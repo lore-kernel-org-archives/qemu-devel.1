@@ -2,80 +2,77 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0C6C432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 03:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F935C432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 03:47:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EAB32064A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 03:28:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EAB32064A
+	by mail.kernel.org (Postfix) with ESMTPS id F215620665
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 03:47:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F215620665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCxyB-0001sq-IF
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 23:27:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45301)
+	id 1iCyGt-0006rf-Vr
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 23:47:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iCxxU-0001T1-7L
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 23:27:17 -0400
+ (envelope-from <jasowang@redhat.com>) id 1iCyG3-000648-Cq
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 23:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iCxxS-00014o-JH
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 23:27:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11021)
+ (envelope-from <jasowang@redhat.com>) id 1iCyG1-0006Zl-Br
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 23:46:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59066)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iCxxS-00014Q-Ax
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 23:27:14 -0400
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iCyG1-0006Z7-2w
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 23:46:25 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3A4E77FDCC
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 03:27:13 +0000 (UTC)
-Received: by mail-pl1-f197.google.com with SMTP id p15so2490289plq.4
- for <qemu-devel@nongnu.org>; Tue, 24 Sep 2019 20:27:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=zWpJ9kPj8TgfaMZLT9oNpV8QAnwBGi4IfaApWvqShoQ=;
- b=pwYXCRave/L4upwvY58M52a4/2R+8hzO+BhGfakNhbnduJryrRs6VwoSjXeHwJoKUV
- boNI22Zxv0Zp4PutLa8WKLFlD42QXq4sxhhlfTI9+JXTdDMINwdEIbjCxjjgR0c4pjlL
- k8d2xO5w25PkzYNGolQ45QdxzI6FfpSVu4vBhiMoCAg2IXxnqHQ+Z/RHM7vMtGjBLeAR
- rx771gJbH5iFla3IPDvGxOy3lyaqtn16m5oX9uRQvbwbnOHOY9fu4NwI9w6BVU92PWYg
- uERhUhXHZjLuoee3WxhiSDDlD+LsrYwfc4q3kE+15ydPjmPb9Q16S7MnQkPnzM7CG86e
- YPaw==
-X-Gm-Message-State: APjAAAXDXzEcibSm6dY2IAQM1ob24LGtA5eWNPaDX5cMQOuZZf6Hjran
- WiXmJIw8NS9814n/YtHtJUmRamecBPrfNRJhUH5zmedEwLNalcFbgUWvpPRazt+Px5kkcceQQ1V
- +gE3WGnR+CmGx2po=
-X-Received: by 2002:a62:1d82:: with SMTP id d124mr7255019pfd.135.1569382032784; 
- Tue, 24 Sep 2019 20:27:12 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx6Y8Y9mSAcck49VLIPBcIlxLFdz9NqNqtpxrzAeWFlV1KAUajsIu+lQLGMmbOdItUjcHmzdw==
-X-Received: by 2002:a62:1d82:: with SMTP id d124mr7254993pfd.135.1569382032353; 
- Tue, 24 Sep 2019 20:27:12 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id cx22sm1178522pjb.19.2019.09.24.20.27.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Sep 2019 20:27:11 -0700 (PDT)
-Date: Wed, 25 Sep 2019 11:27:00 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v7 4/4] s390: do not call
- memory_region_allocate_system_memory() multiple times
-Message-ID: <20190925032700.GI28074@xz-x1>
-References: <20190924144751.24149-1-imammedo@redhat.com>
- <20190924144751.24149-5-imammedo@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 586B918CB8EC;
+ Wed, 25 Sep 2019 03:46:23 +0000 (UTC)
+Received: from [10.72.12.148] (ovpn-12-148.pek2.redhat.com [10.72.12.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0CCBD19C58;
+ Wed, 25 Sep 2019 03:46:15 +0000 (UTC)
+Subject: Re: [Qemu-devel] vhost, iova, and dirty page tracking
+To: "Tian, Kevin" <kevin.tian@intel.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, "Zhao, Yan Y" <yan.y.zhao@intel.com>
+References: <AADFC41AFE54684AB9EE6CBC0274A5D19D577BEA@SHSMSX104.ccr.corp.intel.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57A080@SHSMSX104.ccr.corp.intel.com>
+ <8302a4ae-1914-3046-b3b5-b3234d7dda02@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B1D1@SHSMSX104.ccr.corp.intel.com>
+ <6d73572e-1e89-b04a-bdd6-98ac73798083@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57B90C@SHSMSX104.ccr.corp.intel.com>
+ <204219fa-ee72-ca60-52a4-fb4bbc887773@redhat.com>
+ <20190919052819.GA18391@joy-OptiPlex-7040>
+ <7b6d6343-33de-ebd7-9846-af54a45a82a2@redhat.com>
+ <20190919061756.GB18391@joy-OptiPlex-7040>
+ <e0efbdc0-aad9-0d17-ec68-36460865501f@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D57DD2A@SHSMSX104.ccr.corp.intel.com>
+ <1ec55b2e-6a59-f1df-0604-5b524da0f001@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D587E3C@SHSMSX104.ccr.corp.intel.com>
+ <51578ae6-cc36-3b1a-9184-70a847e58712@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D58C8B9@SHSMSX104.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <80c81bb7-9532-3237-99d5-e184efc27617@redhat.com>
+Date: Wed, 25 Sep 2019 11:46:13 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190924144751.24149-5-imammedo@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D58C8B9@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Wed, 25 Sep 2019 03:46:23 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -90,52 +87,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- pbonzini@redhat.com
+Cc: Adalbert Lazar <alazar@bitdefender.com>,
+ 'Alex Williamson' <alex.williamson@redhat.com>,
+ "tamas@tklengyel.com" <tamas@tklengyel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 24, 2019 at 10:47:51AM -0400, Igor Mammedov wrote:
-> s390 was trying to solve limited KVM memslot size issue by abusing
-> memory_region_allocate_system_memory(), which breaks API contract
-> where the function might be called only once.
-> 
-> Beside an invalid use of API, the approach also introduced migration
-> issue, since RAM chunks for each KVM_SLOT_MAX_BYTES are transferred in
-> migration stream as separate RAMBlocks.
-> 
-> After discussion [1], it was agreed to break migration from older
-> QEMU for guest with RAM >8Tb (as it was relatively new (since 2.12)
-> and considered to be not actually used downstream).
-> Migration should keep working for guests with less than 8TB and for
-> more than 8TB with QEMU 4.2 and newer binary.
-> In case user tries to migrate more than 8TB guest, between incompatible
-> QEMU versions, migration should fail gracefully due to non-exiting
-> RAMBlock ID or RAMBlock size mismatch.
-> 
-> Taking in account above and that now KVM code is able to split too
-> big MemorySection into several memslots, partially revert commit
->  (bb223055b s390-ccw-virtio: allow for systems larger that 7.999TB)
-> and use kvm_set_max_memslot_size() to set KVMSlot size to
-> KVM_SLOT_MAX_BYTES.
-> 
-> 1) [PATCH RFC v2 4/4] s390: do not call  memory_region_allocate_system_memory() multiple times
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Acked-by: Peter Xu <peterx@redhat.com>
+On 2019/9/24 =E4=B8=8A=E5=8D=8810:02, Tian, Kevin wrote:
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Friday, September 20, 2019 9:19 AM
+>>
+>> On 2019/9/20 =E4=B8=8A=E5=8D=886:54, Tian, Kevin wrote:
+>>>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>>>> Sent: Thursday, September 19, 2019 7:14 PM
+>>>>
+>>>> On 19/09/19 09:16, Tian, Kevin wrote:
+>>>>>>> why GPA1 and GPA2 should be both dirty?
+>>>>>>> even they have the same HVA due to overlaping virtual address
+>> space
+>>>> in
+>>>>>>> two processes, they still correspond to two physical pages.
+>>>>>>> don't get what's your meaning :)
+>>>>>> The point is not leave any corner case that is hard to debug or fi=
+x in
+>>>>>> the future.
+>>>>>>
+>>>>>> Let's just start by a single process, the API allows userspace to =
+maps
+>>>>>> HVA to both GPA1 and GPA2. Since it knows GPA1 and GPA2 are
+>>>> equivalent,
+>>>>>> it's ok to sync just through GPA1. That means if you only log GPA2=
+, it
+>>>>>> won't work.
+>>>>> I noted KVM itself doesn't consider such situation (one HVA is mapp=
+ed
+>>>>> to multiple GPAs), when doing its dirty page tracking. If you look =
+at
+>>>>> kvm_vcpu_mark_page_dirty, it simply finds the unique memslot which
+>>>>> contains the dirty gfn and then set the dirty bit within that slot.=
+ It
+>>>>> doesn't attempt to walk all memslots to find out any other GPA whic=
+h
+>>>>> may be mapped to the same HVA.
+>>>>>
+>>>>> So there must be some disconnect here. let's hear from Paolo first =
+and
+>>>>> understand the rationale behind such situation.
+>>>> In general, userspace cannot assume that it's okay to sync just thro=
+ugh
+>>>> GPA1.  It must sync the host page if *either* GPA1 or GPA2 are marke=
+d
+>>>> dirty.
+>>> Agree. In this case the kernel only needs to track whether GPA1 or
+>>> GPA2 is dirtied by guest operations.
+>>
+>> Not necessarily guest operations.
+>>
+>>
+>>>    The reason why vhost has to
+>>> set both GPA1 and GPA2 is due to its own design - it maintains
+>>> IOVA->HVA and GPA->HVA mappings thus given a IOVA you have
+>>> to reverse lookup GPA->HVA memTable which gives multiple possible
+>>> GPAs.
+>>
+>> So if userspace need to track both GPA1 and GPA2, vhost can just stop
+>> when it found a one HVA->GPA mapping there.
+>>
+>>
+>>>    But in concept if vhost can maintain a IOVA->GPA mapping,
+>>> then it is straightforward to set the right GPA every time when a IOV=
+A
+>>> is tracked.
+>>
+>> That means, the translation is done twice by software, IOVA->GPA and
+>> GPA->HVA for each packet.
+>>
+>> Thanks
+>>
+> yes, it's not necessary if we care about only the content of the dirty =
+GPA,
+> as seen in live migration. In that case, just setting the first GPA in =
+the loop
+> is sufficient as you pointed out. However there is one corner case whic=
+h I'm
+> not sure. What about an usage (e.g. VM introspection) which cares only
+> about the guest access pattern i.e. which GPA is dirtied instead of pok=
+ing
+> its content? Neither setting the first GPA nor setting all the aliasing=
+ GPAs
+> can provide the accurate info, if no explicit IOVA->GPA mapping is main=
+tained
+> inside vhost. But I cannot tell whether maintaining such accuracy for a=
+liasing
+> GPAs is really necessary. +VM introspection guys if they have some opin=
+ions.
 
-IMHO it would be good to at least mention bb223055b9 in the commit
-message even if not with a "Fixed:" tag.  May be amended during commit
-if anyone prefers.
 
-Also, this only applies the split limitation to s390.  Would that be a
-good thing to some other archs as well?
+Interesting, for vhost, vIOMMU can pass IOVA->GPA actually and vhost can=20
+keep it and just do the translation from GPA->HVA in the map command. So=20
+it can have both IOVA->GPA and IOVA->HVA mapping.
 
-Thanks,
+Thanks
 
--- 
-Peter Xu
+
+>
+> Thanks
+> Kevin
+>
 
