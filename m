@@ -7,114 +7,114 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5922C432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2114EC432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:49:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9034821D7A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:48:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB72F21D7A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:49:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pDLJGhp7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9034821D7A
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="t/Ig+RKZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB72F21D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD5mY-0001qc-MR
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 07:48:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49060)
+	id 1iD5nY-0002rH-Oe
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 07:49:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iD5kH-0000EH-TV
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:46:10 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iD5kk-0000UF-Oe
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iD5kG-0003AJ-Vc
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:46:09 -0400
-Received: from mail-eopbgr70091.outbound.protection.outlook.com
- ([40.107.7.91]:27842 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iD5kj-0003XE-Nd
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:46:38 -0400
+Received: from mail-eopbgr40096.outbound.protection.outlook.com
+ ([40.107.4.96]:36228 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iD5kG-00038Q-No; Wed, 25 Sep 2019 07:46:08 -0400
+ id 1iD5ki-0003V2-CX; Wed, 25 Sep 2019 07:46:37 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h8/ZIurAYcg/IBkjXWuYgKy81YeWSQKDK7zhL8Hr3S+9wgIyT7JBaA8SUx9/DpuR9vkvLAeFQq6G/F6sxdTjDpVjV8YPM/Ft5LDmbeWzE90TudEuUy1oua+lV1lyHc7oRNlFI3OIWu/jJFgQCMq07JZseW1/y16WcwGp36TEo4uKRJH044PzmmW+xAr+0W/XCjRC/bPTCZDqjxZ/lKY//8sBGX/6/jklhdfE4hLOTM21gdiein0l6DLArthjBezd/sIIHj6k/EwhzvzOQXOfPphHfr+Zu3yOZ/UknOH/hKlYSAi0H1EdLtgvpp2WnI9xmAV+wgu1W4akwiYvnLuiaQ==
+ b=DXV1/vKqFZ8rPSIRfzszkSdVU53GDl/93fOxXKlD9HU0xMObF7cvZYOniC+cU0pC1u4dqgTBq3ZEItLzjEUaEUovca17LYol/LAjlJgT0cOVsVOWzhcrLbsDo9lQJZtBKkEj4ITd5tmVqE5U/De2BawnmExPbCJUK9BdwgEYyC2V3P0MXQlS2jskBmUVtMyLZYVehcAuiRkrLBUtymWOng0RYxNrgT3Vx74+/ztCkS6oV/ThYSJoObRZffaHsr6vp1vMOkAej898n6RAjjd2P/7wRfduU6uNJKbwIGw7SfIcR3V81mbVi2rl6MFKUL8YfdUDI4vtpm2m/Igxu+h24Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6GEnkFY0buPlTJr5N6x0vdpqDo6VhPkMrveqOx9UP8s=;
- b=lKE8hUW5JIIzP8nym4PZdF/Jt8CJaRsuRbmduuBodrOqMVjH1Fh/9bA5C/bcU6aJiELg2s9tQxJ82XA2Sxm0jiUd3n0CnjpTjdUbp3MSmQMCIYbJJPcmP9h/TeQS8dh0uVxYy6xNcih+L/U+WvwUc20j3JyPYEm0U3/v0ytrlTdhCBzAulstJlU2uNU85nFe3yyuGs1XJl6c8bEVAl4+OPAztfJweshV0CuHfzbuRx3FM4br8R+OSy2pcMzPF8IaA3AHpOgnolTmlPFmXornikMS2gWAlCXShWRCrSnNnix5zCLCjwkIO+hwoj42JBy4wcKw5V9lrojg3huZTW80Dg==
+ bh=daWoY9rybQBphIIqDOXo3sLWHmqfsZ0FBhJfNv6jB8c=;
+ b=F3C+2VA3fweCu20RdoXOWSXVLZJLENTNcFRuZnow4MFwimtgS4bgOmkfMSxa0ESiqU9pYHVcUs2DOI1xIPOOKwSANplByDIMZGmYNqdTWU474ZM1wDo4tmGBawdviVQXgqK1B7KSC4NSSKgZ3jrRUa8akVvwkcgU2w60tOF3kLOs0+RELxs1o4ntVmCa6U1QbvSjRo21fFqTeI/HLEu3XTKP+CtFRsh2+DVDdjunBCq/6j3XSdp8uNCH3MA1oZBNckxZ9j6AhAWOfknAwCp7xYnvZ7G2tLb2wHBuEY3ZXvuCaBm4ITlJguJIg8Z05IGiOPNv02UE2AE+jMHouuLJkg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6GEnkFY0buPlTJr5N6x0vdpqDo6VhPkMrveqOx9UP8s=;
- b=pDLJGhp7Fjt67zrvyfiY0mwSREvX2dJTVi/sWJ9WPXk1DeYADZhxDydWEl+Ow6I3Zpq/dVxfNxzF7v02Q3wVrSdMhbUM3aWlpx8jYbiekZpq9UAtKfCwXgccZqLWaNIlBoCSOVlZftgtHTSFDnwoipzgUGjb5dSV1Sd4/wp511k=
+ bh=daWoY9rybQBphIIqDOXo3sLWHmqfsZ0FBhJfNv6jB8c=;
+ b=t/Ig+RKZsq9xPjOkWNaFn3F2RF4rVufhOppH76MCqL+rww13czcvXFESQjj8eV6ncCcGaxeb4EVgY3Cww0ZSJFa21cKEnOCseijWaZJXeJVddBjCiGLIEzItvrO7XPPrb+fPNMQocNdzy+oChKhkf+yDiJLdxMOoJ4AmyQt9WM0=
 Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5242.eurprd08.prod.outlook.com (10.255.18.29) with Microsoft SMTP
+ DB8PR08MB5066.eurprd08.prod.outlook.com (10.255.17.24) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.26; Wed, 25 Sep 2019 11:46:06 +0000
+ 15.20.2284.26; Wed, 25 Sep 2019 11:46:31 +0000
 Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
  ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
  ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Wed, 25 Sep 2019
- 11:46:06 +0000
+ 11:46:31 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
  <qemu-block@nongnu.org>
-Subject: Re: [PATCH 02/22] blockdev: Allow resizing everywhere
-Thread-Topic: [PATCH 02/22] blockdev: Allow resizing everywhere
-Thread-Index: AQHVb8lIJ+XCK0hnnkSP304nb4f4rac8TgwA
-Date: Wed, 25 Sep 2019 11:46:06 +0000
-Message-ID: <fe97b4b1-1099-6b0d-45ee-b85a3aad959d@virtuozzo.com>
+Subject: Re: [PATCH 03/22] block: Drop bdrv_is_first_non_filter()
+Thread-Topic: [PATCH 03/22] block: Drop bdrv_is_first_non_filter()
+Thread-Index: AQHVb8i/rbhDvx+Buk+rHjts4NsxVqc8TiuA
+Date: Wed, 25 Sep 2019 11:46:31 +0000
+Message-ID: <2000d71e-8a08-48be-1909-a44ff4ad630c@virtuozzo.com>
 References: <20190920152804.12875-1-mreitz@redhat.com>
- <20190920152804.12875-3-mreitz@redhat.com>
-In-Reply-To: <20190920152804.12875-3-mreitz@redhat.com>
+ <20190920152804.12875-4-mreitz@redhat.com>
+In-Reply-To: <20190920152804.12875-4-mreitz@redhat.com>
 Accept-Language: ru-RU, en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0240.eurprd05.prod.outlook.com
- (2603:10a6:3:fb::16) To DB8PR08MB5498.eurprd08.prod.outlook.com
+x-clientproxiedby: HE1PR1001CA0006.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:3:f7::16) To DB8PR08MB5498.eurprd08.prod.outlook.com
  (2603:10a6:10:11c::24)
 authentication-results: spf=none (sender IP is )
  smtp.mailfrom=vsementsov@virtuozzo.com; 
 x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190925144604336
+x-tagtoolbar-keys: D20190925144629082
 x-originating-ip: [185.231.240.5]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f9ddd869-d91f-46cf-7ff3-08d741adf348
+x-ms-office365-filtering-correlation-id: 8c36e2d4-64f9-4f1b-7673-08d741ae020b
 x-microsoft-antispam: BCL:0; PCL:0;
  RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5242; 
-x-ms-traffictypediagnostic: DB8PR08MB5242:
-x-microsoft-antispam-prvs: <DB8PR08MB52428D1A90BC21527A999E63C1870@DB8PR08MB5242.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2582;
+ SRVR:DB8PR08MB5066; 
+x-ms-traffictypediagnostic: DB8PR08MB5066:
+x-microsoft-antispam-prvs: <DB8PR08MB50663C65E9BBA68174C01AABC1870@DB8PR08MB5066.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:353;
 x-forefront-prvs: 01713B2841
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(39850400004)(366004)(346002)(136003)(376002)(189003)(199004)(229853002)(558084003)(256004)(54906003)(110136005)(25786009)(31686004)(486006)(2616005)(446003)(11346002)(476003)(86362001)(5660300002)(99286004)(6116002)(76176011)(52116002)(3846002)(36756003)(316002)(386003)(6506007)(102836004)(478600001)(66446008)(2906002)(14454004)(64756008)(66556008)(66476007)(66946007)(71200400001)(26005)(31696002)(8936002)(8676002)(2501003)(186003)(6436002)(6246003)(81156014)(81166006)(66066001)(6486002)(4326008)(7736002)(6512007)(71190400001)(305945005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5242;
+ SFS:(10019020)(979002)(396003)(136003)(39850400004)(346002)(376002)(366004)(189003)(199004)(7736002)(6512007)(14454004)(71200400001)(66066001)(2501003)(66446008)(25786009)(186003)(6246003)(305945005)(99286004)(446003)(3846002)(6116002)(66556008)(26005)(11346002)(478600001)(71190400001)(36756003)(8936002)(66476007)(64756008)(558084003)(81166006)(81156014)(256004)(31686004)(6436002)(66946007)(31696002)(2906002)(6486002)(5660300002)(476003)(54906003)(86362001)(102836004)(52116002)(2616005)(4326008)(229853002)(486006)(76176011)(8676002)(6506007)(386003)(316002)(110136005)(969003)(989001)(999001)(1009001)(1019001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5066;
  H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; MX:1; A:1; 
 received-spf: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 21R+uJjrmqxGVkXX5Wq2QmDAG5XKdfUFwNxWgvW92/8KZUxFov1xVDGxbXqC9MdCeWbUlIYhNaZ2DM/RrLZKJQzZmHvxfRyWVBCyY9tKDpQXmEDddLm7RAhLQ+NiXsvHBdzHjSmWBKd+9VA8gp9hbWIVDzmvGTF2+eQ9JgwBxDXUzcTAYVnVv/gnprSzPwV1ZxYiNqQdhc39rXnXJPL5kYEFkI6ALq7SsQf/5XR9Te5s6XGYz3CQ1LFnMzvfqJTHR8oSBW3A556uCZ1715AApq85qX2Pd9QOSslu3X1YZoJj9KtsSd/pErsanS1od66SZFybm/m6iWGWZgdLGKK7R5Zh3nVZh3JXWoeq4t0gHlfhLW/ZOscrxpqWFskEAlpXeY1wcGyRa3cS5t6VQKRCL/zso2Imr50uw1x8xlyIFaI=
+x-microsoft-antispam-message-info: MkcRDvNG3lrUVDTfYCo/u9heZzuI2jbIldKbXygm8WwynvHEzCnOrxWwWBRcXiRoxy5UKUYTjbB8NuVuhdb0DJrqHRf3w7XRoia9tHmggRu2FCw5jW4txMrHKI21jycU/rgs6kVMQtafiJwxyRHV7RtL+uCB/2GrM/sX5SDVxZ1TTq/h5yv03klUKycjJw2Qx1I3pBC73qtW5LDZq2aFUyJPPbehuUnqhhuag3RthlBaEevlPiYsGEnL7GHpyAffe655dfW/Mz6vO2jGFFnLjegOd6LctDWJlZOFUeu/kM8B+gV1QPqFI2f/JKf459Oh/cCAN5f+TSmaPzoBrhWjUqLQPmsdmU57k0ar9gfhUej60P4mgRVl90rIJPEQ7ajHM/PLyGE27g228OSGAN+9FWJX8uH3iF9qix8DGVzM6HY=
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <9D116B26FF832449A484B79117F39B7E@eurprd08.prod.outlook.com>
+Content-ID: <50F4D0812133394DA9E5DCE1259E9497@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9ddd869-d91f-46cf-7ff3-08d741adf348
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2019 11:46:06.4668 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c36e2d4-64f9-4f1b-7673-08d741ae020b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2019 11:46:31.3227 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: q18mgYaabdsXpJNYMkMXaPhUnVHXxKXtmi2NscIArf+C+GFUnQwI+Xu2Fv694gm3OQAiXyH2DLOpLk9xNPsr3jN0rb1VOPlzMSUA3QGpwlw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5242
+X-MS-Exchange-CrossTenant-userprincipalname: Q6ppuiy3X0UeB8FVB8m1J4/oI01g/dfaJSxvWbVtpiNnxNF/KhThyUF98VEyDAOfqeMpKVEAYzfvEYHimhyG27a8Pjpwwe9trF0NjZeD0L4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5066
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.91
+X-Received-From: 40.107.4.96
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,11 +132,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjAuMDkuMjAxOSAxODoyNywgTWF4IFJlaXR6IHdyb3RlOg0KPiBCbG9jayBub2RlcyB0aGF0IGRv
-IG5vdCBhbGxvdyByZXNpemluZyBzaG91bGQgbm90IHNoYXJlIEJMS19QRVJNX1JFU0laRS4NCj4g
-SXQgZG9lcyBub3QgbWF0dGVyIHdoZXRoZXIgdGhleSBhcmUgdGhlIGZpcnN0IG5vbi1maWx0ZXIg
-aW4gdGhlaXIgY2hhaW4NCj4gb3Igbm90Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogTWF4IFJlaXR6
-IDxtcmVpdHpAcmVkaGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1P
-Z2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KDQotLSANCkJlc3QgcmVnYXJk
-cywNClZsYWRpbWlyDQo=
+MjAuMDkuMjAxOSAxODoyNywgTWF4IFJlaXR6IHdyb3RlOg0KPiBJdCBpcyB1bnVzZWQgbm93LiAg
+KEFuZCBpdCB3YXMgdWdseSBiZWNhdXNlIGl0IG5lZWRlZCB0byBleHBsb3JlIGFsbCBCRFMNCj4g
+Y2hhaW5zIGZyb20gdGhlIHRvcC4pDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBNYXggUmVpdHo8bXJl
+aXR6QHJlZGhhdC5jb20+DQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
+a2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxh
+ZGltaXINCg==
 
