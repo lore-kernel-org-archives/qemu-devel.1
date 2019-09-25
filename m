@@ -2,64 +2,67 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE897C432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 06:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E64AC432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 06:42:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB74E21D7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 06:18:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB74E21D7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E61E021D7B
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 06:42:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E61E021D7B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD0dJ-0000E7-WB
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 02:18:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34617)
+	id 1iD10E-0006yc-Uv
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 02:42:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37371)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iD0c3-0007sm-Jb
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:17:20 -0400
+ (envelope-from <armbru@redhat.com>) id 1iD0yy-00065V-Mf
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iD0c2-0007Et-3Z
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:17:19 -0400
-Received: from 3.mo4.mail-out.ovh.net ([46.105.57.129]:58812)
+ (envelope-from <armbru@redhat.com>) id 1iD0yw-0000yu-3c
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:40:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48486)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iD0bw-00077n-FN
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:17:16 -0400
-Received: from player759.ha.ovh.net (unknown [10.108.42.119])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 54D24208691
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:17:03 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player759.ha.ovh.net (Postfix) with ESMTPSA id 14761A3A23BC;
- Wed, 25 Sep 2019 06:16:55 +0000 (UTC)
-Date: Wed, 25 Sep 2019 08:16:54 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Subject: Re: [PATCH v14 4/7] target/ppc: Build rtas error log upon an MCE
-Message-ID: <20190925081654.2d970842@bahia.lan>
-In-Reply-To: <3282d800-46d5-d270-542c-bcf8bd937944@linux.vnet.ibm.com>
-References: <156879398718.18368.17640174821710157715.stgit@aravinda>
- <156879435456.18368.1144480383769624512.stgit@aravinda>
- <20190925013052.GG17405@umbus>
- <3282d800-46d5-d270-542c-bcf8bd937944@linux.vnet.ibm.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iD0yv-0000yP-UX
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 02:40:58 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7D36410CBC4B;
+ Wed, 25 Sep 2019 06:40:56 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AB71E60C5D;
+ Wed, 25 Sep 2019 06:40:53 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 33549113864E; Wed, 25 Sep 2019 08:40:52 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 03/25] qapi: New QAPISourceInfo, replacing dict
+References: <20190924132830.15835-1-armbru@redhat.com>
+ <20190924132830.15835-4-armbru@redhat.com>
+ <d23eb583-4cc2-7d1b-80cc-b79bdc7282c5@redhat.com>
+Date: Wed, 25 Sep 2019 08:40:52 +0200
+In-Reply-To: <d23eb583-4cc2-7d1b-80cc-b79bdc7282c5@redhat.com> (Eric Blake's
+ message of "Tue, 24 Sep 2019 14:12:27 -0500")
+Message-ID: <87pnjoev4b.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 459085690125851028
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedugddutdekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Wed, 25 Sep 2019 06:40:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.57.129
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,81 +74,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, paulus@ozlabs.org,
- qemu-ppc@nongnu.org, ganeshgr@linux.ibm.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 25 Sep 2019 11:31:30 +0530
-Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+Eric Blake <eblake@redhat.com> writes:
 
-> 
-> 
-> On Wednesday 25 September 2019 07:00 AM, David Gibson wrote:
-> > On Wed, Sep 18, 2019 at 01:42:34PM +0530, Aravinda Prasad wrote:
-> >> Upon a machine check exception (MCE) in a guest address space,
-> >> KVM causes a guest exit to enable QEMU to build and pass the
-> >> error to the guest in the PAPR defined rtas error log format.
-> >>
-> >> This patch builds the rtas error log, copies it to the rtas_addr
-> >> and then invokes the guest registered machine check handler. The
-> >> handler in the guest takes suitable action(s) depending on the type
-> >> and criticality of the error. For example, if an error is
-> >> unrecoverable memory corruption in an application inside the
-> >> guest, then the guest kernel sends a SIGBUS to the application.
-> >> For recoverable errors, the guest performs recovery actions and
-> >> logs the error.
-> >>
-> >> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> On 9/24/19 8:28 AM, Markus Armbruster wrote:
+>> We track source locations with a dict of the form
+>> 
+>>     {'file': FNAME, 'line': LINENO, parent': PARENT}
+>> 
+>> where PARENT is None for the main file, and the include directive's
+>> source location for included files.
+>> 
+>> This is servicable enough, but the next commit will add information,
+>> and that's going to come out cleaner if we turn this into a class.  So
+>> do that.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>
+>>  class QAPIError(Exception):
+>> -    def __init__(self, fname, line, col, incl_info, msg):
+>> +    def __init__(self, info, col, msg):
+>>          Exception.__init__(self)
+>
+> Unrelated to this patch, but I just noticed
+> https://docs.quantifiedcode.com/python-anti-patterns/ today (in part
+> based on my question on another patch about using 'list.get(key, False)'
+> rather than 'key in list and list[key]').  In particular, I found
+> https://docs.quantifiedcode.com/python-anti-patterns/correctness/missing_argument_to_super.html
+> which recommends using:
+>
+> def __init__(...):
+>     super(QAPIError, self).__init__()
+>
+> (because of Python 2), while other sits state that with python 3, you
+> can further get away with:
+>
+> def __init__(...):
+>     super().__init(...)
+>
+> Should we be switching our code base to use super() in more places,
+> rather than hard-coding the parent class name?
 
-[...]
-
-> >> +
-> >> +static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
-> >> +{
-> >> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> >> +    CPUState *cs = CPU(cpu);
-> >> +    uint64_t rtas_addr;
-> >> +    CPUPPCState *env = &cpu->env;
-> >> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-> >> +    target_ulong msr = 0;
-> >> +    struct rtas_error_log log;
-> >> +    struct mc_extended_log *ext_elog;
-> >> +    uint32_t summary;
-> >> +
-> >> +    /*
-> >> +     * Properly set bits in MSR before we invoke the handler.
-> >> +     * SRR0/1, DAR and DSISR are properly set by KVM
-> >> +     */
-> >> +    if (!(*pcc->interrupts_big_endian)(cpu)) {
-> >> +        msr |= (1ULL << MSR_LE);
-> >> +    }
-> >> +
-> >> +    if (env->msr & (1ULL << MSR_SF)) {
-> >> +        msr |= (1ULL << MSR_SF);
-> >> +    }
-> >> +
-> >> +    msr |= (1ULL << MSR_ME);
-> >> +
-> >> +    ext_elog = g_malloc0(sizeof(*ext_elog));
-> > 
-> > g_new0() is preferred for this sort of thing.
-> 
-> I feel g_malloc0() is used to allocate extended logs in other places in
-> this file, so I think g_malloc0() should be fine. Please let me know.
-> 
-
-CODING_STYLE indeed promotes the use of g_new0() but it accepts
-the g_malloc(sizeof(*foo)) syntax:
-
-Declarations like
-
-.. code-block:: c
-
-    T *v = g_malloc(sizeof(*v))
-
-are acceptable, though.
-
+I intend to switch to super() in a future 'bye Python 2' series.
 
