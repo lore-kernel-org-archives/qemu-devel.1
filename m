@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B1DC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 081F6C4360C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:07:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7DF220640
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:07:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7DF220640
+	by mail.kernel.org (Postfix) with ESMTPS id C454A20640
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:07:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C454A20640
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD70v-0004RJ-MQ
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:07:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58021)
+	id 1iD717-0004e3-W6
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:07:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57913)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gr-0001UN-SK
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:43 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gh-0001K3-OR
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gp-0002M6-3g
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:41 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56140 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gd-0002Gr-PY
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:31 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56123 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iD6go-0002Gi-K5
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:38 -0400
+ id 1iD6gd-0002FF-1o
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:27 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 3B5F31A1FFF;
+ by mail.rt-rk.com (Postfix) with ESMTP id 018DA1A23A5;
  Wed, 25 Sep 2019 14:46:22 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id EF9131A23A9;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id BA9281A23B2;
  Wed, 25 Sep 2019 14:46:21 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 16/20] target/mips: msa: Split helpers for
- CLT_<S|U>.<B|H|W|D>
-Date: Wed, 25 Sep 2019 14:46:08 +0200
-Message-Id: <1569415572-19635-17-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v2 11/20] target/mips: msa: Split helpers for
+ B<CLR|NEG|SEL>.<B|H|W|D>
+Date: Wed, 25 Sep 2019 14:46:03 +0200
+Message-Id: <1569415572-19635-12-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -74,278 +74,387 @@ Achieves clearer code and slightly better performance.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/helper.h     |  12 +++-
- target/mips/msa_helper.c | 150 ++++++++++++++++++++++++++++++++++++++++++-----
- target/mips/translate.c  |  38 ++++++++++--
- 3 files changed, 178 insertions(+), 22 deletions(-)
+ target/mips/helper.h     |  18 +++-
+ target/mips/msa_helper.c | 227 ++++++++++++++++++++++++++++++++++++++++++-----
+ target/mips/translate.c  |  57 ++++++++++--
+ 3 files changed, 267 insertions(+), 35 deletions(-)
 
 diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 32ff24b..29dfcf0 100644
+index 27544a1..1411e0e 100644
 --- a/target/mips/helper.h
 +++ b/target/mips/helper.h
-@@ -857,6 +857,16 @@ DEF_HELPER_4(msa_cle_u_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_cle_u_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_cle_u_d, void, env, i32, i32, i32)
+@@ -807,6 +807,21 @@ DEF_HELPER_4(msa_bmnz_v, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_bmz_v, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_bsel_v, void, env, i32, i32, i32)
  
-+DEF_HELPER_4(msa_clt_s_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_clt_s_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_clt_s_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_clt_s_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bclr_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bclr_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bclr_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bclr_d, void, env, i32, i32, i32)
 +
-+DEF_HELPER_4(msa_clt_u_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_clt_u_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_clt_u_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_clt_u_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bneg_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bneg_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bneg_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bneg_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_bset_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bset_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bset_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_bset_d, void, env, i32, i32, i32)
 +
  
  DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
  DEF_HELPER_4(msa_ori_b, void, env, i32, i32, i32)
-@@ -906,8 +916,6 @@ DEF_HELPER_5(msa_min_s_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_min_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_max_a_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_min_a_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_clt_s_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_clt_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_add_a_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_adds_a_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_adds_s_df, void, env, i32, i32, i32, i32)
+@@ -846,9 +861,6 @@ DEF_HELPER_5(msa_srlri_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_sll_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_sra_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_srl_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_bclr_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_bset_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_bneg_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_binsl_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_binsr_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_addv_df, void, env, i32, i32, i32, i32)
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index c4bff76..4cf1a57 100644
+index eda675a..9e4f275 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -1340,6 +1340,142 @@ void helper_msa_cle_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt
-     pwd->d[1]  = msa_cle_u_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
- }
+@@ -523,7 +523,210 @@ void helper_msa_bsel_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
+  * +---------------+----------------------------------------------------------+
+  */
  
-+static inline int64_t msa_clt_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+-/* TODO: insert Bit Set group helpers here */
++static inline int64_t msa_bclr_df(uint32_t df, int64_t arg1, int64_t arg2)
 +{
-+    return arg1 < arg2 ? -1 : 0;
++    int32_t b_arg2 = BIT_POSITION(arg2, df);
++    return UNSIGNED(arg1 & (~(1LL << b_arg2)), df);
 +}
 +
-+void helper_msa_clt_s_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[0]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[1]);
-+    pwd->b[2]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[2]);
-+    pwd->b[3]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[3]);
-+    pwd->b[4]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[4]);
-+    pwd->b[5]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[5]);
-+    pwd->b[6]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[6]);
-+    pwd->b[7]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[7]);
-+    pwd->b[8]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[8]);
-+    pwd->b[9]  = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[9]);
-+    pwd->b[10] = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[10]);
-+    pwd->b[11] = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[11]);
-+    pwd->b[12] = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[12]);
-+    pwd->b[13] = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[13]);
-+    pwd->b[14] = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[14]);
-+    pwd->b[15] = msa_clt_s_df(DF_BYTE, pws->b[0],  pwt->b[15]);
-+}
-+
-+void helper_msa_clt_s_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++void helper_msa_bclr_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->h[0]  = msa_clt_s_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_clt_s_df(DF_HALF, pws->h[0],  pwt->h[1]);
-+    pwd->h[2]  = msa_clt_s_df(DF_HALF, pws->h[0],  pwt->h[2]);
-+    pwd->h[3]  = msa_clt_s_df(DF_HALF, pws->h[0],  pwt->h[3]);
-+    pwd->h[4]  = msa_clt_s_df(DF_HALF, pws->h[0],  pwt->h[4]);
-+    pwd->h[5]  = msa_clt_s_df(DF_HALF, pws->h[0],  pwt->h[5]);
-+    pwd->h[6]  = msa_clt_s_df(DF_HALF, pws->h[0],  pwt->h[6]);
-+    pwd->h[7]  = msa_clt_s_df(DF_HALF, pws->h[0],  pwt->h[7]);
++    pwd->b[0]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[1]);
++    pwd->b[2]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[2]);
++    pwd->b[3]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[3]);
++    pwd->b[4]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[4]);
++    pwd->b[5]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[5]);
++    pwd->b[6]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[6]);
++    pwd->b[7]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[7]);
++    pwd->b[8]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[8]);
++    pwd->b[9]  = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[9]);
++    pwd->b[10] = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[10]);
++    pwd->b[11] = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[11]);
++    pwd->b[12] = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[12]);
++    pwd->b[13] = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[13]);
++    pwd->b[14] = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[14]);
++    pwd->b[15] = msa_bclr_df(DF_BYTE, pws->b[0],  pwt->b[15]);
 +}
 +
-+void helper_msa_clt_s_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++void helper_msa_bclr_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->w[0]  = msa_clt_s_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_clt_s_df(DF_WORD, pws->w[0],  pwt->w[1]);
-+    pwd->w[2]  = msa_clt_s_df(DF_WORD, pws->w[0],  pwt->w[2]);
-+    pwd->w[3]  = msa_clt_s_df(DF_WORD, pws->w[0],  pwt->w[3]);
++    pwd->h[0]  = msa_bclr_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_bclr_df(DF_HALF, pws->h[0],  pwt->h[1]);
++    pwd->h[2]  = msa_bclr_df(DF_HALF, pws->h[0],  pwt->h[2]);
++    pwd->h[3]  = msa_bclr_df(DF_HALF, pws->h[0],  pwt->h[3]);
++    pwd->h[4]  = msa_bclr_df(DF_HALF, pws->h[0],  pwt->h[4]);
++    pwd->h[5]  = msa_bclr_df(DF_HALF, pws->h[0],  pwt->h[5]);
++    pwd->h[6]  = msa_bclr_df(DF_HALF, pws->h[0],  pwt->h[6]);
++    pwd->h[7]  = msa_bclr_df(DF_HALF, pws->h[0],  pwt->h[7]);
 +}
 +
-+void helper_msa_clt_s_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++void helper_msa_bclr_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->d[0]  = msa_clt_s_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_clt_s_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
++    pwd->w[0]  = msa_bclr_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_bclr_df(DF_WORD, pws->w[0],  pwt->w[1]);
++    pwd->w[2]  = msa_bclr_df(DF_WORD, pws->w[0],  pwt->w[2]);
++    pwd->w[3]  = msa_bclr_df(DF_WORD, pws->w[0],  pwt->w[3]);
 +}
 +
-+static inline int64_t msa_clt_u_df(uint32_t df, int64_t arg1, int64_t arg2)
-+{
-+    uint64_t u_arg1 = UNSIGNED(arg1, df);
-+    uint64_t u_arg2 = UNSIGNED(arg2, df);
-+    return u_arg1 < u_arg2 ? -1 : 0;
-+}
-+
-+void helper_msa_clt_u_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++void helper_msa_bclr_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->b[0]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[1]);
-+    pwd->b[2]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[2]);
-+    pwd->b[3]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[3]);
-+    pwd->b[4]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[4]);
-+    pwd->b[5]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[5]);
-+    pwd->b[6]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[6]);
-+    pwd->b[7]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[7]);
-+    pwd->b[8]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[8]);
-+    pwd->b[9]  = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[9]);
-+    pwd->b[10] = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[10]);
-+    pwd->b[11] = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[11]);
-+    pwd->b[12] = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[12]);
-+    pwd->b[13] = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[13]);
-+    pwd->b[14] = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[14]);
-+    pwd->b[15] = msa_clt_u_df(DF_BYTE, pws->b[0],  pwt->b[15]);
++    pwd->d[0]  = msa_bclr_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_bclr_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
 +}
 +
-+void helper_msa_clt_u_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++static inline int64_t msa_bneg_df(uint32_t df, int64_t arg1, int64_t arg2)
++{
++    int32_t b_arg2 = BIT_POSITION(arg2, df);
++    return UNSIGNED(arg1 ^ (1LL << b_arg2), df);
++}
++
++void helper_msa_bneg_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->h[0]  = msa_clt_u_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_clt_u_df(DF_HALF, pws->h[0],  pwt->h[1]);
-+    pwd->h[2]  = msa_clt_u_df(DF_HALF, pws->h[0],  pwt->h[2]);
-+    pwd->h[3]  = msa_clt_u_df(DF_HALF, pws->h[0],  pwt->h[3]);
-+    pwd->h[4]  = msa_clt_u_df(DF_HALF, pws->h[0],  pwt->h[4]);
-+    pwd->h[5]  = msa_clt_u_df(DF_HALF, pws->h[0],  pwt->h[5]);
-+    pwd->h[6]  = msa_clt_u_df(DF_HALF, pws->h[0],  pwt->h[6]);
-+    pwd->h[7]  = msa_clt_u_df(DF_HALF, pws->h[0],  pwt->h[7]);
++    pwd->b[0]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[1]);
++    pwd->b[2]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[2]);
++    pwd->b[3]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[3]);
++    pwd->b[4]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[4]);
++    pwd->b[5]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[5]);
++    pwd->b[6]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[6]);
++    pwd->b[7]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[7]);
++    pwd->b[8]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[8]);
++    pwd->b[9]  = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[9]);
++    pwd->b[10] = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[10]);
++    pwd->b[11] = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[11]);
++    pwd->b[12] = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[12]);
++    pwd->b[13] = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[13]);
++    pwd->b[14] = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[14]);
++    pwd->b[15] = msa_bneg_df(DF_BYTE, pws->b[0],  pwt->b[15]);
 +}
 +
-+void helper_msa_clt_u_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++void helper_msa_bneg_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->w[0]  = msa_clt_u_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_clt_u_df(DF_WORD, pws->w[0],  pwt->w[1]);
-+    pwd->w[2]  = msa_clt_u_df(DF_WORD, pws->w[0],  pwt->w[2]);
-+    pwd->w[3]  = msa_clt_u_df(DF_WORD, pws->w[0],  pwt->w[3]);
++    pwd->h[0]  = msa_bneg_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_bneg_df(DF_HALF, pws->h[0],  pwt->h[1]);
++    pwd->h[2]  = msa_bneg_df(DF_HALF, pws->h[0],  pwt->h[2]);
++    pwd->h[3]  = msa_bneg_df(DF_HALF, pws->h[0],  pwt->h[3]);
++    pwd->h[4]  = msa_bneg_df(DF_HALF, pws->h[0],  pwt->h[4]);
++    pwd->h[5]  = msa_bneg_df(DF_HALF, pws->h[0],  pwt->h[5]);
++    pwd->h[6]  = msa_bneg_df(DF_HALF, pws->h[0],  pwt->h[6]);
++    pwd->h[7]  = msa_bneg_df(DF_HALF, pws->h[0],  pwt->h[7]);
 +}
 +
-+void helper_msa_clt_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++void helper_msa_bneg_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 +{
 +    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
 +    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
 +    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 +
-+    pwd->d[0]  = msa_clt_u_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_clt_u_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
++    pwd->w[0]  = msa_bneg_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_bneg_df(DF_WORD, pws->w[0],  pwt->w[1]);
++    pwd->w[2]  = msa_bneg_df(DF_WORD, pws->w[0],  pwt->w[2]);
++    pwd->w[3]  = msa_bneg_df(DF_WORD, pws->w[0],  pwt->w[3]);
 +}
 +
++void helper_msa_bneg_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_bneg_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_bneg_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
++}
++
++static inline int64_t msa_bset_df(uint32_t df, int64_t arg1,
++        int64_t arg2)
++{
++    int32_t b_arg2 = BIT_POSITION(arg2, df);
++    return UNSIGNED(arg1 | (1LL << b_arg2), df);
++}
++
++void helper_msa_bset_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[1]);
++    pwd->b[2]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[2]);
++    pwd->b[3]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[3]);
++    pwd->b[4]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[4]);
++    pwd->b[5]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[5]);
++    pwd->b[6]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[6]);
++    pwd->b[7]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[7]);
++    pwd->b[8]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[8]);
++    pwd->b[9]  = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[9]);
++    pwd->b[10] = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[10]);
++    pwd->b[11] = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[11]);
++    pwd->b[12] = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[12]);
++    pwd->b[13] = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[13]);
++    pwd->b[14] = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[14]);
++    pwd->b[15] = msa_bset_df(DF_BYTE, pws->b[0],  pwt->b[15]);
++}
++
++void helper_msa_bset_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_bset_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_bset_df(DF_HALF, pws->h[0],  pwt->h[1]);
++    pwd->h[2]  = msa_bset_df(DF_HALF, pws->h[0],  pwt->h[2]);
++    pwd->h[3]  = msa_bset_df(DF_HALF, pws->h[0],  pwt->h[3]);
++    pwd->h[4]  = msa_bset_df(DF_HALF, pws->h[0],  pwt->h[4]);
++    pwd->h[5]  = msa_bset_df(DF_HALF, pws->h[0],  pwt->h[5]);
++    pwd->h[6]  = msa_bset_df(DF_HALF, pws->h[0],  pwt->h[6]);
++    pwd->h[7]  = msa_bset_df(DF_HALF, pws->h[0],  pwt->h[7]);
++}
++
++void helper_msa_bset_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_bset_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_bset_df(DF_WORD, pws->w[0],  pwt->w[1]);
++    pwd->w[2]  = msa_bset_df(DF_WORD, pws->w[0],  pwt->w[2]);
++    pwd->w[3]  = msa_bset_df(DF_WORD, pws->w[0],  pwt->w[3]);
++}
++
++void helper_msa_bset_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_bset_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_bset_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
++}
+ 
  
  /*
-  * Int Divide
-@@ -1747,18 +1883,6 @@ static inline int64_t msa_subv_df(uint32_t df, int64_t arg1, int64_t arg2)
-     return arg1 - arg2;
+@@ -1220,25 +1423,6 @@ static inline int64_t msa_srl_df(uint32_t df, int64_t arg1, int64_t arg2)
+     return u_arg1 >> b_arg2;
  }
  
--static inline int64_t msa_clt_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+-static inline int64_t msa_bclr_df(uint32_t df, int64_t arg1, int64_t arg2)
 -{
--    return arg1 < arg2 ? -1 : 0;
+-    int32_t b_arg2 = BIT_POSITION(arg2, df);
+-    return UNSIGNED(arg1 & (~(1LL << b_arg2)), df);
 -}
 -
--static inline int64_t msa_clt_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+-static inline int64_t msa_bset_df(uint32_t df, int64_t arg1,
+-        int64_t arg2)
 -{
--    uint64_t u_arg1 = UNSIGNED(arg1, df);
--    uint64_t u_arg2 = UNSIGNED(arg2, df);
--    return u_arg1 < u_arg2 ? -1 : 0;
+-    int32_t b_arg2 = BIT_POSITION(arg2, df);
+-    return UNSIGNED(arg1 | (1LL << b_arg2), df);
 -}
 -
- static inline int64_t msa_max_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+-static inline int64_t msa_bneg_df(uint32_t df, int64_t arg1, int64_t arg2)
+-{
+-    int32_t b_arg2 = BIT_POSITION(arg2, df);
+-    return UNSIGNED(arg1 ^ (1LL << b_arg2), df);
+-}
+-
+ static inline int64_t msa_sat_s_df(uint32_t df, int64_t arg, uint32_t m)
  {
-     return arg1 > arg2 ? arg1 : arg2;
-@@ -2356,8 +2480,6 @@ MSA_BINOP_DF(min_s)
- MSA_BINOP_DF(min_u)
- MSA_BINOP_DF(max_a)
- MSA_BINOP_DF(min_a)
--MSA_BINOP_DF(clt_s)
--MSA_BINOP_DF(clt_u)
- MSA_BINOP_DF(add_a)
- MSA_BINOP_DF(adds_a)
- MSA_BINOP_DF(adds_s)
+     return arg < M_MIN_INT(m + 1) ? M_MIN_INT(m + 1) :
+@@ -1734,9 +1918,6 @@ void helper_msa_ ## func ## _df(CPUMIPSState *env, uint32_t df,         \
+ MSA_BINOP_DF(sll)
+ MSA_BINOP_DF(sra)
+ MSA_BINOP_DF(srl)
+-MSA_BINOP_DF(bclr)
+-MSA_BINOP_DF(bset)
+-MSA_BINOP_DF(bneg)
+ MSA_BINOP_DF(addv)
+ MSA_BINOP_DF(subv)
+ MSA_BINOP_DF(max_s)
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 614b9e7..4db87d6 100644
+index 6080c72..1a87f79 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -28578,6 +28578,38 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+@@ -28418,6 +28418,54 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
              break;
          }
          break;
-+    case OPC_CLT_S_df:
++    case OPC_BCLR_df:
 +        switch (df) {
 +        case DF_BYTE:
-+            gen_helper_msa_clt_s_b(cpu_env, twd, tws, twt);
++            gen_helper_msa_bclr_b(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_HALF:
-+            gen_helper_msa_clt_s_h(cpu_env, twd, tws, twt);
++            gen_helper_msa_bclr_h(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_WORD:
-+            gen_helper_msa_clt_s_w(cpu_env, twd, tws, twt);
++            gen_helper_msa_bclr_w(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_DOUBLE:
-+            gen_helper_msa_clt_s_d(cpu_env, twd, tws, twt);
++            gen_helper_msa_bclr_d(cpu_env, twd, tws, twt);
 +            break;
 +        }
 +        break;
-+    case OPC_CLT_U_df:
++    case OPC_BNEG_df:
 +        switch (df) {
 +        case DF_BYTE:
-+            gen_helper_msa_clt_u_b(cpu_env, twd, tws, twt);
++            gen_helper_msa_bneg_b(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_HALF:
-+            gen_helper_msa_clt_u_h(cpu_env, twd, tws, twt);
++            gen_helper_msa_bneg_h(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_WORD:
-+            gen_helper_msa_clt_u_w(cpu_env, twd, tws, twt);
++            gen_helper_msa_bneg_w(cpu_env, twd, tws, twt);
 +            break;
 +        case DF_DOUBLE:
-+            gen_helper_msa_clt_u_d(cpu_env, twd, tws, twt);
++            gen_helper_msa_bneg_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
++    case OPC_BSET_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_bset_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_bset_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_bset_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_bset_d(cpu_env, twd, tws, twt);
 +            break;
 +        }
 +        break;
      case OPC_SLL_df:
          gen_helper_msa_sll_df(cpu_env, tdf, twd, tws, twt);
          break;
-@@ -28626,9 +28658,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_MAX_S_df:
-         gen_helper_msa_max_s_df(cpu_env, tdf, twd, tws, twt);
+@@ -28487,9 +28535,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_SRLR_df:
+         gen_helper_msa_srlr_df(cpu_env, tdf, twd, tws, twt);
          break;
--    case OPC_CLT_S_df:
--        gen_helper_msa_clt_s_df(cpu_env, tdf, twd, tws, twt);
+-    case OPC_BCLR_df:
+-        gen_helper_msa_bclr_df(cpu_env, tdf, twd, tws, twt);
 -        break;
-     case OPC_ADDS_S_df:
-         gen_helper_msa_adds_s_df(cpu_env, tdf, twd, tws, twt);
-         break;
-@@ -28647,9 +28676,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
      case OPC_MAX_U_df:
          gen_helper_msa_max_u_df(cpu_env, tdf, twd, tws, twt);
          break;
--    case OPC_CLT_U_df:
--        gen_helper_msa_clt_u_df(cpu_env, tdf, twd, tws, twt);
+@@ -28505,9 +28550,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_PCKOD_df:
+         gen_helper_msa_pckod_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_BSET_df:
+-        gen_helper_msa_bset_df(cpu_env, tdf, twd, tws, twt);
 -        break;
-     case OPC_ADDS_U_df:
-         gen_helper_msa_adds_u_df(cpu_env, tdf, twd, tws, twt);
+     case OPC_MIN_S_df:
+         gen_helper_msa_min_s_df(cpu_env, tdf, twd, tws, twt);
+         break;
+@@ -28526,9 +28568,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_ILVL_df:
+         gen_helper_msa_ilvl_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_BNEG_df:
+-        gen_helper_msa_bneg_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_MIN_U_df:
+         gen_helper_msa_min_u_df(cpu_env, tdf, twd, tws, twt);
          break;
 -- 
 2.7.4
