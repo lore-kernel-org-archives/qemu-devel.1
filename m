@@ -2,110 +2,82 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BABAFC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7AB3C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:40:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84F8D20673
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:37:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84F8D20673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8418720673
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:40:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dCtfYAMu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8418720673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD6Xe-0004HD-JU
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:37:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56466)
+	id 1iD6bF-0006pH-KC
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:40:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iD6Wy-0003oL-0u
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:36:28 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iD6a2-0005t2-HL
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:39:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iD6Wv-0005fi-Gc
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:36:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46998)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iD6Wv-0005fI-90
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:36:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 854DC309BDBB;
- Wed, 25 Sep 2019 12:36:22 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-109.ams2.redhat.com [10.36.116.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E8C6860A9F;
- Wed, 25 Sep 2019 12:36:15 +0000 (UTC)
-Subject: Re: [PATCH v3 16/33] podman: fix command invocation
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190924210106.27117-1-alex.bennee@linaro.org>
- <20190924210106.27117-17-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <b2aa7538-a15f-0e51-5bf7-2906f509f767@redhat.com>
-Date: Wed, 25 Sep 2019 14:36:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iD6a1-0006rC-6S
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:39:38 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34376)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iD6a0-0006qy-Uo
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:39:37 -0400
+Received: by mail-oi1-x244.google.com with SMTP id 83so4746896oii.1
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 05:39:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Xf5vFOXD7Mv1BXn2YAX9IJHa9Xt+SJ9sCNHzT8AZ1Ps=;
+ b=dCtfYAMuI1zy2cjUfy0dkwHxfOr7av8c3ZaGzCU4DRtX0mV0jBUKVvwXyTmeHU5HJv
+ HdmdaRaecpCXNkf8QdUjFwrYaLvjnq+gExJG4KrTo/xxXuqD4FXNLFuSSx8qe1T5ewkl
+ pxT26rXIDQ1m2bZa0rjApefRPbqCj+tXgHnbTIcJsUo2jqawOtClMe0fOJ8aiEGUDw2s
+ +ZTWnZfbFvJRp4hn4U3VTTkj+eQOFGGgcH10V1oBSjn3ARywPSGdFN+NRZ039vDIl+lf
+ 3IRBi7uV9LdDHFmhQgAXk4JQkPQ70R6exw37A0nxxneOlc2Hsl2nXZoClQYra7H47EER
+ jeug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Xf5vFOXD7Mv1BXn2YAX9IJHa9Xt+SJ9sCNHzT8AZ1Ps=;
+ b=rt8YwZomYucCga7i/hRMQw2k+vBv8h+qjenhCOUry0bpyq66kYwgOwklE0O817E5Vo
+ 1gmWsMhpCe/ltrkLHbgJkWdVF4SSq0tHIBXRgmGBhcxfUGtuBT4LleHlc850lTV5z8yu
+ Q9wFOqJZwkOWf/JHCvJujeaoGEuxOGA/HW+6VWWpOrKOGVuN3Pr3HnnVxUImn6I8kFQV
+ Gl9AcP/UQZEqP0tI5cZaQYgVhpOHI8bSLgalV2HHfY2uh6hPOL8DvVseU8L/15Bwlbwh
+ pg633uukalFbrUIuGdA6X1Lmz2/d98pswOQt6wZUo43HXGeLwEj0uLkHS+hkBOWrh9H2
+ rC1w==
+X-Gm-Message-State: APjAAAUMpi7ksGgSBmURmrrpnJBIR5O186f3nz0CBMypCHHhSqL/CngH
+ z+jKi+SHugylKFuEMkzPK/KpAkdwfP47bfIuvH8mjQ==
+X-Google-Smtp-Source: APXvYqxYMpY1dlzqlS4B9tujbrtFz7tvtCmcTYopohKNOD2tKHVk1C09pXvx/8PLbfyHONbP+cLdD/90Th9/X6mBjFg=
+X-Received: by 2002:aca:b646:: with SMTP id g67mr4371688oif.163.1569415175883; 
+ Wed, 25 Sep 2019 05:39:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190924210106.27117-17-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Wed, 25 Sep 2019 12:36:22 +0000 (UTC)
+References: <20190924124433.96810-1-slp@redhat.com>
+ <CAFEAcA_2-achqUpTk1fDGWXcWPvTTLPvEtL+owNSWuZ5L3p=XA@mail.gmail.com>
+ <87pnjosz3d.fsf@redhat.com> <2d5d7297-0a02-276b-5482-948321f5a8bc@redhat.com>
+In-Reply-To: <2d5d7297-0a02-276b-5482-948321f5a8bc@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 25 Sep 2019 13:39:24 +0100
+Message-ID: <CAFEAcA-bQvP1vA1E6jCeDz4LnqTwT8HoQWtDE3r4--zkRJsMYw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,45 +89,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, jsnow@redhat.com,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, f4bug@amsat.org,
- Cleber Rosa <crosa@redhat.com>
+Cc: Sergio Lopez <slp@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/09/2019 23.00, Alex Benn=C3=A9e wrote:
-> From: John Snow <jsnow@redhat.com>
->=20
-> Oops; there's no argv here.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> Message-Id: <20190913193821.17756-1-jsnow@redhat.com>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> Tested-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  tests/docker/docker.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 3112892fdf5..31d8adf836e 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -332,7 +332,7 @@ class Docker(object):
->              cmd =3D [ "-u", str(uid) ] + cmd
->              # podman requires a bit more fiddling
->              if self._command[0] =3D=3D "podman":
-> -                argv.insert(0, '--userns=3Dkeep-id')
-> +                cmd.insert(0, '--userns=3Dkeep-id')
-> =20
->          ret =3D self._do_check(["run", "--label",
->                               "com.qemu.instance.uuid=3D" + label] + cm=
-d,
->=20
+On Wed, 25 Sep 2019 at 12:33, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> On 9/25/19 7:51 AM, Sergio Lopez wrote:
+> > Peter Maydell <peter.maydell@linaro.org> writes:
+> >
+> >> On Tue, 24 Sep 2019 at 14:25, Sergio Lopez <slp@redhat.com> wrote:
+> >>>
+> >>> Microvm is a machine type inspired by both NEMU and Firecracker, and
+> >>> constructed after the machine model implemented by the latter.
+> >>>
+> >>> It's main purpose is providing users a minimalist machine type free
+> >>> from the burden of legacy compatibility, serving as a stepping stone
+> >>> for future projects aiming at improving boot times, reducing the
+> >>> attack surface and slimming down QEMU's footprint.
+> >>
+> >>
+> >>>  docs/microvm.txt                 |  78 +++
+> >>
+> >> I'm not sure how close to acceptance this patchset is at the
+> >> moment, so not necessarily something you need to do now,
+> >> but could new documentation in docs/ be in rst format, not
+> >> plain text, please? (Ideally also they should be in the right
+> >> manual subdirectory, but documentation of system emulation
+> >> machines at the moment is still in texinfo format, so we
+> >> don't have a subdir for it yet.)
+> >
+> > Sure. What I didn't get is, should I put it in "docs/microvm.rst" or in
+> > some other subdirectory?
+>
+> Should we introduce docs/machines/?
 
-I ran into the same issue, too.
+This should live in the not-yet-created docs/system (the "system emulation
+user's guide"), along with much of the content currently still in
+the texinfo docs. But we don't have that structure yet and won't
+until we do the texinfo conversion, so I think for the moment we
+have two reasonable choices:
+ (1) put it in the texinfo, so it is at least shipped to
+     users until we get around to doing our docs conversion
+ (2) leave it in docs/microvm.rst for now (we have a bunch
+     of other docs in docs/ which are basically there because
+     they're also awaiting the texinfo conversion and creation
+     of the docs/user and docs/system manuals)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
+My ideal vision of how to do documentation of individual
+machines, incidentally, would be to do it via doc comments
+or some other kind of structured markup in the .c files
+that define the machine, so that we could automatically
+collect up the docs for the machines we're building,
+put them in to per-architecture sections of the docs,
+have autogenerated stub "this machine exists but isn't
+documented yet" entries, etc. But that's not something that
+we could easily do today so I don't want to block interim
+improvements to our documentation just because I have some
+nice theoretical idea for how it ought to work :-)
+
+thanks
+-- PMM
 
