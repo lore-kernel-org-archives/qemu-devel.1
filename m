@@ -2,110 +2,75 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9334FC432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B5FC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:42:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A89321D79
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:36:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="OcZrNKvh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A89321D79
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 668D320640
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:42:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 668D320640
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cloudbasesolutions.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD5aW-0003ox-8V
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 07:36:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48073)
+	id 1iD5gb-0006Y7-Dq
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 07:42:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48568)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Paul.Durrant@citrix.com>) id 1iD5YP-0001Zp-NX
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:33:54 -0400
+ (envelope-from <bounces@canonical.com>) id 1iD5fG-0005GM-Jk
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Paul.Durrant@citrix.com>) id 1iD5YO-0005eP-MH
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:33:53 -0400
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:14228)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
- id 1iD5YO-0005cI-CI
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:33:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1569411232;
- h=from:to:cc:subject:date:message-id:
- content-transfer-encoding:mime-version;
- bh=4LTnmsDQNF7B0yZa9CvMNpkIieY5efb/PwVSiiOUhBs=;
- b=OcZrNKvhgGF8dLwQaHLo2Gu/0TcmKBx/0JDyigWpUSfMOrYM2jitkAHJ
- Zqmw9hVyehwDctmtZX+sW+IuBjnkSsygfW3KzZWxexVLaeY+yOTVUW1Ve
- FDqR6Fn3BfWa3bZIOcjCYsJs4K0jclGQQC0XuokDCRppNGDp4m7Z8kfnH s=;
-Authentication-Results: esa5.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none;
- spf=None smtp.pra=Paul.Durrant@citrix.com;
- spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
- spf=None smtp.helo=postmaster@mail.citrix.com
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- Paul.Durrant@citrix.com) identity=pra;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa5.hc3370-68.iphmx.com: domain of
- Paul.Durrant@citrix.com designates 162.221.158.21 as
- permitted sender) identity=mailfrom;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="Paul.Durrant@citrix.com";
- x-conformance=sidf_compatible; x-record-type="v=spf1";
- x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
- ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
- ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
- ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
-Received-SPF: None (esa5.hc3370-68.iphmx.com: no sender
- authenticity information available from domain of
- postmaster@mail.citrix.com) identity=helo;
- client-ip=162.221.158.21; receiver=esa5.hc3370-68.iphmx.com;
- envelope-from="Paul.Durrant@citrix.com";
- x-sender="postmaster@mail.citrix.com";
- x-conformance=sidf_compatible
-IronPort-SDR: wGppYQGP9IOKKGkyB6+Y08TmWWOs6qnPxdPtvDiGLX1rQUpRf9z9Y7t2rcUANMjw5zVWMy0PwJ
- 6yWF8Nv7nm+k/GjCAoxqY/z6OdT1wWcdDP9plciduCaxrn6z8Cus+CI8OY3rdtSt4L5M8h2ut+
- dntfvqOo2V3eGJ915QYKerqAf+SLpZ6nPkPqw38QqVGB3ipU1wMcBtmaMVNshNGrF4TfeZCF1N
- CXgFPjJOWDT2c9yFCUfOAjbi+HtTZNlm9weTbjPVsscHtJomAEgNS/HctmGTPYVfYN/3zJW6pe
- 68A=
-X-SBRS: 2.7
-X-MesageID: 6262187
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.64,547,1559534400"; 
-   d="scan'208";a="6262187"
-From: Paul Durrant <Paul.Durrant@citrix.com>
-To: "'klaus@birkelund.eu'" <klaus@birkelund.eu>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/16] nvme: support multiple
- namespaces
-Thread-Topic: Re: [Qemu-devel] [Qemu-block] [PATCH 16/16] nvme: support
- multiple namespaces
-Thread-Index: AdVzlA/1cShLrLJtR8CJKFpwFC6IfQ==
-Date: Wed, 25 Sep 2019 11:33:45 +0000
-Message-ID: <c60e88d4912848148ce74b574e7dc51e@AMSPEX02CL03.citrite.net>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <bounces@canonical.com>) id 1iD5fF-00017p-5y
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:40:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39054)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iD5fF-00017V-0O
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:40:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iD5fC-0001ss-QU
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 11:40:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C5F4E2E8005
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 11:40:54 +0000 (UTC)
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 216.71.155.168
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Sep 2019 11:26:47 -0000
+From: Adrian Vladu <avladu@cloudbasesolutions.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: mingw32 msys windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: avladu pmaydell
+X-Launchpad-Bug-Reporter: Adrian Vladu (avladu)
+X-Launchpad-Bug-Modifier: Adrian Vladu (avladu)
+References: <156932212305.13447.6077258015607645915.malonedeb@gac.canonical.com>
+Message-Id: <156941080775.27427.8071107314144500369.malone@soybean.canonical.com>
+Subject: [Bug 1845185] Re: Cannot build qemu utils (qemu-img.exe, qemu-edid.exe,
+ qemu-io.exe) statically with MSYS64 on Windows because intl and iconv
+ libs are not loaded
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: da1a1326c705f451b7fc73880d37198f99b33956
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -114,21 +79,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Paul Durrant <paul@xen.org>
+Reply-To: Bug 1845185 <1845185@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Klaus,
+I checked the glib package static deps:
+pkg-config.exe --static --libs glib-2.0
+-LC:/msys64/mingw64/lib -lintl -lglib-2.0 -lws2_32 -lole32 -lwinmm -lshlwap=
+i -pthread -lpcre
 
-  I may have missed something but are you planning a v2 of your nvme_ns ser=
-ies soon? I just ran into another issue with this version when trying to us=
-e non-consecutive nsid value; the code uses an array of ns indexed by the n=
-sid, and using non-consecutive values causes it to wander off the end of th=
-e array when trying to look up an ns by nsid.
 
-  Cheers,
+Let me know if there is anything I can do next to get this issue fixed (if =
+it is fixable).
 
-    Paul
+Thank you,
+Adrian
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1845185
+
+Title:
+  Cannot build qemu utils (qemu-img.exe, qemu-edid.exe, qemu-io.exe)
+  statically with MSYS64 on Windows because intl and iconv libs are not
+  loaded
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using MSYS2 and mingw32 instructions from
+  https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2, I could not
+  statically build the qemu-utils using the latest qemu master branch.
+
+  Steps to reproduce the issue:
+  1. Install MSYS2 on a Windows 10 x64 box
+  2. Install required mingw64 toolchain: pacman -S base-devel mingw-w64-x86=
+_64-toolchain git python mingw-w64-x86_64-glib2 mingw64/mingw-w64-x86_64-gt=
+k3 mingw64/mingw-w64-x86_64-SDL2
+  3. clone qemu
+  4. Run configure for static build for the tools only
+  =C2=A0=C2=A0./configure --disable-user --disable-system --disable-docs --=
+enable-tools  --disable-guest-agent --disable-capstone --disable-sheepdog -=
+-enable-debug --static
+  =C2=A0=C2=A0# I had to remove sheepdog, capstone and guest agent because =
+other errors popped out, but let's not go in the rabbit hole.
+  5. Run 'make -j'. the following errors appeared, signaling that intl lib =
+is not loaded. If I add intl lib, iconv lib needs to be loaded too.
+
+  make: *** [/home/ader1990/qemu/rules.mak:124: qemu-img.exe] Error 1
+  make: *** Waiting for unfinished jobs....
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1522): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x154f): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x157e): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15ad): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x15dc): unde=
+fined reference to `libintl_sprintf'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(giowin32.c.obj):(.text+0x1622): more=
+ undefined references to `libintl_sprintf' follow
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x43): undefi=
+ned reference to `libintl_textdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x52): undefi=
+ned reference to `libintl_gettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x203): undef=
+ined reference to `libintl_bindtextdomain'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x21e): undef=
+ined reference to `libintl_bind_textdomain_codeset'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x2c1): undef=
+ined reference to `libintl_dgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x4e1): undef=
+ined reference to `libintl_dcgettext'
+  C:/msys64l/mingw64/lib\libglib-2.0.a(ggettext.c.obj):(.text+0x53a): undef=
+ined reference to `libintl_dngettext'
+
+  Patch to fix the issue (added intl and iconv to the libs):
+
+  diff --git a/configure b/configure
+  index 30aad233d1..e2ab8ef026 100755
+  --- a/configure
+  +++ b/configure
+  @@ -920,7 +920,7 @@ if test "$mingw32" =3D "yes" ; then
+  =C2=A0=C2=A0=C2=A0DSOSUF=3D".dll"
+  =C2=A0=C2=A0=C2=A0# MinGW needs -mthreads for TLS and macro _MT.
+  =C2=A0=C2=A0=C2=A0QEMU_CFLAGS=3D"-mthreads $QEMU_CFLAGS"
+  -  LIBS=3D"-lwinmm -lws2_32 -liphlpapi $LIBS"
+  +  LIBS=3D"-lwinmm -lws2_32 -liphlpapi -lintl -liconv $LIBS"
+  =C2=A0=C2=A0=C2=A0write_c_skeleton;
+  =C2=A0=C2=A0=C2=A0if compile_prog "" "-liberty" ; then
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0LIBS=3D"-liberty $LIBS"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1845185/+subscriptions
 
