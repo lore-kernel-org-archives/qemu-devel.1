@@ -7,86 +7,87 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD4BC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A67BC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:26:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 800962146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:24:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 341F42146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:26:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rPwLLLGK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 800962146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qWetlA44"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341F42146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDA5f-0007f1-Jc
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:24:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42718)
+	id 1iDA7g-0000v3-CI
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:26:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42840)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iDA3q-0006C5-3o
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:22:39 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iDA4K-0006hC-2d
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:23:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iDA3p-0004e4-0f
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:22:38 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37588)
+ (envelope-from <alex.bennee@linaro.org>) id 1iDA4H-0004nh-VE
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:23:07 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46724)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iDA3o-0004di-Q7
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:22:36 -0400
-Received: by mail-wr1-x442.google.com with SMTP id i1so7684238wro.4
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 09:22:36 -0700 (PDT)
+ id 1iDA4H-0004nV-PN
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:23:05 -0400
+Received: by mail-wr1-x441.google.com with SMTP id o18so7678112wrv.13
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 09:23:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=8TiHYtplUFlHSQa11Zm3hwHiJ5Q/LMI+3K9BEAU6K9c=;
- b=rPwLLLGKvsSLetLUK4ymZC+VstIZ0SvO0sn7/f0tBKPRo+Cs2UiHtEbmbgcT6SfMOk
- LkZ/Bbn4GkVNfioc88K0u0rE7mah7TJ/Sk3fsaie9bsQIKeemhs58Q35r6Brj7pJ3G+b
- PIL+6hwmg46BaotoBBj3kHNvhyspxZciYlCwnG1QuI/UFZzTU19+LdXUOJV7XRDuoSi5
- 150Mh+M/gRgLZsHayxtgrG4aJiM8V6FxRiE6VDifnAQ9HUnjkqhKRxCLnP0I/prtm1nZ
- NHaXIuHjTvBMjylkUFS6moXFUmH3YeMfXJunJJy3N8OfUufOEgFL1JggBoemIvPjskH5
- KC9A==
+ bh=F9C2a5AjczBBRjASG6ypOWQueZFPTCuTyzHg5GZ65ZA=;
+ b=qWetlA44kfvxD6MpBzFl9u0ohKThz8NfyGpPiYnMnHfIcinfm8wHVff1WDPQLQDAgD
+ K/pDcLFlyZZGugWNTHz3xGFSLXH6iKCpPRqmoADfbynFxf6tAVs9iRkjSzCtJLsaxh6+
+ xNetePQptJbCCJNZGkLZ0yAZV9dnNhiWMqwFgHivrIPvrAOY2ff9kHD6LRaDHev+XNNq
+ bn6wWj8L2403lVAesUjnLPwF3vZXBxn50FyPY8yGfShSGZtkZzvbIuPXkgqdzKrR4/YQ
+ noaRuJcG++FgrDQEn2Hf7u9lO8LQ908WpOoAvRN9Q29X8bZ7wN0WoaNZJDM78tZ0M1pP
+ zDzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=8TiHYtplUFlHSQa11Zm3hwHiJ5Q/LMI+3K9BEAU6K9c=;
- b=ATfS3mDj81J93+bC0bV3KGFhf3MuFdKo/gcvc2HC70DoDpx+OTpXLIsjXzjp+vRr5f
- PYNz2aGEasYmrXZ3xUQlJPpdVIPOtX4jeUPA1+KbcsBjYxsbX4fcOHhQElV3BQ4T7bcQ
- EVEgsNPVnaa+Dvhb2ALUlGiQWQe8srf7YuAhFF+QP2o+VLzO2eVmVKAde5bwL/Z/Kb7J
- ojxtZxXGv+Q2Ir+1IfklwLfnAGy6Iv7dq4omPhaYfgcNtlcHa3G9JlP1/0JpUqUDf6ij
- bCBX2izzXN+ZeHBsWtkfJPi5wgsMDqQbc+GAQxoHurpdM+ECLen1OjirEvQ7g3PPn4q1
- wAZg==
-X-Gm-Message-State: APjAAAWcHfV5/+eBszTV1/IXL94EARn0ZUB3P9UJYIcjNEAsZdK8000f
- vlFYelEzqzlQHOKirSHRSYAi5w==
-X-Google-Smtp-Source: APXvYqyprjnW8CXRw1NNksBckBn6XR4xHmThiQNwwXd91DruDyTAtyU28pS1hoETuCeCCnpQs9D/Dw==
-X-Received: by 2002:a05:6000:1632:: with SMTP id
- v18mr10373468wrb.233.1569428555548; 
- Wed, 25 Sep 2019 09:22:35 -0700 (PDT)
+ bh=F9C2a5AjczBBRjASG6ypOWQueZFPTCuTyzHg5GZ65ZA=;
+ b=Sz+uNUBG9frfIN/yhSWCwnYu5TZjqTssacLCH6KH/+LUhQ7Bz429rEB0UdeM7oWyjN
+ +HZ6KqXNP+BgMOQvJT5MbdWipg4FUzY4duT621pr84/cknTxFz/x754jS/8hbN87zUI5
+ 3ZTU3tBXkw78x5AfrLPK7WLhNhaMVpbCydX//FW3IWo6ZxlCkeaGUtX/VvKWBjbkFrmP
+ Vn5VWb16kfXQWFMptWH8+9BOjZ11PKorhS7mwc7Imbn1vL/F/O7L5TJMwI50xGKJrw0u
+ AcZEm0XFsxozBoPosdpTp41tFJckMBTBMwCFnQr2RZOqAUoz9jLAsCsAJ2/FTgapf/z7
+ Nb3Q==
+X-Gm-Message-State: APjAAAXkHbMSmC3Ln6Ik0jXlkRkLtbKYEzRatBxNtY62yI5ZHUz6L5bF
+ Bbecd4ReRftE/DwWdUaDpnCCCuZkb64QEw==
+X-Google-Smtp-Source: APXvYqzWtMVeVXY/blLAaa8ciguHXsUfrjSNVCaZWYXNM2Rs5ouuQEdx0x886syS4a74g2fvxsih4w==
+X-Received: by 2002:a05:6000:1184:: with SMTP id
+ g4mr10247587wrx.361.1569428584563; 
+ Wed, 25 Sep 2019 09:23:04 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e18sm5020991wrv.63.2019.09.25.09.22.34
+ by smtp.gmail.com with ESMTPSA id y3sm6973412wrw.83.2019.09.25.09.23.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 09:22:34 -0700 (PDT)
+ Wed, 25 Sep 2019 09:23:03 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3CEC21FF87;
- Wed, 25 Sep 2019 17:22:34 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 4B43D1FF87;
+ Wed, 25 Sep 2019 17:23:03 +0100 (BST)
 References: <20190923230004.9231-1-richard.henderson@linaro.org>
- <20190923230004.9231-14-richard.henderson@linaro.org>
+ <20190923230004.9231-15-richard.henderson@linaro.org>
 User-agent: mu4e 1.3.4; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v4 13/16] cputlb: Remove cpu->mem_io_vaddr
-In-reply-to: <20190923230004.9231-14-richard.henderson@linaro.org>
-Date: Wed, 25 Sep 2019 17:22:34 +0100
-Message-ID: <87mues9whh.fsf@linaro.org>
+Subject: Re: [PATCH v4 14/16] cputlb: Remove tb_invalidate_phys_page_range
+ is_cpu_write_access
+In-reply-to: <20190923230004.9231-15-richard.henderson@linaro.org>
+Date: Wed, 25 Sep 2019 17:23:03 +0100
+Message-ID: <87lfuc9wgo.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,8 +108,8 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> With the merge of notdirty handling into store_helper,
-> the last user of cpu->mem_io_vaddr was removed.
+> All callers pass false to this argument.  Remove it and pass the
+> constant on to tb_invalidate_phys_page_range__locked.
 >
 > Reviewed-by: David Hildenbrand <david@redhat.com>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
@@ -116,66 +117,78 @@ Richard Henderson <richard.henderson@linaro.org> writes:
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  include/hw/core/cpu.h | 2 --
->  accel/tcg/cputlb.c    | 2 --
->  hw/core/cpu.c         | 1 -
->  3 files changed, 5 deletions(-)
+>  accel/tcg/translate-all.h | 3 +--
+>  accel/tcg/translate-all.c | 6 ++----
+>  exec.c                    | 4 ++--
+>  3 files changed, 5 insertions(+), 8 deletions(-)
 >
-> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> index c7cda65c66..031f587e51 100644
-> --- a/include/hw/core/cpu.h
-> +++ b/include/hw/core/cpu.h
-> @@ -338,7 +338,6 @@ struct qemu_work_item;
->   * @next_cpu: Next CPU sharing TB cache.
->   * @opaque: User data.
->   * @mem_io_pc: Host Program Counter at which the memory was accessed.
-> - * @mem_io_vaddr: Target virtual address at which the memory was accesse=
-d.
->   * @kvm_fd: vCPU file descriptor for KVM.
->   * @work_mutex: Lock to prevent multiple access to queued_work_*.
->   * @queued_work_first: First asynchronous work pending.
-> @@ -413,7 +412,6 @@ struct CPUState {
->       * we store some rarely used information in the CPU context.
->       */
->      uintptr_t mem_io_pc;
-> -    vaddr mem_io_vaddr;
->      /*
->       * This is only needed for the legacy cpu_unassigned_access() hook;
->       * when all targets using it have been converted to use
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index d0bdef1eb3..0ca6ee60b3 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -927,7 +927,6 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBE=
-ntry *iotlbentry,
->          cpu_io_recompile(cpu, retaddr);
+> diff --git a/accel/tcg/translate-all.h b/accel/tcg/translate-all.h
+> index 64f5fd9a05..31f2117188 100644
+> --- a/accel/tcg/translate-all.h
+> +++ b/accel/tcg/translate-all.h
+> @@ -28,8 +28,7 @@ struct page_collection *page_collection_lock(tb_page_ad=
+dr_t start,
+>  void page_collection_unlock(struct page_collection *set);
+>  void tb_invalidate_phys_page_fast(struct page_collection *pages,
+>                                    tb_page_addr_t start, int len);
+> -void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t =
+end,
+> -                                   int is_cpu_write_access);
+> +void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t =
+end);
+>  void tb_check_watchpoint(CPUState *cpu);
+>
+>  #ifdef CONFIG_USER_ONLY
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 5d1e08b169..de4b697163 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1983,8 +1983,7 @@ tb_invalidate_phys_page_range__locked(struct page_c=
+ollection *pages,
+>   *
+>   * Called with mmap_lock held for user-mode emulation
+>   */
+> -void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t =
+end,
+> -                                   int is_cpu_write_access)
+> +void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t =
+end)
+>  {
+>      struct page_collection *pages;
+>      PageDesc *p;
+> @@ -1996,8 +1995,7 @@ void tb_invalidate_phys_page_range(tb_page_addr_t s=
+tart, tb_page_addr_t end,
+>          return;
 >      }
+>      pages =3D page_collection_lock(start, end);
+> -    tb_invalidate_phys_page_range__locked(pages, p, start, end,
+> -                                          is_cpu_write_access);
+> +    tb_invalidate_phys_page_range__locked(pages, p, start, end, 0);
+>      page_collection_unlock(pages);
+>  }
 >
-> -    cpu->mem_io_vaddr =3D addr;
->      cpu->mem_io_access_type =3D access_type;
+> diff --git a/exec.c b/exec.c
+> index 7d835b1a2b..b3df826039 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1012,7 +1012,7 @@ const char *parse_cpu_option(const char *cpu_option)
+>  void tb_invalidate_phys_addr(target_ulong addr)
+>  {
+>      mmap_lock();
+> -    tb_invalidate_phys_page_range(addr, addr + 1, 0);
+> +    tb_invalidate_phys_page_range(addr, addr + 1);
+>      mmap_unlock();
+>  }
 >
->      if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-> @@ -967,7 +966,6 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntr=
-y *iotlbentry,
->      if (!cpu->can_do_io) {
->          cpu_io_recompile(cpu, retaddr);
+> @@ -1039,7 +1039,7 @@ void tb_invalidate_phys_addr(AddressSpace *as, hwad=
+dr addr, MemTxAttrs attrs)
+>          return;
 >      }
-> -    cpu->mem_io_vaddr =3D addr;
->      cpu->mem_io_pc =3D retaddr;
->
->      if (mr->global_locking && !qemu_mutex_iothread_locked()) {
-> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-> index 0035845511..73b1ee34d0 100644
-> --- a/hw/core/cpu.c
-> +++ b/hw/core/cpu.c
-> @@ -261,7 +261,6 @@ static void cpu_common_reset(CPUState *cpu)
->      cpu->interrupt_request =3D 0;
->      cpu->halted =3D 0;
->      cpu->mem_io_pc =3D 0;
-> -    cpu->mem_io_vaddr =3D 0;
->      cpu->icount_extra =3D 0;
->      atomic_set(&cpu->icount_decr_ptr->u32, 0);
->      cpu->can_do_io =3D 1;
+>      ram_addr =3D memory_region_get_ram_addr(mr) + addr;
+> -    tb_invalidate_phys_page_range(ram_addr, ram_addr + 1, 0);
+> +    tb_invalidate_phys_page_range(ram_addr, ram_addr + 1);
+>      rcu_read_unlock();
+>  }
 
 
 --
