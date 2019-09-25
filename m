@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B763AC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 21:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36542C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 21:05:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73FB721D7A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 21:02:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73FB721D7A
+	by mail.kernel.org (Postfix) with ESMTPS id EDCA521D7A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 21:05:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDCA521D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDEQP-0006Jk-K1
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 17:02:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46642)
+	id 1iDETV-0008KN-6f
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 17:05:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tgolembi@redhat.com>) id 1iDEOm-0004Vy-1h
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 17:00:34 -0400
+ (envelope-from <tgolembi@redhat.com>) id 1iDESF-0007sY-A0
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 17:04:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tgolembi@redhat.com>) id 1iDEOi-0008PC-1p
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 17:00:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39020)
+ (envelope-from <tgolembi@redhat.com>) id 1iDESC-000305-IY
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 17:04:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41158)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1iDEOh-0008Mj-QI
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 17:00:28 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
+ (Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1iDESC-0002yi-Ao
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 17:04:04 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 17FBFC01B7E2
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 21:00:22 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id 4so18790wmj.6
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 14:00:22 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9EA6D4E926
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 21:04:02 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id r21so24472wme.5
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 14:04:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=hxB3RT155dg866dOIbs6ijaJLT3zTDnOtRgU/lBPKiY=;
- b=ZZRanB3PfTLxm2bi3hpkMVf285oj2OSVbiLhjfmjDS4muEA7AYsh9crJG9kdupZZCw
- z/THSGXutBKpsarOlbz05TZTNO3fTQ/Du38Doog1KAC4+4GYpqEIucPFrfsUEH3oqqh7
- MWhPDzHtSrK3Mb21h3hkWOFzTXAbKWrCKwFg2gDwew0uhydM3CrIJmRhSsdCZmuFj1qY
- 0VqtjOTldnMcjiRMq26ku+Ov9O9vNMekbMpeu+R1aUtNcWc7/9V9RpaolWabHBdv06Kx
- SHzJb5S+ByK3SHj8ShWiw+2YGvuCTjQQ7QqiXscXiNBM1MRd91O//Hyz5BD4waOZfa1Z
- eyqA==
-X-Gm-Message-State: APjAAAW+c9o27T74UiAU5W2Urhnlxc9UbfUVvUyos/yBy+Hk20klslAL
- Ubp/C0qyRrFwx6W8Wh9mL+FSfmOia82hkKa9pag4rUCsjhHGG1+ZadxXxDApH73BpIHp2cjKxjT
- OlwTBCXDGs+t9/LQ=
-X-Received: by 2002:adf:fc0e:: with SMTP id i14mr221818wrr.302.1569445220368; 
- Wed, 25 Sep 2019 14:00:20 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwXPDCKpNVp2dTnTeOsodRsbX0C+Q0cEzoAIjtye0pjntb9EpEL60FiWE+8h9Iq9p1YST13qw==
-X-Received: by 2002:adf:fc0e:: with SMTP id i14mr221805wrr.302.1569445220041; 
- Wed, 25 Sep 2019 14:00:20 -0700 (PDT)
+ bh=qD4eBW9ppgcmWU+zViI7gJniyLGHkuFPN0fxPrSQsAY=;
+ b=MbilT1Jiyk9WDqEqBFvSCUdk1o39NzNprCtnJXYcpTq2V1YZCgKZt45B1tD5nZuTo0
+ QL8gJ9Iq+bapw34q+3uRDbtcZFzbAsT2ub9yzqlS166VGiqt7fsPKsHYMHG4o/rsBex2
+ D1cEqpItRpcparHAdzClTa0AwtEQbibdsd2YLJGL8rcQwRbjqMxz/YU93k8HDgY+EzzN
+ 4HvuKEVjocbjWlt6YVUdMTCeZjFt4vVcxTFERd1NShVKfFksjjTCg++N8dEyNR0MBWtS
+ cUJ9s+zvY3OTQGkfnAZdFaBWSAexWwWyqQ2V0yYFbGtXjjfncxxrl8rzMeXJ1u1qNsLE
+ JhMQ==
+X-Gm-Message-State: APjAAAWGynSsCFXj1WSUGsuk46ntUEl2wSy+5IoqV/R90ithZ0RTFQYY
+ 0Sa31lk4NNPrbIjOaMqrHqQ3isLN81h6bQlCy3Rak7QPprktNjdPtQcWBGkXsHaGzU44M4pa+RV
+ Mt4okEXo82M4BVR0=
+X-Received: by 2002:a1c:8097:: with SMTP id b145mr142246wmd.29.1569445440805; 
+ Wed, 25 Sep 2019 14:04:00 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyXMONI9rYX5bdYodFUfxfBUOX1ZD6xfTFnW9Li6sSfnY0eIfLt4MMSI0uVvcdmzG5MAvIHgQ==
+X-Received: by 2002:a1c:8097:: with SMTP id b145mr142225wmd.29.1569445440475; 
+ Wed, 25 Sep 2019 14:04:00 -0700 (PDT)
 Received: from auriga.brq.redhat.com (nat-pool-brq-t.redhat.com.
  [213.175.37.10])
- by smtp.gmail.com with ESMTPSA id j1sm472889wrg.24.2019.09.25.14.00.18
+ by smtp.gmail.com with ESMTPSA id r28sm364263wrr.94.2019.09.25.14.03.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 14:00:19 -0700 (PDT)
+ Wed, 25 Sep 2019 14:03:59 -0700 (PDT)
 From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3] qga: add command guest-get-devices for reporting VirtIO
+Subject: [PATCH v4] qga: add command guest-get-devices for reporting VirtIO
  devices
-Date: Wed, 25 Sep 2019 23:00:18 +0200
-Message-Id: <919bbd6e0557d2fe2d9c17de394cc0b4c6fa4426.1569445204.git.tgolembi@redhat.com>
+Date: Wed, 25 Sep 2019 23:03:58 +0200
+Message-Id: <76c63f3fd5e36dcfdd8fff5158a12c8955130103.1569445431.git.tgolembi@redhat.com>
 X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -134,7 +134,7 @@ index dfc05f5b8a..58e93feef9 100644
 +    return NULL;
 +}
 diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 6b67f16faf..139dbd7c9a 100644
+index 6b67f16faf..ec07a5b3ef 100644
 --- a/qga/commands-win32.c
 +++ b/qga/commands-win32.c
 @@ -21,10 +21,11 @@
@@ -251,9 +251,9 @@ e,
 +        /* empty list */
 +        return NULL;
 +    }
-+    values =3D g_array_new(TRUE, TRUE, sizeof(gchar*));
++    values =3D g_array_new(TRUE, TRUE, sizeof(gchar *));
 +    for (id =3D property; '\0' !=3D *id; id +=3D lstrlenW(id) + 1) {
-+        gchar* id8 =3D g_utf16_to_utf8(id, -1, NULL, NULL, NULL);
++        gchar *id8 =3D g_utf16_to_utf8(id, -1, NULL, NULL, NULL);
 +        g_array_append_val(values, id8);
 +    }
 +    hw_ids =3D (GStrv)g_array_free(values, FALSE);
