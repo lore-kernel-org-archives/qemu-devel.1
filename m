@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70391C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38383C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4721A21D7A
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:38:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4721A21D7A
+	by mail.kernel.org (Postfix) with ESMTPS id 0826B21D7A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 19:41:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0826B21D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDD6x-0002qE-Fb
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 15:38:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54307)
+	id 1iDDAS-0004Pm-5X
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 15:41:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDD5s-0001xa-VA
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 15:36:57 -0400
+ (envelope-from <david@redhat.com>) id 1iDD9Y-0003xU-6h
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 15:40:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDD5q-0001F8-D2
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 15:36:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59152)
+ (envelope-from <david@redhat.com>) id 1iDD9W-0005AA-PT
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 15:40:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39188)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDD5q-0001CF-3s; Wed, 25 Sep 2019 15:36:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iDD9W-00058w-EW
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 15:40:42 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B78B9A44AC1;
- Wed, 25 Sep 2019 19:36:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A82203083391;
+ Wed, 25 Sep 2019 19:40:41 +0000 (UTC)
 Received: from [10.36.116.51] (ovpn-116-51.ams2.redhat.com [10.36.116.51])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A17BA5B69A;
- Wed, 25 Sep 2019 19:36:49 +0000 (UTC)
-Subject: Re: [PATCH v2 4/7] s390x/mmu: Inject PGM_ADDRESSING on boguous table
- addresses
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 55C6D5C1D4;
+ Wed, 25 Sep 2019 19:40:37 +0000 (UTC)
+Subject: Re: [PATCH v4 10/16] cputlb: Partially inline
+ memory_region_section_get_iotlb
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190925125236.4043-1-david@redhat.com>
- <20190925125236.4043-5-david@redhat.com>
- <f5ebc34d-7cb9-61bf-97f3-4568d20730ba@linaro.org>
+References: <20190923230004.9231-1-richard.henderson@linaro.org>
+ <20190923230004.9231-11-richard.henderson@linaro.org>
+ <c61bc143-81d3-5198-fbdd-054777faafe0@redhat.com>
+ <c396f679-d100-2f1e-012e-045ad0976268@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -93,18 +94,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <6e879756-7655-a5a0-16c5-004f9234f512@redhat.com>
-Date: Wed, 25 Sep 2019 21:36:48 +0200
+Message-ID: <b514260f-f1b5-8444-88a5-25a5b25c72e0@redhat.com>
+Date: Wed, 25 Sep 2019 21:40:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <f5ebc34d-7cb9-61bf-97f3-4568d20730ba@linaro.org>
+In-Reply-To: <c396f679-d100-2f1e-012e-045ad0976268@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Wed, 25 Sep 2019 19:36:51 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Wed, 25 Sep 2019 19:40:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -119,68 +120,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25.09.19 21:25, Richard Henderson wrote:
-> On 9/25/19 5:52 AM, David Hildenbrand wrote:
->> +static inline int read_table_entry(hwaddr gaddr, uint64_t *entry)
->> +{
->> +    /*
->> +     * According to the PoP, these table addresses are "unpredictably real
->> +     * or absolute". Also, "it is unpredictable whether the address wraps
->> +     * or an addressing exception is recognized".
->> +     *
->> +     * We treat them as absolute addresses and don't wrap them.
->> +     */
->> +    if (unlikely(address_space_read(&address_space_memory, gaddr,
->> +                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)entry, sizeof(*entry)) !=
->> +                 MEMTX_OK)) {
->> +        return -EFAULT;
->> +    }
->> +    *entry = be64_to_cpu(*entry);
->> +    return 0;
->> +}
+On 25.09.19 19:55, Richard Henderson wrote:
+> On 9/24/19 12:59 AM, David Hildenbrand wrote:
+>>> +    is_ram = memory_region_is_ram(section->mr);
+>>> +    is_romd = memory_region_is_romd(section->mr);
+>>> +
+>>> +    if (is_ram || is_romd) {
+>>> +        /* RAM and ROMD both have associated host memory. */
+>>>          addend = (uintptr_t)memory_region_get_ram_ptr(section->mr) + xlat;
+>>> +    } else {
+>>> +        /* I/O does not; force the host address to NULL. */
+>>> +        addend = 0;
+>>> +    }
+>>> +
+>>> +    write_address = address;
+>>
+>> I guess the only "suboptimal" change is that you now have two checks for
+>> "prot & PAGE_WRITE" twice in the case of ram instead of one.
 > 
-> Maybe I've been away from the kernel too long, but I don't find returning
-> -EFAULT helpful.  I would return true/false for success/failure so that...
+> It's a single bit test on a register operand -- as cheap as can be.  If you
+> look at the entire code, there *must* be more than one test.  You can rearrange
+> the code to choose exactly where those tests are, but you'll have to have them
+> somewhere.
 > 
+>>> +        /* I/O or ROMD */
+>>> +        iotlb = memory_region_section_get_iotlb(cpu, section) + xlat;
+>>> +        /*
+>>> +         * Writes to romd devices must go through MMIO to enable write.
+>>> +         * Reads to romd devices go through the ram_ptr found above,
+>>> +         * but of course reads to I/O must go through MMIO.
+>>> +         */
+>>> +        write_address |= TLB_MMIO;
+>>
+>> ... and here you calculate write_address even if probably unused.
 > 
->> +    if (read_table_entry(origin + offs, &pt_entry)) {
->> +        return PGM_ADDRESSING;
->> +    }
+> Well... while the page might not be writable (but I'd bet that it is -- I/O
+> memory is almost never read-only), and therefore write_address is technically
+> unused, the variable is practically used in the next line:
 > 
-> ... this gets written
-> 
->     if (!read_table_entry(...)) {
->         return PGM_ADDRESSING;
+>     if (!is_romd) {
+>         address = write_address
 >     }
 > 
-> This statement, to me, reads "If we did not read_table_entry, return an
-> addressing exception."
+> which will compile to a conditional move.
 > 
-> If you *really* want to return non-zero on failure, I would prefer returning
-> PGM_ADDRESSING instead of the out-of-context -EFAULT.
+>> Can your move the calculation of the write_address completely into the
+>> "prot & PAGE_WRITE" case below?
+> 
+> We'd prefer not to, since the code below is within the cpu tlb lock region.
+> We'd prefer to keep all of the expensive operations outside that.
 
-I'll go for your suggestion with a bool!
+Makes all sense to me then and looks sane :)
 
 > 
->> -    new_entry = ldq_phys(cs->as, origin + offs);
->> +    if (read_table_entry(origin + offs, &new_entry)) {
-> 
-> Do you really want to replace cs->as with address_space_memory?
-> 
-
-I guess it shouldn't make a difference (unless I am missing something),
-but I can just keep using cs->as.
-
-Thanks!
-
 > 
 > r~
 > 
