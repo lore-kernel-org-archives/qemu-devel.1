@@ -2,61 +2,64 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC4B5C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC88C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F4DB21D7B
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:03:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F4DB21D7B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3517521D7B
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:04:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3517521D7B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD8pX-0001qF-3A
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:03:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52737)
+	id 1iD8qf-0003CP-1R
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57571)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iD8NW-0004XA-Vl
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:34:52 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iD8nc-0000c0-2O
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iD8NU-0001OH-J4
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:34:50 -0400
-Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:43982)
+ (envelope-from <dgilbert@redhat.com>) id 1iD8na-0004ZK-TY
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:01:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35556)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iD8NU-0001Nt-DA
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 10:34:48 -0400
-Received: from player786.ha.ovh.net (unknown [10.108.35.59])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id 3FCF018DEC8
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 16:34:47 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id B22A5A4D40F2;
- Wed, 25 Sep 2019 14:34:40 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v2 15/23] aspeed/i2c: Introduce an object class per SoC
-Date: Wed, 25 Sep 2019 16:32:40 +0200
-Message-Id: <20190925143248.10000-16-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190925143248.10000-1-clg@kaod.org>
-References: <20190925143248.10000-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iD8na-0004Yo-O4
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:01:46 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 008F0306731D;
+ Wed, 25 Sep 2019 15:01:46 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-251.ams2.redhat.com
+ [10.36.117.251])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B3DD15C21F;
+ Wed, 25 Sep 2019 15:01:40 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
+ marcandre.lureau@redhat.com, richardw.yang@linux.intel.com,
+ alex.benee@linaro.org
+Subject: [PULL 2/9] migration/postcopy: not necessary to do discard when
+ canonicalizing bitmap
+Date: Wed, 25 Sep 2019 16:01:23 +0100
+Message-Id: <20190925150130.12303-3-dgilbert@redhat.com>
+In-Reply-To: <20190925150130.12303-1-dgilbert@redhat.com>
+References: <20190925150130.12303-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 8865054393088576273
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgdejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 25 Sep 2019 15:01:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.45.168
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,194 +71,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It prepares ground for register differences between SoCs.
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
+All pages, either partially sent or partially dirty, will be discarded in
+postcopy_send_discard_bm_ram(), since we update the unsentmap to be
+unsentmap =3D unsentmap | dirty in ram_postcopy_send_discard_bitmap().
+
+This is not necessary to do discard when canonicalizing bitmap. And by
+doing so, we separate the page discard into two individual steps:
+
+  * canonicalize bitmap
+  * discard page
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Message-Id: <20190819061843.28642-2-richardw.yang@linux.intel.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/hw/i2c/aspeed_i2c.h | 15 ++++++++++
- hw/arm/aspeed_soc.c         |  3 +-
- hw/i2c/aspeed_i2c.c         | 60 ++++++++++++++++++++++++++++++++-----
- 3 files changed, 69 insertions(+), 9 deletions(-)
+ migration/ram.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
-index a2753f0bbbaa..6e2dae7db818 100644
---- a/include/hw/i2c/aspeed_i2c.h
-+++ b/include/hw/i2c/aspeed_i2c.h
-@@ -25,6 +25,8 @@
- #include "hw/sysbus.h"
-=20
- #define TYPE_ASPEED_I2C "aspeed.i2c"
-+#define TYPE_ASPEED_2400_I2C TYPE_ASPEED_I2C "-ast2400"
-+#define TYPE_ASPEED_2500_I2C TYPE_ASPEED_I2C "-ast2500"
- #define ASPEED_I2C(obj) \
-     OBJECT_CHECK(AspeedI2CState, (obj), TYPE_ASPEED_I2C)
-=20
-@@ -59,6 +61,19 @@ typedef struct AspeedI2CState {
-     AspeedI2CBus busses[ASPEED_I2C_NR_BUSSES];
- } AspeedI2CState;
-=20
-+#define ASPEED_I2C_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(AspeedI2CClass, (klass), TYPE_ASPEED_I2C)
-+#define ASPEED_I2C_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(AspeedI2CClass, (obj), TYPE_ASPEED_I2C)
-+
-+typedef struct AspeedI2CClass {
-+    SysBusDeviceClass parent_class;
-+
-+    uint8_t num_busses;
-+    uint8_t reg_size;
-+    uint8_t gap;
-+} AspeedI2CClass;
-+
- I2CBus *aspeed_i2c_get_bus(DeviceState *dev, int busnr);
-=20
- #endif /* ASPEED_I2C_H */
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 5c5fcb810944..e60f198d92c1 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -188,8 +188,9 @@ static void aspeed_soc_init(Object *obj)
-     object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
-                                    OBJECT(&s->scu), &error_abort);
-=20
-+    snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
-     sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
--                          TYPE_ASPEED_I2C);
-+                          typename);
-=20
-     snprintf(typename, sizeof(typename), "aspeed.fmc-%s", socname);
-     sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
-diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
-index a956eb384922..fabdb01e9747 100644
---- a/hw/i2c/aspeed_i2c.c
-+++ b/hw/i2c/aspeed_i2c.c
-@@ -408,10 +408,11 @@ static void aspeed_i2c_reset(DeviceState *dev)
- {
-     int i;
-     AspeedI2CState *s =3D ASPEED_I2C(dev);
-+    AspeedI2CClass *aic =3D ASPEED_I2C_GET_CLASS(s);
-=20
-     s->intr_status =3D 0;
-=20
--    for (i =3D 0; i < ASPEED_I2C_NR_BUSSES; i++) {
-+    for (i =3D 0; i < aic->num_busses; i++) {
-         s->busses[i].intr_ctrl =3D 0;
-         s->busses[i].intr_status =3D 0;
-         s->busses[i].cmd =3D 0;
-@@ -421,7 +422,7 @@ static void aspeed_i2c_reset(DeviceState *dev)
+diff --git a/migration/ram.c b/migration/ram.c
+index 01df326767..57d1a4627e 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2928,7 +2928,7 @@ static int postcopy_each_ram_send_discard(Migration=
+State *ms)
  }
 =20
- /*
-- * Address Definitions
-+ * Address Definitions (AST2400 and AST2500)
+ /**
+- * postcopy_chunk_hostpages_pass: canocalize bitmap in hostpages
++ * postcopy_chunk_hostpages_pass: canonicalize bitmap in hostpages
   *
-  *   0x000 ... 0x03F: Global Register
-  *   0x040 ... 0x07F: Device 1
-@@ -446,22 +447,24 @@ static void aspeed_i2c_realize(DeviceState *dev, Er=
-ror **errp)
-     int i;
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     AspeedI2CState *s =3D ASPEED_I2C(dev);
-+    AspeedI2CClass *aic =3D ASPEED_I2C_GET_CLASS(s);
+  * Helper for postcopy_chunk_hostpages; it's called twice to
+  * canonicalize the two bitmaps, that are similar, but one is
+@@ -2991,18 +2991,6 @@ static void postcopy_chunk_hostpages_pass(Migratio=
+nState *ms, bool unsent_pass,
+                                                              host_ratio)=
+;
+             run_start =3D QEMU_ALIGN_UP(run_start, host_ratio);
 =20
-     sysbus_init_irq(sbd, &s->irq);
-     memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_i2c_ctrl_ops, s,
-                           "aspeed.i2c", 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
-=20
--    for (i =3D 0; i < ASPEED_I2C_NR_BUSSES; i++) {
--        char name[16];
--        int offset =3D i < 7 ? 1 : 5;
-+    for (i =3D 0; i < aic->num_busses; i++) {
-+        char name[32];
-+        int offset =3D i < aic->gap ? 1 : 5;
-         snprintf(name, sizeof(name), "aspeed.i2c.%d", i);
-         s->busses[i].controller =3D s;
-         s->busses[i].id =3D i;
-         s->busses[i].bus =3D i2c_init_bus(dev, name);
-         memory_region_init_io(&s->busses[i].mr, OBJECT(dev),
--                              &aspeed_i2c_bus_ops, &s->busses[i], name, =
-0x40);
--        memory_region_add_subregion(&s->iomem, 0x40 * (i + offset),
-+                              &aspeed_i2c_bus_ops, &s->busses[i], name,
-+                              aic->reg_size);
-+        memory_region_add_subregion(&s->iomem, aic->reg_size * (i + offs=
-et),
-                                     &s->busses[i].mr);
-     }
- }
-@@ -481,11 +484,51 @@ static const TypeInfo aspeed_i2c_info =3D {
-     .parent        =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size =3D sizeof(AspeedI2CState),
-     .class_init    =3D aspeed_i2c_class_init,
-+    .class_size =3D sizeof(AspeedI2CClass),
-+    .abstract   =3D true,
-+};
-+
-+static void aspeed_2400_i2c_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedI2CClass *aic =3D ASPEED_I2C_CLASS(klass);
-+
-+    dc->desc =3D "ASPEED 2400 I2C Controller";
-+
-+    aic->num_busses =3D 14;
-+    aic->reg_size =3D 0x40;
-+    aic->gap =3D 7;
-+}
-+
-+static const TypeInfo aspeed_2400_i2c_info =3D {
-+    .name =3D TYPE_ASPEED_2400_I2C,
-+    .parent =3D TYPE_ASPEED_I2C,
-+    .class_init =3D aspeed_2400_i2c_class_init,
-+};
-+
-+static void aspeed_2500_i2c_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    AspeedI2CClass *aic =3D ASPEED_I2C_CLASS(klass);
-+
-+    dc->desc =3D "ASPEED 2500 I2C Controller";
-+
-+    aic->num_busses =3D 14;
-+    aic->reg_size =3D 0x40;
-+    aic->gap =3D 7;
-+}
-+
-+static const TypeInfo aspeed_2500_i2c_info =3D {
-+    .name =3D TYPE_ASPEED_2500_I2C,
-+    .parent =3D TYPE_ASPEED_I2C,
-+    .class_init =3D aspeed_2500_i2c_class_init,
- };
-=20
- static void aspeed_i2c_register_types(void)
- {
-     type_register_static(&aspeed_i2c_info);
-+    type_register_static(&aspeed_2400_i2c_info);
-+    type_register_static(&aspeed_2500_i2c_info);
- }
-=20
- type_init(aspeed_i2c_register_types)
-@@ -494,9 +537,10 @@ type_init(aspeed_i2c_register_types)
- I2CBus *aspeed_i2c_get_bus(DeviceState *dev, int busnr)
- {
-     AspeedI2CState *s =3D ASPEED_I2C(dev);
-+    AspeedI2CClass *aic =3D ASPEED_I2C_GET_CLASS(s);
-     I2CBus *bus =3D NULL;
-=20
--    if (busnr >=3D 0 && busnr < ASPEED_I2C_NR_BUSSES) {
-+    if (busnr >=3D 0 && busnr < aic->num_busses) {
-         bus =3D s->busses[busnr].bus;
-     }
-=20
+-            /* Tell the destination to discard this page */
+-            if (unsent_pass || !test_bit(fixup_start_addr, unsentmap)) {
+-                /* For the unsent_pass we:
+-                 *     discard partially sent pages
+-                 * For the !unsent_pass (dirty) we:
+-                 *     discard partially dirty pages that were sent
+-                 *     (any partially sent pages were already discarded
+-                 *     by the previous unsent_pass)
+-                 */
+-                postcopy_discard_send_range(ms, fixup_start_addr, host_r=
+atio);
+-            }
+-
+             /* Clean up the bitmap */
+             for (page =3D fixup_start_addr;
+                  page < fixup_start_addr + host_ratio; page++) {
 --=20
 2.21.0
 
