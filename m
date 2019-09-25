@@ -2,50 +2,50 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5D7C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 469D8C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:07:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 481E32146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:05:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 481E32146E
+	by mail.kernel.org (Postfix) with ESMTPS id 1C22D2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:07:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C22D2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDAir-0005Ll-Un
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:05:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47774)
+	id 1iDAl9-0007wq-4S
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:07:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iDAg4-00041G-PE
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:02:10 -0400
+ (envelope-from <thuth@redhat.com>) id 1iDAjV-0006UJ-VP
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iDAg2-0000L2-3C
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:02:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54184)
+ (envelope-from <thuth@redhat.com>) id 1iDAjU-0001c0-Rh
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:05:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47444)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iDAg1-0000KS-Q8; Wed, 25 Sep 2019 13:02:06 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1iDAjU-0001bj-It; Wed, 25 Sep 2019 13:05:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E1041C0578F8;
- Wed, 25 Sep 2019 17:02:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BA1FF308449E;
+ Wed, 25 Sep 2019 17:05:39 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-109.ams2.redhat.com [10.36.116.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D34E31001956;
- Wed, 25 Sep 2019 17:01:59 +0000 (UTC)
-Subject: Re: [PATCH v2 2/7] s390x/mmu: Move DAT protection handling out of
- mmu_translate_asce()
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8151F6012C;
+ Wed, 25 Sep 2019 17:05:35 +0000 (UTC)
+Subject: Re: [PATCH v2 3/7] s390x/mmu: Inject DAT exceptions from a single
+ place
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20190925125236.4043-1-david@redhat.com>
- <20190925125236.4043-3-david@redhat.com>
+ <20190925125236.4043-4-david@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,18 +91,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <2566e76d-9f16-dad0-e12d-f2ecc2c258bf@redhat.com>
-Date: Wed, 25 Sep 2019 19:01:58 +0200
+Message-ID: <54ccfba0-4730-1f19-a9e0-0588f753748f@redhat.com>
+Date: Wed, 25 Sep 2019 19:05:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20190925125236.4043-3-david@redhat.com>
+In-Reply-To: <20190925125236.4043-4-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 25 Sep 2019 17:02:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 25 Sep 2019 17:05:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -125,94 +125,15 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 25/09/2019 14.52, David Hildenbrand wrote:
-> We'll reuse the ilen and tec definitions in mmu_translate
-> soon also for all other DAT exceptions we inject. Move it to the caller,
-> where we can later pair it up with other protection checks, like IEP.
+> Let's return the PGM from the translation functions on error and inject
+> based on that.
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/mmu_helper.c | 39 ++++++++++++++++-----------------------
->  1 file changed, 16 insertions(+), 23 deletions(-)
-> 
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index 6a7ad33c4d..847fb240fb 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -48,20 +48,6 @@ static void trigger_access_exception(CPUS390XState *env, uint32_t type,
->      }
->  }
->  
-> -static void trigger_prot_fault(CPUS390XState *env, target_ulong vaddr,
-> -                               uint64_t asc, int rw, bool exc)
-> -{
-> -    uint64_t tec;
-> -
-> -    tec = vaddr | (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ) | 4 | asc >> 46;
-> -
-> -    if (!exc) {
-> -        return;
-> -    }
-> -
-> -    trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, tec);
-> -}
-> -
->  static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
->                                 uint32_t type, uint64_t asc, int rw, bool exc)
->  {
-> @@ -229,7 +215,6 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
->                                int *flags, int rw, bool exc)
->  {
->      int level;
-> -    int r;
->  
->      if (asce & ASCE_REAL_SPACE) {
->          /* direct mapping */
-> @@ -277,14 +262,8 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
->          break;
->      }
->  
-> -    r = mmu_translate_region(env, vaddr, asc, asce, level, raddr, flags, rw,
-> -                             exc);
-> -    if (!r && rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
-> -        trigger_prot_fault(env, vaddr, asc, rw, exc);
-> -        return -1;
-> -    }
-> -
-> -    return r;
-> +    return mmu_translate_region(env, vaddr, asc, asce, level, raddr, flags, rw,
-> +                                exc);
->  }
->  
->  static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
-> @@ -369,6 +348,10 @@ static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
->  int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->                    target_ulong *raddr, int *flags, bool exc)
->  {
-> +    /* Code accesses have an undefined ilc, let's use 2 bytes. */
-> +    const int ilen = (rw == MMU_INST_FETCH) ? 2 : ILEN_AUTO;
-> +    uint64_t tec = (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
-> +                   (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ);
->      uint64_t asce;
->      int r;
->  
-> @@ -421,6 +404,16 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->          return r;
->      }
->  
-> +    /* check for DAT protection */
-> +    if (unlikely(rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE))) {
-> +        if (exc) {
-> +            /* DAT sets bit 61 only */
-> +            tec |= 0x4;
-> +            trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
-> +        }
-> +        return -1;
-> +    }
-> +
->  nodat:
->      /* Convert real address -> absolute address */
->      *raddr = mmu_real2abs(env, *raddr);
-> 
+>  target/s390x/mmu_helper.c | 63 +++++++++++----------------------------
+>  1 file changed, 17 insertions(+), 46 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+
 
