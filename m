@@ -2,66 +2,85 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21440C432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 07:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A528FC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 07:43:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAC0B2054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 07:42:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAC0B2054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7A4FC2054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 07:43:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A4FC2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD1wK-0001Dq-9D
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 03:42:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43749)
+	id 1iD1xs-0002qA-Qi
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 03:43:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45709)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iD1e1-0000i2-Hd
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 03:23:26 -0400
+ (envelope-from <slp@redhat.com>) id 1iD1np-0001Na-EI
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 03:33:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iD1e0-0008B7-0D
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 03:23:25 -0400
-Received: from 15.mo4.mail-out.ovh.net ([91.121.62.11]:44359)
+ (envelope-from <slp@redhat.com>) id 1iD1nm-0002oC-V7
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 03:33:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52793)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iD1dz-0008AB-Q1
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 03:23:23 -0400
-Received: from player738.ha.ovh.net (unknown [10.109.146.86])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id EEF8420882F
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 09:23:21 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player738.ha.ovh.net (Postfix) with ESMTPSA id 22ACBA516AF0;
- Wed, 25 Sep 2019 07:23:12 +0000 (UTC)
-Subject: Re: [PATCH 17/20] spapr: Remove unused return value in claim path
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
- <20190925064534.19155-18-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2f2f5437-d0c4-8c05-cb1f-584a35fd95db@kaod.org>
-Date: Wed, 25 Sep 2019 09:23:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iD1nm-0002nj-NS
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 03:33:30 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 30FA186668
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 07:33:29 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id n6so1866032wrm.20
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 00:33:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=CuB2l1l2AW1aA9nML3ymWwi25AU3aMKPJA39BqfZBOA=;
+ b=Hu9aVZ5LXJ3hbSJnsy3ToOV+3MGh1MTFQTr6KhHfdZf6hl7oOugKsJZZgVUXmMwzUd
+ 6jf1oAWubnPR6JlUIFJv6azkMudclsgd+UVIFrYSzjm1UdCxt/4CcqaQCFORhKXat8Wx
+ 7ItCvlgj/gXaohhFG7lTTxvzP+nrFutH9KI9+Agqf7LyemF0IlMXqInQWVU1CQt0/NvJ
+ lFRjGjMbTV35Bbq70I9e13RkrxcydoqCSMaNlO8M1uV3wrNYE9rJlSSXm2rSCYezmQaD
+ uUV48GTTVGjks7LuyKSbAt8d9G4kOsrgS1d+t172HaUGeiBSPqijgSJeu7kcVdVlq/9Z
+ iHKA==
+X-Gm-Message-State: APjAAAW4k+j7lOI+uV+jljeB04MNLkCPJelDIH0keNn8cK0jVEFtyFiV
+ XDB0xtJJ4l3Njkntpp1A9BNP3f9tlZRP10JGsF3L/EQ1MnSkH4cqBhj/4whSHHsCDdq5l46uwjQ
+ i51cwLuYy8MMNQ6s=
+X-Received: by 2002:a5d:51d2:: with SMTP id n18mr7531922wrv.10.1569396807750; 
+ Wed, 25 Sep 2019 00:33:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqx3TyvI/tukpUJDUD7w//YM87kZq+CXXLiEYXSPShzH6WwxctW/KKDXl2aWRIBMKFShb5sZDg==
+X-Received: by 2002:a5d:51d2:: with SMTP id n18mr7531893wrv.10.1569396807538; 
+ Wed, 25 Sep 2019 00:33:27 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id z9sm5560762wrp.26.2019.09.25.00.33.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 25 Sep 2019 00:33:26 -0700 (PDT)
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <20190925050629.lg5w6vvikxtgddy6@sirius.home.kraxel.org>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+In-reply-to: <20190925050629.lg5w6vvikxtgddy6@sirius.home.kraxel.org>
+Date: Wed, 25 Sep 2019 09:33:12 +0200
+Message-ID: <87impgsudj.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190925064534.19155-18-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 1578793145168071640
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedugdduvddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.121.62.11
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,162 +92,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, lersek@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
+ imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/09/2019 08:45, David Gibson wrote:
-> spapr_irq_claim() and the hooks it is based on return an integer error =
-code
-> as well as taking an Error ** parameter.  But none of the callers check=
- the
-> integer, so we can remove it and just use the richer Error **.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+--=-=-=
+Content-Type: text/plain
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-> ---
->  hw/ppc/spapr_irq.c         | 32 +++++++++++++-------------------
->  include/hw/ppc/spapr_irq.h |  4 ++--
->  2 files changed, 15 insertions(+), 21 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 261d66ba17..2673a90604 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -112,8 +112,8 @@ static void spapr_irq_init_xics(SpaprMachineState *=
-spapr, Error **errp)
->      spapr->ics =3D ICS_SPAPR(obj);
->  }
-> =20
-> -static int spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, boo=
-l lsi,
-> -                                Error **errp)
-> +static void spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, bo=
-ol lsi,
-> +                                 Error **errp)
->  {
->      ICSState *ics =3D spapr->ics;
-> =20
-> @@ -122,11 +122,10 @@ static int spapr_irq_claim_xics(SpaprMachineState=
- *spapr, int irq, bool lsi,
-> =20
->      if (!ics_irq_free(ics, irq - ics->offset)) {
->          error_setg(errp, "IRQ %d is not free", irq);
-> -        return -1;
-> +        return;
->      }
-> =20
->      ics_set_irq_type(ics, irq - ics->offset, lsi);
-> -    return 0;
->  }
-> =20
->  static void spapr_irq_free_xics(SpaprMachineState *spapr, int irq)
-> @@ -252,14 +251,12 @@ static void spapr_irq_init_xive(SpaprMachineState=
- *spapr, Error **errp)
->      spapr_xive_hcall_init(spapr);
->  }
-> =20
-> -static int spapr_irq_claim_xive(SpaprMachineState *spapr, int irq, boo=
-l lsi,
-> -                                Error **errp)
-> +static void spapr_irq_claim_xive(SpaprMachineState *spapr, int irq, bo=
-ol lsi,
-> +                                 Error **errp)
->  {
->      if (!spapr_xive_irq_claim(spapr->xive, irq, lsi)) {
->          error_setg(errp, "IRQ %d is invalid", irq);
-> -        return -1;
->      }
-> -    return 0;
->  }
-> =20
->  static void spapr_irq_free_xive(SpaprMachineState *spapr, int irq)
-> @@ -406,25 +403,22 @@ static void spapr_irq_init_dual(SpaprMachineState=
- *spapr, Error **errp)
->      }
->  }
-> =20
-> -static int spapr_irq_claim_dual(SpaprMachineState *spapr, int irq, boo=
-l lsi,
-> -                                Error **errp)
-> +static void spapr_irq_claim_dual(SpaprMachineState *spapr, int irq, bo=
-ol lsi,
-> +                                 Error **errp)
->  {
->      Error *local_err =3D NULL;
-> -    int ret;
-> =20
-> -    ret =3D spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
-> +    spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
-> -        return ret;
-> +        return;
->      }
-> =20
-> -    ret =3D spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
-> +    spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
-> -        return ret;
-> +        return;
->      }
-> -
-> -    return ret;
->  }
-> =20
->  static void spapr_irq_free_dual(SpaprMachineState *spapr, int irq)
-> @@ -622,12 +616,12 @@ void spapr_irq_init(SpaprMachineState *spapr, Err=
-or **errp)
->                                        spapr->irq->nr_xirqs + SPAPR_XIR=
-Q_BASE);
->  }
-> =20
-> -int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
- **errp)
-> +void spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Erro=
-r **errp)
->  {
->      assert(irq >=3D SPAPR_XIRQ_BASE);
->      assert(irq < (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
-> =20
-> -    return spapr->irq->claim(spapr, irq, lsi, errp);
-> +    spapr->irq->claim(spapr, irq, lsi, errp);
->  }
-> =20
->  void spapr_irq_free(SpaprMachineState *spapr, int irq, int num)
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index ed88b4599a..75279ca137 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -42,7 +42,7 @@ typedef struct SpaprIrq {
->      uint8_t     ov5;
-> =20
->      void (*init)(SpaprMachineState *spapr, Error **errp);
-> -    int (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error **=
-errp);
-> +    void (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
->      void (*free)(SpaprMachineState *spapr, int irq);
->      void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
->      void (*dt_populate)(SpaprMachineState *spapr, uint32_t nr_servers,
-> @@ -61,7 +61,7 @@ extern SpaprIrq spapr_irq_xive;
->  extern SpaprIrq spapr_irq_dual;
-> =20
->  void spapr_irq_init(SpaprMachineState *spapr, Error **errp);
-> -int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
- **errp);
-> +void spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Erro=
-r **errp);
->  void spapr_irq_free(SpaprMachineState *spapr, int irq, int num);
->  qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq);
->  int spapr_irq_post_load(SpaprMachineState *spapr, int version_id);
->=20
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
+>   Hi,
+>
+>> +microvm.kernel-cmdline=bool (Set off to disable adding virtio-mmio devices to the kernel cmdline)
+>
+> Hmm, is that the long-term plan?  IMO the virtio-mmio devices should be
+> discoverable somehow.  ACPI, or device-tree, or fw_cfg, or ...
+
+I'd say that depends on the machine type. ARM's virt and vexpress do
+support virtio-mmio devices, adding them to a generated DTB.
+
+For microvm that's simply not worth it. Fiddling with the command line
+achieves the same result without any significant drawbacks, with less
+code and less consumed cycles on both sides.
+
+>> +As no current FW is able to boot from a block device using virtio-mmio
+>> +as its transport,
+>
+> To fix that the firmware must be able to find the virtio-mmio devices.
+
+No FW supports modern virtio-mmio transports anyway. And, from microvm's
+perspective, there's little incentive to change this situation, given
+that it's main use cases (serverless computing and VM-isolated
+containers) will run with an external kernel.
+
+Thanks,
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LGDgACgkQ9GknjS8M
+AjUGFA/9En3xpwaRRlk8noOWngoaHWQN83Ugk1tJ6/lQackkpCwakxv+Bhupj9C4
+bdw0Fa7nwIKDfEWx5j/iQH8ig1pyw7qWAlJaZuo09XAW2qkBdIvacyTuIK9z/Xxz
+C2IXRdIY1X90ovNqrZPCX48TtUlGBgCBB8CTMBMktKmA1aqcGahzzHYJE7B24iRo
+onXEy5w3Hss6ln+voTgOvLHtrJ+qBAE92h+UjdICIa748gGWqGI8HjqEIDjMUZfb
+VjxlzR+0U92kOGH6bQmc+inVENltSAlyEC5PuzKUZ8X24VGFae1EHY3nAB9wKtPI
+uxGsqNYJIxliWSwMOEWJzde81b3H30l9dYhxbQKfZri4oOIfr/EG4pAARSKjsZBI
+pZMe9C5eNeCWcfaHA59SHR7Sw4XBdgU+xekL8RR5lCgYz4DYPlVd+1ny6IKcUICV
+aZdY0SYC0eOWVHaAsphjEHf6c+WTQ9CZkC/Wzha8UgGMsL3s0oU6nRcUhIe1LVL/
+Gv75N19Ji+XW2fSRYLi7WMXL7hpgQxWzJ4H8G4ijb88tBtHlGttHlnxtj7g/PIvp
+9w90y+xdK6JXzRYOTwGzN8TSMBmUeEkgUT2EiWCPZNCAZrze0WliEktUBN1g+rsQ
+c74pQhEfC8cAPWMHpGgn1/vsz7K8YOi6KDuoPNpcVOEAkBNcjhs=
+=McNV
+-----END PGP SIGNATURE-----
+--=-=-=--
 
