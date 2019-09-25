@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E45C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:54:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 650D0C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:54:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 477D82146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:54:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 477D82146E
+	by mail.kernel.org (Postfix) with ESMTPS id 2DC7E2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 12:54:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC7E2146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD6o8-0007IK-OS
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:54:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57845)
+	id 1iD6oB-0007Ky-Uk
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 08:54:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6ge-0001HC-Ph
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:32 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gp-0001S6-FX
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gc-0002Ew-3B
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:28 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56079 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gn-0002Ks-Gt
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:39 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56129 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iD6gb-0002DD-Jz
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:25 -0400
+ id 1iD6gn-0002FQ-5r
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:37 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 83B091A239A;
- Wed, 25 Sep 2019 14:46:21 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 255021A23E1;
+ Wed, 25 Sep 2019 14:46:22 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 548141A2012;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id CE8C41A23C3;
  Wed, 25 Sep 2019 14:46:21 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/20] target/mips: Clean up helper.c
-Date: Wed, 25 Sep 2019 14:45:53 +0200
-Message-Id: <1569415572-19635-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v2 13/20] target/mips: msa: Split helpers for
+ AVER_<S|U>.<B|H|W|D>
+Date: Wed, 25 Sep 2019 14:46:05 +0200
+Message-Id: <1569415572-19635-14-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -69,334 +70,287 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
+Achieves clearer code and slightly better performance.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/helper.c | 132 +++++++++++++++++++++++++++++++--------------------
- 1 file changed, 80 insertions(+), 52 deletions(-)
+ target/mips/helper.h     |  12 +++-
+ target/mips/msa_helper.c | 154 ++++++++++++++++++++++++++++++++++++++++++-----
+ target/mips/translate.c  |  38 ++++++++++--
+ 3 files changed, 180 insertions(+), 24 deletions(-)
 
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index a2b6459..3dd1aae 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -39,8 +39,8 @@ enum {
- #if !defined(CONFIG_USER_ONLY)
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 455dd25..9d4c9f1 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -832,6 +832,16 @@ DEF_HELPER_4(msa_ave_u_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_ave_u_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_ave_u_d, void, env, i32, i32, i32)
  
- /* no MMU emulation */
--int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
--                        target_ulong address, int rw, int access_type)
-+int no_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
-+                       target_ulong address, int rw, int access_type)
- {
-     *physical = address;
-     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-@@ -48,26 +48,28 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
++DEF_HELPER_4(msa_aver_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_s_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_aver_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_aver_u_d, void, env, i32, i32, i32)
++
+ 
+ DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_ori_b, void, env, i32, i32, i32)
+@@ -890,8 +900,6 @@ DEF_HELPER_5(msa_add_a_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_adds_a_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_adds_s_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_adds_u_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_aver_s_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_aver_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_subs_s_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_subs_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_subsus_u_df, void, env, i32, i32, i32, i32)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index f0dbf24..a4f51c6 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -970,6 +970,144 @@ void helper_msa_ave_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt
+     pwd->d[1]  = msa_ave_u_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
  }
  
- /* fixed mapping MMU emulation */
--int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
--                           target_ulong address, int rw, int access_type)
-+int fixed_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
-+                          target_ulong address, int rw, int access_type)
- {
-     if (address <= (int32_t)0x7FFFFFFFUL) {
--        if (!(env->CP0_Status & (1 << CP0St_ERL)))
-+        if (!(env->CP0_Status & (1 << CP0St_ERL))) {
-             *physical = address + 0x40000000UL;
--        else
-+        } else {
-             *physical = address;
--    } else if (address <= (int32_t)0xBFFFFFFFUL)
-+        }
-+    } else if (address <= (int32_t)0xBFFFFFFFUL) {
-         *physical = address & 0x1FFFFFFF;
--    else
-+    } else {
-         *physical = address;
-+    }
++static inline int64_t msa_aver_s_df(uint32_t df, int64_t arg1, int64_t arg2)
++{
++    /* signed shift */
++    return (arg1 >> 1) + (arg2 >> 1) + ((arg1 | arg2) & 1);
++}
++
++void helper_msa_aver_s_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[1]);
++    pwd->b[2]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[2]);
++    pwd->b[3]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[3]);
++    pwd->b[4]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[4]);
++    pwd->b[5]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[5]);
++    pwd->b[6]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[6]);
++    pwd->b[7]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[7]);
++    pwd->b[8]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[8]);
++    pwd->b[9]  = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[9]);
++    pwd->b[10] = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[10]);
++    pwd->b[11] = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[11]);
++    pwd->b[12] = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[12]);
++    pwd->b[13] = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[13]);
++    pwd->b[14] = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[14]);
++    pwd->b[15] = msa_aver_s_df(DF_BYTE, pws->b[0],  pwt->b[15]);
++}
++
++void helper_msa_aver_s_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_aver_s_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_aver_s_df(DF_HALF, pws->h[0],  pwt->h[1]);
++    pwd->h[2]  = msa_aver_s_df(DF_HALF, pws->h[0],  pwt->h[2]);
++    pwd->h[3]  = msa_aver_s_df(DF_HALF, pws->h[0],  pwt->h[3]);
++    pwd->h[4]  = msa_aver_s_df(DF_HALF, pws->h[0],  pwt->h[4]);
++    pwd->h[5]  = msa_aver_s_df(DF_HALF, pws->h[0],  pwt->h[5]);
++    pwd->h[6]  = msa_aver_s_df(DF_HALF, pws->h[0],  pwt->h[6]);
++    pwd->h[7]  = msa_aver_s_df(DF_HALF, pws->h[0],  pwt->h[7]);
++}
++
++void helper_msa_aver_s_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_aver_s_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_aver_s_df(DF_WORD, pws->w[0],  pwt->w[1]);
++    pwd->w[2]  = msa_aver_s_df(DF_WORD, pws->w[0],  pwt->w[2]);
++    pwd->w[3]  = msa_aver_s_df(DF_WORD, pws->w[0],  pwt->w[3]);
++}
++
++void helper_msa_aver_s_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_aver_s_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_aver_s_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
++}
++
++static inline uint64_t msa_aver_u_df(uint32_t df, uint64_t arg1, uint64_t arg2)
++{
++    uint64_t u_arg1 = UNSIGNED(arg1, df);
++    uint64_t u_arg2 = UNSIGNED(arg2, df);
++    /* unsigned shift */
++    return (u_arg1 >> 1) + (u_arg2 >> 1) + ((u_arg1 | u_arg2) & 1);
++}
++
++void helper_msa_aver_u_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[1]);
++    pwd->b[2]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[2]);
++    pwd->b[3]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[3]);
++    pwd->b[4]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[4]);
++    pwd->b[5]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[5]);
++    pwd->b[6]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[6]);
++    pwd->b[7]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[7]);
++    pwd->b[8]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[8]);
++    pwd->b[9]  = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[9]);
++    pwd->b[10] = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[10]);
++    pwd->b[11] = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[11]);
++    pwd->b[12] = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[12]);
++    pwd->b[13] = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[13]);
++    pwd->b[14] = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[14]);
++    pwd->b[15] = msa_aver_u_df(DF_BYTE, pws->b[0],  pwt->b[15]);
++}
++
++void helper_msa_aver_u_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_aver_u_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_aver_u_df(DF_HALF, pws->h[0],  pwt->h[1]);
++    pwd->h[2]  = msa_aver_u_df(DF_HALF, pws->h[0],  pwt->h[2]);
++    pwd->h[3]  = msa_aver_u_df(DF_HALF, pws->h[0],  pwt->h[3]);
++    pwd->h[4]  = msa_aver_u_df(DF_HALF, pws->h[0],  pwt->h[4]);
++    pwd->h[5]  = msa_aver_u_df(DF_HALF, pws->h[0],  pwt->h[5]);
++    pwd->h[6]  = msa_aver_u_df(DF_HALF, pws->h[0],  pwt->h[6]);
++    pwd->h[7]  = msa_aver_u_df(DF_HALF, pws->h[0],  pwt->h[7]);
++}
++
++void helper_msa_aver_u_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_aver_u_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_aver_u_df(DF_WORD, pws->w[0],  pwt->w[1]);
++    pwd->w[2]  = msa_aver_u_df(DF_WORD, pws->w[0],  pwt->w[2]);
++    pwd->w[3]  = msa_aver_u_df(DF_WORD, pws->w[0],  pwt->w[3]);
++}
++
++void helper_msa_aver_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_aver_u_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_aver_u_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
++}
++
  
-     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     return TLBRET_MATCH;
+ /*
+  * Int Compare
+@@ -1736,20 +1874,6 @@ static inline uint64_t msa_adds_u_df(uint32_t df, uint64_t arg1, uint64_t arg2)
+     return (u_arg1 < max_uint - u_arg2) ? u_arg1 + u_arg2 : max_uint;
  }
  
- /* MIPS32/MIPS64 R4000-style MMU emulation */
--int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
--                     target_ulong address, int rw, int access_type)
-+int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
-+                    target_ulong address, int rw, int access_type)
+-static inline int64_t msa_aver_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+-{
+-    /* signed shift */
+-    return (arg1 >> 1) + (arg2 >> 1) + ((arg1 | arg2) & 1);
+-}
+-
+-static inline uint64_t msa_aver_u_df(uint32_t df, uint64_t arg1, uint64_t arg2)
+-{
+-    uint64_t u_arg1 = UNSIGNED(arg1, df);
+-    uint64_t u_arg2 = UNSIGNED(arg2, df);
+-    /* unsigned shift */
+-    return (u_arg1 >> 1) + (u_arg2 >> 1) + ((u_arg1 | u_arg2) & 1);
+-}
+-
+ static inline int64_t msa_subs_s_df(uint32_t df, int64_t arg1, int64_t arg2)
  {
-     uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
-     int i;
-@@ -99,8 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
-             if (rw != MMU_DATA_STORE || (n ? tlb->D1 : tlb->D0)) {
-                 *physical = tlb->PFN[n] | (address & (mask >> 1));
-                 *prot = PAGE_READ;
--                if (n ? tlb->D1 : tlb->D0)
-+                if (n ? tlb->D1 : tlb->D0) {
-                     *prot |= PAGE_WRITE;
-+                }
-                 if (!(n ? tlb->XI1 : tlb->XI0)) {
-                     *prot |= PAGE_EXEC;
-                 }
-@@ -130,8 +133,11 @@ static int is_seg_am_mapped(unsigned int am, bool eu, int mmu_idx)
-     int32_t adetlb_mask;
- 
-     switch (mmu_idx) {
--    case 3 /* ERL */:
--        /* If EU is set, always unmapped */
-+    case 3:
-+        /*
-+         * ERL
-+         * If EU is set, always unmapped
-+         */
-         if (eu) {
-             return 0;
+     int64_t max_int = DF_MAX_INT(df);
+@@ -2057,8 +2181,6 @@ MSA_BINOP_DF(add_a)
+ MSA_BINOP_DF(adds_a)
+ MSA_BINOP_DF(adds_s)
+ MSA_BINOP_DF(adds_u)
+-MSA_BINOP_DF(aver_s)
+-MSA_BINOP_DF(aver_u)
+ MSA_BINOP_DF(subs_s)
+ MSA_BINOP_DF(subs_u)
+ MSA_BINOP_DF(subsus_u)
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 2b0abbb..9b186d3 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -28498,6 +28498,38 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             break;
          }
-@@ -204,9 +210,9 @@ static int get_segctl_physical_address(CPUMIPSState *env, hwaddr *physical,
-                                     pa & ~(hwaddr)segmask);
- }
- 
--static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
--                                int *prot, target_ulong real_address,
--                                int rw, int access_type, int mmu_idx)
-+static int get_physical_address(CPUMIPSState *env, hwaddr *physical,
-+                               int *prot, target_ulong real_address,
-+                               int rw, int access_type, int mmu_idx)
- {
-     /* User mode can only access useg/xuseg */
- #if defined(TARGET_MIPS64)
-@@ -252,14 +258,15 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-         } else {
-             segctl = env->CP0_SegCtl2 >> 16;
-         }
--        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
--                                          access_type, mmu_idx, segctl,
--                                          0x3FFFFFFF);
-+        ret = get_segctl_physical_address(env, physical, prot,
-+                                          real_address, rw, access_type,
-+                                          mmu_idx, segctl, 0x3FFFFFFF);
- #if defined(TARGET_MIPS64)
-     } else if (address < 0x4000000000000000ULL) {
-         /* xuseg */
-         if (UX && address <= (0x3FFFFFFFFFFFFFFFULL & env->SEGMask)) {
--            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
-+            ret = env->tlb->map_address(env, physical, prot,
-+                                        real_address, rw, access_type);
-         } else {
-             ret = TLBRET_BADADDR;
-         }
-@@ -267,7 +274,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-         /* xsseg */
-         if ((supervisor_mode || kernel_mode) &&
-             SX && address <= (0x7FFFFFFFFFFFFFFFULL & env->SEGMask)) {
--            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
-+            ret = env->tlb->map_address(env, physical, prot,
-+                                        real_address, rw, access_type);
-         } else {
-             ret = TLBRET_BADADDR;
-         }
-@@ -307,7 +315,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-         /* xkseg */
-         if (kernel_mode && KX &&
-             address <= (0xFFFFFFFF7FFFFFFFULL & env->SEGMask)) {
--            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
-+            ret = env->tlb->map_address(env, physical, prot,
-+                                        real_address, rw, access_type);
-         } else {
-             ret = TLBRET_BADADDR;
-         }
-@@ -328,8 +337,10 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-                                           access_type, mmu_idx,
-                                           env->CP0_SegCtl0 >> 16, 0x1FFFFFFF);
-     } else {
--        /* kseg3 */
--        /* XXX: debug segment is not emulated */
-+        /*
-+         * kseg3
-+         * XXX: debug segment is not emulated
-+         */
-         ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
-                                           access_type, mmu_idx,
-                                           env->CP0_SegCtl0, 0x1FFFFFFF);
-@@ -515,9 +526,9 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
- #if defined(TARGET_MIPS64)
-     env->CP0_EntryHi &= env->SEGMask;
-     env->CP0_XContext =
--        /* PTEBase */   (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) |
--        /* R */         (extract64(address, 62, 2) << (env->SEGBITS - 9)) |
--        /* BadVPN2 */   (extract64(address, 13, env->SEGBITS - 13) << 4);
-+        (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) | /* PTEBase */
-+        (extract64(address, 62, 2) << (env->SEGBITS - 9)) |     /* R       */
-+        (extract64(address, 13, env->SEGBITS - 13) << 4);       /* BadVPN2 */
- #endif
-     cs->exception_index = exception;
-     env->error_code = error_code;
-@@ -945,7 +956,8 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
- }
- 
- #ifndef CONFIG_USER_ONLY
--hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address, int rw)
-+hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address,
-+                                  int rw)
- {
-     hwaddr physical;
-     int prot;
-@@ -1005,7 +1017,7 @@ static const char * const excp_names[EXCP_LAST + 1] = {
- };
- #endif
- 
--target_ulong exception_resume_pc (CPUMIPSState *env)
-+target_ulong exception_resume_pc(CPUMIPSState *env)
- {
-     target_ulong bad_pc;
-     target_ulong isa_mode;
-@@ -1013,8 +1025,10 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
-     isa_mode = !!(env->hflags & MIPS_HFLAG_M16);
-     bad_pc = env->active_tc.PC | isa_mode;
-     if (env->hflags & MIPS_HFLAG_BMASK) {
--        /* If the exception was raised from a delay slot, come back to
--           the jump.  */
-+        /*
-+         * If the exception was raised from a delay slot, come back to
-+         *  the jump.
-+         */
-         bad_pc -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
-     }
- 
-@@ -1022,14 +1036,14 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
- }
- 
- #if !defined(CONFIG_USER_ONLY)
--static void set_hflags_for_handler (CPUMIPSState *env)
-+static void set_hflags_for_handler(CPUMIPSState *env)
- {
-     /* Exception handlers are entered in 32-bit mode.  */
-     env->hflags &= ~(MIPS_HFLAG_M16);
-     /* ...except that microMIPS lets you choose.  */
-     if (env->insn_flags & ASE_MICROMIPS) {
--        env->hflags |= (!!(env->CP0_Config3
--                           & (1 << CP0C3_ISA_ON_EXC))
-+        env->hflags |= (!!(env->CP0_Config3 &
-+                           (1 << CP0C3_ISA_ON_EXC))
-                         << MIPS_HFLAG_M16_SHIFT);
-     }
- }
-@@ -1096,10 +1110,12 @@ void mips_cpu_do_interrupt(CPUState *cs)
-     switch (cs->exception_index) {
-     case EXCP_DSS:
-         env->CP0_Debug |= 1 << CP0DB_DSS;
--        /* Debug single step cannot be raised inside a delay slot and
--           resume will always occur on the next instruction
--           (but we assume the pc has always been updated during
--           code translation). */
-+        /*
-+         * Debug single step cannot be raised inside a delay slot and
-+         * resume will always occur on the next instruction
-+         * (but we assume the pc has always been updated during
-+         * code translation).
-+         */
-         env->CP0_DEPC = env->active_tc.PC | !!(env->hflags & MIPS_HFLAG_M16);
-         goto enter_debug_mode;
-     case EXCP_DINT:
-@@ -1111,7 +1127,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
-     case EXCP_DBp:
-         env->CP0_Debug |= 1 << CP0DB_DBp;
-         /* Setup DExcCode - SDBBP instruction */
--        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) | 9 << CP0DB_DEC;
-+        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) |
-+                         (9 << CP0DB_DEC);
-         goto set_DEPC;
-     case EXCP_DDBS:
-         env->CP0_Debug |= 1 << CP0DB_DDBS;
-@@ -1132,8 +1149,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
-         env->hflags |= MIPS_HFLAG_DM | MIPS_HFLAG_CP0;
-         env->hflags &= ~(MIPS_HFLAG_KSU);
-         /* EJTAG probe trap enable is not implemented... */
--        if (!(env->CP0_Status & (1 << CP0St_EXL)))
-+        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
-             env->CP0_Cause &= ~(1U << CP0Ca_BD);
-+        }
-         env->active_tc.PC = env->exception_base + 0x480;
-         set_hflags_for_handler(env);
          break;
-@@ -1159,8 +1177,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
-         }
-         env->hflags |= MIPS_HFLAG_CP0;
-         env->hflags &= ~(MIPS_HFLAG_KSU);
--        if (!(env->CP0_Status & (1 << CP0St_EXL)))
-+        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
-             env->CP0_Cause &= ~(1U << CP0Ca_BD);
++    case OPC_AVER_S_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_aver_s_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_aver_s_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_aver_s_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_aver_s_d(cpu_env, twd, tws, twt);
++            break;
 +        }
-         env->active_tc.PC = env->exception_base;
-         set_hflags_for_handler(env);
++        break;
++    case OPC_AVER_U_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_aver_u_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_aver_u_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_aver_u_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_aver_u_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
+     case OPC_SLL_df:
+         gen_helper_msa_sll_df(cpu_env, tdf, twd, tws, twt);
          break;
-@@ -1176,12 +1195,16 @@ void mips_cpu_do_interrupt(CPUState *cs)
-                 uint32_t pending = (env->CP0_Cause & CP0Ca_IP_mask) >> CP0Ca_IP;
- 
-                 if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
--                    /* For VEIC mode, the external interrupt controller feeds
--                     * the vector through the CP0Cause IP lines.  */
-+                    /*
-+                     * For VEIC mode, the external interrupt controller feeds
-+                     * the vector through the CP0Cause IP lines.
-+                     */
-                     vector = pending;
-                 } else {
--                    /* Vectored Interrupts
--                     * Mask with Status.IM7-IM0 to get enabled interrupts. */
-+                    /*
-+                     * Vectored Interrupts
-+                     * Mask with Status.IM7-IM0 to get enabled interrupts.
-+                     */
-                     pending &= (env->CP0_Status >> CP0St_IM) & 0xff;
-                     /* Find the highest-priority interrupt. */
-                     while (pending >>= 1) {
-@@ -1354,7 +1377,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
- 
-         env->active_tc.PC += offset;
-         set_hflags_for_handler(env);
--        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) | (cause << CP0Ca_EC);
-+        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) |
-+                         (cause << CP0Ca_EC);
+@@ -28615,9 +28647,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MAX_A_df:
+         gen_helper_msa_max_a_df(cpu_env, tdf, twd, tws, twt);
          break;
-     default:
-         abort();
-@@ -1390,7 +1414,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- }
- 
- #if !defined(CONFIG_USER_ONLY)
--void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
-+void r4k_invalidate_tlb(CPUMIPSState *env, int idx, int use_extra)
- {
-     CPUState *cs = env_cpu(env);
-     r4k_tlb_t *tlb;
-@@ -1400,16 +1424,20 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
-     target_ulong mask;
- 
-     tlb = &env->tlb->mmu.r4k.tlb[idx];
--    /* The qemu TLB is flushed when the ASID changes, so no need to
--       flush these entries again.  */
-+    /*
-+     * The qemu TLB is flushed when the ASID changes, so no need to
-+     * flush these entries again.
-+     */
-     if (tlb->G == 0 && tlb->ASID != ASID) {
-         return;
-     }
- 
-     if (use_extra && env->tlb->tlb_in_use < MIPS_TLB_MAX) {
--        /* For tlbwr, we can shadow the discarded entry into
--           a new (fake) TLB entry, as long as the guest can not
--           tell that it's there.  */
-+        /*
-+         * For tlbwr, we can shadow the discarded entry into
-+         * a new (fake) TLB entry, as long as the guest can not
-+         * tell that it's there.
-+         */
-         env->tlb->mmu.r4k.tlb[env->tlb->tlb_in_use] = *tlb;
-         env->tlb->tlb_in_use++;
-         return;
+-    case OPC_AVER_S_df:
+-        gen_helper_msa_aver_s_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_MOD_S_df:
+         gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
+         break;
+@@ -28627,9 +28656,6 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MIN_A_df:
+         gen_helper_msa_min_a_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_AVER_U_df:
+-        gen_helper_msa_aver_u_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_MOD_U_df:
+         gen_helper_msa_mod_u_df(cpu_env, tdf, twd, tws, twt);
+         break;
 -- 
 2.7.4
 
