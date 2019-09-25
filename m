@@ -2,61 +2,91 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A937C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC09FC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:37:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 636892146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:22:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 636892146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 88987207E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:37:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TqWpHbXn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88987207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDAzx-0001Oh-Fk
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:22:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49438)
+	id 1iDBEI-0007UA-M7
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iDAu0-0005hJ-SV
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:16:34 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iDBDP-0006rB-Gp
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:36:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iDAtz-0005M2-JA
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:16:32 -0400
-Received: from 13.mo4.mail-out.ovh.net ([178.33.251.8]:60844)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDAtz-0005LG-Cm
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:16:31 -0400
-Received: from player789.ha.ovh.net (unknown [10.108.42.5])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 06B3520817F
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 19:16:28 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player789.ha.ovh.net (Postfix) with ESMTPSA id 832DFA2FFFBD;
- Wed, 25 Sep 2019 17:16:18 +0000 (UTC)
-Date: Wed, 25 Sep 2019 19:16:17 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 10/20] spapr: Eliminate nr_irqs parameter to SpaprIrq::init
-Message-ID: <20190925191617.65acbc68@bahia.lan>
-In-Reply-To: <20190925064534.19155-11-david@gibson.dropbear.id.au>
-References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
- <20190925064534.19155-11-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <richard.henderson@linaro.org>) id 1iDBDO-0007eX-A8
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:36:35 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:33100)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iDBDO-0007cY-1n
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:36:34 -0400
+Received: by mail-pg1-x543.google.com with SMTP id i30so251234pgl.0
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 10:36:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=8FtJ4kSv+fBASLFltN6A+y8E6bJ4Hebmn/tO3/QW1WE=;
+ b=TqWpHbXngy4qjQViCRFv384tktV2GcdaN2Ig1LPTeGbj8Jqw0dnGXbiFTxlUGo5i+f
+ Sk6qTXY5jlO9hp2+1PqUw3j0tQ7zfpd4uPvTBtHcUOzpFqfMga9vsGgfjlHCINDoQk9s
+ +ZCO3csghBbE3XCjQPnvGa36GrPkIwUxbJu1QksINtvNgvhmZS84RxV4zl0vH+fikvo/
+ wmIsnI2hHUP0hZIjzDWVf9XpoHcfozNVPsRCDwgP7qDXJzn6yrn7Rv/2Cmo3AbjiQaVW
+ YM1fQilUm596iKhj8bAi+zTvSXiHx6ZpHi1W0aRAjtmlF4anT0R2OlAcXxXrCpZu3dqW
+ llwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8FtJ4kSv+fBASLFltN6A+y8E6bJ4Hebmn/tO3/QW1WE=;
+ b=sK7uONSCxG9CPttwfX6Mg3vXOj8XJg7HePeiw2Yw/S439g3YHThMJr1YeoRrsEHAvZ
+ ZAbcjZL7OvWfa2L+84B58UcMlNGla0HXbj+kaqjbn5dp5fsF5nqdY+GG1/fXaVwiBqgW
+ xPKHlHEH0Wow555wNBishvRz4UJwu2HjTCccQavAqDaC6VT7LGLkopjXlrcsEgG3w3Oi
+ gshyIM1FBin566DvFYbxuLDdP/jFsMYy/B5OCjZxi6RL6CF0CFimH4DKAeYD1NA6xb5w
+ cL2PpKmq/mZDywcysz2ENCL4sqX2HKEjVsWlbb7oM5DZSPNZA8EPA4ldfv0EZyhV9Rc+
+ XJeg==
+X-Gm-Message-State: APjAAAVXfmAf1Qn8pxES7BzgHjbXZ92EJaGdB6PEiQdHRRWhCEiQl/tj
+ KjzL5lGS7Va/671wgodMuUjPMA==
+X-Google-Smtp-Source: APXvYqz6fRpyv0f6advnFNRoGePmKK4IDYY75PJIWXimw2mhQ2PtwQipC5aVUUT5eFk7sEle95hmPg==
+X-Received: by 2002:aa7:8edd:: with SMTP id b29mr10987739pfr.138.1569432992796; 
+ Wed, 25 Sep 2019 10:36:32 -0700 (PDT)
+Received: from [172.20.32.216] ([12.206.46.61])
+ by smtp.gmail.com with ESMTPSA id ep10sm11372530pjb.2.2019.09.25.10.36.31
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 25 Sep 2019 10:36:32 -0700 (PDT)
+Subject: Re: [PATCH v4 06/16] cputlb: Introduce TLB_BSWAP
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190923230004.9231-1-richard.henderson@linaro.org>
+ <20190923230004.9231-7-richard.henderson@linaro.org>
+ <87zhita6w9.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <87a14f8a-62bf-2d0c-4e11-d23ac28d095f@linaro.org>
+Date: Wed, 25 Sep 2019 10:36:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 11595643143125309926
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgdduuddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.251.8
+In-Reply-To: <87zhita6w9.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,118 +98,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- clg@kaod.org,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 25 Sep 2019 16:45:24 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On 9/24/19 11:25 AM, Alex Bennée wrote:
+>> -
+>> -            /* The backing page may or may not require I/O.  */
+>> -            tlb_addr &= ~TLB_WATCHPOINT;
+>> -            if ((tlb_addr & ~TARGET_PAGE_MASK) == 0) {
+>> -                goto do_aligned_access;
+>> -            }
+>>          }
+>>
+>            /* We don't apply MO_BSWAP to op here because we want to
+>             * ensure the compiler can always unfold and dead-code away
+>             * the final load_memop in the fast path. If you try the
+>             * you will find the assert will get you ;-)
+>             */
 
-> The only reason this parameter was needed was to work around the
-> inconsistent meaning of nr_irqs between xics and xive.  Now that we've
-> fixed that, we can consistently use the number directly in the SpaprIrq
-> configuration.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+I added
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
++        /*
++         * Keep these two load_memop separate to ensure that the compiler
++         * is able to fold the entire function to a single instruction.
++         * There is a build-time assert inside to remind you of this.  ;-)
++         */
 
->  hw/ppc/spapr_irq.c         | 21 ++++++++++-----------
->  include/hw/ppc/spapr_irq.h |  2 +-
->  2 files changed, 11 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 5190a33e08..300c65be3a 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -92,8 +92,7 @@ static void spapr_irq_init_kvm(SpaprMachineState *spapr,
->   * XICS IRQ backend.
->   */
->  
-> -static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_xirqs,
-> -                                Error **errp)
-> +static void spapr_irq_init_xics(SpaprMachineState *spapr, Error **errp)
->  {
->      Object *obj;
->      Error *local_err = NULL;
-> @@ -102,7 +101,8 @@ static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_xirqs,
->      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
->      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
->                                     &error_fatal);
-> -    object_property_set_int(obj, nr_xirqs, "nr-irqs",  &error_fatal);
-> +    object_property_set_int(obj, spapr->irq->nr_xirqs,
-> +                            "nr-irqs",  &error_fatal);
->      object_property_set_bool(obj, true, "realized", &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
-> @@ -256,15 +256,15 @@ SpaprIrq spapr_irq_xics = {
->  /*
->   * XIVE IRQ backend.
->   */
-> -static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_xirqs,
-> -                                Error **errp)
-> +static void spapr_irq_init_xive(SpaprMachineState *spapr, Error **errp)
->  {
->      uint32_t nr_servers = spapr_max_server_number(spapr);
->      DeviceState *dev;
->      int i;
->  
->      dev = qdev_create(NULL, TYPE_SPAPR_XIVE);
-> -    qdev_prop_set_uint32(dev, "nr-irqs", nr_xirqs + SPAPR_XIRQ_BASE);
-> +    qdev_prop_set_uint32(dev, "nr-irqs",
-> +                         spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
->      /*
->       * 8 XIVE END structures per CPU. One for each available priority
->       */
-> @@ -443,18 +443,17 @@ static SpaprIrq *spapr_irq_current(SpaprMachineState *spapr)
->          &spapr_irq_xive : &spapr_irq_xics;
->  }
->  
-> -static void spapr_irq_init_dual(SpaprMachineState *spapr, int nr_xirqs,
-> -                                Error **errp)
-> +static void spapr_irq_init_dual(SpaprMachineState *spapr, Error **errp)
->  {
->      Error *local_err = NULL;
->  
-> -    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_xirqs, &local_err);
-> +    spapr_irq_xics.init(spapr, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
->      }
->  
-> -    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_xirqs, &local_err);
-> +    spapr_irq_xive.init(spapr, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> @@ -683,7 +682,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->          spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
->      }
->  
-> -    spapr->irq->init(spapr, spapr->irq->nr_xirqs, errp);
-> +    spapr->irq->init(spapr, errp);
->  
->      spapr->qirqs = qemu_allocate_irqs(spapr->irq->set_irq, spapr,
->                                        spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index a8f9a2ab11..7e26288fcd 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -41,7 +41,7 @@ typedef struct SpaprIrq {
->      uint32_t    nr_msis;
->      uint8_t     ov5;
->  
-> -    void (*init)(SpaprMachineState *spapr, int nr_irqs, Error **errp);
-> +    void (*init)(SpaprMachineState *spapr, Error **errp);
->      int (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error **errp);
->      void (*free)(SpaprMachineState *spapr, int irq, int num);
->      qemu_irq (*qirq)(SpaprMachineState *spapr, int irq);
 
+r~
 
