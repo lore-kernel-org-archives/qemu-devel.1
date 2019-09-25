@@ -2,61 +2,60 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BADC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:22:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C05C4360C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:26:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4744F2054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:22:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4744F2054F
+	by mail.kernel.org (Postfix) with ESMTPS id 2BEDA2054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 15:26:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BEDA2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD985-0003zV-Fn
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:22:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57534)
+	id 1iD9B1-0006VF-JH
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 11:25:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iD8na-0000Zj-JH
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:01:47 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iD8si-0006Jt-BG
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:07:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iD8nY-0004YC-Jh
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:01:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56705)
+ (envelope-from <imammedo@redhat.com>) id 1iD8sf-00067o-Kc
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:07:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45386)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iD8nV-0004XC-RA
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:01:43 -0400
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1iD8sZ-00065k-WA; Wed, 25 Sep 2019 11:06:56 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6CD5B8A1CB9;
- Wed, 25 Sep 2019 15:01:40 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-117-251.ams2.redhat.com
- [10.36.117.251])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 179995C21F;
- Wed, 25 Sep 2019 15:01:38 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com,
- marcandre.lureau@redhat.com, richardw.yang@linux.intel.com,
- alex.benee@linaro.org
-Subject: [PULL 1/9] migration: fix vmdesc leak on vmstate_save() error
-Date: Wed, 25 Sep 2019 16:01:22 +0100
-Message-Id: <20190925150130.12303-2-dgilbert@redhat.com>
-In-Reply-To: <20190925150130.12303-1-dgilbert@redhat.com>
-References: <20190925150130.12303-1-dgilbert@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 193391918648;
+ Wed, 25 Sep 2019 15:06:55 +0000 (UTC)
+Received: from Igors-MacBook-Pro (ovpn-112-17.ams2.redhat.com [10.36.112.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C054D5C1D4;
+ Wed, 25 Sep 2019 15:06:42 +0000 (UTC)
+Date: Wed, 25 Sep 2019 17:06:39 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH-for-4.2 v11 05/11] hw/arm/virt: Enable device memory
+ cold/hot plug with ACPI boot
+Message-ID: <20190925170639.0626ae73@Igors-MacBook-Pro>
+In-Reply-To: <20190918130633.4872-6-shameerali.kolothum.thodi@huawei.com>
+References: <20190918130633.4872-1-shameerali.kolothum.thodi@huawei.com>
+ <20190918130633.4872-6-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Wed, 25 Sep 2019 15:01:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.70]); Wed, 25 Sep 2019 15:06:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -71,59 +70,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, shannon.zhaosl@gmail.com,
+ ard.biesheuvel@linaro.org, qemu-devel@nongnu.org, xuwei5@hisilicon.com,
+ linuxarm@huawei.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
+ mst@redhat.com, sebastien.boeuf@intel.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Wed, 18 Sep 2019 14:06:27 +0100
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20190912122514.22504-2-marcandre.lureau@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/qjson.h  | 2 ++
- migration/savevm.c | 3 +--
- 2 files changed, 3 insertions(+), 2 deletions(-)
+> This initializes the GED device with base memory and irq, configures
+> ged memory hotplug event and builds the corresponding aml code. With
+> this, both hot and cold plug of device memory is enabled now for Guest
+> with ACPI boot. Memory cold plug support with Guest DT boot is not yet
+> supported.
+> 
+> As DSDT table gets changed by this, update bios-tables-test-allowed-diff.h
+> to avoid "make check" failure.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-diff --git a/migration/qjson.h b/migration/qjson.h
-index 41664f2d71..1786bb5864 100644
---- a/migration/qjson.h
-+++ b/migration/qjson.h
-@@ -24,4 +24,6 @@ void json_start_object(QJSON *json, const char *name);
- const char *qjson_get_str(QJSON *json);
- void qjson_finish(QJSON *json);
-=20
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QJSON, qjson_destroy)
-+
- #endif /* QEMU_QJSON_H */
-diff --git a/migration/savevm.c b/migration/savevm.c
-index ee06f91d42..bb9462a54d 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1314,7 +1314,7 @@ int qemu_savevm_state_complete_precopy_non_iterable=
-(QEMUFile *f,
-                                                     bool in_postcopy,
-                                                     bool inactivate_disk=
-s)
- {
--    QJSON *vmdesc;
-+    g_autoptr(QJSON) vmdesc =3D NULL;
-     int vmdesc_len;
-     SaveStateEntry *se;
-     int ret;
-@@ -1375,7 +1375,6 @@ int qemu_savevm_state_complete_precopy_non_iterable=
-(QEMUFile *f,
-         qemu_put_be32(f, vmdesc_len);
-         qemu_put_buffer(f, (uint8_t *)qjson_get_str(vmdesc), vmdesc_len)=
-;
-     }
--    qjson_destroy(vmdesc);
-=20
-     return 0;
- }
---=20
-2.21.0
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+> v10--> v11
+> 
+> Update based on Igor's comments,
+>  - Invoke build_memory_hotplug_aml() based on ged-event property.
+> ---
+>  hw/arm/Kconfig                        |  2 +
+>  hw/arm/virt-acpi-build.c              | 21 ++++++++++
+>  hw/arm/virt.c                         | 59 +++++++++++++++++++++++----
+>  include/hw/arm/virt.h                 |  4 ++
+>  tests/bios-tables-test-allowed-diff.h |  1 +
+>  5 files changed, 80 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 39d285ad3d..c6e7782580 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -22,6 +22,8 @@ config ARM_VIRT
+>      select ACPI_PCI
+>      select MEM_DEVICE
+>      select DIMM
+> +    select ACPI_MEMORY_HOTPLUG
+> +    select ACPI_HW_REDUCED
+>  
+>  config CHEETAH
+>      bool
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 6cdf156cf5..cadeea0f41 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -39,6 +39,8 @@
+>  #include "hw/acpi/aml-build.h"
+>  #include "hw/acpi/utils.h"
+>  #include "hw/acpi/pci.h"
+> +#include "hw/acpi/memory_hotplug.h"
+> +#include "hw/acpi/generic_event_device.h"
+>  #include "hw/pci/pcie_host.h"
+>  #include "hw/pci/pci.h"
+>  #include "hw/arm/virt.h"
+> @@ -708,6 +710,7 @@ static void
+>  build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  {
+>      Aml *scope, *dsdt;
+> +    MachineState *ms = MACHINE(vms);
+>      const MemMapEntry *memmap = vms->memmap;
+>      const int *irqmap = vms->irqmap;
+>  
+> @@ -732,6 +735,24 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>                        vms->highmem, vms->highmem_ecam);
+>      acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
+>                         (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
+> +    if (vms->acpi_dev) {
+> +        build_ged_aml(scope, "\\_SB."GED_DEVICE,
+> +                      HOTPLUG_HANDLER(vms->acpi_dev),
+> +                      irqmap[VIRT_ACPI_GED] + ARM_SPI_BASE, AML_SYSTEM_MEMORY,
+> +                      memmap[VIRT_ACPI_GED].base);
+> +    }
+> +
+> +    if (vms->acpi_dev) {
+> +        uint32_t event = object_property_get_uint(OBJECT(vms->acpi_dev),
+> +                                                  "ged-event", &error_abort);
+> +
+> +        if (event & ACPI_GED_MEM_HOTPLUG_EVT) {
+> +            build_memory_hotplug_aml(scope, ms->ram_slots, "\\_SB", NULL,
+> +                                     AML_SYSTEM_MEMORY,
+> +                                     memmap[VIRT_PCDIMM_ACPI].base);
+> +        }
+> +    }
+> +
+>      acpi_dsdt_add_power_button(scope);
+>  
+>      aml_append(dsdt, scope);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 1c967e3fee..f926477ba5 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -70,6 +70,7 @@
+>  #include "target/arm/internals.h"
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/mem/nvdimm.h"
+> +#include "hw/acpi/generic_event_device.h"
+>  
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -140,6 +141,8 @@ static const MemMapEntry base_memmap[] = {
+>      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
+>      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
+>      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
+> +    [VIRT_PCDIMM_ACPI] =        { 0x09070000, MEMORY_HOTPLUG_IO_LEN },
+> +    [VIRT_ACPI_GED] =           { 0x09080000, ACPI_GED_EVT_SEL_LEN },
+>      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+>      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+> @@ -175,6 +178,7 @@ static const int a15irqmap[] = {
+>      [VIRT_PCIE] = 3, /* ... to 6 */
+>      [VIRT_GPIO] = 7,
+>      [VIRT_SECURE_UART] = 8,
+> +    [VIRT_ACPI_GED] = 9,
+>      [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
+>      [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
+>      [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
+> @@ -527,6 +531,29 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+>      }
+>  }
+>  
+> +static inline DeviceState *create_acpi_ged(VirtMachineState *vms, qemu_irq *pic)
+> +{
+> +    DeviceState *dev;
+> +    MachineState *ms = MACHINE(vms);
+> +    int irq = vms->irqmap[VIRT_ACPI_GED];
+> +    uint32_t event = 0;
+> +
+> +    if (ms->ram_slots) {
+> +        event = ACPI_GED_MEM_HOTPLUG_EVT;
+> +    }
+> +
+> +    dev = qdev_create(NULL, TYPE_ACPI_GED);
+> +    qdev_prop_set_uint32(dev, "ged-event", event);
+> +
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, vms->memmap[VIRT_ACPI_GED].base);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, vms->memmap[VIRT_PCDIMM_ACPI].base);
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[irq]);
+> +
+> +    qdev_init_nofail(dev);
+> +
+> +    return dev;
+> +}
+> +
+>  static void create_its(VirtMachineState *vms, DeviceState *gicdev)
+>  {
+>      const char *itsclass = its_class_name();
+> @@ -1491,6 +1518,7 @@ static void machvirt_init(MachineState *machine)
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      bool firmware_loaded;
+>      bool aarch64 = true;
+> +    bool has_ged = !vmc->no_ged;
+>      unsigned int smp_cpus = machine->smp.cpus;
+>      unsigned int max_cpus = machine->smp.max_cpus;
+>  
+> @@ -1705,6 +1733,10 @@ static void machvirt_init(MachineState *machine)
+>  
+>      create_gpio(vms, pic);
+>  
+> +    if (has_ged && aarch64 && firmware_loaded && acpi_enabled) {
+> +        vms->acpi_dev = create_acpi_ged(vms, pic);
+> +    }
+> +
+>      /* Create mmio transports, so the user can create virtio backends
+>       * (which will be automatically plugged in to the transports). If
+>       * no backend is created the transport will just sit harmlessly idle.
+> @@ -1881,14 +1913,17 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+>  static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                   Error **errp)
+>  {
+> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>  
+> -    /*
+> -     * The device memory is not yet exposed to the Guest either through
+> -     * DT or ACPI and hence both cold/hot plug of memory is explicitly
+> -     * disabled for now.
+> -     */
+> -    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> -        error_setg(errp, "memory cold/hot plug is not yet supported");
+> +    if (is_nvdimm) {
+> +        error_setg(errp, "nvdimm is not yet supported");
+> +        return;
+> +    }
+> +
+> +    if (!vms->acpi_dev) {
+> +        error_setg(errp,
+> +                   "memory hotplug is not enabled: missing acpi-ged device");
+>          return;
+>      }
+>  
+> @@ -1898,11 +1933,18 @@ static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  static void virt_memory_plug(HotplugHandler *hotplug_dev,
+>                               DeviceState *dev, Error **errp)
+>  {
+> +    HotplugHandlerClass *hhc;
+>      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+>      Error *local_err = NULL;
+>  
+>      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+>  
+> +    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
+> +    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, &error_abort);
+> +out:
+>      error_propagate(errp, local_err);
+>  }
+>  
+> @@ -2109,8 +2151,11 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
+>  
+>  static void virt_machine_4_1_options(MachineClass *mc)
+>  {
+> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+> +
+>      virt_machine_4_2_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+> +    vmc->no_ged = true;
+>  }
+>  DEFINE_VIRT_MACHINE(4, 1)
+>  
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index a72094204e..577ee49b4b 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -77,6 +77,8 @@ enum {
+>      VIRT_GPIO,
+>      VIRT_SECURE_UART,
+>      VIRT_SECURE_MEM,
+> +    VIRT_PCDIMM_ACPI,
+> +    VIRT_ACPI_GED,
+>      VIRT_LOWMEMMAP_LAST,
+>  };
+>  
+> @@ -106,6 +108,7 @@ typedef struct {
+>      bool claim_edge_triggered_timers;
+>      bool smbios_old_sys_ver;
+>      bool no_highmem_ecam;
+> +    bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
+>  } VirtMachineClass;
+>  
+>  typedef struct {
+> @@ -133,6 +136,7 @@ typedef struct {
+>      uint32_t iommu_phandle;
+>      int psci_conduit;
+>      hwaddr highest_gpa;
+> +    DeviceState *acpi_dev;
+>  } VirtMachineState;
+>  
+>  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+> diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
+> index dfb8523c8b..7b4adbc822 100644
+> --- a/tests/bios-tables-test-allowed-diff.h
+> +++ b/tests/bios-tables-test-allowed-diff.h
+> @@ -1 +1,2 @@
+>  /* List of comma-separated changed AML files to ignore */
+> +"tests/data/acpi/virt/DSDT",
 
 
