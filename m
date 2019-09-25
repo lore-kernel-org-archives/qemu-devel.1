@@ -2,61 +2,55 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D10DC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C302C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:11:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E641220640
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:11:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E641220640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3498E20640
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:11:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3498E20640
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD74W-0008RS-IR
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:11:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58691)
+	id 1iD74Y-00005o-Nb
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:11:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iD6mq-0006Og-Qc
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:52:53 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gq-0001Tg-Qd
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iD6mp-00044y-Np
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:52:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46000)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gp-0002ME-5q
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:40 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56142 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iD6mp-00044Y-GK; Wed, 25 Sep 2019 08:52:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B0BD530860B9;
- Wed, 25 Sep 2019 12:52:50 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-14.ams2.redhat.com [10.36.117.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E963E600C8;
- Wed, 25 Sep 2019 12:52:48 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1iD6go-0002Gn-N0
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:39 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 537DA1A23A9;
+ Wed, 25 Sep 2019 14:46:22 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 1F4DF1A23E2;
+ Wed, 25 Sep 2019 14:46:22 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/7] s390x/mmu: Move DAT protection handling out of
- mmu_translate_asce()
-Date: Wed, 25 Sep 2019 14:52:31 +0200
-Message-Id: <20190925125236.4043-3-david@redhat.com>
-In-Reply-To: <20190925125236.4043-1-david@redhat.com>
-References: <20190925125236.4043-1-david@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 25 Sep 2019 12:52:50 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Subject: [PATCH v2 20/20] target/mips: msa: Move helpers for <AND|NOR|OR|XOR>.V
+Date: Wed, 25 Sep 2019 14:46:12 +0200
+Message-Id: <1569415572-19635-21-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,113 +62,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: arikalo@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We'll reuse the ilen and tec definitions in mmu_translate
-soon also for all other DAT exceptions we inject. Move it to the caller,
-where we can later pair it up with other protection checks, like IEP.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Cosmetic reorganization.
+
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/s390x/mmu_helper.c | 39 ++++++++++++++++-----------------------
- 1 file changed, 16 insertions(+), 23 deletions(-)
+ target/mips/helper.h     |  9 +++---
+ target/mips/msa_helper.c | 81 ++++++++++++++++++++++++------------------------
+ 2 files changed, 45 insertions(+), 45 deletions(-)
 
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 6a7ad33c4d..847fb240fb 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -48,20 +48,6 @@ static void trigger_access_exception(CPUS390XState *en=
-v, uint32_t type,
-     }
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 3b1a965..d615c83 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -887,6 +887,11 @@ DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
+ 
++DEF_HELPER_4(msa_and_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_nor_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_or_v, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_xor_v, void, env, i32, i32, i32)
++
+ DEF_HELPER_3(msa_move_v, void, env, i32, i32)
+ 
+ DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
+@@ -1021,10 +1026,6 @@ DEF_HELPER_5(msa_mulr_q_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_maddr_q_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_msubr_q_df, void, env, i32, i32, i32, i32)
+ 
+-DEF_HELPER_4(msa_and_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_or_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_nor_v, void, env, i32, i32, i32)
+-DEF_HELPER_4(msa_xor_v, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_fill_df, void, env, i32, i32, i32)
+ 
+ DEF_HELPER_4(msa_copy_s_b, void, env, i32, i32, i32)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index cece69b..e52d74f 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -1962,7 +1962,46 @@ void helper_msa_mod_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt
+  * +---------------+----------------------------------------------------------+
+  */
+ 
+-/* TODO: insert Logic group helpers here */
++
++void helper_msa_and_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0] = pws->d[0] & pwt->d[0];
++    pwd->d[1] = pws->d[1] & pwt->d[1];
++}
++
++void helper_msa_nor_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0] = ~(pws->d[0] | pwt->d[0]);
++    pwd->d[1] = ~(pws->d[1] | pwt->d[1]);
++}
++
++void helper_msa_or_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0] = pws->d[0] | pwt->d[0];
++    pwd->d[1] = pws->d[1] | pwt->d[1];
++}
++
++void helper_msa_xor_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0] = pws->d[0] ^ pwt->d[0];
++    pwd->d[1] = pws->d[1] ^ pwt->d[1];
++}
+ 
+ 
+ /*
+@@ -2112,46 +2151,6 @@ void helper_msa_shf_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     msa_move_v(pwd, pwx);
  }
-=20
--static void trigger_prot_fault(CPUS390XState *env, target_ulong vaddr,
--                               uint64_t asc, int rw, bool exc)
+ 
+-void helper_msa_and_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
 -{
--    uint64_t tec;
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+-    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 -
--    tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | 4 =
-| asc >> 46;
--
--    if (!exc) {
--        return;
--    }
--
--    trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, tec);
+-    pwd->d[0] = pws->d[0] & pwt->d[0];
+-    pwd->d[1] = pws->d[1] & pwt->d[1];
 -}
 -
- static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
-                                uint32_t type, uint64_t asc, int rw, bool=
- exc)
- {
-@@ -229,7 +215,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
-get_ulong vaddr,
-                               int *flags, int rw, bool exc)
- {
-     int level;
--    int r;
-=20
-     if (asce & ASCE_REAL_SPACE) {
-         /* direct mapping */
-@@ -277,14 +262,8 @@ static int mmu_translate_asce(CPUS390XState *env, ta=
-rget_ulong vaddr,
-         break;
-     }
-=20
--    r =3D mmu_translate_region(env, vaddr, asc, asce, level, raddr, flag=
-s, rw,
--                             exc);
--    if (!r && rw =3D=3D MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
--        trigger_prot_fault(env, vaddr, asc, rw, exc);
--        return -1;
--    }
+-void helper_msa_or_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
+-{
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+-    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
 -
--    return r;
-+    return mmu_translate_region(env, vaddr, asc, asce, level, raddr, fla=
-gs, rw,
-+                                exc);
- }
-=20
- static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
-@@ -369,6 +348,10 @@ static void mmu_handle_skey(target_ulong addr, int r=
-w, int *flags)
- int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64=
-_t asc,
-                   target_ulong *raddr, int *flags, bool exc)
+-    pwd->d[0] = pws->d[0] | pwt->d[0];
+-    pwd->d[1] = pws->d[1] | pwt->d[1];
+-}
+-
+-void helper_msa_nor_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
+-{
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+-    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
+-
+-    pwd->d[0] = ~(pws->d[0] | pwt->d[0]);
+-    pwd->d[1] = ~(pws->d[1] | pwt->d[1]);
+-}
+-
+-void helper_msa_xor_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
+-{
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+-    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
+-
+-    pwd->d[0] = pws->d[0] ^ pwt->d[0];
+-    pwd->d[1] = pws->d[1] ^ pwt->d[1];
+-}
+-
+ static inline int64_t msa_addv_df(uint32_t df, int64_t arg1, int64_t arg2)
  {
-+    /* Code accesses have an undefined ilc, let's use 2 bytes. */
-+    const int ilen =3D (rw =3D=3D MMU_INST_FETCH) ? 2 : ILEN_AUTO;
-+    uint64_t tec =3D (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
-+                   (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ);
-     uint64_t asce;
-     int r;
-=20
-@@ -421,6 +404,16 @@ int mmu_translate(CPUS390XState *env, target_ulong v=
-addr, int rw, uint64_t asc,
-         return r;
-     }
-=20
-+    /* check for DAT protection */
-+    if (unlikely(rw =3D=3D MMU_DATA_STORE && !(*flags & PAGE_WRITE))) {
-+        if (exc) {
-+            /* DAT sets bit 61 only */
-+            tec |=3D 0x4;
-+            trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
-+        }
-+        return -1;
-+    }
-+
- nodat:
-     /* Convert real address -> absolute address */
-     *raddr =3D mmu_real2abs(env, *raddr);
---=20
-2.21.0
+     return arg1 + arg2;
+-- 
+2.7.4
 
 
