@@ -2,95 +2,72 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C85C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C28EEC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 18:07:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AFFC205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:57:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d3LPthwq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFFC205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 99F6E21D7A
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 18:07:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F6E21D7A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDBXE-0001IN-4t
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:57:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55070)
+	id 1iDBgw-0005IY-Pe
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 14:07:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56462)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iDBWD-0000k9-Bo
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:56:02 -0400
+ (envelope-from <bounces@canonical.com>) id 1iDBgD-0004sz-TF
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:06:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iDBWC-0008Ii-2O
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:56:01 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33228)
+ (envelope-from <bounces@canonical.com>) id 1iDBgC-00058n-PZ
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:06:21 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40862)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iDBWB-0008ID-Q5
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:55:59 -0400
-Received: by mail-pg1-x544.google.com with SMTP id i30so296351pgl.0
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 10:55:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=v+syrApcrMsvu4H21xycRc0iR43xVWWnHSl+gyh3/70=;
- b=d3LPthwqPWGUFE27kQoLfKmG6F6IdIldKvLYXYkeWkOxg5rcIIizqfDoHdubkmlA/m
- d41ELaMgm9ZWtxI4g7YL2is3VtnNNhIHQVAGJFCz2h8KkA2NH3x7TxnYV/vKMhgXiIYJ
- NBhiA9RRXWiMKMa3ojZuH+KcFmO7+BuFfRNEF2wxTNAjPXWBiW0u1203gHNw6Up1ZkHT
- O3BaPpoXaZuAOhTbGfCbuIgUWZWA7hlKJqLvmA2JVqWTsRq7UAS3pV+Js43E44+1ekoN
- jhcF2KOvacaPsc1DeWzhBG2rIIQ3H1CzaDc/m/0fwTfKYuj7lMrkDV5VA/6OvVxrvS0t
- Mz0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=v+syrApcrMsvu4H21xycRc0iR43xVWWnHSl+gyh3/70=;
- b=TkP/HHjf+SzwKbAH9AV3+WJZaNeXnsGqG0f9CsgsrTIBQgriFrx3JE8C9MIET5dGQ/
- dunm1N0UgYbS6dkQNj9W6HzLZELwxyUJDL2y9tXeySfxe8hG4zyECvb5hdhvfuXV4WCk
- vHylBPzDuRtoi08aCcduIeccl4DB99fwg9FTm2Yyk5m+6fZO8KR+Wm8f0A5P0SIKDqJq
- zogbVmYjUzn6Flkwtum379/Ee2Wm2cJR+2WXXQ7TtyceTtRI/sivzPYYlW+t5z2xDFRu
- je0pg8oORJHEGOzR/ntLkY5Jz90g9Nc8LeTkkgBPlPF4xHp3mqw+ORHRPwBX2TfpbF9d
- NG8A==
-X-Gm-Message-State: APjAAAW7ssLM+3qVgIr8jrWEfovJUuLIEzYpicWfWHTx8CUZQm9Jdx2X
- T8i9fUdHCAJoytSww97ZoXTnPQ==
-X-Google-Smtp-Source: APXvYqxsj7/N9ioPiOsS5x6UV/3CWq2vfET5miBlJ+PrtbVZG8fLNXWrcOmMCoxtZDcgqGShPmjnAg==
-X-Received: by 2002:a63:4a47:: with SMTP id j7mr508157pgl.399.1569434158405;
- Wed, 25 Sep 2019 10:55:58 -0700 (PDT)
-Received: from [172.20.32.216] ([12.206.46.61])
- by smtp.gmail.com with ESMTPSA id v8sm12116827pje.6.2019.09.25.10.55.56
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 25 Sep 2019 10:55:57 -0700 (PDT)
-Subject: Re: [PATCH v4 10/16] cputlb: Partially inline
- memory_region_section_get_iotlb
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190923230004.9231-1-richard.henderson@linaro.org>
- <20190923230004.9231-11-richard.henderson@linaro.org>
- <c61bc143-81d3-5198-fbdd-054777faafe0@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <c396f679-d100-2f1e-012e-045ad0976268@linaro.org>
-Date: Wed, 25 Sep 2019 10:55:55 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iDBgC-00058L-K5
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 14:06:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iDBgB-0006Dq-7D
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 18:06:19 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 30CF92E80C9
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 18:06:19 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <c61bc143-81d3-5198-fbdd-054777faafe0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Sep 2019 17:51:14 -0000
+From: Paul Clarke <pc@us.ibm.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc64 testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: 7-pc mark-cave-ayland philmd
+X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
+X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
+References: <156711057074.6835.13599471410604217618.malonedeb@soybean.canonical.com>
+Message-Id: <156943387416.13580.9092178339785906464.malone@gac.canonical.com>
+Subject: [Bug 1841990] Re: instruction 'denbcdq' misbehaving
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19048";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3068c715f2047513dcd5df9891648595459b3bca
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,60 +76,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, alex.bennee@linaro.org, stefanha@redhat.com
+Reply-To: Bug 1841990 <1841990@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/24/19 12:59 AM, David Hildenbrand wrote:
->> +    is_ram = memory_region_is_ram(section->mr);
->> +    is_romd = memory_region_is_romd(section->mr);
->> +
->> +    if (is_ram || is_romd) {
->> +        /* RAM and ROMD both have associated host memory. */
->>          addend = (uintptr_t)memory_region_get_ram_ptr(section->mr) + xlat;
->> +    } else {
->> +        /* I/O does not; force the host address to NULL. */
->> +        addend = 0;
->> +    }
->> +
->> +    write_address = address;
-> 
-> I guess the only "suboptimal" change is that you now have two checks for
-> "prot & PAGE_WRITE" twice in the case of ram instead of one.
+I'm still trying to track down a BE system.  Everything I have which is
+newer than POWER7 is LE, and POWER7 is not sufficient to run the test.
 
-It's a single bit test on a register operand -- as cheap as can be.  If you
-look at the entire code, there *must* be more than one test.  You can rearrange
-the code to choose exactly where those tests are, but you'll have to have them
-somewhere.
+The test suite that produced the problem is from https://github.com
+/open-power-sdk/pveclib.  The good news is that with your (v1) changes,
+275 tests no longer fail.  22 tests still fail, but I bet it is
+different issue(s).
 
->> +        /* I/O or ROMD */
->> +        iotlb = memory_region_section_get_iotlb(cpu, section) + xlat;
->> +        /*
->> +         * Writes to romd devices must go through MMIO to enable write.
->> +         * Reads to romd devices go through the ram_ptr found above,
->> +         * but of course reads to I/O must go through MMIO.
->> +         */
->> +        write_address |= TLB_MMIO;
-> 
-> ... and here you calculate write_address even if probably unused.
+-- =
 
-Well... while the page might not be writable (but I'd bet that it is -- I/O
-memory is almost never read-only), and therefore write_address is technically
-unused, the variable is practically used in the next line:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1841990
 
-    if (!is_romd) {
-        address = write_address
-    }
+Title:
+  instruction 'denbcdq' misbehaving
 
-which will compile to a conditional move.
+Status in QEMU:
+  New
 
-> Can your move the calculation of the write_address completely into the
-> "prot & PAGE_WRITE" case below?
+Bug description:
+  Instruction 'denbcdq' appears to have no effect.  Test case attached.
 
-We'd prefer not to, since the code below is within the cpu tlb lock region.
-We'd prefer to keep all of the expensive operations outside that.
+  On ppc64le native:
+  --
+  gcc -g -O -mcpu=3Dpower9 bcdcfsq.c test-denbcdq.c -o test-denbcdq
+  $ ./test-denbcdq
+  0x00000000000000000000000000000000
+  0x0000000000000000000000000000000c
+  0x22080000000000000000000000000000
+  $ ./test-denbcdq 1
+  0x00000000000000000000000000000001
+  0x0000000000000000000000000000001c
+  0x22080000000000000000000000000001
+  $ ./test-denbcdq $(seq 0 99)
+  0x00000000000000000000000000000064
+  0x0000000000000000000000000000100c
+  0x22080000000000000000000000000080
+  --
 
+  With "qemu-ppc64le -cpu power9"
+  --
+  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq
+  0x00000000000000000000000000000000
+  0x0000000000000000000000000000000c
+  0x0000000000000000000000000000000c
+  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq 1
+  0x00000000000000000000000000000001
+  0x0000000000000000000000000000001c
+  0x0000000000000000000000000000001c
+  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq $(seq 100)
+  0x00000000000000000000000000000064
+  0x0000000000000000000000000000100c
+  0x0000000000000000000000000000100c
+  --
 
-r~
+  I started looking at the code, but I got confused rather quickly.
+  Could be related to endianness? I think denbcdq arrived on the scene
+  before little-endian was a big deal.  Maybe something to do with
+  utilizing implicit floating-point register pairs...  I don't think the
+  right data is getting to helper_denbcdq, which would point back to the
+  gen_fprp_ptr uses in dfp-impl.inc.c (GEN_DFP_T_FPR_I32_Rc).  (Maybe?)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1841990/+subscriptions
 
