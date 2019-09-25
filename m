@@ -7,85 +7,86 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7B3C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD4BC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:24:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B36F72146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:23:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 800962146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:24:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cIROkNgU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B36F72146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rPwLLLGK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 800962146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDA4h-0006iE-Gd
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:23:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42685)
+	id 1iDA5f-0007f1-Jc
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:24:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iDA3C-0005co-Go
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:21:59 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iDA3q-0006C5-3o
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:22:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iDA3B-0004UC-3s
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:21:58 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40840)
+ (envelope-from <alex.bennee@linaro.org>) id 1iDA3p-0004e4-0f
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:22:38 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37588)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iDA3A-0004Tu-U0
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:21:57 -0400
-Received: by mail-wm1-x344.google.com with SMTP id b24so5624387wmj.5
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 09:21:56 -0700 (PDT)
+ id 1iDA3o-0004di-Q7
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:22:36 -0400
+Received: by mail-wr1-x442.google.com with SMTP id i1so7684238wro.4
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 09:22:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=OE0kmlrUS6geSOuECtrVZ4mYNbga+YvKugHDPVC+yMo=;
- b=cIROkNgUWXEd1Z3jZW1sF8VM6T/e1Ll7U1XMzOjgMOdDYnPbUvshRRdrD6RmVXVfZF
- LVXSvx2ALcCGAy8ECrOafX/ysMiojoB3sa2EsReX2RFn7wpzzXFcSUr53plkpnVT9bIW
- z16ChtGa2RtEf+E+TkmB4Oq8zf7tC4YimdQ4z7otv84r2k71m1ygmcosrXs4IrZdiVLB
- 4uSTq6K63gOCt2QZVbAXHKAwFDVogJ0TT9/hzn6wy/r3ry1e9rZYVpFYZRSjPc1uAIBR
- g8i0nwgstZlaosGfkk2y8QzAy95xIsDtPqfUB3S40IACKGnQY+LwBi95abMfbHKXYKUq
- W4Zw==
+ bh=8TiHYtplUFlHSQa11Zm3hwHiJ5Q/LMI+3K9BEAU6K9c=;
+ b=rPwLLLGKvsSLetLUK4ymZC+VstIZ0SvO0sn7/f0tBKPRo+Cs2UiHtEbmbgcT6SfMOk
+ LkZ/Bbn4GkVNfioc88K0u0rE7mah7TJ/Sk3fsaie9bsQIKeemhs58Q35r6Brj7pJ3G+b
+ PIL+6hwmg46BaotoBBj3kHNvhyspxZciYlCwnG1QuI/UFZzTU19+LdXUOJV7XRDuoSi5
+ 150Mh+M/gRgLZsHayxtgrG4aJiM8V6FxRiE6VDifnAQ9HUnjkqhKRxCLnP0I/prtm1nZ
+ NHaXIuHjTvBMjylkUFS6moXFUmH3YeMfXJunJJy3N8OfUufOEgFL1JggBoemIvPjskH5
+ KC9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=OE0kmlrUS6geSOuECtrVZ4mYNbga+YvKugHDPVC+yMo=;
- b=CdmqME5kfAQBqMx1eXGCpR1A4Cqv2HVDaN0H+wFb23Nw3i8ymioeNX9XSXQ6Ibj/7Q
- n6g56wkVQQR/aAKC7WPeCm29AtOVUMu/30WB9SYJyqkBxoal6vVR8X54ANfhmb9w3vnK
- lY5ya30lXejLWX+WgxMeST7uRMC71CDXKPzgkFXRGn2Ben0hjMwMcvmcMLAO3LG70EJs
- bucjUiKdopIiNrM5IlmhvzLRssHGqnr/gIL97SbKJF8MhrpUd/KsuKoMsbj6VIQFisEe
- veRUH9U9AdCPwHDWPXORIi/eHifwGRBf58Ywm7HChe24W2jcQ8GR8X9tYjPDn6XQ8bMH
- PQtQ==
-X-Gm-Message-State: APjAAAVFt56VL9PY+ZcYOMhB58IeT3Q8iQgpVlhUybacKTBrxHn8eTH0
- uskBFX0G4f7LfSo34WUH6JvPsQ==
-X-Google-Smtp-Source: APXvYqyLNF13F5Dnapw4lJY6H883vZcY+qEN8h0FE/6ZRKaiS15ccqxznwpQzakBCtb/MUow2IMugw==
-X-Received: by 2002:a7b:cd99:: with SMTP id y25mr8640780wmj.152.1569428514895; 
- Wed, 25 Sep 2019 09:21:54 -0700 (PDT)
+ bh=8TiHYtplUFlHSQa11Zm3hwHiJ5Q/LMI+3K9BEAU6K9c=;
+ b=ATfS3mDj81J93+bC0bV3KGFhf3MuFdKo/gcvc2HC70DoDpx+OTpXLIsjXzjp+vRr5f
+ PYNz2aGEasYmrXZ3xUQlJPpdVIPOtX4jeUPA1+KbcsBjYxsbX4fcOHhQElV3BQ4T7bcQ
+ EVEgsNPVnaa+Dvhb2ALUlGiQWQe8srf7YuAhFF+QP2o+VLzO2eVmVKAde5bwL/Z/Kb7J
+ ojxtZxXGv+Q2Ir+1IfklwLfnAGy6Iv7dq4omPhaYfgcNtlcHa3G9JlP1/0JpUqUDf6ij
+ bCBX2izzXN+ZeHBsWtkfJPi5wgsMDqQbc+GAQxoHurpdM+ECLen1OjirEvQ7g3PPn4q1
+ wAZg==
+X-Gm-Message-State: APjAAAWcHfV5/+eBszTV1/IXL94EARn0ZUB3P9UJYIcjNEAsZdK8000f
+ vlFYelEzqzlQHOKirSHRSYAi5w==
+X-Google-Smtp-Source: APXvYqyprjnW8CXRw1NNksBckBn6XR4xHmThiQNwwXd91DruDyTAtyU28pS1hoETuCeCCnpQs9D/Dw==
+X-Received: by 2002:a05:6000:1632:: with SMTP id
+ v18mr10373468wrb.233.1569428555548; 
+ Wed, 25 Sep 2019 09:22:35 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 17sm6840302wrl.15.2019.09.25.09.21.54
+ by smtp.gmail.com with ESMTPSA id e18sm5020991wrv.63.2019.09.25.09.22.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 09:21:54 -0700 (PDT)
+ Wed, 25 Sep 2019 09:22:34 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6F5D21FF87;
- Wed, 25 Sep 2019 17:21:53 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 3CEC21FF87;
+ Wed, 25 Sep 2019 17:22:34 +0100 (BST)
 References: <20190923230004.9231-1-richard.henderson@linaro.org>
- <20190923230004.9231-13-richard.henderson@linaro.org>
+ <20190923230004.9231-14-richard.henderson@linaro.org>
 User-agent: mu4e 1.3.4; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v4 12/16] cputlb: Handle TLB_NOTDIRTY in probe_access
-In-reply-to: <20190923230004.9231-13-richard.henderson@linaro.org>
-Date: Wed, 25 Sep 2019 17:21:53 +0100
-Message-ID: <87o8z89wim.fsf@linaro.org>
+Subject: Re: [PATCH v4 13/16] cputlb: Remove cpu->mem_io_vaddr
+In-reply-to: <20190923230004.9231-14-richard.henderson@linaro.org>
+Date: Wed, 25 Sep 2019 17:22:34 +0100
+Message-ID: <87mues9whh.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,40 +107,75 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> We can use notdirty_write for the write and
-> return a valid host pointer for this case.
-
-nit: reflow the text
-
+> With the merge of notdirty handling into store_helper,
+> the last user of cpu->mem_io_vaddr was removed.
 >
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  accel/tcg/cputlb.c | 26 +++++++++++++++++---------
->  1 file changed, 17 insertions(+), 9 deletions(-)
->
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index 09b0df87c6..d0bdef1eb3 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -1167,16 +1167,24 @@ void *probe_access(CPUArchState *env, target_ulon=
-g addr, int size,
->          return NULL;
->      }
->
-> -    /* Handle watchpoints.  */
-> -    if (tlb_addr & TLB_WATCHPOINT) {
-> -        cpu_check_watchpoint(env_cpu(env), addr, size,
-> -                             env_tlb(env)->d[mmu_idx].iotlb[index].attrs,
-> -                             wp_access, retaddr);
-> -    }
-> +    if (unlikely(tlb_addr & TLB_FLAGS_MASK)) {
-> +        CPUIOTLBEntry *iotlbentry =3D
-> &env_tlb(env)->d[mmu_idx].iotlb[index];
-
-I was going to say we compute this early but I'm assuming the compiler
-can figure that out if it needs to.
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  include/hw/core/cpu.h | 2 --
+>  accel/tcg/cputlb.c    | 2 --
+>  hw/core/cpu.c         | 1 -
+>  3 files changed, 5 deletions(-)
+>
+> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+> index c7cda65c66..031f587e51 100644
+> --- a/include/hw/core/cpu.h
+> +++ b/include/hw/core/cpu.h
+> @@ -338,7 +338,6 @@ struct qemu_work_item;
+>   * @next_cpu: Next CPU sharing TB cache.
+>   * @opaque: User data.
+>   * @mem_io_pc: Host Program Counter at which the memory was accessed.
+> - * @mem_io_vaddr: Target virtual address at which the memory was accesse=
+d.
+>   * @kvm_fd: vCPU file descriptor for KVM.
+>   * @work_mutex: Lock to prevent multiple access to queued_work_*.
+>   * @queued_work_first: First asynchronous work pending.
+> @@ -413,7 +412,6 @@ struct CPUState {
+>       * we store some rarely used information in the CPU context.
+>       */
+>      uintptr_t mem_io_pc;
+> -    vaddr mem_io_vaddr;
+>      /*
+>       * This is only needed for the legacy cpu_unassigned_access() hook;
+>       * when all targets using it have been converted to use
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index d0bdef1eb3..0ca6ee60b3 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -927,7 +927,6 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBE=
+ntry *iotlbentry,
+>          cpu_io_recompile(cpu, retaddr);
+>      }
+>
+> -    cpu->mem_io_vaddr =3D addr;
+>      cpu->mem_io_access_type =3D access_type;
+>
+>      if (mr->global_locking && !qemu_mutex_iothread_locked()) {
+> @@ -967,7 +966,6 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntr=
+y *iotlbentry,
+>      if (!cpu->can_do_io) {
+>          cpu_io_recompile(cpu, retaddr);
+>      }
+> -    cpu->mem_io_vaddr =3D addr;
+>      cpu->mem_io_pc =3D retaddr;
+>
+>      if (mr->global_locking && !qemu_mutex_iothread_locked()) {
+> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+> index 0035845511..73b1ee34d0 100644
+> --- a/hw/core/cpu.c
+> +++ b/hw/core/cpu.c
+> @@ -261,7 +261,6 @@ static void cpu_common_reset(CPUState *cpu)
+>      cpu->interrupt_request =3D 0;
+>      cpu->halted =3D 0;
+>      cpu->mem_io_pc =3D 0;
+> -    cpu->mem_io_vaddr =3D 0;
+>      cpu->icount_extra =3D 0;
+>      atomic_set(&cpu->icount_decr_ptr->u32, 0);
+>      cpu->can_do_io =3D 1;
 
 
 --
