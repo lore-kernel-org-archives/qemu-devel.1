@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 469D8C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44532C4360C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:13:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C22D2146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:07:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C22D2146E
+	by mail.kernel.org (Postfix) with ESMTPS id 1ED0C214DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:13:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ED0C214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDAl9-0007wq-4S
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:07:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48242)
+	id 1iDAqk-0002Hd-Ae
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:13:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iDAjV-0006UJ-VP
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:05:42 -0400
+ (envelope-from <thuth@redhat.com>) id 1iDApx-0001bX-1j
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:12:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iDAjU-0001c0-Rh
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:05:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47444)
+ (envelope-from <thuth@redhat.com>) id 1iDApv-0003lb-BV
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:12:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40506)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iDAjU-0001bj-It; Wed, 25 Sep 2019 13:05:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iDApv-0003lP-3w; Wed, 25 Sep 2019 13:12:19 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BA1FF308449E;
- Wed, 25 Sep 2019 17:05:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 32F48210B;
+ Wed, 25 Sep 2019 17:12:18 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-109.ams2.redhat.com [10.36.116.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8151F6012C;
- Wed, 25 Sep 2019 17:05:35 +0000 (UTC)
-Subject: Re: [PATCH v2 3/7] s390x/mmu: Inject DAT exceptions from a single
- place
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C948D10016EB;
+ Wed, 25 Sep 2019 17:12:13 +0000 (UTC)
+Subject: Re: [PATCH v2 4/7] s390x/mmu: Inject PGM_ADDRESSING on boguous table
+ addresses
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20190925125236.4043-1-david@redhat.com>
- <20190925125236.4043-4-david@redhat.com>
+ <20190925125236.4043-5-david@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,18 +91,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <54ccfba0-4730-1f19-a9e0-0588f753748f@redhat.com>
-Date: Wed, 25 Sep 2019 19:05:34 +0200
+Message-ID: <7b286801-6262-51d5-586a-31101c247e3c@redhat.com>
+Date: Wed, 25 Sep 2019 19:12:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20190925125236.4043-4-david@redhat.com>
+In-Reply-To: <20190925125236.4043-5-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 25 Sep 2019 17:05:39 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Wed, 25 Sep 2019 17:12:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
@@ -125,15 +125,13 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 25/09/2019 14.52, David Hildenbrand wrote:
-> Let's return the PGM from the translation functions on error and inject
-> based on that.
+> Let's document how it works and inject PGM_ADDRESSING if reading of
+> table entries fails.
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/mmu_helper.c | 63 +++++++++++----------------------------
->  1 file changed, 17 insertions(+), 46 deletions(-)
+>  target/s390x/mmu_helper.c | 28 ++++++++++++++++++++++++----
+>  1 file changed, 24 insertions(+), 4 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-
 
