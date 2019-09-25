@@ -4,86 +4,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9263BC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 20:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472BBC432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 20:34:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63FCD21D79
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 20:31:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63FCD21D79
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1883321D79
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 20:34:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1883321D79
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDDwU-00032D-2g
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 16:31:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38461)
+	id 1iDDza-0005sT-0n
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 16:34:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iDDsj-0001OE-Es
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 16:27:26 -0400
+ (envelope-from <groug@kaod.org>) id 1iDDvo-0003Ls-Lv
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 16:30:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iDDsg-0004W0-BZ
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 16:27:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49336)
+ (envelope-from <groug@kaod.org>) id 1iDDvm-0006r1-VC
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 16:30:36 -0400
+Received: from 10.mo179.mail-out.ovh.net ([46.105.79.46]:58538)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDDsg-0004V5-3d
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 16:27:22 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0683489AC0
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 20:27:21 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id q10so37707wro.22
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 13:27:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Ms99ka1ox/KGMSrY7TCk/Icutm9EG4MoHda48WjfdtM=;
- b=svFSl0S3GLSQH4HImZPE19PjmPu4yPcyxbfzzu76f8D6cyTKN4H9wewm2QHNkZS9c9
- y7aQca2nxm9rDlc9E55nh6PtZsh4365nhm+3rrKJcACUHnSikjMmzdNgoCdulCaupBro
- kbXFbGGPgxsCTxSWPGTdSILOy7lVGTRbVw7SPcvk95UvPMBHFbQw6iuZ39YN4yhUvIH3
- Os+fOBIh9k4+aE4yeKiL9iokraX/c2xl8no1c9gYdnvwbpzpc3gs6mSpiMWu31tV/X9+
- 5lHZGRWVIxZA5FKwdnAQM1z03m8SMC8c69v//e5R0wL77WB6dANoLdI/e8pbAlXNcDjS
- h9/w==
-X-Gm-Message-State: APjAAAVlDgw6yAU2MxQND8Ptsd9w3R0jEpswzdmO8p4zsnkHvz7NTATO
- r4R+fe1onwglIJYNUoUa3+5Uy3iFBOyw2ausE6ELrnAeshM9/Ilu3+KalAkACkp0y7lM/7Vvbs6
- hD/gpuEEqHtEq11w=
-X-Received: by 2002:a7b:c92b:: with SMTP id h11mr84605wml.10.1569443239758;
- Wed, 25 Sep 2019 13:27:19 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyQMLwRYBomYvhqvsneEaayh7iX5yjiydR6wruL0JaJ4VOO8cfhN2icayHRG+JTnE0p5aNI2w==
-X-Received: by 2002:a7b:c92b:: with SMTP id h11mr84587wml.10.1569443239523;
- Wed, 25 Sep 2019 13:27:19 -0700 (PDT)
-Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id d10sm59531wma.42.2019.09.25.13.27.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 25 Sep 2019 13:27:18 -0700 (PDT)
-Subject: Re: [PATCH v3 25/33] tests/docker: Add fedora-win10sdk-cross image
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190924210106.27117-1-alex.bennee@linaro.org>
- <20190924210106.27117-26-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7e2fffd9-4b88-870f-1c18-1f08c3f44737@redhat.com>
-Date: Wed, 25 Sep 2019 22:27:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDDvm-0006iW-ML
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 16:30:34 -0400
+Received: from player773.ha.ovh.net (unknown [10.108.57.183])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 041A1141BA3
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 22:30:26 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player773.ha.ovh.net (Postfix) with ESMTPSA id 75443A3CBCAB;
+ Wed, 25 Sep 2019 20:30:16 +0000 (UTC)
+Date: Wed, 25 Sep 2019 22:30:15 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 12/20] spapr: Simplify spapr_qirq() handling
+Message-ID: <20190925223015.67ac8ea1@bahia.lan>
+In-Reply-To: <20190925064534.19155-13-david@gibson.dropbear.id.au>
+References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
+ <20190925064534.19155-13-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190924210106.27117-26-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 14871448921947085286
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgdduheduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-Received-From: 46.105.79.46
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,141 +68,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, jsnow@redhat.com, f4bug@amsat.org,
- Justin Terry <juterry@microsoft.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+On Wed, 25 Sep 2019 16:45:26 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-On 9/24/19 11:00 PM, Alex Benn=C3=A9e wrote:
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> To build WHPX (Windows Hypervisor) binaries, we need the WHPX
-> headers provided by the Windows SDK.
-
-Justin is checking with his company if this patch is OK with them,
-I'd rather wait before merging it:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg646351.html
-
-Can you unqueue this and the next patch (which depends of it) meanwhile
-please?
-
-Thanks,
-
-Phil.
-
-> Add a script that fetches the required MSI/CAB files from the
-> latest SDK (currently 10.0.18362.1).
->=20
-> Headers are accessible under /opt/win10sdk/include.
->=20
-> Set the QEMU_CONFIGURE_OPTS environment variable accordingly,
-> enabling HAX and WHPX. Due to CPP warnings related to Microsoft
-> specific #pragmas, we also need to use the '--disable-werror'
-> configure flag.
->=20
-> Cc: Justin Terry <juterry@microsoft.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Message-Id: <20190920113329.16787-3-philmd@redhat.com>
+> Currently spapr_qirq() used to find the qemu_irq for an spapr global irq
+> number, redirects through the SpaprIrq::qirq method.  But the array of
+> qemu_irqs is allocated in the PAPR layer, not the backends, and so the
+> method implementations all return the same thing, just differing in the
+> preliminary checks they make.
+> 
+> So, we can remove the method, and just implement spapr_qirq() directly,
+> including all the relevant checks in one place.  We change all those
+> checks into assert()s as well, since a failure here indicates an error in
+> the calling code.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  tests/docker/Makefile.include                 |  2 ++
->  .../dockerfiles/fedora-win10sdk-cross.docker  | 23 ++++++++++++++++
->  tests/docker/dockerfiles/win10sdk-dl.sh       | 27 +++++++++++++++++++
->  3 files changed, 52 insertions(+)
->  create mode 100644 tests/docker/dockerfiles/fedora-win10sdk-cross.dock=
-er
->  create mode 100755 tests/docker/dockerfiles/win10sdk-dl.sh
->=20
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
-ude
-> index 3fc7a863e51..e85e73025ba 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -125,6 +125,8 @@ docker-image-debian-ppc64-cross: docker-image-debia=
-n10
->  docker-image-debian-riscv64-cross: docker-image-debian10
->  docker-image-debian-sh4-cross: docker-image-debian10
->  docker-image-debian-sparc64-cross: docker-image-debian10
-> +docker-image-fedora-win10sdk-cross: docker-image-fedora
-> +docker-image-fedora-win10sdk-cross: EXTRA_FILES:=3D$(DOCKER_FILES_DIR)=
-/win10sdk-dl.sh
-> =20
->  docker-image-travis: NOUSER=3D1
-> =20
-> diff --git a/tests/docker/dockerfiles/fedora-win10sdk-cross.docker b/te=
-sts/docker/dockerfiles/fedora-win10sdk-cross.docker
-> new file mode 100644
-> index 00000000000..55ca933d40d
-> --- /dev/null
-> +++ b/tests/docker/dockerfiles/fedora-win10sdk-cross.docker
-> @@ -0,0 +1,23 @@
-> +#
-> +# Docker MinGW64 cross-compiler target with WHPX header installed
-> +#
-> +# This docker target builds on the Fedora 30 base image.
-> +#
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +#
-> +FROM qemu:fedora
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_irq.c         | 47 ++++++++++----------------------------
+>  include/hw/ppc/spapr_irq.h |  1 -
+>  2 files changed, 12 insertions(+), 36 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 9a9e486eb5..038bfffff4 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -150,17 +150,6 @@ static void spapr_irq_free_xics(SpaprMachineState *spapr, int irq, int num)
+>      }
+>  }
+>  
+> -static qemu_irq spapr_qirq_xics(SpaprMachineState *spapr, int irq)
+> -{
+> -    ICSState *ics = spapr->ics;
+> -
+> -    if (ics_valid_irq(ics, irq)) {
+> -        return spapr->qirqs[irq];
+> -    }
+> -
+> -    return NULL;
+> -}
+> -
+>  static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monitor *mon)
+>  {
+>      CPUState *cs;
+> @@ -242,7 +231,6 @@ SpaprIrq spapr_irq_xics = {
+>      .init        = spapr_irq_init_xics,
+>      .claim       = spapr_irq_claim_xics,
+>      .free        = spapr_irq_free_xics,
+> -    .qirq        = spapr_qirq_xics,
+>      .print_info  = spapr_irq_print_info_xics,
+>      .dt_populate = spapr_dt_xics,
+>      .cpu_intc_create = spapr_irq_cpu_intc_create_xics,
+> @@ -300,20 +288,6 @@ static void spapr_irq_free_xive(SpaprMachineState *spapr, int irq, int num)
+>      }
+>  }
+>  
+> -static qemu_irq spapr_qirq_xive(SpaprMachineState *spapr, int irq)
+> -{
+> -    SpaprXive *xive = spapr->xive;
+> -
+> -    if ((irq < SPAPR_XIRQ_BASE) || (irq >= xive->nr_irqs)) {
+> -        return NULL;
+> -    }
+> -
+> -    /* The sPAPR machine/device should have claimed the IRQ before */
+> -    assert(xive_eas_is_valid(&xive->eat[irq]));
+> -
+> -    return spapr->qirqs[irq];
+> -}
+> -
+>  static void spapr_irq_print_info_xive(SpaprMachineState *spapr,
+>                                        Monitor *mon)
+>  {
+> @@ -413,7 +387,6 @@ SpaprIrq spapr_irq_xive = {
+>      .init        = spapr_irq_init_xive,
+>      .claim       = spapr_irq_claim_xive,
+>      .free        = spapr_irq_free_xive,
+> -    .qirq        = spapr_qirq_xive,
+>      .print_info  = spapr_irq_print_info_xive,
+>      .dt_populate = spapr_dt_xive,
+>      .cpu_intc_create = spapr_irq_cpu_intc_create_xive,
+> @@ -487,11 +460,6 @@ static void spapr_irq_free_dual(SpaprMachineState *spapr, int irq, int num)
+>      spapr_irq_xive.free(spapr, irq, num);
+>  }
+>  
+> -static qemu_irq spapr_qirq_dual(SpaprMachineState *spapr, int irq)
+> -{
+> -    return spapr_irq_current(spapr)->qirq(spapr, irq);
+> -}
+> -
+>  static void spapr_irq_print_info_dual(SpaprMachineState *spapr, Monitor *mon)
+>  {
+>      spapr_irq_current(spapr)->print_info(spapr, mon);
+> @@ -586,7 +554,6 @@ SpaprIrq spapr_irq_dual = {
+>      .init        = spapr_irq_init_dual,
+>      .claim       = spapr_irq_claim_dual,
+>      .free        = spapr_irq_free_dual,
+> -    .qirq        = spapr_qirq_dual,
+>      .print_info  = spapr_irq_print_info_dual,
+>      .dt_populate = spapr_irq_dt_populate_dual,
+>      .cpu_intc_create = spapr_irq_cpu_intc_create_dual,
+> @@ -700,7 +667,18 @@ void spapr_irq_free(SpaprMachineState *spapr, int irq, int num)
+>  
+>  qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
+>  {
+> -    return spapr->irq->qirq(spapr, irq);
+> +    assert(irq >= SPAPR_XIRQ_BASE);
+> +    assert(irq < (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
 > +
-> +RUN dnf install -y \
-> +        cabextract \
-> +        msitools \
-> +        wget
+> +    if (spapr->ics) {
+> +        assert(ics_valid_irq(spapr->ics, irq));
+> +    }
+> +    if (spapr->xive) {
+> +        assert(irq < spapr->xive->nr_irqs);
+> +        assert(xive_eas_is_valid(&spapr->xive->eat[irq]));
+> +    }
 > +
-> +# Install WHPX headers from Windows Software Development Kit:
-> +# https://developer.microsoft.com/en-us/windows/downloads/windows-10-s=
-dk
-> +ADD win10sdk-dl.sh /usr/local/bin/win10sdk-dl.sh
-> +RUN /usr/local/bin/win10sdk-dl.sh
-> +
-> +ENV QEMU_CONFIGURE_OPTS ${QEMU_CONFIGURE_OPTS} \
-> +    --cross-prefix=3Dx86_64-w64-mingw32- \
-> +    --extra-cflags=3D-I/opt/win10sdk/include --disable-werror \
-> +    --enable-hax --enable-whpx
-> diff --git a/tests/docker/dockerfiles/win10sdk-dl.sh b/tests/docker/doc=
-kerfiles/win10sdk-dl.sh
-> new file mode 100755
-> index 00000000000..1c35c2a2524
-> --- /dev/null
-> +++ b/tests/docker/dockerfiles/win10sdk-dl.sh
-> @@ -0,0 +1,27 @@
-> +#!/bin/bash
-> +#
-> +# Install WHPX headers from Windows Software Development Kit
-> +# https://developer.microsoft.com/en-us/windows/downloads/windows-10-s=
-dk
-> +#
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +
-> +WINDIR=3D/opt/win10sdk
-> +mkdir -p ${WINDIR}
-> +pushd ${WINDIR}
-> +# Get the bundle base for Windows SDK v10.0.18362.1
-> +BASE_URL=3D$(curl --silent --include 'http://go.microsoft.com/fwlink/?=
-prd=3D11966&pver=3D1.0&plcid=3D0x409&clcid=3D0x409&ar=3DWindows10&sar=3DS=
-DK&o1=3D10.0.18362.1' | sed -nE 's_Location: (.*)/\r_\1_p')/Installers
-> +# Fetch the MSI containing the headers
-> +wget --no-verbose ${BASE_URL}/'Windows SDK Desktop Headers x86-x86_en-=
-us.msi'
-> +while true; do
-> +    # Fetch all cabinets required by this MSI
-> +    CAB_NAME=3D$(msiextract Windows\ SDK\ Desktop\ Headers\ x86-x86_en=
--us.msi 3>&1 2>&3 3>&-| sed -nE "s_.*Error opening file $PWD/(.*): No suc=
-h file or directory_\1_p")
-> +    test -z "${CAB_NAME}" && break
-> +    wget --no-verbose ${BASE_URL}/${CAB_NAME}
-> +done
-> +rm *.{cab,msi}
-> +mkdir /opt/win10sdk/include
-> +# Only keep the WHPX headers
-> +for inc in "${WINDIR}/Program Files/Windows Kits/10/Include/10.0.18362=
-.0/um"/WinHv*; do
-> +    ln -s "${inc}" /opt/win10sdk/include
-> +done
-> +popd > /dev/null
->=20
+> +    return spapr->qirqs[irq];
+>  }
+>  
+>  int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
+> @@ -803,7 +781,6 @@ SpaprIrq spapr_irq_xics_legacy = {
+>      .init        = spapr_irq_init_xics,
+>      .claim       = spapr_irq_claim_xics,
+>      .free        = spapr_irq_free_xics,
+> -    .qirq        = spapr_qirq_xics,
+>      .print_info  = spapr_irq_print_info_xics,
+>      .dt_populate = spapr_dt_xics,
+>      .cpu_intc_create = spapr_irq_cpu_intc_create_xics,
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 7e26288fcd..a4e790ef60 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -44,7 +44,6 @@ typedef struct SpaprIrq {
+>      void (*init)(SpaprMachineState *spapr, Error **errp);
+>      int (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error **errp);
+>      void (*free)(SpaprMachineState *spapr, int irq, int num);
+> -    qemu_irq (*qirq)(SpaprMachineState *spapr, int irq);
+>      void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
+>      void (*dt_populate)(SpaprMachineState *spapr, uint32_t nr_servers,
+>                          void *fdt, uint32_t phandle);
+
 
