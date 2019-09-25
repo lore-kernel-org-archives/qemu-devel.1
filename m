@@ -2,73 +2,89 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D00C4320D
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 668DFC432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:28:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5A5E2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:28:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A5E2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3935F20673
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:28:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3935F20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD2eV-0007gY-NY
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 04:27:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53099)
+	id 1iD2fA-0000AV-8c
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 04:28:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iD2cm-0006nF-Tn
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:26:14 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iD2dF-00072O-Cv
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:26:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iD2ck-00067K-4C
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:26:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49488)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iD2cj-00066h-UV
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:26:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iD2ch-0008Nv-L5
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:26:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 95E052E8054
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:26:07 +0000 (UTC)
+ (envelope-from <pbonzini@redhat.com>) id 1iD2dC-0006Gu-Hk
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:26:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33716)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iD2dC-0006GQ-8e
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:26:38 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B910CC053B32
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:26:36 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id n3so1958501wrt.9
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 01:26:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to;
+ bh=kdp2HK44+wXsmn1byX79nXIhx1QZosWrpcPRfuVl4VE=;
+ b=cZksb7vCLLzNmHOtR0VchZiv9DII5Qy7kZjkUm/pVWyR0wEZWerf8PyTTJyJNNPwEd
+ dJ4Nt4OuXWIqKeNf+LVGHERKdwju10fWvurjNjb7InrKvTVvj7LKQJFIPgdzBgTp2xkW
+ 268ut8E5pQ9fY6TzUB7M3GP4r+lCWobdnDZd+13l1u5eC0g0mHv/fg+LP5glZ1B6aUxL
+ tOrkgqJWYvGdDhrJgm/w+t73WMPYoH+M+5Veb8ArHSKMeXMmMjYch0pga+Cf8VxRrd4o
+ 2Xx+71+G5U6t+7X9gfNpHou3j5wKIrgqMhC0B6VR+v6YxvXTGEAHiy0GlnWelT38MWFP
+ iaTA==
+X-Gm-Message-State: APjAAAVsVwmI4cmuGyyEjgwe2s06FYx4JtBRMFfTackaCRfYpC8Q3Y2D
+ H9tMNo1SQu3vKHDgIDd8qjsrg28VUDpZj+SuITTM5q1fxUbZfBau86yNUzh9xhsswmt5Hzwjma+
+ WThbGDxXhBYJp5Bk=
+X-Received: by 2002:a5d:5384:: with SMTP id d4mr7574954wrv.255.1569399995301; 
+ Wed, 25 Sep 2019 01:26:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxt0NJ+/zWQ2hkmAlnPIduPMhGlmGSIRxYlETHvmC3yOWQVUoa/p3E0PmoTSTUwZbct1OuxrQ==
+X-Received: by 2002:a5d:5384:: with SMTP id d4mr7574922wrv.255.1569399995039; 
+ Wed, 25 Sep 2019 01:26:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id h125sm3440454wmf.31.2019.09.25.01.26.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 25 Sep 2019 01:26:34 -0700 (PDT)
+Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
+To: Sergio Lopez <slp@redhat.com>, David Hildenbrand <david@redhat.com>
+References: <20190924124433.96810-1-slp@redhat.com>
+ <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com> <87h850ssnb.fsf@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <b361be48-d490-ac6a-4b54-d977c20539c0@redhat.com>
+Date: Wed, 25 Sep 2019 10:26:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 25 Sep 2019 08:14:40 -0000
-From: Dion Bosschieter <1831225@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bonzini dgilbert-h dionbosschieter frank9999
- jpmenil
-X-Launchpad-Bug-Reporter: Dion Bosschieter (dionbosschieter)
-X-Launchpad-Bug-Modifier: Dion Bosschieter (dionbosschieter)
-References: <155929929657.13088.9555373471112683391.malonedeb@soybean.canonical.com>
-Message-Id: <156939928053.32214.4282686883148934783.malone@wampee.canonical.com>
-Subject: [Bug 1831225] Re: guest migration 100% cpu freeze bug
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19048";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8679aaf1bdca71c45ee8dbd5359d4bb018053abf
+In-Reply-To: <87h850ssnb.fsf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="F2FwA6MWePplJqqD6t4ZbkIJfHLH21rUa"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,213 +93,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1831225 <1831225@bugs.launchpad.net>
+Cc: Pankaj Gupta <pagupta@redhat.com>, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, lersek@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have found a vm that recovered from a freeze and it seems like it has ju=
-mped in time.
-Below I have pasted a dump of tty1, it is ocr'd though so some characters c=
-ould have been misinterpreted.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--F2FwA6MWePplJqqD6t4ZbkIJfHLH21rUa
+Content-Type: multipart/mixed; boundary="cBcTRQtO2qa6ms4Ydaw0MIaVu5vpj9lLR";
+ protected-headers="v1"
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Sergio Lopez <slp@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+ marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+ philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+ mtosatti@redhat.com, kvm@vger.kernel.org, Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <b361be48-d490-ac6a-4b54-d977c20539c0@redhat.com>
+Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
+References: <20190924124433.96810-1-slp@redhat.com>
+ <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com> <87h850ssnb.fsf@redhat.com>
+In-Reply-To: <87h850ssnb.fsf@redhat.com>
 
-hild =
+--cBcTRQtO2qa6ms4Ydaw0MIaVu5vpj9lLR
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-[13198552.767867] le-rss:010 Killed process 10374 (crop) total,r,4376400, a=
-non-rss,018, tl [13230065.246354] lid Out of memory: Kill process 2009 Icro=
-n) score 1 or sacrifice c [13230065.251227] le-rss:OkB Killed process 19050=
- (cron) total-am:437040B, anon-r=3D0,42, fi [13230065.378536] Out of memory=
-: Kill process 2003 (cron) score 1 or sacrifice 1132 Killed process 19622 I=
-cron) total-vM:4376400, anon-rss:018, fi =
+On 25/09/19 10:10, Sergio Lopez wrote:
+> That would be great. I'm also looking forward for virtio-mem (and an
+> hypothetical virtio-cpu) to eventually gain hotplug capabilities in
+> microvm.
 
-le-rss:OkB =
+I disagree with this.  virtio is not a silver bullet (and in fact
+perhaps it's just me but I've never understood the advantages of
+virtio-mem over anything else).
 
-[14071563.261117] Out of memory: Kill process 2083 (cron) score 1 or sacrif=
-ice child
-[14071563.263500] Killed process 20260 (cron) total-vM:4376400, anon-rss:00=
-0, fi le-rss:OkB =
+If you want to add hotplug to microvm, you can reuse the existing code
+for CPU and memory hotplug controllers, and write drivers for them in
+Linux's drivers/platform.  The drivers would basically do what the ACPI
+AML tells the interpreter to do.
 
-[9223372037.903009] BUG: soft lockup - CPU#0 stuck for 4281394478s! [screen=
-:4843]
-[9223372037.983809] Stack: =
+There is no reason to add the complexity of virtio to something as
+low-level and deadlock-prone as CPU hotplug.
 
-[9223372037.983809] =
-
-[9223372037.903009] Call Trace:
-[9223372037.983809] <IRQ>
-[922337203].983809] <EOI> Code: 83 c4 58 5b 5d c9 90 90 to Of al 9e 19 c0 c=
-9 9c 50 66 .6 90 66 90 c9 57 9E .6 90 c9 f0 BO 67 00 66 66 90 66 90 fd c9 4=
-0 c7 07 c9 fa 66 00 00 00 66 90 00 40 66 66 c7 47 90 c9 fb 66 66 90 00 066: =
+Paolo
 
 
-This is VM is running Debian 7, it was approximately frozen for around 2
-hours and 25 minutes before spinning back into action.
+--cBcTRQtO2qa6ms4Ydaw0MIaVu5vpj9lLR--
 
--- =
+--F2FwA6MWePplJqqD6t4ZbkIJfHLH21rUa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1831225
+-----BEGIN PGP SIGNATURE-----
 
-Title:
-  guest migration 100% cpu freeze bug
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2LJLgACgkQv/vSX3jH
+roN4lgf9GWqNVZS1qNFejt/9p2cQeTMMkKEBjT0YpZzxE21zq+Jfx01+Hl5Ros9U
+RqVaxBd0S2a3ijnF20NKLLtJig7faeJjx+RD9IO9iUfZeTN6sYx3x7C2rBIGHXqn
+eRUN1W9n3PnZ4nSOR13oK7pILWYSHbmV3HpKCIfs0AkOGaOtNZF8o7o+pB3j47Mu
+V5SASFrKqVtuGOq3W80cmVUwlj65Yir/4DYA43Z4U6FjLu7R51kgj8MSkuGlM+G7
+7yM4iP6VWUNak1i0/RUoh4+2qCks5ileshZJIH5ZxwQBoL068Ky3ilW2DPhIE9RK
+NC0g++t91EXj2TBkF/pAfOp7/ekIxg==
+=/GvA
+-----END PGP SIGNATURE-----
 
-Status in QEMU:
-  New
-
-Bug description:
-  # Investigate migration cpu hog(100%) bug
-
-  I have some issues when migrating from kernel 4.14.63 running qemu 2.11.2=
- to kernel 4.19.43 running qemu 2.11.2.
-  The hypervisors are running on debian jessie with libvirt v5.3.0.
-  Linux, libvirt and qemu are all custom compiled.
-
-  I migrated around 10.000 vms and every once in a while a vm is stuck
-  at 100% cpu after what we can see right now is that the target
-  hypervisor runs on linux 4.19.53. This happened with 4 vms so far. It
-  is not that easy to debug, we found this out pretty quickly because we
-  are running monitoring on frozen vms after migrations.
-
-  Last year we were having the same "kind of" bug https://bugs.launchpad.ne=
-t/qemu/+bug/1775555 when trying to upgrade qemu 2.6 to 2.11.
-  This bug was fixed after applying the following patch: http://lists.nongn=
-u.org/archive/html/qemu-devel/2018-04/msg00820.html
-
-  This patch is still applied as you can see because of the available pre_l=
-oad var on the kvmclock_vmsd struct:
-  (gdb) ptype kvmclock_vmsd
-  type =3D const struct VMStateDescription {
-      const char *name;
-      int unmigratable;
-      int version_id;
-      int minimum_version_id;
-      int minimum_version_id_old;
-      MigrationPriority priority;
-      LoadStateHandler *load_state_old;
-      int (*pre_load)(void *);                                             =
-   =
-
-      int (*post_load)(void *, int);
-      int (*pre_save)(void *);
-      _Bool (*needed)(void *);
-      VMStateField *fields;
-      const VMStateDescription **subsections;
-  }
-
-  I attached gdb to a vcpu thread of one stuck vm, and a bt showed the foll=
-owing info:
-  Thread 4 (Thread 0x7f3a431a4700 (LWP 37799)):
-  #0  0x00007f3a576f5017 in ioctl () at ../sysdeps/unix/syscall-template.S:=
-84
-  #1  0x000055d84d15de57 in kvm_vcpu_ioctl (cpu=3Dcpu@entry=3D0x55d84fca78d=
-0, type=3Dtype@entry=3D44672) at /home/dbosschieter/src/qemu-pkg/src/accel/=
-kvm/kvm-all.c:2050
-  #2  0x000055d84d15dfc6 in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x55d84fca78d0)=
- at /home/dbosschieter/src/qemu-pkg/src/accel/kvm/kvm-all.c:1887
-  #3  0x000055d84d13ab64 in qemu_kvm_cpu_thread_fn (arg=3D0x55d84fca78d0) a=
-t /home/dbosschieter/src/qemu-pkg/src/cpus.c:1136
-  #4  0x00007f3a579ba4a4 in start_thread (arg=3D0x7f3a431a4700) at pthread_=
-create.c:456
-  #5  0x00007f3a576fcd0f in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:97
-
-  Thread 3 (Thread 0x7f3a439a5700 (LWP 37798)):
-  #0  0x00007f3a576f5017 in ioctl () at ../sysdeps/unix/syscall-template.S:=
-84
-  #1  0x000055d84d15de57 in kvm_vcpu_ioctl (cpu=3Dcpu@entry=3D0x55d84fc5cbb=
-0, type=3Dtype@entry=3D44672) at /home/dbosschieter/src/qemu-pkg/src/accel/=
-kvm/kvm-all.c:2050
-  #2  0x000055d84d15dfc6 in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x55d84fc5cbb0)=
- at /home/dbosschieter/src/qemu-pkg/src/accel/kvm/kvm-all.c:1887
-  #3  0x000055d84d13ab64 in qemu_kvm_cpu_thread_fn (arg=3D0x55d84fc5cbb0) a=
-t /home/dbosschieter/src/qemu-pkg/src/cpus.c:1136
-  #4  0x00007f3a579ba4a4 in start_thread (arg=3D0x7f3a439a5700) at pthread_=
-create.c:456
-  #5  0x00007f3a576fcd0f in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:97
-
-  The ioctl call is a ioctl(18, KVM_RUN and it looks like it is looping
-  inside the vm itself.
-
-  I saved the state of the VM (with `virsh save`) after I found it was hang=
-ing on its vcpu threads. Then I restored this vm on a test environment runn=
-ing the same kernel, QEMU and libvirt version). After the restore the VM st=
-ill was haning at 100% cpu usage on all the vcpus.
-  I tried to use the perf kvm guest option to trace the guest vm with a cop=
-y of the kernel, modules and kallsyms files from inside the guest vm and I =
-got to the following perf stat:
-
-   Event                                         Total %Total CurAvg/s
-   kvm_entry                                   5198993   23.1   277007
-   kvm_exit                                    5198976   23.1   277006
-   kvm_apic                                    1732103    7.7    92289
-   kvm_msr                                     1732101    7.7    92289
-   kvm_inj_virq                                1731904    7.7    92278
-   kvm_eoi                                     1731900    7.7    92278
-   kvm_apic_accept_irq                         1731900    7.7    92278
-   kvm_hv_timer_state                          1731780    7.7    92274
-   kvm_pv_eoi                                  1731701    7.7    92267
-   kvm_ple_window                                   36    0.0        2
-   Total                                      22521394         1199967
-
-  We tried to run the crash tool against a dump of guest vm memory and that=
- gave us the following backtrace:
-  crash> bt
-  PID: 0      TASK: ffffffff81610040  CPU: 0   COMMAND: "swapper/0"
-      [exception RIP: native_read_tsc+2]
-      RIP: ffffffff810146a9  RSP: ffff88003fc03df0  RFLAGS: 00000046
-      RAX: 000000008762c0fa  RBX: ffff88003fc13680  RCX: 0000000000000001
-      RDX: 0000000000fe4871  RSI: 0000000000000000  RDI: ffff88003fc13603
-      RBP: 000000000003052c   R8: 0000000000000200   R9: ffffffff8169b180
-      R10: 0000000000000020  R11: 0000000000000005  R12: 006a33290b40455c
-      R13: 00000000df1fd292  R14: 000000002ca284ff  R15: 00fe485f3febe21a
-      CS: 0010  SS: 0018
-   #0 [ffff88003fc03df0] pvclock_clocksource_read at ffffffff8102cbb3
-   #1 [ffff88003fc03e40] kvm_clock_read at ffffffff8102c2c9
-   #2 [ffff88003fc03e50] timekeeping_get_ns at ffffffff810691b0
-   #3 [ffff88003fc03e60] ktime_get at ffffffff810695c8
-   #4 [ffff88003fc03e90] sched_rt_period_timer at ffffffff8103e4f5
-   #5 [ffff88003fc03ee0] __run_hrtimer at ffffffff810652d3
-   #6 [ffff88003fc03f20] hrtimer_interrupt at ffffffff81065abd
-   #7 [ffff88003fc03f90] smp_apic_timer_interrupt at ffffffff81024ba8
-   #8 [ffff88003fc03fb0] apic_timer_interrupt at ffffffff813587e2
-  --- <IRQ stack> ---
-   #9 [ffffffff81601e98] apic_timer_interrupt at ffffffff813587e2
-      [exception RIP: native_safe_halt+2]
-      RIP: ffffffff8102c360  RSP: ffffffff81601f40  RFLAGS: 00010246
-      RAX: 0000000000000000  RBX: ffffffff81601fd8  RCX: 00000000ffffffff
-      RDX: 00000000ffffffff  RSI: 0000000000000000  RDI: 0000000000000001
-      RBP: 0000000000000000   R8: 0000000000000000   R9: 0000000000000000
-      R10: 0000000000000020  R11: 0000000000000005  R12: ffffffff816f5d80
-      R13: ffffffffffffffff  R14: 000000000008c800  R15: 0000000000000000
-      ORIG_RAX: ffffffffffffff10  CS: 0010  SS: 0018
-  #10 [ffffffff81601f40] default_idle at ffffffff81014c35
-  #11 [ffffffff81601f50] cpu_idle at ffffffff8100d258
-
-  So it seems like the vm is reading its clock constantly trying to
-  catch up some time after the migration.
-
-  Last time it was a bug that was only triggered on newer Gold cpu
-  hardware, but this time we also see this coming back on older Intel E5
-  cpus we tried to reproduce with a migrate loop of 3 days times between
-  kernel 4.14.63 and 4.19.43 but this gave us no results.
-
-  The vms were running ubuntu 14.04, centos 7, debian 7, debian 8 these
-  vms are running linux kernel 3.*.
-
-  The thing is that we are out of ideas for reproducing this, it seems
-  like it the same kind of bug we are hitting, just like last time the
-  vm is basically only trying to read the clock. Perhaps we can try to
-  read the clock data and also try to read what the guest is actually
-  waiting for, which value of the counter does it want to reach.
-
-  I am not sure how to pinpoint the cause of this issue, I would like some =
-help and possible some extra tips on debugging.
-  We are able to read the guests kernel which makes it a bit easier to debu=
-g, reproducing and finding the source of the problem is still something we =
-are trying to figure out.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1831225/+subscriptions
+--F2FwA6MWePplJqqD6t4ZbkIJfHLH21rUa--
 
