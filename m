@@ -2,119 +2,56 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B66AC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F78C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:19:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26C2321D7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:19:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="wJx2M1Rv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26C2321D7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id C9B2621D7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:19:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9B2621D7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD7CB-0007SU-ML
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:19:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59183)
+	id 1iD7CW-0007jr-PV
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:19:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58018)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iD6qq-0003bB-WB
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:57:02 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gr-0001UJ-P9
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iD6qp-0005Ae-BM
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:57:00 -0400
-Received: from mail-eopbgr150135.outbound.protection.outlook.com
- ([40.107.15.135]:15797 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iD6qo-0005AM-MR; Wed, 25 Sep 2019 08:56:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mIFoO655rCdqIO2d4PyxuCIdDor0oAdJZCiUyRKrnbJx2CDf0wa06I2GFYw0g4TaaYLxmGHV4lC7ek2tSGNfW9RWCX/UZFJNFbUdYaQdfD6Sh8mPP1cmVUl3wrCr07oyvDIDK/7iA6QpwGKQks2X/+tOqQ+Zh5tWl0MoAQtFrmWT0snnA895SQDSqw0OJqlhXAbFI/ZOUGjhLQ+Un2c0cphHNiFOTjPuhwmDwdS0sqYu3lVEdzM+do6xDu1QYf8h3P6T/XaQsUDHF76r2ifKOnXx62ap7KtCyctWiUQbx7Xz78Gs+ld9ufkEU39xQmoI+j64BVRlFgiH+hpDP0zxvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=awfDsFwRMhfEOuE/DETgYhu9TrFG41sMRXRC4vB8LuQ=;
- b=BmjKpUPr8TSFQ+QOevSJQrx44whyg19vY2AezxI7cDGlz4C+HlBpNnbf49L9bvSgy6n8iG7j68mouw0teZWBOjBFDiuvrhyEgiqOZubOUe+qs8u6cDGvHXFuvWL6w4MQPsrwT4IbKoeGlOdlhIA0nKj2bs20O7ILcad8zcnvNT2U9Pt77T+KrAcQL/EzZzt1g1VXh0K+nJxli56rHlnfmTYOoBUhtPYMd5ABEO5SmmqvY7nKJ1HH28R4pMW0l84CrLuA0aUZpS5SAslahhejPUzJfKGgVHHKlcqvO1BxalojABAZqT8N9tjsqe1EYsWNVPonn8KB1uBx7lZvP9hKIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=awfDsFwRMhfEOuE/DETgYhu9TrFG41sMRXRC4vB8LuQ=;
- b=wJx2M1RvT0OBlZcWXtyPqGJTXDTliL6DYuDW5wcWPPf7+470ME4ZZPcljdOhXusr7kuv4izQ2Q4eP/VQRiTqEy0eWv673mFgOU7hhZikEiRrMuNTAxejBKWeKU58TN1Ahf/mq6tmViMTv9R3bheVDJDbwpgP+tDoyKjt3nyly0Y=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5497.eurprd08.prod.outlook.com (52.133.240.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.20; Wed, 25 Sep 2019 12:56:56 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Wed, 25 Sep 2019
- 12:56:55 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH 07/22] blkverify: Implement .bdrv_recurse_can_replace()
-Thread-Topic: [PATCH 07/22] blkverify: Implement .bdrv_recurse_can_replace()
-Thread-Index: AQHVb8i1KdK8X/qXTUulZMXz4xb+tKc8YdaA
-Date: Wed, 25 Sep 2019 12:56:55 +0000
-Message-ID: <02057dd7-ce3a-a5ff-41c3-35a607ea6301@virtuozzo.com>
-References: <20190920152804.12875-1-mreitz@redhat.com>
- <20190920152804.12875-8-mreitz@redhat.com>
-In-Reply-To: <20190920152804.12875-8-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0401CA0049.eurprd04.prod.outlook.com
- (2603:10a6:3:19::17) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190925155653006
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 346a83fa-b820-44a5-e4bc-08d741b7d7d9
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5497; 
-x-ms-traffictypediagnostic: DB8PR08MB5497:
-x-microsoft-antispam-prvs: <DB8PR08MB54977D4B43208DD48D513329C1870@DB8PR08MB5497.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2201;
-x-forefront-prvs: 01713B2841
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(376002)(346002)(366004)(136003)(39850400004)(199004)(189003)(66946007)(66446008)(2616005)(64756008)(476003)(66556008)(66476007)(486006)(26005)(186003)(31686004)(52116002)(76176011)(99286004)(14454004)(478600001)(6436002)(6486002)(6246003)(6512007)(446003)(66066001)(11346002)(256004)(7736002)(305945005)(71200400001)(71190400001)(81156014)(8676002)(81166006)(6116002)(229853002)(4326008)(3846002)(25786009)(2501003)(110136005)(2906002)(54906003)(8936002)(5660300002)(316002)(386003)(102836004)(6506007)(36756003)(86362001)(31696002)(142923001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5497;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: HxYeRI7VuEF3PZtBTeTnSug8xHxta9Amtq458rQWqQ4zAvGHwMAkTXddsFVioMX1hoJN0J7RzgLf5rhxgEE2VV/NyAARBW873Iu/QIO8oYcp5Ca02tymiLhN5Y5TrJ7Z+eUevABCnqBfUr4rzxlX2UyfhmI9bq0zvZ+fQdTKNnicB8rr1rlYEDfadLknlnPWuuU3/yZEt2Cf9NttrfY5QkpkJxXtMBpsk5/lElMDbzWhlMSmAuGIYm1fUu3k4eaWXOT0cXuLl4Z6Yw+a9mI3BqYzmYY2tCJz+C25ALfZkZfhaVEkRKd0ZQbROWGE6rvPOQLo5HGdsNyi3TTr91Z0R5u8l1w1pw0tahyELARHluXs0AFrlNgfngvs/6Gwu6C+FPv3cREY2XKm7Yujb1AM2/UukLZvPzrllEF6XsYnCPs=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D54D9D424545CD4984F12F63F338B171@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 346a83fa-b820-44a5-e4bc-08d741b7d7d9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2019 12:56:55.3697 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gPyWAxFTMVA0z4zMjHD4JiyaUBdAvUhEV+JFeqm0v8//uY1rkM2byDIZFQ55r4nBH9Ob8DSykD7B8ktqeUWbXGySRVoXzzovId8XP526g5w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5497
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.135
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6go-0002Lp-QT
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:41 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:56138 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1iD6go-0002Ga-FP
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:38 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 408651A23B1;
+ Wed, 25 Sep 2019 14:46:22 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 0D72A1A23CD;
+ Wed, 25 Sep 2019 14:46:22 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 18/20] target/mips: msa: Split helpers for
+ MOD_<S|U>.<B|H|W|D>
+Date: Wed, 25 Sep 2019 14:46:10 +0200
+Message-Id: <1569415572-19635-19-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,53 +63,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: arikalo@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjAuMDkuMjAxOSAxODoyNywgTWF4IFJlaXR6IHdyb3RlOg0KPiBTaWduZWQtb2ZmLWJ5OiBNYXgg
-UmVpdHogPG1yZWl0ekByZWRoYXQuY29tPg0KPiAtLS0NCj4gICBibG9jay9ibGt2ZXJpZnkuYyB8
-IDE1ICsrKysrKysrKysrKysrKw0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxNSBpbnNlcnRpb25zKCsp
-DQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svYmxrdmVyaWZ5LmMgYi9ibG9jay9ibGt2ZXJpZnku
-Yw0KPiBpbmRleCAzMDRiMGExMzY4Li4wYWRkM2FiNDgzIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9i
-bGt2ZXJpZnkuYw0KPiArKysgYi9ibG9jay9ibGt2ZXJpZnkuYw0KPiBAQCAtMjgyLDYgKzI4Miwy
-MCBAQCBzdGF0aWMgYm9vbCBibGt2ZXJpZnlfcmVjdXJzZV9pc19maXJzdF9ub25fZmlsdGVyKEJs
-b2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICByZXR1cm4gYmRydl9yZWN1cnNlX2lzX2ZpcnN0
-X25vbl9maWx0ZXIocy0+dGVzdF9maWxlLT5icywgY2FuZGlkYXRlKTsNCj4gICB9DQo+ICAgDQo+
-ICtzdGF0aWMgYm9vbCBibGt2ZXJpZnlfcmVjdXJzZV9jYW5fcmVwbGFjZShCbG9ja0RyaXZlclN0
-YXRlICpicywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJs
-b2NrRHJpdmVyU3RhdGUgKnRvX3JlcGxhY2UpDQo+ICt7DQo+ICsgICAgQkRSVkJsa3ZlcmlmeVN0
-YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4gKw0KPiArICAgIC8qDQo+ICsgICAgICogYmxrdmVyaWZ5
-IHF1aXRzIHRoZSB3aG9sZSBxZW11IHByb2Nlc3MgaWYgdGhlcmUgaXMgYSBtaXNtYXRjaA0KPiAr
-ICAgICAqIGJldHdlZW4gYnMtPmZpbGUtPmJzIGFuZCBzLT50ZXN0X2ZpbGUtPmJzLiAgVGhlcmVm
-b3JlLCB3ZSBrbm93DQo+ICsgICAgICoga25vdyB0aGF0IGJvdGggbXVzdCBtYXRjaCBicyBhbmQg
-d2UgY2FuIHJlY3Vyc2UgZG93biB0byBlaXRoZXIuDQo+ICsgICAgICovDQo+ICsgICAgcmV0dXJu
-IGJkcnZfcmVjdXJzZV9jYW5fcmVwbGFjZShicy0+ZmlsZS0+YnMsIHRvX3JlcGxhY2UpIHx8DQo+
-ICsgICAgICAgICAgIGJkcnZfcmVjdXJzZV9jYW5fcmVwbGFjZShzLT50ZXN0X2ZpbGUtPmJzLCB0
-b19yZXBsYWNlKTsNCg0KT2ssIG5vdyBJIHVuZGVyc3RhbmQsIHdoYXQgYmRydl9yZWN1cnNlX2Nh
-bl9yZXBsYWNlIGFjdHVhbGx5IGRvZXM6DQoNCkl0IHNlYXJjaGVzIGZvciB0b19yZXBsYWNlIGlu
-IGJzLXJvb3RlZCBzdWJ0cmVlLCBnb2luZyBvbmx5IHRocm91Z2ggZXF1YWwNCmNoaWxkcmVuLi4N
-Cg0KU28sIHdlIGNhbiByZXBsYWNlIEB0b19yZXBsYWNlLCBieSBzb21ldGhpbmcgZXF1YWwgdG8g
-QGJzLCBpZiBAdG9fcmVwbGFjZSBpcw0KaW4gZXF1YWwtc3VidHJlZSBvZiBAYnMuDQoNCkknbGwg
-dHJ5IHRvIGV4cGxhaW4gbXkgbWlzbGVhZGluZzoNCg0KYmRydl9yZWN1cnNlX2Nhbl9yZXBsYWNl
-IGRlY2xhcmF0aW9uIGxvb2tzIGxpa2UgYnMgYW5kIHRvX3JlcGxhY2UgbWF5IGJlIGFic29sdXRl
-bHkNCnVucmVsYXRlZCBub2Rlcy4gU28sIHdoeSBicyBzaG91bGQgZGVjaWRlLCBjYW4gd2UgcmVw
-bGFjZSB0aGUgdW5yZWxhdGVkIHRvX3JlcGxhY2UNCm5vZGUgYnkgc29tZXRoaW5nLi4NCg0KU28s
-IGl0IG1heSBiZSBzaW1wbGVyIHRvIGZvbGxvdywgaWYgaXQgd2FzIGNhbGxlZCBiZHJ2X3JlY3Vy
-c2VfZmlsdGVyZWRfc3VidHJlZSwgb3INCmJkcnZfcmVjdXJzZV90cmFuc3BhcmVudF9zdWJ0cmVl
-Li4NCg0KU3RpbGwsIG5vdyBJIHVuZGVyc3RhbmQsIGFuZCBkb24ndCBjYXJlLiBJdCdzIGJldHRl
-ciBhbnl3YXkgdGhhbiBiZHJ2X3JlY3Vyc2VfaXNfZmlyc3Rfbm9uX2ZpbHRlcg0KDQo+ICt9DQo+
-ICsNCj4gICBzdGF0aWMgdm9pZCBibGt2ZXJpZnlfcmVmcmVzaF9maWxlbmFtZShCbG9ja0RyaXZl
-clN0YXRlICpicykNCj4gICB7DQo+ICAgICAgIEJEUlZCbGt2ZXJpZnlTdGF0ZSAqcyA9IGJzLT5v
-cGFxdWU7DQo+IEBAIC0zMjgsNiArMzQyLDcgQEAgc3RhdGljIEJsb2NrRHJpdmVyIGJkcnZfYmxr
-dmVyaWZ5ID0gew0KPiAgIA0KPiAgICAgICAuaXNfZmlsdGVyICAgICAgICAgICAgICAgICAgICAg
-ICAgPSB0cnVlLA0KPiAgICAgICAuYmRydl9yZWN1cnNlX2lzX2ZpcnN0X25vbl9maWx0ZXIgPSBi
-bGt2ZXJpZnlfcmVjdXJzZV9pc19maXJzdF9ub25fZmlsdGVyLA0KPiArICAgIC5iZHJ2X3JlY3Vy
-c2VfY2FuX3JlcGxhY2UgICAgICAgICA9IGJsa3ZlcmlmeV9yZWN1cnNlX2Nhbl9yZXBsYWNlLA0K
-DQppdCB3aWxsIGJlIG5ldmVyIGNhbGxlZCwgYXMgYmRydl9yZWN1cnNlX2Nhbl9yZXBsYWNlIGhh
-bmRsZXMgZmlsdGVycyBieSBpdHNlbGYuDQoNCj4gICB9Ow0KPiAgIA0KPiAgIHN0YXRpYyB2b2lk
-IGJkcnZfYmxrdmVyaWZ5X2luaXQodm9pZCkNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
-bGFkaW1pcg0K
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+Achieves clearer code and slightly better performance.
+
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/helper.h     |  12 +++-
+ target/mips/msa_helper.c | 156 +++++++++++++++++++++++++++++++++++++++++------
+ target/mips/translate.c  |  38 ++++++++++--
+ 3 files changed, 180 insertions(+), 26 deletions(-)
+
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index ec4982f..cc216f7 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -877,6 +877,16 @@ DEF_HELPER_4(msa_div_u_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_div_u_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_div_u_d, void, env, i32, i32, i32)
+ 
++DEF_HELPER_4(msa_mod_u_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_u_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_u_d, void, env, i32, i32, i32)
++
++DEF_HELPER_4(msa_mod_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
++
+ 
+ DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_ori_b, void, env, i32, i32, i32)
+@@ -939,8 +949,6 @@ DEF_HELPER_5(msa_asub_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_mulv_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_maddv_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_msubv_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_mod_s_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_mod_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dotp_s_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dotp_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_dpadd_s_df, void, env, i32, i32, i32, i32)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index 5f64e51..8ad9d42 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -1715,7 +1715,144 @@ void helper_msa_div_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt
+  * +---------------+----------------------------------------------------------+
+  */
+ 
+-/* TODO: insert Int Modulo group helpers here */
++static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
++{
++    if (arg1 == DF_MIN_INT(df) && arg2 == -1) {
++        return 0;
++    }
++    return arg2 ? arg1 % arg2 : arg1;
++}
++
++void helper_msa_mod_s_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[1]);
++    pwd->b[2]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[2]);
++    pwd->b[3]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[3]);
++    pwd->b[4]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[4]);
++    pwd->b[5]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[5]);
++    pwd->b[6]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[6]);
++    pwd->b[7]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[7]);
++    pwd->b[8]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[8]);
++    pwd->b[9]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[9]);
++    pwd->b[10] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[10]);
++    pwd->b[11] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[11]);
++    pwd->b[12] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[12]);
++    pwd->b[13] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[13]);
++    pwd->b[14] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[14]);
++    pwd->b[15] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[15]);
++}
++
++void helper_msa_mod_s_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[1]);
++    pwd->h[2]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[2]);
++    pwd->h[3]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[3]);
++    pwd->h[4]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[4]);
++    pwd->h[5]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[5]);
++    pwd->h[6]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[6]);
++    pwd->h[7]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[7]);
++}
++
++void helper_msa_mod_s_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_mod_s_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_mod_s_df(DF_WORD, pws->w[0],  pwt->w[1]);
++    pwd->w[2]  = msa_mod_s_df(DF_WORD, pws->w[0],  pwt->w[2]);
++    pwd->w[3]  = msa_mod_s_df(DF_WORD, pws->w[0],  pwt->w[3]);
++}
++
++void helper_msa_mod_s_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_mod_s_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_mod_s_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
++}
++
++static inline int64_t msa_mod_u_df(uint32_t df, int64_t arg1, int64_t arg2)
++{
++    uint64_t u_arg1 = UNSIGNED(arg1, df);
++    uint64_t u_arg2 = UNSIGNED(arg2, df);
++    return u_arg2 ? u_arg1 % u_arg2 : u_arg1;
++}
++
++void helper_msa_mod_u_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->b[0]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[0]);
++    pwd->b[1]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[1]);
++    pwd->b[2]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[2]);
++    pwd->b[3]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[3]);
++    pwd->b[4]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[4]);
++    pwd->b[5]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[5]);
++    pwd->b[6]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[6]);
++    pwd->b[7]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[7]);
++    pwd->b[8]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[8]);
++    pwd->b[9]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[9]);
++    pwd->b[10] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[10]);
++    pwd->b[11] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[11]);
++    pwd->b[12] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[12]);
++    pwd->b[13] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[13]);
++    pwd->b[14] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[14]);
++    pwd->b[15] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[15]);
++}
++
++void helper_msa_mod_u_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->h[0]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[0]);
++    pwd->h[1]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[1]);
++    pwd->h[2]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[2]);
++    pwd->h[3]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[3]);
++    pwd->h[4]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[4]);
++    pwd->h[5]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[5]);
++    pwd->h[6]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[6]);
++    pwd->h[7]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[7]);
++}
++
++void helper_msa_mod_u_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->w[0]  = msa_mod_u_df(DF_WORD, pws->w[0],  pwt->w[0]);
++    pwd->w[1]  = msa_mod_u_df(DF_WORD, pws->w[0],  pwt->w[1]);
++    pwd->w[2]  = msa_mod_u_df(DF_WORD, pws->w[0],  pwt->w[2]);
++    pwd->w[3]  = msa_mod_u_df(DF_WORD, pws->w[0],  pwt->w[3]);
++}
++
++void helper_msa_mod_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0]  = msa_mod_u_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
++    pwd->d[1]  = msa_mod_u_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
++}
+ 
+ 
+ /*
+@@ -2394,21 +2531,6 @@ static inline int64_t msa_mulv_df(uint32_t df, int64_t arg1, int64_t arg2)
+     return arg1 * arg2;
+ }
+ 
+-static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+-{
+-    if (arg1 == DF_MIN_INT(df) && arg2 == -1) {
+-        return 0;
+-    }
+-    return arg2 ? arg1 % arg2 : arg1;
+-}
+-
+-static inline int64_t msa_mod_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+-{
+-    uint64_t u_arg1 = UNSIGNED(arg1, df);
+-    uint64_t u_arg2 = UNSIGNED(arg2, df);
+-    return u_arg2 ? u_arg1 % u_arg2 : u_arg1;
+-}
+-
+ #define SIGNED_EVEN(a, df) \
+         ((((int64_t)(a)) << (64 - DF_BITS(df) / 2)) >> (64 - DF_BITS(df) / 2))
+ 
+@@ -2614,8 +2736,6 @@ MSA_BINOP_DF(subsuu_s)
+ MSA_BINOP_DF(asub_s)
+ MSA_BINOP_DF(asub_u)
+ MSA_BINOP_DF(mulv)
+-MSA_BINOP_DF(mod_s)
+-MSA_BINOP_DF(mod_u)
+ MSA_BINOP_DF(dotp_s)
+ MSA_BINOP_DF(dotp_u)
+ MSA_BINOP_DF(srar)
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 27eca0a..5039716 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -28642,6 +28642,38 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             break;
+         }
+         break;
++    case OPC_MOD_S_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_mod_s_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_mod_s_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_mod_s_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_mod_s_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
++    case OPC_MOD_U_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_mod_u_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_mod_u_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_mod_u_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_mod_u_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
+     case OPC_SLL_df:
+         gen_helper_msa_sll_df(cpu_env, tdf, twd, tws, twt);
+         break;
+@@ -28738,18 +28770,12 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_MAX_A_df:
+         gen_helper_msa_max_a_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_MOD_S_df:
+-        gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_ILVEV_df:
+         gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
+         break;
+     case OPC_MIN_A_df:
+         gen_helper_msa_min_a_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_MOD_U_df:
+-        gen_helper_msa_mod_u_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_ILVOD_df:
+         gen_helper_msa_ilvod_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-- 
+2.7.4
+
 
