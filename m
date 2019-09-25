@@ -2,64 +2,122 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B5BC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:05:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3204C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:09:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 761B52146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:05:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 761B52146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AE8DA2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 16:09:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="YfGOY8Lc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE8DA2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD9nH-0004fp-B6
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:05:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35823)
+	id 1iD9qh-0000Da-SW
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 12:09:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iD9QO-0008Ij-1W
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:41:54 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iD9oM-00066O-QY
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:06:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iD9QL-0005bP-3R
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:41:51 -0400
-Received: from 10.mo5.mail-out.ovh.net ([46.105.52.148]:51848)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iD9QK-0005aw-ND
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 11:41:48 -0400
-Received: from player786.ha.ovh.net (unknown [10.109.160.40])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id 18DE924FF82
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 17:41:46 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id 306C4A4E4320;
- Wed, 25 Sep 2019 15:41:41 +0000 (UTC)
-Date: Wed, 25 Sep 2019 17:41:40 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v2 2/2] spapr/irq: Only claim VALID interrupts at the
- KVM level
-Message-ID: <20190925174140.4dfbaf1f@bahia.lan>
-In-Reply-To: <20190916004432.GG2104@umbus.fritz.box>
-References: <20190911133937.2716-1-clg@kaod.org>
- <20190911133937.2716-3-clg@kaod.org>
- <20190916004432.GG2104@umbus.fritz.box>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iD9oL-0007Pf-KX
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 12:06:38 -0400
+Received: from mail-eopbgr130139.outbound.protection.outlook.com
+ ([40.107.13.139]:46082 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iD9o3-0007KC-M3; Wed, 25 Sep 2019 12:06:20 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hG4eC5EOQltsDkx5Z5b16mxbBYSgLDTr9pz1Zy420JJknHmpJI0nErLp1XBMUtMK32YBZk5djULxLR+zwEQAZDdnGvsfMmZjF7NnUjrtWzc2FxR/IRO8FuBh/f9Ac1BdcKyFvWk+YYMLCegK6Lqke8vLBzTF/xlEeW/yqZFNdMQrpbScq0YMBRVum5GUAhC1PT9IEZ/GjvEv04PrC3BuF8VBS+LLBu3txOKZcqJP0djV5vKUpG1cdHJMCMWQQqkFhnBq4N6o0hBFMGPsH678mjpplKwUTl5iti98b7MeQQfGf6FSW7g25hZC+M7vNXIT3RsGa09/mZjpcXl7pyQueA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f6tF2hLeyEmX6zbUff87B7nJ6I8yv+Yhl1KIr1mU2s4=;
+ b=ewvg66PD3hX6E78HX5JnB/Txs56LTAcAWuaecxcl2t8Qa2ibuPYLBg8ZdCEYDyQPqgBze2BxuMOOJgXyLOAwqBCYmZFCESNAChpFh7iMv9wxfUynPLURXWzlXsqOrT4vlSaOokdhrqYmcHV0IrnpB9lxKLuocn+rbvqetyYqAmJ6GcdWgAabqSh86uIA89/8jGNLDw2vk8pG/xgoVmstKBx6FYpH2ncu+0pUaM7vlOnHsvWEqbTATnH6j/8GIenSRGKNxwvNQg704Ufr+9gKCtgAYIDIoCVU5Xn3mKZ621LyVLluL/qbCZdgri/PvVEInTrfHNH1s9z/aOUH/N+4Ig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f6tF2hLeyEmX6zbUff87B7nJ6I8yv+Yhl1KIr1mU2s4=;
+ b=YfGOY8LckUW8GjBcB8fr305CKjApmdA96rUkoCY8gsd6Piq+CfsxeUmLXMbGVtSn5+C+mOsf9YtlhF+/HukQx+S5xLCdW89Djry1kaOfAJ0dzYu2l86GqcQhbhSCuRomumewbNOYiQ+cl5F7yVP2ImUSx3zy7dRqoagJz0ncbVo=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5179.eurprd08.prod.outlook.com (10.255.17.223) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.20; Wed, 25 Sep 2019 16:06:16 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Wed, 25 Sep 2019
+ 16:06:16 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v3 05/25] scripts: add coccinelle script to fix
+ error_append_hint usage
+Thread-Topic: [PATCH v3 05/25] scripts: add coccinelle script to fix
+ error_append_hint usage
+Thread-Index: AQHVcxQFCyGqMJ4u0UKUYIVC3mwAFqc7TMUAgAFDXQA=
+Date: Wed, 25 Sep 2019 16:06:15 +0000
+Message-ID: <d9223010-dfca-ac52-3224-47bb28b3e74e@virtuozzo.com>
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+ <20190924200902.4703-6-vsementsov@virtuozzo.com>
+ <1626833c-a19a-bba1-7194-932b873bc490@redhat.com>
+In-Reply-To: <1626833c-a19a-bba1-7194-932b873bc490@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0401CA0081.eurprd04.prod.outlook.com
+ (2603:10a6:3:19::49) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190925190610128
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4172b38b-b0e5-4295-b6a5-08d741d24b34
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB5179; 
+x-ms-traffictypediagnostic: DB8PR08MB5179:
+x-microsoft-antispam-prvs: <DB8PR08MB5179C4032491F3602FAAD1CDC1870@DB8PR08MB5179.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01713B2841
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(396003)(136003)(366004)(39850400004)(376002)(189003)(199004)(6486002)(31696002)(25786009)(2906002)(229853002)(64756008)(66476007)(305945005)(86362001)(66446008)(7736002)(14454004)(256004)(478600001)(6116002)(5660300002)(110136005)(66946007)(66066001)(31686004)(476003)(71190400001)(486006)(54906003)(2616005)(316002)(11346002)(4326008)(99286004)(6512007)(71200400001)(53546011)(3846002)(36756003)(52116002)(66556008)(7406005)(7416002)(6246003)(2501003)(8936002)(81166006)(386003)(186003)(446003)(102836004)(81156014)(6436002)(26005)(76176011)(8676002)(6506007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5179;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: FiTxUnojLMBdMYUIh5exQIr1jsCPgcFu73JU5k85xOT7ZuBviblY3+XYhRy/E3rENMcwYzupI4t4yvLrlurUhR57UieG6i86grAw8U3SShTyJKhysAukU3TWICEqZGo4we19F7b/mWQkFz8cPXZgPfZJF8ZyGm6tqLUJ3SZohaev77IUA9sxtlHi5dSxlWLQXIJS48ugs2wbdPH5LYU/+2KBuYSPllV+vGcfxteSDN1jPFPOaa9inS5Hd++rNN8hx8ETCeCAi4grVL3oz8t4FbLhSd38d4LaY6JsOo+1y+adH6+kl02SmNhtkuVPZ0ZIassfxMSRFOe3kmkGwcBjPznr8BuRQDDtD/KB63ZD5nJC8mCq6GiXQolosoksuXgtnvSY1CDP7Nz0HJ3LiTTo1xv0nubA2yDhKdSxxq/Xg/Q=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CC8F2E77171DFD4994B17BD2B8F16CC3@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/yiSa_L/uGPDhCQgfwuo6fmq"; protocol="application/pgp-signature"
-X-Ovh-Tracer-Id: 9996302324619975142
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfedvgdelvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.52.148
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4172b38b-b0e5-4295-b6a5-08d741d24b34
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Sep 2019 16:06:15.8429 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: H+XzOq+7ZRA5+eLS6wUOvEi+WMdl/FrCKPehYJxwR0+X8alCDG2v6W8IrQwwf2HAs7zevs7PtnomMWdYJBNtRAmzN3a/zdet+veBd8YFt/4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5179
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.13.139
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,191 +129,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
- =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Paul Burton <pburton@wavecomp.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Jeff Cody <codyprime@gmail.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Yuval Shaia <yuval.shaia@oracle.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ David Hildenbrand <david@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ "integration@gluster.org" <integration@gluster.org>,
+ =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/yiSa_L/uGPDhCQgfwuo6fmq
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 16 Sep 2019 10:44:32 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Wed, Sep 11, 2019 at 03:39:37PM +0200, C=C3=A9dric Le Goater wrote:
-> > A typical pseries VM with 16 vCPUs, one disk, one network adapater
-> > uses less than 100 interrupts but the whole IRQ number space of the
-> > QEMU machine is allocated at reset time and it is 8K wide. This is
-> > wasting a considerable amount of interrupt numbers in the global IRQ
-> > space which has 1M interrupts per socket on a POWER9.
-> >=20
-> > To optimise the HW resources, only request at the KVM level interrupts
-> > which have been claimed by the guest. This will help to increase the
-> > maximum number of VMs per system and also help supporting nested guests
-> > using the XIVE interrupt mode.
-> >=20
-> > Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->=20
-> Applied to ppc-for-4.2, thanks.
->=20
-
-While experimenting 4.1->4.2 migration with your irq cleanup series,
-I've hit this:
-
-qemu-system-ppc64: KVM_SET_DEVICE_ATTR failed: Group 3 attr 0x0000000000001=
-300: Invalid argument
-qemu-system-ppc64: error while loading state for instance 0x0 of device 'sp=
-apr'
-qemu-system-ppc64: load of migration failed: Operation not permitted
-
-Failing to restore the source config with EINVAL seems to come from the
-following check in kvmppc_xive_native_set_source_config():
-
-	if (!state->valid)
-		return -EINVAL;
-
-which makes sense since we haven't requested any interrupt yet.
-
-We should hence do it at post load before restoring the source
-config.
-
-I'll send a patch ASAP.
-
-> > ---
-> >  hw/intc/spapr_xive_kvm.c | 29 ++++++++++++++++++++++++++---
-> >  hw/intc/xics_kvm.c       |  8 ++++++++
-> >  2 files changed, 34 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> > index 17af4d19f54e..71b88d7797bc 100644
-> > --- a/hw/intc/spapr_xive_kvm.c
-> > +++ b/hw/intc/spapr_xive_kvm.c
-> > @@ -255,11 +255,16 @@ void kvmppc_xive_source_reset_one(XiveSource *xsr=
-c, int srcno, Error **errp)
-> > =20
-> >  static void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
-> >  {
-> > +    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
-> >      int i;
-> > =20
-> >      for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> >          Error *local_err =3D NULL;
-> > =20
-> > +        if (!xive_eas_is_valid(&xive->eat[i])) {
-> > +            continue;
-> > +        }
-> > +
-> >          kvmppc_xive_source_reset_one(xsrc, i, &local_err);
-> >          if (local_err) {
-> >              error_propagate(errp, local_err);
-> > @@ -328,11 +333,18 @@ uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int=
- srcno, uint32_t offset,
-> > =20
-> >  static void kvmppc_xive_source_get_state(XiveSource *xsrc)
-> >  {
-> > +    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
-> >      int i;
-> > =20
-> >      for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> > +        uint8_t pq;
-> > +
-> > +        if (!xive_eas_is_valid(&xive->eat[i])) {
-> > +            continue;
-> > +        }
-> > +
-> >          /* Perform a load without side effect to retrieve the PQ bits =
-*/
-> > -        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> > +        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> > =20
-> >          /* and save PQ locally */
-> >          xive_source_esb_set(xsrc, i, pq);
-> > @@ -521,9 +533,14 @@ static void kvmppc_xive_change_state_handler(void =
-*opaque, int running,
-> >       */
-> >      if (running) {
-> >          for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> > -            uint8_t pq =3D xive_source_esb_get(xsrc, i);
-> > +            uint8_t pq;
-> >              uint8_t old_pq;
-> > =20
-> > +            if (!xive_eas_is_valid(&xive->eat[i])) {
-> > +                continue;
-> > +            }
-> > +
-> > +            pq =3D xive_source_esb_get(xsrc, i);
-> >              old_pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq=
- << 8));
-> > =20
-> >              /*
-> > @@ -545,7 +562,13 @@ static void kvmppc_xive_change_state_handler(void =
-*opaque, int running,
-> >       * migration is in progress.
-> >       */
-> >      for (i =3D 0; i < xsrc->nr_irqs; i++) {
-> > -        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> > +        uint8_t pq;
-> > +
-> > +        if (!xive_eas_is_valid(&xive->eat[i])) {
-> > +            continue;
-> > +        }
-> > +
-> > +        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-> > =20
-> >          /*
-> >           * PQ is set to PENDING to possibly catch a triggered
-> > diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> > index a4d2e876cc5f..ba90d6dc966c 100644
-> > --- a/hw/intc/xics_kvm.c
-> > +++ b/hw/intc/xics_kvm.c
-> > @@ -190,6 +190,10 @@ void ics_get_kvm_state(ICSState *ics)
-> >      for (i =3D 0; i < ics->nr_irqs; i++) {
-> >          ICSIRQState *irq =3D &ics->irqs[i];
-> > =20
-> > +        if (ics_irq_free(ics, i)) {
-> > +            continue;
-> > +        }
-> > +
-> >          kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
-> >                            i + ics->offset, &state, false, &error_fatal=
-);
-> > =20
-> > @@ -301,6 +305,10 @@ int ics_set_kvm_state(ICSState *ics, Error **errp)
-> >          Error *local_err =3D NULL;
-> >          int ret;
-> > =20
-> > +        if (ics_irq_free(ics, i)) {
-> > +            continue;
-> > +        }
-> > +
-> >          ret =3D ics_set_kvm_state_one(ics, i, &local_err);
-> >          if (ret < 0) {
-> >              error_propagate(errp, local_err);
->=20
-
-
---Sig_/yiSa_L/uGPDhCQgfwuo6fmq
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2LirQACgkQcdTV5YIv
-c9b/9w/+O1iaUrtEjeQYiFKeyHrPkMjreNjLr/CpIGXkDrPkbvvBpSh+P3wCsLKq
-Ya/AbBIc/ab+FoIaBnyb+dyP1VFfkDX4kk0eYzJ8/2SrA7ofrpz49Z2auAzT3sho
-RDXTFHUyvM5C2+eScNpNwB6ayvwjOQXEA/foJV4qPFy7j7mQfLiV0GygzGaEnen4
-JoQ3hbsndluIcqW6we4e2PyTcAqObb33HytgKcr/BZgROa+IvqKTSQKI+2Zyq+it
-AtSaYP2tU8q1wFwZY0FvvwHCkTtwLz90HwjhjIMC1E8bMSa0SHwuZNU0E5IPHeil
-HWEqq4wGO5J+umshAdgwdLrl95ZhIjXz6JWLs2bXO7Jq+P0WAjWx5aR8//wwZfVE
-Dy7AedIBXSZknm4dkMVg9KdVNqm0krqB8ihZJizXYYxvDBjl7F7m4kv2pMU6iIfl
-oSxYHhkapGiYMjo2LOVSZbxL6Qu3F6uyI8CdgYfLTPYCU0lzEqYcEBvIWeXh0X4C
-H12ObYCcaVQSveQ/DcAicr+eT2+VUawArXIgs//5KfoFXB+her26Y+1JYt80B7ep
-YgbPCJ73YPB/ZnuE7ULxMLdH7td5Q/zs7pLzX86otPacyBfyGNj1h+PDyInfURqB
-zT9Tk6WwqL87qZxc8jKKKZSAYcqtsq/U6myA3TSAoQIiz34GP7g=
-=HV9S
------END PGP SIGNATURE-----
-
---Sig_/yiSa_L/uGPDhCQgfwuo6fmq--
+MjQuMDkuMjAxOSAyMzo0OCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gOS8yNC8xOSAzOjA4IFBN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gZXJyb3JfYXBwZW5kX2hp
+bnQgd2lsbCBub3Qgd29yaywgaWYgZXJycCA9PSAmZmF0YWxfZXJyb3IsIGFzIHByb2dyYW0NCj4+
+IHdpbGwgZXhpdCBiZWZvcmUgZXJyb3JfYXBwZW5kX2hpbnQgY2FsbC4gRml4IHRoaXMgYnkgdXNl
+IG9mIHNwZWNpYWwNCj4+IG1hY3JvIEVSUlBfRlVOQ1RJT05fQkVHSU4uDQo+Pg0KPj4gU2lnbmVk
+LW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96
+em8uY29tPg0KPj4gLS0tDQo+IA0KPiBXaXRoIHRoZSBhcHByb2FjaCBvZiBhIHBhcnRpYWwgY2xl
+YW51cCAocmF0aGVyIHRoYW4gZ2xvYmFsbHkgZW5mb3JjaW5nDQo+IGl0IGZvciBhbGwgZnVuY3Rp
+b25zIHdpdGggZXJycCBwYXJhbWV0ZXIpLCB3ZSdsbCBwcm9iYWJseSBiZSByZXJ1bm5pbmcNCj4g
+dGhpcyBDb2NjaW5lbGxlIHNjcmlwdCByZWd1bGFybHksIHRvIHRyYWNrIGRvd24gYW55IHJlZ3Jl
+c3Npb25zLg0KPiANCj4gDQo+PiArKysgYi9zY3JpcHRzL2NvY2NpbmVsbGUvZml4LWVycm9yX2Fw
+cGVuZF9oaW50LXVzYWdlLmNvY2NpDQo+PiBAQCAtMCwwICsxLDI1IEBADQo+PiArQHJ1bGUwQA0K
+Pj4gKy8vIEFkZCBpbnZvY2F0aW9uIHRvIGVycnAtZnVuY3Rpb25zDQo+PiAraWRlbnRpZmllciBm
+bjsNCj4+ICtAQA0KPj4gKw0KPj4gKyBmbiguLi4sIEVycm9yICoqZXJycCwgLi4uKQ0KPj4gKyB7
+DQo+PiArKyAgIEVSUlBfRlVOQ1RJT05fQkVHSU4oKTsNCj4+ICsgICAgPCsuLi4NCj4+ICsgICAg
+ZXJyb3JfYXBwZW5kX2hpbnQoZXJycCwgLi4uKTsNCj4+ICsgICAgLi4uKz4NCj4+ICsgfQ0KPiAN
+Cj4gRG9lcyBub3QgY2F0Y2ggdGhlIGNhc2UgdGhhdCB3ZSB3YW50IHRvIGFsc28gdXNlIHRoZSBt
+YWNybyBmb3IgYW55IHVzZQ0KPiBvZiAqZXJycCwgYnV0IHdlIGNhbiBhdWdtZW50IHRoYXQgbGF0
+ZXIuDQoNCkkgZG9uJ3Qgd2FudCB0byBpbmNsdWRlICplcnJwIGhlcmUsIGFzIGFjdHVhbGx5IGEg
+bG90IG9mICplcnJwIGludm9jYXRpb25zIGluDQpjb2RlIGFyZSBjb3JyZWN0OiB0aGV5IGRvIGl0
+IGlmIGVycnAgaXMgbm90IE5VTEwuIFNvLCBpdCdzIG5vdCByZWxhdGVkIHRvIHBsYW4gQi4NCg0K
+U3RpbGwsIEkgdGhpbmsgd2UgZm9yZ2V0IGFib3V0IGVycm9yX3ByZXBlbmQgOikpKQ0KDQpJJ3Zl
+IGNoZWNrZWQsIGlmIEkgaW5jbHVkZSBlcnJvcl9wcmVwZW5kIGhlcmUsIHNlcmllcyBiZWNvbWVz
+IDMwIHBhdGNoZXMsIHdoaWNoIGlzDQpub3Qgc2lnbmlmaWNhbnRseSBsYXJnZXIuIFNvIEkgdGhp
+bmssIEknbGwgY292ZXIgZXJyb3JfcHJlcGVuZCBpbiB2NC4NCg0KPiANCj4+ICsNCj4+ICtAQA0K
+Pj4gKy8vIERyb3AgZG91YmxlZCBpbnZvY2F0aW9uDQo+PiAraWRlbnRpZmllciBydWxlMC5mbjsN
+Cj4+ICtAQA0KPj4gKw0KPj4gKyBmbiguLi4pDQo+PiArew0KPj4gKyAgICBFUlJQX0ZVTkNUSU9O
+X0JFR0lOKCk7DQo+PiArLSAgIEVSUlBfRlVOQ1RJT05fQkVHSU4oKTsNCj4+ICsgICAgLi4uDQo+
+PiArfQ0KPiANCj4gVGhpcyBpcyBzbWFsbGVyIHRoYW4gdGhlIHNjcmlwdCB5b3UgcG9zdGVkIGlu
+IHYyLCBhbmQgdGh1cyBJJ20gYSBiaXQNCj4gbW9yZSBjb25maWRlbnQgaW4gc3RhdGluZyB0aGF0
+IGl0IGxvb2tzIGNvcnJlY3QgYW5kIGlkZW1wb3RlbnQuDQo+IA0KPiBSZXZpZXdlZC1ieTogRXJp
+YyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
+VmxhZGltaXINCg==
 
