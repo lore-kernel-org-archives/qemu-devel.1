@@ -2,93 +2,109 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DEAC432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5D7C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 659392146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:03:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dza7MnyV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 659392146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 481E32146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 17:05:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 481E32146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDAhI-0004DM-9U
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:03:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47680)
+	id 1iDAir-0005Ll-Un
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 13:05:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iDAfH-0003Y3-Bq
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:01:20 -0400
+ (envelope-from <thuth@redhat.com>) id 1iDAg4-00041G-PE
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iDAfG-00007W-0f
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:01:18 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:34209)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iDAfF-000071-QV
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:01:17 -0400
-Received: by mail-pf1-x444.google.com with SMTP id b128so3914906pfa.1
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 10:01:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=J1JH6uMyxn8nQIR9PJxKTGU89vsVOKYDJiipmhqb9iY=;
- b=dza7MnyV/c7UoRzGy6QgRXU9GFnQ5y11loM+kkJtmy5Ttc12gJvDgZtFbEBT6YPPhb
- 3NV67OecmEa6YMT+sUMRk/pLIM0CESEIJJeJzMa0MItWfSEt8fjMR9NtWkzubdqjLnCk
- 4/attZrjnGb2KReAyt0J6IoAIJe/FpQxV7g3iqYyKx/KHGnu5wonLVRR/vvRJ2zc1Z8y
- j7rVJecQTknmHMnLNxQgHkT63e/ZlNCsqrr4fHeY7P6BR9C9fAWBncMDYH4YfkUAPd8l
- aiyhj3bwSX9LpuGJ36urh8UjMBZ4ctzhifcSiosTzQqAOkSgI0wupIYNhTfkGti74RR8
- fjoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=J1JH6uMyxn8nQIR9PJxKTGU89vsVOKYDJiipmhqb9iY=;
- b=OmN3YGaCpWyI63YNck5B/vlauH9kMbUbjElNR8z/VIDW/QRkDj8RpIy0y1PIQNhrAU
- EW5JYyC+HMHcZ51Gc3B5eNrjx4ZSCFQtUJic5vVEsSV47vuhIBxcoxg4bD1Z/wtMyFfT
- 2iA2Vm8Vz3om/R2MOTnTwbcjEcueX0oDc/dzW/tr/lW01g7wVRqnxFCRkRV+eH62+/kE
- 5iDF7lDDXyXgHjjvLHZm5sqZ9+H6LFItYQMABy/NZ1GMbxNga8CRzvbM7BJqHmbiGozD
- x9wD6wJ6tYJZGPGxtTV29nxvB7Pdk9A4ryUz3Z8ziBvPPArOhHqllr7xegYjyF5y975r
- kvaw==
-X-Gm-Message-State: APjAAAXZ1vVtRfdtZTmRCs0WN+Lq/v6VnND1CPjZKrWUWn36e5ajUVpc
- Zy13S+E12g7TY9weqHTOOYLxYA==
-X-Google-Smtp-Source: APXvYqyBeS4/CdYVfo+dcj867tUvuchDHdTDTCzM22XJ8V7TeX1SLmgvYGU7QFay5TYjzvOJNYaExA==
-X-Received: by 2002:a65:67d4:: with SMTP id b20mr276898pgs.445.1569430875682; 
- Wed, 25 Sep 2019 10:01:15 -0700 (PDT)
-Received: from [172.20.32.216] ([12.206.46.61])
- by smtp.gmail.com with ESMTPSA id x9sm10339723pje.27.2019.09.25.10.01.12
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 25 Sep 2019 10:01:14 -0700 (PDT)
-Subject: Re: [PATCH v4 08/16] cputlb: Move ROM handling from I/O path to TLB
- path
-To: David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <20190923230004.9231-1-richard.henderson@linaro.org>
- <20190923230004.9231-9-richard.henderson@linaro.org>
- <87v9th9qnz.fsf@linaro.org> <080af734-eccb-16c9-2664-72dd26ff460c@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <thuth@redhat.com>) id 1iDAg2-0000L2-3C
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 13:02:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54184)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iDAg1-0000KS-Q8; Wed, 25 Sep 2019 13:02:06 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E1041C0578F8;
+ Wed, 25 Sep 2019 17:02:04 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-109.ams2.redhat.com [10.36.116.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D34E31001956;
+ Wed, 25 Sep 2019 17:01:59 +0000 (UTC)
+Subject: Re: [PATCH v2 2/7] s390x/mmu: Move DAT protection handling out of
+ mmu_translate_asce()
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190925125236.4043-1-david@redhat.com>
+ <20190925125236.4043-3-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <762b5a49-2f94-a82e-f8bf-61080de592a2@linaro.org>
-Date: Wed, 25 Sep 2019 10:01:10 -0700
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <2566e76d-9f16-dad0-e12d-f2ecc2c258bf@redhat.com>
+Date: Wed, 25 Sep 2019 19:01:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <080af734-eccb-16c9-2664-72dd26ff460c@redhat.com>
+In-Reply-To: <20190925125236.4043-3-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Wed, 25 Sep 2019 17:02:05 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,29 +116,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/24/19 11:59 PM, David Hildenbrand wrote:
->>> +            if (section->readonly) {
->>> +                tn.addr_write |= TLB_ROM;
->>> +            } else if (cpu_physical_memory_is_clean(
->>> +                        memory_region_get_ram_addr(section->mr) + xlat)) {
->>> +                tn.addr_write |= TLB_NOTDIRTY;
->>> +            }
->>
->> This reads a bit weird because we are saying romd isn't a ROM but
->> something that identifies as RAM can be ROM rather than just a memory
->> protected piece of RAM.
->>
+On 25/09/2019 14.52, David Hildenbrand wrote:
+> We'll reuse the ilen and tec definitions in mmu_translate
+> soon also for all other DAT exceptions we inject. Move it to the caller,
+> where we can later pair it up with other protection checks, like IEP.
 > 
-> I proposed a bunch of alternatives as reply to v3 (e.g.,
-> TLB_DISCARD_WRITES), either Richard missed them or I missed his reply :)
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/mmu_helper.c | 39 ++++++++++++++++-----------------------
+>  1 file changed, 16 insertions(+), 23 deletions(-)
+> 
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index 6a7ad33c4d..847fb240fb 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -48,20 +48,6 @@ static void trigger_access_exception(CPUS390XState *env, uint32_t type,
+>      }
+>  }
+>  
+> -static void trigger_prot_fault(CPUS390XState *env, target_ulong vaddr,
+> -                               uint64_t asc, int rw, bool exc)
+> -{
+> -    uint64_t tec;
+> -
+> -    tec = vaddr | (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ) | 4 | asc >> 46;
+> -
+> -    if (!exc) {
+> -        return;
+> -    }
+> -
+> -    trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, tec);
+> -}
+> -
+>  static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+>                                 uint32_t type, uint64_t asc, int rw, bool exc)
+>  {
+> @@ -229,7 +215,6 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
+>                                int *flags, int rw, bool exc)
+>  {
+>      int level;
+> -    int r;
+>  
+>      if (asce & ASCE_REAL_SPACE) {
+>          /* direct mapping */
+> @@ -277,14 +262,8 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
+>          break;
+>      }
+>  
+> -    r = mmu_translate_region(env, vaddr, asc, asce, level, raddr, flags, rw,
+> -                             exc);
+> -    if (!r && rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
+> -        trigger_prot_fault(env, vaddr, asc, rw, exc);
+> -        return -1;
+> -    }
+> -
+> -    return r;
+> +    return mmu_translate_region(env, vaddr, asc, asce, level, raddr, flags, rw,
+> +                                exc);
+>  }
+>  
+>  static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
+> @@ -369,6 +348,10 @@ static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
+>  int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+>                    target_ulong *raddr, int *flags, bool exc)
+>  {
+> +    /* Code accesses have an undefined ilc, let's use 2 bytes. */
+> +    const int ilen = (rw == MMU_INST_FETCH) ? 2 : ILEN_AUTO;
+> +    uint64_t tec = (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
+> +                   (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ);
+>      uint64_t asce;
+>      int r;
+>  
+> @@ -421,6 +404,16 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+>          return r;
+>      }
+>  
+> +    /* check for DAT protection */
+> +    if (unlikely(rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE))) {
+> +        if (exc) {
+> +            /* DAT sets bit 61 only */
+> +            tec |= 0x4;
+> +            trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
+> +        }
+> +        return -1;
+> +    }
+> +
+>  nodat:
+>      /* Convert real address -> absolute address */
+>      *raddr = mmu_real2abs(env, *raddr);
+> 
 
-Missed it, sorry.
-
-
-r~
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
