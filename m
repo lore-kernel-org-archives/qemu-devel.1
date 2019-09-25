@@ -2,83 +2,86 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2119C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 22:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76555C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 22:22:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D4A6205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 22:19:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D4A6205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 46BDD205F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 22:22:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46BDD205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDFd7-0003Fj-5L
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 18:19:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44253)
+	id 1iDFg0-0004ii-Ad
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 18:22:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iDFaz-00022I-Fq
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:17:14 -0400
+ (envelope-from <philmd@redhat.com>) id 1iDFeC-00049U-SO
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:20:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iDFay-00053g-E4
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:17:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56236)
+ (envelope-from <philmd@redhat.com>) id 1iDFe3-0000tJ-S9
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:20:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56824)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDFay-00051z-4J
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:17:12 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDFe3-0000rT-Hk
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 18:20:23 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3445A5859E
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 22:17:11 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id r187so3289898wme.0
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 15:17:11 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8157E5AFE3
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 22:20:22 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id v18so126194wro.16
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 15:20:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=U32e0gvF+Du/ZMCNJhETOwflhH+X8Ij8z6MlMuQx8ZA=;
- b=dD+3si/TpUnuQAPlB2CtTWbWUz79m+Sgls62iUDPXW61AE5JRMmHHj0RPvXFV5giNP
- WYMZbvg0XMS8qStCz6EjJcoKGLO2DIGWJY3LCRccjAc2BoX8VdsPGQD342cGekQkmICV
- MwmmvebPmQElzL3tbJlTNAJqXN0ILcvMKMn12eSeIGrOrCYEmeC4VmXhFbKj7CbOiulo
- r7JekReJxtQz8HAillJe+19746RhU25U/wNCIhUg0s+Wdz55zZFzDckbdLQVsXP8Ogx9
- kAHBA2a0YJi//Jr/+GFHgv51SpLZ811IIcMKAfQD1JzUE5NrvrcRIGJvDgZB48pkQ6E2
- sYTA==
-X-Gm-Message-State: APjAAAU/6VaJ1Z7evZM5nE0S1tOaHFGR3LZH3GU5nkKmDJz9GhcOmhFV
- hF5V/fl5JDk/6rbwHLdS9dCk4LWTE5VBXDjAYp0qJGmXf8yAOG6UHMRaXpP/k5clgMIxcfGV5BH
- MrrS+xJbG4XEgXIE=
-X-Received: by 2002:a7b:c932:: with SMTP id h18mr298960wml.86.1569449829924;
- Wed, 25 Sep 2019 15:17:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzqGNPeJhfxnwKih/vyFhjqm6pTEwifF1drsl9TTLK/3Z9VvOjqHWE2M29++NyJoWoYr9o+Fg==
-X-Received: by 2002:a7b:c932:: with SMTP id h18mr298952wml.86.1569449829770;
- Wed, 25 Sep 2019 15:17:09 -0700 (PDT)
+ bh=AUrJ9yxICkjbN96jkaEKLV8mIS5hDryN21dV+uBqKTw=;
+ b=cH08cjWgN56Dyia/M6cHEwLgsMove0ePZQMZrEHD4eaN6AoYjqwyiwqABhc3+/CCVJ
+ 2cHZuL6U1gcdg+B3uinxe9Ql69COHh2V14iYJMlAxKa+2kYY8Fk75EtE8wKxUoDaJipG
+ JJjVMC3jkpjkr9boEN2txkPBilwdUmXLQ79Wvg+HOGQkiXEHPd8QgyyZJAqENa+SJzKk
+ 8NvC+HuPLBO78iKn6sO3Bzwpx6aaJZfoSIK1n7iruNMCtrE3KgMinjzYvG5qTlfgl29/
+ d0m3b3ZfEoJm+9YUKKY3/CztwyNXG2L3WwB7SJBqN+xpu3ix3/MJ2UTmIjNsHgMMCaA1
+ +rdg==
+X-Gm-Message-State: APjAAAXPH4WYiZvLjJ2dgvtrx+R6pvHYj89ylFkGwz7JnkBso2cnt2wX
+ dN1vd3HJz8nrBBkMMEcqtaLSKWRJo9zTz91VnI7987/Y/MMbVyaDFjmWiAMgaETDbHBKSB94dUb
+ WYYm5vuvHUjmoodk=
+X-Received: by 2002:a05:600c:40f:: with SMTP id
+ q15mr295010wmb.23.1569450021280; 
+ Wed, 25 Sep 2019 15:20:21 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz1iaW7IIo0rm0pPYJwP7RrrgwjJc5A9/zG10iGt9C5taDG1+arGOXV5C/abTmhulRIn81W/w==
+X-Received: by 2002:a05:600c:40f:: with SMTP id
+ q15mr294995wmb.23.1569450021111; 
+ Wed, 25 Sep 2019 15:20:21 -0700 (PDT)
 Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id p85sm760651wme.23.2019.09.25.15.17.08
+ by smtp.gmail.com with ESMTPSA id 79sm925027wmb.7.2019.09.25.15.20.19
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 25 Sep 2019 15:17:09 -0700 (PDT)
-Subject: Re: [PATCH v3 19/33] tests/tcg: add float_madds test to multiarch
+ Wed, 25 Sep 2019 15:20:20 -0700 (PDT)
+Subject: Re: [PATCH v3 21/33] tests/tcg: add simple record/replay smoke test
+ for aarch64
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20190924210106.27117-1-alex.bennee@linaro.org>
- <20190924210106.27117-20-alex.bennee@linaro.org>
+ <20190924210106.27117-22-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8e118a0c-becb-aeb3-5407-4f371945029e@redhat.com>
-Date: Thu, 26 Sep 2019 00:17:08 +0200
+Message-ID: <27600587-35fb-e2e7-72c2-95e8dbeb8f9f@redhat.com>
+Date: Thu, 26 Sep 2019 00:20:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190924210106.27117-20-alex.bennee@linaro.org>
+In-Reply-To: <20190924210106.27117-22-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -96,51 +99,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, jsnow@redhat.com,
- f4bug@amsat.org, Peter Maydell <peter.maydell@linaro.org>
+ f4bug@amsat.org, Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/24/19 11:00 PM, Alex Benn=C3=A9e wrote:
-> This is a generic floating point multiply and accumulate test for
-> single precision floating point values. I've split of the common float
-> functions into a helper library so additional tests can use the same
-> common code.
+> This adds two new tests that re-use the memory test to check basic
+> record replay functionality is still working. We have to define our
+> own runners rather than using the default pattern as we want to change
+> the test name but re-use the memory binary.
 >=20
-> As I don't have references for all architectures I've allowed some
-> flexibility for tests to pass without reference files. They can be
-> added as we get collect them.
+> We declare the test binaries as PHONY as they don't rely exist.
+>=20
+> [AJB: A better test would output some sort of timer value or other
+> otherwise variable value so we could compare the record and replay
+> outputs and ensure they match]
 >=20
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
 > ---
-> v2
->   - allow tests to add addition patterns to the list
->   - conditional diff-out
->   - use __builtin_fmaf instead of forcing optimisation
->   - use hex floating point definitions and output
-> v3
->   - remove add_const stuff, make explicit tests explicit
->   - various style clean-ups
-> ---
->  tests/tcg/Makefile.target           |   9 +
->  tests/tcg/aarch64/float_madds.ref   | 768 ++++++++++++++++++++++++++++
->  tests/tcg/arm/Makefile.target       |   3 +
->  tests/tcg/arm/float_madds.ref       | 768 ++++++++++++++++++++++++++++
->  tests/tcg/multiarch/Makefile.target |  12 +-
->  tests/tcg/multiarch/float_helpers.c | 230 +++++++++
->  tests/tcg/multiarch/float_helpers.h |  26 +
->  tests/tcg/multiarch/float_madds.c   | 103 ++++
->  8 files changed, 1918 insertions(+), 1 deletion(-)
->  create mode 100644 tests/tcg/aarch64/float_madds.ref
->  create mode 100644 tests/tcg/arm/float_madds.ref
->  create mode 100644 tests/tcg/multiarch/float_helpers.c
->  create mode 100644 tests/tcg/multiarch/float_helpers.h
->  create mode 100644 tests/tcg/multiarch/float_madds.c
-[...]
+>  tests/tcg/aarch64/Makefile.softmmu-target | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>=20
+> diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarc=
+h64/Makefile.softmmu-target
+> index 4c4aaf61dd3..b4b39579634 100644
+> --- a/tests/tcg/aarch64/Makefile.softmmu-target
+> +++ b/tests/tcg/aarch64/Makefile.softmmu-target
+> @@ -32,3 +32,24 @@ memory: CFLAGS+=3D-DCHECK_UNALIGNED=3D1
+> =20
+>  # Running
+>  QEMU_OPTS+=3D-M virt -cpu max -display none -semihosting-config enable=
+=3Don,target=3Dnative,chardev=3Doutput -kernel
+> +
+> +# Simple Record/Replay Test
+> +.PHONY: memory-record
+> +run-memory-record: memory-record memory
+> +	$(call run-test, $<, \
+> +	  $(QEMU) -monitor none -display none \
+> +		  -chardev file$(COMMA)path=3D$<.out$(COMMA)id=3Doutput \
+> +		  -icount shift=3D5$(COMMA)rr=3Drecord$(COMMA)rrfile=3Drecord.bin \
+> +	   	  $(QEMU_OPTS) memory, \
+> +	  "$< on $(TARGET_NAME)")
+> +
+> +.PHONY: memory-replay
+> +run-memory-replay: memory-replay run-memory-record
+> +	$(call run-test, $<, \
+> +	  $(QEMU) -monitor none -display none \
+> +		  -chardev file$(COMMA)path=3D$<.out$(COMMA)id=3Doutput \
+> +		  -icount shift=3D5$(COMMA)rr=3Dreplay$(COMMA)rrfile=3Drecord.bin \
+> +	   	  $(QEMU_OPTS) memory, \
+> +	  "$< on $(TARGET_NAME)")
+> +
+> +TESTS+=3Dmemory-record memory-replay
+>=20
 
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
 
