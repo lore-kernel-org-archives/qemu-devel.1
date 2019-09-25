@@ -2,83 +2,62 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE24C432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3216FC432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33D8C2082F
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:11:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33D8C2082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07BCD2082F
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 08:13:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07BCD2082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD2OS-0006rr-Bq
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 04:11:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51465)
+	id 1iD2Qi-00008V-5t
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 04:13:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51865)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iD2Nj-0006Mp-CJ
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:10:40 -0400
+ (envelope-from <guoheyi@huawei.com>) id 1iD2Pt-00082f-Vg
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iD2Ni-0004dW-Dn
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:10:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53722)
+ (envelope-from <guoheyi@huawei.com>) id 1iD2Ps-0005aU-Kw
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:12:53 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2177 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iD2Ni-0004d2-5L
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 04:10:38 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 15D2B81DE0
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 08:10:37 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id f63so1526529wma.7
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 01:10:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=sSedf1PSQ4+XVQg27whbHXC5BsZOA0msBaOP6O2nXYA=;
- b=HqSgjF3cA3feO4L7OrmEXNCa/m8bYTBR+0s5Pg3cbHAMVULOKh5l1WJO22u9reA7/L
- T8PuHv8eUlFk+iYGCQRg+OXAyqPPDYCpcLTvz6eX4NcrXSbDu47TYZa32QNpoJlRZRBq
- kGT158+TerRv8uBLvKqDrAQHxjve0mTjawxGLS0x8SDC7HlLpLlrku3Z+lsIGWeMB9lO
- jGnWNMdkdPSB4im0Og30ddUSm7ev+3VblnZUkO5IVb56JRaUAEOwOu3IihYM4ipUXsCa
- BAtnn6nzz2pTbr9Hu+ACkb3qgKiSWTt/JvDhAD4QfTTvhOs5h19w12cKa7aQ9VtKEYpS
- JkpA==
-X-Gm-Message-State: APjAAAVpJ9UEC6cHFLVvoazQoEUfHVF7Q+j/PaXX+CGCxHI6dLgCZ0D1
- Rbwe7cI+RsrkWYh6HsBKRsMwq3Tm76VGXemXjEYiZNZSgSqf+zQI2qx6CASUSCWQV0wTJW0QfmT
- +4yHzoYaM18ft3BY=
-X-Received: by 2002:a5d:4044:: with SMTP id w4mr8299103wrp.281.1569399035707; 
- Wed, 25 Sep 2019 01:10:35 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyRVq+g1VfZMi0d6Wj/uqNnTxYdPTROhRi471HFmLSLWvA0bKAZQLSNyzFlC9+e4gKyKQ97bg==
-X-Received: by 2002:a5d:4044:: with SMTP id w4mr8299057wrp.281.1569399035412; 
- Wed, 25 Sep 2019 01:10:35 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id d10sm2181806wma.42.2019.09.25.01.10.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 01:10:34 -0700 (PDT)
-References: <20190924124433.96810-1-slp@redhat.com>
- <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v4 0/8] Introduce the microvm machine type
-In-reply-to: <c689e275-1a05-7d08-756b-0be914ed24ca@redhat.com>
-Date: Wed, 25 Sep 2019 10:10:32 +0200
-Message-ID: <87h850ssnb.fsf@redhat.com>
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1iD2Pp-0005Xp-Fq; Wed, 25 Sep 2019 04:12:49 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id EF74175CD047DB4EC037;
+ Wed, 25 Sep 2019 16:12:44 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Wed, 25 Sep 2019
+ 16:12:35 +0800
+Subject: Re: [RFC PATCH 01/12] linux-headers: import arm_sdei.h
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
+ <1569338511-3572-2-git-send-email-guoheyi@huawei.com>
+ <20190924113640-mutt-send-email-mst@kernel.org>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <f0096ac1-e7d4-78d2-9e8a-21a7f6f266ad@huawei.com>
+Date: Wed, 25 Sep 2019 16:12:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <20190924113640-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,75 +69,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pagupta@redhat.com>, ehabkost@redhat.com, kvm@vger.kernel.org,
- mst@redhat.com, lersek@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
- kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, philmd@redhat.com,
- rth@twiddle.net
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Dave Martin <Dave.Martin@arm.com>, qemu-arm@nongnu.org,
+ James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ wanghaibin.wang@huawei.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
 
 
-David Hildenbrand <david@redhat.com> writes:
-
-> On 24.09.19 14:44, Sergio Lopez wrote:
->> Microvm is a machine type inspired by both NEMU and Firecracker, and
->> constructed after the machine model implemented by the latter.
->>=20
->> It's main purpose is providing users a minimalist machine type free
->> from the burden of legacy compatibility, serving as a stepping stone
->> for future projects aiming at improving boot times, reducing the
->> attack surface and slimming down QEMU's footprint.
->>=20
->> The microvm machine type supports the following devices:
->>=20
->>  - ISA bus
->>  - i8259 PIC
->>  - LAPIC (implicit if using KVM)
->>  - IOAPIC (defaults to kernel_irqchip_split =3D true)
->>  - i8254 PIT
->>  - MC146818 RTC (optional)
->>  - kvmclock (if using KVM)
->>  - fw_cfg
->>  - One ISA serial port (optional)
->>  - Up to eight virtio-mmio devices (configured by the user)
+On 2019/9/24 23:39, Michael S. Tsirkin wrote:
+> On Tue, Sep 24, 2019 at 11:21:40PM +0800, Heyi Guo wrote:
+>> Import Linux header file include/uapi/linux/arm_sdei.h from kernel
+>> v5.3 release.
+>>
+>> This is to prepare for qemu SDEI emulation.
+>>
+>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: Dave Martin <Dave.Martin@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Cornelia Huck <cohuck@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Some issues with this.  First linux-headers is for linux as a host.
+> This is for linux as a guest, so belongs in include/standard-headers.
 >
-> So I assume also no ACPI (CPU/memory hotplug), correct?
+> Second, please add to scripts/update-linux-headers.sh in a 1st patch,
+> then add the file in the second patch.
 
-Correct.
+Thanks; now I understand the differences. I'll do that in next version.
 
-> @Pankaj, I think it would make sense to make virtio-pmem play with
-> virtio-mmio/microvm.
+HG
 
-That would be great. I'm also looking forward for virtio-mem (and an
-hypothetical virtio-cpu) to eventually gain hotplug capabilities in
-microvm.
+>
+>
+>
+>> ---
+>>   linux-headers/linux/arm_sdei.h | 73 ++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 73 insertions(+)
+>>   create mode 100644 linux-headers/linux/arm_sdei.h
+>>
+>> diff --git a/linux-headers/linux/arm_sdei.h b/linux-headers/linux/arm_sdei.h
+>> new file mode 100644
+>> index 0000000..af0630b
+>> --- /dev/null
+>> +++ b/linux-headers/linux/arm_sdei.h
+>> @@ -0,0 +1,73 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +/* Copyright (C) 2017 Arm Ltd. */
+>> +#ifndef _UAPI_LINUX_ARM_SDEI_H
+>> +#define _UAPI_LINUX_ARM_SDEI_H
+>> +
+>> +#define SDEI_1_0_FN_BASE			0xC4000020
+>> +#define SDEI_1_0_MASK				0xFFFFFFE0
+>> +#define SDEI_1_0_FN(n)				(SDEI_1_0_FN_BASE + (n))
+>> +
+>> +#define SDEI_1_0_FN_SDEI_VERSION			SDEI_1_0_FN(0x00)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_REGISTER			SDEI_1_0_FN(0x01)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_ENABLE			SDEI_1_0_FN(0x02)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_DISABLE			SDEI_1_0_FN(0x03)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_CONTEXT			SDEI_1_0_FN(0x04)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_COMPLETE			SDEI_1_0_FN(0x05)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_COMPLETE_AND_RESUME	SDEI_1_0_FN(0x06)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_UNREGISTER		SDEI_1_0_FN(0x07)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_STATUS			SDEI_1_0_FN(0x08)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_GET_INFO			SDEI_1_0_FN(0x09)
+>> +#define SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET		SDEI_1_0_FN(0x0A)
+>> +#define SDEI_1_0_FN_SDEI_PE_MASK			SDEI_1_0_FN(0x0B)
+>> +#define SDEI_1_0_FN_SDEI_PE_UNMASK			SDEI_1_0_FN(0x0C)
+>> +#define SDEI_1_0_FN_SDEI_INTERRUPT_BIND			SDEI_1_0_FN(0x0D)
+>> +#define SDEI_1_0_FN_SDEI_INTERRUPT_RELEASE		SDEI_1_0_FN(0x0E)
+>> +#define SDEI_1_0_FN_SDEI_PRIVATE_RESET			SDEI_1_0_FN(0x11)
+>> +#define SDEI_1_0_FN_SDEI_SHARED_RESET			SDEI_1_0_FN(0x12)
+>> +
+>> +#define SDEI_VERSION_MAJOR_SHIFT			48
+>> +#define SDEI_VERSION_MAJOR_MASK				0x7fff
+>> +#define SDEI_VERSION_MINOR_SHIFT			32
+>> +#define SDEI_VERSION_MINOR_MASK				0xffff
+>> +#define SDEI_VERSION_VENDOR_SHIFT			0
+>> +#define SDEI_VERSION_VENDOR_MASK			0xffffffff
+>> +
+>> +#define SDEI_VERSION_MAJOR(x)	(x>>SDEI_VERSION_MAJOR_SHIFT & SDEI_VERSION_MAJOR_MASK)
+>> +#define SDEI_VERSION_MINOR(x)	(x>>SDEI_VERSION_MINOR_SHIFT & SDEI_VERSION_MINOR_MASK)
+>> +#define SDEI_VERSION_VENDOR(x)	(x>>SDEI_VERSION_VENDOR_SHIFT & SDEI_VERSION_VENDOR_MASK)
+>> +
+>> +/* SDEI return values */
+>> +#define SDEI_SUCCESS		0
+>> +#define SDEI_NOT_SUPPORTED	-1
+>> +#define SDEI_INVALID_PARAMETERS	-2
+>> +#define SDEI_DENIED		-3
+>> +#define SDEI_PENDING		-5
+>> +#define SDEI_OUT_OF_RESOURCE	-10
+>> +
+>> +/* EVENT_REGISTER flags */
+>> +#define SDEI_EVENT_REGISTER_RM_ANY	0
+>> +#define SDEI_EVENT_REGISTER_RM_PE	1
+>> +
+>> +/* EVENT_STATUS return value bits */
+>> +#define SDEI_EVENT_STATUS_RUNNING	2
+>> +#define SDEI_EVENT_STATUS_ENABLED	1
+>> +#define SDEI_EVENT_STATUS_REGISTERED	0
+>> +
+>> +/* EVENT_COMPLETE status values */
+>> +#define SDEI_EV_HANDLED	0
+>> +#define SDEI_EV_FAILED	1
+>> +
+>> +/* GET_INFO values */
+>> +#define SDEI_EVENT_INFO_EV_TYPE			0
+>> +#define SDEI_EVENT_INFO_EV_SIGNALED		1
+>> +#define SDEI_EVENT_INFO_EV_PRIORITY		2
+>> +#define SDEI_EVENT_INFO_EV_ROUTING_MODE		3
+>> +#define SDEI_EVENT_INFO_EV_ROUTING_AFF		4
+>> +
+>> +/* and their results */
+>> +#define SDEI_EVENT_TYPE_PRIVATE			0
+>> +#define SDEI_EVENT_TYPE_SHARED			1
+>> +#define SDEI_EVENT_PRIORITY_NORMAL		0
+>> +#define SDEI_EVENT_PRIORITY_CRITICAL		1
+>> +
+>> +#endif /* _UAPI_LINUX_ARM_SDEI_H */
+>> -- 
+>> 1.8.3.1
+> .
+>
 
-Thanks,
-Sergio.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2LIPgACgkQ9GknjS8M
-AjWl+A/+PSvLIkJIXkisI+8HPInHsOhI7krvdkj88nvO3vWQbDvRZR4wjKpzJls+
-QuB7L+5sZh4afO4t0zOOZ54AcN91lSMUL3ovOFbN2zsS3yWO3H1BIgroEdD3Ho2g
-wePVPnB65l10c2X6zqvLZlE06amQ1rG2ooYHJmF6AHl7L6ouHjTqioFoe3itzfqc
-5t3xdJx43IpXY5Zng6S8mNGji7q1PX/tKqYdoOSqafMxN9s9HqX6t9F6/kbUkH9j
-Q+xKcSg5wSHAV000jokgfgJe21Z3/O329Zckb+Vdp8RqZZaR5p1tYThevyshqvLK
-K2QKsT8hxflVPtyXe326UGaRQd/n+Uq9d9BFj4M+imvMsYu6EkV9hXDOq5U9PRtN
-uwiCQj3OlHjzvad18+ZbnPnjfkPDFnYTzgdiQ8o99+a8AK1SbdVi8ePMmFy8tvBF
-szKMv7fzfOGYNJnmd0At1nWMon+0qQKW7v/Ee4qMN+Xg5900ycDhsyf1fMdCj/52
-DkQaFc5Bo94CjhDjQetZd/EHJKfqd4NKACCUNs7Hkubrlj7p+xkI+Oj8jtI96cWK
-ytI43gzylvznVvlH16E0BTiEhAduBY5PGkGBOqpAkjk2wLUmGK7BsFAzpjtMDxdH
-XSR81ecBqDHJXAA0JekepxcEK+S3ho6j2NJpJ2jvuXsKCl8UGiI=
-=DOyt
------END PGP SIGNATURE-----
---=-=-=--
 
