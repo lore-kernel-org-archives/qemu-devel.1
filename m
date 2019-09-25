@@ -2,56 +2,60 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F78C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F01C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9B2621D7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:19:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9B2621D7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id E094D21D7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:20:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E094D21D7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD7CW-0007jr-PV
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:19:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58018)
+	id 1iD7DL-0008RA-0J
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:20:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58849)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6gr-0001UJ-P9
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:43 -0400
+ (envelope-from <david@redhat.com>) id 1iD6n2-0006dx-3f
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iD6go-0002Lp-QT
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:41 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:56138 helo=mail.rt-rk.com)
+ (envelope-from <david@redhat.com>) id 1iD6n0-0004BP-9p
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:53:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51028)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iD6go-0002Ga-FP
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:46:38 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 408651A23B1;
- Wed, 25 Sep 2019 14:46:22 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 0D72A1A23CD;
- Wed, 25 Sep 2019 14:46:22 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iD6n0-0004BA-1i; Wed, 25 Sep 2019 08:53:02 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3E514306085E;
+ Wed, 25 Sep 2019 12:53:01 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-117-14.ams2.redhat.com [10.36.117.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 71602600C8;
+ Wed, 25 Sep 2019 12:52:59 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 18/20] target/mips: msa: Split helpers for
- MOD_<S|U>.<B|H|W|D>
-Date: Wed, 25 Sep 2019 14:46:10 +0200
-Message-Id: <1569415572-19635-19-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+Subject: [PATCH v2 6/7] s390x/mmu: DAT table definition overhaul
+Date: Wed, 25 Sep 2019 14:52:35 +0200
+Message-Id: <20190925125236.4043-7-david@redhat.com>
+In-Reply-To: <20190925125236.4043-1-david@redhat.com>
+References: <20190925125236.4043-1-david@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Wed, 25 Sep 2019 12:53:01 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,296 +67,324 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+Let's use consitent names for the region/section/page table entries and
+for the macros to extract relevant parts from virtual address. Make them
+match the definitions in the PoP - e.g., how the televant bits are actual=
+ly
+called.
 
-Achieves clearer code and slightly better performance.
+Introduce defines for all bits declared in the PoP. This will come in
+handy in follow-up patches.
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/mips/helper.h     |  12 +++-
- target/mips/msa_helper.c | 156 +++++++++++++++++++++++++++++++++++++++++------
- target/mips/translate.c  |  38 ++++++++++--
- 3 files changed, 180 insertions(+), 26 deletions(-)
+ target/s390x/cpu.h        | 77 +++++++++++++++++++++++++++++----------
+ target/s390x/mem_helper.c | 12 +++---
+ target/s390x/mmu_helper.c | 37 ++++++++++---------
+ 3 files changed, 83 insertions(+), 43 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index ec4982f..cc216f7 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -877,6 +877,16 @@ DEF_HELPER_4(msa_div_u_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_div_u_w, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_div_u_d, void, env, i32, i32, i32)
- 
-+DEF_HELPER_4(msa_mod_u_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_mod_u_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_mod_u_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_mod_u_d, void, env, i32, i32, i32)
-+
-+DEF_HELPER_4(msa_mod_s_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
-+
- 
- DEF_HELPER_4(msa_andi_b, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_ori_b, void, env, i32, i32, i32)
-@@ -939,8 +949,6 @@ DEF_HELPER_5(msa_asub_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_mulv_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_maddv_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_msubv_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_mod_s_df, void, env, i32, i32, i32, i32)
--DEF_HELPER_5(msa_mod_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_dotp_s_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_dotp_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_dpadd_s_df, void, env, i32, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 5f64e51..8ad9d42 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1715,7 +1715,144 @@ void helper_msa_div_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt
-  * +---------------+----------------------------------------------------------+
-  */
- 
--/* TODO: insert Int Modulo group helpers here */
-+static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
-+{
-+    if (arg1 == DF_MIN_INT(df) && arg2 == -1) {
-+        return 0;
-+    }
-+    return arg2 ? arg1 % arg2 : arg1;
-+}
-+
-+void helper_msa_mod_s_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[0]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[1]);
-+    pwd->b[2]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[2]);
-+    pwd->b[3]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[3]);
-+    pwd->b[4]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[4]);
-+    pwd->b[5]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[5]);
-+    pwd->b[6]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[6]);
-+    pwd->b[7]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[7]);
-+    pwd->b[8]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[8]);
-+    pwd->b[9]  = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[9]);
-+    pwd->b[10] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[10]);
-+    pwd->b[11] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[11]);
-+    pwd->b[12] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[12]);
-+    pwd->b[13] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[13]);
-+    pwd->b[14] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[14]);
-+    pwd->b[15] = msa_mod_s_df(DF_BYTE, pws->b[0],  pwt->b[15]);
-+}
-+
-+void helper_msa_mod_s_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->h[0]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[1]);
-+    pwd->h[2]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[2]);
-+    pwd->h[3]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[3]);
-+    pwd->h[4]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[4]);
-+    pwd->h[5]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[5]);
-+    pwd->h[6]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[6]);
-+    pwd->h[7]  = msa_mod_s_df(DF_HALF, pws->h[0],  pwt->h[7]);
-+}
-+
-+void helper_msa_mod_s_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->w[0]  = msa_mod_s_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_mod_s_df(DF_WORD, pws->w[0],  pwt->w[1]);
-+    pwd->w[2]  = msa_mod_s_df(DF_WORD, pws->w[0],  pwt->w[2]);
-+    pwd->w[3]  = msa_mod_s_df(DF_WORD, pws->w[0],  pwt->w[3]);
-+}
-+
-+void helper_msa_mod_s_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0]  = msa_mod_s_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_mod_s_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
-+}
-+
-+static inline int64_t msa_mod_u_df(uint32_t df, int64_t arg1, int64_t arg2)
-+{
-+    uint64_t u_arg1 = UNSIGNED(arg1, df);
-+    uint64_t u_arg2 = UNSIGNED(arg2, df);
-+    return u_arg2 ? u_arg1 % u_arg2 : u_arg1;
-+}
-+
-+void helper_msa_mod_u_b(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->b[0]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[0]);
-+    pwd->b[1]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[1]);
-+    pwd->b[2]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[2]);
-+    pwd->b[3]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[3]);
-+    pwd->b[4]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[4]);
-+    pwd->b[5]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[5]);
-+    pwd->b[6]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[6]);
-+    pwd->b[7]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[7]);
-+    pwd->b[8]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[8]);
-+    pwd->b[9]  = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[9]);
-+    pwd->b[10] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[10]);
-+    pwd->b[11] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[11]);
-+    pwd->b[12] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[12]);
-+    pwd->b[13] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[13]);
-+    pwd->b[14] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[14]);
-+    pwd->b[15] = msa_mod_u_df(DF_BYTE, pws->b[0],  pwt->b[15]);
-+}
-+
-+void helper_msa_mod_u_h(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->h[0]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[0]);
-+    pwd->h[1]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[1]);
-+    pwd->h[2]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[2]);
-+    pwd->h[3]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[3]);
-+    pwd->h[4]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[4]);
-+    pwd->h[5]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[5]);
-+    pwd->h[6]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[6]);
-+    pwd->h[7]  = msa_mod_u_df(DF_HALF, pws->h[0],  pwt->h[7]);
-+}
-+
-+void helper_msa_mod_u_w(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->w[0]  = msa_mod_u_df(DF_WORD, pws->w[0],  pwt->w[0]);
-+    pwd->w[1]  = msa_mod_u_df(DF_WORD, pws->w[0],  pwt->w[1]);
-+    pwd->w[2]  = msa_mod_u_df(DF_WORD, pws->w[0],  pwt->w[2]);
-+    pwd->w[3]  = msa_mod_u_df(DF_WORD, pws->w[0],  pwt->w[3]);
-+}
-+
-+void helper_msa_mod_u_d(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0]  = msa_mod_u_df(DF_DOUBLE, pws->d[0],  pwt->d[0]);
-+    pwd->d[1]  = msa_mod_u_df(DF_DOUBLE, pws->d[0],  pwt->d[1]);
-+}
- 
- 
- /*
-@@ -2394,21 +2531,6 @@ static inline int64_t msa_mulv_df(uint32_t df, int64_t arg1, int64_t arg2)
-     return arg1 * arg2;
- }
- 
--static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
--{
--    if (arg1 == DF_MIN_INT(df) && arg2 == -1) {
--        return 0;
--    }
--    return arg2 ? arg1 % arg2 : arg1;
--}
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 163dae13d7..e74a809257 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -558,26 +558,63 @@ QEMU_BUILD_BUG_ON(sizeof(SysIB) !=3D 4096);
+ #define ASCE_TYPE_SEGMENT     0x00        /* segment table type         =
+      */
+ #define ASCE_TABLE_LENGTH     0x03        /* region table length        =
+      */
+=20
+-#define REGION_ENTRY_ORIGIN   (~0xfffULL) /* region/segment table origin=
+    */
+-#define REGION_ENTRY_RO       0x200       /* region/segment protection b=
+it  */
+-#define REGION_ENTRY_TF       0xc0        /* region/segment table offset=
+    */
+-#define REGION_ENTRY_INV      0x20        /* invalid region table entry =
+    */
+-#define REGION_ENTRY_TYPE_MASK 0x0c       /* region/segment table type m=
+ask */
+-#define REGION_ENTRY_TYPE_R1  0x0c        /* region first table type    =
+    */
+-#define REGION_ENTRY_TYPE_R2  0x08        /* region second table type   =
+    */
+-#define REGION_ENTRY_TYPE_R3  0x04        /* region third table type    =
+    */
+-#define REGION_ENTRY_LENGTH   0x03        /* region third length        =
+    */
 -
--static inline int64_t msa_mod_u_df(uint32_t df, int64_t arg1, int64_t arg2)
--{
--    uint64_t u_arg1 = UNSIGNED(arg1, df);
--    uint64_t u_arg2 = UNSIGNED(arg2, df);
--    return u_arg2 ? u_arg1 % u_arg2 : u_arg1;
--}
+-#define SEGMENT_ENTRY_ORIGIN  (~0x7ffULL) /* segment table origin       =
+ */
+-#define SEGMENT_ENTRY_FC      0x400       /* format control             =
+ */
+-#define SEGMENT_ENTRY_RO      0x200       /* page protection bit        =
+ */
+-#define SEGMENT_ENTRY_INV     0x20        /* invalid segment table entry=
+ */
 -
- #define SIGNED_EVEN(a, df) \
-         ((((int64_t)(a)) << (64 - DF_BITS(df) / 2)) >> (64 - DF_BITS(df) / 2))
- 
-@@ -2614,8 +2736,6 @@ MSA_BINOP_DF(subsuu_s)
- MSA_BINOP_DF(asub_s)
- MSA_BINOP_DF(asub_u)
- MSA_BINOP_DF(mulv)
--MSA_BINOP_DF(mod_s)
--MSA_BINOP_DF(mod_u)
- MSA_BINOP_DF(dotp_s)
- MSA_BINOP_DF(dotp_u)
- MSA_BINOP_DF(srar)
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 27eca0a..5039716 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28642,6 +28642,38 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-             break;
+-#define VADDR_PX              0xff000     /* page index bits   */
+-
+-#define PAGE_RO               0x200       /* HW read-only bit  */
+-#define PAGE_INVALID          0x400       /* HW invalid bit    */
+-#define PAGE_RES0             0x800       /* bit must be zero  */
++#define REGION_ENTRY_ORIGIN         0xfffffffffffff000ULL
++#define REGION_ENTRY_P              0x0000000000000200ULL
++#define REGION_ENTRY_TF             0x00000000000000c0ULL
++#define REGION_ENTRY_I              0x0000000000000020ULL
++#define REGION_ENTRY_TT             0x000000000000000cULL
++#define REGION_ENTRY_TL             0x0000000000000003ULL
++
++#define REGION_ENTRY_TT_REGION1     0x000000000000000cULL
++#define REGION_ENTRY_TT_REGION2     0x0000000000000008ULL
++#define REGION_ENTRY_TT_REGION3     0x0000000000000004ULL
++
++#define REGION3_ENTRY_RFAA          0xffffffff80000000ULL
++#define REGION3_ENTRY_AV            0x0000000000010000ULL
++#define REGION3_ENTRY_ACC           0x000000000000f000ULL
++#define REGION3_ENTRY_F             0x0000000000000800ULL
++#define REGION3_ENTRY_FC            0x0000000000000400ULL
++#define REGION3_ENTRY_IEP           0x0000000000000100ULL
++#define REGION3_ENTRY_CR            0x0000000000000010ULL
++
++#define SEGMENT_ENTRY_ORIGIN        0xfffffffffffff800ULL
++#define SEGMENT_ENTRY_SFAA          0xfffffffffff80000ULL
++#define SEGMENT_ENTRY_AV            0x0000000000010000ULL
++#define SEGMENT_ENTRY_ACC           0x000000000000f000ULL
++#define SEGMENT_ENTRY_F             0x0000000000000800ULL
++#define SEGMENT_ENTRY_FC            0x0000000000000400ULL
++#define SEGMENT_ENTRY_P             0x0000000000000200ULL
++#define SEGMENT_ENTRY_IEP           0x0000000000000100ULL
++#define SEGMENT_ENTRY_I             0x0000000000000020ULL
++#define SEGMENT_ENTRY_CS            0x0000000000000010ULL
++#define SEGMENT_ENTRY_TT            0x000000000000000cULL
++
++#define SEGMENT_ENTRY_TT_REGION1    0x000000000000000cULL
++#define SEGMENT_ENTRY_TT_REGION2    0x0000000000000008ULL
++#define SEGMENT_ENTRY_TT_REGION3    0x0000000000000004ULL
++#define SEGMENT_ENTRY_TT_SEGMENT    0x0000000000000000ULL
++
++#define PAGE_ENTRY_0                0x0000000000000800ULL
++#define PAGE_ENTRY_I                0x0000000000000400ULL
++#define PAGE_ENTRY_P                0x0000000000000200ULL
++#define PAGE_ENTRY_IEP              0x0000000000000100ULL
++
++#define VADDR_REGION1_TX_MASK       0xffe0000000000000ULL
++#define VADDR_REGION2_TX_MASK       0x001ffc0000000000ULL
++#define VADDR_REGION3_TX_MASK       0x000003ff80000000ULL
++#define VADDR_SEGMENT_TX_MASK       0x000000007ff00000ULL
++#define VADDR_PAGE_TX_MASK          0x00000000000ff000ULL
++
++#define VADDR_REGION1_TX(vaddr)     (((vaddr) & VADDR_REGION1_TX_MASK) >=
+> 53)
++#define VADDR_REGION2_TX(vaddr)     (((vaddr) & VADDR_REGION2_TX_MASK) >=
+> 42)
++#define VADDR_REGION3_TX(vaddr)     (((vaddr) & VADDR_REGION3_TX_MASK) >=
+> 31)
++#define VADDR_SEGMENT_TX(vaddr)     (((vaddr) & VADDR_SEGMENT_TX_MASK) >=
+> 20)
++#define VADDR_PAGE_TX(vaddr)        (((vaddr) & VADDR_PAGE_TX_MASK) >> 1=
+2)
++
++#define VADDR_REGION1_TL(vaddr)     (((vaddr) & 0xc000000000000000ULL) >=
+> 62)
++#define VADDR_REGION2_TL(vaddr)     (((vaddr) & 0x0018000000000000ULL) >=
+> 51)
++#define VADDR_REGION3_TL(vaddr)     (((vaddr) & 0x0000030000000000ULL) >=
+> 40)
++#define VADDR_SEGMENT_TL(vaddr)     (((vaddr) & 0x0000000060000000ULL) >=
+> 29)
+=20
+ #define SK_C                    (0x1 << 1)
+ #define SK_R                    (0x1 << 2)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 44e535856d..08c5cc6a99 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -2252,9 +2252,9 @@ void HELPER(idte)(CPUS390XState *env, uint64_t r1, =
+uint64_t r2, uint32_t m4)
+             /* addresses are not wrapped in 24/31bit mode but table inde=
+x is */
+             raddr =3D table + ((index + i) & 0x7ff) * sizeof(entry);
+             entry =3D cpu_ldq_real_ra(env, raddr, ra);
+-            if (!(entry & REGION_ENTRY_INV)) {
++            if (!(entry & REGION_ENTRY_I)) {
+                 /* we are allowed to not store if already invalid */
+-                entry |=3D REGION_ENTRY_INV;
++                entry |=3D REGION_ENTRY_I;
+                 cpu_stq_real_ra(env, raddr, entry, ra);
+             }
+         }
+@@ -2279,17 +2279,17 @@ void HELPER(ipte)(CPUS390XState *env, uint64_t pt=
+o, uint64_t vaddr,
+=20
+     /* Compute the page table entry address */
+     pte_addr =3D (pto & SEGMENT_ENTRY_ORIGIN);
+-    pte_addr +=3D (vaddr & VADDR_PX) >> 9;
++    pte_addr +=3D VADDR_PAGE_TX(vaddr) * 8;
+=20
+     /* Mark the page table entry as invalid */
+     pte =3D cpu_ldq_real_ra(env, pte_addr, ra);
+-    pte |=3D PAGE_INVALID;
++    pte |=3D PAGE_ENTRY_I;
+     cpu_stq_real_ra(env, pte_addr, pte, ra);
+=20
+     /* XXX we exploit the fact that Linux passes the exact virtual
+        address here - it's not obliged to! */
+     if (m4 & 1) {
+-        if (vaddr & ~VADDR_PX) {
++        if (vaddr & ~VADDR_PAGE_TX_MASK) {
+             tlb_flush_page(cs, page);
+             /* XXX 31-bit hack */
+             tlb_flush_page(cs, page ^ 0x80000000);
+@@ -2298,7 +2298,7 @@ void HELPER(ipte)(CPUS390XState *env, uint64_t pto,=
+ uint64_t vaddr,
+             tlb_flush(cs);
+         }
+     } else {
+-        if (vaddr & ~VADDR_PX) {
++        if (vaddr & ~VADDR_PAGE_TX_MASK) {
+             tlb_flush_page_all_cpus_synced(cs, page);
+             /* XXX 31-bit hack */
+             tlb_flush_page_all_cpus_synced(cs, page ^ 0x80000000);
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 20e9c13202..9243f04312 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -116,13 +116,13 @@ static int mmu_translate_pte(CPUS390XState *env, ta=
+rget_ulong vaddr,
+                              uint64_t asc, uint64_t pt_entry,
+                              target_ulong *raddr, int *flags, int rw, bo=
+ol exc)
+ {
+-    if (pt_entry & PAGE_INVALID) {
++    if (pt_entry & PAGE_ENTRY_I) {
+         return PGM_PAGE_TRANS;
+     }
+-    if (pt_entry & PAGE_RES0) {
++    if (pt_entry & PAGE_ENTRY_0) {
+         return PGM_TRANS_SPEC;
+     }
+-    if (pt_entry & PAGE_RO) {
++    if (pt_entry & PAGE_ENTRY_P) {
+         *flags &=3D ~PAGE_WRITE;
+     }
+=20
+@@ -138,19 +138,20 @@ static int mmu_translate_segment(CPUS390XState *env=
+, target_ulong vaddr,
+ {
+     uint64_t origin, offs, pt_entry;
+=20
+-    if (st_entry & SEGMENT_ENTRY_RO) {
++    if (st_entry & SEGMENT_ENTRY_P) {
+         *flags &=3D ~PAGE_WRITE;
+     }
+=20
+     if ((st_entry & SEGMENT_ENTRY_FC) && (env->cregs[0] & CR0_EDAT)) {
+         /* Decode EDAT1 segment frame absolute address (1MB page) */
+-        *raddr =3D (st_entry & 0xfffffffffff00000ULL) | (vaddr & 0xfffff=
+);
++        *raddr =3D (st_entry & SEGMENT_ENTRY_SFAA) |
++                 (vaddr & ~SEGMENT_ENTRY_SFAA);
+         return 0;
+     }
+=20
+     /* Look up 4KB page entry */
+     origin =3D st_entry & SEGMENT_ENTRY_ORIGIN;
+-    offs  =3D (vaddr & VADDR_PX) >> 9;
++    offs =3D VADDR_PAGE_TX(vaddr) * 8;
+     if (read_table_entry(origin + offs, &pt_entry)) {
+         return PGM_ADDRESSING;
+     }
+@@ -176,11 +177,11 @@ static int mmu_translate_region(CPUS390XState *env,=
+ target_ulong vaddr,
+         return PGM_ADDRESSING;
+     }
+=20
+-    if ((new_entry & REGION_ENTRY_INV) !=3D 0) {
++    if (new_entry & REGION_ENTRY_I) {
+         return pchks[level / 4];
+     }
+=20
+-    if ((new_entry & REGION_ENTRY_TYPE_MASK) !=3D level) {
++    if ((new_entry & REGION_ENTRY_TT) !=3D level) {
+         return PGM_TRANS_SPEC;
+     }
+=20
+@@ -192,11 +193,11 @@ static int mmu_translate_region(CPUS390XState *env,=
+ target_ulong vaddr,
+     /* Check region table offset and length */
+     offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
+     if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
+-        || offs > (new_entry & REGION_ENTRY_LENGTH)) {
++        || offs > (new_entry & REGION_ENTRY_TL)) {
+         return pchks[level / 4 - 1];
+     }
+=20
+-    if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_RO)) {
++    if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_P)) {
+         *flags &=3D ~PAGE_WRITE;
+     }
+=20
+@@ -209,6 +210,7 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
+                               uint64_t asc, uint64_t asce, target_ulong =
+*raddr,
+                               int *flags, int rw, bool exc)
+ {
++    const int asce_tl =3D asce & ASCE_TABLE_LENGTH;
+     int level;
+=20
+     if (asce & ASCE_REAL_SPACE) {
+@@ -220,31 +222,32 @@ static int mmu_translate_asce(CPUS390XState *env, t=
+arget_ulong vaddr,
+     level =3D asce & ASCE_TYPE_MASK;
+     switch (level) {
+     case ASCE_TYPE_REGION1:
+-        if ((vaddr >> 62) > (asce & ASCE_TABLE_LENGTH)) {
++        if (VADDR_REGION1_TL(vaddr) > asce_tl) {
+             return PGM_REG_FIRST_TRANS;
          }
          break;
-+    case OPC_MOD_S_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_mod_s_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_mod_s_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_mod_s_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_mod_s_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-+    case OPC_MOD_U_df:
-+        switch (df) {
-+        case DF_BYTE:
-+            gen_helper_msa_mod_u_b(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_HALF:
-+            gen_helper_msa_mod_u_h(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_WORD:
-+            gen_helper_msa_mod_u_w(cpu_env, twd, tws, twt);
-+            break;
-+        case DF_DOUBLE:
-+            gen_helper_msa_mod_u_d(cpu_env, twd, tws, twt);
-+            break;
-+        }
-+        break;
-     case OPC_SLL_df:
-         gen_helper_msa_sll_df(cpu_env, tdf, twd, tws, twt);
+     case ASCE_TYPE_REGION2:
+-        if (vaddr & 0xffe0000000000000ULL) {
++        if (VADDR_REGION1_TX(vaddr)) {
+             return PGM_ASCE_TYPE;
+         }
+-        if ((vaddr >> 51 & 3) > (asce & ASCE_TABLE_LENGTH)) {
++        if (VADDR_REGION2_TL(vaddr) > asce_tl) {
+             return PGM_REG_SEC_TRANS;
+         }
          break;
-@@ -28738,18 +28770,12 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
-     case OPC_MAX_A_df:
-         gen_helper_msa_max_a_df(cpu_env, tdf, twd, tws, twt);
+     case ASCE_TYPE_REGION3:
+-        if (vaddr & 0xfffffc0000000000ULL) {
++        if (VADDR_REGION1_TX(vaddr) || VADDR_REGION2_TX(vaddr)) {
+             return PGM_ASCE_TYPE;
+         }
+-        if ((vaddr >> 40 & 3) > (asce & ASCE_TABLE_LENGTH)) {
++        if (VADDR_REGION3_TL(vaddr) > asce_tl) {
+             return PGM_REG_THIRD_TRANS;
+         }
          break;
--    case OPC_MOD_S_df:
--        gen_helper_msa_mod_s_df(cpu_env, tdf, twd, tws, twt);
--        break;
-     case OPC_ILVEV_df:
-         gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
+     case ASCE_TYPE_SEGMENT:
+-        if (vaddr & 0xffffffff80000000ULL) {
++        if (VADDR_REGION1_TX(vaddr) || VADDR_REGION2_TX(vaddr) ||
++            VADDR_REGION3_TX(vaddr)) {
+             return PGM_ASCE_TYPE;
+         }
+-        if ((vaddr >> 29 & 3) > (asce & ASCE_TABLE_LENGTH)) {
++        if (VADDR_SEGMENT_TL(vaddr) > asce_tl) {
+             return PGM_SEGMENT_TRANS;
+         }
          break;
-     case OPC_MIN_A_df:
-         gen_helper_msa_min_a_df(cpu_env, tdf, twd, tws, twt);
-         break;
--    case OPC_MOD_U_df:
--        gen_helper_msa_mod_u_df(cpu_env, tdf, twd, tws, twt);
--        break;
-     case OPC_ILVOD_df:
-         gen_helper_msa_ilvod_df(cpu_env, tdf, twd, tws, twt);
-         break;
--- 
-2.7.4
+--=20
+2.21.0
 
 
