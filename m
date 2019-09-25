@@ -6,85 +6,83 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA76C432C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C755C432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:21:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4875214D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:18:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4875214D9
+	by mail.kernel.org (Postfix) with ESMTPS id E0DE521D7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 11:21:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0DE521D7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD5J2-0001lH-Fe
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 07:18:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45985)
+	id 1iD5MY-0004vR-Dr
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 07:21:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iD5H1-0000jD-IM
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:15:56 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iD5Ll-0004N9-36
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iD5H0-0002Q9-0q
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:15:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60200)
+ (envelope-from <pbonzini@redhat.com>) id 1iD5Lj-00067R-L2
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:20:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48598)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iD5Gz-0002OY-OP
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:15:53 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72])
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iD5Lj-00066p-BZ
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 07:20:47 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 94FF62026F
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 11:15:51 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id o188so1944589wmo.5
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 04:15:51 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0DAEE89AC0
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 11:20:46 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id r21so1837424wme.5
+ for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 04:20:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Mz/uTOuIgKfe8DOWM5fk18hSi3MAKOgNRieLhwQuus0=;
- b=EPTJxRMAvqryirtICgh+twr6X/VvHKn9ALWHkl2KRMmmQ1CUqsLyCixGXZt29434pQ
- pdK0L95WJXWdhV30BzolQamLuh8lgpkaFyq3NSj6ewL1LvLEMkb64qBLfzZgmF/Woe/n
- ORVHrFRgwwtbEEISvX6jaI1s056mtPCh/EsPgnnCveYxl+bkICUMcPEJ5EtL1/yfe5Ja
- i63xD7mFTHL8w6ZPHtiIwRZ9PG2n+5fsvwQIvFjRvIK056EnMvKeBtM3tQknixQM6tMT
- 4+DTWtiwMP0FBwu1zQXjdWx5+oCbUEbJu5j3P7iWIMlx3OxQUe8nLjbCJcU3C+AYrVhD
- VRLA==
-X-Gm-Message-State: APjAAAVWTXws6/GaV4o+srjZyzIgFuKoOYno5iVrH7F6WcdnW4CW4Aoq
- s4941HnNnTo9sJrgxQw4pnlTHaZw7CQmUC87spdn8e/JvDlIC+gX2AqQz68DWF2fPuXvI8jtGhb
- hDzSMt8OrvqbJXB4=
-X-Received: by 2002:a1c:2546:: with SMTP id l67mr7333675wml.10.1569410150335; 
- Wed, 25 Sep 2019 04:15:50 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy1P1JGXoiYjORMP0BrUwaKNAH+aBh02rYeI8FHulHMY+ZAPwCtNpQmYEM3f4Uf+jNfGfoUiA==
-X-Received: by 2002:a1c:2546:: with SMTP id l67mr7333652wml.10.1569410150130; 
- Wed, 25 Sep 2019 04:15:50 -0700 (PDT)
-Received: from [10.201.33.84] ([195.166.127.210])
- by smtp.gmail.com with ESMTPSA id u83sm6917752wme.0.2019.09.25.04.15.48
+ :date:user-agent:mime-version:in-reply-to;
+ bh=TQLyUyTVyN5f3rMPgbSqGLlYWyI3EuIZKhqjMak1wlM=;
+ b=kKUVI0L3HuVTAXBAs1RrcbUihnPJoV1UAi/hlaEN1jhQFqA8HojMiYVDkPtFzbYN/q
+ dKEW9KeOKtAlxI0XN31Fl4gVki6sBgtWNPMsBqrjPUVjDaXG3aU7VMMMmeMGQTawoZDd
+ yO1jxbVxSm7iKUCWjo23ykzK+dYWwHGV76JE2Du1vDs6A50W3SvZS5mRy4SH6fURn8sv
+ cYSH5Wu5JBGky7qil6JTE2XXQ4J97NBA3B3RFSBgJukwsxcgjD2gG3mv2kwdIekK4fdR
+ xSrdpN99c1nt2PfQOxYgSXs8oiWIfFMzKOtbCtocqHZIoPs/Rs32lvF4WONHB25Git06
+ RgWg==
+X-Gm-Message-State: APjAAAWSvcbpZU34AQ9b1XhlfgupXcSkIry5PSfblMnrK3uuZ2K45Kq0
+ K+5bz/weJlU5prE5Mh3hLtXsJAsENG9widNd2QDWxuFlOxQ4pYMZCGfTmXd8lcjUrLjDfK642iP
+ d14kxsJH8lm04ho4=
+X-Received: by 2002:adf:dd41:: with SMTP id u1mr9171304wrm.49.1569410444617;
+ Wed, 25 Sep 2019 04:20:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwihDEnuRrpvaKbtRepAH8BlQ/4mZbya0BuvikfMc9haI+Iq1pqnyC2H/pBV39VR8L7dIFSKA==
+X-Received: by 2002:adf:dd41:: with SMTP id u1mr9171275wrm.49.1569410444363;
+ Wed, 25 Sep 2019 04:20:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id l10sm7276798wrh.20.2019.09.25.04.20.42
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 25 Sep 2019 04:15:49 -0700 (PDT)
-Subject: Re: [PATCH v1 5/6] riscv/virt: Add the PFlash CFI01 device
-To: Alistair Francis <alistair23@gmail.com>
-References: <cover.1568931866.git.alistair.francis@wdc.com>
- <0a5c141a26fada6d93d06e996a2f24e1b269ec50.1568931866.git.alistair.francis@wdc.com>
- <CAEUhbmVvDKQqQYE-riq=cvSrCe_NMoW_KDsLjh8CVHRUhJvk9A@mail.gmail.com>
- <CAKmqyKOofA3U+8kjMkzQ0sNd1=uwJHq3c9eaLZdoNCb7=e-PAw@mail.gmail.com>
- <CAFEAcA-uFPGf4BiDXH=Om3Df-xXrt7QwjzVF7E3kY4aMWMP4YQ@mail.gmail.com>
- <16bab4bf-b91e-ef0c-2d22-53538f74cfc4@redhat.com>
- <CAKmqyKNitR4YCLh1y8YThfVZqZj603pat3C=i=86Wx8=SWV3Wg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <6719a00c-2527-7a21-b311-6e4966195110@redhat.com>
-Date: Wed, 25 Sep 2019 13:15:48 +0200
+ Wed, 25 Sep 2019 04:20:43 -0700 (PDT)
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+To: Sergio Lopez <slp@redhat.com>
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87r245rkld.fsf@redhat.com>
+ <317e53b1-d658-4b6b-c782-4b2a0dd091b2@redhat.com> <87ftkksr9u.fsf@redhat.com>
+ <3fb455f8-13ef-2930-a10d-9cecd6e5931e@redhat.com> <87blv8skkk.fsf@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <5d8a164b-90b9-96cb-a1a5-fbc7694db960@redhat.com>
+Date: Wed, 25 Sep 2019 13:20:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKNitR4YCLh1y8YThfVZqZj603pat3C=i=86Wx8=SWV3Wg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87blv8skkk.fsf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="mJgue5CzEEEizQwnAbeTt45ne4WnQgG6K"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -99,81 +97,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>,
- Markus Armbruster <armbru@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
- Laszlo Ersek <lersek@redhat.com>
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, lersek@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/25/19 2:55 AM, Alistair Francis wrote:
-> On Tue, Sep 24, 2019 at 2:32 AM Philippe Mathieu-Daud=C3=A9
-> <philmd@redhat.com> wrote:
->>
->> On 9/23/19 11:46 PM, Peter Maydell wrote:
->>> On Fri, 20 Sep 2019 at 23:23, Alistair Francis <alistair23@gmail.com>=
- wrote:
->>>> On Thu, Sep 19, 2019 at 10:15 PM Bin Meng <bmeng.cn@gmail.com> wrote=
-:
->>>>> I don't think we should mirror what is used on ARM virt board to
->>>>> create 2 flash for sifive_u. For ARM virt, there are 2 flashes beca=
-use
->>>>> they need distinguish secure and non-secure. For sifive_u, only one=
- is
->>>>> enough.
->>>>
->>>> I went back and forward about 1 or 2. Two seems more usable as maybe
->>>> someone wants to include two pflash files? The Xilinx machine also h=
-as
->>>> two so I'm kind of used to 2, but I'm not really fussed.
->>
->> The Xilinx machine has 2 because it matches the hardware.
->>
->>> One of the reasons for having 2 on the Arm board (we do this
->>> even if we're not supporting secure vs non-secure) is that
->>> then you can use one for a fixed read-only BIOS image (backed
->>> by a file on the host filesystem shared between all VMs), and
->>> one backed by a read-write per-VM file providing permanent
->>> storage for BIOS environment variables. Notably UEFI likes to
->>> work this way, but the idea applies in theory to other
->>> boot loader or BIOSes I guess.
->>
->> IIRC Laszlo's explanation, the only reason it is that way is because t=
-he
->> pflash_cfi01 model still doesn't implement sector locking. At the OVMF
->> emerged from EDK2, to have a safe ROM vs DATA storage it was decided t=
-o
->> use 2 different flashes.
->> When I understood when this config layout started, I suggested Laszlo =
-to
->> use a real ROM to store the OVMF CODE since it is pointless to do
->> firmware upgrade in virtualized environment, but he said it was too la=
-te
->> to change the design.
->>
->> If you don't plan to run UEFI "Capsule Update" on your Virt board, I
->> suggest using memory_region_init_rom() with your firmware CODE, and a
->> parallel/SPI flash for the data VARStore.
->=20
-> We might run that one day, who knows :)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mJgue5CzEEEizQwnAbeTt45ne4WnQgG6K
+Content-Type: multipart/mixed; boundary="iaDySfsMolRS3THVVUKm8AXJsRJPxSCbm";
+ protected-headers="v1"
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+ marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+ philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+ mtosatti@redhat.com, kvm@vger.kernel.org
+Message-ID: <5d8a164b-90b9-96cb-a1a5-fbc7694db960@redhat.com>
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87r245rkld.fsf@redhat.com>
+ <317e53b1-d658-4b6b-c782-4b2a0dd091b2@redhat.com> <87ftkksr9u.fsf@redhat.com>
+ <3fb455f8-13ef-2930-a10d-9cecd6e5931e@redhat.com> <87blv8skkk.fsf@redhat.com>
+In-Reply-To: <87blv8skkk.fsf@redhat.com>
 
-You certainly want to run EDK2, I'm following RISCV progress on the list.
+--iaDySfsMolRS3THVVUKm8AXJsRJPxSCbm
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-What doesn't make sense on a virtualized platform is the "Capsule
-Update" feature IMO. Where it makes sense is on the SiFive E/U boards
-models.
+On 25/09/19 13:04, Sergio Lopez wrote:
+> Yes, that would do the trick. There's another use of it at
+> hw/intc/ioapic.c:78, but we should be safe as, at least in the case of
+> Linux, DM_EXTINT is only used in check_timer(), which is only called if=
 
->>> I would suggest also checking with Markus that your code
->>> for instantiating the flash devices follows the current
->>> recommendations so the backing storage can be configured
->>> via -blockdev. (This is a fairly recent change from June or
->>> so; current-in-master virt and sbsa boards provide an example
->>> of doing the right thing, I think.)
->>>
->>> thanks
->>> -- PMM
->>>
+> it detects a i8259 PIC.
+
+Even there it is actually LVT0's DM_EXTINT, not the IOAPIC's.  I think
+pic_read_irq would have returned 7 (spurious IRQ on master i8259) until
+commit 29bb5317cb ("i8259: QOM cleanups", 2013-04-29), so we should fix i=
+t.
+
+Paolo
+
+> We should probably add an assertion with an informative message, just i=
+n
+> case.
+
+
+
+--iaDySfsMolRS3THVVUKm8AXJsRJPxSCbm--
+
+--mJgue5CzEEEizQwnAbeTt45ne4WnQgG6K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2LTYoACgkQv/vSX3jH
+roPDUAf/ThYeKfKLT6O82x8MZrdERraTDob3kiyMe4MKWOsoyuKRCSwRRdzGFNti
+rVuBPQqcocANVqFKCVLta0BEUxEVsV5e7FRHJqN+gYd7MWa0OsIBKdjSkTSWG271
+GPr5YY7jGszB+Je/anQs3uxy3SdNjZ1pjlFysVDV+YTHgn9wg4GXTrpr6J7JGjld
+mjXVEczFp99+mBCtqYxof6VL4BkRHGp1Yb+XiFXM399Lmnu2y9mPd7VLRZpPHrxz
+PLDuMcohnn0tKmccZ7HtwttuJ4nCIFSgGgkGiItHIugTD2X9ldAe5+JwYPtgknMV
+wejmdsaz98KDNYvX35FKj8+a6XBoKQ==
+=VmG6
+-----END PGP SIGNATURE-----
+
+--mJgue5CzEEEizQwnAbeTt45ne4WnQgG6K--
 
