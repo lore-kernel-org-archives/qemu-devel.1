@@ -2,82 +2,67 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87103C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FECC432C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:22:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C8D620872
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:07:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kTVu+sVi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C8D620872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6443D2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 01:22:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6443D2146E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iCvlx-0005GZ-9E
-	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 21:07:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34445)
+	id 1iCw0J-0000zs-Aa
+	for qemu-devel@archiver.kernel.org; Tue, 24 Sep 2019 21:22:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iCvlB-0004fC-Fl
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 21:06:26 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iCvzd-0000aI-3n
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 21:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iCvl9-0004qS-QF
- for qemu-devel@nongnu.org; Tue, 24 Sep 2019 21:06:25 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:44225)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iCvl6-0004oc-7p; Tue, 24 Sep 2019 21:06:20 -0400
-Received: by mail-lj1-x242.google.com with SMTP id m13so3784994ljj.11;
- Tue, 24 Sep 2019 18:06:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=yUUIa5Ov6YlwQGXP9ytN25tO/ntGka441s3AW41ZIbY=;
- b=kTVu+sViOawRNoye69G0ic+AAFlGT/9b8XHUdGaPqwLaCXbSz4n0sTMuo4w/4rEvJ0
- 9qp0Xd62fZM4WCDsHN/WSPY+uX6meR0TE5xb+TAhW7jThELWoSJhvCB2Onc6YR19865X
- T1xXQLE0Zc2n/ZbYbTgDTZMgrapJHI8qzIL9qHoBZ4fPPiID9PZ95qGWyReynWcB/pI2
- tnj2mVfl4mG9XBWZOIEssifta+6daLXyBOwqEf6KTtfMLrEvSIY6B/8H1B5FHrZU23I8
- HYpLSwhQ5wbd0l7gXXueK0FoEWJh4rx1PpxDL0YAwLP47KV4vEYcwmOpR9Fw4UPnmZCO
- rA0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=yUUIa5Ov6YlwQGXP9ytN25tO/ntGka441s3AW41ZIbY=;
- b=LyvhazIGsThEGgzWzCBhMhD1r6mIbzXWZJapevtaD2gHftDSBJjkOffkLorGEalUjV
- KUAqyYNUuuyEdNcIa6uw2GiH9ln1BwqZNrorlFzgYUeGLW+7spqRvAb6qt3g4vYhn0Gt
- 5k8xpl6xxtzRDTHGngDUqOUliV9mWh7wgZmTXlGZLzxLWHJkjs4k1oHcmDhAB+KN2XXD
- L0bArXOujFXWljMhg2IJCvn2I2tt8dNAB3gXfecrmn6XfS5oR2iEww0V6kwMRvU718Ol
- pAdeoM+iGUbAOtRX9UQLVMtBIHimLeOma4mlopwzRLzz+UgqX8y7VMryXhtpQgAwoNE4
- 0W1w==
-X-Gm-Message-State: APjAAAVVCEYVoAYug+nh+KMCmIEn23hjDkl+aE5cbustDHFT34pz7HlR
- wJjOOXnSS7QYZYsNzMeY4NVNijx1+1JB5H+yWAA=
-X-Google-Smtp-Source: APXvYqxfLUwHnwUXw8Lz3jfTPWKPtqWa2qXXSl3h2+miavJhnqIQNAl3NALDwBJcz8/vpAD1dhQq4ZT3e/b/CW1jKd0=
-X-Received: by 2002:a05:651c:1132:: with SMTP id
- e18mr3976249ljo.33.1569373578718; 
- Tue, 24 Sep 2019 18:06:18 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1iCvza-000518-Nv
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 21:21:20 -0400
+Resent-Date: Tue, 24 Sep 2019 21:21:20 -0400
+Resent-Message-Id: <E1iCvza-000518-Nv@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21475)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iCvza-00050v-FX
+ for qemu-devel@nongnu.org; Tue, 24 Sep 2019 21:21:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1569374467; cv=none; d=zoho.com; s=zohoarc; 
+ b=aXSoqDQ+rK8FInNULiKuswVyKUu2Fxliz69CDcUJcXDnmQMwGi5ozluZ0qTWrZF1JpZCySlHyjo60Q1xERNxdIu+gDd4aaN2zx0rb6b5Kr6UyuePTNYYGFNONdL1SU5m5FfX9H6T3NkYh4PJ/ONyPrNG50SiogjyNaB5vwfk5bE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1569374467;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=3rkNY2ZXsLmS/WjTm1Tjm6fUXlKGIws/TN0KbHdtn4s=; 
+ b=R61dyO8FKJCuMWbh2uJ9DPv6C4otVxe6fQGMIKwfcPKM6iFvLiLbwf5IewNlHUh+biYinlSbgypavlrB7FROj74kPvZh795unb7c+WkHHCalEr4cY4ZUoRfJKEpi6lJtAh14zyYX5leuhUi79/z8jhGbkIi23R4dFW/PtqS325Y=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156937446682221.422686473100043;
+ Tue, 24 Sep 2019 18:21:06 -0700 (PDT)
+Subject: Re: [PULL 00/37] QAPI patches for 2019-09-24
+In-Reply-To: <20190924123334.30645-1-armbru@redhat.com>
+Message-ID: <156937446590.2487.9021468790143367685@8230166b0665>
 MIME-Version: 1.0
-References: <CAKmqyKP+HNfzh5kCKkGDtfr=pDRwcjL+dUQ79NZEk+jMZ3q=_Q@mail.gmail.com>
- <mhng-a172dfe8-dd34-427f-89dd-ca65da3145fb@palmer-si-x1e>
- <CAKmqyKON2=3mO-n3nXwyqN9i-RDOeyrpjxt9JJMSBwyyiEiuow@mail.gmail.com>
-In-Reply-To: <CAKmqyKON2=3mO-n3nXwyqN9i-RDOeyrpjxt9JJMSBwyyiEiuow@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 24 Sep 2019 18:01:36 -0700
-Message-ID: <CAKmqyKPVxkbKkZPg5u+nKiLtNgtf5Na6JgzF3ocrx8wy8+bxJw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] atomic failures on qemu-system-riscv64
-To: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Tue, 24 Sep 2019 18:21:06 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,187 +74,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: me@carlosedp.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Joel Sing <joel@sing.id.au>, Alistair Francis <Alistair.Francis@wdc.com>,
- marco@decred.org
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 24, 2019 at 4:35 PM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Tue, Sep 24, 2019 at 1:04 PM Palmer Dabbelt <palmer@sifive.com> wrote:
-> >
-> > On Tue, 24 Sep 2019 11:29:25 PDT (-0700), alistair23@gmail.com wrote:
-> > > On Mon, Jun 24, 2019 at 11:21 AM Joel Sing <joel@sing.id.au> wrote:
-> > >>
-> > >> On 19-06-17 16:52:44, Richard Henderson wrote:
-> > >> > On 6/16/19 12:19 PM, Joel Sing wrote:
-> > >> > > +    /*
-> > >> > > +     * Clear the load reservation, since an SC must fail if there is
-> > >> > > +     * an SC to any address, in between an LR and SC pair.
-> > >> > > +     */
-> > >> > > +    tcg_gen_movi_tl(load_res, 0);
-> > >> > > +
-> > >> > >      gen_set_label(l2);
-> > >> >
-> > >> > This clear needs to be moved down below label l2.
-> > >> > Otherwise, with lr / sc / sc, the second sc could succeed in error.
-> > >>
-> > >> Indeed, thanks.
-> > >>
-> > >> > FWIW, other targets have used -1 as the "invalid" load reservation, since the
-> > >> > architecture does not require address 0 to be unmapped.  This should be quite
-> > >> > visible in M-mode with paging disabled and ram at offset 0.  Often, other
-> > >> > targets require alignment for the lr/sc address, though I don't see that for riscv.
-> > >>
-> > >> I've switched to -1 as suggested. Regarding the alignment for reservations, the
-> > >> specification does require this, although I do not recall seeing any enforcement
-> > >> of this by qemu itself.
-> > >>
-> > >> New diff follows.
-> > >>
-> > >> From 8ef31a2ce8ef1cbeee92995a0b2994f480e9bb6d Mon Sep 17 00:00:00 2001
-> > >> From: Joel Sing <joel@sing.id.au>
-> > >> Date: Tue, 25 Jun 2019 02:44:24 +1000
-> > >> Subject: [PATCH] Clear load reservations on qemu riscv target
-> > >>
-> > >> This prevents a load reservation from being placed in one context/process,
-> > >> then being used in another, resulting in an SC succeeding incorrectly and
-> > >> breaking atomics.
-> > >>
-> > >> Signed-off-by: Joel Sing <joel@sing.id.au>
-> > >> ---
-> > >>  target/riscv/cpu.c                      | 1 +
-> > >>  target/riscv/cpu_helper.c               | 9 +++++++++
-> > >>  target/riscv/insn_trans/trans_rva.inc.c | 8 +++++++-
-> > >>  3 files changed, 17 insertions(+), 1 deletion(-)
-> > >>
-> > >> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> > >> index d61bce6d55..e7c8bf48fc 100644
-> > >> --- a/target/riscv/cpu.c
-> > >> +++ b/target/riscv/cpu.c
-> > >> @@ -281,6 +281,7 @@ static void riscv_cpu_reset(CPUState *cs)
-> > >>      env->pc = env->resetvec;
-> > >>  #endif
-> > >>      cs->exception_index = EXCP_NONE;
-> > >> +    env->load_res = -1;
-> > >>      set_default_nan_mode(1, &env->fp_status);
-> > >>  }
-> > >>
-> > >> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > >> index b17f169681..6a07b12e65 100644
-> > >> --- a/target/riscv/cpu_helper.c
-> > >> +++ b/target/riscv/cpu_helper.c
-> > >> @@ -113,6 +113,15 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
-> > >>      }
-> > >>      /* tlb_flush is unnecessary as mode is contained in mmu_idx */
-> > >>      env->priv = newpriv;
-> > >> +
-> > >> +    /* Clear the load reservation - otherwise a reservation placed in one
-> > >> +     * context/process can be used by another, resulting in an SC succeeding
-> > >> +     * incorrectly. Version 2.2 of the ISA specification explicitly requires
-> > >> +     * this behaviour, while later revisions say that the kernel "should" use
-> > >> +     * an SC instruction to force the yielding of a load reservation on a
-> > >> +     * preemptive context switch. As a result, do both.
-> > >> +     */
-> > >> +    env->load_res = -1;
-> > >>  }
-> > >>
-> > >>  /* get_physical_address - get the physical address for this virtual address
-> > >> diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc.c
-> > >> index f6dbbc065e..fadd88849e 100644
-> > >> --- a/target/riscv/insn_trans/trans_rva.inc.c
-> > >> +++ b/target/riscv/insn_trans/trans_rva.inc.c
-> > >> @@ -61,7 +61,7 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
-> > >>
-> > >>      gen_set_label(l1);
-> > >>      /*
-> > >> -     * Address comparion failure.  However, we still need to
-> > >> +     * Address comparison failure.  However, we still need to
-> > >>       * provide the memory barrier implied by AQ/RL.
-> > >>       */
-> > >>      tcg_gen_mb(TCG_MO_ALL + a->aq * TCG_BAR_LDAQ + a->rl * TCG_BAR_STRL);
-> > >> @@ -69,6 +69,12 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, TCGMemOp mop)
-> > >>      gen_set_gpr(a->rd, dat);
-> > >>
-> > >>      gen_set_label(l2);
-> > >> +    /*
-> > >> +     * Clear the load reservation, since an SC must fail if there is
-> > >> +     * an SC to any address, in between an LR and SC pair.
-> > >> +     */
-> > >> +    tcg_gen_movi_tl(load_res, -1);
-> > >> +
-> > >>      tcg_temp_free(dat);
-> > >>      tcg_temp_free(src1);
-> > >>      tcg_temp_free(src2);
-> > >> --
-> > >
-> > > This patch causes boot failures when booting systemd built with musl on RV64.
-> > >
-> > > It could possibly be a musl bug, but I wanted to throw that out here
-> > > first to see what people think.
-> >
-> > Looking at the musl port, I see at least one bug in their atomics jumping out
-> > at me:
-> >
-> > diff --git a/arch/riscv64/atomic_arch.h b/arch/riscv64/atomic_arch.h
-> > index c9765342..41ad4d04 100644
-> > --- a/arch/riscv64/atomic_arch.h
-> > +++ b/arch/riscv64/atomic_arch.h
-> > @@ -14,7 +14,7 @@ static inline int a_cas(volatile int *p, int t, int s)
-> >                 "       sc.w.aqrl %1, %4, (%2)\n"
-> >                 "       bnez %1, 1b\n"
-> >                 "1:"
-> > -               : "=&r"(old), "=r"(tmp)
-> > +               : "=&r"(old), "=&r"(tmp)
-> >                 : "r"(p), "r"(t), "r"(s)
-> >                 : "memory");
-> >         return old;
-> > @@ -31,7 +31,7 @@ static inline void *a_cas_p(volatile void *p, void *t, void *s)
-> >                 "       sc.d.aqrl %1, %4, (%2)\n"
-> >                 "       bnez %1, 1b\n"
-> >                 "1:"
-> > -               : "=&r"(old), "=r"(tmp)
-> > +               : "=&r"(old), "=&r"(tmp)
-> >                 : "r"(p), "r"(t), "r"(s)
-> >                 : "memory");
-> >         return old;
-> >
-> > It's a shot in the dark as to whether that'll fix your bug, but I could at
-> > least see a mechanism for it: before we yielded load reservations on context
-> > switches then that backwards branch would never be taken, so we wouldn't notice
-> > if tmp was allocated into one of the same registers as the inputs.  Even if it
-> > doesn't fix your issue it's still a bug so I'll send the patch out, just LMK so
-> > I can indicate how important the issue is.
->
-> I haven't had a chance to test this fix yet. The bug was reported by
-> Khem (and other OE people) as it's break musl for RISC-V.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyNDEyMzMzNC4zMDY0
+NS0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTA5MjQxMjMzMzQuMzA2NDUt
+MS1hcm1icnVAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUFVMTCAwMC8zN10gUUFQSSBwYXRjaGVzIGZv
+ciAyMDE5LTA5LTI0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBy
+ZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNo
+ZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo5NGJiNzFhIHFhcGk6IEFzc2VydCAudmlzaXQoKSBh
+bmQgLmNoZWNrX2NsYXNoKCkgcnVuIG9ubHkgYWZ0ZXIgLmNoZWNrKCkKZTIzNTIxMyBxYXBpOiBG
+aXggZXhjZXNzaXZlIFFBUElTY2hlbWFFbnRpdHkuY2hlY2soKSByZWN1cnNpb24KNmFiY2EwZSBx
+YXBpOiBGaXggdG8gLmNoZWNrKCkgZW1wdHkgc3RydWN0cyBqdXN0IG9uY2UKNDc0ZTM3MyBxYXBp
+OiBEZWxldGUgdXNlbGVzcyBjaGVja19leHBycygpIGNvZGUgZm9yIHNpbXBsZSB1bmlvbiBraW5k
+CmU4MDQ2ZGMgcWFwaTogQ2xlYW4gdXAgYXJvdW5kIGNoZWNrX2tub3duX2tleXMoKQplMDQzNDhm
+IHFhcGk6IFNpbXBsaWZ5IGNoZWNrX2tleXMoKQo4OGUwNzVkIHFhcGk6IE5vcm1hbGl6ZSAnaWYn
+IGluIGNoZWNrX2V4cHJzKCksIGxpa2Ugb3RoZXIgc3VnYXIKN2FhN2FlMiBxYXBpOiBGaXggbWlz
+c2luZyAnaWYnIGNoZWNrcyBpbiBzdHJ1Y3QsIHVuaW9uLCBhbHRlcm5hdGUgJ2RhdGEnCjg1Nzkz
+ZTcgcWFwaTogUmVqZWN0IGJsYW5rICdpZicgY29uZGl0aW9ucyBpbiBhZGRpdGlvbiB0byBlbXB0
+eSBvbmVzCmEwZjJiNTcgcWFwaTogRml4IGJyb2tlbiBkaXNjcmltaW5hdG9yIGVycm9yIG1lc3Nh
+Z2VzCjMwMGQyMGMgcWFwaTogUmVtb3ZlIG51bGwgZnJvbSBzY2hlbWEgbGFuZ3VhZ2UKZDdiMzA0
+NCBxYXBpOiBJbXByb3ZlIHJlcG9ydGluZyBvZiBsZXhpY2FsIGVycm9ycwphZTdkM2I5IHFhcGk6
+IFVzZSBxdW90ZXMgbW9yZSBjb25zaXN0ZW50bHkgaW4gZnJvbnRlbmQgZXJyb3IgbWVzc2FnZXMK
+YzM5MGJkMiB0ZXN0cy9xYXBpLXNjaGVtYTogRGVtb25zdHJhdGUgc3Vib3B0aW1hbCBsZXhpY2Fs
+IGVycm9ycwpmYzIwZmRjIHRlc3RzL3FhcGktc2NoZW1hOiBEZW1vbnN0cmF0ZSBpbnN1ZmZpY2ll
+bnQgJ2lmJyBjaGVja2luZwowNmI2ODFiIHRlc3RzL3FhcGktc2NoZW1hOiBEZW1vbnN0cmF0ZSBi
+cm9rZW4gZGlzY3JpbWluYXRvciBlcnJvcnMKZDA0MjI2MCB0ZXN0cy9xYXBpLXNjaGVtYTogRGVt
+b25zdHJhdGUgbWlzbGVhZGluZyBvcHRpb25hbCB0YWcgZXJyb3IKODk3ZDg5MiB0ZXN0cy9xYXBp
+LXNjaGVtYTogRGVsZXRlIHR3byByZWR1bmRhbnQgdGVzdHMKMTEwZDM4YSB0ZXN0cy9xYXBpLXNj
+aGVtYTogQ292ZXIgdW5rbm93biBwcmFnbWEKZDQzZDE1ZSBxYXBpOiBUd2VhayBjb2RlIHRvIG1h
+dGNoIGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbi50eHQKMTI4YjQ3MiBkb2NzL2RldmVsL3FhcGkt
+Y29kZS1nZW46IEltcHJvdmUgUUFQSSBzY2hlbWEgbGFuZ3VhZ2UgZG9jCjA1NjQyMjUgZG9jcy9k
+ZXZlbC9xYXBpLWNvZGUtZ2VuOiBSZXdyaXRlIGludHJvZHVjdGlvbiB0byBzY2hlbWEKNzU5NmUy
+NCBkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJld3JpdGUgY29tcGF0aWJpbGl0eSBjb25zaWRl
+cmF0aW9ucwoyZGZiOGU3IGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogUmVvcmRlciBzZWN0aW9u
+cyBmb3IgcmVhZGFiaWxpdHkKMDJmN2U1NCBxYXBpOiBBZGp1c3QgZnJvbnRlbmQgZXJyb3JzIHRv
+IHNheSBlbnVtIHZhbHVlLCBub3QgbWVtYmVyCjQzMmQ4YmQgcWFwaTogUGVybWl0IG9taXR0aW5n
+IGFsbCBmbGF0IHVuaW9uIGJyYW5jaGVzCjBkY2M1ZjcgcWFwaTogUGVybWl0IGFsdGVybmF0ZXMg
+d2l0aCBqdXN0IG9uZSBicmFuY2gKZDZlM2ZiZSBxYXBpOiBQZXJtaXQgJ2JveGVkJyB3aXRoIGVt
+cHR5IHR5cGUKODg4NzAzZiBxYXBpOiBEcm9wIHN1cHBvcnQgZm9yIGVzY2FwZSBzZXF1ZW5jZXMg
+b3RoZXIgdGhhbiBcXAowNDQ2ZDYxIHFhcGk6IFJlc3RyaWN0IHN0cmluZ3MgdG8gcHJpbnRhYmxl
+IEFTQ0lJCmIxYjc2NjIgdGVzdHMvcWFwaS1zY2hlbWE6IERlbW9uc3RyYXRlIGJhZCByZXBvcnRp
+bmcgb2YgZnVubnkgY2hhcmFjdGVycwpjMTA2NTM5IGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjog
+TWlub3Igc3BlY2lmaWNhdGlvbiBmaXhlcwo5ZDU4NWI5IHFhcGk6IERyb3Agc3VwcG9ydCBmb3Ig
+Ym94ZWQgYWx0ZXJuYXRlIGFyZ3VtZW50cwo5M2UyNWJhIHFhcGk6IERyb3AgY2hlY2tfdHlwZSgp
+J3MgcmVkdW5kYW50IHBhcmFtZXRlciBAYWxsb3dfb3B0aW9uYWwKMDUyYjNhNCBzY3JpcHRzL2dp
+dC5vcmRlcmZpbGU6IE1hdGNoIFFBUEkgc2NoZW1hIG1vcmUgcHJlY2lzZWx5CmU0NGVjYjAgbWFr
+ZSBjaGVjay11bml0OiB1c2UgYWZ0ZXIgZnJlZSBpbiB0ZXN0LW9wdHMtdmlzaXRvcgo1Y2YzOGMx
+IHFhcGk6IE1ha2UgdmlzaXRfbmV4dF9saXN0KCkncyBjb21tZW50IGxlc3MgY29uZnVzaW5nCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQoxLzM3IENoZWNraW5nIGNvbW1pdCA1Y2YzOGMxOGQ5YjggKHFh
+cGk6IE1ha2UgdmlzaXRfbmV4dF9saXN0KCkncyBjb21tZW50IGxlc3MgY29uZnVzaW5nKQoyLzM3
+IENoZWNraW5nIGNvbW1pdCBlNDRlY2IwOGM2M2QgKG1ha2UgY2hlY2stdW5pdDogdXNlIGFmdGVy
+IGZyZWUgaW4gdGVzdC1vcHRzLXZpc2l0b3IpCjMvMzcgQ2hlY2tpbmcgY29tbWl0IDA1MmIzYTQ5
+YTJmMyAoc2NyaXB0cy9naXQub3JkZXJmaWxlOiBNYXRjaCBRQVBJIHNjaGVtYSBtb3JlIHByZWNp
+c2VseSkKNC8zNyBDaGVja2luZyBjb21taXQgOTNlMjViYWI3YTIzIChxYXBpOiBEcm9wIGNoZWNr
+X3R5cGUoKSdzIHJlZHVuZGFudCBwYXJhbWV0ZXIgQGFsbG93X29wdGlvbmFsKQo1LzM3IENoZWNr
+aW5nIGNvbW1pdCA5ZDU4NWI5MzM2MzYgKHFhcGk6IERyb3Agc3VwcG9ydCBmb3IgYm94ZWQgYWx0
+ZXJuYXRlIGFyZ3VtZW50cykKNi8zNyBDaGVja2luZyBjb21taXQgYzEwNjUzOTY5NDBmIChkb2Nz
+L2RldmVsL3FhcGktY29kZS1nZW46IE1pbm9yIHNwZWNpZmljYXRpb24gZml4ZXMpCjcvMzcgQ2hl
+Y2tpbmcgY29tbWl0IGIxYjc2NjI3MDhiZiAodGVzdHMvcWFwaS1zY2hlbWE6IERlbW9uc3RyYXRl
+IGJhZCByZXBvcnRpbmcgb2YgZnVubnkgY2hhcmFjdGVycykKOC8zNyBDaGVja2luZyBjb21taXQg
+MDQ0NmQ2MTE0ZWQ3IChxYXBpOiBSZXN0cmljdCBzdHJpbmdzIHRvIHByaW50YWJsZSBBU0NJSSkK
+V0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVS
+UyBuZWVkIHVwZGF0aW5nPwojMTEwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBJbnZh
+bGlkIFVURi04LCBwYXRjaCBhbmQgY29tbWl0IG1lc3NhZ2Ugc2hvdWxkIGJlIGVuY29kZWQgaW4g
+VVRGLTgKIzEyNzogRklMRTogdGVzdHMvcWFwaS1zY2hlbWEvc3RyaW5nLWNvZGUtcG9pbnQtMTI3
+Lmpzb246MjoKK3sgJ2NvbW1hbmQnOiAn4oymJyB9CiAgICAgICAgICAgICAgIF4KCkVSUk9SOiBJ
+bnZhbGlkIFVURi04LCBwYXRjaCBhbmQgY29tbWl0IG1lc3NhZ2Ugc2hvdWxkIGJlIGVuY29kZWQg
+aW4gVVRGLTgKIzE1MzogRklMRTogdGVzdHMvcWFwaS1zY2hlbWEvc3RyaW5nLWNvZGUtcG9pbnQt
+MzEuanNvbjoyOgoreyAnY29tbWFuZCc6ICfikJ8nIH0KICAgICAgICAgICAgICAgXgoKdG90YWw6
+IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA3NiBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzM3IGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo5LzM3IENoZWNraW5nIGNvbW1pdCA4ODg3MDNmMzExMjMg
+KHFhcGk6IERyb3Agc3VwcG9ydCBmb3IgZXNjYXBlIHNlcXVlbmNlcyBvdGhlciB0aGFuIFxcKQpX
+QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
+IG5lZWQgdXBkYXRpbmc/CiM3NTogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCA1MyBsaW5lcyBjaGVja2VkCgpQYXRjaCA5LzM3IGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjEwLzM3IENoZWNraW5nIGNvbW1pdCBkNmUzZmJlNGZhOTkgKHFh
+cGk6IFBlcm1pdCAnYm94ZWQnIHdpdGggZW1wdHkgdHlwZSkKV0FSTklORzogYWRkZWQsIG1vdmVk
+IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTMx
+OiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDEyOSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMC8zNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoxMS8zNyBDaGVja2luZyBjb21taXQgMGRjYzVmNzNhMDVmIChxYXBpOiBQZXJtaXQgYWx0ZXJu
+YXRlcyB3aXRoIGp1c3Qgb25lIGJyYW5jaCkKMTIvMzcgQ2hlY2tpbmcgY29tbWl0IDQzMmQ4YmQ1
+OTVkNyAocWFwaTogUGVybWl0IG9taXR0aW5nIGFsbCBmbGF0IHVuaW9uIGJyYW5jaGVzKQoxMy8z
+NyBDaGVja2luZyBjb21taXQgMDJmN2U1NDFmZDc0IChxYXBpOiBBZGp1c3QgZnJvbnRlbmQgZXJy
+b3JzIHRvIHNheSBlbnVtIHZhbHVlLCBub3QgbWVtYmVyKQoxNC8zNyBDaGVja2luZyBjb21taXQg
+MmRmYjhlN2MzNDRiIChkb2NzL2RldmVsL3FhcGktY29kZS1nZW46IFJlb3JkZXIgc2VjdGlvbnMg
+Zm9yIHJlYWRhYmlsaXR5KQoxNS8zNyBDaGVja2luZyBjb21taXQgNzU5NmUyNGYxYmVjIChkb2Nz
+L2RldmVsL3FhcGktY29kZS1nZW46IFJld3JpdGUgY29tcGF0aWJpbGl0eSBjb25zaWRlcmF0aW9u
+cykKMTYvMzcgQ2hlY2tpbmcgY29tbWl0IDA1NjQyMjU3YzBkYiAoZG9jcy9kZXZlbC9xYXBpLWNv
+ZGUtZ2VuOiBSZXdyaXRlIGludHJvZHVjdGlvbiB0byBzY2hlbWEpCjE3LzM3IENoZWNraW5nIGNv
+bW1pdCAxMjhiNDcyNjQ0OGUgKGRvY3MvZGV2ZWwvcWFwaS1jb2RlLWdlbjogSW1wcm92ZSBRQVBJ
+IHNjaGVtYSBsYW5ndWFnZSBkb2MpCjE4LzM3IENoZWNraW5nIGNvbW1pdCBkNDNkMTVlN2Q1NDAg
+KHFhcGk6IFR3ZWFrIGNvZGUgdG8gbWF0Y2ggZG9jcy9kZXZlbC9xYXBpLWNvZGUtZ2VuLnR4dCkK
+MTkvMzcgQ2hlY2tpbmcgY29tbWl0IDExMGQzOGE0YTE5ZiAodGVzdHMvcWFwaS1zY2hlbWE6IENv
+dmVyIHVua25vd24gcHJhZ21hKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxl
+KHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNTogCm5ldyBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwIGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDE5LzM3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjIwLzM3IENoZWNraW5nIGNvbW1p
+dCA4OTdkODkyZGVkY2YgKHRlc3RzL3FhcGktc2NoZW1hOiBEZWxldGUgdHdvIHJlZHVuZGFudCB0
+ZXN0cykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
+VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2NDQKCnRv
+dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjAvMzcg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjEvMzcgQ2hlY2tpbmcgY29tbWl0IGQwNDIyNjBm
+NTQwNSAodGVzdHMvcWFwaS1zY2hlbWE6IERlbW9uc3RyYXRlIG1pc2xlYWRpbmcgb3B0aW9uYWwg
+dGFnIGVycm9yKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
+IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
+b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIxLzM3
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjIyLzM3IENoZWNraW5nIGNvbW1pdCAwNmI2ODFi
+YzdhYjcgKHRlc3RzL3FhcGktc2NoZW1hOiBEZW1vbnN0cmF0ZSBicm9rZW4gZGlzY3JpbWluYXRv
+ciBlcnJvcnMpCjIzLzM3IENoZWNraW5nIGNvbW1pdCBmYzIwZmRjMDRjNWIgKHRlc3RzL3FhcGkt
+c2NoZW1hOiBEZW1vbnN0cmF0ZSBpbnN1ZmZpY2llbnQgJ2lmJyBjaGVja2luZykKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojNTM6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
+cm5pbmdzLCAxMjAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjMvMzcgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KMjQvMzcgQ2hlY2tpbmcgY29tbWl0IGMzOTBiZDIwM2Y2YSAodGVzdHMvcWFwaS1z
+Y2hlbWE6IERlbW9uc3RyYXRlIHN1Ym9wdGltYWwgbGV4aWNhbCBlcnJvcnMpCldBUk5JTkc6IGFk
+ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
+dGluZz8KIzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
+aW5ncywgMTQgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMjQvMzcgaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KMjUvMzcgQ2hlY2tpbmcgY29tbWl0IGFlN2QzYjljODQyMSAocWFwaTogVXNlIHF1b3Rl
+cyBtb3JlIGNvbnNpc3RlbnRseSBpbiBmcm9udGVuZCBlcnJvciBtZXNzYWdlcykKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojMTY0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3
+YXJuaW5ncywgMTQ2IGxpbmVzIGNoZWNrZWQKClBhdGNoIDI1LzM3IGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCjI2LzM3IENoZWNraW5nIGNvbW1pdCBkN2IzMDQ0YWY5MmEgKHFhcGk6IEltcHJv
+dmUgcmVwb3J0aW5nIG9mIGxleGljYWwgZXJyb3JzKQoyNy8zNyBDaGVja2luZyBjb21taXQgMzAw
+ZDIwYzRjZTNjIChxYXBpOiBSZW1vdmUgbnVsbCBmcm9tIHNjaGVtYSBsYW5ndWFnZSkKMjgvMzcg
+Q2hlY2tpbmcgY29tbWl0IGEwZjJiNTcwYTRiOSAocWFwaTogRml4IGJyb2tlbiBkaXNjcmltaW5h
+dG9yIGVycm9yIG1lc3NhZ2VzKQoyOS8zNyBDaGVja2luZyBjb21taXQgODU3OTNlNzlhYzY1IChx
+YXBpOiBSZWplY3QgYmxhbmsgJ2lmJyBjb25kaXRpb25zIGluIGFkZGl0aW9uIHRvIGVtcHR5IG9u
+ZXMpCjMwLzM3IENoZWNraW5nIGNvbW1pdCA3YWE3YWUyNzkxNDEgKHFhcGk6IEZpeCBtaXNzaW5n
+ICdpZicgY2hlY2tzIGluIHN0cnVjdCwgdW5pb24sIGFsdGVybmF0ZSAnZGF0YScpCjMxLzM3IENo
+ZWNraW5nIGNvbW1pdCA4OGUwNzVkMWZjY2IgKHFhcGk6IE5vcm1hbGl6ZSAnaWYnIGluIGNoZWNr
+X2V4cHJzKCksIGxpa2Ugb3RoZXIgc3VnYXIpCjMyLzM3IENoZWNraW5nIGNvbW1pdCBlMDQzNDhm
+MjBlMjggKHFhcGk6IFNpbXBsaWZ5IGNoZWNrX2tleXMoKSkKMzMvMzcgQ2hlY2tpbmcgY29tbWl0
+IGU4MDQ2ZGMyNDM1OCAocWFwaTogQ2xlYW4gdXAgYXJvdW5kIGNoZWNrX2tub3duX2tleXMoKSkK
+MzQvMzcgQ2hlY2tpbmcgY29tbWl0IDQ3NGUzNzM0OWRhMCAocWFwaTogRGVsZXRlIHVzZWxlc3Mg
+Y2hlY2tfZXhwcnMoKSBjb2RlIGZvciBzaW1wbGUgdW5pb24ga2luZCkKMzUvMzcgQ2hlY2tpbmcg
+Y29tbWl0IDZhYmNhMGUyZWQzMyAocWFwaTogRml4IHRvIC5jaGVjaygpIGVtcHR5IHN0cnVjdHMg
+anVzdCBvbmNlKQozNi8zNyBDaGVja2luZyBjb21taXQgZTIzNTIxMzg5MWM5IChxYXBpOiBGaXgg
+ZXhjZXNzaXZlIFFBUElTY2hlbWFFbnRpdHkuY2hlY2soKSByZWN1cnNpb24pCjM3LzM3IENoZWNr
+aW5nIGNvbW1pdCA5NGJiNzFhZGE3ZDcgKHFhcGk6IEFzc2VydCAudmlzaXQoKSBhbmQgLmNoZWNr
+X2NsYXNoKCkgcnVuIG9ubHkgYWZ0ZXIgLmNoZWNrKCkpCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
+IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwOTI0MTIzMzM0LjMwNjQ1LTEtYXJtYnJ1
+QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-I did get a chance to test it. This seems to fix the issue :)
-
-Please send the patch to musl and CC me when you do.
-
-Good catch!
-
-Alistair
-
->
-> >
-> > This should manifest on hardware, but it looks like we managed to drop that SC
-> > patch.  I'll go send the patch out now...
->
-> Thanks, do you mind CCing me?
->
-> Alistair
->
-> >
-> > >
-> > > Alistair
-> > >
-> > >> 2.21.0
-> > >>
-> > >>
 
