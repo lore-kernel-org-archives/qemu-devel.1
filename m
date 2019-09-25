@@ -2,60 +2,110 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1179C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6879C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:25:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA3B721D7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:23:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA3B721D7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 92FBE21D7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:25:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="B91nbKO+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92FBE21D7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD7GO-0003CN-Ok
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:23:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58742)
+	id 1iD7I3-0004te-Ca
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:25:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iD6mt-0006Rq-7q
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:52:56 -0400
+ (envelope-from <Paul.Durrant@citrix.com>) id 1iD6kx-0004Wb-55
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:50:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iD6mr-000466-Qd
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:52:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6176)
+ (envelope-from <Paul.Durrant@citrix.com>) id 1iD6kv-0003YA-Kb
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:50:54 -0400
+Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:24461)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iD6mr-00045k-IR; Wed, 25 Sep 2019 08:52:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BF91F18C8935;
- Wed, 25 Sep 2019 12:52:52 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-14.ams2.redhat.com [10.36.117.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 03D3A600C8;
- Wed, 25 Sep 2019 12:52:50 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/7] s390x/mmu: Inject DAT exceptions from a single place
-Date: Wed, 25 Sep 2019 14:52:32 +0200
-Message-Id: <20190925125236.4043-4-david@redhat.com>
-In-Reply-To: <20190925125236.4043-1-david@redhat.com>
-References: <20190925125236.4043-1-david@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Wed, 25 Sep 2019 12:52:52 +0000 (UTC)
+ (Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
+ id 1iD6kv-0003XI-BJ
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 08:50:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1569415854;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=kwcjc4glZYZay9OmpMDvY7DFzO5bp8owmuZo22nA3gI=;
+ b=B91nbKO+c1VXeSdF8Y//cYb9RXgb8tMDODP2eVzaaJPVfZ5yEuLk8klr
+ Tl0QoQGDEphRz60ekfHrTNP4AeJnHBJpoyHHSLoLaM2HTEge+PWkfigPr
+ JAnpL09sVmSZbsDnwD8aO4YxNMCbyofU7VIc+HX8kzSZ0F7hAqsQjQcoc 0=;
+Authentication-Results: esa3.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=Paul.Durrant@citrix.com;
+ spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ Paul.Durrant@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="Paul.Durrant@citrix.com"; x-conformance=sidf_compatible
+Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
+ Paul.Durrant@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="Paul.Durrant@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa3.hc3370-68.iphmx.com;
+ envelope-from="Paul.Durrant@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: l4uFzXgF+0tpwRo/jf+GbV2hcTXKjgKW9jWuN1oSzUno9/3BPDQ2ih1BAiKCaZWuxrvGgs1zjb
+ YeKI7TJwDe0csoPFnqQBawgLQ1hUvB8pTXoZ/D0BepYxTdbH6yeNXM492OkJF5E7xLIyy+AJl5
+ WCoZUsVt81siHftzc5xHQ29B4RGVolUpHhz4t5lj15CXtLYSOe1T0b8sKp2DpajXv6Gx+/LYam
+ SDg6YdNLXSzT8Zfk2v6hSSnCvz8eMh64T5ipfJC1QenUhLD0cyr6ttwsNYJh5II8TGLaXEZ50k
+ eGA=
+X-SBRS: 2.7
+X-MesageID: 6048788
+X-Ironport-Server: esa3.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.64,548,1559534400"; 
+   d="scan'208";a="6048788"
+From: Paul Durrant <Paul.Durrant@citrix.com>
+To: 'Klaus Jensen' <its@irrelevant.dk>
+Subject: RE: [Qemu-devel] [Qemu-block] [PATCH 16/16] nvme: support multiple
+ namespaces
+Thread-Topic: [Qemu-devel] [Qemu-block] [PATCH 16/16] nvme: support multiple
+ namespaces
+Thread-Index: AQHVc5rsKZ6I5eCEzkaUi0Qi5uVsxqc8WDHw
+Date: Wed, 25 Sep 2019 12:50:46 +0000
+Message-ID: <f5dbcc473f9344e2a5a399683934a2c9@AMSPEX02CL03.citrite.net>
+References: <c60e88d4912848148ce74b574e7dc51e@AMSPEX02CL03.citrite.net>
+ <20190925121513.GA226870@apples.localdomain>
+In-Reply-To: <20190925121513.GA226870@apples.localdomain>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.145.155
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,172 +117,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Paul Durrant <paul@xen.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's return the PGM from the translation functions on error and inject
-based on that.
+> -----Original Message-----
+> From: Klaus Jensen <its@irrelevant.dk>
+> Sent: 25 September 2019 13:15
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-devel@nongnu.org; Paul Durrant <paul@xen.org>
+> Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 16/16] nvme: support multip=
+le namespaces
+>=20
+> On Wed, Sep 25, 2019 at 11:33:45AM +0000, Paul Durrant wrote:
+> > Hi Klaus,
+> >
+> >   I may have missed something but are you planning a v2 of your
+> >   nvme_ns series soon? I just ran into another issue with this version
+> >   when trying to use non-consecutive nsid value; the code uses an
+> >   array of ns indexed by the nsid, and using non-consecutive values
+> >   causes it to wander off the end of the array when trying to look up
+> >   an ns by nsid.
+> >
+>=20
+> Hi Paul,
+>=20
+> Yes, v2 will be served momentarily!
+>=20
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/mmu_helper.c | 63 +++++++++++----------------------------
- 1 file changed, 17 insertions(+), 46 deletions(-)
+Excellent :-)
 
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 847fb240fb..f6ae444655 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -48,26 +48,6 @@ static void trigger_access_exception(CPUS390XState *en=
-v, uint32_t type,
-     }
- }
-=20
--static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
--                               uint32_t type, uint64_t asc, int rw, bool=
- exc)
--{
--    int ilen =3D ILEN_AUTO;
--    uint64_t tec;
--
--    tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | as=
-c >> 46;
--
--    if (!exc) {
--        return;
--    }
--
--    /* Code accesses have an undefined ilc.  */
--    if (rw =3D=3D MMU_INST_FETCH) {
--        ilen =3D 2;
--    }
--
--    trigger_access_exception(env, type, ilen, tec);
--}
--
- /* check whether the address would be proteted by Low-Address Protection=
- */
- static bool is_low_address(uint64_t addr)
- {
-@@ -119,12 +99,10 @@ static int mmu_translate_pte(CPUS390XState *env, tar=
-get_ulong vaddr,
-                              target_ulong *raddr, int *flags, int rw, bo=
-ol exc)
- {
-     if (pt_entry & PAGE_INVALID) {
--        trigger_page_fault(env, vaddr, PGM_PAGE_TRANS, asc, rw, exc);
--        return -1;
-+        return PGM_PAGE_TRANS;
-     }
-     if (pt_entry & PAGE_RES0) {
--        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
--        return -1;
-+        return PGM_TRANS_SPEC;
-     }
-     if (pt_entry & PAGE_RO) {
-         *flags &=3D ~PAGE_WRITE;
-@@ -179,13 +157,11 @@ static int mmu_translate_region(CPUS390XState *env,=
- target_ulong vaddr,
-     new_entry =3D ldq_phys(cs->as, origin + offs);
-=20
-     if ((new_entry & REGION_ENTRY_INV) !=3D 0) {
--        trigger_page_fault(env, vaddr, pchks[level / 4], asc, rw, exc);
--        return -1;
-+        return pchks[level / 4];
-     }
-=20
-     if ((new_entry & REGION_ENTRY_TYPE_MASK) !=3D level) {
--        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
--        return -1;
-+        return PGM_TRANS_SPEC;
-     }
-=20
-     if (level =3D=3D ASCE_TYPE_SEGMENT) {
-@@ -197,8 +173,7 @@ static int mmu_translate_region(CPUS390XState *env, t=
-arget_ulong vaddr,
-     offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
-     if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
-         || offs > (new_entry & REGION_ENTRY_LENGTH)) {
--        trigger_page_fault(env, vaddr, pchks[level / 4 - 1], asc, rw, ex=
-c);
--        return -1;
-+        return pchks[level / 4 - 1];
-     }
-=20
-     if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_RO)) {
-@@ -226,38 +201,31 @@ static int mmu_translate_asce(CPUS390XState *env, t=
-arget_ulong vaddr,
-     switch (level) {
-     case ASCE_TYPE_REGION1:
-         if ((vaddr >> 62) > (asce & ASCE_TABLE_LENGTH)) {
--            trigger_page_fault(env, vaddr, PGM_REG_FIRST_TRANS, asc, rw,=
- exc);
--            return -1;
-+            return PGM_REG_FIRST_TRANS;
-         }
-         break;
-     case ASCE_TYPE_REGION2:
-         if (vaddr & 0xffe0000000000000ULL) {
--            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
--            return -1;
-+            return PGM_ASCE_TYPE;
-         }
-         if ((vaddr >> 51 & 3) > (asce & ASCE_TABLE_LENGTH)) {
--            trigger_page_fault(env, vaddr, PGM_REG_SEC_TRANS, asc, rw, e=
-xc);
--            return -1;
-+            return PGM_REG_SEC_TRANS;
-         }
-         break;
-     case ASCE_TYPE_REGION3:
-         if (vaddr & 0xfffffc0000000000ULL) {
--            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
--            return -1;
-+            return PGM_ASCE_TYPE;
-         }
-         if ((vaddr >> 40 & 3) > (asce & ASCE_TABLE_LENGTH)) {
--            trigger_page_fault(env, vaddr, PGM_REG_THIRD_TRANS, asc, rw,=
- exc);
--            return -1;
-+            return PGM_REG_THIRD_TRANS;
-         }
-         break;
-     case ASCE_TYPE_SEGMENT:
-         if (vaddr & 0xffffffff80000000ULL) {
--            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
--            return -1;
-+            return PGM_ASCE_TYPE;
-         }
-         if ((vaddr >> 29 & 3) > (asce & ASCE_TABLE_LENGTH)) {
--            trigger_page_fault(env, vaddr, PGM_SEGMENT_TRANS, asc, rw, e=
-xc);
--            return -1;
-+            return PGM_SEGMENT_TRANS;
-         }
-         break;
-     }
-@@ -400,8 +368,11 @@ int mmu_translate(CPUS390XState *env, target_ulong v=
-addr, int rw, uint64_t asc,
-=20
-     /* perform the DAT translation */
-     r =3D mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw, ex=
-c);
--    if (r) {
--        return r;
-+    if (unlikely(r)) {
-+        if (exc) {
-+            trigger_access_exception(env, r, ilen, tec);
-+        }
-+        return -1;
-     }
-=20
-     /* check for DAT protection */
---=20
-2.21.0
+> The issue you are describing is fixed in my tree!
+>=20
 
+Cool. I can work around it for the moment, but I'll move onto v2 as soon as=
+ you post it.
+
+  Thanks,
+
+    Paul
 
