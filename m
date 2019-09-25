@@ -2,51 +2,51 @@ Return-Path: <SRS0=SZz4=XU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E49F6C432C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C23C432C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B80652146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:36:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B80652146E
+	by mail.kernel.org (Postfix) with ESMTPS id 0B0EE2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Sep 2019 13:37:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0EE2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iD7TH-0001SX-S4
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:36:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59793)
+	id 1iD7U5-0002i0-Oy
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 09:37:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60979)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iD6vx-0000Sl-9M
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 09:02:18 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iD759-0001V6-8x
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 09:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iD6vv-0006gd-SG
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 09:02:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37116)
+ (envelope-from <jsnow@redhat.com>) id 1iD758-0001pi-CQ
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 09:11:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54092)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iD6vl-0006ZR-Ka; Wed, 25 Sep 2019 09:02:05 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iD754-0001o1-Th; Wed, 25 Sep 2019 09:11:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7EE842106;
- Wed, 25 Sep 2019 13:02:03 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 08BD330860D1;
+ Wed, 25 Sep 2019 13:11:41 +0000 (UTC)
 Received: from [10.10.123.130] (ovpn-123-130.rdu2.redhat.com [10.10.123.130])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0BCBC600C8;
- Wed, 25 Sep 2019 13:01:59 +0000 (UTC)
-Subject: Re: [PATCH 1/1] dirty-bitmaps: remove deprecated autoload parameter
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190924230143.22551-1-jsnow@redhat.com>
- <20190924230143.22551-2-jsnow@redhat.com>
- <fe7c69d5-16b7-d834-d490-b630db387d76@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D419A5C1D4;
+ Wed, 25 Sep 2019 13:11:37 +0000 (UTC)
+Subject: Re: [Qemu-block] [PATCH v6 0/8] Add Qemu to SeaBIOS LCHS interface
+To: Sam Eiderman <sameid@google.com>, Thomas Huth <thuth@redhat.com>
+References: <20190827082427.64280-1-sameid@google.com>
+ <474297a9-f051-8068-ee62-21f09a6269eb@redhat.com>
+ <82459d98-4586-37f7-eb6b-ebe61618fe44@redhat.com>
+ <CAFr6bUkb2RB2rP0xjZb7mDEVFCeYoFLhavheNx2C=OBVXz-qFQ@mail.gmail.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,18 +122,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <d54e767c-3ec2-0003-6259-aa43be968ec6@redhat.com>
-Date: Wed, 25 Sep 2019 09:01:58 -0400
+Message-ID: <5c103ee8-fc08-494e-f222-57cb971a5bf9@redhat.com>
+Date: Wed, 25 Sep 2019 09:11:35 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <fe7c69d5-16b7-d834-d490-b630db387d76@virtuozzo.com>
+In-Reply-To: <CAFr6bUkb2RB2rP0xjZb7mDEVFCeYoFLhavheNx2C=OBVXz-qFQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Wed, 25 Sep 2019 13:02:03 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Wed, 25 Sep 2019 13:11:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -148,88 +148,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, seabios@seabios.org,
+ qemu-devel@nongnu.org, Kevin OConnor <kevin@koconnor.net>,
+ liran.alon@oracle.com, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/25/19 3:20 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 25.09.2019 2:01, John Snow wrote:
->> This parameter has been deprecated since 2.12.0 and is eligible for
->> removal. Remove this parameter as it is actually completely ignored;
->> let's not give false hope.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   qemu-deprecated.texi | 20 +++++++++++++++-----
->>   qapi/block-core.json |  6 +-----
->>   blockdev.c           |  6 ------
->>   3 files changed, 16 insertions(+), 16 deletions(-)
->>
->> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
->> index 01245e0b1c..d60246d5d6 100644
->> --- a/qemu-deprecated.texi
->> +++ b/qemu-deprecated.texi
->> @@ -149,11 +149,6 @@ QEMU 4.1 has three options, please migrate to one of these three:
->>   
->>   @section QEMU Machine Protocol (QMP) commands
->>   
->> -@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
->> -
->> -"autoload" parameter is now ignored. All bitmaps are automatically loaded
->> -from qcow2 images.
->> -
->>   @subsection query-block result field dirty-bitmaps[i].status (since 4.0)
->>   
->>   The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
->> @@ -356,3 +351,18 @@ existing CPU models.  Management software that needs runnability
->>   guarantees must resolve the CPU model aliases using te
->>   ``alias-of'' field returned by the ``query-cpu-definitions'' QMP
->>   command.
->> +
->> +
->> +@node Recently removed features
->> +@appendix Recently removed features
->> +
->> +What follows is a record of recently removed, formerly deprecated
->> +features that serves as a record for users who have encountered
->> +trouble after a recent upgrade.
->> +
->> +@section QEMU Machine Protocol (QMP) commands
->> +
->> +@subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+On 9/25/19 6:20 AM, Sam Eiderman wrote:
+> Thanks Thomas,
 > 
-> Agree with Eric that it should be 4.2 - as this section is about removing
+> Resubmitting the tests, all other code will remain the same.
+> 
+> Sam
 > 
 
-Yes, shame on me. I spent about three seconds on this patch and should
-have spent four.
-
->> +
->> +"autoload" parameter is now ignored. All bitmaps are automatically loaded
->> +from qcow2 images.
-> 
-> Maybe, rephrase it as s/is now ignored/is now removed (ignored since 2.12.0)/ ,
-> so that this paragraph don't mislead without a context.
-> 
-
-Also a good idea.
-
-'The "autoload" parameter has been ignored since 2.12.0. All bitmaps are
-automatically loaded from qcow2 images.'
-
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> (Yay, deprecation works!)
-> 
-
-Thanks, and I'll get to the rest of your pending bitmap patches and
-cleanups soon.
+OK, feel free to just send the test by itself if only patch 8/8 changes.
 
 --js
 
