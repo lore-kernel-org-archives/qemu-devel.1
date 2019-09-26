@@ -2,79 +2,80 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAE4C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 169A1C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:49:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EF0F21D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:47:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD00421D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:49:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TwNnoiFM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EF0F21D56
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNXrZfs3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD00421D56
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDXro-0007Qo-Ag
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:47:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58809)
+	id 1iDXts-0000wj-SD
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:49:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58900)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXgB-0004M8-AV
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:48 -0400
+ id 1iDXgG-0004SM-BI
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXg9-0002qH-OQ
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:47 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38862)
+ id 1iDXgE-0002sh-IM
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:52 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:40282)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXg9-0002p0-Fi; Thu, 26 Sep 2019 13:35:45 -0400
-Received: by mail-wr1-f66.google.com with SMTP id w12so3030319wro.5;
- Thu, 26 Sep 2019 10:35:45 -0700 (PDT)
+ id 1iDXgE-0002sH-BV; Thu, 26 Sep 2019 13:35:50 -0400
+Received: by mail-wr1-f67.google.com with SMTP id l3so3705278wru.7;
+ Thu, 26 Sep 2019 10:35:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/8xcNneZ2/qvbDmM1OKk4z67N/LkpAUXIQ5kG5a96Wc=;
- b=TwNnoiFM7EJNzS+NQNIFxuyhk4QbIaOBCgsNgCY6waK+qwWJlJraWMcsPvYzeW4IqD
- 1yKNf9NU/5tX/ObAztYMZmC7Tvz+/Rl+Pf3fcIEO+px0//XWxod1vKlJOcy9VeFin6v2
- 9t5pL2izNG7VKmrT4eTh5mc/ryQoFzwImMYxGkEKmB79ZpN6mckyBeXNr/qWgwO8csyj
- RDV3Le1Xf0UlEYk0S2nBdGJVB0PkSRC6wPM7nHQaj8DXtMXtFKfiGD7yUTdmAXgXcrHL
- HC2hpb4T7RS1x/nHomNmtHoBTVMA/PyTNHS1AcO0jmKI7tImXBAEdtE5TAYwDqy2iS1S
- sClQ==
+ bh=kskdVuLQCPaH6Xp1rulbaOs6j5l5CnUBB+uNJbXgnDc=;
+ b=mNXrZfs3/JC/MRVyZmuWrCxGg/bFOdrfX0dK7lwwH76fipZczdazhuh3df3WMOmxHg
+ 3QAEQKRnWoce0IfCYn8F6lG7Q3IIqvP1PT0Q/6SWWkAwsAh5fe2vtzMt9nQQHhkyxp1k
+ J4eLhal+tTTmhSaW6ekaWhBmbBpd2sjLa1Ejz9L/zle2nCn7Kl8Tv6D3UUqXnwan1pO0
+ ZDkuBZC6t1gRJMGxFHaDQu7CiTKfZnJ6XH71IzjH5tWwad7mbr5liv75oCc0NChOxNLQ
+ B4upw2f49RGtrmv7SGMDVrT2rM2qyA/wvft3XfeM2FB8XgaOQpOsiMmutFKXkayxdlbq
+ IZhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=/8xcNneZ2/qvbDmM1OKk4z67N/LkpAUXIQ5kG5a96Wc=;
- b=X+yxSt0O3Sr2nW5eV62merqIaJqh/xmItm6fyDorxRZ3EH1Mz8BzXhwUg5bRvCkxSh
- NYjZvDBayT96OjHm2aOpl+nLD/4rMWWSFfgpOMsvrs6ZwpSe5wcuhkUZlRmrOwMR9VYy
- VBkWKoXjOmgRnJeTuz2KPvgt65Zob1JRm3SZBV+14JrJkXvwAzmqSJEKQik4mMiGQdpT
- rt0n6SuIz4nOQE+iPNPGA/vnKyw99RHRbiYHTnFr63qBTtSpI68eCJsG/D9pkBmY1lbW
- y5ece+TtpuAuAVxEjbw0qH0soXbhi6EbbDi29ve4Gfh0ckYqKQIZ3i2i4qna2P4nLlNw
- QEyg==
-X-Gm-Message-State: APjAAAV3epPCqnY2GarO+x3zxSo1CbS+oVEL2sv8UQ2wlfFeMFHyaBqp
- gOO9cPApFrPzEJdbW87iDI0Y6pDBQ6c=
-X-Google-Smtp-Source: APXvYqwRla+cPsLh/Qgqpz/qU/JFJJLJe2vqqDTqnFwTn5ku946P2NzbzWXSpZ6TM0QuYc6tJwM9HQ==
-X-Received: by 2002:adf:ce05:: with SMTP id p5mr2398368wrn.48.1569519284264;
- Thu, 26 Sep 2019 10:34:44 -0700 (PDT)
+ bh=kskdVuLQCPaH6Xp1rulbaOs6j5l5CnUBB+uNJbXgnDc=;
+ b=GRFg5aJTnZth0YDbaRlqM2f9abKPcYOKxq8GgceDHuQvMddBn4IRuSQzYUyyb0Ap9R
+ 31r9Jgx1LSjpHKhml6HXeGzpspXv8AjCnv5lbwbViid+LukRfq+87Yd5tsPL2AR8oPzc
+ tWQsA6eruEzOMi400fxXEMBYiI9b4/LUiflmCB4kkNamvV63hgwizqLNaWX4TjE75N1Z
+ ey8ryCMD8h0kFfVpIkLZT10UkgCui0luxzHXX0Knk27IvZyyyPdxDPV2kqPSstpZk6W0
+ hj2uI3fdA7lyI3UmRO4Eu9tAmPnmBWfeBF+yGgggO/mfAlVTLg8CMjp7zoRob3guLVFv
+ wQ0Q==
+X-Gm-Message-State: APjAAAVqOn4CPbKnRy71MLYuypCKKrrGsDzNsw0HDqsRkPhe0AnlzO7e
+ XcPI0PujnWD/WhslTEyeKgIvkcYYNEY=
+X-Google-Smtp-Source: APXvYqxZrtIOrMOXTDvgpV/Kv08LRzQeF0PP4oUJmV7WJkDQJhHv/e2VaE41bbW7xZ9ODnEKCnY2ZA==
+X-Received: by 2002:adf:f406:: with SMTP id g6mr3722246wro.325.1569519289031; 
+ Thu, 26 Sep 2019 10:34:49 -0700 (PDT)
 Received: from x1w.redhat.com (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.34.42
+ by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.34.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Sep 2019 10:34:43 -0700 (PDT)
+ Thu, 26 Sep 2019 10:34:48 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/19] hw/arm/bcm2835: Add various unimplemented peripherals
-Date: Thu, 26 Sep 2019 19:34:13 +0200
-Message-Id: <20190926173428.10713-6-f4bug@amsat.org>
+Subject: [PATCH 08/19] hw/misc/bcm2835_thermal: Add a dummy BCM2835 thermal
+ sensor
+Date: Thu, 26 Sep 2019 19:34:16 +0200
+Message-Id: <20190926173428.10713-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190926173428.10713-1-f4bug@amsat.org>
 References: <20190926173428.10713-1-f4bug@amsat.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.66
+X-Received-From: 209.85.221.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,138 +115,190 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Base addresses and sizes taken from the "BCM2835 ARM Peripherals"
-datasheet from February 06 2012:
-https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
+We will soon implement the SYS_timer. This timer is used by Linux
+in the thermal subsystem, so once available, the subsystem will be
+enabled and poll the temperature sensors. We need to provide the
+minimum required to keep Linux booting.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Add a dummy thermal sensor returning ~25°C based on:
+https://github.com/raspberrypi/linux/blob/rpi-5.3.y/drivers/thermal/broadcom/bcm2835_thermal.c
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/bcm2835_peripherals.c         | 31 ++++++++++++++++++++++++++++
- include/hw/arm/bcm2835_peripherals.h | 15 ++++++++++++++
- include/hw/arm/raspi_platform.h      |  8 +++++++
- 3 files changed, 54 insertions(+)
+checkpatch warning:
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+This is OK because the regex are:
 
-diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 1bd2ff41d5..fdcf616c56 100644
---- a/hw/arm/bcm2835_peripherals.c
-+++ b/hw/arm/bcm2835_peripherals.c
-@@ -22,6 +22,20 @@
- /* Capabilities for SD controller: no DMA, high-speed, default clocks etc. */
- #define BCM2835_SDHC_CAPAREG 0x52134b4
- 
-+static void create_unimp(BCM2835PeripheralState *ps,
-+                         UnimplementedDeviceState *uds,
-+                         const char *name, hwaddr ofs, hwaddr size)
+  F: hw/*/bcm283*
+  F: include/hw/*/bcm283*
+---
+ hw/misc/Makefile.objs             |   1 +
+ hw/misc/bcm2835_thermal.c         | 109 ++++++++++++++++++++++++++++++
+ include/hw/misc/bcm2835_thermal.h |  27 ++++++++
+ 3 files changed, 137 insertions(+)
+ create mode 100644 hw/misc/bcm2835_thermal.c
+ create mode 100644 include/hw/misc/bcm2835_thermal.h
+
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index a150680966..c89f3816a5 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -53,6 +53,7 @@ common-obj-$(CONFIG_OMAP) += omap_tap.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_property.o
+ common-obj-$(CONFIG_RASPI) += bcm2835_rng.o
++common-obj-$(CONFIG_RASPI) += bcm2835_thermal.o
+ common-obj-$(CONFIG_SLAVIO) += slavio_misc.o
+ common-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
+ common-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
+diff --git a/hw/misc/bcm2835_thermal.c b/hw/misc/bcm2835_thermal.c
+new file mode 100644
+index 0000000000..bac23f21ea
+--- /dev/null
++++ b/hw/misc/bcm2835_thermal.c
+@@ -0,0 +1,109 @@
++/*
++ * BCM2835 dummy thermal sensor
++ *
++ * Copyright (C) 2019 Philippe Mathieu-Daudé <f4bug@amsat.org>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/misc/bcm2835_thermal.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "hw/registerfields.h"
++
++REG32(CTL, 0)
++FIELD(CTL, POWER_DOWN, 0, 1)
++FIELD(CTL, RESET, 1, 1)
++FIELD(CTL, BANDGAP_CTRL, 2, 3)
++FIELD(CTL, INTERRUPT_ENABLE, 5, 1)
++FIELD(CTL, DIRECT, 6, 1)
++FIELD(CTL, INTERRUPT_CLEAR, 7, 1)
++FIELD(CTL, HOLD, 8, 10)
++FIELD(CTL, RESET_DELAY, 18, 8)
++FIELD(CTL, REGULATOR_ENABLE, 26, 1)
++
++REG32(STAT, 4)
++FIELD(STAT, DATA, 0, 10)
++FIELD(STAT, VALID, 10, 1)
++FIELD(STAT, INTERRUPT, 11, 1)
++
++#define THERMAL_OFFSET_C 412
++#define THERMAL_COEFF  (-0.538f)
++
++static uint16_t bcm2835_thermal_temp2adc(int temp_C)
 +{
-+    sysbus_init_child_obj(OBJECT(ps), name, uds,
-+                          sizeof(UnimplementedDeviceState),
-+                          TYPE_UNIMPLEMENTED_DEVICE);
-+    qdev_prop_set_string(DEVICE(uds), "name", name);
-+    qdev_prop_set_uint64(DEVICE(uds), "size", size);
-+    object_property_set_bool(OBJECT(uds), true, "realized", &error_fatal);
-+    memory_region_add_subregion_overlap(&ps->peri_mr, ofs,
-+                    sysbus_mmio_get_region(SYS_BUS_DEVICE(uds), 0), -1000);
++    return (temp_C - THERMAL_OFFSET_C) / THERMAL_COEFF;
 +}
 +
- static void bcm2835_peripherals_init(Object *obj)
- {
-     BCM2835PeripheralState *s = BCM2835_PERIPHERALS(obj);
-@@ -323,6 +337,23 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
-         error_propagate(errp, err);
-         return;
-     }
++static uint64_t bcm2835_thermal_read(void *opaque, hwaddr addr, unsigned size)
++{
++    Bcm2835ThermalState *s = BCM2835_THERMAL(opaque);
++    uint32_t val = 0;
 +
-+    create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
-+    create_unimp(s, &s->systmr, "bcm2835-systimer", ST_OFFSET, 0x20);
-+    create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
-+    create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
-+    create_unimp(s, &s->i2s, "bcm2835-i2s", I2S_OFFSET, 0x100);
-+    create_unimp(s, &s->smi, "bcm2835-smi", SMI_OFFSET, 0x100);
-+    create_unimp(s, &s->spi[0], "bcm2835-spi0", SPI0_OFFSET, 0x20);
-+    create_unimp(s, &s->bscsl, "bcm2835-spis", BSC_SL_OFFSET, 0x100);
-+    create_unimp(s, &s->i2c[0], "bcm2835-i2c0", BSC0_OFFSET, 0x20);
-+    create_unimp(s, &s->i2c[1], "bcm2835-i2c1", BSC1_OFFSET, 0x20);
-+    create_unimp(s, &s->i2c[2], "bcm2835-i2c2", BSC2_OFFSET, 0x20);
-+    create_unimp(s, &s->otp, "bcm2835-otp", OTP_OFFSET, 0x80);
-+    create_unimp(s, &s->dbus, "bcm2835-dbus", DBUS_OFFSET, 0x8000);
-+    create_unimp(s, &s->ave0, "bcm2835-ave0", AVE0_OFFSET, 0x8000);
-+    create_unimp(s, &s->dwc2, "dwc-usb2", USB_OTG_OFFSET, 0x1000);
-+    create_unimp(s, &s->sdramc, "bcm2835-sdramc", SDRAMC_OFFSET, 0x100);
- }
- 
- static void bcm2835_peripherals_class_init(ObjectClass *oc, void *data)
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 6b17f6a382..62a4c7b559 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -23,6 +23,7 @@
- #include "hw/sd/sdhci.h"
- #include "hw/sd/bcm2835_sdhost.h"
- #include "hw/gpio/bcm2835_gpio.h"
-+#include "hw/misc/unimp.h"
- 
- #define TYPE_BCM2835_PERIPHERALS "bcm2835-peripherals"
- #define BCM2835_PERIPHERALS(obj) \
-@@ -37,6 +38,10 @@ typedef struct BCM2835PeripheralState {
-     MemoryRegion ram_alias[4];
-     qemu_irq irq, fiq;
- 
-+    UnimplementedDeviceState systmr;
-+    UnimplementedDeviceState armtmr;
-+    UnimplementedDeviceState cprman;
-+    UnimplementedDeviceState a2w;
-     PL011State uart0;
-     BCM2835AuxState aux;
-     BCM2835FBState fb;
-@@ -48,6 +53,16 @@ typedef struct BCM2835PeripheralState {
-     SDHCIState sdhci;
-     BCM2835SDHostState sdhost;
-     BCM2835GpioState gpio;
-+    UnimplementedDeviceState i2s;
-+    UnimplementedDeviceState spi[1];
-+    UnimplementedDeviceState i2c[3];
-+    UnimplementedDeviceState otp;
-+    UnimplementedDeviceState dbus;
-+    UnimplementedDeviceState ave0;
-+    UnimplementedDeviceState bscsl;
-+    UnimplementedDeviceState smi;
-+    UnimplementedDeviceState dwc2;
-+    UnimplementedDeviceState sdramc;
- } BCM2835PeripheralState;
- 
- #endif /* BCM2835_PERIPHERALS_H */
-diff --git a/include/hw/arm/raspi_platform.h b/include/hw/arm/raspi_platform.h
-index 66969fac5d..cdcbca943f 100644
---- a/include/hw/arm/raspi_platform.h
-+++ b/include/hw/arm/raspi_platform.h
-@@ -38,6 +38,8 @@
-                                                       * Doorbells & Mailboxes */
- #define CPRMAN_OFFSET           0x100000 /* Power Management, Watchdog */
- #define CM_OFFSET               0x101000 /* Clock Management */
-+#define A2W_OFFSET              0x102000 /* Reset controller */
-+#define AVS_OFFSET              0x103000 /* Audio Video Standard */
- #define RNG_OFFSET              0x104000
- #define GPIO_OFFSET             0x200000
- #define UART0_OFFSET            0x201000
-@@ -45,11 +47,17 @@
- #define I2S_OFFSET              0x203000
- #define SPI0_OFFSET             0x204000
- #define BSC0_OFFSET             0x205000 /* BSC0 I2C/TWI */
-+#define OTP_OFFSET              0x20f000
-+#define BSC_SL_OFFSET           0x214000 /* SPI slave */
- #define AUX_OFFSET              0x215000 /* AUX: UART1/SPI1/SPI2 */
- #define EMMC1_OFFSET            0x300000
- #define SMI_OFFSET              0x600000
- #define BSC1_OFFSET             0x804000 /* BSC1 I2C/TWI */
-+#define BSC2_OFFSET             0x805000 /* BSC2 I2C/TWI */
-+#define DBUS_OFFSET             0x900000
-+#define AVE0_OFFSET             0x910000
- #define USB_OTG_OFFSET          0x980000 /* DTC_OTG USB controller */
-+#define SDRAMC_OFFSET           0xe00000
- #define DMA15_OFFSET            0xE05000 /* DMA controller, channel 15 */
- 
- /* GPU interrupts */
++    switch (addr) {
++    case A_CTL:
++        val = s->ctl;
++        break;
++    case A_STAT:
++        val = FIELD_DP32(bcm2835_thermal_temp2adc(25), STAT, VALID, true);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    return val;
++}
++
++static void bcm2835_thermal_write(void *opaque, hwaddr addr,
++                                  uint64_t value, unsigned size)
++{
++    Bcm2835ThermalState *s = BCM2835_THERMAL(opaque);
++
++    switch (addr) {
++    case A_CTL:
++        s->ctl = value;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: write 0x%" PRIx64
++                                       " to 0x%" HWADDR_PRIx "\n",
++                       __func__, value, addr);
++    }
++}
++
++static const MemoryRegionOps bcm2835_thermal_ops = {
++    .read = bcm2835_thermal_read,
++    .write = bcm2835_thermal_write,
++    .impl.max_access_size = 4,
++    .valid.min_access_size = 4,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void bcm2835_thermal_realize(DeviceState *dev, Error **errp)
++{
++    Bcm2835ThermalState *s = BCM2835_THERMAL(dev);
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &bcm2835_thermal_ops,
++                          s, TYPE_BCM2835_THERMAL, 8);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
++}
++
++static void bcm2835_thermal_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = bcm2835_thermal_realize;
++}
++
++static const TypeInfo bcm2835_thermal_info = {
++    .name = TYPE_BCM2835_THERMAL,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(Bcm2835ThermalState),
++    .class_init = bcm2835_thermal_class_init,
++};
++
++static void bcm2835_thermal_register_types(void)
++{
++    type_register_static(&bcm2835_thermal_info);
++}
++
++type_init(bcm2835_thermal_register_types)
+diff --git a/include/hw/misc/bcm2835_thermal.h b/include/hw/misc/bcm2835_thermal.h
+new file mode 100644
+index 0000000000..f85cce7214
+--- /dev/null
++++ b/include/hw/misc/bcm2835_thermal.h
+@@ -0,0 +1,27 @@
++/*
++ * BCM2835 dummy thermal sensor
++ *
++ * Copyright (C) 2019 Philippe Mathieu-Daudé <f4bug@amsat.org>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#ifndef HW_MISC_BCM2835_THERMAL_H
++#define HW_MISC_BCM2835_THERMAL_H
++
++#include "hw/qdev-properties.h"
++#include "hw/sysbus.h"
++
++#define TYPE_BCM2835_THERMAL "bcm2835-thermal"
++
++#define BCM2835_THERMAL(obj) \
++    OBJECT_CHECK(Bcm2835ThermalState, (obj), TYPE_BCM2835_THERMAL)
++
++typedef struct {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++    MemoryRegion iomem;
++    uint32_t ctl;
++} Bcm2835ThermalState;
++
++#endif
 -- 
 2.20.1
 
