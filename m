@@ -2,101 +2,54 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BB6C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E26AC432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:31:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E719221A4A
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:30:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUBwX7Nm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E719221A4A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 413502053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:31:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 413502053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDR2d-0001Pg-27
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 06:30:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37550)
+	id 1iDR3a-00024u-LB
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 06:31:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tgolembi@redhat.com>) id 1iDQuk-0001vs-E0
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:22:24 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDQyr-0006pg-Va
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:26:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tgolembi@redhat.com>) id 1iDQuh-0003fS-DC
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:22:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33989
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDQyn-0007Cm-S7
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:26:37 -0400
+Received: from relay.sw.ru ([185.231.240.75]:54270)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1iDQuh-0003eX-7m
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:22:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1569493338;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Iv6k15IDxPjjXNnDbAZ8xL5j1acQVPuMokfWsQsC6cM=;
- b=KUBwX7Nm5Mq+IHe8P6kBYxZg1HEbhzpsWiBJEoleiDsXg3RPYmULpFg7uN+mhnWbUHyuqg
- Iv8KIuV18g4HXp2aq6RLzoMyoc/62ghMgoU9jahrzRfXjDARTZFWNB+fNKGdetiXonFxyC
- G0zI9z8m5vjgUqGXxPsN/f6t/Eitnvo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-ABH-UnUvPdujeG80CzaobQ-1; Thu, 26 Sep 2019 06:22:16 -0400
-Received: by mail-wr1-f70.google.com with SMTP id v18so734460wro.16
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 03:22:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=coSbExWdz7hgtdhwciQql7d2aEA7PXC1ButsXQL3NZE=;
- b=ERP28wZJ6CTgD+/3d3nCGzyQKqxofzz2i8uhM8vDTAM5s0IoXKTSqimX4e6iZRbQ4/
- uNFggc9b4+7gZzVJ7l4yBZtdBQHgXxFBkmpiNADACoUgMi1CLLXCm7j5oXYT239dHuYn
- 61uqr36Ix8NvLgFp53RY9+cDtauCmgOOfqoAMNFNLAD/g0tarARS6q5/+hRYtAho/aTa
- xFCpkzFNP7Cy1YJdr4OJTpIXv8g3D6qr7Oe3QAgnk5ro55ZOOgL4CbZORfBdWaftkUYa
- 5zjRQSWcAwbI5C2WD437jWcBGWfRnYwYrdCVlxpp45G5cGm8gafFV5hLG9bx2QRWMkdQ
- MQnw==
-X-Gm-Message-State: APjAAAWt9YZx2ZuNeO+TMl+nKfzhxvDTTiEUT3amUFjJidNiO4DQdJ7f
- IA6BhIcGW8nOY/LvmoN7aaEw364B/Nq2BuOTMHO3gxowP0z6T888OBqky5s6dejaabcTFsCAnZE
- SKQfEg2npasyDDZo=
-X-Received: by 2002:a05:600c:22da:: with SMTP id
- 26mr2260607wmg.177.1569493335652; 
- Thu, 26 Sep 2019 03:22:15 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyujLMX2oavQ9WcXEF1Jqz6OuBB/HwApYPnraQnA4myakZjKv+kxyq5gjlWEaSFtWNUwNzsmg==
-X-Received: by 2002:a05:600c:22da:: with SMTP id
- 26mr2260534wmg.177.1569493334612; 
- Thu, 26 Sep 2019 03:22:14 -0700 (PDT)
-Received: from auriga.localdomain (nat-pool-brq-t.redhat.com. [213.175.37.10])
- by smtp.gmail.com with ESMTPSA id
- c8sm2334624wrr.49.2019.09.26.03.22.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Sep 2019 03:22:14 -0700 (PDT)
-Date: Thu, 26 Sep 2019 12:22:13 +0200
-From: =?utf-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Subject: Re: [PATCH v3] qga: add command guest-get-devices for reporting
- VirtIO devices
-Message-ID: <20190926102213.2f3fxcofbnbms3ev@auriga.localdomain>
-References: <919bbd6e0557d2fe2d9c17de394cc0b4c6fa4426.1569445204.git.tgolembi@redhat.com>
- <CAJ+F1C+Mq2HEqwHAycaZ8MgkQgw2hNW1=JoXGy1wLp7jvsmR4A@mail.gmail.com>
- <20190926101637.bu5d2icchu2ilrya@auriga.localdomain>
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iDQyb-0006vc-Go; Thu, 26 Sep 2019 06:26:21 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iDQyX-0003nC-Hn; Thu, 26 Sep 2019 13:26:17 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v14 07/14] block: move block_copy from block/backup.c to
+ separate file
+Date: Thu, 26 Sep 2019 13:26:07 +0300
+Message-Id: <20190926102614.28999-8-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190926102614.28999-1-vsementsov@virtuozzo.com>
+References: <20190926102614.28999-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190926101637.bu5d2icchu2ilrya@auriga.localdomain>
-User-Agent: NeoMutt/20180716
-X-MC-Unique: ABH-UnUvPdujeG80CzaobQ-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,393 +61,858 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, wencongyang2@huawei.com,
+ xiechanglong.d@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ den@openvz.org, mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 12:16:38PM +0200, Tom=C3=A1=C5=A1 Golembiovsk=C3=BD=
- wrote:
-> On Thu, Sep 26, 2019 at 11:13:32AM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >=20
-> > On Thu, Sep 26, 2019 at 1:01 AM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgol=
-embi@redhat.com> wrote:
-> > >
-> > > Add command for reporting devices on Windows guest. The intent is not=
- so
-> > > much to report the devices but more importantly the driver (and its
-> > > version) that is assigned to the device. This gives caller the
-> > > information whether VirtIO drivers are installed and/or whether
-> > > inadequate driver is used on a device (e.g. QXL device with base VGA
-> > > driver).
-> > >
-> > > Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com=
->
-> > > ---
-> > >  qga/commands-posix.c |   9 ++
-> > >  qga/commands-win32.c | 204 +++++++++++++++++++++++++++++++++++++++++=
-+-
-> > >  qga/qapi-schema.json |  32 +++++++
-> > >  3 files changed, 244 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> > > index dfc05f5b8a..58e93feef9 100644
-> > > --- a/qga/commands-posix.c
-> > > +++ b/qga/commands-posix.c
-> > > @@ -2757,6 +2757,8 @@ GList *ga_command_blacklist_init(GList *blackli=
-st)
-> > >      blacklist =3D g_list_append(blacklist, g_strdup("guest-fstrim"))=
-;
-> > >  #endif
-> > >
-> > > +    blacklist =3D g_list_append(blacklist, g_strdup("guest-get-devic=
-es"));
-> > > +
-> > >      return blacklist;
-> > >  }
-> > >
-> > > @@ -2977,3 +2979,10 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp=
-)
-> > >
-> > >      return info;
-> > >  }
-> > > +
-> > > +GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
-> > > +{
-> > > +    error_setg(errp, QERR_UNSUPPORTED);
-> > > +
-> > > +    return NULL;
-> > > +}
-> > > diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> > > index 6b67f16faf..139dbd7c9a 100644
-> > > --- a/qga/commands-win32.c
-> > > +++ b/qga/commands-win32.c
-> > > @@ -21,10 +21,11 @@
-> > >  #ifdef CONFIG_QGA_NTDDSCSI
-> > >  #include <winioctl.h>
-> > >  #include <ntddscsi.h>
-> > > +#endif
-> > >  #include <setupapi.h>
-> > >  #include <cfgmgr32.h>
-> > >  #include <initguid.h>
-> > > -#endif
-> > > +#include <devpropdef.h>
-> > >  #include <lm.h>
-> > >  #include <wtsapi32.h>
-> > >  #include <wininet.h>
-> > > @@ -38,6 +39,36 @@
-> > >  #include "qemu/host-utils.h"
-> > >  #include "qemu/base64.h"
-> > >
-> > > +/*
-> > > + * The following should be in devpkey.h, but it isn't. The key names=
- were
-> > > + * prefixed to avoid (future) name clashes. Once the definitions get=
- into
-> > > + * mingw the following lines can be removed.
-> > > + */
-> > > +DEFINE_DEVPROPKEY(qga_DEVPKEY_NAME, 0xb725f130, 0x47ef, 0x101a, 0xa5=
-,
-> > > +    0xf1, 0x02, 0x60, 0x8c, 0x9e, 0xeb, 0xac, 10);
-> > > +    /* DEVPROP_TYPE_STRING */
-> > > +DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_HardwareIds, 0xa45c254e, 0xdf1c=
-,
-> > > +    0x4efd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 3);
-> > > +    /* DEVPROP_TYPE_STRING_LIST */
-> > > +DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverDate, 0xa8b865dd, 0x2e3d,
-> > > +    0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 2);
-> > > +    /* DEVPROP_TYPE_FILETIME */
-> > > +DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverVersion, 0xa8b865dd, 0x2e=
-3d,
-> > > +    0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 3);
-> > > +    /* DEVPROP_TYPE_STRING */
-> > > +/* The following shoud be in cfgmgr32.h, but it isn't */
-> > > +#ifndef CM_Get_DevNode_Property
-> > > +CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
-> > > +    DEVINST          dnDevInst,
-> > > +    CONST DEVPROPKEY * PropertyKey,
-> > > +    DEVPROPTYPE      * PropertyType,
-> > > +    PBYTE            PropertyBuffer,
-> > > +    PULONG           PropertyBufferSize,
-> > > +    ULONG            ulFlags
-> > > +);
-> > > +#define CM_Get_DevNode_Property CM_Get_DevNode_PropertyW
-> > > +#endif
-> > > +
-> > >  #ifndef SHTDN_REASON_FLAG_PLANNED
-> > >  #define SHTDN_REASON_FLAG_PLANNED 0x80000000
-> > >  #endif
-> > > @@ -92,6 +123,8 @@ static OpenFlags guest_file_open_modes[] =3D {
-> > >      g_free(suffix); \
-> > >  } while (0)
-> > >
-> > > +G_DEFINE_AUTOPTR_CLEANUP_FUNC(GuestDeviceInfo, qapi_free_GuestDevice=
-Info)
-> > > +
-> > >  static OpenFlags *find_open_flag(const char *mode_str)
-> > >  {
-> > >      int mode;
-> > > @@ -2234,3 +2267,172 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **err=
-p)
-> > >
-> > >      return info;
-> > >  }
-> > > +
-> > > +/*
-> > > + * Safely get device property. Returned strings are using wide chara=
-cters.
-> > > + * Caller is responsible for freeing the buffer.
-> > > + */
-> > > +static LPBYTE cm_get_property(DEVINST devInst, const DEVPROPKEY *pro=
-pName,
-> > > +    PDEVPROPTYPE propType)
-> > > +{
-> > > +    CONFIGRET cr;
-> > > +    g_autofree LPBYTE buffer =3D NULL;
-> > > +    ULONG buffer_len =3D 0;
-> > > +
-> > > +    /* First query for needed space */
-> > > +    cr =3D CM_Get_DevNode_PropertyW(devInst, propName, propType,
-> > > +        buffer, &buffer_len, 0);
-> > > +    if (cr !=3D CR_SUCCESS && cr !=3D CR_BUFFER_SMALL) {
-> > > +
-> > > +        slog("failed to get property size, error=3D0x%lx", cr);
-> > > +        return NULL;
-> > > +    }
-> > > +    buffer =3D g_new0(BYTE, buffer_len + 1);
-> > > +    cr =3D CM_Get_DevNode_PropertyW(devInst, propName, propType,
-> > > +        buffer, &buffer_len, 0);
-> > > +    if (cr !=3D CR_SUCCESS) {
-> > > +        slog("failed to get device property, error=3D0x%lx", cr);
-> > > +        return NULL;
-> > > +    }
-> > > +    return g_steal_pointer(&buffer);
-> > > +}
-> > > +
-> > > +static GStrv ga_get_hardware_ids(DEVINST devInstance)
-> > > +{
-> > > +    GStrv hw_ids =3D NULL;
-> > > +    GArray *values =3D NULL;
-> > > +    DEVPROPTYPE cm_type;
-> > > +    LPWSTR id;
-> > > +    g_autofree LPWSTR property =3D (LPWSTR)cm_get_property(devInstan=
-ce,
-> > > +        &qga_DEVPKEY_Device_HardwareIds, &cm_type);
-> > > +    if (property =3D=3D NULL) {
-> > > +        slog("failed to get hardware IDs");
-> > > +        return NULL;
-> > > +    }
-> > > +    if (*property =3D=3D '\0') {
-> > > +        /* empty list */
-> > > +        return NULL;
-> > > +    }
-> > > +    values =3D g_array_new(TRUE, TRUE, sizeof(gchar*));
-> > > +    for (id =3D property; '\0' !=3D *id; id +=3D lstrlenW(id) + 1) {
-> > > +        gchar* id8 =3D g_utf16_to_utf8(id, -1, NULL, NULL, NULL);
-> > > +        g_array_append_val(values, id8);
-> > > +    }
-> > > +    hw_ids =3D (GStrv)g_array_free(values, FALSE);
-> > > +    values =3D NULL;
-> > > +    return hw_ids;
-> >=20
-> > Why not return g_array_free(values, FALSE) directly?
->=20
-> Yeah, you're right. This is a relic from before when I used g_autoptr
-> for it. Could be more straightforward now as you say.
->=20
->     Tomas
+Split block_copy to separate file, to be cleanly shared with backup-top
+filter driver in further commits.
 
-Do you want me to send new version?
+It's a clean movement, the only change is drop "static" from interface
+functions.
 
->=20
-> >=20
-> > > +}
-> > > +
-> > > +/*
-> > > + * https://docs.microsoft.com/en-us/windows-hardware/drivers/install=
-/identifiers-for-pci-devices
-> > > + */
-> > > +#define DEVICE_PCI_RE "PCI\\\\VEN_(1AF4|1B36)&DEV_([0-9A-B]{4})(&|$)=
-"
-> > > +
-> > > +GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
-> > > +{
-> > > +    GuestDeviceInfoList *head =3D NULL, *cur_item =3D NULL, *item =
-=3D NULL;
-> > > +    HDEVINFO dev_info =3D INVALID_HANDLE_VALUE;
-> > > +    SP_DEVINFO_DATA dev_info_data;
-> > > +    int i, j;
-> > > +    GError *gerr =3D NULL;
-> > > +    g_autoptr(GRegex) device_pci_re =3D NULL;
-> > > +    DEVPROPTYPE cm_type;
-> > > +
-> > > +    device_pci_re =3D g_regex_new(DEVICE_PCI_RE,
-> > > +        G_REGEX_ANCHORED | G_REGEX_OPTIMIZE, 0,
-> > > +        &gerr);
-> > > +    g_assert(device_pci_re !=3D NULL);
-> > > +
-> > > +    dev_info_data.cbSize =3D sizeof(SP_DEVINFO_DATA);
-> > > +    dev_info =3D SetupDiGetClassDevs(0, 0, 0, DIGCF_PRESENT | DIGCF_=
-ALLCLASSES);
-> > > +    if (dev_info =3D=3D INVALID_HANDLE_VALUE) {
-> > > +        error_setg(errp, "failed to get device tree");
-> > > +        return NULL;
-> > > +    }
-> > > +
-> > > +    slog("enumerating devices");
-> > > +    for (i =3D 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data)=
-; i++) {
-> > > +        bool skip =3D true;
-> > > +        SYSTEMTIME utc_date;
-> > > +        g_autofree LPWSTR name =3D NULL;
-> > > +        g_autofree LPFILETIME date =3D NULL;
-> > > +        g_autofree LPWSTR version =3D NULL;
-> > > +        g_auto(GStrv) hw_ids =3D NULL;
-> > > +        g_autoptr(GuestDeviceInfo) device =3D g_new0(GuestDeviceInfo=
-, 1);
-> > > +        g_autofree char *vendor_id =3D NULL;
-> > > +        g_autofree char *device_id =3D NULL;
-> > > +
-> > > +        name =3D (LPWSTR)cm_get_property(dev_info_data.DevInst,
-> > > +            &qga_DEVPKEY_NAME, &cm_type);
-> > > +        if (name =3D=3D NULL) {
-> > > +            slog("failed to get device description");
-> > > +            continue;
-> > > +        }
-> > > +        device->driver_name =3D g_utf16_to_utf8(name, -1, NULL, NULL=
-, NULL);
-> > > +        if (device->driver_name =3D=3D NULL) {
-> > > +            error_setg(errp, "conversion to utf8 failed (driver name=
-)");
-> > > +            goto out;
-> > > +        }
-> > > +        slog("querying device: %s", device->driver_name);
-> > > +        hw_ids =3D ga_get_hardware_ids(dev_info_data.DevInst);
-> > > +        if (hw_ids =3D=3D NULL) {
-> > > +            continue;
-> > > +        }
-> > > +        for (j =3D 0; hw_ids[j] !=3D NULL; j++) {
-> > > +            GMatchInfo *match_info;
-> > > +            if (!g_regex_match(device_pci_re, hw_ids[j], 0, &match_i=
-nfo)) {
-> > > +                continue;
-> > > +            }
-> > > +            skip =3D false;
-> > > +            vendor_id =3D g_match_info_fetch(match_info, 1);
-> > > +            device_id =3D g_match_info_fetch(match_info, 2);
-> > > +            device->vendor_id =3D g_ascii_strtoull(vendor_id, NULL, =
-16);
-> > > +            device->device_id =3D g_ascii_strtoull(device_id, NULL, =
-16);
-> > > +            g_match_info_free(match_info);
-> > > +        }
-> > > +        if (skip) {
-> > > +            continue;
-> > > +        }
-> > > +
-> > > +        version =3D (LPWSTR)cm_get_property(dev_info_data.DevInst,
-> > > +            &qga_DEVPKEY_Device_DriverVersion, &cm_type);
-> > > +        if (version =3D=3D NULL) {
-> > > +            slog("failed to get driver version");
-> > > +            continue;
-> > > +        }
-> > > +        device->driver_version =3D g_utf16_to_utf8(version, -1, NULL=
-,
-> > > +            NULL, NULL);
-> > > +        if (device->driver_version =3D=3D NULL) {
-> > > +            error_setg(errp, "conversion to utf8 failed (driver vers=
-ion)");
-> > > +            goto out;
-> > > +        }
-> > > +
-> > > +        date =3D (LPFILETIME)cm_get_property(dev_info_data.DevInst,
-> > > +            &qga_DEVPKEY_Device_DriverDate, &cm_type);
-> > > +        if (date =3D=3D NULL) {
-> > > +            slog("failed to get driver date");
-> > > +            continue;
-> > > +        }
-> > > +        FileTimeToSystemTime(date, &utc_date);
-> > > +        device->driver_date =3D g_strdup_printf("%04d-%02d-%02d",
-> > > +            utc_date.wYear, utc_date.wMonth, utc_date.wDay);
-> > > +
-> > > +        slog("driver: %s\ndriver version: %s,%s\n", device->driver_n=
-ame,
-> > > +            device->driver_date, device->driver_version);
-> > > +        item =3D g_new0(GuestDeviceInfoList, 1);
-> > > +        item->value =3D g_steal_pointer(&device);
-> > > +        if (!cur_item) {
-> > > +            head =3D cur_item =3D item;
-> > > +        } else {
-> > > +            cur_item->next =3D item;
-> > > +            cur_item =3D item;
-> > > +        }
-> > > +        continue;
-> > > +    }
-> > > +
-> > > +out:
-> > > +    if (dev_info !=3D INVALID_HANDLE_VALUE) {
-> > > +        SetupDiDestroyDeviceInfoList(dev_info);
-> > > +    }
-> > > +    return head;
-> > > +}
-> > > diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> > > index fb4605cc19..fe04ff2f39 100644
-> > > --- a/qga/qapi-schema.json
-> > > +++ b/qga/qapi-schema.json
-> > > @@ -1242,3 +1242,35 @@
-> > >  ##
-> > >  { 'command': 'guest-get-osinfo',
-> > >    'returns': 'GuestOSInfo' }
-> > > +
-> > > +##
-> > > +# @GuestDeviceInfo:
-> > > +#
-> > > +# @vendor-id: vendor ID
-> > > +# @device-id: device ID
-> > > +# @driver-name: name of the associated driver
-> > > +# @driver-date: driver release date in format YYYY-MM-DD
-> > > +# @driver-version: driver version
-> > > +#
-> > > +# Since: 4.2
-> > > +##
-> > > +{ 'struct': 'GuestDeviceInfo',
-> > > +  'data': {
-> > > +      'vendor-id': 'uint16',
-> > > +      'device-id': 'uint16',
-> > > +      'driver-name': 'str',
-> > > +      'driver-date': 'str',
-> > > +      'driver-version': 'str'
-> > > +      } }
-> > > +
-> > > +##
-> > > +# @guest-get-devices:
-> > > +#
-> > > +# Retrieve information about device drivers in Windows guest
-> > > +#
-> > > +# Returns: @GuestDeviceInfo
-> > > +#
-> > > +# Since: 4.2
-> > > +##
-> > > +{ 'command': 'guest-get-devices',
-> > > +  'returns': ['GuestDeviceInfo'] }
-> > > --
-> > > 2.23.0
-> > >
-> > >
-> >=20
-> >=20
-> > other than that,
-> >=20
-> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >=20
-> > --=20
-> > Marc-Andr=C3=A9 Lureau
->=20
-> --=20
-> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ include/block/block-copy.h |  76 ++++++++
+ block/backup.c             | 355 +------------------------------------
+ block/block-copy.c         | 333 ++++++++++++++++++++++++++++++++++
+ block/Makefile.objs        |   1 +
+ block/trace-events         |   2 +
+ 5 files changed, 413 insertions(+), 354 deletions(-)
+ create mode 100644 include/block/block-copy.h
+ create mode 100644 block/block-copy.c
 
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+diff --git a/include/block/block-copy.h b/include/block/block-copy.h
+new file mode 100644
+index 0000000000..54f90d0c9a
+--- /dev/null
++++ b/include/block/block-copy.h
+@@ -0,0 +1,76 @@
++/*
++ * block_copy API
++ *
++ * Copyright (C) 2013 Proxmox Server Solutions
++ * Copyright (c) 2019 Virtuozzo International GmbH.
++ *
++ * Authors:
++ *  Dietmar Maurer (dietmar@proxmox.com)
++ *  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef BLOCK_COPY_H
++#define BLOCK_COPY_H
++
++#include "block/block.h"
++
++typedef void (*ProgressBytesCallbackFunc)(int64_t bytes, void *opaque);
++typedef void (*ProgressResetCallbackFunc)(void *opaque);
++typedef struct BlockCopyState {
++    BlockBackend *source;
++    BlockBackend *target;
++    BdrvDirtyBitmap *copy_bitmap;
++    int64_t cluster_size;
++    bool use_copy_range;
++    int64_t copy_range_size;
++    uint64_t len;
++
++    BdrvRequestFlags write_flags;
++
++    /*
++     * skip_unallocated:
++     *
++     * Used by sync=top jobs, which first scan the source node for unallocated
++     * areas and clear them in the copy_bitmap.  During this process, the bitmap
++     * is thus not fully initialized: It may still have bits set for areas that
++     * are unallocated and should actually not be copied.
++     *
++     * This is indicated by skip_unallocated.
++     *
++     * In this case, block_copy() will query the source’s allocation status,
++     * skip unallocated regions, clear them in the copy_bitmap, and invoke
++     * block_copy_reset_unallocated() every time it does.
++     */
++    bool skip_unallocated;
++
++    /* progress_bytes_callback: called when some copying progress is done. */
++    ProgressBytesCallbackFunc progress_bytes_callback;
++
++    /*
++     * progress_reset_callback: called when some bytes reset from copy_bitmap
++     * (see @skip_unallocated above). The callee is assumed to recalculate how
++     * many bytes remain based on the dirty bit count of copy_bitmap.
++     */
++    ProgressResetCallbackFunc progress_reset_callback;
++    void *progress_opaque;
++} BlockCopyState;
++
++BlockCopyState *block_copy_state_new(
++        BlockDriverState *source, BlockDriverState *target,
++        int64_t cluster_size, BdrvRequestFlags write_flags,
++        ProgressBytesCallbackFunc progress_bytes_callback,
++        ProgressResetCallbackFunc progress_reset_callback,
++        void *progress_opaque, Error **errp);
++
++void block_copy_state_free(BlockCopyState *s);
++
++int64_t block_copy_reset_unallocated(BlockCopyState *s,
++                                     int64_t offset, int64_t *count);
++
++int coroutine_fn block_copy(BlockCopyState *s, int64_t start, uint64_t bytes,
++                            bool *error_is_read, bool is_write_notifier);
++
++#endif /* BLOCK_COPY_H */
+diff --git a/block/backup.c b/block/backup.c
+index f5125984db..4613b8c88d 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -18,6 +18,7 @@
+ #include "block/block_int.h"
+ #include "block/blockjob_int.h"
+ #include "block/block_backup.h"
++#include "block/block-copy.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/ratelimit.h"
+@@ -35,47 +36,6 @@ typedef struct CowRequest {
+     CoQueue wait_queue; /* coroutines blocked on this request */
+ } CowRequest;
+ 
+-typedef void (*ProgressBytesCallbackFunc)(int64_t bytes, void *opaque);
+-typedef void (*ProgressResetCallbackFunc)(void *opaque);
+-typedef struct BlockCopyState {
+-    BlockBackend *source;
+-    BlockBackend *target;
+-    BdrvDirtyBitmap *copy_bitmap;
+-    int64_t cluster_size;
+-    bool use_copy_range;
+-    int64_t copy_range_size;
+-    uint64_t len;
+-
+-    BdrvRequestFlags write_flags;
+-
+-    /*
+-     * skip_unallocated:
+-     *
+-     * Used by sync=top jobs, which first scan the source node for unallocated
+-     * areas and clear them in the copy_bitmap.  During this process, the bitmap
+-     * is thus not fully initialized: It may still have bits set for areas that
+-     * are unallocated and should actually not be copied.
+-     *
+-     * This is indicated by skip_unallocated.
+-     *
+-     * In this case, block_copy() will query the source’s allocation status,
+-     * skip unallocated regions, clear them in the copy_bitmap, and invoke
+-     * block_copy_reset_unallocated() every time it does.
+-     */
+-    bool skip_unallocated;
+-
+-    /* progress_bytes_callback: called when some copying progress is done. */
+-    ProgressBytesCallbackFunc progress_bytes_callback;
+-
+-    /*
+-     * progress_reset_callback: called when some bytes reset from copy_bitmap
+-     * (see @skip_unallocated above). The callee is assumed to recalculate how
+-     * many bytes remain based on the dirty bit count of copy_bitmap.
+-     */
+-    ProgressResetCallbackFunc progress_reset_callback;
+-    void *progress_opaque;
+-} BlockCopyState;
+-
+ typedef struct BackupBlockJob {
+     BlockJob common;
+     BlockDriverState *source_bs;
+@@ -135,319 +95,6 @@ static void cow_request_end(CowRequest *req)
+     qemu_co_queue_restart_all(&req->wait_queue);
+ }
+ 
+-static void block_copy_state_free(BlockCopyState *s)
+-{
+-    if (!s) {
+-        return;
+-    }
+-
+-    bdrv_release_dirty_bitmap(blk_bs(s->source), s->copy_bitmap);
+-    blk_unref(s->source);
+-    blk_unref(s->target);
+-    g_free(s);
+-}
+-
+-static BlockCopyState *block_copy_state_new(
+-        BlockDriverState *source, BlockDriverState *target,
+-        int64_t cluster_size, BdrvRequestFlags write_flags,
+-        ProgressBytesCallbackFunc progress_bytes_callback,
+-        ProgressResetCallbackFunc progress_reset_callback,
+-        void *progress_opaque, Error **errp)
+-{
+-    BlockCopyState *s;
+-    int ret;
+-    uint64_t no_resize = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
+-                         BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MOD;
+-    BdrvDirtyBitmap *copy_bitmap;
+-
+-    copy_bitmap = bdrv_create_dirty_bitmap(source, cluster_size, NULL, errp);
+-    if (!copy_bitmap) {
+-        return NULL;
+-    }
+-    bdrv_disable_dirty_bitmap(copy_bitmap);
+-
+-    s = g_new(BlockCopyState, 1);
+-    *s = (BlockCopyState) {
+-        .source = blk_new(bdrv_get_aio_context(source),
+-                          BLK_PERM_CONSISTENT_READ, no_resize),
+-        .target = blk_new(bdrv_get_aio_context(target),
+-                          BLK_PERM_WRITE, no_resize),
+-        .copy_bitmap = copy_bitmap,
+-        .cluster_size = cluster_size,
+-        .len = bdrv_dirty_bitmap_size(copy_bitmap),
+-        .write_flags = write_flags,
+-        .progress_bytes_callback = progress_bytes_callback,
+-        .progress_reset_callback = progress_reset_callback,
+-        .progress_opaque = progress_opaque,
+-    };
+-
+-    s->copy_range_size = QEMU_ALIGN_DOWN(MIN(blk_get_max_transfer(s->source),
+-                                             blk_get_max_transfer(s->target)),
+-                                         s->cluster_size);
+-    /*
+-     * Set use_copy_range, consider the following:
+-     * 1. Compression is not supported for copy_range.
+-     * 2. copy_range does not respect max_transfer (it's a TODO), so we factor
+-     *    that in here. If max_transfer is smaller than the job->cluster_size,
+-     *    we do not use copy_range (in that case it's zero after aligning down
+-     *    above).
+-     */
+-    s->use_copy_range =
+-        !(write_flags & BDRV_REQ_WRITE_COMPRESSED) && s->copy_range_size > 0;
+-
+-    /*
+-     * We just allow aio context change on our block backends. block_copy() user
+-     * (now it's only backup) is responsible for source and target being in same
+-     * aio context.
+-     */
+-    blk_set_disable_request_queuing(s->source, true);
+-    blk_set_allow_aio_context_change(s->source, true);
+-    blk_set_disable_request_queuing(s->target, true);
+-    blk_set_allow_aio_context_change(s->target, true);
+-
+-    ret = blk_insert_bs(s->source, source, errp);
+-    if (ret < 0) {
+-        goto fail;
+-    }
+-
+-    ret = blk_insert_bs(s->target, target, errp);
+-    if (ret < 0) {
+-        goto fail;
+-    }
+-
+-    return s;
+-
+-fail:
+-    block_copy_state_free(s);
+-
+-    return NULL;
+-}
+-
+-/*
+- * Copy range to target with a bounce buffer and return the bytes copied. If
+- * error occurred, return a negative error number
+- */
+-static int coroutine_fn block_copy_with_bounce_buffer(BlockCopyState *s,
+-                                                      int64_t start,
+-                                                      int64_t end,
+-                                                      bool is_write_notifier,
+-                                                      bool *error_is_read,
+-                                                      void **bounce_buffer)
+-{
+-    int ret;
+-    int nbytes;
+-    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
+-
+-    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
+-    bdrv_reset_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
+-    nbytes = MIN(s->cluster_size, s->len - start);
+-    if (!*bounce_buffer) {
+-        *bounce_buffer = blk_blockalign(s->source, s->cluster_size);
+-    }
+-
+-    ret = blk_co_pread(s->source, start, nbytes, *bounce_buffer, read_flags);
+-    if (ret < 0) {
+-        trace_block_copy_with_bounce_buffer_read_fail(s, start, ret);
+-        if (error_is_read) {
+-            *error_is_read = true;
+-        }
+-        goto fail;
+-    }
+-
+-    ret = blk_co_pwrite(s->target, start, nbytes, *bounce_buffer,
+-                        s->write_flags);
+-    if (ret < 0) {
+-        trace_block_copy_with_bounce_buffer_write_fail(s, start, ret);
+-        if (error_is_read) {
+-            *error_is_read = false;
+-        }
+-        goto fail;
+-    }
+-
+-    return nbytes;
+-fail:
+-    bdrv_set_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
+-    return ret;
+-
+-}
+-
+-/*
+- * Copy range to target and return the bytes copied. If error occurred, return a
+- * negative error number.
+- */
+-static int coroutine_fn block_copy_with_offload(BlockCopyState *s,
+-                                                int64_t start,
+-                                                int64_t end,
+-                                                bool is_write_notifier)
+-{
+-    int ret;
+-    int nr_clusters;
+-    int nbytes;
+-    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
+-
+-    assert(QEMU_IS_ALIGNED(s->copy_range_size, s->cluster_size));
+-    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
+-    nbytes = MIN(s->copy_range_size, MIN(end, s->len) - start);
+-    nr_clusters = DIV_ROUND_UP(nbytes, s->cluster_size);
+-    bdrv_reset_dirty_bitmap(s->copy_bitmap, start,
+-                            s->cluster_size * nr_clusters);
+-    ret = blk_co_copy_range(s->source, start, s->target, start, nbytes,
+-                            read_flags, s->write_flags);
+-    if (ret < 0) {
+-        trace_block_copy_with_offload_fail(s, start, ret);
+-        bdrv_set_dirty_bitmap(s->copy_bitmap, start,
+-                              s->cluster_size * nr_clusters);
+-        return ret;
+-    }
+-
+-    return nbytes;
+-}
+-
+-/*
+- * Check if the cluster starting at offset is allocated or not.
+- * return via pnum the number of contiguous clusters sharing this allocation.
+- */
+-static int block_copy_is_cluster_allocated(BlockCopyState *s, int64_t offset,
+-                                           int64_t *pnum)
+-{
+-    BlockDriverState *bs = blk_bs(s->source);
+-    int64_t count, total_count = 0;
+-    int64_t bytes = s->len - offset;
+-    int ret;
+-
+-    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+-
+-    while (true) {
+-        ret = bdrv_is_allocated(bs, offset, bytes, &count);
+-        if (ret < 0) {
+-            return ret;
+-        }
+-
+-        total_count += count;
+-
+-        if (ret || count == 0) {
+-            /*
+-             * ret: partial segment(s) are considered allocated.
+-             * otherwise: unallocated tail is treated as an entire segment.
+-             */
+-            *pnum = DIV_ROUND_UP(total_count, s->cluster_size);
+-            return ret;
+-        }
+-
+-        /* Unallocated segment(s) with uncertain following segment(s) */
+-        if (total_count >= s->cluster_size) {
+-            *pnum = total_count / s->cluster_size;
+-            return 0;
+-        }
+-
+-        offset += count;
+-        bytes -= count;
+-    }
+-}
+-
+-/*
+- * Reset bits in copy_bitmap starting at offset if they represent unallocated
+- * data in the image. May reset subsequent contiguous bits.
+- * @return 0 when the cluster at @offset was unallocated,
+- *         1 otherwise, and -ret on error.
+- */
+-static int64_t block_copy_reset_unallocated(BlockCopyState *s,
+-                                            int64_t offset, int64_t *count)
+-{
+-    int ret;
+-    int64_t clusters, bytes;
+-
+-    ret = block_copy_is_cluster_allocated(s, offset, &clusters);
+-    if (ret < 0) {
+-        return ret;
+-    }
+-
+-    bytes = clusters * s->cluster_size;
+-
+-    if (!ret) {
+-        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
+-        s->progress_reset_callback(s->progress_opaque);
+-    }
+-
+-    *count = bytes;
+-    return ret;
+-}
+-
+-static int coroutine_fn block_copy(BlockCopyState *s,
+-                                   int64_t start, uint64_t bytes,
+-                                   bool *error_is_read,
+-                                   bool is_write_notifier)
+-{
+-    int ret = 0;
+-    int64_t end = bytes + start; /* bytes */
+-    void *bounce_buffer = NULL;
+-    int64_t status_bytes;
+-
+-    /*
+-     * block_copy() user is responsible for keeping source and target in same
+-     * aio context
+-     */
+-    assert(blk_get_aio_context(s->source) == blk_get_aio_context(s->target));
+-
+-    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
+-    assert(QEMU_IS_ALIGNED(end, s->cluster_size));
+-
+-    while (start < end) {
+-        int64_t dirty_end;
+-
+-        if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
+-            trace_block_copy_skip(s, start);
+-            start += s->cluster_size;
+-            continue; /* already copied */
+-        }
+-
+-        dirty_end = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, start,
+-                                                (end - start));
+-        if (dirty_end < 0) {
+-            dirty_end = end;
+-        }
+-
+-        if (s->skip_unallocated) {
+-            ret = block_copy_reset_unallocated(s, start, &status_bytes);
+-            if (ret == 0) {
+-                trace_block_copy_skip_range(s, start, status_bytes);
+-                start += status_bytes;
+-                continue;
+-            }
+-            /* Clamp to known allocated region */
+-            dirty_end = MIN(dirty_end, start + status_bytes);
+-        }
+-
+-        trace_block_copy_process(s, start);
+-
+-        if (s->use_copy_range) {
+-            ret = block_copy_with_offload(s, start, dirty_end,
+-                                          is_write_notifier);
+-            if (ret < 0) {
+-                s->use_copy_range = false;
+-            }
+-        }
+-        if (!s->use_copy_range) {
+-            ret = block_copy_with_bounce_buffer(s, start, dirty_end,
+-                                                is_write_notifier,
+-                                                error_is_read, &bounce_buffer);
+-        }
+-        if (ret < 0) {
+-            break;
+-        }
+-
+-        start += ret;
+-        s->progress_bytes_callback(ret, s->progress_opaque);
+-        ret = 0;
+-    }
+-
+-    if (bounce_buffer) {
+-        qemu_vfree(bounce_buffer);
+-    }
+-
+-    return ret;
+-}
+-
+ static void backup_progress_bytes_callback(int64_t bytes, void *opaque)
+ {
+     BackupBlockJob *s = opaque;
+diff --git a/block/block-copy.c b/block/block-copy.c
+new file mode 100644
+index 0000000000..3fc9152853
+--- /dev/null
++++ b/block/block-copy.c
+@@ -0,0 +1,333 @@
++/*
++ * block_copy API
++ *
++ * Copyright (C) 2013 Proxmox Server Solutions
++ * Copyright (c) 2019 Virtuozzo International GmbH.
++ *
++ * Authors:
++ *  Dietmar Maurer (dietmar@proxmox.com)
++ *  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "trace.h"
++#include "qapi/error.h"
++#include "block/block-copy.h"
++#include "sysemu/block-backend.h"
++
++void block_copy_state_free(BlockCopyState *s)
++{
++    if (!s) {
++        return;
++    }
++
++    bdrv_release_dirty_bitmap(blk_bs(s->source), s->copy_bitmap);
++    blk_unref(s->source);
++    blk_unref(s->target);
++    g_free(s);
++}
++
++BlockCopyState *block_copy_state_new(
++        BlockDriverState *source, BlockDriverState *target,
++        int64_t cluster_size, BdrvRequestFlags write_flags,
++        ProgressBytesCallbackFunc progress_bytes_callback,
++        ProgressResetCallbackFunc progress_reset_callback,
++        void *progress_opaque, Error **errp)
++{
++    BlockCopyState *s;
++    int ret;
++    uint64_t no_resize = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
++                         BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MOD;
++    BdrvDirtyBitmap *copy_bitmap;
++
++    copy_bitmap = bdrv_create_dirty_bitmap(source, cluster_size, NULL, errp);
++    if (!copy_bitmap) {
++        return NULL;
++    }
++    bdrv_disable_dirty_bitmap(copy_bitmap);
++
++    s = g_new(BlockCopyState, 1);
++    *s = (BlockCopyState) {
++        .source = blk_new(bdrv_get_aio_context(source),
++                          BLK_PERM_CONSISTENT_READ, no_resize),
++        .target = blk_new(bdrv_get_aio_context(target),
++                          BLK_PERM_WRITE, no_resize),
++        .copy_bitmap = copy_bitmap,
++        .cluster_size = cluster_size,
++        .len = bdrv_dirty_bitmap_size(copy_bitmap),
++        .write_flags = write_flags,
++        .progress_bytes_callback = progress_bytes_callback,
++        .progress_reset_callback = progress_reset_callback,
++        .progress_opaque = progress_opaque,
++    };
++
++    s->copy_range_size = QEMU_ALIGN_DOWN(MIN(blk_get_max_transfer(s->source),
++                                             blk_get_max_transfer(s->target)),
++                                         s->cluster_size);
++    /*
++     * Set use_copy_range, consider the following:
++     * 1. Compression is not supported for copy_range.
++     * 2. copy_range does not respect max_transfer (it's a TODO), so we factor
++     *    that in here. If max_transfer is smaller than the job->cluster_size,
++     *    we do not use copy_range (in that case it's zero after aligning down
++     *    above).
++     */
++    s->use_copy_range =
++        !(write_flags & BDRV_REQ_WRITE_COMPRESSED) && s->copy_range_size > 0;
++
++    /*
++     * We just allow aio context change on our block backends. block_copy() user
++     * (now it's only backup) is responsible for source and target being in same
++     * aio context.
++     */
++    blk_set_disable_request_queuing(s->source, true);
++    blk_set_allow_aio_context_change(s->source, true);
++    blk_set_disable_request_queuing(s->target, true);
++    blk_set_allow_aio_context_change(s->target, true);
++
++    ret = blk_insert_bs(s->source, source, errp);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    ret = blk_insert_bs(s->target, target, errp);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    return s;
++
++fail:
++    block_copy_state_free(s);
++
++    return NULL;
++}
++
++/*
++ * Copy range to target with a bounce buffer and return the bytes copied. If
++ * error occurred, return a negative error number
++ */
++static int coroutine_fn block_copy_with_bounce_buffer(BlockCopyState *s,
++                                                      int64_t start,
++                                                      int64_t end,
++                                                      bool is_write_notifier,
++                                                      bool *error_is_read,
++                                                      void **bounce_buffer)
++{
++    int ret;
++    int nbytes;
++    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
++
++    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
++    bdrv_reset_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
++    nbytes = MIN(s->cluster_size, s->len - start);
++    if (!*bounce_buffer) {
++        *bounce_buffer = blk_blockalign(s->source, s->cluster_size);
++    }
++
++    ret = blk_co_pread(s->source, start, nbytes, *bounce_buffer, read_flags);
++    if (ret < 0) {
++        trace_block_copy_with_bounce_buffer_read_fail(s, start, ret);
++        if (error_is_read) {
++            *error_is_read = true;
++        }
++        goto fail;
++    }
++
++    ret = blk_co_pwrite(s->target, start, nbytes, *bounce_buffer,
++                        s->write_flags);
++    if (ret < 0) {
++        trace_block_copy_with_bounce_buffer_write_fail(s, start, ret);
++        if (error_is_read) {
++            *error_is_read = false;
++        }
++        goto fail;
++    }
++
++    return nbytes;
++fail:
++    bdrv_set_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
++    return ret;
++
++}
++
++/*
++ * Copy range to target and return the bytes copied. If error occurred, return a
++ * negative error number.
++ */
++static int coroutine_fn block_copy_with_offload(BlockCopyState *s,
++                                                int64_t start,
++                                                int64_t end,
++                                                bool is_write_notifier)
++{
++    int ret;
++    int nr_clusters;
++    int nbytes;
++    int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
++
++    assert(QEMU_IS_ALIGNED(s->copy_range_size, s->cluster_size));
++    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
++    nbytes = MIN(s->copy_range_size, MIN(end, s->len) - start);
++    nr_clusters = DIV_ROUND_UP(nbytes, s->cluster_size);
++    bdrv_reset_dirty_bitmap(s->copy_bitmap, start,
++                            s->cluster_size * nr_clusters);
++    ret = blk_co_copy_range(s->source, start, s->target, start, nbytes,
++                            read_flags, s->write_flags);
++    if (ret < 0) {
++        trace_block_copy_with_offload_fail(s, start, ret);
++        bdrv_set_dirty_bitmap(s->copy_bitmap, start,
++                              s->cluster_size * nr_clusters);
++        return ret;
++    }
++
++    return nbytes;
++}
++
++/*
++ * Check if the cluster starting at offset is allocated or not.
++ * return via pnum the number of contiguous clusters sharing this allocation.
++ */
++static int block_copy_is_cluster_allocated(BlockCopyState *s, int64_t offset,
++                                           int64_t *pnum)
++{
++    BlockDriverState *bs = blk_bs(s->source);
++    int64_t count, total_count = 0;
++    int64_t bytes = s->len - offset;
++    int ret;
++
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
++
++    while (true) {
++        ret = bdrv_is_allocated(bs, offset, bytes, &count);
++        if (ret < 0) {
++            return ret;
++        }
++
++        total_count += count;
++
++        if (ret || count == 0) {
++            /*
++             * ret: partial segment(s) are considered allocated.
++             * otherwise: unallocated tail is treated as an entire segment.
++             */
++            *pnum = DIV_ROUND_UP(total_count, s->cluster_size);
++            return ret;
++        }
++
++        /* Unallocated segment(s) with uncertain following segment(s) */
++        if (total_count >= s->cluster_size) {
++            *pnum = total_count / s->cluster_size;
++            return 0;
++        }
++
++        offset += count;
++        bytes -= count;
++    }
++}
++
++/*
++ * Reset bits in copy_bitmap starting at offset if they represent unallocated
++ * data in the image. May reset subsequent contiguous bits.
++ * @return 0 when the cluster at @offset was unallocated,
++ *         1 otherwise, and -ret on error.
++ */
++int64_t block_copy_reset_unallocated(BlockCopyState *s,
++                                     int64_t offset, int64_t *count)
++{
++    int ret;
++    int64_t clusters, bytes;
++
++    ret = block_copy_is_cluster_allocated(s, offset, &clusters);
++    if (ret < 0) {
++        return ret;
++    }
++
++    bytes = clusters * s->cluster_size;
++
++    if (!ret) {
++        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
++        s->progress_reset_callback(s->progress_opaque);
++    }
++
++    *count = bytes;
++    return ret;
++}
++
++int coroutine_fn block_copy(BlockCopyState *s,
++                            int64_t start, uint64_t bytes,
++                            bool *error_is_read,
++                            bool is_write_notifier)
++{
++    int ret = 0;
++    int64_t end = bytes + start; /* bytes */
++    void *bounce_buffer = NULL;
++    int64_t status_bytes;
++
++    /*
++     * block_copy() user is responsible for keeping source and target in same
++     * aio context
++     */
++    assert(blk_get_aio_context(s->source) == blk_get_aio_context(s->target));
++
++    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
++    assert(QEMU_IS_ALIGNED(end, s->cluster_size));
++
++    while (start < end) {
++        int64_t dirty_end;
++
++        if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
++            trace_block_copy_skip(s, start);
++            start += s->cluster_size;
++            continue; /* already copied */
++        }
++
++        dirty_end = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, start,
++                                                (end - start));
++        if (dirty_end < 0) {
++            dirty_end = end;
++        }
++
++        if (s->skip_unallocated) {
++            ret = block_copy_reset_unallocated(s, start, &status_bytes);
++            if (ret == 0) {
++                trace_block_copy_skip_range(s, start, status_bytes);
++                start += status_bytes;
++                continue;
++            }
++            /* Clamp to known allocated region */
++            dirty_end = MIN(dirty_end, start + status_bytes);
++        }
++
++        trace_block_copy_process(s, start);
++
++        if (s->use_copy_range) {
++            ret = block_copy_with_offload(s, start, dirty_end,
++                                          is_write_notifier);
++            if (ret < 0) {
++                s->use_copy_range = false;
++            }
++        }
++        if (!s->use_copy_range) {
++            ret = block_copy_with_bounce_buffer(s, start, dirty_end,
++                                                is_write_notifier,
++                                                error_is_read, &bounce_buffer);
++        }
++        if (ret < 0) {
++            break;
++        }
++
++        start += ret;
++        s->progress_bytes_callback(ret, s->progress_opaque);
++        ret = 0;
++    }
++
++    if (bounce_buffer) {
++        qemu_vfree(bounce_buffer);
++    }
++
++    return ret;
++}
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 35f3bca4d9..0b5c635fb2 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -37,6 +37,7 @@ block-obj-y += write-threshold.o
+ block-obj-y += backup.o
+ block-obj-$(CONFIG_REPLICATION) += replication.o
+ block-obj-y += throttle.o copy-on-read.o
++block-obj-y += block-copy.o
+ 
+ block-obj-y += crypto.o
+ 
+diff --git a/block/trace-events b/block/trace-events
+index 6e7532f48b..bbf82f069e 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -40,6 +40,8 @@ mirror_yield_in_flight(void *s, int64_t offset, int in_flight) "s %p offset %" P
+ # backup.c
+ backup_do_cow_enter(void *job, int64_t start, int64_t offset, uint64_t bytes) "job %p start %" PRId64 " offset %" PRId64 " bytes %" PRIu64
+ backup_do_cow_return(void *job, int64_t offset, uint64_t bytes, int ret) "job %p offset %" PRId64 " bytes %" PRIu64 " ret %d"
++
++# block-copy.c
+ block_copy_skip(void *bcs, int64_t start) "bcs %p start %"PRId64
+ block_copy_skip_range(void *bcs, int64_t start, uint64_t bytes) "bcs %p start %"PRId64" bytes %"PRId64
+ block_copy_process(void *bcs, int64_t start) "bcs %p start %"PRId64
+-- 
+2.21.0
 
 
