@@ -2,62 +2,62 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DB0C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDD0C352A7
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:14:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D109A206E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3101206E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:14:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EUn9MfQ4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D109A206E0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k5LIr3lm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3101206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDSej-0001xK-HM
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:13:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33634)
+	id 1iDSel-0001wl-Sa
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:13:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iDSdF-0000Ir-2C
+ (envelope-from <dgibson@ozlabs.org>) id 1iDSdE-0000IR-L9
  for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iDSdD-0001z4-Cu
+ (envelope-from <dgibson@ozlabs.org>) id 1iDSdD-0001yZ-89
  for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:24 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:54325 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([203.11.71.1]:55635 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iDSdD-0001wv-1H; Thu, 26 Sep 2019 08:12:23 -0400
+ id 1iDSdC-0001wo-Sr; Thu, 26 Sep 2019 08:12:23 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46fDLY6Y6Jz9sNx; Thu, 26 Sep 2019 22:11:49 +1000 (AEST)
+ id 46fDLZ41bRz9sPK; Thu, 26 Sep 2019 22:11:50 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569499909;
- bh=WGDBBCj7A1m4qix12oFtNQCmys/6SjyWLemjS56DPJU=;
+ d=gibson.dropbear.id.au; s=201602; t=1569499910;
+ bh=UDRwOG2f2d5+VMwe3gnwGDaVkVCAwC1ssMXXSOll1Ug=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=EUn9MfQ4UfQzocClIGJAciFnd6sIBxxI2r6Hq1o/sMXni7lsMOYswifs83euOAV0n
- fS17fjsWxdOVcfWCiGT8UmpGrr4Uzyi9pTNWgjDYBOv9kQIfX7Y0byNlKwK0uMG1zn
- DwReedPbG+rSaldkZHzN2OZP20cwEoPPfXPASpZ8=
-Date: Thu, 26 Sep 2019 21:32:18 +1000
+ b=k5LIr3lmEPaqWqerwY4gmYodQ6DZpO/PMemzlQevofdq7GpuP8aFJd7qQQO3WJT3d
+ X4HhzhegFUbbZys9QY+0sB1w6VtuxLAEPujzq1InP/j9Zty9tcc0ZkpoTeSOucz+YK
+ UMyimDquVqQAN3qfN/yzjL1nOjHkTX/8MEnOHueQ=
+Date: Thu, 26 Sep 2019 21:39:22 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 11/20] spapr: Fix indexing of XICS irqs
-Message-ID: <20190926113218.GZ17405@umbus>
+Subject: Re: [PATCH 16/20] spapr, xics, xive: Better use of assert()s on irq
+ claim/free paths
+Message-ID: <20190926113922.GB17405@umbus>
 References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
- <20190925064534.19155-12-david@gibson.dropbear.id.au>
- <20190925221746.7b497c8c@bahia.lan> <20190926013148.GU17405@umbus>
- <20190926092141.66158590@bahia.lan>
+ <20190925064534.19155-17-david@gibson.dropbear.id.au>
+ <20190926100841.5c8b779b@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="GOYT2+aw+EAigp19"
+ protocol="application/pgp-signature"; boundary="M5PHxtWZRXQUdpfa"
 Content-Disposition: inline
-In-Reply-To: <20190926092141.66158590@bahia.lan>
+In-Reply-To: <20190926100841.5c8b779b@bahia.lan>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
@@ -82,96 +82,133 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---GOYT2+aw+EAigp19
+--M5PHxtWZRXQUdpfa
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 26, 2019 at 09:21:41AM +0200, Greg Kurz wrote:
-> On Thu, 26 Sep 2019 11:31:48 +1000
+On Thu, Sep 26, 2019 at 10:08:41AM +0200, Greg Kurz wrote:
+> On Wed, 25 Sep 2019 16:45:30 +1000
 > David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> > On Wed, Sep 25, 2019 at 10:17:46PM +0200, Greg Kurz wrote:
-> > > On Wed, 25 Sep 2019 16:45:25 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >=20
-> > > > spapr global irq numbers are different from the source numbers on t=
-he ICS
-> > > > when using XICS - they're offset by XICS_IRQ_BASE (0x1000).  But
-> > > > spapr_irq_set_irq_xics() was passing through the global irq number =
-to
-> > > > the ICS code unmodified.
-> > > >=20
-> > > > We only got away with this because of a counteracting bug - we were
-> > > > incorrectly adjusting the qemu_irq we returned for a requested glob=
-al irq
-> > > > number.
-> > > >=20
-> > > > That approach mostly worked but is very confusing, incorrectly reli=
-es on
-> > > > the way the qemu_irq array is allocated, and undermines the intenti=
-on of
-> > > > having the global array of qemu_irqs for spapr have a consistent me=
-aning
-> > > > regardless of irq backend.
-> > > >=20
-> > > > So, fix both set_irq and qemu_irq indexing.  We rename some paramet=
-ers at
-> > > > the same time to make it clear that they are referring to spapr glo=
-bal
-> > > > irq numbers.
-> > > >=20
-> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > ---
-> > >=20
-> > > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > >=20
-> > > Further cleanup could be to have the XICS backend to only take global
-> > > irq numbers and to convert them to ICS source numbers internally. This
-> > > would put an end to the confusion between srcno/irq in the frontend
-> > > code.
+> > The irq claim and free paths for both XICS and XIVE check for some
+> > validity conditions.  Some of these represent genuine runtime failures,
+> > however others - particularly checking that the basic irq number is in a
+> > sane range - could only fail in the case of bugs in the callin code.
+> > Therefore use assert()s instead of runtime failures for those.
 > >=20
-> > Yeah, maybe.  But the local srcnos do actually make sense from within
-> > the perspective of ICS, so I'm not all that keen to do that.
+> > In addition the non backend-specific part of the claim/free paths should
+> > only be used for PAPR external irqs, that is in the range SPAPR_XIRQ_BA=
+SE
+> > to the maximum irq number.  Put assert()s for that into the top level
+> > dispatchers as well.
 > >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/intc/spapr_xive.c |  8 ++------
+> >  hw/ppc/spapr_irq.c   | 18 ++++++++++--------
+> >  2 files changed, 12 insertions(+), 14 deletions(-)
+> >=20
+> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> > index c1c97192a7..47b5ec0b56 100644
+> > --- a/hw/intc/spapr_xive.c
+> > +++ b/hw/intc/spapr_xive.c
+> > @@ -532,9 +532,7 @@ bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t=
+ lisn, bool lsi)
+> >  {
+> >      XiveSource *xsrc =3D &xive->source;
+> > =20
+> > -    if (lisn >=3D xive->nr_irqs) {
+> > -        return false;
+> > -    }
+> > +    assert(lisn < xive->nr_irqs);
+> > =20
+> >      /*
+> >       * Set default values when allocating an IRQ number
+> > @@ -559,9 +557,7 @@ bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t=
+ lisn, bool lsi)
+> > =20
+> >  bool spapr_xive_irq_free(SpaprXive *xive, uint32_t lisn)
+> >  {
+> > -    if (lisn >=3D xive->nr_irqs) {
+> > -        return false;
+> > -    }
+> > +    assert(lisn < xive->nr_irqs);
+> > =20
+> >      xive->eat[lisn].w &=3D cpu_to_be64(~EAS_VALID);
+> >      return true;
+> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > index c40357a985..261d66ba17 100644
+> > --- a/hw/ppc/spapr_irq.c
+> > +++ b/hw/ppc/spapr_irq.c
+> > @@ -118,11 +118,7 @@ static int spapr_irq_claim_xics(SpaprMachineState =
+*spapr, int irq, bool lsi,
+> >      ICSState *ics =3D spapr->ics;
+> > =20
+> >      assert(ics);
+> > -
+> > -    if (!ics_valid_irq(ics, irq)) {
+> > -        error_setg(errp, "IRQ %d is invalid", irq);
+> > -        return -1;
+> > -    }
+> > +    assert(ics_valid_irq(ics, irq));
+> > =20
+> >      if (!ics_irq_free(ics, irq - ics->offset)) {
+> >          error_setg(errp, "IRQ %d is not free", irq);
+> > @@ -138,9 +134,9 @@ static void spapr_irq_free_xics(SpaprMachineState *=
+spapr, int irq)
+> >      ICSState *ics =3D spapr->ics;
+> >      uint32_t srcno =3D irq - ics->offset;
+> > =20
+> > -    if (ics_valid_irq(ics, irq)) {
+> > -        memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
+> > -    }
+> > +    assert(ics_valid_irq(ics, irq));
+> > +
+> > +    memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
+> >  }
+> > =20
+> >  static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monito=
+r *mon)
+> > @@ -628,6 +624,9 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
+ **errp)
+> > =20
+> >  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
+ **errp)
+> >  {
+> > +    assert(irq >=3D SPAPR_XIRQ_BASE);
+> > +    assert(irq < (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
+> > +
+> >      return spapr->irq->claim(spapr, irq, lsi, errp);
+> >  }
+> > =20
+> > @@ -635,6 +634,9 @@ void spapr_irq_free(SpaprMachineState *spapr, int i=
+rq, int num)
+> >  {
+> >      int i;
+> > =20
+> > +    assert(irq >=3D SPAPR_XIRQ_BASE);
+> > +    assert((irq+num) <=3D (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
 >=20
-> Not sure to understand what you mean by "within the perspective of ICS".
+> Non surprisingly this makes checkpatch unhappy:
 >=20
-> My concern is actually to get rid of ics->offset users in spapr_irq.c.
->=20
-> eg,
->=20
-> static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
-> {
->     SpaprMachineState *spapr =3D opaque;
->     uint32_t srcno =3D irq - spapr->ics->offset;
->=20
->     ics_set_irq(spapr->ics, srcno, val);
-> }
->=20
-> It looks like we should do something like:
->=20
-> static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
-> {
->     SpaprMachineState *spapr =3D opaque;
->=20
->     ics_set_irq(spapr->ics, irq, val);
-> }
->=20
-> and have ics_set_irq() do:
->=20
->     uint32_t srcno =3D irq - spapr->ics->offset;
->=20
-> Are you inferring that it is better to keep the irq to srcno conversions
-> in spapr_irq.c ?
+> ERROR: spaces required around that '+' (ctx:VxV)
+> #91: FILE: hw/ppc/spapr_irq.c:638:
+> +    assert((irq+num) <=3D (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
 
-Ah, I see what you mean.  So, the reason srcno appears here is that
-ics_set_irq() is arguably an internal xics function that we shouldn't
-be calling directly from here, but do because of.. reasons.
+Oops, fixed.  I hadn't done a checkpatch run yet, since I'm still
+working actively on the series.
 
-As it happens, I have another patch in the works which will move this
-function back into xics_spapr.c and bind it more tightly to the xics
-code, so I think that will address your concern.
+>=20
+> With that fixed,
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> > +
+> >      for (i =3D irq; i < (irq + num); i++) {
+> >          spapr->irq->free(spapr, irq);
+> >      }
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -179,25 +216,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---GOYT2+aw+EAigp19
+--M5PHxtWZRXQUdpfa
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2MocEACgkQbDjKyiDZ
-s5KHBBAA4dWq/hZ5gRQF7sO65882WkbeJkGrLA2U7fyE2X3mFfxqwqckYrQcok+i
-r93pr8paca54GCjYj4GqOT/7O76qmWlvGkEgeNxK05tMhNCsZcU5D5uvic6gtLyn
-ry81wchDwQp3SutviUJTyHMjl+OHlriu2G4kjQB7WKwXU+MKQe6pbB9P1kIunaEw
-SPI66ChTKWy/rl9Kx2a0sF1pE+Eyy0D1SnsZvhOskgIlJzHKAE9LDNOafs4SYWo8
-9RYq5DbSa3SROh6JGhD/TyFp17PUFtXa6faIYEByCo2f5f+RQcbvYhcm4CVYGld/
-+u9ZqtBtW2dI4gS4cyFH1q/yWhN/aXTaNxMFFW6auGz4+bFuZ6pgETK1OEBd482U
-Jn+LCRwS0bDlI0pxR4kMuoIsVnJT9rCb+NJstX8BIhuDgau4kcs6J1x7K1SEw23T
-Sglpk35AXE+0+O5Kj/sLN/BgRhWFiTVF3bQ0ApytHlo1bsTMXSq9pmhHpD6aYWCv
-dFaJtFjW3CjbGO20iu/RnUmO3DKtGj/bq+tAkKZnSSKq+bd9NfTuq8h3ueruSuIG
-RLgYJkzuqoZBvjyXD9HIzRSwUigpoJK1//sT9jvW+389xJVykmiLDlEPCnIxdyyH
-bpXlq2/wlLj7AYnsOpbb6c0URutNbD5QfjYp3iyMPBcxH9ji1WI=
-=NGkZ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2Mo2oACgkQbDjKyiDZ
+s5JSsQ//Xo3iKYfE1YBcsp3/R9ul7gln2SXqpCsh9IKasLsWfRHRmldTNW/v6Ml8
+G75I8vo4kT1aZclNOcol2MBQo78cCTKwQmhJC9qYlhRsEzppYdqywPP+KuHGVtHL
++WOkXcrgd/Xzh3tviD5FVFPl+mfdBiIoa0X5sOCjayibbjGarp4hnNF2zfC6ssac
+NxDRG2eRmJwJ98ALyP6396BtMSK6+nrLVMfC/0NPNpq4r1kgogThEZRQIBpQon/v
+q0+IG3PvcjiexfjoDLKN5C41DBbc3eq8E88khkAnc8z5XE0aqYAWt+c9FJl/TM6u
+vF4n+zF7tD6shNuW6j3Hsl/MM+VhvcEUetMebvL1opCxZAoWtUchn1UGCe3X3j2S
+v9cJ+hqVGFjO/FL+gyKpuz3Zy9RJpv2GpB4ArQg3DpSxLuZrSBtIC53z4GYHbEBk
+cytv92GcjOvzER9LjNdzlMOMLP/jH6Ip/nfg7NzGzUfUv4LArYupLbBTLQ/gMBwe
+FAL5IidL80cHIDSHg31MplF95lQazupo0qEU7zqprZYgeGSAhDwEYUwGefMbJNc8
+fdErJdJMhdv+VoYkdiHceAk8POwh/GA851GuYR0t0Z0HadA/pW154GY8nW7koeZg
+QqYObW43bHV0EK7sc1/jOpLU0hf5TVAnGS2xrRztyUTbAgnzh5I=
+=LY0Y
 -----END PGP SIGNATURE-----
 
---GOYT2+aw+EAigp19--
+--M5PHxtWZRXQUdpfa--
 
