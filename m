@@ -2,111 +2,86 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 210FAC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FECEC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB845207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB845207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6C523207FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z4tvI2rb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C523207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDSnc-000345-9j
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:23:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35318)
+	id 1iDSnv-0003UE-AF
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:23:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iDSmD-0001ly-Jn
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:21:42 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iDSkY-0000F0-PP
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:20:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iDSmC-0004Gr-G4
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:21:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22715)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iDSmC-0004G3-84; Thu, 26 Sep 2019 08:21:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 689C83082B4B;
- Thu, 26 Sep 2019 12:21:39 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-127.ams2.redhat.com [10.36.116.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B951C5D6B0;
- Thu, 26 Sep 2019 12:21:37 +0000 (UTC)
-Subject: Re: [PATCH v1 1/2] s390x: Add sclp boundary check and fix error
- priority
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
- <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <9f9e27ac-1b40-01e4-32e0-751a2870005d@redhat.com>
-Date: Thu, 26 Sep 2019 14:21:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iDSkQ-0002jT-LI
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:19:53 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:37269)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iDSkQ-0002hd-BO
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:19:50 -0400
+Received: by mail-oi1-f194.google.com with SMTP id i16so1872574oie.4
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 05:19:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=+LIyjU/fauJ/2YVhwqNXeTLPr70F0EfwiLzSh4gvJM8=;
+ b=Z4tvI2rb2gKi9t5hWp3PF/3Q8qxZS8TIXGafQmj+/aU0o2zxrOXv/JHac4mSIyrb9k
+ F77gCAhJgjUWa3g4EajxRyY+KccYUlH3LF6IY55vXRkaLyxEwbWWp0oYR+3GTfQGaBne
+ ia+ODevbLxdNW4NohEAMR8ABMyGzRamIF0cEjvvcjr/t7To6xmayn3TRVP+KbXb7Gydq
+ LRa1iG66WPWZ0EJYrt/dFxe5b48YXYna1XCp9xjJl8gK/WvcvPW2/mDd00avcgPpJDJx
+ L42WSvIzMPZAmxHzCO0flSzOQ7QZh4jGG4Hghfp/hS/vqFROJR4zubmHN0CqvD2qy/yP
+ OniQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=+LIyjU/fauJ/2YVhwqNXeTLPr70F0EfwiLzSh4gvJM8=;
+ b=maBaJzs3d9NAnEU1XRi2gX6W/tHzBfYX3f/ucH5TcIpZhpehXg0HEmBa6e5PHmuNrh
+ uMv+pqDEJiQzcvaY9+Vz/p9jpETX4037aYihg2b1t9Xmh5TXtfFzXtwEx8n5rrv7K0HI
+ 1ZsN6cnt+HgSqW3rgo5mb48CR/l/rPi11woZN1q9wD0/R/BC5Di6/gLhKR0qcld57GPM
+ cB1xmHc9q27OqhqYAocaAItvR5VK8nTv5Yy2361hk523q21i+KdJYWEijOO3qsOdgNi6
+ JAylvTtSgG6U1mL5CU5Vf9VwYvNRgYYS7RUleJ7ImBzJ7MOX78DwwWhlNK0ttp+zdcCY
+ pm3Q==
+X-Gm-Message-State: APjAAAXsxGuWsUcJW8VfxPdRI8jp4s486lVAfk87ODRqfZGhcjp8AIJT
+ zbn32uf6kK8ihKx3LvT2bvVvkBYGl2PH8gYSd5C9/g==
+X-Google-Smtp-Source: APXvYqy/TfkSFNksF9bLe+Smx1n3gSMFIuBWui4YvW6bXweSiiNFihEzuDBxlbd0DKItex7vCIp8zYDKGhqp65ccz3k=
+X-Received: by 2002:aca:50d8:: with SMTP id e207mr2246798oib.48.1569500326916; 
+ Thu, 26 Sep 2019 05:18:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 26 Sep 2019 12:21:39 +0000 (UTC)
+References: <20190920200049.27216-1-jsnow@redhat.com>
+ <20190923145057.GC9445@dhcp-17-179.bos.redhat.com>
+ <6ac39e69-4982-dc35-d853-fedbb1c12e1a@redhat.com>
+ <20190923190533.GR5035@habkost.net>
+ <20190924073513.GA2106@redhat.com> <20190925200440.GO8144@habkost.net>
+ <20190926115829.GA18782@redhat.com>
+In-Reply-To: <20190926115829.GA18782@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 26 Sep 2019 13:18:35 +0100
+Message-ID: <CAFEAcA8Jn=er6mRZX+EYTePruTcHpLzVpqpydkERMVA9DdUOag@mail.gmail.com>
+Subject: Re: Debian support lifetime (was Re: [PATCH] docker: move tests from
+ python2 to python3)
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 209.85.167.194
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,84 +93,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, frankja@linux.ibm.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/09/2019 13.33, Claudio Imbrenda wrote:
-> From: Janosch Frank <frankja@linux.ibm.com>
-> 
-> * All sclp codes need to be checked for page boundary violations.
-> * Requests over 4k are not a spec exception.
-> * Invalid command checking has to be done before the boundary check.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
->  hw/s390x/event-facility.c |  3 ---
->  hw/s390x/sclp.c           | 25 ++++++++++++++++++++++---
->  2 files changed, 22 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index 797ecbb..6620569 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -377,9 +377,6 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
->      case SCLP_CMD_WRITE_EVENT_MASK:
->          write_event_mask(ef, sccb);
->          break;
-> -    default:
-> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-> -        break;
->      }
->  }
->  
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index fac7c3b..76feac8 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -213,14 +213,33 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->      cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
->  
->      /* Valid sccb sizes */
-> -    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader) ||
-> -        be16_to_cpu(work_sccb.h.length) > SCCB_SIZE) {
-> +    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
->          r = -PGM_SPECIFICATION;
->          goto out;
->      }
->  
-> -    sclp_c->execute(sclp, &work_sccb, code);
-> +    switch (code & SCLP_CMD_CODE_MASK) {
-> +    case SCLP_CMDW_READ_SCP_INFO:
-> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
-> +    case SCLP_CMDW_READ_CPU_INFO:
-> +    case SCLP_CMDW_CONFIGURE_IOA:
-> +    case SCLP_CMDW_DECONFIGURE_IOA:
-> +    case SCLP_CMD_READ_EVENT_DATA:
-> +    case SCLP_CMD_WRITE_EVENT_DATA:
-> +    case SCLP_CMD_WRITE_EVENT_MASK:
-> +        break;
-> +    default:
-> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-> +        goto out_write;
-> +    }
->  
-> +    if ((sccb + work_sccb.h.length) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
+On Thu, 26 Sep 2019 at 12:58, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+> When first wording the lifetimes, I tried to strike a balance between
+> limiting what we have to support, while also not negatively impacting
+> a large number of QEMU developers or users. Since we had never had
+> such support lifetimes declared for QEMU before, I was fairly generous,
+> hence picking the 2 year overlap for LTS distros (Ubuntu, RHEL and
+> SLES).
+>
+> It is easier to come to a decision when considering a real world tech
+> problem related to the lifetime.
+>
+> The start of this thread was debating Debian / Python support. If we
+> fix the doc to put debian under the short life distro category, we'll
+> have solved the Python problem IIUC.
 
-I think you likely miss a be16_to_cpu() around work_sccb.h.length here?
+I don't think Debian counts as a distro "with frequent, short-lifetime
+releases", though.
 
-> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
-> +        goto out_write;
-> +    }
-> +
-> +    sclp_c->execute(sclp, &work_sccb, code);
-> +out_write:
->      cpu_physical_memory_write(sccb, &work_sccb,
->                                be16_to_cpu(work_sccb.h.length));
+Stating overall that we don't intend to support distro versions
+that the distro themselves doesn't support ought to be sufficient,
+shouldn't it?
 
-At least here it is swapped --------^
+In general, my view is that if we bump up against any of these
+support-lifetime limits then we're being too eager to drop
+support for something from QEMU and we should prefer to retain
+support for a while longer. I like and think that it's important
+that QEMU as a project does not live on the bleeding-edge and
+require latest-and-greatest versions of its dependencies to build.
 
- Thomas
+thanks
+-- PMM
 
