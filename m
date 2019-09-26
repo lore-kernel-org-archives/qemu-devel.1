@@ -2,85 +2,84 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E08C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD55FC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:29:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5157E21D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:27:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 795E821D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:29:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="BMsFNbc1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5157E21D56
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uYqXsYGW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 795E821D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDWcT-0001la-FZ
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 12:27:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36577)
+	id 1iDWeP-0004UG-Sf
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 12:29:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1iDWLs-0007n5-GK
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:10:45 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iDWc1-0002Wb-L5
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1iDWLo-0001eT-R7
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:10:42 -0400
-Received: from mout.web.de ([212.227.15.3]:57589)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1iDWLl-0001bO-Lr
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:10:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1569514200;
- bh=ntdPFKlLlWF0Oehmz0zzi6cXik6YGFULs1o1Dh1W0VI=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=BMsFNbc10REMNj/OdG9nsj7aUv+FedGCBwS2llHMVKIF5IzG//nwigBVJJKE+Cihf
- BbzuZrPKO7LoZ1V4kmezkQikaAJqcq0v5iPGfbvtbIhiXykDhNoqRDBexnND84KFbp
- m5uiTJ0O9VlbELqx+lep1pHwDSeR3UeQLkpjarQQ=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([87.123.206.190]) by smtp.web.de (mrweb004
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0LwlY0-1i6hnc0G76-016Sl6; Thu, 26
- Sep 2019 18:10:00 +0200
-Date: Thu, 26 Sep 2019 18:09:56 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v5 0/4] colo: Add support for continuous replication
-Message-ID: <20190926180956.731f3c6f@luklap>
-In-Reply-To: <cover.1568574478.git.lukasstraub2@web.de>
-References: <cover.1568574478.git.lukasstraub2@web.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:zZ4FW5xEdlHY3+ulZJ0XpFlpbRgL6/QWwoOYxkfwiVKTs3V/SOc
- lxOvbEmzkGh1NSjIhJr7OP/t/DZM0HfOFE4oCrKQTSYFvDzDEImuY/qthP9CD+nfF14Luja
- tZdIS/6mEq/WhcO7WlwgPgOoIozQq7MqqX2R3F758zqZNGmvbddy5z/Yz9CYgLaPTtofdRM
- uNJc/VsEuLRirMSiSMUpA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:E1ktlcym92M=:MHxgv3l37knYe85ROGlESd
- 9SK8FgtQCuBuvZDKKDp7MDFsTT4f/Y8o7Yz9NWDDqXoQImy5SZEK01cJFLlp2MmXHLo/CY32V
- 4prClQRimGdT3v/2qE4rF3pT0izf3UoCANCNqd9689qzEuR4dUGQ/GstJTXbezLP3hTxjvnKb
- ye/UeO4lEl10OF9AHWcaZetxdw2LkDFZwVjqQ+wg/Vlo5VR+b5keAO2BYXQSt/iYdDXtAIMbN
- mhRwj9rJTBesev3bvxr4te4bfWOhsLzGA4lul9fBTl1k9iM/YqJCXEDeBGDEjkEndi5rdpylw
- gJdm/gRQ3x7dscUlS5HJCf/i80zoce4kiTiuZ/jRjzDfbnrytKg39fOPEhQEY1yKDulKI/GUD
- 1TcVvUhTzIZBTCkz8A1C1qI+y8YdM2ee622FBZBCbbnwf81N6jhUuuyaZ79e/ues/Ydvjgrjw
- X5ZPlGK4GzVdLIi6YZ67RJuLMkEqeLM0cb6DZVKO8FtqyssHlowGso73HSADlr7y5/5qXov5G
- KNR3MqYqDT7/doKJjK8cBYOEI+Ko76RyQPmSBkWve1cddebBbPP38zK3HSuP3wzKjQomZJrqm
- ZEKRubO9KJDC1BbE8oA0Z1NWd3SU9UJsk+pKrZ0Z1NrSnsyrBZZCJRkRy4jO5bgVYdJutABOF
- Q/LKYS2ZghBM1fH8ss8oyRz+PJEQOxi2rQXlwaxOpg1ThsRdfcTRGMmNq8LvQr1QqScqDayPN
- bgJSiqxMA0vBqPtx6zQY76Pftd0PLY+0o9R/1QgeDdez4NDDbVSXv9UxgRzsdiVrvDkDcBYIp
- /V4W+FgXfbe/PBsJ6AAPjlYEDWQvfrF1AMBoOrXnPIqaRCZl5KntZ4/YlTi66JTXcrXqnbGos
- YV57i90urvim4YIExVgGIvTmBdJzWdQrh/O6ZZWh7S9miTYWChj4CSO4rDLmOLDSldtR1QUAK
- /0jmDzIPgGrvPB+1M1ab6K+gTattBewKW490J5qWXtm5ZZrlwPu+qQk3Z6MBGE76GtIwpnDlH
- x3Gi722nlYCGyVTFepqDwjZPBCyAEr3YEIgn5cOZm5cIRRkw1MYBuQDmTxUP60hSchzCW2RFN
- 9WnT41ZBQJK73OKB/74QuTUz1eAJXq5CRV/Qb8x/3DfTVkGrv5GzKdo3eQEOvlN/t/R6n2C0i
- c4njNDJxPh3keqmtZHYtakQXHfe41hhZ6ZtqGiAV5REA3M9viMjqjwYJmQMn38Rs+0oPmmk1d
- Rm2WmmPk7+cKJwTqSnKPX9PqHl+EcciVzvBI/lL3a0471qcWMqnVGTJjFMsI=
+ (envelope-from <richard.henderson@linaro.org>) id 1iDWc0-0004cr-5W
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:25 -0400
+Received: from mail-pf1-f174.google.com ([209.85.210.174]:36987)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iDWc0-0004c9-0f
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:24 -0400
+Received: by mail-pf1-f174.google.com with SMTP id y5so2136786pfo.4
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 09:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=W0jcE++wD2TJpXHODYvTUeOTJfY0O+5q0kOFaZ7p0Ak=;
+ b=uYqXsYGW6HKpwCpBRpflGlgaI8XL6LAzbEomevBFF0uvUXcVJ7Zbtr8rvAEQeiXphT
+ WQPzFrLvhwvguTEvsNQNkcsZFa/5gJJRnnH65roeHSjwQlzeBt7UcmvUyI5O7Oo2JN0H
+ R0gAxWjn4WuNojbKaC0XamnLNfUhEHYaFsZbg6mlrtDGaShUSn2MOEGIB9kS99oH6702
+ GufdPCmw/HjTp3UAYJ5+PjMtw46I0Ala539HRmmrVd9VPd5U6hr8zZe2YYnhHzhWWhu3
+ 9EtaP8g3dD0ARWd4NAk+nDcTUfGqwinmt0Mo+pnDuUyQ+UZmg+BX6hGslB1xxk3uIDrD
+ QjXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=W0jcE++wD2TJpXHODYvTUeOTJfY0O+5q0kOFaZ7p0Ak=;
+ b=KTFa0frLBAFWkIXAgezJ0Sc6qDE1+kINiYgGCOcdZOQ/+hBNA4mu6DZem5ujdwKCUS
+ f9nVkHYEHdStGku4k+pKdhJnh1EDvXOSSE/DM2fgV2CD3LojzZmgI5CG5Apn5mgdjn9T
+ HvOiOIi/7YVs0IS6/RwmEjFT+yGqhkRP1CQ/bhJHmkf6jlTIxPDGQBbsdFV4PDl5psNF
+ 5YQVUi+Pg6KH9yvcjHn6soq6R605iibCam2VhTrsJ/9zzkMt2SHcACjsptL05cOuNWZc
+ 2TIbGxivir0QQ+D606xJvg7dWQB4OSGBHY+3b2AweYEAALIRqLiojC+RXlDaxm54sVrE
+ Q/3A==
+X-Gm-Message-State: APjAAAWF9BzDW/LTTOm5ZQvvW8citxbpEwLjTLyaKauMp3JFZgmW2uM6
+ 2qeGbHCzZIvWi2dC3GMmZPlAGG/0LwY=
+X-Google-Smtp-Source: APXvYqzHZpgbJuTsSmNO+bCKTjmXGMlX13H/3Wjyp5a24ci/p3vqkDAPwAaIn84YcPuICQSihi0/dg==
+X-Received: by 2002:a17:90a:6788:: with SMTP id
+ o8mr4483294pjj.19.1569515182617; 
+ Thu, 26 Sep 2019 09:26:22 -0700 (PDT)
+Received: from localhost.localdomain ([12.157.10.114])
+ by smtp.gmail.com with ESMTPSA id 64sm4453169pfx.31.2019.09.26.09.26.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 26 Sep 2019 09:26:22 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 03/18] target/s390x: Remove ilen parameter from
+ tcg_s390_program_interrupt
+Date: Thu, 26 Sep 2019 09:26:00 -0700
+Message-Id: <20190926162615.31168-4-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190926162615.31168-1-richard.henderson@linaro.org>
+References: <20190926162615.31168-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.3
+ [fuzzy]
+X-Received-From: 209.85.210.174
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,77 +91,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Wen Congyang <wencongyang2@huawei.com>,
- Jason Wang <jasowang@redhat.com>, mreitz@redhat.com,
- Zhang Chen <chen.zhang@intel.com>, Xie Changlong <xiechanglong.d@gmail.com>
+Cc: qemu-s390x@nongnu.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 15 Sep 2019 21:19:50 +0200
-Lukas Straub <lukasstraub2@web.de> wrote:
+Since we begin the operation with an unwind, we have the proper
+value of ilen immediately available.
 
-> Hello Everyone,
-> These Patches add support for continuous replication to colo. This means
-> that after the Primary fails and the Secondary did a failover, the Secon=
-dary
-> can then become Primary and resume replication to a new Secondary.
->
-> On a side note, I wrote a Pacemaker Resource Agent for colo which I will
-> post when its ready.
-> I have to say it's quite fun to randomly kill a Node, wait for resync
-> and repeat and see how the VM stays alive all the time. :)
->
-> Regards,
-> Lukas Straub
->
-> v5:
->  - change syntax for the position=3D parameter
->  - fix spelling mistake
->
-> v4:
->  - fix checkpatch.pl warnings
->
-> v3:
->  - add test for replication changes
->  - check if the filter to be inserted before/behind belongs to the same =
-interface
->  - fix the error message for the position=3D parameter
->  - rename term "after" -> "behind" and variable "insert_before" -> "inse=
-rt_before_flag"
->  - document the quorum node on the secondary side
->  - simplify quorum parameters in documentation
->  - remove trailing spaces in documentation
->  - clarify the testing procedure in documentation
->
-> v2:
->  - fix email formating
->  - fix checkpatch.pl warnings
->  - fix patchew error
->  - clearer commit messages
->
->
-> Lukas Straub (4):
->   block/replication.c: Ignore requests after failover
->   tests/test-replication.c: Add test for ignoring requests after
->     failover
->   net/filter.c: Add Options to insert filters anywhere in the filter
->     list
->   colo: Update Documentation for continuous replication
->
->  block/replication.c        |  38 ++++++-
->  docs/COLO-FT.txt           | 212 +++++++++++++++++++++++++++----------
->  docs/block-replication.txt |  28 +++--
->  include/net/filter.h       |   2 +
->  net/filter.c               |  92 +++++++++++++++-
->  qemu-options.hx            |  10 +-
->  tests/test-replication.c   |  52 +++++++++
->  7 files changed, 358 insertions(+), 76 deletions(-)
->
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/s390x/tcg_s390x.h   | 4 ++--
+ target/s390x/excp_helper.c | 8 ++++----
+ target/s390x/interrupt.c   | 2 +-
+ target/s390x/tcg-stub.c    | 4 ++--
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
-Hello Everyone,
-Ping.
+diff --git a/target/s390x/tcg_s390x.h b/target/s390x/tcg_s390x.h
+index 2813f9d48e..2f54ccb027 100644
+--- a/target/s390x/tcg_s390x.h
++++ b/target/s390x/tcg_s390x.h
+@@ -14,8 +14,8 @@
+ #define TCG_S390X_H
+ 
+ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque);
+-void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+-                                              int ilen, uintptr_t ra);
++void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env,
++                                              uint32_t code, uintptr_t ra);
+ void QEMU_NORETURN tcg_s390_data_exception(CPUS390XState *env, uint32_t dxc,
+                                            uintptr_t ra);
+ void QEMU_NORETURN tcg_s390_vector_exception(CPUS390XState *env, uint32_t vxc,
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index 892f659d5a..681a9c59e1 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -34,15 +34,15 @@
+ #include "hw/boards.h"
+ #endif
+ 
+-void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+-                                              int ilen, uintptr_t ra)
++void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env,
++                                              uint32_t code, uintptr_t ra)
+ {
+     CPUState *cs = env_cpu(env);
+ 
+     cpu_restore_state(cs, ra, true);
+     qemu_log_mask(CPU_LOG_INT, "program interrupt at %#" PRIx64 "\n",
+                   env->psw.addr);
+-    trigger_pgm_exception(env, code, ilen);
++    trigger_pgm_exception(env, code, ILEN_UNWIND);
+     cpu_loop_exit(cs);
+ }
+ 
+@@ -60,7 +60,7 @@ void QEMU_NORETURN tcg_s390_data_exception(CPUS390XState *env, uint32_t dxc,
+     if (env->cregs[0] & CR0_AFP) {
+         env->fpc = deposit32(env->fpc, 8, 8, dxc);
+     }
+-    tcg_s390_program_interrupt(env, PGM_DATA, ILEN_AUTO, ra);
++    tcg_s390_program_interrupt(env, PGM_DATA, ra);
+ }
+ 
+ void QEMU_NORETURN tcg_s390_vector_exception(CPUS390XState *env, uint32_t vxc,
+diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
+index 30a9fb8852..b798e2ecbe 100644
+--- a/target/s390x/interrupt.c
++++ b/target/s390x/interrupt.c
+@@ -40,7 +40,7 @@ void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
+     if (kvm_enabled()) {
+         kvm_s390_program_interrupt(env_archcpu(env), code);
+     } else if (tcg_enabled()) {
+-        tcg_s390_program_interrupt(env, code, ilen, ra);
++        tcg_s390_program_interrupt(env, code, ra);
+     } else {
+         g_assert_not_reached();
+     }
+diff --git a/target/s390x/tcg-stub.c b/target/s390x/tcg-stub.c
+index 32adb7276a..d22c898802 100644
+--- a/target/s390x/tcg-stub.c
++++ b/target/s390x/tcg-stub.c
+@@ -18,8 +18,8 @@
+ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
+ {
+ }
+-void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+-                                              int ilen, uintptr_t ra)
++void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env,
++                                              uint32_t code, uintptr_t ra)
+ {
+     g_assert_not_reached();
+ }
+-- 
+2.17.1
 
-Regards,
-Lukas Straub
 
