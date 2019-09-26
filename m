@@ -2,89 +2,92 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2608AC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89791C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:22:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8FF9222C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:22:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mFbldVZu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8FF9222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 62B1A222C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:22:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62B1A222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDZL3-00017E-K3
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 15:22:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45479)
+	id 1iDZLf-000225-F2
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 15:22:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49565)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iDYmB-0002K6-Kl
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:46:04 -0400
+ (envelope-from <philmd@redhat.com>) id 1iDZ8y-0002k5-6F
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 15:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iDYmA-00055h-7R
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:46:03 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:40012)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iDYm8-0004zY-Je
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:46:01 -0400
-Received: by mail-wr1-x435.google.com with SMTP id l3so3907584wru.7
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 11:45:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=5fLMKoxAcnX8/4qyqjfQR0D8xnH/RRawEKHgUpx30II=;
- b=mFbldVZuWlLD2GhEZUegG2+QpAlQSTFI3gTYfJ6AN/D+s2wKarl7ABAXqPagx9vK51
- VAZTqBpOw9uqqtZksfwUKs6Tc5spRBmo9V6JXwfEWGK6cNkULePFYI7RJ2/NmvH2zXLG
- F9XsFrWHcz0JQRa4NdzFhpIwY412Oblkafuz9kMBSs+lyNJ4InX7a2x7763IC3O62Qzs
- 31B4c8vAym5l61RdXAnSl+nZN/O9E3SlS5hXEbuoFMyZn03AEE+G8sPxWGzd6ZB7AEyt
- xvoQD/hD/3ciIEcj+TxXJ1aYYoz8DwzhCvJYckAtDLvEufBPHBThUapb6FPsV5iiLz2C
- aIKQ==
+ (envelope-from <philmd@redhat.com>) id 1iDZ8v-00065z-Ke
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 15:09:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36184)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDZ8v-00064n-Cn
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 15:09:33 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4AB5918C37B
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 19:09:32 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id t185so1419135wmg.4
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 12:09:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=5fLMKoxAcnX8/4qyqjfQR0D8xnH/RRawEKHgUpx30II=;
- b=BHF7GKADQ8TnFbqwYsyzPCPcNBTobr+801MGSvLj5cjNV0DXT6dI2YWuBazHmoNa8a
- OGInPH/8zQGMR0Iyx+UJQ1uwAMQsL1zwxVGQRunaIyqcd2dSy05uMQJqYgIrY48CJnS3
- +WUC1g1QLUxegMHkL/sUonISG/hoxUBuGhAYbOoi/BpcnA9HlcgpoqUIJDqaBh8xxiAy
- cDvAwV5M21ThjGUy+UV11V7PtMWbrd5CzZvjsP7SSrS1TFWPKw2h1mNw1EwnPiaI6kgP
- hHwKPlx/sK9/Wfgr7k4oz8h3TX6J7RnZgvN2AS5NZrHfbHyBFxben166iUzGJexsPt3J
- 2dkg==
-X-Gm-Message-State: APjAAAVx8QZ1xyEt96LXvt1fESng/d8EUv8UnCeGqs6mC35sWPXaqA8W
- mFqpo+u5FnzFw2xpS7GEX5zdNg==
-X-Google-Smtp-Source: APXvYqxaFE0PR+uncVL23TJnaZMutVhYw2oLRH8g9RTMpItkS5MebF5f+j1V61PiTwoPXtyYqKuU3A==
-X-Received: by 2002:adf:ebd0:: with SMTP id v16mr3954377wrn.352.1569523557012; 
- Thu, 26 Sep 2019 11:45:57 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i8sm113014wrw.36.2019.09.26.11.45.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Sep 2019 11:45:52 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2B9461FFAA;
- Thu, 26 Sep 2019 19:35:55 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 21/28] target/i386: Fix broken build with WHPX enabled
-Date: Thu, 26 Sep 2019 19:35:46 +0100
-Message-Id: <20190926183553.13895-22-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190926183553.13895-1-alex.bennee@linaro.org>
-References: <20190926183553.13895-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lFbCZ3cujd0+mwFAQ9ciIaXXpuOMNFCZNmeNjOWtGag=;
+ b=PT3NbcTbh3kkXY2G/stA8a8y8vNJ0RxWeZQ9jUDOL6MiM9xtHY5t0kzWTec5OdITSm
+ qla8XPH1eB4Rg4Ws3xBkIgyhkjLOHD0nFx+cpcdl2h3jHpLFNgFMIc1vfGw0EKoW8t3s
+ rRF6pm0Sk+aqHBwF4pGk53he9oDL1s1woGTYM3bcW75KbnonhDABkmJlXbawbC4/QuNn
+ 2ppozB0w+2eS3tvooacnj6K9vCxN8O9zlHKcI3Zo+/XuIwB761sIfE/EfBJJ9NtCd8qL
+ TY8oW+jTfLSRpN5o3RHNME7EPcKY6aoOVwyKPFYwWU/et1DYXHn5F/tGus/9e5b6AF9b
+ X6Rw==
+X-Gm-Message-State: APjAAAWafe0//5lgjPlsky2TZhuLA2W04T87+d2j0H32217mlT/NaXFp
+ KDzqcY234vF6eYBGyvwjltYsLluYDX4CivF5HfunrvQqQNlaKEzPy6JMH4XhNiPooZMFVuk0SP2
+ LyObKPDFTIot1QtM=
+X-Received: by 2002:a1c:3904:: with SMTP id g4mr4457376wma.116.1569524970973; 
+ Thu, 26 Sep 2019 12:09:30 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzQanHpzIXwrJgfpEC1shajy/MtlBRcgILJiSdjI+B+yv0BbArbrGbtCBuZSOaoxUT4gpoC4A==
+X-Received: by 2002:a1c:3904:: with SMTP id g4mr4457360wma.116.1569524970745; 
+ Thu, 26 Sep 2019 12:09:30 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id s10sm6018634wmf.48.2019.09.26.12.09.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 26 Sep 2019 12:09:30 -0700 (PDT)
+Subject: Re: [SeaBIOS] [PATCH v7 7/8] bootdevice: FW_CFG interface for LCHS
+ values
+To: John Snow <jsnow@redhat.com>, Sam Eiderman <sameid@google.com>,
+ qemu-devel@nongnu.org
+References: <20190925110639.100699-1-sameid@google.com>
+ <20190925110639.100699-8-sameid@google.com>
+ <ffff9a59-3cbf-8b04-f4e5-8a01dad8d381@redhat.com>
+ <7dc7b14c-8e89-4851-6d05-d69b1bf36e3e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <92b719a7-3838-b019-cd51-5f5b2120a431@redhat.com>
+Date: Thu, 26 Sep 2019 21:09:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::435
+In-Reply-To: <7dc7b14c-8e89-4851-6d05-d69b1bf36e3e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,59 +99,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Ilias Maratos <i.maratos@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, arbel.moshe@oracle.com,
+ seabios@seabios.org, kraxel@redhat.com, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On 9/26/19 8:26 PM, John Snow wrote:
+> On 9/26/19 5:57 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Hi Sam,
+>>
+>> On 9/25/19 1:06 PM, Sam Eiderman wrote:
+>>> From: Sam Eiderman <shmuel.eiderman@oracle.com>
+>>>
+>>> Using fw_cfg, supply logical CHS values directly from QEMU to the BIO=
+S.
+>>>
+>>> Non-standard logical geometries break under QEMU.
+>>>
+>>> A virtual disk which contains an operating system which depends on
+>>> logical geometries (consistent values being reported from BIOS INT13
+>>> AH=3D08) will most likely break under QEMU/SeaBIOS if it has non-stan=
+dard
+>>> logical geometries - for example 56 SPT (sectors per track).
+>>> No matter what QEMU will report - SeaBIOS, for large enough disks - w=
+ill
+>>> use LBA translation, which will report 63 SPT instead.
+>>>
+>>> In addition we cannot force SeaBIOS to rely on physical geometries at
+>>> all. A virtio-blk-pci virtual disk with 255 phyiscal heads cannot
+>>> report more than 16 physical heads when moved to an IDE controller,
+>>> since the ATA spec allows a maximum of 16 heads - this is an artifact=
+ of
+>>> virtualization.
+>>>
+>>> By supplying the logical geometries directly we are able to support s=
+uch
+>>> "exotic" disks.
+>>>
+>>> We serialize this information in a similar way to the "bootorder"
+>>> interface.
+>>> The new fw_cfg entry is "bios-geometry".
+>>>
+>>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>>> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+>>> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+>>> ---
+>>>  bootdevice.c            | 32 ++++++++++++++++++++++++++++++++
+>>>  hw/nvram/fw_cfg.c       | 14 +++++++++++---
+>>>  include/sysemu/sysemu.h |  1 +
+>>>  3 files changed, 44 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/bootdevice.c b/bootdevice.c
+>>> index 2b12fb85a4..b034ad7bdc 100644
+>>> --- a/bootdevice.c
+>>> +++ b/bootdevice.c
+>>> @@ -405,3 +405,35 @@ void del_boot_device_lchs(DeviceState *dev, cons=
+t char *suffix)
+>>>          }
+>>>      }
+>>>  }
+>>> +
+>>> +/* Serialized as: (device name\0 + lchs struct) x devices */
+>>> +char *get_boot_devices_lchs_list(size_t *size)
+>>> +{
+>>> +    FWLCHSEntry *i;
+>>> +    size_t total =3D 0;
+>>> +    char *list =3D NULL;
+>>> +
+>>> +    QTAILQ_FOREACH(i, &fw_lchs, link) {
+>>> +        char *bootpath;
+>>> +        char *chs_string;
+>>> +        size_t len;
+>>> +
+>>> +        bootpath =3D get_boot_device_path(i->dev, false, i->suffix);
+>>> +        chs_string =3D g_strdup_printf("%s %" PRIu32 " %" PRIu32 " %=
+" PRIu32,
+>>> +                                     bootpath, i->lcyls, i->lheads, =
+i->lsecs);
+>>
+>> Hmm maybe we can g_free(bootpath) directly here.
+>>
+>=20
+> I think it's okay to do it at the bottom of the loop. No real benefit t=
+o
+> being that eager to free resources in my mind. I expect setup at the to=
+p
+> of a block and teardown at the bottom of a block.
+>=20
+> Trying to do too much in the middle gets messy in my opinion, not that
+> it seems to matter here.
 
-The WHPX build is broken since commit 12e9493df92 which removed the
-"hw/boards.h" where MachineState is declared:
+No problem.
 
-  $ ./configure \
-     --enable-hax --enable-whpx
+>>> +
+>>> +        if (total) {
+>>> +            list[total - 1] =3D '\n';
+>>> +        }
+>>> +        len =3D strlen(chs_string) + 1;
+>>> +        list =3D g_realloc(list, total + len);
+>>> +        memcpy(&list[total], chs_string, len);
+>>> +        total +=3D len;
+>>> +        g_free(chs_string);
+>>> +        g_free(bootpath);
+>>> +    }
+>>> +
+>>> +    *size =3D total;
+>>> +
+>>> +    return list;
+>>> +}
+>>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>>> index 7dc3ac378e..18aff658c0 100644
+>>> --- a/hw/nvram/fw_cfg.c
+>>> +++ b/hw/nvram/fw_cfg.c
+>>> @@ -920,13 +920,21 @@ void *fw_cfg_modify_file(FWCfgState *s, const c=
+har *filename,
+>>> =20
+>>>  static void fw_cfg_machine_reset(void *opaque)
+>>>  {
+>>> +    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
+>>> +    FWCfgState *s =3D opaque;
+>>>      void *ptr;
+>>>      size_t len;
+>>> -    FWCfgState *s =3D opaque;
+>>> -    char *bootindex =3D get_boot_devices_list(&len);
+>>> +    char *buf;
+>>> =20
+>>> -    ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)bootindex,=
+ len);
+>>> +    buf =3D get_boot_devices_list(&len);
+>>> +    ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)buf, len);
+>>>      g_free(ptr);
+>>> +
+>>> +    if (!mc->legacy_fw_cfg_order) {
+>>> +        buf =3D get_boot_devices_lchs_list(&len);
+>>> +        ptr =3D fw_cfg_modify_file(s, "bios-geometry", (uint8_t *)bu=
+f, len);
+>>
+>> OK. Can you add a test in tests/fw_cfg-test.c please?
+>>
+>=20
+> :D
+>=20
+>>> +        g_free(ptr);
+>>> +    }
+>>>  }
+>>> =20
+>>>  static void fw_cfg_machine_ready(struct Notifier *n, void *data)
+>>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+>>> index 5bc5c79cbc..80c57fdc4e 100644
+>>> --- a/include/sysemu/sysemu.h
+>>> +++ b/include/sysemu/sysemu.h
+>>> @@ -106,6 +106,7 @@ void validate_bootdevices(const char *devices, Er=
+ror **errp);
+>>>  void add_boot_device_lchs(DeviceState *dev, const char *suffix,
+>>>                            uint32_t lcyls, uint32_t lheads, uint32_t =
+lsecs);
+>>>  void del_boot_device_lchs(DeviceState *dev, const char *suffix);
+>>> +char *get_boot_devices_lchs_list(size_t *size);
+>>
+>> Please add some documentation. At least 'size' must be non-NULL.
+>>
+>=20
+> Sure; but I wasn't going to gate on it because this series went unloved
+> for so long. At this point, a follow-up patch is fine.
 
-  $ make x86_64-softmmu/all
-  [...]
-    CC      x86_64-softmmu/target/i386/whpx-all.o
-  target/i386/whpx-all.c: In function 'whpx_accel_init':
-  target/i386/whpx-all.c:1378:25: error: dereferencing pointer to
-  incomplete type 'MachineState' {aka 'struct MachineState'}
-       whpx->mem_quota = ms->ram_size;
-                           ^~
-  make[1]: *** [rules.mak:69: target/i386/whpx-all.o] Error 1
-    CC      x86_64-softmmu/trace/generated-helpers.o
-  make[1]: Target 'all' not remade because of errors.
-  make: *** [Makefile:471: x86_64-softmmu/all] Error 2
+OK
 
-Restore this header, partially reverting commit 12e9493df92.
+>=20
+>> Ideally you should add doc for the other functions added in 3/8
+>> "bootdevice: Add interface to gather LCHS" too.
+>>
+>=20
+> Same thing here.
+>=20
+>> John, what do you think about extracting the *boot_device* functions o=
+ut
+>> of "sysemu.h"?
+>>
+>=20
+> Potentially worthwhile; but not critical at the moment. The source tree
+> is not the best-organized thing as-is and I don't think it's fair to
+> hold this series up for much longer for nice-to-haves, ultimately.
+>=20
+> More targeted improvements might avoid the "whose responsibility is it
+> to stage this?" hot potato we played with this one; so I'd rather have
+> smaller follow-up patches handled by the respective maintainers.
 
-Fixes: 12e9493df92
-Reported-by: Ilias Maratos <i.maratos@gmail.com>
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20190920113329.16787-2-philmd@redhat.com>
+Sure, fair enough.
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 0c15241ae4..def0c28480 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -18,6 +18,7 @@
- #include "sysemu/cpus.h"
- #include "sysemu/runstate.h"
- #include "qemu/main-loop.h"
-+#include "hw/boards.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "migration/blocker.h"
--- 
-2.20.1
+>=20
+>> Thanks,
+>>
+>> Phil.
+>>
+> Thanks for the reviews :)
 
+:)
 
