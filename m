@@ -2,60 +2,85 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8126C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 09:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D781BC432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 09:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B127F222C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 09:00:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B127F222C3
+	by mail.kernel.org (Postfix) with ESMTPS id A5A51222C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 09:02:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5A51222C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDPdH-0003C6-SU
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 05:00:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51386)
+	id 1iDPfs-0004TO-Pn
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 05:02:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51611)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iDPcO-000233-FY
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 04:59:21 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iDPer-0003tY-Ed
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 05:01:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iDPcM-0007gn-ET
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 04:59:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59502)
+ (envelope-from <pbonzini@redhat.com>) id 1iDPep-0001uh-Ax
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 05:01:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60227)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iDPcM-0007eE-8A
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 04:59:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iDPcs-0008RN-I6
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 05:01:50 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6E310796E0;
- Thu, 26 Sep 2019 08:59:17 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.33])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55C975C21F;
- Thu, 26 Sep 2019 08:59:16 +0000 (UTC)
-Message-ID: <3d3f3a0e6e796260348c66e69e859e1901501ee8.camel@redhat.com>
-Subject: Re: Questions about the real mode in kvm/qemu
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 26 Sep 2019 11:59:15 +0300
-In-Reply-To: <CAKXe6SK+cEytTtgKHw8KXY=jY4xv=27GBu55hTbTmbRyTPsfxg@mail.gmail.com>
-References: <CAKXe6SJfZt8WcA43Vsh0=GT=jBedcAOUx9DNGZ4Bsvi10oCkog@mail.gmail.com>
- <644968ffb11c11fd580e96c1e67932501a633fe4.camel@redhat.com>
- <CAKXe6SK+cEytTtgKHw8KXY=jY4xv=27GBu55hTbTmbRyTPsfxg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 26 Sep 2019 08:59:17 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ by mx1.redhat.com (Postfix) with ESMTPS id 860853B738
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 08:59:49 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id b6so661128wrx.0
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 01:59:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to;
+ bh=edpoGsqQ65H3Og8WvxTfFnznGLy9c4jNpqmavlqEW8I=;
+ b=f0RqNLZqHwDckS1MQaMzxXPmG/3yr3yacfGC1FCUTmEHUgR9gCk4Azu1SQv7LKrnEq
+ 2ZEonQRqY+FHkF5+1V8FQsFScNMq8SBpRMPlemU6yEelDpYxRKadSw4P59mqSxRKhBaM
+ 1lr05tqv2SnPyeYXoBmqNaIvj8NjcoB5nwM/jI407BjSRz1YE0UXGPn/GxbL7NAHN5ju
+ RGlBUye8wPLBfC1GxEnX/yo5f7fwCm5CzYTnahzT+aPSnvAL1gJrLEisgPd/LSWKwvhG
+ +6ZYjD73dQomACf454/pqTinVXyBOfjA75qsv07fDtHkLww7rLvf3xy5DF90WAxE/Q3v
+ jldg==
+X-Gm-Message-State: APjAAAVO+ysVbXT/iXbAmU9GcF0Ih8IGEZUv2Sg1dUFdhuCOsLsd4GJR
+ /NXCI3CLvKyWEjyq8OXAnogUuXQme2PZHa2zMDTSNbRZeYpP8HzIDbta9bp/m70VmK44uM1/JmQ
+ hL980HoU4YuOZJKU=
+X-Received: by 2002:a1c:a853:: with SMTP id r80mr1976694wme.140.1569488388135; 
+ Thu, 26 Sep 2019 01:59:48 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyAUmUjHA/DfTedbR1Linvyr8n0uou69CP7kzs/Vp8bLNQl7s5q41Y3O/WX+P+knoO7zLlXMw==
+X-Received: by 2002:a1c:a853:: with SMTP id r80mr1976667wme.140.1569488387812; 
+ Thu, 26 Sep 2019 01:59:47 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id g4sm2290486wrw.9.2019.09.26.01.59.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 26 Sep 2019 01:59:46 -0700 (PDT)
+Subject: Re: [PATCH v4 8/8] hw/i386: Introduce the microvm machine type
+To: Sergio Lopez <slp@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-9-slp@redhat.com>
+ <061b720c-2ef2-b270-f18b-b0619573862d@redhat.com> <87muer36sd.fsf@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <95d0dc60-c418-4ad3-a0f7-dba0ff50515a@redhat.com>
+Date: Thu, 26 Sep 2019 10:59:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <87muer36sd.fsf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="mBw58v5fqflKGijhL5FZIGYsU0C7MbX9K"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,82 +95,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ imammedo@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2019-09-26 at 16:52 +0800, Li Qiang wrote:
->=20
->=20
-> Maxim Levitsky <mlevitsk@redhat.com> =E4=BA=8E2019=E5=B9=B49=E6=9C=8826=
-=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=884:31=E5=86=99=E9=81=93=EF=BC=
-=9A
-> > On Thu, 2019-09-26 at 15:52 +0800, Li Qiang wrote:
-> > > Hi Paolo and all,
-> > >=20
-> > > There are some question about the emulation for real mode in kvm/qe=
-mu. For all the=20
-> > > question I suppose the 'unstrict guest' is not enabled.=20
-> > >=20
-> > > 1. how the protected mode CPU emulate the real mode? It seems it us=
-es vm86, however, vm86 is not available in x86_64 CPU? So what's the 'to_=
-vmx(vcpu)->rmode.vm86_active' here vm86 means?
-> > >=20
-> >=20
->=20
-> Hi Maxim,
->=20
-> Thanks for your kind reply.
->=20
-> =20
-> > As far as I know it, modern intel's cpus support so called unrestrict=
-ed guest mode, which allows guest to be basically in any mode,
->=20
-> Right, but I also want to know the secret when the 'unstrict guest' is =
-disabled. So I suppose the 'unstrict guest' is  not enabled for these que=
-stions.
-> =20
-> > as long as EPT paging is used (that is guest can be in real mode with
-> > no paging, but EPT has to be enabled).
-> > The 'vm86_active' is probably lefover support for cpus that don't sup=
-port EPT and/or the unrestricted guest mode,
-> > where KVM tried to use the good old vm86 mode to
-> > for real mode virtualization.
-> >=20
-> >=20
-> > > 2. Does the guest's real mode code run directly in native CPU? It s=
-eems 'vmx->emulation_required' is also be false, it the vmx_vcpu_run will=
- do a switch to guest.
-> >=20
-> > Same as above
-> >=20
-> > >=20
-> > > 3. How the EPT work in guest real mode? The EPT is for GVA->GPA->HP=
-A, however there is no GVA, seems the identity mapping does something. Bu=
-t there also some confusion for me. For example the
-> > real
-> > > mode uses CS*4 + IP to address the code.  Who does this calculation=
-? In the kernel emulator?=20
-> >=20
-> > EPT sits underneath the guest's paging mode, which in case of real mo=
-de is 1:1 mapping.
->=20
-> It seems when the 'unstrict guest' is enabled, there is no identity map=
-ping table.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mBw58v5fqflKGijhL5FZIGYsU0C7MbX9K
+Content-Type: multipart/mixed; boundary="EoJheJKDNp7fTYfkQWiKwoABRgq4OkHsM";
+ protected-headers="v1"
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Sergio Lopez <slp@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+ marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+ lersek@redhat.com, kraxel@redhat.com, mtosatti@redhat.com,
+ kvm@vger.kernel.org
+Message-ID: <95d0dc60-c418-4ad3-a0f7-dba0ff50515a@redhat.com>
+Subject: Re: [PATCH v4 8/8] hw/i386: Introduce the microvm machine type
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-9-slp@redhat.com>
+ <061b720c-2ef2-b270-f18b-b0619573862d@redhat.com> <87muer36sd.fsf@redhat.com>
+In-Reply-To: <87muer36sd.fsf@redhat.com>
 
-If you mean to ask if there is a way to let guest access use no paging at=
- all, that is access host physical addresses directly,
-then indeed there is no way, since regular non 'unrestricted guest' mode =
-required both protected mode and paging, and 'unrestricted guest' require=
-s
-EPT.
-Academically speaking it is of course possible to create paging tables th=
-at are 1:1...
+--EoJheJKDNp7fTYfkQWiKwoABRgq4OkHsM
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 26/09/19 08:34, Sergio Lopez wrote:
+>> Isn't this inherited from TYPE_X86_MACHINE?
+> Good question. Should we assume all x86 based machines have NMI, or jus=
+t
+> leave it to each board?
+
+NMI is hardcoded to exception 2 in the processor so it is there in all
+x86 machines.
+
+Paolo
 
 
-Best regards,
-	Maxim Levitsky
+--EoJheJKDNp7fTYfkQWiKwoABRgq4OkHsM--
 
+--mBw58v5fqflKGijhL5FZIGYsU0C7MbX9K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2MfgEACgkQv/vSX3jH
+roPZEQf8CbicOml/CMfSZdGdwKF012b22PpkdV0y1zJok7WLvGoKWe5ul4k+liSH
+9k7YH2KoP2bKMwxai0uO5S7AMRm8OR0GzDlSDHT1r9kzhL/ZjrQi2cHa5ssGy4aS
+Y+q4svGEZ3DoGBY0xJ5DqJBm1WEHhuRY96xgt/FiHpmOOeHhuFyAp5LQYqhC5stb
+WF4/tDJVo00Ajrtm0FjQaSBOzadZwEanShhlF3EOHCumcLhsATiQOnxV4/QfUkDN
+zU7Pb6Y21L/oJqJe/rdBrrJj6deREGspRqT+C3YALHkT8LV44rtTKM0g231g5Acr
+Dl98TIPRYiP11SRAiwOKzBvQwuP/4w==
+=JDZc
+-----END PGP SIGNATURE-----
+
+--mBw58v5fqflKGijhL5FZIGYsU0C7MbX9K--
 
