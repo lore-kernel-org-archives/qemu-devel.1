@@ -2,73 +2,142 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 594BDC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:35:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F1FC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12586222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:35:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12586222C2
+	by mail.kernel.org (Postfix) with ESMTPS id 5CE5820835
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:46:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CE5820835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDbQS-0007ic-A9
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 17:35:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52060)
+	id 1iDbar-0005RU-CS
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 17:46:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59296)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iDbNv-0006NW-Dz
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:33:13 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iDbYl-0004nc-FK
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iDbNr-0008Kv-Ez
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:33:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58520)
+ (envelope-from <jsnow@redhat.com>) id 1iDbYj-0002ZX-Up
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:44:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54988)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iDbNr-0008Iu-4g
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:33:07 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iDbYg-0002Sw-F7; Thu, 26 Sep 2019 17:44:18 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7D082A44AD2;
- Thu, 26 Sep 2019 21:33:05 +0000 (UTC)
-Received: from x1.home (ovpn-118-102.phx2.redhat.com [10.3.118.102])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4BED0600C1;
- Thu, 26 Sep 2019 21:33:03 +0000 (UTC)
-Date: Thu, 26 Sep 2019 15:33:02 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [PATCH v8 01/13] vfio: KABI for migration interface
-Message-ID: <20190926153302.65199771@x1.home>
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D19D5911BA@SHSMSX104.ccr.corp.intel.com>
-References: <1566845753-18993-1-git-send-email-kwankhede@nvidia.com>
- <1566845753-18993-2-git-send-email-kwankhede@nvidia.com>
- <20190828145045.20f2a7b3@x1.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D553133@SHSMSX104.ccr.corp.intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D553184@SHSMSX104.ccr.corp.intel.com>
- <20190830103252.2b427144@x1.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D560D74@SHSMSX104.ccr.corp.intel.com>
- <20190912154106.4e784906@x1.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D572142@SHSMSX104.ccr.corp.intel.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D58C8FD@SHSMSX104.ccr.corp.intel.com>
- <20190924120318.04696187@x1.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D58EA38@SHSMSX104.ccr.corp.intel.com>
- <20190925130613.4fdae237@x1.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D5911BA@SHSMSX104.ccr.corp.intel.com>
-Organization: Red Hat
+ by mx1.redhat.com (Postfix) with ESMTPS id A1AD581F25;
+ Thu, 26 Sep 2019 21:44:16 +0000 (UTC)
+Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9C1F460E1C;
+ Thu, 26 Sep 2019 21:44:02 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH 4/4] block/dirty-bitmap: refactor
+ bdrv_dirty_bitmap_next
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190916141911.5255-1-vsementsov@virtuozzo.com>
+ <20190916141911.5255-5-vsementsov@virtuozzo.com>
+ <b099f898-1d0f-d9b3-f8fb-c354f5a3fc50@redhat.com>
+ <0386d7d0-1bda-054b-89d6-6b179d37b46d@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <9903ca0b-07f5-6c18-1a32-58e65ee27f9c@redhat.com>
+Date: Thu, 26 Sep 2019 17:44:01 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Thu, 26 Sep 2019 21:33:05 +0000 (UTC)
+In-Reply-To: <0386d7d0-1bda-054b-89d6-6b179d37b46d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Thu, 26 Sep 2019 21:44:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -83,236 +152,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
- Yi L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org,
+ mreitz@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 26 Sep 2019 03:07:08 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: Thursday, September 26, 2019 3:06 AM  
-> [...]
-> > > > > The second point is about write-protection:
-> > > > >  
-> > > > > > There is another value of recording GPA in VFIO. Vendor drivers
-> > > > > > (e.g. GVT-g) may need to selectively write-protect guest memory
-> > > > > > pages when interpreting certain workload descriptors. Those pages
-> > > > > > are recorded in IOVA when vIOMMU is enabled, however the KVM
-> > > > > > write-protection API only knows GPA. So currently vIOMMU must
-> > > > > > be disabled on Intel vGPUs when GVT-g is enabled. To make it  
-> > working  
-> > > > > > we need a way to translate IOVA into GPA in the vendor drivers.
-> > > > > > There are two options. One is having KVM export a new API for such
-> > > > > > translation purpose. But as you explained earlier it's not good to
-> > > > > > have vendor drivers depend on KVM. The other is having VFIO
-> > > > > > maintaining such knowledge through extended MAP interface,
-> > > > > > then providing a uniform API for all vendor drivers to use.  
-> > > >
-> > > > So the argument is that in order to interact with KVM (write protecting
-> > > > guest memory) there's a missing feature (IOVA to GPA translation), but
-> > > > we don't want to add an API to KVM for this feature because that would
-> > > > create a dependency on KVM (for interacting with KVM), so lets add an
-> > > > API to vfio instead.  That makes no sense to me.  What am I missing?
-> > > > Thanks,
-> > > >  
-> > >
-> > > Then do you have a recommendation how such feature can be
-> > > implemented cleanly in vendor driver, without introducing direct
-> > > dependency on KVM?  
-> > 
-> > I think the disconnect is that these sorts of extensions don't reflect
-> > things that a physical device can actually do.  The idea of vfio is
-> > that it's a userspace driver interface.  It provides a channel for the
-> > user to interact with the device, map device resources, receive
-> > interrupts, map system memory through the iommu, etc.  Mediated
-> > devices
-> > augment this by replacing the physical device the user accesses with a
-> > software virtualized device.  So then the question becomes why this
-> > device virtualizing software, ie. the mdev vendor driver, needs to do
-> > things that a physical device clearly cannot do.  For example, how can
-> > a physical device write-protect portions of system memory?  Or even,
-> > why would it need to?  It makes me suspect that mdev is being used to
-> > bypass the hypervisor, or maybe fill in the gaps for hardware that
-> > isn't as "mediation friendly" as it claims to be.  
-> 
-> We do have one such example on Intel GPU. To support direct cmd
-> submission from userspace (SVA), kernel driver allocates a doorbell
-> page (in system memory) for each application and then registers
-> the page to the GPU. Once the doorbell is armed, the GPU starts
-> to monitor CPU writes to that page. Then the application can ring the 
-> GPU by simply writing to the doorbell page to submit cmds. This
-> possibly makes sense only for integrated devices.
-> 
-> In case that direction submission is not allowed in mediated device
-> (some auditing work is required in GVT-g), we need to write-protect 
-> the doorbell page with hypervisor help to mimic the hardware 
-> behavior. We have prototype work internally, but hasn't sent it out.
 
-What would it look like for QEMU to orchestrate this?  Maybe the mdev
-device could expose a doorbell page as a device specific region.
-Possibly a quirk in QEMU vfio-pci could detect the guest driver
-registering a doorbell (or vendor driver could tell QEMU via a device
-specific interrupt) and setup a MemoryRegion overlay of the doorbell
-page in the guest.  If the physical GPU has the resources, maybe the
-doorbell page is real, otherwise it could be emulated in the vendor
-driver.  Trying to do this without QEMU seems to be where we're running
-into trouble and is what I'd classify as bypassing the hypervisor.
+On 9/26/19 3:28 PM, Eric Blake wrote:
+> On 9/26/19 1:54 PM, John Snow wrote:
+>>
+>>
+>> On 9/16/19 10:19 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> bdrv_dirty_bitmap_next is always used in same pattern. So, split it
+>>> into _next and _first, instead of combining two functions into one an=
+d
+>>> add FOR_EACH_DIRTY_BITMAP macro.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> ---
+>>> =C2=A0 include/block/dirty-bitmap.h=C2=A0=C2=A0 |=C2=A0 9 +++++++--
+>>> =C2=A0 block.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 4 +---
+>>> =C2=A0 block/dirty-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 | 11 +++++++----
+>>> =C2=A0 block/qcow2-bitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0 8 ++------
+>>> =C2=A0 migration/block-dirty-bitmap.c |=C2=A0 4 +---
+>>> =C2=A0 5 files changed, 18 insertions(+), 18 deletions(-)
+>>
+>> I'm not as sure that this is an improvement.
+>>
+>=20
+>>> =C2=A0 bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs)=
+;
+>>> -BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 BdrvDirtyBitmap *bitmap);
+>>> +
+>>> +BdrvDirtyBitmap *bdrv_dirty_bitmap_first(BlockDriverState *bs);
+>>> +BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BdrvDirtyBitmap *bitmap);
+>>> +#define FOR_EACH_DIRTY_BITMAP(bs, bitmap) \
+>>> +for (bitmap =3D bdrv_dirty_bitmap_first(bs); bitmap; \
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 bitmap =3D bdrv_dirty_bitmap_next(bitmap))
+>>> +
+>=20
+> If you want the macro, you can do that without splitting the function i=
+n
+> two:
+>=20
+> #define FOR_EACH_DIRTY_BITMAP(bs, bitmap) \
+> for (bitmap =3D bdrv_dirty_bitmap_next(bs, NULL); bitmap; \
+> =C2=A0=C2=A0=C2=A0=C2=A0 bitmap =3D bdrv_dirty_bitmap_next(bs, bitmap))
+>=20
+>=20
+>>
+>> Well, I guess explicit first and next functions is harder to mess up,
+>> anyway.
+>>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>
+>> (Any other thoughts?)
+>=20
+> I don't mind the macro as much (since we already use iteration macros
+> for QTAILQ_FOREACH and such throughout the codebase, and since it
+> somewhat isolates you from the calling conventions of passing NULL to
+> prime the iteration), but introducing the macro does not imply that we
+> need two functions.=C2=A0 So I think this is, to some extent, a questio=
+n of
+> the maintainer's sense of aesthetics, and not an actual problem in the
+> code.
+>=20
+No harm in taking it and it's easier than not taking it.
 
-> > In the case of a physical device discovering an iova translation, this
-> > is what device iotlbs are for, but as an acceleration and offload
-> > mechanism for the system iommu rather than a lookup mechanism as
-> > seems
-> > to be wanted here.  If we had a system iommu with dirty page tracking,
-> > I believe that tracking would live in the iommu page tables and
-> > therefore reflect dirty pages relative to iova.  We'd need to consume
-> > those dirty page bits before we tear down the iova mappings, much like
-> > we're suggesting QEMU do here.  
-> 
-> Yes. There are two cases:
-> 
-> 1) iova shadowing. Say using only 2nd level as today. Here the dirty 
-> bits are associated to iova. When Qemu is revised to invoke log_sync 
-> before tearing down any iova mapping, vfio can get the dirty info 
-> from iommu driver for affected range.
+Thanks, applied to my bitmaps tree:
 
-Maybe we need two mechanisms, log_sync for the "occasional" polling of
-dirty bits and an UNMAP_DMA ioctl extension that allows the user to
-provide a buffer into which the unmap ioctl would set dirty bits.
-Userspace could potentially chunk MAP/UNMAP_DMA calls in order to bound
-the size of the bitmap buffer (modulo the difficulties of assuming
-physical page alignment).  The QEMU vfio-pci driver would then perform
-the translation and mark the GPA pages dirty.  Seems that might relieve
-your efficiency concerns.  The unpin path and unpin notifier would need
-to relay dirty info for mdev support, where a generic implementation
-might simply assume everything that has been or is currently pinned by
-mdev is dirty.
+https://github.com/jnsnow/qemu/commits/bitmaps
+https://github.com/jnsnow/qemu.git
 
-Now I'm wondering if we should be consolidating vfio dirty page
-tracking per container rather than per device if we do something like
-this...
-
-> 2) iova nesting, where iova->gpa is in 1st level and gpa->hpa is in
-> 2nd level. In that case the iova carried in the map/unmap ioctl is
-> actually gpa, thus the dirty bits are associated to gpa. In such case,
-> Qemu should continue to consume gpa-based dirty bitmap, as if
-> viommu is disabled.
-
-Seems again that it's QEMU that really knows which AddressSpace that
-the kernel vfio is operating in and how to apply it to a dirty bitmap.
-
-> > Unfortunately I also think that KVM and vhost are not really the best
-> > examples of what we need to do for vfio.  KVM is intimately involved
-> > with GPAs, so clearly dirty page tracking at that level is not an
-> > issue.  Vhost tends to circumvent the viommu; it's trying to poke
-> > directly into guest memory without the help of a physical iommu.  So
-> > I can't say that I have much faith that QEMU is already properly wired
-> > with respect to viommu and dirty page tracking, leaving open the
-> > possibility that a log_sync on iommu region unmap is simply a gap in
-> > the QEMU migration story.  The vfio migration interface we have on the
-> > table seems like it could work, but QEMU needs an update and we need to
-> > define the interface in terms of pfns relative to the address space.  
-> 
-> Yan and I did a brief discussion on this. Besides the basic change of
-> doing log_sync for every iova unmap, there are two others gaps to
-> be fixed:
-> 
-> 1) Today the iova->gpa mapping is maintained in two places: viommu 
-> page table in guest memory and viotlb in Qemu. viotlb is filled when 
-> a walk on the viommu page table happens, due to emulation of a virtual
-> DMA operation from emulated devices or request from vhost devices. 
-> It's not affected by passthrough device activities though, since the latter 
-> goes through physical iommu. Per iommu spec, guest iommu driver 
-> first clears the viommu page table, followed by viotlb invalidation 
-> request. It's the latter being trapped by Qemu, then vfio is notified 
-> at that point, where iova->gpa translation will simply fail since no 
-> valid mapping in viommu page table and very likely no hit in viotlb. 
-> To fix this gap, we need extend Qemu to cache all the valid iova 
-> mappings in viommu page table, similar to how vfio does.
-> 
-> 2) Then there will be parallel log_sync requests on each vfio device. 
-> One is from the vcpu thread, when iotlb invalidation request is being 
-> emulated. The other is from the migration thread, where log_sync is 
-> requested for the entire guest memory in iterative copies. The 
-> contention among multiple vCPU threads is already protected through 
-> iommu lock, but we didn't find such thing between migration thread 
-> and vcpu threads. Maybe we overlooked something, but ideally the 
-> whole iova address space should be locked when the migration thread 
-> is doing mega-sync/translation.
-> 
-> +Yi and Peter for their opinions.
-
-Good points, not sure I have anything to add to that.  As above, we can
-think about whether the device or the container is the right place to
-do dirty page tracking.
-
-> > If GPAs are still needed, what are they for?  The write-protect example
-> > is clearly a hypervisor level interaction as I assume it's write
-> > protection relative to the vCPU.  It's a hypervisor specific interface
-> > to perform that write-protection, so why wouldn't we use a hypervisor
-> > specific interface to collect the data to perform that operation?
-> > IOW, if GVT-g already has a KVM dependency, why be concerned about
-> > adding another GVT-g KVM dependency?  It seems like vfio is just a  
-> 
-> This is possibly the way that we have to go, based on discussions
-> so far. Earlier I just hold the same argument as you emphasized
-> for vfio - although there are existing KVM dependencies, we want
-> minimize it. :-) Another worry is what if other vendor drivers may
-> have similar requirements, then can we invent some generic ways
-> thus avoid pushing them to do same tricky thing again. Of course, 
-> we may revisit it later until this issue does become a common 
-> requirement.
-
-I know we don't see quite the same on the degree to which vfio has KVM
-dependencies, but it's possible, and regularly done, to use vfio without
-KVM.  The same cannot be said of GVT-g.  Therefore it's not very
-motivating for me to entertain a proposal for a new vfio interface
-whose main purpose is to fill in a gap in the already existing GVT-g
-dependency on KVM (and in no way reduce that existing KVM dependency).
-I maintain vfio's lack of dependencies on KVM either way ;)
- 
-> > potentially convenient channel, but as discussed above, vfio has no
-> > business in GPAs because devices don't operate on GPAs and I've not
-> > been sold that there's value in vfio getting involved in that
-> > address space.  Convince me otherwise ;)  Thanks,
-> >   
-> 
-> Looks none of my arguments is convincible to you :-), so we move
-> to investigate what should be changed in qemu to support your 
-> proposal (as discussed above). While this part is on-going, let me
-> have a last try on my original idea. ;) Just be curious how your
-> further thought is, regarding to earlier doorbell monitoring 
-> example for operating GPA on device. If it's just Intel GPU only
-> thing, yes we can still fix it in GVT-g itself as you suggested. But
-> I'm just not sure about other integrated devices, and also new
-> accelerators with coherent bus connected to cpu package. Also we
-> don't need call it GPA - it could be named as user_target_address
-> that the iova is mapped to, and is the address space that userspace
-> expects the device to operate for purposes (logging, monitoring,
-> etc.) other than for dma (using iova) and for accessing
-> userspace/guest memory (hva).
-
-My impression of the doorbell example is that we're taking the wrong
-approach to solving how that interaction should work.  To setup an
-interaction between a device and a vCPU, we should be going through
-QEMU.  This is the model we've used from the start with vfio.  KVM is
-an accelerator, but it's up to QEMU to connect KVM and vfio together.
-I'm curious if there's any merit to my proposal above about how this
-could be redesigned.  Thanks,
-
-Alex
+--js
 
