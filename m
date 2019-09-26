@@ -2,79 +2,79 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 183D7C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 827A0C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:38:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4196222C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:38:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53652222C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:38:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g9VHCzIw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4196222C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uu/CHPKK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53652222C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDXit-0006Nw-4q
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:38:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58759)
+	id 1iDXix-0006Oo-Pf
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:38:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXg7-0004GX-SD
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:45 -0400
+ id 1iDXg5-0004Ee-3K
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXg6-0002mV-86
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:43 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40265)
+ id 1iDXg3-0002i2-OW
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:40 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38978)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXg6-0002jG-1C; Thu, 26 Sep 2019 13:35:42 -0400
-Received: by mail-wr1-f66.google.com with SMTP id l3so3704914wru.7;
- Thu, 26 Sep 2019 10:35:41 -0700 (PDT)
+ id 1iDXfz-0002dh-VS; Thu, 26 Sep 2019 13:35:39 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r3so3712987wrj.6;
+ Thu, 26 Sep 2019 10:35:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=a931Z/K+dPRWtr6SANaGNktnywcwvFCOBlZIozS8msg=;
- b=g9VHCzIws7nmj6xArq9oUSTb1ZFb+ahO/PKqn96e+QRLH8jY1Wjm8isgqIFM9FPenA
- F0hdbjGJxaq4pfLdUPIbLxClAzwUVpIhKzUWFRjmNwsIuLkghx2gvwZign8Xn3Wc0GgA
- y0mFKGk3QAp1UMQgvf+AfwcIOGbPfKXMFG++9NCokskzotWwRXHsAriJt0gjpSo74JKq
- 2zMBIzw79NuirWhAoQ7bGYXpZcD35uvyrUUXi9IVfVnwP8wsbQroCYS59wBip0E+wofK
- LRZlWCWz5S4bTEHi8e8rbwH6sdJn+upMXEFdMxwDjpqU1zdiaxep59/AODuBAdyhYfLz
- hECw==
+ bh=voiG7DWCSdFTStaEL19HrjsIseLBzBfq9/zOs+pAh+4=;
+ b=uu/CHPKKHr5AgZc+QvoM46VVMKRFdKrFQYddb7i+3Ff/325da3M2zOhOOypeXbLKcs
+ zo1M0UojOM6gk/UkIfLNoifogrWd10rlDHYeJXOVVi29NshhibQjImApnHj2B/u9kxzh
+ oJDFyEYbSdD/XBGbsK3Ixq9dAlPBmMjiIsqz4C4StLd4DWOdkI2HAIGeXKcdyBzhW47z
+ 83v9xrGxuNAg9vkF1PTvih2fumZXmjB4qDPaWv17347MjpmYt3ztNnd8oASnosazSYr8
+ 51JmXrUwojq2l9AbdLQY1L7pElnKk7iw7huyVthKcwNZKXXOlAbiqrqtFN6hIc4XqCzM
+ Vfjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=a931Z/K+dPRWtr6SANaGNktnywcwvFCOBlZIozS8msg=;
- b=I9RWhPFfiWpNmTHoeTw2/b0/F+g9h1YJUhxtgbZfs3kmNiut4jxgqROOgu9N9D0wMd
- Q5isHZBmTGm1eVmImOY2QmJ6AXasmBiMkzZMhQ7ynhyjC1jdwhrNcT2a1wDhwPcPu6Ve
- NAi/XAI8IZxRCadSoOe3QNmSAm3TYQc+FriSsWKP4Tl6z57J5FcUl5kNJ6KsSAL+ttJC
- bbed6v2MDWD3UsGssVsJ6oeX2Jnv2EB3U3WnM0A0UKM7xbFUv3DdiSfExI2piOR8b5+f
- 28rLUY5pEgvmJxGmzzT0wwedIvuwV8tPApOIFoHlt6isGETZ8U7TC6eoD1BKCmbDUbUs
- fdLg==
-X-Gm-Message-State: APjAAAWyU4pRa8f+n8m4DSXpnH5rLZJjY8K5XtNb4a0q05jDFyvJLJnQ
- OLMtjSvtVXaMjibsPWkSLlYxlFze8iI=
-X-Google-Smtp-Source: APXvYqzsvQYH2fg0d40Ykkaf9nxe4iXOzMU8dl1PTZSycPv5dp8ouAIrjdPQj1zj8pChZLrUDyP0Rg==
-X-Received: by 2002:a5d:4f0d:: with SMTP id c13mr4010196wru.317.1569519279988; 
- Thu, 26 Sep 2019 10:34:39 -0700 (PDT)
+ bh=voiG7DWCSdFTStaEL19HrjsIseLBzBfq9/zOs+pAh+4=;
+ b=cLe093rgP1LfkTBE3uQRMsxqz0EklHM6hWRyXgKRJXIWf4d4X+qDk6h/hP1IbmJs3c
+ jOnUTT7M6p7sC/AU020mK/L/3ywtNB+41gixBI/QhYVOkTQUsIaHJTrQemXePJOSEs7J
+ Qe1pPCTSDZmnynawwdaKJQW+IMvMpMK6oc64fvwnQlrPGwCsf33EydIq9SIAzpdKZBHh
+ Fmveh+NuYXZGG3i1Uc/EXXm0vgr/wroVaqkQO7eu/0ab0VKOLi6kFuqhx9CWYVooRMej
+ DzqxrMYzLh1pB1r2agIi0C3/bL0OdZUCGAm3w8uliRfJZLhQZnqnVdubsub2t31zHFja
+ jIJQ==
+X-Gm-Message-State: APjAAAUoxvBicI6w5CVLfY0X4oFjIU7pmcbGImRwDtN4mqGYZRwHq+3h
+ mBZatpesaI1hTd3RYaNe6ZuP6g/FZWg=
+X-Google-Smtp-Source: APXvYqxw43EJJW3k6tDZQEtl/syOr4bzsuF/Swg0aA+DzdvvUQcoeNKvKADOavyhR/cItlQXqbjynw==
+X-Received: by 2002:adf:904f:: with SMTP id h73mr3943294wrh.128.1569519273793; 
+ Thu, 26 Sep 2019 10:34:33 -0700 (PDT)
 Received: from x1w.redhat.com (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.34.37
+ by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.34.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Sep 2019 10:34:38 -0700 (PDT)
+ Thu, 26 Sep 2019 10:34:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/19] hw/arm/bcm2835_peripherals: Name various address spaces
-Date: Thu, 26 Sep 2019 19:34:11 +0200
-Message-Id: <20190926173428.10713-4-f4bug@amsat.org>
+Subject: [PATCH 01/19] hw/arm/raspi: Use the IEC binary prefix definitions
+Date: Thu, 26 Sep 2019 19:34:09 +0200
+Message-Id: <20190926173428.10713-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190926173428.10713-1-f4bug@amsat.org>
 References: <20190926173428.10713-1-f4bug@amsat.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.66
+X-Received-From: 209.85.221.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,120 +114,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Various address spaces from the BCM2835 are reported as
-'anonymous' in memory tree:
-
-  (qemu) info mtree
-
-  address-space: anonymous
-    0000000000000000-000000000000008f (prio 0, i/o): bcm2835-mbox
-      0000000000000010-000000000000001f (prio 0, i/o): bcm2835-fb
-      0000000000000080-000000000000008f (prio 0, i/o): bcm2835-property
-
-  address-space: anonymous
-    0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
-      0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peripherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
-      0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-
-  [...]
-
-Since the address_space_init() function takes a 'name' argument,
-set it to correctly describe each address space:
-
-  (qemu) info mtree
-
-  address-space: bcm2835-mbox-memory
-    0000000000000000-000000000000008f (prio 0, i/o): bcm2835-mbox
-      0000000000000010-000000000000001f (prio 0, i/o): bcm2835-fb
-      0000000000000080-000000000000008f (prio 0, i/o): bcm2835-property
-
-  address-space: bcm2835-fb-memory
-    0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
-      0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peripherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
-      0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-
-  address-space: bcm2835-property-memory
-    0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
-      0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peripherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
-      0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-
-  address-space: bcm2835-dma-memory
-    0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
-      0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peripherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
-      0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
-      00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-ram-alias[*] @ram 0000000000000000-000000003fffffff
+IEC binary prefixes ease code review: the unit is explicit.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/display/bcm2835_fb.c    | 2 +-
- hw/dma/bcm2835_dma.c       | 2 +-
- hw/misc/bcm2835_mbox.c     | 2 +-
- hw/misc/bcm2835_property.c | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ hw/arm/raspi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
-index 8f856878cd..85aaa54330 100644
---- a/hw/display/bcm2835_fb.c
-+++ b/hw/display/bcm2835_fb.c
-@@ -425,7 +425,7 @@ static void bcm2835_fb_realize(DeviceState *dev, Error **errp)
-     s->initial_config.base = s->vcram_base + BCM2835_FB_OFFSET;
- 
-     s->dma_mr = MEMORY_REGION(obj);
--    address_space_init(&s->dma_as, s->dma_mr, NULL);
-+    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_FB "-memory");
- 
-     bcm2835_fb_reset(dev);
- 
-diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
-index 6acc2b644e..1e458d7fba 100644
---- a/hw/dma/bcm2835_dma.c
-+++ b/hw/dma/bcm2835_dma.c
-@@ -383,7 +383,7 @@ static void bcm2835_dma_realize(DeviceState *dev, Error **errp)
-     }
- 
-     s->dma_mr = MEMORY_REGION(obj);
--    address_space_init(&s->dma_as, s->dma_mr, NULL);
-+    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_DMA "-memory");
- 
-     bcm2835_dma_reset(dev);
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index 74c062d05e..615d755879 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -230,7 +230,7 @@ static void raspi2_machine_init(MachineClass *mc)
+     mc->max_cpus = BCM283X_NCPUS;
+     mc->min_cpus = BCM283X_NCPUS;
+     mc->default_cpus = BCM283X_NCPUS;
+-    mc->default_ram_size = 1024 * 1024 * 1024;
++    mc->default_ram_size = 1 * GiB;
+     mc->ignore_memory_transaction_failures = true;
+ };
+ DEFINE_MACHINE("raspi2", raspi2_machine_init)
+@@ -252,7 +252,7 @@ static void raspi3_machine_init(MachineClass *mc)
+     mc->max_cpus = BCM283X_NCPUS;
+     mc->min_cpus = BCM283X_NCPUS;
+     mc->default_cpus = BCM283X_NCPUS;
+-    mc->default_ram_size = 1024 * 1024 * 1024;
++    mc->default_ram_size = 1 * GiB;
  }
-diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
-index 7690b9afaf..77285624c9 100644
---- a/hw/misc/bcm2835_mbox.c
-+++ b/hw/misc/bcm2835_mbox.c
-@@ -311,7 +311,7 @@ static void bcm2835_mbox_realize(DeviceState *dev, Error **errp)
-     }
- 
-     s->mbox_mr = MEMORY_REGION(obj);
--    address_space_init(&s->mbox_as, s->mbox_mr, NULL);
-+    address_space_init(&s->mbox_as, s->mbox_mr, TYPE_BCM2835_MBOX "-memory");
-     bcm2835_mbox_reset(dev);
- }
- 
-diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-index 0a1a3eb5d9..43a5465c5d 100644
---- a/hw/misc/bcm2835_property.c
-+++ b/hw/misc/bcm2835_property.c
-@@ -407,7 +407,7 @@ static void bcm2835_property_realize(DeviceState *dev, Error **errp)
-     }
- 
-     s->dma_mr = MEMORY_REGION(obj);
--    address_space_init(&s->dma_as, s->dma_mr, NULL);
-+    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_PROPERTY "-memory");
- 
-     /* TODO: connect to MAC address of USB NIC device, once we emulate it */
-     qemu_macaddr_default_if_unset(&s->macaddr);
+ DEFINE_MACHINE("raspi3", raspi3_machine_init)
+ #endif
 -- 
 2.20.1
 
