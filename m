@@ -2,90 +2,66 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E004C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 06:13:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11410C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 06:18:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 017BF206B7
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 06:13:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 017BF206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D9F7A2146E
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 06:18:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9F7A2146E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDN1T-0006AP-8C
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 02:13:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42295)
+	id 1iDN72-0000dG-V9
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 02:18:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iDN06-0005DM-BJ
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:11:39 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iDN5D-0008R2-Oj
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:16:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iDN01-00087L-Tl
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:11:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41198)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDN01-0007uE-ME
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:11:33 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 98C8FC049E1A
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 06:11:29 +0000 (UTC)
-Received: by mail-wm1-f72.google.com with SMTP id z205so634263wmb.7
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 23:11:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wdvzJ5BUbmXeBkpBPOz/EkhJhpcKuotyhBOl5JxNZYw=;
- b=buOTdB/AvIZ7+OyMceuaf7rxP68Gbq4u3+8McAXPJ0gEVYYDRv7AJnW9UCEM1EgFmK
- bcZ17ACrIByTFRjZnsW09+fI7vppJ9uCEJaMXORVQG+kAGpx4MOww1+b/NlkvYUgOkaR
- HSTpHXejzRczDITLGS9Xoa4M+9kc9m6lU18EVsg4elYt2WnC+95hkrLM5/vW3pMAxmUS
- EBScC4T+PgdYxM4m8r4LSk82KNruM03a9VK4SnPqtNr6gJHB4Ze385V2LY9RpVGMZ0I4
- XxUS9zr74YGCQgi4ouhbNmTuP4oolnNC1WPmvRmZ1l8md2XPgtyKnhQNiguhUXhsZ76a
- jjUA==
-X-Gm-Message-State: APjAAAX4mcsQRGU/g1o5TJS1AZiWp3t188goHiyRhDG7KE8eGFEXdB5Z
- rgQF6ZstGU/CcHwkI8ODyBdb94lyAfWG6X7V4f2xplluZsLBfGpWuLPCoNvdV1mmEZftSmu82Ig
- TB5gY1tkXNPzos5w=
-X-Received: by 2002:a1c:1d85:: with SMTP id d127mr1555732wmd.14.1569478288403; 
- Wed, 25 Sep 2019 23:11:28 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwIi5Mnl8wdCh+o6KSfORL3hFuatP2pJyuqulEiwUyEMAEJGsg3fM9fWKaJdZVF/RSYJF58DA==
-X-Received: by 2002:a1c:1d85:: with SMTP id d127mr1555704wmd.14.1569478288079; 
- Wed, 25 Sep 2019 23:11:28 -0700 (PDT)
-Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id z13sm1147316wrq.51.2019.09.25.23.11.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 25 Sep 2019 23:11:27 -0700 (PDT)
-Subject: Re: [PATCH] hw/core/loader: Fix possible crash in rom_copy()
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190925130331.27825-1-thuth@redhat.com>
- <ca146886-12e5-14c7-7b18-76494b1d7c8f@redhat.com>
- <fc1616b5-1404-166a-6cae-c729ce77b1b3@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <9ffdb4ee-46d0-8186-c80e-6177295bd3e2@redhat.com>
-Date: Thu, 26 Sep 2019 08:11:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <no-reply@patchew.org>) id 1iDN5B-0000Fj-0S
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:16:54 -0400
+Resent-Date: Thu, 26 Sep 2019 02:16:53 -0400
+Resent-Message-Id: <E1iDN5B-0000Fj-0S@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21499)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iDN56-0007wo-NJ; Thu, 26 Sep 2019 02:16:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1569478592; cv=none; d=zoho.com; s=zohoarc; 
+ b=h9usNbztlwPGvy5LFcpBjqe8GiOS2CR6qZQ13pGt1iz5NlAnw+/+asywfRHLTgwAPcJJbCCIZXhj/w/T/AYL3BfEcbizBKmiqogJfHPomi8X5Z2tcfxRHGJsqVX6Mf9sQZObg0Allb8L86SdNY4SpJyh+iBnxZisM7vLoTkil0s=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1569478592;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=GRTUxUuaatYho68UHbhIk7p6UF1x7+1Vmgl+sRSahuk=; 
+ b=DbyGJdqZFh/gk2xIYM7q/fYTkw7uGi+I7XagS2C6VABRKjatPMFrP0Ym31MqQfNj90nuA8e+uhIdFJNSYUXWgv7PnphadAi0DbPhuX61K2j/P8kYpa3EwaO6GgewWfbAPIrbaf0eqyFxy+BN6xOytNl06MHZmebYYAuZObagFVA=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1569478591812423.66352886502864;
+ Wed, 25 Sep 2019 23:16:31 -0700 (PDT)
+Subject: Re: [PULL 0/2] Block patches
+In-Reply-To: <20190925174400.8578-1-stefanha@redhat.com>
+Message-ID: <156947859030.9841.4795650725800418297@8230166b0665>
 MIME-Version: 1.0
-In-Reply-To: <fc1616b5-1404-166a-6cae-c729ce77b1b3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefanha@redhat.com
+Date: Wed, 25 Sep 2019 23:16:31 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,41 +73,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, mdroth@linux.vnet.ibm.com,
- qemu-stable@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-block@nongnu.org,
+ mst@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/26/19 7:58 AM, Thomas Huth wrote:
-> On 25/09/2019 22.51, Philippe Mathieu-Daud=C3=A9 wrote:
-> [...]
->> Let's say I have write access to a LAN TFTP server used by some PXE
->> bootloader where I can store my crafted nasty kernel, then I get this =
-score:
->>
->> https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=3DAV:A/AC:=
-L/PR:N/UI:N/S:C/C:H/I:H/A:H/E:P/RL:O/RC:C&version=3D3.1
->>
->> CVSS Base Score:     9.6
->> CVSS Temporal Score: 8.6
->>
->> Which seems quite high.
->=20
-> I don't think you can trigger this bug this way. If you load your kerne=
-l
-> via a PXE server, the ELF parsing will be done by the bootloader, won't
-> it? I think you can only trigger this bug here if you load your kernel
-> via the "-kernel" command line parameter of QEMU (or the generic-loader
-> device), so it's not a real guest escape, as far as I can see.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyNTE3NDQwMC44NTc4
+LTEtc3RlZmFuaGFAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
+Y2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1p
+bWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVk
+b3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgYXV0
+aHovbGlzdC5vCiAgQ0MgICAgICBhdXRoei9saXN0ZmlsZS5vCi90bXAvcWVtdS10ZXN0L3NyYy91
+dGlsL2lvdi5jOiBJbiBmdW5jdGlvbiAncWVtdV9pb3ZlY19pbml0X2V4dGVuZGVkJzoKL3RtcC9x
+ZW11LXRlc3Qvc3JjL3V0aWwvaW92LmM6NDUxOjk6IGVycm9yOiAnbWlkX2lvdicgbWF5IGJlIHVz
+ZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uIFstV2Vycm9yPW1heWJlLXVuaW5pdGlh
+bGl6ZWRdCiAgICAgICAgIG1lbWNweShwLCBtaWRfaW92LCBtaWRfbmlvdiAqIHNpemVvZigqcCkp
+OwogICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6
+IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA5MjUxNzQ0MDAuODU3OC0x
+LXN0ZWZhbmhhQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1l
+c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
+czovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEByZWRoYXQuY29t
 
-Ah indeed you are correct. You have to use the -kernel option to set
-kernel_filename. This reduce the scores:
-
-CVSS Base Score: 8.4
-CVSS Temporal Score: 7.6
-Exploitability Subscore: 1.7
-
-You could load a kernel stored on a NFS server, but it is unlikely a
-production case :)
 
