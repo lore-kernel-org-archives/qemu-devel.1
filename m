@@ -2,80 +2,79 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7AFCC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28109C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 18:00:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77AF4222CC
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:59:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6C46222CC
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 18:00:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQIbIbV9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77AF4222CC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vzs5sgC7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C46222CC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDY2v-0000h9-HS
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:59:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59084)
+	id 1iDY3q-0001NU-Bi
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 14:00:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXgT-0004jm-Mp
+ id 1iDXgS-0004hw-Fr
  for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXgS-00035k-Fv
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:36:05 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35069)
+ id 1iDXgQ-000336-RJ
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:36:04 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:33344)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXgS-00034b-9i; Thu, 26 Sep 2019 13:36:04 -0400
-Received: by mail-wr1-f65.google.com with SMTP id v8so3736777wrt.2;
- Thu, 26 Sep 2019 10:36:04 -0700 (PDT)
+ id 1iDXgQ-00032G-HY; Thu, 26 Sep 2019 13:36:02 -0400
+Received: by mail-wm1-f67.google.com with SMTP id r17so7136030wme.0;
+ Thu, 26 Sep 2019 10:36:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=cygAIn+NuvbvRK0dqFc+XGYOmNQ092Yut2eORQ2IB/E=;
- b=GQIbIbV9fySy4FLDxvt+JEgMFNVpmd1ccC7GT6b21MZWKp4WbYw20LIM7pgz0NVE+y
- hlTlUlr0k2tdGuiUbFoh8MopOPLEOyWysoq8tmL1AipVsVRm5HU2DP3orh4HgR2sLr6a
- J5uR6z7mE5gYiobYBpWg/0Slz6nrF0L2Pp2egTsd/sbvz8pGpp8kuOEam5MhBuDCestT
- lpAobfjhz8b7WqlUHZrJ/qA5SiQhHONtAcFPLjKRdJ2OMygky/dcts4VuOIFe/VhXWvJ
- QOhiz/B2dYU2VpPQWcsLiJWQrFCmpjXDExwu41ZDmhNQwIU6tiyoLoROSZ35ctFG2ABt
- 2ifQ==
+ bh=g3nQVTK9GRsWGCd+XSVezaLWTAj2OLG2kci059FNOZg=;
+ b=Vzs5sgC75Z+MJsuTbcMwEDqv6i/qd7z5YfPlMArif9Bc+Ub35xddM4qSQwYq+UrnXd
+ 3DnIxO7FZjFmyTgQ/Wyao5/kjQ/DqwuLeNPrm/bZN1CTdJNT6MFRbRp5sQnc7lBvO3N8
+ mWUpXWkgBFow+wTvMvCTf0pk86LczFWakNX4c0aOThYo2jv1R6/TgWoP7Bh+yJZ2Le1b
+ ufn3lpxLWfD4amCfXgvZ/jwY+hMQJukbj12yQNAdNp4Shc0DEKt6wIQtvD2iRtD1Y9JT
+ Ul8wBt+fk8SaRIqvCvOL8QTXkuuQqIDMNZtSTwfDAcOTzR4bUkuw+UBc8TMQ7wj46cEE
+ lhdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=cygAIn+NuvbvRK0dqFc+XGYOmNQ092Yut2eORQ2IB/E=;
- b=YcNtuW7nITuqYCG8Gvx65ZXF67GZ78InlfS2IXYe9mdLgzxXjxgJGHqA7ehZzbm6zK
- oAWB9cfo3MLZcI6TWzeChrfLTAiDoLOPZIHc/nk/FSQHFYk0SM5jDdn+kiX1zD6bXhEr
- VYBHuFeXPA9S7q2PL4wbyWBGQCBJbrM98B8zn04MlzFqEnjjaNI3L4iyx+7Wud9Y2mDt
- KPyIgkDclstVnMHDQ7uOWeqLRXL6130f1VB23wXQsaot3iG9pIcEYEC/QdA9jvBqwXhg
- l0Gfye+YC2A3sLtlY7t/784m+LybXyuUZ72lauLes78KZBJ+oIVJa/Z1INOtkUgLG9d1
- TsRg==
-X-Gm-Message-State: APjAAAVY648nTZ3fuHYfHhb0/e/hhl0KYIKNamayY+6f7Hm6ewljqooR
- JhWZggrji8d9gLygXuKAzi7F306HbJM=
-X-Google-Smtp-Source: APXvYqzKi+l8hJ0ZwKsilohSPe/nN9WplkNcPd4ZcY6UM2Vrtfg+PZHV40/XD+YRCAWHC/THRa/S4A==
-X-Received: by 2002:adf:f212:: with SMTP id p18mr4215158wro.340.1569519303075; 
- Thu, 26 Sep 2019 10:35:03 -0700 (PDT)
+ bh=g3nQVTK9GRsWGCd+XSVezaLWTAj2OLG2kci059FNOZg=;
+ b=hg56DIscyk+Qu0D8to3cmsROOEpNZjJn8t41eXNcOd6H6eheWKnuE1caH7VQT4QhWQ
+ AqRkaFBRaDQ3nvWawc2S+o4jUzR7/yzINVfWy6xatq/+mMnIWp4oXIySsNlC+o50gQ9x
+ 67BfLO+8XZrk6SvtlUSHEs8Mz8khZ3RkZKFpttMOhoftkAU+BAxOychFgAnd0CQKFz2I
+ QmCC654yfvd892uev+eJkp1pfzUmoLMc8fyiGmaF+zeGXF4ramMTSv1WpeEsm4DUuH2h
+ 9pMd7SNB0VkIstPTgPLOOeNUiNu4ym4V5BJKpooOvz7ETz8atAkgFCSr/na3riucca/I
+ nBhQ==
+X-Gm-Message-State: APjAAAUqa/cZCT8E/K59ZyO6e7wR3R6QTMOT92ub2L4Aiu0wUCbfKVRb
+ c+fEtl46CGFWbLLeEVhsmnVNm8tX9Po=
+X-Google-Smtp-Source: APXvYqy/ur8XJQRonW1wmDDHBychrQSja2bkKGZMfSGL7rwkC1P560x/x2mQIdTJpwgu8Wk1eMEMLw==
+X-Received: by 2002:a7b:c84f:: with SMTP id c15mr4148285wml.52.1569519301185; 
+ Thu, 26 Sep 2019 10:35:01 -0700 (PDT)
 Received: from x1w.redhat.com (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.35.01
+ by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.34.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Sep 2019 10:35:02 -0700 (PDT)
+ Thu, 26 Sep 2019 10:34:58 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 14/19] python/qemu/machine: Allow to use other serial consoles
- than default
-Date: Thu, 26 Sep 2019 19:34:22 +0200
-Message-Id: <20190926173428.10713-15-f4bug@amsat.org>
+Subject: [PATCH 13/19] hw/arm/raspi: Define various blocks base addresses
+Date: Thu, 26 Sep 2019 19:34:21 +0200
+Message-Id: <20190926173428.10713-14-f4bug@amsat.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190926173428.10713-1-f4bug@amsat.org>
 References: <20190926173428.10713-1-f4bug@amsat.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.65
+X-Received-From: 209.85.128.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,51 +114,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently we are limited to use the first serial console available.
-Some machines/guest might use another console than the first one as
-the 'boot console'.
+The Raspberry firmware is closed-source. While running it, it
+accesses various I/O registers. Logging these accesses as UNIMP
+(unimplemented) help to understand what the firmware is doing
+(ideally we want it able to boot a Linux kernel).
 
-To be able to use the N console as default, we simply need to connect
-all the N - 1 consoles to the null chardev.
+Document various blocks we might use later.
 
-Add an index argument, so we can use a specific serial console as
-default.
+Adresses and names based on:
+https://github.com/hermanhermitage/videocoreiv/wiki/MMIO-Register-map
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- python/qemu/machine.py | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Now the header is incorrect, should I add that in another file or
+update the header?
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 128a3d1dc2..302b158a18 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -235,6 +235,8 @@ class QEMUMachine(object):
-                 '-display', 'none', '-vga', 'none']
-         if self._machine is not None:
-             args.extend(['-machine', self._machine])
-+        for i in range(self._console_id):
-+            args.extend(['-serial', 'null'])
-         if self._console_set:
-             self._console_address = os.path.join(self._temp_dir,
-                                                  self._name + "-console.sock")
-@@ -495,7 +497,7 @@ class QEMUMachine(object):
-         """
-         self._machine = machine_type
+ * These definitions are derived from those in Raspbian Linux at
+ * arch/arm/mach-{bcm2708,bcm2709}/include/mach/platform.h
+ * where they carry the following notice:
+ *
+ * Copyright (C) 2010 Broadcom
+---
+ include/hw/arm/raspi_platform.h | 47 +++++++++++++++++++++++++++------
+ 1 file changed, 39 insertions(+), 8 deletions(-)
+
+diff --git a/include/hw/arm/raspi_platform.h b/include/hw/arm/raspi_platform.h
+index 61b04a1bd4..8bcf1c7c93 100644
+--- a/include/hw/arm/raspi_platform.h
++++ b/include/hw/arm/raspi_platform.h
+@@ -26,14 +26,19 @@
+ #define HW_ARM_RASPI_PLATFORM_H
  
--    def set_console(self, device_type=None):
-+    def set_console(self, device_type=None, console_id=0):
-         """
-         Sets the device type for a console device
+ #define MSYNC_OFFSET            0x0000   /* Multicore Sync Block */
+-#define IC0_OFFSET              0x2000
++#define CCPT_OFFSET             0x1000   /* Compact Camera Port 2 TX */
++#define INTE_OFFSET             0x2000   /* VC Interrupt controller */
+ #define ST_OFFSET               0x3000   /* System Timer */
++#define TXP_OFFSET              0x4000
++#define JPEG_OFFSET             0x5000
+ #define MPHI_OFFSET             0x6000   /* Message-based Parallel Host Intf. */
+ #define DMA_OFFSET              0x7000   /* DMA controller, channels 0-14 */
+-#define ARM_OFFSET              0xB000   /* BCM2708 ARM control block */
++#define ARBA_OFFSET             0x9000
++#define BRDG_OFFSET             0xa000
++#define ARM_OFFSET              0xB000   /* ARM control block */
+ #define ARMCTRL_OFFSET          (ARM_OFFSET + 0x000)
+ #define ARMCTRL_IC_OFFSET       (ARM_OFFSET + 0x200) /* Interrupt controller */
+-#define ARMCTRL_TIMER0_1_OFFSET (ARM_OFFSET + 0x400) /* Timer 0 and 1 */
++#define ARMCTRL_TIMER0_1_OFFSET (ARM_OFFSET + 0x400) /* Timer 0 and 1 (SP804) */
+ #define ARMCTRL_0_SBM_OFFSET    (ARM_OFFSET + 0x800) /* User 0 (ARM) Semaphores
+                                                       * Doorbells & Mailboxes */
+ #define CPRMAN_OFFSET           0x100000 /* Power Management, Watchdog */
+@@ -42,24 +47,50 @@
+ #define AVS_OFFSET              0x103000 /* Audio Video Standard */
+ #define RNG_OFFSET              0x104000
+ #define GPIO_OFFSET             0x200000
+-#define UART0_OFFSET            0x201000
+-#define MMCI0_OFFSET            0x202000
+-#define I2S_OFFSET              0x203000
+-#define SPI0_OFFSET             0x204000
++#define UART0_OFFSET            0x201000 /* PL011 */
++#define MMCI0_OFFSET            0x202000 /* Legacy MMC */
++#define I2S_OFFSET              0x203000 /* PCM */
++#define SPI0_OFFSET             0x204000 /* SPI master */
+ #define BSC0_OFFSET             0x205000 /* BSC0 I2C/TWI */
++#define PIXV0_OFFSET            0x206000
++#define PIXV1_OFFSET            0x207000
++#define DPI_OFFSET              0x208000
++#define DSI0_OFFSET             0x209000 /* Display Serial Interface */
++#define PWM_OFFSET              0x20c000
++#define PERM_OFFSET             0x20d000
++#define TEC_OFFSET              0x20e000
+ #define OTP_OFFSET              0x20f000
++#define SLIM_OFFSET             0x210000 /* SLIMbus */
++#define CPG_OFFSET              0x211000
+ #define THERMAL_OFFSET          0x212000
+-#define BSC_SL_OFFSET           0x214000 /* SPI slave */
++#define AVSP_OFFSET             0x213000
++#define BSC_SL_OFFSET           0x214000 /* SPI slave (bootrom) */
+ #define AUX_OFFSET              0x215000 /* AUX: UART1/SPI1/SPI2 */
+ #define EMMC1_OFFSET            0x300000
++#define EMMC2_OFFSET            0x340000
++#define HVS_OFFSET              0x400000
+ #define SMI_OFFSET              0x600000
++#define DSI1_OFFSET             0x700000
++#define UCAM_OFFSET             0x800000
++#define CMI_OFFSET              0x802000
+ #define BSC1_OFFSET             0x804000 /* BSC1 I2C/TWI */
+ #define BSC2_OFFSET             0x805000 /* BSC2 I2C/TWI */
++#define VECA_OFFSET             0x806000
++#define PIXV2_OFFSET            0x807000
++#define HDMI_OFFSET             0x808000
++#define HDCP_OFFSET             0x809000
++#define ARBR0_OFFSET            0x80a000
+ #define DBUS_OFFSET             0x900000
+ #define AVE0_OFFSET             0x910000
+ #define USB_OTG_OFFSET          0x980000 /* DTC_OTG USB controller */
++#define V3D_OFFSET              0xc00000
+ #define SDRAMC_OFFSET           0xe00000
++#define L2CC_OFFSET             0xe01000 /* Level 2 Cache controller */
++#define L1CC_OFFSET             0xe02000 /* Level 1 Cache controller */
++#define ARBR1_OFFSET            0xe04000
+ #define DMA15_OFFSET            0xE05000 /* DMA controller, channel 15 */
++#define DCRC_OFFSET             0xe07000
++#define AXIP_OFFSET             0xe08000
  
-@@ -519,6 +521,7 @@ class QEMUMachine(object):
-         """
-         self._console_set = True
-         self._console_device_type = device_type
-+        self._console_id = console_id
- 
-     @property
-     def console_socket(self):
+ /* GPU interrupts */
+ #define INTERRUPT_TIMER0               0
 -- 
 2.20.1
 
