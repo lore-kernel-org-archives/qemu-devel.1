@@ -6,51 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D71C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33936C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:31:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C384C222BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:24:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C384C222BE
+	by mail.kernel.org (Postfix) with ESMTPS id 0398B20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:31:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0398B20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDbFU-0000Yw-HZ
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 17:24:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46593)
+	id 1iDbM0-00057h-Vb
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 17:31:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iDbEd-0008Th-6f
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:23:36 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iDbKS-0004b6-Fe
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:29:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iDbEZ-0005u4-IZ
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:23:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18974)
+ (envelope-from <ehabkost@redhat.com>) id 1iDbKP-0004nO-Th
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:29:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51218)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iDbEY-0005sG-HM
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:23:31 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iDbKP-0004kx-Jx
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:29:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D150C315C015;
- Thu, 26 Sep 2019 21:23:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A5E1B10DCC8F;
+ Thu, 26 Sep 2019 21:29:27 +0000 (UTC)
 Received: from localhost (ovpn-116-45.gru2.redhat.com [10.97.116.45])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A21960C5D;
- Thu, 26 Sep 2019 21:23:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 15F365D6B0;
+ Thu, 26 Sep 2019 21:29:26 +0000 (UTC)
+Date: Thu, 26 Sep 2019 18:29:25 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] i386: Re-add "pconfig" CPUID flag name
-Date: Thu, 26 Sep 2019 18:23:26 -0300
-Message-Id: <20190926212326.4092-1-ehabkost@redhat.com>
+Subject: Re: [PATCH] i386: Re-add "pconfig" CPUID flag name
+Message-ID: <20190926212925.GU8144@habkost.net>
+References: <20190926212326.4092-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 26 Sep 2019 21:23:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190926212326.4092-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Thu, 26 Sep 2019 21:29:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,85 +76,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU 3.1.0 was shipped with the "pconfig" CPU property available,
-added by commit 5131dc433df5 ("i386: Add CPUID bit for PCONFIG").
+On Thu, Sep 26, 2019 at 06:23:26PM -0300, Eduardo Habkost wrote:
+> QEMU 3.1.0 was shipped with the "pconfig" CPU property available,
+> added by commit 5131dc433df5 ("i386: Add CPUID bit for PCONFIG").
+> 
+> Then the feature was removed in QEMU 4.0.0 (and 3.1.1), by commit
+> 712f807e1965 ("Revert 'i386: Add CPUID bit for PCONFIG'").
+> 
+> In theory this would be OK, but we do have a problem: existing
+> software (like libvirt) was already using "pconfig=off" since
+> QEMU 3.1.0 on some cases.  This means software that worked with
+> QEMU 3.1.0 doesn't work with QEMU 3.1.1 and newer.
+> 
+> One symptom is the following error being generated by
+> virt-install while trying to use the 'host-model' CPU model, on a
+> host that's identified as Icelake-Server:
+> 
+>   ERROR    internal error: qemu unexpectedly closed the monitor: \
+>       2019-09-24T22:57:42.550032Z qemu-kvm: \
+>       can't apply global Icelake-Server-x86_64-cpu.pconfig=off: Property '.pconfig' not found
+> 
+> Re-add "pconfig" to feature_word_info[FEAT_7_0_EDX].feat_names so
+> "pconfig=off" will work again.
+> 
+> This change still won't let users set "monitor=on" because all
 
-Then the feature was removed in QEMU 4.0.0 (and 3.1.1), by commit
-712f807e1965 ("Revert 'i386: Add CPUID bit for PCONFIG'").
+Sorry, I meant "pconfig=on" above.
 
-In theory this would be OK, but we do have a problem: existing
-software (like libvirt) was already using "pconfig=3Doff" since
-QEMU 3.1.0 on some cases.  This means software that worked with
-QEMU 3.1.0 doesn't work with QEMU 3.1.1 and newer.
+> accelerators currently report the feature as unsupported.  But to
+> make sure PCONFIG won't be enabled by accident in the future
+> before we implement the necessary migration code, also add the
+> feature to .unmigratable_flags.
+> 
+> Fixes: 712f807e1965 ("Revert 'i386: Add CPUID bit for PCONFIG'")
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  target/i386/cpu.h | 2 ++
+>  target/i386/cpu.c | 8 +++++++-
+>  2 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 8e090acd74..b728bd22f1 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -731,6 +731,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+>  #define CPUID_7_0_EDX_AVX512_4VNNIW     (1U << 2)
+>  /* AVX512 Multiply Accumulation Single Precision */
+>  #define CPUID_7_0_EDX_AVX512_4FMAPS     (1U << 3)
+> +/* PCONFIG Instruction */
+> +#define CPUID_7_0_EDX_PCONFIG           (1U << 18)
+>  /* Speculation Control */
+>  #define CPUID_7_0_EDX_SPEC_CTRL         (1U << 26)
+>  /* Arch Capabilities */
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 71034aeb5a..3e25505bd3 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1084,7 +1084,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, "md-clear", NULL,
+>              NULL, NULL, NULL, NULL,
+> -            NULL, NULL, NULL /* pconfig */, NULL,
+> +            NULL, NULL, "pconfig", NULL,
+>              NULL, NULL, NULL, NULL,
+>              NULL, NULL, "spec-ctrl", "stibp",
+>              NULL, "arch-capabilities", "core-capability", "ssbd",
+> @@ -1095,6 +1095,12 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>              .reg = R_EDX,
+>          },
+>          .tcg_features = TCG_7_0_EDX_FEATURES,
+> +        /*
+> +         * CPU state altered by the PCONFIG instruction (e.g. MKTME key table)
+> +         * is not migrated by QEMU yet, so PCONFIG is unmigratable until
+> +         * this is implemented.
+> +         */
+> +        .unmigratable_flags = CPUID_7_0_EDX_PCONFIG,
+>      },
+>      [FEAT_7_1_EAX] = {
+>          .type = CPUID_FEATURE_WORD,
+> -- 
+> 2.21.0
+> 
 
-One symptom is the following error being generated by
-virt-install while trying to use the 'host-model' CPU model, on a
-host that's identified as Icelake-Server:
-
-  ERROR    internal error: qemu unexpectedly closed the monitor: \
-      2019-09-24T22:57:42.550032Z qemu-kvm: \
-      can't apply global Icelake-Server-x86_64-cpu.pconfig=3Doff: Propert=
-y '.pconfig' not found
-
-Re-add "pconfig" to feature_word_info[FEAT_7_0_EDX].feat_names so
-"pconfig=3Doff" will work again.
-
-This change still won't let users set "monitor=3Don" because all
-accelerators currently report the feature as unsupported.  But to
-make sure PCONFIG won't be enabled by accident in the future
-before we implement the necessary migration code, also add the
-feature to .unmigratable_flags.
-
-Fixes: 712f807e1965 ("Revert 'i386: Add CPUID bit for PCONFIG'")
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.h | 2 ++
- target/i386/cpu.c | 8 +++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 8e090acd74..b728bd22f1 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -731,6 +731,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_AVX512_4VNNIW     (1U << 2)
- /* AVX512 Multiply Accumulation Single Precision */
- #define CPUID_7_0_EDX_AVX512_4FMAPS     (1U << 3)
-+/* PCONFIG Instruction */
-+#define CPUID_7_0_EDX_PCONFIG           (1U << 18)
- /* Speculation Control */
- #define CPUID_7_0_EDX_SPEC_CTRL         (1U << 26)
- /* Arch Capabilities */
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 71034aeb5a..3e25505bd3 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1084,7 +1084,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
-RDS] =3D {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, "md-clear", NULL,
-             NULL, NULL, NULL, NULL,
--            NULL, NULL, NULL /* pconfig */, NULL,
-+            NULL, NULL, "pconfig", NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, "spec-ctrl", "stibp",
-             NULL, "arch-capabilities", "core-capability", "ssbd",
-@@ -1095,6 +1095,12 @@ static FeatureWordInfo feature_word_info[FEATURE_W=
-ORDS] =3D {
-             .reg =3D R_EDX,
-         },
-         .tcg_features =3D TCG_7_0_EDX_FEATURES,
-+        /*
-+         * CPU state altered by the PCONFIG instruction (e.g. MKTME key =
-table)
-+         * is not migrated by QEMU yet, so PCONFIG is unmigratable until
-+         * this is implemented.
-+         */
-+        .unmigratable_flags =3D CPUID_7_0_EDX_PCONFIG,
-     },
-     [FEAT_7_1_EAX] =3D {
-         .type =3D CPUID_FEATURE_WORD,
---=20
-2.21.0
-
+-- 
+Eduardo
 
