@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E82BC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 22:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFE6C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:06:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5A83206B7
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 22:58:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5A83206B7
+	by mail.kernel.org (Postfix) with ESMTPS id 6D98D206B7
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:06:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D98D206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDcib-00034d-K6
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 18:58:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54968)
+	id 1iDcqO-0008Et-Hz
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 19:06:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32861)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iDchJ-0001a8-6q
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 18:57:19 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iDcpP-0007lE-Dj
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iDchH-0001p2-62
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 18:57:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37059)
+ (envelope-from <jsnow@redhat.com>) id 1iDcpO-0002oW-AQ
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:05:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36082)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iDch9-0001hN-QL; Thu, 26 Sep 2019 18:57:08 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iDcpK-0002gl-S8; Thu, 26 Sep 2019 19:05:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 73B7A3091740;
- Thu, 26 Sep 2019 22:57:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CD85D30ADBAB;
+ Thu, 26 Sep 2019 23:05:33 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 96D1160E1C;
- Thu, 26 Sep 2019 22:57:05 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH v4 03/10] iotests: add test-case to 165 to
- test reopening qcow2 bitmaps to RW
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 960445D9C9;
+ Thu, 26 Sep 2019 23:05:32 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v4 04/10] iotests.py: add event_wait_log and
+ events_wait_log helpers
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
- <20190807141226.193501-4-vsementsov@virtuozzo.com>
+ <20190807141226.193501-5-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,18 +122,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <6c308090-5841-fcba-d319-8b9d65b7d6b8@redhat.com>
-Date: Thu, 26 Sep 2019 18:57:05 -0400
+Message-ID: <a578331a-86a6-4636-d055-3cc4c43ba495@redhat.com>
+Date: Thu, 26 Sep 2019 19:05:32 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190807141226.193501-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190807141226.193501-5-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 26 Sep 2019 22:57:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Thu, 26 Sep 2019 23:05:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -157,119 +157,40 @@ Sender: "Qemu-devel"
 
 
 On 8/7/19 10:12 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Reopening bitmaps to RW was broken prior to previous commit. Check that
-> it works now.
-> 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/qemu-iotests/165     | 46 ++++++++++++++++++++++++++++++++++++--
->  tests/qemu-iotests/165.out |  4 ++--
->  2 files changed, 46 insertions(+), 4 deletions(-)
+>  tests/qemu-iotests/iotests.py | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 > 
-> diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
-> index 88f62d3c6d..dd93b5a2d0 100755
-> --- a/tests/qemu-iotests/165
-> +++ b/tests/qemu-iotests/165
-> @@ -43,10 +43,10 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
->          os.remove(disk)
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index ce74177ab1..4ad265f140 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -540,6 +540,16 @@ class VM(qtest.QEMUQtestMachine):
+>          log(result, filters, indent=indent)
+>          return result
 >  
->      def mkVm(self):
-> -        return iotests.VM().add_drive(disk)
-> +        return iotests.VM().add_drive(disk, opts='node-name=node0')
->  
->      def mkVmRo(self):
-> -        return iotests.VM().add_drive(disk, opts='readonly=on')
-> +        return iotests.VM().add_drive(disk, opts='readonly=on,node-name=node0')
->  
->      def getSha256(self):
->          result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
-> @@ -102,5 +102,47 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
->  
->          self.vm.shutdown()
->  
-> +    def test_reopen_rw(self):
-> +        self.vm = self.mkVm()
-> +        self.vm.launch()
-> +        self.qmpAddBitmap()
+> +    def event_wait_log(self, name, **kwargs):
+> +        event = self.event_wait(name, **kwargs)
+> +        log(event, filters=[filter_qmp_event])
+> +        return event
 > +
-> +        # Calculate sha256 corresponding to regions1
-> +        self.writeRegions(regions1)
-> +        sha256 = self.getSha256()
-> +        result = self.vm.qmp('block-dirty-bitmap-clear', node='drive0',
-> +                             name='bitmap0')
-> +        self.assert_qmp(result, 'return', {})
+> +    def events_wait_log(self, events, **kwargs):
+> +        event = self.events_wait(events, **kwargs)
+> +        log(event, filters=[filter_qmp_event])
+> +        return event
 > +
-> +        self.vm.shutdown()
-> +
-> +        self.vm = self.mkVmRo()
-> +        self.vm.launch()
-> +
-> +        # We've loaded empty bitmap
-> +        assert sha256 != self.getSha256()
-> +
-> +        # Check that we are in RO mode
-> +        self.writeRegions(regions1)
-> +        assert sha256 != self.getSha256()
-> +
-
-the HMP monitor lets you attempt writes to a Read Only drive...? Or does
-it error out and we just don't check the reply?
-
-I would prefer we use an actual dirty sector count here instead; we have
-the new API that should make it easy to do.
-
-If the debug SHA changes this might be a little fragile.
-
-ACK otherwise.
-
-> +        result = self.vm.qmp('x-blockdev-reopen', **{
-> +            'node-name': 'node0',
-> +            'driver': iotests.imgfmt,
-> +            'file': {
-> +                'driver': 'file',
-> +                'filename': disk
-> +            },
-> +            'read-only': False
-> +        })
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        # Check that bitmap is reopened to RW and we can write to it.
-> +        self.writeRegions(regions1)
-> +        assert sha256 == self.getSha256()
-> +
-> +        self.vm.shutdown()
-> +
-> +
->  if __name__ == '__main__':
->      iotests.main(supported_fmts=['qcow2'])
-> diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
-> index ae1213e6f8..fbc63e62f8 100644
-> --- a/tests/qemu-iotests/165.out
-> +++ b/tests/qemu-iotests/165.out
-> @@ -1,5 +1,5 @@
-> -.
-> +..
->  ----------------------------------------------------------------------
-> -Ran 1 tests
-> +Ran 2 tests
->  
->  OK
+>      # Returns None on success, and an error string on failure
+>      def run_job(self, job, auto_finalize=True, auto_dismiss=False,
+>                  pre_finalize=None, use_log=True, wait=60.0):
 > 
 
-This is a suggestion for an even more rigorous test:
+I'm not sure these are really needed, since you can just log the event
+you get after calling either of these methods anyway. There's nothing
+stopping you from:
 
-- Create bitmap
-- Write a region or two
-- Record the dirty count and the SHA; assert it is equal to known /
-predetermined values.
-- reopen RO
-- verify the bitmap still exists and that the hash and count are the same.
-- Stop the VM
-- Start the VM in readonly mode
-- verify the bitmap still exists and that the hash and count are the same.
-- Reopen-RW
-- verify the bitmap still exists and that the hash and count are the same.
-- Write further region(s)
-- Get the new dirty count and SHA, and assert it is equal to known /
-predetermined values.
+```
+event = event_wait_log(...)
+log(filter_qmp_event(event))
+```
 
