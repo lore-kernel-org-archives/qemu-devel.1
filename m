@@ -2,51 +2,49 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86755C352A9
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6250C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:15:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54448217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:11:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54448217F4
+	by mail.kernel.org (Postfix) with ESMTPS id A6BF32086A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:15:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6BF32086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDZAh-0003tc-O8
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 15:11:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44739)
+	id 1iDZEB-0000qw-4U
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 15:14:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48237)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iDYh6-0003zz-4z
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:40:49 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iDZ16-0003TU-Nz
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 15:01:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iDYh4-0001tM-0m
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:40:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41708)
+ (envelope-from <jsnow@redhat.com>) id 1iDZ14-0000cs-II
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 15:01:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49541)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iDYgu-0001mQ-Vq; Thu, 26 Sep 2019 14:40:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iDZ0x-0000aQ-Q3; Thu, 26 Sep 2019 15:01:20 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3836B8A1CA6;
- Thu, 26 Sep 2019 18:40:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C20B7309DEE2;
+ Thu, 26 Sep 2019 19:01:18 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E36B5F7C0;
- Thu, 26 Sep 2019 18:40:26 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH 3/4] block/dirty-bitmap: drop
- BdrvDirtyBitmap.mutex
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E285A5C220;
+ Thu, 26 Sep 2019 19:01:17 +0000 (UTC)
+Subject: Re: [PATCH v3 0/3] proper locking on bitmap add/remove paths
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
-References: <20190916141911.5255-1-vsementsov@virtuozzo.com>
- <20190916141911.5255-4-vsementsov@virtuozzo.com>
+References: <20190920082543.23444-1-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <7236affa-656f-27c2-5e9f-6bd891017fcf@redhat.com>
-Date: Thu, 26 Sep 2019 14:40:26 -0400
+Message-ID: <d3ad51d9-9e11-6f08-caf1-9c189315d4ac@redhat.com>
+Date: Thu, 26 Sep 2019 15:01:17 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190916141911.5255-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190920082543.23444-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Thu, 26 Sep 2019 18:40:30 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Thu, 26 Sep 2019 19:01:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -148,306 +146,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, quintela@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org,
- mreitz@redhat.com, dgilbert@redhat.com
+Cc: fam@euphon.net, kwolf@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/16/19 10:19 AM, Vladimir Sementsov-Ogievskiy wrote:
-> mutex field is just a pointer to bs->dirty_bitmap_mutex, so no needs
-> to store it in BdrvDirtyBitmap when we have bs pointer in it (since
-> previous patch).
->=20
-> Drop mutex field. Constantly use bdrv_dirty_bitmaps_lock/unlock in
-> block/dirty-bitmap.c to make it more obvious that it's not per-bitmap
-> lock. Still, for simplicity, leave bdrv_dirty_bitmap_lock/unlock
-> functions as an external API.
->=20
+On 9/20/19 4:25 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+> 
+> We need to lock qcow2 mutex on accessing in-image metadata, especially
+> on updating this metadata. Let's implement it.
+> 
+> v3:
+> 01: add John's r-b
+> 02: - fix bdrv_remove_persistent_dirty_bitmap return value
+>     - drop extra zeroing of ret in qcow2_remove_persistent_dirty_bitmap
+> 03: add John's r-b
+> 
+> Vladimir Sementsov-Ogievskiy (3):
+>   block: move bdrv_can_store_new_dirty_bitmap to block/dirty-bitmap.c
+>   block/dirty-bitmap: return int from
+>     bdrv_remove_persistent_dirty_bitmap
+>   block/qcow2: proper locking on bitmap add/remove paths
+> 
+>  block/qcow2.h                |  14 ++---
+>  include/block/block_int.h    |  14 ++---
+>  include/block/dirty-bitmap.h |   5 +-
+>  block.c                      |  22 -------
+>  block/dirty-bitmap.c         | 119 +++++++++++++++++++++++++++++++++--
+>  block/qcow2-bitmap.c         |  36 +++++++----
+>  block/qcow2.c                |   5 +-
+>  blockdev.c                   |  28 +++------
+>  8 files changed, 163 insertions(+), 80 deletions(-)
+> 
 
-It's convenient, but I wish it had a better name because it still
-implies a per-bitmap lock, which we've never had.
-
-It's fine for now, this patch doesn't make it worse, of course.
-
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->  block/dirty-bitmap.c | 84 +++++++++++++++++++++-----------------------
->  1 file changed, 41 insertions(+), 43 deletions(-)
->=20
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index f3dc7b3ca5..76a8e59e61 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -28,7 +28,6 @@
->  #include "block/blockjob.h"
-> =20
->  struct BdrvDirtyBitmap {
-> -    QemuMutex *mutex;
->      BlockDriverState *bs;
->      HBitmap *bitmap;            /* Dirty bitmap implementation */
->      bool busy;                  /* Bitmap is busy, it can't be used vi=
-a QMP */
-> @@ -71,12 +70,12 @@ static inline void bdrv_dirty_bitmaps_unlock(BlockD=
-riverState *bs)
-> =20
->  void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap)
->  {
-> -    qemu_mutex_lock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->  }
-> =20
->  void bdrv_dirty_bitmap_unlock(BdrvDirtyBitmap *bitmap)
->  {
-> -    qemu_mutex_unlock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  /* Called with BQL or dirty_bitmap lock taken.  */
-> @@ -116,7 +115,6 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriv=
-erState *bs,
->      }
->      bitmap =3D g_new0(BdrvDirtyBitmap, 1);
->      bitmap->bs =3D bs;
-> -    bitmap->mutex =3D &bs->dirty_bitmap_mutex;
->      bitmap->bitmap =3D hbitmap_alloc(bitmap_size, ctz32(granularity));
->      bitmap->size =3D bitmap_size;
->      bitmap->name =3D g_strdup(name);
-> @@ -150,9 +148,9 @@ static bool bdrv_dirty_bitmap_busy(const BdrvDirtyB=
-itmap *bitmap)
-> =20
->  void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitmap, bool busy)
->  {
-> -    qemu_mutex_lock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bitmap->busy =3D busy;
-> -    qemu_mutex_unlock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  /* Called with BQL taken.  */
-> @@ -277,10 +275,10 @@ void bdrv_enable_dirty_bitmap_locked(BdrvDirtyBit=
-map *bitmap)
->  /* Called with BQL taken. */
->  void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap)
->  {
-> -    assert(bitmap->mutex =3D=3D bitmap->successor->mutex);
-> -    qemu_mutex_lock(bitmap->mutex);
-> +    assert(bitmap->bs =3D=3D bitmap->successor->bs);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bdrv_enable_dirty_bitmap_locked(bitmap->successor);
-> -    qemu_mutex_unlock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  /* Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.  *=
-/
-> @@ -360,9 +358,9 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BdrvDirt=
-yBitmap *parent,
->  {
->      BdrvDirtyBitmap *ret;
-> =20
-> -    qemu_mutex_lock(parent->mutex);
-> +    bdrv_dirty_bitmaps_lock(parent->bs);
->      ret =3D bdrv_reclaim_dirty_bitmap_locked(parent, errp);
-> -    qemu_mutex_unlock(parent->mutex);
-> +    bdrv_dirty_bitmaps_unlock(parent->bs);
-> =20
->      return ret;
->  }
-> @@ -434,16 +432,16 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDri=
-verState *bs,
-> =20
->  void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
->  {
-> -    bdrv_dirty_bitmap_lock(bitmap);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bitmap->disabled =3D true;
-> -    bdrv_dirty_bitmap_unlock(bitmap);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
->  {
-> -    bdrv_dirty_bitmap_lock(bitmap);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bdrv_enable_dirty_bitmap_locked(bitmap);
-> -    bdrv_dirty_bitmap_unlock(bitmap);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
-> @@ -484,9 +482,9 @@ bool bdrv_dirty_bitmap_get_locked(BdrvDirtyBitmap *=
-bitmap, int64_t offset)
->  bool bdrv_dirty_bitmap_get(BdrvDirtyBitmap *bitmap, int64_t offset)
->  {
->      bool ret;
-> -    bdrv_dirty_bitmap_lock(bitmap);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      ret =3D bdrv_dirty_bitmap_get_locked(bitmap, offset);
-> -    bdrv_dirty_bitmap_unlock(bitmap);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
-> =20
->      return ret;
->  }
-> @@ -551,9 +549,9 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *=
-bitmap,
->  void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->                             int64_t offset, int64_t bytes)
->  {
-> -    bdrv_dirty_bitmap_lock(bitmap);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bdrv_set_dirty_bitmap_locked(bitmap, offset, bytes);
-> -    bdrv_dirty_bitmap_unlock(bitmap);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  /* Called within bdrv_dirty_bitmap_lock..unlock */
-> @@ -567,15 +565,15 @@ void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitm=
-ap *bitmap,
->  void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
->                               int64_t offset, int64_t bytes)
->  {
-> -    bdrv_dirty_bitmap_lock(bitmap);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bdrv_reset_dirty_bitmap_locked(bitmap, offset, bytes);
-> -    bdrv_dirty_bitmap_unlock(bitmap);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap **out)
->  {
->      assert(!bdrv_dirty_bitmap_readonly(bitmap));
-> -    bdrv_dirty_bitmap_lock(bitmap);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      if (!out) {
->          hbitmap_reset_all(bitmap->bitmap);
->      } else {
-> @@ -584,7 +582,7 @@ void bdrv_clear_dirty_bitmap(BdrvDirtyBitmap *bitma=
-p, HBitmap **out)
->                                         hbitmap_granularity(backup));
->          *out =3D backup;
->      }
-> -    bdrv_dirty_bitmap_unlock(bitmap);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  void bdrv_restore_dirty_bitmap(BdrvDirtyBitmap *bitmap, HBitmap *backu=
-p)
-> @@ -679,9 +677,9 @@ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitm=
-ap *bitmap)
->  /* Called with BQL taken. */
->  void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool valu=
-e)
->  {
-> -    qemu_mutex_lock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bitmap->readonly =3D value;
-> -    qemu_mutex_unlock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs)
-> @@ -699,27 +697,27 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *=
-bs)
->  /* Called with BQL taken. */
->  void bdrv_dirty_bitmap_set_persistence(BdrvDirtyBitmap *bitmap, bool p=
-ersistent)
->  {
-> -    qemu_mutex_lock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bitmap->persistent =3D persistent;
-> -    qemu_mutex_unlock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  /* Called with BQL taken. */
->  void bdrv_dirty_bitmap_set_inconsistent(BdrvDirtyBitmap *bitmap)
->  {
-> -    qemu_mutex_lock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      assert(bitmap->persistent =3D=3D true);
->      bitmap->inconsistent =3D true;
->      bitmap->disabled =3D true;
-> -    qemu_mutex_unlock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  /* Called with BQL taken. */
->  void bdrv_dirty_bitmap_skip_store(BdrvDirtyBitmap *bitmap, bool skip)
->  {
-> -    qemu_mutex_lock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_lock(bitmap->bs);
->      bitmap->skip_store =3D skip;
-> -    qemu_mutex_unlock(bitmap->mutex);
-> +    bdrv_dirty_bitmaps_unlock(bitmap->bs);
->  }
-> =20
->  bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap)
-> @@ -779,9 +777,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest,=
- const BdrvDirtyBitmap *src,
->  {
->      bool ret;
-> =20
-> -    qemu_mutex_lock(dest->mutex);
-> -    if (src->mutex !=3D dest->mutex) {
-> -        qemu_mutex_lock(src->mutex);
-> +    bdrv_dirty_bitmaps_lock(dest->bs);
-> +    if (src->bs !=3D dest->bs) {
-> +        bdrv_dirty_bitmaps_lock(src->bs);
->      }
-> =20
->      if (bdrv_dirty_bitmap_check(dest, BDRV_BITMAP_DEFAULT, errp)) {
-> @@ -801,9 +799,9 @@ void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest,=
- const BdrvDirtyBitmap *src,
->      assert(ret);
-> =20
->  out:
-> -    qemu_mutex_unlock(dest->mutex);
-> -    if (src->mutex !=3D dest->mutex) {
-> -        qemu_mutex_unlock(src->mutex);
-> +    bdrv_dirty_bitmaps_unlock(dest->bs);
-> +    if (src->bs !=3D dest->bs) {
-> +        bdrv_dirty_bitmaps_unlock(src->bs);
->      }
->  }
-> =20
-> @@ -827,9 +825,9 @@ bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitm=
-ap *dest,
->      assert(!bdrv_dirty_bitmap_inconsistent(src));
-> =20
->      if (lock) {
-> -        qemu_mutex_lock(dest->mutex);
-> -        if (src->mutex !=3D dest->mutex) {
-> -            qemu_mutex_lock(src->mutex);
-> +        bdrv_dirty_bitmaps_lock(dest->bs);
-> +        if (src->bs !=3D dest->bs) {
-> +            bdrv_dirty_bitmaps_lock(src->bs);
->          }
->      }
-> =20
-> @@ -842,9 +840,9 @@ bool bdrv_dirty_bitmap_merge_internal(BdrvDirtyBitm=
-ap *dest,
->      }
-> =20
->      if (lock) {
-> -        qemu_mutex_unlock(dest->mutex);
-> -        if (src->mutex !=3D dest->mutex) {
-> -            qemu_mutex_unlock(src->mutex);
-> +        bdrv_dirty_bitmaps_unlock(dest->bs);
-> +        if (src->bs !=3D dest->bs) {
-> +            bdrv_dirty_bitmaps_unlock(src->bs);
->          }
->      }
-> =20
->=20
-
---=20
-=E2=80=94js
+I'll take this; I imagine the return signatures are going to change
+again with your error propagation series, though ...?
 
