@@ -2,81 +2,64 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 139EFC432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 06:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 025F1C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 06:54:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CECF7206E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 06:35:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CECF7206E0
+	by mail.kernel.org (Postfix) with ESMTPS id BCBCA222BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 06:54:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCBCA222BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDNNI-0007iI-7j
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 02:35:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45553)
+	id 1iDNft-0005LQ-1A
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 02:54:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iDNM8-0006oa-91
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:34:27 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1iDNeL-00045p-Dq
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:53:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iDNM2-0000Zp-VT
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:34:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60788)
+ (envelope-from <eric.auger@redhat.com>) id 1iDNeI-0005Pa-KC
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:53:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:10054)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iDNM2-0000YQ-LQ
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 02:34:18 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iDNe9-0005EB-9K; Thu, 26 Sep 2019 02:53:01 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 958961108
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 06:34:16 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id s25so577634wmh.1
- for <qemu-devel@nongnu.org>; Wed, 25 Sep 2019 23:34:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=TjThmoOCifZU3qjSQLBWFrKS0UKFSeYXDIZRv/qrZbs=;
- b=tfyUyMtq4SgFMlcxZF+RfjD5k/AwmxA2wFLVspFMvha2B9jawY5rkQcDITJjuE5LUz
- ixg2NjAVbWZTbNJwVMvIRicX4e1kdx9ieFXe5/nVaWfBlXuKqNC2jBbIIjrxTAvNiGzv
- qxCYgvqwENg9nkdSaSUKx9gzq3T+dLpzuSLw1mk4yheyRGchFBDhsSya9wsfFZlN7yDa
- bZkxL+RQKkn6XpdF3D5kl/PxmjQs5tA24WzufX90Aych2k1WvC3FFQsW0PqEa5WqU/bF
- iC175xMPmwpWQqLblbkCq3OWbnI9TceJyeCMyLXKtA6/BFGNJ/zd7fDu2u5G/J+sKE+r
- EHnA==
-X-Gm-Message-State: APjAAAXBhjXJt2QSSZ2wPRjO097yk47DbY2/livCQxC134vSFvPqcqHD
- TB8d1iTwAQo52Loj8ZVkSaLjiHVQJwFB1J5EkfdX/BzBgLLKvUMJi5cm66jVY7+HRye/84Ii+5U
- q0WJqFqPGCFaZxyw=
-X-Received: by 2002:adf:e908:: with SMTP id f8mr1463418wrm.210.1569479654483; 
- Wed, 25 Sep 2019 23:34:14 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxPlmmaMuenRXqK1ncfnTKlhU0M3yCPEaMChd77smaEu2Aox4R2P4S4lCw6pcCnUAQcOs1pAQ==
-X-Received: by 2002:adf:e908:: with SMTP id f8mr1463380wrm.210.1569479654050; 
- Wed, 25 Sep 2019 23:34:14 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id s12sm2341442wrn.90.2019.09.25.23.34.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 25 Sep 2019 23:34:13 -0700 (PDT)
-References: <20190924124433.96810-1-slp@redhat.com>
- <20190924124433.96810-9-slp@redhat.com>
- <061b720c-2ef2-b270-f18b-b0619573862d@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v4 8/8] hw/i386: Introduce the microvm machine type
-In-reply-to: <061b720c-2ef2-b270-f18b-b0619573862d@redhat.com>
-Date: Thu, 26 Sep 2019 08:34:10 +0200
-Message-ID: <87muer36sd.fsf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id CCF69A44AC1;
+ Thu, 26 Sep 2019 06:52:59 +0000 (UTC)
+Received: from [10.36.117.64] (ovpn-117-64.ams2.redhat.com [10.36.117.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B3356012D;
+ Thu, 26 Sep 2019 06:52:56 +0000 (UTC)
+Subject: Re: [PATCH v4 8/9] target/arm/cpu64: max cpu: Support sve properties
+ with KVM
+To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+References: <20190924113105.19076-1-drjones@redhat.com>
+ <20190924113105.19076-9-drjones@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f8578400-c587-73f8-3517-6cc89cd56471@redhat.com>
+Date: Thu, 26 Sep 2019 08:52:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <20190924113105.19076-9-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Thu, 26 Sep 2019 06:52:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -91,845 +74,640 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- pbonzini@redhat.com, imammedo@redhat.com, lersek@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
+ imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Drew,
+
+On 9/24/19 1:31 PM, Andrew Jones wrote:
+> Extend the SVE vq map initialization and validation with KVM's
+> supported vector lengths when KVM is enabled. In order to determine
+> and select supported lengths we add two new KVM functions for getting
+> and setting the KVM_REG_ARM64_SVE_VLS pseudo-register.
+> 
+> This patch has been co-authored with Richard Henderson, who reworked
+> the target/arm/cpu64.c changes in order to push all the validation and
+> auto-enabling/disabling steps into the finalizer, resulting in a nice
+> LOC reduction.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  docs/arm-cpu-features.rst |  36 +++++---
+>  target/arm/cpu64.c        | 167 +++++++++++++++++++++++++++++---------
+>  target/arm/kvm64.c        | 100 ++++++++++++++++++++++-
+>  target/arm/kvm_arm.h      |  12 +++
+>  tests/arm-cpu-features.c  | 105 +++++++++++++++++++++++-
+>  5 files changed, 368 insertions(+), 52 deletions(-)
+> 
+> diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
+> index 1262fddc6201..939366f959cf 100644
+> --- a/docs/arm-cpu-features.rst
+> +++ b/docs/arm-cpu-features.rst
+> @@ -188,10 +188,17 @@ SVE CPU Property Dependencies and Constraints
+>  
+>    1) At least one vector length must be enabled when `sve` is enabled.
+>  
+> -  2) If a vector length `N` is enabled, then all power-of-two vector
+> -     lengths smaller than `N` must also be enabled.  E.g. if `sve512`
+> -     is enabled, then `sve128` and `sve256` must also be enabled,
+> -     but `sve384` is not required.
+> +  2) If a vector length `N` is enabled, then, when KVM is enabled, all
+> +     smaller, host supported vector lengths must also be enabled.  If
+> +     KVM is not enabled, then only all the smaller, power-of-two vector
+> +     lengths must be enabled.  E.g. with KVM if the host supports all
+> +     vector lengths up to 512-bits (128, 256, 384, 512), then if
+> +     `sve512` is enabled, `sve128`, `sve256`, and `sve384` must also
+> +     be enabled. Without KVM, `sve384` would not be required.
+> +
+> +  3) If KVM is enabled then only vector lengths that the host CPU type
+> +     support may be enabled.  If SVE is not supported by the host, then
+> +     no `sve*` properties may be enabled.
+>  
+>  SVE CPU Property Parsing Semantics
+>  ----------------------------------
+> @@ -210,20 +217,29 @@ SVE CPU Property Parsing Semantics
+>       disable the last enabled vector length (see constraint (1) of "SVE
+>       CPU Property Dependencies and Constraints").
+>  
+> -  4) If one or more `sve<N>` CPU properties are set `off`, but no `sve<N>`,
+> +  4) When KVM is enabled, if the host does not support SVE, then an error
+> +     is generated when attempting to enable any `sve*` properties.
+> +
+> +  5) When KVM is enabled, if the host does support SVE, then an error is
+> +     generated when attempting to enable any vector lengths not supported
+> +     by the host.
+> +
+> +  6) If one or more `sve<N>` CPU properties are set `off`, but no `sve<N>`,
+>       CPU properties are set `on`, then the specified vector lengths are
+>       disabled but the default for any unspecified lengths remains enabled.
+> -     Disabling a power-of-two vector length also disables all vector
+> -     lengths larger than the power-of-two length (see constraint (2) of
+> -     "SVE CPU Property Dependencies and Constraints").
+> +     When KVM is not enabled, disabling a power-of-two vector length also
+> +     disables all vector lengths larger than the power-of-two length.
+> +     When KVM is enabled, then disabling any supported vector length also
+> +     disables all larger vector lengths (see constraint (2) of "SVE CPU
+> +     Property Dependencies and Constraints").
+>  
+> -  5) If one or more `sve<N>` CPU properties are set to `on`, then they
+> +  7) If one or more `sve<N>` CPU properties are set to `on`, then they
+>       are enabled and all unspecified lengths default to disabled, except
+>       for the required lengths per constraint (2) of "SVE CPU Property
+>       Dependencies and Constraints", which will even be auto-enabled if
+>       they were not explicitly enabled.
+>  
+> -  6) If SVE was disabled (`sve=off`), allowing all vector lengths to be
+> +  8) If SVE was disabled (`sve=off`), allowing all vector lengths to be
+>       explicitly disabled (i.e. avoiding the error specified in (3) of
+>       "SVE CPU Property Parsing Semantics"), then if later an `sve=on` is
+>       provided an error will be generated.  To avoid this error, one must
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index b7eff4e1e107..18dd5e24ec61 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -273,9 +273,18 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+>       * any of the above.  Finally, if SVE is not disabled, then at least one
+>       * vector length must be enabled.
+>       */
+> +    DECLARE_BITMAP(kvm_supported, ARM_MAX_VQ);
+>      DECLARE_BITMAP(tmp, ARM_MAX_VQ);
+>      uint32_t vq, max_vq = 0;
+>  
+> +    /* Collect the set of vector lengths supported by KVM. */
+> +    bitmap_zero(kvm_supported, ARM_MAX_VQ);
+> +    if (kvm_enabled() && kvm_arm_sve_supported(CPU(cpu))) {
+> +        kvm_arm_sve_get_vls(CPU(cpu), kvm_supported);
+> +    } else if (kvm_enabled()) {
+> +        assert(!cpu_isar_feature(aa64_sve, cpu));
+why not set an error and propagate it instead?
+> +    }
+> +
+>      /*
+>       * Process explicit sve<N> properties.
+>       * From the properties, sve_vq_map<N> implies sve_vq_init<N>.
+> @@ -293,10 +302,19 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+>              return;
+>          }
+>  
+> -        /* Propagate enabled bits down through required powers-of-two. */
+> -        for (vq = pow2floor(max_vq); vq >= 1; vq >>= 1) {
+> -            if (!test_bit(vq - 1, cpu->sve_vq_init)) {
+> -                set_bit(vq - 1, cpu->sve_vq_map);
+> +        if (kvm_enabled()) {
+> +            /*
+> +             * For KVM we have to automatically enable all supported unitialized
+> +             * lengths, even when the smaller lengths are not all powers-of-two.
+> +             */
+> +            bitmap_andnot(tmp, kvm_supported, cpu->sve_vq_init, max_vq);
+> +            bitmap_or(cpu->sve_vq_map, cpu->sve_vq_map, tmp, max_vq);
+> +        } else {
+> +            /* Propagate enabled bits down through required powers-of-two. */
+> +            for (vq = pow2floor(max_vq); vq >= 1; vq >>= 1) {
+> +                if (!test_bit(vq - 1, cpu->sve_vq_init)) {
+> +                    set_bit(vq - 1, cpu->sve_vq_map);
+> +                }
+>              }
+>          }
+>      } else if (cpu->sve_max_vq == 0) {
+> @@ -308,23 +326,46 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+>              return;
+>          }
+>  
+> -        /* Disabling a power-of-two disables all larger lengths. */
+> -        if (test_bit(0, cpu->sve_vq_init)) {
+> -            error_setg(errp, "cannot disable sve128");
+> -            error_append_hint(errp, "Disabling sve128 results in all vector "
+> -                              "lengths being disabled.\n");
+> -            error_append_hint(errp, "With SVE enabled, at least one vector "
+> -                              "length must be enabled.\n");
+> -            return;
+> -        }
+> -        for (vq = 2; vq <= ARM_MAX_VQ; vq <<= 1) {
+> -            if (test_bit(vq - 1, cpu->sve_vq_init)) {
+> -                break;
+> +        if (kvm_enabled()) {
+> +            /* Disabling a supported length disables all larger lengths. */
+> +            for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
+> +                if (test_bit(vq - 1, cpu->sve_vq_init) &&
+> +                    test_bit(vq - 1, kvm_supported)) {
+> +                    break;
+> +                }
+> +            }
+> +            max_vq = vq <= ARM_MAX_VQ ? vq - 1 : ARM_MAX_VQ;
+> +            bitmap_andnot(cpu->sve_vq_map, kvm_supported,
+> +                          cpu->sve_vq_init, max_vq);
+> +            if (max_vq == 0 || bitmap_empty(cpu->sve_vq_map, max_vq)) {
+> +                vq = find_next_bit(kvm_supported, ARM_MAX_VQ, 0) + 1;
+> +                error_setg(errp, "cannot disable sve%d", vq * 128);
+isn't the one disabled max_vq? Do you really need to re-compute vq?
+> +                error_append_hint(errp, "Disabling sve%d results in all "
+> +                                  "vector lengths being disabled.\n",
+> +                                  vq * 128);
+> +                error_append_hint(errp, "With SVE enabled, at least one "
+> +                                  "vector length must be enabled.\n");
+> +                return;> +            }
+> +        } else {
+> +            /* Disabling a power-of-two disables all larger lengths. */
+> +            if (test_bit(0, cpu->sve_vq_init)) {
+> +                error_setg(errp, "cannot disable sve128");
+> +                error_append_hint(errp, "Disabling sve128 results in all "
+> +                                  "vector lengths being disabled.\n");
+> +                error_append_hint(errp, "With SVE enabled, at least one "
+> +                                  "vector length must be enabled.\n");
+> +                return;
+> +            }
+> +            for (vq = 2; vq <= ARM_MAX_VQ; vq <<= 1) {
+> +                if (test_bit(vq - 1, cpu->sve_vq_init)) {
+> +                    break;
+> +                }
+>              }
+> +            max_vq = vq <= ARM_MAX_VQ ? vq - 1 : ARM_MAX_VQ;
+> +            bitmap_complement(cpu->sve_vq_map, cpu->sve_vq_init, max_vq);
+>          }
+> -        max_vq = vq <= ARM_MAX_VQ ? vq - 1 : ARM_MAX_VQ;
+>  
+> -        bitmap_complement(cpu->sve_vq_map, cpu->sve_vq_init, max_vq);
+>          max_vq = find_last_bit(cpu->sve_vq_map, max_vq) + 1;
+>      }
+>  
+> @@ -358,16 +399,48 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+>      assert(max_vq != 0);
+>      bitmap_clear(cpu->sve_vq_map, max_vq, ARM_MAX_VQ - max_vq);
+>  
+> -    /* Ensure all required powers-of-two are enabled. */
+> -    for (vq = pow2floor(max_vq); vq >= 1; vq >>= 1) {
+> -        if (!test_bit(vq - 1, cpu->sve_vq_map)) {
+> -            error_setg(errp, "cannot disable sve%d", vq * 128);
+> -            error_append_hint(errp, "sve%d is required as it "
+> -                              "is a power-of-two length smaller than "
+> -                              "the maximum, sve%d\n",
+> -                              vq * 128, max_vq * 128);
+> +    if (kvm_enabled()) {
+> +        /* Ensure the set of lengths matches what KVM supports. */
+> +        bitmap_xor(tmp, cpu->sve_vq_map, kvm_supported, max_vq);
+> +        if (!bitmap_empty(tmp, max_vq)) {
+> +            vq = find_last_bit(tmp, max_vq) + 1;
+> +            if (test_bit(vq - 1, cpu->sve_vq_map)) {
+> +                if (cpu->sve_max_vq) {
+> +                    error_setg(errp, "cannot set sve-max-vq=%d",
+> +                               cpu->sve_max_vq);
+> +                    error_append_hint(errp, "This KVM host does not support "
+> +                                      "the vector length %d-bits.\n",
+> +                                      vq * 128);
+> +                    error_append_hint(errp, "It may not be possible to use "
+> +                                      "sve-max-vq with this KVM host. Try "
+> +                                      "using only sve<N> properties.\n");
+> +                } else {
+> +                    error_setg(errp, "cannot enable sve%d", vq * 128);
+> +                    error_append_hint(errp, "This KVM host does not support "
+> +                                      "the vector length %d-bits.\n",
+> +                                      vq * 128);
+> +                }
+> +            } else {
+> +                error_setg(errp, "cannot disable sve%d", vq * 128);
+I am not sure about the above message. what is the vq value supposed to
+be? For instance if we previously entered the
+"if (!bitmap_empty(cpu->sve_vq_map, ARM_MAX_VQ)) {" path
+> +                error_append_hint(errp, "The KVM host requires all "
+> +                                  "supported vector lengths smaller "
+> +                                  "than %d bits to also be enabled.\n",
+> +                                  max_vq * 128);
+> +            }
+>              return;
+>          }
+> +    } else {
+> +        /* Ensure all required powers-of-two are enabled. */
+> +        for (vq = pow2floor(max_vq); vq >= 1; vq >>= 1) {
+> +            if (!test_bit(vq - 1, cpu->sve_vq_map)) {
+> +                error_setg(errp, "cannot disable sve%d", vq * 128);
+> +                error_append_hint(errp, "sve%d is required as it "
+> +                                  "is a power-of-two length smaller than "
+> +                                  "the maximum, sve%d\n",
+> +                                  vq * 128, max_vq * 128);
+> +                return;
+> +            }
+> +        }
+>      }
+>  
+>      /* From now on sve_max_vq is the actual maximum supported length. */
+> @@ -411,13 +484,22 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
+>      Error *err = NULL;
+>  
+>      visit_type_uint32(v, name, &cpu->sve_max_vq, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+>  
+> -    if (!err && (cpu->sve_max_vq == 0 || cpu->sve_max_vq > ARM_MAX_VQ)) {
+> -        error_setg(&err, "unsupported SVE vector length");
+> -        error_append_hint(&err, "Valid sve-max-vq in range [1-%d]\n",
+> +    if (kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
+> +        error_setg(errp, "cannot set sve-max-vq");
+> +        error_append_hint(errp, "SVE not supported by KVM on this host\n");
+> +        return;
+> +    }
+> +
+> +    if (cpu->sve_max_vq == 0 || cpu->sve_max_vq > ARM_MAX_VQ) {
+> +        error_setg(errp, "unsupported SVE vector length");
+> +        error_append_hint(errp, "Valid sve-max-vq in range [1-%d]\n",
+>                            ARM_MAX_VQ);
+>      }
+> -    error_propagate(errp, err);
+>  }
+>  
+>  static void cpu_arm_get_sve_vq(Object *obj, Visitor *v, const char *name,
+> @@ -450,6 +532,12 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name,
+>          return;
+>      }
+>  
+> +    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
+> +        error_setg(errp, "cannot enable %s", name);
+> +        error_append_hint(errp, "SVE not supported by KVM on this host\n");
+> +        return;
+> +    }
+> +
+>      if (value) {
+>          set_bit(vq - 1, cpu->sve_vq_map);
+>      } else {
+> @@ -607,20 +695,19 @@ static void aarch64_max_initfn(Object *obj)
+>          cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
+>          cpu->dcz_blocksize = 7; /*  512 bytes */
+>  #endif
+> -
+> -        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_vq,
+> -                            cpu_max_set_sve_max_vq, NULL, NULL, &error_fatal);
+> -
+> -        for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
+> -            char name[8];
+> -            sprintf(name, "sve%d", vq * 128);
+> -            object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
+> -                                cpu_arm_set_sve_vq, NULL, NULL, &error_fatal);
+> -        }
+>      }
+>  
+>      object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
+>                          cpu_arm_set_sve, NULL, NULL, &error_fatal);
+> +    object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_vq,
+> +                        cpu_max_set_sve_max_vq, NULL, NULL, &error_fatal);
+> +
+> +    for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
+> +        char name[8];
+> +        sprintf(name, "sve%d", vq * 128);
+> +        object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
+> +                            cpu_arm_set_sve_vq, NULL, NULL, &error_fatal);
+> +    }
+>  }
+>  
+>  struct ARMCPUInfo {
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index f96649ae0349..cff4217a8469 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -613,6 +613,100 @@ bool kvm_arm_sve_supported(CPUState *cpu)
+>      return kvm_check_extension(s, KVM_CAP_ARM_SVE);
+>  }
+>  
+> +QEMU_BUILD_BUG_ON(KVM_ARM64_SVE_VQ_MIN != 1);
+> +
+> +void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map)
+> +{
+> +    /* Only call this function if kvm_arm_sve_supported() returns true. */
+> +    static uint64_t vls[KVM_ARM64_SVE_VLS_WORDS];
+> +    static bool probed;
+> +    uint32_t vq = 0;
+> +    int i, j;
+> +
+> +    bitmap_clear(map, 0, ARM_MAX_VQ);
+> +
+> +    /*
+> +     * KVM ensures all host CPUs support the same set of vector lengths.
+> +     * So we only need to create the scratch VCPUs once and then cache
+> +     * the results.
+> +     */
+> +    if (!probed) {
+> +        struct kvm_vcpu_init init = {
+> +            .target = -1,
+> +            .features[0] = (1 << KVM_ARM_VCPU_SVE),
+> +        };
+> +        struct kvm_one_reg reg = {
+> +            .id = KVM_REG_ARM64_SVE_VLS,
+> +            .addr = (uint64_t)&vls[0],
+> +        };
+> +        int fdarray[3], ret;
+> +
+> +        probed = true;
+> +
+> +        if (!kvm_arm_create_scratch_host_vcpu(NULL, fdarray, &init)) {
+> +            error_report("failed to create scratch VCPU with SVE enabled");
+> +            abort();
+> +        }
+> +        ret = ioctl(fdarray[2], KVM_GET_ONE_REG, &reg);
+> +        kvm_arm_destroy_scratch_host_vcpu(fdarray);
+> +        if (ret) {
+> +            error_report("failed to get KVM_REG_ARM64_SVE_VLS: %s",
+> +                         strerror(errno));
+> +            abort();
+> +        }
+> +
+> +        for (i = KVM_ARM64_SVE_VLS_WORDS - 1; i >= 0; --i) {
+> +            if (vls[i]) {
+> +                vq = 64 - clz64(vls[i]) + i * 64;
+> +                break;
+> +            }
+> +        }
+> +        if (vq > ARM_MAX_VQ) {
+> +            warn_report("KVM supports vector lengths larger than "
+> +                        "QEMU can enable");
+> +        }
+> +    }
+> +
+> +    for (i = 0; i < KVM_ARM64_SVE_VLS_WORDS; ++i) {
+> +        if (!vls[i]) {
+> +            continue;
+> +        }
+> +        for (j = 1; j <= 64; ++j) {
+> +            vq = j + i * 64;
+> +            if (vq > ARM_MAX_VQ) {
+> +                return;
+> +            }
+> +            if (vls[i] & (1UL << (j - 1))) {
+> +                set_bit(vq - 1, map);
+> +            }
+> +        }
+> +    }
+> +}
+> +
+> +static int kvm_arm_sve_set_vls(CPUState *cs)
+> +{
+> +    uint64_t vls[KVM_ARM64_SVE_VLS_WORDS] = {0};
+> +    struct kvm_one_reg reg = {
+> +        .id = KVM_REG_ARM64_SVE_VLS,
+> +        .addr = (uint64_t)&vls[0],
+> +    };
+> +    ARMCPU *cpu = ARM_CPU(cs);
+> +    uint32_t vq;
+> +    int i, j;
+> +
+> +    assert(cpu->sve_max_vq <= KVM_ARM64_SVE_VQ_MAX);
+> +
+> +    for (vq = 1; vq <= cpu->sve_max_vq; ++vq) {
+> +        if (test_bit(vq - 1, cpu->sve_vq_map)) {
+> +            i = (vq - 1) / 64;
+> +            j = (vq - 1) % 64;
+> +            vls[i] |= 1UL << j;
+> +        }
+> +    }
+> +
+> +    return kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+> +}
+> +
+>  #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
+>  
+>  int kvm_arch_init_vcpu(CPUState *cs)
+> @@ -624,7 +718,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>  
+>      if (cpu->kvm_target == QEMU_KVM_ARM_TARGET_NONE ||
+>          !object_dynamic_cast(OBJECT(cpu), TYPE_AARCH64_CPU)) {
+> -        fprintf(stderr, "KVM is not supported for this guest CPU type\n");
+> +        error_report("KVM is not supported for this guest CPU type");
+>          return -EINVAL;
+>      }
+>  
+> @@ -660,6 +754,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      }
+>  
+>      if (cpu_isar_feature(aa64_sve, cpu)) {
+> +        ret = kvm_arm_sve_set_vls(cs);
+> +        if (ret) {
+> +            return ret;
+> +        }
+>          ret = kvm_arm_vcpu_finalize(cs, KVM_ARM_VCPU_SVE);
+>          if (ret) {
+>              return ret;
+> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> index 1151877f97ea..a1cc6513f72b 100644
+> --- a/target/arm/kvm_arm.h
+> +++ b/target/arm/kvm_arm.h
+> @@ -212,6 +212,17 @@ typedef struct ARMHostCPUFeatures {
+>   */
+>  bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
+>  
+> +/**
+> + * kvm_arm_sve_get_vls:
+> + * @cs: CPUState
+> + * @map: bitmap to fill in
+> + *
+> + * Get all the SVE vector lengths supported by the KVM host, setting
+> + * the bits corresponding to their length in quadwords minus one
+> + * (vq - 1) in @map up to ARM_MAX_VQ.
+> + */
+> +void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map);
+> +
+>  /**
+>   * kvm_arm_set_cpu_features_from_host:
+>   * @cpu: ARMCPU to set the features for
+> @@ -315,6 +326,7 @@ static inline int kvm_arm_vgic_probe(void)
+>  static inline void kvm_arm_pmu_set_irq(CPUState *cs, int irq) {}
+>  static inline void kvm_arm_pmu_init(CPUState *cs) {}
+>  
+> +static inline void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map) {}
+>  #endif
+>  
+>  static inline const char *gic_class_name(void)
+> diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+> index d50f98cb6aea..a0129aebf409 100644
+> --- a/tests/arm-cpu-features.c
+> +++ b/tests/arm-cpu-features.c
+> @@ -117,6 +117,17 @@ static QDict *resp_get_props(QDict *resp)
+>      return qdict;
+>  }
+>  
+> +static bool resp_get_feature(QDict *resp, const char *feature)
+> +{
+> +    QDict *props;
+> +
+> +    g_assert(resp);
+> +    g_assert(resp_has_props(resp));
+> +    props = resp_get_props(resp);
+> +    g_assert(qdict_get(props, feature));
+> +    return qdict_get_bool(props, feature);
+> +}
+> +
+>  #define assert_has_feature(qts, cpu_type, feature)                     \
+>  ({                                                                     \
+>      QDict *_resp = do_query_no_props(qts, cpu_type);                   \
+> @@ -336,6 +347,25 @@ static void sve_tests_sve_off(const void *data)
+>      qtest_quit(qts);
+>  }
+>  
+> +static void sve_tests_sve_off_kvm(const void *data)
+> +{
+> +    QTestState *qts;
+> +
+> +    qts = qtest_init(MACHINE "-accel kvm -cpu max,sve=off");
+> +
+> +    /*
+> +     * We don't know if this host supports SVE so we don't
+> +     * attempt to test enabling anything. We only test that
+> +     * everything is disabled (as it should be with sve=off)
+> +     * and that using sve<N>=off to explicitly disable vector
+> +     * lengths is OK too.
+> +     */
+> +    assert_sve_vls(qts, "max", 0, NULL);
+> +    assert_sve_vls(qts, "max", 0, "{ 'sve128': false }");
+> +
+> +    qtest_quit(qts);
+> +}
+> +
+>  static void test_query_cpu_model_expansion(const void *data)
+>  {
+>      QTestState *qts;
+> @@ -385,12 +415,81 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+>      assert_has_feature(qts, "host", "pmu");
+>  
+>      if (g_str_equal(qtest_get_arch(), "aarch64")) {
+> +        bool kvm_supports_sve;
+> +        char max_name[8], name[8];
+> +        uint32_t max_vq, vq;
+> +        uint64_t vls;
+> +        QDict *resp;
+> +        char *error;
+> +
+>          assert_has_feature(qts, "host", "aarch64");
+> -        assert_has_feature(qts, "max", "sve");
+>  
+>          assert_error(qts, "cortex-a15",
+>              "We cannot guarantee the CPU type 'cortex-a15' works "
+>              "with KVM on this host", NULL);
+> +
+> +        assert_has_feature(qts, "max", "sve");
+> +        resp = do_query_no_props(qts, "max");
+> +        kvm_supports_sve = resp_get_feature(resp, "sve");
+> +        vls = resp_get_sve_vls(resp);
+> +        qobject_unref(resp);
+> +
+> +        if (kvm_supports_sve) {
+> +            g_assert(vls != 0);
+> +            max_vq = 64 - __builtin_clzll(vls);
+> +            sprintf(max_name, "sve%d", max_vq * 128);
+> +
+> +            /* Enabling a supported length is of course fine. */
+> +            assert_sve_vls(qts, "max", vls, "{ %s: true }", max_name);
+> +
+> +            /* Get the next supported length smaller than max-vq. */
+> +            vq = 64 - __builtin_clzll(vls & ~BIT(max_vq - 1));
+> +            if (vq) {
+> +                /*
+> +                 * We have at least one length smaller than max-vq,
+> +                 * so we can disable max-vq.
+> +                 */
+> +                assert_sve_vls(qts, "max", (vls & ~BIT(max_vq - 1)),
+> +                               "{ %s: false }", max_name);
+> +
+> +                /*
+> +                 * Smaller, supported vector lengths cannot be disabled
+> +                 * unless all larger, supported vector lengths are also
+> +                 * disabled.
+> +                 */
+> +                sprintf(name, "sve%d", vq * 128);
+> +                error = g_strdup_printf("cannot disable %s", name);
+> +                assert_error(qts, "max", error,
+> +                             "{ %s: true, %s: false }",
+> +                             max_name, name);
+> +                g_free(error);
+> +            }
+> +
+> +            /*
+> +             * The smallest, supported vector length is required, because
+> +             * we need at least one vector length enabled.
+> +             */
+> +            vq = __builtin_ffsll(vls);
+> +            sprintf(name, "sve%d", vq * 128);
+> +            error = g_strdup_printf("cannot disable %s", name);
+> +            assert_error(qts, "max", error, "{ %s: false }", name);
+> +            g_free(error);
+> +
+> +            /* Get an unsupported length. */
+> +            for (vq = 1; vq <= max_vq; ++vq) {
+> +                if (!(vls & BIT(vq - 1))) {
+> +                    break;
+> +                }
+> +            }
+> +            if (vq <= SVE_MAX_VQ) {
+> +                sprintf(name, "sve%d", vq * 128);
+> +                error = g_strdup_printf("cannot enable %s", name);
+> +                assert_error(qts, "max", error, "{ %s: true }", name);
+> +                g_free(error);
+> +            }
+> +        } else {
+> +            g_assert(vls == 0);
+> +        }
+>      } else {
+>          assert_error(qts, "host",
+>                       "'pmu' feature not supported by KVM on this host",
+> @@ -427,6 +526,10 @@ int main(int argc, char **argv)
+>      if (kvm_available) {
+>          qtest_add_data_func("/arm/kvm/query-cpu-model-expansion",
+>                              NULL, test_query_cpu_model_expansion_kvm);
+> +        if (g_str_equal(qtest_get_arch(), "aarch64")) {
+> +            qtest_add_data_func("/arm/kvm/query-cpu-model-expansion/sve-off",
+> +                                NULL, sve_tests_sve_off_kvm);
+> +        }
+>      }
+>  
+>      return g_test_run();
+> 
+Besides,
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Thanks
 
-> On 9/24/19 2:44 PM, Sergio Lopez wrote:
->> Microvm is a machine type inspired by both NEMU and Firecracker, and
->> constructed after the machine model implemented by the latter.
->>=20
->> It's main purpose is providing users a minimalist machine type free
->> from the burden of legacy compatibility, serving as a stepping stone
->> for future projects aiming at improving boot times, reducing the
->> attack surface and slimming down QEMU's footprint.
->>=20
->> The microvm machine type supports the following devices:
->>=20
->>  - ISA bus
->>  - i8259 PIC
->>  - LAPIC (implicit if using KVM)
->>  - IOAPIC (defaults to kernel_irqchip_split =3D true)
->>  - i8254 PIT
->>  - MC146818 RTC (optional)
->>  - kvmclock (if using KVM)
->>  - fw_cfg
->>  - One ISA serial port (optional)
->>  - Up to eight virtio-mmio devices (configured by the user)
->>=20
->> It supports the following machine-specific options:
->>=20
->> microvm.option-roms=3Dbool (Set off to disable loading option ROMs)
->> microvm.isa-serial=3Dbool (Set off to disable the instantiation an ISA s=
-erial port)
->> microvm.rtc=3Dbool (Set off to disable the instantiation of an MC146818 =
-RTC)
->> microvm.kernel-cmdline=3Dbool (Set off to disable adding virtio-mmio dev=
-ices to the kernel cmdline)
->>=20
->> By default, microvm uses qboot as its BIOS, to obtain better boot
->> times, but it's also compatible with SeaBIOS.
->>=20
->> As no current FW is able to boot from a block device using virtio-mmio
->> as its transport, a microvm-based VM needs to be run using a host-side
->> kernel and, optionally, an initrd image.
->>=20
->> This is an example of instantiating a microvm VM with a virtio-mmio
->> based console:
->>=20
->> qemu-system-x86_64 -M microvm
->>  -enable-kvm -cpu host -m 512m -smp 2 \
->>  -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
->>  -nodefaults -no-user-config -nographic \
->>  -chardev stdio,id=3Dvirtiocon0,server \
->>  -device virtio-serial-device \
->>  -device virtconsole,chardev=3Dvirtiocon0 \
->>  -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
->>  -device virtio-blk-device,drive=3Dtest \
->>  -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
->>  -device virtio-net-device,netdev=3Dtap0
->>=20
->> This is another example, this time using an ISA serial port, useful
->> for debugging purposes:
->>=20
->> qemu-system-x86_64 -M microvm \
->>  -enable-kvm -cpu host -m 512m -smp 2 \
->>  -kernel vmlinux -append "earlyprintk=3DttyS0 console=3DttyS0 root=3D/de=
-v/vda" \
->>  -nodefaults -no-user-config -nographic \
->>  -serial stdio \
->>  -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
->>  -device virtio-blk-device,drive=3Dtest \
->>  -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
->>  -device virtio-net-device,netdev=3Dtap0
->>=20
->> Finally, in this example a microvm VM is instantiated without RTC,
->> without an ISA serial port and without loading the option ROMs,
->> obtaining the smallest configuration:
->>=20
->> qemu-system-x86_64 -M microvm,rtc=3Doff,isa-serial=3Doff,option-roms=3Do=
-ff \
->>  -enable-kvm -cpu host -m 512m -smp 2 \
->>  -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
->>  -nodefaults -no-user-config -nographic \
->>  -chardev stdio,id=3Dvirtiocon0,server \
->>  -device virtio-serial-device \
->>  -device virtconsole,chardev=3Dvirtiocon0 \
->>  -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
->>  -device virtio-blk-device,drive=3Dtest \
->>  -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
->>  -device virtio-net-device,netdev=3Dtap0
->>=20
->> Signed-off-by: Sergio Lopez <slp@redhat.com>
->> ---
->>  default-configs/i386-softmmu.mak |   1 +
->>  hw/i386/Kconfig                  |   4 +
->>  hw/i386/Makefile.objs            |   1 +
->>  hw/i386/microvm.c                | 512 +++++++++++++++++++++++++++++++
->>  include/hw/i386/microvm.h        |  80 +++++
->>  5 files changed, 598 insertions(+)
->>  create mode 100644 hw/i386/microvm.c
->>  create mode 100644 include/hw/i386/microvm.h
->>=20
->> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-sof=
-tmmu.mak
->> index cd5ea391e8..c27cdd98e9 100644
->> --- a/default-configs/i386-softmmu.mak
->> +++ b/default-configs/i386-softmmu.mak
->> @@ -26,3 +26,4 @@ CONFIG_ISAPC=3Dy
->>  CONFIG_I440FX=3Dy
->>  CONFIG_Q35=3Dy
->>  CONFIG_ACPI_PCI=3Dy
->> +CONFIG_MICROVM=3Dy
->> \ No newline at end of file
->> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
->> index 6350438036..324e193dd8 100644
->> --- a/hw/i386/Kconfig
->> +++ b/hw/i386/Kconfig
->> @@ -88,6 +88,10 @@ config Q35
->>      select SMBIOS
->>      select FW_CFG_DMA
->>=20=20
->> +config MICROVM
->> +    bool
->> +    select VIRTIO_MMIO
->> +
->>  config VTD
->>      bool
->>=20=20
->> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
->> index 5b4b3a672e..bb17d54567 100644
->> --- a/hw/i386/Makefile.objs
->> +++ b/hw/i386/Makefile.objs
->> @@ -6,6 +6,7 @@ obj-y +=3D pc.o
->>  obj-y +=3D e820.o
->>  obj-$(CONFIG_I440FX) +=3D pc_piix.o
->>  obj-$(CONFIG_Q35) +=3D pc_q35.o
->> +obj-$(CONFIG_MICROVM) +=3D microvm.o
->>  obj-y +=3D fw_cfg.o pc_sysfw.o
->>  obj-y +=3D x86-iommu.o
->>  obj-$(CONFIG_VTD) +=3D intel_iommu.o
->> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
->> new file mode 100644
->> index 0000000000..4b494a1b27
->> --- /dev/null
->> +++ b/hw/i386/microvm.c
->> @@ -0,0 +1,512 @@
->> +/*
->> + * Copyright (c) 2018 Intel Corporation
->> + * Copyright (c) 2019 Red Hat, Inc.
->> + *
->> + * This program is free software; you can redistribute it and/or modify=
- it
->> + * under the terms and conditions of the GNU General Public License,
->> + * version 2 or later, as published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope it will be useful, but WITHO=
-UT
->> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
->> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licens=
-e for
->> + * more details.
->> + *
->> + * You should have received a copy of the GNU General Public License al=
-ong with
->> + * this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/error-report.h"
->> +#include "qemu/cutils.h"
->> +#include "qemu/units.h"
->> +#include "qapi/error.h"
->> +#include "qapi/visitor.h"
->> +#include "sysemu/sysemu.h"
->> +#include "sysemu/cpus.h"
->> +#include "sysemu/numa.h"
->> +#include "sysemu/reset.h"
->> +
->> +#include "hw/loader.h"
->> +#include "hw/irq.h"
->> +#include "hw/nmi.h"
->> +#include "hw/kvm/clock.h"
->> +#include "hw/i386/microvm.h"
->> +#include "hw/i386/x86.h"
->> +#include "hw/i386/pc.h"
->> +#include "target/i386/cpu.h"
->> +#include "hw/timer/i8254.h"
->> +#include "hw/timer/mc146818rtc.h"
->> +#include "hw/char/serial.h"
->> +#include "hw/i386/topology.h"
->> +#include "hw/i386/e820.h"
->> +#include "hw/i386/fw_cfg.h"
->> +#include "hw/virtio/virtio-mmio.h"
->> +
->> +#include "cpu.h"
->> +#include "elf.h"
->> +#include "pvh.h"
->> +#include "kvm_i386.h"
->> +#include "hw/xen/start_info.h"
->> +
->> +#define MICROVM_BIOS_FILENAME "bios-microvm.bin"
->> +
->> +static void microvm_set_rtc(MicrovmMachineState *mms, ISADevice *s)
->> +{
->> +    X86MachineState *x86ms =3D X86_MACHINE(mms);
->> +    int val;
->> +
->> +    val =3D MIN(x86ms->below_4g_mem_size / KiB, 640);
->> +    rtc_set_memory(s, 0x15, val);
->> +    rtc_set_memory(s, 0x16, val >> 8);
->> +    /* extended memory (next 64MiB) */
->> +    if (x86ms->below_4g_mem_size > 1 * MiB) {
->> +        val =3D (x86ms->below_4g_mem_size - 1 * MiB) / KiB;
->> +    } else {
->> +        val =3D 0;
->> +    }
->> +    if (val > 65535) {
->> +        val =3D 65535;
->> +    }
->> +    rtc_set_memory(s, 0x17, val);
->> +    rtc_set_memory(s, 0x18, val >> 8);
->> +    rtc_set_memory(s, 0x30, val);
->> +    rtc_set_memory(s, 0x31, val >> 8);
->> +    /* memory between 16MiB and 4GiB */
->> +    if (x86ms->below_4g_mem_size > 16 * MiB) {
->> +        val =3D (x86ms->below_4g_mem_size - 16 * MiB) / (64 * KiB);
->> +    } else {
->> +        val =3D 0;
->> +    }
->> +    if (val > 65535) {
->> +        val =3D 65535;
->> +    }
->> +    rtc_set_memory(s, 0x34, val);
->> +    rtc_set_memory(s, 0x35, val >> 8);
->> +    /* memory above 4GiB */
->> +    val =3D x86ms->above_4g_mem_size / 65536;
->> +    rtc_set_memory(s, 0x5b, val);
->> +    rtc_set_memory(s, 0x5c, val >> 8);
->> +    rtc_set_memory(s, 0x5d, val >> 16);
->> +}
->> +
->> +static void microvm_devices_init(MicrovmMachineState *mms)
->> +{
->> +    X86MachineState *x86ms =3D X86_MACHINE(mms);
->> +    ISABus *isa_bus;
->> +    ISADevice *rtc_state;
->> +    GSIState *gsi_state;
->> +    qemu_irq *i8259;
->> +    int i;
->> +
->> +    gsi_state =3D g_malloc0(sizeof(*gsi_state));
->> +    x86ms->gsi =3D qemu_allocate_irqs(gsi_handler, gsi_state, GSI_NUM_P=
-INS);
->> +
->> +    isa_bus =3D isa_bus_new(NULL, get_system_memory(), get_system_io(),
->> +                          &error_abort);
->> +    isa_bus_irqs(isa_bus, x86ms->gsi);
->> +
->> +    i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
->> +
->> +    for (i =3D 0; i < ISA_NUM_IRQS; i++) {
->> +        gsi_state->i8259_irq[i] =3D i8259[i];
->> +    }
->> +
->> +    ioapic_init_gsi(gsi_state, "machine");
->> +
->> +    if (mms->rtc_enabled) {
->> +        rtc_state =3D mc146818_rtc_init(isa_bus, 2000, NULL);
->> +        microvm_set_rtc(mms, rtc_state);
->> +    }
->> +
->
-> Maybe refactor that ...
->
->> +    if (kvm_pit_in_kernel()) {
->> +        kvm_pit_init(isa_bus, 0x40);
->> +    } else {
->> +        i8254_pit_init(isa_bus, 0x40, 0, NULL);
->> +    }
->
-> ... as a x86_pit_create() function?
-
-This is deemed to change in v5, as we want to avoid the legacy PIC+PIT
-when possible.
-
->> +
->> +    kvmclock_create();
->> +
->> +    for (i =3D 0; i < VIRTIO_NUM_TRANSPORTS; i++) {
->> +        int nirq =3D VIRTIO_IRQ_BASE + i;
->> +        ISADevice *isadev =3D isa_create(isa_bus, TYPE_ISA_SERIAL);
->> +        qemu_irq mmio_irq;
->> +
->> +        isa_init_irq(isadev, &mmio_irq, nirq);
->> +        sysbus_create_simple("virtio-mmio",
->> +                             VIRTIO_MMIO_BASE + i * 512,
->> +                             x86ms->gsi[VIRTIO_IRQ_BASE + i]);
->> +    }
->> +
->> +    g_free(i8259);
->
-> Not related to this patch, but i8259_init() API is not clear,
-> it returns an allocated array of allocated qemu_irqs? Is it safe to copy
-> them to gsi_state then free the array?
-
-That's how I understand it, and also how it's used elsewhere.
-
->> +
->> +    if (mms->isa_serial_enabled) {
->> +        serial_hds_isa_init(isa_bus, 0, 1);
->> +    }
->> +
->> +    if (bios_name =3D=3D NULL) {
->> +        bios_name =3D MICROVM_BIOS_FILENAME;
->> +    }
->> +    x86_system_rom_init(get_system_memory(), true);
->> +}
->> +
->> +static void microvm_memory_init(MicrovmMachineState *mms)
->> +{
->> +    MachineState *machine =3D MACHINE(mms);
->> +    X86MachineState *x86ms =3D X86_MACHINE(mms);
->> +    MemoryRegion *ram, *ram_below_4g, *ram_above_4g;
->> +    MemoryRegion *system_memory =3D get_system_memory();
->> +    FWCfgState *fw_cfg;
->> +    ram_addr_t lowmem;
->> +    int i;
->> +
->> +    /*
->> +     * Check whether RAM fits below 4G (leaving 1/2 GByte for IO memory
->> +     * and 256 Mbytes for PCI Express Enhanced Configuration Access Map=
-ping
->> +     * also known as MMCFG).
->> +     * If it doesn't, we need to split it in chunks below and above 4G.
->> +     * In any case, try to make sure that guest addresses aligned at
->> +     * 1G boundaries get mapped to host addresses aligned at 1G boundar=
-ies.
->> +     */
->> +    if (machine->ram_size >=3D 0xb0000000) {
->> +        lowmem =3D 0x80000000;
->> +    } else {
->> +        lowmem =3D 0xb0000000;
->> +    }
->> +
->> +    /*
->> +     * Handle the machine opt max-ram-below-4g.  It is basically doing
->> +     * min(qemu limit, user limit).
->> +     */
->> +    if (!x86ms->max_ram_below_4g) {
->> +        x86ms->max_ram_below_4g =3D 1ULL << 32; /* default: 4G */
->
-> Please use '4 * GiB' with no comment.
-
-Ack (this is copypaste from pc_q35.c).
-
->> +    }
->> +    if (lowmem > x86ms->max_ram_below_4g) {
->> +        lowmem =3D x86ms->max_ram_below_4g;
->> +        if (machine->ram_size - lowmem > lowmem &&
->> +            lowmem & (1 * GiB - 1)) {
->> +            warn_report("There is possibly poor performance as the ram =
-size "
->> +                        " (0x%" PRIx64 ") is more then twice the size o=
-f"
->> +                        " max-ram-below-4g (%"PRIu64") and"
->> +                        " max-ram-below-4g is not a multiple of 1G.",
->> +                        (uint64_t)machine->ram_size, x86ms->max_ram_bel=
-ow_4g);
->> +        }
->> +    }
->> +
->> +    if (machine->ram_size > lowmem) {
->> +        x86ms->above_4g_mem_size =3D machine->ram_size - lowmem;
->> +        x86ms->below_4g_mem_size =3D lowmem;
->> +    } else {
->> +        x86ms->above_4g_mem_size =3D 0;
->> +        x86ms->below_4g_mem_size =3D machine->ram_size;
->> +    }
->> +
->> +    ram =3D g_malloc(sizeof(*ram));
->> +    memory_region_allocate_system_memory(ram, NULL, "microvm.ram",
->> +                                         machine->ram_size);
->> +
->> +    ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
->> +    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
->> +                             0, x86ms->below_4g_mem_size);
->> +    memory_region_add_subregion(system_memory, 0, ram_below_4g);
->> +
->> +    e820_add_entry(0, x86ms->below_4g_mem_size, E820_RAM);
->> +
->> +    if (x86ms->above_4g_mem_size > 0) {
->> +        ram_above_4g =3D g_malloc(sizeof(*ram_above_4g));
->> +        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ra=
-m,
->> +                                 x86ms->below_4g_mem_size,
->> +                                 x86ms->above_4g_mem_size);
->> +        memory_region_add_subregion(system_memory, 0x100000000ULL,
->> +                                    ram_above_4g);
->> +        e820_add_entry(0x100000000ULL, x86ms->above_4g_mem_size, E820_R=
-AM);
->> +    }
->> +
->> +    fw_cfg =3D fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4,
->> +                                &address_space_memory);
->> +
->> +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
->> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)x86ms->apic_id_li=
-mit);
->> +    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size=
-);
->> +    fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_overri=
-de());
->> +
->> +    rom_set_fw(fw_cfg);
->> +
->> +    e820_create_fw_entry(fw_cfg);
->> +
->> +    load_linux(x86ms, fw_cfg, 0, true, true);
->> +
->> +    if (mms->option_roms_enabled) {
->> +        for (i =3D 0; i < nb_option_roms; i++) {
->> +            rom_add_option(option_rom[i].name, option_rom[i].bootindex);
->> +        }
->> +    }
->> +
->> +    x86ms->fw_cfg =3D fw_cfg;
->> +    x86ms->ioapic_as =3D &address_space_memory;
->> +}
->> +
->> +static gchar *microvm_get_mmio_cmdline(gchar *name)
->> +{
->> +    gchar *cmdline;
->> +    gchar *separator;
->> +    long int index;
->> +    int ret;
->> +
->> +    separator =3D g_strrstr(name, ".");
->> +    if (!separator) {
->> +        return NULL;
->> +    }
->> +
->> +    if (qemu_strtol(separator + 1, NULL, 10, &index) !=3D 0) {
->> +        return NULL;
->> +    }
->> +
->> +    cmdline =3D g_malloc0(VIRTIO_CMDLINE_MAXLEN);
->> +    ret =3D g_snprintf(cmdline, VIRTIO_CMDLINE_MAXLEN,
->> +                     " virtio_mmio.device=3D512@0x%lx:%ld",
->> +                     VIRTIO_MMIO_BASE + index * 512,
->> +                     VIRTIO_IRQ_BASE + index);
->> +    if (ret < 0 || ret >=3D VIRTIO_CMDLINE_MAXLEN) {
->> +        g_free(cmdline);
->> +        return NULL;
->> +    }
->> +
->> +    return cmdline;
->> +}
->> +
->> +static void microvm_fix_kernel_cmdline(MachineState *machine)
->> +{
->> +    X86MachineState *x86ms =3D X86_MACHINE(machine);
->> +    BusState *bus;
->> +    BusChild *kid;
->> +    char *cmdline;
->> +
->> +    /*
->> +     * Find MMIO transports with attached devices, and add them to the =
-kernel
->> +     * command line.
->> +     *
->> +     * Yes, this is a hack, but one that heavily improves the UX without
->> +     * introducing any significant issues.
->> +     */
->> +    cmdline =3D g_strdup(machine->kernel_cmdline);
->> +    bus =3D sysbus_get_default();
->> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
->> +        DeviceState *dev =3D kid->child;
->> +        ObjectClass *class =3D object_get_class(OBJECT(dev));
->> +
->> +        if (class =3D=3D object_class_by_name(TYPE_VIRTIO_MMIO)) {
->> +            VirtIOMMIOProxy *mmio =3D VIRTIO_MMIO(OBJECT(dev));
->> +            VirtioBusState *mmio_virtio_bus =3D &mmio->bus;
->> +            BusState *mmio_bus =3D &mmio_virtio_bus->parent_obj;
->> +
->> +            if (!QTAILQ_EMPTY(&mmio_bus->children)) {
->> +                gchar *mmio_cmdline =3D microvm_get_mmio_cmdline(mmio_b=
-us->name);
->> +                if (mmio_cmdline) {
->> +                    char *newcmd =3D g_strjoin(NULL, cmdline, mmio_cmdl=
-ine, NULL);
->> +                    g_free(mmio_cmdline);
->> +                    g_free(cmdline);
->> +                    cmdline =3D newcmd;
->> +                }
->> +            }
->> +        }
->> +    }
->> +
->> +    fw_cfg_modify_i32(x86ms->fw_cfg, FW_CFG_CMDLINE_SIZE, strlen(cmdlin=
-e) + 1);
->> +    fw_cfg_modify_string(x86ms->fw_cfg, FW_CFG_CMDLINE_DATA, cmdline);
->> +}
->> +
->> +static void microvm_machine_state_init(MachineState *machine)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(machine);
->> +    X86MachineState *x86ms =3D X86_MACHINE(machine);
->> +    Error *local_err =3D NULL;
->> +
->> +    if (machine->kernel_filename =3D=3D NULL) {
->> +        error_report("missing kernel image file name, required by micro=
-vm");
->> +        exit(1);
->> +    }
->> +
->> +    microvm_memory_init(mms);
->> +
->> +    x86_cpus_init(x86ms, CPU_VERSION_LATEST);
->> +    if (local_err) {
->> +        error_report_err(local_err);
->> +        exit(1);
->> +    }
->> +
->> +    microvm_devices_init(mms);
->> +}
->> +
->> +static void microvm_machine_reset(MachineState *machine)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(machine);
->> +    CPUState *cs;
->> +    X86CPU *cpu;
->> +
->> +    if (mms->kernel_cmdline_enabled && !mms->kernel_cmdline_fixed) {
->> +        microvm_fix_kernel_cmdline(machine);
->> +        mms->kernel_cmdline_fixed =3D true;
->> +    }
->> +
->> +    qemu_devices_reset();
->> +
->> +    CPU_FOREACH(cs) {
->> +        cpu =3D X86_CPU(cs);
->> +
->> +        if (cpu->apic_state) {
->> +            device_reset(cpu->apic_state);
->> +        }
->> +    }
->> +}
->> +
->> +static bool microvm_machine_get_rtc(Object *obj, Error **errp)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    return mms->rtc_enabled;
->> +}
->> +
->> +static void microvm_machine_set_rtc(Object *obj, bool value, Error **er=
-rp)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    mms->rtc_enabled =3D value;
->> +}
->> +
->> +static bool microvm_machine_get_isa_serial(Object *obj, Error **errp)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    return mms->isa_serial_enabled;
->> +}
->> +
->> +static void microvm_machine_set_isa_serial(Object *obj, bool value,
->> +                                           Error **errp)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    mms->isa_serial_enabled =3D value;
->> +}
->> +
->> +static bool microvm_machine_get_option_roms(Object *obj, Error **errp)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    return mms->option_roms_enabled;
->> +}
->> +
->> +static void microvm_machine_set_option_roms(Object *obj, bool value,
->> +                                            Error **errp)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    mms->option_roms_enabled =3D value;
->> +}
->> +
->> +static bool microvm_machine_get_kernel_cmdline(Object *obj, Error **err=
-p)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    return mms->kernel_cmdline_enabled;
->> +}
->> +
->> +static void microvm_machine_set_kernel_cmdline(Object *obj, bool value,
->> +                                               Error **errp)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    mms->kernel_cmdline_enabled =3D value;
->> +}
->> +
->> +static void microvm_machine_initfn(Object *obj)
->> +{
->> +    MicrovmMachineState *mms =3D MICROVM_MACHINE(obj);
->> +
->> +    /* Configuration */
->> +    mms->rtc_enabled =3D true;
->> +    mms->isa_serial_enabled =3D true;
->> +    mms->option_roms_enabled =3D true;
->> +    mms->kernel_cmdline_enabled =3D true;
->> +
->> +    /* State */
->> +    mms->kernel_cmdline_fixed =3D false;
->> +}
->> +
->> +static void microvm_class_init(ObjectClass *oc, void *data)
->> +{
->> +    MachineClass *mc =3D MACHINE_CLASS(oc);
->> +    NMIClass *nc =3D NMI_CLASS(oc);
->> +
->> +    mc->init =3D microvm_machine_state_init;
->> +
->> +    mc->family =3D "microvm_i386";
->> +    mc->desc =3D "Microvm (i386)";
->> +    mc->units_per_default_bus =3D 1;
->> +    mc->no_floppy =3D 1;
->> +    machine_class_allow_dynamic_sysbus_dev(mc, "sysbus-debugcon");
->> +    machine_class_allow_dynamic_sysbus_dev(mc, "sysbus-debugexit");
->
-> Aren't these common to X86?
-
-Hm... Those seem to be leftovers from NEMU's virt.c. I'll check it those
-are really needed.
-
->> +    mc->max_cpus =3D 288;
->> +    mc->has_hotpluggable_cpus =3D false;
->> +    mc->auto_enable_numa_with_memhp =3D false;
->> +    mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
->> +    mc->nvdimm_supported =3D false;
->> +
->> +    /* Avoid relying too much on kernel components */
->> +    mc->default_kernel_irqchip_split =3D true;
->> +
->> +    /* Machine class handlers */
->> +    mc->reset =3D microvm_machine_reset;
->> +
->> +    /* NMI handler */
->> +    nc->nmi_monitor_handler =3D x86_nmi;
->> +
->> +    object_class_property_add_bool(oc, MICROVM_MACHINE_RTC,
->> +                                   microvm_machine_get_rtc,
->> +                                   microvm_machine_set_rtc,
->> +                                   &error_abort);
->> +    object_class_property_set_description(oc, MICROVM_MACHINE_RTC,
->> +        "Set off to disable the instantiation of an MC146818 RTC",
->> +        &error_abort);
->> +
->> +    object_class_property_add_bool(oc, MICROVM_MACHINE_ISA_SERIAL,
->> +                                   microvm_machine_get_isa_serial,
->> +                                   microvm_machine_set_isa_serial,
->> +                                   &error_abort);
->> +    object_class_property_set_description(oc, MICROVM_MACHINE_ISA_SERIA=
-L,
->> +        "Set off to disable the instantiation an ISA serial port",
->> +        &error_abort);
->> +
->> +    object_class_property_add_bool(oc, MICROVM_MACHINE_OPTION_ROMS,
->> +                                   microvm_machine_get_option_roms,
->> +                                   microvm_machine_set_option_roms,
->> +                                   &error_abort);
->> +    object_class_property_set_description(oc, MICROVM_MACHINE_OPTION_RO=
-MS,
->> +        "Set off to disable loading option ROMs", &error_abort);
->> +
->> +    object_class_property_add_bool(oc, MICROVM_MACHINE_KERNEL_CMDLINE,
->> +                                   microvm_machine_get_kernel_cmdline,
->> +                                   microvm_machine_set_kernel_cmdline,
->> +                                   &error_abort);
->> +    object_class_property_set_description(oc, MICROVM_MACHINE_KERNEL_CM=
-DLINE,
->> +        "Set off to disable adding virtio-mmio devices to the kernel cm=
-dline",
->> +        &error_abort);
->> +}
->> +
->> +static const TypeInfo microvm_machine_info =3D {
->> +    .name          =3D TYPE_MICROVM_MACHINE,
->> +    .parent        =3D TYPE_X86_MACHINE,
->> +    .instance_size =3D sizeof(MicrovmMachineState),
->> +    .instance_init =3D microvm_machine_initfn,
->> +    .class_size    =3D sizeof(MicrovmMachineClass),
->> +    .class_init    =3D microvm_class_init,
->> +    .interfaces =3D (InterfaceInfo[]) {
->> +         { TYPE_NMI },
->
-> Isn't this inherited from TYPE_X86_MACHINE?
-
-Good question. Should we assume all x86 based machines have NMI, or just
-leave it to each board?
-
-Thanks,
-Sergio.
-
->> +         { }
->> +    },
->> +};
->> +
->> +static void microvm_machine_init(void)
->> +{
->> +    type_register_static(&microvm_machine_info);
->> +}
->> +type_init(microvm_machine_init);
->> diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
->> new file mode 100644
->> index 0000000000..04c8caf886
->> --- /dev/null
->> +++ b/include/hw/i386/microvm.h
->> @@ -0,0 +1,80 @@
->> +/*
->> + * Copyright (c) 2018 Intel Corporation
->> + * Copyright (c) 2019 Red Hat, Inc.
->> + *
->> + * This program is free software; you can redistribute it and/or modify=
- it
->> + * under the terms and conditions of the GNU General Public License,
->> + * version 2 or later, as published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope it will be useful, but WITHO=
-UT
->> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
->> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Licens=
-e for
->> + * more details.
->> + *
->> + * You should have received a copy of the GNU General Public License al=
-ong with
->> + * this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#ifndef HW_I386_MICROVM_H
->> +#define HW_I386_MICROVM_H
->> +
->> +#include "qemu-common.h"
->> +#include "exec/hwaddr.h"
->> +#include "qemu/notify.h"
->> +
->> +#include "hw/boards.h"
->> +#include "hw/i386/x86.h"
->> +
->> +/* Microvm memory layout */
->> +#define PVH_START_INFO        0x6000
->> +#define MEMMAP_START          0x7000
->> +#define MODLIST_START         0x7800
->> +#define BOOT_STACK_POINTER    0x8ff0
->> +#define PML4_START            0x9000
->> +#define PDPTE_START           0xa000
->> +#define PDE_START             0xb000
->> +#define KERNEL_CMDLINE_START  0x20000
->> +#define EBDA_START            0x9fc00
->> +#define HIMEM_START           0x100000
->> +
->> +/* Platform virtio definitions */
->> +#define VIRTIO_MMIO_BASE      0xc0000000
->> +#define VIRTIO_IRQ_BASE       5
->> +#define VIRTIO_NUM_TRANSPORTS 8
->> +#define VIRTIO_CMDLINE_MAXLEN 64
->> +
->> +/* Machine type options */
->> +#define MICROVM_MACHINE_RTC            "rtc"
->> +#define MICROVM_MACHINE_ISA_SERIAL     "isa-serial"
->> +#define MICROVM_MACHINE_OPTION_ROMS    "option-roms"
->> +#define MICROVM_MACHINE_KERNEL_CMDLINE "kernel-cmdline"
->> +
->> +typedef struct {
->> +    X86MachineClass parent;
->> +    HotplugHandler *(*orig_hotplug_handler)(MachineState *machine,
->> +                                           DeviceState *dev);
->> +} MicrovmMachineClass;
->> +
->> +typedef struct {
->> +    X86MachineState parent;
->> +
->> +    /* Machine type options */
->> +    bool rtc_enabled;
->> +    bool isa_serial_enabled;
->> +    bool option_roms_enabled;
->> +    bool kernel_cmdline_enabled;
->> +
->> +
->> +    /* Machine state */
->> +    bool kernel_cmdline_fixed;
->> +} MicrovmMachineState;
->> +
->> +#define TYPE_MICROVM_MACHINE   MACHINE_TYPE_NAME("microvm")
->> +#define MICROVM_MACHINE(obj) \
->> +    OBJECT_CHECK(MicrovmMachineState, (obj), TYPE_MICROVM_MACHINE)
->> +#define MICROVM_MACHINE_GET_CLASS(obj) \
->> +    OBJECT_GET_CLASS(MicrovmMachineClass, obj, TYPE_MICROVM_MACHINE)
->> +#define MICROVM_MACHINE_CLASS(class) \
->> +    OBJECT_CLASS_CHECK(MicrovmMachineClass, class, TYPE_MICROVM_MACHINE)
->> +
->> +#endif
->>=20
+Eric
 
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2MW+IACgkQ9GknjS8M
-AjX8Ug/+PXigHTQR8Twzt6rRWUkGSeIU7gfO7G5lK3+XnO+A0AGThCJ9QdacOfTI
-j0z7mPdWpdiUdhCxn4QIVOls58rPToYtLOZt+69x2rN3TZ4IIRuKsCL5GvgdVK6R
-M2QOKI1RjUiPyF43RaBrkoYWE3h1IbcJH3nRO8yhfn1aU5QZadh9VbsvmKcLiFkt
-apt8lznvp8P+INao7oPaMpTUL8X4CntKKUL1g7CMJ8p3ny8cv7Y+flM+Jn9DySz+
-fFI4F93/LlidbxrB/gLRoXO1YMdKFC5Ee7qgnBmW3qLZK/djfCqHt0Dn+qSqkxvG
-WA1flZuqmueRBal8yzynuh4vIWd501MZeo9ynll+nlZ39GPKDZaIHmQASwNK4lvo
-1/23Msfd4fVJ4DPKHv5ltcaBHJNeeeu0BoOIzQ78SMQbo29tjecVdot/X3rZEbte
-Jm+fMXCtoedKA3fDHexvXacVICShB72mQr7sffZHam84pqp+BLuIb/aI0jD3KXE9
-XGYoi2YSFK+pLu3V1VOgXehJQ+kfvUQvfEB20mKzc1fdgr9ixfMfBkexrlP5dsuI
-mFqxZjOY0Z6PUVz+10XLM2rRVIcveqncSt+ZCb+BKebfWr/joaTZ25zawCSE1ylo
-m8DxzgoROcI+PF5JhPQmwJ9egln7qmBxzG9dB2wmhxpbS38ep3o=
-=BI4G
------END PGP SIGNATURE-----
---=-=-=--
 
