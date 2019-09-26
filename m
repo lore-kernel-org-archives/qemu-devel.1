@@ -2,118 +2,66 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6074C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF292C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:13:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72361222BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:08:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB726206E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:13:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tTDrq+sO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72361222BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mXaSFMnk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB726206E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDSZ2-0005nF-TE
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:08:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60928)
+	id 1iDSeM-0001L5-Im
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:13:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33556)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDSXS-0004bu-6v
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:06:27 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iDScs-0008Dq-QX
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDSXQ-0001N9-Vx
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:06:26 -0400
-Received: from mail-eopbgr60123.outbound.protection.outlook.com
- ([40.107.6.123]:16600 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDSXI-0000hq-C8; Thu, 26 Sep 2019 08:06:19 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZzwoFZDX6wd0uQfj/KoDyK7d1h0TGUhuxT3vB32JyPdO+iTezjqE5wHm2BtE2B/oHjziUi6EhFF+pc9AArojpeuurBypOox9eamgQac0Io7IXZl4iiArsqCbG0PDy5MMDg7t8OFz03enCDnRcHuQv8ME+PRIsqR5rQ4yvT2xTHy0eW+NuYOJzX9kWjD7pI8k7a4aGeClnaZXawxlkGA40dpovd/HFmWaVMrke10tyB8cmYHEvjkMaD0673lg0DwRyisl6HyDAuvFZuLmC0HJWIpRxftwjuToqRriVRgnLNSxDdYOreywmLEt8qRiqs0M+RVk4naAF8VFfl0CxnbMSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Fuuw830LBL35ZBgYCTJcUkI5kz/IovUwFlznvE8HgpE=;
- b=ZO2OmCbNhaluh9ZmDROuyNviKX7r+O/lefZ8EBtlUjg6X2lAJvNNrJw5HCUuV1K1nrnVvumz1ytlZ6JAByVeZsEDWe4yQsbtkE1NQftUphWfxgoNVzHCxOh8ysdOtj7OsBP9IBOwDdFKpnnnofVO65aP1GvClXHjxKNGgBppKgwjemMC75bm4nR1ve7Dd93A5ov8rpCf7CMZxkaYS0wd9UGm8nBUVye5xmoGmXHAIH1toNBlOGnbIvl/TnmT8CsPJL1p+QU3UuadG/cZL//vfxJjh/Y5EjdsbDm9YXlLUrVHcW+OdkJ6zOgfvaCqAFuCKtbqCxRZqY6SV1m3oV2SQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Fuuw830LBL35ZBgYCTJcUkI5kz/IovUwFlznvE8HgpE=;
- b=tTDrq+sOhHKVg2Ngrocn4Yxa9XVqlimE1bVmEMT5xLVO25hZZgObHf1k+9PpwvWXpEzhMz0kVBiHmoGAXwqE0DS9OtA35sjrDv++GKgY9vvXFzgqbOgsgpinlbANIA4Py1wHugWK6A3mD1vXqtWD8Ucf7vNccA8SWtztalisnb0=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5353.eurprd08.prod.outlook.com (52.133.240.85) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.20; Thu, 26 Sep 2019 12:06:12 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Thu, 26 Sep 2019
- 12:06:11 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "no-reply@patchew.org"
- <no-reply@patchew.org>, "stefanha@redhat.com" <stefanha@redhat.com>
-Subject: Re: [PULL 0/2] Block patches
-Thread-Topic: [PULL 0/2] Block patches
-Thread-Index: AQHVc8k1k3YXEIerUkem33IUrXFaAqc9fE6AgABhr4A=
-Date: Thu, 26 Sep 2019 12:06:11 +0000
-Message-ID: <c705d17e-6e39-d9a2-e791-02c4f95c3faf@virtuozzo.com>
-References: <156947859030.9841.4795650725800418297@8230166b0665>
-In-Reply-To: <156947859030.9841.4795650725800418297@8230166b0665>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0281.eurprd05.prod.outlook.com
- (2603:10a6:3:fc::33) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190926150608985
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3f7a552d-eba9-48c5-cfcf-08d74279ec26
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:DB8PR08MB5353; 
-x-ms-traffictypediagnostic: DB8PR08MB5353:
-x-ms-exchange-purlcount: 3
-x-microsoft-antispam-prvs: <DB8PR08MB535350E86C2B3B101F1BB676C1860@DB8PR08MB5353.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0172F0EF77
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39850400004)(366004)(136003)(346002)(376002)(396003)(199004)(189003)(36756003)(86362001)(186003)(54906003)(25786009)(6116002)(3846002)(66946007)(2501003)(2906002)(31686004)(5660300002)(11346002)(446003)(66476007)(229853002)(6512007)(386003)(4326008)(6506007)(476003)(14454004)(6306002)(66066001)(2616005)(102836004)(6486002)(486006)(76176011)(305945005)(71190400001)(71200400001)(316002)(26005)(81166006)(8676002)(31696002)(81156014)(7736002)(256004)(110136005)(478600001)(6436002)(2201001)(966005)(64756008)(66446008)(66556008)(8936002)(52116002)(99286004)(6246003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5353;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 23QTGtP7ucaC9KmuegM9q3kmKrVwjmmbykjRgZDVZ8ksG7zeLZ2Cvg8tXZXIzFzivjDvKPe8JDg7VSArcF9QHu9IEgbp1BAjeOonjRo6entRpHEINsFHEoRRIT0KFSB8cLXiAOggs7Mi0ddUTp9p+qMNcPBOWCJODyyz0amisRJKKHtsODub35kGzMQsImwNi/S3TpCB4+JB4GDKuf3k3zj9iXceAZ3TKRqZOipMdKFkPCh2h2onPdZMXK28MNdEObGfit53Jb3tOFPNyijr+iTNow9Obmwy/2ru/Hbey1V0TcSoXIeYuQuhJ7pariTKJsoN7RIkdQ/PfPkAYyY2TCwjwWMerAFYe33gGJWNK19o6FZQ3Rk+7mJbbL6GPyHT7FkTY7FPxC+k2piR2TT3D7vqYOy9sXgt/lmWgO/0udhAIzaSQ1akl0e5Ht3rNezMtQNeZPPhL+XMiJtx71wgQg==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B69AC6DC3BDD1342A3755B74388EE42D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <dgibson@ozlabs.org>) id 1iDScr-0001aW-AW
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:02 -0400
+Received: from ozlabs.org ([203.11.71.1]:34025)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iDSco-0001NQ-Kr; Thu, 26 Sep 2019 08:12:01 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46fDLY4YXHz9sDB; Thu, 26 Sep 2019 22:11:49 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569499909;
+ bh=yNZ6CGfFgj7n2E519KmJ2C1XwRtMYpmI95cYE/JiXHE=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=mXaSFMnkWQDbpDHkgDD5ZlEx4FsWA6XpGED5VhV3T2IsdHCIumtzQRjHXtCP0gzFT
+ R1K+pZDbbKl9H1hG3bvCcDamI4NSBD5U2DmnrW410nnVLpeW0mUpVHAesK4fTlOqlk
+ EYKwNMjmnZOKlqz+HIsqPsozQHV0V4Bt6SdhG6DU=
+Date: Thu, 26 Sep 2019 21:29:13 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 20/20] spapr: Eliminate SpaprIrq::init hook
+Message-ID: <20190926112913.GY17405@umbus>
+References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
+ <20190925064534.19155-21-david@gibson.dropbear.id.au>
+ <1b74c0fc-b318-df5a-d66d-fe59ae562d70@kaod.org>
+ <20190926011336.GS17405@umbus>
+ <92ce15dd-f7f9-3d2b-4226-9693bd9cfd65@kaod.org>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f7a552d-eba9-48c5-cfcf-08d74279ec26
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2019 12:06:11.7788 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mpDaBOxltgDgk858rmUGIqeXQOZnK+qEAoT8MloGk8JXMI1mpnAHFIvYi8NsldOiXgp51fH0XwHCyEOfiJuuItaigXKemohg+D2/quw4Bfs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5353
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.123
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="krsqJi1PDCheOQxO"
+Content-Disposition: inline
+In-Reply-To: <92ce15dd-f7f9-3d2b-4226-9693bd9cfd65@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,40 +73,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "mst@redhat.com" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjYuMDkuMjAxOSA5OjE2LCBuby1yZXBseUBwYXRjaGV3Lm9yZyB3cm90ZToNCj4gUGF0Y2hldyBV
-Ukw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyNTE3NDQwMC44NTc4LTEtc3RlZmFu
-aGFAcmVkaGF0LmNvbS8NCj4gDQo+IA0KPiANCj4gSGksDQo+IA0KPiBUaGlzIHNlcmllcyBmYWls
-ZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
-c3RpbmcgY29tbWFuZHMgYW5kDQo+IHRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9j
-a2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQNCj4gbG9jYWxseS4N
-Cj4gDQo+ID09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0NCj4gIyEgL2Jpbi9iYXNoDQo+IGV4cG9y
-dCBBUkNIPXg4Nl82NA0KPiBtYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQ0K
-PiB0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xDQo+ID09
-PSBURVNUIFNDUklQVCBFTkQgPT09DQo+IA0KPiAgICBDQyAgICAgIGF1dGh6L2xpc3Qubw0KPiAg
-ICBDQyAgICAgIGF1dGh6L2xpc3RmaWxlLm8NCj4gL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvaW92
-LmM6IEluIGZ1bmN0aW9uICdxZW11X2lvdmVjX2luaXRfZXh0ZW5kZWQnOg0KPiAvdG1wL3FlbXUt
-dGVzdC9zcmMvdXRpbC9pb3YuYzo0NTE6OTogZXJyb3I6ICdtaWRfaW92JyBtYXkgYmUgdXNlZCB1
-bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXpl
-ZF0NCj4gICAgICAgICAgIG1lbWNweShwLCBtaWRfaW92LCBtaWRfbmlvdiAqIHNpemVvZigqcCkp
-Ow0KPiAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4N
-Cj4gY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMNCj4gDQo+IA0KPiBU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0DQo+IGh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
-MTkwOTI1MTc0NDAwLjg1NzgtMS1zdGVmYW5oYUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1p
-bmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLg0KPiAtLS0NCj4gRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLg0KPiBQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ0KPiANCg0KQWN0dWFs
-bHkgaXQncyBvYnZpb3VzIHRoYXQgaXQgaXMgaW5pdGlhbGl6ZWQgaGVyZToNCg0KV2UgZ28gaGVy
-ZSBvbmx5IGlmIG1pZF9uaW92LCB3aGljaCBtYXkgYmUgc2V0IG9ubHkgaW4gImlmIChtaWRfbGVu
-KSIsIGFuZCBtaWRfaW92IGlzIHNldCBpbiBzYW1lICJpZiAobWlkX2xlbikiLg0KDQpNeSBjbGFu
-ZyBkb24ndCB3YXJuLg0KDQpTdGlsbCwgd2UgbWF5IGp1c3QgaW5pdGlhbGl6ZSBtaWRfaW92IHRv
-IE5VTEwgYW5kIGRvbid0IGNhcmUuDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+
+--krsqJi1PDCheOQxO
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Sep 26, 2019 at 09:05:56AM +0200, C=E9dric Le Goater wrote:
+> >>> +    if (spapr->irq->xive) {
+> >>> +        uint32_t nr_servers =3D spapr_max_server_number(spapr);
+> >>> +        DeviceState *dev;
+> >>> +        int i;
+> >>> +
+> >>> +        dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+> >>> +        qdev_prop_set_uint32(dev, "nr-irqs",
+> >>> +                             spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
+> >>> +        /*
+> >>> +         * 8 XIVE END structures per CPU. One for each available
+> >>> +         * priority
+> >>> +         */
+> >>> +        qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
+> >>> +        qdev_init_nofail(dev);
+> >>> +
+> >>> +        spapr->xive =3D SPAPR_XIVE(dev);
+> >>> +
+> >>> +        /* Enable the CPU IPIs */
+> >>> +        for (i =3D 0; i < nr_servers; ++i) {
+> >>> +            Error *local_err =3D NULL;
+> >>> +
+> >>> +            spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, fal=
+se, &local_err);
+> >>> +            if (local_err) {
+> >>> +                goto out;
+> >>> +            }
+> >>> +        }
+> >>
+> >> We could move the IPI claim part in the realize routine of SPAPR_XIVE.
+> >=20
+> > Yeah, I know.  I thought about this, but there's a slight complication
+> > in that the XIVE part doesn't know nr_servers directly.  There's
+> > several possible ways to handle that, but I wasn't 100% happy with any
+> > that I came up with yet.
+>=20
+> The "nr-ends" property was inappropriate, "nr-servers" would have been
+> better and we would have hidden the calculation of ENDs 'nr_servers << 3'
+> in the realize routine of SpaprXive.=20
+
+Ah, interesting.
+
+> I don't think we can change that without breaking migration though
+> :/
+
+Hm, there might be a way around it, I'll see what I can do, but
+probably as a rather later patch.
+
+>=20
+> C.
+>=20
+> >>
+> >>> +        spapr_xive_hcall_init(spapr);
+> >>
+> >> This also.
+> >=20
+> > Right.
+> >=20
+> >> It can be done later one.
+> >=20
+> > That's my intention.
+> >=20
+> >>
+> >> C.
+> >>
+> >>> +    }
+> >>> =20
+> >>>      spapr->qirqs =3D qemu_allocate_irqs(spapr->irq->set_irq, spapr,
+> >>>                                        spapr->irq->nr_xirqs + SPAPR_X=
+IRQ_BASE);
+> >>> +
+> >>> +out:
+> >>> +    error_propagate(errp, local_err);
+> >>>  }
+> >>> =20
+> >>>  void spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Er=
+ror **errp)
+> >>> @@ -757,7 +744,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+> >>>      .xics        =3D true,
+> >>>      .xive        =3D false,
+> >>> =20
+> >>> -    .init        =3D spapr_irq_init_xics,
+> >>>      .claim       =3D spapr_irq_claim_xics,
+> >>>      .free        =3D spapr_irq_free_xics,
+> >>>      .print_info  =3D spapr_irq_print_info_xics,
+> >>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> >>> index 6816cb0500..fa862c665b 100644
+> >>> --- a/include/hw/ppc/spapr_irq.h
+> >>> +++ b/include/hw/ppc/spapr_irq.h
+> >>> @@ -42,7 +42,6 @@ typedef struct SpaprIrq {
+> >>>      bool        xics;
+> >>>      bool        xive;
+> >>> =20
+> >>> -    void (*init)(SpaprMachineState *spapr, Error **errp);
+> >>>      void (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error=
+ **errp);
+> >>>      void (*free)(SpaprMachineState *spapr, int irq);
+> >>>      void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
+> >>> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+> >>> index 691a6d00f7..267984a97b 100644
+> >>> --- a/include/hw/ppc/xics_spapr.h
+> >>> +++ b/include/hw/ppc/xics_spapr.h
+> >>> @@ -34,6 +34,7 @@
+> >>>  #define TYPE_ICS_SPAPR "ics-spapr"
+> >>>  #define ICS_SPAPR(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SPAPR)
+> >>> =20
+> >>> +void ics_spapr_create(SpaprMachineState *spapr, int nr_xirqs, Error =
+**errp);
+> >>>  void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, vo=
+id *fdt,
+> >>>                     uint32_t phandle);
+> >>>  int xics_kvm_connect(SpaprMachineState *spapr, Error **errp);
+> >>>
+> >>
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--krsqJi1PDCheOQxO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2MoQkACgkQbDjKyiDZ
+s5KO+w//WNT+WYb9Hj3Lwl7Gspt13/FQ1cpRj5OOnDtTTrvKPGVdXaDhfftQdc4I
+N8wuCmCPq0qRiLBa3S6+tF092bokx6I3qiEELPlbCDyIxGyWmN46s4qz7Y5D/MQi
+w5+e4HkYeCRccHgWyLTZXoeYGVxGEHkRwd1a3VZYX8z13S/w+mXx66CKkT6JGA6S
+ZRyq3SIcTS/NO802HMOYsLzaMSuYlWWNd1wtwRl4f+rLkG0lcHC7ebNHiy8Aspa2
+XrX4xA09NYeGNEcX88mO/oe4X7FDGdT8peHfnBFojgrD3tOH+CLLYW2kzRW2efFa
+Kn0qsDyXFv4o1nhATERdfiiQSvCidKRvw96XZ8WneTqzWdj5UXkxrbz9bKkre//A
+6Uhco0UGxFtvseo5R8jmLn1khmQr2kc/D4huU7/MfJ6MTvwZPiD0VHjg3U2LClCo
+bMwxX2e5AWAa5loJU0azkil0E3JPDSGKCftvwWTdsPDSiNeEkL6KdMmWeG1DPSNf
+YtoNWU5atNyjgjXQZcwlNxrFPM6wHhGocg7l5RRZpoTrbCJR1g04u9kPqCmMBT+r
+ZxtTSD6Sdagp4itTNPLsd8dzm3zxeEug17crnOwRXysJVqaQ0VoGvmsm+a5xCfkB
+Z68J75SaH8ksO72F8xls9/51of3PK8AUxomkRrte6n+oaqXlZSM=
+=aQxc
+-----END PGP SIGNATURE-----
+
+--krsqJi1PDCheOQxO--
 
