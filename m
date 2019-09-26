@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F18A7C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA2A5C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C67F4207E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:44:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C67F4207E0
+	by mail.kernel.org (Postfix) with ESMTPS id BC7C9207E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:45:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7C9207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDRGM-0008DN-N4
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 06:44:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38721)
+	id 1iDRGu-0000Zv-CN
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 06:45:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDQz8-0006xG-82
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDQz8-0006xD-7z
  for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:26:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDQz6-0007Sy-9S
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDQz6-0007St-8q
  for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:26:53 -0400
-Received: from relay.sw.ru ([185.231.240.75]:54310)
+Received: from relay.sw.ru ([185.231.240.75]:54304)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDQyv-0006vX-LB; Thu, 26 Sep 2019 06:26:42 -0400
+ id 1iDQyv-0006vf-Mp; Thu, 26 Sep 2019 06:26:42 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDQyX-0003nC-Lk; Thu, 26 Sep 2019 13:26:17 +0300
+ id 1iDQyW-0003nC-Og; Thu, 26 Sep 2019 13:26:16 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v14 08/14] block: teach bdrv_debug_breakpoint skip filters
- with backing
-Date: Thu, 26 Sep 2019 13:26:08 +0300
-Message-Id: <20190926102614.28999-9-vsementsov@virtuozzo.com>
+Subject: [PATCH v14 02/14] block/backup: fix backup_cow_with_offload for last
+ cluster
+Date: Thu, 26 Sep 2019 13:26:02 +0300
+Message-Id: <20190926102614.28999-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190926102614.28999-1-vsementsov@virtuozzo.com>
 References: <20190926102614.28999-1-vsementsov@virtuozzo.com>
@@ -67,75 +67,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Teach bdrv_debug_breakpoint and bdrv_debug_remove_breakpoint skip
-filters with backing. This is needed to implement and use in backup job
-it's own backup_top filter driver (like mirror already has one), and
-without this improvement, breakpoint removal will fail at least in 55
-iotest.
+We shouldn't try to copy bytes beyond EOF. Fix it.
 
+Fixes: 9ded4a0114968e
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block.c | 34 ++++++++++++++++++++++++++--------
- 1 file changed, 26 insertions(+), 8 deletions(-)
+ block/backup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index 5944124845..1c7c199849 100644
---- a/block.c
-+++ b/block.c
-@@ -5164,14 +5164,35 @@ void bdrv_debug_event(BlockDriverState *bs, BlkdebugEvent event)
-     bs->drv->bdrv_debug_event(bs, event);
- }
+diff --git a/block/backup.c b/block/backup.c
+index db20249063..99177f03f8 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -161,7 +161,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
  
--int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
--                          const char *tag)
-+static BlockDriverState *bdrv_find_debug_node(BlockDriverState *bs)
- {
-     while (bs && bs->drv && !bs->drv->bdrv_debug_breakpoint) {
--        bs = bs->file ? bs->file->bs : NULL;
-+        if (bs->file) {
-+            bs = bs->file->bs;
-+            continue;
-+        }
-+
-+        if (bs->drv->is_filter && bs->backing) {
-+            bs = bs->backing->bs;
-+            continue;
-+        }
-+
-+        break;
-     }
- 
-     if (bs && bs->drv && bs->drv->bdrv_debug_breakpoint) {
-+        assert(bs->drv->bdrv_debug_remove_breakpoint);
-+        return bs;
-+    }
-+
-+    return NULL;
-+}
-+
-+int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
-+                          const char *tag)
-+{
-+    bs = bdrv_find_debug_node(bs);
-+    if (bs) {
-         return bs->drv->bdrv_debug_breakpoint(bs, event, tag);
-     }
- 
-@@ -5180,11 +5201,8 @@ int bdrv_debug_breakpoint(BlockDriverState *bs, const char *event,
- 
- int bdrv_debug_remove_breakpoint(BlockDriverState *bs, const char *tag)
- {
--    while (bs && bs->drv && !bs->drv->bdrv_debug_remove_breakpoint) {
--        bs = bs->file ? bs->file->bs : NULL;
--    }
--
--    if (bs && bs->drv && bs->drv->bdrv_debug_remove_breakpoint) {
-+    bs = bdrv_find_debug_node(bs);
-+    if (bs) {
-         return bs->drv->bdrv_debug_remove_breakpoint(bs, tag);
-     }
- 
+     assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
+     assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+-    nbytes = MIN(job->copy_range_size, end - start);
++    nbytes = MIN(job->copy_range_size, MIN(end, job->len) - start);
+     nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
+     bdrv_reset_dirty_bitmap(job->copy_bitmap, start,
+                             job->cluster_size * nr_clusters);
 -- 
 2.21.0
 
