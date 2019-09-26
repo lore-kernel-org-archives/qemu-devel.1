@@ -6,79 +6,80 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED07C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 07:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A46C8C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 07:14:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8C5221A4A
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 07:13:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8C5221A4A
+	by mail.kernel.org (Postfix) with ESMTPS id 758FE21A4A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 07:14:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 758FE21A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDNyK-0001vu-IF
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 03:13:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54513)
+	id 1iDNyZ-0002Gh-0v
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 03:14:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54587)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iDNvo-00081z-1j
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:11:17 -0400
+ (envelope-from <philmd@redhat.com>) id 1iDNwL-0008Qx-KK
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iDNvm-0007M7-KH
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:11:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64720)
+ (envelope-from <philmd@redhat.com>) id 1iDNwH-0007hR-99
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:11:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55354)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDNvm-0007Kc-Ct
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:11:14 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDNwG-0007fp-S1
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:11:45 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 623FCC06512C
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 07:11:11 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id z8so534981wrs.14
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 00:11:11 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id D828950F45
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 07:11:43 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id m16so611991wmg.8
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 00:11:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Xen6qL0B0p30H/ek3UjK60QpqxMYdUJMbKTKXb7Ml3w=;
- b=dCUjiOtG123939IX4tx+szk+hvgKEr+tVL1NuZ1qmuTyBcQCFrBh+U2I4O/U6vUSz9
- k31uDjzpqLEqGRipqvDeHkkMe2DuHeioQmSLfPl6o94bwma+jTkb/8wQ0Rd5fzoglkm/
- GVeHieXbaiIKhNcjoWd/SQjDx8+P0fhXXVpALpVdxFQGFzsLA8AWYmzQ1vW0S+OoNRG+
- BeK2jmZmqrK304hdgUmW8A5McvGNtTnUpksmZ/OcX1+A5q/rElyjfh0mTStsdymQnmpM
- vsP1ITzq2oMcdKszZCuQYxonxr0JYDvnFmdI8QmkrJ9qF4tzKx4kvErl71EEFZM5R2nz
- 2qHw==
-X-Gm-Message-State: APjAAAVeIspDsF9n2AdgR4ZC4MmkVeaawoxCBVwUusjrth8tXtXSFfVx
- x1y4ETCHT0JyGQrrKHpCZH6bPaTGLvpkkbf2MOw/vHJoq+QU475B6rfSXWvoEqv+3S+GcNLP6DN
- 8BJOz9zmiCQtn7b0=
-X-Received: by 2002:a7b:cc91:: with SMTP id p17mr1583142wma.43.1569481870145; 
- Thu, 26 Sep 2019 00:11:10 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwcJaahijvFAdwKeol0CCjw4J2ATQLRtU7/qPsHcMnUVX3nVziE6bsuuFOcdz3l0p4jqbzQOw==
-X-Received: by 2002:a7b:cc91:: with SMTP id p17mr1583131wma.43.1569481869966; 
- Thu, 26 Sep 2019 00:11:09 -0700 (PDT)
+ bh=L50BqEk2vG3CzamW0ew1TzwncVMiTDVDnigoLpG8dr0=;
+ b=oEN8U7I0sKFw6M8+eVM5MaXSel21ll9ANyLhPauLNxNkzoGCjF4pU2+gxEuwyyV4bi
+ Jb0GHrZED8ID9p6gIJqwdv02aXFNsrQ/I16UBWhbZfhj54oapTcCyqlq8mzHr20ErRyI
+ JoLQ583RkIq0Jq8I0/ALMTr5AwdnzZm+mcnKVTDA2SgcHRHtVZY+4UYwjFmTWcY1G+k3
+ vv1ofbIHSyyvYx7AseIpixWAggd3hnIKWK9XCzWArnenxETGSLSIg2801w6iKnoRGarl
+ Jb/nYcSC+uGjdlmxzCVF43AGp9RpWFJkrhlc+wwFsrIk8NEfo/kcYXP37n5OWHiDDVyA
+ KQVA==
+X-Gm-Message-State: APjAAAWFb1IDsEbO6ShHBA8buWwi02OmVx4QistfawUfYXmNJoplvd/m
+ MEarxYMV2ukFRLs1X6F+I4cRYBRGHs8eQQzAdQTKfEGB7KQqBKMU3wsoSzCkoAgCuAiDtxZQSrU
+ 6Pej8bpAqqcsY2wk=
+X-Received: by 2002:a1c:1dd4:: with SMTP id d203mr1704934wmd.45.1569481902656; 
+ Thu, 26 Sep 2019 00:11:42 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwz3Sf1hL9VylQZLDJHeuMsTleUqpD3XkjnhKjsihuqMlJQ+oe3V7fTVF4Dok4e4kwOUWuncA==
+X-Received: by 2002:a1c:1dd4:: with SMTP id d203mr1704909wmd.45.1569481902430; 
+ Thu, 26 Sep 2019 00:11:42 -0700 (PDT)
 Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id i73sm2353419wmg.33.2019.09.26.00.11.08
+ by smtp.gmail.com with ESMTPSA id a7sm1885776wra.43.2019.09.26.00.11.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 26 Sep 2019 00:11:09 -0700 (PDT)
-Subject: Re: [PATCH 13/20] spapr: Eliminate SpaprIrq:get_nodename method
+ Thu, 26 Sep 2019 00:11:41 -0700 (PDT)
+Subject: Re: [PATCH 14/20] spapr: Remove unhelpful tracepoints from
+ spapr_irq_free_xics()
 To: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
  clg@kaod.org, qemu-devel@nongnu.org
 References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
- <20190925064534.19155-14-david@gibson.dropbear.id.au>
+ <20190925064534.19155-15-david@gibson.dropbear.id.au>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <dcb62065-40f5-e422-e144-dd124d863822@redhat.com>
-Date: Thu, 26 Sep 2019 09:11:08 +0200
+Message-ID: <6cb2b40a-b65c-6c00-e2a3-148ab3334966@redhat.com>
+Date: Thu, 26 Sep 2019 09:11:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190925064534.19155-14-david@gibson.dropbear.id.au>
+In-Reply-To: <20190925064534.19155-15-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -105,140 +106,58 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/25/19 8:45 AM, David Gibson wrote:
-> This method is used to determine the name of the irq backend's node in =
-the
-> device tree, so that we can find its phandle (after SLOF may have modif=
-ied
-> it from the phandle we initially gave it).
->=20
-> But, in the two cases the only difference between the node name is the
-> presence of a unit address.  Searching for a node name without consider=
-ing
-> unit address is standard practice for the device tree, and
-> fdt_subnode_offset() will do exactly that.
->=20
-> So, the method is unnecessary.
+> These traces contain some useless information (the always-0 source#) an=
+d
+> have no equivalents for XIVE mode.  For now just remove them, and we ca=
+n
+> put back something more sensible if and when we need it.
 >=20
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  hw/ppc/spapr_irq.c         | 25 +++----------------------
->  include/hw/ppc/spapr_irq.h |  1 -
->  2 files changed, 3 insertions(+), 23 deletions(-)
+>  hw/ppc/spapr_irq.c  | 4 ----
+>  hw/ppc/trace-events | 4 ----
+>  2 files changed, 8 deletions(-)
 >=20
 > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 038bfffff4..79167ccc68 100644
+> index 79167ccc68..db6755f3ab 100644
 > --- a/hw/ppc/spapr_irq.c
 > +++ b/hw/ppc/spapr_irq.c
-> @@ -211,11 +211,6 @@ static void spapr_irq_reset_xics(SpaprMachineState=
- *spapr, Error **errp)
+> @@ -140,11 +140,7 @@ static void spapr_irq_free_xics(SpaprMachineState =
+*spapr, int irq, int num)
+>      int i;
+> =20
+>      if (ics_valid_irq(ics, irq)) {
+> -        trace_spapr_irq_free(0, irq, num);
+>          for (i =3D srcno; i < srcno + num; ++i) {
+> -            if (ics_irq_free(ics, i)) {
+> -                trace_spapr_irq_free_warn(0, i);
+> -            }
+>              memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+>          }
 >      }
->  }
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index 96dad767a1..9ea620f23c 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -13,10 +13,6 @@ spapr_pci_msi_retry(unsigned config_addr, unsigned r=
+eq_num, unsigned max_irqs) "
+>  spapr_cas_failed(unsigned long n) "DT diff buffer is too small: %ld by=
+tes"
+>  spapr_cas_continue(unsigned long n) "Copy changes to the guest: %ld by=
+tes"
 > =20
-> -static const char *spapr_irq_get_nodename_xics(SpaprMachineState *spap=
-r)
-> -{
-> -    return XICS_NODENAME;
-> -}
+> -# spapr_irq.c
+> -spapr_irq_free(int src, int irq, int num) "Source#%d, first irq %d, %d=
+ irqs"
+> -spapr_irq_free_warn(int src, int irq) "Source#%d, irq %d is already fr=
+ee"
 > -
->  static void spapr_irq_init_kvm_xics(SpaprMachineState *spapr, Error **=
-errp)
->  {
->      if (kvm_enabled()) {
-> @@ -237,7 +232,6 @@ SpaprIrq spapr_irq_xics =3D {
->      .post_load   =3D spapr_irq_post_load_xics,
->      .reset       =3D spapr_irq_reset_xics,
->      .set_irq     =3D spapr_irq_set_irq_xics,
-> -    .get_nodename =3D spapr_irq_get_nodename_xics,
->      .init_kvm    =3D spapr_irq_init_kvm_xics,
->  };
-> =20
-> @@ -362,11 +356,6 @@ static void spapr_irq_set_irq_xive(void *opaque, i=
-nt irq, int val)
->      }
->  }
-> =20
-> -static const char *spapr_irq_get_nodename_xive(SpaprMachineState *spap=
-r)
-> -{
-> -    return spapr->xive->nodename;
-> -}
-> -
->  static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error **=
-errp)
->  {
->      if (kvm_enabled()) {
-> @@ -393,7 +382,6 @@ SpaprIrq spapr_irq_xive =3D {
->      .post_load   =3D spapr_irq_post_load_xive,
->      .reset       =3D spapr_irq_reset_xive,
->      .set_irq     =3D spapr_irq_set_irq_xive,
-> -    .get_nodename =3D spapr_irq_get_nodename_xive,
->      .init_kvm    =3D spapr_irq_init_kvm_xive,
->  };
-> =20
-> @@ -538,11 +526,6 @@ static void spapr_irq_set_irq_dual(void *opaque, i=
-nt irq, int val)
->      spapr_irq_current(spapr)->set_irq(spapr, irq, val);
->  }
-> =20
-> -static const char *spapr_irq_get_nodename_dual(SpaprMachineState *spap=
-r)
-> -{
-> -    return spapr_irq_current(spapr)->get_nodename(spapr);
-> -}
-> -
->  /*
->   * Define values in sync with the XIVE and XICS backend
->   */
-> @@ -560,7 +543,6 @@ SpaprIrq spapr_irq_dual =3D {
->      .post_load   =3D spapr_irq_post_load_dual,
->      .reset       =3D spapr_irq_reset_dual,
->      .set_irq     =3D spapr_irq_set_irq_dual,
-> -    .get_nodename =3D spapr_irq_get_nodename_dual,
->      .init_kvm    =3D NULL, /* should not be used */
->  };
-> =20
-> @@ -697,13 +679,13 @@ void spapr_irq_reset(SpaprMachineState *spapr, Er=
-ror **errp)
-> =20
->  int spapr_irq_get_phandle(SpaprMachineState *spapr, void *fdt, Error *=
-*errp)
->  {
-> -    const char *nodename =3D spapr->irq->get_nodename(spapr);
-> +    const char *nodename =3D "interrupt-controller";
->      int offset, phandle;
-> =20
->      offset =3D fdt_subnode_offset(fdt, 0, nodename);
->      if (offset < 0) {
-> -        error_setg(errp, "Can't find node \"%s\": %s", nodename,
-> -                   fdt_strerror(offset));
-> +        error_setg(errp, "Can't find node \"%s\": %s",
-> +                   nodename, fdt_strerror(offset));
->          return -1;
->      }
-> =20
-> @@ -787,6 +769,5 @@ SpaprIrq spapr_irq_xics_legacy =3D {
->      .post_load   =3D spapr_irq_post_load_xics,
->      .reset       =3D spapr_irq_reset_xics,
->      .set_irq     =3D spapr_irq_set_irq_xics,
-> -    .get_nodename =3D spapr_irq_get_nodename_xics,
->      .init_kvm    =3D spapr_irq_init_kvm_xics,
->  };
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index a4e790ef60..9b60378e28 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -52,7 +52,6 @@ typedef struct SpaprIrq {
->      int (*post_load)(SpaprMachineState *spapr, int version_id);
->      void (*reset)(SpaprMachineState *spapr, Error **errp);
->      void (*set_irq)(void *opaque, int srcno, int val);
-> -    const char *(*get_nodename)(SpaprMachineState *spapr);
-
-Another Yay!
+>  # spapr_hcall.c
+>  spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr)=
+ "current=3D0x%x, explicit_match=3D%u, new=3D0x%x"
+>  spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=3D0x=
+%"PRIx64", shift=3D%"PRIu64
+>=20
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
->      void (*init_kvm)(SpaprMachineState *spapr, Error **errp);
->  } SpaprIrq;
-> =20
->=20
 
