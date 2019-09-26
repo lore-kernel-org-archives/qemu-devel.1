@@ -2,57 +2,87 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9825C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B31D9C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:25:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDF6420872
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:25:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDF6420872
+	by mail.kernel.org (Postfix) with ESMTPS id 8998B21D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:25:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8998B21D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDQxM-0005bg-S9
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 06:25:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36171)
+	id 1iDQxu-0005ij-PA
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 06:25:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDQpK-0004Kx-Ox
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:16:47 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iDQuC-0001Gt-Bq
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDQpJ-0007ki-Lc
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:16:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54358)
+ (envelope-from <pbonzini@redhat.com>) id 1iDQuB-0003JM-BL
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:21:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47902)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDQpJ-0007k9-G8; Thu, 26 Sep 2019 06:16:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iDQuB-0003Ik-24
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:21:47 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9E5FA793EC;
- Thu, 26 Sep 2019 10:16:44 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-65.ams2.redhat.com [10.36.116.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C6E8660A9F;
- Thu, 26 Sep 2019 10:16:42 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 5/5] s390x/cpumodel: Add new TCG features to QEMU cpu model
-Date: Thu, 26 Sep 2019 12:16:27 +0200
-Message-Id: <20190926101627.23376-6-david@redhat.com>
-In-Reply-To: <20190926101627.23376-1-david@redhat.com>
-References: <20190926101627.23376-1-david@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id EE1285859E
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 10:21:45 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id 32so734090wrk.15
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 03:21:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to;
+ bh=smZP7Ak6TUdAStHczxY+TFyiyW4XCmuQsrVLOpFovYM=;
+ b=Xe0x5zWorMZUlV5J2uC8fJazhRXKO9VvHq9aDA4QmZJOAUWh/o5+qDCbd4jiPZHABA
+ Zu83k9QX/WHN3kADfKfdTXGwWQRq62AsG06E23f7ORVI0XyxX1sPXCS3GC6q/jqN8hVu
+ I6VgWkdUa7hTN8Mr6w6md91XI64bTBEjyrYldwr4m9xDDLYyjP2n224xbWcKzDFWCKRS
+ 18ydmHqUvssFfgbILxnB2aFPRzghR9BU4N/0n70JfT9zVl9ZD6VjuYbZuuZHCkBlxkri
+ FS8hMFOx7rj9RXm67CcNTTo3EiyDkGUzgGH732uMludj2jT8CMmox+zwRvddfFSXv5+J
+ 1Y0A==
+X-Gm-Message-State: APjAAAXKWUkHUS2Ga8bfCL+4UAe98Qu6VHFC+iu8FwAvY7uDYVSLx7KD
+ qcnQtIS8wc3qQBCNfmoliSVLDE8qRxf30rnk2x+dP69xl7eaRnbZgN8WjJnMDi8ZHHQI5QS2MDx
+ dwPn5WLgmVC7MxKk=
+X-Received: by 2002:adf:e4c9:: with SMTP id v9mr2252019wrm.396.1569493304503; 
+ Thu, 26 Sep 2019 03:21:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzEM1fJqjAcO3LNo8fGTeDwLMKXZ7bAIxM/22o/XdAKAvgSAD+0JBY98xZxQ2RFhxoJt3IYgQ==
+X-Received: by 2002:adf:e4c9:: with SMTP id v9mr2251984wrm.396.1569493304168; 
+ Thu, 26 Sep 2019 03:21:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id x6sm2565779wmf.35.2019.09.26.03.21.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 26 Sep 2019 03:21:43 -0700 (PDT)
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+To: Sergio Lopez <slp@redhat.com>
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87a7ass9ho.fsf@redhat.com>
+ <d70d3812-fd84-b248-7965-cae15704e785@redhat.com> <87o8z737am.fsf@redhat.com>
+ <92575de9-da44-cac4-5b3d-6b07a7a8ea34@redhat.com> <87k19v2whk.fsf@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <b02ada95-9853-ff21-cc14-ca0acf48782a@redhat.com>
+Date: Thu, 26 Sep 2019 12:21:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 26 Sep 2019 10:16:44 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87k19v2whk.fsf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="9YieZgL59Jn4Hc9ihwvFTlw1Wh8CxdCFs"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -67,76 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, lersek@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We now implement a bunch of new facilities we can properly indicate.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9YieZgL59Jn4Hc9ihwvFTlw1Wh8CxdCFs
+Content-Type: multipart/mixed; boundary="Qm5zknIqrXaGsQ4AktEFQXxQ0ieqpoL6p";
+ protected-headers="v1"
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
+ marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
+ philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com,
+ mtosatti@redhat.com, kvm@vger.kernel.org
+Message-ID: <b02ada95-9853-ff21-cc14-ca0acf48782a@redhat.com>
+Subject: Re: [PATCH v4 7/8] docs/microvm.txt: document the new microvm machine
+ type
+References: <20190924124433.96810-1-slp@redhat.com>
+ <20190924124433.96810-8-slp@redhat.com>
+ <23a6e891-c3ba-3991-d627-433eb1fe156d@redhat.com> <87a7ass9ho.fsf@redhat.com>
+ <d70d3812-fd84-b248-7965-cae15704e785@redhat.com> <87o8z737am.fsf@redhat.com>
+ <92575de9-da44-cac4-5b3d-6b07a7a8ea34@redhat.com> <87k19v2whk.fsf@redhat.com>
+In-Reply-To: <87k19v2whk.fsf@redhat.com>
 
-ESOP-1/ESOP-2 handling is discussed in the PoP Chafter 3-15
-("Suppression on Protection"). The "Basic suppression-on-protection (SOP)
-facility" is a core part of z/Architecture without a facility
-indication. ESOP-2 is indicated by ESOP-1 + Side-effect facility
-("ESOP-2"). Besides ESOP-2, the side-effect facility is only relevant for
-the guarded-storage facility (we don't implement).
+--Qm5zknIqrXaGsQ4AktEFQXxQ0ieqpoL6p
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-S390_ESOP:
-- We indicate DAT exeptions by setting bit 61 of the TEID (TEC) to 1 and
-  bit 60 to zero. We don't trigger ALCP exceptions yet. Also, we set
-  bit 0-51 and bit 62/63 to the right values.
-S390_ACCESS_EXCEPTION_FS_INDICATION:
-- The TEID (TEC) properly indicates in bit 52/53 on any access if it was
-  a fetch or a store
-S390_SIDE_EFFECT_ACCESS_ESOP2:
-- We have no side-effect accesses (esp., we don't implement the
-  guarded-storage faciliy), we correctly set bit 64 of the TEID (TEC) to
-  0 (no side-effect).
-- ESOP2: We properly set bit 56, 60, 61 in the TEID (TEC) to indicate the
-  type of protection. We don't trigger KCP/ALCP exceptions yet.
-S390_INSTRUCTION_EXEC_PROT:
-- The MMU properly detects and indicates the exception on instruction fet=
-ches
-- Protected TLB entries will never get PAGE_EXEC set.
+On 26/09/19 12:16, Sergio Lopez wrote:
+>> If KVM is in use, the
+>> LAPIC timer frequency is known to be 1 GHz.
+>>
+>> arch/x86/kernel/kvm.c can just set
+>>
+>> 	lapic_timer_period =3D 1000000000 / HZ;
+>>
+>> and that should disabled LAPIC calibration if TSC deadline is absent.
+> Given that they can only be omitted when an specific set of conditions
+> is met, I think I'm going to make them optional but enabled by default.=
 
-There is no need to fake the abscence of any of the facilities - without
-the facilities, some bits of the TEID (TEC) are simply unpredictable.
 
-As IEP was added with z14 and we currently implement a z13, add it to
-the MAX model instead.
+Please do introduce the infrastructure to make them OnOffAuto, and for
+now make Auto the same as On.  We have time to review that since microvm
+is not versioned.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/gen-features.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Thanks,
 
-diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-index 7e82f2f004..6278845b12 100644
---- a/target/s390x/gen-features.c
-+++ b/target/s390x/gen-features.c
-@@ -704,12 +704,17 @@ static uint16_t qemu_V4_1[] =3D {
- };
-=20
- static uint16_t qemu_LATEST[] =3D {
-+    S390_FEAT_ACCESS_EXCEPTION_FS_INDICATION,
-+    S390_FEAT_SIDE_EFFECT_ACCESS_ESOP2,
-+    S390_FEAT_ESOP,
- };
-=20
- /* add all new definitions before this point */
- static uint16_t qemu_MAX[] =3D {
-     /* generates a dependency warning, leave it out for now */
-     S390_FEAT_MSA_EXT_5,
-+    /* features introduced after the z13 */
-+    S390_FEAT_INSTRUCTION_EXEC_PROT,
- };
-=20
- /****** END FEATURE DEFS ******/
---=20
-2.21.0
+Paolo
 
+> I'll also point to this in the documentation.
+
+
+
+
+--Qm5zknIqrXaGsQ4AktEFQXxQ0ieqpoL6p--
+
+--9YieZgL59Jn4Hc9ihwvFTlw1Wh8CxdCFs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2MkTUACgkQv/vSX3jH
+roMM2ggAnECT7ubOBQLjvDUBtboi+CrQQam36JptZSdfukZ+IOvo8HeLcvVLjNYa
+wkCBraN7W92ZXp2tlJUUuADE6Jhaij+J1Vx0Bw8foVtpsDufNd97FhxIHhu9SeV9
+VS3z3pyDQSWDunuAqRn+TvHkbYFrURiXPsxb7Lw03VxRSVC3sGdjt1pUuWzO26YW
+zsKPPwqdD4TJ5zTSSJWXeOFN/x02sOlCMZWAq2ND0mej793VAYLOwIUVS13xaBCX
+3Asa7f0sAqRvCW5wyHEfMJuC4fUxPq3pI9vuSlzKmO5Hx4v7lxi2MgZplje6L2V4
+hFFTOvohRluh378NNk93f6Xc6LRcAw==
+=COY9
+-----END PGP SIGNATURE-----
+
+--9YieZgL59Jn4Hc9ihwvFTlw1Wh8CxdCFs--
 
