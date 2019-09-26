@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD95C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42FACC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:23:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F9FB206B7
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:11:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F9FB206B7
+	by mail.kernel.org (Postfix) with ESMTPS id 0DDF9207E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:23:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DDF9207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDcvW-0003Hz-AV
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 19:11:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37204)
+	id 1iDd6L-0008TN-72
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 19:23:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45502)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iDcuT-0002SW-9C
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:10:54 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iDd4q-0007fI-Sz
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iDcuS-0000ui-2U
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:10:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36720)
+ (envelope-from <jsnow@redhat.com>) id 1iDd4p-000607-6i
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:21:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44190)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iDcuO-0000q9-II; Thu, 26 Sep 2019 19:10:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iDd4i-0005ep-FG; Thu, 26 Sep 2019 19:21:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A92D330ADBA7;
- Thu, 26 Sep 2019 23:10:46 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CBCB3C04D312;
+ Thu, 26 Sep 2019 23:21:22 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B795A5D6B2;
- Thu, 26 Sep 2019 23:10:43 +0000 (UTC)
-Subject: Re: [PATCH v4 02/10] block: reverse order for reopen commits
-To: Max Reitz <mreitz@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BAA31608C2;
+ Thu, 26 Sep 2019 23:21:21 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v4 09/10] block/qcow2-bitmap: fix and improve
+ qcow2_reopen_bitmaps_rw
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
- <20190807141226.193501-3-vsementsov@virtuozzo.com>
- <8aa8b6f1-0698-fa97-64e7-1dd251d0eeee@redhat.com>
+ <20190807141226.193501-10-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -123,18 +122,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <3695d87c-3b10-341d-f257-5397e825c8da@redhat.com>
-Date: Thu, 26 Sep 2019 19:10:43 -0400
+Message-ID: <c3e11dc4-14ab-e6a4-26c3-ab0d66bda330@redhat.com>
+Date: Thu, 26 Sep 2019 19:21:21 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <8aa8b6f1-0698-fa97-64e7-1dd251d0eeee@redhat.com>
+In-Reply-To: <20190807141226.193501-10-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 26 Sep 2019 23:10:46 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.31]); Thu, 26 Sep 2019 23:21:22 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -149,87 +148,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, den@openvz.org
+Cc: fam@euphon.net, kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/24/19 6:12 AM, Max Reitz wrote:
-> On 07.08.19 16:12, Vladimir Sementsov-Ogievskiy wrote:
->> It's needed to fix reopening qcow2 with bitmaps to RW. Currently it
->> can't work, as qcow2 needs write access to file child, to mark bitmaps
->> in-image with IN_USE flag. But usually children goes after parents in
->> reopen queue and file child is still RO on qcow2 reopen commit. Revers=
-e
->> reopen order to fix it.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>  block.c | 12 +++++++++---
->>  1 file changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/block.c b/block.c
->> index 696162cd7a..d59f9f97cb 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -3476,10 +3476,16 @@ int bdrv_reopen_multiple(BlockReopenQueue *bs_=
-queue, Error **errp)
->>          bs_entry->perms_checked =3D true;
->>      }
->> =20
->> -    /* If we reach this point, we have success and just need to apply=
- the
->> -     * changes
->> +    /*
->> +     * If we reach this point, we have success and just need to apply=
- the
->> +     * changes.
->> +     *
->> +     * Reverse order is used to comfort qcow2 driver: on commit it ne=
-ed to write
->> +     * IN_USE flag to the image, to mark bitmaps in the image as inva=
-lid. But
->> +     * children are usually goes after parents in reopen-queue, so go=
- from last
->> +     * to first element.
->>       */
->> -    QTAILQ_FOREACH(bs_entry, bs_queue, entry) {
->> +    QTAILQ_FOREACH_REVERSE(bs_entry, bs_queue, entry) {
->>          bdrv_reopen_commit(&bs_entry->state);
->>      }
->=20
-> I suppose this works, but only because everything but the IN_USE thing
-> actually behaves correctly.  In theory, all the work is done by the tim=
-e
-> .prepare is through, so we can call commit in any order anyway.
->=20
-> So I=E2=80=99m still of the opinion that writing IN_USE in commit is ju=
-st plain
-> wrong.
->=20
-> It feels like you=E2=80=99re trying to work around wrongs in reopen by =
-piling
-> more wrongs on top.  I don=E2=80=99t like reopen already, and I don=E2=80=
-=99t think this
-> makes it any better.
->=20
-> I don=E2=80=99t like how the comment implies that everything is just as=
- it
-> should be, but that isn=E2=80=99t the real problem here, so whatever.
->=20
->=20
-> Well, at least the change is simple, and it doesn=E2=80=99t make things=
- worse
-> than they actually are already (that is, wrong), so
->=20
-> Acked-by: Max Reitz <mreitz@redhat.com>
->=20
+On 8/7/19 10:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+> - Correct check for write access to file child, and in correct place
+>   (only if we want to write).
+> - Support reopen rw -> rw (which will be used in following commit),
+>   for example, !bdrv_dirty_bitmap_readonly() is not a corruption if
+>   bitmap is marked IN_USE in the image.
+> - Consider unexpected bitmap as a corruption and check other
+>   combinations of in-image and in-RAM bitmaps.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-bitmap.c | 56 +++++++++++++++++++++++++++++---------------
+>  1 file changed, 37 insertions(+), 19 deletions(-)
+> 
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index a636dc50ca..e276a95154 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -1108,18 +1108,14 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
+>      Qcow2BitmapList *bm_list;
+>      Qcow2Bitmap *bm;
+>      GSList *ro_dirty_bitmaps = NULL;
+> -    int ret = 0;
+> +    int ret = -EINVAL;
+> +    bool need_header_update = false;
+>  
+>      if (s->nb_bitmaps == 0) {
+>          /* No bitmaps - nothing to do */
+>          return 0;
+>      }
+>  
+> -    if (!can_write(bs)) {
+> -        error_setg(errp, "Can't write to the image on reopening bitmaps rw");
+> -        return -EINVAL;
+> -    }
+> -
+>      bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+>                                 s->bitmap_directory_size, errp);
+>      if (bm_list == NULL) {
+> @@ -1128,32 +1124,54 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
+>  
+>      QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+>          BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
+> -        if (bitmap == NULL) {
+> -            continue;
+> -        }
+>  
+> -        if (!bdrv_dirty_bitmap_readonly(bitmap)) {
+> -            error_setg(errp, "Bitmap %s was loaded prior to rw-reopen, but was "
+> -                       "not marked as readonly. This is a bug, something went "
+> -                       "wrong. All of the bitmaps may be corrupted", bm->name);
+> -            ret = -EINVAL;
+> +        if (!bitmap) {
+> +            error_setg(errp, "Unexpected bitmap '%s' in the image '%s'",
+> +                       bm->name, bs->filename);
+>              goto out;
+>          }
+>  
 
-Thanks, Max!
+I think you can actually drop the definite article, because the image
+name is the specifier.
 
-Unfortunate, but I agree.
+"Unexpected bitmap '%s' in image '%s'" is sufficient.
 
-Acked-by: John Snow <jsnow@redhat.com>
+> -        bm->flags |= BME_FLAG_IN_USE;
+> -        ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
+> +        if (!(bm->flags & BME_FLAG_IN_USE)) {
+> +            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
+> +                error_setg(errp, "Corruption: bitmap '%s' is not marked IN_USE "
+> +                           "in the image '%s' and not marked readonly in RAM",
+> +                           bm->name, bs->filename);
+> +                goto out;
+> +            }
+> +            if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
+> +                error_setg(errp, "Corruption: bitmap '%s' is inconsistent but "
+> +                           "is not marked IN_USE in the image '%s'", bm->name,
+> +                           bs->filename);
+> +                goto out;
+> +            }
+
+We support RW --> RW now, but what happens if something is marked IN_USE
+on RO --> RW? It's not obvious from this function alone why that's safe
+to ignore.
+
+> +
+> +            bm->flags |= BME_FLAG_IN_USE;
+> +            need_header_update = true;
+> +        }
+> +
+> +        if (bdrv_dirty_bitmap_readonly(bitmap)) {
+> +            ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
+> +        }
+>      }
+>  
+> -    if (ro_dirty_bitmaps != NULL) {
+> +    if (need_header_update) {
+> +        if (!can_write(bs->file->bs) || !(bs->file->perm & BLK_PERM_WRITE)) {
+> +            error_setg(errp, "Failed to reopen bitmaps rw: no write access "
+> +                       "the protocol file");
+> +            goto out;
+> +        }
+> +
+>          /* in_use flags must be updated */
+>          ret = update_ext_header_and_dir_in_place(bs, bm_list);
+>          if (ret < 0) {
+> -            error_setg_errno(errp, -ret, "Can't update bitmap directory");
+> +            error_setg_errno(errp, -ret, "Cannot update bitmap directory");
+>              goto out;
+>          }
+> -        g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
+>      }
+>  
+> +    g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
+> +    ret = 0;
+> +
+>  out:
+>      g_slist_free(ro_dirty_bitmaps);
+>      bitmap_list_free(bm_list);
+> 
+
+Seems OK otherwise, but I just have that one doubt.
 
