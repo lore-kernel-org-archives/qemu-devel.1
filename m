@@ -2,117 +2,147 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F28C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 13:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40951C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 13:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D89CA222BE
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 13:13:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="A6ZV9/Ha"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D89CA222BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 139D0207FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 13:48:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 139D0207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDTaD-0003Um-0D
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 09:13:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49133)
+	id 1iDU8I-0000i6-Vz
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 09:48:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDTZ7-0002x7-AS
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 09:12:14 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1iDU66-0007wy-IK
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 09:46:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDTZ5-0006NQ-BE
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 09:12:12 -0400
-Received: from mail-eopbgr60133.outbound.protection.outlook.com
- ([40.107.6.133]:16705 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ (envelope-from <borntraeger@de.ibm.com>) id 1iDU65-0004MO-AV
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 09:46:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55492
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDTZ5-0006L9-5q; Thu, 26 Sep 2019 09:12:11 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I5EVr/zT0OSSM/aplhgH9K4KmXxpqIu4vuE4RXVnxiwbx8xO4HPYTQoNYnBvlaa2f83XbGCMsZ0NDs/n6/k/9zlFryOb5aRRaSEo8C0rC/N/GMN4nZ1Tm3kwnWi0VGQv4qgUxGATahYRPJJeEMEkHEzmg4lIv+UDwqFyPR/96ET0IYf4+ZiDVP4jZK9Qa01/L1kD9F5JT2rU4Ol5MTN9beaLCG6xh2aYAR8yKFUVKMfwG0JWHDfWzOJTgoLOyIqIwsxEUWlUyoYhyM6Nr75E75W8JfHtl/6HMkyNeQnrhhC8yRM/sDJkGbYMz1kp3iqcmziMbvK3Zq9BF/bvjzYYgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=524SsJx7uobtNsWcsVTuPlcOBagtRGRN54T3x3Bq0Nk=;
- b=T6MnqOtDWb7ZqZUZ6sM5C2DZkECRg48HIKd4VjWeuwGUwC9+1645p7k56I/22GGWK8rg7px3dWXctdtDSfTuvlIHHod65kceyP8FpzjFALN7yu44PmCu6fb+NHaKx0jiV2yga74FfqruE0hucn7RCfdHmt45yobyIj7Or9HvsiNk1LKfmoIo5g46tpPRHYSldoyJUINiIedEDx0YbMi1aWU0MvVpdqKLxPF8DiNV7fSqaLjbkhclTd/8BkK9spTZL+oeJHYJS7m5beFQgNgD94+yXebeEis+b9tlYzHc5EUfsKw7gotWkr3rI94tWRNjl3Q0X09X7rB8DpkQeKj3Ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=524SsJx7uobtNsWcsVTuPlcOBagtRGRN54T3x3Bq0Nk=;
- b=A6ZV9/HaB/9nP9SQu1teKCZ4nW/n2ynfGJ302+/WrSkrjmdHu1f3FJh3UZ70Mmm1l4CYsYEJtF8na5oxSVB9VGWy+rbFFvsUL1SON0/cO4vtvVDXTeUDmthlOtWLh9gz8J+AY9tK9YgcLyi9nayuv5c4MdXaeNDuIHcs0a3tVAw=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB3945.eurprd08.prod.outlook.com (20.179.8.218) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.20; Thu, 26 Sep 2019 13:11:55 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Thu, 26 Sep 2019
- 13:11:55 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH 16/22] iotests: Use complete_and_wait() in 155
-Thread-Topic: [PATCH 16/22] iotests: Use complete_and_wait() in 155
-Thread-Index: AQHVb82pky6TSxjYVUCjxbmTCCB4yqc9+FKA
-Date: Thu, 26 Sep 2019 13:11:54 +0000
-Message-ID: <ae7d50ee-170b-94da-349d-2fbdbc3a357d@virtuozzo.com>
-References: <20190920152804.12875-1-mreitz@redhat.com>
- <20190920152804.12875-17-mreitz@redhat.com>
-In-Reply-To: <20190920152804.12875-17-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR08CA0048.eurprd08.prod.outlook.com (10.170.248.147) To
- DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190926161153014
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 107955d6-5304-44b3-4a43-08d742831a5e
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600167)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB3945; 
-x-ms-traffictypediagnostic: DB8PR08MB3945:
-x-microsoft-antispam-prvs: <DB8PR08MB3945847F41F54F002239CE6CC1860@DB8PR08MB3945.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1186;
-x-forefront-prvs: 0172F0EF77
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(39850400004)(396003)(366004)(136003)(376002)(199004)(189003)(11346002)(52116002)(476003)(76176011)(486006)(7736002)(478600001)(3846002)(6246003)(446003)(2616005)(6506007)(386003)(81156014)(81166006)(8936002)(6512007)(36756003)(99286004)(186003)(26005)(305945005)(102836004)(8676002)(25786009)(110136005)(54906003)(6116002)(316002)(5660300002)(2906002)(64756008)(66556008)(229853002)(31696002)(71200400001)(66446008)(66946007)(66476007)(14454004)(66066001)(6436002)(4326008)(71190400001)(2501003)(31686004)(86362001)(256004)(6486002)(558084003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB3945;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: NrJiCh//4uONfZIFoKugvYHuKS0yyOThq5QtcQV/w6uhT0lOL4VLAAfoq6TdlAtqLBZLfH/uRr+EACDCQ5kpOxpKIZMzLbMuABL0PRS2eqJVSVre7cNWkJFfZQc13q799epzkox9VllhV9HTAAMRgxxNhSEWMqFWapTLXdtkmszwDaGFBsJl5nNWdlr1A0Axd0LaKM2lpnqBvNOFjcUTUsHHg+VX7UipHPbbeOChEEldHIUVv1YEgD5i+2PKEVp9dn2TtmDyigxR5m2qOapmHcHYCK2iFGMbY9sPjKA1o8srB6ty8pw2MBQKSrtlsQ38vBXb7Nxfp7WLhraUhuP8avVx/k3iZAlFltr1FBz8a5U4kOKJzCBj89CJvgcD/8HPBSYwipMORH51zzlvuB5Og7IvAEh3DN5EKs7/qFW6gUM=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0FEDB71D84C58042BB5E78225985AD44@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1iDU65-0004Ln-5S
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 09:46:17 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8QDbZvB053525
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 09:46:07 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2v8wwqab6w-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 09:46:07 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Thu, 26 Sep 2019 14:46:06 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 26 Sep 2019 14:46:02 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8QDk1uC47251496
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 26 Sep 2019 13:46:01 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E8C2F4C046;
+ Thu, 26 Sep 2019 13:46:00 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8EFE94C044;
+ Thu, 26 Sep 2019 13:46:00 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 26 Sep 2019 13:46:00 +0000 (GMT)
+Subject: Re: [RFC PATCH] configure: deprecate 32 bit build hosts
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190925233013.6449-1-alex.bennee@linaro.org>
+ <CAFEAcA9vb5_Mi_axWpu7269Zg0xMLbiiV80ofLeyDpfws3G4nQ@mail.gmail.com>
+ <20190926125817.GB19660@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Thu, 26 Sep 2019 15:46:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 107955d6-5304-44b3-4a43-08d742831a5e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2019 13:11:54.8802 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: y0j67QFFV4SU4vjXSl7/9ZQPGAgiLOXgozR3KZQAJux6MgmmdBgjb9l4cdQhSX/OQwOyzuIOFa4ki9hHOy9DGgWtoC2j+/OVliG7HgrAkzE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB3945
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.133
+In-Reply-To: <20190926125817.GB19660@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19092613-0008-0000-0000-0000031B5904
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092613-0009-0000-0000-00004A39F4A5
+Message-Id: <ea6b671a-0c05-d880-3b9f-62a4f8626ec1@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-26_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909260127
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0b-001b2d01.pphosted.com id x8QDbZvB053525
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,15 +154,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-discuss <qemu-discuss@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, qemu-ppc@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjAuMDkuMjAxOSAxODoyNywgTWF4IFJlaXR6IHdyb3RlOg0KPiBUaGlzIHdheSwgd2UgZ2V0IHRv
-IHNlZSBlcnJvcnMgZHVyaW5nIHRoZSBjb21wbGV0aW9uIHBoYXNlLg0KPiANCj4gU2lnbmVkLW9m
-Zi1ieTogTWF4IFJlaXR6PG1yZWl0ekByZWRoYXQuY29tPg0KDQpSZXZpZXdlZC1ieTogVmxhZGlt
-aXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KDQotLSAN
-CkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+
+
+On 26.09.19 14:58, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Sep 26, 2019 at 08:50:36AM +0100, Peter Maydell wrote:
+>> On Thu, 26 Sep 2019 at 00:31, Alex Benn=C3=A9e <alex.bennee@linaro.org=
+> wrote:
+>>>
+>>> The 32 bit hosts are already a second class citizen especially with
+>>> support for running 64 bit guests under TCG. We are also limited by
+>>> testing as actual working 32 bit machines are getting quite rare in
+>>> developers personal menageries. For TCG supporting newer types like
+>>> Int128 is a lot harder with 32 bit calling conventions compared to
+>>> their larger bit sized cousins. Fundamentally address space is the
+>>> most useful thing for the translator to have even for a 32 bit guest =
+a
+>>> 32 bit host is quite constrained.
+>>>
+>>> As far as I'm aware 32 bit KVM users are even less numerous. Even
+>>> ILP32 doesn't make much sense given the address space QEMU needs to
+>>> manage.
+>>
+>> For KVM we should wait until the kernel chooses to drop support,
+>> I think.
+>=20
+> What if the kernel is waiting for QEMU to drop support too ;-P
+
+For what its worth on kvm/s390 we never cared about implementing
+32 bit.=20
+
+>=20
+>>> @@ -745,19 +744,22 @@ case "$cpu" in
+>>>    ;;
+>>>    armv*b|armv*l|arm)
+>>>      cpu=3D"arm"
+>>> -    supported_cpu=3D"yes"
+>>>    ;;
+>>
+>> I'll leave others to voice opinions about their architectures,
+>> but I still have 32-bit arm in my test set for builds, and
+>> I'm pretty sure we have users (raspi users, for a start).
+>=20
+> RHEL dropped all 32-bit host support a long time ago, so Red Hat
+> don't care for our products.
+>=20
+> Fedora has recently stopped building i686 kernels and thus also no
+> long composes i686 installs. Some users complained, but ultimately
+> no one cares enough to step forward as maintainers.
+>=20
+> That leaves armv7 as the only 32-bit arch in Fedora that is somewhat
+> active & maintained. I don't have any real insight on whether any
+> armv7 (Fedora) users are making much use of QEMU/KVM though, either
+> system or user emulation.=20
+>=20
+> Our preference in Fedora is to have things built on every architecture
+> that the distro targets, but if upstream developers explicitly drop an
+> architecture we're not going to try to add it back.
+>=20
+> Regards,
+> Daniel
+>=20
+
 
