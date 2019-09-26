@@ -2,65 +2,64 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A74EAC432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 01:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D64E4C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 01:30:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7665621655
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 01:17:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7665621655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F32221655
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 01:30:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="S4+HInUd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F32221655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDIOy-0004HJ-Cx
-	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 21:17:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38444)
+	id 1iDIcB-00028h-LT
+	for qemu-devel@archiver.kernel.org; Wed, 25 Sep 2019 21:30:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iDINQ-0002tz-QQ
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 21:15:26 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iDIaO-0000te-EW
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 21:28:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iDINO-0001WN-LW
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 21:15:23 -0400
-Received: from mga14.intel.com ([192.55.52.115]:31121)
+ (envelope-from <dgibson@ozlabs.org>) id 1iDIaL-0003Rx-9C
+ for qemu-devel@nongnu.org; Wed, 25 Sep 2019 21:28:48 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:44209 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iDINO-0001RD-C8
- for qemu-devel@nongnu.org; Wed, 25 Sep 2019 21:15:22 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 25 Sep 2019 18:15:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,549,1559545200"; d="scan'208";a="189847069"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.173])
- ([10.239.196.173])
- by fmsmga007.fm.intel.com with ESMTP; 25 Sep 2019 18:15:12 -0700
-Subject: Re: [PATCH v4 2/2] target/i386: drop the duplicated definition of
- cpuid AVX512_VBMI marco
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <20190924010209.27149-1-tao3.xu@intel.com>
- <20190924010209.27149-3-tao3.xu@intel.com>
- <20190925084228.sew5mtwdlwmwe4ju@steredhat>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <55a00364-4640-0d02-2b7e-ed7ab61f60c4@intel.com>
-Date: Thu, 26 Sep 2019 09:15:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iDIaK-0003H3-A9; Wed, 25 Sep 2019 21:28:45 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46dy4P6Mggz9sPY; Thu, 26 Sep 2019 11:28:37 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569461317;
+ bh=MZsHKUB+q7ag39nzpZmT1yb5AbiHrAMhziFOxE8gg7c=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=S4+HInUd1dEy3EPGLUwgbu4S7NGcjh5/SEW9ZamVyb50tbpCvaEvxYK9LLYqOB99F
+ 0lous0VFQOTmAXSxLXJCJCs8t+OR8GqtwxTwoUptzmNkOdUsWQqTc/SjLLOo7gerFD
+ BNZOC8IcWa4HMAfH4hzBSmME1MZo+4Z1r6iELEzE=
+Date: Thu, 26 Sep 2019 11:05:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 18/20] xive: Improve irq claim/free path
+Message-ID: <20190926010545.GR17405@umbus>
+References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
+ <20190925064534.19155-19-david@gibson.dropbear.id.au>
+ <3cdde622-4ca0-5edd-6bf7-ceb03895f1f2@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20190925084228.sew5mtwdlwmwe4ju@steredhat>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="RyOXVFQXzAE23HDB"
+Content-Disposition: inline
+In-Reply-To: <3cdde622-4ca0-5edd-6bf7-ceb03895f1f2@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,110 +71,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/25/2019 4:42 PM, Stefano Garzarella wrote:
-> Hi Tao,
-> 
-> Typo in the commit title and message? s/marco/macro?
-> 
-> On Tue, Sep 24, 2019 at 09:02:09AM +0800, Tao Xu wrote:
->> Drop the duplicated definition of cpuid AVX512_VBMI and marco and
-> I'm not native speaker but I'd remove some 'and'      ^ this
-> 
->> rename it as CPUID_7_0_ECX_AVX512_VBMI. And rename CPUID_7_0_ECX_VBMI2
->                                            ^ this
-> 
-Oh, my mistake, I will correct these. Thank you for reminding me.
->> as CPUID_7_0_ECX_AVX512_VBMI2.
->>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
->>   target/i386/cpu.c           | 8 ++++----
->>   target/i386/cpu.h           | 5 ++---
->>   target/i386/hvf/x86_cpuid.c | 2 +-
->>   3 files changed, 7 insertions(+), 8 deletions(-)
->>
-> 
-> The rest LGTM:
-> 
-> Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> Thanks,
-> Stefano
-> 
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 9e0bac31e8..71034aeb5a 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -2412,8 +2412,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
->>               CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
->>               CPUID_7_0_EBX_SMAP,
->>           .features[FEAT_7_0_ECX] =
->> -            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->> -            CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
->> +            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->> +            CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI |
->>               CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
->>               CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
->>               CPUID_7_0_ECX_AVX512_VPOPCNTDQ,
->> @@ -2470,8 +2470,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
->>               CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512CD |
->>               CPUID_7_0_EBX_AVX512VL | CPUID_7_0_EBX_CLFLUSHOPT,
->>           .features[FEAT_7_0_ECX] =
->> -            CPUID_7_0_ECX_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->> -            CPUID_7_0_ECX_VBMI2 | CPUID_7_0_ECX_GFNI |
->> +            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
->> +            CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI |
->>               CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
->>               CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
->>               CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57,
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index fa4c4cad79..8e090acd74 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -695,8 +695,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->>   #define CPUID_7_0_EBX_AVX512VL          (1U << 31)
->>   
->>   /* AVX-512 Vector Byte Manipulation Instruction */
->> -#define CPUID_7_0_ECX_AVX512BMI         (1U << 1)
->> -#define CPUID_7_0_ECX_VBMI              (1U << 1)
->> +#define CPUID_7_0_ECX_AVX512_VBMI       (1U << 1)
->>   /* User-Mode Instruction Prevention */
->>   #define CPUID_7_0_ECX_UMIP              (1U << 2)
->>   /* Protection Keys for User-mode Pages */
->> @@ -704,7 +703,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->>   /* OS Enable Protection Keys */
->>   #define CPUID_7_0_ECX_OSPKE             (1U << 4)
->>   /* Additional AVX-512 Vector Byte Manipulation Instruction */
->> -#define CPUID_7_0_ECX_VBMI2             (1U << 6)
->> +#define CPUID_7_0_ECX_AVX512_VBMI2      (1U << 6)
->>   /* Galois Field New Instructions */
->>   #define CPUID_7_0_ECX_GFNI              (1U << 8)
->>   /* Vector AES Instructions */
->> diff --git a/target/i386/hvf/x86_cpuid.c b/target/i386/hvf/x86_cpuid.c
->> index 4d957fe896..16762b6eb4 100644
->> --- a/target/i386/hvf/x86_cpuid.c
->> +++ b/target/i386/hvf/x86_cpuid.c
->> @@ -89,7 +89,7 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
->>                   ebx &= ~CPUID_7_0_EBX_INVPCID;
->>               }
->>   
->> -            ecx &= CPUID_7_0_ECX_AVX512BMI | CPUID_7_0_ECX_AVX512_VPOPCNTDQ;
->> +            ecx &= CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_AVX512_VPOPCNTDQ;
->>               edx &= CPUID_7_0_EDX_AVX512_4VNNIW | CPUID_7_0_EDX_AVX512_4FMAPS;
->>           } else {
->>               ebx = 0;
->> -- 
->> 2.20.1
->>
-> 
 
+--RyOXVFQXzAE23HDB
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Sep 25, 2019 at 09:25:47AM +0200, C=E9dric Le Goater wrote:
+> On 25/09/2019 08:45, David Gibson wrote:
+> > spapr_xive_irq_claim() returns a bool to indicate if it succeeded.  But
+> > most of the callers and one callee use a richer Error * instead.  So use
+> > that instead of a bool return so we can actually pass more informative
+> > errors up the stack.
+> >=20
+> > In addition it didn't actually check if the irq was already claimed, wh=
+ich
+> > is one of the primary purposes of the claim path, so do that.
+> >=20
+> > spapr_xive_irq_free() also returned a bool... which no callers checked,=
+ so
+> > just drop it.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/intc/spapr_xive.c        | 17 ++++++++++-------
+> >  hw/ppc/spapr_irq.c          | 12 ++++++++----
+> >  include/hw/ppc/spapr_xive.h |  5 +++--
+> >  3 files changed, 21 insertions(+), 13 deletions(-)
+> >=20
+> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> > index 47b5ec0b56..5a56a58299 100644
+> > --- a/hw/intc/spapr_xive.c
+> > +++ b/hw/intc/spapr_xive.c
+> > @@ -528,12 +528,18 @@ static void spapr_xive_register_types(void)
+> > =20
+> >  type_init(spapr_xive_register_types)
+> > =20
+> > -bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t lisn, bool lsi)
+> > +void spapr_xive_irq_claim(SpaprXive *xive, uint32_t lisn, bool lsi,
+> > +                          Error **errp)
+> >  {
+> >      XiveSource *xsrc =3D &xive->source;
+> > =20
+> >      assert(lisn < xive->nr_irqs);
+> > =20
+> > +    if (be64_to_cpu(xive->eat[lisn].w) & EAS_VALID) {
+>=20
+> please use xive_eas_is_valid()
+
+Oops, missed that that existed.  Fixed.
+
+> with that change,
+>=20
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+
+Oops, missed
+
+>=20
+>=20
+> C.=20
+>=20
+> > +        error_setg(errp, "IRQ %d is not free", lisn);
+> > +        return;
+> > +    }
+> > +
+> >      /*
+> >       * Set default values when allocating an IRQ number
+> >       */
+> > @@ -547,20 +553,17 @@ bool spapr_xive_irq_claim(SpaprXive *xive, uint32=
+_t lisn, bool lsi)
+> > =20
+> >          kvmppc_xive_source_reset_one(xsrc, lisn, &local_err);
+> >          if (local_err) {
+> > -            error_report_err(local_err);
+> > -            return false;
+> > +            error_propagate(errp, local_err);
+> > +            return;
+> >          }
+> >      }
+> > -
+> > -    return true;
+> >  }
+> > =20
+> > -bool spapr_xive_irq_free(SpaprXive *xive, uint32_t lisn)
+> > +void spapr_xive_irq_free(SpaprXive *xive, uint32_t lisn)
+> >  {
+> >      assert(lisn < xive->nr_irqs);
+> > =20
+> >      xive->eat[lisn].w &=3D cpu_to_be64(~EAS_VALID);
+> > -    return true;
+> >  }
+> > =20
+> >  /*
+> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > index 2673a90604..f53544e45e 100644
+> > --- a/hw/ppc/spapr_irq.c
+> > +++ b/hw/ppc/spapr_irq.c
+> > @@ -245,7 +245,13 @@ static void spapr_irq_init_xive(SpaprMachineState =
+*spapr, Error **errp)
+> > =20
+> >      /* Enable the CPU IPIs */
+> >      for (i =3D 0; i < nr_servers; ++i) {
+> > -        spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, false);
+> > +        Error *local_err =3D NULL;
+> > +
+> > +        spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, false, &l=
+ocal_err);
+> > +        if (local_err) {
+> > +            error_propagate(errp, local_err);
+> > +            return;
+> > +        }
+> >      }
+> > =20
+> >      spapr_xive_hcall_init(spapr);
+> > @@ -254,9 +260,7 @@ static void spapr_irq_init_xive(SpaprMachineState *=
+spapr, Error **errp)
+> >  static void spapr_irq_claim_xive(SpaprMachineState *spapr, int irq, bo=
+ol lsi,
+> >                                   Error **errp)
+> >  {
+> > -    if (!spapr_xive_irq_claim(spapr->xive, irq, lsi)) {
+> > -        error_setg(errp, "IRQ %d is invalid", irq);
+> > -    }
+> > +    spapr_xive_irq_claim(spapr->xive, irq, lsi, errp);
+> >  }
+> > =20
+> >  static void spapr_irq_free_xive(SpaprMachineState *spapr, int irq)
+> > diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> > index bfd40f01d8..69df3793e1 100644
+> > --- a/include/hw/ppc/spapr_xive.h
+> > +++ b/include/hw/ppc/spapr_xive.h
+> > @@ -54,8 +54,9 @@ typedef struct SpaprXive {
+> >   */
+> >  #define SPAPR_XIVE_BLOCK_ID 0x0
+> > =20
+> > -bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t lisn, bool lsi);
+> > -bool spapr_xive_irq_free(SpaprXive *xive, uint32_t lisn);
+> > +void spapr_xive_irq_claim(SpaprXive *xive, uint32_t lisn, bool lsi,
+> > +                          Error **errp);
+> > +void spapr_xive_irq_free(SpaprXive *xive, uint32_t lisn);
+> >  void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
+> >  int spapr_xive_post_load(SpaprXive *xive, int version_id);
+> > =20
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--RyOXVFQXzAE23HDB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2MDugACgkQbDjKyiDZ
+s5JEfQ//dMhlCD25y5TMjt5pDftgtIs/VN7KX7FEpQqx36nJcicbD/V2BymmV+96
+XYQA36SHt3n2HZFVCfJUUr6mMjGGV5MevePLfkHPXBP/c2+Wum288bCm18nnELF7
+BLJdx+SQZjms6hHlRvvTSMhrXjbMgJvlQpFUC3HNCTTGXiFIP9ZjtfIeD/HWtOlg
+JZA2ZiNHrxdoN9Q0jyxJqNm4d1NUhsCY2Oagb0HbTSmTdxgY9KtsA69u113SN/6Z
+oRjAYDTJ4RF9CM4qrCeDCAi2dggIdBPsIA6AYLSeVzfqxlhcmas2vfYc9ziNSXe7
+feXJdUsCqMIeoDVJJXTe1bpDcB3Sta07gctme6VoGvnLF0A/7ruH9zSog6SfgwbO
+c2zis7a28+C1IJSDAqo/c+zgmG2nK9WnUU9MvK6DjrAYh7EgmP7r3iRdQIxpElTc
+g0VTtftxFOXKhEQ4l6cz23e0gXnAetA7NTF+LwsrPxwBVt35DmXWQQpbq5jD6lMw
+Nq/WWYpOcN45UvYDV4mu0cBfMsszPoqcbXm+67VRB9OTmvJvTmhbEy5m0aFyUBqd
+Is1pexE9nUD0zwLxek6QJS83VWoh2SyA0syMzgAh6obbF8eDfcDyVsJwfVY5MuCa
+eIOEmSIxUGHS+qoT7jJagcSFGT9ffg9Ll+Tnm6eJz9uo/m4mqME=
+=F8/m
+-----END PGP SIGNATURE-----
+
+--RyOXVFQXzAE23HDB--
 
