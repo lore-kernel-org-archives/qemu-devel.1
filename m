@@ -2,49 +2,49 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 971DFC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:07:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8ECCC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:08:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68EE721D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:07:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EE721D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE2D121D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:08:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE2D121D56
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDXEK-0001st-To
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:07:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43045)
+	id 1iDXFQ-0003IV-9J
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52081)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iDWk3-0002rx-6x
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:35:44 -0400
+ (envelope-from <bounces@canonical.com>) id 1iDXDH-0001LB-1c
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:05:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iDWk1-00028c-Ox
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:35:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52960)
+ (envelope-from <bounces@canonical.com>) id 1iDXDE-0006g7-IG
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:05:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57188)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iDWk1-000262-KM
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:35:41 -0400
+ id 1iDXDE-0006cg-CT
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:05:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iDWjy-0007oy-Tv
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 16:35:38 +0000
+ id 1iDXDC-00020A-1q
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 17:05:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E159D2E80C9
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 16:35:38 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0A9E12E80C7
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 17:05:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Sep 2019 16:26:54 -0000
-From: Paul Clarke <pc@us.ibm.com>
+Date: Thu, 26 Sep 2019 16:59:48 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -54,16 +54,16 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: 7-pc mark-cave-ayland philmd
 X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
+X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
 References: <156711057074.6835.13599471410604217618.malonedeb@soybean.canonical.com>
-Message-Id: <156951521458.19206.18095718983843992802.malone@wampee.canonical.com>
+Message-Id: <156951718898.31232.4174685388028140833.malone@soybean.canonical.com>
 Subject: [Bug 1841990] Re: instruction 'denbcdq' misbehaving
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19056";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 23e7533fca89fa132257a20e97d8a4ff6e81c2c1
+X-Launchpad-Hash: 9dbf09f53194be48ecb5a4f9c678ff11510ba72e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,46 +81,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-`vsl` appears to be acting incorrectly as well, per the test
-'vec_bcdsr':
+Ahhh in that case I suspect that you may be seeing a bug in this commit:
 
-=3D> 0x100006e0 <vec_slq+132>:    vsl     v0,v0,v1      =
+commit 4e6d0920e7547e6af4bbac5ffe9adfe6ea621822
+Author: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+Date:   Mon Jul 15 16:22:48 2019 +0200
 
-(gdb) p $vr0.uint128                                  =
+    target/ppc: Optimize emulation of vsl and vsr instructions
+    =
 
-$21 =3D 0x10111213141516172021222324252650              =
+    Optimization of altivec instructions vsl and vsr(Vector Shift Left/Rigt=
+).
+    Perform shift operation (left and right respectively) on 128 bit value =
+of
+    register vA by value specified in bits 125-127 of register vB. Lowest 3
+    bits in each byte element of register vB must be identical or result is
+    undefined.
+    =
 
-(gdb) p $vr1.uint128                                  =
+    For vsl instruction, the first step is bits 125-127 of register vB have
+    to be saved in variable sh. Then, the highest sh bits of the lower
+    doubleword element of register vA are saved in variable shifted,
+    in order not to lose those bits when shift operation is performed on
+    the lower doubleword element of register vA, which is the next
+    step. After shifting the lower doubleword element shift operation
+    is performed on higher doubleword element of vA, with replacement of
+    the lowest sh bits(that are now 0) with bits saved in shifted.
+    =
 
-$22 =3D 0x0                                             =
+    For vsr instruction, firstly, the bits 125-127 of register vB have
+    to be saved in variable sh. Then, the lowest sh bits of the higher
+    doubleword element of register vA are saved in variable shifted,
+    in odred not to lose those bits when the shift operation is
+    performed on the higher doubleword element of register vA, which is
+    the next step. After shifting higher doubleword element, shift operation
+    is performed on lower doubleword element of vA, with replacement of
+    highest sh bits(that are now 0) with bits saved in shifted.
+    =
 
-(gdb) stepi                                           =
+    Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+    Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+    Message-Id: <1563200574-11098-3-git-send-email-stefan.brankovic@rt-rk.c=
+om>
+    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-0x00000000100006e4 in vec_slq ()                      =
-
-1: x/i $pc                                             each byte           =
-                                            =
-
-=3D> 0x100006e4 <vec_slq+136>:    xxlor   vs0,vs32,vs32 =
-
-(gdb) p $vr0.uint128                                  =
-
-$23 =3D 0x10111213141516572021222324252650
-
-=3D> 0x100006e0 <vec_slq+132>:    vsl     v0,v0,v1
-(gdb) p $vr0.uint128
-$21 =3D 0x10111213141516172021222324252650
-(gdb) p $vr1.uint128
-$22 =3D 0x0
-(gdb) stepi
-0x00000000100006e4 in vec_slq ()
-1: x/i $pc
-=3D> 0x100006e4 <vec_slq+136>:    xxlor   vs0,vs32,vs32
-(gdb) p $vr0.uint128
-$23 =3D 0x10111213141516172021222324252650
-
-Note in the final result differs in the first nybble of the 8th MSB
-('57' vs '17').
+In fact, looking at that commit I think you should just be able to
+revert it for a quick test - does that enable your regression tests to
+pass?
 
 -- =
 
