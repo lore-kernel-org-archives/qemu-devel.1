@@ -2,79 +2,79 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FDFC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02921C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7C59222C6
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:43:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C48F6222C6
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 17:44:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zf4hUEyt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7C59222C6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jmzr0cep"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C48F6222C6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDXnb-00020O-AI
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:43:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58837)
+	id 1iDXoi-0003bK-CZ
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 13:44:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXgC-0004Nm-Q5
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:50 -0400
+ id 1iDXgH-0004Th-D6
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXgB-0002qt-5M
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:48 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33788)
+ id 1iDXgG-0002uJ-0N
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:35:53 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:32772)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDXgA-0002qV-Tm; Thu, 26 Sep 2019 13:35:47 -0400
-Received: by mail-wr1-f66.google.com with SMTP id b9so3740463wrs.0;
- Thu, 26 Sep 2019 10:35:46 -0700 (PDT)
+ id 1iDXgF-0002tD-PG; Thu, 26 Sep 2019 13:35:51 -0400
+Received: by mail-wr1-f67.google.com with SMTP id b9so3740735wrs.0;
+ Thu, 26 Sep 2019 10:35:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0nYrEyIE8Ksn++8Q6sjUUjo6us9YPYxfJ0rmZNlZ6VA=;
- b=Zf4hUEytuT66Vk8Q/kLrnqWhVUdYRPo5txTb0r2vrCAptQk/xn1csbclZAYGxstLYP
- YLwqU5rG0W+Ww2cBreX8g5mYQjnOaSpCCMiwtoJIYVawHVI+XX/ntBfjt/790Uvli0Zp
- dHaYgYYhqWCS31UiNzTAVDH0N0x+UdopVoNa6cX6xvwAVJv2BUB2gZu4tK2q0e7IJ+Q4
- lFdEv6Kzyu4Os4ttvuqEcwoXhg4PWE81f4pvhng0sLcYzH77Djdom9qF8rsFhv/1BpCp
- hFA5ky1wXzqvxG+ozWVBGkpoaXRjL/eUQiL6OLfQXFjPk/zEKgl0DP2biBge+tbxb3g4
- WqQQ==
+ bh=dMBRiTpLuqyI3tuVBy2ZLm7Wzg1GaNHi9g5XPWVyXlc=;
+ b=Jmzr0cepOGPkBtav/ifREcbjSkztyj4oaLOjlFggGH84IjFxe/y9BRADm2t992Zbtp
+ +NeizxJcxR49MK4ex7iSxdoaOpm7vkRbbSh2zm1IjeBmBW/lNZZCQrpNX+aeEsey2mBP
+ XiTea//MnVQCeKZQz58jllVa2TyyFfnfNHAdvtlFYHzzY094lob4KdWRmuNEFIRc/dAp
+ IEbSsXmy9RjE7ZEUDcEUgSNkNyR+O5S6jJcl5JyQOpWVzROXv01o+E4LQFvvgt+kTUHm
+ +gZXiraEGRl1D/ykjZv+Up+ePPJPnHUpbCdUeE5JHW5mC/FrUnrvr0Hmw2l2D2Ib1VDM
+ CxIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=0nYrEyIE8Ksn++8Q6sjUUjo6us9YPYxfJ0rmZNlZ6VA=;
- b=lbWvouvlMx8sAJOGrcJOdKcVhK112fBEsBZEF7s/m4UotAMxEKEoiHOY9SdbkwMHF5
- X6YfgWi8a16RXxg+bNebh1zzqlWGbdhBt/VKjKSdygtlOWnWHMmyYAVLd6acQZ+CSmMp
- V/s2x8YZj5S23i6oKVwpURAXygifcD/FeKmTR1VT0iWcwPqcZg5LAVhZA+/L36bG5BMq
- xxTLi3zJ1di+daB3Xodwo9+Q+K1sw4WgN5vzg8EeHdpuYfTyXGdT8go203wgeAu1MCac
- L103OX9cH9waR9VPd3fpd5bjSWE/B5jqugTvQtot8dQG89IEBu0E/rYFDPNvXSBrHS+L
- jDWA==
-X-Gm-Message-State: APjAAAVQL1BSqSShk7Ls30UAnn18SZdscYMK7IE0s6VJSTHXgpvqDlL4
- 2ak+Tsm83LjhdaE7/8o0+nZFTaP1ioo=
-X-Google-Smtp-Source: APXvYqxxaLT1w5lIln4IJ9CMskeEmmTd7HqbS80bDrPUp0A3ZHMbm7PhjTcOw2DxraJwYG8kbIwETA==
-X-Received: by 2002:a5d:5642:: with SMTP id j2mr3980873wrw.345.1569519285785; 
- Thu, 26 Sep 2019 10:34:45 -0700 (PDT)
+ bh=dMBRiTpLuqyI3tuVBy2ZLm7Wzg1GaNHi9g5XPWVyXlc=;
+ b=WojbChAH54DryaO3EwaJPmFTOHxcWa5mq7WSM6rgZji30R+D1EmdjtHPNgYn7JNc2y
+ 4mXbCGzAB53P5yB3PaX1US9MuzlWQrvzlNQ15CKCzg+FnaA7GiWAGlpVvLKmd7mU/dyj
+ 1GsfdpXjbq0nxhxoYHzMDExixjUgpRBz6iRlJEQEKgfsC7zlGqTqqskSzfBEmnN9qZ2l
+ AT60SmrqEmhZp716h7UYk8G3p3pMPTNS8dXjLWLLzeo/KcJuzOQkg9P6qc3nLZ/rLmrZ
+ T4Me/TD5Dvu5S9R+kFgSEMbf/Ze4skcILfGcYvDNycwu0X1waGHYQ/DlPx0G+0gq6/S5
+ 3/YQ==
+X-Gm-Message-State: APjAAAU4y8IKzf+ks3gGB1jVL3pAKyGvhUwMWhBLwAHvhXjDgbqi8rf6
+ PuXNITtxkzLDi2Abr9WcCepahkzsPNk=
+X-Google-Smtp-Source: APXvYqxeuWYYg9hX3pE803WJPHi40gPn283dlsa22r7adI30TKyVLYiJIztv6j7iQzBAvCQ2vhtBwg==
+X-Received: by 2002:adf:dc4b:: with SMTP id m11mr4217967wrj.269.1569519290674; 
+ Thu, 26 Sep 2019 10:34:50 -0700 (PDT)
 Received: from x1w.redhat.com (240.red-88-21-68.staticip.rima-tde.net.
  [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.34.44
+ by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.34.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Sep 2019 10:34:45 -0700 (PDT)
+ Thu, 26 Sep 2019 10:34:50 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 06/19] hw/char/bcm2835_aux: Add trace events
-Date: Thu, 26 Sep 2019 19:34:14 +0200
-Message-Id: <20190926173428.10713-7-f4bug@amsat.org>
+Subject: [PATCH 09/19] hw/arm/bcm2835_peripherals: Use the thermal sensor block
+Date: Thu, 26 Sep 2019 19:34:17 +0200
+Message-Id: <20190926173428.10713-10-f4bug@amsat.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190926173428.10713-1-f4bug@amsat.org>
 References: <20190926173428.10713-1-f4bug@amsat.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.66
+X-Received-From: 209.85.221.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,170 +114,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The BCM2835 AUX UART is compatible with the 16650 model, when
-the registers belong the the 16650 block, use its trace events,
-else use bcm2835_aux_read/write.
+Map the thermal sensor in the BCM2835 block.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/char/bcm2835_aux.c | 55 +++++++++++++++++++++++++++++++------------
- hw/char/trace-events  |  4 ++++
- 2 files changed, 44 insertions(+), 15 deletions(-)
+ hw/arm/bcm2835_peripherals.c         | 13 +++++++++++++
+ include/hw/arm/bcm2835_peripherals.h |  2 ++
+ include/hw/arm/raspi_platform.h      |  1 +
+ 3 files changed, 16 insertions(+)
 
-diff --git a/hw/char/bcm2835_aux.c b/hw/char/bcm2835_aux.c
-index a6fc1bf152..b26a255630 100644
---- a/hw/char/bcm2835_aux.c
-+++ b/hw/char/bcm2835_aux.c
-@@ -27,6 +27,7 @@
- #include "migration/vmstate.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "trace.h"
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index fdcf616c56..70bf927a02 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -111,6 +111,10 @@ static void bcm2835_peripherals_init(Object *obj)
+     object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
+                                    OBJECT(&s->gpu_bus_mr), &error_abort);
  
- #define AUX_IRQ         0x0
- #define AUX_ENABLES     0x4
-@@ -62,17 +63,24 @@ static void bcm2835_aux_update(BCM2835AuxState *s)
-     qemu_set_irq(s->irq, s->iir != 0);
- }
- 
-+static bool is_16650(hwaddr offset)
-+{
-+    return offset >= AUX_MU_IO_REG && offset < AUX_MU_CNTL_REG;
-+}
++    /* Thermal */
++    sysbus_init_child_obj(obj, "thermal", &s->thermal, sizeof(s->thermal),
++                          TYPE_BCM2835_THERMAL);
 +
- static uint64_t bcm2835_aux_read(void *opaque, hwaddr offset, unsigned size)
- {
-     BCM2835AuxState *s = opaque;
--    uint32_t c, res;
-+    uint32_t c, res = 0;
- 
-     switch (offset) {
-     case AUX_IRQ:
--        return s->iir != 0;
-+        res = s->iir != 0;
-+        break;
- 
-     case AUX_ENABLES:
--        return 1; /* mini UART permanently enabled */
-+        res = 1; /* mini UART permanently enabled */
-+        break;
- 
-     case AUX_MU_IO_REG:
-         /* "DLAB bit set means access baudrate register" is NYI */
-@@ -85,11 +93,13 @@ static uint64_t bcm2835_aux_read(void *opaque, hwaddr offset, unsigned size)
-         }
-         qemu_chr_fe_accept_input(&s->chr);
-         bcm2835_aux_update(s);
--        return c;
-+        res = c;
-+        break;
- 
-     case AUX_MU_IER_REG:
-         /* "DLAB bit set means access baudrate register" is NYI */
--        return 0xc0 | s->ier; /* FIFO enables always read 1 */
-+        res = 0xc0 | s->ier; /* FIFO enables always read 1 */
-+        break;
- 
-     case AUX_MU_IIR_REG:
-         res = 0xc0; /* FIFO enables */
-@@ -105,33 +115,34 @@ static uint64_t bcm2835_aux_read(void *opaque, hwaddr offset, unsigned size)
-         if (s->iir == 0) {
-             res |= 0x1;
-         }
--        return res;
-+        break;
- 
-     case AUX_MU_LCR_REG:
-         qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_LCR_REG unsupported\n", __func__);
--        return 0;
-+        break;
- 
-     case AUX_MU_MCR_REG:
-         qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_MCR_REG unsupported\n", __func__);
--        return 0;
-+        break;
- 
-     case AUX_MU_LSR_REG:
-         res = 0x60; /* tx idle, empty */
-         if (s->read_count != 0) {
-             res |= 0x1;
-         }
--        return res;
-+        break;
- 
-     case AUX_MU_MSR_REG:
-         qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_MSR_REG unsupported\n", __func__);
--        return 0;
-+        break;
- 
-     case AUX_MU_SCRATCH:
-         qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_SCRATCH unsupported\n", __func__);
--        return 0;
-+        break;
- 
-     case AUX_MU_CNTL_REG:
--        return 0x3; /* tx, rx enabled */
-+        res = 0x3; /* tx, rx enabled */
-+        break;
- 
-     case AUX_MU_STAT_REG:
-         res = 0x30e; /* space in the output buffer, empty tx fifo, idle tx/rx */
-@@ -140,17 +151,25 @@ static uint64_t bcm2835_aux_read(void *opaque, hwaddr offset, unsigned size)
-             assert(s->read_count < BCM2835_AUX_RX_FIFO_LEN);
-             res |= ((uint32_t)s->read_count) << 16; /* rx fifo fill level */
-         }
--        return res;
-+        break;
- 
-     case AUX_MU_BAUD_REG:
-         qemu_log_mask(LOG_UNIMP, "%s: AUX_MU_BAUD_REG unsupported\n", __func__);
--        return 0;
-+        break;
- 
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-                       __func__, offset);
--        return 0;
-+        break;
+     /* GPIO */
+     sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
+                           TYPE_BCM2835_GPIO);
+@@ -321,6 +325,15 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+                                                   INTERRUPT_DMA0 + n));
      }
-+
-+    if (is_16650(offset)) {
-+        trace_serial_ioport_read((offset & 0x1f) >> 2, res);
-+    } else {
-+        trace_bcm2835_aux_read(offset, res);
+ 
++    /* THERMAL */
++    object_property_set_bool(OBJECT(&s->thermal), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
 +    }
++    memory_region_add_subregion(&s->peri_mr, THERMAL_OFFSET,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->thermal), 0));
 +
-+    return res;
- }
- 
- static void bcm2835_aux_write(void *opaque, hwaddr offset, uint64_t value,
-@@ -159,6 +178,12 @@ static void bcm2835_aux_write(void *opaque, hwaddr offset, uint64_t value,
-     BCM2835AuxState *s = opaque;
-     unsigned char ch;
- 
-+    if (is_16650(offset)) {
-+        trace_serial_ioport_write((offset & 0x1f) >> 2, value);
-+    } else {
-+        trace_bcm2835_aux_write(offset, value);
-+    }
-+
-     switch (offset) {
-     case AUX_ENABLES:
-         if (value != 1) {
-diff --git a/hw/char/trace-events b/hw/char/trace-events
-index 2ce7f2f998..a7d477ab1e 100644
---- a/hw/char/trace-events
-+++ b/hw/char/trace-events
-@@ -1,5 +1,9 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
-+# bcm2835_aux.c
-+bcm2835_aux_read(uint64_t addr, uint32_t value) "read addr 0x%"PRIx64" value 0x%x"
-+bcm2835_aux_write(uint64_t addr, uint32_t value) "read addr 0x%"PRIx64" value 0x%x"
-+
- # parallel.c
- parallel_ioport_read(const char *desc, uint16_t addr, uint8_t value) "read [%s] addr 0x%02x val 0x%02x"
- parallel_ioport_write(const char *desc, uint16_t addr, uint8_t value) "write [%s] addr 0x%02x val 0x%02x"
+     /* GPIO */
+     object_property_set_bool(OBJECT(&s->gpio), true, "realized", &err);
+     if (err) {
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index 62a4c7b559..be7ad9b499 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -20,6 +20,7 @@
+ #include "hw/misc/bcm2835_property.h"
+ #include "hw/misc/bcm2835_rng.h"
+ #include "hw/misc/bcm2835_mbox.h"
++#include "hw/misc/bcm2835_thermal.h"
+ #include "hw/sd/sdhci.h"
+ #include "hw/sd/bcm2835_sdhost.h"
+ #include "hw/gpio/bcm2835_gpio.h"
+@@ -53,6 +54,7 @@ typedef struct BCM2835PeripheralState {
+     SDHCIState sdhci;
+     BCM2835SDHostState sdhost;
+     BCM2835GpioState gpio;
++    Bcm2835ThermalState thermal;
+     UnimplementedDeviceState i2s;
+     UnimplementedDeviceState spi[1];
+     UnimplementedDeviceState i2c[3];
+diff --git a/include/hw/arm/raspi_platform.h b/include/hw/arm/raspi_platform.h
+index cdcbca943f..61b04a1bd4 100644
+--- a/include/hw/arm/raspi_platform.h
++++ b/include/hw/arm/raspi_platform.h
+@@ -48,6 +48,7 @@
+ #define SPI0_OFFSET             0x204000
+ #define BSC0_OFFSET             0x205000 /* BSC0 I2C/TWI */
+ #define OTP_OFFSET              0x20f000
++#define THERMAL_OFFSET          0x212000
+ #define BSC_SL_OFFSET           0x214000 /* SPI slave */
+ #define AUX_OFFSET              0x215000 /* AUX: UART1/SPI1/SPI2 */
+ #define EMMC1_OFFSET            0x300000
 -- 
 2.20.1
 
