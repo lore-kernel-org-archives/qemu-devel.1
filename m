@@ -2,112 +2,62 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF8EC432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 07:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C2BC432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 07:23:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F904206E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 07:19:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F904206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0D7B6206E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 07:23:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7B6206E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDO3w-0007O6-F7
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 03:19:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55697)
+	id 1iDO7D-00015z-GS
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 03:23:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56350)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDO25-00065u-CG
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:17:46 -0400
+ (envelope-from <groug@kaod.org>) id 1iDO6F-0000Q3-SY
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:22:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDO21-0004A0-Ep
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:17:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57218)
+ (envelope-from <groug@kaod.org>) id 1iDO6C-0006Xn-EC
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:22:01 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:36748)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iDO21-00049S-6u
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:17:41 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 065CF3D955;
- Thu, 26 Sep 2019 07:17:40 +0000 (UTC)
-Received: from [10.36.117.15] (ovpn-117-15.ams2.redhat.com [10.36.117.15])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A908B5D6A7;
- Thu, 26 Sep 2019 07:17:36 +0000 (UTC)
-Subject: Re: hw/s390x: why watchdog device diag288 is resetted twice?
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Xu Wang <gesaint@linux.vnet.ibm.com>
-References: <a52656b8-3b99-fb9e-f554-fbd988f62d87@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <ef3d6a2e-d102-ff01-4a3f-17c438065202@redhat.com>
-Date: Thu, 26 Sep 2019 09:17:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDO6C-0006U8-7v
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 03:22:00 -0400
+Received: from player770.ha.ovh.net (unknown [10.109.160.87])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id B2FF91AE09D
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 09:21:53 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player770.ha.ovh.net (Postfix) with ESMTPSA id 29FFBA405DEC;
+ Thu, 26 Sep 2019 07:21:42 +0000 (UTC)
+Date: Thu, 26 Sep 2019 09:21:41 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 11/20] spapr: Fix indexing of XICS irqs
+Message-ID: <20190926092141.66158590@bahia.lan>
+In-Reply-To: <20190926013148.GU17405@umbus>
+References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
+ <20190925064534.19155-12-david@gibson.dropbear.id.au>
+ <20190925221746.7b497c8c@bahia.lan> <20190926013148.GU17405@umbus>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <a52656b8-3b99-fb9e-f554-fbd988f62d87@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 26 Sep 2019 07:17:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/=vnKrevK6F5xYEM.0UHozJg"; protocol="application/pgp-signature"
+X-Ovh-Tracer-Id: 7426717261815060966
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfeefgdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 188.165.52.147
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,55 +69,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26.09.19 08:22, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi,
+--Sig_/=vnKrevK6F5xYEM.0UHozJg
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 26 Sep 2019 11:31:48 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Wed, Sep 25, 2019 at 10:17:46PM +0200, Greg Kurz wrote:
+> > On Wed, 25 Sep 2019 16:45:25 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >=20
+> > > spapr global irq numbers are different from the source numbers on the=
+ ICS
+> > > when using XICS - they're offset by XICS_IRQ_BASE (0x1000).  But
+> > > spapr_irq_set_irq_xics() was passing through the global irq number to
+> > > the ICS code unmodified.
+> > >=20
+> > > We only got away with this because of a counteracting bug - we were
+> > > incorrectly adjusting the qemu_irq we returned for a requested global=
+ irq
+> > > number.
+> > >=20
+> > > That approach mostly worked but is very confusing, incorrectly relies=
+ on
+> > > the way the qemu_irq array is allocated, and undermines the intention=
+ of
+> > > having the global array of qemu_irqs for spapr have a consistent mean=
+ing
+> > > regardless of irq backend.
+> > >=20
+> > > So, fix both set_irq and qemu_irq indexing.  We rename some parameter=
+s at
+> > > the same time to make it clear that they are referring to spapr global
+> > > irq numbers.
+> > >=20
+> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > ---
+> >=20
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> >=20
+> > Further cleanup could be to have the XICS backend to only take global
+> > irq numbers and to convert them to ICS source numbers internally. This
+> > would put an end to the confusion between srcno/irq in the frontend
+> > code.
 >=20
-> hw/watchdog/wdt_diag288.c use 2 different resets:
->=20
-> 1/ registered handler:
->=20
->     qemu_register_reset(diag288_reset, diag288);
->=20
-> 2/ DeviceClass reset:
->=20
->     dc->reset =3D wdt_diag288_reset;
->=20
-> diag288_reset() simply calls wdt_diag288_reset():
->=20
-> static void wdt_diag288_reset(DeviceState *dev)
-> {
->     DIAG288State *diag288 =3D DIAG288(dev);
->=20
->     diag288->enabled =3D false;
->     timer_del(diag288->timer);
-> }
->=20
-> static void diag288_reset(void *opaque)
-> {
->     DeviceState *diag288 =3D opaque;
->=20
->     wdt_diag288_reset(diag288);
-> }
->=20
-> Why do we need this distinction?
-> Is this some special corner case?
-> Isn't this device connected to the QOM bus?
+> Yeah, maybe.  But the local srcnos do actually make sense from within
+> the perspective of ICS, so I'm not all that keen to do that.
 >=20
 
-It's not a qdev device, so it won't get reset via the sysbus (I saw
-patches changing that but I think they are not upstream yet).
+Not sure to understand what you mean by "within the perspective of ICS".
 
-The "dc->reset =3D wdt_diag288_reset;" is needed to make
-hw/s390x/s390-virtio-ccw.c:subsystem_reset() work.
+My concern is actually to get rid of ics->offset users in spapr_irq.c.
 
---=20
+eg,
 
-Thanks,
+static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
+{
+    SpaprMachineState *spapr =3D opaque;
+    uint32_t srcno =3D irq - spapr->ics->offset;
 
-David / dhildenb
+    ics_set_irq(spapr->ics, srcno, val);
+}
+
+It looks like we should do something like:
+
+static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
+{
+    SpaprMachineState *spapr =3D opaque;
+
+    ics_set_irq(spapr->ics, irq, val);
+}
+
+and have ics_set_irq() do:
+
+    uint32_t srcno =3D irq - spapr->ics->offset;
+
+Are you inferring that it is better to keep the irq to srcno conversions
+in spapr_irq.c ?
+
+--Sig_/=vnKrevK6F5xYEM.0UHozJg
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2MZwUACgkQcdTV5YIv
+c9ZzFxAAohV7O/LsJCbSiPH3irxOFaQw/C7+ifXaYCYYVphuI7KUQaqc7rEWFQn/
+hmJqjmfPJkxz0wPsL+Sp7CkrwZ6Jsc6zCnhN3PCcrP50xnq+yvdPBz0oBMs0nHeW
+NE4XBJ2Mz6MMhDB3EpmZ2daBF7t+kTCTzlJ1UZCj+6UWySa11/fPSOcy74syoQ+I
+5i62w4TU/pyepwObdMlyS4CGOaFIXVSV7iWgpAfBUDiQI4nTSQWcfJxT7UcnXIB7
+n1B5o/HYUarZOAvKdwKPlLV5UjNjIvdzSCQhjZUKHsYuTsWqNT4/kG6RgTnbfw+/
+nAuIkomiPm8JRBbKuagJb4xJNDElxIZHLLgUOn9IcmfRXCHBCifiUvbr/tDPVlVs
+Viy/J46WJOue0BV5f8KHMAjAK49v4l7l3FLTG5TbVyWbtEsG08uYIVV+UV9jaQXv
+/k/jfsyh11omxm2ePi9X8OAwxjzxsZGpY0/Z4ZvkntC58xgFwGFDHS8hcbY2yolK
+mXBdi9EiHgap4/tlyuUC0ThDXXHfyt2jJs4R8bfbQsp9OgaZY/B70nSy5lUyRzJw
+EagK7WsPxekA8okF9aMCdbvMgYBIXdFPMvWEBBtZGllhsLXCzbRhrIasep3PxvdF
+W8I2xEeDaACXTbYsfxOACsuSNR9Zfgo3pqqH7JyGZ5Y5NB/4Onc=
+=Etsz
+-----END PGP SIGNATURE-----
+
+--Sig_/=vnKrevK6F5xYEM.0UHozJg--
 
