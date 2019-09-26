@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C85C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 11:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC1DC432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 11:25:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D38FB217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 11:24:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38FB217F4
+	by mail.kernel.org (Postfix) with ESMTPS id 1F3A0217F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 11:25:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F3A0217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDRt1-0001GH-Nz
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 07:24:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53065)
+	id 1iDRu7-0002Wr-B7
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 07:25:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iDRrt-00008z-8R
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 07:23:30 -0400
+ (envelope-from <lvivier@redhat.com>) id 1iDRsp-0001PX-KS
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 07:24:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iDRrs-0006Yb-3O
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 07:23:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38576)
+ (envelope-from <lvivier@redhat.com>) id 1iDRso-0007a0-M0
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 07:24:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42780)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iDRrr-0006W4-H0
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 07:23:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iDRso-0007Zg-E3
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 07:24:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5D17D5D66B
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 11:23:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A07C7308FBB4
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 11:24:25 +0000 (UTC)
 Received: from [10.36.117.232] (ovpn-117-232.ams2.redhat.com [10.36.117.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E71A60BE0;
- Thu, 26 Sep 2019 11:23:19 +0000 (UTC)
-Subject: Re: [PATCH 1/2] tests: fix usb-hcd-ehci-test compilation
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 866B760923;
+ Thu, 26 Sep 2019 11:24:19 +0000 (UTC)
+Subject: Re: [PATCH 2/2] tests: fix echi/ehci typo
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190926111955.17276-1-marcandre.lureau@redhat.com>
- <20190926111955.17276-2-marcandre.lureau@redhat.com>
+ <20190926111955.17276-3-marcandre.lureau@redhat.com>
 From: Laurent Vivier <lvivier@redhat.com>
 Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -101,17 +101,17 @@ Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
  XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
  D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <81a0798f-ea2d-468e-5772-4766dfe48361@redhat.com>
-Date: Thu, 26 Sep 2019 13:23:18 +0200
+Message-ID: <1a20ceca-804e-4592-c499-57f5cd973e65@redhat.com>
+Date: Thu, 26 Sep 2019 13:24:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190926111955.17276-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20190926111955.17276-3-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 26 Sep 2019 11:23:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Thu, 26 Sep 2019 11:24:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -134,43 +134,33 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 26/09/2019 13:19, Marc-Andr=C3=A9 Lureau wrote:
-> Fixes commit
-> e5758de4e836c3b2edc2befd904651fc6967d74f ("tests/libqtest: Make
-> qtest_qmp_device_add/del independent from global_qtest")
+> While at it, simplify using $(land).
 >=20
-> and commit
-> dd210749727530cdef7c335040edbf81c3c5d041 ("tests/libqtest: Use
-> libqtest-single.h in tests that require global_qtest").
->=20
-> Cc: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  tests/usb-hcd-ehci-test.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  tests/Makefile.include | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 >=20
-> diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
-> index 8bc3e44189..5251d539e9 100644
-> --- a/tests/usb-hcd-ehci-test.c
-> +++ b/tests/usb-hcd-ehci-test.c
-> @@ -8,7 +8,7 @@
->   */
-> =20
->  #include "qemu/osdep.h"
-> -#include "libqtest.h"
-> +#include "libqtest-single.h"
->  #include "libqos/pci-pc.h"
->  #include "hw/usb/uhci-regs.h"
->  #include "hw/usb/ehci-regs.h"
-> @@ -139,7 +139,7 @@ static void pci_ehci_port_3_hotplug(void)
-> =20
->  static void pci_ehci_port_hotplug(void)
->  {
-> -    usb_test_hotplug("ich9-ehci-1", "3", pci_ehci_port_3_hotplug);
-> +    usb_test_hotplug(global_qtest, "ich9-ehci-1", "3", pci_ehci_port_3=
-_hotplug);
->  }
-> =20
-> =20
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 0595914526..3543451ed3 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -182,9 +182,7 @@ check-qtest-i386-$(CONFIG_PVPANIC) +=3D tests/pvpan=
+ic-test$(EXESUF)
+>  check-qtest-i386-$(CONFIG_I82801B11) +=3D tests/i82801b11-test$(EXESUF=
+)
+>  check-qtest-i386-$(CONFIG_IOH3420) +=3D tests/ioh3420-test$(EXESUF)
+>  check-qtest-i386-$(CONFIG_USB_UHCI) +=3D tests/usb-hcd-uhci-test$(EXES=
+UF)
+> -ifeq ($(CONFIG_USB_ECHI)$(CONFIG_USB_UHCI),yy)
+> -check-qtest-i386-y +=3D tests/usb-hcd-ehci-test$(EXESUF)
+> -endif
+> +check-qtest-i386-$(call land,$(CONFIG_USB_EHCI),$(CONFIG_USB_UHCI)) +=3D=
+ tests/usb-hcd-ehci-test$(EXESUF)
+>  check-qtest-i386-$(CONFIG_USB_XHCI_NEC) +=3D tests/usb-hcd-xhci-test$(=
+EXESUF)
+>  check-qtest-i386-y +=3D tests/cpu-plug-test$(EXESUF)
+>  check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
 >=20
 
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
