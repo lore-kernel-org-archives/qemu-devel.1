@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0BFC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 210FAC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5101207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5101207FF
+	by mail.kernel.org (Postfix) with ESMTPS id EB845207FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB845207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDSnU-0002t8-Hm
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:23:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35031)
+	id 1iDSnc-000345-9j
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:23:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35318)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iDSkj-0000WL-4v
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:20:10 -0400
+ (envelope-from <thuth@redhat.com>) id 1iDSmD-0001ly-Jn
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:21:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iDSkg-00030C-B5
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:20:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32829)
+ (envelope-from <thuth@redhat.com>) id 1iDSmC-0004Gr-G4
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:21:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:22715)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iDSkg-0002yP-2Z; Thu, 26 Sep 2019 08:20:06 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1iDSmC-0004G3-84; Thu, 26 Sep 2019 08:21:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AEB603082131;
- Thu, 26 Sep 2019 12:20:03 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 689C83082B4B;
+ Thu, 26 Sep 2019 12:21:39 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-127.ams2.redhat.com [10.36.116.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 02DC11001DC0;
- Thu, 26 Sep 2019 12:20:01 +0000 (UTC)
-Subject: Re: [PATCH v1 2/2] s390x: Fix SCLP return code when buffer too small
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B951C5D6B0;
+ Thu, 26 Sep 2019 12:21:37 +0000 (UTC)
+Subject: Re: [PATCH v1 1/2] s390x: Add sclp boundary check and fix error
+ priority
 To: Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
  qemu-s390x@nongnu.org
 References: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
- <1569497622-12496-3-git-send-email-imbrenda@linux.ibm.com>
+ <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,18 +92,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <fe2b8d81-f3b9-a752-b6b5-172686780341@redhat.com>
-Date: Thu, 26 Sep 2019 14:20:00 +0200
+Message-ID: <9f9e27ac-1b40-01e4-32e0-751a2870005d@redhat.com>
+Date: Thu, 26 Sep 2019 14:21:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <1569497622-12496-3-git-send-email-imbrenda@linux.ibm.com>
+In-Reply-To: <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 26 Sep 2019 12:20:03 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 26 Sep 2019 12:21:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -123,51 +124,78 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 26/09/2019 13.33, Claudio Imbrenda wrote:
-> Return the correct error code when the SCCB buffer is too small to
-> contain all of the output, for the Read SCP Information and
-> Read CPU Information commands.
+> From: Janosch Frank <frankja@linux.ibm.com>
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> * All sclp codes need to be checked for page boundary violations.
+> * Requests over 4k are not a spec exception.
+> * Invalid command checking has to be done before the boundary check.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
 > ---
->  hw/s390x/sclp.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  hw/s390x/event-facility.c |  3 ---
+>  hw/s390x/sclp.c           | 25 ++++++++++++++++++++++---
+>  2 files changed, 22 insertions(+), 6 deletions(-)
 > 
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 797ecbb..6620569 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -377,9 +377,6 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
+>      case SCLP_CMD_WRITE_EVENT_MASK:
+>          write_event_mask(ef, sccb);
+>          break;
+> -    default:
+> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> -        break;
+>      }
+>  }
+>  
 > diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index 76feac8..8f7fe1c 100644
+> index fac7c3b..76feac8 100644
 > --- a/hw/s390x/sclp.c
 > +++ b/hw/s390x/sclp.c
-> @@ -68,6 +68,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+> @@ -213,14 +213,33 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>      cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
 >  
->      read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+>      /* Valid sccb sizes */
+> -    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader) ||
+> -        be16_to_cpu(work_sccb.h.length) > SCCB_SIZE) {
+> +    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
+>          r = -PGM_SPECIFICATION;
+>          goto out;
+>      }
 >  
-> +    if (sccb->h.length < (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
+> -    sclp_c->execute(sclp, &work_sccb, code);
+> +    switch (code & SCLP_CMD_CODE_MASK) {
+> +    case SCLP_CMDW_READ_SCP_INFO:
+> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
+> +    case SCLP_CMDW_READ_CPU_INFO:
+> +    case SCLP_CMDW_CONFIGURE_IOA:
+> +    case SCLP_CMDW_DECONFIGURE_IOA:
+> +    case SCLP_CMD_READ_EVENT_DATA:
+> +    case SCLP_CMD_WRITE_EVENT_DATA:
+> +    case SCLP_CMD_WRITE_EVENT_MASK:
+> +        break;
+> +    default:
+> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> +        goto out_write;
+> +    }
+>  
+> +    if ((sccb + work_sccb.h.length) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
 
-Don't you need a cpu16_to_cpu() around sccb->h.length?
+I think you likely miss a be16_to_cpu() around work_sccb.h.length here?
 
-> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-> +        return;
+> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
+> +        goto out_write;
 > +    }
 > +
->      /* Configuration Characteristic (Extension) */
->      s390_get_feat_block(S390_FEAT_TYPE_SCLP_CONF_CHAR,
->                           read_info->conf_char);
-> @@ -118,6 +123,11 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
->      cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
->      cpu_info->nr_standby = cpu_to_be16(0);
->  
-> +    if (sccb->h.length < (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
+> +    sclp_c->execute(sclp, &work_sccb, code);
+> +out_write:
+>      cpu_physical_memory_write(sccb, &work_sccb,
+>                                be16_to_cpu(work_sccb.h.length));
 
-dito?
-
-> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-> +        return;
-> +    }
-> +
->      /* The standby offset is 16-byte for each CPU */
->      cpu_info->offset_standby = cpu_to_be16(cpu_info->offset_configured
->          + cpu_info->nr_configured*sizeof(CPUEntry));
-> 
+At least here it is swapped --------^
 
  Thomas
 
