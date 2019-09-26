@@ -2,72 +2,101 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20ADAC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 14:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E53BC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 14:27:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4D4E21D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 14:21:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D4E21D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02C25222C6
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 14:27:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02C25222C6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDUeO-0002h4-99
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 10:21:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35429)
+	id 1iDUjl-0005Iw-1T
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 10:27:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37382)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iDUdT-0002CD-RO
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 10:20:49 -0400
+ (envelope-from <pmorel@linux.ibm.com>) id 1iDUiE-0004Sa-PP
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 10:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iDUdS-00061Z-Gq
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 10:20:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42004)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iDUdS-000606-CK
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 10:20:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iDUdN-00050M-61
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 14:20:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 16CD82E80CD
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 14:20:41 +0000 (UTC)
+ (envelope-from <pmorel@linux.ibm.com>) id 1iDUiD-000806-K5
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 10:25:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14476
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+ id 1iDUiD-0007yG-GJ
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 10:25:41 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8QENnaD029811
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 10:25:33 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v8x0dkskt-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 10:25:32 -0400
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+ Thu, 26 Sep 2019 15:25:31 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 26 Sep 2019 15:25:27 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8QEPQ2v51773682
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 26 Sep 2019 14:25:26 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1C2F011C04C;
+ Thu, 26 Sep 2019 14:25:26 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B01EE11C04A;
+ Thu, 26 Sep 2019 14:25:25 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.49])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 26 Sep 2019 14:25:25 +0000 (GMT)
+Subject: Re: [PATCH] s390: PCI: fix IOMMU region init
+To: Matthew Rosato <mjrosato@linux.ibm.com>, cohuck@redhat.com
+References: <1569507036-15314-1-git-send-email-mjrosato@linux.ibm.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Thu, 26 Sep 2019 16:25:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 26 Sep 2019 14:08:17 -0000
-From: Paul Clarke <pc@us.ibm.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc64 testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 7-pc mark-cave-ayland philmd
-X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
-X-Launchpad-Bug-Modifier: Paul Clarke (7-pc)
-References: <156711057074.6835.13599471410604217618.malonedeb@soybean.canonical.com>
-Message-Id: <156950689750.20092.3609250169427301223.malone@wampee.canonical.com>
-Subject: [Bug 1841990] Re: instruction 'denbcdq' misbehaving
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19056";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7873f92e804501e803d4df2aad6ba6718cfa72fc
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+In-Reply-To: <1569507036-15314-1-git-send-email-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19092614-0020-0000-0000-00000371FE6B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092614-0021-0000-0000-000021C7CA77
+Message-Id: <c2de2181-88ce-d4a6-bc2b-ce40e015a4b8@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-26_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909260132
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,164 +105,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1841990 <1841990@bugs.launchpad.net>
+Cc: walling@linux.ibm.com, fiuczy@linux.ibm.com, david@redhat.com,
+ stzi@linux.ibm.com, qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, thuth@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I haven't tried QEMU 3.1 yet.  Adding to to-do list.
 
-I am narrowing down the remaining failures.  Within the pveclib test suite,=
- there are two tests, one is failing, "pveclib_test".  It contains numerous=
- subtests.  The failing subtests are:
-- test_setb_bcdsq
-- test_setb_bcdinv
-- test_bcdsr
-- test_bcdsrrqi
+Yes, it is the right thing to do.
 
-Investigating the first two so far, it looks like "bcdadd." and
-"bcdsub." are not operating correctly.  gdb sessions showing the
-difference in behavior between QEMU 4.2+patches and hardware (in that
-order):
+We will see if we one of these day can fix the address space size and 
+get rid of the access to the lower memory.
 
-QEMU 4.2+patches:
+The iommu region translation callback protect us from setting a 
+translation outside of pba-pal, so that we should be safe.
 
-(gdb) x/i $pc                                                              =
-                                         =
-
-=3D> 0x10000698 <vec_setbool_bcdsq+60>:   bcdsub. v0,v0,v1,0               =
-                                           =
-
-(gdb) p $vr0.uint128                                                       =
-                                         =
-
-$3 =3D 0x9999999999999999999999999999999d                                  =
-                                           =
-
-(gdb) p $vr1.uint128                                                       =
-                                         =
-
-$4 =3D 0x1d                                                                =
-                                           =
-
-(gdb) stepi                                                                =
-                                         =
-
-(gdb) p $vr1.uint128                                                       =
-                                         =
-
-$5 =3D 0x1d
-
-hardware:
-
-1: x/i $pc
-=3D> 0x10000698 <vec_setbool_bcdsq+60>:	bcdsub. v0,v0,v1,0
-(gdb) p $vr0.uint128
-$2 =3D 0x9999999999999999999999999999999d
-(gdb) p $vr1.uint128
-$3 =3D 0x1d
-(gdb) nexti
-(gdb) p $vr0.uint128
-$4 =3D 0x9999999999999999999999999999998d
-
---
-
-QEMU 4.2+patches:
-
-=3D> 0x10000740 <vec_setbool_bcdinv+60>:  bcdadd. v0,v0,v1,0
-(gdb) p $vr0.uint128                                      =
-
-$1 =3D 0xa999999999999999000000000000000c                   =
-
-(gdb) p $vr1.uint128                                      =
-
-$2 =3D 0xc                                                  =
-
-(gdb) p $cr                                               =
-
-$4 =3D 0x24000242                                           =
-
-(gdb) nexti                                               =
-
-(gdb) p $vr0.uint128                                      =
-
-$5 =3D 0xffffffffffffffffffffffffffffffff                   =
-
-(gdb) p $cr                             =
-
-$6 =3D 0x24000212                         =
+reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 
 
-hardware:
+On 9/26/19 4:10 PM, Matthew Rosato wrote:
+> The fix in dbe9cf606c shrinks the IOMMU memory region to a size
+> that seems reasonable on the surface, however is actually too
+> small as it is based against a 0-mapped address space.  This
+> causes breakage with small guests as they can overrun the IOMMU window.
+>
+> Let's go back to the prior method of initializing iommu for now.
+>
+> Fixes: dbe9cf606c ("s390x/pci: Set the iommu region size mpcifc request")
+> Reported-by: Boris Fiuczynski <fiuczy@linux.ibm.com>
+> Reported-by: Stefan Zimmerman <stzi@linux.ibm.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   hw/s390x/s390-pci-bus.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 963a41c..2d2f4a7 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -695,10 +695,15 @@ static const MemoryRegionOps s390_msi_ctrl_ops = {
+>   
+>   void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
+>   {
+> +    /*
+> +     * The iommu region is initialized against a 0-mapped address space,
+> +     * so the smallest IOMMU region we can define runs from 0 to the end
+> +     * of the PCI address space.
+> +     */
+>       char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
+>       memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
+>                                TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
+> -                             name, iommu->pal - iommu->pba + 1);
+> +                             name, iommu->pal + 1);
+>       iommu->enabled = true;
+>       memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
+>       g_free(name);
 
-=3D> 0x10000740 <vec_setbool_bcdinv+60>:  bcdadd. v0,v0,v1,0
-(gdb) p $vr0.uint128
-$2 =3D 0xa999999999999999000000000000000c
-(gdb) p $vr1.uint128
-$3 =3D 0xc
-(gdb) p $cr
-$4 =3D 0x24000442
-(gdb) nexti
-(gdb) p $vr0.uint128
-$5 =3D 0x999999999999999000000000000000c
-(gdb) p $cr
-$6 =3D 0x24000412
+-- 
+Pierre Morel
+IBM Lab Boeblingen
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1841990
-
-Title:
-  instruction 'denbcdq' misbehaving
-
-Status in QEMU:
-  New
-
-Bug description:
-  Instruction 'denbcdq' appears to have no effect.  Test case attached.
-
-  On ppc64le native:
-  --
-  gcc -g -O -mcpu=3Dpower9 bcdcfsq.c test-denbcdq.c -o test-denbcdq
-  $ ./test-denbcdq
-  0x00000000000000000000000000000000
-  0x0000000000000000000000000000000c
-  0x22080000000000000000000000000000
-  $ ./test-denbcdq 1
-  0x00000000000000000000000000000001
-  0x0000000000000000000000000000001c
-  0x22080000000000000000000000000001
-  $ ./test-denbcdq $(seq 0 99)
-  0x00000000000000000000000000000064
-  0x0000000000000000000000000000100c
-  0x22080000000000000000000000000080
-  --
-
-  With "qemu-ppc64le -cpu power9"
-  --
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq
-  0x00000000000000000000000000000000
-  0x0000000000000000000000000000000c
-  0x0000000000000000000000000000000c
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq 1
-  0x00000000000000000000000000000001
-  0x0000000000000000000000000000001c
-  0x0000000000000000000000000000001c
-  $ qemu-ppc64le -cpu power9 -L [...] ./test-denbcdq $(seq 100)
-  0x00000000000000000000000000000064
-  0x0000000000000000000000000000100c
-  0x0000000000000000000000000000100c
-  --
-
-  I started looking at the code, but I got confused rather quickly.
-  Could be related to endianness? I think denbcdq arrived on the scene
-  before little-endian was a big deal.  Maybe something to do with
-  utilizing implicit floating-point register pairs...  I don't think the
-  right data is getting to helper_denbcdq, which would point back to the
-  gen_fprp_ptr uses in dfp-impl.inc.c (GEN_DFP_T_FPR_I32_Rc).  (Maybe?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1841990/+subscriptions
 
