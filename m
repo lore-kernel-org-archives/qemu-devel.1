@@ -2,90 +2,64 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C56AFC352A9
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 15:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BB0C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 15:53:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 943F4222C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 15:51:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NPHz2nzh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 943F4222C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7B44A222C6
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 15:53:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B44A222C6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDW3b-00020b-1c
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 11:51:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55186)
+	id 1iDW5E-0004IR-Oy
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 11:53:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iDVgl-0006OJ-HN
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 11:28:16 -0400
+ (envelope-from <groug@kaod.org>) id 1iDVoJ-00059d-Cw
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 11:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iDVgj-0000Gp-TG
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 11:28:15 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53079)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iDVgj-0000Fd-O6
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 11:28:13 -0400
-Received: by mail-wm1-f68.google.com with SMTP id r19so3275487wmh.2
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 08:28:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=4wK0RZCTcEazdzPAKObyHDNw9KgRIqAnCbP1QCI6pJU=;
- b=NPHz2nzhMFscJMnlOomR8c3ft92PoUYNDLe8y/JGVm22q+5V+VOSruw2e+uGYhF3nF
- Q+m0g+MKRGrp1nGO0tjC/gj0WGRn6t8kTvidVZwRGY+YSaarz5NFYD0REQyybzelyYkN
- xwRIBLujNfEDY0dWkC3ezTPY3fdWfwO1WzWmIH5lKqJqxMGIlCAkmRQjQW7RU9s2gL6G
- BRuAt7O2wjle5tPUpxj4N6A+I3aM0z2tcLmC+4xbT0a8KDpIVNJB9nTMqbv+uEaU+4hA
- JiYlOyMUmXc67TOoauoROMO/WPmklP1XM3EPg1oV844aHK3MR/N5fFtJdcNsz0JLLex0
- uhmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=4wK0RZCTcEazdzPAKObyHDNw9KgRIqAnCbP1QCI6pJU=;
- b=c00KXJqstSHjxYwcX/fx/p4UNv/FMx2AU43Kd3zJzx9+AExSNPkQHZ+wJCSHfZqyjM
- qGabZBoxI6k202M/zvBIUKTlTdvGCk/73KfWjNKqag7qwZKIry1TQsz/2+9eCT151FmM
- NsLoHF0KvYQayIKn8lRkR8LKExlGiqqY6G/ZUzfptrSzc27xmI7WMDpl43CWkC8XlZbi
- 8nNrYpdDrqsnISvJwRaTIs8CloC7NySVgDKX0AoSFBaKkTmo+2Nr7bt4PCYICzdarVoM
- meETdhnYV5U7Aej04wjjJlDSm1ibvCN6rV7xzZDsFJ6eL+m6f0394piM8SuCz+nV83PY
- H/dQ==
-X-Gm-Message-State: APjAAAWENNmnPcOkfHbKt1O2tHgcLWAnUCUVr8QsBRmBgXKz5gVwFsOj
- Hrhvo11E54eYsvN/aeiY2CsvTg==
-X-Google-Smtp-Source: APXvYqxbq9iIGB4kbgtDZPGi+PeG7zmAJHODiExH79+6Vw46D7HyhQbrgN7XqZmyrzprF5VzuH28DA==
-X-Received: by 2002:a1c:980e:: with SMTP id a14mr3315727wme.99.1569511630427; 
- Thu, 26 Sep 2019 08:27:10 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q192sm5033836wme.23.2019.09.26.08.27.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Sep 2019 08:27:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D81D21FF87;
- Thu, 26 Sep 2019 16:27:08 +0100 (BST)
-References: <20190925233013.6449-1-alex.bennee@linaro.org>
- <0a2c56da-173e-2abd-de76-e38a649e8f25@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [RFC PATCH] configure: deprecate 32 bit build hosts
-In-reply-to: <0a2c56da-173e-2abd-de76-e38a649e8f25@redhat.com>
-Date: Thu, 26 Sep 2019 16:27:08 +0100
-Message-ID: <87ef039iyb.fsf@linaro.org>
+ (envelope-from <groug@kaod.org>) id 1iDVoF-00041t-LD
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 11:36:01 -0400
+Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:59732)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDVoF-0003ve-FM
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 11:35:59 -0400
+Received: from player693.ha.ovh.net (unknown [10.109.146.50])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id AE2E811A8B2
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 17:35:53 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player693.ha.ovh.net (Postfix) with ESMTPSA id 28655A3FE141;
+ Thu, 26 Sep 2019 15:35:41 +0000 (UTC)
+Date: Thu, 26 Sep 2019 17:35:39 +0200
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 20/20] spapr: Eliminate SpaprIrq::init hook
+Message-ID: <20190926173539.4a07d419@bahia.lan>
+In-Reply-To: <92ce15dd-f7f9-3d2b-4226-9693bd9cfd65@kaod.org>
+References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
+ <20190925064534.19155-21-david@gibson.dropbear.id.au>
+ <1b74c0fc-b318-df5a-d66d-fe59ae562d70@kaod.org>
+ <20190926011336.GS17405@umbus>
+ <92ce15dd-f7f9-3d2b-4226-9693bd9cfd65@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 15769635571495049611
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfeeggdeltdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
+X-Received-From: 46.105.34.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,132 +71,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, qemu-discuss@nongnu.org, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ =?UTF-8?B?TWFy?= =?UTF-8?B?Yy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 26 Sep 2019 09:05:56 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Thomas Huth <thuth@redhat.com> writes:
+> >>> +    if (spapr->irq->xive) {
+> >>> +        uint32_t nr_servers =3D spapr_max_server_number(spapr);
+> >>> +        DeviceState *dev;
+> >>> +        int i;
+> >>> +
+> >>> +        dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+> >>> +        qdev_prop_set_uint32(dev, "nr-irqs",
+> >>> +                             spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
+> >>> +        /*
+> >>> +         * 8 XIVE END structures per CPU. One for each available
+> >>> +         * priority
+> >>> +         */
+> >>> +        qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
+> >>> +        qdev_init_nofail(dev);
+> >>> +
+> >>> +        spapr->xive =3D SPAPR_XIVE(dev);
+> >>> +
+> >>> +        /* Enable the CPU IPIs */
+> >>> +        for (i =3D 0; i < nr_servers; ++i) {
+> >>> +            Error *local_err =3D NULL;
+> >>> +
+> >>> +            spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, fal=
+se, &local_err);
+> >>> +            if (local_err) {
+> >>> +                goto out;
+> >>> +            }
+> >>> +        }
+> >>
+> >> We could move the IPI claim part in the realize routine of SPAPR_XIVE.
+> >=20
+> > Yeah, I know.  I thought about this, but there's a slight complication
+> > in that the XIVE part doesn't know nr_servers directly.  There's
+> > several possible ways to handle that, but I wasn't 100% happy with any
+> > that I came up with yet.
+>=20
+> The "nr-ends" property was inappropriate, "nr-servers" would have been
+> better and we would have hidden the calculation of ENDs 'nr_servers << 3'
+> in the realize routine of SpaprXive.=20
+>=20
 
-> On 26/09/2019 01.30, Alex Benn=C3=A9e wrote:
->> The 32 bit hosts are already a second class citizen especially with
->> support for running 64 bit guests under TCG. We are also limited by
->> testing as actual working 32 bit machines are getting quite rare in
->> developers personal menageries. For TCG supporting newer types like
->> Int128 is a lot harder with 32 bit calling conventions compared to
->> their larger bit sized cousins. Fundamentally address space is the
->> most useful thing for the translator to have even for a 32 bit guest a
->> 32 bit host is quite constrained.
->>
->> As far as I'm aware 32 bit KVM users are even less numerous. Even
->> ILP32 doesn't make much sense given the address space QEMU needs to
->> manage.
->>
->> Lets mark these machines as deprecated so we can have the wailing and
->> gnashing of teeth now and look to actually dropping the support in a
->> couple of cycles.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Cc: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  configure | 24 +++++++++++++-----------
->>  1 file changed, 13 insertions(+), 11 deletions(-)
->>
->> diff --git a/configure b/configure
->> index 542f6aea3f..776fd460b5 100755
->> --- a/configure
->> +++ b/configure
->> @@ -728,7 +728,7 @@ ARCH=3D
->>  # Normalise host CPU name and set ARCH.
->>  # Note that this case should only have supported host CPUs, not guests.
->>  case "$cpu" in
->> -  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
->> +  ppc64|s390|s390x|sparc64|riscv64)
->
-> I think you can also remove "s390". "s390" is the 32-bit variant,
-> "s390x" is the 64-bit variant.
->
->>      supported_cpu=3D"yes"
->>    ;;
->>    ppc64le)
->> @@ -737,7 +737,6 @@ case "$cpu" in
->>    ;;
->>    i386|i486|i586|i686|i86pc|BePC)
->>      cpu=3D"i386"
->> -    supported_cpu=3D"yes"
->>    ;;
->>    x86_64|amd64)
->>      cpu=3D"x86_64"
->> @@ -745,19 +744,22 @@ case "$cpu" in
->>    ;;
->>    armv*b|armv*l|arm)
->>      cpu=3D"arm"
->> -    supported_cpu=3D"yes"
->>    ;;
->>    aarch64)
->>      cpu=3D"aarch64"
->>      supported_cpu=3D"yes"
->>    ;;
->> -  mips*)
->> +  mips64*)
->>      cpu=3D"mips"
->>      supported_cpu=3D"yes"
->>    ;;
->> +  mips*)
->> +    cpu=3D"mips"
->> +  ;;
->>    sparc|sun4[cdmuv])
->>      cpu=3D"sparc"
->> -    supported_cpu=3D"yes"
->> +  ;;
->> +  x32|riscv32)
->
-> You forgot to add "ppc" (and "s390") here.
->
->>    ;;
->>    *)
->>      # This will result in either an error or falling back to TCI later
->> @@ -6438,12 +6440,12 @@ if test "$supported_cpu" =3D "no"; then
->>      echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE REL=
-EASES!"
->>      echo
->>      echo "CPU host architecture $cpu support is not currently maintaine=
-d."
->> -    echo "The QEMU project intends to remove support for this host CPU =
-in"
->> -    echo "a future release if nobody volunteers to maintain it and to"
->> -    echo "provide a build host for our continuous integration setup."
->> -    echo "configure has succeeded and you can continue to build, but"
->> -    echo "if you care about QEMU on this platform you should contact"
->> -    echo "us upstream at qemu-devel@nongnu.org."
->> +    echo "The QEMU project intends to remove support for all 32 bit hos=
-t"
->> +    echo "CPUs in a future release. 64 bit hosts will need a volunteer"
->> +    echo "to maintain it and to provide a build host for our continuous"
->> +    echo "integration setup. configure has succeeded and you can contin=
-ue"
->> +    echo "to build, but if you care about QEMU on this platform you"
->> +    echo "should contact us upstream at qemu-devel@nongnu.org."
->>  fi
->>
->>  if test "$supported_os" =3D "no"; then
->
-> In case this gets accepted, we also might want to deprecate the
-> qemu-system-i386, qemu-system-arm and qemu-system-ppc targets, since
-> they are AFAIK just a subset of qemu-system-x86_64, qemu-system-aarch64
-> and qemu-system-ppc64. But that's likely something for a later patch, I
-> think.
+Yeah it would make sense to have nr_servers within the sPAPR XIVE object,
+so that we don't have to pass it when building the FDT node. Same stands
+for XICS actually.
 
-Yes this is purely for the host side. I'm not intending to deprecate any
-guest support.
+And as part of my current work to reduce HW VP consumption, I also need
+nr_servers to pass it to the KVM device.
 
->
->  Thomas
+> I don't think we can change that without breaking migration though :/
+>=20
 
+Hmm... why ? The QOM property is just an interface, it doesn't change the
+state. In the end we migrate the same number of XiveEND objects.
 
---
-Alex Benn=C3=A9e
+> C.
+>=20
+> >>
+> >>> +        spapr_xive_hcall_init(spapr);
+> >>
+> >> This also.
+> >=20
+> > Right.
+> >=20
+> >> It can be done later one.
+> >=20
+> > That's my intention.
+> >=20
+> >>
+> >> C.
+> >>
+> >>> +    }
+> >>> =20
+> >>>      spapr->qirqs =3D qemu_allocate_irqs(spapr->irq->set_irq, spapr,
+> >>>                                        spapr->irq->nr_xirqs + SPAPR_X=
+IRQ_BASE);
+> >>> +
+> >>> +out:
+> >>> +    error_propagate(errp, local_err);
+> >>>  }
+> >>> =20
+> >>>  void spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Er=
+ror **errp)
+> >>> @@ -757,7 +744,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+> >>>      .xics        =3D true,
+> >>>      .xive        =3D false,
+> >>> =20
+> >>> -    .init        =3D spapr_irq_init_xics,
+> >>>      .claim       =3D spapr_irq_claim_xics,
+> >>>      .free        =3D spapr_irq_free_xics,
+> >>>      .print_info  =3D spapr_irq_print_info_xics,
+> >>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> >>> index 6816cb0500..fa862c665b 100644
+> >>> --- a/include/hw/ppc/spapr_irq.h
+> >>> +++ b/include/hw/ppc/spapr_irq.h
+> >>> @@ -42,7 +42,6 @@ typedef struct SpaprIrq {
+> >>>      bool        xics;
+> >>>      bool        xive;
+> >>> =20
+> >>> -    void (*init)(SpaprMachineState *spapr, Error **errp);
+> >>>      void (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error=
+ **errp);
+> >>>      void (*free)(SpaprMachineState *spapr, int irq);
+> >>>      void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
+> >>> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+> >>> index 691a6d00f7..267984a97b 100644
+> >>> --- a/include/hw/ppc/xics_spapr.h
+> >>> +++ b/include/hw/ppc/xics_spapr.h
+> >>> @@ -34,6 +34,7 @@
+> >>>  #define TYPE_ICS_SPAPR "ics-spapr"
+> >>>  #define ICS_SPAPR(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SPAPR)
+> >>> =20
+> >>> +void ics_spapr_create(SpaprMachineState *spapr, int nr_xirqs, Error =
+**errp);
+> >>>  void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, vo=
+id *fdt,
+> >>>                     uint32_t phandle);
+> >>>  int xics_kvm_connect(SpaprMachineState *spapr, Error **errp);
+> >>>
+> >>
+> >=20
+>=20
+
 
