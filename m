@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1830C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 11:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90293C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 11:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C77A7207E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 11:00:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C77A7207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 65A8621A4A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 11:02:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65A8621A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDRVL-0002ny-Sh
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 07:00:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48774)
+	id 1iDRXj-0005Z0-DD
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 07:02:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iDRTz-00021T-Ek
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:58:49 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iDRWB-0004vy-PT
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 07:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iDRTx-0004Gm-G6
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:58:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:26305)
+ (envelope-from <mreitz@redhat.com>) id 1iDRW8-0006yg-H5
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 07:01:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46616)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iDRTq-00047w-JP; Thu, 26 Sep 2019 06:58:38 -0400
+ id 1iDRVs-0006aK-0x; Thu, 26 Sep 2019 07:00:44 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7CF3B10CC1F1;
- Thu, 26 Sep 2019 10:58:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1437018C4269;
+ Thu, 26 Sep 2019 11:00:43 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.151])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 570FD1001B20;
- Thu, 26 Sep 2019 10:58:35 +0000 (UTC)
-Subject: Re: [PATCH 2/3] iotests: Disable 125 on broken XFS versions
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20190925183231.11196-1-mreitz@redhat.com>
- <20190925183231.11196-3-mreitz@redhat.com>
- <ed2e18dc-1217-7825-aebd-af48e440ef96@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 250A91001DE4;
+ Thu, 26 Sep 2019 11:00:38 +0000 (UTC)
+Subject: Re: [PATCH v2 2/4] blkdebug: Allow taking/unsharing permissions
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190923115728.28250-1-mreitz@redhat.com>
+ <20190923115728.28250-3-mreitz@redhat.com>
+ <a51238ad-bfac-32eb-1b1e-05f526181e07@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -71,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1e3bb4f4-f2a0-ce38-aa82-d87291ef9b3c@redhat.com>
-Date: Thu, 26 Sep 2019 12:58:33 +0200
+Message-ID: <8ec11c5e-6a41-d116-7bcb-6ac2ea16493d@redhat.com>
+Date: Thu, 26 Sep 2019 13:00:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <ed2e18dc-1217-7825-aebd-af48e440ef96@redhat.com>
+In-Reply-To: <a51238ad-bfac-32eb-1b1e-05f526181e07@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="qXvzepnHyO0CeojG2YD0l5jqFkfUPgZUO"
+ boundary="pLEfPiKoP43LQGORNfpTfPaHivhYMEqYq"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Thu, 26 Sep 2019 10:58:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.62]); Thu, 26 Sep 2019 11:00:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -97,88 +98,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qXvzepnHyO0CeojG2YD0l5jqFkfUPgZUO
-Content-Type: multipart/mixed; boundary="YEkCJa7uHhQNOtd40bqrUnKfW3KGOa573"
+--pLEfPiKoP43LQGORNfpTfPaHivhYMEqYq
+Content-Type: multipart/mixed; boundary="5u1ezOTgv7mz1aNi7ZCOMVWsWY1p1oUlJ"
 
---YEkCJa7uHhQNOtd40bqrUnKfW3KGOa573
+--5u1ezOTgv7mz1aNi7ZCOMVWsWY1p1oUlJ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 25.09.19 23:28, Eric Blake wrote:
-> On 9/25/19 1:32 PM, Max Reitz wrote:
->> And by that I mean all XFS versions, as far as I can tell.=C2=A0 All d=
-etails
->> are in the comment below.
+On 25.09.19 12:12, Vladimir Sementsov-Ogievskiy wrote:
+> 23.09.2019 14:57, Max Reitz wrote:
+>> Sometimes it is useful to be able to add a node to the block graph tha=
+t
+>> takes or unshare a certain set of permissions for debugging purposes.
+>> This patch adds this capability to blkdebug.
 >>
->> We never noticed this problem because we only read the first number fr=
-om
->> qemu-img info's "disk size" output -- and that is effectively useless,=
+>> (Note that you cannot make blkdebug release or share permissions that =
+it
+>> needs to take or cannot share, because this might result in assertion
+>> failures in the block layer.  But if the blkdebug node has no parents,=
 
->> because qemu-img prints a human-readable value (which generally includ=
-es
->> a decimal point).=C2=A0 That will be fixed in the next patch.
+>> it will not take any permissions and share everything by default, so y=
+ou
+>> can then freely choose what permissions to take and share.)
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->> =C2=A0 tests/qemu-iotests/125 | 40 +++++++++++++++++++++++++++++++++++=
-+++++
->> =C2=A0 1 file changed, 40 insertions(+)
+>>   qapi/block-core.json |  14 +++++-
+>>   block/blkdebug.c     | 106 +++++++++++++++++++++++++++++++++++++++++=
++-
+>>   2 files changed, 118 insertions(+), 2 deletions(-)
 >>
->> diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
->> index df328a63a6..0ef51f1e21 100755
->> --- a/tests/qemu-iotests/125
->> +++ b/tests/qemu-iotests/125
->> @@ -49,6 +49,46 @@ if [ -z "$TEST_IMG_FILE" ]; then
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TEST_IMG_FILE=3D$TEST_IMG
->> =C2=A0 fi
->> =C2=A0 +# Test whether we are running on a broken XFS version.=C2=A0 T=
-here is this
->> +# bug:
->> +
->> +# $ rm -f foo
->> +# $ touch foo
->> +# $ block_size=3D4096 # Your FS's block size
->> +# $ fallocate -o $((block_size / 2)) -l $block_size foo
->> +# $ LANG=3DC xfs_bmap foo | grep hole
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1: [8..15]: hole
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index b5cd00c361..572c5756f1 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -3394,6 +3394,16 @@
+>>   #
+>>   # @set-state:       array of state-change descriptions
+>>   #
+>> +# @take-child-perms: Permissions to take on @image in addition to wha=
+t
+>> +#                    is necessary anyway (which depends on how the
+>> +#                    blkdebug node is used).  Defaults to none.
+>> +#                    (since 4.2)
 >> +#
->> +# The problem is that the XFS driver rounds down the offset and
->> +# rounds up the length to the block size, but independently.
->=20
-> Eww. I concur you uncovered a bug.=C2=A0 Have you reported this to xfs =
-folks?
+>> +# @unshare-child-perms: Permissions not to share on @image in additio=
+n
+>> +#                       to what cannot be shared anyway (which depend=
+s
+>> +#                       on how the blkdebug node is used).  Defaults
+>> +#                       to none.  (since 4.2)
+>> +#
+>>   # Since: 2.9
+>>   ##
+>>   { 'struct': 'BlockdevOptionsBlkdebug',
+>> @@ -3403,7 +3413,9 @@
+>>               '*opt-write-zero': 'int32', '*max-write-zero': 'int32',
+>>               '*opt-discard': 'int32', '*max-discard': 'int32',
+>>               '*inject-error': ['BlkdebugInjectErrorOptions'],
+>> -            '*set-state': ['BlkdebugSetStateOptions'] } }
+>> +            '*set-state': ['BlkdebugSetStateOptions'],
+>> +            '*take-child-perms': ['BlockPermission'],
+>> +            '*unshare-child-perms': ['BlockPermission'] } }
+>>  =20
+>>   ##
+>>   # @BlockdevOptionsBlklogwrites:
+>> diff --git a/block/blkdebug.c b/block/blkdebug.c
+>> index 5ae96c52b0..f3c1e4ad7b 100644
+>> --- a/block/blkdebug.c
+>> +++ b/block/blkdebug.c
+>> @@ -28,9 +28,11 @@
+>>   #include "qemu/cutils.h"
+>>   #include "qemu/config-file.h"
+>>   #include "block/block_int.h"
+>> +#include "block/qdict.h"
+>>   #include "qemu/module.h"
+>>   #include "qemu/option.h"
+>>   #include "qapi/qmp/qdict.h"
+>> +#include "qapi/qmp/qlist.h"
+>>   #include "qapi/qmp/qstring.h"
+>>   #include "sysemu/qtest.h"
+>>  =20
+>> @@ -44,6 +46,9 @@ typedef struct BDRVBlkdebugState {
+>>       uint64_t opt_discard;
+>>       uint64_t max_discard;
+>>  =20
+>> +    uint64_t take_child_perms;
+>> +    uint64_t unshare_child_perms;
+>> +
+>>       /* For blkdebug_refresh_filename() */
+>>       char *config_file;
+>>  =20
+>> @@ -344,6 +349,84 @@ static void blkdebug_parse_filename(const char *f=
+ilename, QDict *options,
+>>       qdict_put_str(options, "x-image", filename);
+>>   }
+>>  =20
+>> +static int blkdebug_parse_perm_list(uint64_t *dest, QDict *options,
+>> +                                    const char *prefix, Error **errp)=
 
-I have now.  Took a bit of kernel compiling to see whether what I think
-would fix it works.
+>> +{
+>> +    int ret =3D 0;
+>> +    QDict *subqdict =3D NULL;
+>> +    QObject *crumpled_subqdict =3D NULL;
+>> +    QList *perm_list;
+>> +    const QListEntry *perm;
+>> +
+>> +    qdict_extract_subqdict(options, &subqdict, prefix);
+>> +    if (!qdict_size(subqdict)) {
+>> +        goto out;
+>> +    }
+>> +
+>> +    crumpled_subqdict =3D qdict_crumple(subqdict, errp);
+>> +    if (!crumpled_subqdict) {
+>> +        ret =3D -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    perm_list =3D qobject_to(QList, crumpled_subqdict);
+>> +    if (!perm_list) {
+>> +        /* Omit the trailing . from the prefix */
+>> +        error_setg(errp, "%.*s expects a list",
+>> +                   (int)(strlen(prefix) - 1), prefix);
+>> +        ret =3D -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    for (perm =3D qlist_first(perm_list); perm; perm =3D qlist_next(p=
+erm)) {
+>> +        const char *perm_name;
+>> +        BlockPermission perm_bit;
+>> +
+>> +        perm_name =3D qstring_get_try_str(qobject_to(QString, perm->v=
+alue));
+>> +        if (!perm_name) {
+>> +            /* Omit the trailing . from the prefix */
+>> +            error_setg(errp, "%.*s expects a list of enum strings",
+>> +                       (int)(strlen(prefix) - 1), prefix);
+>> +            ret =3D -EINVAL;
+>> +            goto out;
+>> +        }
+>> +
+>> +        perm_bit =3D qapi_enum_parse(&BlockPermission_lookup, perm_na=
+me,
+>> +                                   BLOCK_PERMISSION__MAX, errp);
+>> +        if (perm_bit =3D=3D BLOCK_PERMISSION__MAX) {
+>> +            ret =3D -EINVAL;
+>> +            goto out;
+>> +        }
+>> +
+>> +        *dest |=3D UINT64_C(1) << perm_bit;
+>> +    }
+>=20
+>=20
+> I still think that parsing it all by hand is a bad idea. We already hav=
+e
+> functions which does it, why to opencode? The following works for me:
+
+Ah, yes.  I don=E2=80=99t know why I didn=E2=80=99t think of just using a=
+ visitor for
+the crumpled sub-QDict.  Will do, thanks.
 
 Max
 
 
---YEkCJa7uHhQNOtd40bqrUnKfW3KGOa573--
+--5u1ezOTgv7mz1aNi7ZCOMVWsWY1p1oUlJ--
 
---qXvzepnHyO0CeojG2YD0l5jqFkfUPgZUO
+--pLEfPiKoP43LQGORNfpTfPaHivhYMEqYq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2MmdkACgkQ9AfbAGHV
-z0DBUwgAgNT4hYsOkStB7xxaeacBKmbpqBpHtjKEIvgj2rB7IxtZLEg+Ua0bwMd5
-eUDADNR+DKEgIKTxvQF7dR6QurgxRe92D77A3ZBu01T9OW+DHoccoAAH05JxqIvL
-FlGp2Q5B2bg50yvb4agimm0eM2m/ya4fXpx8FCyd4ibzRq3N0W4/hk7XJDKwsb7V
-f7sZT/7idUmsP+AgwZg3NylCW94uF38IJnnQzSZMK54yFVfBYo66digP3nUf8kvB
-znN9QbxuZdSMOvRZPPvwEPC5BIARf4ZKKeEdKAHcn/VHS29/bR1NGcW2epUchCJN
-bo7jiMvX1V3+O80k4s+lZ75S98UqtA==
-=GM4G
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2MmlUACgkQ9AfbAGHV
+z0DJWQf/aI8Ih0wOKD0v/Xmwka0VYdjQQh8HaUkfHDs+ny0yKFVqrvf27I18CaXd
+gt+ZT26nEcwNZ9v/k16ZIBBTu4tfPZxRSarbRucV09SVRVmHkhven3J899rQtJSe
+MlZl23MQBIvllYc5+pgKPXZfHKNgVEwPvoNNdptakiiM9KC/p4CHUPKY+ui5QDz5
+H3JzB3JfT/+EF8xuc6MyuMJPkEmU6ImVceVPZPOjI5tUR6s0wQxAoFwhNGqXqchl
+X+Dc0dDQFgvEqkCGzj+7EGd5B/ITCmOUjwh459aYBUQiatMssJinjt7rcWMT6bD9
+vCoN5MCeqPbBhOjiUQ9lC1j45WSxxA==
+=1jgn
 -----END PGP SIGNATURE-----
 
---qXvzepnHyO0CeojG2YD0l5jqFkfUPgZUO--
+--pLEfPiKoP43LQGORNfpTfPaHivhYMEqYq--
 
