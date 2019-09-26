@@ -2,61 +2,91 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E848C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE99FC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:17:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38E092086A
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:15:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E092086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8A646222C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 19:17:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="krPm1BbQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A646222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDZEU-00014C-Gi
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 15:15:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47675)
+	id 1iDZGU-0003kU-QB
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 15:17:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45401)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iDYyz-0000gp-5R
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:59:18 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iDYm8-0002Ig-Pg
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iDYyx-0007x9-Jr
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:59:17 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:40360
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iDYyx-0007AS-DQ; Thu, 26 Sep 2019 14:59:15 -0400
-Received: from host86-138-245-63.range86-138.btcentralplus.com
- ([86.138.245.63] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iDYyD-0001em-Us; Thu, 26 Sep 2019 19:58:30 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, pc@us.ibm.com,
- david@gibson.dropbear.id.au
-Date: Thu, 26 Sep 2019 19:57:55 +0100
-Message-Id: <20190926185801.11176-2-mark.cave-ayland@ilande.co.uk>
+ (envelope-from <alex.bennee@linaro.org>) id 1iDYm6-00050U-Mz
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:46:00 -0400
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:52263)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iDYm4-0004vc-BU
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 14:45:56 -0400
+Received: by mail-wm1-x331.google.com with SMTP id r19so3926208wmh.2
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 11:45:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=gro+z/wFLTJjm9Dv+fnOwNEEEX5E90hn1M3fFFejlAU=;
+ b=krPm1BbQJvHKVpCrZeEjVwF2f1J4EFQiSP3qi2QhwCuSRyecWg8iS4bvsa4GP2z8KJ
+ 5aTb8r39E9Zb7Id1WkoRtB5x71V9Hd7mjy7vZuDp1ETfSbJ2OXQYh/FIfMmoEdIsvyJW
+ hTYcNnCH1PXT8VEW45mfjW46WhjQa5r7PMhdSuzKxDXR3sKroC/Lf6qx1AVvmPbc9het
+ 5UFAcLB3qQfoZTkO2vIUZU5pQ+vDKU4I7HjXToGTbRjdanLbNQMiSMwq15uaWXMw5Mkx
+ OKnuyoPFNX1CVDeZO8jLeX3T7Ms0Zq0J7v1pSJJmgwVAtE+DBadexCeHM7gE+OpUw/Vn
+ /BIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=gro+z/wFLTJjm9Dv+fnOwNEEEX5E90hn1M3fFFejlAU=;
+ b=DzdALigvq41jszFEt6/CtkVHh55btDlMq5aD3kNmixt2e/dq6aK01MP4bjuavj3h7H
+ lAmxJFpvopTd5ZjbPQLebV0fOESLbEgXQ9dGpup+1F/9oV99ZkSZNkyoDQGWAsC9MOCd
+ A0EFOyWHLqqWmpbppDxZwirXp/kcncSCYX1jG9ZBFetIY8gdYiUkFA2ioe33jarLa31M
+ NXvEF56fo5uAnPuVW6tH5JNzvh4IBY5o7w+DAqJVlQ5+QjZoI0I6MMkOdPrYqr1bsm9H
+ QAcjXJYX2LZGsRGXP4MSmld08dwIwch2p65zuhdsltgOmmtauVOLQFKyqLNvsm5WChAB
+ p3Yg==
+X-Gm-Message-State: APjAAAWtTJsyvn4EZfWo037ICFwfbzWsRQu/y6T4UhlL+xDPVW1eQjgr
+ l3Lc7T+0GCJDRnBT0IE2FxVdOQ==
+X-Google-Smtp-Source: APXvYqwidT+Jr03F0zCTQomOhN86yGVAUesIEkRPeBKxm8ZsyZFkJiQLYR79TAsVyAxTSu5ceqgH0Q==
+X-Received: by 2002:a05:600c:2059:: with SMTP id
+ p25mr4410734wmg.50.1569523551010; 
+ Thu, 26 Sep 2019 11:45:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v20sm2145002wml.26.2019.09.26.11.45.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 26 Sep 2019 11:45:48 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DFE071FFA5;
+ Thu, 26 Sep 2019 19:35:54 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 18/28] tests/tcg: add simple record/replay smoke test for
+ aarch64
+Date: Thu, 26 Sep 2019 19:35:43 +0100
+Message-Id: <20190926183553.13895-19-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190926185801.11176-1-mark.cave-ayland@ilande.co.uk>
-References: <20190926185801.11176-1-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20190926183553.13895-1-alex.bennee@linaro.org>
+References: <20190926183553.13895-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.138.245.63
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v2 1/7] target/ppc: introduce get_dfp{64,
- 128}() helper functions
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,165 +98,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The existing functions (now incorrectly) assume that the MSB and LSB of DFP
-numbers are stored as consecutive 64-bit words in memory. Instead of accessing
-the DFP numbers directly, introduce get_dfp{64,128}() helper functions to ease
-the switch to the correct representation.
+This adds two new tests that re-use the memory test to check basic
+record replay functionality is still working. We have to define our
+own runners rather than using the default pattern as we want to change
+the test name but re-use the memory binary.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/ppc/dfp_helper.c | 52 ++++++++++++++++++++++++++++++-----------
- 1 file changed, 39 insertions(+), 13 deletions(-)
+We declare the test binaries as PHONY as they don't really exist.
 
-diff --git a/target/ppc/dfp_helper.c b/target/ppc/dfp_helper.c
-index f102177572..354a4aa877 100644
---- a/target/ppc/dfp_helper.c
-+++ b/target/ppc/dfp_helper.c
-@@ -36,6 +36,17 @@
- #define LO_IDX 0
- #endif
+[AJB: A better test would output some sort of timer value or other
+otherwise variable value so we could compare the record and replay
+outputs and ensure they match]
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+
+diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
+index 4c4aaf61dd..b4b3957963 100644
+--- a/tests/tcg/aarch64/Makefile.softmmu-target
++++ b/tests/tcg/aarch64/Makefile.softmmu-target
+@@ -32,3 +32,24 @@ memory: CFLAGS+=-DCHECK_UNALIGNED=1
  
-+static void get_dfp64(uint64_t *dst, uint64_t *dfp)
-+{
-+    dst[0] = dfp[0];
-+}
+ # Running
+ QEMU_OPTS+=-M virt -cpu max -display none -semihosting-config enable=on,target=native,chardev=output -kernel
 +
-+static void get_dfp128(uint64_t *dst, uint64_t *dfp)
-+{
-+    dst[0] = dfp[HI_IDX];
-+    dst[1] = dfp[LO_IDX];
-+}
++# Simple Record/Replay Test
++.PHONY: memory-record
++run-memory-record: memory-record memory
++	$(call run-test, $<, \
++	  $(QEMU) -monitor none -display none \
++		  -chardev file$(COMMA)path=$<.out$(COMMA)id=output \
++		  -icount shift=5$(COMMA)rr=record$(COMMA)rrfile=record.bin \
++	   	  $(QEMU_OPTS) memory, \
++	  "$< on $(TARGET_NAME)")
 +
- struct PPC_DFP {
-     CPUPPCState *env;
-     uint64_t t64[2], a64[2], b64[2];
-@@ -129,7 +140,7 @@ static void dfp_prepare_decimal64(struct PPC_DFP *dfp, uint64_t *a,
-     dfp->env = env;
- 
-     if (a) {
--        dfp->a64[0] = *a;
-+        get_dfp64(dfp->a64, a);
-         decimal64ToNumber((decimal64 *)dfp->a64, &dfp->a);
-     } else {
-         dfp->a64[0] = 0;
-@@ -137,7 +148,7 @@ static void dfp_prepare_decimal64(struct PPC_DFP *dfp, uint64_t *a,
-     }
- 
-     if (b) {
--        dfp->b64[0] = *b;
-+        get_dfp64(dfp->b64, b);
-         decimal64ToNumber((decimal64 *)dfp->b64, &dfp->b);
-     } else {
-         dfp->b64[0] = 0;
-@@ -153,8 +164,7 @@ static void dfp_prepare_decimal128(struct PPC_DFP *dfp, uint64_t *a,
-     dfp->env = env;
- 
-     if (a) {
--        dfp->a64[0] = a[HI_IDX];
--        dfp->a64[1] = a[LO_IDX];
-+        get_dfp128(dfp->a64, a);
-         decimal128ToNumber((decimal128 *)dfp->a64, &dfp->a);
-     } else {
-         dfp->a64[0] = dfp->a64[1] = 0;
-@@ -162,8 +172,7 @@ static void dfp_prepare_decimal128(struct PPC_DFP *dfp, uint64_t *a,
-     }
- 
-     if (b) {
--        dfp->b64[0] = b[HI_IDX];
--        dfp->b64[1] = b[LO_IDX];
-+        get_dfp128(dfp->b64, b);
-         decimal128ToNumber((decimal128 *)dfp->b64, &dfp->b);
-     } else {
-         dfp->b64[0] = dfp->b64[1] = 0;
-@@ -617,10 +626,12 @@ uint32_t helper_##op(CPUPPCState *env, uint64_t *a, uint64_t *b)         \
- {                                                                        \
-     struct PPC_DFP dfp;                                                  \
-     unsigned k;                                                          \
-+    uint64_t a64;                                                        \
-                                                                          \
-     dfp_prepare_decimal##size(&dfp, 0, b, env);                          \
-                                                                          \
--    k = *a & 0x3F;                                                       \
-+    get_dfp64(&a64, a);                                                  \
-+    k = a64 & 0x3F;                                                      \
-                                                                          \
-     if (unlikely(decNumberIsSpecial(&dfp.b))) {                          \
-         dfp.crbf = 1;                                                    \
-@@ -817,11 +828,15 @@ void helper_##op(CPUPPCState *env, uint64_t *t, uint64_t *a,            \
-                  uint64_t *b, uint32_t rmc)                             \
- {                                                                       \
-     struct PPC_DFP dfp;                                                 \
--    int32_t ref_sig = *a & 0x3F;                                        \
-+    uint64_t a64;                                                       \
-+    int32_t ref_sig;                                                    \
-     int32_t xmax = ((size) == 64) ? 369 : 6111;                         \
-                                                                         \
-     dfp_prepare_decimal##size(&dfp, 0, b, env);                         \
-                                                                         \
-+    get_dfp64(&a64, a);                                                 \
-+    ref_sig = a64 & 0x3f;                                               \
-+                                                                        \
-     _dfp_reround(rmc, ref_sig, xmax, &dfp);                             \
-     decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t,         \
-                               &dfp.context);                            \
-@@ -881,7 +896,12 @@ DFP_HELPER_RINT(drintnq, RINTN_PPs, 128)
- void helper_dctdp(CPUPPCState *env, uint64_t *t, uint64_t *b)
- {
-     struct PPC_DFP dfp;
--    uint32_t b_short = *b;
-+    uint64_t b64;
-+    uint32_t b_short;
++.PHONY: memory-replay
++run-memory-replay: memory-replay run-memory-record
++	$(call run-test, $<, \
++	  $(QEMU) -monitor none -display none \
++		  -chardev file$(COMMA)path=$<.out$(COMMA)id=output \
++		  -icount shift=5$(COMMA)rr=replay$(COMMA)rrfile=record.bin \
++	   	  $(QEMU_OPTS) memory, \
++	  "$< on $(TARGET_NAME)")
 +
-+    get_dfp64(&b64, b);
-+    b_short = (uint32_t)b64;
-+
-     dfp_prepare_decimal64(&dfp, 0, 0, env);
-     decimal32ToNumber((decimal32 *)&b_short, &dfp.t);
-     decimal64FromNumber((decimal64 *)t, &dfp.t, &dfp.context);
-@@ -891,8 +911,10 @@ void helper_dctdp(CPUPPCState *env, uint64_t *t, uint64_t *b)
- void helper_dctqpq(CPUPPCState *env, uint64_t *t, uint64_t *b)
- {
-     struct PPC_DFP dfp;
-+    uint64_t b64;
-     dfp_prepare_decimal128(&dfp, 0, 0, env);
--    decimal64ToNumber((decimal64 *)b, &dfp.t);
-+    get_dfp64(&b64, b);
-+    decimal64ToNumber((decimal64 *)&b64, &dfp.t);
- 
-     dfp_check_for_VXSNAN_and_convert_to_QNaN(&dfp);
-     dfp_set_FPRF_from_FRT(&dfp);
-@@ -940,8 +962,10 @@ void helper_drdpq(CPUPPCState *env, uint64_t *t, uint64_t *b)
- void helper_##op(CPUPPCState *env, uint64_t *t, uint64_t *b)                   \
- {                                                                              \
-     struct PPC_DFP dfp;                                                        \
-+    uint64_t b64;                                                              \
-     dfp_prepare_decimal##size(&dfp, 0, b, env);                                \
--    decNumberFromInt64(&dfp.t, (int64_t)(*b));                                 \
-+    get_dfp64(&b64, b);                                                        \
-+    decNumberFromInt64(&dfp.t, (int64_t)b64);                                  \
-     decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t, &dfp.context); \
-     CFFIX_PPs(&dfp);                                                           \
-                                                                                \
-@@ -1183,10 +1207,12 @@ static void dfp_set_raw_exp_128(uint64_t *t, uint64_t raw)
- void helper_##op(CPUPPCState *env, uint64_t *t, uint64_t *a, uint64_t *b) \
- {                                                                         \
-     struct PPC_DFP dfp;                                                   \
--    uint64_t raw_qnan, raw_snan, raw_inf, max_exp;                        \
-+    uint64_t raw_qnan, raw_snan, raw_inf, max_exp, a64;                   \
-     int bias;                                                             \
--    int64_t exp = *((int64_t *)a);                                        \
-+    int64_t exp;                                                          \
-                                                                           \
-+    get_dfp64(&a64, a);                                                   \
-+    exp = (int64_t)a64;                                                   \
-     dfp_prepare_decimal##size(&dfp, 0, b, env);                           \
-                                                                           \
-     if ((size) == 64) {                                                   \
++TESTS+=memory-record memory-replay
 -- 
 2.20.1
 
