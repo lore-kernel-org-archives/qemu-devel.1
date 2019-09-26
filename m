@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC241ECE589
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE4BECE58B
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:41:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7924222C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:41:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DBB321655
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:41:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RPLYePRB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7924222C9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sglKhyY6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DBB321655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDWpI-0007ps-EJ
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 12:41:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41239)
+	id 1iDWpL-0008Ap-BZ
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 12:41:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41080)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iDWcC-0002fO-Si
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:38 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iDWc2-0002XO-H3
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iDWc8-0004jz-Sh
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:34 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:33024)
+ (envelope-from <richard.henderson@linaro.org>) id 1iDWbz-0004c4-BJ
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:25 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44342)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iDWc6-0004ff-LM
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:32 -0400
-Received: by mail-pl1-f196.google.com with SMTP id d22so1550151pls.0
- for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 09:27:27 -0700 (PDT)
+ id 1iDWbz-0004aX-6R
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:23 -0400
+Received: by mail-pf1-f196.google.com with SMTP id q21so2103154pfn.11
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 09:27:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=nOk3WYhtYahGat7iYj1GhM9dpB7AkH9Zaoypf0AhgeE=;
- b=RPLYePRBWAV6fWtJDMS7+OuMNADukAUIoZC2HprOk8qRgmmK5Wpy9uZHwuU34ixnwZ
- 4WDUhNAzAm+laD7sekfwLDKHhqH4gqAuzWsx5wHmqeTTMdr5NJ22JAq0ofBqFOOfb3Bd
- D1nOYIyx5Y9H7QSjNQp3qsGmSnyT3woRyId0+IjxPlIYn21wu8RnTkbzt580r0/0TOZo
- x/r8yKskobDhK1G4MVAfDUeLogxRmMxgQPtFROWH/QtRFZYcm5JQjKO3tiiUxuyocTgi
- xF5ZwV5bYyGzL1rz7neLrtFSGxddov2MZ9uRxFKMmXS0mlbsTYt7AWc8IyI4nj1ebSiv
- vAtw==
+ bh=m0A5hOzZEJmS1c+sxnHnolxCjQzyN94AtrGRUtBbpGQ=;
+ b=sglKhyY6pcUvb3rcImY9EopmQ7xuhFcLjIxOGbccP9Rt1kpFKwah1P+fUQTu0L82qo
+ d6fxq/o6p0DCYLenuB3i6FLaWLuHZ2jcnt2h6nG1Jn6V0R5HMUy6UJN+puw/F9hUHIAL
+ gzHlBP4kavlioLAWJrFVv9uUNCuHDb6EGYUeQNW3bTx8DVwib7/l1+FXkTl+lhMnH+Cr
+ BUfzZ+W5q0SV4IwKwiuVG3oZbVjiDx235b2Az+zGeiD6vTIE7Ib+gA48XhIEk/HMfZqg
+ GffaC9Pvum9A/dm0Z9dOjGREZMuPf12wLff3Kiv5dUNirKXkLKDiBjoUfrVwmEWdMxY5
+ PL+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=nOk3WYhtYahGat7iYj1GhM9dpB7AkH9Zaoypf0AhgeE=;
- b=XSPjhgrsP76NRUNdeQt5yvLCy8K3xSSboTSQ+NBVCEMsNgTv3jvSIap+PTaqPrXf/g
- UnkLQAwBHuuZ+1iAJ9Afn+kSxZrLuO8OVUXOYN4dY2Dui0hw9eP9rNX42K194apGsq3G
- L9+cS4NQcHEBA2f6g5FbcJfWlXei5B+Yasd3O0UbSR3Dj3slTl6BaMQgRsiRlzaR+2Vp
- LW+nl+7FRdHtOHvq62ayV9yxAQVgz07vimMTZLvKJSbN3aaBbyvVxhwta5aEG3e0x2/L
- hIER0kZ3ntjZpF/9sy6y+v8DI6LdftRpsX6kzrGw/hHtunzWoY5RtlT3QCobtHqA54Dj
- sY1g==
-X-Gm-Message-State: APjAAAXeK5JxWHUHcXT0Tu0zJukNSL2zAVl17tdSXtC+SZ3/jdOcUn91
- IqtIuDO8HzOLRSX6acQKez1eU43z3tE=
-X-Google-Smtp-Source: APXvYqwnZjD3y0kF8uAmXwb6Wixrs87O1RbcO5dFKVQ7RXtkjXiDyfJpB1jbdmkQ5CORgHZ9Iw11ew==
-X-Received: by 2002:a17:902:7611:: with SMTP id
- k17mr4594355pll.314.1569515186521; 
- Thu, 26 Sep 2019 09:26:26 -0700 (PDT)
+ bh=m0A5hOzZEJmS1c+sxnHnolxCjQzyN94AtrGRUtBbpGQ=;
+ b=P+J7OybrmgFza1WRIfSM6VaPDzFG1XoGgIGKHpSbxRoKbLper3IuyTbsSQ7/bQfZIN
+ 8n7tfVFRhKbrT0qIO60bGuy9KSEdhvsfme/jlQpXbZ65PjLECMybKR8LrlCFtKHkpTBw
+ HMGZHNfCzpchDj2T7OkOUn4qyCDadDdXg+LEhpFAzS1+THBu0d5u8diIbtZbLHP/SPzR
+ h5UZVfkzPNrZ2husJpNnKQuTh4kr3q6GwG5uUt4FeF5ppAS5/4nqA/4lJ8bdzGaVACBJ
+ GKWBsqZrVEmM/MCJdGj2qo4GgLXXCbpeWvEnOT2ArrEmHPO7pKN3YfpJYnu6v/a8GVbi
+ +rOQ==
+X-Gm-Message-State: APjAAAWIAXnXoKpcwpa4z1Znww2qQXpBHPf5exwgwLd37f+eP2gN0x1+
+ 6cfh4jnzv+oMMFylvAt8/K3Tn8DXHZU=
+X-Google-Smtp-Source: APXvYqxmah4eTeDLq6Cv+TFrZ6eJZ2scsNMs6k79k3NYmGLN8JkgPE1aMTGfqP5JWPTFtFdcK26HVQ==
+X-Received: by 2002:a17:90a:a404:: with SMTP id
+ y4mr4537383pjp.62.1569515179760; 
+ Thu, 26 Sep 2019 09:26:19 -0700 (PDT)
 Received: from localhost.localdomain ([12.157.10.114])
- by smtp.gmail.com with ESMTPSA id 64sm4453169pfx.31.2019.09.26.09.26.25
+ by smtp.gmail.com with ESMTPSA id 64sm4453169pfx.31.2019.09.26.09.26.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Sep 2019 09:26:25 -0700 (PDT)
+ Thu, 26 Sep 2019 09:26:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 06/18] target/s390x: Push trigger_pgm_exception lower in
- s390_cpu_tlb_fill
-Date: Thu, 26 Sep 2019 09:26:03 -0700
-Message-Id: <20190926162615.31168-7-richard.henderson@linaro.org>
+Subject: [PATCH v3 01/18] target/s390x: Truncate 32-bit psw_addr before
+ creating TB
+Date: Thu, 26 Sep 2019 09:25:58 -0700
+Message-Id: <20190926162615.31168-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190926162615.31168-1-richard.henderson@linaro.org>
 References: <20190926162615.31168-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.214.196
+X-Received-From: 209.85.210.196
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,62 +96,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Delay triggering an exception until the end, after we have
-determined ultimate success or failure, and also taken into
-account whether this is a non-faulting probe.
+If, somehow, the psw_addr is out of range, truncate early
+rather than after we get into gen_intermediate_code.
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/s390x/excp_helper.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ target/s390x/cpu.h       | 26 +++++++++++++++++++-------
+ target/s390x/translate.c |  6 ------
+ 2 files changed, 19 insertions(+), 13 deletions(-)
 
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index dbff772d34..552098be5f 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -127,7 +127,7 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     CPUS390XState *env = &cpu->env;
-     target_ulong vaddr, raddr;
-     uint64_t asc;
--    int prot, fail;
-+    int prot, fail, excp;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index e74a809257..ce20dafd23 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -357,18 +357,30 @@ static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
+ #endif
+ }
  
-     qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
-                   __func__, address, access_type, mmu_idx);
-@@ -141,12 +141,14 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-             vaddr &= 0x7fffffff;
-         }
-         fail = mmu_translate(env, vaddr, access_type, asc, &raddr, &prot, true);
-+        excp = 0; /* exception already raised */
-     } else if (mmu_idx == MMU_REAL_IDX) {
-         /* 31-Bit mode */
-         if (!(env->psw.mask & PSW_MASK_64)) {
-             vaddr &= 0x7fffffff;
-         }
-         fail = mmu_translate_real(env, vaddr, access_type, &raddr, &prot);
-+        excp = 0; /* exception already raised */
-     } else {
-         g_assert_not_reached();
+-static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
+-                                        target_ulong *cs_base, uint32_t *flags)
++static inline void cpu_get_tb_cpu_state(CPUS390XState* env,
++                                        target_ulong *p_pc,
++                                        target_ulong *cs_base,
++                                        uint32_t *p_flags)
+ {
+-    *pc = env->psw.addr;
+-    *cs_base = env->ex_value;
+-    *flags = (env->psw.mask >> FLAG_MASK_PSW_SHIFT) & FLAG_MASK_PSW;
++    uint32_t flags;
++    uint64_t pc;
++
++    flags = (env->psw.mask >> FLAG_MASK_PSW_SHIFT) & FLAG_MASK_PSW;
+     if (env->cregs[0] & CR0_AFP) {
+-        *flags |= FLAG_MASK_AFP;
++        flags |= FLAG_MASK_AFP;
      }
-@@ -159,7 +161,7 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-         qemu_log_mask(CPU_LOG_MMU,
-                       "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
-                       __func__, (uint64_t)raddr, (uint64_t)ram_size);
--        trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
-+        excp = PGM_ADDRESSING;
-         fail = 1;
+     if (env->cregs[0] & CR0_VECTOR) {
+-        *flags |= FLAG_MASK_VECTOR;
++        flags |= FLAG_MASK_VECTOR;
      }
- 
-@@ -175,6 +177,9 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-         return false;
-     }
- 
-+    if (excp) {
-+        trigger_pgm_exception(env, excp, ILEN_AUTO);
++
++    pc = env->psw.addr;
++    if (!(flags & FLAG_MASK_64)) {
++        pc &= 0x7fffffff;
 +    }
-     cpu_restore_state(cs, retaddr, true);
++
++    *p_pc = pc;
++    *cs_base = env->ex_value;
++    *p_flags = flags;
+ }
  
-     /*
+ /* PER bits from control register 9 */
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index a3e43ff9ec..e1c54ab03b 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -6446,12 +6446,6 @@ static void s390x_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+ 
+-    /* 31-bit mode */
+-    if (!(dc->base.tb->flags & FLAG_MASK_64)) {
+-        dc->base.pc_first &= 0x7fffffff;
+-        dc->base.pc_next = dc->base.pc_first;
+-    }
+-
+     dc->cc_op = CC_OP_DYNAMIC;
+     dc->ex_value = dc->base.tb->cs_base;
+     dc->do_debug = dc->base.singlestep_enabled;
 -- 
 2.17.1
 
