@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFE6C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E3CEC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:10:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D98D206B7
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:06:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D98D206B7
+	by mail.kernel.org (Postfix) with ESMTPS id BC4F5206B7
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 23:10:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC4F5206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDcqO-0008Et-Hz
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 19:06:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32861)
+	id 1iDcuG-00028e-Ur
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 19:10:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36144)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iDcpP-0007lE-Dj
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:05:40 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iDctE-00014P-KO
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:09:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iDcpO-0002oW-AQ
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:05:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36082)
+ (envelope-from <jsnow@redhat.com>) id 1iDctC-0007YA-J4
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 19:09:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42826)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iDcpK-0002gl-S8; Thu, 26 Sep 2019 19:05:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1iDct7-0007O8-6Q; Thu, 26 Sep 2019 19:09:29 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CD85D30ADBAB;
- Thu, 26 Sep 2019 23:05:33 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0E3CAC0578F4;
+ Thu, 26 Sep 2019 23:09:27 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 960445D9C9;
- Thu, 26 Sep 2019 23:05:32 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH v4 04/10] iotests.py: add event_wait_log and
- events_wait_log helpers
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D89BC60BE2;
+ Thu, 26 Sep 2019 23:09:25 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v4 08/10] iotests: add test 260 to check
+ bitmap life after snapshot + commit
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
- <20190807141226.193501-5-vsementsov@virtuozzo.com>
+ <20190807141226.193501-9-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,18 +122,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <a578331a-86a6-4636-d055-3cc4c43ba495@redhat.com>
-Date: Thu, 26 Sep 2019 19:05:32 -0400
+Message-ID: <7a0f389d-128e-d9d5-1287-165a52ac4e19@redhat.com>
+Date: Thu, 26 Sep 2019 19:09:25 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190807141226.193501-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20190807141226.193501-9-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 26 Sep 2019 23:05:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Thu, 26 Sep 2019 23:09:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -157,40 +157,185 @@ Sender: "Qemu-devel"
 
 
 On 8/7/19 10:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Two testcases with persistent bitmaps are not added here, as there are
+> bugs to be fixed soon.
+> 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+OK:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+there may or may not be conflicts on test setup, depending on when the
+iotests logging changes go in, but that can be handled.
+
 > ---
->  tests/qemu-iotests/iotests.py | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  tests/qemu-iotests/260     | 87 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/260.out | 52 +++++++++++++++++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 140 insertions(+)
+>  create mode 100755 tests/qemu-iotests/260
+>  create mode 100644 tests/qemu-iotests/260.out
 > 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index ce74177ab1..4ad265f140 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -540,6 +540,16 @@ class VM(qtest.QEMUQtestMachine):
->          log(result, filters, indent=indent)
->          return result
->  
-> +    def event_wait_log(self, name, **kwargs):
-> +        event = self.event_wait(name, **kwargs)
-> +        log(event, filters=[filter_qmp_event])
-> +        return event
+> diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
+> new file mode 100755
+> index 0000000000..d8fcf4567a
+> --- /dev/null
+> +++ b/tests/qemu-iotests/260
+> @@ -0,0 +1,87 @@
+> +#!/usr/bin/env python
+> +#
+> +# Tests for temporary external snapshot when we have bitmaps.
+> +#
+> +# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
 > +
-> +    def events_wait_log(self, events, **kwargs):
-> +        event = self.events_wait(events, **kwargs)
-> +        log(event, filters=[filter_qmp_event])
-> +        return event
+> +import iotests
+> +from iotests import qemu_img_create, file_path, log
 > +
->      # Returns None on success, and an error string on failure
->      def run_job(self, job, auto_finalize=True, auto_dismiss=False,
->                  pre_finalize=None, use_log=True, wait=60.0):
+> +iotests.verify_image_format(supported_fmts=['qcow2'])
+> +
+> +base, top = file_path('base', 'top')
+> +size = 64 * 1024 * 3
+> +
+> +
+> +def print_bitmap(msg, vm):
+> +    result = vm.qmp('query-block')['return'][0]
+> +    if 'dirty-bitmaps' in result:
+> +        bitmap = result['dirty-bitmaps'][0]
+> +        log('{}: name={} dirty-clusters={}'.format(msg, bitmap['name'],
+> +            bitmap['count'] // 64 // 1024))
+> +    else:
+> +        log(msg + ': not found')
+> +
+> +
+> +def test(persistent, restart):
+> +    assert persistent or not restart
+> +    log("\nTestcase {}persistent {} restart\n".format(
+> +            '' if persistent else 'non-', 'with' if restart else 'without'))
+> +
+> +    qemu_img_create('-f', iotests.imgfmt, base, str(size))
+> +
+> +    vm = iotests.VM().add_drive(base)
+> +    vm.launch()
+> +
+> +    vm.qmp_log('block-dirty-bitmap-add', node='drive0', name='bitmap0',
+> +               persistent=persistent)
+> +    vm.hmp_qemu_io('drive0', 'write 0 64K')
+> +    print_bitmap('initial bitmap', vm)
+> +
+> +    vm.qmp_log('blockdev-snapshot-sync', device='drive0', snapshot_file=top,
+> +               format=iotests.imgfmt, filters=[iotests.filter_qmp_testfiles])
+> +    vm.hmp_qemu_io('drive0', 'write 64K 512')
+> +    print_bitmap('check that no bitmaps are in snapshot', vm)
+> +
+> +    if restart:
+> +        log("... Restart ...")
+> +        vm.shutdown()
+> +        vm = iotests.VM().add_drive(top)
+> +        vm.launch()
+> +
+> +    vm.qmp_log('block-commit', device='drive0', top=top,
+> +               filters=[iotests.filter_qmp_testfiles])
+> +    ev = vm.events_wait_log((('BLOCK_JOB_READY', None),
+> +                             ('BLOCK_JOB_COMPLETED', None)))
+> +    if (ev['event'] == 'BLOCK_JOB_COMPLETED'):
+> +        vm.shutdown()
+> +        log(vm.get_log())
+> +        exit()
+> +
+> +    vm.qmp_log('block-job-complete', device='drive0')
+> +    vm.event_wait_log('BLOCK_JOB_COMPLETED')
+> +    print_bitmap('check bitmap after commit', vm)
+> +
+> +    vm.hmp_qemu_io('drive0', 'write 128K 64K')
+> +    print_bitmap('check updated bitmap', vm)
+> +
+> +    vm.shutdown()
+> +
+> +
+> +test(persistent=False, restart=False)
+> +test(persistent=True, restart=False)
+> +test(persistent=True, restart=True)
+> diff --git a/tests/qemu-iotests/260.out b/tests/qemu-iotests/260.out
+> new file mode 100644
+> index 0000000000..2f0d98d036
+> --- /dev/null
+> +++ b/tests/qemu-iotests/260.out
+> @@ -0,0 +1,52 @@
+> +
+> +Testcase non-persistent without restart
+> +
+> +{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": false}}
+> +{"return": {}}
+> +initial bitmap: name=bitmap0 dirty-clusters=1
+> +{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
+> +{"return": {}}
+> +check that no bitmaps are in snapshot: not found
+> +{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
+> +{"return": {}}
+> +{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+> +{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
+> +{"return": {}}
+> +{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+> +check bitmap after commit: name=bitmap0 dirty-clusters=2
+> +check updated bitmap: name=bitmap0 dirty-clusters=3
+> +
+> +Testcase persistent without restart
+> +
+> +{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": true}}
+> +{"return": {}}
+> +initial bitmap: name=bitmap0 dirty-clusters=1
+> +{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
+> +{"return": {}}
+> +check that no bitmaps are in snapshot: not found
+> +{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
+> +{"return": {}}
+> +{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+> +{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
+> +{"return": {}}
+> +{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+> +check bitmap after commit: name=bitmap0 dirty-clusters=2
+> +check updated bitmap: name=bitmap0 dirty-clusters=3
+> +
+> +Testcase persistent with restart
+> +
+> +{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": true}}
+> +{"return": {}}
+> +initial bitmap: name=bitmap0 dirty-clusters=1
+> +{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
+> +{"return": {}}
+> +check that no bitmaps are in snapshot: not found
+> +... Restart ...
+> +{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
+> +{"return": {}}
+> +{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+> +{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
+> +{"return": {}}
+> +{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+> +check bitmap after commit: name=bitmap0 dirty-clusters=2
+> +check updated bitmap: name=bitmap0 dirty-clusters=3
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index f13e5f2e23..06f1ea904c 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -271,3 +271,4 @@
+>  254 rw backing quick
+>  255 rw quick
+>  256 rw quick
+> +260 rw auto quick
 > 
-
-I'm not sure these are really needed, since you can just log the event
-you get after calling either of these methods anyway. There's nothing
-stopping you from:
-
-```
-event = event_wait_log(...)
-log(filter_qmp_event(event))
-```
 
