@@ -2,111 +2,118 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F346C432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:05:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6074C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 768682053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:05:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 768682053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72361222BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:08:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tTDrq+sO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72361222BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDSWb-0003mn-Ki
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:05:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60503)
+	id 1iDSZ2-0005nF-TE
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:08:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iDSVl-0003ET-Ma
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:04:44 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDSXS-0004bu-6v
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:06:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iDSVj-0001yq-2h
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:04:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45558)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iDSVh-0001tE-6a
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:04:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 23BF311A29;
- Thu, 26 Sep 2019 12:04:32 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-127.ams2.redhat.com [10.36.116.127])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8C55060923;
- Thu, 26 Sep 2019 12:04:05 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH v3 11/22] libqos: split qos-test and libqos
- makefile vars
-To: "Oleinik, Alexander" <alxndr@bu.edu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190918231846.22538-1-alxndr@bu.edu>
- <20190918231846.22538-12-alxndr@bu.edu>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <e41ee963-bfcf-bb73-ee28-8991293241a2@redhat.com>
-Date: Thu, 26 Sep 2019 14:04:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20190918231846.22538-12-alxndr@bu.edu>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDSXQ-0001N9-Vx
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:06:26 -0400
+Received: from mail-eopbgr60123.outbound.protection.outlook.com
+ ([40.107.6.123]:16600 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iDSXI-0000hq-C8; Thu, 26 Sep 2019 08:06:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZzwoFZDX6wd0uQfj/KoDyK7d1h0TGUhuxT3vB32JyPdO+iTezjqE5wHm2BtE2B/oHjziUi6EhFF+pc9AArojpeuurBypOox9eamgQac0Io7IXZl4iiArsqCbG0PDy5MMDg7t8OFz03enCDnRcHuQv8ME+PRIsqR5rQ4yvT2xTHy0eW+NuYOJzX9kWjD7pI8k7a4aGeClnaZXawxlkGA40dpovd/HFmWaVMrke10tyB8cmYHEvjkMaD0673lg0DwRyisl6HyDAuvFZuLmC0HJWIpRxftwjuToqRriVRgnLNSxDdYOreywmLEt8qRiqs0M+RVk4naAF8VFfl0CxnbMSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Fuuw830LBL35ZBgYCTJcUkI5kz/IovUwFlznvE8HgpE=;
+ b=ZO2OmCbNhaluh9ZmDROuyNviKX7r+O/lefZ8EBtlUjg6X2lAJvNNrJw5HCUuV1K1nrnVvumz1ytlZ6JAByVeZsEDWe4yQsbtkE1NQftUphWfxgoNVzHCxOh8ysdOtj7OsBP9IBOwDdFKpnnnofVO65aP1GvClXHjxKNGgBppKgwjemMC75bm4nR1ve7Dd93A5ov8rpCf7CMZxkaYS0wd9UGm8nBUVye5xmoGmXHAIH1toNBlOGnbIvl/TnmT8CsPJL1p+QU3UuadG/cZL//vfxJjh/Y5EjdsbDm9YXlLUrVHcW+OdkJ6zOgfvaCqAFuCKtbqCxRZqY6SV1m3oV2SQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Fuuw830LBL35ZBgYCTJcUkI5kz/IovUwFlznvE8HgpE=;
+ b=tTDrq+sOhHKVg2Ngrocn4Yxa9XVqlimE1bVmEMT5xLVO25hZZgObHf1k+9PpwvWXpEzhMz0kVBiHmoGAXwqE0DS9OtA35sjrDv++GKgY9vvXFzgqbOgsgpinlbANIA4Py1wHugWK6A3mD1vXqtWD8Ucf7vNccA8SWtztalisnb0=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5353.eurprd08.prod.outlook.com (52.133.240.85) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.20; Thu, 26 Sep 2019 12:06:12 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::b5c0:6b97:438d:77ed%2]) with mapi id 15.20.2284.023; Thu, 26 Sep 2019
+ 12:06:11 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "no-reply@patchew.org"
+ <no-reply@patchew.org>, "stefanha@redhat.com" <stefanha@redhat.com>
+Subject: Re: [PULL 0/2] Block patches
+Thread-Topic: [PULL 0/2] Block patches
+Thread-Index: AQHVc8k1k3YXEIerUkem33IUrXFaAqc9fE6AgABhr4A=
+Date: Thu, 26 Sep 2019 12:06:11 +0000
+Message-ID: <c705d17e-6e39-d9a2-e791-02c4f95c3faf@virtuozzo.com>
+References: <156947859030.9841.4795650725800418297@8230166b0665>
+In-Reply-To: <156947859030.9841.4795650725800418297@8230166b0665>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 26 Sep 2019 12:04:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0281.eurprd05.prod.outlook.com
+ (2603:10a6:3:fc::33) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190926150608985
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3f7a552d-eba9-48c5-cfcf-08d74279ec26
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
+ SRVR:DB8PR08MB5353; 
+x-ms-traffictypediagnostic: DB8PR08MB5353:
+x-ms-exchange-purlcount: 3
+x-microsoft-antispam-prvs: <DB8PR08MB535350E86C2B3B101F1BB676C1860@DB8PR08MB5353.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0172F0EF77
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39850400004)(366004)(136003)(346002)(376002)(396003)(199004)(189003)(36756003)(86362001)(186003)(54906003)(25786009)(6116002)(3846002)(66946007)(2501003)(2906002)(31686004)(5660300002)(11346002)(446003)(66476007)(229853002)(6512007)(386003)(4326008)(6506007)(476003)(14454004)(6306002)(66066001)(2616005)(102836004)(6486002)(486006)(76176011)(305945005)(71190400001)(71200400001)(316002)(26005)(81166006)(8676002)(31696002)(81156014)(7736002)(256004)(110136005)(478600001)(6436002)(2201001)(966005)(64756008)(66446008)(66556008)(8936002)(52116002)(99286004)(6246003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5353;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 23QTGtP7ucaC9KmuegM9q3kmKrVwjmmbykjRgZDVZ8ksG7zeLZ2Cvg8tXZXIzFzivjDvKPe8JDg7VSArcF9QHu9IEgbp1BAjeOonjRo6entRpHEINsFHEoRRIT0KFSB8cLXiAOggs7Mi0ddUTp9p+qMNcPBOWCJODyyz0amisRJKKHtsODub35kGzMQsImwNi/S3TpCB4+JB4GDKuf3k3zj9iXceAZ3TKRqZOipMdKFkPCh2h2onPdZMXK28MNdEObGfit53Jb3tOFPNyijr+iTNow9Obmwy/2ru/Hbey1V0TcSoXIeYuQuhJ7pariTKJsoN7RIkdQ/PfPkAYyY2TCwjwWMerAFYe33gGJWNK19o6FZQ3Rk+7mJbbL6GPyHT7FkTY7FPxC+k2piR2TT3D7vqYOy9sXgt/lmWgO/0udhAIzaSQ1akl0e5Ht3rNezMtQNeZPPhL+XMiJtx71wgQg==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B69AC6DC3BDD1342A3755B74388EE42D@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f7a552d-eba9-48c5-cfcf-08d74279ec26
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2019 12:06:11.7788 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mpDaBOxltgDgk858rmUGIqeXQOZnK+qEAoT8MloGk8JXMI1mpnAHFIvYi8NsldOiXgp51fH0XwHCyEOfiJuuItaigXKemohg+D2/quw4Bfs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5353
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.123
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,126 +125,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/09/2019 01.19, Oleinik, Alexander wrote:
-> Most qos-related objects were specified in the qos-test-obj-y variable.
-> qos-test-obj-y also included qos-test.o which defines a main().
-> This made it difficult to repurpose qos-test-obj-y to link anything
-> beside tests/qos-test against libqos. This change separates objects that
-> are libqos-specific and ones that are qos-test specific into different
-> variables.
-> 
-> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
-> ---
->  tests/Makefile.include | 70 ++++++++++++++++++++++--------------------
->  1 file changed, 36 insertions(+), 34 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index a9b3c36259..da665ca7eb 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -687,51 +687,53 @@ tests/test-crypto-block$(EXESUF): tests/test-crypto-block.o $(test-crypto-obj-y)
->  
->  libqgraph-obj-y = tests/libqos/qgraph.o
->  
-> -libqos-obj-y = $(libqgraph-obj-y) tests/libqos/pci.o tests/libqos/fw_cfg.o
-> -libqos-obj-y += tests/libqos/malloc.o
-> -libqos-obj-y += tests/libqos/libqos.o
-> -libqos-spapr-obj-y = $(libqos-obj-y) tests/libqos/malloc-spapr.o
-> +libqos-core-obj-y = $(libqgraph-obj-y) tests/libqos/pci.o tests/libqos/fw_cfg.o
-> +libqos-core-obj-y += tests/libqos/malloc.o
-> +libqos-core-obj-y += tests/libqos/libqos.o
-> +libqos-spapr-obj-y = $(libqos-core-obj-y) tests/libqos/malloc-spapr.o
->  libqos-spapr-obj-y += tests/libqos/libqos-spapr.o
->  libqos-spapr-obj-y += tests/libqos/rtas.o
->  libqos-spapr-obj-y += tests/libqos/pci-spapr.o
-> -libqos-pc-obj-y = $(libqos-obj-y) tests/libqos/pci-pc.o
-> +libqos-pc-obj-y = $(libqos-core-obj-y) tests/libqos/pci-pc.o
->  libqos-pc-obj-y += tests/libqos/malloc-pc.o tests/libqos/libqos-pc.o
->  libqos-pc-obj-y += tests/libqos/ahci.o
->  libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
->  
->  # Devices
-> -qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
-> -qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
-> -qos-test-obj-y += tests/libqos/e1000e.o
-> -qos-test-obj-y += tests/libqos/i2c.o
-> -qos-test-obj-y += tests/libqos/i2c-imx.o
-> -qos-test-obj-y += tests/libqos/i2c-omap.o
-> -qos-test-obj-y += tests/libqos/sdhci.o
-> -qos-test-obj-y += tests/libqos/tpci200.o
-> -qos-test-obj-y += tests/libqos/virtio.o
-> -qos-test-obj-$(CONFIG_VIRTFS) += tests/libqos/virtio-9p.o
-> -qos-test-obj-y += tests/libqos/virtio-balloon.o
-> -qos-test-obj-y += tests/libqos/virtio-blk.o
-> -qos-test-obj-y += tests/libqos/virtio-mmio.o
-> -qos-test-obj-y += tests/libqos/virtio-net.o
-> -qos-test-obj-y += tests/libqos/virtio-pci.o
-> -qos-test-obj-y += tests/libqos/virtio-rng.o
-> -qos-test-obj-y += tests/libqos/virtio-scsi.o
-> -qos-test-obj-y += tests/libqos/virtio-serial.o
-> +libqos-obj-y = $(libqos-core-obj-y)
-> +libqos-obj-y += $(libqgraph-obj-y)
-> +libqos-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
-> +libqos-obj-y += tests/libqos/e1000e.o
-> +libqos-obj-y += tests/libqos/i2c.o
-> +libqos-obj-y += tests/libqos/i2c-imx.o
-> +libqos-obj-y += tests/libqos/i2c-omap.o
-> +libqos-obj-y += tests/libqos/sdhci.o
-> +libqos-obj-y += tests/libqos/tpci200.o
-> +libqos-obj-y += tests/libqos/virtio.o
-> +libqos-obj-$(CONFIG_VIRTFS) += tests/libqos/virtio-9p.o
-> +libqos-obj-y += tests/libqos/virtio-balloon.o
-> +libqos-obj-y += tests/libqos/virtio-blk.o
-> +libqos-obj-y += tests/libqos/virtio-mmio.o
-> +libqos-obj-y += tests/libqos/virtio-net.o
-> +libqos-obj-y += tests/libqos/virtio-pci.o
-> +libqos-obj-y += tests/libqos/virtio-rng.o
-> +libqos-obj-y += tests/libqos/virtio-scsi.o
-> +libqos-obj-y += tests/libqos/virtio-serial.o
->  
->  # Machines
-> -qos-test-obj-y += tests/libqos/aarch64-xlnx-zcu102-machine.o
-> -qos-test-obj-y += tests/libqos/arm-imx25-pdk-machine.o
-> -qos-test-obj-y += tests/libqos/arm-n800-machine.o
-> -qos-test-obj-y += tests/libqos/arm-raspi2-machine.o
-> -qos-test-obj-y += tests/libqos/arm-sabrelite-machine.o
-> -qos-test-obj-y += tests/libqos/arm-smdkc210-machine.o
-> -qos-test-obj-y += tests/libqos/arm-virt-machine.o
-> -qos-test-obj-y += tests/libqos/arm-xilinx-zynq-a9-machine.o
-> -qos-test-obj-y += tests/libqos/ppc64_pseries-machine.o
-> -qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
-> +libqos-obj-y += tests/libqos/aarch64-xlnx-zcu102-machine.o
-> +libqos-obj-y += tests/libqos/arm-imx25-pdk-machine.o
-> +libqos-obj-y += tests/libqos/arm-n800-machine.o
-> +libqos-obj-y += tests/libqos/arm-raspi2-machine.o
-> +libqos-obj-y += tests/libqos/arm-sabrelite-machine.o
-> +libqos-obj-y += tests/libqos/arm-smdkc210-machine.o
-> +libqos-obj-y += tests/libqos/arm-virt-machine.o
-> +libqos-obj-y += tests/libqos/arm-xilinx-zynq-a9-machine.o
-> +libqos-obj-y += tests/libqos/ppc64_pseries-machine.o
-> +libqos-obj-y += tests/libqos/x86_64_pc-machine.o
->  
->  # Tests
-> +qos-test-obj-y = tests/qos-test.o
->  qos-test-obj-y += tests/ac97-test.o
->  qos-test-obj-y += tests/ds1338-test.o
->  qos-test-obj-y += tests/e1000-test.o
-> @@ -763,7 +765,7 @@ check-unit-y += tests/test-qgraph$(EXESUF)
->  tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
->  
->  check-qtest-generic-y += tests/qos-test$(EXESUF)
-> -tests/qos-test$(EXESUF): $(qos-test-obj-y)
-> +tests/qos-test$(EXESUF): $(qos-test-obj-y) $(libqos-obj-y)
->  
->  tests/qmp-test$(EXESUF): tests/qmp-test.o
->  tests/qmp-cmd-test$(EXESUF): tests/qmp-cmd-test.o
-> 
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+MjYuMDkuMjAxOSA5OjE2LCBuby1yZXBseUBwYXRjaGV3Lm9yZyB3cm90ZToNCj4gUGF0Y2hldyBV
+Ukw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyNTE3NDQwMC44NTc4LTEtc3RlZmFu
+aGFAcmVkaGF0LmNvbS8NCj4gDQo+IA0KPiANCj4gSGksDQo+IA0KPiBUaGlzIHNlcmllcyBmYWls
+ZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
+c3RpbmcgY29tbWFuZHMgYW5kDQo+IHRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9j
+a2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQNCj4gbG9jYWxseS4N
+Cj4gDQo+ID09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0NCj4gIyEgL2Jpbi9iYXNoDQo+IGV4cG9y
+dCBBUkNIPXg4Nl82NA0KPiBtYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQ0K
+PiB0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xDQo+ID09
+PSBURVNUIFNDUklQVCBFTkQgPT09DQo+IA0KPiAgICBDQyAgICAgIGF1dGh6L2xpc3Qubw0KPiAg
+ICBDQyAgICAgIGF1dGh6L2xpc3RmaWxlLm8NCj4gL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvaW92
+LmM6IEluIGZ1bmN0aW9uICdxZW11X2lvdmVjX2luaXRfZXh0ZW5kZWQnOg0KPiAvdG1wL3FlbXUt
+dGVzdC9zcmMvdXRpbC9pb3YuYzo0NTE6OTogZXJyb3I6ICdtaWRfaW92JyBtYXkgYmUgdXNlZCB1
+bmluaXRpYWxpemVkIGluIHRoaXMgZnVuY3Rpb24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXpl
+ZF0NCj4gICAgICAgICAgIG1lbWNweShwLCBtaWRfaW92LCBtaWRfbmlvdiAqIHNpemVvZigqcCkp
+Ow0KPiAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4N
+Cj4gY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMNCj4gDQo+IA0KPiBU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0DQo+IGh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIw
+MTkwOTI1MTc0NDAwLjg1NzgtMS1zdGVmYW5oYUByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1p
+bmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLg0KPiAtLS0NCj4gRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLg0KPiBQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ0KPiANCg0KQWN0dWFs
+bHkgaXQncyBvYnZpb3VzIHRoYXQgaXQgaXMgaW5pdGlhbGl6ZWQgaGVyZToNCg0KV2UgZ28gaGVy
+ZSBvbmx5IGlmIG1pZF9uaW92LCB3aGljaCBtYXkgYmUgc2V0IG9ubHkgaW4gImlmIChtaWRfbGVu
+KSIsIGFuZCBtaWRfaW92IGlzIHNldCBpbiBzYW1lICJpZiAobWlkX2xlbikiLg0KDQpNeSBjbGFu
+ZyBkb24ndCB3YXJuLg0KDQpTdGlsbCwgd2UgbWF5IGp1c3QgaW5pdGlhbGl6ZSBtaWRfaW92IHRv
+IE5VTEwgYW5kIGRvbid0IGNhcmUuDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
