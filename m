@@ -2,88 +2,90 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC4CC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 18:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA722C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 18:06:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A59C1222C7
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 18:03:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59C1222C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id BB03C21A4A
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 18:06:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n5FXHbVk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB03C21A4A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDY71-0003S1-Jv
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 14:03:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60006)
+	id 1iDYAK-0007Fa-9t
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 14:06:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59165)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1iDXkY-0008Id-EP
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:40:19 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iDXgZ-0004r1-3l
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:36:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1iDXkR-0002CV-37
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:40:15 -0400
-Received: from mga05.intel.com ([192.55.52.43]:51787)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1iDXkQ-00023r-0n
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:40:10 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 26 Sep 2019 10:40:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,552,1559545200"; d="scan'208";a="194208449"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga006.jf.intel.com with ESMTP; 26 Sep 2019 10:40:05 -0700
-Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 26 Sep 2019 10:40:05 -0700
-Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 26 Sep 2019 10:40:04 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Thu, 26 Sep 2019 10:40:04 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.113]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.92]) with mapi id 14.03.0439.000;
- Fri, 27 Sep 2019 01:40:03 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
-Subject: RE: [PATCH v5 2/4] tests/test-replication.c: Add test for ignoring
- requests after failover
-Thread-Topic: [PATCH v5 2/4] tests/test-replication.c: Add test for ignoring
- requests after failover
-Thread-Index: AQHVa/qhYqqFivT2Tkmj/wvfs4Rj+6c+SXUA
-Date: Thu, 26 Sep 2019 17:40:03 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D780627E731@shsmsx102.ccr.corp.intel.com>
-References: <cover.1568574478.git.lukasstraub2@web.de>
- <e3f1e1ec5b2bd2ce2c9a6c7669284a3fc2fdbaaa.1568574478.git.lukasstraub2@web.de>
-In-Reply-To: <e3f1e1ec5b2bd2ce2c9a6c7669284a3fc2fdbaaa.1568574478.git.lukasstraub2@web.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZjBlY2EzOGUtOGU5ZS00NGVlLThiZjgtZGEzNjgyNjc2OTRhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoia0h0OGFuQzkwY3VwTFR3dU1DSiszVGY3eXQ1alVSUjUxSUNBVjhLaTcxa3Vyd3NjYWlCMk1EbytzbnJqOGl3QSJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iDXgX-00039Y-Nq
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 13:36:10 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38909)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iDXgX-000391-Fg; Thu, 26 Sep 2019 13:36:09 -0400
+Received: by mail-wr1-f67.google.com with SMTP id w12so3031473wro.5;
+ Thu, 26 Sep 2019 10:36:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=izDpyq59rblh6afPzQ7olE7lYmJirhrXObmCCQIkPKI=;
+ b=n5FXHbVkOx7bQwPOi/0BCGY9XMInZ0xX7NJNdLVdyDZTzD2UmLS1pcYzWHlG5+f13I
+ sqb9ZdCBomy1Q1z8c4vuniwkKM+KTr19w6ZiaZtppKLxbdhRx71Yr57DnZS4reS5syxt
+ 7a64NKssGnWi5mRFi4ZqmGnLx5CRkHBf+WrO0kkbz1OmWZr5dHVywmIC2pteDyZrnfen
+ nguR6XphsrLsUU5nfF4tIBG141cESkcWpVTLA4KPozd+RWPIM/sbdnnuA05KWb9ziAOW
+ gHv0/sOo9D1akNDowj4TdeKU8DFbk/z3M/Q/xFQOjLTAuF+MVIpFQmihguxkSdy0Ob6j
+ xSTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=izDpyq59rblh6afPzQ7olE7lYmJirhrXObmCCQIkPKI=;
+ b=UE0FdeqoPG4AgfE5GPFtsRfRYjBDdB64EvGX6MUgYLh1tXAzg/7i7DAuwB31EqusfY
+ bxJ4HoEhEvQQ9RaC/7ZpIoxDh1lfKEnsPQ/AS01ANHAKURbq5xc0RNN0zptsEWohdet7
+ n7S+MXQty0p1Wtr1M3Gv8fh21XrdRe21uEFSs/xRlu/HS+yvDgMadGGz2U2bfcIPIama
+ ESgJ7YIsl+fkjTBjJZN0xn8HCg9/fjVFYwpHX7F85VDG7ZRyp1OO80AKi8dvfBbXUA9I
+ /CQo6g0rOfO29Qsms1g8x2M4fdudHf5M7eKR96mUsl4U+eRb4TzR1fN3em6Wtd1n5mfo
+ hjOw==
+X-Gm-Message-State: APjAAAUbetIXcXv1dNwVrnL09j/SGyHhDOS2DQ6Q0zXDwU9qU8bLMXJG
+ bzMMf36u1fiRrxcZRun641KGiwccE4U=
+X-Google-Smtp-Source: APXvYqxFLjHuLuQjIqejqyCRvTixIuUpLMqjiCHSl8awLjPnLvYm6KiZHtzGjR1esXJmBAYw1wFEcA==
+X-Received: by 2002:adf:f081:: with SMTP id n1mr4240702wro.273.1569519308279; 
+ Thu, 26 Sep 2019 10:35:08 -0700 (PDT)
+Received: from x1w.redhat.com (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id b186sm9918980wmd.16.2019.09.26.10.35.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 26 Sep 2019 10:35:07 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 17/19] tests/boot_linux_console: Test the raspi2 UART1 (16550
+ based)
+Date: Thu, 26 Sep 2019 19:34:25 +0200
+Message-Id: <20190926173428.10713-18-f4bug@amsat.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190926173428.10713-1-f4bug@amsat.org>
+References: <20190926173428.10713-1-f4bug@amsat.org>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.43
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,120 +97,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Zolt=C3=A1n=20Baldaszti?= <bztemail@gmail.com>,
+ Laurent Bonnans <laurent.bonnans@here.com>,
+ Esteban Bosse <estebanbosse@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-arm@nongnu.org, Clement Deschamps <clement.deschamps@antfield.fr>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Cheng Xiang <ext-cheng.xiang@here.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The current do_test_arm_raspi2() case tests the PL011 UART0.
+Our model also supports the AUX UART (16550 based).
+We can very simply test the UART1 with Linux, modifying the
+kernel command line.
 
-> -----Original Message-----
-> From: Lukas Straub <lukasstraub2@web.de>
-> Sent: Monday, September 16, 2019 3:20 AM
-> To: qemu-devel <qemu-devel@nongnu.org>
-> Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
-> <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
-> Xie Changlong <xiechanglong.d@gmail.com>; kwolf@redhat.com;
-> mreitz@redhat.com
-> Subject: [PATCH v5 2/4] tests/test-replication.c: Add test for ignoring
-> requests after failover
->=20
-> This simulates the case that happens when we resume COLO after failover.
->=20
+Add few lines to expand our previous test and cover the AUX
+UART.
 
-It looks change the title to "Add test for secondary node continuous backup=
-" is better.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/acceptance/boot_linux_console.py | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> ---
->  tests/test-replication.c | 52
-> ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
->=20
-> diff --git a/tests/test-replication.c b/tests/test-replication.c index
-> f085d1993a..5addfc2227 100644
-> --- a/tests/test-replication.c
-> +++ b/tests/test-replication.c
-> @@ -489,6 +489,56 @@ static void test_secondary_stop(void)
->      teardown_secondary();
->  }
->=20
-> +static void test_secondary_failover_then_ignore_requests(void)
-
-Same as title, I think change to "test_secondary_continuous_backup" is more=
- clear.
-
-Thanks
-Zhang Chen
-
-> +{
-> +    BlockBackend *top_blk, *local_blk;
-> +    Error *local_err =3D NULL;
-> +
-> +    top_blk =3D start_secondary();
-> +    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
-> +    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
-> +    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
-> +
-> +    /* replication will backup s_local_disk to s_hidden_disk */
-> +    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
-> +                  IMG_SIZE / 2, 0, IMG_SIZE, false);
-> +
-> +    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
-> +    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
-> +
-> +    /* do failover (active commit) */
-> +    replication_stop_all(true, &local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* it should ignore all requests from now on */
-> +
-> +    /* start after failover */
-> +    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* checkpoint */
-> +    replication_do_checkpoint_all(&local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* stop */
-> +    replication_stop_all(true, &local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* read from s_local_disk (0, IMG_SIZE / 2) */
-> +    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
-> +                  0, IMG_SIZE / 2, false);
-> +
-> +
-> +    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
-> +    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
-> +                  IMG_SIZE / 2, 0, IMG_SIZE, false);
-> +
-> +    teardown_secondary();
-> +}
-> +
->  static void test_secondary_do_checkpoint(void)
->  {
->      BlockBackend *top_blk, *local_blk;
-> @@ -584,6 +634,8 @@ int main(int argc, char **argv)
->      g_test_add_func("/replication/secondary/write", test_secondary_write=
-);
->      g_test_add_func("/replication/secondary/start", test_secondary_start=
-);
->      g_test_add_func("/replication/secondary/stop",  test_secondary_stop)=
-;
-> +
-> g_test_add_func("/replication/secondary/failover_then_ignore_requests",
-> +                    test_secondary_failover_then_ignore_requests);
->      g_test_add_func("/replication/secondary/do_checkpoint",
->                      test_secondary_do_checkpoint);
->      g_test_add_func("/replication/secondary/get_error_all",
-> --
-> 2.20.1
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 7eaf6cb60e..33e8f6c635 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -326,6 +326,7 @@ class BootLinuxConsole(Test):
+         """
+         serial_kernel_cmdline = {
+             0: 'earlycon=pl011,0x3f201000 console=ttyAMA0',
++            1: 'earlycon=uart8250,mmio32,0x3f215040 console=ttyS1,115200'
+         }
+         deb_url = ('http://archive.raspberrypi.org/debian/'
+                    'pool/main/r/raspberrypi-firmware/'
+@@ -336,7 +337,7 @@ class BootLinuxConsole(Test):
+         dtb_path = self.extract_from_deb(deb_path, '/boot/bcm2709-rpi-2-b.dtb')
+ 
+         self.vm.set_machine('raspi2')
+-        self.vm.set_console()
++        self.vm.set_console(console_id=uart_id)
+         kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
+                                serial_kernel_cmdline[uart_id])
+         self.vm.add_args('-kernel', kernel_path,
+@@ -354,6 +355,14 @@ class BootLinuxConsole(Test):
+         """
+         self.do_test_arm_raspi2(0)
+ 
++    def test_arm_raspi2_uart1(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:raspi2
++        :avocado: tags=device:bcm2835_aux
++        """
++        self.do_test_arm_raspi2(1)
++
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=arch:s390x
+-- 
+2.20.1
 
 
