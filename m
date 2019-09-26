@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9436BC432C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE58C432C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:38:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D8EB2053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:37:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D8EB2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 41D882053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 10:38:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D882053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33617 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDR9e-0000GP-0J
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 06:37:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38475)
+	id 1iDRAf-0001JT-Rn
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 06:38:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDQyj-0006g9-5c
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDQyj-0006go-IJ
  for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDQyg-00074W-Fz
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:26:28 -0400
-Received: from relay.sw.ru ([185.231.240.75]:54262)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDQyh-00075D-8t
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 06:26:29 -0400
+Received: from relay.sw.ru ([185.231.240.75]:54306)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDQyb-0006vS-GL; Thu, 26 Sep 2019 06:26:21 -0400
+ id 1iDQyb-0006vg-Hs; Thu, 26 Sep 2019 06:26:21 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDQyX-0003nC-CY; Thu, 26 Sep 2019 13:26:17 +0300
+ id 1iDQyY-0003nC-5f; Thu, 26 Sep 2019 13:26:18 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v14 06/14] block/backup: fix block-comment style
-Date: Thu, 26 Sep 2019 13:26:06 +0300
-Message-Id: <20190926102614.28999-7-vsementsov@virtuozzo.com>
+Subject: [PATCH v14 10/14] iotests: 257: drop unused Drive.device field
+Date: Thu, 26 Sep 2019 13:26:10 +0300
+Message-Id: <20190926102614.28999-11-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190926102614.28999-1-vsementsov@virtuozzo.com>
 References: <20190926102614.28999-1-vsementsov@virtuozzo.com>
@@ -66,89 +66,137 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We need to fix comment style around block-copy functions before further
-moving them to separate file to satisfy checkpatch. But do more: fix
-all comments style. Also, seems like doubled first asterisk is not
-forbidden, but drop it too for consistency.
+After previous commit Drive.device is actually unused. Drop it together
+with .name property.  While being here reuse .node in qmp commands
+instead of writing 'drive0' twice.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c | 32 +++++++++++++++++++++-----------
- 1 file changed, 21 insertions(+), 11 deletions(-)
+ tests/qemu-iotests/257 | 37 +++++++++++++++----------------------
+ 1 file changed, 15 insertions(+), 22 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 5dda1673ca..f5125984db 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -223,8 +223,10 @@ fail:
-     return NULL;
- }
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index 6b368e1e70..5d77202157 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -148,11 +148,6 @@ class Drive:
+         self.fmt = None
+         self.size = None
+         self.node = None
+-        self.device = None
+-
+-    @property
+-    def name(self):
+-        return self.node or self.device
  
--/* Copy range to target with a bounce buffer and return the bytes copied. If
-- * error occurred, return a negative error number */
-+/*
-+ * Copy range to target with a bounce buffer and return the bytes copied. If
-+ * error occurred, return a negative error number
-+ */
- static int coroutine_fn block_copy_with_bounce_buffer(BlockCopyState *s,
-                                                       int64_t start,
-                                                       int64_t end,
-@@ -269,8 +271,10 @@ fail:
+     def img_create(self, fmt, size):
+         self.fmt = fmt
+@@ -201,7 +196,7 @@ def blockdev_backup(vm, device, target, sync, **kwargs):
+ def blockdev_backup_mktarget(drive, target_id, filepath, sync, **kwargs):
+     target_drive = Drive(filepath, vm=drive.vm)
+     target_drive.create_target(target_id, drive.fmt, drive.size)
+-    blockdev_backup(drive.vm, drive.name, target_id, sync, **kwargs)
++    blockdev_backup(drive.vm, drive.node, target_id, sync, **kwargs)
  
- }
+ def reference_backup(drive, n, filepath):
+     log("--- Reference Backup #{:d} ---\n".format(n))
+@@ -229,7 +224,7 @@ def perform_writes(drive, n):
+             pattern.offset,
+             pattern.size)
+         log(cmd)
+-        log(drive.vm.hmp_qemu_io(drive.name, cmd))
++        log(drive.vm.hmp_qemu_io(drive.node, cmd))
+     bitmaps = drive.vm.query_bitmaps()
+     log({'bitmaps': bitmaps}, indent=2)
+     log('')
+@@ -324,18 +319,17 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+                 }]
+             }
  
--/* Copy range to target and return the bytes copied. If error occurred, return a
-- * negative error number. */
-+/*
-+ * Copy range to target and return the bytes copied. If error occurred, return a
-+ * negative error number.
-+ */
- static int coroutine_fn block_copy_with_offload(BlockCopyState *s,
-                                                 int64_t start,
-                                                 int64_t end,
-@@ -341,7 +345,7 @@ static int block_copy_is_cluster_allocated(BlockCopyState *s, int64_t offset,
-     }
- }
++        drive0.node = 'drive0'
+         vm.qmp_log('blockdev-add',
+                    filters=[iotests.filter_qmp_testfiles],
+-                   node_name="drive0",
++                   node_name=drive0.node,
+                    driver=drive0.fmt,
+                    file=file_config)
+-        drive0.node = 'drive0'
+-        drive0.device = 'device0'
+         # Use share-rw to allow writes directly to the node;
+         # The anonymous block-backend for this configuration prevents us
+         # from using HMP's qemu-io commands to address the device.
+-        vm.qmp_log("device_add", id=drive0.device,
+-                   drive=drive0.name, driver="scsi-hd",
++        vm.qmp_log("device_add", id='device0',
++                   drive=drive0.node, driver="scsi-hd",
+                    share_rw=True)
+         log('')
  
--/**
-+/*
-  * Reset bits in copy_bitmap starting at offset if they represent unallocated
-  * data in the image. May reset subsequent contiguous bits.
-  * @return 0 when the cluster at @offset was unallocated,
-@@ -592,8 +596,10 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
-         return true;
-     }
+@@ -343,7 +337,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+         perform_writes(drive0, 0)
+         reference_backup(drive0, 0, fbackup0)
+         log('--- Add Bitmap ---\n')
+-        vm.qmp_log("block-dirty-bitmap-add", node=drive0.name,
++        vm.qmp_log("block-dirty-bitmap-add", node=drive0.node,
+                    name="bitmap0", granularity=GRANULARITY)
+         log('')
+         ebitmap = EmulatedBitmap()
+@@ -358,7 +352,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
+         # 1 - Test Backup (w/ Optional induced failure)
+         if failure == 'intermediate':
+             # Activate blkdebug induced failure for second-to-next read
+-            log(vm.hmp_qemu_io(drive0.name, 'flush'))
++            log(vm.hmp_qemu_io(drive0.node, 'flush'))
+             log('')
+         job = backup(drive0, 1, bsync1, msync_mode,
+                      bitmap="bitmap0", bitmap_mode=bsync_mode)
+@@ -426,7 +420,7 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
  
--    /* We need to yield even for delay_ns = 0 so that bdrv_drain_all() can
--     * return. Without a yield, the VM would not reboot. */
-+    /*
-+     * We need to yield even for delay_ns = 0 so that bdrv_drain_all() can
-+     * return. Without a yield, the VM would not reboot.
-+     */
-     delay_ns = block_job_ratelimit_get_delay(&job->common, job->bytes_read);
-     job->bytes_read = 0;
-     job_sleep_ns(&job->common.job, delay_ns);
-@@ -692,11 +698,15 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
-     }
- 
-     if (s->sync_mode == MIRROR_SYNC_MODE_NONE) {
--        /* All bits are set in copy_bitmap to allow any cluster to be copied.
--         * This does not actually require them to be copied. */
-+        /*
-+         * All bits are set in copy_bitmap to allow any cluster to be copied.
-+         * This does not actually require them to be copied.
-+         */
-         while (!job_is_cancelled(job)) {
--            /* Yield until the job is cancelled.  We just let our before_write
--             * notify callback service CoW requests. */
-+            /*
-+             * Yield until the job is cancelled.  We just let our before_write
-+             * notify callback service CoW requests.
-+             */
-             job_yield(job);
+         log('--- Cleanup ---\n')
+         vm.qmp_log("block-dirty-bitmap-remove",
+-                   node=drive0.name, name="bitmap0")
++                   node=drive0.node, name="bitmap0")
+         bitmaps = vm.query_bitmaps()
+         log({'bitmaps': bitmaps}, indent=2)
+         vm.shutdown()
+@@ -467,22 +461,21 @@ def test_backup_api():
+             'filename': drive0.path
          }
-     } else {
+ 
++        drive0.node = 'drive0'
+         vm.qmp_log('blockdev-add',
+                    filters=[iotests.filter_qmp_testfiles],
+-                   node_name="drive0",
++                   node_name=drive0.node,
+                    driver=drive0.fmt,
+                    file=file_config)
+-        drive0.node = 'drive0'
+-        drive0.device = 'device0'
+-        vm.qmp_log("device_add", id=drive0.device,
+-                   drive=drive0.name, driver="scsi-hd")
++        vm.qmp_log("device_add", id='device0',
++                   drive=drive0.node, driver="scsi-hd")
+         log('')
+ 
+         target0 = Drive(backup_path, vm=vm)
+         target0.create_target("backup_target", drive0.fmt, drive0.size)
+         log('')
+ 
+-        vm.qmp_log("block-dirty-bitmap-add", node=drive0.name,
++        vm.qmp_log("block-dirty-bitmap-add", node=drive0.node,
+                    name="bitmap0", granularity=GRANULARITY)
+         log('')
+ 
+@@ -521,7 +514,7 @@ def test_backup_api():
+             log("-- Sync mode {:s} tests --\n".format(sync_mode))
+             for bitmap in (None, 'bitmap404', 'bitmap0'):
+                 for policy in error_cases[sync_mode][bitmap]:
+-                    blockdev_backup(drive0.vm, drive0.name, "backup_target",
++                    blockdev_backup(drive0.vm, drive0.node, "backup_target",
+                                     sync_mode, job_id='api_job',
+                                     bitmap=bitmap, bitmap_mode=policy)
+                     log('')
 -- 
 2.21.0
 
