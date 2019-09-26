@@ -2,64 +2,110 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38AB2C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:17:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0BFC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B44DE207FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:17:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bqffvw8q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B44DE207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id D5101207FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:23:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5101207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDSiM-0006t5-JI
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:17:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33636)
+	id 1iDSnU-0002t8-Hm
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:23:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iDSdF-0000J8-6K
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:26 -0400
+ (envelope-from <thuth@redhat.com>) id 1iDSkj-0000WL-4v
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:20:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iDSdD-0001zb-Hw
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:25 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37131 helo=ozlabs.org)
+ (envelope-from <thuth@redhat.com>) id 1iDSkg-00030C-B5
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:20:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32829)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iDSdD-0001x3-5r; Thu, 26 Sep 2019 08:12:23 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46fDLZ2dnVz9sPS; Thu, 26 Sep 2019 22:11:50 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569499910;
- bh=yE0V37b06eUGKiBUMYzOJ/dKwkx/geBtZDc+qRFj9bw=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=bqffvw8qO0ye/sNIU6Vuyc5LX+AHZkos/FShFR44Kr4HctG0NB8hdXEUqOyeQiwjq
- v2U341rY8dzH2o1jzAqYMo8PfAw+dAl/lhE6NcCrZgaJfFcZADMWHlWmnXHJ4+6su/
- nJh3ktM9l943wRTelF2nlyoZMpIonwDX3AqVkQ5g=
-Date: Thu, 26 Sep 2019 21:36:20 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 13/20] spapr: Eliminate SpaprIrq:get_nodename method
-Message-ID: <20190926113620.GA17405@umbus>
-References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
- <20190925064534.19155-14-david@gibson.dropbear.id.au>
- <20190926094839.33913bdf@bahia.lan>
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iDSkg-0002yP-2Z; Thu, 26 Sep 2019 08:20:06 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AEB603082131;
+ Thu, 26 Sep 2019 12:20:03 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-127.ams2.redhat.com [10.36.116.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 02DC11001DC0;
+ Thu, 26 Sep 2019 12:20:01 +0000 (UTC)
+Subject: Re: [PATCH v1 2/2] s390x: Fix SCLP return code when buffer too small
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
+ <1569497622-12496-3-git-send-email-imbrenda@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <fe2b8d81-f3b9-a752-b6b5-172686780341@redhat.com>
+Date: Thu, 26 Sep 2019 14:20:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="n8BV0TfTmv8nl9Pc"
-Content-Disposition: inline
-In-Reply-To: <20190926094839.33913bdf@bahia.lan>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <1569497622-12496-3-git-send-email-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Thu, 26 Sep 2019 12:20:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,234 +117,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- clg@kaod.org,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, frankja@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 26/09/2019 13.33, Claudio Imbrenda wrote:
+> Return the correct error code when the SCCB buffer is too small to
+> contain all of the output, for the Read SCP Information and
+> Read CPU Information commands.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  hw/s390x/sclp.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 76feac8..8f7fe1c 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -68,6 +68,11 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB *sccb)
+>  
+>      read_info->ibc_val = cpu_to_be32(s390_get_ibc_val());
+>  
+> +    if (sccb->h.length < (sizeof(ReadInfo) + cpu_count * sizeof(CPUEntry))) {
 
---n8BV0TfTmv8nl9Pc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Don't you need a cpu16_to_cpu() around sccb->h.length?
 
-On Thu, Sep 26, 2019 at 09:48:39AM +0200, Greg Kurz wrote:
-> On Wed, 25 Sep 2019 16:45:27 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > This method is used to determine the name of the irq backend's node in =
-the
-> > device tree, so that we can find its phandle (after SLOF may have modif=
-ied
-> > it from the phandle we initially gave it).
-> >=20
-> > But, in the two cases the only difference between the node name is the
-> > presence of a unit address.  Searching for a node name without consider=
-ing
-> > unit address is standard practice for the device tree, and
-> > fdt_subnode_offset() will do exactly that.
-> >=20
-> > So, the method is unnecessary.
-> >=20
->=20
-> So is the XICS_NODENAME macro which was introduced by the same
-> commit 743ed566c1d80, and it seems that "interrupt-controller"
-> is a well-known string that is used everywhere:
->=20
-> [greg@bahia qemu-spapr]$ git grep -E \"interrupt-controller\"
-> hw/arm/virt.c:    qemu_fdt_setprop(vms->fdt, nodename, "interrupt-control=
-ler", NULL, 0);
-> hw/arm/xlnx-versal-virt.c:    qemu_fdt_setprop(s->fdt, nodename, "interru=
-pt-controller", NULL, 0);
-> hw/intc/sh_intc.c:                          "interrupt-controller", 0x100=
-000000ULL);
-> hw/intc/spapr_xive.c:    _FDT(fdt_setprop(fdt, node, "interrupt-controlle=
-r", NULL, 0));
-> hw/intc/xics_spapr.c:    _FDT(fdt_setprop(fdt, node, "interrupt-controlle=
-r", NULL, 0));
-> hw/pci/pci.c:    { 0x0800, "Interrupt controller", "interrupt-controller"=
-},
-> hw/ppc/e500.c:    qemu_fdt_setprop(fdt, mpic, "interrupt-controller", NUL=
-L, 0);
-> hw/ppc/pnv.c:    _FDT((fdt_setprop(fdt, offset, "interrupt-controller", N=
-ULL, 0)));
-> hw/ppc/spapr_events.c:    _FDT((fdt_setprop(fdt, event_sources, "interrup=
-t-controller", NULL, 0)));
-> hw/ppc/spapr_irq.c:    const char *nodename =3D "interrupt-controller";
-> hw/ppc/spapr_pci.c:    { PCI_CLASS_SYSTEM_PIC, "interrupt-controller", pi=
-c_iface },
-> hw/ppc/spapr_vio.c:    _FDT(fdt_setprop(fdt, node, "interrupt-controller"=
-, NULL, 0));
-> hw/riscv/sifive_u.c:        qemu_fdt_setprop(fdt, intc, "interrupt-contro=
-ller", NULL, 0);
-> hw/riscv/sifive_u.c:    qemu_fdt_setprop(fdt, nodename, "interrupt-contro=
-ller", NULL, 0);
-> hw/riscv/spike.c:        qemu_fdt_setprop(fdt, intc, "interrupt-controlle=
-r", NULL, 0);
-> hw/riscv/virt.c:        qemu_fdt_setprop(fdt, intc, "interrupt-controller=
-", NULL, 0);
-> hw/riscv/virt.c:    qemu_fdt_setprop(fdt, nodename, "interrupt-controller=
-", NULL, 0);
-> include/hw/ppc/spapr.h: * "interrupt-controller" node has its "#interrupt=
--cells" property set to 2 (ie,
-> include/hw/ppc/xics_spapr.h:#define XICS_NODENAME "interrupt-controller"
->=20
-> Maybe drop XICS_NODENAME as well while here ?
+> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> +        return;
+> +    }
+> +
+>      /* Configuration Characteristic (Extension) */
+>      s390_get_feat_block(S390_FEAT_TYPE_SCLP_CONF_CHAR,
+>                           read_info->conf_char);
+> @@ -118,6 +123,11 @@ static void sclp_read_cpu_info(SCLPDevice *sclp, SCCB *sccb)
+>      cpu_info->offset_configured = cpu_to_be16(offsetof(ReadCpuInfo, entries));
+>      cpu_info->nr_standby = cpu_to_be16(0);
+>  
+> +    if (sccb->h.length < (sizeof(ReadCpuInfo) + cpu_count * sizeof(CPUEntry))) {
 
-Fair point, done.
+dito?
 
->=20
-> With or without that,
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr_irq.c         | 25 +++----------------------
-> >  include/hw/ppc/spapr_irq.h |  1 -
-> >  2 files changed, 3 insertions(+), 23 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> > index 038bfffff4..79167ccc68 100644
-> > --- a/hw/ppc/spapr_irq.c
-> > +++ b/hw/ppc/spapr_irq.c
-> > @@ -211,11 +211,6 @@ static void spapr_irq_reset_xics(SpaprMachineState=
- *spapr, Error **errp)
-> >      }
-> >  }
-> > =20
-> > -static const char *spapr_irq_get_nodename_xics(SpaprMachineState *spap=
-r)
-> > -{
-> > -    return XICS_NODENAME;
-> > -}
-> > -
-> >  static void spapr_irq_init_kvm_xics(SpaprMachineState *spapr, Error **=
-errp)
-> >  {
-> >      if (kvm_enabled()) {
-> > @@ -237,7 +232,6 @@ SpaprIrq spapr_irq_xics =3D {
-> >      .post_load   =3D spapr_irq_post_load_xics,
-> >      .reset       =3D spapr_irq_reset_xics,
-> >      .set_irq     =3D spapr_irq_set_irq_xics,
-> > -    .get_nodename =3D spapr_irq_get_nodename_xics,
-> >      .init_kvm    =3D spapr_irq_init_kvm_xics,
-> >  };
-> > =20
-> > @@ -362,11 +356,6 @@ static void spapr_irq_set_irq_xive(void *opaque, i=
-nt irq, int val)
-> >      }
-> >  }
-> > =20
-> > -static const char *spapr_irq_get_nodename_xive(SpaprMachineState *spap=
-r)
-> > -{
-> > -    return spapr->xive->nodename;
-> > -}
-> > -
-> >  static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error **=
-errp)
-> >  {
-> >      if (kvm_enabled()) {
-> > @@ -393,7 +382,6 @@ SpaprIrq spapr_irq_xive =3D {
-> >      .post_load   =3D spapr_irq_post_load_xive,
-> >      .reset       =3D spapr_irq_reset_xive,
-> >      .set_irq     =3D spapr_irq_set_irq_xive,
-> > -    .get_nodename =3D spapr_irq_get_nodename_xive,
-> >      .init_kvm    =3D spapr_irq_init_kvm_xive,
-> >  };
-> > =20
-> > @@ -538,11 +526,6 @@ static void spapr_irq_set_irq_dual(void *opaque, i=
-nt irq, int val)
-> >      spapr_irq_current(spapr)->set_irq(spapr, irq, val);
-> >  }
-> > =20
-> > -static const char *spapr_irq_get_nodename_dual(SpaprMachineState *spap=
-r)
-> > -{
-> > -    return spapr_irq_current(spapr)->get_nodename(spapr);
-> > -}
-> > -
-> >  /*
-> >   * Define values in sync with the XIVE and XICS backend
-> >   */
-> > @@ -560,7 +543,6 @@ SpaprIrq spapr_irq_dual =3D {
-> >      .post_load   =3D spapr_irq_post_load_dual,
-> >      .reset       =3D spapr_irq_reset_dual,
-> >      .set_irq     =3D spapr_irq_set_irq_dual,
-> > -    .get_nodename =3D spapr_irq_get_nodename_dual,
-> >      .init_kvm    =3D NULL, /* should not be used */
-> >  };
-> > =20
-> > @@ -697,13 +679,13 @@ void spapr_irq_reset(SpaprMachineState *spapr, Er=
-ror **errp)
-> > =20
-> >  int spapr_irq_get_phandle(SpaprMachineState *spapr, void *fdt, Error *=
-*errp)
-> >  {
-> > -    const char *nodename =3D spapr->irq->get_nodename(spapr);
-> > +    const char *nodename =3D "interrupt-controller";
-> >      int offset, phandle;
-> > =20
-> >      offset =3D fdt_subnode_offset(fdt, 0, nodename);
-> >      if (offset < 0) {
-> > -        error_setg(errp, "Can't find node \"%s\": %s", nodename,
-> > -                   fdt_strerror(offset));
-> > +        error_setg(errp, "Can't find node \"%s\": %s",
-> > +                   nodename, fdt_strerror(offset));
-> >          return -1;
-> >      }
-> > =20
-> > @@ -787,6 +769,5 @@ SpaprIrq spapr_irq_xics_legacy =3D {
-> >      .post_load   =3D spapr_irq_post_load_xics,
-> >      .reset       =3D spapr_irq_reset_xics,
-> >      .set_irq     =3D spapr_irq_set_irq_xics,
-> > -    .get_nodename =3D spapr_irq_get_nodename_xics,
-> >      .init_kvm    =3D spapr_irq_init_kvm_xics,
-> >  };
-> > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> > index a4e790ef60..9b60378e28 100644
-> > --- a/include/hw/ppc/spapr_irq.h
-> > +++ b/include/hw/ppc/spapr_irq.h
-> > @@ -52,7 +52,6 @@ typedef struct SpaprIrq {
-> >      int (*post_load)(SpaprMachineState *spapr, int version_id);
-> >      void (*reset)(SpaprMachineState *spapr, Error **errp);
-> >      void (*set_irq)(void *opaque, int srcno, int val);
-> > -    const char *(*get_nodename)(SpaprMachineState *spapr);
-> >      void (*init_kvm)(SpaprMachineState *spapr, Error **errp);
-> >  } SpaprIrq;
-> > =20
->=20
+> +        sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
+> +        return;
+> +    }
+> +
+>      /* The standby offset is 16-byte for each CPU */
+>      cpu_info->offset_standby = cpu_to_be16(cpu_info->offset_configured
+>          + cpu_info->nr_configured*sizeof(CPUEntry));
+> 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---n8BV0TfTmv8nl9Pc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2MorQACgkQbDjKyiDZ
-s5KuYBAAjDPnYlY2dBan1AN4x7IKRQScwIX5nRPe/+J9km+N38iLRgcHd31SozWq
-qq5Vp/v3NhI9esowoIFGDuNgn/NEKKTtXRPD8LDYCJkqBcTLEe2DV8PhjZZ6T9cO
-lf4cADxWHKOuvgHs/rz/fdyzt0QxJnMKHCAwKUqnEK7U8p8WrD8X9/Ewfm7w6IaM
-j4y8XzM7jLsgu4fTYvqln+GwHwdcINWJsgT6w/+XiT5YGshIegaBtJ4JQ/61wM77
-DeUW0djmaEM9us9Kygduy3IFIoKkOEmcxvcPFkVl3djleST0VNTInTz7ImdvgHzy
-LlbqIwo2D1reAK8NCma83cfULyR9VoaW28n4W6CUgEBcawooycHND0RoSS8kEVdK
-TPiRfTnZtMZDfA3i66CAaFdYsFe/Pm/6+MD1FOYucqJkP/F3OJZPBo2uU+6kLAE3
-+hXgFVU/AmaCwh59NJiIYVSCi+prDO/za10MUSRoLG8A5jzN3lIQbDzXia8w5Tco
-hRIk7KL828wnRJo25wwYbD8F6WoeVi4iKLbew348mwrffvYbNeqBLsKIMo5c+Vag
-V/b3XGWD9HRME5Nd1KvvvSWd8Z/u65bsUHny4vIHFWA7ZlucHST3z+E1x9msUUS+
-fL05EjLEJNonfYJwKH8SoobHIcGE0SulKWvTb8WdaUM719GJ/Hc=
-=RbeC
------END PGP SIGNATURE-----
-
---n8BV0TfTmv8nl9Pc--
+ Thomas
 
