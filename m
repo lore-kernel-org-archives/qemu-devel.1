@@ -2,84 +2,78 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 260BFC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AADB6ECE589
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:35:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3BAA21655
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:31:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7437521655
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 16:35:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2pYd1Ak"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3BAA21655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qyhgjTF1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7437521655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDWfd-0004zU-W0
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 12:31:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38133)
+	id 1iDWjw-0001gZ-Vu
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 12:35:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41004)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iDWS4-0007Vh-0X
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:17:09 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iDWby-0002T5-HI
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iDWS2-0005vC-Jm
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:17:07 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:41364)
+ (envelope-from <richard.henderson@linaro.org>) id 1iDWbw-0004a8-0B
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:21 -0400
+Received: from mail-pg1-f170.google.com ([209.85.215.170]:40893)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iDWS2-0005u2-Co; Thu, 26 Sep 2019 12:17:06 -0400
-Received: by mail-lj1-f194.google.com with SMTP id f5so2784669ljg.8;
- Thu, 26 Sep 2019 09:17:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=uqsguunlShpqJNqDpG6lT6Vkk/vUY2GxbBa3kyTdV2Q=;
- b=l2pYd1AkoxmHr7LHM4VVfFpuHI0MY5Uv5wtL1RSWoNnWPKicoIU7khFPfKHu/0hs+4
- cY05pyOOlCBsH+nACIq9802l+7N4pkXHL9EZPkByVdiIOi+z597Gq+BL1q3t8xyLmvuG
- Xxp7GdQOflqcZE6qoUHTWbgGCDbnucRmXtyCFueYnZAM5cr/dUsGLLdIA+TvtJ4NocF6
- T+Xk8bnuXUVR/5dMTDPRk9vnE1zMo/o4yhGtfa3co5fEPdiqw60oJhoYsVE/wxWSte80
- 0m1Wtv1y4HMgtyQ9mfpgc9QRF2c9RIZU01q/9jiuZ0GMqI7mDc2m0PqoRJ7Ev6y7W0Ch
- 1EyQ==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iDWbv-0004Zn-Rl
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 12:27:19 -0400
+Received: by mail-pg1-f170.google.com with SMTP id w10so1833954pgj.7
+ for <qemu-devel@nongnu.org>; Thu, 26 Sep 2019 09:27:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=gWWGSTfYrzYkzLZawcn3q2Ja4PFRns9a4fWpQZIcwHM=;
+ b=qyhgjTF1LMsMlb4y37zkYiM7/3hiKYWsPijb6POezQWq59JYNgT8Xw9H12sTTR6+EI
+ mLhPJWtNs9TcrUeOy59707FyfDqsFd6l/UKP+4HrUCHTRrk1e1o7BoI1mgTHojH4nFZo
+ CpXaH8DC6ByIxUJ1Xsh49cFHLeC2T2ulvXm6zZ+4ZWkCw0X3BAKcDKMKU1bc7tk+8Ulj
+ eP00CqnN9neET8mz4XlpQgR6jsKQWOQ1ODCGgr/N5/Npqwnp99muoD29bbgfjKAy4kP/
+ +0TzTCvQATHwOf+bbr7O+RFb/oOn/brrlR+5Nop38rLzsBQjzb3K//2CApjTqGG61sHO
+ eCnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=uqsguunlShpqJNqDpG6lT6Vkk/vUY2GxbBa3kyTdV2Q=;
- b=AWrmLH0Kyz1ZYkxlZE8syfJ+dKPgbiIidM20xvTXPj+Ry62ixZtoiWLYQyEzinHeZn
- NPKZFNJj+diBwCxWvAVsprmKxetbZHyOwulPLu5Nk7Dc+oQzvU2hq69URuPl0wMaIN50
- 2ltFJdy7WEV3LOcr0x9SiQac/3sPV6AA6/B5gjz7nwbhyshBorweMfR55OcYWIqUWu9U
- F38NEyHlFfrCD5C1aaQ1z9ZKa/3rnCBqa0MqFXmtHPh4dq4MuqyFMpavF1BTkw1owhvX
- USV3csdbWtv+XfH0OeY9fjFb11DQV0LAMXWaU/VeIAKOiCSRkoGyBT/5w3RhWD+3mqVd
- klfw==
-X-Gm-Message-State: APjAAAW4HNmdbAWnL7FtSbkoDcJgm2lFeP/gIBfeSt2a0bhbAqwh9Hx4
- B7fvMryCeOU3JRLGAr48GIMc3QdOzWCgylKkaLk=
-X-Google-Smtp-Source: APXvYqwkHW3JOaT++fWR+7HZQXosIMjUu9HNmt0jS9yHUo48urz3VedxfHaMj56jBuxlb9yiRCeqDKZxg5C4MPtRfP4=
-X-Received: by 2002:a2e:890c:: with SMTP id d12mr3249154lji.85.1569514563687; 
- Thu, 26 Sep 2019 09:16:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190925233013.6449-1-alex.bennee@linaro.org>
- <CAFEAcA9vb5_Mi_axWpu7269Zg0xMLbiiV80ofLeyDpfws3G4nQ@mail.gmail.com>
- <20190926125817.GB19660@redhat.com>
- <ea6b671a-0c05-d880-3b9f-62a4f8626ec1@de.ibm.com>
- <19efe3ee-a532-cf66-a5a7-03a7c053737c@redhat.com> <87d0fn9ix8.fsf@linaro.org>
-In-Reply-To: <87d0fn9ix8.fsf@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 26 Sep 2019 09:11:17 -0700
-Message-ID: <CAKmqyKOSyhd5zv0hOa_THCX8g1fxN69NXWxCw0m+=TA+8h0Wug@mail.gmail.com>
-Subject: Re: [RFC PATCH] configure: deprecate 32 bit build hosts
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=gWWGSTfYrzYkzLZawcn3q2Ja4PFRns9a4fWpQZIcwHM=;
+ b=nTSkNU0f6UQmC7l7LR429IdCwbZC3grBe6BXdbJMfwB8YvBBEWRbSMp37zM9TO9vk4
+ cHILdCV+yrmFl7WFJrFrUYG2igqXB9rfKJZlvqbO7RARODdsS6wqz2b7GdH2fcMndreM
+ WPju3rMdEiR3iUD5AvAPZbwD9jOJ/KNk43DGh84V6Ca+rW8l8f2rjNK00F2PVvxA63fz
+ sKk3qzo+Zyw42gmRm6prsCL8l/jMZXphb3WHLK11mFkMj/MZJoDrVLa77pL0/Vaso0TP
+ 57EQF2UeL/wb2bpEUOeR7eYN7sOSk5ZkLF88ebS4/CGGRtA9auz9zvWhnGtm5tWVSEAZ
+ i4eA==
+X-Gm-Message-State: APjAAAV0tgs5DQWCpdEDwK8yUzkqSUr8BZPB+UTbCu7RzQaH7Hfi4gZi
+ BFrCh6NLMYju9v18cT7lIBR07W5U0hg=
+X-Google-Smtp-Source: APXvYqwxT1bzMmo4EKFWhcdr6xTtbe/we8gdaLLggYqVPBY+Ao7gcKrx4e1xfREoKWxcuO6gljtIYQ==
+X-Received: by 2002:a63:1a5a:: with SMTP id a26mr4314274pgm.178.1569515178114; 
+ Thu, 26 Sep 2019 09:26:18 -0700 (PDT)
+Received: from localhost.localdomain ([12.157.10.114])
+ by smtp.gmail.com with ESMTPSA id 64sm4453169pfx.31.2019.09.26.09.26.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 26 Sep 2019 09:26:17 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 00/18] target/s390: Use tcg unwinding for ilen
+Date: Thu, 26 Sep 2019 09:25:57 -0700
+Message-Id: <20190926162615.31168-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.208.194
+X-Received-From: 209.85.215.170
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,83 +85,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- qemu-discuss <qemu-discuss@nongnu.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- "open list:New World" <qemu-ppc@nongnu.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>
+Cc: qemu-s390x@nongnu.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 8:41 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->
->
-> Thomas Huth <thuth@redhat.com> writes:
->
-> > On 26/09/2019 15.46, Christian Borntraeger wrote:
-> >>
-> >>
-> >> On 26.09.19 14:58, Daniel P. Berrang=C3=A9 wrote:
-> >>> On Thu, Sep 26, 2019 at 08:50:36AM +0100, Peter Maydell wrote:
-> >>>> On Thu, 26 Sep 2019 at 00:31, Alex Benn=C3=A9e <alex.bennee@linaro.o=
-rg> wrote:
-> >>>>>
-> >>>>> The 32 bit hosts are already a second class citizen especially with
-> >>>>> support for running 64 bit guests under TCG. We are also limited by
-> >>>>> testing as actual working 32 bit machines are getting quite rare in
-> >>>>> developers personal menageries. For TCG supporting newer types like
-> >>>>> Int128 is a lot harder with 32 bit calling conventions compared to
-> >>>>> their larger bit sized cousins. Fundamentally address space is the
-> >>>>> most useful thing for the translator to have even for a 32 bit gues=
-t a
-> >>>>> 32 bit host is quite constrained.
-> >>>>>
-> >>>>> As far as I'm aware 32 bit KVM users are even less numerous. Even
-> >>>>> ILP32 doesn't make much sense given the address space QEMU needs to
-> >>>>> manage.
-> >>>>
-> >>>> For KVM we should wait until the kernel chooses to drop support,
-> >>>> I think.
-> >>>
-> >>> What if the kernel is waiting for QEMU to drop support too ;-P
-> >>
-> >> For what its worth on kvm/s390 we never cared about implementing
-> >> 32 bit.
-> >
-> > Looking at tcg/s390/tcg-target.inc.c :
-> >
-> > ...
-> > /* We only support generating code for 64-bit mode.  */
-> > #if TCG_TARGET_REG_BITS !=3D 64
-> > #error "unsupported code generation mode"
-> > #endif
-> > ...
-> >
-> > ... it seems to me that TCG does not support 32-bit on s390 either. I
-> > think we can remove s390 (32-bit) from the list completely?
->
-> It's the same for riscv32 I think.
+David's cleanup of some of the mmu code reminded me of an old branch
+that I have laying around.  His new code allowed me to finish this
+idea up to completely transition away from ILEN_AUTO.
 
-I think riscv32 host *should* work, although I don't think it was ever test=
-ed.
+V1 was posted back in 2017:
+   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07607.html
+V2 was posted back in April:
+   https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg00063.html
 
-Considering that we have enough trouble keeping the riscv32 kernel
-booting it's probably ok to drop it from QEMU.
+Based-on: <20190925125236.4043-1-david@redhat.com> \
+  ("s390x/mmu: DAT translation rewrite")
 
-Alistair
 
->
-> >
-> >  Thomas
->
->
-> --
-> Alex Benn=C3=A9e
->
+r~
+
+
+Richard Henderson (18):
+  target/s390x: Truncate 32-bit psw_addr before creating TB
+  target/s390x: Add ilen to unwind data
+  target/s390x: Remove ilen parameter from tcg_s390_program_interrupt
+  target/s390x: Remove ilen parameter from s390_program_interrupt
+  target/s390x: Use tcg_s390_program_interrupt in TCG helpers
+  target/s390x: Push trigger_pgm_exception lower in s390_cpu_tlb_fill
+  target/s390x: Handle tec in s390_cpu_tlb_fill
+  target/s390: Return exception from mmu_translate_real
+  target/s390x: Remove exc argument to mmu_translate_asce
+  target/s390: Return exception from mmu_translate
+  target/s390: Return exception from translate_pages
+  target/s390x: Remove fail variable from s390_cpu_tlb_fill
+  target/s390x: Simplify helper_lra
+  target/s390x: Rely on unwinding in s390_cpu_tlb_fill
+  target/s390x: Rely on unwinding in s390_cpu_virt_mem_rw
+  target/s390x: Remove ILEN_AUTO
+  target/s390x: Remove ilen argument from trigger_access_exception
+  target/s390x: Remove ilen argument from trigger_pgm_exception
+
+ target/s390x/cpu.h           | 35 ++++++++++++++-------
+ target/s390x/internal.h      |  6 ++--
+ target/s390x/tcg_s390x.h     |  4 +--
+ hw/s390x/s390-pci-inst.c     | 58 +++++++++++++++++-----------------
+ target/s390x/cc_helper.c     |  4 +--
+ target/s390x/crypto_helper.c |  7 ++---
+ target/s390x/diag.c          | 14 ++++-----
+ target/s390x/excp_helper.c   | 60 ++++++++++++++++-------------------
+ target/s390x/fpu_helper.c    |  6 ++--
+ target/s390x/int_helper.c    | 15 ++++-----
+ target/s390x/interrupt.c     |  9 +++---
+ target/s390x/ioinst.c        | 40 +++++++++++------------
+ target/s390x/mem_helper.c    | 61 +++++++++++++++++-------------------
+ target/s390x/misc_helper.c   | 27 ++++++----------
+ target/s390x/mmu_helper.c    | 60 +++++++++++++++--------------------
+ target/s390x/tcg-stub.c      |  4 +--
+ target/s390x/translate.c     | 27 ++++++++++------
+ 17 files changed, 214 insertions(+), 223 deletions(-)
+
+-- 
+2.17.1
+
 
