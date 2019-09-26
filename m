@@ -2,58 +2,58 @@ Return-Path: <SRS0=3xBk=XV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF1EC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 20:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D71C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71613208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 20:46:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71613208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id C384C222BE
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 21:24:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C384C222BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDaee-0001zz-IO
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 16:46:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37818)
+	id 1iDbFU-0000Yw-HZ
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 17:24:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iDadS-0000s1-Bd
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 16:45:12 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iDbEd-0008Th-6f
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iDadQ-0007Zi-T2
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 16:45:10 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:40654
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iDadQ-0007XG-Mv; Thu, 26 Sep 2019 16:45:08 -0400
-Received: from host86-138-245-63.range86-138.btcentralplus.com
- ([86.138.245.63] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iDadf-0002BU-Bs; Thu, 26 Sep 2019 21:45:23 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, pc@us.ibm.com,
- david@gibson.dropbear.id.au
-Date: Thu, 26 Sep 2019 21:44:53 +0100
-Message-Id: <20190926204453.31837-1-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <ehabkost@redhat.com>) id 1iDbEZ-0005u4-IZ
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:23:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18974)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iDbEY-0005sG-HM
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 17:23:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D150C315C015;
+ Thu, 26 Sep 2019 21:23:28 +0000 (UTC)
+Received: from localhost (ovpn-116-45.gru2.redhat.com [10.97.116.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A21960C5D;
+ Thu, 26 Sep 2019 21:23:28 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] i386: Re-add "pconfig" CPUID flag name
+Date: Thu, 26 Sep 2019 18:23:26 -0300
+Message-Id: <20190926212326.4092-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.138.245.63
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH] target/ppc: use Vsr macros in BCD helpers
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Thu, 26 Sep 2019 21:23:29 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,201 +65,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: thomas.lendacky@amd.com, luwei.kang@intel.com, berrange@redhat.com,
+ Robert Hoo <robert.hu@linux.intel.com>, kai.huang@intel.com,
+ robert.hu@intel.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This allows us to remove more endian-specific defines from int_helper.c.
+QEMU 3.1.0 was shipped with the "pconfig" CPU property available,
+added by commit 5131dc433df5 ("i386: Add CPUID bit for PCONFIG").
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Then the feature was removed in QEMU 4.0.0 (and 3.1.1), by commit
+712f807e1965 ("Revert 'i386: Add CPUID bit for PCONFIG'").
+
+In theory this would be OK, but we do have a problem: existing
+software (like libvirt) was already using "pconfig=3Doff" since
+QEMU 3.1.0 on some cases.  This means software that worked with
+QEMU 3.1.0 doesn't work with QEMU 3.1.1 and newer.
+
+One symptom is the following error being generated by
+virt-install while trying to use the 'host-model' CPU model, on a
+host that's identified as Icelake-Server:
+
+  ERROR    internal error: qemu unexpectedly closed the monitor: \
+      2019-09-24T22:57:42.550032Z qemu-kvm: \
+      can't apply global Icelake-Server-x86_64-cpu.pconfig=3Doff: Propert=
+y '.pconfig' not found
+
+Re-add "pconfig" to feature_word_info[FEAT_7_0_EDX].feat_names so
+"pconfig=3Doff" will work again.
+
+This change still won't let users set "monitor=3Don" because all
+accelerators currently report the feature as unsupported.  But to
+make sure PCONFIG won't be enabled by accident in the future
+before we implement the necessary migration code, also add the
+feature to .unmigratable_flags.
+
+Fixes: 712f807e1965 ("Revert 'i386: Add CPUID bit for PCONFIG'")
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/ppc/int_helper.c | 72 ++++++++++++++---------------------------
- 1 file changed, 25 insertions(+), 47 deletions(-)
+ target/i386/cpu.h | 2 ++
+ target/i386/cpu.c | 8 +++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 46deb57a34..6d238b989d 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -2052,15 +2052,11 @@ void helper_vsubecuq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
- #define NATIONAL_PLUS   0x2B
- #define NATIONAL_NEG    0x2D
- 
--#if defined(HOST_WORDS_BIGENDIAN)
- #define BCD_DIG_BYTE(n) (15 - ((n) / 2))
--#else
--#define BCD_DIG_BYTE(n) ((n) / 2)
--#endif
- 
- static int bcd_get_sgn(ppc_avr_t *bcd)
- {
--    switch (bcd->u8[BCD_DIG_BYTE(0)] & 0xF) {
-+    switch (bcd->VsrB(BCD_DIG_BYTE(0)) & 0xF) {
-     case BCD_PLUS_PREF_1:
-     case BCD_PLUS_PREF_2:
-     case BCD_PLUS_ALT_1:
-@@ -2095,9 +2091,9 @@ static uint8_t bcd_get_digit(ppc_avr_t *bcd, int n, int *invalid)
- {
-     uint8_t result;
-     if (n & 1) {
--        result = bcd->u8[BCD_DIG_BYTE(n)] >> 4;
-+        result = bcd->VsrB(BCD_DIG_BYTE(n)) >> 4;
-     } else {
--       result = bcd->u8[BCD_DIG_BYTE(n)] & 0xF;
-+       result = bcd->VsrB(BCD_DIG_BYTE(n)) & 0xF;
-     }
- 
-     if (unlikely(result > 9)) {
-@@ -2109,11 +2105,11 @@ static uint8_t bcd_get_digit(ppc_avr_t *bcd, int n, int *invalid)
- static void bcd_put_digit(ppc_avr_t *bcd, uint8_t digit, int n)
- {
-     if (n & 1) {
--        bcd->u8[BCD_DIG_BYTE(n)] &= 0x0F;
--        bcd->u8[BCD_DIG_BYTE(n)] |= (digit << 4);
-+        bcd->VsrB(BCD_DIG_BYTE(n)) &= 0x0F;
-+        bcd->VsrB(BCD_DIG_BYTE(n)) |= (digit << 4);
-     } else {
--        bcd->u8[BCD_DIG_BYTE(n)] &= 0xF0;
--        bcd->u8[BCD_DIG_BYTE(n)] |= digit;
-+        bcd->VsrB(BCD_DIG_BYTE(n)) &= 0xF0;
-+        bcd->VsrB(BCD_DIG_BYTE(n)) |= digit;
-     }
- }
- 
-@@ -2228,21 +2224,21 @@ uint32_t helper_bcdadd(ppc_avr_t *r,  ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
- 
-     if (!invalid) {
-         if (sgna == sgnb) {
--            result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
-+            result.VsrB(BCD_DIG_BYTE(0)) = bcd_preferred_sgn(sgna, ps);
-             bcd_add_mag(&result, a, b, &invalid, &overflow);
-             cr = bcd_cmp_zero(&result);
-         } else {
-             int magnitude = bcd_cmp_mag(a, b);
-             if (magnitude > 0) {
--                result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgna, ps);
-+                result.VsrB(BCD_DIG_BYTE(0)) = bcd_preferred_sgn(sgna, ps);
-                 bcd_sub_mag(&result, a, b, &invalid, &overflow);
-                 cr = (sgna > 0) ? CRF_GT : CRF_LT;
-             } else if (magnitude < 0) {
--                result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(sgnb, ps);
-+                result.VsrB(BCD_DIG_BYTE(0)) = bcd_preferred_sgn(sgnb, ps);
-                 bcd_sub_mag(&result, b, a, &invalid, &overflow);
-                 cr = (sgnb > 0) ? CRF_GT : CRF_LT;
-             } else {
--                result.u8[BCD_DIG_BYTE(0)] = bcd_preferred_sgn(0, ps);
-+                result.VsrB(BCD_DIG_BYTE(0)) = bcd_preferred_sgn(0, ps);
-                 cr = CRF_EQ;
-             }
-         }
-@@ -2353,15 +2349,15 @@ uint32_t helper_bcdcfz(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     int zone_lead = ps ? 0xF : 0x3;
-     int digit = 0;
-     ppc_avr_t ret = { .u64 = { 0, 0 } };
--    int sgnb = b->u8[BCD_DIG_BYTE(0)] >> 4;
-+    int sgnb = b->VsrB(BCD_DIG_BYTE(0)) >> 4;
- 
-     if (unlikely((sgnb < 0xA) && ps)) {
-         invalid = 1;
-     }
- 
-     for (i = 0; i < 16; i++) {
--        zone_digit = i ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_lead;
--        digit = b->u8[BCD_DIG_BYTE(i * 2)] & 0xF;
-+        zone_digit = i ? b->VsrB(BCD_DIG_BYTE(i * 2)) >> 4 : zone_lead;
-+        digit = b->VsrB(BCD_DIG_BYTE(i * 2)) & 0xF;
-         if (unlikely(zone_digit != zone_lead || digit > 0x9)) {
-             invalid = 1;
-             break;
-@@ -2407,7 +2403,7 @@ uint32_t helper_bcdctz(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-             break;
-         }
- 
--        ret.u8[BCD_DIG_BYTE(i * 2)] = zone_lead + digit;
-+        ret.VsrB(BCD_DIG_BYTE(i * 2)) = zone_lead + digit;
-     }
- 
-     if (ps) {
-@@ -2519,7 +2515,7 @@ uint32_t helper_bcdcpsgn(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     }
- 
-     *r = *a;
--    bcd_put_digit(r, b->u8[BCD_DIG_BYTE(0)] & 0xF, 0);
-+    bcd_put_digit(r, b->VsrB(BCD_DIG_BYTE(0)) & 0xF, 0);
- 
-     for (i = 1; i < 32; i++) {
-         bcd_get_digit(a, i, &invalid);
-@@ -2549,11 +2545,7 @@ uint32_t helper_bcdsetsgn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
- uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
- {
-     int cr;
--#if defined(HOST_WORDS_BIGENDIAN)
--    int i = a->s8[7];
--#else
--    int i = a->s8[8];
--#endif
-+    int i = a->VsrSB(7);
-     bool ox_flag = false;
-     int sgnb = bcd_get_sgn(b);
-     ppc_avr_t ret = *b;
-@@ -2602,11 +2594,7 @@ uint32_t helper_bcdus(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-         }
-     }
- 
--#if defined(HOST_WORDS_BIGENDIAN)
--    i = a->s8[7];
--#else
--    i = a->s8[8];
--#endif
-+    i = a->VsrSB(7);
-     if (i >= 32) {
-         ox_flag = true;
-         ret.VsrD(1) = ret.VsrD(0) = 0;
-@@ -2637,13 +2625,11 @@ uint32_t helper_bcdsr(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     ppc_avr_t ret = *b;
-     ret.VsrD(1) &= ~0xf;
- 
--#if defined(HOST_WORDS_BIGENDIAN)
--    int i = a->s8[7];
--    ppc_avr_t bcd_one = { .u64 = { 0, 0x10 } };
--#else
--    int i = a->s8[8];
--    ppc_avr_t bcd_one = { .u64 = { 0x10, 0 } };
--#endif
-+    int i = a->VsrSB(7);
-+    ppc_avr_t bcd_one;
-+
-+    bcd_one.VsrD(0) = 0;
-+    bcd_one.VsrD(1) = 0x10;
- 
-     if (bcd_is_valid(b) == false) {
-         return CRF_SO;
-@@ -2679,11 +2665,7 @@ uint32_t helper_bcdtrunc(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
- {
-     uint64_t mask;
-     uint32_t ox_flag = 0;
--#if defined(HOST_WORDS_BIGENDIAN)
--    int i = a->s16[3] + 1;
--#else
--    int i = a->s16[4] + 1;
--#endif
-+    int i = a->VsrSH(3) + 1;
-     ppc_avr_t ret = *b;
- 
-     if (bcd_is_valid(b) == false) {
-@@ -2728,11 +2710,7 @@ uint32_t helper_bcdutrunc(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-         }
-     }
- 
--#if defined(HOST_WORDS_BIGENDIAN)
--    i = a->s16[3];
--#else
--    i = a->s16[4];
--#endif
-+    i = a->VsrSH(3);
-     if (i > 16 && i < 33) {
-         mask = (uint64_t)-1 >> (128 - i * 4);
-         if (ret.VsrD(0) & ~mask) {
--- 
-2.20.1
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 8e090acd74..b728bd22f1 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -731,6 +731,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4VNNIW     (1U << 2)
+ /* AVX512 Multiply Accumulation Single Precision */
+ #define CPUID_7_0_EDX_AVX512_4FMAPS     (1U << 3)
++/* PCONFIG Instruction */
++#define CPUID_7_0_EDX_PCONFIG           (1U << 18)
+ /* Speculation Control */
+ #define CPUID_7_0_EDX_SPEC_CTRL         (1U << 26)
+ /* Arch Capabilities */
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 71034aeb5a..3e25505bd3 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1084,7 +1084,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
+RDS] =3D {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "md-clear", NULL,
+             NULL, NULL, NULL, NULL,
+-            NULL, NULL, NULL /* pconfig */, NULL,
++            NULL, NULL, "pconfig", NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "spec-ctrl", "stibp",
+             NULL, "arch-capabilities", "core-capability", "ssbd",
+@@ -1095,6 +1095,12 @@ static FeatureWordInfo feature_word_info[FEATURE_W=
+ORDS] =3D {
+             .reg =3D R_EDX,
+         },
+         .tcg_features =3D TCG_7_0_EDX_FEATURES,
++        /*
++         * CPU state altered by the PCONFIG instruction (e.g. MKTME key =
+table)
++         * is not migrated by QEMU yet, so PCONFIG is unmigratable until
++         * this is implemented.
++         */
++        .unmigratable_flags =3D CPUID_7_0_EDX_PCONFIG,
+     },
+     [FEAT_7_1_EAX] =3D {
+         .type =3D CPUID_FEATURE_WORD,
+--=20
+2.21.0
 
 
