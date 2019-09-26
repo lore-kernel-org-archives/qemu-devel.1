@@ -3,62 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF292C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DB0C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:13:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB726206E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:13:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D109A206E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Sep 2019 12:13:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mXaSFMnk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB726206E0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EUn9MfQ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D109A206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDSeM-0001L5-Im
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:13:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33556)
+	id 1iDSej-0001xK-HM
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 08:13:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33634)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iDScs-0008Dq-QX
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:03 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iDSdF-0000Ir-2C
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iDScr-0001aW-AW
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:02 -0400
-Received: from ozlabs.org ([203.11.71.1]:34025)
+ (envelope-from <dgibson@ozlabs.org>) id 1iDSdD-0001z4-Cu
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 08:12:24 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54325 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iDSco-0001NQ-Kr; Thu, 26 Sep 2019 08:12:01 -0400
+ id 1iDSdD-0001wv-1H; Thu, 26 Sep 2019 08:12:23 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46fDLY4YXHz9sDB; Thu, 26 Sep 2019 22:11:49 +1000 (AEST)
+ id 46fDLY6Y6Jz9sNx; Thu, 26 Sep 2019 22:11:49 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1569499909;
- bh=yNZ6CGfFgj7n2E519KmJ2C1XwRtMYpmI95cYE/JiXHE=;
+ bh=WGDBBCj7A1m4qix12oFtNQCmys/6SjyWLemjS56DPJU=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=mXaSFMnkWQDbpDHkgDD5ZlEx4FsWA6XpGED5VhV3T2IsdHCIumtzQRjHXtCP0gzFT
- R1K+pZDbbKl9H1hG3bvCcDamI4NSBD5U2DmnrW410nnVLpeW0mUpVHAesK4fTlOqlk
- EYKwNMjmnZOKlqz+HIsqPsozQHV0V4Bt6SdhG6DU=
-Date: Thu, 26 Sep 2019 21:29:13 +1000
+ b=EUn9MfQ4UfQzocClIGJAciFnd6sIBxxI2r6Hq1o/sMXni7lsMOYswifs83euOAV0n
+ fS17fjsWxdOVcfWCiGT8UmpGrr4Uzyi9pTNWgjDYBOv9kQIfX7Y0byNlKwK0uMG1zn
+ DwReedPbG+rSaldkZHzN2OZP20cwEoPPfXPASpZ8=
+Date: Thu, 26 Sep 2019 21:32:18 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 20/20] spapr: Eliminate SpaprIrq::init hook
-Message-ID: <20190926112913.GY17405@umbus>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 11/20] spapr: Fix indexing of XICS irqs
+Message-ID: <20190926113218.GZ17405@umbus>
 References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
- <20190925064534.19155-21-david@gibson.dropbear.id.au>
- <1b74c0fc-b318-df5a-d66d-fe59ae562d70@kaod.org>
- <20190926011336.GS17405@umbus>
- <92ce15dd-f7f9-3d2b-4226-9693bd9cfd65@kaod.org>
+ <20190925064534.19155-12-david@gibson.dropbear.id.au>
+ <20190925221746.7b497c8c@bahia.lan> <20190926013148.GU17405@umbus>
+ <20190926092141.66158590@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="krsqJi1PDCheOQxO"
+ protocol="application/pgp-signature"; boundary="GOYT2+aw+EAigp19"
 Content-Disposition: inline
-In-Reply-To: <92ce15dd-f7f9-3d2b-4226-9693bd9cfd65@kaod.org>
+In-Reply-To: <20190926092141.66158590@bahia.lan>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
@@ -74,136 +73,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
  =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Laurent Vivier <laurent@vivier.eu>
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---krsqJi1PDCheOQxO
-Content-Type: text/plain; charset=iso-8859-1
+--GOYT2+aw+EAigp19
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 26, 2019 at 09:05:56AM +0200, C=E9dric Le Goater wrote:
-> >>> +    if (spapr->irq->xive) {
-> >>> +        uint32_t nr_servers =3D spapr_max_server_number(spapr);
-> >>> +        DeviceState *dev;
-> >>> +        int i;
-> >>> +
-> >>> +        dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
-> >>> +        qdev_prop_set_uint32(dev, "nr-irqs",
-> >>> +                             spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
-> >>> +        /*
-> >>> +         * 8 XIVE END structures per CPU. One for each available
-> >>> +         * priority
-> >>> +         */
-> >>> +        qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
-> >>> +        qdev_init_nofail(dev);
-> >>> +
-> >>> +        spapr->xive =3D SPAPR_XIVE(dev);
-> >>> +
-> >>> +        /* Enable the CPU IPIs */
-> >>> +        for (i =3D 0; i < nr_servers; ++i) {
-> >>> +            Error *local_err =3D NULL;
-> >>> +
-> >>> +            spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, fal=
-se, &local_err);
-> >>> +            if (local_err) {
-> >>> +                goto out;
-> >>> +            }
-> >>> +        }
-> >>
-> >> We could move the IPI claim part in the realize routine of SPAPR_XIVE.
-> >=20
-> > Yeah, I know.  I thought about this, but there's a slight complication
-> > in that the XIVE part doesn't know nr_servers directly.  There's
-> > several possible ways to handle that, but I wasn't 100% happy with any
-> > that I came up with yet.
+On Thu, Sep 26, 2019 at 09:21:41AM +0200, Greg Kurz wrote:
+> On Thu, 26 Sep 2019 11:31:48 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> The "nr-ends" property was inappropriate, "nr-servers" would have been
-> better and we would have hidden the calculation of ENDs 'nr_servers << 3'
-> in the realize routine of SpaprXive.=20
-
-Ah, interesting.
-
-> I don't think we can change that without breaking migration though
-> :/
-
-Hm, there might be a way around it, I'll see what I can do, but
-probably as a rather later patch.
-
->=20
-> C.
->=20
-> >>
-> >>> +        spapr_xive_hcall_init(spapr);
-> >>
-> >> This also.
+> > On Wed, Sep 25, 2019 at 10:17:46PM +0200, Greg Kurz wrote:
+> > > On Wed, 25 Sep 2019 16:45:25 +1000
+> > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > >=20
+> > > > spapr global irq numbers are different from the source numbers on t=
+he ICS
+> > > > when using XICS - they're offset by XICS_IRQ_BASE (0x1000).  But
+> > > > spapr_irq_set_irq_xics() was passing through the global irq number =
+to
+> > > > the ICS code unmodified.
+> > > >=20
+> > > > We only got away with this because of a counteracting bug - we were
+> > > > incorrectly adjusting the qemu_irq we returned for a requested glob=
+al irq
+> > > > number.
+> > > >=20
+> > > > That approach mostly worked but is very confusing, incorrectly reli=
+es on
+> > > > the way the qemu_irq array is allocated, and undermines the intenti=
+on of
+> > > > having the global array of qemu_irqs for spapr have a consistent me=
+aning
+> > > > regardless of irq backend.
+> > > >=20
+> > > > So, fix both set_irq and qemu_irq indexing.  We rename some paramet=
+ers at
+> > > > the same time to make it clear that they are referring to spapr glo=
+bal
+> > > > irq numbers.
+> > > >=20
+> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > ---
+> > >=20
+> > > Reviewed-by: Greg Kurz <groug@kaod.org>
+> > >=20
+> > > Further cleanup could be to have the XICS backend to only take global
+> > > irq numbers and to convert them to ICS source numbers internally. This
+> > > would put an end to the confusion between srcno/irq in the frontend
+> > > code.
 > >=20
-> > Right.
-> >=20
-> >> It can be done later one.
-> >=20
-> > That's my intention.
-> >=20
-> >>
-> >> C.
-> >>
-> >>> +    }
-> >>> =20
-> >>>      spapr->qirqs =3D qemu_allocate_irqs(spapr->irq->set_irq, spapr,
-> >>>                                        spapr->irq->nr_xirqs + SPAPR_X=
-IRQ_BASE);
-> >>> +
-> >>> +out:
-> >>> +    error_propagate(errp, local_err);
-> >>>  }
-> >>> =20
-> >>>  void spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Er=
-ror **errp)
-> >>> @@ -757,7 +744,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
-> >>>      .xics        =3D true,
-> >>>      .xive        =3D false,
-> >>> =20
-> >>> -    .init        =3D spapr_irq_init_xics,
-> >>>      .claim       =3D spapr_irq_claim_xics,
-> >>>      .free        =3D spapr_irq_free_xics,
-> >>>      .print_info  =3D spapr_irq_print_info_xics,
-> >>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> >>> index 6816cb0500..fa862c665b 100644
-> >>> --- a/include/hw/ppc/spapr_irq.h
-> >>> +++ b/include/hw/ppc/spapr_irq.h
-> >>> @@ -42,7 +42,6 @@ typedef struct SpaprIrq {
-> >>>      bool        xics;
-> >>>      bool        xive;
-> >>> =20
-> >>> -    void (*init)(SpaprMachineState *spapr, Error **errp);
-> >>>      void (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error=
- **errp);
-> >>>      void (*free)(SpaprMachineState *spapr, int irq);
-> >>>      void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
-> >>> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
-> >>> index 691a6d00f7..267984a97b 100644
-> >>> --- a/include/hw/ppc/xics_spapr.h
-> >>> +++ b/include/hw/ppc/xics_spapr.h
-> >>> @@ -34,6 +34,7 @@
-> >>>  #define TYPE_ICS_SPAPR "ics-spapr"
-> >>>  #define ICS_SPAPR(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SPAPR)
-> >>> =20
-> >>> +void ics_spapr_create(SpaprMachineState *spapr, int nr_xirqs, Error =
-**errp);
-> >>>  void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, vo=
-id *fdt,
-> >>>                     uint32_t phandle);
-> >>>  int xics_kvm_connect(SpaprMachineState *spapr, Error **errp);
-> >>>
-> >>
+> > Yeah, maybe.  But the local srcnos do actually make sense from within
+> > the perspective of ICS, so I'm not all that keen to do that.
 > >=20
 >=20
+> Not sure to understand what you mean by "within the perspective of ICS".
+>=20
+> My concern is actually to get rid of ics->offset users in spapr_irq.c.
+>=20
+> eg,
+>=20
+> static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
+> {
+>     SpaprMachineState *spapr =3D opaque;
+>     uint32_t srcno =3D irq - spapr->ics->offset;
+>=20
+>     ics_set_irq(spapr->ics, srcno, val);
+> }
+>=20
+> It looks like we should do something like:
+>=20
+> static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
+> {
+>     SpaprMachineState *spapr =3D opaque;
+>=20
+>     ics_set_irq(spapr->ics, irq, val);
+> }
+>=20
+> and have ics_set_irq() do:
+>=20
+>     uint32_t srcno =3D irq - spapr->ics->offset;
+>=20
+> Are you inferring that it is better to keep the irq to srcno conversions
+> in spapr_irq.c ?
+
+Ah, I see what you mean.  So, the reason srcno appears here is that
+ics_set_irq() is arguably an internal xics function that we shouldn't
+be calling directly from here, but do because of.. reasons.
+
+As it happens, I have another patch in the works which will move this
+function back into xics_spapr.c and bind it more tightly to the xics
+code, so I think that will address your concern.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -211,25 +179,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---krsqJi1PDCheOQxO
+--GOYT2+aw+EAigp19
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2MoQkACgkQbDjKyiDZ
-s5KO+w//WNT+WYb9Hj3Lwl7Gspt13/FQ1cpRj5OOnDtTTrvKPGVdXaDhfftQdc4I
-N8wuCmCPq0qRiLBa3S6+tF092bokx6I3qiEELPlbCDyIxGyWmN46s4qz7Y5D/MQi
-w5+e4HkYeCRccHgWyLTZXoeYGVxGEHkRwd1a3VZYX8z13S/w+mXx66CKkT6JGA6S
-ZRyq3SIcTS/NO802HMOYsLzaMSuYlWWNd1wtwRl4f+rLkG0lcHC7ebNHiy8Aspa2
-XrX4xA09NYeGNEcX88mO/oe4X7FDGdT8peHfnBFojgrD3tOH+CLLYW2kzRW2efFa
-Kn0qsDyXFv4o1nhATERdfiiQSvCidKRvw96XZ8WneTqzWdj5UXkxrbz9bKkre//A
-6Uhco0UGxFtvseo5R8jmLn1khmQr2kc/D4huU7/MfJ6MTvwZPiD0VHjg3U2LClCo
-bMwxX2e5AWAa5loJU0azkil0E3JPDSGKCftvwWTdsPDSiNeEkL6KdMmWeG1DPSNf
-YtoNWU5atNyjgjXQZcwlNxrFPM6wHhGocg7l5RRZpoTrbCJR1g04u9kPqCmMBT+r
-ZxtTSD6Sdagp4itTNPLsd8dzm3zxeEug17crnOwRXysJVqaQ0VoGvmsm+a5xCfkB
-Z68J75SaH8ksO72F8xls9/51of3PK8AUxomkRrte6n+oaqXlZSM=
-=aQxc
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2MocEACgkQbDjKyiDZ
+s5KHBBAA4dWq/hZ5gRQF7sO65882WkbeJkGrLA2U7fyE2X3mFfxqwqckYrQcok+i
+r93pr8paca54GCjYj4GqOT/7O76qmWlvGkEgeNxK05tMhNCsZcU5D5uvic6gtLyn
+ry81wchDwQp3SutviUJTyHMjl+OHlriu2G4kjQB7WKwXU+MKQe6pbB9P1kIunaEw
+SPI66ChTKWy/rl9Kx2a0sF1pE+Eyy0D1SnsZvhOskgIlJzHKAE9LDNOafs4SYWo8
+9RYq5DbSa3SROh6JGhD/TyFp17PUFtXa6faIYEByCo2f5f+RQcbvYhcm4CVYGld/
++u9ZqtBtW2dI4gS4cyFH1q/yWhN/aXTaNxMFFW6auGz4+bFuZ6pgETK1OEBd482U
+Jn+LCRwS0bDlI0pxR4kMuoIsVnJT9rCb+NJstX8BIhuDgau4kcs6J1x7K1SEw23T
+Sglpk35AXE+0+O5Kj/sLN/BgRhWFiTVF3bQ0ApytHlo1bsTMXSq9pmhHpD6aYWCv
+dFaJtFjW3CjbGO20iu/RnUmO3DKtGj/bq+tAkKZnSSKq+bd9NfTuq8h3ueruSuIG
+RLgYJkzuqoZBvjyXD9HIzRSwUigpoJK1//sT9jvW+389xJVykmiLDlEPCnIxdyyH
+bpXlq2/wlLj7AYnsOpbb6c0URutNbD5QfjYp3iyMPBcxH9ji1WI=
+=NGkZ
 -----END PGP SIGNATURE-----
 
---krsqJi1PDCheOQxO--
+--GOYT2+aw+EAigp19--
 
