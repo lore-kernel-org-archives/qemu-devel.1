@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE1BC388F3
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40DAC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:18:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 653B621841
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:14:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 653B621841
+	by mail.kernel.org (Postfix) with ESMTPS id 945632146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:18:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 945632146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDr0q-0005dA-TL
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:14:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35987)
+	id 1iDr53-0001Tq-GG
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:18:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34363)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDqJe-00026I-Ej
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:29:47 -0400
+ (envelope-from <david@redhat.com>) id 1iDqCF-0003BT-Ne
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:22:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDqJd-0001Qs-4X
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:29:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55710)
+ (envelope-from <david@redhat.com>) id 1iDqCE-0000Gw-Ci
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:22:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54145)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDqJc-0001Ql-Rb; Fri, 27 Sep 2019 09:29:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1iDqCE-0000Gm-3d; Fri, 27 Sep 2019 09:22:06 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5232A3090FE8;
- Fri, 27 Sep 2019 11:02:48 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 961B918C8937;
+ Fri, 27 Sep 2019 10:56:09 +0000 (UTC)
 Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 635115D9C3;
- Fri, 27 Sep 2019 11:02:47 +0000 (UTC)
-Subject: Re: [PATCH v3 14/18] target/s390x: Rely on unwinding in
- s390_cpu_tlb_fill
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BBDEE3DBB;
+ Fri, 27 Sep 2019 10:56:08 +0000 (UTC)
+Subject: Re: [PATCH v3 11/18] target/s390: Return exception from
+ translate_pages
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190926162615.31168-1-richard.henderson@linaro.org>
- <20190926162615.31168-15-richard.henderson@linaro.org>
+ <20190926162615.31168-12-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -92,18 +92,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <f3277035-17b8-59a6-e4ae-7b1a95ea0c84@redhat.com>
-Date: Fri, 27 Sep 2019 13:02:46 +0200
+Message-ID: <ac667e90-1aa4-eee5-c856-613a95edf8f2@redhat.com>
+Date: Fri, 27 Sep 2019 12:56:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190926162615.31168-15-richard.henderson@linaro.org>
+In-Reply-To: <20190926162615.31168-12-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 27 Sep 2019 11:02:48 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Fri, 27 Sep 2019 10:56:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -124,73 +124,73 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 26.09.19 18:26, Richard Henderson wrote:
-> We currently set ilen to AUTO, then overwrite that during
-> unwinding, then overwrite that for the code access case.
-> 
-> This can be simplified to setting ilen to our arbitrary
-> value for the (undefined) code access case, then rely on
-> unwinding to overwrite that with the correct value for
-> the data access case.
+> Do not raise the exception directly within translate_pages,
+> but pass it back so that caller may do so.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/s390x/excp_helper.c | 23 +++++++----------------
->  1 file changed, 7 insertions(+), 16 deletions(-)
+>  target/s390x/mmu_helper.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index 98a1ee8317..8ce992e639 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -96,7 +96,7 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index a9219942b1..5ecd9ee87e 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -423,25 +423,22 @@ nodat:
+>   * the MEMOP interface.
+>   */
+>  static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
+> -                           target_ulong *pages, bool is_write)
+> +                           target_ulong *pages, bool is_write, uint64_t *tec)
 >  {
->      S390CPU *cpu = S390_CPU(cs);
+>      uint64_t asc = cpu->env.psw.mask & PSW_MASK_ASC;
+>      CPUS390XState *env = &cpu->env;
+>      int ret, i, pflags;
 >  
-> -    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_AUTO);
-> +    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_UNWIND);
-
-Hmm, we always trigger a pgm exceptions, meaning we set
-cs->exception_index even if we have probe = true. Confused by that.
-
->      /* On real machines this value is dropped into LowMem.  Since this
->         is userland, simply put this someplace that cpu_loop can find it.  */
->      cpu->env.__excp_addr = address;
-> @@ -179,24 +179,15 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->          stq_phys(env_cpu(env)->as,
->                   env->psa + offsetof(LowCore, trans_exc_code), tec);
->      }
-> -    trigger_pgm_exception(env, excp, ILEN_AUTO);
-> -    cpu_restore_state(cs, retaddr, true);
->  
->      /*
-> -     * The ILC value for code accesses is undefined.  The important
-> -     * thing here is to *not* leave env->int_pgm_ilen set to ILEN_AUTO,
-> -     * which would cause do_program_interrupt to attempt to read from
-> -     * env->psw.addr again.  C.f. the condition in trigger_page_fault,
-> -     * but is not universally applied.
-> -     *
-> -     * ??? If we remove ILEN_AUTO, by moving the computation of ILEN
-> -     * into cpu_restore_state, then we may remove this entirely.
-> +     * For data accesses, ILEN will be filled in from the unwind info,
-> +     * within cpu_loop_exit_restore.  For code accesses, retaddr == 0,
-> +     * and so unwinding will not occur.  However, ILEN is also undefined
-> +     * for that case -- we choose to set ILEN = 2.
->       */
-> -    if (access_type == MMU_INST_FETCH) {
-> -        env->int_pgm_ilen = 2;
-> -    }
+>      for (i = 0; i < nr_pages; i++) {
+> -        uint64_t tec;
 > -
-> -    cpu_loop_exit(cs);
-> +    trigger_pgm_exception(env, excp, 2);
-
-I wonder if it is still worth setting this only conditionally. Most
-probably not.
-
-> +    cpu_loop_exit_restore(cs, retaddr);
->  }
+> -        ret = mmu_translate(env, addr, is_write, asc, &pages[i], &pflags, &tec);
+> +        ret = mmu_translate(env, addr, is_write, asc, &pages[i], &pflags, tec);
+>          if (ret) {
+> -            trigger_access_exception(env, ret, ILEN_AUTO, tec);
+> -            return -EFAULT;
+> +            return ret;
+>          }
+>          if (!address_space_access_valid(&address_space_memory, pages[i],
+>                                          TARGET_PAGE_SIZE, is_write,
+>                                          MEMTXATTRS_UNSPECIFIED)) {
+> -            trigger_access_exception(env, PGM_ADDRESSING, ILEN_AUTO, 0);
+> -            return -EFAULT;
+> +            *tec = 0; /* unused */
+> +            return PGM_ADDRESSING;
+>          }
+>          addr += TARGET_PAGE_SIZE;
+>      }
+> @@ -469,6 +466,7 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+>  {
+>      int currlen, nr_pages, i;
+>      target_ulong *pages;
+> +    uint64_t tec;
+>      int ret;
 >  
->  static void do_program_interrupt(CPUS390XState *env)
+>      if (kvm_enabled()) {
+> @@ -482,8 +480,10 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+>                 + 1;
+>      pages = g_malloc(nr_pages * sizeof(*pages));
+>  
+> -    ret = translate_pages(cpu, laddr, nr_pages, pages, is_write);
+> -    if (ret == 0 && hostbuf != NULL) {
+> +    ret = translate_pages(cpu, laddr, nr_pages, pages, is_write, &tec);
+> +    if (ret) {
+> +        trigger_access_exception(&cpu->env, ret, ILEN_AUTO, tec);
+> +    } else if (hostbuf != NULL) {
+>          /* Copy data by stepping through the area page by page */
+>          for (i = 0; i < nr_pages; i++) {
+>              currlen = MIN(len, TARGET_PAGE_SIZE - (laddr % TARGET_PAGE_SIZE));
 > 
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 
