@@ -2,119 +2,62 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1305C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 07:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECD2C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 07:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8100B2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 07:54:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="mf8XI3DD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8100B2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 13CB22075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 07:55:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13CB22075D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDl5X-0003um-E9
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 03:54:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39742)
+	id 1iDl6J-0005At-8m
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 03:55:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDl4R-0002zi-FT
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:53:44 -0400
+ (envelope-from <groug@kaod.org>) id 1iDl4y-0003Zv-7T
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDl4Q-0005Wu-IZ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:53:43 -0400
-Received: from mail-he1eur04on072f.outbound.protection.outlook.com
- ([2a01:111:f400:fe0d::72f]:18634
- helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDl4Q-0005So-B9; Fri, 27 Sep 2019 03:53:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B+0DLu3y+kRd6WrbAYNZduRIuzyZQKnMyyorUxs3CZ07e5dqpNAuCgs07dq7fxAWlcbKmmV30qMyAZhkJ/e5JW1sjvx5m8HFbKyBuQYmIbm9OxOfwqCD9ns59SitSvLck01kK0S+TQBWVaoOPO+fwjVJ28ZPrmAg5NNOS4eQo4HIPh7Kn5muCEdI9zf4gtw9uNMdYBO4jCBdQrrq7T4GM4fsOx6fZwP1oY22A30jWWyCQ9hbnr573z3fJ3gPyaMf622erFQC9t9pTBE11UlXHPrzG1uNFJ/w7pRNGeEhuQ13LP2qYiAkpKUk7LSwYcbFUsMcVxCqOoWOCP2TvgyenA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NsoMopGTKxDRD/iS98i4BEXtEzClwJYo2grKtHCBXPc=;
- b=NHbW0UeExR2aMPuP/y5gxLLxb1IQWBC4q+RF3GvN1/SBZ5sT6q9s9u1psj+q5kCOOLz8oEbhD80YYIDd91/1fldysG+PE0oBiSH045wjXF1SS9ynfgkD3iTFTWimLWhkiplSyw3J/lM2Rl9MZZ95IEtvNx7TW1CKt2+y9tW4+lctW/ogd862plmpIGuk0WOSG9nvYfNvNqMwbp6pVa0YkedLPazWQGYfKBKVLgFGqRgWduvgzRkCNB4T8C7HBb4fFlG5NTsRdsWd2KlulDWHOfy4Yt7kX+4GrNRWg41hXmmjBkDP4UrVqVleyPwFNgYS3bYzD3QNmOBfI02pb01mfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NsoMopGTKxDRD/iS98i4BEXtEzClwJYo2grKtHCBXPc=;
- b=mf8XI3DDqBPNsZuspCOZdcSfuFBzKo6oEykc14F0mAOW0mpI304NPvq7Tx5GtoB9rCT//FZXaNsAq5G84nX0p2KaecGRnwnH2171C/IBCIBeTT/F6nlrtYf8UQFEokVPyG7vKXfb5cBqDEkua3tufzdLRGep4YqKClIMtDx1H1I=
-Received: from AM0PR08MB5491.eurprd08.prod.outlook.com (52.132.215.9) by
- AM0PR08MB3955.eurprd08.prod.outlook.com (20.178.119.139) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2305.15; Fri, 27 Sep 2019 07:53:38 +0000
-Received: from AM0PR08MB5491.eurprd08.prod.outlook.com
- ([fe80::d552:8bd7:4773:3d75]) by AM0PR08MB5491.eurprd08.prod.outlook.com
- ([fe80::d552:8bd7:4773:3d75%2]) with mapi id 15.20.2305.017; Fri, 27 Sep 2019
- 07:53:38 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [Qemu-devel] [PATCH v4 00/10] qcow2-bitmaps: rewrite reopening
- logic
-Thread-Topic: [Qemu-devel] [PATCH v4 00/10] qcow2-bitmaps: rewrite reopening
- logic
-Thread-Index: AQHVTSopPwiUxx2MOkaQtW14Kblt36c+6R0AgACN4QA=
-Date: Fri, 27 Sep 2019 07:53:38 +0000
-Message-ID: <d630aeb5-9c42-ce5b-24a0-a39ce88644ef@virtuozzo.com>
-References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
- <8989f49a-6211-e65d-4146-4ad3fdf7ea57@redhat.com>
-In-Reply-To: <8989f49a-6211-e65d-4146-4ad3fdf7ea57@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0174.eurprd05.prod.outlook.com
- (2603:10a6:3:f8::22) To AM0PR08MB5491.eurprd08.prod.outlook.com
- (2603:10a6:208:189::9)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190927105333965
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ae00a4d5-221d-4f62-a093-08d7431fce46
-x-ms-traffictypediagnostic: AM0PR08MB3955:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB395537AEB9E4DAE74CB0B75EC1810@AM0PR08MB3955.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0173C6D4D5
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(396003)(366004)(39850400004)(136003)(346002)(189003)(199004)(53754006)(6116002)(8936002)(446003)(2501003)(11346002)(2906002)(4326008)(110136005)(81156014)(107886003)(66946007)(64756008)(6246003)(71200400001)(3846002)(8676002)(229853002)(71190400001)(66476007)(53546011)(66556008)(6436002)(26005)(66446008)(6506007)(52116002)(31696002)(76176011)(386003)(6486002)(6512007)(186003)(5660300002)(316002)(36756003)(86362001)(54906003)(81166006)(102836004)(25786009)(66066001)(99286004)(7736002)(14454004)(478600001)(31686004)(2616005)(256004)(4744005)(305945005)(14444005)(486006)(476003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3955;
- H:AM0PR08MB5491.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: tqATrziTxJJJkp+fwN06B6Gs+ADDfgNBShiNEe5XcsVO9YuDa76Qx8vajPWZZicq+HXnaaChQT7JVQjX7gB97RcdFSqEcwahLsvjTK64m7k64yH14QVkUuNTthWVtthmaSuTuRLxnj5JMY7FDWGlrDGbtu9ZliYgUjn+gHudusvzUWVCKB+uPQzVa0vQKkZuzw3ugE9u5AgW5ASGgstGGFqG0anq9ajxVOhlaxLIS2NSXyHaHqXlDRTT30uHjsO9TYlM2sa1gDTSZtHc/LJwwdX1rLyh04b3Ykijj/JV5uaDyzFAuu0GYnuGEgiM0KQAIVFilsdmaHRWoe046OwMZXFZKJ9dIl0l+OH5jzDzYMDIaylr/rFzxr3FZ+WdOkC/MnB/CzJc9yoDfWH4PToicnRI1h/1XGYYY0zLCzfAV6Y=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6E602FD0102E9841A5742963712D5C4C@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <groug@kaod.org>) id 1iDl4w-00069j-CU
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:54:15 -0400
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:59553)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDl4w-00067t-50
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:54:14 -0400
+Received: from player732.ha.ovh.net (unknown [10.109.143.208])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 978E66852C
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:54:11 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player732.ha.ovh.net (Postfix) with ESMTPSA id 6181DA2F6EAA;
+ Fri, 27 Sep 2019 07:54:00 +0000 (UTC)
+Date: Fri, 27 Sep 2019 09:53:59 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v2 09/33] spapr: Clarify and fix handling of nr_irqs
+Message-ID: <20190927095359.4e07ea70@bahia.lan>
+In-Reply-To: <20190927055028.11493-10-david@gibson.dropbear.id.au>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-10-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae00a4d5-221d-4f62-a093-08d7431fce46
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2019 07:53:38.0907 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: DzYi5OYPZ1misGGJyNRK12wfN2P+9dJdAsG90F+6br3MHOeq78VYNVcanxJuWZaWEG6mcpC2OrGRoqRMaXC0ELEdVPG7rkELjQAOEvhGIVQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3955
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0d::72f
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13844909680325728742
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfeehgdduvdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.43.105
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,24 +69,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjcuMDkuMjAxOSAyOjI1LCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiBPbiA4LzcvMTkgMTA6MTIg
-QU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBIaSBhbGwhDQo+Pg0K
-Pj4gQml0bWFwcyByZW9wZW5pbmcgaXMgYnVnZ3ksIHJlb3BlbmluZy1ydyBqdXN0IG5vdCB3b3Jr
-aW5nIGF0IGFsbCBhbmQNCj4+IHJlb3BlbmluZy1ybyBtYXkgbGVhZCB0byBwcm9kdWNpbmcgYnJv
-a2VuIGluY3JlbWVudGFsDQo+PiBiYWNrdXAgaWYgd2UgZG8gdGVtcG9yYXJ5IHNuYXBzaG90IGlu
-IGEgbWVhbnRpbWUuDQo+Pg0KPj4gdjQ6IERyb3AgY29tcGxpY2F0ZWQgc29sdXRpb24gYXJvdW5k
-IHJlb3BlbmluZyBsb2dpYyBbS2V2aW5dLCBmaXgNCj4+ICAgICAgdGhlIGV4aXN0aW5nIGJ1ZyBp
-biBhIHNpbXBsZXN0IHdheQ0KPj4NCj4gT3ZlcmFsbCwgc2VlbXMgZ29vZC4gSSB3YW50IE1heCB0
-byB0YWtlIGEgbG9vayBhdCAxMC8xMCwgYW5kIHRoZXJlIGFyZQ0KPiBzb21lIG1pbm9yIHJlYmFz
-ZSBjb25mbGljdHMuIEkgaG9wZSB0byBnZXQgdGhpcyBzdGFnZWQgbmV4dCB3ZWVrIGlmIGF0DQo+
-IGFsbCBwb3NzaWJsZS4NCj4gDQo+IFRoYW5rcywNCj4gLS1qcw0KPiANCg0KVGhhbmsgeW91IGZv
-ciByZXZpZXdpbmchDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On Fri, 27 Sep 2019 15:50:04 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> Both the XICS and XIVE interrupt backends have a "nr-irqs" property, but
+> it means slightly different things.  For XICS (or, strictly, the ICS) it
+> indicates the number of "real" external IRQs.  Those start at XICS_IRQ_BASE
+> (0x1000) and don't include the special IPI vector.  For XIVE, however, it
+> includes the whole IRQ space, including XIVE's many IPI vectors.
+> 
+> The spapr code currently doesn't handle this sensibly, with the
+> nr_irqs value in SpaprIrq having different meanings depending on the
+> backend.  We fix this by renaming nr_irqs to nr_xirqs and making it
+> always indicate just the number of external irqs, adjusting the value
+> we pass to XIVE accordingly.  We also move to using common constants
+> in most of the irq configurations, to make it clearer that the IRQ
+> space looks the same to the guest (and emulated devices), even if the
+> backend is different.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+
+Cedric and I have already given an R-b for this one.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_irq.c         | 53 ++++++++++++++------------------------
+>  include/hw/ppc/spapr_irq.h | 19 +++++++++-----
+>  2 files changed, 31 insertions(+), 41 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 8c26fa2d1e..3207b6bd01 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -92,7 +92,7 @@ static void spapr_irq_init_kvm(SpaprMachineState *spapr,
+>   * XICS IRQ backend.
+>   */
+>  
+> -static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
+> +static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_xirqs,
+>                                  Error **errp)
+>  {
+>      Object *obj;
+> @@ -102,7 +102,7 @@ static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
+>      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+>      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+>                                     &error_fatal);
+> -    object_property_set_int(obj, nr_irqs, "nr-irqs",  &error_fatal);
+> +    object_property_set_int(obj, nr_xirqs, "nr-irqs",  &error_fatal);
+>      object_property_set_bool(obj, true, "realized", &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> @@ -234,13 +234,9 @@ static void spapr_irq_init_kvm_xics(SpaprMachineState *spapr, Error **errp)
+>      }
+>  }
+>  
+> -#define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+> -#define SPAPR_IRQ_XICS_NR_MSIS     \
+> -    (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+> -
+>  SpaprIrq spapr_irq_xics = {
+> -    .nr_irqs     = SPAPR_IRQ_XICS_NR_IRQS,
+> -    .nr_msis     = SPAPR_IRQ_XICS_NR_MSIS,
+> +    .nr_xirqs    = SPAPR_NR_XIRQS,
+> +    .nr_msis     = SPAPR_NR_MSIS,
+>      .ov5         = SPAPR_OV5_XIVE_LEGACY,
+>  
+>      .init        = spapr_irq_init_xics,
+> @@ -260,7 +256,7 @@ SpaprIrq spapr_irq_xics = {
+>  /*
+>   * XIVE IRQ backend.
+>   */
+> -static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_irqs,
+> +static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_xirqs,
+>                                  Error **errp)
+>  {
+>      uint32_t nr_servers = spapr_max_server_number(spapr);
+> @@ -268,7 +264,7 @@ static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_irqs,
+>      int i;
+>  
+>      dev = qdev_create(NULL, TYPE_SPAPR_XIVE);
+> -    qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
+> +    qdev_prop_set_uint32(dev, "nr-irqs", nr_xirqs + SPAPR_XIRQ_BASE);
+>      /*
+>       * 8 XIVE END structures per CPU. One for each available priority
+>       */
+> @@ -308,7 +304,7 @@ static qemu_irq spapr_qirq_xive(SpaprMachineState *spapr, int irq)
+>  {
+>      SpaprXive *xive = spapr->xive;
+>  
+> -    if (irq >= xive->nr_irqs) {
+> +    if ((irq < SPAPR_XIRQ_BASE) || (irq >= xive->nr_irqs)) {
+>          return NULL;
+>      }
+>  
+> @@ -404,17 +400,9 @@ static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error **errp)
+>      }
+>  }
+>  
+> -/*
+> - * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+> - * with XICS.
+> - */
+> -
+> -#define SPAPR_IRQ_XIVE_NR_IRQS     0x2000
+> -#define SPAPR_IRQ_XIVE_NR_MSIS     (SPAPR_IRQ_XIVE_NR_IRQS - SPAPR_IRQ_MSI)
+> -
+>  SpaprIrq spapr_irq_xive = {
+> -    .nr_irqs     = SPAPR_IRQ_XIVE_NR_IRQS,
+> -    .nr_msis     = SPAPR_IRQ_XIVE_NR_MSIS,
+> +    .nr_xirqs    = SPAPR_NR_XIRQS,
+> +    .nr_msis     = SPAPR_NR_MSIS,
+>      .ov5         = SPAPR_OV5_XIVE_EXPLOIT,
+>  
+>      .init        = spapr_irq_init_xive,
+> @@ -450,18 +438,18 @@ static SpaprIrq *spapr_irq_current(SpaprMachineState *spapr)
+>          &spapr_irq_xive : &spapr_irq_xics;
+>  }
+>  
+> -static void spapr_irq_init_dual(SpaprMachineState *spapr, int nr_irqs,
+> +static void spapr_irq_init_dual(SpaprMachineState *spapr, int nr_xirqs,
+>                                  Error **errp)
+>  {
+>      Error *local_err = NULL;
+>  
+> -    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_irqs, &local_err);
+> +    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_xirqs, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+>  
+> -    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_irqs, &local_err);
+> +    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_xirqs, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
+> @@ -586,12 +574,9 @@ static const char *spapr_irq_get_nodename_dual(SpaprMachineState *spapr)
+>  /*
+>   * Define values in sync with the XIVE and XICS backend
+>   */
+> -#define SPAPR_IRQ_DUAL_NR_IRQS     0x2000
+> -#define SPAPR_IRQ_DUAL_NR_MSIS     (SPAPR_IRQ_DUAL_NR_IRQS - SPAPR_IRQ_MSI)
+> -
+>  SpaprIrq spapr_irq_dual = {
+> -    .nr_irqs     = SPAPR_IRQ_DUAL_NR_IRQS,
+> -    .nr_msis     = SPAPR_IRQ_DUAL_NR_MSIS,
+> +    .nr_xirqs    = SPAPR_NR_XIRQS,
+> +    .nr_msis     = SPAPR_NR_MSIS,
+>      .ov5         = SPAPR_OV5_XIVE_BOTH,
+>  
+>      .init        = spapr_irq_init_dual,
+> @@ -693,10 +678,10 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>          spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
+>      }
+>  
+> -    spapr->irq->init(spapr, spapr->irq->nr_irqs, errp);
+> +    spapr->irq->init(spapr, spapr->irq->nr_xirqs, errp);
+>  
+>      spapr->qirqs = qemu_allocate_irqs(spapr->irq->set_irq, spapr,
+> -                                      spapr->irq->nr_irqs);
+> +                                      spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
+>  }
+>  
+>  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error **errp)
+> @@ -804,11 +789,11 @@ int spapr_irq_find(SpaprMachineState *spapr, int num, bool align, Error **errp)
+>      return first + ics->offset;
+>  }
+>  
+> -#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     0x400
+> +#define SPAPR_IRQ_XICS_LEGACY_NR_XIRQS     0x400
+>  
+>  SpaprIrq spapr_irq_xics_legacy = {
+> -    .nr_irqs     = SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> -    .nr_msis     = SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> +    .nr_xirqs    = SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
+> +    .nr_msis     = SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
+>      .ov5         = SPAPR_OV5_XIVE_LEGACY,
+>  
+>      .init        = spapr_irq_init_xics,
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 5db305165c..a8f9a2ab11 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -16,13 +16,18 @@
+>   * IRQ range offsets per device type
+>   */
+>  #define SPAPR_IRQ_IPI        0x0
+> -#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
+> -#define SPAPR_IRQ_HOTPLUG    0x1001
+> -#define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
+> -#define SPAPR_IRQ_PCI_LSI    0x1200  /* 32+ PHBs devices */
+>  
+> -#define SPAPR_IRQ_MSI        0x1300  /* Offset of the dynamic range covered
+> -                                      * by the bitmap allocator */
+> +#define SPAPR_XIRQ_BASE      XICS_IRQ_BASE /* 0x1000 */
+> +#define SPAPR_IRQ_EPOW       (SPAPR_XIRQ_BASE + 0x0000)
+> +#define SPAPR_IRQ_HOTPLUG    (SPAPR_XIRQ_BASE + 0x0001)
+> +#define SPAPR_IRQ_VIO        (SPAPR_XIRQ_BASE + 0x0100)  /* 256 VIO devices */
+> +#define SPAPR_IRQ_PCI_LSI    (SPAPR_XIRQ_BASE + 0x0200)  /* 32+ PHBs devices */
+> +
+> +/* Offset of the dynamic range covered by the bitmap allocator */
+> +#define SPAPR_IRQ_MSI        (SPAPR_XIRQ_BASE + 0x0300)
+> +
+> +#define SPAPR_NR_XIRQS       0x1000
+> +#define SPAPR_NR_MSIS        (SPAPR_XIRQ_BASE + SPAPR_NR_XIRQS - SPAPR_IRQ_MSI)
+>  
+>  typedef struct SpaprMachineState SpaprMachineState;
+>  
+> @@ -32,7 +37,7 @@ int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool align,
+>  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t num);
+>  
+>  typedef struct SpaprIrq {
+> -    uint32_t    nr_irqs;
+> +    uint32_t    nr_xirqs;
+>      uint32_t    nr_msis;
+>      uint8_t     ov5;
+>  
+
 
