@@ -2,62 +2,53 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C86ADC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BA6C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DA8A217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:48:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DA8A217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 28305217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:49:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28305217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrXv-0006qu-GT
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:48:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37661)
+	id 1iDrYM-00077m-91
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:49:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34639)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iDqRD-00015w-GQ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:37:36 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDqD0-0003r8-GP
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iDqRC-0002yc-2D
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:37:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:12788)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDqCw-0000QB-8n
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:22:51 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49752)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iDqRB-0002yH-Q3
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:37:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4029069084
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:59:41 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-112-55.ams2.redhat.com
- [10.36.112.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A29E60606;
- Fri, 27 Sep 2019 09:59:37 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 06/11] qcrypto-luks: purge unused error codes from open callback
-Date: Fri, 27 Sep 2019 10:59:21 +0100
-Message-Id: <20190927095926.22230-7-berrange@redhat.com>
-In-Reply-To: <20190927095926.22230-1-berrange@redhat.com>
-References: <20190927095926.22230-1-berrange@redhat.com>
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iDqCt-0000IU-Hv; Fri, 27 Sep 2019 09:22:47 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iDpHy-0003za-8q; Fri, 27 Sep 2019 15:23:58 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v5 4/9] block/qcow2-bitmap: get rid of
+ bdrv_has_changed_persistent_bitmaps
+Date: Fri, 27 Sep 2019 15:23:50 +0300
+Message-Id: <20190927122355.7344-5-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190927122355.7344-1-vsementsov@virtuozzo.com>
+References: <20190927122355.7344-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 27 Sep 2019 09:59:41 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,190 +60,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+Firstly, no reason to optimize failure path. Then, function name is
+ambiguous: it checks for readonly and similar things, but someone may
+think that it will ignore normal bitmaps which was just unchanged, and
+this is in bad relation with the fact that we should drop IN_USE flag
+for unchanged bitmaps in the image.
 
-These values are not used by generic crypto code anyway
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- crypto/block-luks.c | 45 +++++++++++++--------------------------------
- 1 file changed, 13 insertions(+), 32 deletions(-)
+ include/block/dirty-bitmap.h |  1 -
+ block/dirty-bitmap.c         | 12 ------------
+ block/qcow2-bitmap.c         | 23 +++++++++++++----------
+ 3 files changed, 13 insertions(+), 23 deletions(-)
 
-diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-index f3bfc921b2..b8f9b9c20a 100644
---- a/crypto/block-luks.c
-+++ b/crypto/block-luks.c
-@@ -622,9 +622,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
- {
-     QCryptoBlockLUKS *luks =3D NULL;
-     Error *local_err =3D NULL;
--    int ret =3D 0;
-     size_t i;
--    ssize_t rv;
-     g_autofree uint8_t *masterkey =3D NULL;
-     char *ivgen_name, *ivhash_name;
-     g_autofree char *password =3D NULL;
-@@ -648,13 +646,11 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-=20
-     /* Read the entire LUKS header, minus the key material from
-      * the underlying device */
--    rv =3D readfunc(block, 0,
--                  (uint8_t *)&luks->header,
--                  sizeof(luks->header),
--                  opaque,
--                  errp);
--    if (rv < 0) {
--        ret =3D rv;
-+    if (readfunc(block, 0,
-+                 (uint8_t *)&luks->header,
-+                 sizeof(luks->header),
-+                 opaque,
-+                 errp) < 0) {
-         goto fail;
-     }
-=20
-@@ -675,13 +671,11 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     if (memcmp(luks->header.magic, qcrypto_block_luks_magic,
-                QCRYPTO_BLOCK_LUKS_MAGIC_LEN) !=3D 0) {
-         error_setg(errp, "Volume is not in LUKS format");
--        ret =3D -EINVAL;
-         goto fail;
-     }
-     if (luks->header.version !=3D QCRYPTO_BLOCK_LUKS_VERSION) {
-         error_setg(errp, "LUKS version %" PRIu32 " is not supported",
-                    luks->header.version);
--        ret =3D -ENOTSUP;
-         goto fail;
-     }
-=20
-@@ -697,7 +691,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-      */
-     ivgen_name =3D strchr(cipher_mode, '-');
-     if (!ivgen_name) {
--        ret =3D -EINVAL;
-         error_setg(errp, "Unexpected cipher mode string format %s",
-                    cipher_mode);
-         goto fail;
-@@ -715,7 +708,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-         luks->ivgen_hash_alg =3D qcrypto_block_luks_hash_name_lookup(ivh=
-ash_name,
-                                                                    &loca=
-l_err);
-         if (local_err) {
--            ret =3D -ENOTSUP;
-             error_propagate(errp, local_err);
-             goto fail;
-         }
-@@ -724,7 +716,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     luks->cipher_mode =3D qcrypto_block_luks_cipher_mode_lookup(cipher_m=
-ode,
-                                                               &local_err=
-);
-     if (local_err) {
--        ret =3D -ENOTSUP;
-         error_propagate(errp, local_err);
-         goto fail;
-     }
-@@ -735,7 +726,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-                                               luks->header.master_key_le=
-n,
-                                               &local_err);
-     if (local_err) {
--        ret =3D -ENOTSUP;
-         error_propagate(errp, local_err);
-         goto fail;
-     }
-@@ -744,7 +734,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-             qcrypto_block_luks_hash_name_lookup(luks->header.hash_spec,
-                                                 &local_err);
-     if (local_err) {
--        ret =3D -ENOTSUP;
-         error_propagate(errp, local_err);
-         goto fail;
-     }
-@@ -752,14 +741,12 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     luks->ivgen_alg =3D qcrypto_block_luks_ivgen_name_lookup(ivgen_name,
-                                                            &local_err);
-     if (local_err) {
--        ret =3D -ENOTSUP;
-         error_propagate(errp, local_err);
-         goto fail;
-     }
-=20
-     if (luks->ivgen_alg =3D=3D QCRYPTO_IVGEN_ALG_ESSIV) {
-         if (!ivhash_name) {
--            ret =3D -EINVAL;
-             error_setg(errp, "Missing IV generator hash specification");
-             goto fail;
-         }
-@@ -768,7 +755,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-                                                 luks->ivgen_hash_alg,
-                                                 &local_err);
-         if (local_err) {
--            ret =3D -ENOTSUP;
-             error_propagate(errp, local_err);
-             goto fail;
-         }
-@@ -795,7 +781,6 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-                                         masterkey,
-                                         readfunc, opaque,
-                                         errp) < 0) {
--            ret =3D -EACCES;
-             goto fail;
-         }
-=20
-@@ -813,19 +798,16 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-                                          luks->header.master_key_len,
-                                          errp);
-         if (!block->ivgen) {
--            ret =3D -ENOTSUP;
-             goto fail;
-         }
-=20
--        ret =3D qcrypto_block_init_cipher(block,
--                                        luks->cipher_alg,
--                                        luks->cipher_mode,
--                                        masterkey,
--                                        luks->header.master_key_len,
--                                        n_threads,
--                                        errp);
--        if (ret < 0) {
--            ret =3D -ENOTSUP;
-+        if (qcrypto_block_init_cipher(block,
-+                                      luks->cipher_alg,
-+                                      luks->cipher_mode,
-+                                      masterkey,
-+                                      luks->header.master_key_len,
-+                                      n_threads,
-+                                      errp) < 0) {
-             goto fail;
-         }
-     }
-@@ -834,14 +816,13 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     block->payload_offset =3D luks->header.payload_offset_sector *
-         block->sector_size;
-=20
--
-     return 0;
-=20
-  fail:
-     qcrypto_block_free_cipher(block);
-     qcrypto_ivgen_free(block->ivgen);
-     g_free(luks);
--    return ret;
-+    return -1;
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 4b4b731b46..6644da3e23 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -104,7 +104,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+ bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap);
+ bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap);
+-bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+                                         BdrvDirtyBitmap *bitmap);
+ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 134e0c9a0c..82cb4f9d8f 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -778,18 +778,6 @@ bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap)
+     return bitmap->inconsistent;
  }
-=20
-=20
---=20
+ 
+-bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs)
+-{
+-    BdrvDirtyBitmap *bm;
+-    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
+-        if (bm->persistent && !bm->readonly && !bm->skip_store) {
+-            return true;
+-        }
+-    }
+-
+-    return false;
+-}
+-
+ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+                                         BdrvDirtyBitmap *bitmap)
+ {
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index b2487101ed..60b79f1dac 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1456,16 +1456,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+     Qcow2Bitmap *bm;
+     QSIMPLEQ_HEAD(, Qcow2BitmapTable) drop_tables;
+     Qcow2BitmapTable *tb, *tb_next;
+-
+-    if (!bdrv_has_changed_persistent_bitmaps(bs)) {
+-        /* nothing to do */
+-        return;
+-    }
+-
+-    if (!can_write(bs)) {
+-        error_setg(errp, "No write access");
+-        return;
+-    }
++    bool need_write = false;
+ 
+     QSIMPLEQ_INIT(&drop_tables);
+ 
+@@ -1493,6 +1484,8 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+             continue;
+         }
+ 
++        need_write = true;
++
+         if (check_constraints_on_bitmap(bs, name, granularity, errp) < 0) {
+             error_prepend(errp, "Bitmap '%s' doesn't satisfy the constraints: ",
+                           name);
+@@ -1531,6 +1524,15 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+         bm->dirty_bitmap = bitmap;
+     }
+ 
++    if (!need_write) {
++        goto success;
++    }
++
++    if (!can_write(bs)) {
++        error_setg(errp, "No write access");
++        goto fail;
++    }
++
+     /* allocate clusters and store bitmaps */
+     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+         if (bm->dirty_bitmap == NULL) {
+@@ -1572,6 +1574,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+         bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
+     }
+ 
++success:
+     bitmap_list_free(bm_list);
+     return;
+ 
+-- 
 2.21.0
 
 
