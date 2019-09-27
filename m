@@ -2,80 +2,61 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD1CC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E42C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:34:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8333B2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:33:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qcFWW4Gw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8333B2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5C0282146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:34:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C0282146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrJe-0000kP-PL
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:33:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36709)
+	id 1iDrKS-0001PG-VC
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:34:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37249)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iDqN6-0005Ap-MM
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:21 -0400
+ (envelope-from <david@redhat.com>) id 1iDqPT-0007xT-OK
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:35:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iDqN5-0001xB-6W
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:20 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36795)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iDqN5-0001x4-0g
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:19 -0400
-Received: by mail-oi1-x241.google.com with SMTP id k20so5206847oih.3
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 06:33:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=XpRff2jEEJjun5C2nBwnEy0mpg4KSV3BL/CHwT484IE=;
- b=qcFWW4Gw2Z1hHz2R8mU/7PNImqDSLwQyb9YokkDvkIFBQGNra8ryGJ0Mu/u0rqwqLc
- 9NMqnwwG/iPr9oGSWsYCfiQOvZoZOLQcIx37TenROPvMxcIlNLsszFebmz/ISrP1I002
- nNKTwl7k6+zZBC90PoaDCvyHQ5jsc8CZImfI/O+2g6UWFgnUHjMBN9edyv10srOnB0aB
- zWVJKjFkmhJ7UTofs8uuCyw7EBlDbXtoflkBUeseFk0Qp/QkuOJsFy6S2GmeIhPT50fR
- Imoh+XTDM1Uf1uKnWGcunaRpKbyBqhJWOUtLXAK8/mbTyTnfmhOR3Xdn1DX+1qi6udvt
- 1+og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=XpRff2jEEJjun5C2nBwnEy0mpg4KSV3BL/CHwT484IE=;
- b=q9lETtwq8Md39b5G42ZSw/gw6iWMFVpihjz9RuCpXQm7VOX2PkJKBPJbxsurVxOAxo
- Sh63Fu2Up2FI0/oHCmJ9Np3OZpAlbU55+Hs8Awq0BV1IiI3jpnNfTNUzHyS/O0TV3V70
- eUCQ9RP667/WZpdeSTBKDkggLNPJnQBkhV6dOxnP0Im50NVoY7HRWu+HzNOohZRmaSOz
- C1haKs5bsDbnrmtCk7p5VEvzIgA4jxG6KBjmkIdAiWJDyhvspKeQChRqMGISzjuy6jD1
- f/RMwNTqjf/zzTL5sSaY0Ze9FyGmhrjz250oVQyHiK2xBJuPIoPUpLjt2SxlkxO6d4rG
- IPtw==
-X-Gm-Message-State: APjAAAXEC6Tu4ZRsytIsFgzpoDyFLyuXWsp38dxsYm3xRBRhb5ZU7ne8
- CeNwrAV06/ZXUYLONDPHWMk3mUIt7KkqZ8HJfN1QPg==
-X-Google-Smtp-Source: APXvYqzq1Mf0Cwsntez7S0gT5ElVn+nWXKGzokuwMctHq6cA/F3Ytm0RCygkiV1cnVmxGAYhvxowxpAmouCw/rKpz6k=
-X-Received: by 2002:aca:b48a:: with SMTP id d132mr7301167oif.98.1569591198389; 
- Fri, 27 Sep 2019 06:33:18 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1iDqPS-0002R6-3y
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:35:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60906)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iDqPR-0002R0-S2; Fri, 27 Sep 2019 09:35:46 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1205B3082135;
+ Fri, 27 Sep 2019 09:58:43 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-169.ams2.redhat.com [10.36.116.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 154221001281;
+ Fri, 27 Sep 2019 09:58:40 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/7] s390x/mmu: Drop debug logging from MMU code
+Date: Fri, 27 Sep 2019 11:58:25 +0200
+Message-Id: <20190927095831.23543-2-david@redhat.com>
+In-Reply-To: <20190927095831.23543-1-david@redhat.com>
+References: <20190927095831.23543-1-david@redhat.com>
 MIME-Version: 1.0
-References: <20190906083152.25716-1-zhengxiang9@huawei.com>
- <20190906083152.25716-6-zhengxiang9@huawei.com>
-In-Reply-To: <20190906083152.25716-6-zhengxiang9@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Sep 2019 14:33:07 +0100
-Message-ID: <CAFEAcA-xc2XUq2Kwa1cK=4sAMq8B-2jUFAmxiGOQbmRCp-+UmQ@mail.gmail.com>
-Subject: Re: [PATCH v18 5/6] target-arm: kvm64: inject synchronous External
- Abort
-To: Xiang Zheng <zhengxiang9@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 27 Sep 2019 09:58:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,113 +68,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
- Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- James Morse <james.morse@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
->
-> From: Dongjiu Geng <gengdongjiu@huawei.com>
->
-> Introduce kvm_inject_arm_sea() function in which we will setup the type
-> of exception and the syndrome information in order to inject a virtual
-> synchronous external abort. When switching to guest, it will jump to the
-> synchronous external abort vector table entry.
->
-> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and
-> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
-> not valid and hold an UNKNOWN value. These values will be set to KVM
-> register structures through KVM_SET_ONE_REG IOCTL.
->
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+Let's get it out of the way to make some further refactorings easier.
+Personally, I've never used these debug statements at all. And if I had
+to debug issues, I used plain GDB instead (debug prints are just way too
+much noise in the MMU). We might want to introduce tracing at some point
+instead, so we can able selected events on demand.
 
-> +/* Inject synchronous external abort */
-> +static void kvm_inject_arm_sea(CPUState *c)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/mmu_helper.c | 51 ---------------------------------------
+ 1 file changed, 51 deletions(-)
 
-This will cause a compilation failure at this point in
-the patch series, because the compiler will complain about
-a static function which is defined but never used.
-To avoid breaking bisection, we need to put the definition
-of the function in the same patch where it's used.
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 7e6b0d0508..6a7ad33c4d 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -28,31 +28,6 @@
+ #include "hw/hw.h"
+ #include "hw/s390x/storage-keys.h"
+=20
+-/* #define DEBUG_S390 */
+-/* #define DEBUG_S390_PTE */
+-/* #define DEBUG_S390_STDOUT */
+-
+-#ifdef DEBUG_S390
+-#ifdef DEBUG_S390_STDOUT
+-#define DPRINTF(fmt, ...) \
+-    do { fprintf(stderr, fmt, ## __VA_ARGS__); \
+-         if (qemu_log_separate()) qemu_log(fmt, ##__VA_ARGS__); } while =
+(0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { qemu_log(fmt, ## __VA_ARGS__); } while (0)
+-#endif
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
+-
+-#ifdef DEBUG_S390_PTE
+-#define PTE_DPRINTF DPRINTF
+-#else
+-#define PTE_DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
+-
+ /* Fetch/store bits in the translation exception code: */
+ #define FS_READ  0x800
+ #define FS_WRITE 0x400
+@@ -80,8 +55,6 @@ static void trigger_prot_fault(CPUS390XState *env, targ=
+et_ulong vaddr,
+=20
+     tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | 4 =
+| asc >> 46;
+=20
+-    DPRINTF("%s: trans_exc_code=3D%016" PRIx64 "\n", __func__, tec);
+-
+     if (!exc) {
+         return;
+     }
+@@ -97,8 +70,6 @@ static void trigger_page_fault(CPUS390XState *env, targ=
+et_ulong vaddr,
+=20
+     tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | as=
+c >> 46;
+=20
+-    DPRINTF("%s: trans_exc_code=3D%016" PRIx64 "\n", __func__, tec);
+-
+     if (!exc) {
+         return;
+     }
+@@ -162,7 +133,6 @@ static int mmu_translate_pte(CPUS390XState *env, targ=
+et_ulong vaddr,
+                              target_ulong *raddr, int *flags, int rw, bo=
+ol exc)
+ {
+     if (pt_entry & PAGE_INVALID) {
+-        DPRINTF("%s: PTE=3D0x%" PRIx64 " invalid\n", __func__, pt_entry)=
+;
+         trigger_page_fault(env, vaddr, PGM_PAGE_TRANS, asc, rw, exc);
+         return -1;
+     }
+@@ -175,9 +145,6 @@ static int mmu_translate_pte(CPUS390XState *env, targ=
+et_ulong vaddr,
+     }
+=20
+     *raddr =3D pt_entry & ASCE_ORIGIN;
+-
+-    PTE_DPRINTF("%s: PTE=3D0x%" PRIx64 "\n", __func__, pt_entry);
+-
+     return 0;
+ }
+=20
+@@ -197,7 +164,6 @@ static int mmu_translate_segment(CPUS390XState *env, =
+target_ulong vaddr,
+     if ((st_entry & SEGMENT_ENTRY_FC) && (env->cregs[0] & CR0_EDAT)) {
+         /* Decode EDAT1 segment frame absolute address (1MB page) */
+         *raddr =3D (st_entry & 0xfffffffffff00000ULL) | (vaddr & 0xfffff=
+);
+-        PTE_DPRINTF("%s: SEG=3D0x%" PRIx64 "\n", __func__, st_entry);
+         return 0;
+     }
+=20
+@@ -205,8 +171,6 @@ static int mmu_translate_segment(CPUS390XState *env, =
+target_ulong vaddr,
+     origin =3D st_entry & SEGMENT_ENTRY_ORIGIN;
+     offs  =3D (vaddr & VADDR_PX) >> 9;
+     pt_entry =3D ldq_phys(cs->as, origin + offs);
+-    PTE_DPRINTF("%s: 0x%" PRIx64 " + 0x%" PRIx64 " =3D> 0x%016" PRIx64 "=
+\n",
+-                __func__, origin, offs, pt_entry);
+     return mmu_translate_pte(env, vaddr, asc, pt_entry, raddr, flags, rw=
+, exc);
+ }
+=20
+@@ -223,17 +187,12 @@ static int mmu_translate_region(CPUS390XState *env,=
+ target_ulong vaddr,
+         PGM_REG_SEC_TRANS, PGM_REG_FIRST_TRANS
+     };
+=20
+-    PTE_DPRINTF("%s: 0x%" PRIx64 "\n", __func__, entry);
+-
+     origin =3D entry & REGION_ENTRY_ORIGIN;
+     offs =3D (vaddr >> (17 + 11 * level / 4)) & 0x3ff8;
+=20
+     new_entry =3D ldq_phys(cs->as, origin + offs);
+-    PTE_DPRINTF("%s: 0x%" PRIx64 " + 0x%" PRIx64 " =3D> 0x%016" PRIx64 "=
+\n",
+-                __func__, origin, offs, new_entry);
+=20
+     if ((new_entry & REGION_ENTRY_INV) !=3D 0) {
+-        DPRINTF("%s: invalid region\n", __func__);
+         trigger_page_fault(env, vaddr, pchks[level / 4], asc, rw, exc);
+         return -1;
+     }
+@@ -252,7 +211,6 @@ static int mmu_translate_region(CPUS390XState *env, t=
+arget_ulong vaddr,
+     offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
+     if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
+         || offs > (new_entry & REGION_ENTRY_LENGTH)) {
+-        DPRINTF("%s: invalid offset or len (%lx)\n", __func__, new_entry=
+);
+         trigger_page_fault(env, vaddr, pchks[level / 4 - 1], asc, rw, ex=
+c);
+         return -1;
+     }
+@@ -289,8 +247,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
+         break;
+     case ASCE_TYPE_REGION2:
+         if (vaddr & 0xffe0000000000000ULL) {
+-            DPRINTF("%s: vaddr doesn't fit 0x%16" PRIx64
+-                    " 0xffe0000000000000ULL\n", __func__, vaddr);
+             trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+             return -1;
+         }
+@@ -301,8 +257,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
+         break;
+     case ASCE_TYPE_REGION3:
+         if (vaddr & 0xfffffc0000000000ULL) {
+-            DPRINTF("%s: vaddr doesn't fit 0x%16" PRIx64
+-                    " 0xfffffc0000000000ULL\n", __func__, vaddr);
+             trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+             return -1;
+         }
+@@ -313,8 +267,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
+         break;
+     case ASCE_TYPE_SEGMENT:
+         if (vaddr & 0xffffffff80000000ULL) {
+-            DPRINTF("%s: vaddr doesn't fit 0x%16" PRIx64
+-                    " 0xffffffff80000000ULL\n", __func__, vaddr);
+             trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+             return -1;
+         }
+@@ -449,15 +401,12 @@ int mmu_translate(CPUS390XState *env, target_ulong =
+vaddr, int rw, uint64_t asc,
+=20
+     switch (asc) {
+     case PSW_ASC_PRIMARY:
+-        PTE_DPRINTF("%s: asc=3Dprimary\n", __func__);
+         asce =3D env->cregs[1];
+         break;
+     case PSW_ASC_HOME:
+-        PTE_DPRINTF("%s: asc=3Dhome\n", __func__);
+         asce =3D env->cregs[13];
+         break;
+     case PSW_ASC_SECONDARY:
+-        PTE_DPRINTF("%s: asc=3Dsecondary\n", __func__);
+         asce =3D env->cregs[7];
+         break;
+     case PSW_ASC_ACCREG:
+--=20
+2.21.0
 
-> +{
-> +    ARMCPU *cpu = ARM_CPU(c);
-> +    CPUARMState *env = &cpu->env;
-> +    CPUClass *cc = CPU_GET_CLASS(c);
-> +    uint32_t esr;
-> +    bool same_el;
-> +
-> +    /**
-> +     * Set the exception type to synchronous data abort
-> +     * and the target exception Level to EL1.
-> +     */
-
-This comment doesn't really tell us anything that's not obvious
-from the two lines of code that it's commenting on:
-
-> +    c->exception_index = EXCP_DATA_ABORT;
-> +    env->exception.target_el = 1;
-> +
-> +    /*
-> +     * Set the DFSC to synchronous external abort and set FnV to not valid,
-> +     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
-> +     */
-> +
-> +    /* This exception comes from lower or current exception level. */
-
-This comment too is stating the obvious I think.
-
-> +    same_el = arm_current_el(env) == env->exception.target_el;
-> +    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
-> +
-> +    env->exception.syndrome = esr;
-> +
-> +    /**
-
-There's a stray second '*' in this comment-start.
-
-
-> +     * The vcpu thread already hold BQL, so no need hold again when
-> +     * calling do_interrupt
-
-I think this requirement would be better placed as a
-comment at the top of the function noting that callers
-must hold the iothread lock.
-
-> +     */
-> +    cc->do_interrupt(c);
-> +}
-> +
->  #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
->                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
->
-> diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
-> index 5feb312941..499672ebbc 100644
-> --- a/target/arm/tlb_helper.c
-> +++ b/target/arm/tlb_helper.c
-> @@ -33,7 +33,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
->       * ISV field.
->       */
->      if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
-> -        syn = syn_data_abort_no_iss(same_el,
-> +        syn = syn_data_abort_no_iss(same_el, 0,
->                                      ea, 0, s1ptw, is_write, fsc);
->      } else {
->          /*
-> --
-> 2.19.1
-
-thanks
--- PMM
 
