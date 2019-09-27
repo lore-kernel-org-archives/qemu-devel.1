@@ -2,111 +2,89 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A4FC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE0EC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C8EA2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:10:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C8EA2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7A60521841
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:10:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8Edi8jP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A60521841
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDqwa-00075i-3F
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:10:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36404)
+	id 1iDqxV-0008LK-2o
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:10:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDqLy-0004Pz-4B
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:32:11 -0400
+ (envelope-from <groeck7@gmail.com>) id 1iDqG8-0007aY-Et
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:26:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDqLv-0001nN-Vc
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:32:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35212)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDqLv-0001nI-NK; Fri, 27 Sep 2019 09:32:07 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CAAAA18C37B;
- Fri, 27 Sep 2019 11:04:10 +0000 (UTC)
-Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EEDFE60BE2;
- Fri, 27 Sep 2019 11:04:09 +0000 (UTC)
-Subject: Re: [PATCH v3 15/18] target/s390x: Rely on unwinding in
- s390_cpu_virt_mem_rw
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190926162615.31168-1-richard.henderson@linaro.org>
- <20190926162615.31168-16-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <cf20b4e6-af8b-1a11-9a99-f8e8b14be205@redhat.com>
-Date: Fri, 27 Sep 2019 13:04:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <groeck7@gmail.com>) id 1iDqG7-00012a-Aq
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:26:08 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:45129)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1iDqG7-00012W-58; Fri, 27 Sep 2019 09:26:07 -0400
+Received: by mail-pf1-x442.google.com with SMTP id y72so1581835pfb.12;
+ Fri, 27 Sep 2019 06:26:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=TzPly1HOOP5ZxOVgZNGoYgvsj1Jnu09Ez2nIhgHlkY8=;
+ b=L8Edi8jPOfq2NbZlINTGOHDgfJyjJIFAI0nrKtzA6iGx5qYKUMti0M25LvSOnNbN4l
+ OM0naoRLzCuuz+zd0sp4/SzoW8ThYeAkfz/Qcifhbkg+zeAf5eLmkuK6MKwkPNPgY8uN
+ QLPyZvLxTdjqCUU7QoVN1L+/HbWwX0jlzDRKQZSVEjCxy627dNVcsn2dIMev11PpNDsP
+ uygFZN7Y9gGP5BpOSy1jfeb/tZxSN7HUKJzJkzpiqGUeM2Fzcr4DvpfsmBRagxFwwXLP
+ GU+e1Eu8fzZnMofGeVof73xUnkzr/dbO5dK/uZZzIH0MC6CK3akiIoyRCdEB4J16P5Kj
+ dT9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :references:mime-version:content-disposition
+ :content-transfer-encoding:in-reply-to:user-agent;
+ bh=TzPly1HOOP5ZxOVgZNGoYgvsj1Jnu09Ez2nIhgHlkY8=;
+ b=twWtxuFP0aG9Tdg0gm14nTRwZAxouQB99+QYCF/beTm2qj+tXdtgNDAxbXyH3MFIgZ
+ IJKQDhOs3ULBLGlnJGZeNswjPw8y1Dbrvg0y4rwkiPqRVZxOOT7o3/rbXbnLbImAYnT3
+ SKSEaRCVxUZL8rLLNDSgaM8zO4N+CT5cPlvDlssr0xkwGhFNKDy1hmTuM2KYjLn3oYqS
+ ka3eKT8TQxcqIInok9LbtSFUhnN5ipkCU4AgSUG0sJRJ+PqVAwEhYZ2A021+0Tqwt3L+
+ 5/qzpgiuFo0Mb8CI2c4HdiJtFvuP7ETRU/Z9b+glEDvAsTBt0dyCxYt5ep+ScXc+C89A
+ VLoQ==
+X-Gm-Message-State: APjAAAX4Q/XKwU19VF708pumFaGwgtYDdiE9ijSR9/rbam48jJ1wQWs1
+ cqlBsQPBEOcDfPOsr1zih4s=
+X-Google-Smtp-Source: APXvYqwcBNT6wz0SymG2SWs8UsfrdYXH7KWpEqDSy2cs2h2hc5olPQw4Gno3/UQ1orULSMWr603PMA==
+X-Received: by 2002:a63:5745:: with SMTP id h5mr9518090pgm.268.1569590765893; 
+ Fri, 27 Sep 2019 06:26:05 -0700 (PDT)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id f6sm4488541pga.50.2019.09.27.06.26.03
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 27 Sep 2019 06:26:04 -0700 (PDT)
+Date: Fri, 27 Sep 2019 06:26:02 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: bzt <bztemail@gmail.com>
+Subject: Re: [PATCH 14/19] python/qemu/machine: Allow to use other serial
+ consoles than default
+Message-ID: <20190927132602.GA19931@roeck-us.net>
+References: <20190926173428.10713-1-f4bug@amsat.org>
+ <20190926173428.10713-15-f4bug@amsat.org>
+ <CADYoBw11iiK=+O-mGYS5Xp85zVhezOXXXr-wKV_xCg07ZYuzVw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190926162615.31168-16-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Fri, 27 Sep 2019 11:04:10 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADYoBw11iiK=+O-mGYS5Xp85zVhezOXXXr-wKV_xCg07ZYuzVw@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,42 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Cheng Xiang <ext-cheng.xiang@here.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Laurent Bonnans <laurent.bonnans@here.com>,
+ Esteban Bosse <estebanbosse@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-devel@nongnu.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-arm@nongnu.org, Clement Deschamps <clement.deschamps@antfield.fr>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Pekka Enberg <penberg@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26.09.19 18:26, Richard Henderson wrote:
-> For TCG, we will always call s390_cpu_virt_mem_handle_exc,
-> which will go through the unwinder to set ILEN.  For KVM,
-> we do not go through do_program_interrupt, so this argument
-> is unused.
+On Fri, Sep 27, 2019 at 02:54:10PM +0200, bzt wrote:
+> Hi,
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/s390x/mmu_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 9/26/19, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+> > Currently we are limited to use the first serial console available.
 > 
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index 5ecd9ee87e..bf7fddb056 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -482,7 +482,7 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
->  
->      ret = translate_pages(cpu, laddr, nr_pages, pages, is_write, &tec);
->      if (ret) {
-> -        trigger_access_exception(&cpu->env, ret, ILEN_AUTO, tec);
-> +        trigger_access_exception(&cpu->env, ret, ILEN_UNWIND, tec);
->      } else if (hostbuf != NULL) {
->          /* Copy data by stepping through the area page by page */
->          for (i = 0; i < nr_pages; i++) {
+> I'm not so sure. Right now it works like this:
 > 
+> qemu -serial stdio
+> Connects the VM's UART0 (PL011) serial console to the host terminal
+> 
+> qemu -serial null -serial stdio
+> Connects the VM's UART1 (AUX) serial console to the host terminal
+> 
+> I think this is simple and good, please don't remove this option. If
+> your commit does not influence these cli args, I'm not against it.
+> 
+Agreed. I am using that mechanism (raspi3 uses the second console,
+not pl011) in my scripts. Please don't take it away.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-
-Thanks,
-
-David / dhildenb
+Guenter
 
