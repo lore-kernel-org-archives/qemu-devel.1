@@ -3,55 +3,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF407C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:53:37 +0000 (UTC)
-Received: from lists.gnu.org (unknown [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B496C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:53:52 +0000 (UTC)
+Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E737217D9
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:53:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E737217D9
+	by mail.kernel.org (Postfix) with ESMTPS id 00C89217D9
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:53:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00C89217D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrck-00037a-UH
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:53:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37724)
+	id 1iDrd0-0003MH-RX
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:53:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDqRY-0001Px-03
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:37:57 -0400
+ (envelope-from <armbru@redhat.com>) id 1iDqaE-0001Iw-JT
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDqRW-000394-5J
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:37:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58604)
+ (envelope-from <armbru@redhat.com>) id 1iDqa9-00065g-4r
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34688)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDqRV-00038S-Sh; Fri, 27 Sep 2019 09:37:54 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa8-00063x-K0
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:48 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 96E0D898101;
- Fri, 27 Sep 2019 09:59:00 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C4AC71001B20;
- Fri, 27 Sep 2019 09:58:58 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 3FD0B3083394;
+ Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D86223D8E;
+ Fri, 27 Sep 2019 13:46:46 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B951A1136426; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 7/7] s390x/mmu: Convert to non-recursive page table walk
-Date: Fri, 27 Sep 2019 11:58:31 +0200
-Message-Id: <20190927095831.23543-8-david@redhat.com>
-In-Reply-To: <20190927095831.23543-1-david@redhat.com>
-References: <20190927095831.23543-1-david@redhat.com>
+Subject: [PATCH v2 26/26] qapi: Improve source file read error handling
+Date: Fri, 27 Sep 2019 15:46:39 +0200
+Message-Id: <20190927134639.4284-27-armbru@redhat.com>
+In-Reply-To: <20190927134639.4284-1-armbru@redhat.com>
+References: <20190927134639.4284-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Fri, 27 Sep 2019 09:59:00 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -67,305 +70,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A non-recursive implementation allows to make better use of the
-branch predictor, avoids function calls, and makes the implementation of
-new features only for a subset of region table levels easier.
+qapi-gen.py crashes when it can't open the main schema file, and when
+it can't read from any schema file.  Lazy.
 
-We can now directly compare our implementation to the KVM gaccess
-implementation in arch/s390/kvm/gaccess.c:guest_translate().
+Change QAPISchema.__init__() to take a file name instead of a file
+object.  Move the open code from _include() to __init__(), so it's
+used for the main schema file, too.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Move the read into the try for good measure, and rephrase the error
+message.
+
+Reporting open or read failure for the main schema file needs a
+QAPISourceInfo representing "no source".  Make QAPISourceInfo cope
+with fname=3DNone.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- target/s390x/mmu_helper.c | 212 ++++++++++++++++++++------------------
- 1 file changed, 112 insertions(+), 100 deletions(-)
+ scripts/qapi/common.py                | 46 +++++++++++++++------------
+ tests/qapi-schema/include-no-file.err |  2 +-
+ 2 files changed, 27 insertions(+), 21 deletions(-)
 
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index a114fb1628..6b34c4c7b4 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -114,107 +114,16 @@ static inline bool read_table_entry(CPUS390XState =
-*env, hwaddr gaddr,
-     return true;
- }
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index a74cd957d4..d6e00c80ea 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -53,7 +53,12 @@ class QAPISourceInfo(object):
+         return info
 =20
--/* Decode page table entry (normal 4KB page) */
--static int mmu_translate_pte(CPUS390XState *env, target_ulong vaddr,
--                             uint64_t asc, uint64_t pt_entry,
--                             target_ulong *raddr, int *flags, int rw, bo=
-ol exc)
--{
--    if (pt_entry & PAGE_ENTRY_I) {
--        return PGM_PAGE_TRANS;
--    }
--    if (pt_entry & PAGE_ENTRY_0) {
--        return PGM_TRANS_SPEC;
--    }
--    if (pt_entry & PAGE_ENTRY_P) {
--        *flags &=3D ~PAGE_WRITE;
--    }
--
--    *raddr =3D pt_entry & TARGET_PAGE_MASK;
--    return 0;
--}
--
--/* Decode segment table entry */
--static int mmu_translate_segment(CPUS390XState *env, target_ulong vaddr,
--                                 uint64_t asc, uint64_t st_entry,
--                                 target_ulong *raddr, int *flags, int rw=
-,
--                                 bool exc)
--{
--    uint64_t origin, offs, pt_entry;
--
--    if (st_entry & SEGMENT_ENTRY_P) {
--        *flags &=3D ~PAGE_WRITE;
--    }
--
--    if ((st_entry & SEGMENT_ENTRY_FC) && (env->cregs[0] & CR0_EDAT)) {
--        /* Decode EDAT1 segment frame absolute address (1MB page) */
--        *raddr =3D (st_entry & SEGMENT_ENTRY_SFAA) |
--                 (vaddr & ~SEGMENT_ENTRY_SFAA);
--        return 0;
--    }
--
--    /* Look up 4KB page entry */
--    origin =3D st_entry & SEGMENT_ENTRY_ORIGIN;
--    offs =3D VADDR_PAGE_TX(vaddr) * 8;
--    if (!read_table_entry(env, origin + offs, &pt_entry)) {
--        return PGM_ADDRESSING;
--    }
--    return mmu_translate_pte(env, vaddr, asc, pt_entry, raddr, flags, rw=
-, exc);
--}
--
--/* Decode region table entries */
--static int mmu_translate_region(CPUS390XState *env, target_ulong vaddr,
--                                uint64_t asc, uint64_t entry, int level,
--                                target_ulong *raddr, int *flags, int rw,
--                                bool exc)
--{
--    uint64_t origin, offs, new_entry;
--    const int pchks[4] =3D {
--        PGM_SEGMENT_TRANS, PGM_REG_THIRD_TRANS,
--        PGM_REG_SEC_TRANS, PGM_REG_FIRST_TRANS
--    };
--
--    origin =3D entry & REGION_ENTRY_ORIGIN;
--    offs =3D (vaddr >> (17 + 11 * level / 4)) & 0x3ff8;
--
--    if (!read_table_entry(env, origin + offs, &new_entry)) {
--        return PGM_ADDRESSING;
--    }
--
--    if (new_entry & REGION_ENTRY_I) {
--        return pchks[level / 4];
--    }
--
--    if ((new_entry & REGION_ENTRY_TT) !=3D level) {
--        return PGM_TRANS_SPEC;
--    }
--
--    if (level =3D=3D ASCE_TYPE_SEGMENT) {
--        return mmu_translate_segment(env, vaddr, asc, new_entry, raddr, =
-flags,
--                                     rw, exc);
--    }
--
--    /* Check region table offset and length */
--    offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
--    if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
--        || offs > (new_entry & REGION_ENTRY_TL)) {
--        return pchks[level / 4 - 1];
--    }
--
--    if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_P)) {
--        *flags &=3D ~PAGE_WRITE;
--    }
--
--    /* yet another region */
--    return mmu_translate_region(env, vaddr, asc, new_entry, level - 4,
--                                raddr, flags, rw, exc);
--}
--
- static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
-                               uint64_t asc, uint64_t asce, target_ulong =
-*raddr,
-                               int *flags, int rw, bool exc)
- {
-+    const bool edat1 =3D (env->cregs[0] & CR0_EDAT) &&
-+                       s390_has_feat(S390_FEAT_EDAT);
-     const int asce_tl =3D asce & ASCE_TABLE_LENGTH;
--    int level;
-+    const int asce_p =3D asce & ASCE_PRIVATE_SPACE;
-+    hwaddr gaddr =3D asce & ASCE_ORIGIN;
-+    uint64_t entry;
+     def loc(self):
+-        return '%s:%d' % (self.fname, self.line)
++        if self.fname is None:
++            return sys.argv[0]
++        ret =3D self.fname
++        if self.line is not None:
++            ret +=3D ':%d' % self.line
++        return ret
 =20
-     if (asce & ASCE_REAL_SPACE) {
-         /* direct mapping */
-@@ -222,12 +131,12 @@ static int mmu_translate_asce(CPUS390XState *env, t=
-arget_ulong vaddr,
-         return 0;
-     }
+     def in_defn(self):
+         if self.defn_name:
+@@ -383,14 +388,26 @@ class QAPIDoc(object):
 =20
--    level =3D asce & ASCE_TYPE_MASK;
--    switch (level) {
-+    switch (asce & ASCE_TYPE_MASK) {
-     case ASCE_TYPE_REGION1:
-         if (VADDR_REGION1_TL(vaddr) > asce_tl) {
-             return PGM_REG_FIRST_TRANS;
-         }
-+        gaddr +=3D VADDR_REGION1_TX(vaddr) * 8;
-         break;
-     case ASCE_TYPE_REGION2:
-         if (VADDR_REGION1_TX(vaddr)) {
-@@ -236,6 +145,7 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
-get_ulong vaddr,
-         if (VADDR_REGION2_TL(vaddr) > asce_tl) {
-             return PGM_REG_SEC_TRANS;
-         }
-+        gaddr +=3D VADDR_REGION2_TX(vaddr) * 8;
-         break;
-     case ASCE_TYPE_REGION3:
-         if (VADDR_REGION1_TX(vaddr) || VADDR_REGION2_TX(vaddr)) {
-@@ -244,6 +154,7 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
-get_ulong vaddr,
-         if (VADDR_REGION3_TL(vaddr) > asce_tl) {
-             return PGM_REG_THIRD_TRANS;
-         }
-+        gaddr +=3D VADDR_REGION3_TX(vaddr) * 8;
-         break;
-     case ASCE_TYPE_SEGMENT:
-         if (VADDR_REGION1_TX(vaddr) || VADDR_REGION2_TX(vaddr) ||
-@@ -253,11 +164,112 @@ static int mmu_translate_asce(CPUS390XState *env, =
-target_ulong vaddr,
-         if (VADDR_SEGMENT_TL(vaddr) > asce_tl) {
-             return PGM_SEGMENT_TRANS;
-         }
-+        gaddr +=3D VADDR_SEGMENT_TX(vaddr) * 8;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
+ class QAPISchemaParser(object):
+=20
+-    def __init__(self, fp, previously_included=3D[], incl_info=3DNone):
+-        self.fname =3D fp.name
+-        previously_included.append(os.path.abspath(fp.name))
+-        self.src =3D fp.read()
++    def __init__(self, fname, previously_included=3D[], incl_info=3DNone=
+):
++        previously_included.append(os.path.abspath(fname))
 +
-+    switch (asce & ASCE_TYPE_MASK) {
-+    case ASCE_TYPE_REGION1:
-+        if (!read_table_entry(env, gaddr, &entry)) {
-+            return PGM_ADDRESSING;
-+        }
-+        if (entry & REGION_ENTRY_I) {
-+            return PGM_REG_FIRST_TRANS;
-+        }
-+        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION1) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if (VADDR_REGION2_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
-+            VADDR_REGION2_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
-+            return PGM_REG_SEC_TRANS;
-+        }
-+        if (edat1 && (entry & REGION_ENTRY_P)) {
-+            *flags &=3D ~PAGE_WRITE;
-+        }
-+        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_REGION2_TX(vaddr=
-) * 8;
-+        /* fall through */
-+    case ASCE_TYPE_REGION2:
-+        if (!read_table_entry(env, gaddr, &entry)) {
-+            return PGM_ADDRESSING;
-+        }
-+        if (entry & REGION_ENTRY_I) {
-+            return PGM_REG_SEC_TRANS;
-+        }
-+        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION2) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if (VADDR_REGION3_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
-+            VADDR_REGION3_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
-+            return PGM_REG_THIRD_TRANS;
-+        }
-+        if (edat1 && (entry & REGION_ENTRY_P)) {
-+            *flags &=3D ~PAGE_WRITE;
-+        }
-+        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_REGION3_TX(vaddr=
-) * 8;
-+        /* fall through */
-+    case ASCE_TYPE_REGION3:
-+        if (!read_table_entry(env, gaddr, &entry)) {
-+            return PGM_ADDRESSING;
-+        }
-+        if (entry & REGION_ENTRY_I) {
-+            return PGM_REG_THIRD_TRANS;
-+        }
-+        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION3) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if (edat1 && (entry & REGION_ENTRY_P)) {
-+            *flags &=3D ~PAGE_WRITE;
-+        }
-+        if (VADDR_SEGMENT_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
-+            VADDR_SEGMENT_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
-+            return PGM_SEGMENT_TRANS;
-+        }
-+        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_SEGMENT_TX(vaddr=
-) * 8;
-+        /* fall through */
-+    case ASCE_TYPE_SEGMENT:
-+        if (!read_table_entry(env, gaddr, &entry)) {
-+            return PGM_ADDRESSING;
-+        }
-+        if (entry & SEGMENT_ENTRY_I) {
-+            return PGM_SEGMENT_TRANS;
-+        }
-+        if ((entry & SEGMENT_ENTRY_TT) !=3D SEGMENT_ENTRY_TT_SEGMENT) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if ((entry & SEGMENT_ENTRY_CS) && asce_p) {
-+            return PGM_TRANS_SPEC;
-+        }
-+        if (entry & SEGMENT_ENTRY_P) {
-+            *flags &=3D ~PAGE_WRITE;
-+        }
-+        if (edat1 && (entry & SEGMENT_ENTRY_FC)) {
-+            *raddr =3D (entry & SEGMENT_ENTRY_SFAA) |
-+                     (vaddr & ~SEGMENT_ENTRY_SFAA);
-+            return 0;
-+        }
-+        gaddr =3D (entry & SEGMENT_ENTRY_ORIGIN) + VADDR_PAGE_TX(vaddr) =
-* 8;
-         break;
-+    default:
-+        g_assert_not_reached();
-+    }
++        try:
++            if sys.version_info[0] >=3D 3:
++                fp =3D open(fname, 'r', encoding=3D'utf-8')
++            else:
++                fp =3D open(fname, 'r')
++            self.src =3D fp.read()
++        except IOError as e:
++            raise QAPISemError(incl_info or QAPISourceInfo(None, None, N=
+one),
++                               "can't read %s file '%s': %s"
++                               % ("include" if incl_info else "schema",
++                                  fname,
++                                  e.strerror))
 +
-+    if (!read_table_entry(env, gaddr, &entry)) {
-+        return PGM_ADDRESSING;
-+    }
-+    if (entry & PAGE_ENTRY_I) {
-+        return PGM_PAGE_TRANS;
-+    }
-+    if (entry & PAGE_ENTRY_0) {
-+        return PGM_TRANS_SPEC;
-+    }
-+    if (entry & PAGE_ENTRY_P) {
-+        *flags &=3D ~PAGE_WRITE;
-     }
+         if self.src =3D=3D '' or self.src[-1] !=3D '\n':
+             self.src +=3D '\n'
+         self.cursor =3D 0
+-        self.info =3D QAPISourceInfo(self.fname, 1, incl_info)
++        self.info =3D QAPISourceInfo(fname, 1, incl_info)
+         self.line_pos =3D 0
+         self.exprs =3D []
+         self.docs =3D []
+@@ -414,7 +431,7 @@ class QAPISchemaParser(object):
+                 if not isinstance(include, str):
+                     raise QAPISemError(info,
+                                        "value of 'include' must be a str=
+ing")
+-                incl_fname =3D os.path.join(os.path.dirname(self.fname),
++                incl_fname =3D os.path.join(os.path.dirname(fname),
+                                           include)
+                 self.exprs.append({'expr': {'include': incl_fname},
+                                    'info': info})
+@@ -466,14 +483,7 @@ class QAPISchemaParser(object):
+         if incl_abs_fname in previously_included:
+             return None
 =20
--    return mmu_translate_region(env, vaddr, asc, asce, level, raddr, fla=
-gs, rw,
--                                exc);
-+    *raddr =3D entry & TARGET_PAGE_MASK;
-+    return 0;
- }
+-        try:
+-            if sys.version_info[0] >=3D 3:
+-                fobj =3D open(incl_fname, 'r', encoding=3D'utf-8')
+-            else:
+-                fobj =3D open(incl_fname, 'r')
+-        except IOError as e:
+-            raise QAPISemError(info, "%s: %s" % (e.strerror, incl_fname)=
+)
+-        return QAPISchemaParser(fobj, previously_included, info)
++        return QAPISchemaParser(incl_fname, previously_included, info)
 =20
- static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
+     def _pragma(self, name, value, info):
+         global doc_required, returns_whitelist, name_case_whitelist
+@@ -1734,11 +1744,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
+ class QAPISchema(object):
+     def __init__(self, fname):
+         self.fname =3D fname
+-        if sys.version_info[0] >=3D 3:
+-            f =3D open(fname, 'r', encoding=3D'utf-8')
+-        else:
+-            f =3D open(fname, 'r')
+-        parser =3D QAPISchemaParser(f)
++        parser =3D QAPISchemaParser(fname)
+         exprs =3D check_exprs(parser.exprs)
+         self.docs =3D parser.docs
+         self._entity_list =3D []
+diff --git a/tests/qapi-schema/include-no-file.err b/tests/qapi-schema/in=
+clude-no-file.err
+index e42bcf4bc1..0a6c6bb4a9 100644
+--- a/tests/qapi-schema/include-no-file.err
++++ b/tests/qapi-schema/include-no-file.err
+@@ -1 +1 @@
+-tests/qapi-schema/include-no-file.json:1: No such file or directory: tes=
+ts/qapi-schema/include-no-file-sub.json
++tests/qapi-schema/include-no-file.json:1: can't read include file 'tests=
+/qapi-schema/include-no-file-sub.json': No such file or directory
 --=20
 2.21.0
 
