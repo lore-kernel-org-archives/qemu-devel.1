@@ -2,60 +2,63 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E62BC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 10:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0ACAC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 10:05:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7C15217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 10:04:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7C15217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2EBD217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 10:05:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2EBD217D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDn6e-0008TU-0J
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 06:04:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33616)
+	id 1iDn7b-0000wC-TQ
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 06:05:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35066)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iDmme-0003nz-4Q
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:43:29 -0400
+ (envelope-from <groug@kaod.org>) id 1iDmvd-00053k-JC
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iDmmc-00088n-Qy
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:43:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34024)
+ (envelope-from <groug@kaod.org>) id 1iDmvc-0005GO-53
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:52:45 -0400
+Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:54663)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iDmma-00082l-5E; Fri, 27 Sep 2019 05:43:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 64239E8CD9;
- Fri, 27 Sep 2019 09:43:23 +0000 (UTC)
-Received: from localhost (ovpn-204-76.brq.redhat.com [10.40.204.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F334360606;
- Fri, 27 Sep 2019 09:43:22 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 16/18] iotests: Make 198 work with data_file
-Date: Fri, 27 Sep 2019 11:42:40 +0200
-Message-Id: <20190927094242.11152-17-mreitz@redhat.com>
-In-Reply-To: <20190927094242.11152-1-mreitz@redhat.com>
-References: <20190927094242.11152-1-mreitz@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDmvb-00056r-TY
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:52:44 -0400
+Received: from player786.ha.ovh.net (unknown [10.108.54.237])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 2828D11B05C
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 11:52:40 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id BC085A6124BD;
+ Fri, 27 Sep 2019 09:52:29 +0000 (UTC)
+Date: Fri, 27 Sep 2019 11:52:28 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v2 20/33] spapr, xics, xive: Introduce
+ SpaprInterruptController QOM interface
+Message-ID: <20190927115228.176b0b26@bahia.lan>
+In-Reply-To: <20190927055028.11493-21-david@gibson.dropbear.id.au>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-21-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 27 Sep 2019 09:43:23 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 15845915288956803558
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfeeigddvtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 178.33.111.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,75 +70,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We do not care about the json:{} filenames here, so we can just filter
-them out and thus make the test work both with and without external data
-files.
+On Fri, 27 Sep 2019 15:50:15 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/198     | 6 ++++--
- tests/qemu-iotests/198.out | 4 ++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+> The SpaprIrq structure is used to represent ths spapr machine's irq
+> backend.  Except that it kind of conflates two concepts: one is the
+> backend proper - a specific interrupt controller that we might or
+> might not be using, the other is the irq configuration which covers
+> the layout of irq space and which interrupt controllers are allowed.
+> 
+> This leads to some pretty confusing code paths for the "dual"
+> configuration where its hooks redirect to other SpaprIrq structures
+> depending on the currently active irq controller.
+> 
+> To clean this up, we start by introducing a new
+> SpaprInterruptController QOM interface to represent strictly an
+> interrupt controller backend, not counting anything configuration
+> related.  We implement this interface in the XICs and XIVE interrupt
+> controllers, and in future we'll move relevant methods from SpaprIrq
+> into it.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
-index c8f824cfae..d9981942a7 100755
---- a/tests/qemu-iotests/198
-+++ b/tests/qemu-iotests/198
-@@ -92,13 +92,15 @@ echo
- echo "=3D=3D checking image base =3D=3D"
- $QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info --format-spe=
-cific \
-     | sed -e "/^disk size:/ D" -e '/refcount bits:/ D' -e '/compat:/ D' =
-\
--          -e '/lazy refcounts:/ D' -e '/corrupt:/ D'
-+          -e '/lazy refcounts:/ D' -e '/corrupt:/ D' -e '/^\s*data file/=
- D' \
-+          -e 's#image: json:.*#image: json:{ /* filtered */ }#'
-=20
- echo
- echo "=3D=3D checking image layer =3D=3D"
- $QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info --format-sp=
-ecific \
-     | sed -e "/^disk size:/ D" -e '/refcount bits:/ D' -e '/compat:/ D' =
-\
--          -e '/lazy refcounts:/ D' -e '/corrupt:/ D'
-+          -e '/lazy refcounts:/ D' -e '/corrupt:/ D' -e '/^\s*data file/=
- D' \
-+          -e 's#image: json:.*#image: json:{ /* filtered */ }#'
-=20
-=20
- # success, all done
-diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-index e86b175e39..831ce3a289 100644
---- a/tests/qemu-iotests/198.out
-+++ b/tests/qemu-iotests/198.out
-@@ -32,7 +32,7 @@ read 16777216/16777216 bytes at offset 0
- 16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-=20
- =3D=3D checking image base =3D=3D
--image: json:{"encrypt.key-secret": "sec0", "driver": "IMGFMT", "file": {=
-"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}
-+image: json:{ /* filtered */ }
- file format: IMGFMT
- virtual size: 16 MiB (16777216 bytes)
- Format specific information:
-@@ -74,7 +74,7 @@ Format specific information:
-         master key iters: 1024
-=20
- =3D=3D checking image layer =3D=3D
--image: json:{"encrypt.key-secret": "sec1", "driver": "IMGFMT", "file": {=
-"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}
-+image: json:{ /* filtered */ }
- file format: IMGFMT
- virtual size: 16 MiB (16777216 bytes)
- backing file: TEST_DIR/t.IMGFMT.base
---=20
-2.21.0
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/intc/spapr_xive.c       |  4 ++++
+>  hw/intc/xics_spapr.c       |  4 ++++
+>  hw/ppc/spapr_irq.c         | 13 +++++++++++++
+>  include/hw/ppc/spapr_irq.h | 14 ++++++++++++++
+>  4 files changed, 35 insertions(+)
+> 
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 04879abf2e..b67e9c3245 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -519,6 +519,10 @@ static const TypeInfo spapr_xive_info = {
+>      .instance_init = spapr_xive_instance_init,
+>      .instance_size = sizeof(SpaprXive),
+>      .class_init = spapr_xive_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_SPAPR_INTC },
+> +        { }
+> +    },
+>  };
+>  
+>  static void spapr_xive_register_types(void)
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index 6e5eb24b3c..4874e6be55 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -343,6 +343,10 @@ static const TypeInfo ics_spapr_info = {
+>      .name = TYPE_ICS_SPAPR,
+>      .parent = TYPE_ICS,
+>      .class_init = ics_spapr_class_init,
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_SPAPR_INTC },
+> +        { }
+> +    },
+>  };
+>  
+>  static void xics_spapr_register_types(void)
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 5e448b1fd4..0603c82fe8 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -23,6 +23,12 @@
+>  
+>  #include "trace.h"
+>  
+> +static const TypeInfo spapr_intc_info = {
+> +    .name = TYPE_SPAPR_INTC,
+> +    .parent = TYPE_INTERFACE,
+> +    .class_size = sizeof(SpaprInterruptControllerClass),
+> +};
+> +
+>  void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis)
+>  {
+>      spapr->irq_map_nr = nr_msis;
+> @@ -763,3 +769,10 @@ SpaprIrq spapr_irq_xics_legacy = {
+>      .set_irq     = spapr_irq_set_irq_xics,
+>      .init_kvm    = spapr_irq_init_kvm_xics,
+>  };
+> +
+> +static void spapr_irq_register_types(void)
+> +{
+> +    type_register_static(&spapr_intc_info);
+> +}
+> +
+> +type_init(spapr_irq_register_types)
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 69a37f608e..b9398e0be3 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -31,6 +31,20 @@
+>  
+>  typedef struct SpaprMachineState SpaprMachineState;
+>  
+> +typedef struct SpaprInterruptController SpaprInterruptController;
+> +
+> +#define TYPE_SPAPR_INTC "spapr-interrupt-controller"
+> +#define SPAPR_INTC(obj)                                     \
+> +    INTERFACE_CHECK(SpaprInterruptController, (obj), TYPE_SPAPR_INTC)
+> +#define SPAPR_INTC_CLASS(klass)                                     \
+> +    OBJECT_CLASS_CHECK(SpaprInterruptControllerClass, (klass), TYPE_SPAPR_INTC)
+> +#define SPAPR_INTC_GET_CLASS(obj)                                   \
+> +    OBJECT_GET_CLASS(SpaprInterruptControllerClass, (obj), TYPE_SPAPR_INTC)
+> +
+> +typedef struct SpaprInterruptControllerClass {
+> +    InterfaceClass parent;
+> +} SpaprInterruptControllerClass;
+> +
+>  void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis);
+>  int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool align,
+>                          Error **errp);
 
 
