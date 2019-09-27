@@ -2,62 +2,63 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7863EC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 199E0C388F3
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:19:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EED6207E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:18:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EED6207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E7444207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:19:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7444207E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDs0V-0002qA-Ax
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:18:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38917)
+	id 1iDs20-0004Bv-UK
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:19:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46257)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iDqWC-0005mk-KH
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:46 -0400
+ (envelope-from <groug@kaod.org>) id 1iDr31-0000D2-Er
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:16:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iDqWA-0005Ko-S8
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35938)
+ (envelope-from <groug@kaod.org>) id 1iDr2z-0003Bw-Mn
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:16:39 -0400
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:57801)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iDqWA-0005JO-Fm
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8C4C1309BDBA
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 13:42:39 +0000 (UTC)
-Received: from localhost (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B80681001281;
- Fri, 27 Sep 2019 13:42:35 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/7] vmstate: add qom interface to get id
-Date: Fri, 27 Sep 2019 17:42:18 +0400
-Message-Id: <20190927134224.14550-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20190927134224.14550-1-marcandre.lureau@redhat.com>
-References: <20190927134224.14550-1-marcandre.lureau@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDr2z-0003BU-Cv
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:16:37 -0400
+Received: from player726.ha.ovh.net (unknown [10.109.146.137])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id EFF1A1187B6
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 16:16:34 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player726.ha.ovh.net (Postfix) with ESMTPSA id 2D53BA3ED097;
+ Fri, 27 Sep 2019 14:16:23 +0000 (UTC)
+Date: Fri, 27 Sep 2019 16:16:22 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v2 23/33] spapr: Formalize notion of active interrupt
+ controller
+Message-ID: <20190927161622.2097585b@bahia.lan>
+In-Reply-To: <20190927055028.11493-24-david@gibson.dropbear.id.au>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-24-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 27 Sep 2019 13:42:39 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 1856045998940330470
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfeeigdejudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 46.105.40.148
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,217 +70,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
- dgilbert@redhat.com, pbonzini@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add an interface to get the instance id, instead of depending on
-Device and qdev_get_dev_path().
+On Fri, 27 Sep 2019 15:50:18 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- MAINTAINERS                  |  2 ++
- hw/core/Makefile.objs        |  1 +
- hw/core/qdev.c               | 14 +++++++++++++
- hw/core/vmstate-if.c         | 23 +++++++++++++++++++++
- include/hw/vmstate-if.h      | 40 ++++++++++++++++++++++++++++++++++++
- include/migration/register.h |  2 ++
- include/migration/vmstate.h  |  2 ++
- tests/Makefile.include       |  1 +
- 8 files changed, 85 insertions(+)
- create mode 100644 hw/core/vmstate-if.c
- create mode 100644 include/hw/vmstate-if.h
+> spapr now has the mechanism of constructing both XICS and XIVE instances of
+> the SpaprInterruptController interface.  However, only one of the interrupt
+> controllers will actually be active at any given time, depending on feature
+> negotiation with the guest.  This is handled in the current code via
+> spapr_irq_current() which checks the OV5 vector from feature negotiation to
+> determine the current backend.
+> 
+> Determining the active controller at the point we need it like this
+> can be pretty confusing, because it makes it very non obvious at what
+> points the active controller can change.  This can make it difficult
+> to reason about the code and where a change of active controller could
+> appear in sequence with other events.
+> 
+> Make this mechanism more explicit by adding an 'active_intc' pointer
+> and an explicit spapr_irq_update_active_intc() function to update it
+> from the CAS state.  We also add hooks on the intc backend which will
+> get called when it is activated or deactivated.
+> 
+> For now we just introduce the switch and hooks, later patches will
+> actually start using them.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bd7ee23101..b97fdd80d0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2147,6 +2147,8 @@ Migration
- M: Juan Quintela <quintela@redhat.com>
- M: Dr. David Alan Gilbert <dgilbert@redhat.com>
- S: Maintained
-+F: hw/core/vmstate-if.c
-+F: include/hw/vmstate-if.h
- F: include/migration/
- F: migration/
- F: scripts/vmstate-static-checker.py
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index fd0550d1d9..0edd9e635d 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -9,6 +9,7 @@ common-obj-y +=3D hotplug.o
- common-obj-$(CONFIG_SOFTMMU) +=3D nmi.o
- common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state-handler.o
- common-obj-y +=3D cpu.o
-+common-obj-y +=3D vmstate-if.o
-=20
- common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
- common-obj-$(CONFIG_XILINX_AXI) +=3D stream.o
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index cbad6c1d55..fe13ccb37f 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -1064,9 +1064,18 @@ static void device_unparent(Object *obj)
-     }
- }
-=20
-+static char *
-+device_vmstate_if_get_id(VMStateIf *obj)
-+{
-+    DeviceState *dev =3D DEVICE(obj);
-+
-+    return qdev_get_dev_path(dev);
-+}
-+
- static void device_class_init(ObjectClass *class, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(class);
-+    VMStateIfClass *vc =3D VMSTATE_IF_CLASS(class);
-=20
-     class->unparent =3D device_unparent;
-=20
-@@ -1078,6 +1087,7 @@ static void device_class_init(ObjectClass *class, v=
-oid *data)
-      */
-     dc->hotpluggable =3D true;
-     dc->user_creatable =3D true;
-+    vc->get_id =3D device_vmstate_if_get_id;
- }
-=20
- void device_class_set_parent_reset(DeviceClass *dc,
-@@ -1135,6 +1145,10 @@ static const TypeInfo device_type_info =3D {
-     .class_init =3D device_class_init,
-     .abstract =3D true,
-     .class_size =3D sizeof(DeviceClass),
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_VMSTATE_IF },
-+        { }
-+    }
- };
-=20
- static void qdev_register_types(void)
-diff --git a/hw/core/vmstate-if.c b/hw/core/vmstate-if.c
-new file mode 100644
-index 0000000000..bf453620fe
---- /dev/null
-+++ b/hw/core/vmstate-if.c
-@@ -0,0 +1,23 @@
-+/*
-+ * VMState interface
-+ *
-+ * Copyright (c) 2009-2019 Red Hat Inc
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/vmstate-if.h"
-+
-+static const TypeInfo vmstate_if_info =3D {
-+    .name =3D TYPE_VMSTATE_IF,
-+    .parent =3D TYPE_INTERFACE,
-+    .class_size =3D sizeof(VMStateIfClass),
-+};
-+
-+static void vmstate_register_types(void)
-+{
-+    type_register_static(&vmstate_if_info);
-+}
-+
-+type_init(vmstate_register_types);
-diff --git a/include/hw/vmstate-if.h b/include/hw/vmstate-if.h
-new file mode 100644
-index 0000000000..8ff7f0f292
---- /dev/null
-+++ b/include/hw/vmstate-if.h
-@@ -0,0 +1,40 @@
-+/*
-+ * VMState interface
-+ *
-+ * Copyright (c) 2009-2019 Red Hat Inc
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef VMSTATE_IF_H
-+#define VMSTATE_IF_H
-+
-+#include "qom/object.h"
-+
-+#define TYPE_VMSTATE_IF "vmstate-if"
-+
-+#define VMSTATE_IF_CLASS(klass)                                     \
-+    OBJECT_CLASS_CHECK(VMStateIfClass, (klass), TYPE_VMSTATE_IF)
-+#define VMSTATE_IF_GET_CLASS(obj)                           \
-+    OBJECT_GET_CLASS(VMStateIfClass, (obj), TYPE_VMSTATE_IF)
-+#define VMSTATE_IF(obj)                             \
-+    INTERFACE_CHECK(VMStateIf, (obj), TYPE_VMSTATE_IF)
-+
-+typedef struct VMStateIf VMStateIf;
-+
-+typedef struct VMStateIfClass {
-+    InterfaceClass parent_class;
-+
-+    char * (*get_id)(VMStateIf *obj);
-+} VMStateIfClass;
-+
-+static inline char *vmstate_if_get_id(VMStateIf *vmif)
-+{
-+    if (!vmif) {
-+        return NULL;
-+    }
-+
-+    return VMSTATE_IF_GET_CLASS(vmif)->get_id(vmif);
-+}
-+
-+#endif /* VMSTATE_IF_H */
-diff --git a/include/migration/register.h b/include/migration/register.h
-index a13359a08d..73149c9a01 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -14,6 +14,8 @@
- #ifndef MIGRATION_REGISTER_H
- #define MIGRATION_REGISTER_H
-=20
-+#include "hw/vmstate-if.h"
-+
- typedef struct SaveVMHandlers {
-     /* This runs inside the iothread lock.  */
-     SaveStateHandler *save_state;
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 1fbfd099dd..bdcf8a1652 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -27,6 +27,8 @@
- #ifndef QEMU_VMSTATE_H
- #define QEMU_VMSTATE_H
-=20
-+#include "hw/vmstate-if.h"
-+
- typedef struct VMStateInfo VMStateInfo;
- typedef struct VMStateField VMStateField;
-=20
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 0595914526..fb5ccf3947 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -567,6 +567,7 @@ tests/test-qdev-global-props$(EXESUF): tests/test-qde=
-v-global-props.o \
- 	hw/core/irq.o \
- 	hw/core/fw-path-provider.o \
- 	hw/core/reset.o \
-+	hw/core/vmstate-if.o \
- 	$(test-qapi-obj-y)
- tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
- 	migration/vmstate.o migration/vmstate-types.o migration/qemu-file.o \
---=20
-2.23.0
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_irq.c         | 51 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/ppc/spapr.h     |  5 ++--
+>  include/hw/ppc/spapr_irq.h |  5 ++++
+>  3 files changed, 59 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index ea44378d8c..dfa875b7cd 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -593,6 +593,7 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
+>  
+>  int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
+>  {
+> +    spapr_irq_update_active_intc(spapr);
+>      return spapr->irq->post_load(spapr, version_id);
+>  }
+>  
+> @@ -600,6 +601,8 @@ void spapr_irq_reset(SpaprMachineState *spapr, Error **errp)
+>  {
+>      assert(!spapr->irq_map || bitmap_empty(spapr->irq_map, spapr->irq_map_nr));
+>  
+> +    spapr_irq_update_active_intc(spapr);
+> +
+>      if (spapr->irq->reset) {
+>          spapr->irq->reset(spapr, errp);
+>      }
+> @@ -626,6 +629,54 @@ int spapr_irq_get_phandle(SpaprMachineState *spapr, void *fdt, Error **errp)
+>      return phandle;
+>  }
+>  
+> +static void set_active_intc(SpaprMachineState *spapr,
+> +                            SpaprInterruptController *new_intc)
+> +{
+> +    SpaprInterruptControllerClass *sicc;
+> +
+> +    assert(new_intc);
+> +
+> +    if (new_intc == spapr->active_intc) {
+> +        /* Nothing to do */
+> +        return;
+> +    }
+> +
+> +    if (spapr->active_intc) {
+> +        sicc = SPAPR_INTC_GET_CLASS(spapr->active_intc);
+> +        if (sicc->deactivate) {
+> +            sicc->deactivate(spapr->active_intc);
+> +        }
+> +    }
+> +
+> +    sicc = SPAPR_INTC_GET_CLASS(new_intc);
+> +    if (sicc->activate) {
+> +        sicc->activate(new_intc, &error_fatal);
+> +    }
+> +
+> +    spapr->active_intc = new_intc;
+> +}
+> +
+> +void spapr_irq_update_active_intc(SpaprMachineState *spapr)
+> +{
+> +    SpaprInterruptController *new_intc;
+> +
+> +    if (!spapr->ics) {
+> +        /*
+> +         * XXX before we run CAS, ov5_cas is initialized empty, which
+> +         * indicates XICS, even if we have ic-mode=xive.  TODO: clean
+> +         * up the CAS path so that we have a clearer way of handling
+> +         * this.
+> +         */
+> +        new_intc = SPAPR_INTC(spapr->xive);
+> +    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
+> +        new_intc = SPAPR_INTC(spapr->xive);
+> +    } else {
+> +        new_intc = SPAPR_INTC(spapr->ics);
+> +    }
+> +
+> +    set_active_intc(spapr, new_intc);
+> +}
+> +
+>  /*
+>   * XICS legacy routines - to deprecate one day
+>   */
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index cbd1a4c9f3..763da757f0 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -143,7 +143,6 @@ struct SpaprMachineState {
+>      struct SpaprVioBus *vio_bus;
+>      QLIST_HEAD(, SpaprPhbState) phbs;
+>      struct SpaprNvram *nvram;
+> -    ICSState *ics;
+>      SpaprRtcState rtc;
+>  
+>      SpaprResizeHpt resize_hpt;
+> @@ -195,9 +194,11 @@ struct SpaprMachineState {
+>  
+>      int32_t irq_map_nr;
+>      unsigned long *irq_map;
+> -    SpaprXive  *xive;
+>      SpaprIrq *irq;
+>      qemu_irq *qirqs;
+> +    SpaprInterruptController *active_intc;
+> +    ICSState *ics;
+> +    SpaprXive *xive;
+>  
+>      bool cmd_line_caps[SPAPR_CAP_NUM];
+>      SpaprCapabilities def, eff, mig;
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 616086f9bb..3102d152b2 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -44,6 +44,9 @@ typedef struct SpaprInterruptController SpaprInterruptController;
+>  typedef struct SpaprInterruptControllerClass {
+>      InterfaceClass parent;
+>  
+> +    void (*activate)(SpaprInterruptController *intc, Error **errp);
+> +    void (*deactivate)(SpaprInterruptController *intc);
+> +
+>      /*
+>       * These methods will typically be called on all intcs, active and
+>       * inactive
+> @@ -55,6 +58,8 @@ typedef struct SpaprInterruptControllerClass {
+>      void (*free_irq)(SpaprInterruptController *intc, int irq);
+>  } SpaprInterruptControllerClass;
+>  
+> +void spapr_irq_update_active_intc(SpaprMachineState *spapr);
+> +
+>  void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
+>  void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
+>                    void *fdt, uint32_t phandle);
 
 
