@@ -2,70 +2,112 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE71BC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2484CC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:53:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4258217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:52:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4258217D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id EC3DD217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:53:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC3DD217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDlyx-00039h-Qv
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:52:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50547)
+	id 1iDm0Q-00046r-1u
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:53:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50714)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDlxe-0001lU-HD
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:50:47 -0400
+ (envelope-from <david@redhat.com>) id 1iDlyX-0002oi-Qk
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:51:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDlxd-0002T5-AQ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:50:46 -0400
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:45336)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iDlxZ-0002Bp-Tf; Fri, 27 Sep 2019 04:50:41 -0400
-Received: by mail-yw1-f66.google.com with SMTP id x65so634913ywf.12;
- Fri, 27 Sep 2019 01:50:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=NJ8Rg8Su0CjPii+ukETP0Glw88YzYNTSm39Og1Jt1/M=;
- b=tCRgul+SogcrKrj27rrVryXPkn2hT8/fT4N/FVMS9m/okiAhOjon3eBS1lZQkWpYWa
- LMznORb2h2FQ+phvAz65R4EW0ZtxUFYyFjh7wYnV0MgVUpMaARYHkh2XsEP5/+BPgnxU
- FnYJTKiJC/a4WFKWqGMlDa1OG+aVVn9fDOPuxpTxcatRYOP2h2b9zBzI24zm9aMpOynB
- jtQuMeAoGnZqHiH4cXz+xVhQ6IiXVjI+OGJXCRRv1EjAfkdJvcYEgyxUXxLfKQjomrRv
- ClN5jjbShE2auq2u4RuF3zaxNwJ+dc+bQNBgV5SX5aL3//3ONejptQ3FBKDdFAZElC7i
- eZ5g==
-X-Gm-Message-State: APjAAAVAy6Xh6EY+lDFCoPpW90lDhOL795sh14o7pV0CE2yoteMrxxHz
- p4I1TsDxLj8ZilHqWi1+540E7rXulDLTe5sjoBE=
-X-Google-Smtp-Source: APXvYqzBGc2Eas8uwSl7As0UrRrsr0ZShxu3LhPU47gYNAR8pBgQshFC7ayql6wVUkpbeOJ/ZoUEVlBS2KGc5qmajHU=
-X-Received: by 2002:a0d:e6d3:: with SMTP id p202mr1850147ywe.368.1569574240454; 
- Fri, 27 Sep 2019 01:50:40 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1iDlyU-0004qj-Ah
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:51:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50070)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iDlyU-0004kr-1a; Fri, 27 Sep 2019 04:51:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A5095806CD;
+ Fri, 27 Sep 2019 08:51:34 +0000 (UTC)
+Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 52F925D6B0;
+ Fri, 27 Sep 2019 08:51:33 +0000 (UTC)
+Subject: Re: [PATCH v1 1/2] s390x: Add sclp boundary check and fix error
+ priority
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
+ <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <d7ee2ad4-d928-88f1-94d6-3f6b22d2da72@redhat.com>
+Date: Fri, 27 Sep 2019 10:51:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190926173428.10713-1-f4bug@amsat.org>
- <alpine.BSF.2.21.9999.1909262221020.91838@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.21.9999.1909262221020.91838@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 27 Sep 2019 10:50:28 +0200
-Message-ID: <CAAdtpL63edWaf1nEYznR4cjzqy6=1o5w69FFo70+vVSSmCy+qA@mail.gmail.com>
-Subject: Re: [PATCH 00/19] hw/arm/raspi: Improve Raspberry Pi 2/3 reliability
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Fri, 27 Sep 2019 08:51:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.161.66
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,74 +119,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Guenter Roeck <linux@roeck-us.net>
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, frankja@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 10:32 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> On Thu, 26 Sep 2019, Philippe Mathieu-Daud=C3=A9 wrote:
-> > and got it almost working (boots Linux kernel to userland, sadly
-> > I'm still having timeout issues with the eMMC block).
-> [...]
-> > $ make aarch64-softmmu/all check-venv
-> > $ ./tests/venv/bin/avocado --show=3Dapp,console run -t machine:raspi2 -=
-t machine:raspi3 tests/acceptance
-> > JOB ID     : 10bf6593659f0b191941265c19fe3dbf1652c3e7
-> > JOB LOG    : /home/phil/avocado/job-results/job-2019-09-26T19.04-10bf65=
-9/job.log
-> > (1/4) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_=
-raspi2_uart0: \console: [    0.000000] Booting Linux on physical CPU 0xf00
-> > console: [    0.000000] Linux version 4.14.98-v7+ (dom@dom-XPS-13-9370)=
- (gcc version 4.9.3 (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1200 S=
-MP Tue Feb 12 20:27:48 GMT 2019
-> > console: [    0.000000] CPU: ARMv7 Processor [410fc075] revision 5 (ARM=
-v7), cr=3D10c5387d
-> > console: [    0.000000] CPU: div instructions available: patching divis=
-ion code
-> > console: [    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT a=
-liasing instruction cache
-> > console: [    0.000000] OF: fdt: Machine model: Raspberry Pi 2 Model B
-> > console: [    0.000000] earlycon: pl11 at MMIO 0x3f201000 (options '')
-> > console: [    0.000000] bootconsole [pl11] enabled
-> > console: [    0.000000] Memory policy: Data cache writealloc
-> > console: [    0.000000] cma: Reserved 8 MiB at 0x3b800000
-> > console: [    0.000000] percpu: Embedded 17 pages/cpu @baf2e000 s38720 =
-r8192 d22720 u69632
-> > console: [    0.000000] Built 1 zonelists, mobility grouping on.  Total=
- pages: 243600
-> > console: [    0.000000] Kernel command line: printk.time=3D0 earlycon=
-=3Dpl011,0x3f201000 console=3DttyAMA0
->
-> Not sure what timeouts you get related to eMMC but previously we've found
-> that panic at boot due to mmcblk not ready is avoided with the "rootwait"
-> kernel option which does not seem to be present in most of these tests.
-> (It's also not present in images for real hardware so likely this only
-> happens with QEMU but not on real hardware. Could it be that real hardwar=
-e
-> is slower so timing is different?)
+On 26.09.19 13:33, Claudio Imbrenda wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> * All sclp codes need to be checked for page boundary violations.
+> * Requests over 4k are not a spec exception.
+> * Invalid command checking has to be done before the boundary check.
 
-The eMMC issue is on the raspi4.
-Looking at my notes, I used "root=3D/dev/mmcblk0 rootwait", and it hangs wi=
-th:
+Can we split this patch up so we fix one thing at a time?
 
-Waiting for root device /dev/mmcblk0...
-[    0.898870] mmc-bcm2835 3f300000.mmc: mmc_debug:0 mmc_debug2:0
-[    0.901397] mmc-bcm2835 3f300000.mmc: DMA channel allocated
-[    0.930041] sdhost: log_buf @ (ptrval) (fac53000)
-[    0.969910] mmc1: queuing unknown CIS tuple 0x80 (2 bytes)
-[    0.973894] mmc1: queuing unknown CIS tuple 0x80 (3 bytes)
-[    0.977753] mmc1: queuing unknown CIS tuple 0x80 (3 bytes)
-[    0.981228] mmc0: sdhost-bcm2835 loaded - DMA enabled (>1)
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  hw/s390x/event-facility.c |  3 ---
+>  hw/s390x/sclp.c           | 25 ++++++++++++++++++++++---
+>  2 files changed, 22 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 797ecbb..6620569 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -377,9 +377,6 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
+>      case SCLP_CMD_WRITE_EVENT_MASK:
+>          write_event_mask(ef, sccb);
+>          break;
+> -    default:
+> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> -        break;
+>      }
+>  }
+>  
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index fac7c3b..76feac8 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -213,14 +213,33 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>      cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
+>  
+>      /* Valid sccb sizes */
+> -    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader) ||
+> -        be16_to_cpu(work_sccb.h.length) > SCCB_SIZE) {
+> +    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
+>          r = -PGM_SPECIFICATION;
+>          goto out;
+>      }
+>  
+> -    sclp_c->execute(sclp, &work_sccb, code);
+> +    switch (code & SCLP_CMD_CODE_MASK) {
+> +    case SCLP_CMDW_READ_SCP_INFO:
+> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
+> +    case SCLP_CMDW_READ_CPU_INFO:
+> +    case SCLP_CMDW_CONFIGURE_IOA:
+> +    case SCLP_CMDW_DECONFIGURE_IOA:
+> +    case SCLP_CMD_READ_EVENT_DATA:
+> +    case SCLP_CMD_WRITE_EVENT_DATA:
+> +    case SCLP_CMD_WRITE_EVENT_MASK:
+> +        break;
+> +    default:
+> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> +        goto out_write;
+> +    }
+>  
+> +    if ((sccb + work_sccb.h.length) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
+> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
+> +        goto out_write;
+> +    }
+> +
+> +    sclp_c->execute(sclp, &work_sccb, code);
+> +out_write:
+>      cpu_physical_memory_write(sccb, &work_sccb,
+>                                be16_to_cpu(work_sccb.h.length));
+>  
+> 
 
-So I guess now Linux improved and use new features not covered by our
-hw/sd/bcm2835_sdhost.c model :(
-(I have to use recent Linux kernels because older don't support the raspi4)=
-.
 
-I'll keep you informed, thanks for the hint!
+-- 
 
-Phil.
+Thanks,
+
+David / dhildenb
 
