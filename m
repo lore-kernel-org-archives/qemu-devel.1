@@ -2,83 +2,80 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8544C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 21:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F758C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 21:54:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 800CB21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 21:50:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 186CB21655
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 21:54:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HSCa2Zgh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 800CB21655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UpnHg/fM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 186CB21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDy8T-0006w5-V6
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 17:50:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34801)
+	id 1iDyCC-0001v1-TR
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 17:54:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iDy1P-0002x8-AG
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 17:43:29 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iDy9j-0008OR-Bu
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 17:52:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iDy1N-00060E-5S
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 17:43:27 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:33243)
+ (envelope-from <alistair23@gmail.com>) id 1iDy9f-000126-T1
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 17:52:02 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:41135)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iDy1M-0005yh-NZ; Fri, 27 Sep 2019 17:43:24 -0400
-Received: by mail-lj1-x242.google.com with SMTP id a22so3906633ljd.0;
- Fri, 27 Sep 2019 14:43:24 -0700 (PDT)
+ id 1iDy9b-0000tH-Bw; Fri, 27 Sep 2019 17:51:59 -0400
+Received: by mail-lf1-x143.google.com with SMTP id r2so2965852lfn.8;
+ Fri, 27 Sep 2019 14:51:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Z3z2HJgtQRyIS4euPZSz8ASTQEQCVryL16ycqUnflPw=;
- b=HSCa2Zgh3JXvYXQ9jzo1JGDOnRbDrBcm6DTlsC9pHobFxgumNJOj2C2lbElJbxtMKk
- ImUjp8UgjfL8Plqn9ARocJ56YgGV81zQ01+m8CPMqIOx91EzuTF52XDdR58mZbaVv5mj
- 5jHnyrdN9F6vPitNI2K3C3GEEIOW7ivb8/i/X3cNAWAdfdWUMvfq/h1VLEQiOJj/T2ic
- QYw8rBzIp1S17bssKfC4/v5cVWXQ/oDbsUxoXkNksTp6mYwELAAWQuN2dNSpXfEKj5cf
- MVVxvNn2/rN0+Ra4t8qjtZhVaz/GOQd71gYCI0eeDqxYCMSCMC8HlnLQWrYzMzwxWWq/
- Q7IQ==
+ :cc; bh=BLBr7qiWAfyYl/v8+1LEkv7+EHsq3wG4rWqEdWOyVVc=;
+ b=UpnHg/fM814d+qRvJDmmYAtzTbvz/aI2wP9H2PNG8Q5GNfIM5HJdmhR20aTuq4byCa
+ JA/aBTEgA5uHcUb6zZYcVXlVZTLbKj8hPZGjUBJD6Hf6EYfoUL15Ae/tEyVAthQCM4s3
+ hz8GPGAuGl+F/PlI2od22POjinDuihHLGHfY1hWxkX36msLBFL6VLixn1SRnOU3plZpH
+ gYw46Pu3czH9hA6iCq2ovrw8ADuJIDjKOzBHN1QSJJI/DRSbi9v/aOYV8hvCeU7PsldQ
+ iqgr6+yViSRHC8f5LPEa46E3aR++7uv3/lkiQ/xTElk9Y1MncNG/YGI3q2LrHBtMvK2U
+ GQBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Z3z2HJgtQRyIS4euPZSz8ASTQEQCVryL16ycqUnflPw=;
- b=H0ataQ+jpJ8WzwnFxPDM04vs2tdry/DAloP44L0ewzHSntQ7UbmftuH4DkFfI5EA9n
- gKOaG9HmcZFwMFqjq/KOSykBZlbeEjVcEyIFjBuhwmOc9H0iS7Wut1iN72z2kPfUueE/
- Rjn5G4iwaHqBtGkibEAb/+BiIhqBDykbRuKcQqIQfdHwFdx2FiDxuTvFZcinTWm8+YIS
- 9CBCZWFnWXeqO919l8FmoU9/S/kVufh8xyW2tkJUjCA2bjDUDsZ+/YB+GNe2QbqgDM0i
- STeOaLXJ+tw+rXTMqoyTybp1iYJov50qRFwYhVaCTXl5SwiNNQ3EBihQDhXGs8thNesS
- e8ig==
-X-Gm-Message-State: APjAAAXSlDYXnIXaQqFwA7RcoxUQ0zJ0fpx761Sf0WiUkN4Ne07ZdPjp
- LN2kt7bJeL4MG3O48rdYqu06kkX6MMyj2Scpc00=
-X-Google-Smtp-Source: APXvYqychEopiXHGb+HjBrDuWH9HVQ/+04lbY2tpnbFmteoP9JUNeXPLDcr4OQQ57QU3Gzu1jLxpEbhreqQs7FfZC+4=
-X-Received: by 2002:a2e:3902:: with SMTP id g2mr4450813lja.196.1569620603159; 
- Fri, 27 Sep 2019 14:43:23 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=BLBr7qiWAfyYl/v8+1LEkv7+EHsq3wG4rWqEdWOyVVc=;
+ b=rrg8d90wBCzAfXG4MSpI1MygDAXb6YGKxZOoazycKHbhVnz0fzyB8Y+1cZ2X/5iI52
+ 9WFcnIazCM9UdhT+pFK2cP1wAKbU03cKp8iVXTNKYb13AGcoN5ZMq1ZO27GvvqX9yVpP
+ 8q3wBwAqSd7oThBkn/BGZl9/cjhsXOQ/BgzVbCAZmH3nD1ow4wI3wrQb/dQ4eAwW/vLB
+ 4p+DNXj0Lsj0U1xd8rt2H5Ww0MHLKZ8uwIEICmwn1uGwMQ30dCZHLuFp13/K9OgFDcgm
+ lx/Nr7iaFPEu68jEFwlS/g+b0g6tLRGjgV2TNdrUl6AhbP9wMN6B/BAR+em7MvpYhpRJ
+ pTGg==
+X-Gm-Message-State: APjAAAU0NzmP6anbEoUF+kOKAPQe2glLHAk9z1l+Fdrb5SETr382/4VG
+ v4VtfFC9Lok65nK2fatEP0MLV2cu85l1n4Bsngc=
+X-Google-Smtp-Source: APXvYqys1PzcQ0RXjf19NdGe/VFEyKwjB1ruDI/i7FPiNrI8itTEZEEI8CVWsGiyfFGxOHnFIzxeVZWzpmA6u7XnGDk=
+X-Received: by 2002:a19:4912:: with SMTP id w18mr4049708lfa.93.1569621111014; 
+ Fri, 27 Sep 2019 14:51:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-4-f4bug@amsat.org>
-In-Reply-To: <20190926173428.10713-4-f4bug@amsat.org>
+References: <cover.1569545046.git.alistair.francis@wdc.com>
+ <bf4f869cab915364855a1c9ffadfeac16b151e4b.1569545046.git.alistair.francis@wdc.com>
+ <CAEUhbmVBDs5dNH06BjA=Xsa_AEtqoaA6Nm04VtY9-nxJUhmkPQ@mail.gmail.com>
+In-Reply-To: <CAEUhbmVBDs5dNH06BjA=Xsa_AEtqoaA6Nm04VtY9-nxJUhmkPQ@mail.gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 27 Sep 2019 14:38:36 -0700
-Message-ID: <CAKmqyKOOo5nRSiSHWXKUMLR_pMbZexzY_N3a014tbZNgEgoTGQ@mail.gmail.com>
-Subject: Re: [PATCH 03/19] hw/arm/bcm2835_peripherals: Name various address
- spaces
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 27 Sep 2019 14:47:04 -0700
+Message-ID: <CAKmqyKMiZ6gNn6rgABfa=QWL_X4oXVN1Pd4itFzFoR66=hgQhQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/7] riscv/sifive_u: Add L2-LIM cache memory
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::242
+X-Received-From: 2a00:1450:4864:20::143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,177 +87,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Zolt=C3=A1n_Baldaszti?= <bztemail@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Esteban Bosse <estebanbosse@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- Clement Deschamps <clement.deschamps@antfield.fr>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 10:36 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
+On Fri, Sep 27, 2019 at 12:57 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> Various address spaces from the BCM2835 are reported as
-> 'anonymous' in memory tree:
+> On Fri, Sep 27, 2019 at 8:52 AM Alistair Francis
+> <alistair.francis@wdc.com> wrote:
+> >
+> > On reset only a single L2 cache way is enabled, the others are exposed
+> > as memory that can be used by early boot firmware. This L2 region is
+> > generally disabled using the WayEnable register at a later stage in the
+> > boot process. To allow firmware to target QEMU and the HiFive Unleashed
+> > let's add the L2 LIM (LooselyIntegrated Memory).
+> >
+> > Ideally we would want to adjust the size of this chunk of memory as the
+> > L2 Cache Controller WayEnable register is incremented. Unfortunately I
+> > don't see a nice way to handle reducing or blocking out the L2 LIM while
+> > still allowing it be re returned to all enabled from a reset.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
 >
->   (qemu) info mtree
->
->   address-space: anonymous
->     0000000000000000-000000000000008f (prio 0, i/o): bcm2835-mbox
->       0000000000000010-000000000000001f (prio 0, i/o): bcm2835-fb
->       0000000000000080-000000000000008f (prio 0, i/o): bcm2835-property
->
->   address-space: anonymous
->     0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
->       0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peri=
-pherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
->       0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->
->   [...]
->
-> Since the address_space_init() function takes a 'name' argument,
-> set it to correctly describe each address space:
->
->   (qemu) info mtree
->
->   address-space: bcm2835-mbox-memory
->     0000000000000000-000000000000008f (prio 0, i/o): bcm2835-mbox
->       0000000000000010-000000000000001f (prio 0, i/o): bcm2835-fb
->       0000000000000080-000000000000008f (prio 0, i/o): bcm2835-property
->
->   address-space: bcm2835-fb-memory
->     0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
->       0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peri=
-pherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
->       0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->
->   address-space: bcm2835-property-memory
->     0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
->       0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peri=
-pherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
->       0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->
->   address-space: bcm2835-dma-memory
->     0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
->       0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peri=
-pherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
->       0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->       00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-=
-ram-alias[*] @ram 0000000000000000-000000003fffffff
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Please include a changelog in the future. otherwise it's hard to track
+> what is changed between patch versions.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+I normally just include one in the cover letter, individual patch
+change logs can be a bit of a pain to maintain. I'll try to do a
+better job in the future.
 
 Alistair
 
-> ---
->  hw/display/bcm2835_fb.c    | 2 +-
->  hw/dma/bcm2835_dma.c       | 2 +-
->  hw/misc/bcm2835_mbox.c     | 2 +-
->  hw/misc/bcm2835_property.c | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
-> index 8f856878cd..85aaa54330 100644
-> --- a/hw/display/bcm2835_fb.c
-> +++ b/hw/display/bcm2835_fb.c
-> @@ -425,7 +425,7 @@ static void bcm2835_fb_realize(DeviceState *dev, Erro=
-r **errp)
->      s->initial_config.base =3D s->vcram_base + BCM2835_FB_OFFSET;
+> >  hw/riscv/sifive_u.c         | 16 ++++++++++++++++
+> >  include/hw/riscv/sifive_u.h |  1 +
+> >  2 files changed, 17 insertions(+)
+> >
 >
->      s->dma_mr =3D MEMORY_REGION(obj);
-> -    address_space_init(&s->dma_as, s->dma_mr, NULL);
-> +    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_FB "-memory")=
-;
->
->      bcm2835_fb_reset(dev);
->
-> diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
-> index 6acc2b644e..1e458d7fba 100644
-> --- a/hw/dma/bcm2835_dma.c
-> +++ b/hw/dma/bcm2835_dma.c
-> @@ -383,7 +383,7 @@ static void bcm2835_dma_realize(DeviceState *dev, Err=
-or **errp)
->      }
->
->      s->dma_mr =3D MEMORY_REGION(obj);
-> -    address_space_init(&s->dma_as, s->dma_mr, NULL);
-> +    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_DMA "-memory"=
-);
->
->      bcm2835_dma_reset(dev);
->  }
-> diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
-> index 7690b9afaf..77285624c9 100644
-> --- a/hw/misc/bcm2835_mbox.c
-> +++ b/hw/misc/bcm2835_mbox.c
-> @@ -311,7 +311,7 @@ static void bcm2835_mbox_realize(DeviceState *dev, Er=
-ror **errp)
->      }
->
->      s->mbox_mr =3D MEMORY_REGION(obj);
-> -    address_space_init(&s->mbox_as, s->mbox_mr, NULL);
-> +    address_space_init(&s->mbox_as, s->mbox_mr, TYPE_BCM2835_MBOX "-memo=
-ry");
->      bcm2835_mbox_reset(dev);
->  }
->
-> diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-> index 0a1a3eb5d9..43a5465c5d 100644
-> --- a/hw/misc/bcm2835_property.c
-> +++ b/hw/misc/bcm2835_property.c
-> @@ -407,7 +407,7 @@ static void bcm2835_property_realize(DeviceState *dev=
-, Error **errp)
->      }
->
->      s->dma_mr =3D MEMORY_REGION(obj);
-> -    address_space_init(&s->dma_as, s->dma_mr, NULL);
-> +    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_PROPERTY "-me=
-mory");
->
->      /* TODO: connect to MAC address of USB NIC device, once we emulate i=
-t */
->      qemu_macaddr_default_if_unset(&s->macaddr);
-> --
-> 2.20.1
->
->
+> Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
 
