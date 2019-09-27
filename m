@@ -2,79 +2,63 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B419AC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A867C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:54:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E674207E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:53:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fskt4+8G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E674207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 60891207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:54:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60891207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDsZ5-0004G8-5A
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:53:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45861)
+	id 1iDsZE-0004XQ-Pn
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:54:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39937)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iDr0R-0005nZ-Ct
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:14:00 -0400
+ (envelope-from <armbru@redhat.com>) id 1iDqaC-0001H1-Pc
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iDr0P-0002iX-1N
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:13:59 -0400
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:45317)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iDr0O-0002iN-Rg
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:13:56 -0400
-Received: by mail-oi1-x229.google.com with SMTP id o205so5271427oib.12
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 07:13:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SxuuRQJqmEVqp9TIF6drb9JYM20Amto8QuZ5gXsXbVM=;
- b=Fskt4+8Gq+ogKIqC1fHfwCB1XDFxW/SKr1OYKsGOw90TTovXYAOAKcUM7SyKzZLLx0
- dwK62Zzt/PkBc2s9sET84yl4kDvEVNLq/wAWDQWdi+3bCTsYSQ9R3puGSUGiBJLO/JqU
- Nor7MAy/YUPSeQ6OxxoFy8qMb/BcLgb8Ndh8nTvh//5lef3vlf+p4BCcOm05vOaBF5O9
- kLpniVJRq63OObvVYbo371w2mR5ET4u/hz6MAKFJQot4/Tg64oOwFXqMVO+MttlLtDUc
- VrL7pdLDf/DV9pFIDWpjauhTHYcBe1vVw46GCjuRWqQj8ccZChTNlubg+vdZigEGM7f8
- REmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SxuuRQJqmEVqp9TIF6drb9JYM20Amto8QuZ5gXsXbVM=;
- b=grJh+Yq/GfK+9xZ75k4YH719fy3jvHu3wqfT7Zvjb3Qp+s999sr/fME5Xp7t9Vbxpk
- LHz/FNLx6pCnGBjRiOVgBz+XFmwQDZn3i8LjPBYdzDrZdY6EKHrKnPRb9MLYuxhjysJ1
- NElyTjqmeuE08upGEg2BEKqGrAETH67bebGGWjG7Ct4blLvSWJE0AKs8jYfDbd6Jg8fs
- 0/+iKiVKfFKFYWJ8BuY9hFo41r1GVpMy4vtqh8gAS/QqyTX8g7gPzlHJQLYd63CAD/t5
- k2Cv+YPyFyP8ZLxdlLDGvV7QnFdRm7sHmZZe90WgpWITU7WLA9xttnsgc4+7cdwBdk4Y
- K44g==
-X-Gm-Message-State: APjAAAXmbJmzf9p9/snFh3m0x15+E+yLotmxGePkq5Zr++CTDzxKg01x
- tNnDNFzXlejkiUJ+Z8FBSLAYdsnwXnQCxm/lGJXGJ5uHNAw=
-X-Google-Smtp-Source: APXvYqxGhb2XwMikb+4uqTO5Woy9yBsgsexaf2WpStNxlQNvnqj2M4Vs1apVSxbqgHQFgHRxdIWZnl0UW9yoidt2pWI=
-X-Received: by 2002:aca:b48a:: with SMTP id d132mr6569438oif.98.1569579030208; 
- Fri, 27 Sep 2019 03:10:30 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1iDqa8-00064z-KT
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42170)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa8-00063e-3T
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:48 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 111162026F;
+ Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D5062614C3;
+ Fri, 27 Sep 2019 13:46:46 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B60A41136425; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 25/26] qapi: Improve reporting of redefinition
+Date: Fri, 27 Sep 2019 15:46:38 +0200
+Message-Id: <20190927134639.4284-26-armbru@redhat.com>
+In-Reply-To: <20190927134639.4284-1-armbru@redhat.com>
+References: <20190927134639.4284-1-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20190925142910.26529-1-mst@redhat.com>
-In-Reply-To: <20190925142910.26529-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Sep 2019 11:10:19 +0100
-Message-ID: <CAFEAcA_=DJcN4XSK0z5Q7R-vhhGG0+XxARe3eQMU91BkWPMDOg@mail.gmail.com>
-Subject: Re: [PULL 0/3] vhost: fixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::229
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,39 +70,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 25 Sep 2019 at 15:30, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> A very quiet cycle. Did I miss a bunch of patches? if so, let me know.
->
-> The following changes since commit 240ab11fb72049d6373cbbec8d788f8e411a00bc:
->
->   Merge remote-tracking branch 'remotes/aperard/tags/pull-xen-20190924' into staging (2019-09-24 15:36:31 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 3fc4a64cbaed2ddee4c60ddc06740b320e18ab82:
->
->   vhost: Fix memory region section comparison (2019-09-25 10:16:39 -0400)
->
-> ----------------------------------------------------------------
-> vhost: fixes
->
-> Misc fixes related to memory region handling.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
+Point to the previous definition, unless it's a built-in.
 
-Applied, thanks.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ scripts/qapi/common.py                  | 5 +++++
+ tests/qapi-schema/redefined-command.err | 4 +++-
+ tests/qapi-schema/redefined-event.err   | 4 +++-
+ tests/qapi-schema/redefined-type.err    | 4 +++-
+ 4 files changed, 14 insertions(+), 3 deletions(-)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index bd834270f8..a74cd957d4 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -1759,6 +1759,11 @@ class QAPISchema(object):
+         # because they're liable to clash in generated C.
+         other_ent =3D self._entity_dict.get(ent.name)
+         if other_ent:
++            if other_ent.info:
++                where =3D QAPIError(other_ent.info, None, "previous defi=
+nition")
++                raise QAPISemError(
++                    ent.info,
++                    "'%s' is already defined\n%s" % (ent.name, where))
+             raise QAPISemError(
+                 ent.info, "%s is already defined" % other_ent.describe()=
+)
+         self._entity_dict[ent.name] =3D ent
+diff --git a/tests/qapi-schema/redefined-command.err b/tests/qapi-schema/=
+redefined-command.err
+index b77a05d354..54e366bbf3 100644
+--- a/tests/qapi-schema/redefined-command.err
++++ b/tests/qapi-schema/redefined-command.err
+@@ -1,2 +1,4 @@
+ tests/qapi-schema/redefined-command.json: In command 'foo':
+-tests/qapi-schema/redefined-command.json:3: command 'foo' is already def=
+ined
++tests/qapi-schema/redefined-command.json:3: 'foo' is already defined
++tests/qapi-schema/redefined-command.json: In command 'foo':
++tests/qapi-schema/redefined-command.json:2: previous definition
+diff --git a/tests/qapi-schema/redefined-event.err b/tests/qapi-schema/re=
+defined-event.err
+index fd02d38157..606c6e4497 100644
+--- a/tests/qapi-schema/redefined-event.err
++++ b/tests/qapi-schema/redefined-event.err
+@@ -1,2 +1,4 @@
+ tests/qapi-schema/redefined-event.json: In event 'EVENT_A':
+-tests/qapi-schema/redefined-event.json:3: event 'EVENT_A' is already def=
+ined
++tests/qapi-schema/redefined-event.json:3: 'EVENT_A' is already defined
++tests/qapi-schema/redefined-event.json: In event 'EVENT_A':
++tests/qapi-schema/redefined-event.json:2: previous definition
+diff --git a/tests/qapi-schema/redefined-type.err b/tests/qapi-schema/red=
+efined-type.err
+index 39f51c14ea..77786f98ae 100644
+--- a/tests/qapi-schema/redefined-type.err
++++ b/tests/qapi-schema/redefined-type.err
+@@ -1,2 +1,4 @@
+ tests/qapi-schema/redefined-type.json: In enum 'foo':
+-tests/qapi-schema/redefined-type.json:3: struct type 'foo' is already de=
+fined
++tests/qapi-schema/redefined-type.json:3: 'foo' is already defined
++tests/qapi-schema/redefined-type.json: In struct 'foo':
++tests/qapi-schema/redefined-type.json:2: previous definition
+--=20
+2.21.0
 
--- PMM
 
