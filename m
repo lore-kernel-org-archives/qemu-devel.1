@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF98C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DCEC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:20:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAC8F2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:20:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAC8F2075D
+	by mail.kernel.org (Postfix) with ESMTPS id 33AD92075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:20:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33AD92075D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDmQ0-0008SF-66
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:20:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53946)
+	id 1iDmQ1-0008Uc-3v
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:20:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53734)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iDmCQ-0002k9-Vj
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:06:07 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iDmCE-0002Tp-LT
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iDmCM-0003lB-5f
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:06:02 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:36231)
+ (envelope-from <laurent@vivier.eu>) id 1iDmC5-00036G-Bz
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:05:50 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:55665)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iDmC0-0002ox-JQ; Fri, 27 Sep 2019 05:05:37 -0400
+ id 1iDmC4-00033K-Qw; Fri, 27 Sep 2019 05:05:41 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MQMmF-1iZPm43mVd-00MHmQ; Fri, 27 Sep 2019 11:05:06 +0200
+ id 1MtfRp-1hsxgD24ml-00v4ts; Fri, 27 Sep 2019 11:05:15 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v13 3/9] hw/m68k: add VIA support
-Date: Fri, 27 Sep 2019 11:04:47 +0200
-Message-Id: <20190927090453.24712-4-laurent@vivier.eu>
+Subject: [PATCH v13 8/9] hw/m68k: define Macintosh Quadra 800
+Date: Fri, 27 Sep 2019 11:04:52 +0200
+Message-Id: <20190927090453.24712-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190927090453.24712-1-laurent@vivier.eu>
 References: <20190927090453.24712-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:7rn4FAlnS9c7EchNMdneppNjy/aPYJu3Zf5Rhl+UWc7JQQN4ED5
- yBFBZKLQnD/SwSvUdjBRkIYTbmmofcSJCXiLm4YtXpt4sa3DxnBsEnDo7sehZdMZl8/1GBi
- /iLd6p2DDr6Hr+T9aqUM9nfAWCJotOxJCia5pt6yztR+3t3F7cHrxCid6dpXcuMn1kPa1Sp
- YQcn1WKGFknoy+ccLCk4Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:cHG7BNqUkqw=:WzImDxO/MT7VR9ZSoktr0c
- UOYjDR7SK+jNcd5u/zmMahFdt3qvGLSsHr5A+1rvMytMvr7/Km2eZLekCPaerbea+aQ++Etfq
- ZjiiyCh5EhNhyedzx10B0M9ooCZ3iydy20OV7I4qbLRs4Q8mnL+58g0DIW5SkJekNtFanGF8o
- MArX6pWQobvb1USMWu6KnE7yOridF0shHju/KQKwQYeei8nTQy6Mv+AQC95GqYH/88mypHlrt
- ue3WtIruI7E2a+2c4LYBStGxqqdvVgCDxZ2KRg2DQ5RecnWu7nZHhOo4nq+OKPsrSLqshAJlc
- //osjlTl6vpeoAqlfrodzFrqOnIid7tVhnpSqACgbw3j9oCbXzk6Dg/x+wwCJYjRpfTl/dgrq
- 5M3qwjE4JJZxUrcAR9X/M4rkOxYMjG00PPYaYvzmSZGo9b2RYkH6/j+TXhPz9bZUyzqT13uRA
- Nt2vjj6oO+AhmHIKq/9kPnU1NdnlCz/0kNLGwisN28JiLNeTM5JmsJLIZ3hLwxGy7XvfIgOV7
- WCO2cfmfU/B08jpg0oFPhnRiOLUNf7zzdwtXLr+HkA7LiaPs8x7tJkwu4mY+5qI32UIzB/9ko
- Dvvvpj1tUkPPqxliECN038cAbU6ao6Paynhr/E+fPjZP70pY/PEQW4iWFc5PPplRNlZMkjoRS
- cvgrpiHivYsmSGA/z/H/Bkso731OPJcOblJutxgwv6FpXKcNhFSKmpXzIBu3sZAiRy2awPl/L
- i1aH+MNB3aRGAdCiYhGl01WMxZhzjFn/crjDV0VcG3aeogwol1zYRGvVoLQqi6wQLQ4XpMqba
- hPSi9WRWZfsBxw2GfDhD+ZYZ5iQhUYgn6xK5LWhR0Fimocc2+T1/8TB0ztznkCIQ0T4sFq6d8
- 6gecqoGwIdWU+6LvkFC0N9qop4/G9AoXBQ6uGbmEI=
+X-Provags-ID: V03:K1:yfs0Zl5ilTw9xOxpU1Jgi598sVvEyW2BmmCPBCaitPGQA3L6mXm
+ qacvIVrD1+TtYLzImQf+l0GATqCIPji4Y7+5KfJ+eXudv/cJ25uw9BD6nQuDdvOUGf19NDm
+ f0uvfmO1Da+6t1rHumoEU6hzwSi9qwF1vyxOgjRD0+RUZHrJeH/uDiyi5NTj0IckG0Rlg/A
+ gjAj0J7kUUUMN0Bc9kG6g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:X5uu1OtvYoo=:TXYE++zD4rhWzdVhN3b2ud
+ 8m4UkKBKk/9amsDTeS26Dx695jiEF70Uc81znrUYYhcL0odVTHfVd2o/3eOgKXY/ruBWij3XJ
+ vuivOy13wBGxF9RIpxkExSOhSBjPBgSINAZZhaJdWqL/y/IDzmKmtB5e4b2qgsy6IdxOScqBa
+ IKDOuptGR+eCZtSunxc4PDd8CcXELo3wCT0DXsnmQAZBXwSAkEGPsq/fu65kXymD1HljopM3N
+ HbHBzhRWWUxFnphd4qVPB8xnLAthmlkuIi0abMD7u3qj3wm+G3ozZZ20t3PYu1Q32eAw4Blem
+ cXHaARooxajNdOW53J7T2BlxH7wc19GFjyJEDhzpoU4N9zs1kFUhrYXC7NwGdcjALY1wA3fpI
+ qOcFozX8Guk8QDki/LyxzXBkX2VxjR5aIfZ4StsCjAZXTwyhWqyLN4DZZzlGTmAlb45DY2Nk3
+ 3BlJj9jH4Oqe9OCmpY39zIR39j/Uqs0sOnDSsxj3IBl4hDqc0QzB+nboV+0vPcjug6I6UqE5O
+ XIPDsfCtSv9XH21avB0guYoCsqCbprW3Fpk3XBZ2UVzLi4qRxywHOVr7gsQBiB65zwuLXO53O
+ C1QEHM8zUEoUZE6U9jJnwsU/qQMA2z+cTkbYvyj2d8d5Sh2XVG/nqssDcb7E+NJNliW4On2YY
+ /lrpNRVUlDu8pzYFr4sbEbQ6vCSEEyLrttc/57EwmSpua+mpfrt1ahQ6D1B6mWad3axXpJekX
+ iU81AoIFobV/q98KPrOyOiq/hFljz4K5tbtkso5f/0vdVqGkO5gKPR05c0BOjujAoS5lT2amh
+ lgoAkGRAxws0q3gOefKALMiPt782CMKPHXJTRWFlMrkYwak94d8erchji4vsU3VKK+s+blOX9
+ bxP387BfIx84yqvKMCYw==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.13
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,951 +90,596 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Inside the 680x0 Macintosh, VIA (Versatile Interface Adapter) is used
-to interface the keyboard, Mouse, and real-time clock. It also provides
-control line for the floppy disk driver, video interface, sound circuitry
-and serial interface.
+If you want to test the machine, it doesn't yet boot a MacROM, but you can
+boot a linux kernel from the command line.
 
-This implementation is based on the MOS6522 object.
+You can install your own disk using debian-installer with:
+
+    ./qemu-system-m68k \
+    -M q800 \
+    -serial none -serial mon:stdio \
+    -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+    -append "console=ttyS0 vga=off" \
+    -kernel vmlinux-4.15.0-2-m68k \
+    -initrd initrd.gz \
+    -drive file=debian-9.0-m68k-NETINST-1.iso \
+    -drive file=m68k.qcow2,format=qcow2 \
+    -nographic
+
+If you use a graphic adapter instead of "-nographic", you can use "-g"
+to set the size of the display (I use "-g 1600x800x24").
 
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- MAINTAINERS                      |   6 +
- default-configs/m68k-softmmu.mak |   1 +
- hw/m68k/Kconfig                  |   4 +
- hw/misc/Kconfig                  |   4 +
- hw/misc/Makefile.objs            |   1 +
- hw/misc/mac_via.c                | 742 +++++++++++++++++++++++++++++++
- include/hw/misc/mac_via.h        | 106 +++++
- 7 files changed, 864 insertions(+)
- create mode 100644 hw/misc/mac_via.c
- create mode 100644 include/hw/misc/mac_via.h
+ MAINTAINERS           |   2 +
+ hw/m68k/Kconfig       |   3 +
+ hw/m68k/Makefile.objs |   1 +
+ hw/m68k/bootinfo.h    | 114 ++++++++++++
+ hw/m68k/q800.c        | 394 ++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 514 insertions(+)
+ create mode 100644 hw/m68k/bootinfo.h
+ create mode 100644 hw/m68k/q800.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index bd7ee23101..5aeee1b603 100644
+index c20f6bd4cb..d4a6b2c9b7 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -917,6 +917,12 @@ F: hw/m68k/next-*.c
- F: hw/display/next-fb.c
- F: include/hw/m68k/next-cube.h
- 
-+q800
-+M: Laurent Vivier <laurent@vivier.eu>
-+S: Maintained
-+F: hw/misc/mac_via.c
-+F: include/hw/misc/mac_via.h
-+
- MicroBlaze Machines
- -------------------
- petalogix_s3adsp1800
-diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
-index d67ab8b96d..6629fd2aa3 100644
---- a/default-configs/m68k-softmmu.mak
-+++ b/default-configs/m68k-softmmu.mak
-@@ -7,3 +7,4 @@ CONFIG_SEMIHOSTING=y
- CONFIG_AN5206=y
- CONFIG_MCF5208=y
- CONFIG_NEXTCUBE=y
-+CONFIG_Q800=y
+@@ -920,10 +920,12 @@ F: include/hw/m68k/next-cube.h
+ q800
+ M: Laurent Vivier <laurent@vivier.eu>
+ S: Maintained
++F: hw/m68k/q800.c
+ F: hw/misc/mac_via.c
+ F: hw/nubus/*
+ F: hw/display/macfb.c
+ F: hw/block/swim.c
++F: hw/m68k/bootinfo.h
+ F: include/hw/misc/mac_via.h
+ F: include/hw/nubus/*
+ F: include/hw/display/macfb.h
 diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-index a74fac5abd..22a357609c 100644
+index bab4885ca5..c757e7dfa4 100644
 --- a/hw/m68k/Kconfig
 +++ b/hw/m68k/Kconfig
-@@ -12,3 +12,7 @@ config NEXTCUBE
-     bool
-     select FRAMEBUFFER
-     select ESCC
-+
-+config Q800
-+    bool
-+    select MAC_VIA
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 51754bb47c..18a5dc9c09 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -120,4 +120,8 @@ config AUX
- config UNIMP
-     bool
- 
-+config MAC_VIA
-+    bool
-+    select MOS6522
-+
- source macio/Kconfig
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index a150680966..8cde75c9dd 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -78,5 +78,6 @@ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_xdma.o
- common-obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
- common-obj-$(CONFIG_MSF2) += msf2-sysreg.o
- common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
-+obj-$(CONFIG_MAC_VIA) += mac_via.o
- 
- common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+@@ -19,3 +19,6 @@ config Q800
+     select NUBUS
+     select MACFB
+     select SWIM
++    select ESCC
++    select ESP
++    select DP8393X
+diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+index f25854730d..b2c9e5ab12 100644
+--- a/hw/m68k/Makefile.objs
++++ b/hw/m68k/Makefile.objs
+@@ -1,3 +1,4 @@
+ obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
+ obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
+ obj-$(CONFIG_NEXTCUBE) += next-kbd.o next-cube.o
++obj-$(CONFIG_Q800) += q800.o
+diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
 new file mode 100644
-index 0000000000..70bfffe5a7
+index 0000000000..5f8ded2686
 --- /dev/null
-+++ b/hw/misc/mac_via.c
-@@ -0,0 +1,742 @@
++++ b/hw/m68k/bootinfo.h
+@@ -0,0 +1,114 @@
 +/*
-+ * QEMU m68k Macintosh VIA device support
++ * SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
 + *
-+ * Copyright (c) 2011-2018 Laurent Vivier
-+ * Copyright (c) 2018 Mark Cave-Ayland
++ * Bootinfo tags from linux bootinfo.h and bootinfo-mac.h:
++ * This is an easily parsable and extendable structure containing all
++ * information to be passed from the bootstrap to the kernel
 + *
-+ * Some parts from hw/misc/macio/cuda.c
++ * This structure is copied right after the kernel by the bootstrap
++ * routine.
++ */
++
++#ifndef HW_M68K_BOOTINFO_H
++#define HW_M68K_BOOTINFO_H
++struct bi_record {
++    uint16_t tag;        /* tag ID */
++    uint16_t size;       /* size of record */
++    uint32_t data[0];    /* data */
++};
++
++/* machine independent tags */
++
++#define BI_LAST         0x0000 /* last record */
++#define BI_MACHTYPE     0x0001 /* machine type (u_long) */
++#define BI_CPUTYPE      0x0002 /* cpu type (u_long) */
++#define BI_FPUTYPE      0x0003 /* fpu type (u_long) */
++#define BI_MMUTYPE      0x0004 /* mmu type (u_long) */
++#define BI_MEMCHUNK     0x0005 /* memory chunk address and size */
++                               /* (struct mem_info) */
++#define BI_RAMDISK      0x0006 /* ramdisk address and size */
++                               /* (struct mem_info) */
++#define BI_COMMAND_LINE 0x0007 /* kernel command line parameters */
++                               /* (string) */
++
++/*  Macintosh-specific tags (all u_long) */
++
++#define BI_MAC_MODEL    0x8000  /* Mac Gestalt ID (model type) */
++#define BI_MAC_VADDR    0x8001  /* Mac video base address */
++#define BI_MAC_VDEPTH   0x8002  /* Mac video depth */
++#define BI_MAC_VROW     0x8003  /* Mac video rowbytes */
++#define BI_MAC_VDIM     0x8004  /* Mac video dimensions */
++#define BI_MAC_VLOGICAL 0x8005  /* Mac video logical base */
++#define BI_MAC_SCCBASE  0x8006  /* Mac SCC base address */
++#define BI_MAC_BTIME    0x8007  /* Mac boot time */
++#define BI_MAC_GMTBIAS  0x8008  /* Mac GMT timezone offset */
++#define BI_MAC_MEMSIZE  0x8009  /* Mac RAM size (sanity check) */
++#define BI_MAC_CPUID    0x800a  /* Mac CPU type (sanity check) */
++#define BI_MAC_ROMBASE  0x800b  /* Mac system ROM base address */
++
++/*  Macintosh hardware profile data */
++
++#define BI_MAC_VIA1BASE 0x8010  /* Mac VIA1 base address (always present) */
++#define BI_MAC_VIA2BASE 0x8011  /* Mac VIA2 base address (type varies) */
++#define BI_MAC_VIA2TYPE 0x8012  /* Mac VIA2 type (VIA, RBV, OSS) */
++#define BI_MAC_ADBTYPE  0x8013  /* Mac ADB interface type */
++#define BI_MAC_ASCBASE  0x8014  /* Mac Apple Sound Chip base address */
++#define BI_MAC_SCSI5380 0x8015  /* Mac NCR 5380 SCSI (base address, multi) */
++#define BI_MAC_SCSIDMA  0x8016  /* Mac SCSI DMA (base address) */
++#define BI_MAC_SCSI5396 0x8017  /* Mac NCR 53C96 SCSI (base address, multi) */
++#define BI_MAC_IDETYPE  0x8018  /* Mac IDE interface type */
++#define BI_MAC_IDEBASE  0x8019  /* Mac IDE interface base address */
++#define BI_MAC_NUBUS    0x801a  /* Mac Nubus type (none, regular, pseudo) */
++#define BI_MAC_SLOTMASK 0x801b  /* Mac Nubus slots present */
++#define BI_MAC_SCCTYPE  0x801c  /* Mac SCC serial type (normal, IOP) */
++#define BI_MAC_ETHTYPE  0x801d  /* Mac builtin ethernet type (Sonic, MACE */
++#define BI_MAC_ETHBASE  0x801e  /* Mac builtin ethernet base address */
++#define BI_MAC_PMU      0x801f  /* Mac power management / poweroff hardware */
++#define BI_MAC_IOP_SWIM 0x8020  /* Mac SWIM floppy IOP */
++#define BI_MAC_IOP_ADB  0x8021  /* Mac ADB IOP */
++
++#define BOOTINFO0(as, base, id) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record)); \
++        base += 2; \
++    } while (0)
++
++#define BOOTINFO1(as, base, id, value) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 4); \
++        base += 2; \
++        stl_phys(as, base, value); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFO2(as, base, id, value1, value2) \
++    do { \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, sizeof(struct bi_record) + 8); \
++        base += 2; \
++        stl_phys(as, base, value1); \
++        base += 4; \
++        stl_phys(as, base, value2); \
++        base += 4; \
++    } while (0)
++
++#define BOOTINFOSTR(as, base, id, string) \
++    do { \
++        int i; \
++        stw_phys(as, base, id); \
++        base += 2; \
++        stw_phys(as, base, \
++                 (sizeof(struct bi_record) + strlen(string) + 2) & ~1); \
++        base += 2; \
++        for (i = 0; string[i]; i++) { \
++            stb_phys(as, base++, string[i]); \
++        } \
++        stb_phys(as, base++, 0); \
++        base = (parameters_base + 1) & ~1; \
++    } while (0)
++#endif
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+new file mode 100644
+index 0000000000..039bfbd88b
+--- /dev/null
++++ b/hw/m68k/q800.c
+@@ -0,0 +1,394 @@
++/*
++ * QEMU Motorla 680x0 Macintosh hardware System Emulator
 + *
-+ * Copyright (c) 2004-2007 Fabrice Bellard
-+ * Copyright (c) 2007 Jocelyn Mayer
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
 + *
-+ * some parts from linux-2.6.29, arch/m68k/include/asm/mac_via.h
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
 + */
 +
 +#include "qemu/osdep.h"
 +#include "qemu-common.h"
-+#include "migration/vmstate.h"
-+#include "hw/sysbus.h"
++#include "sysemu/sysemu.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/boards.h"
 +#include "hw/irq.h"
-+#include "qemu/timer.h"
-+#include "hw/misc/mac_via.h"
-+#include "hw/misc/mos6522.h"
-+#include "hw/input/adb.h"
-+#include "sysemu/runstate.h"
-+#include "qapi/error.h"
-+#include "qemu/cutils.h"
-+
-+
-+/*
-+ * VIAs: There are two in every machine,
-+ */
-+
-+#define VIA_SIZE (0x2000)
-+
-+/*
-+ * Not all of these are true post MacII I think.
-+ * CSA: probably the ones CHRP marks as 'unused' change purposes
-+ * when the IWM becomes the SWIM.
-+ * http://www.rs6000.ibm.com/resource/technology/chrpio/via5.mak.html
-+ * ftp://ftp.austin.ibm.com/pub/technology/spec/chrp/inwork/CHRP_IORef_1.0.pdf
-+ *
-+ * also, http://developer.apple.com/technotes/hw/hw_09.html claims the
-+ * following changes for IIfx:
-+ * VIA1A_vSccWrReq not available and that VIA1A_vSync has moved to an IOP.
-+ * Also, "All of the functionality of VIA2 has been moved to other chips".
-+ */
-+
-+#define VIA1A_vSccWrReq 0x80   /*
-+                                * SCC write. (input)
-+                                * [CHRP] SCC WREQ: Reflects the state of the
-+                                * Wait/Request pins from the SCC.
-+                                * [Macintosh Family Hardware]
-+                                * as CHRP on SE/30,II,IIx,IIcx,IIci.
-+                                * on IIfx, "0 means an active request"
-+                                */
-+#define VIA1A_vRev8     0x40   /*
-+                                * Revision 8 board ???
-+                                * [CHRP] En WaitReqB: Lets the WaitReq_L
-+                                * signal from port B of the SCC appear on
-+                                * the PA7 input pin. Output.
-+                                * [Macintosh Family] On the SE/30, this
-+                                * is the bit to flip screen buffers.
-+                                * 0=alternate, 1=main.
-+                                * on II,IIx,IIcx,IIci,IIfx this is a bit
-+                                * for Rev ID. 0=II,IIx, 1=IIcx,IIci,IIfx
-+                                */
-+#define VIA1A_vHeadSel  0x20   /*
-+                                * Head select for IWM.
-+                                * [CHRP] unused.
-+                                * [Macintosh Family] "Floppy disk
-+                                * state-control line SEL" on all but IIfx
-+                                */
-+#define VIA1A_vOverlay  0x10   /*
-+                                * [Macintosh Family] On SE/30,II,IIx,IIcx
-+                                * this bit enables the "Overlay" address
-+                                * map in the address decoders as it is on
-+                                * reset for mapping the ROM over the reset
-+                                * vector. 1=use overlay map.
-+                                * On the IIci,IIfx it is another bit of the
-+                                * CPU ID: 0=normal IIci, 1=IIci with parity
-+                                * feature or IIfx.
-+                                * [CHRP] En WaitReqA: Lets the WaitReq_L
-+                                * signal from port A of the SCC appear
-+                                * on the PA7 input pin (CHRP). Output.
-+                                * [MkLinux] "Drive Select"
-+                                *  (with 0x20 being 'disk head select')
-+                                */
-+#define VIA1A_vSync     0x08   /*
-+                                * [CHRP] Sync Modem: modem clock select:
-+                                * 1: select the external serial clock to
-+                                *    drive the SCC's /RTxCA pin.
-+                                * 0: Select the 3.6864MHz clock to drive
-+                                *    the SCC cell.
-+                                * [Macintosh Family] Correct on all but IIfx
-+                                */
-+
-+/*
-+ * Macintosh Family Hardware sez: bits 0-2 of VIA1A are volume control
-+ * on Macs which had the PWM sound hardware.  Reserved on newer models.
-+ * On IIci,IIfx, bits 1-2 are the rest of the CPU ID:
-+ * bit 2: 1=IIci, 0=IIfx
-+ * bit 1: 1 on both IIci and IIfx.
-+ * MkLinux sez bit 0 is 'burnin flag' in this case.
-+ * CHRP sez: VIA1A bits 0-2 and 5 are 'unused': if programmed as
-+ * inputs, these bits will read 0.
-+ */
-+#define VIA1A_vVolume   0x07    /* Audio volume mask for PWM */
-+#define VIA1A_CPUID0    0x02    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID1    0x04    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID2    0x10    /* CPU id bit 0 on RBV, others */
-+#define VIA1A_CPUID3    0x40    /* CPU id bit 0 on RBV, others */
-+
-+/*
-+ * Info on VIA1B is from Macintosh Family Hardware & MkLinux.
-+ * CHRP offers no info.
-+ */
-+#define VIA1B_vSound   0x80    /*
-+                                * Sound enable (for compatibility with
-+                                * PWM hardware) 0=enabled.
-+                                * Also, on IIci w/parity, shows parity error
-+                                * 0=error, 1=OK.
-+                                */
-+#define VIA1B_vMystery 0x40    /*
-+                                * On IIci, parity enable. 0=enabled,1=disabled
-+                                * On SE/30, vertical sync interrupt enable.
-+                                * 0=enabled. This vSync interrupt shows up
-+                                * as a slot $E interrupt.
-+                                */
-+#define VIA1B_vADBS2   0x20    /* ADB state input bit 1 (unused on IIfx) */
-+#define VIA1B_vADBS1   0x10    /* ADB state input bit 0 (unused on IIfx) */
-+#define VIA1B_vADBInt  0x08    /* ADB interrupt 0=interrupt (unused on IIfx)*/
-+#define VIA1B_vRTCEnb  0x04    /* Enable Real time clock. 0=enabled. */
-+#define VIA1B_vRTCClk  0x02    /* Real time clock serial-clock line. */
-+#define VIA1B_vRTCData 0x01    /* Real time clock serial-data line. */
-+
-+/*
-+ *    VIA2 A register is the interrupt lines raised off the nubus
-+ *    slots.
-+ *      The below info is from 'Macintosh Family Hardware.'
-+ *      MkLinux calls the 'IIci internal video IRQ' below the 'RBV slot 0 irq.'
-+ *      It also notes that the slot $9 IRQ is the 'Ethernet IRQ' and
-+ *      defines the 'Video IRQ' as 0x40 for the 'EVR' VIA work-alike.
-+ *      Perhaps OSS uses vRAM1 and vRAM2 for ADB.
-+ */
-+
-+#define VIA2A_vRAM1    0x80    /* RAM size bit 1 (IIci: reserved) */
-+#define VIA2A_vRAM0    0x40    /* RAM size bit 0 (IIci: internal video IRQ) */
-+#define VIA2A_vIRQE    0x20    /* IRQ from slot $E */
-+#define VIA2A_vIRQD    0x10    /* IRQ from slot $D */
-+#define VIA2A_vIRQC    0x08    /* IRQ from slot $C */
-+#define VIA2A_vIRQB    0x04    /* IRQ from slot $B */
-+#define VIA2A_vIRQA    0x02    /* IRQ from slot $A */
-+#define VIA2A_vIRQ9    0x01    /* IRQ from slot $9 */
-+
-+/*
-+ * RAM size bits decoded as follows:
-+ * bit1 bit0  size of ICs in bank A
-+ *  0    0    256 kbit
-+ *  0    1    1 Mbit
-+ *  1    0    4 Mbit
-+ *  1    1   16 Mbit
-+ */
-+
-+/*
-+ *    Register B has the fun stuff in it
-+ */
-+
-+#define VIA2B_vVBL    0x80    /*
-+                               * VBL output to VIA1 (60.15Hz) driven by
-+                               * timer T1.
-+                               * on IIci, parity test: 0=test mode.
-+                               * [MkLinux] RBV_PARODD: 1=odd,0=even.
-+                               */
-+#define VIA2B_vSndJck 0x40    /*
-+                               * External sound jack status.
-+                               * 0=plug is inserted.  On SE/30, always 0
-+                               */
-+#define VIA2B_vTfr0   0x20    /* Transfer mode bit 0 ack from NuBus */
-+#define VIA2B_vTfr1   0x10    /* Transfer mode bit 1 ack from NuBus */
-+#define VIA2B_vMode32 0x08    /*
-+                               * 24/32bit switch - doubles as cache flush
-+                               * on II, AMU/PMMU control.
-+                               *   if AMU, 0=24bit to 32bit translation
-+                               *   if PMMU, 1=PMMU is accessing page table.
-+                               * on SE/30 tied low.
-+                               * on IIx,IIcx,IIfx, unused.
-+                               * on IIci/RBV, cache control. 0=flush cache.
-+                               */
-+#define VIA2B_vPower  0x04   /*
-+                              * Power off, 0=shut off power.
-+                              * on SE/30 this signal sent to PDS card.
-+                              */
-+#define VIA2B_vBusLk  0x02   /*
-+                              * Lock NuBus transactions, 0=locked.
-+                              * on SE/30 sent to PDS card.
-+                              */
-+#define VIA2B_vCDis   0x01   /*
-+                              * Cache control. On IIci, 1=disable cache card
-+                              * on others, 0=disable processor's instruction
-+                              * and data caches.
-+                              */
-+
-+/* interrupt flags */
-+
-+#define IRQ_SET         0x80
-+
-+/* common */
-+
-+#define VIA_IRQ_TIMER1      0x40
-+#define VIA_IRQ_TIMER2      0x20
-+
-+/*
-+ * Apple sez: http://developer.apple.com/technotes/ov/ov_04.html
-+ * Another example of a valid function that has no ROM support is the use
-+ * of the alternate video page for page-flipping animation. Since there
-+ * is no ROM call to flip pages, it is necessary to go play with the
-+ * right bit in the VIA chip (6522 Versatile Interface Adapter).
-+ * [CSA: don't know which one this is, but it's one of 'em!]
-+ */
-+
-+/*
-+ *    6522 registers - see databook.
-+ * CSA: Assignments for VIA1 confirmed from CHRP spec.
-+ */
-+
-+/* partial address decode.  0xYYXX : XX part for RBV, YY part for VIA */
-+/* Note: 15 VIA regs, 8 RBV regs */
-+
-+#define vBufB    0x0000  /* [VIA/RBV]  Register B */
-+#define vBufAH   0x0200  /* [VIA only] Buffer A, with handshake. DON'T USE! */
-+#define vDirB    0x0400  /* [VIA only] Data Direction Register B. */
-+#define vDirA    0x0600  /* [VIA only] Data Direction Register A. */
-+#define vT1CL    0x0800  /* [VIA only] Timer one counter low. */
-+#define vT1CH    0x0a00  /* [VIA only] Timer one counter high. */
-+#define vT1LL    0x0c00  /* [VIA only] Timer one latches low. */
-+#define vT1LH    0x0e00  /* [VIA only] Timer one latches high. */
-+#define vT2CL    0x1000  /* [VIA only] Timer two counter low. */
-+#define vT2CH    0x1200  /* [VIA only] Timer two counter high. */
-+#define vSR      0x1400  /* [VIA only] Shift register. */
-+#define vACR     0x1600  /* [VIA only] Auxilary control register. */
-+#define vPCR     0x1800  /* [VIA only] Peripheral control register. */
-+                         /*
-+                          *           CHRP sez never ever to *write* this.
-+                          *            Mac family says never to *change* this.
-+                          * In fact we need to initialize it once at start.
-+                          */
-+#define vIFR     0x1a00  /* [VIA/RBV]  Interrupt flag register. */
-+#define vIER     0x1c00  /* [VIA/RBV]  Interrupt enable register. */
-+#define vBufA    0x1e00  /* [VIA/RBV] register A (no handshake) */
-+
-+/* from linux 2.6 drivers/macintosh/via-macii.c */
-+
-+/* Bits in ACR */
-+
-+#define VIA1ACR_vShiftCtrl         0x1c        /* Shift register control bits */
-+#define VIA1ACR_vShiftExtClk       0x0c        /* Shift on external clock */
-+#define VIA1ACR_vShiftOut          0x10        /* Shift out if 1 */
-+
-+/*
-+ * Apple Macintosh Family Hardware Refenece
-+ * Table 19-10 ADB transaction states
-+ */
-+
-+#define VIA1B_vADB_StateMask    (VIA1B_vADBS1 | VIA1B_vADBS2)
-+#define VIA1B_vADB_StateShift   4
-+
-+#define VIA_TIMER_FREQ (783360)
-+
-+/* VIA returns time offset from Jan 1, 1904, not 1970 */
-+#define RTC_OFFSET 2082844800
-+
-+static void via1_VBL_update(MOS6522Q800VIA1State *v1s)
-+{
-+    MOS6522State *s = MOS6522(v1s);
-+    if (s->ier & VIA1_IRQ_VBLANK) { /* 60 Hz irq */
-+        timer_mod(v1s->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+		  16630) / 16630 * 16630);
-+    } else {
-+        timer_del(v1s->VBL_timer);
-+    }
-+}
-+
-+static void via1_one_second_update(MOS6522Q800VIA1State *v1s)
-+{
-+    MOS6522State *s = MOS6522(v1s);
-+    if (s->ier & VIA1_IRQ_ONE_SECOND) {
-+        timer_mod(v1s->one_second_timer, (qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL)
-+                  + 1000) / 1000 * 1000);
-+    } else {
-+        timer_del(v1s->one_second_timer);
-+    }
-+}
-+
-+static void via1_VBL(void *opaque)
-+{
-+    MOS6522Q800VIA1State *v1s = opaque;
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    s->ifr |= VIA1_IRQ_VBLANK;
-+    mdc->update_irq(s);
-+
-+    via1_VBL_update(v1s);
-+}
-+
-+static void via1_one_second(void *opaque)
-+{
-+    MOS6522Q800VIA1State *v1s = opaque;
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    s->ifr |= VIA1_IRQ_ONE_SECOND;
-+    mdc->update_irq(s);
-+
-+    via1_one_second_update(v1s);
-+}
-+
-+static void via1_irq_request(void *opaque, int irq, int level)
-+{
-+    MOS6522Q800VIA1State *v1s = opaque;
-+    MOS6522State *s = MOS6522(v1s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    if (level) {
-+        s->ifr |= 1 << irq;
-+    } else {
-+        s->ifr &= ~(1 << irq);
-+    }
-+
-+    mdc->update_irq(s);
-+}
-+
-+static void via2_irq_request(void *opaque, int irq, int level)
-+{
-+    MOS6522Q800VIA2State *v2s = opaque;
-+    MOS6522State *s = MOS6522(v2s);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
-+
-+    if (level) {
-+        s->ifr |= 1 << irq;
-+    } else {
-+        s->ifr &= ~(1 << irq);
-+    }
-+
-+    mdc->update_irq(s);
-+}
-+
-+static void via1_rtc_update(MacVIAState *m)
-+{
-+    MOS6522Q800VIA1State *v1s = &m->mos6522_via1;
-+    MOS6522State *s = MOS6522(v1s);
-+
-+    if (s->b & VIA1B_vRTCEnb) {
-+        return;
-+    }
-+
-+    if (s->dirb & VIA1B_vRTCData) {
-+        /* send bits to the RTC */
-+        if (!(v1s->last_b & VIA1B_vRTCClk) && (s->b & VIA1B_vRTCClk)) {
-+            m->data_out <<= 1;
-+            m->data_out |= s->b & VIA1B_vRTCData;
-+            m->data_out_cnt++;
-+        }
-+    } else {
-+        /* receive bits from the RTC */
-+        if ((v1s->last_b & VIA1B_vRTCClk) &&
-+            !(s->b & VIA1B_vRTCClk) &&
-+            m->data_in_cnt) {
-+            s->b = (s->b & ~VIA1B_vRTCData) |
-+                   ((m->data_in >> 7) & VIA1B_vRTCData);
-+            m->data_in <<= 1;
-+            m->data_in_cnt--;
-+        }
-+    }
-+
-+    if (m->data_out_cnt == 8) {
-+        m->data_out_cnt = 0;
-+
-+        if (m->cmd == 0) {
-+            if (m->data_out & 0x80) {
-+                /* this is a read command */
-+                uint32_t time = m->tick_offset +
-+                               (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) /
-+                               NANOSECONDS_PER_SECOND);
-+                if (m->data_out == 0x81) {        /* seconds register 0 */
-+                    m->data_in = time & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x85) { /* seconds register 1 */
-+                    m->data_in = (time >> 8) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x89) { /* seconds register 2 */
-+                    m->data_in = (time >> 16) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if (m->data_out == 0x8d) { /* seconds register 3 */
-+                    m->data_in = (time >> 24) & 0xff;
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x10 -> 0x13 */
-+                    int addr = (m->data_out >> 2) & 0x03;
-+                    m->data_in = v1s->PRAM[addr];
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x00 -> 0x0f */
-+                    int addr = (m->data_out >> 2) & 0x0f;
-+                    m->data_in = v1s->PRAM[addr];
-+                    m->data_in_cnt = 8;
-+                } else if ((m->data_out & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    m->cmd = m->data_out;
-+                }
-+            } else {
-+                /* this is a write command */
-+                m->cmd = m->data_out;
-+            }
-+        } else {
-+            if (m->cmd & 0x80) {
-+                if ((m->cmd & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    int sector = m->cmd & 0x07;
-+                    int addr = (m->data_out >> 2) & 0x1f;
-+
-+                    m->data_in = v1s->PRAM[sector * 8 + addr];
-+                    m->data_in_cnt = 8;
-+                }
-+            } else if (!m->wprotect) {
-+                /* this is a write command */
-+                if (m->alt != 0) {
-+                    /* extended memory designator and sector number */
-+                    int sector = m->cmd & 0x07;
-+                    int addr = (m->alt >> 2) & 0x1f;
-+
-+                    v1s->PRAM[sector * 8 + addr] = m->data_out;
-+
-+                    m->alt = 0;
-+                } else if (m->cmd == 0x01) { /* seconds register 0 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x05) { /* seconds register 1 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x09) { /* seconds register 2 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x0d) { /* seconds register 3 */
-+                    /* FIXME */
-+                } else if (m->cmd == 0x31) {
-+                    /* Test Register */
-+                } else if (m->cmd == 0x35) {
-+                    /* Write Protect register */
-+                    m->wprotect = m->data_out & 1;
-+                } else if ((m->cmd & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x10 -> 0x13 */
-+                    int addr = (m->cmd >> 2) & 0x03;
-+                    v1s->PRAM[addr] = m->data_out;
-+                } else if ((m->cmd & 0xf3) == 0xa1) {
-+                    /* PRAM address 0x00 -> 0x0f */
-+                    int addr = (m->cmd >> 2) & 0x0f;
-+                    v1s->PRAM[addr] = m->data_out;
-+                } else if ((m->cmd & 0xf8) == 0xb8) {
-+                    /* extended memory designator and sector number */
-+                    m->alt = m->cmd;
-+                }
-+            }
-+        }
-+        m->data_out = 0;
-+    }
-+}
-+
-+static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    return mos6522_read(ms, addr, size);
-+}
-+
-+static void mos6522_q800_via1_write(void *opaque, hwaddr addr, uint64_t val,
-+                                    unsigned size)
-+{
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(opaque);
-+    MOS6522State *ms = MOS6522(v1s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    mos6522_write(ms, addr, val, size);
-+
-+    via1_one_second_update(v1s);
-+    via1_VBL_update(v1s);
-+}
-+
-+static const MemoryRegionOps mos6522_q800_via1_ops = {
-+    .read = mos6522_q800_via1_read,
-+    .write = mos6522_q800_via1_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static uint64_t mos6522_q800_via2_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MOS6522Q800VIA2State *s = MOS6522_Q800_VIA2(opaque);
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    return mos6522_read(ms, addr, size);
-+}
-+
-+static void mos6522_q800_via2_write(void *opaque, hwaddr addr, uint64_t val,
-+                                    unsigned size)
-+{
-+    MOS6522Q800VIA2State *s = MOS6522_Q800_VIA2(opaque);
-+    MOS6522State *ms = MOS6522(s);
-+
-+    addr = (addr >> 9) & 0xf;
-+    mos6522_write(ms, addr, val, size);
-+}
-+
-+static const MemoryRegionOps mos6522_q800_via2_ops = {
-+    .read = mos6522_q800_via2_read,
-+    .write = mos6522_q800_via2_write,
-+    .endianness = DEVICE_BIG_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static void mac_via_reset(DeviceState *dev)
-+{
-+    MacVIAState *m = MAC_VIA(dev);
-+    MOS6522Q800VIA1State *v1s = &m->mos6522_via1;
-+
-+    timer_del(v1s->VBL_timer);
-+    timer_del(v1s->one_second_timer);
-+}
-+
-+static void mac_via_realize(DeviceState *dev, Error **errp)
-+{
-+    MacVIAState *m = MAC_VIA(dev);
-+    MOS6522State *ms;
-+    struct tm tm;
-+
-+    /* Init VIAs 1 and 2 */
-+    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
-+                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
-+
-+    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
-+                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
-+
-+    /* Pass through mos6522 output IRQs */
-+    ms = MOS6522(&m->mos6522_via1);
-+    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+    ms = MOS6522(&m->mos6522_via2);
-+    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
-+                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
-+
-+    /* Pass through mos6522 input IRQs */
-+    qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
-+    qdev_pass_gpios(DEVICE(&m->mos6522_via2), dev, "via2-irq");
-+
-+    /* VIA 1 */
-+    m->mos6522_via1.one_second_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
-+                                                     via1_one_second,
-+                                                     &m->mos6522_via1);
-+    m->mos6522_via1.VBL_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via1_VBL,
-+                                              &m->mos6522_via1);
-+
-+    qemu_get_timedate(&tm, 0);
-+    m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
-+}
-+
-+static void mac_via_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    MacVIAState *m = MAC_VIA(obj);
-+
-+    /* MMIO */
-+    memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
-+    sysbus_init_mmio(sbd, &m->mmio);
-+
-+    memory_region_init_io(&m->via1mem, obj, &mos6522_q800_via1_ops,
-+                          &m->mos6522_via1, "via1", VIA_SIZE);
-+    memory_region_add_subregion(&m->mmio, 0x0, &m->via1mem);
-+
-+    memory_region_init_io(&m->via2mem, obj, &mos6522_q800_via2_ops,
-+                          &m->mos6522_via2, "via2", VIA_SIZE);
-+    memory_region_add_subregion(&m->mmio, VIA_SIZE, &m->via2mem);
-+
-+    /* ADB */
-+    qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
-+                        TYPE_ADB_BUS, DEVICE(obj), "adb.0");
-+}
-+
-+static const VMStateDescription vmstate_mac_via = {
-+    .name = "mac-via",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        /* VIAs */
-+        VMSTATE_STRUCT(mos6522_via1.parent_obj, MacVIAState, 0, vmstate_mos6522,
-+                       MOS6522State),
-+        VMSTATE_UINT8(mos6522_via1.last_b, MacVIAState),
-+        VMSTATE_BUFFER(mos6522_via1.PRAM, MacVIAState),
-+        VMSTATE_TIMER_PTR(mos6522_via1.one_second_timer, MacVIAState),
-+        VMSTATE_TIMER_PTR(mos6522_via1.VBL_timer, MacVIAState),
-+        VMSTATE_STRUCT(mos6522_via2.parent_obj, MacVIAState, 0, vmstate_mos6522,
-+                       MOS6522State),
-+        /* RTC */
-+        VMSTATE_UINT32(tick_offset, MacVIAState),
-+        VMSTATE_UINT8(data_out, MacVIAState),
-+        VMSTATE_INT32(data_out_cnt, MacVIAState),
-+        VMSTATE_UINT8(data_in, MacVIAState),
-+        VMSTATE_UINT8(data_in_cnt, MacVIAState),
-+        VMSTATE_UINT8(cmd, MacVIAState),
-+        VMSTATE_INT32(wprotect, MacVIAState),
-+        VMSTATE_INT32(alt, MacVIAState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void mac_via_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = mac_via_realize;
-+    dc->reset = mac_via_reset;
-+    dc->vmsd = &vmstate_mac_via;
-+}
-+
-+static TypeInfo mac_via_info = {
-+    .name = TYPE_MAC_VIA,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MacVIAState),
-+    .instance_init = mac_via_init,
-+    .class_init = mac_via_class_init,
-+};
-+
-+/* VIA 1 */
-+static void mos6522_q800_via1_portB_write(MOS6522State *s)
-+{
-+    MOS6522Q800VIA1State *v1s = container_of(s, MOS6522Q800VIA1State,
-+                                             parent_obj);
-+    MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
-+
-+    via1_rtc_update(m);
-+
-+    v1s->last_b = s->b;
-+}
-+
-+static void mos6522_q800_via1_reset(DeviceState *dev)
-+{
-+    MOS6522State *ms = MOS6522(dev);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-+
-+    mdc->parent_reset(dev);
-+
-+    ms->timers[0].frequency = VIA_TIMER_FREQ;
-+    ms->timers[1].frequency = VIA_TIMER_FREQ;
-+
-+    ms->b = VIA1B_vADB_StateMask | VIA1B_vADBInt | VIA1B_vRTCEnb;
-+}
-+
-+static void mos6522_q800_via1_init(Object *obj)
-+{
-+    qdev_init_gpio_in_named(DEVICE(obj), via1_irq_request, "via1-irq",
-+                            VIA1_IRQ_NB);
-+}
-+
-+static void mos6522_q800_via1_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
-+
-+    dc->reset = mos6522_q800_via1_reset;
-+    mdc->portB_write = mos6522_q800_via1_portB_write;
-+}
-+
-+static const TypeInfo mos6522_q800_via1_type_info = {
-+    .name = TYPE_MOS6522_Q800_VIA1,
-+    .parent = TYPE_MOS6522,
-+    .instance_size = sizeof(MOS6522Q800VIA1State),
-+    .instance_init = mos6522_q800_via1_init,
-+    .class_init = mos6522_q800_via1_class_init,
-+};
-+
-+/* VIA 2 */
-+static void mos6522_q800_via2_portB_write(MOS6522State *s)
-+{
-+    if (s->dirb & VIA2B_vPower && (s->b & VIA2B_vPower) == 0) {
-+        /* shutdown */
-+        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+    }
-+}
-+
-+static void mos6522_q800_via2_reset(DeviceState *dev)
-+{
-+    MOS6522State *ms = MOS6522(dev);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
-+
-+    mdc->parent_reset(dev);
-+
-+    ms->timers[0].frequency = VIA_TIMER_FREQ;
-+    ms->timers[1].frequency = VIA_TIMER_FREQ;
-+
-+    ms->dirb = 0;
-+    ms->b = 0;
-+}
-+
-+static void mos6522_q800_via2_init(Object *obj)
-+{
-+    qdev_init_gpio_in_named(DEVICE(obj), via2_irq_request, "via2-irq",
-+                            VIA2_IRQ_NB);
-+}
-+
-+static void mos6522_q800_via2_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
-+
-+    dc->reset = mos6522_q800_via2_reset;
-+    mdc->portB_write = mos6522_q800_via2_portB_write;
-+}
-+
-+static const TypeInfo mos6522_q800_via2_type_info = {
-+    .name = TYPE_MOS6522_Q800_VIA2,
-+    .parent = TYPE_MOS6522,
-+    .instance_size = sizeof(MOS6522Q800VIA2State),
-+    .instance_init = mos6522_q800_via2_init,
-+    .class_init = mos6522_q800_via2_class_init,
-+};
-+
-+static void mac_via_register_types(void)
-+{
-+    type_register_static(&mos6522_q800_via1_type_info);
-+    type_register_static(&mos6522_q800_via2_type_info);
-+    type_register_static(&mac_via_info);
-+}
-+
-+type_init(mac_via_register_types);
-diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
-new file mode 100644
-index 0000000000..5b6ab9cc1a
---- /dev/null
-+++ b/include/hw/misc/mac_via.h
-@@ -0,0 +1,106 @@
-+/*
-+ *
-+ * Copyright (c) 2011-2018 Laurent Vivier
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_MISC_MAC_VIA_H
-+#define HW_MISC_MAC_VIA_H
-+
-+#include "exec/memory.h"
++#include "elf.h"
++#include "hw/loader.h"
++#include "ui/console.h"
++#include "exec/address-spaces.h"
++#include "hw/char/escc.h"
 +#include "hw/sysbus.h"
-+#include "hw/misc/mos6522.h"
++#include "hw/scsi/esp.h"
++#include "bootinfo.h"
++#include "hw/misc/mac_via.h"
++#include "hw/input/adb.h"
++#include "hw/nubus/mac-nubus-bridge.h"
++#include "hw/display/macfb.h"
++#include "hw/block/swim.h"
++#include "net/net.h"
++#include "qapi/error.h"
++#include "sysemu/qtest.h"
++#include "sysemu/runstate.h"
++#include "sysemu/reset.h"
++
++#define MACROM_ADDR     0x40000000
++#define MACROM_SIZE     0x00100000
++
++#define MACROM_FILENAME "MacROM.bin"
++
++#define Q800_MACHINE_ID 35
++#define Q800_CPU_ID (1 << 2)
++#define Q800_FPU_ID (1 << 2)
++#define Q800_MMU_ID (1 << 2)
++
++#define MACH_MAC        3
++#define Q800_MAC_CPU_ID 2
++
++#define VIA_BASE              0x50f00000
++#define SONIC_PROM_BASE       0x50f08000
++#define SONIC_BASE            0x50f0a000
++#define SCC_BASE              0x50f0c020
++#define ESP_BASE              0x50f10000
++#define ESP_PDMA              0x50f10100
++#define ASC_BASE              0x50F14000
++#define SWIM_BASE             0x50F1E000
++#define NUBUS_SUPER_SLOT_BASE 0x60000000
++#define NUBUS_SLOT_BASE       0xf0000000
++
++/*
++ * the video base, whereas it a Nubus address,
++ * is needed by the kernel to have early display and
++ * thus provided by the bootloader
++ */
++#define VIDEO_BASE            0xf9001000
++
++#define MAC_CLOCK  3686418
++
++/*
++ * The GLUE (General Logic Unit) is an Apple custom integrated circuit chip
++ * that performs a variety of functions (RAM management, clock generation, ...).
++ * The GLUE chip receives interrupt requests from various devices,
++ * assign priority to each, and asserts one or more interrupt line to the
++ * CPU.
++ */
++
++typedef struct {
++    M68kCPU *cpu;
++    uint8_t ipr;
++} GLUEState;
++
++static void GLUE_set_irq(void *opaque, int irq, int level)
++{
++    GLUEState *s = opaque;
++    int i;
++
++    if (level) {
++        s->ipr |= 1 << irq;
++    } else {
++        s->ipr &= ~(1 << irq);
++    }
++
++    for (i = 7; i >= 0; i--) {
++        if ((s->ipr >> i) & 1) {
++            m68k_set_irq_level(s->cpu, i + 1, i + 25);
++            return;
++        }
++    }
++    m68k_set_irq_level(s->cpu, 0, 0);
++}
++
++static void main_cpu_reset(void *opaque)
++{
++    M68kCPU *cpu = opaque;
++    CPUState *cs = CPU(cpu);
++
++    cpu_reset(cs);
++    cpu->env.aregs[7] = ldl_phys(cs->as, 0);
++    cpu->env.pc = ldl_phys(cs->as, 4);
++}
++
++static void q800_init(MachineState *machine)
++{
++    M68kCPU *cpu = NULL;
++    int linux_boot;
++    int32_t kernel_size;
++    uint64_t elf_entry;
++    char *filename;
++    int bios_size;
++    ram_addr_t initrd_base;
++    int32_t initrd_size;
++    MemoryRegion *rom;
++    MemoryRegion *ram;
++    ram_addr_t ram_size = machine->ram_size;
++    const char *kernel_filename = machine->kernel_filename;
++    const char *initrd_filename = machine->initrd_filename;
++    const char *kernel_cmdline = machine->kernel_cmdline;
++    hwaddr parameters_base;
++    CPUState *cs;
++    DeviceState *dev;
++    DeviceState *via_dev;
++    SysBusESPState *sysbus_esp;
++    ESPState *esp;
++    SysBusDevice *sysbus;
++    BusState *adb_bus;
++    NubusBus *nubus;
++    GLUEState *irq;
++    qemu_irq *pic;
++
++    linux_boot = (kernel_filename != NULL);
++
++    /* init CPUs */
++    cpu = M68K_CPU(cpu_create(machine->cpu_type));
++    qemu_register_reset(main_cpu_reset, cpu);
++
++    ram = g_malloc(sizeof(*ram));
++    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
++    memory_region_add_subregion(get_system_memory(), 0, ram);
++
++    /* IRQ Glue */
++
++    irq = g_new0(GLUEState, 1);
++    irq->cpu = cpu;
++    pic = qemu_allocate_irqs(GLUE_set_irq, irq, 8);
++
++    /* VIA */
++
++    via_dev = qdev_create(NULL, TYPE_MAC_VIA);
++    qdev_init_nofail(via_dev);
++    sysbus = SYS_BUS_DEVICE(via_dev);
++    sysbus_mmio_map(sysbus, 0, VIA_BASE);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
++    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
 +
 +
-+/* VIA 1 */
-+#define VIA1_IRQ_ONE_SECOND_BIT 0
-+#define VIA1_IRQ_VBLANK_BIT     1
-+#define VIA1_IRQ_ADB_READY_BIT  2
-+#define VIA1_IRQ_ADB_DATA_BIT   3
-+#define VIA1_IRQ_ADB_CLOCK_BIT  4
++    adb_bus = qdev_get_child_bus(via_dev, "adb.0");
++    dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
++    qdev_init_nofail(dev);
++    dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
++    qdev_init_nofail(dev);
 +
-+#define VIA1_IRQ_NB             8
++    /* MACSONIC */
 +
-+#define VIA1_IRQ_ONE_SECOND (1 << VIA1_IRQ_ONE_SECOND_BIT)
-+#define VIA1_IRQ_VBLANK     (1 << VIA1_IRQ_VBLANK_BIT)
-+#define VIA1_IRQ_ADB_READY  (1 << VIA1_IRQ_ADB_READY_BIT)
-+#define VIA1_IRQ_ADB_DATA   (1 << VIA1_IRQ_ADB_DATA_BIT)
-+#define VIA1_IRQ_ADB_CLOCK  (1 << VIA1_IRQ_ADB_CLOCK_BIT)
++    if (nb_nics > 1) {
++        error_report("q800 can only have one ethernet interface");
++        exit(1);
++    }
 +
++    qemu_check_nic_model(&nd_table[0], "dp83932");
 +
-+#define TYPE_MOS6522_Q800_VIA1 "mos6522-q800-via1"
-+#define MOS6522_Q800_VIA1(obj)  OBJECT_CHECK(MOS6522Q800VIA1State, (obj), \
-+                                    TYPE_MOS6522_Q800_VIA1)
++    /*
++     * MacSonic driver needs an Apple MAC address
++     * Valid prefix are:
++     * 00:05:02 Apple
++     * 00:80:19 Dayna Communications, Inc.
++     * 00:A0:40 Apple
++     * 08:00:07 Apple
++     * (Q800 use the last one)
++     */
++    nd_table[0].macaddr.a[0] = 0x08;
++    nd_table[0].macaddr.a[1] = 0x00;
++    nd_table[0].macaddr.a[2] = 0x07;
 +
-+typedef struct MOS6522Q800VIA1State {
-+    /*< private >*/
-+    MOS6522State parent_obj;
++    dev = qdev_create(NULL, "dp8393x");
++    qdev_set_nic_properties(dev, &nd_table[0]);
++    qdev_prop_set_uint8(dev, "it_shift", 2);
++    qdev_prop_set_bit(dev, "big_endian", true);
++    qdev_prop_set_ptr(dev, "dma_mr", get_system_memory());
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(sysbus, 0, SONIC_BASE);
++    sysbus_mmio_map(sysbus, 1, SONIC_PROM_BASE);
++    sysbus_connect_irq(sysbus, 0, pic[2]);
 +
-+    qemu_irq irqs[VIA1_IRQ_NB];
-+    uint8_t last_b;
-+    uint8_t PRAM[256];
++    /* SCC */
 +
-+    /* external timers */
-+    QEMUTimer *one_second_timer;
-+    QEMUTimer *VBL_timer;
-+} MOS6522Q800VIA1State;
++    dev = qdev_create(NULL, TYPE_ESCC);
++    qdev_prop_set_uint32(dev, "disabled", 0);
++    qdev_prop_set_uint32(dev, "frequency", MAC_CLOCK);
++    qdev_prop_set_uint32(dev, "it_shift", 1);
++    qdev_prop_set_bit(dev, "bit_swap", true);
++    qdev_prop_set_chr(dev, "chrA", serial_hd(0));
++    qdev_prop_set_chr(dev, "chrB", serial_hd(1));
++    qdev_prop_set_uint32(dev, "chnBtype", 0);
++    qdev_prop_set_uint32(dev, "chnAtype", 0);
++    qdev_init_nofail(dev);
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, pic[3]);
++    sysbus_connect_irq(sysbus, 1, pic[3]);
++    sysbus_mmio_map(sysbus, 0, SCC_BASE);
 +
++    /* SCSI */
 +
-+/* VIA 2 */
-+#define VIA2_IRQ_SCSI_DATA_BIT  0
-+#define VIA2_IRQ_SLOT_BIT       1
-+#define VIA2_IRQ_UNUSED_BIT     2
-+#define VIA2_IRQ_SCSI_BIT       3
-+#define VIA2_IRQ_ASC_BIT        4
++    dev = qdev_create(NULL, TYPE_ESP);
++    sysbus_esp = ESP_STATE(dev);
++    esp = &sysbus_esp->esp;
++    esp->dma_memory_read = NULL;
++    esp->dma_memory_write = NULL;
++    esp->dma_opaque = NULL;
++    sysbus_esp->it_shift = 4;
++    esp->dma_enabled = 1;
++    qdev_init_nofail(dev);
 +
-+#define VIA2_IRQ_NB             8
++    sysbus = SYS_BUS_DEVICE(dev);
++    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(via_dev,
++                                                         "via2-irq",
++                                                         VIA2_IRQ_SCSI_BIT));
++    sysbus_connect_irq(sysbus, 1,
++                       qdev_get_gpio_in_named(via_dev, "via2-irq",
++                                              VIA2_IRQ_SCSI_DATA_BIT));
++    sysbus_mmio_map(sysbus, 0, ESP_BASE);
++    sysbus_mmio_map(sysbus, 1, ESP_PDMA);
 +
-+#define VIA2_IRQ_SCSI_DATA  (1 << VIA2_IRQ_SCSI_DATA_BIT)
-+#define VIA2_IRQ_SLOT       (1 << VIA2_IRQ_SLOT_BIT)
-+#define VIA2_IRQ_UNUSED     (1 << VIA2_IRQ_SCSI_BIT)
-+#define VIA2_IRQ_SCSI       (1 << VIA2_IRQ_UNUSED_BIT)
-+#define VIA2_IRQ_ASC        (1 << VIA2_IRQ_ASC_BIT)
++    scsi_bus_legacy_handle_cmdline(&esp->bus);
 +
-+#define TYPE_MOS6522_Q800_VIA2 "mos6522-q800-via2"
-+#define MOS6522_Q800_VIA2(obj)  OBJECT_CHECK(MOS6522Q800VIA2State, (obj), \
-+                                    TYPE_MOS6522_Q800_VIA2)
++    /* SWIM floppy controller */
 +
-+typedef struct MOS6522Q800VIA2State {
-+    /*< private >*/
-+    MOS6522State parent_obj;
-+} MOS6522Q800VIA2State;
++    dev = qdev_create(NULL, TYPE_SWIM);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, SWIM_BASE);
 +
++    /* NuBus */
 +
-+#define TYPE_MAC_VIA "mac_via"
-+#define MAC_VIA(obj)   OBJECT_CHECK(MacVIAState, (obj), TYPE_MAC_VIA)
++    dev = qdev_create(NULL, TYPE_MAC_NUBUS_BRIDGE);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, NUBUS_SUPER_SLOT_BASE);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, NUBUS_SLOT_BASE);
 +
-+typedef struct MacVIAState {
-+    SysBusDevice busdev;
++    nubus = MAC_NUBUS_BRIDGE(dev)->bus;
 +
-+    /* MMIO */
-+    MemoryRegion mmio;
-+    MemoryRegion via1mem;
-+    MemoryRegion via2mem;
++    /* framebuffer in nubus slot #9 */
 +
-+    /* VIAs */
-+    MOS6522Q800VIA1State mos6522_via1;
-+    MOS6522Q800VIA2State mos6522_via2;
++    dev = qdev_create(BUS(nubus), TYPE_NUBUS_MACFB);
++    qdev_prop_set_uint32(dev, "width", graphic_width);
++    qdev_prop_set_uint32(dev, "height", graphic_height);
++    qdev_prop_set_uint8(dev, "depth", graphic_depth);
++    qdev_init_nofail(dev);
 +
-+    /* RTC */
-+    uint32_t tick_offset;
++    cs = CPU(cpu);
++    if (linux_boot) {
++        uint64_t high;
++        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
++                               &elf_entry, NULL, &high, 1,
++                               EM_68K, 0, 0);
++        if (kernel_size < 0) {
++            error_report("could not load kernel '%s'", kernel_filename);
++            exit(1);
++        }
++        stl_phys(cs->as, 4, elf_entry); /* reset initial PC */
++        parameters_base = (high + 1) & ~1;
 +
-+    uint8_t data_out;
-+    int data_out_cnt;
-+    uint8_t data_in;
-+    uint8_t data_in_cnt;
-+    uint8_t cmd;
-+    int wprotect;
-+    int alt;
++        BOOTINFO1(cs->as, parameters_base, BI_MACHTYPE, MACH_MAC);
++        BOOTINFO1(cs->as, parameters_base, BI_FPUTYPE, Q800_FPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MMUTYPE, Q800_MMU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_CPUTYPE, Q800_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_CPUID, Q800_MAC_CPU_ID);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_MODEL, Q800_MACHINE_ID);
++        BOOTINFO1(cs->as, parameters_base,
++                  BI_MAC_MEMSIZE, ram_size >> 20); /* in MB */
++        BOOTINFO2(cs->as, parameters_base, BI_MEMCHUNK, 0, ram_size);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VADDR, VIDEO_BASE);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDEPTH, graphic_depth);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDIM,
++                  (graphic_height << 16) | graphic_width);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_VROW,
++                  (graphic_width * graphic_depth + 7) / 8);
++        BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
 +
-+    /* ADB */
-+    ADBBusState adb_bus;
-+} MacVIAState;
++        if (kernel_cmdline) {
++            BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
++                        kernel_cmdline);
++        }
 +
-+#endif
++        /* load initrd */
++        if (initrd_filename) {
++            initrd_size = get_image_size(initrd_filename);
++            if (initrd_size < 0) {
++                error_report("could not load initial ram disk '%s'",
++                             initrd_filename);
++                exit(1);
++            }
++
++            initrd_base = (ram_size - initrd_size) & TARGET_PAGE_MASK;
++            load_image_targphys(initrd_filename, initrd_base,
++                                ram_size - initrd_base);
++            BOOTINFO2(cs->as, parameters_base, BI_RAMDISK, initrd_base,
++                      initrd_size);
++        } else {
++            initrd_base = 0;
++            initrd_size = 0;
++        }
++        BOOTINFO0(cs->as, parameters_base, BI_LAST);
++    } else {
++        uint8_t *ptr;
++        /* allocate and load BIOS */
++        rom = g_malloc(sizeof(*rom));
++        memory_region_init_ram(rom, NULL, "m68k_mac.rom", MACROM_SIZE,
++                               &error_abort);
++        if (bios_name == NULL) {
++            bios_name = MACROM_FILENAME;
++        }
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
++        memory_region_set_readonly(rom, true);
++        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
++
++        /* Load MacROM binary */
++        if (filename) {
++            bios_size = load_image_targphys(filename, MACROM_ADDR, MACROM_SIZE);
++            g_free(filename);
++        } else {
++            bios_size = -1;
++        }
++
++        /* Remove qtest_enabled() check once firmware files are in the tree */
++        if (!qtest_enabled()) {
++            if (bios_size < 0 || bios_size > MACROM_SIZE) {
++                error_report("could not load MacROM '%s'", bios_name);
++                exit(1);
++            }
++
++            ptr = rom_ptr(MACROM_ADDR, MACROM_SIZE);
++            stl_phys(cs->as, 0, ldl_p(ptr));    /* reset initial SP */
++            stl_phys(cs->as, 4,
++                     MACROM_ADDR + ldl_p(ptr + 4)); /* reset initial PC */
++        }
++    }
++}
++
++static void q800_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    mc->desc = "Macintosh Quadra 800";
++    mc->init = q800_init;
++    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m68040");
++    mc->max_cpus = 1;
++    mc->is_default = 0;
++    mc->block_default_type = IF_SCSI;
++}
++
++static const TypeInfo q800_machine_typeinfo = {
++    .name       = MACHINE_TYPE_NAME("q800"),
++    .parent     = TYPE_MACHINE,
++    .class_init = q800_machine_class_init,
++};
++
++static void q800_machine_register_types(void)
++{
++    type_register_static(&q800_machine_typeinfo);
++}
++
++type_init(q800_machine_register_types)
 -- 
 2.21.0
 
