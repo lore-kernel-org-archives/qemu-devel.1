@@ -2,107 +2,60 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2D7DC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:15:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38811C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B63EF207FF
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:15:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B63EF207FF
+	by mail.kernel.org (Postfix) with ESMTPS id 069282146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:22:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 069282146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDq5l-0004xV-Oh
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 09:15:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55208)
+	id 1iDqCE-0002dw-Eo
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 09:22:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55841)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDpqh-0002KQ-7m
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 08:59:55 -0400
+ (envelope-from <drjones@redhat.com>) id 1iDprR-0003BH-I5
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:00:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDpqd-0002zK-AQ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 08:59:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51942)
+ (envelope-from <drjones@redhat.com>) id 1iDprN-0003Pv-QN
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:00:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51096)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDpqc-0002x2-86; Fri, 27 Sep 2019 08:59:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iDprB-0003LL-M1; Fri, 27 Sep 2019 09:00:21 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 80CDB18C4269;
- Fri, 27 Sep 2019 10:30:59 +0000 (UTC)
-Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 649FA5D9C3;
- Fri, 27 Sep 2019 10:30:58 +0000 (UTC)
-Subject: Re: [PATCH v3 02/18] target/s390x: Add ilen to unwind data
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190926162615.31168-1-richard.henderson@linaro.org>
- <20190926162615.31168-3-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <4d1f9fbc-a6b3-cb7d-63a7-8d9568bc7406@redhat.com>
-Date: Fri, 27 Sep 2019 12:30:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 1466730BC58E;
+ Fri, 27 Sep 2019 13:00:20 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 914AF60606;
+ Fri, 27 Sep 2019 13:00:10 +0000 (UTC)
+Date: Fri, 27 Sep 2019 15:00:08 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Subject: Re: [PATCH v4 5/9] target/arm/kvm64: Add kvm_arch_get/put_sve
+Message-ID: <20190927130008.lh3t2tz26cknvvmf@kamzik.brq.redhat.com>
+References: <20190924113105.19076-1-drjones@redhat.com>
+ <20190924113105.19076-6-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190926162615.31168-3-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 27 Sep 2019 10:30:59 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190924113105.19076-6-drjones@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 27 Sep 2019 13:00:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -117,138 +70,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
+ eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
+ Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26.09.19 18:25, Richard Henderson wrote:
-> From: Richard Henderson <rth@twiddle.net>
+On Tue, Sep 24, 2019 at 01:31:01PM +0200, Andrew Jones wrote:
+> These are the SVE equivalents to kvm_arch_get/put_fpsimd. Note, the
+> swabbing is different than it is for fpsmid because the vector format
+> is a little-endian stream of words.
 > 
-> Use ILEN_UNWIND to signal that we have in fact that
-> cpu_restore_state will have been called by the time
-> we arrive in do_program_interrupt.
-> 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/s390x/cpu.h       |  4 +++-
->  target/s390x/interrupt.c |  5 ++++-
->  target/s390x/translate.c | 21 ++++++++++++++++++---
->  3 files changed, 25 insertions(+), 5 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index ce20dafd23..080ebcd6bb 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -30,7 +30,7 @@
->  /* The z/Architecture has a strong memory model with some store-after-load re-ordering */
->  #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
->  
-> -#define TARGET_INSN_START_EXTRA_WORDS 1
-> +#define TARGET_INSN_START_EXTRA_WORDS 2
->  
->  #define MMU_MODE0_SUFFIX _primary
->  #define MMU_MODE1_SUFFIX _secondary
-> @@ -814,6 +814,8 @@ int cpu_s390x_signal_handler(int host_signum, void *pinfo, void *puc);
->  void s390_crw_mchk(void);
->  void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
->                         uint32_t io_int_parm, uint32_t io_int_word);
-> +/* instruction length set by unwind info */
-> +#define ILEN_UNWIND                 0
->  /* automatically detect the instruction length */
->  #define ILEN_AUTO                   0xff
->  #define RA_IGNORED                  0
-> diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-> index a841f7187d..30a9fb8852 100644
-> --- a/target/s390x/interrupt.c
-> +++ b/target/s390x/interrupt.c
-> @@ -28,7 +28,10 @@ void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
->  
->      cs->exception_index = EXCP_PGM;
->      env->int_pgm_code = code;
-> -    env->int_pgm_ilen = ilen;
-> +    /* If ILEN_UNWIND, int_pgm_ilen already has the correct value.  */
-> +    if (ilen != ILEN_UNWIND) {
-> +        env->int_pgm_ilen = ilen;
-> +    }
->  }
->  
->  void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index e1c54ab03b..08f99454de 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -6309,6 +6309,9 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
->      /* Search for the insn in the table.  */
->      insn = extract_insn(env, s, &f);
->  
-> +    /* Emit insn_start now that we know the ILEN.  */
-> +    tcg_gen_insn_start(s->base.pc_next, s->cc_op, s->ilen);
-> +
->      /* Not found means unimplemented/illegal opcode.  */
->      if (insn == NULL) {
->          qemu_log_mask(LOG_UNIMP, "unimplemented opcode 0x%02x%02x\n",
-> @@ -6457,9 +6460,6 @@ static void s390x_tr_tb_start(DisasContextBase *db, CPUState *cs)
->  
->  static void s390x_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
->  {
-> -    DisasContext *dc = container_of(dcbase, DisasContext, base);
-> -
-> -    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
->  }
->  
->  static bool s390x_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-> @@ -6467,6 +6467,12 @@ static bool s390x_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
->  {
->      DisasContext *dc = container_of(dcbase, DisasContext, base);
->  
-> +    /*
-> +     * Emit an insn_start to accompany the breakpoint exception.
-> +     * The ILEN value is a dummy, since we didn't actually read an insn.
-> +     */
-> +    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op, 0);
-> +
->      dc->base.is_jmp = DISAS_PC_STALE;
->      dc->do_debug = true;
->      /* The address covered by the breakpoint must be included in
-> @@ -6561,8 +6567,17 @@ void restore_state_to_opc(CPUS390XState *env, TranslationBlock *tb,
->                            target_ulong *data)
->  {
->      int cc_op = data[1];
-> +    int ilen = data[2];
-> +
->      env->psw.addr = data[0];
-> +
-> +    /* Update the CC opcode if it is not already up-to-date.  */
->      if ((cc_op != CC_OP_DYNAMIC) && (cc_op != CC_OP_STATIC)) {
->          env->cc_op = cc_op;
->      }
-> +
-> +    /* Update ILEN, except for breakpoint, where we didn't load an insn.  */
-> +    if (ilen) {
-> +        env->int_pgm_ilen = ilen;
-> +    }
+>  target/arm/kvm64.c | 137 +++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 133 insertions(+), 4 deletions(-)
+>
 
-I am not completely sure about breakpoint handling and which
-implications we'll have when not setting int_pgm_ilen ...
-
->  }
-> 
-
-I wonder if that change can help to better handle exceptions during
-EXECUTE, whereby we have to indicate the EXECUTE instruction and the
-ilen of the EXECUTE instruction (so the pc and ilen of the original
-EXECUTE function, not of the EXECUTE target).
-
-I don't completely like the current interrupt handling when we have
-"env->ex_value" in "s390_cpu_exec_interrupt()". I'd love to see that
-check go, then we can reuse that function easily e.g., in MVC to test
-and inject exceptions while processing such an interruptible instruction
-- like MVC.
-
--- 
+It looks like I need to add the below changes to this patch as well,
+since FPSR and FPCR are still in use with SVE.
 
 Thanks,
+drew
 
-David / dhildenb
+
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 2da366ba113e..be31e56a1ab0 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -854,10 +854,8 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+ 
+ static int kvm_arch_put_fpsimd(CPUState *cs)
+ {
+-    ARMCPU *cpu = ARM_CPU(cs);
+-    CPUARMState *env = &cpu->env;
++    CPUARMState *env = &ARM_CPU(cs)->env;
+     struct kvm_one_reg reg;
+-    uint32_t fpr;
+     int i, ret;
+ 
+     for (i = 0; i < 32; i++) {
+@@ -875,22 +873,6 @@ static int kvm_arch_put_fpsimd(CPUState *cs)
+         }
+     }
+ 
+-    reg.addr = (uintptr_t)(&fpr);
+-    fpr = vfp_get_fpsr(env);
+-    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
+-    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+-    if (ret) {
+-        return ret;
+-    }
+-
+-    reg.addr = (uintptr_t)(&fpr);
+-    fpr = vfp_get_fpcr(env);
+-    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
+-    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+-    if (ret) {
+-        return ret;
+-    }
+-
+     return 0;
+ }
+ 
+@@ -970,6 +952,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+ {
+     struct kvm_one_reg reg;
+     uint64_t val;
++    uint32_t fpr;
+     int i, ret;
+     unsigned int el;
+ 
+@@ -1069,6 +1052,22 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         return ret;
+     }
+ 
++    reg.addr = (uintptr_t)(&fpr);
++    fpr = vfp_get_fpsr(env);
++    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
++    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg.addr = (uintptr_t)(&fpr);
++    fpr = vfp_get_fpcr(env);
++    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
++    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++
+     ret = kvm_put_vcpu_events(cpu);
+     if (ret) {
+         return ret;
+@@ -1087,10 +1086,8 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+ 
+ static int kvm_arch_get_fpsimd(CPUState *cs)
+ {
+-    ARMCPU *cpu = ARM_CPU(cs);
+-    CPUARMState *env = &cpu->env;
++    CPUARMState *env = &ARM_CPU(cs)->env;
+     struct kvm_one_reg reg;
+-    uint32_t fpr;
+     int i, ret;
+ 
+     for (i = 0; i < 32; i++) {
+@@ -1108,22 +1105,6 @@ static int kvm_arch_get_fpsimd(CPUState *cs)
+         }
+     }
+ 
+-    reg.addr = (uintptr_t)(&fpr);
+-    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
+-    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+-    if (ret) {
+-        return ret;
+-    }
+-    vfp_set_fpsr(env, fpr);
+-
+-    reg.addr = (uintptr_t)(&fpr);
+-    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
+-    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+-    if (ret) {
+-        return ret;
+-    }
+-    vfp_set_fpcr(env, fpr);
+-
+     return 0;
+ }
+ 
+@@ -1180,6 +1161,7 @@ int kvm_arch_get_registers(CPUState *cs)
+     struct kvm_one_reg reg;
+     uint64_t val;
+     unsigned int el;
++    uint32_t fpr;
+     int i, ret;
+ 
+     ARMCPU *cpu = ARM_CPU(cs);
+@@ -1278,6 +1260,22 @@ int kvm_arch_get_registers(CPUState *cs)
+         return ret;
+     }
+ 
++    reg.addr = (uintptr_t)(&fpr);
++    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
++    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++    vfp_set_fpsr(env, fpr);
++
++    reg.addr = (uintptr_t)(&fpr);
++    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
++    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++    vfp_set_fpcr(env, fpr);
++
+     ret = kvm_get_vcpu_events(cpu);
+     if (ret) {
+         return ret;
 
