@@ -2,69 +2,70 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD7AC32774
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D87C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:10:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86B44217D9
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:08:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86B44217D9
+	by mail.kernel.org (Postfix) with ESMTPS id 5C7792146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:10:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C7792146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDmEM-0004Ot-5n
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:08:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53490)
+	id 1iDmGY-0007Cv-4t
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:10:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53715)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iDmBz-00029f-Ga
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:05:38 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iDmCD-0002S9-BH
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iDmBw-0002fX-R2
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:05:35 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:39653)
+ (envelope-from <laurent@vivier.eu>) id 1iDmC6-000398-Ld
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:05:49 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:34321)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iDmBw-0002NF-GG; Fri, 27 Sep 2019 05:05:32 -0400
+ id 1iDmBx-0002Sz-1k; Fri, 27 Sep 2019 05:05:33 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M4s8v-1iCxVC03rb-0021LE; Fri, 27 Sep 2019 11:05:01 +0200
+ id 1MAfQk-1iKQ0k1lYu-00B7lH; Fri, 27 Sep 2019 11:05:03 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v13 0/9] hw/m68k: add Apple Machintosh Quadra 800 machine
-Date: Fri, 27 Sep 2019 11:04:44 +0200
-Message-Id: <20190927090453.24712-1-laurent@vivier.eu>
+Subject: [PATCH v13 1/9] esp: add pseudo-DMA as used by Macintosh
+Date: Fri, 27 Sep 2019 11:04:45 +0200
+Message-Id: <20190927090453.24712-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190927090453.24712-1-laurent@vivier.eu>
+References: <20190927090453.24712-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:CSG1dfkvff81EIYRl4upwCnKiWceCNWeryGjzNrqOcsJSeC2Avp
- 27MHN2i6GFAaAJ3uGgr/uk6IX0qASWjUcpyl+GSMBSjzIUmYrsiJEp9lQq7mcSDXVRlrX3F
- UIlknFQietnW7k09V6jU2w51NIiIb2RR2rbpiNIFIU7lIzVOyM0FFvK5+8n8pZIlna8PfeS
- 7PL0r6GEG5WsuuJRvHavg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:nkdrNHprrZU=:7hsSfjS0xHn2OWLlxIbERw
- rc80uT14jJkawdsORFfviCieaWDby2nEKPivWy+x5DWaNTNkhZksHtNVpWyN7zlV6thPXNFS/
- vafvmc0jRrPdD/6JKdZ/7V8o97cSzC89noljazPHlyCfZ1Pv3TRqfnYwzQTkRB2Y9bSxS3ABj
- GT1wZ1f4f6uJFIKdDUBZzw5CR1nL0TRAb1hoxal2QjPrOSc24ywgIlEIgkDmBOFFSBYXdttgs
- 4s/5/XzYNqc36/LoHsAUFgEkge6qwJPpu7qIJUWYMM43T4jbRG/qkab2TiNWCaCBM6iisdjID
- sbLqrAJ0MTQjEu+mBix9qruAtQRIREK7+yD6XYnawm3hoMgYNtCCZ4happHT4yfo2XtFpCVUl
- hakxc3HyIFlqwdmK5dPXzH3kCTjPTWywNcG8kBUm+QnjZkxvzH/IHRye4g6kqjAf7m4O5FMwi
- Qoq2mkh4mwaOMUEQMoZyAtHwVFrkUDB8b/xy4ZEmbC8tj0mhW1X71Rn8bLHbSaPKF78Pi0lcT
- dJ3NieP0IZf2jGs7m3ZtDoZNe/LqTu3sgaY0sfTKO3UvwsUlpOybEad+bY3g/qKFfeJ1MRJAu
- iro0ezqHVm9tqyMZ+k9I2MNvu6NQX4IUljyLRlolA8soAKcFY5ggwlMxlO9JaeGziyguC+D23
- BCzWNzJT0mN+z2D+J+ITp0S9OYETwIpkdexrx4tzz4OgR0kSqLKQmH4l0I4rkPeoIDTQSZGKP
- 8bkoeAw5C7e/YtWohDTaJLs0J9V7ruYgyuLavHFtnjSsYWst8Bv9ti55+jKN5FtNbfZ9VB0Rd
- 71nHV+8XyxqTcVIcXYZFYlYvK6jTi1G64gRwEnZ/A3hwmRITaitm0shWxUjELV7H4x0amkzle
- 6vfapMQRU2YGr5aBOVI3cnZHt/9NHnKa6/GB2Quy8=
+X-Provags-ID: V03:K1:toTMRRctYFUkkqS/pgM05/nC72aVK8A7UE6lB+feKEVHfY0ewrE
+ QXyIv58LuSnf8xUbejEMEw3GTVVmactGA+rViwYbkdQOEBwG1rjdN4Y1ENVqlDjRjZ4WeCN
+ lAcFwhKYBpUlVXEYXk+Ji/2iJm52+KoT5ybVNhgGgCGdAswZMjLqI9ZHIag0zvcNurYcUfJ
+ vC7ACxQdr/o1/TGg8R8Qw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:EfX7Q91lXyM=:cl7ECDARx1uv6KWUqNoOJ4
+ TK85POUg7iSGv0TV0lBfNx3s2aoPQ2uLKJw9ypWCth89GgG+bGGk75brVt9MfNcM5eZhzXeGB
+ BiybYCQZ/jTKePmzWNZ4PK7uWMOdwfFjdXvnNb01HsjUrfLSPVsEhqEmIwwTifHPMyzBCMkca
+ Whk8d3Mj0U6wX/4LUZWK5czUVS8tU6nXbShcF17H5b1fwaSl/Oi89sgPo5mXkC/8VUowiQvNs
+ NlmiIkmp5TEYaIX0Xsq66pJwMN1k6mpiNEfhE3aBrOspK+7+oYvtJlm0JXhwahl/ooYy19hoJ
+ usIP8RDoiXE+uquZA9OL8Mp0L6IiwPz6h79+rni7gE8DoWWsm1FMLJpeJDLZcdY+qk+b6+j+9
+ v+Be7IZzfvWC/X8b66j+c2uo31pZgpSTzXI1t3sEH6eLNDATIzVraXhiX5QZObDf8deXCEKoX
+ aaEKjtirmxGKkWr7iGgo/daoj6vMCpVN5tpAhPzON44//1egOPkuEt0RQRbUkpYiC9ZDiFWVe
+ SxOMsC0lvbO68Vcb8Nb1I7kHF/4HOqbGzR3SI8fYFlLjUiQNW2+42vpW69l7y8kAIMhBaSX+E
+ 9pgFmgUKNEZ20lPVx7CZfX5KdUA8vRYkZoH/1SRL/ItkfJAFVXxtpoGOk4Jtzk8CtZpCAm4sU
+ zD5Lozd4n05V7KKvPbeZAlMafDxcyN3pkPily4OAjfp26zYJoioni6fzCOxSavji3jlBPmRdZ
+ HhATqMy4/OI1jEqpp0JJN0o6qDGc+c1hR4fGrYb9E+s2MU1mHeAobgduMKW2BJZnwa3AmnLa6
+ JQR3vEQfn7yrFYriP4WM8m2QDgzmHGlHoD54lraPNTPFuz5KsoU1ocXossOrX0jE6PFn9kMAC
+ GO0zejvd9MM2+CHoRNTA==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.75
+X-Received-From: 217.72.192.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,232 +90,582 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm rebasing some of these patches for seven years now,
-too many years...
+There is no DMA in Quadra 800, so the CPU reads/writes the data from the
+PDMA register (offset 0x100, ESP_PDMA in hw/m68k/q800.c) and copies them
+to/from the memory.
 
-if you want to test the machine, I'm sorry, it doesn't boot
-a MacROM, but you can boot a linux kernel from the command line.
+There is a nice assembly loop in the kernel to do that, see
+linux/drivers/scsi/mac_esp.c:MAC_ESP_PDMA_LOOP().
 
-You can install your own disk using debian-installer, with:
+The start of the transfer is triggered by the DREQ interrupt (see linux
+mac_esp_send_pdma_cmd()), the CPU polls on the IRQ flag to start the
+transfer after a SCSI command has been sent (in Quadra 800 it goes
+through the VIA2, the via2-irq line and the vIFR register)
 
-    ...
-    -M q800 \
-    -serial none -serial mon:stdio \
-    -m 1000M \
-    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
-    -append "console=ttyS0 vga=off" \
-    -kernel vmlinux-4.16.0-1-m68k \
-    -initrd initrd.gz \
-    -drive file=debian-10.0-m68k-NETINST-1.iso,media=cdrom \
-    -drive file=m68k.qcow2,format=qcow2 \
-    -nographic
+The Macintosh hardware includes hardware handshaking to prevent the CPU
+from reading invalid data or writing data faster than the peripheral
+device can accept it.
 
-If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
-size of the display (I use "-g 1600x800x24").
+This is the "blind mode", and from the doc:
+"Approximate maximum SCSI transfer rates within a blocks are 1.4 MB per
+second for blind transfers in the Macintosh II"
 
-You can get the ISO from:
+Some references can be found in:
+  Apple Macintosh Family Hardware Reference, ISBN 0-201-19255-1
+  Guide to the Macintosh Family Hardware, ISBN-0-201-52405-8
 
-https://cdimage.debian.org/cdimage/ports/10.0/m68k/iso-cd/debian-10.0-m68k-NETINST-1.iso
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/scsi/esp.c         | 338 ++++++++++++++++++++++++++++++++++++++----
+ include/hw/scsi/esp.h |  15 ++
+ 2 files changed, 324 insertions(+), 29 deletions(-)
 
-and extract the kernel and initrd.gz:
-
-guestfish --add debian-10.0-m68k-NETINST-1.iso --ro \
-          --mount /dev/sda:/ <<_EOF_
-copy-out /install/cdrom/initrd.gz .
-copy-out /install/kernels/vmlinux-4.16.0-1-m68k .
-_EOF_
-
-The mirror to use is: http://ftp.ports.debian.org/debian-ports/
-when it fails, continue without boot loader.
-
-In the same way, you can extract the kernel and the initramfs from the qcow2
-image to use it with "-kernel" and "-initrd":
-
-guestfish --add m68k.qcow2 --mount /dev/sda2:/ <<_EOF_
-copy-out /boot/vmlinux-4.16.0-1-m68k .
-copy-out /boot/initrd.img-4.16.0-1-m68k .
-_EOF_
-
-and boot with:
-
-   ...
-   -append "root=/dev/sda2 rw console=ttyS0 console=tty \
-   -kernel vmlinux-4.16.0-1-m68k \
-   -initrd initrd.img-4.16.0-1-m68k
-
-NOTE: DHCP doesn't work but you can assign a static IP address.
-      We need some patches for dp8393x that are not ready to be merged.
-      See http://patchwork.ozlabs.org/patch/927020/
-          http://patchwork.ozlabs.org/patch/927030/
-          http://patchwork.ozlabs.org/patch/927026/
-
-v13: rebase
-     Stop 1-second and VBL timers when the interrupt is disabled
-     (fix some performance regressions on PowerMac G5, and 100% CPU
-      usage on x86_64)
-
-v12: Merge macfb and nubus macfb patches
-     Add some commit messages
-     replace DEFINE_MACHINE() by type_init()
-     Add BootLinuxConsoleTest from Philippe
-     rebase
-
-v11: Add VMState to migrate ESP PDMA
-
-     The new VMState structures cannot be tested because m68k is not
-     migratable and then Q800 is not either.
-     I've tested the ESP VMState is not broken by the change
-     with 'migrate "exec:cat > mig"' with qemu-system-sparc and
-     I have compared the result with/without the patch with
-     scripts/analyze-migrate.py: files desc.json are identical.
-
-v10: Add SWIM VMState and reset function
-     Add MacVIA VMState
-     rework Kconfig
-
-v9: Fix comments format
-    rebase on top of NeXTcube
-
-v8: rebase (new blk_new(), add "qemu-common.h")
-    update bootinfo information and license
-    add some braces
-    Rename Q800IRQState to GLUEState:
-    it's more like a Logic Unit than an IRQ controller,
-    and Apple calls it "GLUE" (Mark: I prefer to keep it
-    like this for the moment, in the future this part
-    need to be reworked, we have to review the IRQ levels
-    and to wire NUBUS IRQ. The implementation is really trivial
-    for the moment and we will move it to QOM in the future)
-
-v7: rebase and port to Kconfig
-    move IRQ controller back to q800.c (we don't need an object for this)
-    update log message for ESP changes and add some g_assert()
-    re-order patches: put esp, escc and dp8393x first
-
-v6: Rebase onto git master (this now includes the m68k EXCP_ILLEGAL fix required
-      for this patchset to boot)
-    Add Hervé's R-B tags
-    Drop ASC (Apple Sound Chip) device since the Linux driver is broken and
-      it is not required for a successful boot
-    Remove extra esp_raise_irq() from ESP pseudo-DMA patch (Hervé)
-    Remove "return" from unimplemented write functions and instead add a
-      "read only" comment (Hervé)
-    Rename MAX_FD to SWIM_MAX_FD in SWIM floppy controller patch to prevent
-      potential conflicts with other files (Hervé)
-
-v5: Rebase onto git master
-    Add Philippe's R-B to patch 10
-    Include the command line to boot a Linux kernel under the q800 machine in the
-    commit message for patch 11 (Philippe)
-    Fix up comments in hw/misc/mac_via.c (Thomas)
-    Add asserts to VIA ADB support to prevent potential buffer overflows (Thomas)
-    Move macfb surface/resolution checks to realise and remove hw_error (Thomas)
-    Move macfb draw_line functions inline and remove macfb-template.h (Mark)
-    Use guest address rather than source pointer in draw_line functions - this brings
-      macfb in line with the VGA device and can prevent a potential buffer overflow
-    Use g_strdup_printf() for memory region names in NuBus devices instead of
-      hardcoded length char arrays (Thomas)
-    Move NuBus QOM types from patch 7 to patch 8 (spotted by Thomas)
-    Move CONFIG_COLDFIRE sections together in hw/m68k/Makefile.objs (Thomas)
-    Remove obsolete comment from q800.c in patch 11 (Thomas)
-
-v4: Drop RFC from subject prefix as this is getting close to final
-    Rebased onto master (fixing ESP, rom_ptr() conflicts)
-    Reworked q800.c based upon Thomas' comments about cpu_init() and
-      qemu_check_nic_model()
-    Address Thomas' comments on using error_report() instead of hw_error()
-    Change the NuBus memory regions from DEVICE_NATIVE_ENDIAN to
-      DEVICE_BIG_ENDIAN
-    Split macfb Nubus support into separate commit
-    Change VMSTATE_BUFFER_UNSAFE() to VMSTATE_UINT8_ARRAY() in macfb.c as
-      suggested by David
-    Remove dummy Apple Sound Chip migration state as pointed out by David
-    Keep VIA ADB state and buffers in the mac_via device rather than adding
-      to existing ADBState (this matches the pattern used in the PPC CUDA/PMU
-      VIAs)
-    Remove blacklisting for q800 machine from "make check" as requested by
-      Thomas with the following fixes:
-        - Fix incorrect MemoryRegion owner in ASC device
-        - Add qtest_enabled() check in q800_init() to allow testing when no
-          kernel is specified
-        - Move some Mac VIA initialisation from init to realize
-    Remove legacy drive properties from SWIM floppy controller and instead
-      expose separate floppy bus and drive devices as requested by Kevin
-
-v3: fix subject prefix "C" -> "RFC"
-
-v2: remove the dp8393x fixes, because one of the patch breaks something
-    Update "dp8393x: manage big endian bus" with idea from Thomas
-    Mark has reworked most of the patches:
-    - use mos6522
-    - some code move, renamings and cleanup
-
-Laurent Vivier (8):
-  esp: add pseudo-DMA as used by Macintosh
-  dp8393x: manage big endian bus
-  hw/m68k: add VIA support
-  hw/m68k: implement ADB bus support for via
-  hw/m68k: add Nubus support
-  hw/m68k: add Nubus macfb video card
-  hw/m68k: add a dummy SWIM floppy controller
-  hw/m68k: define Macintosh Quadra 800
-
-Philippe Mathieu-Daudé (1):
-  BootLinuxConsoleTest: Test the Quadra 800
-
- MAINTAINERS                            |  14 +
- arch_init.c                            |   4 +
- default-configs/m68k-softmmu.mak       |   1 +
- hw/Kconfig                             |   1 +
- hw/Makefile.objs                       |   1 +
- hw/block/Kconfig                       |   3 +
- hw/block/Makefile.objs                 |   1 +
- hw/block/swim.c                        | 487 +++++++++++++
- hw/display/Kconfig                     |   5 +
- hw/display/Makefile.objs               |   1 +
- hw/display/macfb.c                     | 477 +++++++++++++
- hw/m68k/Kconfig                        |  10 +
- hw/m68k/Makefile.objs                  |   1 +
- hw/m68k/bootinfo.h                     | 114 +++
- hw/m68k/q800.c                         | 394 +++++++++++
- hw/misc/Kconfig                        |   5 +
- hw/misc/Makefile.objs                  |   1 +
- hw/misc/mac_via.c                      | 939 +++++++++++++++++++++++++
- hw/net/dp8393x.c                       |  88 ++-
- hw/nubus/Kconfig                       |   2 +
- hw/nubus/Makefile.objs                 |   4 +
- hw/nubus/mac-nubus-bridge.c            |  45 ++
- hw/nubus/nubus-bridge.c                |  34 +
- hw/nubus/nubus-bus.c                   | 111 +++
- hw/nubus/nubus-device.c                | 215 ++++++
- hw/scsi/esp.c                          | 338 ++++++++-
- include/hw/block/swim.h                |  76 ++
- include/hw/display/macfb.h             |  64 ++
- include/hw/misc/mac_via.h              | 113 +++
- include/hw/nubus/mac-nubus-bridge.h    |  24 +
- include/hw/nubus/nubus.h               |  69 ++
- include/hw/scsi/esp.h                  |  15 +
- qemu-options.hx                        |   2 +-
- tests/acceptance/boot_linux_console.py |  24 +
- vl.c                                   |   3 +-
- 35 files changed, 3624 insertions(+), 62 deletions(-)
- create mode 100644 hw/block/swim.c
- create mode 100644 hw/display/macfb.c
- create mode 100644 hw/m68k/bootinfo.h
- create mode 100644 hw/m68k/q800.c
- create mode 100644 hw/misc/mac_via.c
- create mode 100644 hw/nubus/Kconfig
- create mode 100644 hw/nubus/Makefile.objs
- create mode 100644 hw/nubus/mac-nubus-bridge.c
- create mode 100644 hw/nubus/nubus-bridge.c
- create mode 100644 hw/nubus/nubus-bus.c
- create mode 100644 hw/nubus/nubus-device.c
- create mode 100644 include/hw/block/swim.h
- create mode 100644 include/hw/display/macfb.h
- create mode 100644 include/hw/misc/mac_via.h
- create mode 100644 include/hw/nubus/mac-nubus-bridge.h
- create mode 100644 include/hw/nubus/nubus.h
-
+diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
+index 841d79b60e..90b40c4cb5 100644
+--- a/hw/scsi/esp.c
++++ b/hw/scsi/esp.c
+@@ -38,6 +38,8 @@
+  * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR89C100.txt
+  * and
+  * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR53C9X.txt
++ *
++ * On Macintosh Quadra it is a NCR53C96.
+  */
+ 
+ static void esp_raise_irq(ESPState *s)
+@@ -58,6 +60,16 @@ static void esp_lower_irq(ESPState *s)
+     }
+ }
+ 
++static void esp_raise_drq(ESPState *s)
++{
++    qemu_irq_raise(s->irq_data);
++}
++
++static void esp_lower_drq(ESPState *s)
++{
++    qemu_irq_lower(s->irq_data);
++}
++
+ void esp_dma_enable(ESPState *s, int irq, int level)
+ {
+     if (level) {
+@@ -84,29 +96,35 @@ void esp_request_cancelled(SCSIRequest *req)
+     }
+ }
+ 
+-static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
++static void set_pdma(ESPState *s, enum pdma_origin_id origin,
++                     uint32_t index, uint32_t len)
++{
++    s->pdma_origin = origin;
++    s->pdma_start = index;
++    s->pdma_cur = index;
++    s->pdma_len = len;
++}
++
++static uint8_t *get_pdma_buf(ESPState *s)
++{
++    switch (s->pdma_origin) {
++    case PDMA:
++        return s->pdma_buf;
++    case TI:
++        return s->ti_buf;
++    case CMD:
++        return s->cmdbuf;
++    case ASYNC:
++        return s->async_buf;
++    }
++    return NULL;
++}
++
++static int get_cmd_cb(ESPState *s)
+ {
+-    uint32_t dmalen;
+     int target;
+ 
+     target = s->wregs[ESP_WBUSID] & BUSID_DID;
+-    if (s->dma) {
+-        dmalen = s->rregs[ESP_TCLO];
+-        dmalen |= s->rregs[ESP_TCMID] << 8;
+-        dmalen |= s->rregs[ESP_TCHI] << 16;
+-        if (dmalen > buflen) {
+-            return 0;
+-        }
+-        s->dma_memory_read(s->dma_opaque, buf, dmalen);
+-    } else {
+-        dmalen = s->ti_size;
+-        if (dmalen > TI_BUFSZ) {
+-            return 0;
+-        }
+-        memcpy(buf, s->ti_buf, dmalen);
+-        buf[0] = buf[2] >> 5;
+-    }
+-    trace_esp_get_cmd(dmalen, target);
+ 
+     s->ti_size = 0;
+     s->ti_rptr = 0;
+@@ -125,8 +143,46 @@ static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
+         s->rregs[ESP_RINTR] = INTR_DC;
+         s->rregs[ESP_RSEQ] = SEQ_0;
+         esp_raise_irq(s);
++        return -1;
++    }
++    return 0;
++}
++
++static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
++{
++    int target;
++    uint32_t dmalen;
++
++    target = s->wregs[ESP_WBUSID] & BUSID_DID;
++    if (s->dma) {
++        dmalen = s->rregs[ESP_TCLO];
++        dmalen |= s->rregs[ESP_TCMID] << 8;
++        dmalen |= s->rregs[ESP_TCHI] << 16;
++        if (dmalen > buflen) {
++            return 0;
++        }
++        if (s->dma_memory_read) {
++            s->dma_memory_read(s->dma_opaque, buf, dmalen);
++        } else {
++            memcpy(s->pdma_buf, buf, dmalen);
++            set_pdma(s, PDMA, 0, dmalen);
++            esp_raise_drq(s);
++            return 0;
++        }
++    } else {
++        dmalen = s->ti_size;
++        if (dmalen > TI_BUFSZ) {
++            return 0;
++        }
++        memcpy(buf, s->ti_buf, dmalen);
++        buf[0] = buf[2] >> 5;
++    }
++    trace_esp_get_cmd(dmalen, target);
++
++    if (get_cmd_cb(s) < 0) {
+         return 0;
+     }
++
+     return dmalen;
+ }
+ 
+@@ -165,6 +221,16 @@ static void do_cmd(ESPState *s, uint8_t *buf)
+     do_busid_cmd(s, &buf[1], busid);
+ }
+ 
++static void satn_pdma_cb(ESPState *s)
++{
++    if (get_cmd_cb(s) < 0) {
++        return;
++    }
++    if (s->pdma_cur != s->pdma_start) {
++        do_cmd(s, get_pdma_buf(s) + s->pdma_start);
++    }
++}
++
+ static void handle_satn(ESPState *s)
+ {
+     uint8_t buf[32];
+@@ -174,11 +240,22 @@ static void handle_satn(ESPState *s)
+         s->dma_cb = handle_satn;
+         return;
+     }
++    s->pdma_cb = satn_pdma_cb;
+     len = get_cmd(s, buf, sizeof(buf));
+     if (len)
+         do_cmd(s, buf);
+ }
+ 
++static void s_without_satn_pdma_cb(ESPState *s)
++{
++    if (get_cmd_cb(s) < 0) {
++        return;
++    }
++    if (s->pdma_cur != s->pdma_start) {
++        do_busid_cmd(s, get_pdma_buf(s) + s->pdma_start, 0);
++    }
++}
++
+ static void handle_s_without_atn(ESPState *s)
+ {
+     uint8_t buf[32];
+@@ -188,18 +265,36 @@ static void handle_s_without_atn(ESPState *s)
+         s->dma_cb = handle_s_without_atn;
+         return;
+     }
++    s->pdma_cb = s_without_satn_pdma_cb;
+     len = get_cmd(s, buf, sizeof(buf));
+     if (len) {
+         do_busid_cmd(s, buf, 0);
+     }
+ }
+ 
++static void satn_stop_pdma_cb(ESPState *s)
++{
++    if (get_cmd_cb(s) < 0) {
++        return;
++    }
++    s->cmdlen = s->pdma_cur - s->pdma_start;
++    if (s->cmdlen) {
++        trace_esp_handle_satn_stop(s->cmdlen);
++        s->do_cmd = 1;
++        s->rregs[ESP_RSTAT] = STAT_TC | STAT_CD;
++        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
++        s->rregs[ESP_RSEQ] = SEQ_CD;
++        esp_raise_irq(s);
++    }
++}
++
+ static void handle_satn_stop(ESPState *s)
+ {
+     if (s->dma && !s->dma_enabled) {
+         s->dma_cb = handle_satn_stop;
+         return;
+     }
++    s->pdma_cb = satn_stop_pdma_cb;;
+     s->cmdlen = get_cmd(s, s->cmdbuf, sizeof(s->cmdbuf));
+     if (s->cmdlen) {
+         trace_esp_handle_satn_stop(s->cmdlen);
+@@ -211,16 +306,31 @@ static void handle_satn_stop(ESPState *s)
+     }
+ }
+ 
++static void write_response_pdma_cb(ESPState *s)
++{
++    s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
++    s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
++    s->rregs[ESP_RSEQ] = SEQ_CD;
++    esp_raise_irq(s);
++}
++
+ static void write_response(ESPState *s)
+ {
+     trace_esp_write_response(s->status);
+     s->ti_buf[0] = s->status;
+     s->ti_buf[1] = 0;
+     if (s->dma) {
+-        s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
+-        s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
+-        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
+-        s->rregs[ESP_RSEQ] = SEQ_CD;
++        if (s->dma_memory_write) {
++            s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
++            s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
++            s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
++            s->rregs[ESP_RSEQ] = SEQ_CD;
++        } else {
++            set_pdma(s, TI, 0, 2);
++            s->pdma_cb = write_response_pdma_cb;
++            esp_raise_drq(s);
++            return;
++        }
+     } else {
+         s->ti_size = 2;
+         s->ti_rptr = 0;
+@@ -242,6 +352,41 @@ static void esp_dma_done(ESPState *s)
+     esp_raise_irq(s);
+ }
+ 
++static void do_dma_pdma_cb(ESPState *s)
++{
++    int to_device = (s->ti_size < 0);
++    int len = s->pdma_cur - s->pdma_start;
++    if (s->do_cmd) {
++        s->ti_size = 0;
++        s->cmdlen = 0;
++        s->do_cmd = 0;
++        do_cmd(s, s->cmdbuf);
++        return;
++    }
++    s->dma_left -= len;
++    s->async_buf += len;
++    s->async_len -= len;
++    if (to_device) {
++        s->ti_size += len;
++    } else {
++        s->ti_size -= len;
++    }
++    if (s->async_len == 0) {
++        scsi_req_continue(s->current_req);
++        /*
++         * If there is still data to be read from the device then
++         * complete the DMA operation immediately.  Otherwise defer
++         * until the scsi layer has completed.
++         */
++        if (to_device || s->dma_left != 0 || s->ti_size == 0) {
++            return;
++        }
++    }
++
++    /* Partially filled a scsi buffer. Complete immediately.  */
++    esp_dma_done(s);
++}
++
+ static void esp_do_dma(ESPState *s)
+ {
+     uint32_t len;
+@@ -252,10 +397,25 @@ static void esp_do_dma(ESPState *s)
+         trace_esp_do_dma(s->cmdlen, len);
+         assert (s->cmdlen <= sizeof(s->cmdbuf) &&
+                 len <= sizeof(s->cmdbuf) - s->cmdlen);
+-        s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
++        if (s->dma_memory_read) {
++            s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
++        } else {
++            set_pdma(s, CMD, s->cmdlen, len);
++            s->pdma_cb = do_dma_pdma_cb;
++            esp_raise_drq(s);
++            return;
++        }
++        trace_esp_handle_ti_cmd(s->cmdlen);
++        s->ti_size = 0;
++        s->cmdlen = 0;
++        s->do_cmd = 0;
++        do_cmd(s, s->cmdbuf);
+         return;
+     }
+     if (s->async_len == 0) {
++        if (s->dma_left == 0) {
++            esp_dma_done(s);
++        }
+         /* Defer until data is available.  */
+         return;
+     }
+@@ -264,9 +424,23 @@ static void esp_do_dma(ESPState *s)
+     }
+     to_device = (s->ti_size < 0);
+     if (to_device) {
+-        s->dma_memory_read(s->dma_opaque, s->async_buf, len);
++        if (s->dma_memory_read) {
++            s->dma_memory_read(s->dma_opaque, s->async_buf, len);
++        } else {
++            set_pdma(s, ASYNC, 0, len);
++            s->pdma_cb = do_dma_pdma_cb;
++            esp_raise_drq(s);
++            return;
++        }
+     } else {
+-        s->dma_memory_write(s->dma_opaque, s->async_buf, len);
++        if (s->dma_memory_write) {
++            s->dma_memory_write(s->dma_opaque, s->async_buf, len);
++        } else {
++            set_pdma(s, ASYNC, 0, len);
++            s->pdma_cb = do_dma_pdma_cb;
++            esp_raise_drq(s);
++            return;
++        }
+     }
+     s->dma_left -= len;
+     s->async_buf += len;
+@@ -373,8 +547,7 @@ static void handle_ti(ESPState *s)
+         s->dma_left = minlen;
+         s->rregs[ESP_RSTAT] &= ~STAT_TC;
+         esp_do_dma(s);
+-    }
+-    if (s->do_cmd) {
++    } else if (s->do_cmd) {
+         trace_esp_handle_ti_cmd(s->cmdlen);
+         s->ti_size = 0;
+         s->cmdlen = 0;
+@@ -401,6 +574,7 @@ void esp_hard_reset(ESPState *s)
+ static void esp_soft_reset(ESPState *s)
+ {
+     qemu_irq_lower(s->irq);
++    qemu_irq_lower(s->irq_data);
+     esp_hard_reset(s);
+ }
+ 
+@@ -590,6 +764,28 @@ static bool esp_mem_accepts(void *opaque, hwaddr addr,
+     return (size == 1) || (is_write && size == 4);
+ }
+ 
++static bool esp_pdma_needed(void *opaque)
++{
++    ESPState *s = opaque;
++    return s->dma_memory_read == NULL && s->dma_memory_write == NULL &&
++           s->dma_enabled;
++}
++
++static const VMStateDescription vmstate_esp_pdma = {
++    .name = "esp/pdma",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = esp_pdma_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_BUFFER(pdma_buf, ESPState),
++        VMSTATE_INT32(pdma_origin, ESPState),
++        VMSTATE_UINT32(pdma_len, ESPState),
++        VMSTATE_UINT32(pdma_start, ESPState),
++        VMSTATE_UINT32(pdma_cur, ESPState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ const VMStateDescription vmstate_esp = {
+     .name ="esp",
+     .version_id = 4,
+@@ -611,6 +807,10 @@ const VMStateDescription vmstate_esp = {
+         VMSTATE_UINT32(do_cmd, ESPState),
+         VMSTATE_UINT32(dma_left, ESPState),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_esp_pdma,
++        NULL
+     }
+ };
+ 
+@@ -641,6 +841,82 @@ static const MemoryRegionOps sysbus_esp_mem_ops = {
+     .valid.accepts = esp_mem_accepts,
+ };
+ 
++static void sysbus_esp_pdma_write(void *opaque, hwaddr addr,
++                                  uint64_t val, unsigned int size)
++{
++    SysBusESPState *sysbus = opaque;
++    ESPState *s = &sysbus->esp;
++    uint32_t dmalen;
++    uint8_t *buf = get_pdma_buf(s);
++
++    dmalen = s->rregs[ESP_TCLO];
++    dmalen |= s->rregs[ESP_TCMID] << 8;
++    dmalen |= s->rregs[ESP_TCHI] << 16;
++    if (dmalen == 0 || s->pdma_len == 0) {
++        return;
++    }
++    switch (size) {
++    case 1:
++        buf[s->pdma_cur++] = val;
++        s->pdma_len--;
++        dmalen--;
++        break;
++    case 2:
++        buf[s->pdma_cur++] = val >> 8;
++        buf[s->pdma_cur++] = val;
++        s->pdma_len -= 2;
++        dmalen -= 2;
++        break;
++    }
++    s->rregs[ESP_TCLO] = dmalen & 0xff;
++    s->rregs[ESP_TCMID] = dmalen >> 8;
++    s->rregs[ESP_TCHI] = dmalen >> 16;
++    if (s->pdma_len == 0 && s->pdma_cb) {
++        esp_lower_drq(s);
++        s->pdma_cb(s);
++        s->pdma_cb = NULL;
++    }
++}
++
++static uint64_t sysbus_esp_pdma_read(void *opaque, hwaddr addr,
++                                     unsigned int size)
++{
++    SysBusESPState *sysbus = opaque;
++    ESPState *s = &sysbus->esp;
++    uint8_t *buf = get_pdma_buf(s);
++    uint64_t val = 0;
++
++    if (s->pdma_len == 0) {
++        return 0;
++    }
++    switch (size) {
++    case 1:
++        val = buf[s->pdma_cur++];
++        s->pdma_len--;
++        break;
++    case 2:
++        val = buf[s->pdma_cur++];
++        val = (val << 8) | buf[s->pdma_cur++];
++        s->pdma_len -= 2;
++        break;
++    }
++
++    if (s->pdma_len == 0 && s->pdma_cb) {
++        esp_lower_drq(s);
++        s->pdma_cb(s);
++        s->pdma_cb = NULL;
++    }
++    return val;
++}
++
++static const MemoryRegionOps sysbus_esp_pdma_ops = {
++    .read = sysbus_esp_pdma_read,
++    .write = sysbus_esp_pdma_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 2,
++};
++
+ static const struct SCSIBusInfo esp_scsi_info = {
+     .tcq = false,
+     .max_target = ESP_MAX_DEVS,
+@@ -673,12 +949,16 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
+     ESPState *s = &sysbus->esp;
+ 
+     sysbus_init_irq(sbd, &s->irq);
++    sysbus_init_irq(sbd, &s->irq_data);
+     assert(sysbus->it_shift != -1);
+ 
+     s->chip_id = TCHI_FAS100A;
+     memory_region_init_io(&sysbus->iomem, OBJECT(sysbus), &sysbus_esp_mem_ops,
+-                          sysbus, "esp", ESP_REGS << sysbus->it_shift);
++                          sysbus, "esp-regs", ESP_REGS << sysbus->it_shift);
+     sysbus_init_mmio(sbd, &sysbus->iomem);
++    memory_region_init_io(&sysbus->pdma, OBJECT(sysbus), &sysbus_esp_pdma_ops,
++                          sysbus, "esp-pdma", 2);
++    sysbus_init_mmio(sbd, &sysbus->pdma);
+ 
+     qdev_init_gpio_in(dev, sysbus_esp_gpio_demux, 2);
+ 
+diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
+index adab63d1c9..6ba47dac41 100644
+--- a/include/hw/scsi/esp.h
++++ b/include/hw/scsi/esp.h
+@@ -14,10 +14,18 @@ typedef void (*ESPDMAMemoryReadWriteFunc)(void *opaque, uint8_t *buf, int len);
+ 
+ typedef struct ESPState ESPState;
+ 
++enum pdma_origin_id {
++    PDMA,
++    TI,
++    CMD,
++    ASYNC,
++};
++
+ struct ESPState {
+     uint8_t rregs[ESP_REGS];
+     uint8_t wregs[ESP_REGS];
+     qemu_irq irq;
++    qemu_irq irq_data;
+     uint8_t chip_id;
+     bool tchi_written;
+     int32_t ti_size;
+@@ -48,6 +56,12 @@ struct ESPState {
+     ESPDMAMemoryReadWriteFunc dma_memory_write;
+     void *dma_opaque;
+     void (*dma_cb)(ESPState *s);
++    uint8_t pdma_buf[32];
++    int pdma_origin;
++    uint32_t pdma_len;
++    uint32_t pdma_start;
++    uint32_t pdma_cur;
++    void (*pdma_cb)(ESPState *s);
+ };
+ 
+ #define TYPE_ESP "esp"
+@@ -59,6 +73,7 @@ typedef struct {
+     /*< public >*/
+ 
+     MemoryRegion iomem;
++    MemoryRegion pdma;
+     uint32_t it_shift;
+     ESPState esp;
+ } SysBusESPState;
 -- 
 2.21.0
 
