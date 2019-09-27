@@ -2,53 +2,65 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF918C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A01C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:38:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2FE22146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:36:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2FE22146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 86F6221841
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:38:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86F6221841
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrM4-0003nl-QD
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:36:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34551)
+	id 1iDrO6-0005gR-3a
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:38:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDqCp-0003fl-WC
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:22:46 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iDqNH-0005Lf-QZ
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDqCn-0000N6-VX
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:22:43 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49752)
+ (envelope-from <imammedo@redhat.com>) id 1iDqNG-0001yB-EG
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59244)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDqCj-0000IU-MZ; Fri, 27 Sep 2019 09:22:37 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDpHz-0003za-25; Fri, 27 Sep 2019 15:23:59 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v5 7/9] iotests: add test 260 to check bitmap life after
- snapshot + commit
-Date: Fri, 27 Sep 2019 15:23:53 +0300
-Message-Id: <20190927122355.7344-8-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190927122355.7344-1-vsementsov@virtuozzo.com>
-References: <20190927122355.7344-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1iDqNG-0001xz-5K; Fri, 27 Sep 2019 09:33:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A7BC13082137;
+ Fri, 27 Sep 2019 13:33:28 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1FD875C220;
+ Fri, 27 Sep 2019 13:33:21 +0000 (UTC)
+Date: Fri, 27 Sep 2019 15:33:20 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v7 4/4] s390: do not call
+ memory_region_allocate_system_memory() multiple times
+Message-ID: <20190927153320.2edc683c@redhat.com>
+In-Reply-To: <20190925235235.GV28074@xz-x1>
+References: <20190924144751.24149-1-imammedo@redhat.com>
+ <20190924144751.24149-5-imammedo@redhat.com>
+ <20190925032700.GI28074@xz-x1> <20190925135105.6e5f249a@redhat.com>
+ <20190925235235.GV28074@xz-x1>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 27 Sep 2019 13:33:28 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,187 +72,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/260     | 89 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/260.out | 52 ++++++++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 142 insertions(+)
- create mode 100755 tests/qemu-iotests/260
- create mode 100644 tests/qemu-iotests/260.out
+On Thu, 26 Sep 2019 07:52:35 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
-new file mode 100755
-index 0000000000..4f6082c9d2
---- /dev/null
-+++ b/tests/qemu-iotests/260
-@@ -0,0 +1,89 @@
-+#!/usr/bin/env python
-+#
-+# Tests for temporary external snapshot when we have bitmaps.
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+from iotests import qemu_img_create, file_path, log, filter_qmp_event
-+
-+iotests.verify_image_format(supported_fmts=['qcow2'])
-+
-+base, top = file_path('base', 'top')
-+size = 64 * 1024 * 3
-+
-+
-+def print_bitmap(msg, vm):
-+    result = vm.qmp('query-block')['return'][0]
-+    if 'dirty-bitmaps' in result:
-+        bitmap = result['dirty-bitmaps'][0]
-+        log('{}: name={} dirty-clusters={}'.format(msg, bitmap['name'],
-+            bitmap['count'] // 64 // 1024))
-+    else:
-+        log(msg + ': not found')
-+
-+
-+def test(persistent, restart):
-+    assert persistent or not restart
-+    log("\nTestcase {}persistent {} restart\n".format(
-+            '' if persistent else 'non-', 'with' if restart else 'without'))
-+
-+    qemu_img_create('-f', iotests.imgfmt, base, str(size))
-+
-+    vm = iotests.VM().add_drive(base)
-+    vm.launch()
-+
-+    vm.qmp_log('block-dirty-bitmap-add', node='drive0', name='bitmap0',
-+               persistent=persistent)
-+    vm.hmp_qemu_io('drive0', 'write 0 64K')
-+    print_bitmap('initial bitmap', vm)
-+
-+    vm.qmp_log('blockdev-snapshot-sync', device='drive0', snapshot_file=top,
-+               format=iotests.imgfmt, filters=[iotests.filter_qmp_testfiles])
-+    vm.hmp_qemu_io('drive0', 'write 64K 512')
-+    print_bitmap('check that no bitmaps are in snapshot', vm)
-+
-+    if restart:
-+        log("... Restart ...")
-+        vm.shutdown()
-+        vm = iotests.VM().add_drive(top)
-+        vm.launch()
-+
-+    vm.qmp_log('block-commit', device='drive0', top=top,
-+               filters=[iotests.filter_qmp_testfiles])
-+    ev = vm.events_wait((('BLOCK_JOB_READY', None),
-+                         ('BLOCK_JOB_COMPLETED', None)))
-+    log(filter_qmp_event(ev))
-+    if (ev['event'] == 'BLOCK_JOB_COMPLETED'):
-+        vm.shutdown()
-+        log(vm.get_log())
-+        exit()
-+
-+    vm.qmp_log('block-job-complete', device='drive0')
-+    ev = vm.event_wait('BLOCK_JOB_COMPLETED')
-+    log(filter_qmp_event(ev))
-+    print_bitmap('check bitmap after commit', vm)
-+
-+    vm.hmp_qemu_io('drive0', 'write 128K 64K')
-+    print_bitmap('check updated bitmap', vm)
-+
-+    vm.shutdown()
-+
-+
-+test(persistent=False, restart=False)
-+test(persistent=True, restart=False)
-+test(persistent=True, restart=True)
-diff --git a/tests/qemu-iotests/260.out b/tests/qemu-iotests/260.out
-new file mode 100644
-index 0000000000..2f0d98d036
---- /dev/null
-+++ b/tests/qemu-iotests/260.out
-@@ -0,0 +1,52 @@
-+
-+Testcase non-persistent without restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": false}}
-+{"return": {}}
-+initial bitmap: name=bitmap0 dirty-clusters=1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=bitmap0 dirty-clusters=2
-+check updated bitmap: name=bitmap0 dirty-clusters=3
-+
-+Testcase persistent without restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": true}}
-+{"return": {}}
-+initial bitmap: name=bitmap0 dirty-clusters=1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=bitmap0 dirty-clusters=2
-+check updated bitmap: name=bitmap0 dirty-clusters=3
-+
-+Testcase persistent with restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": true}}
-+{"return": {}}
-+initial bitmap: name=bitmap0 dirty-clusters=1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+... Restart ...
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=bitmap0 dirty-clusters=2
-+check updated bitmap: name=bitmap0 dirty-clusters=3
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5d3da937e4..5ed068220e 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -273,6 +273,7 @@
- 256 rw quick
- 257 rw
- 258 rw quick
-+260 rw auto quick
- 262 rw quick migration
- 263 rw quick
- 265 rw auto quick
--- 
-2.21.0
+> On Wed, Sep 25, 2019 at 01:51:05PM +0200, Igor Mammedov wrote:
+> > On Wed, 25 Sep 2019 11:27:00 +0800
+> > Peter Xu <peterx@redhat.com> wrote:
+> >   
+> > > On Tue, Sep 24, 2019 at 10:47:51AM -0400, Igor Mammedov wrote:  
+> > > > s390 was trying to solve limited KVM memslot size issue by abusing
+> > > > memory_region_allocate_system_memory(), which breaks API contract
+> > > > where the function might be called only once.
+> > > > 
+> > > > Beside an invalid use of API, the approach also introduced migration
+> > > > issue, since RAM chunks for each KVM_SLOT_MAX_BYTES are transferred in
+> > > > migration stream as separate RAMBlocks.
+> > > > 
+> > > > After discussion [1], it was agreed to break migration from older
+> > > > QEMU for guest with RAM >8Tb (as it was relatively new (since 2.12)
+> > > > and considered to be not actually used downstream).
+> > > > Migration should keep working for guests with less than 8TB and for
+> > > > more than 8TB with QEMU 4.2 and newer binary.
+> > > > In case user tries to migrate more than 8TB guest, between incompatible
+> > > > QEMU versions, migration should fail gracefully due to non-exiting
+> > > > RAMBlock ID or RAMBlock size mismatch.
+> > > > 
+> > > > Taking in account above and that now KVM code is able to split too
+> > > > big MemorySection into several memslots, partially revert commit
+> > > >  (bb223055b s390-ccw-virtio: allow for systems larger that 7.999TB)
+> > > > and use kvm_set_max_memslot_size() to set KVMSlot size to
+> > > > KVM_SLOT_MAX_BYTES.
+> > > > 
+> > > > 1) [PATCH RFC v2 4/4] s390: do not call  memory_region_allocate_system_memory() multiple times
+> > > > 
+> > > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>    
+> > > 
+> > > Acked-by: Peter Xu <peterx@redhat.com>
+> > > 
+> > > IMHO it would be good to at least mention bb223055b9 in the commit
+> > > message even if not with a "Fixed:" tag.  May be amended during commit
+> > > if anyone prefers.  
+> > 
+> > /me confused, bb223055b9 is mentioned in commit message  
+> 
+> I'm sorry, I overlooked that.
+> 
+> >    
+> > > Also, this only applies the split limitation to s390.  Would that be a
+> > > good thing to some other archs as well?  
+> > 
+> > Don't we have the similar bitmap size issue in KVM for other archs?  
+> 
+> Yes I thought we had.  So I feel like it would be good to also allow
+> other archs to support >8TB mem as well.  Thanks,
+Another question, Is there another archs with that much RAM that are
+available/used in real life (if not I'd wait for demand to arise first)?
 
+If we are to generalize it to other targets, then instead of using
+arbitrary memslot max size per target, we could just hardcode or get
+from KVM, max supported size of bitmap and use that to calculate
+kvm_max_slot_size depending on target page size.
+
+Then there wouldn't be need for having machine specific code
+to care about it and pick/set arbitrary values.
+
+Another aspect to think about if we are to enable it for
+other targets is memslot accounting. It doesn't affect s390
+but other targets that support memory hotplug now assume 1:1
+relation between memoryregion:memslot, which currently holds
+true but would need to amended in case split is enabled there.
 
