@@ -2,59 +2,64 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAE32C32774
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 458E1C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77D07206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:36:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77D07206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 105F3206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:38:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MHrredvO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 105F3206B7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDjs8-0001zy-E9
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:36:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53754)
+	id 1iDju2-0004cw-R1
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:38:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48164)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iDjew-0007IH-W4
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:22 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iDjAB-0007yY-OZ
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 01:51:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iDjer-00047P-UY
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:18 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:59375)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iDjer-00041c-IW
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:13 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id DBEC66CD09;
- Fri, 27 Sep 2019 15:23:11 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 77FD3240085;
- Fri, 27 Sep 2019 15:23:11 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v25 09/22] target/rx: Replace operand with prt_ldmi in
- disassembler
-Date: Fri, 27 Sep 2019 15:22:49 +0900
-Message-Id: <20190927062302.110144-10-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190927062302.110144-1-ysato@users.sourceforge.jp>
-References: <20190927062302.110144-1-ysato@users.sourceforge.jp>
+ (envelope-from <dgibson@ozlabs.org>) id 1iDjAA-0006Mi-BV
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 01:51:31 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:48655)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iDjA9-0005aA-W1; Fri, 27 Sep 2019 01:51:30 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46fgrH5h2vz9sRl; Fri, 27 Sep 2019 15:50:39 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569563439;
+ bh=OUMFLJ2oAKnJyXX3VCtqoaChCMhLCtIv3hZW9G9u/Cw=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=MHrredvOfaGEGkjhkjXCDY6N6H1ED5M91u5xjYSO+OVxCMUffNGhqlgTn1P0zV06z
+ bHW69wZ/0Aju3BIpxdfWJ7QJV7JFz5Un8QzEyBrveo3VTndur/6UeiwTHZHRrcZNe2
+ POIgD9kn6Dv1H9PWw7TMgotCca+hK7PHYHzQPc1U=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org,
+	clg@kaod.org,
+	qemu-ppc@nongnu.org
+Subject: [PATCH v2 30/33] spapr, xics,
+ xive: Move SpaprIrq::post_load hook to backends
+Date: Fri, 27 Sep 2019 15:50:25 +1000
+Message-Id: <20190927055028.11493-31-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,311 +71,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, imammedo@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+The remaining logic in the post_load hook really belongs to the interrupt
+controller backends, and just needs to be called on the active controller
+(after the active controller is set to the right thing based on the
+incoming migration in the generic spapr_irq_post_load() logic).
 
-This has consistency with prt_ri().  It loads all data before
-beginning output.  It uses exactly one call to prt() to emit
-the full instruction.
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-20-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/rx/disas.c | 77 +++++++++++++++++------------------------------
- 1 file changed, 27 insertions(+), 50 deletions(-)
+ hw/intc/spapr_xive.c        |  5 +++--
+ hw/intc/xics_spapr.c        | 13 +++++++++++
+ hw/ppc/spapr_irq.c          | 45 ++++---------------------------------
+ include/hw/ppc/spapr_irq.h  |  3 +--
+ include/hw/ppc/spapr_xive.h |  1 -
+ 5 files changed, 21 insertions(+), 46 deletions(-)
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 64342537ee..515b365528 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -135,18 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char o=
-ut[8], int ld, int mi)
-     sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
- }
-=20
--static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
-+static void prt_ldmi(DisasContext *ctx, const char *insn,
-+                     int ld, int mi, int rs, int rd)
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index e8b946982c..ab68e6eaf6 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -462,10 +462,10 @@ static int vmstate_spapr_xive_pre_save(void *opaque=
+)
+  * Called by the sPAPR IRQ backend 'post_load' method at the machine
+  * level.
+  */
+-int spapr_xive_post_load(SpaprXive *xive, int version_id)
++static int spapr_xive_post_load(SpaprInterruptController *intc, int vers=
+ion_id)
  {
-     static const char sizes[][4] =3D {".b", ".w", ".l", ".uw", ".ub"};
-     char dsp[8];
-=20
-     if (ld < 3) {
-         rx_index_addr(ctx, dsp, ld, mi);
--        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
-+        prt("%s\t%s[r%d]%s, r%d", insn, dsp, rs, sizes[mi], rd);
-     } else {
--        prt("r%d", rs);
-+        prt("%s\tr%d, r%d", insn, rs, rd);
+     if (kvm_irqchip_in_kernel()) {
+-        return kvmppc_xive_post_load(xive, version_id);
++        return kvmppc_xive_post_load(SPAPR_XIVE(intc), version_id);
      }
--    prt(", r%d", rd);
+=20
+     return 0;
+@@ -699,6 +699,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+     sicc->set_irq =3D spapr_xive_set_irq;
+     sicc->print_info =3D spapr_xive_print_info;
+     sicc->dt =3D spapr_xive_dt;
++    sicc->post_load =3D spapr_xive_post_load;
  }
 =20
- static void prt_ir(DisasContext *ctx, const char *insn, int imm, int rd)
-@@ -416,8 +416,7 @@ static bool trans_AND_ir(DisasContext *ctx, arg_AND_i=
-r *a)
- /* and rs,rd */
- static bool trans_AND_mr(DisasContext *ctx, arg_AND_mr *a)
+ static const TypeInfo spapr_xive_info =3D {
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 8abbc799ba..9590eedc3d 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -395,6 +395,18 @@ static void xics_spapr_print_info(SpaprInterruptCont=
+roller *intc, Monitor *mon)
+     ics_pic_print_info(ics, mon);
+ }
+=20
++static int xics_spapr_post_load(SpaprInterruptController *intc, int vers=
+ion_id)
++{
++    if (!kvm_irqchip_in_kernel()) {
++        CPUState *cs;
++        CPU_FOREACH(cs) {
++            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++            icp_resend(spapr_cpu_state(cpu)->icp);
++        }
++    }
++    return 0;
++}
++
+ static void xics_spapr_activate(SpaprInterruptController *intc, Error **=
+errp)
  {
--    prt("and\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "and", a->ld, a->mi, a->rs, a->rd);
-     return true;
+     if (kvm_enabled()) {
+@@ -425,6 +437,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
+void *data)
+     sicc->set_irq =3D xics_spapr_set_irq;
+     sicc->print_info =3D xics_spapr_print_info;
+     sicc->dt =3D xics_spapr_dt;
++    sicc->post_load =3D xics_spapr_post_load;
  }
 =20
-@@ -440,8 +439,7 @@ static bool trans_OR_ir(DisasContext *ctx, arg_OR_ir =
-*a)
- /* or rs,rd */
- static bool trans_OR_mr(DisasContext *ctx, arg_OR_mr *a)
+ static const TypeInfo ics_spapr_info =3D {
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 2fd9dd0ec2..040384b0fe 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -100,43 +100,22 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptCont=
+roller *, Error **),
+  * XICS IRQ backend.
+  */
+=20
+-static int spapr_irq_post_load_xics(SpaprMachineState *spapr, int versio=
+n_id)
+-{
+-    if (!kvm_irqchip_in_kernel()) {
+-        CPUState *cs;
+-        CPU_FOREACH(cs) {
+-            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-            icp_resend(spapr_cpu_state(cpu)->icp);
+-        }
+-    }
+-    return 0;
+-}
+-
+ SpaprIrq spapr_irq_xics =3D {
+     .nr_xirqs    =3D SPAPR_NR_XIRQS,
+     .nr_msis     =3D SPAPR_NR_MSIS,
+     .xics        =3D true,
+     .xive        =3D false,
+-
+-    .post_load   =3D spapr_irq_post_load_xics,
+ };
+=20
+ /*
+  * XIVE IRQ backend.
+  */
+=20
+-static int spapr_irq_post_load_xive(SpaprMachineState *spapr, int versio=
+n_id)
+-{
+-    return spapr_xive_post_load(spapr->xive, version_id);
+-}
+-
+ SpaprIrq spapr_irq_xive =3D {
+     .nr_xirqs    =3D SPAPR_NR_XIRQS,
+     .nr_msis     =3D SPAPR_NR_MSIS,
+     .xics        =3D false,
+     .xive        =3D true,
+-
+-    .post_load   =3D spapr_irq_post_load_xive,
+ };
+=20
+ /*
+@@ -148,21 +127,6 @@ SpaprIrq spapr_irq_xive =3D {
+  * activated after an extra machine reset.
+  */
+=20
+-/*
+- * Returns the sPAPR IRQ backend negotiated by CAS. XICS is the
+- * default.
+- */
+-static SpaprIrq *spapr_irq_current(SpaprMachineState *spapr)
+-{
+-    return spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT) ?
+-        &spapr_irq_xive : &spapr_irq_xics;
+-}
+-
+-static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int versio=
+n_id)
+-{
+-    return spapr_irq_current(spapr)->post_load(spapr, version_id);
+-}
+-
+ /*
+  * Define values in sync with the XIVE and XICS backend
+  */
+@@ -171,8 +135,6 @@ SpaprIrq spapr_irq_dual =3D {
+     .nr_msis     =3D SPAPR_NR_MSIS,
+     .xics        =3D true,
+     .xive        =3D true,
+-
+-    .post_load   =3D spapr_irq_post_load_dual,
+ };
+=20
+=20
+@@ -454,8 +416,11 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int ir=
+q)
+=20
+ int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
  {
--    prt("or\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "or", a->ld, a->mi, a->rs, a->rd);
-     return true;
++    SpaprInterruptControllerClass *sicc;
++
+     spapr_irq_update_active_intc(spapr);
+-    return spapr->irq->post_load(spapr, version_id);
++    sicc =3D SPAPR_INTC_GET_CLASS(spapr->active_intc);
++    return sicc->post_load(spapr->active_intc, version_id);
  }
 =20
-@@ -463,8 +461,7 @@ static bool trans_XOR_ir(DisasContext *ctx, arg_XOR_i=
-r *a)
- /* xor rs,rd */
- static bool trans_XOR_mr(DisasContext *ctx, arg_XOR_mr *a)
- {
--    prt("xor\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "xor", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
+ void spapr_irq_reset(SpaprMachineState *spapr, Error **errp)
+@@ -596,8 +561,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+     .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
+     .xics        =3D true,
+     .xive        =3D false,
+-
+-    .post_load   =3D spapr_irq_post_load_xics,
+ };
 =20
-@@ -479,8 +476,7 @@ static bool trans_TST_ir(DisasContext *ctx, arg_TST_i=
-r *a)
- /* tst rs, rd */
- static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
- {
--    prt("tst\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "tst", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
+ static void spapr_irq_register_types(void)
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index 28044d7479..bc379b0761 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -62,6 +62,7 @@ typedef struct SpaprInterruptControllerClass {
+     void (*print_info)(SpaprInterruptController *intc, Monitor *mon);
+     void (*dt)(SpaprInterruptController *intc, uint32_t nr_servers,
+                void *fdt, uint32_t phandle);
++    int (*post_load)(SpaprInterruptController *intc, int version_id);
+ } SpaprInterruptControllerClass;
 =20
-@@ -548,8 +544,7 @@ static bool trans_ADD_irr(DisasContext *ctx, arg_ADD_=
-irr *a)
- /* add dsp[rs], rd */
- static bool trans_ADD_mr(DisasContext *ctx, arg_ADD_mr *a)
- {
--    prt("add\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "add", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
+ void spapr_irq_update_active_intc(SpaprMachineState *spapr);
+@@ -82,8 +83,6 @@ typedef struct SpaprIrq {
+     uint32_t    nr_msis;
+     bool        xics;
+     bool        xive;
+-
+-    int (*post_load)(SpaprMachineState *spapr, int version_id);
+ } SpaprIrq;
 =20
-@@ -573,8 +568,7 @@ static bool trans_CMP_ir(DisasContext *ctx, arg_CMP_i=
-r *a)
- /* cmp dsp[rs], rs2 */
- static bool trans_CMP_mr(DisasContext *ctx, arg_CMP_mr *a)
- {
--    prt("cmp\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "cmp", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
+ extern SpaprIrq spapr_irq_xics;
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 64972754f9..d84bd5c229 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -55,7 +55,6 @@ typedef struct SpaprXive {
+ #define SPAPR_XIVE_BLOCK_ID 0x0
 =20
-@@ -589,8 +583,7 @@ static bool trans_SUB_ir(DisasContext *ctx, arg_SUB_i=
-r *a)
- /* sub dsp[rs], rd */
- static bool trans_SUB_mr(DisasContext *ctx, arg_SUB_mr *a)
- {
--    prt("sub\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "sub", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
+ void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
+-int spapr_xive_post_load(SpaprXive *xive, int version_id);
 =20
-@@ -611,8 +604,7 @@ static bool trans_SBB_rr(DisasContext *ctx, arg_SBB_r=
-r *a)
- /* sbb dsp[rs], rd */
- static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
- {
--    prt("sbb\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "sbb", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -640,8 +632,7 @@ static bool trans_MAX_ir(DisasContext *ctx, arg_MAX_i=
-r *a)
- /* max dsp[rs], rd */
- static bool trans_MAX_mr(DisasContext *ctx, arg_MAX_mr *a)
- {
--    prt("max\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "max", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -656,8 +647,7 @@ static bool trans_MIN_ir(DisasContext *ctx, arg_MIN_i=
-r *a)
- /* min dsp[rs], rd */
- static bool trans_MIN_mr(DisasContext *ctx, arg_MIN_mr *a)
- {
--    prt("max\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "min", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -673,8 +663,7 @@ static bool trans_MUL_ir(DisasContext *ctx, arg_MUL_i=
-r *a)
- /* mul dsp[rs], rd */
- static bool trans_MUL_mr(DisasContext *ctx, arg_MUL_mr *a)
- {
--    prt("mul\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "mul", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -696,8 +685,7 @@ static bool trans_EMUL_ir(DisasContext *ctx, arg_EMUL=
-_ir *a)
- /* emul dsp[rs], rd */
- static bool trans_EMUL_mr(DisasContext *ctx, arg_EMUL_mr *a)
- {
--    prt("emul\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "emul", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -712,8 +700,7 @@ static bool trans_EMULU_ir(DisasContext *ctx, arg_EMU=
-LU_ir *a)
- /* emulu dsp[rs], rd */
- static bool trans_EMULU_mr(DisasContext *ctx, arg_EMULU_mr *a)
- {
--    prt("emulu\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "emulu", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -728,8 +715,7 @@ static bool trans_DIV_ir(DisasContext *ctx, arg_DIV_i=
-r *a)
- /* div dsp[rs], rd */
- static bool trans_DIV_mr(DisasContext *ctx, arg_DIV_mr *a)
- {
--    prt("div\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "div", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -744,8 +730,7 @@ static bool trans_DIVU_ir(DisasContext *ctx, arg_DIVU=
-_ir *a)
- /* divu dsp[rs], rd */
- static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
- {
--    prt("divu\t");
--    operand(ctx, a->ld, a->mi, a->rs, a->rd);
-+    prt_ldmi(ctx, "divu", a->ld, a->mi, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1089,8 +1074,7 @@ static bool trans_FADD_ir(DisasContext *ctx, arg_FA=
-DD_ir *a)
- /* fadd rs, rd */
- static bool trans_FADD_mr(DisasContext *ctx, arg_FADD_mr *a)
- {
--    prt("fadd\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fadd", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1105,8 +1089,7 @@ static bool trans_FCMP_ir(DisasContext *ctx, arg_FC=
-MP_ir *a)
- /* fcmp rs, rd */
- static bool trans_FCMP_mr(DisasContext *ctx, arg_FCMP_mr *a)
- {
--    prt("fcmp\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fcmp", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1121,8 +1104,7 @@ static bool trans_FSUB_ir(DisasContext *ctx, arg_FS=
-UB_ir *a)
- /* fsub rs, rd */
- static bool trans_FSUB_mr(DisasContext *ctx, arg_FSUB_mr *a)
- {
--    prt("fsub\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fsub", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1130,8 +1112,7 @@ static bool trans_FSUB_mr(DisasContext *ctx, arg_FS=
-UB_mr *a)
- /* ftoi rs, rd */
- static bool trans_FTOI(DisasContext *ctx, arg_FTOI *a)
- {
--    prt("ftoi\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "ftoi", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1146,8 +1127,7 @@ static bool trans_FMUL_ir(DisasContext *ctx, arg_FM=
-UL_ir *a)
- /* fmul rs, rd */
- static bool trans_FMUL_mr(DisasContext *ctx, arg_FMUL_mr *a)
- {
--    prt("fmul\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fmul", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1162,8 +1142,7 @@ static bool trans_FDIV_ir(DisasContext *ctx, arg_FD=
-IV_ir *a)
- /* fdiv rs, rd */
- static bool trans_FDIV_mr(DisasContext *ctx, arg_FDIV_mr *a)
- {
--    prt("fdiv\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "fdiv", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1171,8 +1150,7 @@ static bool trans_FDIV_mr(DisasContext *ctx, arg_FD=
-IV_mr *a)
- /* round rs, rd */
- static bool trans_ROUND(DisasContext *ctx, arg_ROUND *a)
- {
--    prt("round\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "round", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1180,8 +1158,7 @@ static bool trans_ROUND(DisasContext *ctx, arg_ROUN=
-D *a)
- /* itof dsp[rs], rd */
- static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
- {
--    prt("itof\t");
--    operand(ctx, a->ld, RX_IM_LONG, a->rs, a->rd);
-+    prt_ldmi(ctx, "itof", a->ld, RX_IM_LONG, a->rs, a->rd);
-     return true;
- }
-=20
+ void spapr_xive_hcall_init(SpaprMachineState *spapr);
+ void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
 --=20
-2.20.1
+2.21.0
 
 
