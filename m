@@ -2,92 +2,145 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D14B7C352AB
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F727C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:22:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ECB121850
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:20:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ECB121850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2E65A2054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:22:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E65A2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDmQ3-00004z-1C
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:20:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55426)
+	id 1iDmSJ-0002nq-4Q
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:22:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55562)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iDmJx-00039W-RT
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:13:51 -0400
+ (envelope-from <frankja@linux.ibm.com>) id 1iDmKb-0003vg-Dn
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iDmJw-0007nN-7A
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:13:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43360)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iDmJs-0007a4-NK; Fri, 27 Sep 2019 05:13:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0A5443082135;
- Fri, 27 Sep 2019 09:13:43 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-76.brq.redhat.com
- [10.40.204.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 470015D6A7;
- Fri, 27 Sep 2019 09:13:41 +0000 (UTC)
-Subject: Re: [PATCH v4 10/10] qcow2-bitmap: move bitmap reopen-rw code to
- qcow2_reopen_commit
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
- <20190807141226.193501-11-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <79c92b1c-d626-6374-bcd0-8e2bb3a8e6d9@redhat.com>
-Date: Fri, 27 Sep 2019 11:13:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <frankja@linux.ibm.com>) id 1iDmKa-0001Vp-1C
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:14:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3662)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iDmKZ-0001To-P7
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:14:27 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8R98HpQ109206
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 05:14:25 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v9fey0cmn-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 05:14:25 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Fri, 27 Sep 2019 10:14:23 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 27 Sep 2019 10:14:20 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8R9EIqH49938570
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 27 Sep 2019 09:14:18 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5C3C8AE045;
+ Fri, 27 Sep 2019 09:14:18 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F01B3AE055;
+ Fri, 27 Sep 2019 09:14:17 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.85.251])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 27 Sep 2019 09:14:17 +0000 (GMT)
+Subject: Re: [PATCH v1 1/2] s390x: Add sclp boundary check and fix error
+ priority
+To: David Hildenbrand <david@redhat.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
+ <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
+ <d7ee2ad4-d928-88f1-94d6-3f6b22d2da72@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Fri, 27 Sep 2019 11:14:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190807141226.193501-11-vsementsov@virtuozzo.com>
+In-Reply-To: <d7ee2ad4-d928-88f1-94d6-3f6b22d2da72@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="zjskGgH1rbwmixmDn27ef36xkXFq1Yc3t"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 27 Sep 2019 09:13:43 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+ boundary="TYN3slF9M4hiIIkraDXNhVBpUgqlWik6D"
+X-TM-AS-GCONF: 00
+x-cbid: 19092709-0008-0000-0000-0000031B9A4D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092709-0009-0000-0000-00004A3A38E0
+Message-Id: <a7f404a1-7985-e506-db3e-815bb6d8e8cc@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-27_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909270088
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,184 +152,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- den@openvz.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zjskGgH1rbwmixmDn27ef36xkXFq1Yc3t
-Content-Type: multipart/mixed; boundary="OYxzrnNjGJqocSsfGaQrCAAg7lKherQqX"
+--TYN3slF9M4hiIIkraDXNhVBpUgqlWik6D
+Content-Type: multipart/mixed; boundary="YxRJWbs5wERXllzShC8yECjaJZSs2Xdc2";
+ protected-headers="v1"
+From: Janosch Frank <frankja@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com
+Message-ID: <a7f404a1-7985-e506-db3e-815bb6d8e8cc@linux.ibm.com>
+Subject: Re: [PATCH v1 1/2] s390x: Add sclp boundary check and fix error
+ priority
+References: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
+ <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
+ <d7ee2ad4-d928-88f1-94d6-3f6b22d2da72@redhat.com>
+In-Reply-To: <d7ee2ad4-d928-88f1-94d6-3f6b22d2da72@redhat.com>
 
---OYxzrnNjGJqocSsfGaQrCAAg7lKherQqX
+--YxRJWbs5wERXllzShC8yECjaJZSs2Xdc2
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 07.08.19 16:12, Vladimir Sementsov-Ogievskiy wrote:
-> The only reason I can imagine for this strange code at the very-end of
-> bdrv_reopen_commit is the fact that bs->read_only updated after
-> calling drv->bdrv_reopen_commit in bdrv_reopen_commit. And in the same
-> time, prior to previous commit, qcow2_reopen_bitmaps_rw did a wrong
-> check for being writable, when actually it only need writable file
-> child not self.
+On 9/27/19 10:51 AM, David Hildenbrand wrote:
+> On 26.09.19 13:33, Claudio Imbrenda wrote:
+>> From: Janosch Frank <frankja@linux.ibm.com>
+>>
+>> * All sclp codes need to be checked for page boundary violations.
+>> * Requests over 4k are not a spec exception.
+>> * Invalid command checking has to be done before the boundary check.
 >=20
-> So, as it's fixed, let's move things to correct place.
+> Can we split this patch up so we fix one thing at a time?
+
+Sure, but we would end up with very small patches.
+Do you want that?
+
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/block_int.h |  6 ------
->  block.c                   | 19 -------------------
->  block/qcow2.c             | 15 ++++++++++++++-
->  3 files changed, 14 insertions(+), 26 deletions(-)
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> ---
+>>  hw/s390x/event-facility.c |  3 ---
+>>  hw/s390x/sclp.c           | 25 ++++++++++++++++++++++---
+>>  2 files changed, 22 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+>> index 797ecbb..6620569 100644
+>> --- a/hw/s390x/event-facility.c
+>> +++ b/hw/s390x/event-facility.c
+>> @@ -377,9 +377,6 @@ static void command_handler(SCLPEventFacility *ef,=
+ SCCB *sccb, uint64_t code)
+>>      case SCLP_CMD_WRITE_EVENT_MASK:
+>>          write_event_mask(ef, sccb);
+>>          break;
+>> -    default:
+>> -        sccb->h.response_code =3D cpu_to_be16(SCLP_RC_INVALID_SCLP_CO=
+MMAND);
+>> -        break;
+>>      }
+>>  }
+>> =20
+>> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+>> index fac7c3b..76feac8 100644
+>> --- a/hw/s390x/sclp.c
+>> +++ b/hw/s390x/sclp.c
+>> @@ -213,14 +213,33 @@ int sclp_service_call(CPUS390XState *env, uint64=
+_t sccb, uint32_t code)
+>>      cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
+>> =20
+>>      /* Valid sccb sizes */
+>> -    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader) ||
+>> -        be16_to_cpu(work_sccb.h.length) > SCCB_SIZE) {
+>> +    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
+>>          r =3D -PGM_SPECIFICATION;
+>>          goto out;
+>>      }
+>> =20
+>> -    sclp_c->execute(sclp, &work_sccb, code);
+>> +    switch (code & SCLP_CMD_CODE_MASK) {
+>> +    case SCLP_CMDW_READ_SCP_INFO:
+>> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
+>> +    case SCLP_CMDW_READ_CPU_INFO:
+>> +    case SCLP_CMDW_CONFIGURE_IOA:
+>> +    case SCLP_CMDW_DECONFIGURE_IOA:
+>> +    case SCLP_CMD_READ_EVENT_DATA:
+>> +    case SCLP_CMD_WRITE_EVENT_DATA:
+>> +    case SCLP_CMD_WRITE_EVENT_MASK:
+>> +        break;
+>> +    default:
+>> +        work_sccb.h.response_code =3D cpu_to_be16(SCLP_RC_INVALID_SCL=
+P_COMMAND);
+>> +        goto out_write;
+>> +    }
+>> =20
+>> +    if ((sccb + work_sccb.h.length) > ((sccb & PAGE_MASK) + PAGE_SIZE=
+)) {
+>> +        work_sccb.h.response_code =3D cpu_to_be16(SCLP_RC_SCCB_BOUNDA=
+RY_VIOLATION);
+>> +        goto out_write;
+>> +    }
+>> +
+>> +    sclp_c->execute(sclp, &work_sccb, code);
+>> +out_write:
+>>      cpu_physical_memory_write(sccb, &work_sccb,
+>>                                be16_to_cpu(work_sccb.h.length));
+>> =20
+>>
 >=20
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 3aa1e832a8..18a1e81194 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -531,12 +531,6 @@ struct BlockDriver {
->                               uint64_t parent_perm, uint64_t parent_sha=
-red,
->                               uint64_t *nperm, uint64_t *nshared);
-> =20
-> -    /**
-> -     * Bitmaps should be marked as 'IN_USE' in the image on reopening =
-image
-> -     * as rw. This handler should realize it. It also should unset rea=
-donly
-> -     * field of BlockDirtyBitmap's in case of success.
-> -     */
-> -    int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);=
-
->      bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs,
->                                              const char *name,
->                                              uint32_t granularity,
-> diff --git a/block.c b/block.c
-> index d59f9f97cb..395bc88045 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3925,16 +3925,12 @@ void bdrv_reopen_commit(BDRVReopenState *reopen=
-_state)
->      BlockDriver *drv;
->      BlockDriverState *bs;
->      BdrvChild *child;
-> -    bool old_can_write, new_can_write;
-> =20
->      assert(reopen_state !=3D NULL);
->      bs =3D reopen_state->bs;
->      drv =3D bs->drv;
->      assert(drv !=3D NULL);
-> =20
-> -    old_can_write =3D
-> -        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTI=
-VE);
-> -
->      /* If there are any driver level actions to take */
->      if (drv->bdrv_reopen_commit) {
->          drv->bdrv_reopen_commit(reopen_state);
-> @@ -3978,21 +3974,6 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_=
-state)
->      }
-> =20
->      bdrv_refresh_limits(bs, NULL);
-> -
-> -    new_can_write =3D
-> -        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTI=
-VE);
-> -    if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw=
-) {
-> -        Error *local_err =3D NULL;
-> -        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
-> -            /* This is not fatal, bitmaps just left read-only, so all =
-following
-> -             * writes will fail. User can remove read-only bitmaps to =
-unblock
-> -             * writes.
-> -             */
-> -            error_reportf_err(local_err,
-> -                              "%s: Failed to make dirty bitmaps writab=
-le: ",
-> -                              bdrv_get_node_name(bs));
-> -        }
-> -    }
->  }
-> =20
->  /*
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 5c1187e2f9..9e6210c282 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1828,6 +1828,20 @@ fail:
->  static void qcow2_reopen_commit(BDRVReopenState *state)
->  {
->      qcow2_update_options_commit(state->bs, state->opaque);
-> +    if (state->flags & BDRV_O_RDWR) {
-> +        Error *local_err =3D NULL;
-> +
-> +        if (qcow2_reopen_bitmaps_rw(state->bs, &local_err) < 0) {
-> +            /*
-> +             * This is not fatal, bitmaps just left read-only, so all =
-following
-> +             * writes will fail. User can remove read-only bitmaps to =
-unblock
-> +             * writes or retry reopen.
-> +             */
-
-It=E2=80=99s still my impression that this is absolutely fatal, because t=
-hat
-means the node isn=E2=80=99t actually writable, and that means the reopen=
-
-effectively failed.
-
-But again, it doesn=E2=80=99t make things worse.
-
-Assuming the RW -> RW transition is a no-op now (the previous patch
-claims to handle that case):
-
-Acked-by: Max Reitz <mreitz@redhat.com>
-
-> +            error_reportf_err(local_err,
-> +                              "%s: Failed to make dirty bitmaps writab=
-le: ",
-> +                              bdrv_get_node_name(state->bs));
-> +        }
-> +    }
->      g_free(state->opaque);
->  }
-> =20
-> @@ -5229,7 +5243,6 @@ BlockDriver bdrv_qcow2 =3D {
->      .bdrv_detach_aio_context  =3D qcow2_detach_aio_context,
->      .bdrv_attach_aio_context  =3D qcow2_attach_aio_context,
-> =20
-> -    .bdrv_reopen_bitmaps_rw =3D qcow2_reopen_bitmaps_rw,
->      .bdrv_can_store_new_dirty_bitmap =3D qcow2_can_store_new_dirty_bit=
-map,
->      .bdrv_remove_persistent_dirty_bitmap =3D qcow2_remove_persistent_d=
-irty_bitmap,
->  };
 >=20
 
 
 
---OYxzrnNjGJqocSsfGaQrCAAg7lKherQqX--
+--YxRJWbs5wERXllzShC8yECjaJZSs2Xdc2--
 
---zjskGgH1rbwmixmDn27ef36xkXFq1Yc3t
+--TYN3slF9M4hiIIkraDXNhVBpUgqlWik6D
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2N0sMACgkQ9AfbAGHV
-z0AKLgf+P1D61R7kC/yjTsvOMJeDV9Q17FR9nS9cMVCWQOBvyeU4DSLb2+NPLZ8p
-1aE+kjsH7cb35fFQ7rWTrixF337LcrNQeBOFNgk75fLlMyIfy+p8aFr/drJnxZLn
-VZJL3eMEw2+DLiEsoGnNLKs/AOubIzIIEy1Tzx5P+u3XZNuZ7RRatInCXJeCwzq9
-rlVtIkY0oyyXLHmiIR2+NQYti5KmHljyJs5Daww3BFQzPB1YeCoXCsNu/YCysAbn
-EuVKHo4kJdqmb9ufTxd0S1cVmfq1THTRCpx+O9FeGYU0Ry7lx3EAufPAgKiBxB5d
-/ew2vknV0kGNx6oSggClH5TJmivmiQ==
-=3zGh
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl2N0ukACgkQ41TmuOI4
+ufj6yA/9GVknph8Ics7mFOqfp4YlQhhEqEHrRVXJn46uW+fzikgivOJEwyYHaG7j
+LypIH41N/Vu5Xa1Ei/W8wt+3Xblo8lHJ/cmP8viNV2lGvxA+Fzf6jYaR1f72Fwdw
+xovr35hTuIsOIW1eG2rsBcvtZlIET5m3QMGys0kg93oSWqCF6VfcWOyMn/FGcLeV
+glQWKBpXto3OVMj1gRTz6bwixaNXisVJPYSpyrHCWjIYhOQgOPawtZMxpCn8qMJk
+MoWIS5KLby+Boq4HM/NjBt1oI61agaTKgG9gMkLFaugNT0+jx2lnnkB8/DE55rYh
+eIkwMocCIIVeSPgxE++1Qe7QPQexP/RRu6+Tk9cfyHeabFPniL6XOGpiAxgfZcLS
+h5P1qghgPMaozYGpTmu/JVj4YZ2QBDLhSau9m4sAeOjaq1USMPxZ1qCn+zRl6h+8
+t5F12ZrcQ+Z0g6InKYwl9pUsSozL9tUfpAjz4qVOhuAc3FshUterpnxe2lcP8zIp
+89fXVg1zWT4z/LZgeBHJP+01f28X2rL0wFUt/Na265nicIPRtXtS2hCpDg9J5mmO
+tH4b4kmEPMReo0eW7SbYjn4kSCb7hOgvFi4/QN0gnywwczrr8KUpI95Krzuva32x
+MA7QqwE4wPBd6T++rJPkYBA/0xX7El5BrVEqNXZIE4T8n5vovFQ=
+=cm5K
 -----END PGP SIGNATURE-----
 
---zjskGgH1rbwmixmDn27ef36xkXFq1Yc3t--
+--TYN3slF9M4hiIIkraDXNhVBpUgqlWik6D--
+
 
