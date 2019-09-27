@@ -6,62 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD99C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32080C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:27:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8AF121920
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:27:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8AF121920
+	by mail.kernel.org (Postfix) with ESMTPS id 07F24217D9
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:27:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07F24217D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrDD-0002Xv-Qw
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:27:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34204)
+	id 1iDrDZ-0002zA-BH
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:27:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iDqBM-0002Wr-4F
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:21:13 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iDqWP-00061v-Qe
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iDqBK-00009B-Rc
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:21:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41780)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iDqWN-0005OB-S4
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18791)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqBK-00008q-JQ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:21:10 -0400
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iDqWN-0005O0-JN
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:55 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3DCE2C065116;
- Fri, 27 Sep 2019 12:03:16 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AB7A196B2;
- Fri, 27 Sep 2019 12:03:13 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 905D2113864E; Fri, 27 Sep 2019 14:03:11 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Subject: Re: [PATCH v2 01/20] target/mips: Clean up helper.c
-References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1569415572-19635-2-git-send-email-aleksandar.markovic@rt-rk.com>
- <8f976a4a-e56a-d1f7-def9-14dd66140f0c@redhat.com>
- <CAL1e-=gdKQvtCX5DXCzMGPum5XiOxr7j51bQM0K8vosjPa-TcQ@mail.gmail.com>
-Date: Fri, 27 Sep 2019 14:03:11 +0200
-In-Reply-To: <CAL1e-=gdKQvtCX5DXCzMGPum5XiOxr7j51bQM0K8vosjPa-TcQ@mail.gmail.com>
- (Aleksandar Markovic's message of "Fri, 27 Sep 2019 06:32:52 +0200")
-Message-ID: <874l0ydk00.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id CEAE4A44AC7
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 13:42:54 +0000 (UTC)
+Received: from localhost (ovpn-112-38.ams2.redhat.com [10.36.112.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5AEB3194B6;
+ Fri, 27 Sep 2019 13:42:50 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 3/7] docs: start a document to describe D-Bus usage
+Date: Fri, 27 Sep 2019 17:42:20 +0400
+Message-Id: <20190927134224.14550-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20190927134224.14550-1-marcandre.lureau@redhat.com>
+References: <20190927134224.14550-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 27 Sep 2019 12:03:16 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 27 Sep 2019 13:42:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -76,95 +69,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, arikalo@wavecomp.com,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
+ dgilbert@redhat.com, pbonzini@redhat.com,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Aleksandar, your message is hard to read, because you sent Content-Type:
-multipart/alternative, and both the test/html and the test/plain
-alternative ride roughshot over the quoted text's line structure.
-Quoted patches become unreadable garbage.  Please check your e-mail
-setup.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ MAINTAINERS            |  5 +++
+ docs/interop/dbus.rst  | 99 ++++++++++++++++++++++++++++++++++++++++++
+ docs/interop/index.rst |  1 +
+ 3 files changed, 105 insertions(+)
+ create mode 100644 docs/interop/dbus.rst
 
-Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
+diff --git a/MAINTAINERS b/MAINTAINERS
+index b97fdd80d0..219a76f0a1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2157,6 +2157,11 @@ F: tests/migration-test.c
+ F: docs/devel/migration.rst
+ F: qapi/migration.json
+=20
++D-Bus
++M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++S: Maintained
++F: docs/interop/dbus.rst
++
+ Seccomp
+ M: Eduardo Otubo <otubo@redhat.com>
+ S: Supported
+diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
+new file mode 100644
+index 0000000000..3d760e4882
+--- /dev/null
++++ b/docs/interop/dbus.rst
+@@ -0,0 +1,99 @@
++=3D=3D=3D=3D=3D
++D-Bus
++=3D=3D=3D=3D=3D
++
++Introduction
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++QEMU may be running with various helper processes involved:
++ - vhost-user* processes (gpu, virtfs, input, etc...)
++ - TPM emulation (or other devices)
++ - user networking (slirp)
++ - network services (DHCP/DNS, samba/ftp etc)
++ - background tasks (compression, streaming etc)
++ - client UI
++ - admin & cli
++
++Having several processes allows stricter security rules, as well as
++greater modularity.
++
++While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
++display), D-Bus is the de facto IPC of choice on Unix systems. The
++wire format is machine friendly, good bindings exist for various
++languages, and there are various tools available.
++
++Using a bus, helper processes can discover and communicate with each
++other easily, without going through QEMU. The bus topology is also
++easier to apprehend and debug than a mesh. However, it is wise to
++consider the security aspects of it.
++
++Security
++=3D=3D=3D=3D=3D=3D=3D=3D
++
++A QEMU D-Bus bus should be private to a single VM. Thus, only
++cooperative tasks are running on the same bus to serve the VM.
++
++D-Bus, the protocol and standard, doesn't have mechanisms to enforce
++security between peers once the connection is established. Peers may
++have additional mechanisms to enforce security rules, based for
++example on UNIX credentials. However, because the daemon has
++controlled who can send/recv messages to who, doesn't magically make
++this secure. The semantics of the actual methods implemented using
++D-Bus are just as critical. Peers need to carefully validate any
++information they received from a peer with a different trust level.
++
++dbus-daemon policy
++------------------
++
++dbus-daemon can enforce various policies based on the UID/GID of the
++processes that are connected to it. It is thus a good idea to run
++helpers as different UID from QEMU and set appropriate policies.
++
++Depending on the use case, you may choose different scenarios:
++
++ - Everything the same UID
++
++   - Convenient for developers
++   - Improved reliability - crash of one part doens't take
++     out entire VM
++   - No security benefit over traditional QEMU
++
++ - Two UIDs, one for QEMU, one for dbus & helpers
++
++   - Moderately improved security isolation
++
++ - Many UIDs, one for QEMU one for dbus and one for each helpers
++
++   - Best security isolation
++   - Complex to manager distinct UIDs needed for each VM
++
++For example, to allow only ``qemu`` user to talk to ``qemu-helper``
++``org.qemu.Helper1`` service, a dbus-daemon policy may contain:
++
++.. code:: xml
++
++  <policy user=3D"qemu">
++     <allow send_destination=3D"org.qemu.Helper1"/>
++     <allow receive_sender=3D"org.qemu.Helper1"/>
++  </policy>
++
++  <policy user=3D"qemu-helper">
++     <allow own=3D"org.qemu.Helper1"/>
++  </policy>
++
++
++dbus-daemon can also perfom SELinux checks based on the security
++context of the source and the target. For example, ``virtiofs_t``
++could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
++wouldn't be allowed to send a message to ``virtiofs_t``.
++
++See dbus-daemon man page for details.
++
++Guidelines
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++When implementing new D-Bus interfaces, it is recommended to follow
++the "D-Bus API Design Guidelines":
++https://dbus.freedesktop.org/doc/dbus-api-design.html
++
++The "org.qemu.*" prefix is reserved for the QEMU project.
+diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+index 3e33fb5933..ded134ea75 100644
+--- a/docs/interop/index.rst
++++ b/docs/interop/index.rst
+@@ -13,6 +13,7 @@ Contents:
+    :maxdepth: 2
+=20
+    bitmaps
++   dbus
+    live-block-operations
+    pr-helper
+    qemu-ga
+--=20
+2.23.0
 
-> 25.09.2019. 17.53, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> =D1=
-=98=D0=B5
-> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->>
->> On 9/25/19 2:45 PM, Aleksandar Markovic wrote:
->> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
->> >
->> > Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
->> >
->> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->> > ---
->> >  target/mips/helper.c | 132
-> +++++++++++++++++++++++++++++++--------------------
->> >  1 file changed, 80 insertions(+), 52 deletions(-)
->> >
->> > diff --git a/target/mips/helper.c b/target/mips/helper.c
->> > index a2b6459..3dd1aae 100644
->> > --- a/target/mips/helper.c
->> > +++ b/target/mips/helper.c
->> > @@ -130,8 +133,11 @@ static int is_seg_am_mapped(unsigned int am, bool
-> eu, int mmu_idx)
->> >      int32_t adetlb_mask;
->> >
->> >      switch (mmu_idx) {
->> > -    case 3 /* ERL */:
->> > -        /* If EU is set, always unmapped */
->> > +    case 3:
->> > +        /*
->> > +         * ERL
->> > +         * If EU is set, always unmapped
->> > +         */
->>
->> My IDE show the current form nicer when the switch is folded.
->>
->> Are these comment really bothering checkpatch?
->>
->
-> While being sintaxically correct, interleaving comments and code in a
-> single code line is considered a bad practice by many.
-
-I take that as a "no".
-
-The preferences of "many" (whoever they may be) are a lot less relevant
-than the specific project's prevailing style.  "git-grep ' case .*/\*'"
-shows thousands of hits.
-
-If you want to pursue this change, please put it in a separate patch,
-so this one is really about fixing "errors and warnings reported by
-'checkpatch.pl -f'", as your commit message promises.
-
->> >          if (eu) {
->> >              return 0;
->> >          }
-[...]
->> Except 2 comments, OK for the rest.
->>
->> Another patch that makes rebasing very painful :(
->>
->
-> It would be fantastic if you apply the same reasoning to your patches, th=
-at
-> spread all over the code base, and happen so frequently, and certainly
-> create enormously more rebasing problems for multitude of people than this
-> patch or series does.
-
-Please tone down the aggression a notch.
-
-Philippe merely observed a trade-off.  We deal with such trade-offs all
-the time.  When your reviewer challenges one, you consider it (unless
-you did that already), then tell him what you concluded.
-
-"Tu quoque" is not a proper reply to such an observation (or to anything
-else for that matter).  When you have an issue with Philippe's patches,
-address it in review of Philippe's patches.
-
-Thank you.
 
