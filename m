@@ -2,140 +2,65 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A5EC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 681F0C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:08:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 692F9217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:08:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 692F9217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F7EE217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:08:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="LXsNHIcT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F7EE217D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDlIK-0007uG-AN
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:08:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42146)
+	id 1iDlJ4-0000ND-29
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40831)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1iDlGu-0006Ef-BG
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:06:37 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iDlAB-0000m7-UH
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:59:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1iDlGt-0002vH-5S
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:06:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42300)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1iDlGs-0002sq-UZ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:06:35 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8R83JAK058792
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 04:06:27 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2v9cjp3x2u-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 04:06:26 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 27 Sep 2019 09:06:24 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 27 Sep 2019 09:06:21 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x8R86Jvi42139990
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 27 Sep 2019 08:06:19 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 52AA95204F;
- Fri, 27 Sep 2019 08:06:19 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id CFC9F5204E;
- Fri, 27 Sep 2019 08:06:18 +0000 (GMT)
-Subject: Re: [PATCH] s390: PCI: fix IOMMU region init
-To: Peter Maydell <peter.maydell@linaro.org>,
- Matthew Rosato <mjrosato@linux.ibm.com>
-References: <1569507036-15314-1-git-send-email-mjrosato@linux.ibm.com>
- <CAFEAcA9VFmeqGy0Rt7_8GEenQx_8M75=FQX4zbL+c904hNx0gg@mail.gmail.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date: Fri, 27 Sep 2019 10:06:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <dgibson@ozlabs.org>) id 1iDlA9-0003Ma-Hp
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:59:39 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:41751)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iDlA7-0003GE-An; Fri, 27 Sep 2019 03:59:37 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46fkhy1vTnz9sNf; Fri, 27 Sep 2019 17:59:30 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569571170;
+ bh=hU/8RqKETjSyvesMjbN30QTESQFyRW0a5xuYEJaYlNQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=LXsNHIcTsEnVzF6mfNHoUl96gddwsSCsK4JuRqHmIy86CpAC9t7NwkB1z7NqFrtFE
+ UxuVOWE9WQ5HOZ0T3uc92oBIG1wUeczpaHTGpf2smvdVkF5QcT65+iNejblWtpWzHv
+ vkLT/0JOSY90RAU2ObePtSYckAMQycE5bHObv/fE=
+Date: Fri, 27 Sep 2019 17:58:58 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 09/33] spapr: Clarify and fix handling of nr_irqs
+Message-ID: <20190927075858.GB12116@umbus.fritz.box>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-10-david@gibson.dropbear.id.au>
+ <20190927095359.4e07ea70@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9VFmeqGy0Rt7_8GEenQx_8M75=FQX4zbL+c904hNx0gg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19092708-0012-0000-0000-000003513A95
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19092708-0013-0000-0000-0000218BD4F2
-Message-Id: <23275df6-ad82-ea96-72a8-4e0ee839a04e@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-27_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909270076
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="wzJLGUyc3ArbnUjN"
+Content-Disposition: inline
+In-Reply-To: <20190927095359.4e07ea70@bahia.lan>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,46 +72,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Collin Walling <walling@linux.ibm.com>,
- Boris Fiuczynski <fiuczy@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, stzi@linux.ibm.com,
- Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Halil Pasic <pasic@linux.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--wzJLGUyc3ArbnUjN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 26.09.19 16:34, Peter Maydell wrote:
-> On Thu, 26 Sep 2019 at 15:12, Matthew Rosato <mjrosato@linux.ibm.com> wrote:
->>
->> The fix in dbe9cf606c shrinks the IOMMU memory region to a size
->> that seems reasonable on the surface, however is actually too
->> small as it is based against a 0-mapped address space.  This
->> causes breakage with small guests as they can overrun the IOMMU window.
->>
->> Let's go back to the prior method of initializing iommu for now.
->>
->> Fixes: dbe9cf606c ("s390x/pci: Set the iommu region size mpcifc request")
->> Reported-by: Boris Fiuczynski <fiuczy@linux.ibm.com>
->> Reported-by: Stefan Zimmerman <stzi@linux.ibm.com>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> 
-> So in commit f0a399dbae6a2d0e2 (Nov 2015) we used "pal - pba + 1".
-> In commit f7c40aa1e7feb50bc4 (June 2016) we switched to "pal + 1".
-> In commit dbe9cf606c (Jan 2019) we went back to "pal - pba + 1"
-> Now we're on "pal + 1" again...
-> 
-> Are we really sure that this is correct and that we're not
-> just going to keep looping around between these two formations
-> forever? :-)
+On Fri, Sep 27, 2019 at 09:53:59AM +0200, Greg Kurz wrote:
+65;5603;1c> On Fri, 27 Sep 2019 15:50:04 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > Both the XICS and XIVE interrupt backends have a "nr-irqs" property, but
+> > it means slightly different things.  For XICS (or, strictly, the ICS) it
+> > indicates the number of "real" external IRQs.  Those start at XICS_IRQ_=
+BASE
+> > (0x1000) and don't include the special IPI vector.  For XIVE, however, =
+it
+> > includes the whole IRQ space, including XIVE's many IPI vectors.
+> >=20
+> > The spapr code currently doesn't handle this sensibly, with the
+> > nr_irqs value in SpaprIrq having different meanings depending on the
+> > backend.  We fix this by renaming nr_irqs to nr_xirqs and making it
+> > always indicate just the number of external irqs, adjusting the value
+> > we pass to XIVE accordingly.  We also move to using common constants
+> > in most of the irq configurations, to make it clearer that the IRQ
+> > space looks the same to the guest (and emulated devices), even if the
+> > backend is different.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+>=20
+> Cedric and I have already given an R-b for this one.
 
-As Matt and Pierre outlined this is indeed the variant that works
-reliably. I will add 
-Cc: qemu-stable@nongnu.org
+Oh, yeah, not sure how I dropped that one.
 
-and apply.
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> >  hw/ppc/spapr_irq.c         | 53 ++++++++++++++------------------------
+> >  include/hw/ppc/spapr_irq.h | 19 +++++++++-----
+> >  2 files changed, 31 insertions(+), 41 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > index 8c26fa2d1e..3207b6bd01 100644
+> > --- a/hw/ppc/spapr_irq.c
+> > +++ b/hw/ppc/spapr_irq.c
+> > @@ -92,7 +92,7 @@ static void spapr_irq_init_kvm(SpaprMachineState *spa=
+pr,
+> >   * XICS IRQ backend.
+> >   */
+> > =20
+> > -static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
+> > +static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_xirqs,
+> >                                  Error **errp)
+> >  {
+> >      Object *obj;
+> > @@ -102,7 +102,7 @@ static void spapr_irq_init_xics(SpaprMachineState *=
+spapr, int nr_irqs,
+> >      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+> >      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+> >                                     &error_fatal);
+> > -    object_property_set_int(obj, nr_irqs, "nr-irqs",  &error_fatal);
+> > +    object_property_set_int(obj, nr_xirqs, "nr-irqs",  &error_fatal);
+> >      object_property_set_bool(obj, true, "realized", &local_err);
+> >      if (local_err) {
+> >          error_propagate(errp, local_err);
+> > @@ -234,13 +234,9 @@ static void spapr_irq_init_kvm_xics(SpaprMachineSt=
+ate *spapr, Error **errp)
+> >      }
+> >  }
+> > =20
+> > -#define SPAPR_IRQ_XICS_NR_IRQS     0x1000
+> > -#define SPAPR_IRQ_XICS_NR_MSIS     \
+> > -    (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
+> > -
+> >  SpaprIrq spapr_irq_xics =3D {
+> > -    .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
+> > -    .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
+> > +    .nr_xirqs    =3D SPAPR_NR_XIRQS,
+> > +    .nr_msis     =3D SPAPR_NR_MSIS,
+> >      .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
+> > =20
+> >      .init        =3D spapr_irq_init_xics,
+> > @@ -260,7 +256,7 @@ SpaprIrq spapr_irq_xics =3D {
+> >  /*
+> >   * XIVE IRQ backend.
+> >   */
+> > -static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_irqs,
+> > +static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_xirqs,
+> >                                  Error **errp)
+> >  {
+> >      uint32_t nr_servers =3D spapr_max_server_number(spapr);
+> > @@ -268,7 +264,7 @@ static void spapr_irq_init_xive(SpaprMachineState *=
+spapr, int nr_irqs,
+> >      int i;
+> > =20
+> >      dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+> > -    qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
+> > +    qdev_prop_set_uint32(dev, "nr-irqs", nr_xirqs + SPAPR_XIRQ_BASE);
+> >      /*
+> >       * 8 XIVE END structures per CPU. One for each available priority
+> >       */
+> > @@ -308,7 +304,7 @@ static qemu_irq spapr_qirq_xive(SpaprMachineState *=
+spapr, int irq)
+> >  {
+> >      SpaprXive *xive =3D spapr->xive;
+> > =20
+> > -    if (irq >=3D xive->nr_irqs) {
+> > +    if ((irq < SPAPR_XIRQ_BASE) || (irq >=3D xive->nr_irqs)) {
+> >          return NULL;
+> >      }
+> > =20
+> > @@ -404,17 +400,9 @@ static void spapr_irq_init_kvm_xive(SpaprMachineSt=
+ate *spapr, Error **errp)
+> >      }
+> >  }
+> > =20
+> > -/*
+> > - * XIVE uses the full IRQ number space. Set it to 8K to be compatible
+> > - * with XICS.
+> > - */
+> > -
+> > -#define SPAPR_IRQ_XIVE_NR_IRQS     0x2000
+> > -#define SPAPR_IRQ_XIVE_NR_MSIS     (SPAPR_IRQ_XIVE_NR_IRQS - SPAPR_IRQ=
+_MSI)
+> > -
+> >  SpaprIrq spapr_irq_xive =3D {
+> > -    .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
+> > -    .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
+> > +    .nr_xirqs    =3D SPAPR_NR_XIRQS,
+> > +    .nr_msis     =3D SPAPR_NR_MSIS,
+> >      .ov5         =3D SPAPR_OV5_XIVE_EXPLOIT,
+> > =20
+> >      .init        =3D spapr_irq_init_xive,
+> > @@ -450,18 +438,18 @@ static SpaprIrq *spapr_irq_current(SpaprMachineSt=
+ate *spapr)
+> >          &spapr_irq_xive : &spapr_irq_xics;
+> >  }
+> > =20
+> > -static void spapr_irq_init_dual(SpaprMachineState *spapr, int nr_irqs,
+> > +static void spapr_irq_init_dual(SpaprMachineState *spapr, int nr_xirqs,
+> >                                  Error **errp)
+> >  {
+> >      Error *local_err =3D NULL;
+> > =20
+> > -    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_irqs, &local_err);
+> > +    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_xirqs, &local_err);
+> >      if (local_err) {
+> >          error_propagate(errp, local_err);
+> >          return;
+> >      }
+> > =20
+> > -    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_irqs, &local_err);
+> > +    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_xirqs, &local_err);
+> >      if (local_err) {
+> >          error_propagate(errp, local_err);
+> >          return;
+> > @@ -586,12 +574,9 @@ static const char *spapr_irq_get_nodename_dual(Spa=
+prMachineState *spapr)
+> >  /*
+> >   * Define values in sync with the XIVE and XICS backend
+> >   */
+> > -#define SPAPR_IRQ_DUAL_NR_IRQS     0x2000
+> > -#define SPAPR_IRQ_DUAL_NR_MSIS     (SPAPR_IRQ_DUAL_NR_IRQS - SPAPR_IRQ=
+_MSI)
+> > -
+> >  SpaprIrq spapr_irq_dual =3D {
+> > -    .nr_irqs     =3D SPAPR_IRQ_DUAL_NR_IRQS,
+> > -    .nr_msis     =3D SPAPR_IRQ_DUAL_NR_MSIS,
+> > +    .nr_xirqs    =3D SPAPR_NR_XIRQS,
+> > +    .nr_msis     =3D SPAPR_NR_MSIS,
+> >      .ov5         =3D SPAPR_OV5_XIVE_BOTH,
+> > =20
+> >      .init        =3D spapr_irq_init_dual,
+> > @@ -693,10 +678,10 @@ void spapr_irq_init(SpaprMachineState *spapr, Err=
+or **errp)
+> >          spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
+> >      }
+> > =20
+> > -    spapr->irq->init(spapr, spapr->irq->nr_irqs, errp);
+> > +    spapr->irq->init(spapr, spapr->irq->nr_xirqs, errp);
+> > =20
+> >      spapr->qirqs =3D qemu_allocate_irqs(spapr->irq->set_irq, spapr,
+> > -                                      spapr->irq->nr_irqs);
+> > +                                      spapr->irq->nr_xirqs + SPAPR_XIR=
+Q_BASE);
+> >  }
+> > =20
+> >  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
+ **errp)
+> > @@ -804,11 +789,11 @@ int spapr_irq_find(SpaprMachineState *spapr, int =
+num, bool align, Error **errp)
+> >      return first + ics->offset;
+> >  }
+> > =20
+> > -#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     0x400
+> > +#define SPAPR_IRQ_XICS_LEGACY_NR_XIRQS     0x400
+> > =20
+> >  SpaprIrq spapr_irq_xics_legacy =3D {
+> > -    .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> > -    .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
+> > +    .nr_xirqs    =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
+> > +    .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
+> >      .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
+> > =20
+> >      .init        =3D spapr_irq_init_xics,
+> > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> > index 5db305165c..a8f9a2ab11 100644
+> > --- a/include/hw/ppc/spapr_irq.h
+> > +++ b/include/hw/ppc/spapr_irq.h
+> > @@ -16,13 +16,18 @@
+> >   * IRQ range offsets per device type
+> >   */
+> >  #define SPAPR_IRQ_IPI        0x0
+> > -#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
+> > -#define SPAPR_IRQ_HOTPLUG    0x1001
+> > -#define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
+> > -#define SPAPR_IRQ_PCI_LSI    0x1200  /* 32+ PHBs devices */
+> > =20
+> > -#define SPAPR_IRQ_MSI        0x1300  /* Offset of the dynamic range co=
+vered
+> > -                                      * by the bitmap allocator */
+> > +#define SPAPR_XIRQ_BASE      XICS_IRQ_BASE /* 0x1000 */
+> > +#define SPAPR_IRQ_EPOW       (SPAPR_XIRQ_BASE + 0x0000)
+> > +#define SPAPR_IRQ_HOTPLUG    (SPAPR_XIRQ_BASE + 0x0001)
+> > +#define SPAPR_IRQ_VIO        (SPAPR_XIRQ_BASE + 0x0100)  /* 256 VIO de=
+vices */
+> > +#define SPAPR_IRQ_PCI_LSI    (SPAPR_XIRQ_BASE + 0x0200)  /* 32+ PHBs d=
+evices */
+> > +
+> > +/* Offset of the dynamic range covered by the bitmap allocator */
+> > +#define SPAPR_IRQ_MSI        (SPAPR_XIRQ_BASE + 0x0300)
+> > +
+> > +#define SPAPR_NR_XIRQS       0x1000
+> > +#define SPAPR_NR_MSIS        (SPAPR_XIRQ_BASE + SPAPR_NR_XIRQS - SPAPR=
+_IRQ_MSI)
+> > =20
+> >  typedef struct SpaprMachineState SpaprMachineState;
+> > =20
+> > @@ -32,7 +37,7 @@ int spapr_irq_msi_alloc(SpaprMachineState *spapr, uin=
+t32_t num, bool align,
+> >  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t nu=
+m);
+> > =20
+> >  typedef struct SpaprIrq {
+> > -    uint32_t    nr_irqs;
+> > +    uint32_t    nr_xirqs;
+> >      uint32_t    nr_msis;
+> >      uint8_t     ov5;
+> > =20
+>=20
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--wzJLGUyc3ArbnUjN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2NwT0ACgkQbDjKyiDZ
+s5LdiBAAgQkwKpj9ZeQfIXMyuZYn61D7c3LcmmunKJw7wP/T94WNCIOZN3YbH9/2
+hyBllMpvv0QcS+0GJoEd71DCwhwF3oQ47aFf5VApbUvif21cpzYneyt9+6uLR7V0
+VgBBU24OZyKhLxpSlG55jWdg9oY/QGu3DlHJ7oj23WewC7aCeS84PjAIT4CcufJL
+c6b7tkfVUQxS0UNCoV4DRarop7zZBwKhWCdkfaez9MLDrV/gDujrf+R6mp0kOuXz
+8pHHLNd4cFT5GXoyUP6hM0U/Trnhyn1QxDHV59h0kk4fnJKYXVCt7+k6GneIfYq+
+Jmr3kNZIFsfq/cVRUroMx0AMhyW7G82X5uA84y6/R38EkohxjGJsfF0EsE1yFAuR
+X+y++NULqtAv/eLcYFEapWB5VJl051McLjXJyultPsmRAx7AFPx2C+heiMLryLjx
+Tb2mCBtklGKrttq7Gpq7vEGbscTJBX3Nm5dUSUtViYWCEtzkjKKp19LCTF18aMTy
+/QHVJ4eJrrIpgrqkT8K1QI7ZLmZOXZW4oX9QkoybdM9ONCs4JzyVpD/fC/QWOJSY
+ue2n2MsNprTqQCdbY9bCcmVwERYSWX7rgIgsTxCoIJTkmChMjxVUUnwVFCw/GFxr
+3PU5qFuVNwcpU+xPKP9u9Ux0IHAw2NZP9Jnx4LOaJmadE4cF7hY=
+=Gn1q
+-----END PGP SIGNATURE-----
+
+--wzJLGUyc3ArbnUjN--
 
