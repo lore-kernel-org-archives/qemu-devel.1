@@ -6,55 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B218AC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:52:07 +0000 (UTC)
-Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF407C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:53:37 +0000 (UTC)
+Received: from lists.gnu.org (unknown [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75BD4217D9
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:52:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75BD4217D9
+	by mail.kernel.org (Postfix) with ESMTPS id 4E737217D9
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:53:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E737217D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrbK-0001Ys-DI
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:52:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37333)
+	id 1iDrck-00037a-UH
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:53:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iDqPs-0008R4-6B
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:36:14 -0400
+ (envelope-from <david@redhat.com>) id 1iDqRY-0001Px-03
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:37:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iDqPq-0002UM-1F
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:36:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49438)
+ (envelope-from <david@redhat.com>) id 1iDqRW-000394-5J
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:37:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58604)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iDqPp-0002U8-OJ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:36:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iDqRV-00038S-Sh; Fri, 27 Sep 2019 09:37:54 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1FC6EC001F03
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:59:31 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-112-55.ams2.redhat.com
- [10.36.112.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D4E2E608C2;
- Fri, 27 Sep 2019 09:59:29 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 96E0D898101;
+ Fri, 27 Sep 2019 09:59:00 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-169.ams2.redhat.com [10.36.116.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C4AC71001B20;
+ Fri, 27 Sep 2019 09:58:58 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/11] qcrypto-luks: rename some fields in
- QCryptoBlockLUKSHeader
-Date: Fri, 27 Sep 2019 10:59:16 +0100
-Message-Id: <20190927095926.22230-2-berrange@redhat.com>
-In-Reply-To: <20190927095926.22230-1-berrange@redhat.com>
-References: <20190927095926.22230-1-berrange@redhat.com>
+Subject: [PATCH v3 7/7] s390x/mmu: Convert to non-recursive page table walk
+Date: Fri, 27 Sep 2019 11:58:31 +0200
+Message-Id: <20190927095831.23543-8-david@redhat.com>
+In-Reply-To: <20190927095831.23543-1-david@redhat.com>
+References: <20190927095831.23543-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 27 Sep 2019 09:59:31 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Fri, 27 Sep 2019 09:59:00 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -70,356 +67,305 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxim Levitsky <mlevitsk@redhat.com>
+A non-recursive implementation allows to make better use of the
+branch predictor, avoids function calls, and makes the implementation of
+new features only for a subset of region table levels easier.
 
-* key_bytes -> master_key_len
-* payload_offset =3D payload_offset_sector (to emphasise that this isn't =
-byte offset)
-* key_offset -> key_offset_sector - same as above for luks slots
+We can now directly compare our implementation to the KVM gaccess
+implementation in arch/s390/kvm/gaccess.c:guest_translate().
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- crypto/block-luks.c | 91 +++++++++++++++++++++++----------------------
- 1 file changed, 47 insertions(+), 44 deletions(-)
+ target/s390x/mmu_helper.c | 212 ++++++++++++++++++++------------------
+ 1 file changed, 112 insertions(+), 100 deletions(-)
 
-diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-index 743949adbf..f12fa2d270 100644
---- a/crypto/block-luks.c
-+++ b/crypto/block-luks.c
-@@ -143,7 +143,7 @@ struct QCryptoBlockLUKSKeySlot {
-     /* salt for PBKDF2 */
-     uint8_t salt[QCRYPTO_BLOCK_LUKS_SALT_LEN];
-     /* start sector of key material */
--    uint32_t key_offset;
-+    uint32_t key_offset_sector;
-     /* number of anti-forensic stripes */
-     uint32_t stripes;
- };
-@@ -172,10 +172,10 @@ struct QCryptoBlockLUKSHeader {
-     char hash_spec[QCRYPTO_BLOCK_LUKS_HASH_SPEC_LEN];
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index a114fb1628..6b34c4c7b4 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -114,107 +114,16 @@ static inline bool read_table_entry(CPUS390XState =
+*env, hwaddr gaddr,
+     return true;
+ }
 =20
-     /* start offset of the volume data (in 512 byte sectors) */
--    uint32_t payload_offset;
-+    uint32_t payload_offset_sector;
-=20
-     /* Number of key bytes */
--    uint32_t key_bytes;
-+    uint32_t master_key_len;
-=20
-     /* master key checksum after PBKDF2 */
-     uint8_t master_key_digest[QCRYPTO_BLOCK_LUKS_DIGEST_LEN];
-@@ -466,7 +466,7 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-      * then encrypted.
-      */
-     rv =3D readfunc(block,
--                  slot->key_offset * QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
-+                  slot->key_offset_sector * QCRYPTO_BLOCK_LUKS_SECTOR_SI=
-ZE,
-                   splitkey, splitkeylen,
-                   opaque,
-                   errp);
-@@ -584,8 +584,8 @@ qcrypto_block_luks_find_key(QCryptoBlock *block,
-     size_t i;
-     int rv;
-=20
--    *masterkey =3D g_new0(uint8_t, luks->header.key_bytes);
--    *masterkeylen =3D luks->header.key_bytes;
-+    *masterkey =3D g_new0(uint8_t, luks->header.master_key_len);
-+    *masterkeylen =3D luks->header.master_key_len;
-=20
-     for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-         rv =3D qcrypto_block_luks_load_key(block,
-@@ -677,14 +677,14 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     /* The header is always stored in big-endian format, so
-      * convert everything to native */
-     be16_to_cpus(&luks->header.version);
--    be32_to_cpus(&luks->header.payload_offset);
--    be32_to_cpus(&luks->header.key_bytes);
-+    be32_to_cpus(&luks->header.payload_offset_sector);
-+    be32_to_cpus(&luks->header.master_key_len);
-     be32_to_cpus(&luks->header.master_key_iterations);
-=20
-     for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-         be32_to_cpus(&luks->header.key_slots[i].active);
-         be32_to_cpus(&luks->header.key_slots[i].iterations);
--        be32_to_cpus(&luks->header.key_slots[i].key_offset);
-+        be32_to_cpus(&luks->header.key_slots[i].key_offset_sector);
-         be32_to_cpus(&luks->header.key_slots[i].stripes);
-     }
-=20
-@@ -743,10 +743,11 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-         goto fail;
-     }
-=20
--    cipheralg =3D qcrypto_block_luks_cipher_name_lookup(luks->header.cip=
-her_name,
--                                                      ciphermode,
--                                                      luks->header.key_b=
-ytes,
--                                                      &local_err);
-+    cipheralg =3D
-+        qcrypto_block_luks_cipher_name_lookup(luks->header.cipher_name,
-+                                              ciphermode,
-+                                              luks->header.master_key_le=
-n,
-+                                              &local_err);
-     if (local_err) {
-         ret =3D -ENOTSUP;
-         error_propagate(errp, local_err);
-@@ -838,7 +839,7 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     }
-=20
-     block->sector_size =3D QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
--    block->payload_offset =3D luks->header.payload_offset *
-+    block->payload_offset =3D luks->header.payload_offset_sector *
-         block->sector_size;
-=20
-     luks->cipher_alg =3D cipheralg;
-@@ -993,9 +994,11 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     strcpy(luks->header.cipher_mode, cipher_mode_spec);
-     strcpy(luks->header.hash_spec, hash_alg);
-=20
--    luks->header.key_bytes =3D qcrypto_cipher_get_key_len(luks_opts.ciph=
-er_alg);
-+    luks->header.master_key_len =3D
-+        qcrypto_cipher_get_key_len(luks_opts.cipher_alg);
-+
-     if (luks_opts.cipher_mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
--        luks->header.key_bytes *=3D 2;
-+        luks->header.master_key_len *=3D 2;
-     }
-=20
-     /* Generate the salt used for hashing the master key
-@@ -1008,9 +1011,9 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     }
-=20
-     /* Generate random master key */
--    masterkey =3D g_new0(uint8_t, luks->header.key_bytes);
-+    masterkey =3D g_new0(uint8_t, luks->header.master_key_len);
-     if (qcrypto_random_bytes(masterkey,
--                             luks->header.key_bytes, errp) < 0) {
-+                             luks->header.master_key_len, errp) < 0) {
-         goto error;
-     }
-=20
-@@ -1018,7 +1021,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     /* Setup the block device payload encryption objects */
-     if (qcrypto_block_init_cipher(block, luks_opts.cipher_alg,
-                                   luks_opts.cipher_mode, masterkey,
--                                  luks->header.key_bytes, 1, errp) < 0) =
-{
-+                                  luks->header.master_key_len, 1, errp) =
-< 0) {
-         goto error;
-     }
-=20
-@@ -1028,7 +1031,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     block->ivgen =3D qcrypto_ivgen_new(luks_opts.ivgen_alg,
-                                      ivcipheralg,
-                                      luks_opts.ivgen_hash_alg,
--                                     masterkey, luks->header.key_bytes,
-+                                     masterkey, luks->header.master_key_=
-len,
-                                      errp);
-=20
-     if (!block->ivgen) {
-@@ -1040,7 +1043,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-      * key, in order to have 1 second of compute time used
-      */
-     iters =3D qcrypto_pbkdf2_count_iters(luks_opts.hash_alg,
--                                       masterkey, luks->header.key_bytes=
+-/* Decode page table entry (normal 4KB page) */
+-static int mmu_translate_pte(CPUS390XState *env, target_ulong vaddr,
+-                             uint64_t asc, uint64_t pt_entry,
+-                             target_ulong *raddr, int *flags, int rw, bo=
+ol exc)
+-{
+-    if (pt_entry & PAGE_ENTRY_I) {
+-        return PGM_PAGE_TRANS;
+-    }
+-    if (pt_entry & PAGE_ENTRY_0) {
+-        return PGM_TRANS_SPEC;
+-    }
+-    if (pt_entry & PAGE_ENTRY_P) {
+-        *flags &=3D ~PAGE_WRITE;
+-    }
+-
+-    *raddr =3D pt_entry & TARGET_PAGE_MASK;
+-    return 0;
+-}
+-
+-/* Decode segment table entry */
+-static int mmu_translate_segment(CPUS390XState *env, target_ulong vaddr,
+-                                 uint64_t asc, uint64_t st_entry,
+-                                 target_ulong *raddr, int *flags, int rw=
 ,
-+                                       masterkey, luks->header.master_ke=
-y_len,
-                                        luks->header.master_key_salt,
-                                        QCRYPTO_BLOCK_LUKS_SALT_LEN,
-                                        QCRYPTO_BLOCK_LUKS_DIGEST_LEN,
-@@ -1080,7 +1083,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-      * valid master key
-      */
-     if (qcrypto_pbkdf2(luks_opts.hash_alg,
--                       masterkey, luks->header.key_bytes,
-+                       masterkey, luks->header.master_key_len,
-                        luks->header.master_key_salt,
-                        QCRYPTO_BLOCK_LUKS_SALT_LEN,
-                        luks->header.master_key_iterations,
-@@ -1093,7 +1096,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+-                                 bool exc)
+-{
+-    uint64_t origin, offs, pt_entry;
+-
+-    if (st_entry & SEGMENT_ENTRY_P) {
+-        *flags &=3D ~PAGE_WRITE;
+-    }
+-
+-    if ((st_entry & SEGMENT_ENTRY_FC) && (env->cregs[0] & CR0_EDAT)) {
+-        /* Decode EDAT1 segment frame absolute address (1MB page) */
+-        *raddr =3D (st_entry & SEGMENT_ENTRY_SFAA) |
+-                 (vaddr & ~SEGMENT_ENTRY_SFAA);
+-        return 0;
+-    }
+-
+-    /* Look up 4KB page entry */
+-    origin =3D st_entry & SEGMENT_ENTRY_ORIGIN;
+-    offs =3D VADDR_PAGE_TX(vaddr) * 8;
+-    if (!read_table_entry(env, origin + offs, &pt_entry)) {
+-        return PGM_ADDRESSING;
+-    }
+-    return mmu_translate_pte(env, vaddr, asc, pt_entry, raddr, flags, rw=
+, exc);
+-}
+-
+-/* Decode region table entries */
+-static int mmu_translate_region(CPUS390XState *env, target_ulong vaddr,
+-                                uint64_t asc, uint64_t entry, int level,
+-                                target_ulong *raddr, int *flags, int rw,
+-                                bool exc)
+-{
+-    uint64_t origin, offs, new_entry;
+-    const int pchks[4] =3D {
+-        PGM_SEGMENT_TRANS, PGM_REG_THIRD_TRANS,
+-        PGM_REG_SEC_TRANS, PGM_REG_FIRST_TRANS
+-    };
+-
+-    origin =3D entry & REGION_ENTRY_ORIGIN;
+-    offs =3D (vaddr >> (17 + 11 * level / 4)) & 0x3ff8;
+-
+-    if (!read_table_entry(env, origin + offs, &new_entry)) {
+-        return PGM_ADDRESSING;
+-    }
+-
+-    if (new_entry & REGION_ENTRY_I) {
+-        return pchks[level / 4];
+-    }
+-
+-    if ((new_entry & REGION_ENTRY_TT) !=3D level) {
+-        return PGM_TRANS_SPEC;
+-    }
+-
+-    if (level =3D=3D ASCE_TYPE_SEGMENT) {
+-        return mmu_translate_segment(env, vaddr, asc, new_entry, raddr, =
+flags,
+-                                     rw, exc);
+-    }
+-
+-    /* Check region table offset and length */
+-    offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
+-    if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
+-        || offs > (new_entry & REGION_ENTRY_TL)) {
+-        return pchks[level / 4 - 1];
+-    }
+-
+-    if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_P)) {
+-        *flags &=3D ~PAGE_WRITE;
+-    }
+-
+-    /* yet another region */
+-    return mmu_translate_region(env, vaddr, asc, new_entry, level - 4,
+-                                raddr, flags, rw, exc);
+-}
+-
+ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
+                               uint64_t asc, uint64_t asce, target_ulong =
+*raddr,
+                               int *flags, int rw, bool exc)
+ {
++    const bool edat1 =3D (env->cregs[0] & CR0_EDAT) &&
++                       s390_has_feat(S390_FEAT_EDAT);
+     const int asce_tl =3D asce & ASCE_TABLE_LENGTH;
+-    int level;
++    const int asce_p =3D asce & ASCE_PRIVATE_SPACE;
++    hwaddr gaddr =3D asce & ASCE_ORIGIN;
++    uint64_t entry;
 =20
-     /* Although LUKS has multiple key slots, we're just going
-      * to use the first key slot */
--    splitkeylen =3D luks->header.key_bytes * QCRYPTO_BLOCK_LUKS_STRIPES;
-+    splitkeylen =3D luks->header.master_key_len * QCRYPTO_BLOCK_LUKS_STR=
-IPES;
-     for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-         luks->header.key_slots[i].active =3D i =3D=3D 0 ?
-             QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED :
-@@ -1103,7 +1106,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-         /* This calculation doesn't match that shown in the spec,
-          * but instead follows the cryptsetup implementation.
-          */
--        luks->header.key_slots[i].key_offset =3D
-+        luks->header.key_slots[i].key_offset_sector =3D
-             (QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
-              QCRYPTO_BLOCK_LUKS_SECTOR_SIZE) +
-             (ROUND_UP(DIV_ROUND_UP(splitkeylen, QCRYPTO_BLOCK_LUKS_SECTO=
-R_SIZE),
-@@ -1124,7 +1127,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-                                        (uint8_t *)password, strlen(passw=
-ord),
-                                        luks->header.key_slots[0].salt,
-                                        QCRYPTO_BLOCK_LUKS_SALT_LEN,
--                                       luks->header.key_bytes,
-+                                       luks->header.master_key_len,
-                                        &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -1155,13 +1158,13 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     /* Generate a key that we'll use to encrypt the master
-      * key, from the user's password
-      */
--    slotkey =3D g_new0(uint8_t, luks->header.key_bytes);
-+    slotkey =3D g_new0(uint8_t, luks->header.master_key_len);
-     if (qcrypto_pbkdf2(luks_opts.hash_alg,
-                        (uint8_t *)password, strlen(password),
-                        luks->header.key_slots[0].salt,
-                        QCRYPTO_BLOCK_LUKS_SALT_LEN,
-                        luks->header.key_slots[0].iterations,
--                       slotkey, luks->header.key_bytes,
-+                       slotkey, luks->header.master_key_len,
-                        errp) < 0) {
-         goto error;
-     }
-@@ -1172,7 +1175,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-      */
-     cipher =3D qcrypto_cipher_new(luks_opts.cipher_alg,
-                                 luks_opts.cipher_mode,
--                                slotkey, luks->header.key_bytes,
-+                                slotkey, luks->header.master_key_len,
-                                 errp);
-     if (!cipher) {
-         goto error;
-@@ -1181,7 +1184,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     ivgen =3D qcrypto_ivgen_new(luks_opts.ivgen_alg,
-                               ivcipheralg,
-                               luks_opts.ivgen_hash_alg,
--                              slotkey, luks->header.key_bytes,
-+                              slotkey, luks->header.master_key_len,
-                               errp);
-     if (!ivgen) {
-         goto error;
-@@ -1193,7 +1196,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     splitkey =3D g_new0(uint8_t, splitkeylen);
-=20
-     if (qcrypto_afsplit_encode(luks_opts.hash_alg,
--                               luks->header.key_bytes,
-+                               luks->header.master_key_len,
-                                luks->header.key_slots[0].stripes,
-                                masterkey,
-                                splitkey,
-@@ -1217,7 +1220,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-      * slot headers, rounded up to the nearest sector, combined with
-      * the size of each master key material region, also rounded up
-      * to the nearest sector */
--    luks->header.payload_offset =3D
-+    luks->header.payload_offset_sector =3D
-         (QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
-          QCRYPTO_BLOCK_LUKS_SECTOR_SIZE) +
-         (ROUND_UP(DIV_ROUND_UP(splitkeylen, QCRYPTO_BLOCK_LUKS_SECTOR_SI=
-ZE),
-@@ -1226,7 +1229,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-          QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS);
-=20
-     block->sector_size =3D QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
--    block->payload_offset =3D luks->header.payload_offset *
-+    block->payload_offset =3D luks->header.payload_offset_sector *
-         block->sector_size;
-=20
-     /* Reserve header space to match payload offset */
-@@ -1239,14 +1242,14 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     /* Everything on disk uses Big Endian, so flip header fields
-      * before writing them */
-     cpu_to_be16s(&luks->header.version);
--    cpu_to_be32s(&luks->header.payload_offset);
--    cpu_to_be32s(&luks->header.key_bytes);
-+    cpu_to_be32s(&luks->header.payload_offset_sector);
-+    cpu_to_be32s(&luks->header.master_key_len);
-     cpu_to_be32s(&luks->header.master_key_iterations);
-=20
-     for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-         cpu_to_be32s(&luks->header.key_slots[i].active);
-         cpu_to_be32s(&luks->header.key_slots[i].iterations);
--        cpu_to_be32s(&luks->header.key_slots[i].key_offset);
-+        cpu_to_be32s(&luks->header.key_slots[i].key_offset_sector);
-         cpu_to_be32s(&luks->header.key_slots[i].stripes);
+     if (asce & ASCE_REAL_SPACE) {
+         /* direct mapping */
+@@ -222,12 +131,12 @@ static int mmu_translate_asce(CPUS390XState *env, t=
+arget_ulong vaddr,
+         return 0;
      }
 =20
-@@ -1263,14 +1266,14 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     /* Byte swap the header back to native, in case we need
-      * to read it again later */
-     be16_to_cpus(&luks->header.version);
--    be32_to_cpus(&luks->header.payload_offset);
--    be32_to_cpus(&luks->header.key_bytes);
-+    be32_to_cpus(&luks->header.payload_offset_sector);
-+    be32_to_cpus(&luks->header.master_key_len);
-     be32_to_cpus(&luks->header.master_key_iterations);
-=20
-     for (i =3D 0; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS; i++) {
-         be32_to_cpus(&luks->header.key_slots[i].active);
-         be32_to_cpus(&luks->header.key_slots[i].iterations);
--        be32_to_cpus(&luks->header.key_slots[i].key_offset);
-+        be32_to_cpus(&luks->header.key_slots[i].key_offset_sector);
-         be32_to_cpus(&luks->header.key_slots[i].stripes);
+-    level =3D asce & ASCE_TYPE_MASK;
+-    switch (level) {
++    switch (asce & ASCE_TYPE_MASK) {
+     case ASCE_TYPE_REGION1:
+         if (VADDR_REGION1_TL(vaddr) > asce_tl) {
+             return PGM_REG_FIRST_TRANS;
+         }
++        gaddr +=3D VADDR_REGION1_TX(vaddr) * 8;
+         break;
+     case ASCE_TYPE_REGION2:
+         if (VADDR_REGION1_TX(vaddr)) {
+@@ -236,6 +145,7 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
+         if (VADDR_REGION2_TL(vaddr) > asce_tl) {
+             return PGM_REG_SEC_TRANS;
+         }
++        gaddr +=3D VADDR_REGION2_TX(vaddr) * 8;
+         break;
+     case ASCE_TYPE_REGION3:
+         if (VADDR_REGION1_TX(vaddr) || VADDR_REGION2_TX(vaddr)) {
+@@ -244,6 +154,7 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
+         if (VADDR_REGION3_TL(vaddr) > asce_tl) {
+             return PGM_REG_THIRD_TRANS;
+         }
++        gaddr +=3D VADDR_REGION3_TX(vaddr) * 8;
+         break;
+     case ASCE_TYPE_SEGMENT:
+         if (VADDR_REGION1_TX(vaddr) || VADDR_REGION2_TX(vaddr) ||
+@@ -253,11 +164,112 @@ static int mmu_translate_asce(CPUS390XState *env, =
+target_ulong vaddr,
+         if (VADDR_SEGMENT_TL(vaddr) > asce_tl) {
+             return PGM_SEGMENT_TRANS;
+         }
++        gaddr +=3D VADDR_SEGMENT_TX(vaddr) * 8;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    switch (asce & ASCE_TYPE_MASK) {
++    case ASCE_TYPE_REGION1:
++        if (!read_table_entry(env, gaddr, &entry)) {
++            return PGM_ADDRESSING;
++        }
++        if (entry & REGION_ENTRY_I) {
++            return PGM_REG_FIRST_TRANS;
++        }
++        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION1) {
++            return PGM_TRANS_SPEC;
++        }
++        if (VADDR_REGION2_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
++            VADDR_REGION2_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
++            return PGM_REG_SEC_TRANS;
++        }
++        if (edat1 && (entry & REGION_ENTRY_P)) {
++            *flags &=3D ~PAGE_WRITE;
++        }
++        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_REGION2_TX(vaddr=
+) * 8;
++        /* fall through */
++    case ASCE_TYPE_REGION2:
++        if (!read_table_entry(env, gaddr, &entry)) {
++            return PGM_ADDRESSING;
++        }
++        if (entry & REGION_ENTRY_I) {
++            return PGM_REG_SEC_TRANS;
++        }
++        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION2) {
++            return PGM_TRANS_SPEC;
++        }
++        if (VADDR_REGION3_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
++            VADDR_REGION3_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
++            return PGM_REG_THIRD_TRANS;
++        }
++        if (edat1 && (entry & REGION_ENTRY_P)) {
++            *flags &=3D ~PAGE_WRITE;
++        }
++        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_REGION3_TX(vaddr=
+) * 8;
++        /* fall through */
++    case ASCE_TYPE_REGION3:
++        if (!read_table_entry(env, gaddr, &entry)) {
++            return PGM_ADDRESSING;
++        }
++        if (entry & REGION_ENTRY_I) {
++            return PGM_REG_THIRD_TRANS;
++        }
++        if ((entry & REGION_ENTRY_TT) !=3D REGION_ENTRY_TT_REGION3) {
++            return PGM_TRANS_SPEC;
++        }
++        if (edat1 && (entry & REGION_ENTRY_P)) {
++            *flags &=3D ~PAGE_WRITE;
++        }
++        if (VADDR_SEGMENT_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
++            VADDR_SEGMENT_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
++            return PGM_SEGMENT_TRANS;
++        }
++        gaddr =3D (entry & REGION_ENTRY_ORIGIN) + VADDR_SEGMENT_TX(vaddr=
+) * 8;
++        /* fall through */
++    case ASCE_TYPE_SEGMENT:
++        if (!read_table_entry(env, gaddr, &entry)) {
++            return PGM_ADDRESSING;
++        }
++        if (entry & SEGMENT_ENTRY_I) {
++            return PGM_SEGMENT_TRANS;
++        }
++        if ((entry & SEGMENT_ENTRY_TT) !=3D SEGMENT_ENTRY_TT_SEGMENT) {
++            return PGM_TRANS_SPEC;
++        }
++        if ((entry & SEGMENT_ENTRY_CS) && asce_p) {
++            return PGM_TRANS_SPEC;
++        }
++        if (entry & SEGMENT_ENTRY_P) {
++            *flags &=3D ~PAGE_WRITE;
++        }
++        if (edat1 && (entry & SEGMENT_ENTRY_FC)) {
++            *raddr =3D (entry & SEGMENT_ENTRY_SFAA) |
++                     (vaddr & ~SEGMENT_ENTRY_SFAA);
++            return 0;
++        }
++        gaddr =3D (entry & SEGMENT_ENTRY_ORIGIN) + VADDR_PAGE_TX(vaddr) =
+* 8;
+         break;
++    default:
++        g_assert_not_reached();
++    }
++
++    if (!read_table_entry(env, gaddr, &entry)) {
++        return PGM_ADDRESSING;
++    }
++    if (entry & PAGE_ENTRY_I) {
++        return PGM_PAGE_TRANS;
++    }
++    if (entry & PAGE_ENTRY_0) {
++        return PGM_TRANS_SPEC;
++    }
++    if (entry & PAGE_ENTRY_P) {
++        *flags &=3D ~PAGE_WRITE;
      }
 =20
-@@ -1282,7 +1285,7 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     /* Write out the master key material, starting at the
-      * sector immediately following the partition header. */
-     if (writefunc(block,
--                  luks->header.key_slots[0].key_offset *
-+                  luks->header.key_slots[0].key_offset_sector *
-                   QCRYPTO_BLOCK_LUKS_SECTOR_SIZE,
-                   splitkey, splitkeylen,
-                   opaque,
-@@ -1296,17 +1299,17 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-     luks->ivgen_hash_alg =3D luks_opts.ivgen_hash_alg;
-     luks->hash_alg =3D luks_opts.hash_alg;
+-    return mmu_translate_region(env, vaddr, asc, asce, level, raddr, fla=
+gs, rw,
+-                                exc);
++    *raddr =3D entry & TARGET_PAGE_MASK;
++    return 0;
+ }
 =20
--    memset(masterkey, 0, luks->header.key_bytes);
--    memset(slotkey, 0, luks->header.key_bytes);
-+    memset(masterkey, 0, luks->header.master_key_len);
-+    memset(slotkey, 0, luks->header.master_key_len);
-=20
-     return 0;
-=20
-  error:
-     if (masterkey) {
--        memset(masterkey, 0, luks->header.key_bytes);
-+        memset(masterkey, 0, luks->header.master_key_len);
-     }
-     if (slotkey) {
--        memset(slotkey, 0, luks->header.key_bytes);
-+        memset(slotkey, 0, luks->header.master_key_len);
-     }
-=20
-     qcrypto_block_free_cipher(block);
-@@ -1346,7 +1349,7 @@ static int qcrypto_block_luks_get_info(QCryptoBlock=
- *block,
-         slots->value =3D slot =3D g_new0(QCryptoBlockInfoLUKSSlot, 1);
-         slot->active =3D luks->header.key_slots[i].active =3D=3D
-             QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED;
--        slot->key_offset =3D luks->header.key_slots[i].key_offset
-+        slot->key_offset =3D luks->header.key_slots[i].key_offset_sector
-              * QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
-         if (slot->active) {
-             slot->has_iters =3D true;
+ static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
 --=20
 2.21.0
 
