@@ -2,62 +2,63 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EE8C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE223C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:34:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67D24217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:31:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67D24217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 94248217D9
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:34:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94248217D9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDsD7-0007EE-Dk
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:31:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39103)
+	id 1iDsGO-0002F1-33
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:34:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48049)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iDqWX-0006DX-66
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:43:06 -0400
+ (envelope-from <groug@kaod.org>) id 1iDrDW-0003dW-1S
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:27:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iDqWV-0005Q2-OF
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:43:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35884)
+ (envelope-from <groug@kaod.org>) id 1iDrDU-0004wv-6O
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:27:29 -0400
+Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:39122)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iDqWV-0005Pn-FK
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:43:03 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B5C4D301A3AE
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 13:43:02 +0000 (UTC)
-Received: from localhost (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 22C1710018F8;
- Fri, 27 Sep 2019 13:42:58 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 4/7] util: add dbus helper unit
-Date: Fri, 27 Sep 2019 17:42:21 +0400
-Message-Id: <20190927134224.14550-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20190927134224.14550-1-marcandre.lureau@redhat.com>
-References: <20190927134224.14550-1-marcandre.lureau@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDrDU-0004wO-0Y
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:27:28 -0400
+Received: from player737.ha.ovh.net (unknown [10.109.143.145])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 9B8C310C7B6
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 16:27:24 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player737.ha.ovh.net (Postfix) with ESMTPSA id 384B6E1118A;
+ Fri, 27 Sep 2019 14:27:13 +0000 (UTC)
+Date: Fri, 27 Sep 2019 16:27:12 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v2 24/33] spapr, xics, xive: Move set_irq from SpaprIrq
+ to SpaprInterruptController
+Message-ID: <20190927162712.049286e1@bahia.lan>
+In-Reply-To: <20190927055028.11493-25-david@gibson.dropbear.id.au>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-25-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 27 Sep 2019 13:43:02 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 2039004731314444774
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfeeigdejhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 46.105.51.249
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,139 +70,243 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
- dgilbert@redhat.com, pbonzini@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- MAINTAINERS         |  2 ++
- include/qemu/dbus.h | 18 +++++++++++++++
- util/Makefile.objs  |  3 +++
- util/dbus.c         | 55 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 78 insertions(+)
- create mode 100644 include/qemu/dbus.h
- create mode 100644 util/dbus.c
+On Fri, 27 Sep 2019 15:50:19 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 219a76f0a1..dccea79d48 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2160,6 +2160,8 @@ F: qapi/migration.json
- D-Bus
- M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
- S: Maintained
-+F: util/dbus.c
-+F: include/qemu/dbus.h
- F: docs/interop/dbus.rst
-=20
- Seccomp
-diff --git a/include/qemu/dbus.h b/include/qemu/dbus.h
-new file mode 100644
-index 0000000000..efd74bef96
---- /dev/null
-+++ b/include/qemu/dbus.h
-@@ -0,0 +1,18 @@
-+/*
-+ * Helpers for using D-Bus
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef DBUS_H
-+#define DBUS_H
-+
-+#include <gio/gio.h>
-+
-+GStrv qemu_dbus_get_queued_owners(GDBusConnection *connection,
-+                                  const char *name);
-+
-+#endif /* DBUS_H */
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index 41bf59d127..f435cfbd64 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -54,5 +54,8 @@ util-obj-$(CONFIG_INOTIFY1) +=3D filemonitor-inotify.o
- util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
- util-obj-$(CONFIG_POSIX) +=3D drm.o
- util-obj-y +=3D guest-random.o
-+util-obj-$(CONFIG_GIO) +=3D dbus.o
-+dbus.o-cflags =3D $(GIO_CFLAGS)
-+dbus.o-libs =3D $(GIO_LIBS)
-=20
- stub-obj-y +=3D filemonitor-stub.o
-diff --git a/util/dbus.c b/util/dbus.c
-new file mode 100644
-index 0000000000..bb51870e54
---- /dev/null
-+++ b/util/dbus.c
-@@ -0,0 +1,55 @@
-+/*
-+ * Helpers for using D-Bus
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/dbus.h"
-+#include "qemu/error-report.h"
-+
-+/*
-+ * qemu_dbus_get_queued_owners() - return the list of queued unique name=
-s
-+ * @connection: A GDBusConnection
-+ * @name: a service name
-+ *
-+ * Return: a GStrv of unique names, or NULL on failure.
-+ */
-+GStrv
-+qemu_dbus_get_queued_owners(GDBusConnection *connection, const char *nam=
-e)
-+{
-+    g_autoptr(GDBusProxy) proxy =3D NULL;
-+    g_autoptr(GVariant) result =3D NULL;
-+    g_autoptr(GVariant) child =3D NULL;
-+    g_autoptr(GError) err =3D NULL;
-+
-+    proxy =3D g_dbus_proxy_new_sync(connection, G_DBUS_PROXY_FLAGS_NONE,=
- NULL,
-+                                  "org.freedesktop.DBus",
-+                                  "/org/freedesktop/DBus",
-+                                  "org.freedesktop.DBus",
-+                                  NULL, &err);
-+    if (!proxy) {
-+        error_report("Failed to create DBus proxy: %s", err->message);
-+        return NULL;
-+    }
-+
-+    result =3D g_dbus_proxy_call_sync(proxy, "ListQueuedOwners",
-+                                    g_variant_new("(s)", name),
-+                                    G_DBUS_CALL_FLAGS_NO_AUTO_START,
-+                                    -1, NULL, &err);
-+    if (!result) {
-+        if (g_error_matches(err,
-+                            G_DBUS_ERROR,
-+                            G_DBUS_ERROR_NAME_HAS_NO_OWNER)) {
-+            return g_new0(char *, 1);
-+        }
-+        error_report("Failed to call ListQueuedOwners: %s", err->message=
-);
-+        return NULL;
-+    }
-+
-+    child =3D g_variant_get_child_value(result, 0);
-+    return g_variant_dup_strv(child, NULL);
-+}
---=20
-2.23.0
+> This method depends only on the active irq controller.  Now that we've
+> formalized the notion of active controller we can dispatch directly through
+> that, rather than dispatching via SpaprIrq with the dual version having
+> to do a second conditional dispatch.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/intc/spapr_xive.c       | 12 +++++++++++
+>  hw/intc/xics_spapr.c       |  9 +++++++++
+>  hw/ppc/spapr_irq.c         | 41 ++++++++++----------------------------
+>  include/hw/ppc/spapr_irq.h |  4 +++-
+>  4 files changed, 34 insertions(+), 32 deletions(-)
+> 
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index ff1a175b44..52d5e71793 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -553,6 +553,17 @@ static int spapr_xive_cpu_intc_create(SpaprInterruptController *intc,
+>      return 0;
+>  }
+>  
+> +static void spapr_xive_set_irq(SpaprInterruptController *intc, int irq, int val)
+> +{
+> +    SpaprXive *xive = SPAPR_XIVE(intc);
+> +
+> +    if (kvm_irqchip_in_kernel()) {
+> +        kvmppc_xive_source_set_irq(&xive->source, irq, val);
+> +    } else {
+> +        xive_source_set_irq(&xive->source, irq, val);
+> +    }
+> +}
+> +
+>  static void spapr_xive_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -574,6 +585,7 @@ static void spapr_xive_class_init(ObjectClass *klass, void *data)
+>      sicc->cpu_intc_create = spapr_xive_cpu_intc_create;
+>      sicc->claim_irq = spapr_xive_claim_irq;
+>      sicc->free_irq = spapr_xive_free_irq;
+> +    sicc->set_irq = spapr_xive_set_irq;
+>  }
+>  
+>  static const TypeInfo spapr_xive_info = {
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index 224fe1efcd..02372697f6 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -373,6 +373,14 @@ static void xics_spapr_free_irq(SpaprInterruptController *intc, int irq)
+>      memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
+>  }
+>  
+> +static void xics_spapr_set_irq(SpaprInterruptController *intc, int irq, int val)
+> +{
+> +    ICSState *ics = ICS_SPAPR(intc);
+> +    uint32_t srcno = irq - ics->offset;
+> +
+> +    ics_set_irq(ics, srcno, val);
+
+And we have:
+
+void ics_set_irq(void *opaque, int srcno, int val)
+{
+    ICSState *ics = (ICSState *)opaque;
+
+    if (kvm_irqchip_in_kernel()) {
+        ics_kvm_set_irq(ics, srcno, val);
+        return;
+    }
+
+    if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
+        ics_set_irq_lsi(ics, srcno, val);
+    } else {
+        ics_set_irq_msi(ics, srcno, val);
+    }
+}
+
+The kvm_irqchip_in_kernel() block would fit better in xics_spapr_set_irq(),
+like it is already the case for XIVE. Maybe do it now while here ?
+
+Anyway,
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> +}
+> +
+>  static void ics_spapr_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -384,6 +392,7 @@ static void ics_spapr_class_init(ObjectClass *klass, void *data)
+>      sicc->cpu_intc_create = xics_spapr_cpu_intc_create;
+>      sicc->claim_irq = xics_spapr_claim_irq;
+>      sicc->free_irq = xics_spapr_free_irq;
+> +    sicc->set_irq = xics_spapr_set_irq;
+>  }
+>  
+>  static const TypeInfo ics_spapr_info = {
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index dfa875b7cd..4922062908 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -123,14 +123,6 @@ static int spapr_irq_post_load_xics(SpaprMachineState *spapr, int version_id)
+>      return 0;
+>  }
+>  
+> -static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
+> -{
+> -    SpaprMachineState *spapr = opaque;
+> -    uint32_t srcno = irq - spapr->ics->offset;
+> -
+> -    ics_set_irq(spapr->ics, srcno, val);
+> -}
+> -
+>  static void spapr_irq_reset_xics(SpaprMachineState *spapr, Error **errp)
+>  {
+>      Error *local_err = NULL;
+> @@ -159,7 +151,6 @@ SpaprIrq spapr_irq_xics = {
+>      .dt_populate = spapr_dt_xics,
+>      .post_load   = spapr_irq_post_load_xics,
+>      .reset       = spapr_irq_reset_xics,
+> -    .set_irq     = spapr_irq_set_irq_xics,
+>      .init_kvm    = spapr_irq_init_kvm_xics,
+>  };
+>  
+> @@ -208,17 +199,6 @@ static void spapr_irq_reset_xive(SpaprMachineState *spapr, Error **errp)
+>      spapr_xive_mmio_set_enabled(spapr->xive, true);
+>  }
+>  
+> -static void spapr_irq_set_irq_xive(void *opaque, int irq, int val)
+> -{
+> -    SpaprMachineState *spapr = opaque;
+> -
+> -    if (kvm_irqchip_in_kernel()) {
+> -        kvmppc_xive_source_set_irq(&spapr->xive->source, irq, val);
+> -    } else {
+> -        xive_source_set_irq(&spapr->xive->source, irq, val);
+> -    }
+> -}
+> -
+>  static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error **errp)
+>  {
+>      if (kvm_enabled()) {
+> @@ -236,7 +216,6 @@ SpaprIrq spapr_irq_xive = {
+>      .dt_populate = spapr_dt_xive,
+>      .post_load   = spapr_irq_post_load_xive,
+>      .reset       = spapr_irq_reset_xive,
+> -    .set_irq     = spapr_irq_set_irq_xive,
+>      .init_kvm    = spapr_irq_init_kvm_xive,
+>  };
+>  
+> @@ -316,13 +295,6 @@ static void spapr_irq_reset_dual(SpaprMachineState *spapr, Error **errp)
+>      spapr_irq_current(spapr)->reset(spapr, errp);
+>  }
+>  
+> -static void spapr_irq_set_irq_dual(void *opaque, int irq, int val)
+> -{
+> -    SpaprMachineState *spapr = opaque;
+> -
+> -    spapr_irq_current(spapr)->set_irq(spapr, irq, val);
+> -}
+> -
+>  /*
+>   * Define values in sync with the XIVE and XICS backend
+>   */
+> @@ -336,7 +308,6 @@ SpaprIrq spapr_irq_dual = {
+>      .dt_populate = spapr_irq_dt_populate_dual,
+>      .post_load   = spapr_irq_post_load_dual,
+>      .reset       = spapr_irq_reset_dual,
+> -    .set_irq     = spapr_irq_set_irq_dual,
+>      .init_kvm    = NULL, /* should not be used */
+>  };
+>  
+> @@ -422,6 +393,15 @@ int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+>      return 0;
+>  }
+>  
+> +static void spapr_set_irq(void *opaque, int irq, int level)
+> +{
+> +    SpaprMachineState *spapr = SPAPR_MACHINE(opaque);
+> +    SpaprInterruptControllerClass *sicc
+> +        = SPAPR_INTC_GET_CLASS(spapr->active_intc);
+> +
+> +    sicc->set_irq(spapr->active_intc, irq, level);
+> +}
+> +
+>  void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>  {
+>      MachineState *machine = MACHINE(spapr);
+> @@ -510,7 +490,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>          spapr_xive_hcall_init(spapr);
+>      }
+>  
+> -    spapr->qirqs = qemu_allocate_irqs(spapr->irq->set_irq, spapr,
+> +    spapr->qirqs = qemu_allocate_irqs(spapr_set_irq, spapr,
+>                                        spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
+>  
+>  out:
+> @@ -744,7 +724,6 @@ SpaprIrq spapr_irq_xics_legacy = {
+>      .dt_populate = spapr_dt_xics,
+>      .post_load   = spapr_irq_post_load_xics,
+>      .reset       = spapr_irq_reset_xics,
+> -    .set_irq     = spapr_irq_set_irq_xics,
+>      .init_kvm    = spapr_irq_init_kvm_xics,
+>  };
+>  
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 3102d152b2..8286a9aa63 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -56,6 +56,9 @@ typedef struct SpaprInterruptControllerClass {
+>      int (*claim_irq)(SpaprInterruptController *intc, int irq, bool lsi,
+>                       Error **errp);
+>      void (*free_irq)(SpaprInterruptController *intc, int irq);
+> +
+> +    /* These methods should only be called on the active intc */
+> +    void (*set_irq)(SpaprInterruptController *intc, int irq, int val);
+>  } SpaprInterruptControllerClass;
+>  
+>  void spapr_irq_update_active_intc(SpaprMachineState *spapr);
+> @@ -83,7 +86,6 @@ typedef struct SpaprIrq {
+>                          void *fdt, uint32_t phandle);
+>      int (*post_load)(SpaprMachineState *spapr, int version_id);
+>      void (*reset)(SpaprMachineState *spapr, Error **errp);
+> -    void (*set_irq)(void *opaque, int srcno, int val);
+>      void (*init_kvm)(SpaprMachineState *spapr, Error **errp);
+>  } SpaprIrq;
+>  
 
 
