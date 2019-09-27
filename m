@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E80CC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 19:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFABC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 19:45:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52E2F20863
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 19:42:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B63020863
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 19:45:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AHG7gKZV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E2F20863
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bARj/F15"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B63020863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDw8k-0005Pl-Sv
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 15:42:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46682)
+	id 1iDwBF-0000bi-83
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 15:45:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46378)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iDw5r-0003QA-SG
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 15:39:58 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iDw5W-000391-LO
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 15:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iDw5o-0006VO-4i
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 15:39:55 -0400
-Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:37601)
+ (envelope-from <richard.henderson@linaro.org>) id 1iDw5V-0006BL-8G
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 15:39:34 -0400
+Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:39940)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iDw5n-0006TV-4E
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 15:39:51 -0400
-Received: by mail-pg1-x530.google.com with SMTP id c17so4018794pgg.4
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 12:39:50 -0700 (PDT)
+ id 1iDw5V-0006Ay-2C
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 15:39:33 -0400
+Received: by mail-pg1-x52a.google.com with SMTP id w10so4002787pgj.7
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 12:39:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=kOQn8fqkcBbOOtc4Nsvslx7elS0LZpOm6Sn3ku0T4zo=;
- b=AHG7gKZVLFXKWAsW6M1b7gJlGnmm+IvtxGokLYxlv+9dun69blIUp6XEnDN4Im72Iy
- tEo202NQCCJtZ3BQapjZvjIYfHRxbBgjeS3cGje4nVWGLutLxKMeLBGrQ126qL1hx7JN
- QQqpwsjthQGxSv190zbM82yZDjCMdcf3Dci+7uG7bgsXZb0i/tNFZiw5UylOimeEaKaZ
- 36GOoCmOwok6li8iC615rvQtgd/VpklgFISyory2Q0NMSje+jBE/sr+RxdVKC5Qbjv2f
- tnJQysS8gsrdlx9qzMLG49cZ4OBx+IFsLLrqrU0nLfVKuxW3LS24XEprlqFEM8vDsGiN
- plIw==
+ bh=w2Q9PJQfueojRR+QKppS6QU37PaRJeAezOuF/SJtJSk=;
+ b=bARj/F152KNyjvJ9HpAQMsNuD8coka1Aqez1QksdNMkKVM9LEVJJjQ0fgdP3uRQ0WO
+ zJ1f4Ksi7g+R9rnzz8J8NAvRfFzMZxkUw4Gl4BwfgMsCt9aaa7pHdOZplD8mJUnxzW5o
+ 4TqLfHpPT0L+JEB+km5PgSl80Pix278710A16a8XswxyAT/a8rfB/LyZVolFeX3F7VR1
+ GqZ7zthy17FAgRlPEpUNvsbPpqlOD1uMuclzwZSgEDNyufx8IhtacCCAXpBPzK+tQRqQ
+ /NM26OhND6/vUjByRvN/OFU68a4Dspef2GWORmlwMYMGbKrfF85vIO2up+6XOTqgmQ0i
+ /40w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=kOQn8fqkcBbOOtc4Nsvslx7elS0LZpOm6Sn3ku0T4zo=;
- b=Wr1TEkqQh9Al0c5kZtwAzirYUUgBEvoY7b8n5LtxrZgLyd4NqabwWyVvU5hSvCF1Vz
- KvVbWp0Ni+istCVqq22wN8xEMDE9vz3btYel1ARocX3/xE+g5kvPai95NunXY/QJhxzh
- +/IEs3K16OlhODfGbBJQNP+0ATstxJypc9s6I+5JFNx5gv6B6G/Pr8/izwCoIwWHHVdc
- ph+8cdJzSBxVFaYLGjemGKqfpRQG2hmiSI57kbtMXj4sLnKe+awX4IK5ST8KEqk8hQu+
- 8QJoXFUoz5W3MD/PWX/1X7XS8T81vh0aq9VSWjqMQ+EvjaQod8e9WgEUr0mFJ+xpCY84
- SODg==
-X-Gm-Message-State: APjAAAXstxVKnJcXbbkNiScTg+9q2OFJEjAPlEvDOKO/R/fPf9lTilv0
- Tap+De6MVb/kZ1G1fDfgLZdF2T2zHhw=
-X-Google-Smtp-Source: APXvYqzAlc7bFHue5cSmhqH32wIIlB0o1cmx03MuWcZ9BvTgYul39ig453r5UfQpHDKl9FqDGGe9sg==
-X-Received: by 2002:a63:f5f:: with SMTP id 31mr10859655pgp.265.1569613189080; 
- Fri, 27 Sep 2019 12:39:49 -0700 (PDT)
+ bh=w2Q9PJQfueojRR+QKppS6QU37PaRJeAezOuF/SJtJSk=;
+ b=n8yhx9WTLxQJ9+8ojyHCWRqCka5ss+JOwxRnbtAOHXekm2PQS2GplhNEBPl5P8anhI
+ x7duNe9GkXo1TTQd7CtcKuXSglvbFKf25SMRGAUuJYadDWBKxlAH3KmciXLsDSK9Mdxm
+ 5f4ZDFInMIayv5gd95xGsahji/B0CvEw1QHgANH+WjTX2vou9v/PpaEZelzQMKrM8N0C
+ jSj82ai18VRt8+FZLHNxpWDEGZWdoKclFR5/garFZhAwovAK58gkSBW1aMKIK7jZZfRk
+ pMx9zmreHaru+Oli9gT8kI9ZEIU2Iik9Al/yqZQTALqmgWhlecRLmrtroMy3PlqSibom
+ hdiQ==
+X-Gm-Message-State: APjAAAXIkwMaMviI4adVZU3kerul0JnBlRMqjIpLAXgRMIy5mX/eSsuB
+ ER/izDK82KEGEsMP21DcAQpuQOOHQ1s=
+X-Google-Smtp-Source: APXvYqypAM5/JCXubU4AD1mP6sCaptS5ItHMD29GAn3PlqOjr+01s5KNTIv+WCENQeyouSEhCnCkwA==
+X-Received: by 2002:a62:64ca:: with SMTP id y193mr6380720pfb.164.1569613171657; 
+ Fri, 27 Sep 2019 12:39:31 -0700 (PDT)
 Received: from localhost.localdomain ([12.206.46.62])
- by smtp.gmail.com with ESMTPSA id 192sm3676403pfb.110.2019.09.27.12.39.47
+ by smtp.gmail.com with ESMTPSA id 192sm3676403pfb.110.2019.09.27.12.39.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 27 Sep 2019 12:39:48 -0700 (PDT)
+ Fri, 27 Sep 2019 12:39:30 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 11/18] target/s390x: Remove fail variable from
- s390_cpu_tlb_fill
-Date: Fri, 27 Sep 2019 12:39:18 -0700
-Message-Id: <20190927193925.23567-12-richard.henderson@linaro.org>
+Subject: [PATCH v4 01/18] target/s390x: Add ilen to unwind data
+Date: Fri, 27 Sep 2019 12:39:08 -0700
+Message-Id: <20190927193925.23567-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190927193925.23567-1-richard.henderson@linaro.org>
 References: <20190927193925.23567-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::530
+X-Received-From: 2607:f8b0:4864:20::52a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,86 +89,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, david@redhat.com
+Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that excp always contains a real exception number, we can
-use that instead of a separate fail variable.  This allows a
-redundant test to be removed.
+From: Richard Henderson <rth@twiddle.net>
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Use ILEN_UNWIND to signal that we have in fact that cpu_restore_state
+will have been called by the time we arrive in do_program_interrupt.
+
+Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/excp_helper.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+ target/s390x/cpu.h       |  4 +++-
+ target/s390x/interrupt.c |  5 ++++-
+ target/s390x/translate.c | 20 +++++++++++++++++---
+ 3 files changed, 24 insertions(+), 5 deletions(-)
 
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 6a0728b65f..98a1ee8317 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -127,7 +127,7 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     CPUS390XState *env = &cpu->env;
-     target_ulong vaddr, raddr;
-     uint64_t asc, tec;
--    int prot, fail, excp;
-+    int prot, excp;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 1996f44baa..b7d408bf81 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -30,7 +30,7 @@
+ /* The z/Architecture has a strong memory model with some store-after-load re-ordering */
+ #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
  
-     qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
-                   __func__, address, access_type, mmu_idx);
-@@ -141,20 +141,18 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-             vaddr &= 0x7fffffff;
-         }
-         excp = mmu_translate(env, vaddr, access_type, asc, &raddr, &prot, &tec);
--        fail = excp;
-     } else if (mmu_idx == MMU_REAL_IDX) {
-         /* 31-Bit mode */
-         if (!(env->psw.mask & PSW_MASK_64)) {
-             vaddr &= 0x7fffffff;
-         }
-         excp = mmu_translate_real(env, vaddr, access_type, &raddr, &prot, &tec);
--        fail = excp;
-     } else {
-         g_assert_not_reached();
+-#define TARGET_INSN_START_EXTRA_WORDS 1
++#define TARGET_INSN_START_EXTRA_WORDS 2
+ 
+ #define MMU_MODE0_SUFFIX _primary
+ #define MMU_MODE1_SUFFIX _secondary
+@@ -803,6 +803,8 @@ int cpu_s390x_signal_handler(int host_signum, void *pinfo, void *puc);
+ void s390_crw_mchk(void);
+ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
+                        uint32_t io_int_parm, uint32_t io_int_word);
++/* instruction length set by unwind info */
++#define ILEN_UNWIND                 0
+ /* automatically detect the instruction length */
+ #define ILEN_AUTO                   0xff
+ #define RA_IGNORED                  0
+diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
+index a841f7187d..30a9fb8852 100644
+--- a/target/s390x/interrupt.c
++++ b/target/s390x/interrupt.c
+@@ -28,7 +28,10 @@ void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
+ 
+     cs->exception_index = EXCP_PGM;
+     env->int_pgm_code = code;
+-    env->int_pgm_ilen = ilen;
++    /* If ILEN_UNWIND, int_pgm_ilen already has the correct value.  */
++    if (ilen != ILEN_UNWIND) {
++        env->int_pgm_ilen = ilen;
++    }
+ }
+ 
+ void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index a3e43ff9ec..151dfa91fb 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -6309,6 +6309,9 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
+     /* Search for the insn in the table.  */
+     insn = extract_insn(env, s, &f);
+ 
++    /* Emit insn_start now that we know the ILEN.  */
++    tcg_gen_insn_start(s->base.pc_next, s->cc_op, s->ilen);
++
+     /* Not found means unimplemented/illegal opcode.  */
+     if (insn == NULL) {
+         qemu_log_mask(LOG_UNIMP, "unimplemented opcode 0x%02x%02x\n",
+@@ -6463,9 +6466,6 @@ static void s390x_tr_tb_start(DisasContextBase *db, CPUState *cs)
+ 
+ static void s390x_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
+ {
+-    DisasContext *dc = container_of(dcbase, DisasContext, base);
+-
+-    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
+ }
+ 
+ static bool s390x_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
+@@ -6473,6 +6473,14 @@ static bool s390x_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+ 
++    /*
++     * Emit an insn_start to accompany the breakpoint exception.
++     * The ILEN value is a dummy, since this does not result in
++     * an s390x exception, but an internal qemu exception which
++     * brings us back to interact with the gdbstub.
++     */
++    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op, 2);
++
+     dc->base.is_jmp = DISAS_PC_STALE;
+     dc->do_debug = true;
+     /* The address covered by the breakpoint must be included in
+@@ -6567,8 +6575,14 @@ void restore_state_to_opc(CPUS390XState *env, TranslationBlock *tb,
+                           target_ulong *data)
+ {
+     int cc_op = data[1];
++
+     env->psw.addr = data[0];
++
++    /* Update the CC opcode if it is not already up-to-date.  */
+     if ((cc_op != CC_OP_DYNAMIC) && (cc_op != CC_OP_STATIC)) {
+         env->cc_op = cc_op;
      }
- 
-     /* check out of RAM access */
--    if (!fail &&
-+    if (!excp &&
-         !address_space_access_valid(&address_space_memory, raddr,
-                                     TARGET_PAGE_SIZE, access_type,
-                                     MEMTXATTRS_UNSPECIFIED)) {
-@@ -163,10 +161,9 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                       __func__, (uint64_t)raddr, (uint64_t)ram_size);
-         excp = PGM_ADDRESSING;
-         tec = 0; /* unused */
--        fail = 1;
-     }
- 
--    if (!fail) {
-+    if (!excp) {
-         qemu_log_mask(CPU_LOG_MMU,
-                       "%s: set tlb %" PRIx64 " -> %" PRIx64 " (%x)\n",
-                       __func__, (uint64_t)vaddr, (uint64_t)raddr, prot);
-@@ -178,13 +175,11 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-         return false;
-     }
- 
--    if (excp) {
--        if (excp != PGM_ADDRESSING) {
--            stq_phys(env_cpu(env)->as,
--                     env->psa + offsetof(LowCore, trans_exc_code), tec);
--        }
--        trigger_pgm_exception(env, excp, ILEN_AUTO);
-+    if (excp != PGM_ADDRESSING) {
-+        stq_phys(env_cpu(env)->as,
-+                 env->psa + offsetof(LowCore, trans_exc_code), tec);
-     }
-+    trigger_pgm_exception(env, excp, ILEN_AUTO);
-     cpu_restore_state(cs, retaddr, true);
- 
-     /*
++
++    /* Record ILEN.  */
++    env->int_pgm_ilen = data[2];
+ }
 -- 
 2.17.1
 
