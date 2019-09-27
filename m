@@ -6,45 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 554E9C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E9EC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:52:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2897020863
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:50:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2897020863
+	by mail.kernel.org (Postfix) with ESMTPS id EF3BA20872
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:52:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF3BA20872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDk52-00076C-OE
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:50:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53759)
+	id 1iDk6v-0001Ib-Gr
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:52:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53668)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iDjex-0007Ih-7Q
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:22 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iDjet-0004EX-TT
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjet-0007DR-VQ
  for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:18 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:59670)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iDjet-00045l-Dc
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjer-00047I-Tg
  for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:15 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:59364)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjer-0003nY-I0
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:13 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id CF44469A95;
- Fri, 27 Sep 2019 15:23:12 +0900 (JST)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 525D36CD01;
+ Fri, 27 Sep 2019 15:23:09 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 7FC58240086;
- Fri, 27 Sep 2019 15:23:12 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id C9CEB240088;
+ Fri, 27 Sep 2019 15:23:08 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v25 12/22] target/rx: Collect all bytes during disassembly
-Date: Fri, 27 Sep 2019 15:22:52 +0900
-Message-Id: <20190927062302.110144-13-ysato@users.sourceforge.jp>
+Subject: [PATCH v25 03/22] hw/registerfields.h: Add 8bit and 16bit register
+ macros
+Date: Fri, 27 Sep 2019 15:22:43 +0900
+Message-Id: <20190927062302.110144-4-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190927062302.110144-1-ysato@users.sourceforge.jp>
 References: <20190927062302.110144-1-ysato@users.sourceforge.jp>
@@ -53,7 +54,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.15
+X-Received-From: 202.224.55.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,154 +66,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, imammedo@redhat.com,
- Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: peter.maydell@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ richard.henderson@linaro.org, Alistair Francis <alistair.francis@wdc.com>,
+ imammedo@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Collected, to be used in the next patch.
+Some RX peripheral using 8bit and 16bit registers.
+Added 8bit and 16bit APIs.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-23-ysato@users.sourceforge.jp>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-11-ysato@users.sourceforge.jp>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/rx/disas.c | 62 ++++++++++++++++++++++++++++++++---------------
- 1 file changed, 42 insertions(+), 20 deletions(-)
+ include/hw/registerfields.h | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index ebc1a44249..5a32a87534 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -25,43 +25,59 @@ typedef struct DisasContext {
-     disassemble_info *dis;
-     uint32_t addr;
-     uint32_t pc;
-+    uint8_t len;
-+    uint8_t bytes[8];
- } DisasContext;
+diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
+index 2659a58737..a0bb0654d6 100644
+--- a/include/hw/registerfields.h
++++ b/include/hw/registerfields.h
+@@ -22,6 +22,14 @@
+     enum { A_ ## reg =3D (addr) };                                      =
+    \
+     enum { R_ ## reg =3D (addr) / 4 };
 =20
-=20
- static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
--                           int i, int n)
-+                                  int i, int n)
- {
--    bfd_byte buf;
-+    uint32_t addr =3D ctx->addr;
++#define REG8(reg, addr)                                                 =
+ \
++    enum { A_ ## reg =3D (addr) };                                      =
+    \
++    enum { R_ ## reg =3D (addr) };
 +
-+    g_assert(ctx->len =3D=3D i);
-+    g_assert(n <=3D ARRAY_SIZE(ctx->bytes));
++#define REG16(reg, addr)                                                =
+  \
++    enum { A_ ## reg =3D (addr) };                                      =
+    \
++    enum { R_ ## reg =3D (addr) / 2 };
 +
-     while (++i <=3D n) {
--        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
--        insn |=3D buf << (32 - i * 8);
-+        ctx->dis->read_memory_func(addr++, &ctx->bytes[i - 1], 1, ctx->d=
-is);
-+        insn |=3D ctx->bytes[i - 1] << (32 - i * 8);
-     }
-+    ctx->addr =3D addr;
-+    ctx->len =3D n;
-+
-     return insn;
- }
+ /* Define SHIFT, LENGTH and MASK constants for a field within a register=
+ */
 =20
- static int32_t li(DisasContext *ctx, int sz)
- {
--    int32_t addr;
--    bfd_byte buf[4];
--    addr =3D ctx->addr;
-+    uint32_t addr =3D ctx->addr;
-+    uintptr_t len =3D ctx->len;
+ /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_=
+LENGTH
+@@ -34,6 +42,12 @@
+                                         MAKE_64BIT_MASK(shift, length)};
 =20
-     switch (sz) {
-     case 1:
-+        g_assert(len + 1 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 1;
--        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
--        return (int8_t)buf[0];
-+        ctx->len +=3D 1;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
-+        return (int8_t)ctx->bytes[len];
-     case 2:
-+        g_assert(len + 2 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 2;
--        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
--        return ldsw_le_p(buf);
-+        ctx->len +=3D 2;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
-+        return ldsw_le_p(ctx->bytes + len);
-     case 3:
-+        g_assert(len + 3 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 3;
--        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
--        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
-+        ctx->len +=3D 3;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 3, ctx->dis);
-+        return (int8_t)ctx->bytes[len + 2] << 16 | lduw_le_p(ctx->bytes =
-+ len);
-     case 0:
-+        g_assert(len + 4 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 4;
--        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
--        return ldl_le_p(buf);
-+        ctx->len +=3D 4;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 4, ctx->dis);
-+        return ldl_le_p(ctx->bytes + len);
-     default:
-         g_assert_not_reached();
-     }
-@@ -110,7 +126,7 @@ static const char psw[] =3D {
- static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi=
-)
- {
-     uint32_t addr =3D ctx->addr;
--    uint8_t buf[2];
-+    uintptr_t len =3D ctx->len;
-     uint16_t dsp;
-=20
-     switch (ld) {
-@@ -119,14 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char o=
-ut[8], int ld, int mi)
-         out[0] =3D '\0';
-         return;
-     case 1:
-+        g_assert(len + 1 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 1;
--        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
--        dsp =3D buf[0];
-+        ctx->len +=3D 1;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
-+        dsp =3D ctx->bytes[len];
-         break;
-     case 2:
-+        g_assert(len + 2 <=3D ARRAY_SIZE(ctx->bytes));
-         ctx->addr +=3D 2;
--        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
--        dsp =3D lduw_le_p(buf);
-+        ctx->len +=3D 2;
-+        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
-+        dsp =3D lduw_le_p(ctx->bytes + len);
-         break;
-     default:
-         g_assert_not_reached();
-@@ -1392,8 +1412,10 @@ int print_insn_rx(bfd_vma addr, disassemble_info *=
-dis)
-     DisasContext ctx;
-     uint32_t insn;
-     int i;
-+
-     ctx.dis =3D dis;
-     ctx.pc =3D ctx.addr =3D addr;
-+    ctx.len =3D 0;
-=20
-     insn =3D decode_load(&ctx);
-     if (!decode(&ctx, insn)) {
+ /* Extract a field from a register */
++#define FIELD_EX8(storage, reg, field)                                  =
+  \
++    extract8((storage), R_ ## reg ## _ ## field ## _SHIFT,              =
+  \
++              R_ ## reg ## _ ## field ## _LENGTH)
++#define FIELD_EX16(storage, reg, field)                                 =
+  \
++    extract16((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
++              R_ ## reg ## _ ## field ## _LENGTH)
+ #define FIELD_EX32(storage, reg, field)                                 =
+  \
+     extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
+  \
+               R_ ## reg ## _ ## field ## _LENGTH)
+@@ -49,6 +63,22 @@
+  * Assigning values larger then the target field will result in
+  * compilation warnings.
+  */
++#define FIELD_DP8(storage, reg, field, val) ({                          =
+  \
++    struct {                                                            =
+  \
++        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
++    } v =3D { .v =3D val };                                             =
+      \
++    uint8_t d;                                                          =
+  \
++    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
++                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
++    d; })
++#define FIELD_DP16(storage, reg, field, val) ({                         =
+  \
++    struct {                                                            =
+  \
++        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
++    } v =3D { .v =3D val };                                             =
+      \
++    uint16_t d;                                                         =
+  \
++    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
++                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
++    d; })
+ #define FIELD_DP32(storage, reg, field, val) ({                         =
+  \
+     struct {                                                            =
+  \
+         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+@@ -57,7 +87,7 @@
+     d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
+    \
+                   R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
+  \
+     d; })
+-#define FIELD_DP64(storage, reg, field, val) ({                         =
+  \
++#define FIELD_DP64(storage, reg, field, val) ({                         =
+\
+     struct {                                                            =
+  \
+         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
+  \
+     } v =3D { .v =3D val };                                             =
+      \
 --=20
 2.20.1
 
