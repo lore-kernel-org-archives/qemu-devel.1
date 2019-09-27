@@ -2,65 +2,58 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91495C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E9CC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:55:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 660B520872
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:54:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660B520872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4AAB21783
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:55:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4AAB21783
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDk8x-0003bq-Lk
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:54:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57387)
+	id 1iDkA0-0004lI-R5
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:55:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53735)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iDk0T-0003gk-ML
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:45:34 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjew-0007HW-GZ
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iDk0S-0007ZA-Gc
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:45:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39192)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1iDk0O-0007QE-OM; Fri, 27 Sep 2019 02:45:28 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 28080315C01F;
- Fri, 27 Sep 2019 06:45:27 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 07475600C6;
- Fri, 27 Sep 2019 06:45:22 +0000 (UTC)
-Date: Fri, 27 Sep 2019 08:45:20 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v4 4/9] target/arm/cpu64: max cpu: Introduce sve<N>
- properties
-Message-ID: <20190927064520.o2sghq5hye4tvycf@kamzik.brq.redhat.com>
-References: <20190924113105.19076-1-drjones@redhat.com>
- <20190924113105.19076-5-drjones@redhat.com>
- <2beb840f-99cf-d928-0926-c284933c78d9@linaro.org>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjeu-0004HH-8F
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:18 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:59398)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjet-0004CU-Q1
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:16 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 282C86CC71;
+ Fri, 27 Sep 2019 15:23:15 +0900 (JST)
+Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
+ [222.8.5.235])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id D202F240086;
+ Fri, 27 Sep 2019 15:23:14 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v25 18/22] hw/rx: Honor -accel qtest
+Date: Fri, 27 Sep 2019 15:22:58 +0900
+Message-Id: <20190927062302.110144-19-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190927062302.110144-1-ysato@users.sourceforge.jp>
+References: <20190927062302.110144-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2beb840f-99cf-d928-0926-c284933c78d9@linaro.org>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 27 Sep 2019 06:45:27 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,64 +65,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com,
- eric.auger@redhat.com, qemu-arm@nongnu.org, imammedo@redhat.com,
- alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: peter.maydell@linaro.org, imammedo@redhat.com,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 12:07:54PM -0700, Richard Henderson wrote:
-> On 9/24/19 4:31 AM, Andrew Jones wrote:
-> > +static uint32_t sve_zcr_get_valid_len(ARMCPU *cpu, uint32_t start_len)
-> > +{
-> > +    uint32_t start_vq = (start_len & 0xf) + 1;
-> > +
-> > +    return arm_cpu_vq_map_next_smaller(cpu, start_vq + 1) - 1;
-> > +}
-> > +
-> >  /*
-> >   * Given that SVE is enabled, return the vector length for EL.
-> >   */
-> > @@ -5360,13 +5367,13 @@ uint32_t sve_zcr_len_for_el(CPUARMState *env, int el)
-> >      uint32_t zcr_len = cpu->sve_max_vq - 1;
-> >  
-> >      if (el <= 1) {
-> > -        zcr_len = MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[1]);
-> > +        zcr_len = sve_zcr_get_valid_len(cpu, env->vfp.zcr_el[1]);
-> >      }
-> >      if (el <= 2 && arm_feature(env, ARM_FEATURE_EL2)) {
-> > -        zcr_len = MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[2]);
-> > +        zcr_len = sve_zcr_get_valid_len(cpu, env->vfp.zcr_el[2]);
-> >      }
-> >      if (arm_feature(env, ARM_FEATURE_EL3)) {
-> > -        zcr_len = MIN(zcr_len, 0xf & (uint32_t)env->vfp.zcr_el[3]);
-> > +        zcr_len = sve_zcr_get_valid_len(cpu, env->vfp.zcr_el[3]);
-> 
-> This has lost the MIN relation between these 3 registers.
-> One possible solution is to keep these 3 if statements as-is,
-> but make one call
-> 
->     zcr_len = arm_cpu_vq_map_next_smaller(cpu, zcr_len);
-> 
-> at the end.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Argh. I obviously didn't look closely enough at this function when I was
-modifying it. I must have interpreted it as an if-else-if sequence...
+Issue an error if no kernel, no bios, and not qtest'ing.
+Fixes make check-qtest-rx: test/qom-test.
 
-I'll fix this as you suggest.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-16-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+We could squash this with the previous patch
+---
+ hw/rx/rx62n.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-> 
-> > +#if __SIZEOF_LONG__ == 8
-> > +#define BIT(n) (1UL << (n))
-> > +#else
-> > +#define BIT(n) (1ULL << (n))
-> > +#endif
-> 
-> There's no reason not to always use 1ULL is there?
+diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+index ac47f2a397..a0986fd15e 100644
+--- a/hw/rx/rx62n.c
++++ b/hw/rx/rx62n.c
+@@ -21,12 +21,14 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qemu/error-report.h"
+ #include "hw/hw.h"
+ #include "hw/rx/rx62n.h"
+ #include "hw/loader.h"
+ #include "hw/sysbus.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
+ #include "cpu.h"
+=20
+ /*
+@@ -191,8 +193,14 @@ static void rx62n_realize(DeviceState *dev, Error **=
+errp)
+     memory_region_init_rom(&s->c_flash, NULL, "codeflash",
+                            RX62N_CFLASH_SIZE, errp);
+     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
+h);
++
+     if (!s->kernel) {
+-        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++        if (bios_name) {
++            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
++        }  else if (!qtest_enabled()) {
++            error_report("No bios or kernel specified");
++            exit(1);
++        }
+     }
+=20
+     /* Initialize CPU */
+--=20
+2.20.1
 
-Indeed ULL == UL for AArch64. I'll drop the #if... stuff.
-
-Thanks,
-drew
 
