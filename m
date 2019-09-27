@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3378C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E318BC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:12:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 971BE2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:11:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 971BE2146E
+	by mail.kernel.org (Postfix) with ESMTPS id A80DD2146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:12:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A80DD2146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDmHo-00009C-CK
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:11:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53824)
+	id 1iDmIF-0000Xb-73
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:12:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iDmCJ-0002a4-9k
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:06:00 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iDmCN-0002gF-UI
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iDmCB-0003KQ-Dw
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:05:55 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:40651)
+ (envelope-from <laurent@vivier.eu>) id 1iDmCI-0003bw-Vu
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:05:59 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:43297)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iDmBz-0002mF-FO; Fri, 27 Sep 2019 05:05:36 -0400
+ id 1iDmC2-0002vO-Bw; Fri, 27 Sep 2019 05:05:38 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mwwhx-1hyRKU06yx-00yMgW; Fri, 27 Sep 2019 11:05:13 +0200
+ id 1N0G5h-1hzXG63KJ5-00xGky; Fri, 27 Sep 2019 11:05:10 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v13 7/9] hw/m68k: add a dummy SWIM floppy controller
-Date: Fri, 27 Sep 2019 11:04:51 +0200
-Message-Id: <20190927090453.24712-8-laurent@vivier.eu>
+Subject: [PATCH v13 5/9] hw/m68k: add Nubus support
+Date: Fri, 27 Sep 2019 11:04:49 +0200
+Message-Id: <20190927090453.24712-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190927090453.24712-1-laurent@vivier.eu>
 References: <20190927090453.24712-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:jOvofQqnfv+PDHQZeV/ErMvrOjVyYr9ipa6MQJJfs1ez6702u1c
- YEMiFAjpFm0IQuIaLfY7MnQKLjlRhcP3tXOoBclrvvhj/P0D3JHzzR2O73OkYXosf3mJHDZ
- JenTags50k58libEIiyShxJNJHInF0k/vzO5Jsxz/jAL1Xazck7DPR4u8j1n4Eb5oQwpPBH
- yFiRWyeYif5zdkDftOsIQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Q4YAPsYpoqc=:4xu60nb2Kl/V/A4/tpQcNz
- Et8SzWeenorOSMetnEQlUauABBaG2yDxH+yld/V+F/t8OhbpK0n0EM40y2EGr/SSIyFFmA3uZ
- zmCT6wpnbGvL9lQ6vXf1p2O9+sJ7n6rtes7CVf/YVVPZwL+eJkThGwqSx5mqY9SZgPMSpJuPP
- WtB/cAr+z0EHNlo/rOf/FBNHI0vy2kLKHpwe4M+/bwAWpQIj+0v/Wz8126GlPFjBNIYqMuFXB
- TfdK8EwAeantCCXGgHr1TlR7j3XlsInYjKPeALU0rNaUA+M6CbY64kEy6da3oxIIJbT1RQBcg
- jwfSOp0jhLdsWwGHCzqX6YyA1wLqLDAW7fqm5OceoKG+fpcIYYzg8RsxgXzJVUWKQDDEB7PGS
- CahO2Y2UIJ8k8FX46h/GmLuT88NENiBaKRANVzG2wuYGlU30WqMbld1hqobQ/aTZ5vFOo7lgT
- ntw9upNYNIuIwu4O6mlUay99bJZOKijmfCWrz0BxwpGL5R2arxs8cIVlb1rlNiNvarwN9sVTj
- OyGZ6n7Oh/ik914KqsP0oU224mvex6qbXPTqvG6mKQh37QwjgW2rkkkgYC8ImyXBTNh0zYcOl
- sb3TsH16/dg3oWQrqGnY2/6ywMvcqdIVWKj0uJf18er3WraNmT7q/vjbvKX/QagDGyFZOpRno
- hZ4qCkCLnUDadM1cI26ecMFarCpaTduFLHtZC7yK53ZlomuOfny6qVFMohcRx3ej5DHhAfCbL
- WkcSb6+opPoKz6gRA95Krx5EeSFuRmme+dXdtY3upMKnrfX2XFhD6I4/+Wmy/W5cl49z/mWdu
- BY1h9ZYRmt5ge0SB6MOHkfi25rel0mgrcZ454xIpQt+1hffOQPgxf1foF/ZU+eAEggcEdbxRz
- SoSSBcG85tlv748/nDJFyJp6TZNXVCrVrmZWi5jwg=
+X-Provags-ID: V03:K1:7oI9+Sa7xF9Xw6kCVemCXHSInpO4YPgOqMyutjWb12dAor+UpcD
+ iHJcnNSYSu3H/8Q1SjzE1IniZYQJIHc7spW5sAV04i9siNQi6KL2n3fd2DFvLIchqc1WQwx
+ 1KFc6G72Z76in/GC6Z6y1V0Dgwt4V2qPZRzNIiUkauHyUcJaGqpAPtH7iR1V8RzHv9eEspS
+ E9DPmctD9cCpK1LepC+Qg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:f2jQzqTb/3Y=:0bXn4fv4inxM3jg9eRe8FP
+ vgqoq2e0RB1F8PDXtw/F9sg36QbTCjIB1/dPmLndqLQscvkh2prML8WbueEHztbl2fV5gk9h5
+ sIIuUSnzB1OadbJzi2nhrzlV9hnxIEgdbDjFQHGBcDRh2Vtaoruso3CaDVJwP6S0J5vXELdCz
+ nGDm5pUTyNagtBY9StVuPa8mG6MvL8bdPikTf2cQg9jb/BeVdbUUhrv3ft0FH/wJ/Hc8JhamN
+ sDSr/FnyBTv2zCJ3XMKrvQLz7axcSJEHH+6olv3RTuH6djJkFKfMSEoup1LRdzG6R69Ls2dwb
+ 5ig8Jzd8vHvXS2MOqg4Q7RzT/hm6Ag18qrmYqzBiRMQ1wh97FYp0/1qOnNHrTxSyH/Yva9n7S
+ AQYKuYy0nWXQ2MUBVla0ITANZF2TSBybKJi9zzmy5hykfLUEEwhZGUZTSRE+JMiB1gSbkgrcJ
+ jORes10LZKl9Cy7zZKgurrpuk16pMdKBm6wUNcv7ZHJQLtCZgHip9bk4g5nC22HH92yWsg+po
+ mQSlutoFmnXPo/HOClmqjNmfkwlzV7dqZ3vZ/L5jlhxvT6DkKW0qXC30GtY/F+cjrTu7fSAZ5
+ gjj/PZkmAMzMKoK+Ni4grBkQywNKRD7QOfXp4r2IlhV4bEzPkt9GI82uTnCXgJisXEhz27hoT
+ HoONeNZdP35umihDFO8AU7TkSnhvhzQKgWu0PuGAftkQh7RNMWDvYun4l4C3SehAFA/1o7HNu
+ YD90E6BGZY9RNNzmdrDZhOHgjYI45s5zXQ7FH5BINWeDFQ0wHNZU6L1wCOc6vbpcToVMNh9zD
+ 6wJkqMG0pyoTBrnArTue2hLybCDXD0oGzJl95v3pMm9SDD1t7HHXTlprcv5gJy+89QeVAAj/x
+ UQK1rwheMBepRMa4+RaA==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.73
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,652 +90,634 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SWIM (Sander-Wozniak Integrated Machine) is the floppy controller of
-the 680x0 Macintosh.
-
-This patch introduces only the basic support: it allows to switch from
-IWM (Integrated WOZ Machine) mode to the SWIM mode and makes the linux
-driver happy.
-
-It cannot read any floppy image.
+This patch adds basic support for the NuBus bus. This is used by 680x0
+Macintosh.
 
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Reviewed-by: Thomas Huth <huth@tuxfamily.org>
 ---
- MAINTAINERS             |   2 +
- hw/block/Kconfig        |   3 +
- hw/block/Makefile.objs  |   1 +
- hw/block/swim.c         | 487 ++++++++++++++++++++++++++++++++++++++++
- hw/m68k/Kconfig         |   1 +
- include/hw/block/swim.h |  76 +++++++
- 6 files changed, 570 insertions(+)
- create mode 100644 hw/block/swim.c
- create mode 100644 include/hw/block/swim.h
+ MAINTAINERS                         |   2 +
+ hw/Kconfig                          |   1 +
+ hw/Makefile.objs                    |   1 +
+ hw/m68k/Kconfig                     |   1 +
+ hw/nubus/Kconfig                    |   2 +
+ hw/nubus/Makefile.objs              |   4 +
+ hw/nubus/mac-nubus-bridge.c         |  45 ++++++
+ hw/nubus/nubus-bridge.c             |  34 +++++
+ hw/nubus/nubus-bus.c                | 111 ++++++++++++++
+ hw/nubus/nubus-device.c             | 215 ++++++++++++++++++++++++++++
+ include/hw/nubus/mac-nubus-bridge.h |  24 ++++
+ include/hw/nubus/nubus.h            |  69 +++++++++
+ 12 files changed, 509 insertions(+)
+ create mode 100644 hw/nubus/Kconfig
+ create mode 100644 hw/nubus/Makefile.objs
+ create mode 100644 hw/nubus/mac-nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bus.c
+ create mode 100644 hw/nubus/nubus-device.c
+ create mode 100644 include/hw/nubus/mac-nubus-bridge.h
+ create mode 100644 include/hw/nubus/nubus.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index f31fa3f469..c20f6bd4cb 100644
+index 5aeee1b603..547b82457e 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -923,9 +923,11 @@ S: Maintained
+@@ -921,7 +921,9 @@ q800
+ M: Laurent Vivier <laurent@vivier.eu>
+ S: Maintained
  F: hw/misc/mac_via.c
- F: hw/nubus/*
- F: hw/display/macfb.c
-+F: hw/block/swim.c
++F: hw/nubus/*
  F: include/hw/misc/mac_via.h
- F: include/hw/nubus/*
- F: include/hw/display/macfb.h
-+F: include/hw/block/swim.h
++F: include/hw/nubus/*
  
  MicroBlaze Machines
  -------------------
-diff --git a/hw/block/Kconfig b/hw/block/Kconfig
-index df96dc5dcc..2d17f481ad 100644
---- a/hw/block/Kconfig
-+++ b/hw/block/Kconfig
-@@ -37,3 +37,6 @@ config VHOST_USER_BLK
-     # Only PCI devices are provided for now
-     default y if VIRTIO_PCI
-     depends on VIRTIO && VHOST_USER && LINUX
-+
-+config SWIM
-+    bool
-diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-index f5f643f0cc..28c2495a00 100644
---- a/hw/block/Makefile.objs
-+++ b/hw/block/Makefile.objs
-@@ -8,6 +8,7 @@ common-obj-$(CONFIG_XEN) += xen-block.o
- common-obj-$(CONFIG_ECC) += ecc.o
- common-obj-$(CONFIG_ONENAND) += onenand.o
- common-obj-$(CONFIG_NVME_PCI) += nvme.o
-+common-obj-$(CONFIG_SWIM) += swim.o
- 
- obj-$(CONFIG_SH4) += tc58128.o
- 
-diff --git a/hw/block/swim.c b/hw/block/swim.c
+diff --git a/hw/Kconfig b/hw/Kconfig
+index b45db3c813..0501a55315 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -21,6 +21,7 @@ source isa/Kconfig
+ source mem/Kconfig
+ source misc/Kconfig
+ source net/Kconfig
++source nubus/Kconfig
+ source nvram/Kconfig
+ source pci-bridge/Kconfig
+ source pci-host/Kconfig
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index ece6cc3755..457b95e28d 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -37,6 +37,7 @@ devices-dirs-y += virtio/
+ devices-dirs-y += watchdog/
+ devices-dirs-y += xen/
+ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
++devices-dirs-$(CONFIG_NUBUS) += nubus/
+ devices-dirs-y += semihosting/
+ devices-dirs-y += smbios/
+ endif
+diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
+index 22a357609c..947cd42c01 100644
+--- a/hw/m68k/Kconfig
++++ b/hw/m68k/Kconfig
+@@ -16,3 +16,4 @@ config NEXTCUBE
+ config Q800
+     bool
+     select MAC_VIA
++    select NUBUS
+diff --git a/hw/nubus/Kconfig b/hw/nubus/Kconfig
 new file mode 100644
-index 0000000000..80addcea9d
+index 0000000000..8fb8b22189
 --- /dev/null
-+++ b/hw/block/swim.c
-@@ -0,0 +1,487 @@
++++ b/hw/nubus/Kconfig
+@@ -0,0 +1,2 @@
++config NUBUS
++    bool
+diff --git a/hw/nubus/Makefile.objs b/hw/nubus/Makefile.objs
+new file mode 100644
+index 0000000000..135ba7878d
+--- /dev/null
++++ b/hw/nubus/Makefile.objs
+@@ -0,0 +1,4 @@
++common-obj-y += nubus-device.o
++common-obj-y += nubus-bus.o
++common-obj-y += nubus-bridge.o
++common-obj-$(CONFIG_Q800) += mac-nubus-bridge.o
+diff --git a/hw/nubus/mac-nubus-bridge.c b/hw/nubus/mac-nubus-bridge.c
+new file mode 100644
+index 0000000000..7c329300b8
+--- /dev/null
++++ b/hw/nubus/mac-nubus-bridge.c
+@@ -0,0 +1,45 @@
 +/*
-+ * QEMU Macintosh floppy disk controller emulator (SWIM)
++ *  Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
 + *
-+ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + *
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/error.h"
-+#include "sysemu/block-backend.h"
 +#include "hw/sysbus.h"
-+#include "migration/vmstate.h"
-+#include "hw/block/block.h"
-+#include "hw/block/swim.h"
-+#include "hw/qdev-properties.h"
++#include "hw/nubus/mac-nubus-bridge.h"
 +
-+/* IWM registers */
 +
-+#define IWM_PH0L                0
-+#define IWM_PH0H                1
-+#define IWM_PH1L                2
-+#define IWM_PH1H                3
-+#define IWM_PH2L                4
-+#define IWM_PH2H                5
-+#define IWM_PH3L                6
-+#define IWM_PH3H                7
-+#define IWM_MTROFF              8
-+#define IWM_MTRON               9
-+#define IWM_INTDRIVE            10
-+#define IWM_EXTDRIVE            11
-+#define IWM_Q6L                 12
-+#define IWM_Q6H                 13
-+#define IWM_Q7L                 14
-+#define IWM_Q7H                 15
-+
-+/* SWIM registers */
-+
-+#define SWIM_WRITE_DATA         0
-+#define SWIM_WRITE_MARK         1
-+#define SWIM_WRITE_CRC          2
-+#define SWIM_WRITE_PARAMETER    3
-+#define SWIM_WRITE_PHASE        4
-+#define SWIM_WRITE_SETUP        5
-+#define SWIM_WRITE_MODE0        6
-+#define SWIM_WRITE_MODE1        7
-+
-+#define SWIM_READ_DATA          8
-+#define SWIM_READ_MARK          9
-+#define SWIM_READ_ERROR         10
-+#define SWIM_READ_PARAMETER     11
-+#define SWIM_READ_PHASE         12
-+#define SWIM_READ_SETUP         13
-+#define SWIM_READ_STATUS        14
-+#define SWIM_READ_HANDSHAKE     15
-+
-+#define REG_SHIFT               9
-+
-+#define SWIM_MODE_IWM  0
-+#define SWIM_MODE_SWIM 1
-+
-+/* bits in phase register */
-+
-+#define SWIM_SEEK_NEGATIVE   0x074
-+#define SWIM_STEP            0x071
-+#define SWIM_MOTOR_ON        0x072
-+#define SWIM_MOTOR_OFF       0x076
-+#define SWIM_INDEX           0x073
-+#define SWIM_EJECT           0x077
-+#define SWIM_SETMFM          0x171
-+#define SWIM_SETGCR          0x175
-+#define SWIM_RELAX           0x033
-+#define SWIM_LSTRB           0x008
-+#define SWIM_CA_MASK         0x077
-+
-+/* Select values for swim_select and swim_readbit */
-+
-+#define SWIM_READ_DATA_0     0x074
-+#define SWIM_TWOMEG_DRIVE    0x075
-+#define SWIM_SINGLE_SIDED    0x076
-+#define SWIM_DRIVE_PRESENT   0x077
-+#define SWIM_DISK_IN         0x170
-+#define SWIM_WRITE_PROT      0x171
-+#define SWIM_TRACK_ZERO      0x172
-+#define SWIM_TACHO           0x173
-+#define SWIM_READ_DATA_1     0x174
-+#define SWIM_MFM_MODE        0x175
-+#define SWIM_SEEK_COMPLETE   0x176
-+#define SWIM_ONEMEG_MEDIA    0x177
-+
-+/* Bits in handshake register */
-+
-+#define SWIM_MARK_BYTE       0x01
-+#define SWIM_CRC_ZERO        0x02
-+#define SWIM_RDDATA          0x04
-+#define SWIM_SENSE           0x08
-+#define SWIM_MOTEN           0x10
-+#define SWIM_ERROR           0x20
-+#define SWIM_DAT2BYTE        0x40
-+#define SWIM_DAT1BYTE        0x80
-+
-+/* bits in setup register */
-+
-+#define SWIM_S_INV_WDATA     0x01
-+#define SWIM_S_3_5_SELECT    0x02
-+#define SWIM_S_GCR           0x04
-+#define SWIM_S_FCLK_DIV2     0x08
-+#define SWIM_S_ERROR_CORR    0x10
-+#define SWIM_S_IBM_DRIVE     0x20
-+#define SWIM_S_GCR_WRITE     0x40
-+#define SWIM_S_TIMEOUT       0x80
-+
-+/* bits in mode register */
-+
-+#define SWIM_CLFIFO          0x01
-+#define SWIM_ENBL1           0x02
-+#define SWIM_ENBL2           0x04
-+#define SWIM_ACTION          0x08
-+#define SWIM_WRITE_MODE      0x10
-+#define SWIM_HEDSEL          0x20
-+#define SWIM_MOTON           0x80
-+
-+static void fd_recalibrate(FDrive *drive)
++static void mac_nubus_bridge_init(Object *obj)
 +{
++    MacNubusState *s = MAC_NUBUS_BRIDGE(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++
++    s->bus = NUBUS_BUS(qbus_create(TYPE_NUBUS_BUS, DEVICE(s), NULL));
++
++    sysbus_init_mmio(sbd, &s->bus->super_slot_io);
++    sysbus_init_mmio(sbd, &s->bus->slot_io);
 +}
 +
-+static void swim_change_cb(void *opaque, bool load, Error **errp)
++static void mac_nubus_bridge_class_init(ObjectClass *klass, void *data)
 +{
-+    FDrive *drive = opaque;
++    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    if (!load) {
-+        blk_set_perm(drive->blk, 0, BLK_PERM_ALL, &error_abort);
-+    } else {
-+        if (!blkconf_apply_backend_options(drive->conf,
-+                                           blk_is_read_only(drive->blk), false,
-+                                           errp)) {
-+            return;
-+        }
-+    }
++    dc->desc = "Nubus bridge";
 +}
 +
-+static const BlockDevOps swim_block_ops = {
-+    .change_media_cb = swim_change_cb,
++static const TypeInfo mac_nubus_bridge_info = {
++    .name          = TYPE_MAC_NUBUS_BRIDGE,
++    .parent        = TYPE_NUBUS_BRIDGE,
++    .instance_init = mac_nubus_bridge_init,
++    .instance_size = sizeof(MacNubusState),
++    .class_init    = mac_nubus_bridge_class_init,
 +};
 +
-+static Property swim_drive_properties[] = {
-+    DEFINE_PROP_INT32("unit", SWIMDrive, unit, -1),
-+    DEFINE_BLOCK_PROPERTIES(SWIMDrive, conf),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void swim_drive_realize(DeviceState *qdev, Error **errp)
++static void mac_nubus_bridge_register_types(void)
 +{
-+    SWIMDrive *dev = SWIM_DRIVE(qdev);
-+    SWIMBus *bus = SWIM_BUS(qdev->parent_bus);
-+    FDrive *drive;
-+    int ret;
-+
-+    if (dev->unit == -1) {
-+        for (dev->unit = 0; dev->unit < SWIM_MAX_FD; dev->unit++) {
-+            drive = &bus->ctrl->drives[dev->unit];
-+            if (!drive->blk) {
-+                break;
-+            }
-+        }
-+    }
-+
-+    if (dev->unit >= SWIM_MAX_FD) {
-+        error_setg(errp, "Can't create floppy unit %d, bus supports "
-+                   "only %d units", dev->unit, SWIM_MAX_FD);
-+        return;
-+    }
-+
-+    drive = &bus->ctrl->drives[dev->unit];
-+    if (drive->blk) {
-+        error_setg(errp, "Floppy unit %d is in use", dev->unit);
-+        return;
-+    }
-+
-+    if (!dev->conf.blk) {
-+        /* Anonymous BlockBackend for an empty drive */
-+        dev->conf.blk = blk_new(qemu_get_aio_context(), 0, BLK_PERM_ALL);
-+        ret = blk_attach_dev(dev->conf.blk, qdev);
-+        assert(ret == 0);
-+    }
-+
-+    blkconf_blocksizes(&dev->conf);
-+    if (dev->conf.logical_block_size != 512 ||
-+        dev->conf.physical_block_size != 512)
-+    {
-+        error_setg(errp, "Physical and logical block size must "
-+                   "be 512 for floppy");
-+        return;
-+    }
-+
-+    /*
-+     * rerror/werror aren't supported by fdc and therefore not even registered
-+     * with qdev. So set the defaults manually before they are used in
-+     * blkconf_apply_backend_options().
-+     */
-+    dev->conf.rerror = BLOCKDEV_ON_ERROR_AUTO;
-+    dev->conf.werror = BLOCKDEV_ON_ERROR_AUTO;
-+
-+    if (!blkconf_apply_backend_options(&dev->conf,
-+                                       blk_is_read_only(dev->conf.blk),
-+                                       false, errp)) {
-+        return;
-+    }
-+
-+    /*
-+     * 'enospc' is the default for -drive, 'report' is what blk_new() gives us
-+     * for empty drives.
-+     */
-+    if (blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC &&
-+        blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_REPORT) {
-+        error_setg(errp, "fdc doesn't support drive option werror");
-+        return;
-+    }
-+    if (blk_get_on_error(dev->conf.blk, 1) != BLOCKDEV_ON_ERROR_REPORT) {
-+        error_setg(errp, "fdc doesn't support drive option rerror");
-+        return;
-+    }
-+
-+    drive->conf = &dev->conf;
-+    drive->blk = dev->conf.blk;
-+    drive->swimctrl = bus->ctrl;
-+
-+    blk_set_dev_ops(drive->blk, &swim_block_ops, drive);
++    type_register_static(&mac_nubus_bridge_info);
 +}
 +
-+static void swim_drive_class_init(ObjectClass *klass, void *data)
++type_init(mac_nubus_bridge_register_types)
+diff --git a/hw/nubus/nubus-bridge.c b/hw/nubus/nubus-bridge.c
+new file mode 100644
+index 0000000000..cd8c6a91eb
+--- /dev/null
++++ b/hw/nubus/nubus-bridge.c
+@@ -0,0 +1,34 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/nubus/nubus.h"
++
++static void nubus_bridge_class_init(ObjectClass *klass, void *data)
 +{
-+    DeviceClass *k = DEVICE_CLASS(klass);
-+    k->realize = swim_drive_realize;
-+    set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
-+    k->bus_type = TYPE_SWIM_BUS;
-+    k->props = swim_drive_properties;
-+    k->desc = "virtual SWIM drive";
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->fw_name = "nubus";
 +}
 +
-+static const TypeInfo swim_drive_info = {
-+    .name = TYPE_SWIM_DRIVE,
-+    .parent = TYPE_DEVICE,
-+    .instance_size = sizeof(SWIMDrive),
-+    .class_init = swim_drive_class_init,
++static const TypeInfo nubus_bridge_info = {
++    .name          = TYPE_NUBUS_BRIDGE,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SysBusDevice),
++    .class_init    = nubus_bridge_class_init,
 +};
 +
-+static const TypeInfo swim_bus_info = {
-+    .name = TYPE_SWIM_BUS,
-+    .parent = TYPE_BUS,
-+    .instance_size = sizeof(SWIMBus),
-+};
-+
-+static void iwmctrl_write(void *opaque, hwaddr reg, uint64_t value,
-+                          unsigned size)
++static void nubus_register_types(void)
 +{
-+    SWIMCtrl *swimctrl = opaque;
-+
-+    reg >>= REG_SHIFT;
-+
-+    swimctrl->regs[reg >> 1] = reg & 1;
-+
-+    if (swimctrl->regs[IWM_Q6] &&
-+        swimctrl->regs[IWM_Q7]) {
-+        if (swimctrl->regs[IWM_MTR]) {
-+            /* data register */
-+            swimctrl->iwm_data = value;
-+        } else {
-+            /* mode register */
-+            swimctrl->iwm_mode = value;
-+            /* detect sequence to switch from IWM mode to SWIM mode */
-+            switch (swimctrl->iwm_switch) {
-+            case 0:
-+                if (value == 0x57) {
-+                    swimctrl->iwm_switch++;
-+                }
-+                break;
-+            case 1:
-+                if (value == 0x17) {
-+                    swimctrl->iwm_switch++;
-+                }
-+                break;
-+            case 2:
-+                if (value == 0x57) {
-+                    swimctrl->iwm_switch++;
-+                }
-+                break;
-+            case 3:
-+                if (value == 0x57) {
-+                    swimctrl->mode = SWIM_MODE_SWIM;
-+                    swimctrl->iwm_switch = 0;
-+                }
-+                break;
-+            }
-+        }
-+    }
++    type_register_static(&nubus_bridge_info);
 +}
 +
-+static uint64_t iwmctrl_read(void *opaque, hwaddr reg, unsigned size)
++type_init(nubus_register_types)
+diff --git a/hw/nubus/nubus-bus.c b/hw/nubus/nubus-bus.c
+new file mode 100644
+index 0000000000..942a6d5342
+--- /dev/null
++++ b/hw/nubus/nubus-bus.c
+@@ -0,0 +1,111 @@
++/*
++ * QEMU Macintosh Nubus
++ *
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "hw/nubus/nubus.h"
++#include "hw/sysbus.h"
++#include "qapi/error.h"
++
++
++static NubusBus *nubus_find(void)
 +{
-+    SWIMCtrl *swimctrl = opaque;
++    /* Returns NULL unless there is exactly one nubus device */
++    return NUBUS_BUS(object_resolve_path_type("", TYPE_NUBUS_BUS, NULL));
++}
 +
-+    reg >>= REG_SHIFT;
++static void nubus_slot_write(void *opaque, hwaddr addr, uint64_t val,
++                             unsigned int size)
++{
++    /* read only */
++}
 +
-+    swimctrl->regs[reg >> 1] = reg & 1;
 +
++static uint64_t nubus_slot_read(void *opaque, hwaddr addr,
++                                unsigned int size)
++{
 +    return 0;
 +}
 +
-+static void swimctrl_write(void *opaque, hwaddr reg, uint64_t value,
-+                           unsigned size)
-+{
-+    SWIMCtrl *swimctrl = opaque;
++static const MemoryRegionOps nubus_slot_ops = {
++    .read  = nubus_slot_read,
++    .write = nubus_slot_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
 +
-+    if (swimctrl->mode == SWIM_MODE_IWM) {
-+        iwmctrl_write(opaque, reg, value, size);
++static void nubus_super_slot_write(void *opaque, hwaddr addr, uint64_t val,
++                                   unsigned int size)
++{
++    /* read only */
++}
++
++static uint64_t nubus_super_slot_read(void *opaque, hwaddr addr,
++                                      unsigned int size)
++{
++    return 0;
++}
++
++static const MemoryRegionOps nubus_super_slot_ops = {
++    .read  = nubus_super_slot_read,
++    .write = nubus_super_slot_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static void nubus_realize(BusState *bus, Error **errp)
++{
++    if (!nubus_find()) {
++        error_setg(errp, "at most one %s device is permitted", TYPE_NUBUS_BUS);
 +        return;
 +    }
-+
-+    reg >>= REG_SHIFT;
-+
-+    switch (reg) {
-+    case SWIM_WRITE_PHASE:
-+        swimctrl->swim_phase = value;
-+        break;
-+    case SWIM_WRITE_MODE0:
-+        swimctrl->swim_mode &= ~value;
-+        break;
-+    case SWIM_WRITE_MODE1:
-+        swimctrl->swim_mode |= value;
-+        break;
-+    case SWIM_WRITE_DATA:
-+    case SWIM_WRITE_MARK:
-+    case SWIM_WRITE_CRC:
-+    case SWIM_WRITE_PARAMETER:
-+    case SWIM_WRITE_SETUP:
-+        break;
-+    }
 +}
 +
-+static uint64_t swimctrl_read(void *opaque, hwaddr reg, unsigned size)
++static void nubus_init(Object *obj)
 +{
-+    SWIMCtrl *swimctrl = opaque;
-+    uint32_t value = 0;
++    NubusBus *nubus = NUBUS_BUS(obj);
 +
-+    if (swimctrl->mode == SWIM_MODE_IWM) {
-+        return iwmctrl_read(opaque, reg, size);
-+    }
++    memory_region_init_io(&nubus->super_slot_io, obj, &nubus_super_slot_ops,
++                          nubus, "nubus-super-slots",
++                          NUBUS_SUPER_SLOT_NB * NUBUS_SUPER_SLOT_SIZE);
 +
-+    reg >>= REG_SHIFT;
++    memory_region_init_io(&nubus->slot_io, obj, &nubus_slot_ops,
++                          nubus, "nubus-slots",
++                          NUBUS_SLOT_NB * NUBUS_SLOT_SIZE);
 +
-+    switch (reg) {
-+    case SWIM_READ_PHASE:
-+        value = swimctrl->swim_phase;
-+        break;
-+    case SWIM_READ_HANDSHAKE:
-+        if (swimctrl->swim_phase == SWIM_DRIVE_PRESENT) {
-+            /* always answer "no drive present" */
-+            value = SWIM_SENSE;
-+        }
-+        break;
-+    case SWIM_READ_DATA:
-+    case SWIM_READ_MARK:
-+    case SWIM_READ_ERROR:
-+    case SWIM_READ_PARAMETER:
-+    case SWIM_READ_SETUP:
-+    case SWIM_READ_STATUS:
-+        break;
-+    }
-+
-+    return value;
++    nubus->current_slot = NUBUS_FIRST_SLOT;
 +}
 +
-+static const MemoryRegionOps swimctrl_mem_ops = {
-+    .write = swimctrl_write,
-+    .read = swimctrl_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
++static void nubus_class_init(ObjectClass *oc, void *data)
++{
++    BusClass *bc = BUS_CLASS(oc);
++
++    bc->realize = nubus_realize;
++}
++
++static const TypeInfo nubus_bus_info = {
++    .name = TYPE_NUBUS_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(NubusBus),
++    .instance_init = nubus_init,
++    .class_init = nubus_class_init,
 +};
 +
-+static void sysbus_swim_reset(DeviceState *d)
++static void nubus_register_types(void)
 +{
-+    SWIM *sys = SWIM(d);
-+    SWIMCtrl *ctrl = &sys->ctrl;
-+    int i;
-+
-+    ctrl->mode = 0;
-+    ctrl->iwm_switch = 0;
-+    for (i = 0; i < 8; i++) {
-+        ctrl->regs[i] = 0;
-+    }
-+    ctrl->iwm_data = 0;
-+    ctrl->iwm_mode = 0;
-+    ctrl->swim_phase = 0;
-+    ctrl->swim_mode = 0;
-+    for (i = 0; i < SWIM_MAX_FD; i++) {
-+        fd_recalibrate(&ctrl->drives[i]);
-+    }
++    type_register_static(&nubus_bus_info);
 +}
 +
-+static void sysbus_swim_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    SWIM *sbs = SWIM(obj);
-+    SWIMCtrl *swimctrl = &sbs->ctrl;
-+
-+    memory_region_init_io(&swimctrl->iomem, obj, &swimctrl_mem_ops, swimctrl,
-+                          "swim", 0x2000);
-+    sysbus_init_mmio(sbd, &swimctrl->iomem);
-+}
-+
-+static void sysbus_swim_realize(DeviceState *dev, Error **errp)
-+{
-+    SWIM *sys = SWIM(dev);
-+    SWIMCtrl *swimctrl = &sys->ctrl;
-+
-+    qbus_create_inplace(&swimctrl->bus, sizeof(SWIMBus), TYPE_SWIM_BUS, dev,
-+                        NULL);
-+    swimctrl->bus.ctrl = swimctrl;
-+}
-+
-+static const VMStateDescription vmstate_fdrive = {
-+    .name = "fdrive",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_swim = {
-+    .name = "swim",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_INT32(mode, SWIMCtrl),
-+        /* IWM mode */
-+        VMSTATE_INT32(iwm_switch, SWIMCtrl),
-+        VMSTATE_UINT16_ARRAY(regs, SWIMCtrl, 8),
-+        VMSTATE_UINT8(iwm_data, SWIMCtrl),
-+        VMSTATE_UINT8(iwm_mode, SWIMCtrl),
-+        /* SWIM mode */
-+        VMSTATE_UINT8(swim_phase, SWIMCtrl),
-+        VMSTATE_UINT8(swim_mode, SWIMCtrl),
-+        /* Drives */
-+        VMSTATE_STRUCT_ARRAY(drives, SWIMCtrl, SWIM_MAX_FD, 1,
-+                             vmstate_fdrive, FDrive),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static const VMStateDescription vmstate_sysbus_swim = {
-+    .name = "SWIM",
-+    .version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_STRUCT(ctrl, SWIM, 0, vmstate_swim, SWIMCtrl),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void sysbus_swim_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = sysbus_swim_realize;
-+    dc->reset = sysbus_swim_reset;
-+    dc->vmsd = &vmstate_sysbus_swim;
-+}
-+
-+static const TypeInfo sysbus_swim_info = {
-+    .name          = TYPE_SWIM,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SWIM),
-+    .instance_init = sysbus_swim_init,
-+    .class_init    = sysbus_swim_class_init,
-+};
-+
-+static void swim_register_types(void)
-+{
-+    type_register_static(&sysbus_swim_info);
-+    type_register_static(&swim_bus_info);
-+    type_register_static(&swim_drive_info);
-+}
-+
-+type_init(swim_register_types)
-diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-index ef4917dee6..bab4885ca5 100644
---- a/hw/m68k/Kconfig
-+++ b/hw/m68k/Kconfig
-@@ -18,3 +18,4 @@ config Q800
-     select MAC_VIA
-     select NUBUS
-     select MACFB
-+    select SWIM
-diff --git a/include/hw/block/swim.h b/include/hw/block/swim.h
++type_init(nubus_register_types)
+diff --git a/hw/nubus/nubus-device.c b/hw/nubus/nubus-device.c
 new file mode 100644
-index 0000000000..6add3499d0
+index 0000000000..01ccad9e8e
 --- /dev/null
-+++ b/include/hw/block/swim.h
-@@ -0,0 +1,76 @@
++++ b/hw/nubus/nubus-device.c
+@@ -0,0 +1,215 @@
 +/*
-+ * QEMU Macintosh floppy disk controller emulator (SWIM)
++ * QEMU Macintosh Nubus
 + *
-+ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + *
 + */
 +
-+#ifndef SWIM_H
-+#define SWIM_H
-+
 +#include "qemu/osdep.h"
-+#include "hw/sysbus.h"
++#include "hw/nubus/nubus.h"
++#include "qapi/error.h"
 +
-+#define SWIM_MAX_FD            2
 +
-+typedef struct SWIMDrive SWIMDrive;
-+typedef struct SWIMBus SWIMBus;
-+typedef struct SWIMCtrl SWIMCtrl;
++/* The Format Block Structure */
 +
-+#define TYPE_SWIM_DRIVE "swim-drive"
-+#define SWIM_DRIVE(obj) OBJECT_CHECK(SWIMDrive, (obj), TYPE_SWIM_DRIVE)
++#define FBLOCK_DIRECTORY_OFFSET 0
++#define FBLOCK_LENGTH           4
++#define FBLOCK_CRC              8
++#define FBLOCK_REVISION_LEVEL   12
++#define FBLOCK_FORMAT           13
++#define FBLOCK_TEST_PATTERN     14
++#define FBLOCK_RESERVED         18
++#define FBLOCK_BYTE_LANES       19
 +
-+struct SWIMDrive {
++#define FBLOCK_SIZE             20
++#define FBLOCK_PATTERN_VAL      0x5a932bc7
++
++static uint64_t nubus_fblock_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    NubusDevice *dev = opaque;
++    uint64_t val;
++
++#define BYTE(v, b) (((v) >> (24 - 8 * (b))) & 0xff)
++    switch (addr) {
++    case FBLOCK_BYTE_LANES:
++        val = dev->byte_lanes;
++        val |= (val ^ 0xf) << 4;
++        break;
++    case FBLOCK_RESERVED:
++        val = 0x00;
++        break;
++    case FBLOCK_TEST_PATTERN...FBLOCK_TEST_PATTERN + 3:
++        val = BYTE(FBLOCK_PATTERN_VAL, addr - FBLOCK_TEST_PATTERN);
++        break;
++    case FBLOCK_FORMAT:
++        val = dev->rom_format;
++        break;
++    case FBLOCK_REVISION_LEVEL:
++        val = dev->rom_rev;
++        break;
++    case FBLOCK_CRC...FBLOCK_CRC + 3:
++        val = BYTE(dev->rom_crc, addr - FBLOCK_CRC);
++        break;
++    case FBLOCK_LENGTH...FBLOCK_LENGTH + 3:
++        val = BYTE(dev->rom_length, addr - FBLOCK_LENGTH);
++        break;
++    case FBLOCK_DIRECTORY_OFFSET...FBLOCK_DIRECTORY_OFFSET + 3:
++        val = BYTE(dev->directory_offset, addr - FBLOCK_DIRECTORY_OFFSET);
++        break;
++    default:
++        val = 0;
++        break;
++    }
++    return val;
++}
++
++static void nubus_fblock_write(void *opaque, hwaddr addr, uint64_t val,
++                               unsigned int size)
++{
++    /* read only */
++}
++
++static const MemoryRegionOps nubus_format_block_ops = {
++    .read = nubus_fblock_read,
++    .write = nubus_fblock_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    }
++};
++
++static void nubus_register_format_block(NubusDevice *dev)
++{
++    char *fblock_name;
++
++    fblock_name = g_strdup_printf("nubus-slot-%d-format-block",
++                                  dev->slot_nb);
++
++    hwaddr fblock_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE;
++    memory_region_init_io(&dev->fblock_io, NULL, &nubus_format_block_ops,
++                          dev, fblock_name, FBLOCK_SIZE);
++    memory_region_add_subregion(&dev->slot_mem, fblock_offset,
++                                &dev->fblock_io);
++
++    g_free(fblock_name);
++}
++
++static void mac_nubus_rom_write(void *opaque, hwaddr addr, uint64_t val,
++                                       unsigned int size)
++{
++    /* read only */
++}
++
++static uint64_t mac_nubus_rom_read(void *opaque, hwaddr addr,
++                                    unsigned int size)
++{
++    NubusDevice *dev = opaque;
++
++    return dev->rom[addr];
++}
++
++static const MemoryRegionOps mac_nubus_rom_ops = {
++    .read  = mac_nubus_rom_read,
++    .write = mac_nubus_rom_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++
++void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
++                        int revision, int format, uint8_t byte_lanes)
++{
++    hwaddr rom_offset;
++    char *rom_name;
++
++    /* FIXME : really compute CRC */
++    dev->rom_length = 0;
++    dev->rom_crc = 0;
++
++    dev->rom_rev = revision;
++    dev->rom_format = format;
++
++    dev->byte_lanes = byte_lanes;
++    dev->directory_offset = -size;
++
++    /* ROM */
++
++    dev->rom = rom;
++    rom_name = g_strdup_printf("nubus-slot-%d-rom", dev->slot_nb);
++    memory_region_init_io(&dev->rom_io, NULL, &mac_nubus_rom_ops,
++                          dev, rom_name, size);
++    memory_region_set_readonly(&dev->rom_io, true);
++
++    rom_offset = memory_region_size(&dev->slot_mem) - FBLOCK_SIZE +
++                 dev->directory_offset;
++    memory_region_add_subregion(&dev->slot_mem, rom_offset, &dev->rom_io);
++
++    g_free(rom_name);
++}
++
++static void nubus_device_realize(DeviceState *dev, Error **errp)
++{
++    NubusBus *nubus = NUBUS_BUS(qdev_get_parent_bus(DEVICE(dev)));
++    NubusDevice *nd = NUBUS_DEVICE(dev);
++    char *name;
++    hwaddr slot_offset;
++
++    if (nubus->current_slot < NUBUS_FIRST_SLOT ||
++            nubus->current_slot > NUBUS_LAST_SLOT) {
++        error_setg(errp, "Cannot register nubus card, not enough slots");
++        return;
++    }
++
++    nd->slot_nb = nubus->current_slot++;
++    name = g_strdup_printf("nubus-slot-%d", nd->slot_nb);
++
++    if (nd->slot_nb < NUBUS_FIRST_SLOT) {
++        /* Super */
++        slot_offset = (nd->slot_nb - 6) * NUBUS_SUPER_SLOT_SIZE;
++
++        memory_region_init(&nd->slot_mem, OBJECT(dev), name,
++                           NUBUS_SUPER_SLOT_SIZE);
++        memory_region_add_subregion(&nubus->super_slot_io, slot_offset,
++                                    &nd->slot_mem);
++    } else {
++        /* Normal */
++        slot_offset = nd->slot_nb * NUBUS_SLOT_SIZE;
++
++        memory_region_init(&nd->slot_mem, OBJECT(dev), name, NUBUS_SLOT_SIZE);
++        memory_region_add_subregion(&nubus->slot_io, slot_offset,
++                                    &nd->slot_mem);
++    }
++
++    g_free(name);
++    nubus_register_format_block(nd);
++}
++
++static void nubus_device_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = nubus_device_realize;
++    dc->bus_type = TYPE_NUBUS_BUS;
++}
++
++static const TypeInfo nubus_device_type_info = {
++    .name = TYPE_NUBUS_DEVICE,
++    .parent = TYPE_DEVICE,
++    .abstract = true,
++    .instance_size = sizeof(NubusDevice),
++    .class_init = nubus_device_class_init,
++};
++
++static void nubus_register_types(void)
++{
++    type_register_static(&nubus_device_type_info);
++}
++
++type_init(nubus_register_types)
+diff --git a/include/hw/nubus/mac-nubus-bridge.h b/include/hw/nubus/mac-nubus-bridge.h
+new file mode 100644
+index 0000000000..ce9c789d99
+--- /dev/null
++++ b/include/hw/nubus/mac-nubus-bridge.h
+@@ -0,0 +1,24 @@
++/*
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef HW_NUBUS_MAC_H
++#define HW_NUBUS_MAC_H
++
++#include "hw/nubus/nubus.h"
++
++#define TYPE_MAC_NUBUS_BRIDGE "mac-nubus-bridge"
++#define MAC_NUBUS_BRIDGE(obj) OBJECT_CHECK(MacNubusState, (obj), \
++                                           TYPE_MAC_NUBUS_BRIDGE)
++
++typedef struct MacNubusState {
++    SysBusDevice sysbus_dev;
++
++    NubusBus *bus;
++} MacNubusState;
++
++#endif
+diff --git a/include/hw/nubus/nubus.h b/include/hw/nubus/nubus.h
+new file mode 100644
+index 0000000000..a8634e54c5
+--- /dev/null
++++ b/include/hw/nubus/nubus.h
+@@ -0,0 +1,69 @@
++/*
++ * Copyright (c) 2013-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef HW_NUBUS_NUBUS_H
++#define HW_NUBUS_NUBUS_H
++
++#include "hw/qdev-properties.h"
++#include "exec/address-spaces.h"
++
++#define NUBUS_SUPER_SLOT_SIZE 0x10000000U
++#define NUBUS_SUPER_SLOT_NB   0x9
++
++#define NUBUS_SLOT_SIZE       0x01000000
++#define NUBUS_SLOT_NB         0xF
++
++#define NUBUS_FIRST_SLOT      0x9
++#define NUBUS_LAST_SLOT       0xF
++
++#define TYPE_NUBUS_DEVICE "nubus-device"
++#define NUBUS_DEVICE(obj) \
++     OBJECT_CHECK(NubusDevice, (obj), TYPE_NUBUS_DEVICE)
++
++#define TYPE_NUBUS_BUS "nubus-bus"
++#define NUBUS_BUS(obj) OBJECT_CHECK(NubusBus, (obj), TYPE_NUBUS_BUS)
++
++#define TYPE_NUBUS_BRIDGE "nubus-bridge"
++#define NUBUS_BRIDGE(obj) OBJECT_CHECK(NubusBridge, (obj), TYPE_NUBUS_BRIDGE)
++
++typedef struct NubusBus {
++    BusState qbus;
++
++    MemoryRegion super_slot_io;
++    MemoryRegion slot_io;
++
++    int current_slot;
++} NubusBus;
++
++typedef struct NubusDevice {
 +    DeviceState qdev;
-+    int32_t     unit;
-+    BlockConf   conf;
-+};
 +
-+#define TYPE_SWIM_BUS "swim-bus"
-+#define SWIM_BUS(obj) OBJECT_CHECK(SWIMBus, (obj), TYPE_SWIM_BUS)
++    int slot_nb;
++    MemoryRegion slot_mem;
 +
-+struct SWIMBus {
-+    BusState bus;
-+    struct SWIMCtrl *ctrl;
-+};
++    /* Format Block */
 +
-+typedef struct FDrive {
-+    SWIMCtrl *swimctrl;
-+    BlockBackend *blk;
-+    BlockConf *conf;
-+} FDrive;
++    MemoryRegion fblock_io;
 +
-+struct SWIMCtrl {
-+    MemoryRegion iomem;
-+    FDrive drives[SWIM_MAX_FD];
-+    int mode;
-+    /* IWM mode */
-+    int iwm_switch;
-+    uint16_t regs[8];
-+#define IWM_PH0   0
-+#define IWM_PH1   1
-+#define IWM_PH2   2
-+#define IWM_PH3   3
-+#define IWM_MTR   4
-+#define IWM_DRIVE 5
-+#define IWM_Q6    6
-+#define IWM_Q7    7
-+    uint8_t iwm_data;
-+    uint8_t iwm_mode;
-+    /* SWIM mode */
-+    uint8_t swim_phase;
-+    uint8_t swim_mode;
-+    SWIMBus bus;
-+};
++    uint32_t rom_length;
++    uint32_t rom_crc;
++    uint8_t rom_rev;
++    uint8_t rom_format;
++    uint8_t byte_lanes;
++    int32_t directory_offset;
 +
-+#define TYPE_SWIM "swim"
-+#define SWIM(obj) OBJECT_CHECK(SWIM, (obj), TYPE_SWIM)
++    /* ROM */
 +
-+typedef struct SWIM {
-+    SysBusDevice parent_obj;
-+    SWIMCtrl     ctrl;
-+} SWIM;
++    MemoryRegion rom_io;
++    const uint8_t *rom;
++} NubusDevice;
++
++void nubus_register_rom(NubusDevice *dev, const uint8_t *rom, uint32_t size,
++                        int revision, int format, uint8_t byte_lanes);
++
 +#endif
 -- 
 2.21.0
