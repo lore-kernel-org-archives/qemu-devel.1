@@ -2,50 +2,51 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6A1C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 20:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFDDBC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 20:44:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABB42205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 20:39:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABB42205F4
+	by mail.kernel.org (Postfix) with ESMTPS id BFD1A207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 20:44:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFD1A207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDx1O-0000q9-LA
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 16:39:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53629)
+	id 1iDx61-00036I-VX
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 16:44:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iDx0E-00089q-48
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 16:38:11 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iDx54-00026J-9e
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 16:43:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iDx0D-0000Ls-4x
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 16:38:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51142)
+ (envelope-from <jsnow@redhat.com>) id 1iDx53-0002au-1s
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 16:43:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46562)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iDx0A-0000L3-2P; Fri, 27 Sep 2019 16:38:06 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iDx4z-0002XM-Uu; Fri, 27 Sep 2019 16:43:06 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2B3B13003AFE;
- Fri, 27 Sep 2019 20:38:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 86CCB3CBE2;
+ Fri, 27 Sep 2019 20:43:04 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D8CDC600CD;
- Fri, 27 Sep 2019 20:38:01 +0000 (UTC)
-Subject: Re: [PATCH 4/4] qemu-iotests: 044: remove inaccurate docstring class
- description
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <20190927141728.7137-1-crosa@redhat.com>
- <20190927141728.7137-5-crosa@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 83A7D60F9F;
+ Fri, 27 Sep 2019 20:43:03 +0000 (UTC)
+Subject: Re: [PATCH v5 3/9] iotests: add test-case to 165 to test reopening
+ qcow2 bitmaps to RW
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190927122355.7344-1-vsementsov@virtuozzo.com>
+ <20190927122355.7344-4-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -121,18 +122,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <7bf94c77-8344-8bac-e5e5-9d56f416b764@redhat.com>
-Date: Fri, 27 Sep 2019 16:38:01 -0400
+Message-ID: <06acd6be-0b8f-a5e3-5f81-e47c550dc6ea@redhat.com>
+Date: Fri, 27 Sep 2019 16:43:03 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190927141728.7137-5-crosa@redhat.com>
+In-Reply-To: <20190927122355.7344-4-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 27 Sep 2019 20:38:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Fri, 27 Sep 2019 20:43:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -147,33 +148,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/27/19 10:17 AM, Cleber Rosa wrote:
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  tests/qemu-iotests/044 | 1 -
->  1 file changed, 1 deletion(-)
+On 9/27/19 8:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Reopening bitmaps to RW was broken prior to previous commit. Check that
+> it works now.
 > 
-> diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-> index eb42df0fe1..0ca4bcfc6d 100755
-> --- a/tests/qemu-iotests/044
-> +++ b/tests/qemu-iotests/044
-> @@ -34,7 +34,6 @@ if sys.version_info.major == 2:
->  test_img = os.path.join(iotests.test_dir, 'test.img')
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/165     | 57 ++++++++++++++++++++++++++++++++++++--
+>  tests/qemu-iotests/165.out |  4 +--
+>  2 files changed, 57 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+> index 5650dc7c87..951ea011a2 100755
+> --- a/tests/qemu-iotests/165
+> +++ b/tests/qemu-iotests/165
+> @@ -43,10 +43,10 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
+>          os.remove(disk)
 >  
->  class TestRefcountTableGrowth(iotests.QMPTestCase):
-> -    '''Abstract base class for image mirroring test cases'''
+>      def mkVm(self):
+> -        return iotests.VM().add_drive(disk)
+> +        return iotests.VM().add_drive(disk, opts='node-name=node0')
 >  
->      def preallocate(self, name):
->          fd = open(name, "r+b")
+>      def mkVmRo(self):
+> -        return iotests.VM().add_drive(disk, opts='readonly=on')
+> +        return iotests.VM().add_drive(disk, opts='readonly=on,node-name=node0')
+>  
+>      def getSha256(self):
+>          result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
+> @@ -102,6 +102,59 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
+>  
+>          self.vm.shutdown()
+>  
+> +    def test_reopen_rw(self):
+> +        self.vm = self.mkVm()
+> +        self.vm.launch()
+> +        self.qmpAddBitmap()
+> +
+> +        # Calculate hashes
+> +
+> +        self.writeRegions(regions1)
+> +        sha256_1 = self.getSha256()
+> +
+> +        self.writeRegions(regions2)
+> +        sha256_2 = self.getSha256()
+> +        assert sha256_1 != sha256_2 # Otherwise, it's not very interesting.
+> +
+> +        result = self.vm.qmp('block-dirty-bitmap-clear', node='drive0',
+> +                             name='bitmap0')
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        # Start with regions1
+> +
+> +        self.writeRegions(regions1)
+> +        assert sha256_1 == self.getSha256()
+> +
+> +        self.vm.shutdown()
+> +
+> +        self.vm = self.mkVmRo()
+> +        self.vm.launch()
+> +
+> +        assert sha256_1 == self.getSha256()
+> +
+> +        # Check that we are in RO mode and can't modify bitmap.
+> +        self.writeRegions(regions2)
+> +        assert sha256_1 == self.getSha256()
+> +
+> +        # Reopen to RW
+> +        result = self.vm.qmp('x-blockdev-reopen', **{
+> +            'node-name': 'node0',
+> +            'driver': iotests.imgfmt,
+> +            'file': {
+> +                'driver': 'file',
+> +                'filename': disk
+> +            },
+> +            'read-only': False
+> +        })
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        # Check that bitmap is reopened to RW and we can write to it.
+> +        self.writeRegions(regions2)
+> +        assert sha256_2 == self.getSha256()
+> +
+> +        self.vm.shutdown()
+> +
+> +
+>  if __name__ == '__main__':
+>      iotests.main(supported_fmts=['qcow2'],
+>                   supported_protocols=['file'])
+> diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
+> index ae1213e6f8..fbc63e62f8 100644
+> --- a/tests/qemu-iotests/165.out
+> +++ b/tests/qemu-iotests/165.out
+> @@ -1,5 +1,5 @@
+> -.
+> +..
+>  ----------------------------------------------------------------------
+> -Ran 1 tests
+> +Ran 2 tests
+>  
+>  OK
 > 
 
 Reviewed-by: John Snow <jsnow@redhat.com>
