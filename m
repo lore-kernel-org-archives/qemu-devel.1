@@ -2,92 +2,69 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44987C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD99C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:27:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18A6B2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:25:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18A6B2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8AF121920
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:27:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8AF121920
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrC0-00016t-Tc
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:25:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36833)
+	id 1iDrDD-0002Xv-Qw
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:27:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imbrenda@linux.ibm.com>) id 1iDqNO-0005Sg-5X
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:39 -0400
+ (envelope-from <armbru@redhat.com>) id 1iDqBM-0002Wr-4F
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imbrenda@linux.ibm.com>) id 1iDqNN-00020O-3C
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19962)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imbrenda@linux.ibm.com>)
- id 1iDqNM-00020G-SB
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:37 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8RDWYXd134149
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:33:36 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2v9j7rjw7a-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:33:35 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <imbrenda@linux.ibm.com>;
- Fri, 27 Sep 2019 14:33:31 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 27 Sep 2019 14:33:27 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8RDXPNa52625442
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 27 Sep 2019 13:33:25 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6803D42041;
- Fri, 27 Sep 2019 13:33:25 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1F9FC4204B;
- Fri, 27 Sep 2019 13:33:25 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.39])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Fri, 27 Sep 2019 13:33:25 +0000 (GMT)
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
-Subject: [PATCH v2 3/4] s390x: sclp: fix error handling for oversize control
- blocks
-Date: Fri, 27 Sep 2019 15:33:22 +0200
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1569591203-15258-1-git-send-email-imbrenda@linux.ibm.com>
-References: <1569591203-15258-1-git-send-email-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19092713-0020-0000-0000-00000372509A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19092713-0021-0000-0000-000021C821B3
-Message-Id: <1569591203-15258-4-git-send-email-imbrenda@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-27_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909270127
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <armbru@redhat.com>) id 1iDqBK-00009B-Rc
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:21:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41780)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqBK-00008q-JQ
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:21:10 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3DCE2C065116;
+ Fri, 27 Sep 2019 12:03:16 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AB7A196B2;
+ Fri, 27 Sep 2019 12:03:13 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 905D2113864E; Fri, 27 Sep 2019 14:03:11 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Subject: Re: [PATCH v2 01/20] target/mips: Clean up helper.c
+References: <1569415572-19635-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1569415572-19635-2-git-send-email-aleksandar.markovic@rt-rk.com>
+ <8f976a4a-e56a-d1f7-def9-14dd66140f0c@redhat.com>
+ <CAL1e-=gdKQvtCX5DXCzMGPum5XiOxr7j51bQM0K8vosjPa-TcQ@mail.gmail.com>
+Date: Fri, 27 Sep 2019 14:03:11 +0200
+In-Reply-To: <CAL1e-=gdKQvtCX5DXCzMGPum5XiOxr7j51bQM0K8vosjPa-TcQ@mail.gmail.com>
+ (Aleksandar Markovic's message of "Fri, 27 Sep 2019 06:32:52 +0200")
+Message-ID: <874l0ydk00.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 27 Sep 2019 12:03:16 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,37 +76,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, arikalo@wavecomp.com,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Janosch Frank <frankja@linux.ibm.com>
+Aleksandar, your message is hard to read, because you sent Content-Type:
+multipart/alternative, and both the test/html and the test/plain
+alternative ride roughshot over the quoted text's line structure.
+Quoted patches become unreadable garbage.  Please check your e-mail
+setup.
 
-Requests over 4k are not a spec exception.
+Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
----
- hw/s390x/sclp.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> 25.09.2019. 17.53, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> =D1=
+=98=D0=B5
+> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>>
+>> On 9/25/19 2:45 PM, Aleksandar Markovic wrote:
+>> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>> >
+>> > Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
+>> >
+>> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>> > ---
+>> >  target/mips/helper.c | 132
+> +++++++++++++++++++++++++++++++--------------------
+>> >  1 file changed, 80 insertions(+), 52 deletions(-)
+>> >
+>> > diff --git a/target/mips/helper.c b/target/mips/helper.c
+>> > index a2b6459..3dd1aae 100644
+>> > --- a/target/mips/helper.c
+>> > +++ b/target/mips/helper.c
+>> > @@ -130,8 +133,11 @@ static int is_seg_am_mapped(unsigned int am, bool
+> eu, int mmu_idx)
+>> >      int32_t adetlb_mask;
+>> >
+>> >      switch (mmu_idx) {
+>> > -    case 3 /* ERL */:
+>> > -        /* If EU is set, always unmapped */
+>> > +    case 3:
+>> > +        /*
+>> > +         * ERL
+>> > +         * If EU is set, always unmapped
+>> > +         */
+>>
+>> My IDE show the current form nicer when the switch is folded.
+>>
+>> Are these comment really bothering checkpatch?
+>>
+>
+> While being sintaxically correct, interleaving comments and code in a
+> single code line is considered a bad practice by many.
 
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 73244c9..abb6e50 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -213,8 +213,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
-     cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
- 
-     /* Valid sccb sizes */
--    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader) ||
--        be16_to_cpu(work_sccb.h.length) > SCCB_SIZE) {
-+    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
-         r = -PGM_SPECIFICATION;
-         goto out;
-     }
--- 
-2.7.4
+I take that as a "no".
 
+The preferences of "many" (whoever they may be) are a lot less relevant
+than the specific project's prevailing style.  "git-grep ' case .*/\*'"
+shows thousands of hits.
+
+If you want to pursue this change, please put it in a separate patch,
+so this one is really about fixing "errors and warnings reported by
+'checkpatch.pl -f'", as your commit message promises.
+
+>> >          if (eu) {
+>> >              return 0;
+>> >          }
+[...]
+>> Except 2 comments, OK for the rest.
+>>
+>> Another patch that makes rebasing very painful :(
+>>
+>
+> It would be fantastic if you apply the same reasoning to your patches, th=
+at
+> spread all over the code base, and happen so frequently, and certainly
+> create enormously more rebasing problems for multitude of people than this
+> patch or series does.
+
+Please tone down the aggression a notch.
+
+Philippe merely observed a trade-off.  We deal with such trade-offs all
+the time.  When your reviewer challenges one, you consider it (unless
+you did that already), then tell him what you concluded.
+
+"Tu quoque" is not a proper reply to such an observation (or to anything
+else for that matter).  When you have an issue with Philippe's patches,
+address it in review of Philippe's patches.
+
+Thank you.
 
