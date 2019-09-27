@@ -2,81 +2,80 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7E6C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13459C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:31:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6E68207FF
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:31:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D420D207FF
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:31:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JrbJmc+5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6E68207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JDsbod88"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D420D207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDu5G-0004yh-27
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 13:31:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36917)
+	id 1iDu5U-0005Ew-3a
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 13:31:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iDsYk-0004Qz-Fm
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 11:53:31 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iDu27-00035V-Tz
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 13:27:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iDsYi-00004y-SF
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 11:53:29 -0400
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:47091)
+ (envelope-from <alistair23@gmail.com>) id 1iDu26-0006yR-HP
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 13:27:55 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:37974)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iDsYi-0008W8-KQ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 11:53:28 -0400
-Received: by mail-ot1-x32c.google.com with SMTP id f21so2620794otl.13
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 08:53:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iDu26-0006xF-AG; Fri, 27 Sep 2019 13:27:54 -0400
+Received: by mail-lj1-x241.google.com with SMTP id b20so3272980ljj.5;
+ Fri, 27 Sep 2019 10:27:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=3/G7m2otVF7Uqv/8c1hbtrQ7HI2pW3ujjKpfWAXO4NM=;
- b=JrbJmc+58j1RBNZerievp5HY2RXnTkG5QteFwJbQvXYOCdA9SpIl4CBdob2XgTEoJa
- qWopY+X4jhkVsHe9fauyt7WSOLX2qa5bCpX5hi1F/LWmg0hjAVaIPIw4nQol2rkdH2mp
- KTTQZRHegdXvUSN8vOrr7PlWmZ20HBTgcAhNe8Om933VHW+wSfHrjeu2swsVTkZDK/aT
- I6OIvPzGRC8EeBBKiUJ/nm/gWlrHgAZdWQBGnKUD1YO2aSBsjvKVevOBL7eQQ2rhg1/M
- tj0CEQ0mkbICFUWJsY8CQtnZ+hcqpOUJzJSUI7gR9e2W4WMX7PVREEFBG3/JRX+OuhVx
- 6EYA==
+ :cc; bh=IfJzy4terBGPP4bGKhDOLeEhWY8WGZfQa1k269F/Qrg=;
+ b=JDsbod88Crk5LQPX4x6Ptn4G632nabUk2tPlPfalQb2N+++57kDwOgYbESsFF7k+ra
+ DPNmYALl0slm+A9tGmDEdpI4nK1ArninINzF6Jfg3LNN22r0dcjiFnY7K3uOqGidLQ6w
+ npANfmOxBUzGZbmTEqLd5QIB5HSBQDVdIqb5IwHbgpwsJJBi+cjUFnIDHlRzAQsOJkIF
+ ZlrdgbZJ3jMk+JOBwdnYpIpN9TGi82g/XWysOSTIUFz8a01j8Oid+6J3FR7QhEyu5BRw
+ B8WB9t+v/Q8V5jN8t3ZYBxxTJJZacVAnh3VYiuaAVULoXHSnIlexYPJ8ELzzWbNazlxK
+ L2hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=3/G7m2otVF7Uqv/8c1hbtrQ7HI2pW3ujjKpfWAXO4NM=;
- b=M7JobV6kNygT+TXsHtR3muFGLQaQmSxRkOfpz3wrEIBD57GcTTknED8kfcWxnGupDm
- c4cBcLUaJYmF9tX4msLITA0k7OvEU8E3LFazVe4cdvumogvZE3rC5PYwThNR/6JOdZ7v
- HXmeryeg72Vp7ZDzNtcDVXksMHWbiDbG5i7VM51GDrWLk9iDB7CGD2GnG6w/2Bvqwx4y
- w+TvDyKOeVJnVJ57KaZNXe3X4gVf7wNAcV4HikvnZVYmzOqaSRXNfhubr37JKGMA5q8M
- jtS03z7g+x0r43RNz0vD2C/i9fuzakbwcfgjjT9x+U8nW5ToA2J0wbNco/4tfppuwv7H
- opKQ==
-X-Gm-Message-State: APjAAAU6qEnrIH2jOuRvcdP1jzqvfXkfuMpUpIA5zXv1OAPTndA4KIgR
- RRxr9FGJiPVsibdQCZbyecOsuWm1H/qY7gP7k/DaTg==
-X-Google-Smtp-Source: APXvYqxcgLIBTDsJMzb0AwJ8AwyE7K9anbHaT7j2YKBWjzz/chQXBN0nfKR+z5kK5IxBZnXMyDv8UK0K4XcAfZjvOAE=
-X-Received: by 2002:a9d:4615:: with SMTP id y21mr3625007ote.97.1569599607555; 
- Fri, 27 Sep 2019 08:53:27 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=IfJzy4terBGPP4bGKhDOLeEhWY8WGZfQa1k269F/Qrg=;
+ b=JACq39eo7jTjK6so9tJtat2RtGy5JE+eDNtj5wM4EceW/YKWGazIGNPApb/ALyOmSC
+ zHWMBjMcQPbioSzbD12w001a4HcGdX1RtIW9rGkXZYY5gNWIfQKRJBq4ADzxEWlkmTSM
+ gcpRfX0SDtajwVhj7a6J/7EawIq4J6hrgCabZgrrnS8NbFd1XFfrX1+yPfPzfExZY8oB
+ 34OoU0HCf4hfOIVuUaO1VijmwdvwMopVqGJ4hQbI5sIpCAjhqhHVEujynTl8zDUe0Vat
+ t0pS9yHo+0LqSRjCXYNw/jfa3KjoUZ2/VSvfcZw1G4qJ8m93/vmlIRpluvnITWE0Pq1c
+ JNsA==
+X-Gm-Message-State: APjAAAVZn3GAtJQBUpYsJhcbziHAbBY7I9GXlDSYRFzWcn9EvJZ1/NHl
+ YouqxgcePNbX3xlj2ZU5wFVbCllAyranvE3PoWY=
+X-Google-Smtp-Source: APXvYqyESdFzyiszcyAvTXZckAayxMr6m1ldKkURIYDynORRu+ze/7iZJ9jeZ0xS1fvdHD823oZRNSJTxbloa5Ra3fM=
+X-Received: by 2002:a2e:90d9:: with SMTP id o25mr395611ljg.94.1569605272888;
+ Fri, 27 Sep 2019 10:27:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190926183553.13895-1-alex.bennee@linaro.org>
-In-Reply-To: <20190926183553.13895-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Sep 2019 16:53:16 +0100
-Message-ID: <CAFEAcA8xoku9RWdn4aqHV7Ln0FvdbA+eoGWFvobx2ZF8N0f_Dw@mail.gmail.com>
-Subject: Re: [PULL 00/28] testing updates (docker,podman,tcg,alpha)
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+References: <ab8f108eceb973aaee565bb1fe347fcf8c788f5b.1569545120.git.alistair.francis@wdc.com>
+ <960d9622-8241-efe7-cee6-1d4a1307fbc0@linaro.org>
+In-Reply-To: <960d9622-8241-efe7-cee6-1d4a1307fbc0@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 27 Sep 2019 10:23:06 -0700
+Message-ID: <CAKmqyKP90UDcS4moAYvLVN2q+aZ_cqGwY2fEgfX8dCjsHW1Tfg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] target/riscv: Print CPU and privledge in disas
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::32c
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,45 +87,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 26 Sep 2019 at 19:35, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
+On Fri, Sep 27, 2019 at 10:18 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> The following changes since commit eb13d1cf4a0478fc29f80abfbac8209479325f=
-35:
+> On 9/26/19 5:45 PM, Alistair Francis wrote:
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  target/riscv/translate.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> > index adeddb85f6..537af0003e 100644
+> > --- a/target/riscv/translate.c
+> > +++ b/target/riscv/translate.c
+> > @@ -810,7 +810,14 @@ static void riscv_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+> >
+> >  static void riscv_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
+> >  {
+> > +#ifndef CONFIG_USER_ONLY
+> > +    RISCVCPU *rvcpu = RISCV_CPU(cpu);
+> > +    CPURISCVState *env = &rvcpu->env;
+> > +#endif
+> >      qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
+> > +#ifndef CONFIG_USER_ONLY
+> > +    qemu_log("CPU: %d; priv: "TARGET_FMT_ld"\n", cpu->cpu_index, env->priv);
+> > +#endif
+> >      log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size);
+> >  }
 >
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2019=
-0925a' into staging (2019-09-26 14:23:58 +0100)
+> I'm curious about the motivation here.
 >
-> are available in the Git repository at:
->
->   https://github.com/stsquad/qemu.git tags/pull-testing-next-260919-1
->
-> for you to fetch changes up to 80394ccf216da9ff48f23b9b8dab65ef809b7870:
->
->   tests/docker: remove debian-powerpc-user-cross (2019-09-26 19:00:53 +01=
-00)
->
-> ----------------------------------------------------------------
-> Testing updates plus alpha FP fixes:
->
->   - fix alpha handling of FtoI overflow
->   - various docker cleanups
->   - fix docker.py cleanup race
->   - fix podman invocation
->   - tests/tcg: add float and record/replay tests
->   - remove unused docker images
->   - expand documentation for check-tcg
+> In particular, what difference does it make what cpu the TB is generated for?
+> It would seem like the more relevant place to look for this is with -d cpu or
+> -d exec where the TB is actually executed, which could well be multiple cpus.
 
+The main reason is that the sifive_u machine now has two RISC-V
+clusters so it's useful to see what is happening on each CPU. -d cpu
+and -d exec are much more difficult to comprehend so aren't always as
+useful.
 
-Applied, thanks.
+>
+> As for env->priv... is there really anything in the input assembly that depends
+> on the privilege?  Or conversely, why priv and not all of the other bits that
+> are in tb_flags?  And are you placing that here in -d in_asm because are always
+> also using either -d op or -d op_opt, and it somehow looks better to have this
+> at the top?
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+I think it's just clearer to see what privileged mode the instructions
+were generated for, it helps with debugging boot issues. Again it
+comes back to the other options being difficult to comprehend, in_asm
+I find is the clearest to understand (although it has lots of
+limitations).
 
--- PMM
+Alistair
+
+>
+>
+> r~
 
