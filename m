@@ -2,81 +2,67 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C87C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ADF6C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:15:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4016920872
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:14:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FBTy3hwE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4016920872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4156320872
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:15:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4156320872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDtpE-00059Y-Rv
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 13:14:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55963)
+	id 1iDtpv-0005xg-8R
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 13:15:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48431)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iDrtF-0003n0-W6
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 11:10:39 -0400
+ (envelope-from <eblake@redhat.com>) id 1iDtOj-0003uU-AV
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 12:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iDrtD-0006oU-Pr
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 11:10:37 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45696)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iDrtD-0006o2-8t
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 11:10:35 -0400
-Received: by mail-oi1-x242.google.com with SMTP id o205so5442628oib.12
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 08:10:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=oDB8EllkV6hJE5Q1W0qZoUXhMkoU9z/410kgIlQT1Zk=;
- b=FBTy3hwEJpjZh6BKYr4V7hj72pVNA4L4oHSPuG+b0W0noxdZquYJImprKEIiBWN86i
- DJsFXQU92/avbtFclrnwIXTk4lzGv3+YD0gCYNqJxP8CkRgitVOAg8L3rsVwG5P1lo8K
- Wh4D5is9AnPYgM0TRgKWi54SuW1UGBYlfeAwsvgy4xgd6k2Fkfday9ZrP5YYayDsR0ie
- lMQxWVVMZVlzMpKxNMF/iwrWxxXqOv+pppKql2J+f5725OStRFZOF2g/MRlkzdEX5rlT
- wT27SUdtLrbKQtXl33q+qHudrRl2I3tR23pydK8QK6AGUZd7BYZgOXgMgjeteR0qPZar
- MAig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=oDB8EllkV6hJE5Q1W0qZoUXhMkoU9z/410kgIlQT1Zk=;
- b=WhXXDwMne1gmDSqGsu2wmPdoNVOuzB07f9kQQyZZeKSTcykZxtu7kLx3SgdsvgV1d2
- hVS/Lmb8tg0orHwNDzxQq6du/WE6tpcZ0L9VqPfxXbPKtvq8fVFn3eMqLHynlaLy5UH1
- ynYp4zoNsIDNvg4Sml+akcIfEiOAwcNifRYXKSNpc8dePj+lqvI/nt0P+YDZGj6DhFQ7
- iWORUgIPrs1nuDGiV8uoYgQfbe/Z6OlthIJ/8AHth1FLGv4Kk8qT62g8AeVaYOu/j3VE
- XSVn9I+qg3lHjhy1RM0l6+TwDHRJuvF1VJwNIDJaO6u2Ada6X7UpIiOgASa2u8KbUqGD
- IORw==
-X-Gm-Message-State: APjAAAXdRpaFPhH9+unkRIZ5zEDQetl7U2fSheg0fktgystx6Iqq+EHV
- jtrdGazltIxuR2EDcxHW974qRGDPd3BhAhCZzX06ig==
-X-Google-Smtp-Source: APXvYqwIuuIQSyOzTDZdjqcqdDTL6IdiaZfRmLa2GPYWwcM/SxkTdSrGMrtjyhh0vE1b3y9YdmoVAlrYzYzqVHrsIiI=
-X-Received: by 2002:aca:53d4:: with SMTP id h203mr7231655oib.146.1569597034055; 
- Fri, 27 Sep 2019 08:10:34 -0700 (PDT)
+ (envelope-from <eblake@redhat.com>) id 1iDtOh-0000Ij-3G
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 12:47:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48080)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iDtOb-0007rO-Ly; Fri, 27 Sep 2019 12:47:05 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2DF11898110;
+ Fri, 27 Sep 2019 16:47:03 +0000 (UTC)
+Received: from [10.3.116.249] (ovpn-116-249.phx2.redhat.com [10.3.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FFFE600CD;
+ Fri, 27 Sep 2019 16:47:02 +0000 (UTC)
+Subject: Re: [PATCH 2/4] qemu-iotests: remove forceful execution success from
+ library files
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20190927141728.7137-1-crosa@redhat.com>
+ <20190927141728.7137-3-crosa@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <0f7ccc53-9740-a689-ea5a-c86fe05d3d0f@redhat.com>
+Date: Fri, 27 Sep 2019 11:47:02 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <cover.1567750222.git.alistair@alistair23.me>
- <CAFEAcA8gLzitZ8OKU+Ht79fsU1BOguxEu9FvafD0vjR9cJKx7A@mail.gmail.com>
- <acd9fbba-71af-47b1-911c-f8b88e806cac@www.fastmail.com>
-In-Reply-To: <acd9fbba-71af-47b1-911c-f8b88e806cac@www.fastmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Sep 2019 16:10:22 +0100
-Message-ID: <CAFEAcA9XEkMaZTut4zp+43e3WDhRMu3HQrwvpUYOTziR=nbwyw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] Add the STM32F405 and Netduino Plus 2
- machine
-To: Alistair <alistair@alistair23.me>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <20190927141728.7137-3-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Fri, 27 Sep 2019 16:47:03 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,29 +74,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 11 Sep 2019 at 15:07, Alistair <alistair@alistair23.me> wrote:
->
-> On Wed, Sep 11, 2019, at 11:49 AM, Peter Maydell wrote:
-> > On Fri, 6 Sep 2019 at 07:10, Alistair Francis <alistair@alistair23.me> wrote:
-> > > Now that the Arm-M4 CPU has been added to QEMU we can add the Netduino
-> > > Plus 2 machine. This is very similar to the STM32F205 and Netduino 2 SoC
-> > > and machine.
+On 9/27/19 9:17 AM, Cleber Rosa wrote:
+> Should not be necessary on files that are not executed standalone.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/qemu-iotests/common.config | 3 ---
+>   tests/qemu-iotests/common.filter | 3 ---
+>   tests/qemu-iotests/common.rc     | 3 ---
+>   3 files changed, 9 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
+> index 6956d38d4c..0a24d960ff 100644
+> --- a/tests/qemu-iotests/common.config
+> +++ b/tests/qemu-iotests/common.config
+> @@ -34,6 +34,3 @@ _optstr_add()
+>           echo "$2"
+>       fi
+>   }
+> -
+> -# make sure this script returns success
+> -true
 
-> > What are the changes for setting initial SP and PC for?
->
-> If it's not set the the guest code jumps into some broken address and crashes at boot.
+The exit status of the source command in the caller depends on the last 
+command executed here.
 
-If this happens then something else is wrong. The CPU
-should be reading the initial SP and PC from the vector
-table that's in the guest image. If it's not doing that
-then we need to figure out why (perhaps we're not setting
-the correct value for the vector table base register?)
+However, you also have the point that if you delete this line, the last 
+command executed is a function definition which is successful (for all 3 
+files touched).  So there is no behavior change in dropping this line.
 
-thanks
--- PMM
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
