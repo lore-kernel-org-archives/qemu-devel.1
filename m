@@ -2,60 +2,83 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56126C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 720E0C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:50:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26CFC217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:50:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26CFC217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 375EA217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:50:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rd+Gqi3/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375EA217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDqdw-00049U-5n
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 09:50:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57292)
+	id 1iDqe4-0004F4-Gk
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 09:50:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58557)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDpuq-0005Cn-8M
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:04:10 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iDpy4-0007aR-PI
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:07:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDpuo-0004EI-F1
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:04:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53836)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDpum-0004DD-Dt; Fri, 27 Sep 2019 09:04:05 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 023F1796E9;
- Fri, 27 Sep 2019 09:58:54 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0299E1001B20;
- Fri, 27 Sep 2019 09:58:49 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 5/7] s390x/mmu: Use TARGET_PAGE_MASK in mmu_translate_pte()
-Date: Fri, 27 Sep 2019 11:58:29 +0200
-Message-Id: <20190927095831.23543-6-david@redhat.com>
-In-Reply-To: <20190927095831.23543-1-david@redhat.com>
-References: <20190927095831.23543-1-david@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iDpy3-0005GR-6n
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:07:28 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41609)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iDpy3-0005G9-28
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:07:27 -0400
+Received: by mail-oi1-x243.google.com with SMTP id w17so5111659oiw.8
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 06:07:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HLTVzSrf+tbOprGdeY1EjMH96uf7xbbND9M4/9Ikjn4=;
+ b=Rd+Gqi3/pPuFt7kwr0q0RraaxEG267+jQaryTZLaqgIJViiinTjMjBtAnC/J0hmZhA
+ 6pxNNfgUpdIu3htRSsgYBbjxF3tkNHSLkWNYrbdeBqHIYiKKTfSQjn3aP3+wRt4ajjUv
+ m3kPTQV24J5ce+aDb9Q5hLUEWd7dPRxa92WLkbfkgCpYIE91b58MQkFLgLuTwXFmhvSb
+ HR60wxBOxB/n5XWJQiksaXzY6VneQ3IHGRybKKkQhEBhjJz9+9PZm2K1Ey+soOW7CG5/
+ VeNs/3lD8tudN1+mn820BvYQ80h3M0qy+o6busz/ml7l8yXrlBkPICrP8pzqfvCfvxaO
+ Hn2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HLTVzSrf+tbOprGdeY1EjMH96uf7xbbND9M4/9Ikjn4=;
+ b=rz4/61SqdkjzU9GuN27BBRfrr1ORXa1ySBFL+/ijO1d7iORk9tNmLcr16koLSgJCVa
+ 2l/jAF+mx30SlCIpFGeWA+Q5CKMuplM7eyO0tbbNYI5ssQWDgZbdcUKVGdela1A9XJ0D
+ o7iCyR486qj8y3I1QAIfSyDA4gjDg2zwtYZ9NPKlYJwI4diPP5w16auW5NcJLq6wYCvP
+ 6N4bKnJjEXXVe43fmcTNjSZBfp1vnhN1DM0XxFqXYP8NFeCK8WktDwAR4l3edxuJ5MCu
+ dNkjip/RttVklagoj7EEBIHg7K3WEaAwPX6UZ77avh1So+ZS6c4762oL60RO/HdRaxxd
+ D+Lw==
+X-Gm-Message-State: APjAAAUJXSzjZsp7b6Ht4mSeZFsmu/FZulTxkcs+8STzmTxFICsNy2eN
+ dPUUBZKSBLVHz32R7aia049knETFumv8MoID3YTfIA==
+X-Google-Smtp-Source: APXvYqyoFOWi5vdyYPAovY+C9UEwY4lb1Y8ASGUje2FU7MtBHTEVihasNfnDXXkhoDyk1IVtY15H14QbxO/lmXRVG6o=
+X-Received: by 2002:aca:50d8:: with SMTP id e207mr6573765oib.48.1569589645543; 
+ Fri, 27 Sep 2019 06:07:25 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 27 Sep 2019 09:58:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20190821163341.16309-1-damien.hedde@greensocs.com>
+ <20190821163341.16309-3-damien.hedde@greensocs.com>
+ <20190911080642.GC13785@umbus.fritz.box>
+ <1a3b4d7b-77a9-46af-e6f4-dc7b3ba13b4f@greensocs.com>
+ <20190918091135.GA22790@umbus.fritz.box>
+ <f482912f-9541-f90c-bd80-5c95322e670d@greensocs.com>
+In-Reply-To: <f482912f-9541-f90c-bd80-5c95322e670d@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 27 Sep 2019 14:07:14 +0100
+Message-ID: <CAFEAcA8pja6bOh4vwqWco=1ZtqR0mJFUuZT+WjJwYuA5AZZuQg@mail.gmail.com>
+Subject: Re: [PATCH v4 02/10] hw/core: create Resettable QOM interface
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,41 +90,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While ASCE_ORIGIN is not wrong, it is certainly confusing. We want a
-page frame address.
+On Tue, 24 Sep 2019 at 12:21, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+> Hi All,
+>
+> Do you think I should respin with the sugestions made by David so far ?
+>
+> + reset type removal
+> + s/init/enter/ for the phases terminology
+> + handling of parent changes during reset
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/mmu_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+My takes:
+ * I think we should keep the reset type. Among other things,
+   we probably want a reset type for "PCI bus reset" and
+   "SCSI bus reset", when we come to conversion of those
+ * I don't have an opinion about the phase names
+ * I think we should look at what we're doing for dynamic
+   changes of the reset tree. This falls into two parts,
+   both of which have come up in this thread:
+    - hotplug, ie what state should a hotplugged device
+      get set up to if it's plugged into a bus that's
+      currently in reset
+    - the modification of the qbus tree during reset,
+      like the raspi sd card thing
+   These feel related to me, so maybe handling the first
+   gives a better answer to handling the second ?
 
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 71dee0a5d9..aaf5b23513 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -129,7 +129,7 @@ static int mmu_translate_pte(CPUS390XState *env, targ=
-et_ulong vaddr,
-         *flags &=3D ~PAGE_WRITE;
-     }
-=20
--    *raddr =3D pt_entry & ASCE_ORIGIN;
-+    *raddr =3D pt_entry & TARGET_PAGE_MASK;
-     return 0;
- }
-=20
---=20
-2.21.0
-
+thanks
+-- PMM
 
