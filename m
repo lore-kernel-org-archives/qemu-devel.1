@@ -2,63 +2,67 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C017CC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:30:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF8D3C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:31:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8455A207FF
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:30:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7CEE20872
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:31:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gvEhTwUW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8455A207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GXx9IGEi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7CEE20872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDjlg-0004Bs-8o
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:30:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47978)
+	id 1iDjmy-0004tP-5E
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:31:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48185)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iDj9u-0007Vr-1F
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 01:51:15 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iDjAE-00082Q-Di
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 01:51:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iDj9s-0005hK-CT
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 01:51:13 -0400
-Received: from ozlabs.org ([203.11.71.1]:46825)
+ (envelope-from <dgibson@ozlabs.org>) id 1iDjAC-0006Ok-6D
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 01:51:34 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:49659)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iDj9r-00058e-VI; Fri, 27 Sep 2019 01:51:12 -0400
+ id 1iDjAB-0006K8-Q7; Fri, 27 Sep 2019 01:51:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46fgrH2vqPz9sRk; Fri, 27 Sep 2019 15:50:38 +1000 (AEST)
+ id 46fgsC3KtJz9sPY; Fri, 27 Sep 2019 15:51:27 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569563439;
- bh=RFj5CUYkakE4AUYr/nO1fu+1P4WRfY2FnQ66Dj8mQ8k=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=gvEhTwUWyWlidTB2LDRR7UsUgD3nzlzSmR3UWQR2uwktXSS6T6yLTMz1NqOPf00s7
- 0t72W1bP+eVBrfWHQtI9wZzxyiEgOq6Tqr7Hgo4nZ7wDbdpqkuMCa+o6l4kAklmHJ8
- 0g+siAHAK//HRHD7le8jvfPnLCNn9qUxOHrhnTEg=
+ d=gibson.dropbear.id.au; s=201602; t=1569563487;
+ bh=zBvjfVZR9kT89//ygMqCXGAqVDWJYCxH7bM+2sUku6w=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=GXx9IGEiFh/0pPs+LgyjWTg3r6bhmZiWtZOgz/WlySvq3YGfq0+C9gb0bGAXfX503
+ 7H5tsAhXFHPBeRJAYXEdhGwp9PPOflIpfjj5XAKAiq+jgO0VzQGzWzNC9lv43E6sva
+ JNLNGKF2z/ji603AEBWPpsICHcwlwH74546vOVK0=
+Date: Fri, 27 Sep 2019 15:51:04 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-devel@nongnu.org,
-	clg@kaod.org,
-	qemu-ppc@nongnu.org
-Subject: [PATCH v2 28/33] spapr: Remove SpaprIrq::init_kvm hook
-Date: Fri, 27 Sep 2019 15:50:23 +1000
-Message-Id: <20190927055028.11493-29-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190927055028.11493-1-david@gibson.dropbear.id.au>
-References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 20/20] spapr: Eliminate SpaprIrq::init hook
+Message-ID: <20190927055104.GG17405@umbus>
+References: <20190925064534.19155-1-david@gibson.dropbear.id.au>
+ <20190925064534.19155-21-david@gibson.dropbear.id.au>
+ <1b74c0fc-b318-df5a-d66d-fe59ae562d70@kaod.org>
+ <20190926011336.GS17405@umbus>
+ <92ce15dd-f7f9-3d2b-4226-9693bd9cfd65@kaod.org>
+ <20190926173539.4a07d419@bahia.lan>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="oxour8c+zPVguRmP"
+Content-Disposition: inline
+In-Reply-To: <20190926173539.4a07d419@bahia.lan>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,205 +75,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This hook is a bit odd.  The only caller is spapr_irq_init_kvm(), but
-it explicitly takes an SpaprIrq *, so it's never really called through th=
-e
-current SpaprIrq.  Essentially this is just a way of passing through a
-function pointer so that spapr_irq_init_kvm() can handle some
-configuration and error handling logic without duplicating it between the
-xics and xive reset paths.
 
-So, make it just take that function pointer.  Because of earlier reworks
-to the KVM connect/disconnect code in the xics and xive backends we can
-also eliminate some wrapper functions and streamline error handling a bit=
-.
+--oxour8c+zPVguRmP
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_irq.c         | 74 +++++++++++++-------------------------
- include/hw/ppc/spapr_irq.h |  1 -
- 2 files changed, 25 insertions(+), 50 deletions(-)
+On Thu, Sep 26, 2019 at 05:35:39PM +0200, Greg Kurz wrote:
+> On Thu, 26 Sep 2019 09:05:56 +0200
+> C=E9dric Le Goater <clg@kaod.org> wrote:
+>=20
+> > >>> +    if (spapr->irq->xive) {
+> > >>> +        uint32_t nr_servers =3D spapr_max_server_number(spapr);
+> > >>> +        DeviceState *dev;
+> > >>> +        int i;
+> > >>> +
+> > >>> +        dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+> > >>> +        qdev_prop_set_uint32(dev, "nr-irqs",
+> > >>> +                             spapr->irq->nr_xirqs + SPAPR_XIRQ_BAS=
+E);
+> > >>> +        /*
+> > >>> +         * 8 XIVE END structures per CPU. One for each available
+> > >>> +         * priority
+> > >>> +         */
+> > >>> +        qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
+> > >>> +        qdev_init_nofail(dev);
+> > >>> +
+> > >>> +        spapr->xive =3D SPAPR_XIVE(dev);
+> > >>> +
+> > >>> +        /* Enable the CPU IPIs */
+> > >>> +        for (i =3D 0; i < nr_servers; ++i) {
+> > >>> +            Error *local_err =3D NULL;
+> > >>> +
+> > >>> +            spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, f=
+alse, &local_err);
+> > >>> +            if (local_err) {
+> > >>> +                goto out;
+> > >>> +            }
+> > >>> +        }
+> > >>
+> > >> We could move the IPI claim part in the realize routine of SPAPR_XIV=
+E.
+> > >=20
+> > > Yeah, I know.  I thought about this, but there's a slight complication
+> > > in that the XIVE part doesn't know nr_servers directly.  There's
+> > > several possible ways to handle that, but I wasn't 100% happy with any
+> > > that I came up with yet.
+> >=20
+> > The "nr-ends" property was inappropriate, "nr-servers" would have been
+> > better and we would have hidden the calculation of ENDs 'nr_servers << =
+3'
+> > in the realize routine of SpaprXive.=20
+> >=20
+>=20
+> Yeah it would make sense to have nr_servers within the sPAPR XIVE object,
+> so that we don't have to pass it when building the FDT node. Same stands
+> for XICS actually.
+>=20
+> And as part of my current work to reduce HW VP consumption, I also need
+> nr_servers to pass it to the KVM device.
+>=20
+> > I don't think we can change that without breaking migration though :/
+> >=20
+>=20
+> Hmm... why ? The QOM property is just an interface, it doesn't change the
+> state. In the end we migrate the same number of XiveEND objects.
 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 561bdbc4de..c6abebc4ef 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -65,33 +65,35 @@ void spapr_irq_msi_free(SpaprMachineState *spapr, int=
- irq, uint32_t num)
-     bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
- }
-=20
--static void spapr_irq_init_kvm(SpaprMachineState *spapr,
--                                  SpaprIrq *irq, Error **errp)
-+static int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Erro=
-r **),
-+                              SpaprInterruptController *intc,
-+                              Error **errp)
- {
--    MachineState *machine =3D MACHINE(spapr);
-+    MachineState *machine =3D MACHINE(qdev_get_machine());
-     Error *local_err =3D NULL;
-=20
-     if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
--        irq->init_kvm(spapr, &local_err);
--        if (local_err && machine_kernel_irqchip_required(machine)) {
--            error_prepend(&local_err,
--                          "kernel_irqchip requested but unavailable: ");
--            error_propagate(errp, local_err);
--            return;
--        }
-+        if (fn(intc, &local_err) < 0) {
-+            if (machine_kernel_irqchip_required(machine)) {
-+                error_prepend(&local_err,
-+                              "kernel_irqchip requested but unavailable:=
- ");
-+                error_propagate(errp, local_err);
-+                return -1;
-+            }
-=20
--        if (!local_err) {
--            return;
-+            /*
-+             * We failed to initialize the KVM device, fallback to
-+             * emulated mode
-+             */
-+            error_prepend(&local_err,
-+                          "kernel_irqchip allowed but unavailable: ");
-+            error_append_hint(&local_err,
-+                              "Falling back to kernel-irqchip=3Doff\n");
-+            warn_report_err(local_err);
-         }
--
--        /*
--         * We failed to initialize the KVM device, fallback to
--         * emulated mode
--         */
--        error_prepend(&local_err, "kernel_irqchip allowed but unavailabl=
-e: ");
--        error_append_hint(&local_err, "Falling back to kernel-irqchip=3D=
-off\n");
--        warn_report_err(local_err);
-     }
-+
-+    return 0;
- }
-=20
- /*
-@@ -112,20 +114,7 @@ static int spapr_irq_post_load_xics(SpaprMachineStat=
-e *spapr, int version_id)
-=20
- static void spapr_irq_reset_xics(SpaprMachineState *spapr, Error **errp)
- {
--    Error *local_err =3D NULL;
--
--    spapr_irq_init_kvm(spapr, &spapr_irq_xics, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--}
--
--static void spapr_irq_init_kvm_xics(SpaprMachineState *spapr, Error **er=
-rp)
--{
--    if (kvm_enabled()) {
--        xics_kvm_connect(SPAPR_INTC(spapr->ics), errp);
--    }
-+    spapr_irq_init_kvm(xics_kvm_connect, SPAPR_INTC(spapr->ics), errp);
- }
-=20
- SpaprIrq spapr_irq_xics =3D {
-@@ -136,7 +125,6 @@ SpaprIrq spapr_irq_xics =3D {
-=20
-     .post_load   =3D spapr_irq_post_load_xics,
-     .reset       =3D spapr_irq_reset_xics,
--    .init_kvm    =3D spapr_irq_init_kvm_xics,
- };
-=20
- /*
-@@ -151,7 +139,6 @@ static int spapr_irq_post_load_xive(SpaprMachineState=
- *spapr, int version_id)
- static void spapr_irq_reset_xive(SpaprMachineState *spapr, Error **errp)
- {
-     CPUState *cs;
--    Error *local_err =3D NULL;
-=20
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-@@ -160,9 +147,8 @@ static void spapr_irq_reset_xive(SpaprMachineState *s=
-papr, Error **errp)
-         spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
-     }
-=20
--    spapr_irq_init_kvm(spapr, &spapr_irq_xive, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (spapr_irq_init_kvm(kvmppc_xive_connect,
-+                           SPAPR_INTC(spapr->xive), errp) < 0) {
-         return;
-     }
-=20
-@@ -170,13 +156,6 @@ static void spapr_irq_reset_xive(SpaprMachineState *=
-spapr, Error **errp)
-     spapr_xive_mmio_set_enabled(spapr->xive, true);
- }
-=20
--static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error **er=
-rp)
--{
--    if (kvm_enabled()) {
--        kvmppc_xive_connect(SPAPR_INTC(spapr->xive), errp);
--    }
--}
--
- SpaprIrq spapr_irq_xive =3D {
-     .nr_xirqs    =3D SPAPR_NR_XIRQS,
-     .nr_msis     =3D SPAPR_NR_MSIS,
-@@ -185,7 +164,6 @@ SpaprIrq spapr_irq_xive =3D {
-=20
-     .post_load   =3D spapr_irq_post_load_xive,
-     .reset       =3D spapr_irq_reset_xive,
--    .init_kvm    =3D spapr_irq_init_kvm_xive,
- };
-=20
- /*
-@@ -251,7 +229,6 @@ SpaprIrq spapr_irq_dual =3D {
-=20
-     .post_load   =3D spapr_irq_post_load_dual,
-     .reset       =3D spapr_irq_reset_dual,
--    .init_kvm    =3D NULL, /* should not be used */
- };
-=20
-=20
-@@ -682,7 +659,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
-=20
-     .post_load   =3D spapr_irq_post_load_xics,
-     .reset       =3D spapr_irq_reset_xics,
--    .init_kvm    =3D spapr_irq_init_kvm_xics,
- };
-=20
- static void spapr_irq_register_types(void)
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index c82724fc2b..c947f40571 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -85,7 +85,6 @@ typedef struct SpaprIrq {
-=20
-     int (*post_load)(SpaprMachineState *spapr, int version_id);
-     void (*reset)(SpaprMachineState *spapr, Error **errp);
--    void (*init_kvm)(SpaprMachineState *spapr, Error **errp);
- } SpaprIrq;
-=20
- extern SpaprIrq spapr_irq_xics;
+Yeah, I think it can probably be done.  I don't really have the energy
+left to sort it out for the time being, maybe one day.
+
 --=20
-2.21.0
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--oxour8c+zPVguRmP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2No0cACgkQbDjKyiDZ
+s5IN2BAAhBdpn1Z7qOk3pScrgqah23xpK+tfs9OiOBdliTZOOlkxq6+golhUgX2F
+f7cEn03B56CWSS6eomM/yzLhkFl/24b2f2LUnUYI/7iapwJ/zsQRDapyfSJkbGui
+bs4jJC5znTWG597YgDoo3BpDv2zRkhajUwWsmvDhh2bUdhlJm54/7MKvosUd3+m6
+aH8d2yJPHibYMca7NUi7fVSTfP0VIwBIT1OL/agmXn3Z5ih7zrED8Js1pH8V7foD
+1EIiu6HoGQmw2aGEd2Brs0+qFY7O6elxbnWS/zInLLIstmv56Q6FfEc5PccTohW+
+vPXFiQMT53yB5t7K2RV8j0QQ4dTRfUU6UlzCsb4732T5iUl9HpVLpG+Ha/Uzhui9
+Xs6rw5PpqQtPGlFfXFXB98+ujAX7pbuMDKXkyy/FH02SxEhr9Tk90NeFYI01CSeE
+hf9cC2rrIg7Itk/KpRqr3SDFPLmuM9/lkC51Rtq8+0hTCFC7cQBfN+7XRKrQSvTO
+1wX/bRgCC/WDFx98L0vdsfHfqV0aLXxnZaqfS3LJmSZ3oRy9Ot45sS4jHNYgq9qR
+wD9FDoaMhhsc/60TSPQa6dMZUQBnyxm/Lj7HOqSO2SGCFQHdO4/ytYxIkXKdd1X2
+Yo9B8lvl9Po1xLUmS3685ZTDS3wUWmBG9Iatth8LgifOwwm913g=
+=UvyF
+-----END PGP SIGNATURE-----
+
+--oxour8c+zPVguRmP--
 
