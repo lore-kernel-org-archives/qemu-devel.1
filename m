@@ -2,50 +2,50 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADDB5C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6403C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:06:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7294D21D71
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:04:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7294D21D71
+	by mail.kernel.org (Postfix) with ESMTPS id 9CF372146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:06:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF372146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrnI-0005ca-5D
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:04:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38918)
+	id 1iDrpF-000740-JF
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:06:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36490)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDqWC-0005ml-K7
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:46 -0400
+ (envelope-from <david@redhat.com>) id 1iDqMR-0004b4-7g
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:32:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDqWA-0005Kb-L3
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51690)
+ (envelope-from <david@redhat.com>) id 1iDqMP-0001pQ-8O
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:32:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59754)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDqW9-0005IL-NW; Fri, 27 Sep 2019 09:42:42 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iDqMO-0001om-Va; Fri, 27 Sep 2019 09:32:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 06641C001F03;
- Fri, 27 Sep 2019 13:42:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 16246305C3A4;
+ Fri, 27 Sep 2019 11:04:48 +0000 (UTC)
 Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1F2FB1C92B;
- Fri, 27 Sep 2019 13:42:35 +0000 (UTC)
-Subject: Re: [PATCH v2 1/4] s390x: sclp: refactor invalid command check
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <1569591203-15258-1-git-send-email-imbrenda@linux.ibm.com>
- <1569591203-15258-2-git-send-email-imbrenda@linux.ibm.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3981A60BF3;
+ Fri, 27 Sep 2019 11:04:47 +0000 (UTC)
+Subject: Re: [PATCH v3 17/18] target/s390x: Remove ilen argument from
+ trigger_access_exception
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190926162615.31168-1-richard.henderson@linaro.org>
+ <20190926162615.31168-18-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -92,18 +92,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <874cef66-d09d-b8ed-3bbc-eb1d9f39d1d6@redhat.com>
-Date: Fri, 27 Sep 2019 15:42:35 +0200
+Message-ID: <3a977709-6488-f30e-5eab-0f0f1173141d@redhat.com>
+Date: Fri, 27 Sep 2019 13:04:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1569591203-15258-2-git-send-email-imbrenda@linux.ibm.com>
+In-Reply-To: <20190926162615.31168-18-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 27 Sep 2019 13:42:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Fri, 27 Sep 2019 11:04:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -118,69 +118,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
- frankja@linux.ibm.com, rth@twiddle.net
+Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.09.19 15:33, Claudio Imbrenda wrote:
-> From: Janosch Frank <frankja@linux.ibm.com>
+On 26.09.19 18:26, Richard Henderson wrote:
+> The single caller passes ILEN_UNWIND; pass that along to
+> trigger_pgm_exception directly.
 > 
-> Invalid command checking has to be done before the boundary check,
-> refactoring it now allows to insert the boundary check at the correct
-> place later.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  hw/s390x/event-facility.c |  3 ---
->  hw/s390x/sclp.c           | 17 ++++++++++++++++-
->  2 files changed, 16 insertions(+), 4 deletions(-)
+>  target/s390x/mmu_helper.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index 797ecbb..6620569 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -377,9 +377,6 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
->      case SCLP_CMD_WRITE_EVENT_MASK:
->          write_event_mask(ef, sccb);
->          break;
-> -    default:
-> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-> -        break;
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index bf7fddb056..e6c3139c57 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -33,7 +33,7 @@
+>  #define FS_WRITE 0x400
+>  
+>  static void trigger_access_exception(CPUS390XState *env, uint32_t type,
+> -                                     uint32_t ilen, uint64_t tec)
+> +                                     uint64_t tec)
+>  {
+>      S390CPU *cpu = env_archcpu(env);
+>  
+> @@ -44,7 +44,7 @@ static void trigger_access_exception(CPUS390XState *env, uint32_t type,
+>          if (type != PGM_ADDRESSING) {
+>              stq_phys(cs->as, env->psa + offsetof(LowCore, trans_exc_code), tec);
+>          }
+> -        trigger_pgm_exception(env, type, ilen);
+> +        trigger_pgm_exception(env, type, ILEN_UNWIND);
 >      }
 >  }
 >  
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index fac7c3b..95ebfe7 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -219,8 +219,23 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->          goto out;
->      }
+> @@ -482,7 +482,7 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
 >  
-> -    sclp_c->execute(sclp, &work_sccb, code);
-> +    switch (code & SCLP_CMD_CODE_MASK) {
-> +    case SCLP_CMDW_READ_SCP_INFO:
-> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
-> +    case SCLP_CMDW_READ_CPU_INFO:
-> +    case SCLP_CMDW_CONFIGURE_IOA:
-> +    case SCLP_CMDW_DECONFIGURE_IOA:
-> +    case SCLP_CMD_READ_EVENT_DATA:
-> +    case SCLP_CMD_WRITE_EVENT_DATA:
-> +    case SCLP_CMD_WRITE_EVENT_MASK:
-> +        break;
-> +    default:
-> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-> +        goto out_write;
-> +    }
->  
-> +    sclp_c->execute(sclp, &work_sccb, code);
-> +out_write:
->      cpu_physical_memory_write(sccb, &work_sccb,
->                                be16_to_cpu(work_sccb.h.length));
->  
+>      ret = translate_pages(cpu, laddr, nr_pages, pages, is_write, &tec);
+>      if (ret) {
+> -        trigger_access_exception(&cpu->env, ret, ILEN_UNWIND, tec);
+> +        trigger_access_exception(&cpu->env, ret, tec);
+>      } else if (hostbuf != NULL) {
+>          /* Copy data by stepping through the area page by page */
+>          for (i = 0; i < nr_pages; i++) {
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
