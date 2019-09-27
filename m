@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0583FC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6ADC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C65802146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:50:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C65802146E
+	by mail.kernel.org (Postfix) with ESMTPS id 45CC22146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:53:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45CC22146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDmtR-0001lT-Nh
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:50:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33499)
+	id 1iDmvw-0004qq-NF
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:53:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33437)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iDmmV-0003as-OK
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:43:20 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iDmmP-0003SO-LX
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iDmmT-0007re-Ua
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:43:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48628)
+ (envelope-from <mreitz@redhat.com>) id 1iDmmO-0007it-EL
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:43:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45328)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iDmmQ-0007lh-TE; Fri, 27 Sep 2019 05:43:15 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iDmmL-0007d2-RS; Fri, 27 Sep 2019 05:43:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 26B473090FE1;
- Fri, 27 Sep 2019 09:43:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1AECDA44ADE;
+ Fri, 27 Sep 2019 09:43:09 +0000 (UTC)
 Received: from localhost (ovpn-204-76.brq.redhat.com [10.40.204.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B27276012C;
- Fri, 27 Sep 2019 09:43:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A653E5D9C3;
+ Fri, 27 Sep 2019 09:43:08 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 12/18] iotests: Avoid cp/mv of test images
-Date: Fri, 27 Sep 2019 11:42:36 +0200
-Message-Id: <20190927094242.11152-13-mreitz@redhat.com>
+Subject: [PATCH 10/18] iotests: Avoid qemu-img create
+Date: Fri, 27 Sep 2019 11:42:34 +0200
+Message-Id: <20190927094242.11152-11-mreitz@redhat.com>
 In-Reply-To: <20190927094242.11152-1-mreitz@redhat.com>
 References: <20190927094242.11152-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 27 Sep 2019 09:43:14 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 27 Sep 2019 09:43:09 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,135 +73,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will not work with external data files, so try to get tests working
-without it as far as possible.
+Use _make_test_img whenever possible.  This way, we will not ignore
+user-specified image options.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/063     | 12 ++++--------
- tests/qemu-iotests/063.out |  3 ++-
- tests/qemu-iotests/085     |  9 +++------
- tests/qemu-iotests/085.out |  8 ++++----
- 4 files changed, 13 insertions(+), 19 deletions(-)
+ tests/qemu-iotests/094 | 2 +-
+ tests/qemu-iotests/111 | 3 +--
+ tests/qemu-iotests/123 | 2 +-
+ tests/qemu-iotests/153 | 2 +-
+ tests/qemu-iotests/200 | 4 ++--
+ 5 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
-index eef2b8a534..c750b3806e 100755
---- a/tests/qemu-iotests/063
-+++ b/tests/qemu-iotests/063
-@@ -51,15 +51,13 @@ _unsupported_imgopts "subformat=3DmonolithicFlat" \
- _make_test_img 4M
+diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
+index 9343e09492..d645952d54 100755
+--- a/tests/qemu-iotests/094
++++ b/tests/qemu-iotests/094
+@@ -45,7 +45,7 @@ _supported_proto nbd
+ _unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
+xtentFlat"
 =20
- echo "=3D=3D Testing conversion with -n fails with no target file =3D=3D=
-"
--# check .orig file does not exist
--rm -f "$TEST_IMG.orig"
- if $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG.ori=
-g" >/dev/null 2>&1; then
-     exit 1
- fi
+ _make_test_img 64M
+-$QEMU_IMG create -f $IMGFMT "$TEST_DIR/source.$IMGFMT" 64M | _filter_img=
+_create
++TEST_IMG_FILE=3D"$TEST_DIR/source.$IMGFMT" IMGPROTO=3Dfile _make_test_im=
+g 64M
 =20
- echo "=3D=3D Testing conversion with -n succeeds with a target file =3D=3D=
-"
--rm -f "$TEST_IMG.orig"
--cp "$TEST_IMG" "$TEST_IMG.orig"
-+_rm_test_img "$TEST_IMG.orig"
-+TEST_IMG=3D"$TEST_IMG.orig" _make_test_img 4M
- if ! $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG.o=
-rig" ; then
-     exit 1
- fi
-@@ -85,10 +83,8 @@ fi
- _check_test_img
+ _launch_qemu -drive if=3Dnone,id=3Dsrc,file=3D"$TEST_DIR/source.$IMGFMT"=
+,format=3Draw \
+              -nodefaults
+diff --git a/tests/qemu-iotests/111 b/tests/qemu-iotests/111
+index 490a5bbcb5..3b43d1bd83 100755
+--- a/tests/qemu-iotests/111
++++ b/tests/qemu-iotests/111
+@@ -41,8 +41,7 @@ _supported_fmt qed qcow qcow2 vmdk
+ _supported_proto file
+ _unsupported_imgopts "subformat=3DmonolithicFlat" "subformat=3DtwoGbMaxE=
+xtentFlat"
 =20
- echo "=3D=3D Testing conversion to a smaller file fails =3D=3D"
--rm -f "$TEST_IMG.orig"
--mv "$TEST_IMG" "$TEST_IMG.orig"
--_make_test_img 2M
--if $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n "$TEST_IMG.orig" "$TEST_IM=
-G" >/dev/null 2>&1; then
-+TEST_IMG=3D"$TEST_IMG.target" _make_test_img 2M
-+if $QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG.tar=
-get" >/dev/null 2>&1; then
-     exit 1
- fi
+-$QEMU_IMG create -f $IMGFMT -b "$TEST_IMG.inexistent" "$TEST_IMG" 2>&1 \
+-    | _filter_testdir | _filter_imgfmt
++_make_test_img -b "$TEST_IMG.inexistent"
 =20
-diff --git a/tests/qemu-iotests/063.out b/tests/qemu-iotests/063.out
-index 7b691b2c9e..890b719bf0 100644
---- a/tests/qemu-iotests/063.out
-+++ b/tests/qemu-iotests/063.out
-@@ -2,11 +2,12 @@ QA output created by 063
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D4194304
- =3D=3D Testing conversion with -n fails with no target file =3D=3D
- =3D=3D Testing conversion with -n succeeds with a target file =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D4194304
- =3D=3D Testing conversion to raw is the same after conversion with -n =3D=
-=3D
- =3D=3D Testing conversion back to original format =3D=3D
- No errors were found on the image.
- =3D=3D Testing conversion to a smaller file fails =3D=3D
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D2097152
-+Formatting 'TEST_DIR/t.IMGFMT.target', fmt=3DIMGFMT size=3D2097152
- =3D=3D Regression testing for copy offloading bug =3D=3D
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
- Formatting 'TEST_DIR/t.IMGFMT.target', fmt=3DIMGFMT size=3D1048576
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index bbea1252d2..46981dbb64 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -105,8 +105,7 @@ add_snapshot_image()
- {
-     base_image=3D"${TEST_DIR}/$((${1}-1))-${snapshot_virt0}"
-     snapshot_file=3D"${TEST_DIR}/${1}-${snapshot_virt0}"
--    _make_test_img -u -b "${base_image}" "$size"
--    mv "${TEST_IMG}" "${snapshot_file}"
-+    TEST_IMG=3D$snapshot_file _make_test_img -u -b "${base_image}" "$siz=
-e"
-     do_blockdev_add "$1" "'backing': null, " "${snapshot_file}"
- }
+ # success, all done
+ echo '*** done'
+diff --git a/tests/qemu-iotests/123 b/tests/qemu-iotests/123
+index d33950eb54..74d40d0478 100755
+--- a/tests/qemu-iotests/123
++++ b/tests/qemu-iotests/123
+@@ -44,7 +44,7 @@ _supported_os Linux
+ SRC_IMG=3D"$TEST_DIR/source.$IMGFMT"
 =20
-@@ -122,10 +121,8 @@ blockdev_snapshot()
+ _make_test_img 1M
+-$QEMU_IMG create -f $IMGFMT "$SRC_IMG" 1M | _filter_img_create
++TEST_IMG_FILE=3D$SRC_IMG IMGPROTO=3Dfile _make_test_img 1M
 =20
- size=3D128M
+ $QEMU_IO -c 'write -P 42 0 1M' "$SRC_IMG" | _filter_qemu_io
 =20
--_make_test_img $size
--mv "${TEST_IMG}" "${TEST_IMG}.1"
--_make_test_img $size
--mv "${TEST_IMG}" "${TEST_IMG}.2"
-+TEST_IMG=3D"$TEST_IMG.1" _make_test_img $size
-+TEST_IMG=3D"$TEST_IMG.2" _make_test_img $size
+diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
+index c969a1a16f..e59090259c 100755
+--- a/tests/qemu-iotests/153
++++ b/tests/qemu-iotests/153
+@@ -98,7 +98,7 @@ for opts1 in "" "read-only=3Don" "read-only=3Don,force-=
+share=3Don"; do
 =20
- echo
- echo =3D=3D=3D Running QEMU =3D=3D=3D
-diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
-index 2a5f256cd3..313198f182 100644
---- a/tests/qemu-iotests/085.out
-+++ b/tests/qemu-iotests/085.out
-@@ -1,6 +1,6 @@
- QA output created by 085
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT.1', fmt=3DIMGFMT size=3D134217728
-+Formatting 'TEST_DIR/t.IMGFMT.2', fmt=3DIMGFMT size=3D134217728
+     echo
+     echo "=3D=3D Creating test image =3D=3D"
+-    $QEMU_IMG create -f $IMGFMT "${TEST_IMG}" -b ${TEST_IMG}.base | _fil=
+ter_img_create
++    _make_test_img -b "${TEST_IMG}.base"
 =20
- =3D=3D=3D Running QEMU =3D=3D=3D
+     echo
+     echo "=3D=3D Launching QEMU, opts: '$opts1' =3D=3D"
+diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
+index 72d431f251..d904885136 100755
+--- a/tests/qemu-iotests/200
++++ b/tests/qemu-iotests/200
+@@ -46,8 +46,8 @@ _supported_proto file
+ BACKING_IMG=3D"${TEST_DIR}/backing.img"
+ TEST_IMG=3D"${TEST_DIR}/test.img"
 =20
-@@ -55,10 +55,10 @@ Formatting 'TEST_DIR/10-snapshot-v1.qcow2', fmt=3Dqco=
-w2 size=3D134217728 backing_fil
+-${QEMU_IMG} create -f $IMGFMT "${BACKING_IMG}" 512M | _filter_img_create
+-${QEMU_IMG} create -f $IMGFMT -F $IMGFMT "${TEST_IMG}" -b "${BACKING_IMG=
+}" 512M | _filter_img_create
++TEST_IMG=3D"$BACKING_IMG" _make_test_img 512M
++_make_test_img -F $IMGFMT -b "$BACKING_IMG" 512M
 =20
- =3D=3D=3D Create a couple of snapshots using blockdev-snapshot =3D=3D=3D
-=20
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/10-snapshot-v0.IMGFMT
-+Formatting 'TEST_DIR/11-snapshot-v0.IMGFMT', fmt=3DIMGFMT size=3D1342177=
-28 backing_file=3DTEST_DIR/10-snapshot-v0.IMGFMT
- {"return": {}}
- {"return": {}}
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/11-snapshot-v0.IMGFMT
-+Formatting 'TEST_DIR/12-snapshot-v0.IMGFMT', fmt=3DIMGFMT size=3D1342177=
-28 backing_file=3DTEST_DIR/11-snapshot-v0.IMGFMT
- {"return": {}}
- {"return": {}}
+ ${QEMU_IO} -c "write -P 0xa5 512 300M" "${BACKING_IMG}" | _filter_qemu_i=
+o
 =20
 --=20
 2.21.0
