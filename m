@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57006C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF83C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C5F3205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:50:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C5F3205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 92E62207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:52:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92E62207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDsVU-00083j-Sg
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40033)
+	id 1iDsXQ-0001oh-VY
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:52:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iDqaF-0001Ky-Uh
+ (envelope-from <armbru@redhat.com>) id 1iDqaC-0001Gj-FQ
  for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iDqa9-00065a-3J
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24486)
+ (envelope-from <armbru@redhat.com>) id 1iDqa8-00064u-MO
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44726)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa8-00063y-Hy
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa8-00063c-5c
  for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:48 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3FAD810CC1F4;
+ by mx1.redhat.com (Postfix) with ESMTPS id 0F52D18C428C;
  Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B8C61194B6;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ACCE15D9D5;
  Fri, 27 Sep 2019 13:46:46 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id AC5971136422; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
+ id A385F1138408; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 22/26] qapi: Improve reporting of invalid 'if' further
-Date: Fri, 27 Sep 2019 15:46:35 +0200
-Message-Id: <20190927134639.4284-23-armbru@redhat.com>
+Subject: [PATCH v2 19/26] qapi: Improve reporting of invalid flags
+Date: Fri, 27 Sep 2019 15:46:32 +0200
+Message-Id: <20190927134639.4284-20-armbru@redhat.com>
 In-Reply-To: <20190927134639.4284-1-armbru@redhat.com>
 References: <20190927134639.4284-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.62]); Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,223 +75,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-check_if()'s errors don't point to the offending part of the
-expression.  For instance:
+Split check_flags() off check_keys() and have check_exprs() call it
+later, so its error messages gain an "in definition" line.  Tweak the
+error messages.
 
-    tests/qapi-schema/alternate-branch-if-invalid.json:2: 'if' condition =
-' ' makes no sense
-
-Other check_FOO() do, with the help of a @source argument.  Make
-check_if() do that, too.  The example above improves to:
-
-    tests/qapi-schema/alternate-branch-if-invalid.json:2: 'if' condition =
-' ' of 'data' member 'branch' makes no sense
+Checking values in a function named check_keys() is unclean anyway.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi/common.py                        | 27 +++++++++++--------
- .../alternate-branch-if-invalid.err           |  2 +-
- tests/qapi-schema/bad-if-empty-list.err       |  2 +-
- tests/qapi-schema/bad-if-empty.err            |  2 +-
- tests/qapi-schema/bad-if-list.err             |  2 +-
- tests/qapi-schema/bad-if.err                  |  2 +-
- tests/qapi-schema/enum-if-invalid.err         |  2 +-
- tests/qapi-schema/features-if-invalid.err     |  2 +-
- .../qapi-schema/struct-member-if-invalid.err  |  2 +-
- tests/qapi-schema/union-branch-if-invalid.err |  2 +-
- 10 files changed, 25 insertions(+), 20 deletions(-)
+ scripts/qapi/common.py                     | 22 ++++++++++++----------
+ tests/qapi-schema/allow-preconfig-test.err |  3 ++-
+ tests/qapi-schema/args-bad-boxed.err       |  3 ++-
+ tests/qapi-schema/oob-test.err             |  3 ++-
+ tests/qapi-schema/type-bypass-bad-gen.err  |  3 ++-
+ 5 files changed, 20 insertions(+), 14 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 81c217cd60..4bc8c807aa 100644
+index 8f96974f85..4f67b73684 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -692,22 +692,27 @@ def check_defn_name_str(name, info, meta):
-             info, "%s name should not end in '%s'" % (meta, name[-4:]))
-=20
-=20
--def check_if(expr, info):
-+def check_if(expr, info, source):
-=20
-     def check_if_str(ifcond, info):
-         if not isinstance(ifcond, str):
-             raise QAPISemError(
--                info, "'if' condition must be a string or a list of stri=
-ngs")
-+                info,
-+                "'if' condition of %s must be a string or a list of stri=
-ngs"
-+                % source)
-         if ifcond.strip() =3D=3D '':
--            raise QAPISemError(info, "'if' condition '%s' makes no sense=
-"
--                               % ifcond)
+@@ -915,16 +915,17 @@ def check_keys(expr, info, meta, required, optional=
+=3D[]):
+     required =3D required + [meta]
+     source =3D "%s '%s'" % (meta, name)
+     check_known_keys(expr, info, source, required, optional)
+-    for (key, value) in expr.items():
+-        if key in ['gen', 'success-response'] and value is not False:
+-            raise QAPISemError(info,
+-                               "'%s' of %s '%s' should only use false va=
+lue"
+-                               % (key, meta, name))
+-        if (key in ['boxed', 'allow-oob', 'allow-preconfig']
+-                and value is not True):
+-            raise QAPISemError(info,
+-                               "'%s' of %s '%s' should only use true val=
+ue"
+-                               % (key, meta, name))
++
++
++def check_flags(expr, info):
++    for key in ['gen', 'success-response']:
++        if key in expr and expr[key] is not False:
 +            raise QAPISemError(
-+                info,
-+                "'if' condition '%s' of %s makes no sense"
-+                % (ifcond, source))
-=20
-     ifcond =3D expr.get('if')
-     if ifcond is None:
-         return
-     if isinstance(ifcond, list):
-         if ifcond =3D=3D []:
--            raise QAPISemError(info, "'if' condition [] is useless")
++                info, "flag '%s' may only use false value" % key)
++    for key in ['boxed', 'allow-oob', 'allow-preconfig']:
++        if key in expr and expr[key] is not True:
 +            raise QAPISemError(
-+                info, "'if' condition [] of %s is useless" % source)
-         for elt in ifcond:
-             check_if_str(elt, info)
-     else:
-@@ -752,7 +757,7 @@ def check_type(value, info, source,
-         if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswit=
-h('has_'):
-             raise QAPISemError(info, "%s uses reserved name" % key_sourc=
-e)
-         check_known_keys(arg, info, key_source, ['type'], ['if'])
--        check_if(arg, info)
-+        check_if(arg, info, key_source)
-         normalize_if(arg)
-         check_type(arg['type'], info, key_source, allow_array=3DTrue)
-=20
-@@ -796,7 +801,7 @@ def check_union(expr, info):
-         source =3D "'data' member '%s'" % key
-         check_name_str(key, info, source)
-         check_known_keys(value, info, source, ['type'], ['if'])
--        check_if(value, info)
-+        check_if(value, info, source)
-         normalize_if(value)
-         check_type(value['type'], info, source, allow_array=3Dnot base)
-=20
-@@ -810,7 +815,7 @@ def check_alternate(expr, info):
-         source =3D "'data' member '%s'" % key
-         check_name_str(key, info, source)
-         check_known_keys(value, info, source, ['type'], ['if'])
--        check_if(value, info)
-+        check_if(value, info, source)
-         normalize_if(value)
-         check_type(value['type'], info, source)
-=20
-@@ -834,7 +839,7 @@ def check_enum(expr, info):
-         source =3D "%s '%s'" % (source, member['name'])
-         check_name_str(member['name'], info, source,
-                        enum_member=3DTrue, permit_upper=3Dpermit_upper)
--        check_if(member, info)
-+        check_if(member, info, source)
-         normalize_if(member)
++                info, "flag '%s' may only use true value" % key)
 =20
 =20
-@@ -856,7 +861,7 @@ def check_struct(expr, info):
-             check_name_is_str(f['name'], info, source)
-             source =3D "%s '%s'" % (source, f['name'])
-             check_name_str(f['name'], info, source)
--            check_if(f, info)
-+            check_if(f, info, source)
-             normalize_if(f)
-=20
-=20
-@@ -994,7 +999,7 @@ def check_exprs(exprs):
+ def normalize_enum(expr):
+@@ -1027,6 +1028,7 @@ def check_exprs(exprs):
              assert False, 'unexpected meta type'
 =20
-         normalize_if(expr)
--        check_if(expr, info)
-+        check_if(expr, info, meta)
-         check_flags(expr, info)
+         check_if(expr, info)
++        check_flags(expr, info)
 =20
          if doc:
-diff --git a/tests/qapi-schema/alternate-branch-if-invalid.err b/tests/qa=
-pi-schema/alternate-branch-if-invalid.err
-index 8684829aca..6c68e5a922 100644
---- a/tests/qapi-schema/alternate-branch-if-invalid.err
-+++ b/tests/qapi-schema/alternate-branch-if-invalid.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/alternate-branch-if-invalid.json: In alternate 'Alt':
--tests/qapi-schema/alternate-branch-if-invalid.json:2: 'if' condition ' '=
- makes no sense
-+tests/qapi-schema/alternate-branch-if-invalid.json:2: 'if' condition ' '=
- of 'data' member 'branch' makes no sense
-diff --git a/tests/qapi-schema/bad-if-empty-list.err b/tests/qapi-schema/=
-bad-if-empty-list.err
-index 2218c9279b..517519f500 100644
---- a/tests/qapi-schema/bad-if-empty-list.err
-+++ b/tests/qapi-schema/bad-if-empty-list.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/bad-if-empty-list.json: In struct 'TestIfStruct':
--tests/qapi-schema/bad-if-empty-list.json:2: 'if' condition [] is useless
-+tests/qapi-schema/bad-if-empty-list.json:2: 'if' condition [] of struct =
-is useless
-diff --git a/tests/qapi-schema/bad-if-empty.err b/tests/qapi-schema/bad-i=
-f-empty.err
-index a3fdb3009d..5f1767388e 100644
---- a/tests/qapi-schema/bad-if-empty.err
-+++ b/tests/qapi-schema/bad-if-empty.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/bad-if-empty.json: In struct 'TestIfStruct':
--tests/qapi-schema/bad-if-empty.json:2: 'if' condition '' makes no sense
-+tests/qapi-schema/bad-if-empty.json:2: 'if' condition '' of struct makes=
- no sense
-diff --git a/tests/qapi-schema/bad-if-list.err b/tests/qapi-schema/bad-if=
--list.err
-index e03bf0fc3a..e5d72b2f39 100644
---- a/tests/qapi-schema/bad-if-list.err
-+++ b/tests/qapi-schema/bad-if-list.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/bad-if-list.json: In struct 'TestIfStruct':
--tests/qapi-schema/bad-if-list.json:2: 'if' condition ' ' makes no sense
-+tests/qapi-schema/bad-if-list.json:2: 'if' condition ' ' of struct makes=
- no sense
-diff --git a/tests/qapi-schema/bad-if.err b/tests/qapi-schema/bad-if.err
-index 190216c109..65d8efd7e4 100644
---- a/tests/qapi-schema/bad-if.err
-+++ b/tests/qapi-schema/bad-if.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/bad-if.json: In struct 'TestIfStruct':
--tests/qapi-schema/bad-if.json:2: 'if' condition must be a string or a li=
-st of strings
-+tests/qapi-schema/bad-if.json:2: 'if' condition of struct must be a stri=
-ng or a list of strings
-diff --git a/tests/qapi-schema/enum-if-invalid.err b/tests/qapi-schema/en=
-um-if-invalid.err
-index db9eb45b25..30c1f0e91c 100644
---- a/tests/qapi-schema/enum-if-invalid.err
-+++ b/tests/qapi-schema/enum-if-invalid.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/enum-if-invalid.json: In enum 'TestIfEnum':
--tests/qapi-schema/enum-if-invalid.json:2: 'if' condition must be a strin=
-g or a list of strings
-+tests/qapi-schema/enum-if-invalid.json:2: 'if' condition of 'data' membe=
-r 'bar' must be a string or a list of strings
-diff --git a/tests/qapi-schema/features-if-invalid.err b/tests/qapi-schem=
-a/features-if-invalid.err
-index 90f4119ae7..ffb39378af 100644
---- a/tests/qapi-schema/features-if-invalid.err
-+++ b/tests/qapi-schema/features-if-invalid.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/features-if-invalid.json: In struct 'Stru':
--tests/qapi-schema/features-if-invalid.json:2: 'if' condition must be a s=
-tring or a list of strings
-+tests/qapi-schema/features-if-invalid.json:2: 'if' condition of 'feature=
-s' member 'f' must be a string or a list of strings
-diff --git a/tests/qapi-schema/struct-member-if-invalid.err b/tests/qapi-=
-schema/struct-member-if-invalid.err
-index e8ad02b9fc..4c5983674b 100644
---- a/tests/qapi-schema/struct-member-if-invalid.err
-+++ b/tests/qapi-schema/struct-member-if-invalid.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/struct-member-if-invalid.json: In struct 'Stru':
--tests/qapi-schema/struct-member-if-invalid.json:2: 'if' condition must b=
-e a string or a list of strings
-+tests/qapi-schema/struct-member-if-invalid.json:2: 'if' condition of 'da=
-ta' member 'member' must be a string or a list of strings
-diff --git a/tests/qapi-schema/union-branch-if-invalid.err b/tests/qapi-s=
-chema/union-branch-if-invalid.err
-index b49cf9b664..14819bf8b8 100644
---- a/tests/qapi-schema/union-branch-if-invalid.err
-+++ b/tests/qapi-schema/union-branch-if-invalid.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/union-branch-if-invalid.json: In union 'Uni':
--tests/qapi-schema/union-branch-if-invalid.json:4: 'if' condition '' make=
-s no sense
-+tests/qapi-schema/union-branch-if-invalid.json:4: 'if' condition '' of '=
-data' member 'branch1' makes no sense
+             doc.check_expr(expr)
+diff --git a/tests/qapi-schema/allow-preconfig-test.err b/tests/qapi-sche=
+ma/allow-preconfig-test.err
+index 700d583306..2a4e6ce663 100644
+--- a/tests/qapi-schema/allow-preconfig-test.err
++++ b/tests/qapi-schema/allow-preconfig-test.err
+@@ -1 +1,2 @@
+-tests/qapi-schema/allow-preconfig-test.json:2: 'allow-preconfig' of comm=
+and 'allow-preconfig-test' should only use true value
++tests/qapi-schema/allow-preconfig-test.json: In command 'allow-preconfig=
+-test':
++tests/qapi-schema/allow-preconfig-test.json:2: flag 'allow-preconfig' ma=
+y only use true value
+diff --git a/tests/qapi-schema/args-bad-boxed.err b/tests/qapi-schema/arg=
+s-bad-boxed.err
+index ad0d417321..31d39038fc 100644
+--- a/tests/qapi-schema/args-bad-boxed.err
++++ b/tests/qapi-schema/args-bad-boxed.err
+@@ -1 +1,2 @@
+-tests/qapi-schema/args-bad-boxed.json:2: 'boxed' of command 'foo' should=
+ only use true value
++tests/qapi-schema/args-bad-boxed.json: In command 'foo':
++tests/qapi-schema/args-bad-boxed.json:2: flag 'boxed' may only use true =
+value
+diff --git a/tests/qapi-schema/oob-test.err b/tests/qapi-schema/oob-test.=
+err
+index 35b60f7480..3c2ba6e0fd 100644
+--- a/tests/qapi-schema/oob-test.err
++++ b/tests/qapi-schema/oob-test.err
+@@ -1 +1,2 @@
+-tests/qapi-schema/oob-test.json:2: 'allow-oob' of command 'oob-command-1=
+' should only use true value
++tests/qapi-schema/oob-test.json: In command 'oob-command-1':
++tests/qapi-schema/oob-test.json:2: flag 'allow-oob' may only use true va=
+lue
+diff --git a/tests/qapi-schema/type-bypass-bad-gen.err b/tests/qapi-schem=
+a/type-bypass-bad-gen.err
+index a83c3c655d..1077651896 100644
+--- a/tests/qapi-schema/type-bypass-bad-gen.err
++++ b/tests/qapi-schema/type-bypass-bad-gen.err
+@@ -1 +1,2 @@
+-tests/qapi-schema/type-bypass-bad-gen.json:2: 'gen' of command 'foo' sho=
+uld only use false value
++tests/qapi-schema/type-bypass-bad-gen.json: In command 'foo':
++tests/qapi-schema/type-bypass-bad-gen.json:2: flag 'gen' may only use fa=
+lse value
 --=20
 2.21.0
 
