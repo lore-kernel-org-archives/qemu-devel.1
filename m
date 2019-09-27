@@ -2,51 +2,49 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18BD8C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 23:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC47C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 23:39:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0F6020863
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 23:37:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0F6020863
+	by mail.kernel.org (Postfix) with ESMTPS id 2BF1520863
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 23:39:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BF1520863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDzne-0008Jl-1T
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 19:37:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50058)
+	id 1iDzpV-0000wN-9G
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 19:39:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50107)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iDzmR-0007if-1r
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 19:36:09 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iDzmg-0007ka-GO
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 19:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iDzmN-0000iM-1M
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 19:36:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48200)
+ (envelope-from <jsnow@redhat.com>) id 1iDzme-0000yW-6y
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 19:36:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48230)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iDzm5-0000Pb-19; Fri, 27 Sep 2019 19:35:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1iDzma-0000vP-2H; Fri, 27 Sep 2019 19:36:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 92BFD3082135;
- Fri, 27 Sep 2019 23:35:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F1C03082135;
+ Fri, 27 Sep 2019 23:36:15 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0F0475D9C3;
- Fri, 27 Sep 2019 23:35:38 +0000 (UTC)
-Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
- platforms
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-2-jsnow@redhat.com>
- <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 333E160606;
+ Fri, 27 Sep 2019 23:36:14 +0000 (UTC)
+Subject: Re: [PATCH v5 0/9] qcow2-bitmaps: rewrite reopening logic
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190927122355.7344-1-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -122,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
-Date: Fri, 27 Sep 2019 19:35:38 -0400
+Message-ID: <133c9c4d-9ad2-f813-eab8-8ddb8dffbce5@redhat.com>
+Date: Fri, 27 Sep 2019 19:36:13 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+In-Reply-To: <20190927122355.7344-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 27 Sep 2019 23:35:39 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.42]); Fri, 27 Sep 2019 23:36:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -148,69 +146,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 9/23/19 9:09 AM, Max Reitz wrote:
-> On 18.09.19 01:45, John Snow wrote:
->> verify_platform will check an explicit whitelist and blacklist instead=
-.
->> The default will now be assumed to be allowed to run anywhere.
->>
->> For tests that do not specify their platforms explicitly, this has the=
- effect of
->> enabling these tests on non-linux platforms. For tests that always spe=
-cified
->> linux explicitly, there is no change.
->>
->> For Python tests on FreeBSD at least; only seven python tests fail:
->> 045 147 149 169 194 199 211
->>
->> 045 and 149 appear to be misconfigurations,
->> 147 and 194 are the AF_UNIX path too long error,
->> 169 and 199 are bitmap migration bugs, and
->> 211 is a bug that shows up on Linux platforms, too.
->>
->> This is at least good evidence that these tests are not Linux-only. If
->> they aren't suitable for other platforms, they should be disabled on a
->> per-platform basis as appropriate.
->>
->> Therefore, let's switch these on and deal with the failures.
->=20
-> What exactly do you mean by =E2=80=9Cdeal with the failures=E2=80=9D?  =
-Do you have a
-> reference to patches that deal with them, or are you or is someone else
-> working on them...?
->=20
-> Apart from that, I am rather hesitant to take a patch through my tree
-> that not only may cause test failures on platforms that I will not or
-> actually cannot run tests on (like MacOS or Windows), but that actually
-> does introduce new failures as you describe.
->=20
-> Well, at least it doesn=E2=80=99t introduce build failures because it a=
-ppears
-> there is no Python test that=E2=80=99s in the auto group, so I suppose =
-=E2=80=9Crather
-> hesitant=E2=80=9D is not an =E2=80=9CI won=E2=80=99t=E2=80=9D.
->=20
+On 9/27/19 8:23 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+> 
+> Bitmaps reopening is buggy, reopening-rw just not working at all and
+> reopening-ro may lead to producing broken incremental
+> backup if we do temporary snapshot in a meantime.
+> 
+> v5:
+> 01: - add Max's r-b
+>     - fix s/QSIMPLE_INIT/QTAILQ_INIT/ in a comment
+> 02: - add Max's and John's a-b
+> 03: - improve test to check bitmap hashes in more safe way
+> 07: - drop wrong statement from commit message
+>     - log events by hand
+> 08: - drop 'the' from comment
+>     - add Corruption in case of existent IN_USE on RO->RW reopen
+> 09: - add Max's a-b and John's r-b
+> 
+> v4: Drop complicated solution around reopening logic [Kevin], fix
+>     the existing bug in a simplest way
+> 
+> Vladimir Sementsov-Ogievskiy (9):
+>   block: switch reopen queue from QSIMPLEQ to QTAILQ
+>   block: reverse order for reopen commits
+>   iotests: add test-case to 165 to test reopening qcow2 bitmaps to RW
+>   block/qcow2-bitmap: get rid of bdrv_has_changed_persistent_bitmaps
+>   block/qcow2-bitmap: drop qcow2_reopen_bitmaps_rw_hint()
+>   block/qcow2-bitmap: do not remove bitmaps on reopen-ro
+>   iotests: add test 260 to check bitmap life after snapshot + commit
+>   block/qcow2-bitmap: fix and improve qcow2_reopen_bitmaps_rw
+>   qcow2-bitmap: move bitmap reopen-rw code to qcow2_reopen_commit
+> 
+>  block/qcow2.h                |   5 +-
+>  include/block/block.h        |   2 +-
+>  include/block/block_int.h    |   6 --
+>  include/block/dirty-bitmap.h |   1 -
+>  block.c                      |  53 +++++------
+>  block/dirty-bitmap.c         |  12 ---
+>  block/qcow2-bitmap.c         | 164 ++++++++++++++++++++++-------------
+>  block/qcow2.c                |  17 +++-
+>  tests/qemu-iotests/165       |  57 +++++++++++-
+>  tests/qemu-iotests/165.out   |   4 +-
+>  tests/qemu-iotests/260       |  89 +++++++++++++++++++
+>  tests/qemu-iotests/260.out   |  52 +++++++++++
+>  tests/qemu-iotests/group     |   1 +
+>  13 files changed, 343 insertions(+), 120 deletions(-)
+>  create mode 100755 tests/qemu-iotests/260
+>  create mode 100644 tests/qemu-iotests/260.out
+> 
 
-Think of it more like this: The failures were always there, but we hid
-them. I'm not "introducing new failures" as such O:-)
+Provisionally staged, pending feedback from Kevin.
 
-I think that I have demonstrated sufficiently that it's not correct to
-prohibit python tests from running on other platforms wholesale, so I'd
-prefer we don't do that anymore.
+Some minor rebase conflicts against the current bitmaps branch:
 
-Further, iotests on FreeBSD already weren't 100% green, so I'm not
-causing a regression in that sense, either.
+012/17:[----] [-C] 'block/qcow2-bitmap: get rid of
+bdrv_has_changed_persistent_bitmaps'
+014/17:[0004] [FC] 'block/qcow2-bitmap: do not remove bitmaps on reopen-ro'
+017/17:[----] [-C] 'qcow2-bitmap: move bitmap reopen-rw code to
+qcow2_reopen_commit'
 
-I'm going to meekly push and ask that we stage this as-is, and when
-something bad happens you can remind me that I wanted this and make me
-do it.
+
+12: just context against changed _first and _next prototypes.
+14: the signature of bdrv_release_dirty_bitmap has changed, which incurs
+a change in the refactor.
+17: bdrv_can_store... has changed to bdrv_co_can_store...
+    Same for bdrv_remove_persistent.
+
+
+Thanks, applied to my bitmaps tree:
+
+https://github.com/jnsnow/qemu/commits/bitmaps
+https://github.com/jnsnow/qemu.git
 
 --js
 
