@@ -2,110 +2,121 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1966CC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 12:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82121C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 12:56:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3DF920872
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 12:54:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3DF920872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4BE16217D9
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 12:56:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JWt7hWTa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BE16217D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDplL-00035i-VJ
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 08:54:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51291)
+	id 1iDpnN-0005UM-5U
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 08:56:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDpgU-0006sp-H2
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 08:49:20 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDpiT-00015T-BB
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 08:51:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDpgR-0000n4-Iv
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 08:49:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35138)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDpgR-0000mc-8u; Fri, 27 Sep 2019 08:49:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8B7D610DCC8F;
- Fri, 27 Sep 2019 10:55:05 +0000 (UTC)
-Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B10055C21F;
- Fri, 27 Sep 2019 10:55:04 +0000 (UTC)
-Subject: Re: [PATCH v3 10/18] target/s390: Return exception from mmu_translate
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190926162615.31168-1-richard.henderson@linaro.org>
- <20190926162615.31168-11-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <55bd537c-5d62-ee48-6636-b1b386adeee8@redhat.com>
-Date: Fri, 27 Sep 2019 12:55:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190926162615.31168-11-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iDpiR-00017L-Pk
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 08:51:20 -0400
+Received: from mail-eopbgr10132.outbound.protection.outlook.com
+ ([40.107.1.132]:28549 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iDpiQ-00017B-V7; Fri, 27 Sep 2019 08:51:19 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KgeLa2drf96eMJ8bX30n+Zy/xINVIHK1uiSFX8z2OsFWjEUTG+J1IAS01zYOFmFROaU2mlozgTEs56rmKmdv3+nrJLawt/8nrAm9nk2W6hP1MKc1zvsEQ26nYLRT/asW59mvnPSgDa5a74DX3Irxn5Y3Hn/ybtZ/W26XE2Hx5U5Bt8B4Q7WnxAPIf6NxXajIBgFn/zuii/vZvPBrCTE/C/bj18l9uGxcL7CjVIb47+GGP1yRi8uBNV0nk/ur94a7G1karjZ4h17PYj9v5CMPb1ozl14mGviYO1kFgNetLL9b9qRQbYfEh9yEMz9zQ9TA5Bz3H5fIRQ1o2wBdeb78nQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dn6uY9fNYHCbRozDmBCMXnMDWAkQFAdPUcdUmJKaOV4=;
+ b=mVKEMN66TY5jQOrqMlm7oGJFjtN6vcvgLnOFhiHMFb9xJSUlDilzDfDMlXjWnUAtFgjRUSSiJsLU5wjNQyHbpwYH0KVYbFOa6Si6067yVq+1L2o2P0g6XilpTWPubxovJoTJdU7z4mb1UUTuCNQqrWIOyA9iQNIw/XfCXMUEDw8fNikCPpvPmyMvEVYyVxvThl+eIyDHwwAYU2cax287UMFFRTO2xDw+9DZpAbwqKccZOQrgY2+mzZRWMGBjMJBNOF+oUvnaaP/4yCCHi1J7X+6n08LmRW3v3lQadEqAwIm3FZAc6rOl9yraLhKeNXOmpIzKwIgjyso5YKMDLTm9CA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dn6uY9fNYHCbRozDmBCMXnMDWAkQFAdPUcdUmJKaOV4=;
+ b=JWt7hWTaHlM4+OGfQe440SkBbMIaT6CaIyRUgduhjs6h7xWkpiP2elkY+umpaPiGfr+DsE1OF3MoyMAUS4v//B+CdfA4INEI8cxhPcGT+lLMml/sbY6BaWTBEWXBlXr2UDl9G3/LfonSz83UbPFQo1UOW4XGCTVWKlYjJ3SK2rI=
+Received: from AM0PR08MB5491.eurprd08.prod.outlook.com (52.132.215.9) by
+ AM0PR08MB5089.eurprd08.prod.outlook.com (10.255.29.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.17; Fri, 27 Sep 2019 10:38:38 +0000
+Received: from AM0PR08MB5491.eurprd08.prod.outlook.com
+ ([fe80::d552:8bd7:4773:3d75]) by AM0PR08MB5491.eurprd08.prod.outlook.com
+ ([fe80::d552:8bd7:4773:3d75%2]) with mapi id 15.20.2305.017; Fri, 27 Sep 2019
+ 10:38:38 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [Qemu-devel] [PATCH v4 04/10] iotests.py: add event_wait_log and
+ events_wait_log helpers
+Thread-Topic: [Qemu-devel] [PATCH v4 04/10] iotests.py: add event_wait_log and
+ events_wait_log helpers
+Thread-Index: AQHVTSopsvgVlwVKVEeEJ+8OAOZN+qc+43YAgAC/nACAAAIIAA==
+Date: Fri, 27 Sep 2019 10:38:38 +0000
+Message-ID: <30562b63-0598-101e-5177-1b31cab7f45a@virtuozzo.com>
+References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
+ <20190807141226.193501-5-vsementsov@virtuozzo.com>
+ <a578331a-86a6-4636-d055-3cc4c43ba495@redhat.com>
+ <62862d28-5183-8af7-f515-36d6c9d8a2e8@virtuozzo.com>
+In-Reply-To: <62862d28-5183-8af7-f515-36d6c9d8a2e8@virtuozzo.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Fri, 27 Sep 2019 10:55:05 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0901CA0048.eurprd09.prod.outlook.com
+ (2603:10a6:3:45::16) To AM0PR08MB5491.eurprd08.prod.outlook.com
+ (2603:10a6:208:189::9)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190927133836036
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5fa60e69-dffe-48ac-918d-08d74336db89
+x-ms-traffictypediagnostic: AM0PR08MB5089:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR08MB508905110B8ED298A49CB8B1C1810@AM0PR08MB5089.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:923;
+x-forefront-prvs: 0173C6D4D5
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(396003)(39850400004)(376002)(346002)(366004)(189003)(199004)(54906003)(14454004)(386003)(31696002)(446003)(11346002)(86362001)(2616005)(486006)(66066001)(31686004)(71190400001)(99286004)(71200400001)(26005)(6116002)(6506007)(102836004)(186003)(53546011)(2906002)(7736002)(5660300002)(305945005)(476003)(25786009)(478600001)(316002)(66946007)(66476007)(66556008)(64756008)(66446008)(8676002)(81166006)(8936002)(52116002)(3846002)(76176011)(36756003)(6512007)(6436002)(107886003)(110136005)(81156014)(6486002)(256004)(4326008)(14444005)(229853002)(2501003)(6246003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB5089;
+ H:AM0PR08MB5491.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tvvH4sTwM+MijOjXBlgXVLWrKaYesT9bLMSBU50RC18NawMS3mWfxfiDwU83VNrnWuaKD+FPW02j1djslMInu2JurUpfwX8FsHsxv9NyDsD++/w/xh9FR0WFRzUtum9rJCW+eps/HbTTZzbIfZA8fRb2t+f5zMArXQI9aJbH4M3SPF0U1y/F2KOVZGMjf8J4gi9CG4Zvn+q9hAKlZOXh+c66uaIw3wHxBA3gwiS36HftYKxS4DYp+kOTtuawES7rWdFRA1IvIJqapLZ/Noh9Jvxf4FpPmsXnFyhlv5hiS527R4rQB3zQNLEAmdtqIqgcClkxGPQI+vMA/nwloLZTJfhnvtifhAQPtGG9rPa7nNw138QyBHu3TUBYsb9RJ7E4ykZ/t0/3D8NTmV3k3cQSRTvpjdCT5b1DQCMBNUNt0Q8=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9B68CABAABCA2F4EBE5CC29C0A5B18A1@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fa60e69-dffe-48ac-918d-08d74336db89
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2019 10:38:38.7516 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0dKq+K0nDrQzP1o/6YgB41osFvq4Z1pHCPZfjb89N6F29mztSplwGAM0vlPRxDfB+w6xv/OaugCMxCv4ahuzEa3riNLmqYEAbY2bCN8Fflc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5089
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.1.132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,203 +128,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26.09.19 18:26, Richard Henderson wrote:
-> Do not raise the exception directly within mmu_translate,
-> but pass it back so that caller may do so.
->=20
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/s390x/internal.h    |  2 +-
->  target/s390x/excp_helper.c |  4 ++--
->  target/s390x/mem_helper.c  | 13 ++++++++++---
->  target/s390x/mmu_helper.c  | 36 ++++++++++++++----------------------
->  4 files changed, 27 insertions(+), 28 deletions(-)
->=20
-> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-> index c4388aaf23..c993c3ef40 100644
-> --- a/target/s390x/internal.h
-> +++ b/target/s390x/internal.h
-> @@ -360,7 +360,7 @@ void probe_write_access(CPUS390XState *env, uint64_=
-t addr, uint64_t len,
-> =20
->  /* mmu_helper.c */
->  int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint=
-64_t asc,
-> -                  target_ulong *raddr, int *flags, bool exc);
-> +                  target_ulong *raddr, int *flags, uint64_t *tec);
->  int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
->                         target_ulong *addr, int *flags, uint64_t *tec);
-> =20
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index 906b87c071..6a0728b65f 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -140,8 +140,8 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address,=
- int size,
->          if (!(env->psw.mask & PSW_MASK_64)) {
->              vaddr &=3D 0x7fffffff;
->          }
-> -        fail =3D mmu_translate(env, vaddr, access_type, asc, &raddr, &=
-prot, true);
-> -        excp =3D 0; /* exception already raised */
-> +        excp =3D mmu_translate(env, vaddr, access_type, asc, &raddr, &=
-prot, &tec);
-> +        fail =3D excp;
-
-... so what about instruction fetches? I assume this works as designed
-as we set  env->int_pgm_ilen =3D 2 in s390_cpu_tlb_fill() in case of
-MMU_INST_FETCH. But the comment indicates that "we may remove this
-entirely".
-
-Can you paint me the big picture? :)
-
-
->      } else if (mmu_idx =3D=3D MMU_REAL_IDX) {
->          /* 31-Bit mode */
->          if (!(env->psw.mask & PSW_MASK_64)) {
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 7d2a652823..e15aa296dd 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -2364,8 +2364,8 @@ uint64_t HELPER(lra)(CPUS390XState *env, uint64_t=
- addr)
->      CPUState *cs =3D env_cpu(env);
->      uint32_t cc =3D 0;
->      uint64_t asc =3D env->psw.mask & PSW_MASK_ASC;
-> -    uint64_t ret;
-> -    int old_exc, flags;
-> +    uint64_t ret, tec;
-> +    int old_exc, flags, exc;
-> =20
->      /* XXX incomplete - has more corner cases */
->      if (!(env->psw.mask & PSW_MASK_64) && (addr >> 32)) {
-> @@ -2373,7 +2373,14 @@ uint64_t HELPER(lra)(CPUS390XState *env, uint64_=
-t addr)
->      }
-> =20
->      old_exc =3D cs->exception_index;
-> -    if (mmu_translate(env, addr, 0, asc, &ret, &flags, true)) {
-> +    exc =3D mmu_translate(env, addr, 0, asc, &ret, &flags, &tec);
-> +    if (exc) {
-> +        /*
-> +         * We don't care about ILEN or TEC, as we're not going to
-> +         * deliver the exception -- thus resetting exception_index bel=
-ow.
-> +         * TODO: clean this up.
-> +         */
-> +        trigger_pgm_exception(env, exc, ILEN_UNWIND);
-
-Yeah, this needs a cleanup.
-
->          cc =3D 3;
->      }
->      if (cs->exception_index =3D=3D EXCP_PGM) {
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index ed6570db62..a9219942b1 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -349,17 +349,15 @@ static void mmu_handle_skey(target_ulong addr, in=
-t rw, int *flags)
->   * @return       0 if the translation was successful, -1 if a fault oc=
-curred
->   */
->  int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint=
-64_t asc,
-> -                  target_ulong *raddr, int *flags, bool exc)
-> +                  target_ulong *raddr, int *flags, uint64_t *tec)
->  {
-> -    /* Code accesses have an undefined ilc, let's use 2 bytes. */
-> -    const int ilen =3D (rw =3D=3D MMU_INST_FETCH) ? 2 : ILEN_AUTO;
-
-Now I realize that this ilen currently gets overwritten in
-s390_cpu_tlb_fill().
-
-> -    uint64_t tec =3D (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
-> -                   (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ);
->      uint64_t asce;
->      int r;
-> =20
-> -
-> +    *tec =3D (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
-> +            (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ);
->      *flags =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-> +
->      if (is_low_address(vaddr & TARGET_PAGE_MASK) && lowprot_enabled(en=
-v, asc)) {
->          /*
->           * If any part of this page is currently protected, make sure =
-the
-> @@ -371,10 +369,7 @@ int mmu_translate(CPUS390XState *env, target_ulong=
- vaddr, int rw, uint64_t asc,
->           */
->          *flags |=3D PAGE_WRITE_INV;
->          if (is_low_address(vaddr) && rw =3D=3D MMU_DATA_STORE) {
-> -            if (exc) {
-> -                trigger_access_exception(env, PGM_PROTECTION, ILEN_AUT=
-O, 0);
-> -            }
-> -            return -EACCES;
-> +            return PGM_PROTECTION;
->          }
->      }
-> =20
-> @@ -404,20 +399,14 @@ int mmu_translate(CPUS390XState *env, target_ulon=
-g vaddr, int rw, uint64_t asc,
->      /* perform the DAT translation */
->      r =3D mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw);
->      if (unlikely(r)) {
-> -        if (exc) {
-> -            trigger_access_exception(env, r, ilen, tec);
-> -        }
-> -        return -1;
-> +        return r;
->      }
-> =20
->      /* check for DAT protection */
->      if (unlikely(rw =3D=3D MMU_DATA_STORE && !(*flags & PAGE_WRITE))) =
-{
-> -        if (exc) {
-> -            /* DAT sets bit 61 only */
-> -            tec |=3D 0x4;
-> -            trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
-> -        }
-> -        return -1;
-> +        /* DAT sets bit 61 only */
-> +        *tec |=3D 0x4;
-> +        return PGM_PROTECTION;
->      }
-> =20
->  nodat:
-> @@ -441,9 +430,12 @@ static int translate_pages(S390CPU *cpu, vaddr add=
-r, int nr_pages,
->      int ret, i, pflags;
-> =20
->      for (i =3D 0; i < nr_pages; i++) {
-> -        ret =3D mmu_translate(env, addr, is_write, asc, &pages[i], &pf=
-lags, true);
-> +        uint64_t tec;
-> +
-> +        ret =3D mmu_translate(env, addr, is_write, asc, &pages[i], &pf=
-lags, &tec);
->          if (ret) {
-> -            return ret;
-> +            trigger_access_exception(env, ret, ILEN_AUTO, tec);
-> +            return -EFAULT;
->          }
->          if (!address_space_access_valid(&address_space_memory, pages[i=
-],
->                                          TARGET_PAGE_SIZE, is_write,
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+MjcuMDkuMjAxOSAxMDozMSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MjcuMDkuMjAxOSAyOjA1LCBKb2huIFNub3cgd3JvdGU6DQo+Pg0KPj4NCj4+IE9uIDgvNy8xOSAx
+MDoxMiBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+PiBTaWduZWQt
+b2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6
+by5jb20+DQo+Pj4gLS0tDQo+Pj4gwqAgdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkgfCAx
+MCArKysrKysrKysrDQo+Pj4gwqAgMSBmaWxlIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKykNCj4+
+Pg0KPj4+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weSBiL3Rlc3Rz
+L3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+Pj4gaW5kZXggY2U3NDE3N2FiMS4uNGFkMjY1ZjE0
+MCAxMDA2NDQNCj4+PiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weQ0KPj4+ICsr
+KyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+Pj4gQEAgLTU0MCw2ICs1NDAsMTYg
+QEAgY2xhc3MgVk0ocXRlc3QuUUVNVVF0ZXN0TWFjaGluZSk6DQo+Pj4gwqDCoMKgwqDCoMKgwqDC
+oMKgIGxvZyhyZXN1bHQsIGZpbHRlcnMsIGluZGVudD1pbmRlbnQpDQo+Pj4gwqDCoMKgwqDCoMKg
+wqDCoMKgIHJldHVybiByZXN1bHQNCj4+PiArwqDCoMKgIGRlZiBldmVudF93YWl0X2xvZyhzZWxm
+LCBuYW1lLCAqKmt3YXJncyk6DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGV2ZW50ID0gc2VsZi5ldmVu
+dF93YWl0KG5hbWUsICoqa3dhcmdzKQ0KPj4+ICvCoMKgwqDCoMKgwqDCoCBsb2coZXZlbnQsIGZp
+bHRlcnM9W2ZpbHRlcl9xbXBfZXZlbnRdKQ0KPj4+ICvCoMKgwqDCoMKgwqDCoCByZXR1cm4gZXZl
+bnQNCj4+PiArDQo+Pj4gK8KgwqDCoCBkZWYgZXZlbnRzX3dhaXRfbG9nKHNlbGYsIGV2ZW50cywg
+Kiprd2FyZ3MpOg0KPj4+ICvCoMKgwqDCoMKgwqDCoCBldmVudCA9IHNlbGYuZXZlbnRzX3dhaXQo
+ZXZlbnRzLCAqKmt3YXJncykNCj4+PiArwqDCoMKgwqDCoMKgwqAgbG9nKGV2ZW50LCBmaWx0ZXJz
+PVtmaWx0ZXJfcW1wX2V2ZW50XSkNCj4+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuIGV2ZW50DQo+
+Pj4gKw0KPj4+IMKgwqDCoMKgwqAgIyBSZXR1cm5zIE5vbmUgb24gc3VjY2VzcywgYW5kIGFuIGVy
+cm9yIHN0cmluZyBvbiBmYWlsdXJlDQo+Pj4gwqDCoMKgwqDCoCBkZWYgcnVuX2pvYihzZWxmLCBq
+b2IsIGF1dG9fZmluYWxpemU9VHJ1ZSwgYXV0b19kaXNtaXNzPUZhbHNlLA0KPj4+IMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcHJlX2ZpbmFsaXplPU5vbmUsIHVzZV9sb2c9VHJ1
+ZSwgd2FpdD02MC4wKToNCj4+Pg0KPj4NCj4+IEknbSBub3Qgc3VyZSB0aGVzZSBhcmUgcmVhbGx5
+IG5lZWRlZCwgc2luY2UgeW91IGNhbiBqdXN0IGxvZyB0aGUgZXZlbnQNCj4+IHlvdSBnZXQgYWZ0
+ZXIgY2FsbGluZyBlaXRoZXIgb2YgdGhlc2UgbWV0aG9kcyBhbnl3YXkuIFRoZXJlJ3Mgbm90aGlu
+Zw0KPj4gc3RvcHBpbmcgeW91IGZyb206DQo+Pg0KPj4gYGBgDQo+PiBldmVudCA9IGV2ZW50X3dh
+aXRfbG9nKC4uLikNCj4+IGxvZyhmaWx0ZXJfcW1wX2V2ZW50KGV2ZW50KSkNCj4+IGBgYA0KPiAN
+Cj4gdHdvIGxpbmVzIHZzIG9uZQ0KPiANCj4gSG0sIGp1c3Qgc2ltcGxlIHdyYXBwZXJzIGxpa2Ug
+cW1wX2xvZygpLCB0byBtYWtlIHRlc3QgYSBiaXQgbW9yZSByZWFkYWJsZSwgd2h5IG5vdC4uDQo+
+IA0KDQpTdGlsbCBrZWVwaW5nIGluIG1pbmQgaWRlYSBvZiBnbG9iYWwgbG9nZ2luZyB0dXJuIG9u
+L29mZiwgaXQgbWF5IGJlIGJhZCB0byBpbmNyZWFzZSBudW1iZXIgb2YgZl9sb2cNCmZ1bmN0aW9u
+IHZlcnNpb25zLCBpdCByZW1lbWJlciBtZSB0aGUgcGFpbiB3aXRoIF9sb2NrZWQgQVBJcyBpbiBk
+aXJ0eS1iaXRtYXBzLg0KDQpPSywgSSdsbCBkcm9wIGl0Lg0KDQotLSANCkJlc3QgcmVnYXJkcywN
+ClZsYWRpbWlyDQo=
 
