@@ -6,44 +6,45 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D279AC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D99BC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB63821A4C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:20:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB63821A4C
+	by mail.kernel.org (Postfix) with ESMTPS id 656082075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:38:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 656082075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDlUj-0005mF-Rp
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:20:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44386)
+	id 1iDllo-0003aH-7z
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:38:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDlSu-0004qv-4J
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:19:02 -0400
+ (envelope-from <david@redhat.com>) id 1iDlkR-0002YW-Vl
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:37:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDlSn-0005Fo-TD
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:18:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52276)
+ (envelope-from <david@redhat.com>) id 1iDlkO-00012x-Vs
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:37:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47950)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDlSn-0005FS-LG; Fri, 27 Sep 2019 04:18:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1iDlkO-000112-NY; Fri, 27 Sep 2019 04:37:04 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 405B3A44ACF;
- Fri, 27 Sep 2019 08:18:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 83192369D3;
+ Fri, 27 Sep 2019 08:37:02 +0000 (UTC)
 Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6588D1001281;
- Fri, 27 Sep 2019 08:18:50 +0000 (UTC)
-Subject: Re: [PATCH v3 00/18] target/s390: Use tcg unwinding for ilen
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190926162615.31168-1-richard.henderson@linaro.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB6815C21A;
+ Fri, 27 Sep 2019 08:37:00 +0000 (UTC)
+Subject: Re: [PATCH v1 0/2] s390x: SCLP error cleanup
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,18 +91,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <226fc3d9-72bb-032b-926e-ec102dd36bef@redhat.com>
-Date: Fri, 27 Sep 2019 10:18:49 +0200
+Message-ID: <17455634-cd9e-15c4-3e31-18702d53cdf8@redhat.com>
+Date: Fri, 27 Sep 2019 10:37:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190926162615.31168-1-richard.henderson@linaro.org>
+In-Reply-To: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Fri, 27 Sep 2019 08:18:51 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 27 Sep 2019 08:37:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -116,28 +117,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, frankja@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26.09.19 18:25, Richard Henderson wrote:
-> David's cleanup of some of the mmu code reminded me of an old branch
-> that I have laying around.  His new code allowed me to finish this
-> idea up to completely transition away from ILEN_AUTO.
+On 26.09.19 13:33, Claudio Imbrenda wrote:
+> SCLP doesn't report a lot of errors like it should do, let's fix that.
 > 
-> V1 was posted back in 2017:
->    https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07607.html
-> V2 was posted back in April:
->    https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg00063.html
+> Janosch Frank (1):
+>   s390x: Add sclp boundary check and fix error priority
 > 
-> Based-on: <20190925125236.4043-1-david@redhat.com> \
->   ("s390x/mmu: DAT translation rewrite")
+> Claudio Imbrenda (1):
+>   s390x: Fix SCLP return code when buffer too small
+> 
+>  hw/s390x/event-facility.c |  3 ---
+>  hw/s390x/sclp.c           | 35 ++++++++++++++++++++++++++++++++---
+>  2 files changed, 32 insertions(+), 6 deletions(-)
 > 
 
-Right, that rings a bell :) I assume we can unwind in all cases except
-on instruction fetches - I'm curious how it turned out and will try to
-review as soon as time permits (most probably I'll start reviewing today).
+Just wondering, are you using scripts/get_maintainer.pl ? I would have
+assume to get CCed on these patches (along with Richard).
 
 -- 
 
