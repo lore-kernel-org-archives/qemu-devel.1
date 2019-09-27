@@ -2,60 +2,108 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD6BC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCEC0C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:26:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B068B217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:25:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B068B217D7
+	by mail.kernel.org (Postfix) with ESMTPS id B1ADB217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:26:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1ADB217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDs7J-0001Yz-Vo
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:25:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39981)
+	id 1iDs8N-0002UI-LL
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:26:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39020)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iDqaE-0001If-B2
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:47:01 -0400
+ (envelope-from <david@redhat.com>) id 1iDqWN-0005yj-JR
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iDqa9-00066F-NM
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49416)
+ (envelope-from <david@redhat.com>) id 1iDqWM-0005Nn-Ih
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52584)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa9-00064J-3p
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iDqWM-0005NZ-7T; Fri, 27 Sep 2019 09:42:54 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BA3F9CD4CD;
- Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A3AA45D6A7;
- Fri, 27 Sep 2019 13:46:46 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9E0F01138406; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 18/26] qapi: Improve reporting of invalid 'if' errors
-Date: Fri, 27 Sep 2019 15:46:31 +0200
-Message-Id: <20190927134639.4284-19-armbru@redhat.com>
-In-Reply-To: <20190927134639.4284-1-armbru@redhat.com>
-References: <20190927134639.4284-1-armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 61EB53018ED0;
+ Fri, 27 Sep 2019 13:42:53 +0000 (UTC)
+Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B0AD5600C6;
+ Fri, 27 Sep 2019 13:42:51 +0000 (UTC)
+Subject: Re: [PATCH v2 2/4] s390x: sclp: boundary check
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <1569591203-15258-1-git-send-email-imbrenda@linux.ibm.com>
+ <1569591203-15258-3-git-send-email-imbrenda@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <b074d8fe-8dc8-0f13-5789-0ede689ce874@redhat.com>
+Date: Fri, 27 Sep 2019 15:42:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <1569591203-15258-3-git-send-email-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.46]); Fri, 27 Sep 2019 13:42:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,90 +118,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: pasic@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+ frankja@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move check_if() from check_keys() to check_exprs() and call it later,
-so its error messages gain an "in definition" line.
+On 27.09.19 15:33, Claudio Imbrenda wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> All sclp codes need to be checked for page boundary violations.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  hw/s390x/sclp.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index 95ebfe7..73244c9 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -234,6 +234,11 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>          goto out_write;
+>      }
+>  
+> +    if ((sccb + be16_to_cpu(work_sccb.h.length)) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
+> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
+> +        goto out_write;
+> +    }
+> +
+>      sclp_c->execute(sclp, &work_sccb, code);
+>  out_write:
+>      cpu_physical_memory_write(sccb, &work_sccb,
+> 
 
-Checking values in a function named check_keys() is unclean anyway.
-The original sin was commit 0545f6b887 "qapi: Better error messages
-for bad expressions", which checks the value of key 'name'.  More
-sinning in commit 2cbf09925a "qapi: More rigorous checking for type
-safety bypass", commit c818408e44 "qapi: Implement boxed types for
-commands/events", and commit 967c885108 "qapi: add 'if' to top-level
-expressions".  This commit does penance for the latter.  The next
-commits will do penance for the others.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- scripts/qapi/common.py                  | 4 ++--
- tests/qapi-schema/bad-if-empty-list.err | 1 +
- tests/qapi-schema/bad-if-empty.err      | 1 +
- tests/qapi-schema/bad-if-list.err       | 1 +
- tests/qapi-schema/bad-if.err            | 1 +
- 5 files changed, 6 insertions(+), 2 deletions(-)
+-- 
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 2e1d8158d6..8f96974f85 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -925,8 +925,6 @@ def check_keys(expr, info, meta, required, optional=3D=
-[]):
-             raise QAPISemError(info,
-                                "'%s' of %s '%s' should only use true val=
-ue"
-                                % (key, meta, name))
--        if key =3D=3D 'if':
--            check_if(expr, info)
-=20
-=20
- def normalize_enum(expr):
-@@ -1028,6 +1026,8 @@ def check_exprs(exprs):
-         else:
-             assert False, 'unexpected meta type'
-=20
-+        check_if(expr, info)
-+
-         if doc:
-             doc.check_expr(expr)
-=20
-diff --git a/tests/qapi-schema/bad-if-empty-list.err b/tests/qapi-schema/=
-bad-if-empty-list.err
-index 75fe6497bc..2218c9279b 100644
---- a/tests/qapi-schema/bad-if-empty-list.err
-+++ b/tests/qapi-schema/bad-if-empty-list.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/bad-if-empty-list.json: In struct 'TestIfStruct':
- tests/qapi-schema/bad-if-empty-list.json:2: 'if' condition [] is useless
-diff --git a/tests/qapi-schema/bad-if-empty.err b/tests/qapi-schema/bad-i=
-f-empty.err
-index 358bdc3e51..a3fdb3009d 100644
---- a/tests/qapi-schema/bad-if-empty.err
-+++ b/tests/qapi-schema/bad-if-empty.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/bad-if-empty.json: In struct 'TestIfStruct':
- tests/qapi-schema/bad-if-empty.json:2: 'if' condition '' makes no sense
-diff --git a/tests/qapi-schema/bad-if-list.err b/tests/qapi-schema/bad-if=
--list.err
-index 53af099083..e03bf0fc3a 100644
---- a/tests/qapi-schema/bad-if-list.err
-+++ b/tests/qapi-schema/bad-if-list.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/bad-if-list.json: In struct 'TestIfStruct':
- tests/qapi-schema/bad-if-list.json:2: 'if' condition ' ' makes no sense
-diff --git a/tests/qapi-schema/bad-if.err b/tests/qapi-schema/bad-if.err
-index c2e3f5f44c..190216c109 100644
---- a/tests/qapi-schema/bad-if.err
-+++ b/tests/qapi-schema/bad-if.err
-@@ -1 +1,2 @@
-+tests/qapi-schema/bad-if.json: In struct 'TestIfStruct':
- tests/qapi-schema/bad-if.json:2: 'if' condition must be a string or a li=
-st of strings
---=20
-2.21.0
+Thanks,
 
+David / dhildenb
 
