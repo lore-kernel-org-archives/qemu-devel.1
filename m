@@ -2,65 +2,77 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 681F0C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F08C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:09:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F7EE217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:08:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="LXsNHIcT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F7EE217D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id DFC75217D9
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:09:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC75217D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDlJ4-0000ND-29
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:08:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40831)
+	id 1iDlJQ-0000z8-0i
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:09:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41516)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iDlAB-0000m7-UH
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:59:42 -0400
+ (envelope-from <qi1.zhang@intel.com>) id 1iDlE3-0003hd-0S
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:03:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iDlA9-0003Ma-Hp
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 03:59:39 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:41751)
+ (envelope-from <qi1.zhang@intel.com>) id 1iDlDy-0000EP-Ng
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:03:36 -0400
+Received: from mga06.intel.com ([134.134.136.31]:61562)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iDlA7-0003GE-An; Fri, 27 Sep 2019 03:59:37 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46fkhy1vTnz9sNf; Fri, 27 Sep 2019 17:59:30 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569571170;
- bh=hU/8RqKETjSyvesMjbN30QTESQFyRW0a5xuYEJaYlNQ=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=LXsNHIcTsEnVzF6mfNHoUl96gddwsSCsK4JuRqHmIy86CpAC9t7NwkB1z7NqFrtFE
- UxuVOWE9WQ5HOZ0T3uc92oBIG1wUeczpaHTGpf2smvdVkF5QcT65+iNejblWtpWzHv
- vkLT/0JOSY90RAU2ObePtSYckAMQycE5bHObv/fE=
-Date: Fri, 27 Sep 2019 17:58:58 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 09/33] spapr: Clarify and fix handling of nr_irqs
-Message-ID: <20190927075858.GB12116@umbus.fritz.box>
-References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
- <20190927055028.11493-10-david@gibson.dropbear.id.au>
- <20190927095359.4e07ea70@bahia.lan>
+ (Exim 4.71) (envelope-from <qi1.zhang@intel.com>) id 1iDlDy-00004u-81
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:03:34 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 27 Sep 2019 01:03:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,554,1559545200"; d="scan'208";a="201939772"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+ by orsmga002.jf.intel.com with ESMTP; 27 Sep 2019 01:03:24 -0700
+Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 27 Sep 2019 01:03:23 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.113]) by
+ SHSMSX101.ccr.corp.intel.com ([169.254.1.92]) with mapi id 14.03.0439.000;
+ Fri, 27 Sep 2019 16:03:22 +0800
+From: "Zhang, Qi1" <qi1.zhang@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [PATCH V2] intel_iommu: TM field should not be in reserved bits
+Thread-Topic: [PATCH V2] intel_iommu: TM field should not be in reserved bits
+Thread-Index: AQHVdPGo8xxlixx6u0uh+e2QWzPmzKc+hHCAgAChAlA=
+Date: Fri, 27 Sep 2019 08:03:21 +0000
+Message-ID: <215440059103624D9AD9D1DCACBF45DD3E84E270@shsmsx102.ccr.corp.intel.com>
+References: <20190927045838.2968-1-qi1.zhang@intel.com>
+ <20190927061011.GB9412@xz-x1>
+In-Reply-To: <20190927061011.GB9412@xz-x1>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMDEyNDU5YmQtOTU4NC00MWE1LWJiYzMtNGM2ZDFjMGI3NDY2IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibjlvT2QzYmw0Y2tBM25PdkxTejMzM3ZYMEs2RmRSVUNJZHRtYXFEcFFTcVhOclNNdVA5OG8wcUFVc0l3VlJheiJ9
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="wzJLGUyc3ArbnUjN"
-Content-Disposition: inline
-In-Reply-To: <20190927095359.4e07ea70@bahia.lan>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 134.134.136.31
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,290 +84,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- clg@kaod.org,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Qi,
+ Yadong" <yadong.qi@intel.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---wzJLGUyc3ArbnUjN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Sep 27, 2019 at 09:53:59AM +0200, Greg Kurz wrote:
-65;5603;1c> On Fri, 27 Sep 2019 15:50:04 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > Both the XICS and XIVE interrupt backends have a "nr-irqs" property, but
-> > it means slightly different things.  For XICS (or, strictly, the ICS) it
-> > indicates the number of "real" external IRQs.  Those start at XICS_IRQ_=
-BASE
-> > (0x1000) and don't include the special IPI vector.  For XIVE, however, =
-it
-> > includes the whole IRQ space, including XIVE's many IPI vectors.
-> >=20
-> > The spapr code currently doesn't handle this sensibly, with the
-> > nr_irqs value in SpaprIrq having different meanings depending on the
-> > backend.  We fix this by renaming nr_irqs to nr_xirqs and making it
-> > always indicate just the number of external irqs, adjusting the value
-> > we pass to XIVE accordingly.  We also move to using common constants
-> > in most of the irq configurations, to make it clearer that the IRQ
-> > space looks the same to the guest (and emulated devices), even if the
-> > backend is different.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
->=20
-> Cedric and I have already given an R-b for this one.
-
-Oh, yeah, not sure how I dropped that one.
-
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
-> >  hw/ppc/spapr_irq.c         | 53 ++++++++++++++------------------------
-> >  include/hw/ppc/spapr_irq.h | 19 +++++++++-----
-> >  2 files changed, 31 insertions(+), 41 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> > index 8c26fa2d1e..3207b6bd01 100644
-> > --- a/hw/ppc/spapr_irq.c
-> > +++ b/hw/ppc/spapr_irq.c
-> > @@ -92,7 +92,7 @@ static void spapr_irq_init_kvm(SpaprMachineState *spa=
-pr,
-> >   * XICS IRQ backend.
-> >   */
-> > =20
-> > -static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_irqs,
-> > +static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_xirqs,
-> >                                  Error **errp)
-> >  {
-> >      Object *obj;
-> > @@ -102,7 +102,7 @@ static void spapr_irq_init_xics(SpaprMachineState *=
-spapr, int nr_irqs,
-> >      object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
-> >      object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
-> >                                     &error_fatal);
-> > -    object_property_set_int(obj, nr_irqs, "nr-irqs",  &error_fatal);
-> > +    object_property_set_int(obj, nr_xirqs, "nr-irqs",  &error_fatal);
-> >      object_property_set_bool(obj, true, "realized", &local_err);
-> >      if (local_err) {
-> >          error_propagate(errp, local_err);
-> > @@ -234,13 +234,9 @@ static void spapr_irq_init_kvm_xics(SpaprMachineSt=
-ate *spapr, Error **errp)
-> >      }
-> >  }
-> > =20
-> > -#define SPAPR_IRQ_XICS_NR_IRQS     0x1000
-> > -#define SPAPR_IRQ_XICS_NR_MSIS     \
-> > -    (XICS_IRQ_BASE + SPAPR_IRQ_XICS_NR_IRQS - SPAPR_IRQ_MSI)
-> > -
-> >  SpaprIrq spapr_irq_xics =3D {
-> > -    .nr_irqs     =3D SPAPR_IRQ_XICS_NR_IRQS,
-> > -    .nr_msis     =3D SPAPR_IRQ_XICS_NR_MSIS,
-> > +    .nr_xirqs    =3D SPAPR_NR_XIRQS,
-> > +    .nr_msis     =3D SPAPR_NR_MSIS,
-> >      .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
-> > =20
-> >      .init        =3D spapr_irq_init_xics,
-> > @@ -260,7 +256,7 @@ SpaprIrq spapr_irq_xics =3D {
-> >  /*
-> >   * XIVE IRQ backend.
-> >   */
-> > -static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_irqs,
-> > +static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_xirqs,
-> >                                  Error **errp)
-> >  {
-> >      uint32_t nr_servers =3D spapr_max_server_number(spapr);
-> > @@ -268,7 +264,7 @@ static void spapr_irq_init_xive(SpaprMachineState *=
-spapr, int nr_irqs,
-> >      int i;
-> > =20
-> >      dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
-> > -    qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
-> > +    qdev_prop_set_uint32(dev, "nr-irqs", nr_xirqs + SPAPR_XIRQ_BASE);
-> >      /*
-> >       * 8 XIVE END structures per CPU. One for each available priority
-> >       */
-> > @@ -308,7 +304,7 @@ static qemu_irq spapr_qirq_xive(SpaprMachineState *=
-spapr, int irq)
-> >  {
-> >      SpaprXive *xive =3D spapr->xive;
-> > =20
-> > -    if (irq >=3D xive->nr_irqs) {
-> > +    if ((irq < SPAPR_XIRQ_BASE) || (irq >=3D xive->nr_irqs)) {
-> >          return NULL;
-> >      }
-> > =20
-> > @@ -404,17 +400,9 @@ static void spapr_irq_init_kvm_xive(SpaprMachineSt=
-ate *spapr, Error **errp)
-> >      }
-> >  }
-> > =20
-> > -/*
-> > - * XIVE uses the full IRQ number space. Set it to 8K to be compatible
-> > - * with XICS.
-> > - */
-> > -
-> > -#define SPAPR_IRQ_XIVE_NR_IRQS     0x2000
-> > -#define SPAPR_IRQ_XIVE_NR_MSIS     (SPAPR_IRQ_XIVE_NR_IRQS - SPAPR_IRQ=
-_MSI)
-> > -
-> >  SpaprIrq spapr_irq_xive =3D {
-> > -    .nr_irqs     =3D SPAPR_IRQ_XIVE_NR_IRQS,
-> > -    .nr_msis     =3D SPAPR_IRQ_XIVE_NR_MSIS,
-> > +    .nr_xirqs    =3D SPAPR_NR_XIRQS,
-> > +    .nr_msis     =3D SPAPR_NR_MSIS,
-> >      .ov5         =3D SPAPR_OV5_XIVE_EXPLOIT,
-> > =20
-> >      .init        =3D spapr_irq_init_xive,
-> > @@ -450,18 +438,18 @@ static SpaprIrq *spapr_irq_current(SpaprMachineSt=
-ate *spapr)
-> >          &spapr_irq_xive : &spapr_irq_xics;
-> >  }
-> > =20
-> > -static void spapr_irq_init_dual(SpaprMachineState *spapr, int nr_irqs,
-> > +static void spapr_irq_init_dual(SpaprMachineState *spapr, int nr_xirqs,
-> >                                  Error **errp)
-> >  {
-> >      Error *local_err =3D NULL;
-> > =20
-> > -    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_irqs, &local_err);
-> > +    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_xirqs, &local_err);
-> >      if (local_err) {
-> >          error_propagate(errp, local_err);
-> >          return;
-> >      }
-> > =20
-> > -    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_irqs, &local_err);
-> > +    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_xirqs, &local_err);
-> >      if (local_err) {
-> >          error_propagate(errp, local_err);
-> >          return;
-> > @@ -586,12 +574,9 @@ static const char *spapr_irq_get_nodename_dual(Spa=
-prMachineState *spapr)
-> >  /*
-> >   * Define values in sync with the XIVE and XICS backend
-> >   */
-> > -#define SPAPR_IRQ_DUAL_NR_IRQS     0x2000
-> > -#define SPAPR_IRQ_DUAL_NR_MSIS     (SPAPR_IRQ_DUAL_NR_IRQS - SPAPR_IRQ=
-_MSI)
-> > -
-> >  SpaprIrq spapr_irq_dual =3D {
-> > -    .nr_irqs     =3D SPAPR_IRQ_DUAL_NR_IRQS,
-> > -    .nr_msis     =3D SPAPR_IRQ_DUAL_NR_MSIS,
-> > +    .nr_xirqs    =3D SPAPR_NR_XIRQS,
-> > +    .nr_msis     =3D SPAPR_NR_MSIS,
-> >      .ov5         =3D SPAPR_OV5_XIVE_BOTH,
-> > =20
-> >      .init        =3D spapr_irq_init_dual,
-> > @@ -693,10 +678,10 @@ void spapr_irq_init(SpaprMachineState *spapr, Err=
-or **errp)
-> >          spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
-> >      }
-> > =20
-> > -    spapr->irq->init(spapr, spapr->irq->nr_irqs, errp);
-> > +    spapr->irq->init(spapr, spapr->irq->nr_xirqs, errp);
-> > =20
-> >      spapr->qirqs =3D qemu_allocate_irqs(spapr->irq->set_irq, spapr,
-> > -                                      spapr->irq->nr_irqs);
-> > +                                      spapr->irq->nr_xirqs + SPAPR_XIR=
-Q_BASE);
-> >  }
-> > =20
-> >  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
- **errp)
-> > @@ -804,11 +789,11 @@ int spapr_irq_find(SpaprMachineState *spapr, int =
-num, bool align, Error **errp)
-> >      return first + ics->offset;
-> >  }
-> > =20
-> > -#define SPAPR_IRQ_XICS_LEGACY_NR_IRQS     0x400
-> > +#define SPAPR_IRQ_XICS_LEGACY_NR_XIRQS     0x400
-> > =20
-> >  SpaprIrq spapr_irq_xics_legacy =3D {
-> > -    .nr_irqs     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
-> > -    .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_IRQS,
-> > +    .nr_xirqs    =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
-> > +    .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
-> >      .ov5         =3D SPAPR_OV5_XIVE_LEGACY,
-> > =20
-> >      .init        =3D spapr_irq_init_xics,
-> > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> > index 5db305165c..a8f9a2ab11 100644
-> > --- a/include/hw/ppc/spapr_irq.h
-> > +++ b/include/hw/ppc/spapr_irq.h
-> > @@ -16,13 +16,18 @@
-> >   * IRQ range offsets per device type
-> >   */
-> >  #define SPAPR_IRQ_IPI        0x0
-> > -#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
-> > -#define SPAPR_IRQ_HOTPLUG    0x1001
-> > -#define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
-> > -#define SPAPR_IRQ_PCI_LSI    0x1200  /* 32+ PHBs devices */
-> > =20
-> > -#define SPAPR_IRQ_MSI        0x1300  /* Offset of the dynamic range co=
-vered
-> > -                                      * by the bitmap allocator */
-> > +#define SPAPR_XIRQ_BASE      XICS_IRQ_BASE /* 0x1000 */
-> > +#define SPAPR_IRQ_EPOW       (SPAPR_XIRQ_BASE + 0x0000)
-> > +#define SPAPR_IRQ_HOTPLUG    (SPAPR_XIRQ_BASE + 0x0001)
-> > +#define SPAPR_IRQ_VIO        (SPAPR_XIRQ_BASE + 0x0100)  /* 256 VIO de=
-vices */
-> > +#define SPAPR_IRQ_PCI_LSI    (SPAPR_XIRQ_BASE + 0x0200)  /* 32+ PHBs d=
-evices */
-> > +
-> > +/* Offset of the dynamic range covered by the bitmap allocator */
-> > +#define SPAPR_IRQ_MSI        (SPAPR_XIRQ_BASE + 0x0300)
-> > +
-> > +#define SPAPR_NR_XIRQS       0x1000
-> > +#define SPAPR_NR_MSIS        (SPAPR_XIRQ_BASE + SPAPR_NR_XIRQS - SPAPR=
-_IRQ_MSI)
-> > =20
-> >  typedef struct SpaprMachineState SpaprMachineState;
-> > =20
-> > @@ -32,7 +37,7 @@ int spapr_irq_msi_alloc(SpaprMachineState *spapr, uin=
-t32_t num, bool align,
-> >  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t nu=
-m);
-> > =20
-> >  typedef struct SpaprIrq {
-> > -    uint32_t    nr_irqs;
-> > +    uint32_t    nr_xirqs;
-> >      uint32_t    nr_msis;
-> >      uint8_t     ov5;
-> > =20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---wzJLGUyc3ArbnUjN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2NwT0ACgkQbDjKyiDZ
-s5LdiBAAgQkwKpj9ZeQfIXMyuZYn61D7c3LcmmunKJw7wP/T94WNCIOZN3YbH9/2
-hyBllMpvv0QcS+0GJoEd71DCwhwF3oQ47aFf5VApbUvif21cpzYneyt9+6uLR7V0
-VgBBU24OZyKhLxpSlG55jWdg9oY/QGu3DlHJ7oj23WewC7aCeS84PjAIT4CcufJL
-c6b7tkfVUQxS0UNCoV4DRarop7zZBwKhWCdkfaez9MLDrV/gDujrf+R6mp0kOuXz
-8pHHLNd4cFT5GXoyUP6hM0U/Trnhyn1QxDHV59h0kk4fnJKYXVCt7+k6GneIfYq+
-Jmr3kNZIFsfq/cVRUroMx0AMhyW7G82X5uA84y6/R38EkohxjGJsfF0EsE1yFAuR
-X+y++NULqtAv/eLcYFEapWB5VJl051McLjXJyultPsmRAx7AFPx2C+heiMLryLjx
-Tb2mCBtklGKrttq7Gpq7vEGbscTJBX3Nm5dUSUtViYWCEtzkjKKp19LCTF18aMTy
-/QHVJ4eJrrIpgrqkT8K1QI7ZLmZOXZW4oX9QkoybdM9ONCs4JzyVpD/fC/QWOJSY
-ue2n2MsNprTqQCdbY9bCcmVwERYSWX7rgIgsTxCoIJTkmChMjxVUUnwVFCw/GFxr
-3PU5qFuVNwcpU+xPKP9u9Ux0IHAw2NZP9Jnx4LOaJmadE4cF7hY=
-=Gn1q
------END PGP SIGNATURE-----
-
---wzJLGUyc3ArbnUjN--
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgWHUgPHBldGVy
+eEByZWRoYXQuY29tPg0KPiBTZW50OiBGcmlkYXksIFNlcHRlbWJlciAyNywgMjAxOSAyOjEwIFBN
+DQo+IFRvOiBaaGFuZywgUWkxIDxxaTEuemhhbmdAaW50ZWwuY29tPg0KPiBDYzogcWVtdS1kZXZl
+bEBub25nbnUub3JnOyBlaGFia29zdEByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsNCj4gcGJv
+bnppbmlAcmVkaGF0LmNvbTsgcnRoQHR3aWRkbGUubmV0DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
+VjJdIGludGVsX2lvbW11OiBUTSBmaWVsZCBzaG91bGQgbm90IGJlIGluIHJlc2VydmVkIGJpdHMN
+Cj4gDQo+IE9uIEZyaSwgU2VwIDI3LCAyMDE5IGF0IDEyOjU4OjM4UE0gKzA4MDAsIHFpMS56aGFu
+Z0BpbnRlbC5jb20gd3JvdGU6DQo+ID4gRnJvbTogIlpoYW5nLCBRaSIgPHFpMS56aGFuZ0BpbnRl
+bC5jb20+DQo+ID4NCj4gPiBXaGVuIGR0IGlzIHN1cHBvcnRlZCwgVE0gZmllbGQgc2hvdWxkIG5v
+dCBiZSBSZXNlcnZlZCgwKS4NCj4gPg0KPiA+IFJlZmVyIHRvIFZULWQgU3BlYyA5LjgNCj4gPg0K
+PiA+IFNpZ25lZC1vZmYtYnk6IFpoYW5nLCBRaSA8cWkxLnpoYW5nQGludGVsLmNvbT4NCj4gPiBT
+aWduZWQtb2ZmLWJ5OiBRaSwgWWFkb25nIDx5YWRvbmcucWlAaW50ZWwuY29tPg0KPiA+IC0tLQ0K
+PiA+ICBody9pMzg2L2ludGVsX2lvbW11LmMgICAgICAgICAgfCAxMiArKysrKystLS0tLS0NCj4g
+PiAgaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oIHwgMjUgKysrKysrKysrKysrKysrKysr
+Ky0tLS0tLQ0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDI1IGluc2VydGlvbnMoKyksIDEyIGRlbGV0
+aW9ucygtKQ0KPiA+IC0tLQ0KPiA+IENoYW5nZWxvZyBWMjoNCj4gPiAgbW92ZSBkdF9zdXBwb3J0
+ZWQgZmxhZyB0byBWVERfU1BURV9QQUdFX0xYX1JTVkRfTUFTSyBhbmQNCj4gPiBWVERfU1BURV9M
+UEFHRV9MWF9SU1ZEX01BU0sNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2ludGVsX2lv
+bW11LmMgYi9ody9pMzg2L2ludGVsX2lvbW11LmMgaW5kZXgNCj4gPiBmMWRlOGZkYjc1Li4zNTIy
+MmNmNTVjIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ICsrKyBi
+L2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IEBAIC0zNTQ4LDEzICszNTQ4LDEzIEBAIHN0YXRp
+YyB2b2lkIHZ0ZF9pbml0KEludGVsSU9NTVVTdGF0ZSAqcykNCj4gPiAgICAgICAqIFJzdmQgZmll
+bGQgbWFza3MgZm9yIHNwdGUNCj4gPiAgICAgICAqLw0KPiA+ICAgICAgdnRkX3BhZ2luZ19lbnRy
+eV9yc3ZkX2ZpZWxkWzBdID0gfjBVTEw7DQo+ID4gLSAgICB2dGRfcGFnaW5nX2VudHJ5X3JzdmRf
+ZmllbGRbMV0gPSBWVERfU1BURV9QQUdFX0wxX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7DQo+
+ID4gLSAgICB2dGRfcGFnaW5nX2VudHJ5X3JzdmRfZmllbGRbMl0gPSBWVERfU1BURV9QQUdFX0wy
+X1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7DQo+ID4gLSAgICB2dGRfcGFnaW5nX2VudHJ5X3Jz
+dmRfZmllbGRbM10gPSBWVERfU1BURV9QQUdFX0wzX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7
+DQo+ID4gKyAgICB2dGRfcGFnaW5nX2VudHJ5X3JzdmRfZmllbGRbMV0gPSBWVERfU1BURV9QQUdF
+X0wxX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cywgeDg2X2lvbW11LT5kdF9zdXBwb3J0ZWQpOw0K
+PiA+ICsgICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzJdID0gVlREX1NQVEVfUEFHRV9M
+Ml9SU1ZEX01BU0socy0NCj4gPmF3X2JpdHMsIHg4Nl9pb21tdS0+ZHRfc3VwcG9ydGVkKTsNCj4g
+PiArICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVsZFszXSA9DQo+ID4gKyBWVERfU1BURV9Q
+QUdFX0wzX1JTVkRfTUFTSyhzLT5hd19iaXRzLCB4ODZfaW9tbXUtDQo+ID5kdF9zdXBwb3J0ZWQp
+Ow0KPiA+ICAgICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzRdID0gVlREX1NQVEVfUEFH
+RV9MNF9SU1ZEX01BU0socy0NCj4gPmF3X2JpdHMpOw0KPiA+IC0gICAgdnRkX3BhZ2luZ19lbnRy
+eV9yc3ZkX2ZpZWxkWzVdID0gVlREX1NQVEVfTFBBR0VfTDFfUlNWRF9NQVNLKHMtDQo+ID5hd19i
+aXRzKTsNCj4gPiAtICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVsZFs2XSA9IFZURF9TUFRF
+X0xQQUdFX0wyX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7DQo+ID4gLSAgICB2dGRfcGFnaW5n
+X2VudHJ5X3JzdmRfZmllbGRbN10gPSBWVERfU1BURV9MUEFHRV9MM19SU1ZEX01BU0socy0NCj4g
+PmF3X2JpdHMpOw0KPiA+ICsgICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzVdID0NCj4g
+VlREX1NQVEVfTFBBR0VfTDFfUlNWRF9NQVNLKHMtPmF3X2JpdHMsIHg4Nl9pb21tdS0NCj4gPmR0
+X3N1cHBvcnRlZCk7DQo+ID4gKyAgICB2dGRfcGFnaW5nX2VudHJ5X3JzdmRfZmllbGRbNl0gPQ0K
+PiBWVERfU1BURV9MUEFHRV9MMl9SU1ZEX01BU0socy0+YXdfYml0cywgeDg2X2lvbW11LQ0KPiA+
+ZHRfc3VwcG9ydGVkKTsNCj4gPiArICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVsZFs3XSA9
+DQo+ID4gKyBWVERfU1BURV9MUEFHRV9MM19SU1ZEX01BU0socy0+YXdfYml0cywgeDg2X2lvbW11
+LQ0KPiA+ZHRfc3VwcG9ydGVkKTsNCj4gPiAgICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVs
+ZFs4XSA9DQo+ID4gVlREX1NQVEVfTFBBR0VfTDRfUlNWRF9NQVNLKHMtPmF3X2JpdHMpOw0KPiAN
+Cj4gU2hvdWxkIHRoaXMgVE0gYml0IG9ubHkgYWZmZWN0cyBsZWF2ZXM/ICBTYXksIGVudHJ5IDEg
+KDRLKSwgNSAoMk0pLCA2ICgxRykuDQo+IFdoaWxlIHRoaXMgcmVtaW5kZWQgbWUgdGhhdCBJJ20g
+dG90YWxseSBjb25mdXNlZCBvbiB3aHkgd2UgaGF2ZSBoYWQgZW50cnkNCj4gNywgOCBhZnRlciBh
+bGwuLi4gIEFyZSB0aGV5IHJlYWxseSB1c2VkPw0KWWVzLiBUTSBiaXQgb25seSBhZmZlY3RzLiBU
+byB0aGlzIGFycmF5LCBpbmRleCAxLCA1LDYsNyBtYXkgYmUgbGVhZi4gV2lsbCB1cGRhdGUgYSBu
+ZXcgcGF0Y2hzZXQgZm9yIGl0Lg0KPiANCj4gPg0KPiA+ICAgICAgaWYgKHg4Nl9pb21tdV9pcl9z
+dXBwb3J0ZWQoeDg2X2lvbW11KSkgeyBkaWZmIC0tZ2l0DQo+ID4gYS9ody9pMzg2L2ludGVsX2lv
+bW11X2ludGVybmFsLmggYi9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgNCj4gPiBpbmRl
+eCBjMTIzNWE3MDYzLi4wMWYxYWE2Yzg2IDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxf
+aW9tbXVfaW50ZXJuYWwuaA0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXVfaW50ZXJuYWwu
+aA0KPiA+IEBAIC0zODcsMTkgKzM4NywzMSBAQCB0eXBlZGVmIHVuaW9uIFZUREludkRlc2MgVlRE
+SW52RGVzYzsgICNkZWZpbmUNCj4gPiBWVERfSU5WX0RFU0NfREVWSUNFX0lPVExCX1JTVkRfTE8g
+MHhmZmZmMDAwMGZmZTBmZmY4DQo+ID4NCj4gPiAgLyogUnN2ZCBmaWVsZCBtYXNrcyBmb3Igc3B0
+ZSAqLw0KPiA+IC0jZGVmaW5lIFZURF9TUFRFX1BBR0VfTDFfUlNWRF9NQVNLKGF3KSBcDQo+ID4g
+KyNkZWZpbmUgVlREX1NQVEVfUEFHRV9MMV9SU1ZEX01BU0soYXcsIGR0X3N1cHBvcnRlZCkgXA0K
+PiA+ICsgICAgICAgIGR0X3N1cHBvcnRlZD8gXA0KPiA+ICsgICAgICAgICgweDgwMFVMTCB8IH4o
+VlREX0hBV19NQVNLKGF3KSB8IFZURF9TTF9JR05fQ09NIHwNCj4gVlREX1NMX1RNKSkNCj4gPiAr
+OiBcDQo+ID4gICAgICAgICAgKDB4ODAwVUxMIHwgfihWVERfSEFXX01BU0soYXcpIHwgVlREX1NM
+X0lHTl9DT00pKQ0KPiANCj4gVGhpcyBzZWVtcyBzdHJhbmdlIHRvbyBpbiB0aGF0IH5WVERfSEFX
+X01BU0soYXcpIHByb2JhYmx5IGNvdmVyZWQgYml0cw0KPiA2My00OCBmb3IgYXc9PTQ4IGNhc2Ug
+c28gaXQgc2hvdWxkIGFscmVhZHkgY292ZXIgVlREX1NMX1RNPw0KVlREX1NMX0lHTl9DT00gMHhi
+ZmYwMDAwMDAwMDAwMDAwVUxMLCBUTSBmaWVsZCBpcyBjbGVhcmVkIGJ5IH4gVlREX1NMX0lHTl9D
+T00NCj4gDQo+IE1lYW53aGlsZSB3aGVuIEknbSByZWFkaW5nIHRoZSBzcGVjIEkgc2VlIGF0IGxl
+YXN0IGJpdHMgNjEtNTIgaWdub3JlZCByYXRoZXINCj4gdGhhbiByZXNlcnZlZC4NClllcy4gQml0
+IDYxfjUyIGlzIGlnbm9yZWQuIFN1Y2ggYXMgdGhlIGluZGV4IDUgb2YgdGhpcyBhcnJheSBpcyAw
+eGZmZjgwMDAwMDA4MDAuDQo+IA0KPiBUaGFua3MsDQo+IA0KPiA+IC0jZGVmaW5lIFZURF9TUFRF
+X1BBR0VfTDJfUlNWRF9NQVNLKGF3KSBcDQo+ID4gKyNkZWZpbmUgVlREX1NQVEVfUEFHRV9MMl9S
+U1ZEX01BU0soYXcsIGR0X3N1cHBvcnRlZCkgXA0KPiA+ICsgICAgICAgIGR0X3N1cHBvcnRlZD8g
+XA0KPiA+ICsgICAgICAgICgweDgwMFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZURF9TTF9J
+R05fQ09NIHwNCj4gVlREX1NMX1RNKSkNCj4gPiArOiBcDQo+ID4gICAgICAgICAgKDB4ODAwVUxM
+IHwgfihWVERfSEFXX01BU0soYXcpIHwgVlREX1NMX0lHTl9DT00pKSAtI2RlZmluZQ0KPiA+IFZU
+RF9TUFRFX1BBR0VfTDNfUlNWRF9NQVNLKGF3KSBcDQo+ID4gKyNkZWZpbmUgVlREX1NQVEVfUEFH
+RV9MM19SU1ZEX01BU0soYXcsIGR0X3N1cHBvcnRlZCkgXA0KPiA+ICsgICAgICAgIGR0X3N1cHBv
+cnRlZD8gXA0KPiA+ICsgICAgICAgICgweDgwMFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZU
+RF9TTF9JR05fQ09NIHwNCj4gVlREX1NMX1RNKSkNCj4gPiArOiBcDQo+ID4gICAgICAgICAgKDB4
+ODAwVUxMIHwgfihWVERfSEFXX01BU0soYXcpIHwgVlREX1NMX0lHTl9DT00pKSAgI2RlZmluZQ0K
+PiA+IFZURF9TUFRFX1BBR0VfTDRfUlNWRF9NQVNLKGF3KSBcDQo+ID4gICAgICAgICAgKDB4ODgw
+VUxMIHwgfihWVERfSEFXX01BU0soYXcpIHwgVlREX1NMX0lHTl9DT00pKSAtI2RlZmluZQ0KPiA+
+IFZURF9TUFRFX0xQQUdFX0wxX1JTVkRfTUFTSyhhdykgXA0KPiA+ICsjZGVmaW5lIFZURF9TUFRF
+X0xQQUdFX0wxX1JTVkRfTUFTSyhhdywgZHRfc3VwcG9ydGVkKSBcDQo+ID4gKyAgICAgICAgZHRf
+c3VwcG9ydGVkPyBcDQo+ID4gKyAgICAgICAgKDB4ODAwVUxMIHwgfihWVERfSEFXX01BU0soYXcp
+IHwgVlREX1NMX0lHTl9DT00gfA0KPiBWVERfU0xfVE0pKQ0KPiA+ICs6IFwNCj4gPiAgICAgICAg
+ICAoMHg4MDBVTEwgfCB+KFZURF9IQVdfTUFTSyhhdykgfCBWVERfU0xfSUdOX0NPTSkpIC0jZGVm
+aW5lDQo+ID4gVlREX1NQVEVfTFBBR0VfTDJfUlNWRF9NQVNLKGF3KSBcDQo+ID4gKyNkZWZpbmUg
+VlREX1NQVEVfTFBBR0VfTDJfUlNWRF9NQVNLKGF3LCBkdF9zdXBwb3J0ZWQpIFwNCj4gPiArICAg
+ICAgICBkdF9zdXBwb3J0ZWQ/IFwNCj4gPiArICAgICAgICAoMHgxZmY4MDBVTEwgfCB+KFZURF9I
+QVdfTUFTSyhhdykgfCBWVERfU0xfSUdOX0NPTSB8DQo+ID4gK1ZURF9TTF9UTSkpIDogXA0KPiA+
+ICAgICAgICAgICgweDFmZjgwMFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZURF9TTF9JR05f
+Q09NKSkgLQ0KPiAjZGVmaW5lDQo+ID4gVlREX1NQVEVfTFBBR0VfTDNfUlNWRF9NQVNLKGF3KSBc
+DQo+ID4gKyNkZWZpbmUgVlREX1NQVEVfTFBBR0VfTDNfUlNWRF9NQVNLKGF3LCBkdF9zdXBwb3J0
+ZWQpIFwNCj4gPiArICAgICAgICBkdF9zdXBwb3J0ZWQ/IFwNCj4gPiArICAgICAgICAoMHgzZmZm
+ZjgwMFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZURF9TTF9JR05fQ09NIHwNCj4gPiArVlRE
+X1NMX1RNKSkgOiBcDQo+ID4gICAgICAgICAgKDB4M2ZmZmY4MDBVTEwgfCB+KFZURF9IQVdfTUFT
+SyhhdykgfCBWVERfU0xfSUdOX0NPTSkpDQo+ID4gI2RlZmluZSBWVERfU1BURV9MUEFHRV9MNF9S
+U1ZEX01BU0soYXcpIFwNCj4gPiAgICAgICAgICAoMHg4ODBVTEwgfCB+KFZURF9IQVdfTUFTSyhh
+dykgfCBWVERfU0xfSUdOX0NPTSkpIEBAIC0NCj4gNTA2LDUNCj4gPiArNTE4LDYgQEAgdHlwZWRl
+ZiBzdHJ1Y3QgVlREUm9vdEVudHJ5IFZURFJvb3RFbnRyeTsNCj4gPiAgI2RlZmluZSBWVERfU0xf
+VyAgICAgICAgICAgICAgICAgICAgKDFVTEwgPDwgMSkNCj4gPiAgI2RlZmluZSBWVERfU0xfUFRf
+QkFTRV9BRERSX01BU0soYXcpICh+KFZURF9QQUdFX1NJWkUgLSAxKSAmDQo+IFZURF9IQVdfTUFT
+SyhhdykpDQo+ID4gICNkZWZpbmUgVlREX1NMX0lHTl9DT00gICAgICAgICAgICAgIDB4YmZmMDAw
+MDAwMDAwMDAwMFVMTA0KPiA+ICsjZGVmaW5lIFZURF9TTF9UTSAgICAgICAgICAgICAgICAgICAo
+MVVMTCA8PCA2MikNCj4gPg0KPiA+ICAjZW5kaWYNCj4gPiAtLQ0KPiA+IDIuMjAuMQ0KPiA+DQo+
+ID4NCj4gDQo+IC0tDQo+IFBldGVyIFh1DQo=
 
