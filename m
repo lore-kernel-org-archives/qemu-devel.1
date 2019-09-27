@@ -2,64 +2,59 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 458E1C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:38:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7F1C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:39:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 105F3206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:38:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MHrredvO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 105F3206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 4E742206B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 06:39:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E742206B7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDju2-0004cw-R1
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:38:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48164)
+	id 1iDjuG-00052X-3M
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 02:39:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iDjAB-0007yY-OZ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 01:51:34 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjey-0007KP-9n
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iDjAA-0006Mi-BV
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 01:51:31 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:48655)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iDjA9-0005aA-W1; Fri, 27 Sep 2019 01:51:30 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46fgrH5h2vz9sRl; Fri, 27 Sep 2019 15:50:39 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569563439;
- bh=OUMFLJ2oAKnJyXX3VCtqoaChCMhLCtIv3hZW9G9u/Cw=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=MHrredvOfaGEGkjhkjXCDY6N6H1ED5M91u5xjYSO+OVxCMUffNGhqlgTn1P0zV06z
- bHW69wZ/0Aju3BIpxdfWJ7QJV7JFz5Un8QzEyBrveo3VTndur/6UeiwTHZHRrcZNe2
- POIgD9kn6Dv1H9PWw7TMgotCca+hK7PHYHzQPc1U=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-devel@nongnu.org,
-	clg@kaod.org,
-	qemu-ppc@nongnu.org
-Subject: [PATCH v2 30/33] spapr, xics,
- xive: Move SpaprIrq::post_load hook to backends
-Date: Fri, 27 Sep 2019 15:50:25 +1000
-Message-Id: <20190927055028.11493-31-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190927055028.11493-1-david@gibson.dropbear.id.au>
-References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjet-0004Bm-5w
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:20 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:59674)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iDjes-00046D-Oj
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 02:23:15 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 693B469AA8;
+ Fri, 27 Sep 2019 15:23:14 +0900 (JST)
+Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
+ [222.8.5.235])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 0DBEF240087;
+ Fri, 27 Sep 2019 15:23:14 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v25 16/22] hw/char: RX62N serial communication interface (SCI)
+Date: Fri, 27 Sep 2019 15:22:56 +0900
+Message-Id: <20190927062302.110144-17-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190927062302.110144-1-ysato@users.sourceforge.jp>
+References: <20190927062302.110144-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 202.224.55.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,232 +66,465 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>,
+ philmd@redhat.com, richard.henderson@linaro.org, imammedo@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The remaining logic in the post_load hook really belongs to the interrupt
-controller backends, and just needs to be called on the active controller
-(after the active controller is set to the right thing based on the
-incoming migration in the generic spapr_irq_post_load() logic).
+This module supported only non FIFO type.
+Hardware manual.
+https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
+ej0140_rx62n.pdf
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-8-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/intc/spapr_xive.c        |  5 +++--
- hw/intc/xics_spapr.c        | 13 +++++++++++
- hw/ppc/spapr_irq.c          | 45 ++++---------------------------------
- include/hw/ppc/spapr_irq.h  |  3 +--
- include/hw/ppc/spapr_xive.h |  1 -
- 5 files changed, 21 insertions(+), 46 deletions(-)
+ include/hw/char/renesas_sci.h |  45 +++++
+ hw/char/renesas_sci.c         | 343 ++++++++++++++++++++++++++++++++++
+ hw/char/Kconfig               |   3 +
+ hw/char/Makefile.objs         |   1 +
+ 4 files changed, 392 insertions(+)
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 hw/char/renesas_sci.c
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index e8b946982c..ab68e6eaf6 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -462,10 +462,10 @@ static int vmstate_spapr_xive_pre_save(void *opaque=
-)
-  * Called by the sPAPR IRQ backend 'post_load' method at the machine
-  * level.
-  */
--int spapr_xive_post_load(SpaprXive *xive, int version_id)
-+static int spapr_xive_post_load(SpaprInterruptController *intc, int vers=
-ion_id)
- {
-     if (kvm_irqchip_in_kernel()) {
--        return kvmppc_xive_post_load(xive, version_id);
-+        return kvmppc_xive_post_load(SPAPR_XIVE(intc), version_id);
-     }
-=20
-     return 0;
-@@ -699,6 +699,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     sicc->set_irq =3D spapr_xive_set_irq;
-     sicc->print_info =3D spapr_xive_print_info;
-     sicc->dt =3D spapr_xive_dt;
-+    sicc->post_load =3D spapr_xive_post_load;
- }
-=20
- static const TypeInfo spapr_xive_info =3D {
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 8abbc799ba..9590eedc3d 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -395,6 +395,18 @@ static void xics_spapr_print_info(SpaprInterruptCont=
-roller *intc, Monitor *mon)
-     ics_pic_print_info(ics, mon);
- }
-=20
-+static int xics_spapr_post_load(SpaprInterruptController *intc, int vers=
-ion_id)
+diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.=
+h
+new file mode 100644
+index 0000000000..50d1336944
+--- /dev/null
++++ b/include/hw/char/renesas_sci.h
+@@ -0,0 +1,45 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Copyright (c) 2018 Yoshinori Sato
++ *
++ * This code is licensed under the GPL version 2 or later.
++ *
++ */
++
++#include "chardev/char-fe.h"
++#include "qemu/timer.h"
++#include "hw/sysbus.h"
++
++#define TYPE_RENESAS_SCI "renesas-sci"
++#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
++
++enum {
++    ERI =3D 0,
++    RXI =3D 1,
++    TXI =3D 2,
++    TEI =3D 3,
++    SCI_NR_IRQ =3D 4,
++};
++
++typedef struct {
++    SysBusDevice parent_obj;
++    MemoryRegion memory;
++
++    uint8_t smr;
++    uint8_t brr;
++    uint8_t scr;
++    uint8_t tdr;
++    uint8_t ssr;
++    uint8_t rdr;
++    uint8_t scmr;
++    uint8_t semr;
++
++    uint8_t read_ssr;
++    int64_t trtime;
++    int64_t rx_next;
++    QEMUTimer *timer;
++    CharBackend chr;
++    uint64_t input_freq;
++    qemu_irq irq[SCI_NR_IRQ];
++} RSCIState;
+diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+new file mode 100644
+index 0000000000..df63c5292e
+--- /dev/null
++++ b/hw/char/renesas_sci.c
+@@ -0,0 +1,343 @@
++/*
++ * Renesas Serial Communication Interface
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
++ *
++ * Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify =
+it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOU=
+T
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
+ for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/qdev-properties.h"
++#include "hw/char/renesas_sci.h"
++#include "migration/vmstate.h"
++#include "qemu/error-report.h"
++
++/* SCI register map */
++REG8(SMR, 0)
++  FIELD(SMR, CKS,  0, 2)
++  FIELD(SMR, MP,   2, 1)
++  FIELD(SMR, STOP, 3, 1)
++  FIELD(SMR, PM,   4, 1)
++  FIELD(SMR, PE,   5, 1)
++  FIELD(SMR, CHR,  6, 1)
++  FIELD(SMR, CM,   7, 1)
++REG8(BRR, 1)
++REG8(SCR, 2)
++  FIELD(SCR, CKE, 0, 2)
++  FIELD(SCR, TEIE, 2, 1)
++  FIELD(SCR, MPIE, 3, 1)
++  FIELD(SCR, RE,   4, 1)
++  FIELD(SCR, TE,   5, 1)
++  FIELD(SCR, RIE,  6, 1)
++  FIELD(SCR, TIE,  7, 1)
++REG8(TDR, 3)
++REG8(SSR, 4)
++  FIELD(SSR, MPBT, 0, 1)
++  FIELD(SSR, MPB,  1, 1)
++  FIELD(SSR, TEND, 2, 1)
++  FIELD(SSR, ERR, 3, 3)
++    FIELD(SSR, PER,  3, 1)
++    FIELD(SSR, FER,  4, 1)
++    FIELD(SSR, ORER, 5, 1)
++  FIELD(SSR, RDRF, 6, 1)
++  FIELD(SSR, TDRE, 7, 1)
++REG8(RDR, 5)
++REG8(SCMR, 6)
++  FIELD(SCMR, SMIF, 0, 1)
++  FIELD(SCMR, SINV, 2, 1)
++  FIELD(SCMR, SDIR, 3, 1)
++  FIELD(SCMR, BCP2, 7, 1)
++REG8(SEMR, 7)
++  FIELD(SEMR, ACS0, 0, 1)
++  FIELD(SEMR, ABCS, 4, 1)
++
++static int can_receive(void *opaque)
 +{
-+    if (!kvm_irqchip_in_kernel()) {
-+        CPUState *cs;
-+        CPU_FOREACH(cs) {
-+            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+            icp_resend(spapr_cpu_state(cpu)->icp);
-+        }
++    RSCIState *sci =3D RSCI(opaque);
++    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
++        return 0;
++    } else {
++        return FIELD_EX8(sci->scr, SCR, RE);
 +    }
-+    return 0;
 +}
 +
- static void xics_spapr_activate(SpaprInterruptController *intc, Error **=
-errp)
- {
-     if (kvm_enabled()) {
-@@ -425,6 +437,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
-     sicc->set_irq =3D xics_spapr_set_irq;
-     sicc->print_info =3D xics_spapr_print_info;
-     sicc->dt =3D xics_spapr_dt;
-+    sicc->post_load =3D xics_spapr_post_load;
- }
-=20
- static const TypeInfo ics_spapr_info =3D {
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 2fd9dd0ec2..040384b0fe 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -100,43 +100,22 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptCont=
-roller *, Error **),
-  * XICS IRQ backend.
-  */
-=20
--static int spapr_irq_post_load_xics(SpaprMachineState *spapr, int versio=
-n_id)
--{
--    if (!kvm_irqchip_in_kernel()) {
--        CPUState *cs;
--        CPU_FOREACH(cs) {
--            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--            icp_resend(spapr_cpu_state(cpu)->icp);
--        }
--    }
--    return 0;
--}
--
- SpaprIrq spapr_irq_xics =3D {
-     .nr_xirqs    =3D SPAPR_NR_XIRQS,
-     .nr_msis     =3D SPAPR_NR_MSIS,
-     .xics        =3D true,
-     .xive        =3D false,
--
--    .post_load   =3D spapr_irq_post_load_xics,
- };
-=20
- /*
-  * XIVE IRQ backend.
-  */
-=20
--static int spapr_irq_post_load_xive(SpaprMachineState *spapr, int versio=
-n_id)
--{
--    return spapr_xive_post_load(spapr->xive, version_id);
--}
--
- SpaprIrq spapr_irq_xive =3D {
-     .nr_xirqs    =3D SPAPR_NR_XIRQS,
-     .nr_msis     =3D SPAPR_NR_MSIS,
-     .xics        =3D false,
-     .xive        =3D true,
--
--    .post_load   =3D spapr_irq_post_load_xive,
- };
-=20
- /*
-@@ -148,21 +127,6 @@ SpaprIrq spapr_irq_xive =3D {
-  * activated after an extra machine reset.
-  */
-=20
--/*
-- * Returns the sPAPR IRQ backend negotiated by CAS. XICS is the
-- * default.
-- */
--static SpaprIrq *spapr_irq_current(SpaprMachineState *spapr)
--{
--    return spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT) ?
--        &spapr_irq_xive : &spapr_irq_xics;
--}
--
--static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int versio=
-n_id)
--{
--    return spapr_irq_current(spapr)->post_load(spapr, version_id);
--}
--
- /*
-  * Define values in sync with the XIVE and XICS backend
-  */
-@@ -171,8 +135,6 @@ SpaprIrq spapr_irq_dual =3D {
-     .nr_msis     =3D SPAPR_NR_MSIS,
-     .xics        =3D true,
-     .xive        =3D true,
--
--    .post_load   =3D spapr_irq_post_load_dual,
- };
-=20
-=20
-@@ -454,8 +416,11 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int ir=
-q)
-=20
- int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
- {
-+    SpaprInterruptControllerClass *sicc;
++static void receive(void *opaque, const uint8_t *buf, int size)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime=
+;
++    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    } else {
++        sci->rdr =3D buf[0];
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_irq_pulse(sci->irq[RXI]);
++        }
++    }
++}
 +
-     spapr_irq_update_active_intc(spapr);
--    return spapr->irq->post_load(spapr, version_id);
-+    sicc =3D SPAPR_INTC_GET_CLASS(spapr->active_intc);
-+    return sicc->post_load(spapr->active_intc, version_id);
- }
++static void send_byte(RSCIState *sci)
++{
++    if (qemu_chr_fe_backend_connected(&sci->chr)) {
++        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
++    }
++    timer_mod(sci->timer,
++              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
++    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 0);
++    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++    qemu_set_irq(sci->irq[TEI], 0);
++    if (FIELD_EX8(sci->scr, SCR, TIE)) {
++        qemu_irq_pulse(sci->irq[TXI]);
++    }
++}
++
++static void txend(void *opaque)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
++        send_byte(sci);
++    } else {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
++        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 1);
++        }
++    }
++}
++
++static void update_trtime(RSCIState *sci)
++{
++    /* char per bits */
++    sci->trtime =3D 8 - FIELD_EX8(sci->smr, SMR, CHR);
++    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, PE);
++    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, STOP) + 1;
++    /* x bit transmit time (32 * divrate * brr) / base freq */
++    sci->trtime *=3D 32 * sci->brr;
++    sci->trtime *=3D 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
++    sci->trtime *=3D NANOSECONDS_PER_SECOND;
++    sci->trtime /=3D sci->input_freq;
++}
++
++#define IS_TR_ENABLED(scr) \
++    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
++
++static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
+size)
++{
++    hwaddr offset =3D addr & 0x07;
++    RSCIState *sci =3D RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->smr =3D val;
++            update_trtime(sci);
++        }
++        break;
++    case A_BRR:
++        if (!IS_TR_ENABLED(sci->scr)) {
++            sci->brr =3D val;
++            update_trtime(sci);
++        }
++        break;
++    case A_SCR:
++        sci->scr =3D val;
++        if (FIELD_EX8(sci->scr, SCR, TE)) {
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
++            if (FIELD_EX8(sci->scr, SCR, TIE)) {
++                qemu_irq_pulse(sci->irq[TXI]);
++            }
++        }
++        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
++            qemu_set_irq(sci->irq[TEI], 0);
++        }
++        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_TDR:
++        sci->tdr =3D val;
++        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
++            send_byte(sci);
++        } else {
++            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 0);
++        }
++        break;
++    case A_SSR:
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, MPBT,
++                             FIELD_EX8(val, SSR, MPBT));
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ERR,
++                             FIELD_EX8(val, SSR, ERR) & 0x07);
++        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
++            FIELD_EX8(sci->ssr, SSR, ERR) =3D=3D 0) {
++            qemu_set_irq(sci->irq[ERI], 0);
++        }
++        break;
++    case A_RDR:
++        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n"=
+);
++        break;
++    case A_SCMR:
++        sci->scmr =3D val; break;
++    case A_SEMR: /* SEMR */
++        sci->semr =3D val; break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented\n", offset);
++    }
++}
++
++static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
++{
++    hwaddr offset =3D addr & 0x07;
++    RSCIState *sci =3D RSCI(opaque);
++
++    switch (offset) {
++    case A_SMR:
++        return sci->smr;
++    case A_BRR:
++        return sci->brr;
++    case A_SCR:
++        return sci->scr;
++    case A_TDR:
++        return sci->tdr;
++    case A_SSR:
++        sci->read_ssr =3D sci->ssr;
++        return sci->ssr;
++    case A_RDR:
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 0);
++        return sci->rdr;
++    case A_SCMR:
++        return sci->scmr;
++    case A_SEMR:
++        return sci->semr;
++    default:
++        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
++                      " not implemented.\n", offset);
++    }
++    return UINT64_MAX;
++}
++
++static const MemoryRegionOps sci_ops =3D {
++    .write =3D sci_write,
++    .read  =3D sci_read,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .impl =3D {
++        .max_access_size =3D 1,
++    },
++};
++
++static void rsci_reset(DeviceState *dev)
++{
++    RSCIState *sci =3D RSCI(dev);
++    sci->smr =3D sci->scr =3D 0x00;
++    sci->brr =3D 0xff;
++    sci->tdr =3D 0xff;
++    sci->rdr =3D 0x00;
++    sci->ssr =3D 0x84;
++    sci->scmr =3D 0x00;
++    sci->semr =3D 0x00;
++    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++}
++
++static void sci_event(void *opaque, int event)
++{
++    RSCIState *sci =3D RSCI(opaque);
++    if (event =3D=3D CHR_EVENT_BREAK) {
++        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, FER, 1);
++        if (FIELD_EX8(sci->scr, SCR, RIE)) {
++            qemu_set_irq(sci->irq[ERI], 1);
++        }
++    }
++}
++
++static void rsci_realize(DeviceState *dev, Error **errp)
++{
++    RSCIState *sci =3D RSCI(dev);
++
++    if (sci->input_freq =3D=3D 0) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "renesas_sci: input-freq property must be set.");
++        return;
++    }
++    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
++                             sci_event, NULL, sci, NULL, true);
++}
++
++static void rsci_init(Object *obj)
++{
++    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
++    RSCIState *sci =3D RSCI(obj);
++    int i;
++
++    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
++                          sci, "renesas-sci", 0x8);
++    sysbus_init_mmio(d, &sci->memory);
++
++    for (i =3D 0; i < SCI_NR_IRQ; i++) {
++        sysbus_init_irq(d, &sci->irq[i]);
++    }
++    sci->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
++}
++
++static const VMStateDescription vmstate_rsci =3D {
++    .name =3D "renesas-sci",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property rsci_properties[] =3D {
++    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
++    DEFINE_PROP_CHR("chardev", RSCIState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void rsci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->realize =3D rsci_realize;
++    dc->props =3D rsci_properties;
++    dc->vmsd =3D &vmstate_rsci;
++    dc->reset =3D rsci_reset;
++}
++
++static const TypeInfo rsci_info =3D {
++    .name       =3D TYPE_RENESAS_SCI,
++    .parent     =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(RSCIState),
++    .instance_init =3D rsci_init,
++    .class_init =3D rsci_class_init,
++};
++
++static void rsci_register_types(void)
++{
++    type_register_static(&rsci_info);
++}
++
++type_init(rsci_register_types)
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 40e7a8b8bb..874627520c 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -46,3 +46,6 @@ config SCLPCONSOLE
 =20
- void spapr_irq_reset(SpaprMachineState *spapr, Error **errp)
-@@ -596,8 +561,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
-     .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
-     .xics        =3D true,
-     .xive        =3D false,
--
--    .post_load   =3D spapr_irq_post_load_xics,
- };
+ config TERMINAL3270
+     bool
++
++config RENESAS_SCI
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 02d8a66925..4472d563b5 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
+ obj-$(CONFIG_DIGIC) +=3D digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
++obj-$(CONFIG_RENESAS_SCI) +=3D renesas_sci.o
 =20
- static void spapr_irq_register_types(void)
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 28044d7479..bc379b0761 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -62,6 +62,7 @@ typedef struct SpaprInterruptControllerClass {
-     void (*print_info)(SpaprInterruptController *intc, Monitor *mon);
-     void (*dt)(SpaprInterruptController *intc, uint32_t nr_servers,
-                void *fdt, uint32_t phandle);
-+    int (*post_load)(SpaprInterruptController *intc, int version_id);
- } SpaprInterruptControllerClass;
-=20
- void spapr_irq_update_active_intc(SpaprMachineState *spapr);
-@@ -82,8 +83,6 @@ typedef struct SpaprIrq {
-     uint32_t    nr_msis;
-     bool        xics;
-     bool        xive;
--
--    int (*post_load)(SpaprMachineState *spapr, int version_id);
- } SpaprIrq;
-=20
- extern SpaprIrq spapr_irq_xics;
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 64972754f9..d84bd5c229 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -55,7 +55,6 @@ typedef struct SpaprXive {
- #define SPAPR_XIVE_BLOCK_ID 0x0
-=20
- void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
--int spapr_xive_post_load(SpaprXive *xive, int version_id);
-=20
- void spapr_xive_hcall_init(SpaprMachineState *spapr);
- void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+ common-obj-$(CONFIG_CMSDK_APB_UART) +=3D cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
 --=20
-2.21.0
+2.20.1
 
 
