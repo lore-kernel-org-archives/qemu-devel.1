@@ -2,107 +2,57 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67853C388F3
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3398CC388F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:29:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CCF521850
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:28:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CCF521850
+	by mail.kernel.org (Postfix) with ESMTPS id 0E0C32146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:29:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E0C32146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrEv-0004cn-9J
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:28:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36210)
+	id 1iDrFW-0005HW-Qb
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:29:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDqL7-0003d6-W2
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:31:18 -0400
+ (envelope-from <david@redhat.com>) id 1iDqOK-0006R5-Am
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDqL6-0001gD-8j
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:31:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46340)
+ (envelope-from <david@redhat.com>) id 1iDqOI-0002C0-Uy
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:34:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34588)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDqL6-0001g6-0G; Fri, 27 Sep 2019 09:31:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iDqOI-0002Br-Mt; Fri, 27 Sep 2019 09:34:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D6D0F7BDA1;
- Fri, 27 Sep 2019 11:04:23 +0000 (UTC)
-Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 090835D6A7;
- Fri, 27 Sep 2019 11:04:22 +0000 (UTC)
-Subject: Re: [PATCH v3 16/18] target/s390x: Remove ILEN_AUTO
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190926162615.31168-1-richard.henderson@linaro.org>
- <20190926162615.31168-17-richard.henderson@linaro.org>
+ by mx1.redhat.com (Postfix) with ESMTPS id 9457A8A1CAB;
+ Fri, 27 Sep 2019 09:58:47 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-169.ams2.redhat.com [10.36.116.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9B9701001281;
+ Fri, 27 Sep 2019 09:58:45 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <ce178c0f-8f7c-3863-0083-c8b76ce8309e@redhat.com>
-Date: Fri, 27 Sep 2019 13:04:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 3/7] s390x/mmu: Inject DAT exceptions from a single place
+Date: Fri, 27 Sep 2019 11:58:27 +0200
+Message-Id: <20190927095831.23543-4-david@redhat.com>
+In-Reply-To: <20190927095831.23543-1-david@redhat.com>
+References: <20190927095831.23543-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190926162615.31168-17-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 27 Sep 2019 11:04:23 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Fri, 27 Sep 2019 09:58:47 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -117,54 +67,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26.09.19 18:26, Richard Henderson wrote:
-> This setting is no longer used.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/s390x/cpu.h         | 2 --
->  target/s390x/excp_helper.c | 3 ---
->  2 files changed, 5 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index a5eab491cd..fc941c7d76 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -816,8 +816,6 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
->                         uint32_t io_int_parm, uint32_t io_int_word);
->  /* instruction length set by unwind info */
->  #define ILEN_UNWIND                 0
-> -/* automatically detect the instruction length */
-> -#define ILEN_AUTO                   0xff
->  #define RA_IGNORED                  0
->  void s390_program_interrupt(CPUS390XState *env, uint32_t code, uintptr_t ra);
->  /* service interrupts are floating therefore we must not pass an cpustate */
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index 8ce992e639..c252e9a7d8 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -196,9 +196,6 @@ static void do_program_interrupt(CPUS390XState *env)
->      LowCore *lowcore;
->      int ilen = env->int_pgm_ilen;
->  
-> -    if (ilen == ILEN_AUTO) {
-> -        ilen = get_ilen(cpu_ldub_code(env, env->psw.addr));
-> -    }
->      assert(ilen == 2 || ilen == 4 || ilen == 6);
->  
->      switch (env->int_pgm_code) {
-> 
+Let's return the PGM from the translation functions on error and inject
+based on that.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/mmu_helper.c | 63 +++++++++++----------------------------
+ 1 file changed, 17 insertions(+), 46 deletions(-)
 
--- 
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 847fb240fb..f6ae444655 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -48,26 +48,6 @@ static void trigger_access_exception(CPUS390XState *en=
+v, uint32_t type,
+     }
+ }
+=20
+-static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+-                               uint32_t type, uint64_t asc, int rw, bool=
+ exc)
+-{
+-    int ilen =3D ILEN_AUTO;
+-    uint64_t tec;
+-
+-    tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | as=
+c >> 46;
+-
+-    if (!exc) {
+-        return;
+-    }
+-
+-    /* Code accesses have an undefined ilc.  */
+-    if (rw =3D=3D MMU_INST_FETCH) {
+-        ilen =3D 2;
+-    }
+-
+-    trigger_access_exception(env, type, ilen, tec);
+-}
+-
+ /* check whether the address would be proteted by Low-Address Protection=
+ */
+ static bool is_low_address(uint64_t addr)
+ {
+@@ -119,12 +99,10 @@ static int mmu_translate_pte(CPUS390XState *env, tar=
+get_ulong vaddr,
+                              target_ulong *raddr, int *flags, int rw, bo=
+ol exc)
+ {
+     if (pt_entry & PAGE_INVALID) {
+-        trigger_page_fault(env, vaddr, PGM_PAGE_TRANS, asc, rw, exc);
+-        return -1;
++        return PGM_PAGE_TRANS;
+     }
+     if (pt_entry & PAGE_RES0) {
+-        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
+-        return -1;
++        return PGM_TRANS_SPEC;
+     }
+     if (pt_entry & PAGE_RO) {
+         *flags &=3D ~PAGE_WRITE;
+@@ -179,13 +157,11 @@ static int mmu_translate_region(CPUS390XState *env,=
+ target_ulong vaddr,
+     new_entry =3D ldq_phys(cs->as, origin + offs);
+=20
+     if ((new_entry & REGION_ENTRY_INV) !=3D 0) {
+-        trigger_page_fault(env, vaddr, pchks[level / 4], asc, rw, exc);
+-        return -1;
++        return pchks[level / 4];
+     }
+=20
+     if ((new_entry & REGION_ENTRY_TYPE_MASK) !=3D level) {
+-        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
+-        return -1;
++        return PGM_TRANS_SPEC;
+     }
+=20
+     if (level =3D=3D ASCE_TYPE_SEGMENT) {
+@@ -197,8 +173,7 @@ static int mmu_translate_region(CPUS390XState *env, t=
+arget_ulong vaddr,
+     offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
+     if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
+         || offs > (new_entry & REGION_ENTRY_LENGTH)) {
+-        trigger_page_fault(env, vaddr, pchks[level / 4 - 1], asc, rw, ex=
+c);
+-        return -1;
++        return pchks[level / 4 - 1];
+     }
+=20
+     if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_RO)) {
+@@ -226,38 +201,31 @@ static int mmu_translate_asce(CPUS390XState *env, t=
+arget_ulong vaddr,
+     switch (level) {
+     case ASCE_TYPE_REGION1:
+         if ((vaddr >> 62) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_FIRST_TRANS, asc, rw,=
+ exc);
+-            return -1;
++            return PGM_REG_FIRST_TRANS;
+         }
+         break;
+     case ASCE_TYPE_REGION2:
+         if (vaddr & 0xffe0000000000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 51 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_SEC_TRANS, asc, rw, e=
+xc);
+-            return -1;
++            return PGM_REG_SEC_TRANS;
+         }
+         break;
+     case ASCE_TYPE_REGION3:
+         if (vaddr & 0xfffffc0000000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 40 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_THIRD_TRANS, asc, rw,=
+ exc);
+-            return -1;
++            return PGM_REG_THIRD_TRANS;
+         }
+         break;
+     case ASCE_TYPE_SEGMENT:
+         if (vaddr & 0xffffffff80000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 29 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_SEGMENT_TRANS, asc, rw, e=
+xc);
+-            return -1;
++            return PGM_SEGMENT_TRANS;
+         }
+         break;
+     }
+@@ -400,8 +368,11 @@ int mmu_translate(CPUS390XState *env, target_ulong v=
+addr, int rw, uint64_t asc,
+=20
+     /* perform the DAT translation */
+     r =3D mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw, ex=
+c);
+-    if (r) {
+-        return r;
++    if (unlikely(r)) {
++        if (exc) {
++            trigger_access_exception(env, r, ilen, tec);
++        }
++        return -1;
+     }
+=20
+     /* check for DAT protection */
+--=20
+2.21.0
 
-Thanks,
-
-David / dhildenb
 
