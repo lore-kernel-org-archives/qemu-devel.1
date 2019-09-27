@@ -2,63 +2,91 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B19C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:10:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 270F7C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:12:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D3E520872
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:10:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D3E520872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E92CC20872
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 17:12:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E92CC20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDtkr-00082t-T5
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 13:10:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52196)
+	id 1iDtmy-0002Ga-GZ
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 13:12:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iDrZb-0000J0-7A
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:50:21 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iDtMb-0002FH-RP
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 12:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iDrZY-00018x-6c
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:50:18 -0400
-Received: from 3.mo6.mail-out.ovh.net ([178.33.253.26]:43433)
+ (envelope-from <mreitz@redhat.com>) id 1iDtMX-0003XI-8p
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 12:45:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47188)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iDrZX-00017Z-LR
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:50:16 -0400
-Received: from player795.ha.ovh.net (unknown [10.108.57.95])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 044231E14CE
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 16:50:12 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player795.ha.ovh.net (Postfix) with ESMTPSA id EA5D5A3E2E69;
- Fri, 27 Sep 2019 14:49:59 +0000 (UTC)
-Date: Fri, 27 Sep 2019 16:49:58 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v2 27/33] spapr, xics, xive: Match signatures for XICS
- and XIVE KVM connect routines
-Message-ID: <20190927164958.4949f83b@bahia.lan>
-In-Reply-To: <20190927055028.11493-28-david@gibson.dropbear.id.au>
-References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
- <20190927055028.11493-28-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iDtMP-0002ii-K5; Fri, 27 Sep 2019 12:44:49 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 369E710CC1F4;
+ Fri, 27 Sep 2019 16:44:48 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-76.brq.redhat.com
+ [10.40.204.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D03A460BE2;
+ Fri, 27 Sep 2019 16:44:46 +0000 (UTC)
+Subject: Re: iotest failure -- test possibly not using sufficiently unique
+ temp filename?
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <CAFEAcA8fwM03PXzkMvLdOWAL0R1Mq8hLmt8O-+NFSri6oHun1w@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <010553d9-9dc6-907f-fc74-4cd5614f4a0e@redhat.com>
+Date: Fri, 27 Sep 2019 18:44:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 2424062501213346278
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrfeeigdektdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+In-Reply-To: <CAFEAcA8fwM03PXzkMvLdOWAL0R1Mq8hLmt8O-+NFSri6oHun1w@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ARa8UgMdQCdZDapeUAbpgWbCxCI9OkMY4"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Fri, 27 Sep 2019 16:44:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.253.26
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,242 +98,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- clg@kaod.org,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 27 Sep 2019 15:50:22 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ARa8UgMdQCdZDapeUAbpgWbCxCI9OkMY4
+Content-Type: multipart/mixed; boundary="54wArcY6snVGyFYCffQdXQSSjDq1iS656"
 
-> Both XICS and XIVE have routines to connect and disconnect KVM with similar
-> but not identical signatures.  This adjusts them to match exactly, which
+--54wArcY6snVGyFYCffQdXQSSjDq1iS656
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Maybe mention this includes a return value to be able to streamline error
-reporting.
+On 27.09.19 18:39, Peter Maydell wrote:
+> Hi; I just saw this iotest failure (on an s390x box, as it happens):
+>=20
+>   TEST    iotest-qcow2: 130 [fail]
+> QEMU          --
+> "/home/linux1/qemu/build/all/tests/qemu-iotests/../../s390x-softmmu/qem=
+u-system-s390x"
+> -nodefaults -display none -machine accel=3Dqtest
+> QEMU_IMG      -- "/home/linux1/qemu/build/all/tests/qemu-iotests/../../=
+qemu-img"
+> QEMU_IO       --
+> "/home/linux1/qemu/build/all/tests/qemu-iotests/../../qemu-io"
+> --cache writeback -f qcow2
+> QEMU_NBD      -- "/home/linux1/qemu/build/all/tests/qemu-iotests/../../=
+qemu-nbd"
+> IMGFMT        -- qcow2 (compat=3D1.1)
+> IMGPROTO      -- file
+> PLATFORM      -- Linux/s390x lxub05 4.15.0-58-generic
+> TEST_DIR      -- /home/linux1/qemu/build/all/tests/qemu-iotests/scratch=
 
-> will be useful for further cleanups later.
-> 
-> While we're at it, remove error reporting from the disconnect path.  In the
-> XICS case this wasn't used at all.  In the XIVE case the only error case
-> was if the KVM device was set up, but KVM didn't have the capability to do
-> so which is pretty obviously impossible.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+> SOCKET_SCM_HELPER --
+> /home/linux1/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+>=20
+> --- /home/linux1/qemu/tests/qemu-iotests/130.out        2019-05-10
+> 12:27:16.948075733 -0400
+> +++ /home/linux1/qemu/build/all/tests/qemu-iotests/130.out.bad
+> 2019-09-27 12:01:23.649722655 -0400
+> @@ -18,20 +18,22 @@
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) commit testdisk
+>  (qemu)
+> -image: TEST_DIR/t.IMGFMT
+> -file format: IMGFMT
+> -virtual size: 64 MiB (67108864 bytes)
+> -backing file: TEST_DIR/t.IMGFMT.orig
+> -backing file format: raw
+> +qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Failed to get shared "wr=
+ite" lock
+> +Is another process using the image [TEST_DIR/t.IMGFMT]?
+>=20
+>  =3D=3D=3D Marking image dirty (lazy refcounts) =3D=3D=3D
+>=20
+> +qemu-img: TEST_DIR/t.IMGFMT: Failed to get "write" lock
+> +Is another process using the image [TEST_DIR/t.IMGFMT]?
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+> -wrote 4096/4096 bytes at offset 0
+> -4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> +qemu-io: can't open device
+> /home/linux1/qemu/build/all/tests/qemu-iotests/scratch/t.qcow2: Failed
+> to get "write" lock
+> +Is another process using the image
+> [/home/linux1/qemu/build/all/tests/qemu-iotests/scratch/t.qcow2]?
+> +no file open, try 'help open'
+>  image: TEST_DIR/t.IMGFMT
+>  file format: IMGFMT
+>  virtual size: 64 MiB (67108864 bytes)
+> +backing file: TEST_DIR/t.IMGFMT.orig
+> +backing file format: raw
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+> backing_file=3DTEST_DIR/t.IMGFMT.orig backing_fmt=3Draw
+>  wrote 4096/4096 bytes at offset 0
+>  4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>=20
+>=20
+>=20
+> This looks suspiciously like the test isn't using a unique
+> filename for its disk image: "qemu-iotests/scratch/t.qcow2"
+> in the build directory, and so perhaps it has collided with
+> another iotest ?
+>=20
+> If we run 'make check' with a -j<something> option do the
+> iotests all get run serially anyway, or do they run in
+> parallel against each other ?
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+As far as I know, all iotests are executed serially.  Anything else
+would not work with the same scratch directory.
 
->  hw/intc/spapr_xive_kvm.c    | 22 ++++++++++------------
->  hw/intc/xics_kvm.c          |  9 +++++----
->  hw/ppc/spapr_irq.c          | 22 +++++-----------------
->  include/hw/ppc/spapr_xive.h |  4 ++--
->  include/hw/ppc/xics_spapr.h |  4 ++--
->  5 files changed, 24 insertions(+), 37 deletions(-)
-> 
-> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index 51b334b676..08012ac7cd 100644
-> --- a/hw/intc/spapr_xive_kvm.c
-> +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -740,8 +740,9 @@ static void *kvmppc_xive_mmap(SpaprXive *xive, int pgoff, size_t len,
->   * All the XIVE memory regions are now backed by mappings from the KVM
->   * XIVE device.
->   */
-> -void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
-> +int kvmppc_xive_connect(SpaprInterruptController *intc, Error **errp)
->  {
-> +    SpaprXive *xive = SPAPR_XIVE(intc);
->      XiveSource *xsrc = &xive->source;
->      Error *local_err = NULL;
->      size_t esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-> @@ -753,19 +754,19 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
->       * rebooting under the XIVE-only interrupt mode.
->       */
->      if (xive->fd != -1) {
-> -        return;
-> +        return 0;
->      }
->  
->      if (!kvmppc_has_cap_xive()) {
->          error_setg(errp, "IRQ_XIVE capability must be present for KVM");
-> -        return;
-> +        return -1;
->      }
->  
->      /* First, create the KVM XIVE device */
->      xive->fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_XIVE, false);
->      if (xive->fd < 0) {
->          error_setg_errno(errp, -xive->fd, "XIVE: error creating KVM device");
-> -        return;
-> +        return -1;
->      }
->  
->      /*
-> @@ -821,15 +822,17 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
->      kvm_kernel_irqchip = true;
->      kvm_msi_via_irqfd_allowed = true;
->      kvm_gsi_direct_mapping = true;
-> -    return;
-> +    return 0;
->  
->  fail:
->      error_propagate(errp, local_err);
-> -    kvmppc_xive_disconnect(xive, NULL);
-> +    kvmppc_xive_disconnect(intc);
-> +    return -1;
->  }
->  
-> -void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp)
-> +void kvmppc_xive_disconnect(SpaprInterruptController *intc)
->  {
-> +    SpaprXive *xive = SPAPR_XIVE(intc);
->      XiveSource *xsrc;
->      size_t esb_len;
->  
-> @@ -838,11 +841,6 @@ void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp)
->          return;
->      }
->  
-> -    if (!kvmppc_has_cap_xive()) {
-> -        error_setg(errp, "IRQ_XIVE capability must be present for KVM");
-> -        return;
-> -    }
-> -
->      /* Clear the KVM mapping */
->      xsrc = &xive->source;
->      esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index ba90d6dc96..954c424b36 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -342,8 +342,9 @@ void ics_kvm_set_irq(ICSState *ics, int srcno, int val)
->      }
->  }
->  
-> -int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
-> +int xics_kvm_connect(SpaprInterruptController *intc, Error **errp)
->  {
-> +    ICSState *ics = ICS_SPAPR(intc);
->      int rc;
->      CPUState *cs;
->      Error *local_err = NULL;
-> @@ -413,7 +414,7 @@ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
->      }
->  
->      /* Update the KVM sources */
-> -    ics_set_kvm_state(spapr->ics, &local_err);
-> +    ics_set_kvm_state(ics, &local_err);
->      if (local_err) {
->          goto fail;
->      }
-> @@ -431,11 +432,11 @@ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
->  
->  fail:
->      error_propagate(errp, local_err);
-> -    xics_kvm_disconnect(spapr, NULL);
-> +    xics_kvm_disconnect(intc);
->      return -1;
->  }
->  
-> -void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp)
-> +void xics_kvm_disconnect(SpaprInterruptController *intc)
->  {
->      /*
->       * Only on P9 using the XICS-on XIVE KVM device:
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 79cbe8064e..561bdbc4de 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -124,7 +124,7 @@ static void spapr_irq_reset_xics(SpaprMachineState *spapr, Error **errp)
->  static void spapr_irq_init_kvm_xics(SpaprMachineState *spapr, Error **errp)
->  {
->      if (kvm_enabled()) {
-> -        xics_kvm_connect(spapr, errp);
-> +        xics_kvm_connect(SPAPR_INTC(spapr->ics), errp);
->      }
->  }
->  
-> @@ -173,7 +173,7 @@ static void spapr_irq_reset_xive(SpaprMachineState *spapr, Error **errp)
->  static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error **errp)
->  {
->      if (kvm_enabled()) {
-> -        kvmppc_xive_connect(spapr->xive, errp);
-> +        kvmppc_xive_connect(SPAPR_INTC(spapr->xive), errp);
->      }
->  }
->  
-> @@ -215,7 +215,7 @@ static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int version_id)
->       */
->      if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->          if (kvm_irqchip_in_kernel()) {
-> -            xics_kvm_disconnect(spapr, &error_fatal);
-> +            xics_kvm_disconnect(SPAPR_INTC(spapr->ics));
->          }
->          spapr_irq_xive.reset(spapr, &error_fatal);
->      }
-> @@ -225,8 +225,6 @@ static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int version_id)
->  
->  static void spapr_irq_reset_dual(SpaprMachineState *spapr, Error **errp)
->  {
-> -    Error *local_err = NULL;
-> -
->      /*
->       * Deactivate the XIVE MMIOs. The XIVE backend will reenable them
->       * if selected.
-> @@ -235,18 +233,8 @@ static void spapr_irq_reset_dual(SpaprMachineState *spapr, Error **errp)
->  
->      /* Destroy all KVM devices */
->      if (kvm_irqchip_in_kernel()) {
-> -        xics_kvm_disconnect(spapr, &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            error_prepend(errp, "KVM XICS disconnect failed: ");
-> -            return;
-> -        }
-> -        kvmppc_xive_disconnect(spapr->xive, &local_err);
-> -        if (local_err) {
-> -            error_propagate(errp, local_err);
-> -            error_prepend(errp, "KVM XIVE disconnect failed: ");
-> -            return;
-> -        }
-> +        xics_kvm_disconnect(SPAPR_INTC(spapr->ics));
-> +        kvmppc_xive_disconnect(SPAPR_INTC(spapr->xive));
->      }
->  
->      spapr_irq_current(spapr)->reset(spapr, errp);
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index ebe156eb30..64972754f9 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -68,8 +68,8 @@ int spapr_xive_end_to_target(uint8_t end_blk, uint32_t end_idx,
->  /*
->   * KVM XIVE device helpers
->   */
-> -void kvmppc_xive_connect(SpaprXive *xive, Error **errp);
-> -void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp);
-> +int kvmppc_xive_connect(SpaprInterruptController *intc, Error **errp);
-> +void kvmppc_xive_disconnect(SpaprInterruptController *intc);
->  void kvmppc_xive_reset(SpaprXive *xive, Error **errp);
->  void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveEAS *eas,
->                                     Error **errp);
-> diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
-> index 9c9044db65..445beeffef 100644
-> --- a/include/hw/ppc/xics_spapr.h
-> +++ b/include/hw/ppc/xics_spapr.h
-> @@ -33,8 +33,8 @@
->  #define ICS_SPAPR(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SPAPR)
->  
->  void ics_spapr_create(SpaprMachineState *spapr, int nr_xirqs, Error **errp);
-> -int xics_kvm_connect(SpaprMachineState *spapr, Error **errp);
-> -void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp);
-> +int xics_kvm_connect(SpaprInterruptController *intc, Error **errp);
-> +void xics_kvm_disconnect(SpaprInterruptController *intc);
->  bool xics_kvm_has_broken_disconnect(SpaprMachineState *spapr);
->  
->  #endif /* XICS_SPAPR_H */
+The only thing I suspect is that some tool has been accidentally left
+running by some previous test that still accesses its own image.  But I
+don=E2=80=99t know.
 
+Max
+
+(I=E2=80=99m personally still very skeptical of running some iotests in m=
+ake
+check, so I don=E2=80=99t have an opinion on the matter other than =E2=80=
+=9CIf it fails,
+we should remove it from make check=E2=80=9D.)
+
+
+--54wArcY6snVGyFYCffQdXQSSjDq1iS656--
+
+--ARa8UgMdQCdZDapeUAbpgWbCxCI9OkMY4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2OPH0ACgkQ9AfbAGHV
+z0B2Hwf9EaUzf96MeFFBYdAiNzgpAz4ssbbRzjBgWClKiMZcoTAXkDmldK2k6hUR
+KWrtvNZPaxejzN8r1nTkvpD4X4hXzSzB6cBkWLe98lJJgHtAJauNToQOfY9ClwG5
+re9S5yE+zaSM/DrAF2/sy9GOwMKuajNPWbD9N4QHJEPA6YrcAnob3lFM3KPltaLw
+vHKY8MNY3+Fa013s+sz1rWQBgndcyG2a0lMAnyY8rBIjiV5/OleC2z9MpSuzLd59
+6gtZ73W+pcvr7UIINNBBgCy8qZwNX2cPBYXKzrKvmBpMYfDVEHRGdJFn3aKrWpU5
+ZvQTGSxG2aS/Jm5sTHm18p844PkydA==
+=1Sgc
+-----END PGP SIGNATURE-----
+
+--ARa8UgMdQCdZDapeUAbpgWbCxCI9OkMY4--
 
