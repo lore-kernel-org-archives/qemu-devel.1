@@ -5,73 +5,72 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41014C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 21:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AACCC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 21:45:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C6D92146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 21:44:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90D2F20863
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 21:45:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HiRXd7Lh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C6D92146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JD3RFpSb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90D2F20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDy2J-0002yP-Qd
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 17:44:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34481)
+	id 1iDy3l-00049I-7Q
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 17:45:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iDxzS-0001Qx-5v
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 17:41:28 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iDy0X-0001sI-I5
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 17:42:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iDxzP-0003fJ-Qm
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 17:41:26 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:42837)
+ (envelope-from <alistair23@gmail.com>) id 1iDy0V-0004xq-E9
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 17:42:33 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:34909)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iDxzO-0003dl-OX; Fri, 27 Sep 2019 17:41:22 -0400
-Received: by mail-lf1-x141.google.com with SMTP id c195so2949952lfg.9;
- Fri, 27 Sep 2019 14:41:22 -0700 (PDT)
+ id 1iDy0V-0004wd-0N; Fri, 27 Sep 2019 17:42:31 -0400
+Received: by mail-lf1-x141.google.com with SMTP id w6so2971021lfl.2;
+ Fri, 27 Sep 2019 14:42:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=7ai9FymlssHTVJ4+wNEtq7TIzct8wXX8me30CyW3QFY=;
- b=HiRXd7Lhf/8C74qUaHhNE3cN7F/mxSI5XjATRDWQqDuSkMLHEnfu5NSf0bG/20hxFa
- np/DGvZlapEFJuY6Tqq7wjHrRRmqbRdYWu5FXj9ecx5r9lDWtPywyyJZLHGD/OEML5kk
- XWoP7On7xRNOT9Q8FPTX8yd8ZeuBXm4x1jAUUsjdPEA9iNFaJxyQq9q8GLENkKqZVN13
- Baaam1R4x8MduaAWQuh9YzVtcxy5WapuoihmqgjTMt9CX6qfHAhZkabP8wrBEx2KVjXq
- inKgpDHsFh9eUuZmPYvup9H0RLHwyhiEXRMT0tWFRRedmHXuNOIprfUqVT8iEQmXCjoc
- We2w==
+ bh=pA/Tdq4jk0AJMN3fUQKqIPvN2jrY/MiicAii9Ap3hIs=;
+ b=JD3RFpSbYNRPW6iWDuXf29Zlim6MUbrmJHmwxwQlZwwNJnZVt5at70wp2zNQeGWmbH
+ E4LOal8sXSH869lWHqij7FUiWx7uEH2AjIAvIL1wqRlHg08Nbx2uHoKr5UFUkb+25KEA
+ qvv5gKIo+XF8mg/iytd8wHdkIB7dBZIvPLxINb8VkOZGpyBGTQXktfVZTpra1/jvGdTr
+ TX4OaY+EC7Yj/5YcU+vseDDhbKdXJOCvprodYrcP0hDks/xYWe4+JGA2xCaxDmJ91WtR
+ QKuIx2WpQiKDt6nWqagoKagXGPLLnx3opnW256KzynxIOJSIXXRW4iTPbbF+RgYehFzD
+ 48/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=7ai9FymlssHTVJ4+wNEtq7TIzct8wXX8me30CyW3QFY=;
- b=IgbV8QmoeJ6m/40aDBakLLC/6Rixqcf8dAjrEY6FKI3iJB1MF/gnrw1T5/rD1fZWZs
- sHM89yjObq57s4RmOzdMDoPaPoyRQxUFN06dIFcZdf01dfk4r+dmOxJsvbDzVigbJBBG
- csdv00Z9wf67CP66VKk03aoIieSvXHEFQyJfA+aD7eiMQjtKJ1eJc0bBUhqPHenUudMY
- /jyAqi1tmZbyd7l7kwD0cFcPcNocMwBiQDrr5xYJ8DZLOoknOBzc06Ih4rXdWN1BUGG7
- sdQLmPW6k/+8UuqmBCWKbAUM+Sqzd3PXVfcFJCf2OGytfTRvXIxkjwyZ0SRzpOI1FNPV
- lCfw==
-X-Gm-Message-State: APjAAAWwxsmtov1jPpSWVTjGwCwftlZQmBG4JqSkbD0W281SMabOSt+1
- dFAqlcOlTj6BZaQFR/hkbKXwmQSadzj9vFwItwE=
-X-Google-Smtp-Source: APXvYqyikoO0hAmpIxLPt038QbGZwY51+9x11FqcL9TbxqeLUagE3aKaH+ku9ShiiPDqFU6ILjsx+grv6QikRrdaimE=
-X-Received: by 2002:ac2:5e9e:: with SMTP id b30mr4207561lfq.5.1569620480935;
- Fri, 27 Sep 2019 14:41:20 -0700 (PDT)
+ bh=pA/Tdq4jk0AJMN3fUQKqIPvN2jrY/MiicAii9Ap3hIs=;
+ b=m8ODbkrTrSmOlbkTbpgQ5qV3hQ45Y01z7bGfDJAQgZy3t6dhEAKzl0YALDLO+Rc9OV
+ xOeFsERA0QbiEHBsrJRAIYN+jrG7jKC3wzXeCkWk0BKqbIsGSvNg9uZrciVtHnCzlr/b
+ WnDTgCrWgahBr41hC6dXbCk/FQL2QY17h0pUpxbvTlctrHzLIJJdMKBOTyJW8KXM3wnu
+ JeCtVh0q3QAdmdvdego3L748j4WvtKVfVnVbbWduSuZf2DHsbAVqs+D5z3iQUaIjyQ+G
+ lUZU0FES1UMhYHLBIwn7ALaZJDW4tZ8+mgDVISk96EYuorDPRTFsTTNNdxODVy0nWVop
+ E5fQ==
+X-Gm-Message-State: APjAAAVJY+vze4nEiGiN2RdhnCIUsibohuQwmy9Ero3BrlhuSkMX8Hrt
+ MUpLZiTZZCHfrm+o7yCQrzgTG3vQW8asGjvuLYA=
+X-Google-Smtp-Source: APXvYqwMSgJK+zpe+Y/sOaXPSvoB8o3F4+X1EVTCRflkPnHAtF1AwFBnYiEff2Tm0vej42NCOvxeTief7Ym2IsGbjCE=
+X-Received: by 2002:ac2:4a69:: with SMTP id q9mr4023307lfp.86.1569620548361;
+ Fri, 27 Sep 2019 14:42:28 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-2-f4bug@amsat.org>
-In-Reply-To: <20190926173428.10713-2-f4bug@amsat.org>
+ <20190926173428.10713-3-f4bug@amsat.org>
+In-Reply-To: <20190926173428.10713-3-f4bug@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 27 Sep 2019 14:36:33 -0700
-Message-ID: <CAKmqyKO4aNVjh+w0MT29etz6tTrH_k1EoQKyi5xG0n9bTW_8kg@mail.gmail.com>
-Subject: Re: [PATCH 01/19] hw/arm/raspi: Use the IEC binary prefix definitions
+Date: Fri, 27 Sep 2019 14:37:41 -0700
+Message-ID: <CAKmqyKOoYyc-CX5Q2x2jwoFFm8ZdW9+eFbpL5_49SUJryNeUrA@mail.gmail.com>
+Subject: Re: [PATCH 02/19] hw/arm/bcm2835_peripherals: Improve logging
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -107,10 +106,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 10:36 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+On Thu, Sep 26, 2019 at 10:40 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
 rg> wrote:
 >
-> IEC binary prefixes ease code review: the unit is explicit.
+> Various logging improvements as once:
+> - Use 0x prefix for hex numbers
+> - Display value written during write accesses
+> - Move some logs from GUEST_ERROR to UNIMP
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
@@ -119,31 +121,216 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/arm/raspi.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> v2: Use PRIx64 format (pm215)
+> ---
+>  hw/char/bcm2835_aux.c      |  5 +++--
+>  hw/dma/bcm2835_dma.c       |  8 ++++----
+>  hw/intc/bcm2836_control.c  |  7 ++++---
+>  hw/misc/bcm2835_mbox.c     |  7 ++++---
+>  hw/misc/bcm2835_property.c | 16 ++++++++++------
+>  5 files changed, 25 insertions(+), 18 deletions(-)
 >
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index 74c062d05e..615d755879 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -230,7 +230,7 @@ static void raspi2_machine_init(MachineClass *mc)
->      mc->max_cpus =3D BCM283X_NCPUS;
->      mc->min_cpus =3D BCM283X_NCPUS;
->      mc->default_cpus =3D BCM283X_NCPUS;
-> -    mc->default_ram_size =3D 1024 * 1024 * 1024;
-> +    mc->default_ram_size =3D 1 * GiB;
->      mc->ignore_memory_transaction_failures =3D true;
->  };
->  DEFINE_MACHINE("raspi2", raspi2_machine_init)
-> @@ -252,7 +252,7 @@ static void raspi3_machine_init(MachineClass *mc)
->      mc->max_cpus =3D BCM283X_NCPUS;
->      mc->min_cpus =3D BCM283X_NCPUS;
->      mc->default_cpus =3D BCM283X_NCPUS;
-> -    mc->default_ram_size =3D 1024 * 1024 * 1024;
-> +    mc->default_ram_size =3D 1 * GiB;
->  }
->  DEFINE_MACHINE("raspi3", raspi3_machine_init)
->  #endif
+> diff --git a/hw/char/bcm2835_aux.c b/hw/char/bcm2835_aux.c
+> index 3f855196e3..a6fc1bf152 100644
+> --- a/hw/char/bcm2835_aux.c
+> +++ b/hw/char/bcm2835_aux.c
+> @@ -162,8 +162,9 @@ static void bcm2835_aux_write(void *opaque, hwaddr of=
+fset, uint64_t value,
+>      switch (offset) {
+>      case AUX_ENABLES:
+>          if (value !=3D 1) {
+> -            qemu_log_mask(LOG_UNIMP, "%s: unsupported attempt to enable =
+SPI "
+> -                          "or disable UART\n", __func__);
+> +            qemu_log_mask(LOG_UNIMP, "%s: unsupported attempt to enable =
+SPI"
+> +                                     " or disable UART: 0x%"PRIx64"\n",
+> +                          __func__, value);
+>          }
+>          break;
+>
+> diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
+> index 192bd377a0..6acc2b644e 100644
+> --- a/hw/dma/bcm2835_dma.c
+> +++ b/hw/dma/bcm2835_dma.c
+> @@ -180,7 +180,7 @@ static uint64_t bcm2835_dma_read(BCM2835DMAState *s, =
+hwaddr offset,
+>          res =3D ch->debug;
+>          break;
+>      default:
+> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n"=
+,
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"HWADDR_PRIx"\=
+n",
+>                        __func__, offset);
+>          break;
+>      }
+> @@ -228,7 +228,7 @@ static void bcm2835_dma_write(BCM2835DMAState *s, hwa=
+ddr offset,
+>          ch->debug =3D value;
+>          break;
+>      default:
+> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n"=
+,
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"HWADDR_PRIx"\=
+n",
+>                        __func__, offset);
+>          break;
+>      }
+> @@ -247,7 +247,7 @@ static uint64_t bcm2835_dma0_read(void *opaque, hwadd=
+r offset, unsigned size)
+>          case BCM2708_DMA_ENABLE:
+>              return s->enable;
+>          default:
+> -            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx=
+"\n",
+> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"HWADDR_PR=
+Ix"\n",
+>                            __func__, offset);
+>              return 0;
+>          }
+> @@ -274,7 +274,7 @@ static void bcm2835_dma0_write(void *opaque, hwaddr o=
+ffset, uint64_t value,
+>              s->enable =3D (value & 0xffff);
+>              break;
+>          default:
+> -            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx=
+"\n",
+> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"HWADDR_PR=
+Ix"\n",
+>                            __func__, offset);
+>          }
+>      }
+> diff --git a/hw/intc/bcm2836_control.c b/hw/intc/bcm2836_control.c
+> index 04229b8a17..61f884ff9e 100644
+> --- a/hw/intc/bcm2836_control.c
+> +++ b/hw/intc/bcm2836_control.c
+> @@ -264,7 +264,7 @@ static uint64_t bcm2836_control_read(void *opaque, hw=
+addr offset, unsigned size)
+>      } else if (offset >=3D REG_MBOX0_RDCLR && offset < REG_LIMIT) {
+>          return s->mailboxes[(offset - REG_MBOX0_RDCLR) >> 2];
+>      } else {
+> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n"=
+,
+> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx=
+"\n",
+>                        __func__, offset);
+>          return 0;
+>      }
+> @@ -293,8 +293,9 @@ static void bcm2836_control_write(void *opaque, hwadd=
+r offset,
+>      } else if (offset >=3D REG_MBOX0_RDCLR && offset < REG_LIMIT) {
+>          s->mailboxes[(offset - REG_MBOX0_RDCLR) >> 2] &=3D ~val;
+>      } else {
+> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n"=
+,
+> -                      __func__, offset);
+> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx
+> +                                 " value 0x%"PRIx64"\n",
+> +                      __func__, offset, val);
+>          return;
+>      }
+>
+> diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
+> index 79bad11631..7690b9afaf 100644
+> --- a/hw/misc/bcm2835_mbox.c
+> +++ b/hw/misc/bcm2835_mbox.c
+> @@ -176,7 +176,7 @@ static uint64_t bcm2835_mbox_read(void *opaque, hwadd=
+r offset, unsigned size)
+>          break;
+>
+>      default:
+> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n"=
+,
+> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx=
+"\n",
+>                        __func__, offset);
+>          return 0;
+>      }
+> @@ -228,8 +228,9 @@ static void bcm2835_mbox_write(void *opaque, hwaddr o=
+ffset,
+>          break;
+>
+>      default:
+> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n"=
+,
+> -                      __func__, offset);
+> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx
+> +                                 " value 0x%"PRIx64"\n",
+> +                      __func__, offset, value);
+>          return;
+>      }
+>
+> diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
+> index d86d510572..0a1a3eb5d9 100644
+> --- a/hw/misc/bcm2835_property.c
+> +++ b/hw/misc/bcm2835_property.c
+> @@ -56,7 +56,8 @@ static void bcm2835_property_mbox_push(BCM2835PropertyS=
+tate *s, uint32_t value)
+>              break;
+>          case 0x00010001: /* Get board model */
+>              qemu_log_mask(LOG_UNIMP,
+> -                          "bcm2835_property: %x get board model NYI\n", =
+tag);
+> +                          "bcm2835_property: 0x%08x get board model NYI\=
+n",
+> +                          tag);
+>              resplen =3D 4;
+>              break;
+>          case 0x00010002: /* Get board revision */
+> @@ -69,7 +70,8 @@ static void bcm2835_property_mbox_push(BCM2835PropertyS=
+tate *s, uint32_t value)
+>              break;
+>          case 0x00010004: /* Get board serial */
+>              qemu_log_mask(LOG_UNIMP,
+> -                          "bcm2835_property: %x get board serial NYI\n",=
+ tag);
+> +                          "bcm2835_property: 0x%08x get board serial NYI=
+\n",
+> +                          tag);
+>              resplen =3D 8;
+>              break;
+>          case 0x00010005: /* Get ARM memory */
+> @@ -104,7 +106,8 @@ static void bcm2835_property_mbox_push(BCM2835Propert=
+yState *s, uint32_t value)
+>
+>          case 0x00038001: /* Set clock state */
+>              qemu_log_mask(LOG_UNIMP,
+> -                          "bcm2835_property: %x set clock state NYI\n", =
+tag);
+> +                          "bcm2835_property: 0x%08x set clock state NYI\=
+n",
+> +                          tag);
+>              resplen =3D 8;
+>              break;
+>
+> @@ -129,7 +132,8 @@ static void bcm2835_property_mbox_push(BCM2835Propert=
+yState *s, uint32_t value)
+>          case 0x00038004: /* Set max clock rate */
+>          case 0x00038007: /* Set min clock rate */
+>              qemu_log_mask(LOG_UNIMP,
+> -                          "bcm2835_property: %x set clock rates NYI\n", =
+tag);
+> +                          "bcm2835_property: 0x%08x set clock rate NYI\n=
+",
+> +                          tag);
+>              resplen =3D 8;
+>              break;
+>
+> @@ -274,8 +278,8 @@ static void bcm2835_property_mbox_push(BCM2835Propert=
+yState *s, uint32_t value)
+>              break;
+>
+>          default:
+> -            qemu_log_mask(LOG_GUEST_ERROR,
+> -                          "bcm2835_property: unhandled tag %08x\n", tag)=
+;
+> +            qemu_log_mask(LOG_UNIMP,
+> +                          "bcm2835_property: unhandled tag 0x%08x\n", ta=
+g);
+>              break;
+>          }
+>
 > --
 > 2.20.1
 >
