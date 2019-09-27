@@ -2,62 +2,90 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 349B5C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 00:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D589C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 00:51:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 097DC2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 00:43:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 097DC2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C9EE20872
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 00:51:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="gf0rqPjU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C9EE20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDeMO-0003ce-Ah
-	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 20:43:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44445)
+	id 1iDeTP-0000Id-60
+	for qemu-devel@archiver.kernel.org; Thu, 26 Sep 2019 20:51:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49111)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iDeL9-0002PE-No
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 20:42:32 -0400
+ (envelope-from <prvs=1662a5b7b=alistair.francis@wdc.com>)
+ id 1iDeRB-0006wZ-Jz
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 20:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iDeL5-0008Kt-D7
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 20:42:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59296)
+ (envelope-from <prvs=1662a5b7b=alistair.francis@wdc.com>)
+ id 1iDeRA-0008I6-6J
+ for qemu-devel@nongnu.org; Thu, 26 Sep 2019 20:48:45 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:49428)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iDeL5-0008IH-4T
- for qemu-devel@nongnu.org; Thu, 26 Sep 2019 20:42:27 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CE2DD18CB8FA;
- Fri, 27 Sep 2019 00:42:24 +0000 (UTC)
-Received: from localhost (ovpn-116-45.gru2.redhat.com [10.97.116.45])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BC41A60BE2;
- Fri, 27 Sep 2019 00:42:21 +0000 (UTC)
-Date: Thu, 26 Sep 2019 21:42:20 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] i386: Re-add "pconfig" CPUID flag name
-Message-ID: <20190927004220.GV8144@habkost.net>
-References: <20190926212326.4092-1-ehabkost@redhat.com>
- <CABgObfa-PHfeNVVYCuEFJ4_=KADJEddJS1k0Au+sOgtxgundDQ@mail.gmail.com>
+ (Exim 4.71) (envelope-from <prvs=1662a5b7b=alistair.francis@wdc.com>)
+ id 1iDeR9-0008AO-52; Thu, 26 Sep 2019 20:48:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1569545323; x=1601081323;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=to2LSvU6SRtGzE2StLUvISodwbfvMN16nW0KP1wbnVw=;
+ b=gf0rqPjUW5VGZmYq5XJCTrwFS0lhUvZBpPEI+T1+wsETJK5RCHpaxpc/
+ FKOtx2gTyiYmvrASEqJReukhXgPWhTuYdYfzC+hfnZf9y05PZkZiMz64s
+ vgDdM16J9r59sI5dDFF0pFS+F3y3EQpHq+nx21snQTTb4muGld7OJa37b
+ v34u75mO8FstVbcYJQkJtnHgE2LyTuvJ62RGZ8WXPAjIAPKmYrQ/wqVvV
+ mU8po6vEIEqnR9dmLbImnGBamuIffNRwMwlcFe5XAo0Ip+rC9PxilQ3O5
+ Ys1kIUMV0gQPGo7TJDDT11cq0WD39Nt91KlnUnbOJo7TOgREUDO3m4pi9 g==;
+IronPort-SDR: gZ6i0KSYUQHijrEOndPwg3aYGICuw6RGGVstH+aZNW0OudeLeW8KL0mIE8M19PXm8AVp0NvtYB
+ LJVXXGcPpfF8O0qO4ppjOl2F2ImpVvxiwRS13ClKnO+iupwi1N0sEe5jjy8lE+yPhQMRCyEwmS
+ nv2qX4PjAbNIdH+DRes9WCQ+toWc4URiGfMUNP6aAB76WXXiKxwj4W81aIgimqlHGZ+Ujd3nqY
+ L5tTrIb0nH0hEHhmpm5rENbjyiVUBhEQDKdUaEhzGWTnEsCvqqAfNildBd3JWMWy4rBBlAIOIk
+ EfU=
+X-IronPort-AV: E=Sophos;i="5.64,553,1559491200"; d="scan'208";a="120012181"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 27 Sep 2019 08:48:36 +0800
+IronPort-SDR: Ndww3ipI075j3B0QvLBvGooHVorpPd5BhTo5tBzKH2isIFA95Urs9UFcwpuWRnnhWCiWqC7+WD
+ t1HqwnqhRJZx2OPQZFq8+X+R7BOo/BYBdlZcVrvJBdFuO4SuNZXCR9HAtBJOdQLAvKuN9Zccf6
+ zm9DMXRLhm2jka4a2no2HMFUZJDV0dGiBlkSVnVMEqE4elR99jLjfj5wiLBjZE0NBUDx4WbXi4
+ N/s5ofOaK6BAUr5Qjx1agkDIkDwltnr66NdEg54L/xokywD4Irfug7KMkSfLhsLtc3c53qk5Uh
+ UNmC8cWNC1X14X/ULnrmAa/H
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 26 Sep 2019 17:44:56 -0700
+IronPort-SDR: w9TNfa7USp9TYeeBNJX5TGG4Fiqqkj6QTTJzms1rlmvycuih3VIdO95sr3FOJ8Hx2jGhD+ayuZ
+ h9tDLpAR+mISnDxJG17fkyV/gmlQfTGXw+m9HkCdmInnCAlHiD0G8rhBhYCIZ6dLYkP807D1+A
+ lxDnRee7akksB5X4sOXcQ50vM1RcYWgousQ+AXOFHv6cer7Blvvwc1qqqpgFjid6GBCWu+ISUj
+ rOGnLFcGx7xqLil1o+mt7I6HLeOLy/5pjKvMnm98uJL79KaJmQddb0mCR2+quT27BeYjsS4H8h
+ PbI=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.157.58])
+ by uls-op-cesaip02.wdc.com with ESMTP; 26 Sep 2019 17:48:36 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v2 0/7]  RISC-V: Add more machine memory
+Date: Thu, 26 Sep 2019 17:44:17 -0700
+Message-Id: <cover.1569545046.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfa-PHfeNVVYCuEFJ4_=KADJEddJS1k0Au+sOgtxgundDQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 27 Sep 2019 00:42:24 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.153.144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,122 +97,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, "Kang, Luwei" <luwei.kang@intel.com>,
- libvir-list@redhat.com, qemu-devel <qemu-devel@nongnu.org>,
- Robert Hoo <robert.hu@linux.intel.com>, kai.huang@intel.com,
- berrange@redhat.com, robert.hu@intel.com, Jiri Denemark <jdenemar@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-(CCing libvir-list)
 
-On Thu, Sep 26, 2019 at 11:58:30PM +0200, Paolo Bonzini wrote:
-> Is this really needed? QEMU's value of pconfig=on vs. off should be
-> provided by QMP CPU model queries, if a property is not available then
-> Libvirt should not try to set it to off.
-> 
+This series aims to improve the use of QEMU for developing boot code. It
+does a few things:
 
-Libvirt can easily work around it for new VMs, and it should.
+ - sifive_u machine:
+   - Adds a chunk of memory in the Flash area. This allows boot loaders
+   to use this memory. I can't find details on the QSPI flash used on
+   the real board, so this is the best bet at the moment.
+   - Adds a chunk of memory in the L2-LIM area. This is actualy the L2
+   cache and should shrink as the L2 cache is enalbed. Unfortunatley I
+   don't see a nice way to shrink this memory.
+   - Adds a property that allows users to specify if QEMU should jump to
+   flash or DRAM after the ROM code.
 
-The issue are VMs that were created with QEMU 3.1.0.  QEMU 3.1.0
-was telling libvirt "Icelake-Server can't be used unless
-pconfig=off is used", and libvirt was adding pconfig=off to the
-domain XML as expected.
+ - virt machine:
+   - Add the pflash_cfi01 flash device. This is based on the ARM virt
+   board implementation
+   - Adjusts QEMU to jump to the flash if a user has speciefied any
+   pflash.
 
-It would be wrong for libvirt to remove a device option when
-migrating an existing VM to another QEMU version.  We can change
-the rules (and document that), but do we want to?
+Both machines have been tested with oreboot, but this should also help
+the coreboot developers.
+
+v2:
+ - Address comments
+ - Fixup addresses
+ - Don't use macro for machine definition of RISC-V virt machine
 
 
-> Paolo
-> 
-> Il gio 26 set 2019, 23:23 Eduardo Habkost <ehabkost@redhat.com> ha scritto:
-> 
-> > QEMU 3.1.0 was shipped with the "pconfig" CPU property available,
-> > added by commit 5131dc433df5 ("i386: Add CPUID bit for PCONFIG").
-> >
-> > Then the feature was removed in QEMU 4.0.0 (and 3.1.1), by commit
-> > 712f807e1965 ("Revert 'i386: Add CPUID bit for PCONFIG'").
-> >
-> > In theory this would be OK, but we do have a problem: existing
-> > software (like libvirt) was already using "pconfig=off" since
-> > QEMU 3.1.0 on some cases.  This means software that worked with
-> > QEMU 3.1.0 doesn't work with QEMU 3.1.1 and newer.
-> >
-> > One symptom is the following error being generated by
-> > virt-install while trying to use the 'host-model' CPU model, on a
-> > host that's identified as Icelake-Server:
-> >
-> >   ERROR    internal error: qemu unexpectedly closed the monitor: \
-> >       2019-09-24T22:57:42.550032Z qemu-kvm: \
-> >       can't apply global Icelake-Server-x86_64-cpu.pconfig=off: Property
-> > '.pconfig' not found
-> >
-> > Re-add "pconfig" to feature_word_info[FEAT_7_0_EDX].feat_names so
-> > "pconfig=off" will work again.
-> >
-> > This change still won't let users set "monitor=on" because all
-> > accelerators currently report the feature as unsupported.  But to
-> > make sure PCONFIG won't be enabled by accident in the future
-> > before we implement the necessary migration code, also add the
-> > feature to .unmigratable_flags.
-> >
-> > Fixes: 712f807e1965 ("Revert 'i386: Add CPUID bit for PCONFIG'")
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  target/i386/cpu.h | 2 ++
-> >  target/i386/cpu.c | 8 +++++++-
-> >  2 files changed, 9 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> > index 8e090acd74..b728bd22f1 100644
-> > --- a/target/i386/cpu.h
-> > +++ b/target/i386/cpu.h
-> > @@ -731,6 +731,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
-> >  #define CPUID_7_0_EDX_AVX512_4VNNIW     (1U << 2)
-> >  /* AVX512 Multiply Accumulation Single Precision */
-> >  #define CPUID_7_0_EDX_AVX512_4FMAPS     (1U << 3)
-> > +/* PCONFIG Instruction */
-> > +#define CPUID_7_0_EDX_PCONFIG           (1U << 18)
-> >  /* Speculation Control */
-> >  #define CPUID_7_0_EDX_SPEC_CTRL         (1U << 26)
-> >  /* Arch Capabilities */
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 71034aeb5a..3e25505bd3 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -1084,7 +1084,7 @@ static FeatureWordInfo
-> > feature_word_info[FEATURE_WORDS] = {
-> >              NULL, NULL, NULL, NULL,
-> >              NULL, NULL, "md-clear", NULL,
-> >              NULL, NULL, NULL, NULL,
-> > -            NULL, NULL, NULL /* pconfig */, NULL,
-> > +            NULL, NULL, "pconfig", NULL,
-> >              NULL, NULL, NULL, NULL,
-> >              NULL, NULL, "spec-ctrl", "stibp",
-> >              NULL, "arch-capabilities", "core-capability", "ssbd",
-> > @@ -1095,6 +1095,12 @@ static FeatureWordInfo
-> > feature_word_info[FEATURE_WORDS] = {
-> >              .reg = R_EDX,
-> >          },
-> >          .tcg_features = TCG_7_0_EDX_FEATURES,
-> > +        /*
-> > +         * CPU state altered by the PCONFIG instruction (e.g. MKTME key
-> > table)
-> > +         * is not migrated by QEMU yet, so PCONFIG is unmigratable until
-> > +         * this is implemented.
-> > +         */
-> > +        .unmigratable_flags = CPUID_7_0_EDX_PCONFIG,
-> >      },
-> >      [FEAT_7_1_EAX] = {
-> >          .type = CPUID_FEATURE_WORD,
-> > --
-> > 2.21.0
-> >
-> >
+
+Alistair Francis (7):
+  riscv/sifive_u: Add L2-LIM cache memory
+  riscv/sifive_u: Add QSPI memory region
+  riscv/sifive_u: Manually define the machine
+  riscv/sifive_u: Add the start-in-flash property
+  riscv/virt: Manually define the machine
+  riscv/virt: Add the PFlash CFI01 device
+  riscv/virt: Jump to pflash if specified
+
+ hw/riscv/Kconfig            |   1 +
+ hw/riscv/sifive_u.c         |  95 +++++++++++++++++++++++----
+ hw/riscv/virt.c             | 127 ++++++++++++++++++++++++++++++++++--
+ include/hw/riscv/sifive_u.h |  11 +++-
+ include/hw/riscv/virt.h     |  10 ++-
+ 5 files changed, 222 insertions(+), 22 deletions(-)
 
 -- 
-Eduardo
+2.23.0
+
 
