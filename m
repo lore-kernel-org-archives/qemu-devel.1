@@ -2,83 +2,62 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 720E0C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C54B0C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 375EA217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:50:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rd+Gqi3/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375EA217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 96CA620872
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:54:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96CA620872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDqe4-0004F4-Gk
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 09:50:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58557)
+	id 1iDqhX-00082Z-4Y
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 09:54:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iDpy4-0007aR-PI
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:07:29 -0400
+ (envelope-from <berrange@redhat.com>) id 1iDpuq-0005Cu-Hu
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:04:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iDpy3-0005GR-6n
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:07:28 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41609)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iDpy3-0005G9-28
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:07:27 -0400
-Received: by mail-oi1-x243.google.com with SMTP id w17so5111659oiw.8
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 06:07:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HLTVzSrf+tbOprGdeY1EjMH96uf7xbbND9M4/9Ikjn4=;
- b=Rd+Gqi3/pPuFt7kwr0q0RraaxEG267+jQaryTZLaqgIJViiinTjMjBtAnC/J0hmZhA
- 6pxNNfgUpdIu3htRSsgYBbjxF3tkNHSLkWNYrbdeBqHIYiKKTfSQjn3aP3+wRt4ajjUv
- m3kPTQV24J5ce+aDb9Q5hLUEWd7dPRxa92WLkbfkgCpYIE91b58MQkFLgLuTwXFmhvSb
- HR60wxBOxB/n5XWJQiksaXzY6VneQ3IHGRybKKkQhEBhjJz9+9PZm2K1Ey+soOW7CG5/
- VeNs/3lD8tudN1+mn820BvYQ80h3M0qy+o6busz/ml7l8yXrlBkPICrP8pzqfvCfvxaO
- Hn2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HLTVzSrf+tbOprGdeY1EjMH96uf7xbbND9M4/9Ikjn4=;
- b=rz4/61SqdkjzU9GuN27BBRfrr1ORXa1ySBFL+/ijO1d7iORk9tNmLcr16koLSgJCVa
- 2l/jAF+mx30SlCIpFGeWA+Q5CKMuplM7eyO0tbbNYI5ssQWDgZbdcUKVGdela1A9XJ0D
- o7iCyR486qj8y3I1QAIfSyDA4gjDg2zwtYZ9NPKlYJwI4diPP5w16auW5NcJLq6wYCvP
- 6N4bKnJjEXXVe43fmcTNjSZBfp1vnhN1DM0XxFqXYP8NFeCK8WktDwAR4l3edxuJ5MCu
- dNkjip/RttVklagoj7EEBIHg7K3WEaAwPX6UZ77avh1So+ZS6c4762oL60RO/HdRaxxd
- D+Lw==
-X-Gm-Message-State: APjAAAUJXSzjZsp7b6Ht4mSeZFsmu/FZulTxkcs+8STzmTxFICsNy2eN
- dPUUBZKSBLVHz32R7aia049knETFumv8MoID3YTfIA==
-X-Google-Smtp-Source: APXvYqyoFOWi5vdyYPAovY+C9UEwY4lb1Y8ASGUje2FU7MtBHTEVihasNfnDXXkhoDyk1IVtY15H14QbxO/lmXRVG6o=
-X-Received: by 2002:aca:50d8:: with SMTP id e207mr6573765oib.48.1569589645543; 
- Fri, 27 Sep 2019 06:07:25 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1iDpuo-0004EO-Vc
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:04:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45304)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iDpum-0004DC-E7
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:04:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A52C0796FC
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:59:50 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-112-55.ams2.redhat.com
+ [10.36.112.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ABBC460A9F;
+ Fri, 27 Sep 2019 09:59:47 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 11/11] qcrypto-luks: more rigorous header checking
+Date: Fri, 27 Sep 2019 10:59:26 +0100
+Message-Id: <20190927095926.22230-12-berrange@redhat.com>
+In-Reply-To: <20190927095926.22230-1-berrange@redhat.com>
+References: <20190927095926.22230-1-berrange@redhat.com>
 MIME-Version: 1.0
-References: <20190821163341.16309-1-damien.hedde@greensocs.com>
- <20190821163341.16309-3-damien.hedde@greensocs.com>
- <20190911080642.GC13785@umbus.fritz.box>
- <1a3b4d7b-77a9-46af-e6f4-dc7b3ba13b4f@greensocs.com>
- <20190918091135.GA22790@umbus.fritz.box>
- <f482912f-9541-f90c-bd80-5c95322e670d@greensocs.com>
-In-Reply-To: <f482912f-9541-f90c-bd80-5c95322e670d@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Sep 2019 14:07:14 +0100
-Message-ID: <CAFEAcA8pja6bOh4vwqWco=1ZtqR0mJFUuZT+WjJwYuA5AZZuQg@mail.gmail.com>
-Subject: Re: [PATCH v4 02/10] hw/core: create Resettable QOM interface
-To: Damien Hedde <damien.hedde@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Fri, 27 Sep 2019 09:59:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,42 +69,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Sep 2019 at 12:21, Damien Hedde <damien.hedde@greensocs.com> wrote:
->
-> Hi All,
->
-> Do you think I should respin with the sugestions made by David so far ?
->
-> + reset type removal
-> + s/init/enter/ for the phases terminology
-> + handling of parent changes during reset
+From: Maxim Levitsky <mlevitsk@redhat.com>
 
-My takes:
- * I think we should keep the reset type. Among other things,
-   we probably want a reset type for "PCI bus reset" and
-   "SCSI bus reset", when we come to conversion of those
- * I don't have an opinion about the phase names
- * I think we should look at what we're doing for dynamic
-   changes of the reset tree. This falls into two parts,
-   both of which have come up in this thread:
-    - hotplug, ie what state should a hotplugged device
-      get set up to if it's plugged into a bus that's
-      currently in reset
-    - the modification of the qbus tree during reset,
-      like the raspi sd card thing
-   These feel related to me, so maybe handling the first
-   gives a better answer to handling the second ?
+Check that keyslots don't overlap with the data,
+and check that keyslots don't overlap with each other.
+(this is done using naive O(n^2) nested loops,
+but since there are just 8 keyslots, this doesn't really matter.
 
-thanks
--- PMM
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ crypto/block-luks.c | 52 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
+
+diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+index a53d5d1916..4861db810c 100644
+--- a/crypto/block-luks.c
++++ b/crypto/block-luks.c
+@@ -530,6 +530,11 @@ qcrypto_block_luks_load_header(QCryptoBlock *block,
+ static int
+ qcrypto_block_luks_check_header(const QCryptoBlockLUKS *luks, Error **er=
+rp)
+ {
++    size_t i, j;
++
++    unsigned int header_sectors =3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_OFFSET /
++        QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
++
+     if (memcmp(luks->header.magic, qcrypto_block_luks_magic,
+                QCRYPTO_BLOCK_LUKS_MAGIC_LEN) !=3D 0) {
+         error_setg(errp, "Volume is not in LUKS format");
+@@ -541,6 +546,53 @@ qcrypto_block_luks_check_header(const QCryptoBlockLU=
+KS *luks, Error **errp)
+                    luks->header.version);
+         return -1;
+     }
++
++    /* Check all keyslots for corruption  */
++    for (i =3D 0 ; i < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; i++) {
++
++        const QCryptoBlockLUKSKeySlot *slot1 =3D &luks->header.key_slots=
+[i];
++        unsigned int start1 =3D slot1->key_offset_sector;
++        unsigned int len1 =3D
++            qcrypto_block_luks_splitkeylen_sectors(luks,
++                                                   header_sectors,
++                                                   slot1->stripes);
++
++        if (slot1->stripes =3D=3D 0) {
++            error_setg(errp, "Keyslot %zu is corrupted (stripes =3D=3D 0=
+)", i);
++            return -1;
++        }
++
++        if (slot1->active !=3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_DISABLED &&
++            slot1->active !=3D QCRYPTO_BLOCK_LUKS_KEY_SLOT_ENABLED) {
++            error_setg(errp,
++                       "Keyslot %zu state (active/disable) is corrupted"=
+, i);
++            return -1;
++        }
++
++        if (start1 + len1 > luks->header.payload_offset_sector) {
++            error_setg(errp,
++                       "Keyslot %zu is overlapping with the encrypted pa=
+yload",
++                       i);
++            return -1;
++        }
++
++        for (j =3D i + 1 ; j < QCRYPTO_BLOCK_LUKS_NUM_KEY_SLOTS ; j++) {
++            const QCryptoBlockLUKSKeySlot *slot2 =3D &luks->header.key_s=
+lots[j];
++            unsigned int start2 =3D slot2->key_offset_sector;
++            unsigned int len2 =3D
++                qcrypto_block_luks_splitkeylen_sectors(luks,
++                                                       header_sectors,
++                                                       slot2->stripes);
++
++            if (start1 + len1 > start2 && start2 + len2 > start1) {
++                error_setg(errp,
++                           "Keyslots %zu and %zu are overlapping in the =
+header",
++                           i, j);
++                return -1;
++            }
++        }
++
++    }
+     return 0;
+ }
+=20
+--=20
+2.21.0
+
 
