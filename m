@@ -6,45 +6,46 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E73C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB76AC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E4E6217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:43:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4E6217D7
+	by mail.kernel.org (Postfix) with ESMTPS id AB26E217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 13:44:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB26E217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDqWq-0005vQ-OU
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 09:43:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59752)
+	id 1iDqXT-0006w6-Ud
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 09:44:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDq1K-0001aC-LE
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:10:51 -0400
+ (envelope-from <david@redhat.com>) id 1iDq1u-00025h-AB
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDq1J-00067G-Bu
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:10:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51182)
+ (envelope-from <david@redhat.com>) id 1iDq1t-0006Id-8D
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:11:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47332)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDq1J-00066b-2b; Fri, 27 Sep 2019 09:10:49 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iDq1s-0006IM-Vo; Fri, 27 Sep 2019 09:11:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3EF1F300BEAC;
- Fri, 27 Sep 2019 10:42:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1D1E318CB90E;
+ Fri, 27 Sep 2019 10:45:23 +0000 (UTC)
 Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 65FD760BE2;
- Fri, 27 Sep 2019 10:42:38 +0000 (UTC)
-Subject: Re: [PATCH v3 07/18] target/s390x: Handle tec in s390_cpu_tlb_fill
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2B9585D6A7;
+ Fri, 27 Sep 2019 10:45:22 +0000 (UTC)
+Subject: Re: [PATCH v3 09/18] target/s390x: Remove exc argument to
+ mmu_translate_asce
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190926162615.31168-1-richard.henderson@linaro.org>
- <20190926162615.31168-8-richard.henderson@linaro.org>
+ <20190926162615.31168-10-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,18 +92,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <306619b3-40c8-bad5-b986-0f467aaf5ef8@redhat.com>
-Date: Fri, 27 Sep 2019 12:42:37 +0200
+Message-ID: <6f1f7ca4-b40b-acbc-d1eb-ca818695fb70@redhat.com>
+Date: Fri, 27 Sep 2019 12:45:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190926162615.31168-8-richard.henderson@linaro.org>
+In-Reply-To: <20190926162615.31168-10-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 27 Sep 2019 10:42:39 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Fri, 27 Sep 2019 10:45:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -123,51 +124,39 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 26.09.19 18:26, Richard Henderson wrote:
-> As a step toward moving all excption handling out of mmu_translate,
-> copy handling of the LowCore tec value from trigger_access_exception
-> into s390_cpu_tlb_fill.  So far this new plumbing isn't used.
+> Now that mmu_translate_asce returns the exception instead of
+> raising it, the argument is unused.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/s390x/excp_helper.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  target/s390x/mmu_helper.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index 552098be5f..ab2ed47fef 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -126,7 +126,7 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->      S390CPU *cpu = S390_CPU(cs);
->      CPUS390XState *env = &cpu->env;
->      target_ulong vaddr, raddr;
-> -    uint64_t asc;
-> +    uint64_t asc, tec;
->      int prot, fail, excp;
+> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> index b783c62bd7..ed6570db62 100644
+> --- a/target/s390x/mmu_helper.c
+> +++ b/target/s390x/mmu_helper.c
+> @@ -113,7 +113,7 @@ static inline int read_table_entry(hwaddr gaddr, uint64_t *entry)
 >  
->      qemu_log_mask(CPU_LOG_MMU, "%s: addr 0x%" VADDR_PRIx " rw %d mmu_idx %d\n",
-> @@ -162,6 +162,7 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->                        "%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n",
->                        __func__, (uint64_t)raddr, (uint64_t)ram_size);
->          excp = PGM_ADDRESSING;
-> +        tec = 0; /* unused */
->          fail = 1;
+>  static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
+>                                uint64_t asc, uint64_t asce, target_ulong *raddr,
+> -                              int *flags, int rw, bool exc)
+> +                              int *flags, int rw)
+>  {
+>      const bool edat1 = (env->cregs[0] & CR0_EDAT) &&
+>                         s390_has_feat(S390_FEAT_EDAT);
+> @@ -402,7 +402,7 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
 >      }
 >  
-> @@ -178,6 +179,10 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->      }
->  
->      if (excp) {
-> +        if (excp != PGM_ADDRESSING) {
-> +            stq_phys(env_cpu(env)->as,
-> +                     env->psa + offsetof(LowCore, trans_exc_code), tec);
-> +        }
->          trigger_pgm_exception(env, excp, ILEN_AUTO);
->      }
->      cpu_restore_state(cs, retaddr, true);
+>      /* perform the DAT translation */
+> -    r = mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw, exc);
+> +    r = mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw);
+>      if (unlikely(r)) {
+>          if (exc) {
+>              trigger_access_exception(env, r, ilen, tec);
 > 
 
-Again, depends on what's going to follow next, but I have a rough idea
-already :)
+Very nice, I missed that
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
