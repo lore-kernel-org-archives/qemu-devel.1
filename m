@@ -2,82 +2,63 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28ABAC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6A6C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:46:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9280205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:46:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x6m1c+RI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9280205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EA3C0205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:46:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA3C0205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDsRX-0004xf-Dv
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:46:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42537)
+	id 1iDsRa-0005FE-3H
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:46:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iDql6-0004lS-5U
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:58:09 -0400
+ (envelope-from <armbru@redhat.com>) id 1iDqa8-0001D4-Dt
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iDql4-0008Gz-FC
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:58:07 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40641)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iDql4-0008Go-Al
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:58:06 -0400
-Received: by mail-ot1-x342.google.com with SMTP id y39so2298255ota.7
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 06:58:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/L1vk8ZEX1dDFsyoP8jdEPTbwfmUYl1fqd9uotjBFoQ=;
- b=x6m1c+RIp9S7ggPV9dD5W8bthMp/oigvGlUwn0P8vP5dyfwGciPgIqLFSuAVJxZPT4
- CP1cRDyy5hWppSOhv0KDBB61zO+IFpXNGI9iJem8UT4mVqmcgi88bOBU/9ZxJPZhBc66
- NYfbHGjn5kYCx10GDN4KZHp3WaSqs2qDXPPku+2r2jW2IdjNn2FRco56rhpVbNOECVrb
- Hi7Pbi+KAs7QTCI6zE6oGtw5lJM56TyEluaqfhrFZ0YCecLW7xlhTiy0ax39XnZTKVD9
- meU7mgozp/vriibdlNDuOGKLahraOnRjlW2dur9VMe5fVTVbmuGzJN4udrCOFHmDGOlN
- m0nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/L1vk8ZEX1dDFsyoP8jdEPTbwfmUYl1fqd9uotjBFoQ=;
- b=j9+Q3RJsVmhqifXHymShduBw6iKMmwvB09scV+3K17LQdErPzy502Q5H65vS2dmSdf
- lw+Zs9dyE+aVjrnG9DKbIiyD3g6KqfrB1UYQn7IjW+SdYvI5MJK16j5rFajNt8RhvczI
- vA5hjblq22xQn7c/3VnJ/uio4xpEDy4KPpJm7kMnhziaHb+t98w7MaFbdbFM/sgE9UYz
- LWvxZi8eh/X6UrzAKJZc389jA6d8N4WVqrQ2wN6VkKQg/6S8IUWGh/ttno7KwNSJZxHR
- M5rkl9L8Cc8vhAI+zgSDsR50dWD4NbQzbY8MWPZt8r6M70st21THVcULN+RzCOENkWTu
- qbyA==
-X-Gm-Message-State: APjAAAWVMTuntT2C15LGQHk+NGvWKIvRZ5KSk0BlZzo9fewYancPtBag
- 9dQhKRXJY1/JHVEhfgIryjBXz2Gm1zUFK72SPcPnJw==
-X-Google-Smtp-Source: APXvYqx/U/Fyiz/LD14vi413zuKKZi9VIQ+Ap4zw2wBTN+o9Bnb6t+a9XUiOR3Rrp5pKjc5Z52IKSf9Io7r6O3MckpI=
-X-Received: by 2002:a05:6830:1357:: with SMTP id
- r23mr3354259otq.91.1569592685416; 
- Fri, 27 Sep 2019 06:58:05 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1iDqa6-00062q-Ij
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:15905)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa6-00062D-7p
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:46 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4AA013003AFE;
+ Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1719510001BC;
+ Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 8311911385CB; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 10/26] qapi: Use check_name_str() where it suffices
+Date: Fri, 27 Sep 2019 15:46:23 +0200
+Message-Id: <20190927134639.4284-11-armbru@redhat.com>
+In-Reply-To: <20190927134639.4284-1-armbru@redhat.com>
+References: <20190927134639.4284-1-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20190906083152.25716-1-zhengxiang9@huawei.com>
- <20190906083152.25716-7-zhengxiang9@huawei.com>
-In-Reply-To: <20190906083152.25716-7-zhengxiang9@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 27 Sep 2019 14:57:54 +0100
-Message-ID: <CAFEAcA9Y3J8uRDN+HQO74-codKhoj5CyPW=9q3GwH8Mk_PNYTA@mail.gmail.com>
-Subject: Re: [PATCH v18 6/6] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
-To: Xiang Zheng <zhengxiang9@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,164 +70,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
- Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- James Morse <james.morse@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
->
-> From: Dongjiu Geng <gengdongjiu@huawei.com>
->
-> Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> translates the host VA delivered by host to guest PA, then fills this PA
-> to guest APEI GHES memory, then notifies guest according to the SIGBUS
-> type.
->
-> If guest accesses the poisoned memory, it generates Synchronous External
-> Abort(SEA). Then host kernel gets an APEI notification and calls
-> memory_failure() to unmapped the affected page in stage 2, finally
-> returns to guest.
->
-> Guest continues to access PG_hwpoison page, it will trap to KVM as
-> stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
-> Qemu, Qemu records this error address into guest APEI GHES memory and
-> notifes guest using Synchronous-External-Abort(SEA).
->
-> Suggested-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> ---
->  hw/acpi/acpi_ghes.c         | 252 ++++++++++++++++++++++++++++++++++++
->  include/hw/acpi/acpi_ghes.h |  40 ++++++
->  include/sysemu/kvm.h        |   2 +-
->  target/arm/kvm64.c          |  39 ++++++
->  4 files changed, 332 insertions(+), 1 deletion(-)
+Replace check_name() by check_name_str() where the name is known to be
+a string.
 
-I'll let somebody else review the ACPI parts as that's not my
-area of expertise, but I'll look at the target/arm parts below:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ scripts/qapi/common.py | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
-> index 20c45179ff..2d17c88045 100644
-> --- a/hw/acpi/acpi_ghes.c
-> +++ b/hw/acpi/acpi_ghes.c
-> @@ -26,6 +26,168 @@
->  #include "sysemu/sysemu.h"
->  #include "qemu/error-report.h"
->
-> +/* Total size for Generic Error Status Block
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 6f35cd131e..d0d997f31c 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -816,8 +816,8 @@ def check_type(value, info, source,
+=20
+     # value is a dictionary, check that each member is okay
+     for (key, arg) in value.items():
+-        check_name(key, info, "member of %s" % source,
+-                   allow_optional=3DTrue, permit_upper=3Dpermit_upper)
++        check_name_str(key, info, "member of %s" % source,
++                       allow_optional=3DTrue, permit_upper=3Dpermit_uppe=
+r)
+         if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswit=
+h('has_'):
+             raise QAPISemError(
+                 info, "member of %s uses reserved name '%s'" % (source, =
+key))
+@@ -920,8 +920,7 @@ def check_union(expr, info):
+         raise QAPISemError(info, "union '%s' has no branches" % name)
+=20
+     for (key, value) in members.items():
+-        check_name(key, info, "member of union '%s'" % name)
+-
++        check_name_str(key, info, "member of union '%s'" % name)
+         check_known_keys(value, info,
+                          "member '%s' of union '%s'" % (key, name),
+                          ['type'], ['if'])
+@@ -951,7 +950,7 @@ def check_alternate(expr, info):
+         raise QAPISemError(info,
+                            "alternate '%s' cannot have empty 'data'" % n=
+ame)
+     for (key, value) in members.items():
+-        check_name(key, info, "member of alternate '%s'" % name)
++        check_name_str(key, info, "member of alternate '%s'" % name)
+         check_known_keys(value, info,
+                          "member '%s' of alternate '%s'" % (key, name),
+                          ['type'], ['if'])
+--=20
+2.21.0
 
-This block comment should start with '/*' on a line of its own
-(as should others in this patch). Usually checkpatch catches these
-but it's not infallible.
-
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 909bcd77cf..5f57e4ed43 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -378,7 +378,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
->  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
->  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
->
-> -#ifdef TARGET_I386
-> +#if defined(TARGET_I386) || defined(TARGET_AARCH64)
->  #define KVM_HAVE_MCE_INJECTION 1
->  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
->  #endif
-
-Rather than introducing a new ifdef with lots of TARGET_*,
-I think it would be better to have target/i386/cpu.h and
-target/arm/cpu.h do "#define KVM_HAVE_MCE_INJECTION 1"
-(nb that the arm cpu.h needs to define it only for aarch64,
-not for 32-bit arm host compiles).
-
-and then kvm.h can just do
-#ifdef KVM_HAVE_MCE_INJECTION
-void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
-#endif
-
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index bf6edaa3f6..186d855522 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -28,6 +28,8 @@
->  #include "kvm_arm.h"
->  #include "hw/boards.h"
->  #include "internals.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/acpi_ghes.h"
->
->  static bool have_guest_debug;
->
-> @@ -1070,6 +1072,43 @@ int kvm_arch_get_registers(CPUState *cs)
->      return ret;
->  }
->
-> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-> +{
-> +    ram_addr_t ram_addr;
-> +    hwaddr paddr;
-> +
-> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
-> +
-> +    if (acpi_enabled && addr &&
-> +            object_property_get_bool(qdev_get_machine(), "ras", NULL)) {
-> +        ram_addr = qemu_ram_addr_from_host(addr);
-> +        if (ram_addr != RAM_ADDR_INVALID &&
-> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> +            kvm_hwpoison_page_add(ram_addr);
-> +            /* Asynchronous signal will be masked by main thread, so
-> +             * only handle synchronous signal.
-> +             */
-
-I don't entirely understand this comment. The x86 version
-of this function says:
-
-    /* If we get an action required MCE, it has been injected by KVM
-     * while the VM was running.  An action optional MCE instead should
-     * be coming from the main thread, which qemu_init_sigbus identifies
-     * as the "early kill" thread.
-     */
-
-so we can be called for action-optional MCE here (not on the vcpu
-thread). We obviously can't deliver those as a synchronous exception
-to a particular CPU, but is there no mechanism for reporting them
-to the guest at all?
-
-> +            if (code == BUS_MCEERR_AR) {
-> +                kvm_cpu_synchronize_state(c);
-> +                if (ACPI_GHES_CPER_FAIL !=
-> +                    acpi_ghes_record_errors(ACPI_GHES_NOTIFY_SEA, paddr)) {
-> +                    kvm_inject_arm_sea(c);
-> +                } else {
-> +                    fprintf(stderr, "failed to record the error\n");
-> +                }
-> +            }
-> +            return;
-> +        }
-> +        fprintf(stderr, "Hardware memory error for memory used by "
-> +                "QEMU itself instead of guest system!\n");
-> +    }
-> +
-> +    if (code == BUS_MCEERR_AR) {
-> +        fprintf(stderr, "Hardware memory error!\n");
-> +        exit(1);
-> +    }
-> +}
-> +
->  /* C6.6.29 BRK instruction */
->  static const uint32_t brk_insn = 0xd4200000;
->
-
-thanks
--- PMM
 
