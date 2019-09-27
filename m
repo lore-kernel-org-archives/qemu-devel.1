@@ -4,51 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E73C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9347C388F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:22:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3E2A217D9
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:22:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3E2A217D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8988F2146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:22:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8988F2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDr8H-00058h-4h
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:22:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34470)
+	id 1iDr8g-0005fb-Rk
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:22:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDqCh-0003Tr-Ie
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:22:37 -0400
+ (envelope-from <imbrenda@linux.ibm.com>) id 1iDqNL-0005Pv-6h
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iDqCg-0000KJ-2i
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:22:35 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49752)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDqCa-0000IU-4E; Fri, 27 Sep 2019 09:22:28 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iDpHz-0003za-HR; Fri, 27 Sep 2019 15:23:59 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v5 9/9] qcow2-bitmap: move bitmap reopen-rw code to
- qcow2_reopen_commit
-Date: Fri, 27 Sep 2019 15:23:55 +0300
-Message-Id: <20190927122355.7344-10-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190927122355.7344-1-vsementsov@virtuozzo.com>
-References: <20190927122355.7344-1-vsementsov@virtuozzo.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ (envelope-from <imbrenda@linux.ibm.com>) id 1iDqNJ-0001yz-Us
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48418)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imbrenda@linux.ibm.com>)
+ id 1iDqNJ-0001yT-Ma
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:33:33 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8RDWbH7127170
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:33:32 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2v9jysh432-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:33:31 -0400
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <imbrenda@linux.ibm.com>;
+ Fri, 27 Sep 2019 14:33:28 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 27 Sep 2019 14:33:26 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8RDXPBm61604008
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 27 Sep 2019 13:33:25 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 152F242041;
+ Fri, 27 Sep 2019 13:33:25 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B019B4204B;
+ Fri, 27 Sep 2019 13:33:24 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.39])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Fri, 27 Sep 2019 13:33:24 +0000 (GMT)
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Subject: [PATCH v2 2/4] s390x: sclp: boundary check
+Date: Fri, 27 Sep 2019 15:33:21 +0200
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1569591203-15258-1-git-send-email-imbrenda@linux.ibm.com>
+References: <1569591203-15258-1-git-send-email-imbrenda@linux.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19092713-0020-0000-0000-000003725098
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092713-0021-0000-0000-000021C821B1
+Message-Id: <1569591203-15258-3-git-send-email-imbrenda@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-27_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=835 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909270127
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,124 +98,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The only reason I can imagine for this strange code at the very-end of
-bdrv_reopen_commit is the fact that bs->read_only updated after
-calling drv->bdrv_reopen_commit in bdrv_reopen_commit. And in the same
-time, prior to previous commit, qcow2_reopen_bitmaps_rw did a wrong
-check for being writable, when actually it only need writable file
-child not self.
+From: Janosch Frank <frankja@linux.ibm.com>
 
-So, as it's fixed, let's move things to correct place.
+All sclp codes need to be checked for page boundary violations.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Acked-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
 ---
- include/block/block_int.h |  6 ------
- block.c                   | 19 -------------------
- block/qcow2.c             | 15 ++++++++++++++-
- 3 files changed, 14 insertions(+), 26 deletions(-)
+ hw/s390x/sclp.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 0422acdf1c..039a44a959 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -546,12 +546,6 @@ struct BlockDriver {
-                              uint64_t parent_perm, uint64_t parent_shared,
-                              uint64_t *nperm, uint64_t *nshared);
- 
--    /**
--     * Bitmaps should be marked as 'IN_USE' in the image on reopening image
--     * as rw. This handler should realize it. It also should unset readonly
--     * field of BlockDirtyBitmap's in case of success.
--     */
--    int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
-     bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs,
-                                             const char *name,
-                                             uint32_t granularity,
-diff --git a/block.c b/block.c
-index a2de16c8c7..2f2b7b3c57 100644
---- a/block.c
-+++ b/block.c
-@@ -3935,16 +3935,12 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
-     BlockDriver *drv;
-     BlockDriverState *bs;
-     BdrvChild *child;
--    bool old_can_write, new_can_write;
- 
-     assert(reopen_state != NULL);
-     bs = reopen_state->bs;
-     drv = bs->drv;
-     assert(drv != NULL);
- 
--    old_can_write =
--        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
--
-     /* If there are any driver level actions to take */
-     if (drv->bdrv_reopen_commit) {
-         drv->bdrv_reopen_commit(reopen_state);
-@@ -3988,21 +3984,6 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index 95ebfe7..73244c9 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -234,6 +234,11 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+         goto out_write;
      }
  
-     bdrv_refresh_limits(bs, NULL);
--
--    new_can_write =
--        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
--    if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) {
--        Error *local_err = NULL;
--        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
--            /* This is not fatal, bitmaps just left read-only, so all following
--             * writes will fail. User can remove read-only bitmaps to unblock
--             * writes.
--             */
--            error_reportf_err(local_err,
--                              "%s: Failed to make dirty bitmaps writable: ",
--                              bdrv_get_node_name(bs));
--        }
--    }
- }
- 
- /*
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a3d672e9b2..758c37cd3e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1834,6 +1834,20 @@ fail:
- static void qcow2_reopen_commit(BDRVReopenState *state)
- {
-     qcow2_update_options_commit(state->bs, state->opaque);
-+    if (state->flags & BDRV_O_RDWR) {
-+        Error *local_err = NULL;
-+
-+        if (qcow2_reopen_bitmaps_rw(state->bs, &local_err) < 0) {
-+            /*
-+             * This is not fatal, bitmaps just left read-only, so all following
-+             * writes will fail. User can remove read-only bitmaps to unblock
-+             * writes or retry reopen.
-+             */
-+            error_reportf_err(local_err,
-+                              "%s: Failed to make dirty bitmaps writable: ",
-+                              bdrv_get_node_name(state->bs));
-+        }
++    if ((sccb + be16_to_cpu(work_sccb.h.length)) > ((sccb & PAGE_MASK) + PAGE_SIZE)) {
++        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_SCCB_BOUNDARY_VIOLATION);
++        goto out_write;
 +    }
-     g_free(state->opaque);
- }
- 
-@@ -5262,7 +5276,6 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_detach_aio_context  = qcow2_detach_aio_context,
-     .bdrv_attach_aio_context  = qcow2_attach_aio_context,
- 
--    .bdrv_reopen_bitmaps_rw = qcow2_reopen_bitmaps_rw,
-     .bdrv_can_store_new_dirty_bitmap = qcow2_can_store_new_dirty_bitmap,
-     .bdrv_remove_persistent_dirty_bitmap = qcow2_remove_persistent_dirty_bitmap,
- };
++
+     sclp_c->execute(sclp, &work_sccb, code);
+ out_write:
+     cpu_physical_memory_write(sccb, &work_sccb,
 -- 
-2.21.0
+2.7.4
 
 
