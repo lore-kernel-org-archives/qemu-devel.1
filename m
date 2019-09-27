@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AEDC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B65C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FBC4207E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:21:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FBC4207E0
+	by mail.kernel.org (Postfix) with ESMTPS id B6F43217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:21:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6F43217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDs3H-0005e5-BH
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:20:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39854)
+	id 1iDs3w-0006Ji-5u
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:21:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39959)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iDqa9-0001EZ-Tt
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:55 -0400
+ (envelope-from <armbru@redhat.com>) id 1iDqaD-0001Hz-Pz
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iDqa6-00063B-Ut
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51866)
+ (envelope-from <armbru@redhat.com>) id 1iDqa9-00066L-PU
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43512)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa6-00062R-Ce
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:46 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa9-00064K-6w
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 73AF0211A;
- Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B99BC796E9;
+ Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 19B741000232;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A9F55D6B7;
  Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 863DB11385D4; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
+ id 8CA851138528; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 11/26] qapi: Report invalid '*' prefix like any other
- invalid name
-Date: Fri, 27 Sep 2019 15:46:24 +0200
-Message-Id: <20190927134639.4284-12-armbru@redhat.com>
+Subject: [PATCH v2 13/26] qapi: Make check_type()'s array case a bit more
+ obvious
+Date: Fri, 27 Sep 2019 15:46:26 +0200
+Message-Id: <20190927134639.4284-14-armbru@redhat.com>
 In-Reply-To: <20190927134639.4284-1-armbru@redhat.com>
 References: <20190927134639.4284-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -76,90 +76,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The special "does not allow optional name" error is well meant, but
-confusing in practice.  Drop it.
+check_type() checks the array's contents, then peels off the array and
+falls through to the "not array" code without resetting allow_array
+and allow_dict to False.  Works because the peeled value is a string,
+and allow_array and allow_dict aren't used then.  Tidy up anyway:
+recurse instead, defaulting allow_array and allow_dict to False.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi/common.py                                   | 6 ++----
- tests/qapi-schema/bad-ident.err                          | 2 +-
- tests/qapi-schema/flat-union-discriminator-bad-name.err  | 2 +-
- tests/qapi-schema/flat-union-discriminator-bad-name.json | 2 +-
- tests/qapi-schema/union-optional-branch.err              | 2 +-
- 5 files changed, 6 insertions(+), 8 deletions(-)
+ scripts/qapi/common.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index d0d997f31c..a4cf41f13e 100644
+index 111a4bbe55..870d8b0ecb 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -724,11 +724,8 @@ def check_name_str(name, info, source,
-     global valid_name
-     membername =3D name
+@@ -795,7 +795,8 @@ def check_type(value, info, source,
+             raise QAPISemError(info,
+                                "%s: array type must contain single type =
+name" %
+                                source)
+-        value =3D value[0]
++        check_type(value[0], info, source, allow_metas=3Dallow_metas)
++        return
 =20
--    if name.startswith('*'):
-+    if allow_optional and name.startswith('*'):
-         membername =3D name[1:]
--        if not allow_optional:
--            raise QAPISemError(info, "%s does not allow optional name '%=
-s'"
--                               % (source, name))
-     # Enum members can start with a digit, because the generated C
-     # code always prefixes it with the enum name
-     if enum_member and membername[0].isdigit():
-@@ -741,6 +738,7 @@ def check_name_str(name, info, source,
-     if not permit_upper and name.lower() !=3D name:
-         raise QAPISemError(
-             info, "%s uses uppercase in name '%s'" % (source, name))
-+    assert not membername.startswith('*')
-=20
-=20
- def add_name(name, info, meta):
-diff --git a/tests/qapi-schema/bad-ident.err b/tests/qapi-schema/bad-iden=
-t.err
-index 6878889854..ddc96bd3a9 100644
---- a/tests/qapi-schema/bad-ident.err
-+++ b/tests/qapi-schema/bad-ident.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/bad-ident.json: In struct '*oops':
--tests/qapi-schema/bad-ident.json:2: 'struct' does not allow optional nam=
-e '*oops'
-+tests/qapi-schema/bad-ident.json:2: 'struct' uses invalid name '*oops'
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.err b/te=
-sts/qapi-schema/flat-union-discriminator-bad-name.err
-index f7f64c5c1a..44e41883b1 100644
---- a/tests/qapi-schema/flat-union-discriminator-bad-name.err
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/flat-union-discriminator-bad-name.json: In union 'MyUn=
-ion':
--tests/qapi-schema/flat-union-discriminator-bad-name.json:7: discriminato=
-r of flat union 'MyUnion' does not allow optional name '*switch'
-+tests/qapi-schema/flat-union-discriminator-bad-name.json:7: discriminato=
-r of flat union 'MyUnion' uses invalid name '*switch'
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.json b/t=
-ests/qapi-schema/flat-union-discriminator-bad-name.json
-index 66376084fc..ea84b75cac 100644
---- a/tests/qapi-schema/flat-union-discriminator-bad-name.json
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.json
-@@ -1,5 +1,5 @@
- # discriminator '*switch' isn't a member of base, 'switch' is
--# reports "does not allow optional name", which is good enough
-+# reports "uses invalid name", which is good enough
- { 'enum': 'Enum', 'data': [ 'one', 'two' ] }
- { 'struct': 'Base',
-   'data': { '*switch': 'Enum' } }
-diff --git a/tests/qapi-schema/union-optional-branch.err b/tests/qapi-sch=
-ema/union-optional-branch.err
-index a5677f74bc..8e9b18d7c6 100644
---- a/tests/qapi-schema/union-optional-branch.err
-+++ b/tests/qapi-schema/union-optional-branch.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/union-optional-branch.json: In union 'Union':
--tests/qapi-schema/union-optional-branch.json:2: member of union 'Union' =
-does not allow optional name '*a'
-+tests/qapi-schema/union-optional-branch.json:2: member of union 'Union' =
-uses invalid name '*a'
+     # Check if type name for value is okay
+     if isinstance(value, str):
 --=20
 2.21.0
 
