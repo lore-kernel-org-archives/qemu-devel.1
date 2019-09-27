@@ -2,114 +2,82 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6655FC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8914C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:35:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FA3D207E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:31:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FA3D207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 779BC207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:35:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779BC207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDmaw-0002z7-Ew
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:31:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58690)
+	id 1iDmeo-00057v-FO
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:35:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iDmZV-0001wM-UQ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:29:54 -0400
+ (envelope-from <peterx@redhat.com>) id 1iDmcC-0003XG-Ul
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iDmZT-0005N6-ST
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:29:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36582)
+ (envelope-from <peterx@redhat.com>) id 1iDmc9-0001gn-VJ
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53344)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iDmZR-0005Jx-9M; Fri, 27 Sep 2019 05:29:51 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iDmc8-0001dm-E7
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:37 -0400
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 53B00302C09F;
- Fri, 27 Sep 2019 09:29:46 +0000 (UTC)
-Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0319B194B6;
- Fri, 27 Sep 2019 09:29:44 +0000 (UTC)
-Subject: Re: [PATCH v1 1/2] s390x: Add sclp boundary check and fix error
- priority
-To: Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
-References: <1569497622-12496-1-git-send-email-imbrenda@linux.ibm.com>
- <1569497622-12496-2-git-send-email-imbrenda@linux.ibm.com>
- <d7ee2ad4-d928-88f1-94d6-3f6b22d2da72@redhat.com>
- <a7f404a1-7985-e506-db3e-815bb6d8e8cc@linux.ibm.com>
- <db8f5dda-73fe-6e24-3bf5-a721853680a7@redhat.com>
- <bdafeda3-0ec1-72c7-ccd6-ad5a06ea7077@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <d676e169-322f-39bf-1076-094fb5b41898@redhat.com>
-Date: Fri, 27 Sep 2019 11:29:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 0B2465313A
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:32:35 +0000 (UTC)
+Received: by mail-pf1-f199.google.com with SMTP id 194so1521936pfu.3
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 02:32:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=zPpXJBsgXCdgZO86UPMdugD/7JfMMFe/AjIloYQYWug=;
+ b=k62ijUYUyIGdPQfmWVPrBsSupSl3Qy5PQYqCLAA6LhjIyMUFn1GdjvtRX50KyNUTfV
+ B+2Qz/eY8E6Kgbo7aYc8Jq09U7Nj8pqimqCx73LdcBFvjzzW8nqM5nzLyALXhCHXRh2y
+ kXmxPv2PDQElS98lSDIzMeJ7tmnGx6tU5YnWAPmecqDF6jMKoilAGPjDyC5wWtL0rWc4
+ 8X8n10m/e1UcTddMWWYKfTCcCKcLK+7dwSAr/0j1xmqueDTqVQWUVomz0hgljm4rkdMR
+ R+xjFAdHYViJHiNGzKvFgRwkNFLLrrPgyBastbhlQ2G/sUi58Ys1rlZqMUkle3VMUV1J
+ AXnA==
+X-Gm-Message-State: APjAAAUVSb63bA0emZAzEqlzePtqNRl0ExgDYRb8IVc/JVHoEY3eV3IU
+ 0HRhJvTz1IGsfpA0W2ftD/exxe7RdkiDAbUk0Rqod75E0AcRPa9R7EL6ey/8FP6MmyoXGRU7nhX
+ dd/FBNwSy4t1XC/M=
+X-Received: by 2002:a17:90a:2086:: with SMTP id
+ f6mr8816434pjg.104.1569576753574; 
+ Fri, 27 Sep 2019 02:32:33 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyz3UiS5nvzuqeXSjJLmzd6fvm7V8YIpGiFRgwCXq9rx7oE8mStrFQV/OYbUISEQGV2S24AaA==
+X-Received: by 2002:a17:90a:2086:: with SMTP id
+ f6mr8816410pjg.104.1569576753307; 
+ Fri, 27 Sep 2019 02:32:33 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id b5sm4182873pgb.68.2019.09.27.02.32.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 27 Sep 2019 02:32:32 -0700 (PDT)
+Date: Fri, 27 Sep 2019 17:32:23 +0800
+From: Peter Xu <peterx@redhat.com>
+To: "Zhang, Qi1" <qi1.zhang@intel.com>
+Subject: Re: [PATCH V2] intel_iommu: TM field should not be in reserved bits
+Message-ID: <20190927093223.GC9412@xz-x1>
+References: <20190927045838.2968-1-qi1.zhang@intel.com>
+ <20190927061011.GB9412@xz-x1>
+ <215440059103624D9AD9D1DCACBF45DD3E84E270@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <bdafeda3-0ec1-72c7-ccd6-ad5a06ea7077@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 27 Sep 2019 09:29:46 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <215440059103624D9AD9D1DCACBF45DD3E84E270@shsmsx102.ccr.corp.intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -124,40 +92,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Qi,
+ Yadong" <yadong.qi@intel.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.09.19 11:20, Janosch Frank wrote:
-> On 9/27/19 11:17 AM, David Hildenbrand wrote:
->> On 27.09.19 11:14, Janosch Frank wrote:
->>> On 9/27/19 10:51 AM, David Hildenbrand wrote:
->>>> On 26.09.19 13:33, Claudio Imbrenda wrote:
->>>>> From: Janosch Frank <frankja@linux.ibm.com>
->>>>>
->>>>> * All sclp codes need to be checked for page boundary violations.
->>>>> * Requests over 4k are not a spec exception.
->>>>> * Invalid command checking has to be done before the boundary check.
->>>>
->>>> Can we split this patch up so we fix one thing at a time?
->>>
->>> Sure, but we would end up with very small patches.
->>> Do you want that?
->>
->> Why should I say no to easy-to-review, logically consistent, small
->> chunks? I have shortcuts for my RB's and ACK's, so I don't have to type
->> much ;)
->>
+On Fri, Sep 27, 2019 at 08:03:21AM +0000, Zhang, Qi1 wrote:
 > 
-> Higher patch count for me, win - win :-)
 > 
+> > -----Original Message-----
+> > From: Peter Xu <peterx@redhat.com>
+> > Sent: Friday, September 27, 2019 2:10 PM
+> > To: Zhang, Qi1 <qi1.zhang@intel.com>
+> > Cc: qemu-devel@nongnu.org; ehabkost@redhat.com; mst@redhat.com;
+> > pbonzini@redhat.com; rth@twiddle.net
+> > Subject: Re: [PATCH V2] intel_iommu: TM field should not be in reserved bits
+> > 
+> > On Fri, Sep 27, 2019 at 12:58:38PM +0800, qi1.zhang@intel.com wrote:
+> > > From: "Zhang, Qi" <qi1.zhang@intel.com>
+> > >
+> > > When dt is supported, TM field should not be Reserved(0).
+> > >
+> > > Refer to VT-d Spec 9.8
+> > >
+> > > Signed-off-by: Zhang, Qi <qi1.zhang@intel.com>
+> > > Signed-off-by: Qi, Yadong <yadong.qi@intel.com>
+> > > ---
+> > >  hw/i386/intel_iommu.c          | 12 ++++++------
+> > >  hw/i386/intel_iommu_internal.h | 25 +++++++++++++++++++------
+> > >  2 files changed, 25 insertions(+), 12 deletions(-)
+> > > ---
+> > > Changelog V2:
+> > >  move dt_supported flag to VTD_SPTE_PAGE_LX_RSVD_MASK and
+> > > VTD_SPTE_LPAGE_LX_RSVD_MASK
+> > >
+> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
+> > > f1de8fdb75..35222cf55c 100644
+> > > --- a/hw/i386/intel_iommu.c
+> > > +++ b/hw/i386/intel_iommu.c
+> > > @@ -3548,13 +3548,13 @@ static void vtd_init(IntelIOMMUState *s)
+> > >       * Rsvd field masks for spte
+> > >       */
+> > >      vtd_paging_entry_rsvd_field[0] = ~0ULL;
+> > > -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s-
+> > >aw_bits);
+> > > -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s-
+> > >aw_bits);
+> > > -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s-
+> > >aw_bits);
+> > > +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s-
+> > >aw_bits, x86_iommu->dt_supported);
+> > > +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s-
+> > >aw_bits, x86_iommu->dt_supported);
+> > > +    vtd_paging_entry_rsvd_field[3] =
+> > > + VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits, x86_iommu-
+> > >dt_supported);
+> > >      vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s-
+> > >aw_bits);
+> > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s-
+> > >aw_bits);
+> > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s-
+> > >aw_bits);
+> > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s-
+> > >aw_bits);
+> > > +    vtd_paging_entry_rsvd_field[5] =
+> > VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits, x86_iommu-
+> > >dt_supported);
+> > > +    vtd_paging_entry_rsvd_field[6] =
+> > VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits, x86_iommu-
+> > >dt_supported);
+> > > +    vtd_paging_entry_rsvd_field[7] =
+> > > + VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits, x86_iommu-
+> > >dt_supported);
+> > >      vtd_paging_entry_rsvd_field[8] =
+> > > VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
+> > 
+> > Should this TM bit only affects leaves?  Say, entry 1 (4K), 5 (2M), 6 (1G).
+> > While this reminded me that I'm totally confused on why we have had entry
+> > 7, 8 after all...  Are they really used?
+> Yes. TM bit only affects. To this array, index 1, 5,6,7 may be leaf. Will update a new patchset for it.
 
-Now that's the spirit :)
+Could I ask why index 7 may be leaf?
 
--- 
+> > 
+> > >
+> > >      if (x86_iommu_ir_supported(x86_iommu)) { diff --git
+> > > a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> > > index c1235a7063..01f1aa6c86 100644
+> > > --- a/hw/i386/intel_iommu_internal.h
+> > > +++ b/hw/i386/intel_iommu_internal.h
+> > > @@ -387,19 +387,31 @@ typedef union VTDInvDesc VTDInvDesc;  #define
+> > > VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
+> > >
+> > >  /* Rsvd field masks for spte */
+> > > -#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw) \
+> > > +#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw, dt_supported) \
+> > > +        dt_supported? \
+> > > +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM |
+> > VTD_SL_TM))
+> > > +: \
+> > >          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> > 
+> > This seems strange too in that ~VTD_HAW_MASK(aw) probably covered bits
+> > 63-48 for aw==48 case so it should already cover VTD_SL_TM?
+> VTD_SL_IGN_COM 0xbff0000000000000ULL, TM field is cleared by ~ VTD_SL_IGN_COM
+> > 
+> > Meanwhile when I'm reading the spec I see at least bits 61-52 ignored rather
+> > than reserved.
+> Yes. Bit 61~52 is ignored. Such as the index 5 of this array is 0xfff8000000800.
+
+Oops, my poor eye obviously didn't see that the "~" operator is
+applied over the whole (VTD_HAW_MASK(aw) | VTD_SL_IGN_COM)... :)
+
+Btw, you should only touch up the macros that are leaves here.
+Non-leaves should still keep that bit as reserved.
 
 Thanks,
 
-David / dhildenb
+-- 
+Peter Xu
 
