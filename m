@@ -2,63 +2,141 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A41C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1318C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:45:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EAAE2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:44:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EAAE2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 75B81205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:45:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75B81205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDsQN-0003hO-EA
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:44:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39919)
+	id 1iDsRL-0004mE-Gj
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:45:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iDqaB-0001GI-Sl
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:47:01 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1iDrKq-0002w2-Fl
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iDqa6-000632-Q3
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:16872)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa6-00062N-An
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:46 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 66FBA8A1C8E;
- Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CAC260C5D;
- Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7904211385FD; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/26] qapi: Improve reporting of member name clashes
-Date: Fri, 27 Sep 2019 15:46:20 +0200
-Message-Id: <20190927134639.4284-8-armbru@redhat.com>
-In-Reply-To: <20190927134639.4284-1-armbru@redhat.com>
-References: <20190927134639.4284-1-armbru@redhat.com>
+ (envelope-from <borntraeger@de.ibm.com>) id 1iDrKo-0006Ss-VX
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:35:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34912
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1iDrKo-0006Si-M7
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 10:35:02 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8REW0n2022089
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 10:35:01 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2v9kk2t05r-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 10:35:00 -0400
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 27 Sep 2019 15:34:59 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 27 Sep 2019 15:34:56 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8REYtGQ36569188
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 27 Sep 2019 14:34:55 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2810E5204E;
+ Fri, 27 Sep 2019 14:34:55 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id CA83552054;
+ Fri, 27 Sep 2019 14:34:54 +0000 (GMT)
+Subject: Re: [PATCH v2 1/4] s390x: sclp: refactor invalid command check
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
+References: <1569591203-15258-1-git-send-email-imbrenda@linux.ibm.com>
+ <1569591203-15258-2-git-send-email-imbrenda@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Fri, 27 Sep 2019 16:34:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <1569591203-15258-2-git-send-email-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19092714-4275-0000-0000-0000036BD09C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092714-4276-0000-0000-0000387E5314
+Message-Id: <8cb8b36c-af52-f65e-2828-c2ab9d3de8bd@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-27_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909270136
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,219 +148,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: pasic@linux.ibm.com, cohuck@redhat.com, david@redhat.com,
+ frankja@linux.ibm.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We report name clashes like this:
 
-    struct-base-clash.json: In struct 'Sub':
-    struct-base-clash.json:5: 'name' (member of Sub) collides with 'name'=
- (member of Base)
 
-The "(member of Sub)" is redundant with "In struct 'Sub'".  Comes from
-QAPISchemaMember.describe().  Pass info to it, so it can detect the
-redundancy and avoid it.  Result:
+On 27.09.19 15:33, Claudio Imbrenda wrote:
+> From: Janosch Frank <frankja@linux.ibm.com>
+> 
+> Invalid command checking has to be done before the boundary check,
+> refactoring it now allows to insert the boundary check at the correct
+> place later.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+>  hw/s390x/event-facility.c |  3 ---
+>  hw/s390x/sclp.c           | 17 ++++++++++++++++-
+>  2 files changed, 16 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 797ecbb..6620569 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -377,9 +377,6 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
+>      case SCLP_CMD_WRITE_EVENT_MASK:
+>          write_event_mask(ef, sccb);
+>          break;
+> -    default:
+> -        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> -        break;
+>      }
+>  }
+>  
+> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> index fac7c3b..95ebfe7 100644
+> --- a/hw/s390x/sclp.c
+> +++ b/hw/s390x/sclp.c
+> @@ -219,8 +219,23 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
+>          goto out;
+>      }
+>  
+> -    sclp_c->execute(sclp, &work_sccb, code);
+> +    switch (code & SCLP_CMD_CODE_MASK) {
+> +    case SCLP_CMDW_READ_SCP_INFO:
+> +    case SCLP_CMDW_READ_SCP_INFO_FORCED:
+> +    case SCLP_CMDW_READ_CPU_INFO:
+> +    case SCLP_CMDW_CONFIGURE_IOA:
+> +    case SCLP_CMDW_DECONFIGURE_IOA:
+> +    case SCLP_CMD_READ_EVENT_DATA:
+> +    case SCLP_CMD_WRITE_EVENT_DATA:
+> +    case SCLP_CMD_WRITE_EVENT_MASK:
+> +        break;
+> +    default:
+> +        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
+> +        goto out_write;
+> +    }
+>  
+> +    sclp_c->execute(sclp, &work_sccb, code);
+> +out_write:
+>      cpu_physical_memory_write(sccb, &work_sccb,
+>                                be16_to_cpu(work_sccb.h.length));
+>  
 
-    struct-base-clash.json: In struct 'Sub':
-    struct-base-clash.json:5: member 'name' collides with member 'name' o=
-f type 'Base'
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- scripts/qapi/common.py                        | 36 ++++++++++++-------
- tests/qapi-schema/alternate-clash.err         |  2 +-
- tests/qapi-schema/args-name-clash.err         |  2 +-
- tests/qapi-schema/enum-clash-member.err       |  2 +-
- tests/qapi-schema/features-duplicate-name.err |  2 +-
- tests/qapi-schema/flat-union-bad-base.err     |  2 +-
- tests/qapi-schema/flat-union-clash-member.err |  2 +-
- tests/qapi-schema/struct-base-clash-deep.err  |  2 +-
- tests/qapi-schema/struct-base-clash.err       |  2 +-
- tests/qapi-schema/union-clash-branches.err    |  2 +-
- 10 files changed, 32 insertions(+), 22 deletions(-)
-
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 3d73332487..14d1e34c2c 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -1575,31 +1575,41 @@ class QAPISchemaMember(object):
-     def check_clash(self, info, seen):
-         cname =3D c_name(self.name)
-         if cname in seen:
--            raise QAPISemError(info, "%s collides with %s" %
--                               (self.describe(), seen[cname].describe())=
-)
-+            raise QAPISemError(
-+                info,
-+                "%s collides with %s"
-+                % (self.describe(info), seen[cname].describe(info)))
-         seen[cname] =3D self
-=20
--    def _pretty_defined_in(self):
-+    def describe(self, info):
-+        role =3D self.role
-         defined_in =3D self.defined_in
-+        assert defined_in
-+
-         if defined_in.startswith('q_obj_'):
-             # See QAPISchema._make_implicit_object_type() - reverse the
-             # mapping there to create a nice human-readable description
-             defined_in =3D defined_in[6:]
-             if defined_in.endswith('-arg'):
--                return '(parameter of %s)' % defined_in[:-4]
-+                # Implicit type created for a command's dict 'data'
-+                assert role =3D=3D 'member'
-+                role =3D 'parameter'
-             elif defined_in.endswith('-base'):
--                return '(base of %s)' % defined_in[:-5]
-+                # Implicit type created for a flat union's dict 'base'
-+                role =3D 'base ' + role
-             else:
-+                # Implicit type created for a simple union's branch
-                 assert defined_in.endswith('-wrapper')
-                 # Unreachable and not implemented
-                 assert False
--        if defined_in.endswith('Kind'):
-+        elif defined_in.endswith('Kind'):
-             # See QAPISchema._make_implicit_enum_type()
--            return '(branch of %s)' % defined_in[:-4]
--        return '(%s of %s)' % (self.role, defined_in)
--
--    def describe(self):
--        return "'%s' %s" % (self.name, self._pretty_defined_in())
-+            # Implicit enum created for simple union's branches
-+            assert role =3D=3D 'value'
-+            role =3D 'branch'
-+        elif defined_in !=3D info.defn_name:
-+            return "%s '%s' of type '%s'" % (role, self.name, defined_in=
-)
-+        return "%s '%s'" % (role, self.name)
-=20
-=20
- class QAPISchemaEnumMember(QAPISchemaMember):
-@@ -1871,7 +1881,7 @@ class QAPISchema(object):
-                 for v in values]
-=20
-     def _make_implicit_enum_type(self, name, info, ifcond, values):
--        # See also QAPISchemaObjectTypeMember._pretty_defined_in()
-+        # See also QAPISchemaObjectTypeMember.describe()
-         name =3D name + 'Kind'   # Use namespace reserved by add_name()
-         self._def_entity(QAPISchemaEnumType(
-             name, info, None, ifcond, self._make_enum_members(values), N=
-one))
-@@ -1887,7 +1897,7 @@ class QAPISchema(object):
-                                    role, members):
-         if not members:
-             return None
--        # See also QAPISchemaObjectTypeMember._pretty_defined_in()
-+        # See also QAPISchemaObjectTypeMember.describe()
-         name =3D 'q_obj_%s-%s' % (name, role)
-         typ =3D self.lookup_entity(name, QAPISchemaObjectType)
-         if typ:
-diff --git a/tests/qapi-schema/alternate-clash.err b/tests/qapi-schema/al=
-ternate-clash.err
-index 426ff6a7c4..73a52d69d1 100644
---- a/tests/qapi-schema/alternate-clash.err
-+++ b/tests/qapi-schema/alternate-clash.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/alternate-clash.json: In alternate 'Alt1':
--tests/qapi-schema/alternate-clash.json:7: 'a_b' (branch of Alt1) collide=
-s with 'a-b' (branch of Alt1)
-+tests/qapi-schema/alternate-clash.json:7: branch 'a_b' collides with bra=
-nch 'a-b'
-diff --git a/tests/qapi-schema/args-name-clash.err b/tests/qapi-schema/ar=
-gs-name-clash.err
-index eeb4e1b4dd..c5916a80fb 100644
---- a/tests/qapi-schema/args-name-clash.err
-+++ b/tests/qapi-schema/args-name-clash.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/args-name-clash.json: In command 'oops':
--tests/qapi-schema/args-name-clash.json:4: 'a_b' (parameter of oops) coll=
-ides with 'a-b' (parameter of oops)
-+tests/qapi-schema/args-name-clash.json:4: parameter 'a_b' collides with =
-parameter 'a-b'
-diff --git a/tests/qapi-schema/enum-clash-member.err b/tests/qapi-schema/=
-enum-clash-member.err
-index 26944f5e06..84e02db82c 100644
---- a/tests/qapi-schema/enum-clash-member.err
-+++ b/tests/qapi-schema/enum-clash-member.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/enum-clash-member.json: In enum 'MyEnum':
--tests/qapi-schema/enum-clash-member.json:2: 'one_two' (value of MyEnum) =
-collides with 'one-two' (value of MyEnum)
-+tests/qapi-schema/enum-clash-member.json:2: value 'one_two' collides wit=
-h value 'one-two'
-diff --git a/tests/qapi-schema/features-duplicate-name.err b/tests/qapi-s=
-chema/features-duplicate-name.err
-index 0ebec8e4b0..a99bbde737 100644
---- a/tests/qapi-schema/features-duplicate-name.err
-+++ b/tests/qapi-schema/features-duplicate-name.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/features-duplicate-name.json: In struct 'FeatureStruct=
-0':
--tests/qapi-schema/features-duplicate-name.json:1: 'foo' (feature of Feat=
-ureStruct0) collides with 'foo' (feature of FeatureStruct0)
-+tests/qapi-schema/features-duplicate-name.json:1: feature 'foo' collides=
- with feature 'foo'
-diff --git a/tests/qapi-schema/flat-union-bad-base.err b/tests/qapi-schem=
-a/flat-union-bad-base.err
-index ae8adc3947..5da7602c20 100644
---- a/tests/qapi-schema/flat-union-bad-base.err
-+++ b/tests/qapi-schema/flat-union-bad-base.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/flat-union-bad-base.json: In union 'TestUnion':
--tests/qapi-schema/flat-union-bad-base.json:8: 'string' (member of TestTy=
-peA) collides with 'string' (base of TestUnion)
-+tests/qapi-schema/flat-union-bad-base.json:8: member 'string' of type 'T=
-estTypeA' collides with base member 'string'
-diff --git a/tests/qapi-schema/flat-union-clash-member.err b/tests/qapi-s=
-chema/flat-union-clash-member.err
-index 48e939db19..40f10681f8 100644
---- a/tests/qapi-schema/flat-union-clash-member.err
-+++ b/tests/qapi-schema/flat-union-clash-member.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/flat-union-clash-member.json: In union 'TestUnion':
--tests/qapi-schema/flat-union-clash-member.json:11: 'name' (member of Bra=
-nch1) collides with 'name' (member of Base)
-+tests/qapi-schema/flat-union-clash-member.json:11: member 'name' of type=
- 'Branch1' collides with member 'name' of type 'Base'
-diff --git a/tests/qapi-schema/struct-base-clash-deep.err b/tests/qapi-sc=
-hema/struct-base-clash-deep.err
-index 53e9bb108e..2b12b3c07f 100644
---- a/tests/qapi-schema/struct-base-clash-deep.err
-+++ b/tests/qapi-schema/struct-base-clash-deep.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/struct-base-clash-deep.json: In struct 'Sub':
--tests/qapi-schema/struct-base-clash-deep.json:10: 'name' (member of Sub)=
- collides with 'name' (member of Base)
-+tests/qapi-schema/struct-base-clash-deep.json:10: member 'name' collides=
- with member 'name' of type 'Base'
-diff --git a/tests/qapi-schema/struct-base-clash.err b/tests/qapi-schema/=
-struct-base-clash.err
-index bf94eee8b3..8c3ee1c435 100644
---- a/tests/qapi-schema/struct-base-clash.err
-+++ b/tests/qapi-schema/struct-base-clash.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/struct-base-clash.json: In struct 'Sub':
--tests/qapi-schema/struct-base-clash.json:5: 'name' (member of Sub) colli=
-des with 'name' (member of Base)
-+tests/qapi-schema/struct-base-clash.json:5: member 'name' collides with =
-member 'name' of type 'Base'
-diff --git a/tests/qapi-schema/union-clash-branches.err b/tests/qapi-sche=
-ma/union-clash-branches.err
-index 145efebd9f..931399f076 100644
---- a/tests/qapi-schema/union-clash-branches.err
-+++ b/tests/qapi-schema/union-clash-branches.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/union-clash-branches.json: In union 'TestUnion':
--tests/qapi-schema/union-clash-branches.json:4: 'a_b' (branch of TestUnio=
-n) collides with 'a-b' (branch of TestUnion)
-+tests/qapi-schema/union-clash-branches.json:4: branch 'a_b' collides wit=
-h branch 'a-b'
---=20
-2.21.0
+Thanks applied.
 
 
