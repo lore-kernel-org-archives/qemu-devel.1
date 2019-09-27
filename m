@@ -2,59 +2,107 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32080C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67853C388F3
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07F24217D9
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:27:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07F24217D9
+	by mail.kernel.org (Postfix) with ESMTPS id 3CCF521850
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 14:28:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CCF521850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDrDZ-0002zA-BH
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:27:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39045)
+	id 1iDrEv-0004cn-9J
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 10:28:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iDqWP-00061v-Qe
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:59 -0400
+ (envelope-from <david@redhat.com>) id 1iDqL7-0003d6-W2
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iDqWN-0005OB-S4
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18791)
+ (envelope-from <david@redhat.com>) id 1iDqL6-0001gD-8j
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:31:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46340)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iDqWN-0005O0-JN
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:42:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iDqL6-0001g6-0G; Fri, 27 Sep 2019 09:31:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CEAE4A44AC7
- for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 13:42:54 +0000 (UTC)
-Received: from localhost (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5AEB3194B6;
- Fri, 27 Sep 2019 13:42:50 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 3/7] docs: start a document to describe D-Bus usage
-Date: Fri, 27 Sep 2019 17:42:20 +0400
-Message-Id: <20190927134224.14550-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20190927134224.14550-1-marcandre.lureau@redhat.com>
-References: <20190927134224.14550-1-marcandre.lureau@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id D6D0F7BDA1;
+ Fri, 27 Sep 2019 11:04:23 +0000 (UTC)
+Received: from [10.36.116.169] (ovpn-116-169.ams2.redhat.com [10.36.116.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 090835D6A7;
+ Fri, 27 Sep 2019 11:04:22 +0000 (UTC)
+Subject: Re: [PATCH v3 16/18] target/s390x: Remove ILEN_AUTO
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190926162615.31168-1-richard.henderson@linaro.org>
+ <20190926162615.31168-17-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <ce178c0f-8f7c-3863-0083-c8b76ce8309e@redhat.com>
+Date: Fri, 27 Sep 2019 13:04:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Fri, 27 Sep 2019 13:42:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190926162615.31168-17-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Fri, 27 Sep 2019 11:04:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -69,155 +117,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
- dgilbert@redhat.com, pbonzini@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- MAINTAINERS            |  5 +++
- docs/interop/dbus.rst  | 99 ++++++++++++++++++++++++++++++++++++++++++
- docs/interop/index.rst |  1 +
- 3 files changed, 105 insertions(+)
- create mode 100644 docs/interop/dbus.rst
+On 26.09.19 18:26, Richard Henderson wrote:
+> This setting is no longer used.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/s390x/cpu.h         | 2 --
+>  target/s390x/excp_helper.c | 3 ---
+>  2 files changed, 5 deletions(-)
+> 
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index a5eab491cd..fc941c7d76 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -816,8 +816,6 @@ void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
+>                         uint32_t io_int_parm, uint32_t io_int_word);
+>  /* instruction length set by unwind info */
+>  #define ILEN_UNWIND                 0
+> -/* automatically detect the instruction length */
+> -#define ILEN_AUTO                   0xff
+>  #define RA_IGNORED                  0
+>  void s390_program_interrupt(CPUS390XState *env, uint32_t code, uintptr_t ra);
+>  /* service interrupts are floating therefore we must not pass an cpustate */
+> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+> index 8ce992e639..c252e9a7d8 100644
+> --- a/target/s390x/excp_helper.c
+> +++ b/target/s390x/excp_helper.c
+> @@ -196,9 +196,6 @@ static void do_program_interrupt(CPUS390XState *env)
+>      LowCore *lowcore;
+>      int ilen = env->int_pgm_ilen;
+>  
+> -    if (ilen == ILEN_AUTO) {
+> -        ilen = get_ilen(cpu_ldub_code(env, env->psw.addr));
+> -    }
+>      assert(ilen == 2 || ilen == 4 || ilen == 6);
+>  
+>      switch (env->int_pgm_code) {
+> 
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b97fdd80d0..219a76f0a1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2157,6 +2157,11 @@ F: tests/migration-test.c
- F: docs/devel/migration.rst
- F: qapi/migration.json
-=20
-+D-Bus
-+M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+S: Maintained
-+F: docs/interop/dbus.rst
-+
- Seccomp
- M: Eduardo Otubo <otubo@redhat.com>
- S: Supported
-diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
-new file mode 100644
-index 0000000000..3d760e4882
---- /dev/null
-+++ b/docs/interop/dbus.rst
-@@ -0,0 +1,99 @@
-+=3D=3D=3D=3D=3D
-+D-Bus
-+=3D=3D=3D=3D=3D
-+
-+Introduction
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+QEMU may be running with various helper processes involved:
-+ - vhost-user* processes (gpu, virtfs, input, etc...)
-+ - TPM emulation (or other devices)
-+ - user networking (slirp)
-+ - network services (DHCP/DNS, samba/ftp etc)
-+ - background tasks (compression, streaming etc)
-+ - client UI
-+ - admin & cli
-+
-+Having several processes allows stricter security rules, as well as
-+greater modularity.
-+
-+While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
-+display), D-Bus is the de facto IPC of choice on Unix systems. The
-+wire format is machine friendly, good bindings exist for various
-+languages, and there are various tools available.
-+
-+Using a bus, helper processes can discover and communicate with each
-+other easily, without going through QEMU. The bus topology is also
-+easier to apprehend and debug than a mesh. However, it is wise to
-+consider the security aspects of it.
-+
-+Security
-+=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+A QEMU D-Bus bus should be private to a single VM. Thus, only
-+cooperative tasks are running on the same bus to serve the VM.
-+
-+D-Bus, the protocol and standard, doesn't have mechanisms to enforce
-+security between peers once the connection is established. Peers may
-+have additional mechanisms to enforce security rules, based for
-+example on UNIX credentials. However, because the daemon has
-+controlled who can send/recv messages to who, doesn't magically make
-+this secure. The semantics of the actual methods implemented using
-+D-Bus are just as critical. Peers need to carefully validate any
-+information they received from a peer with a different trust level.
-+
-+dbus-daemon policy
-+------------------
-+
-+dbus-daemon can enforce various policies based on the UID/GID of the
-+processes that are connected to it. It is thus a good idea to run
-+helpers as different UID from QEMU and set appropriate policies.
-+
-+Depending on the use case, you may choose different scenarios:
-+
-+ - Everything the same UID
-+
-+   - Convenient for developers
-+   - Improved reliability - crash of one part doens't take
-+     out entire VM
-+   - No security benefit over traditional QEMU
-+
-+ - Two UIDs, one for QEMU, one for dbus & helpers
-+
-+   - Moderately improved security isolation
-+
-+ - Many UIDs, one for QEMU one for dbus and one for each helpers
-+
-+   - Best security isolation
-+   - Complex to manager distinct UIDs needed for each VM
-+
-+For example, to allow only ``qemu`` user to talk to ``qemu-helper``
-+``org.qemu.Helper1`` service, a dbus-daemon policy may contain:
-+
-+.. code:: xml
-+
-+  <policy user=3D"qemu">
-+     <allow send_destination=3D"org.qemu.Helper1"/>
-+     <allow receive_sender=3D"org.qemu.Helper1"/>
-+  </policy>
-+
-+  <policy user=3D"qemu-helper">
-+     <allow own=3D"org.qemu.Helper1"/>
-+  </policy>
-+
-+
-+dbus-daemon can also perfom SELinux checks based on the security
-+context of the source and the target. For example, ``virtiofs_t``
-+could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
-+wouldn't be allowed to send a message to ``virtiofs_t``.
-+
-+See dbus-daemon man page for details.
-+
-+Guidelines
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+When implementing new D-Bus interfaces, it is recommended to follow
-+the "D-Bus API Design Guidelines":
-+https://dbus.freedesktop.org/doc/dbus-api-design.html
-+
-+The "org.qemu.*" prefix is reserved for the QEMU project.
-diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-index 3e33fb5933..ded134ea75 100644
---- a/docs/interop/index.rst
-+++ b/docs/interop/index.rst
-@@ -13,6 +13,7 @@ Contents:
-    :maxdepth: 2
-=20
-    bitmaps
-+   dbus
-    live-block-operations
-    pr-helper
-    qemu-ga
---=20
-2.23.0
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
+-- 
+
+Thanks,
+
+David / dhildenb
 
