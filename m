@@ -2,77 +2,139 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F08C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B42C352AB
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:11:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFC75217D9
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:09:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFC75217D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id F2E952146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 08:11:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2E952146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDlJQ-0000z8-0i
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:09:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41516)
+	id 1iDlLc-0002Ui-5t
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 04:11:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42757)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qi1.zhang@intel.com>) id 1iDlE3-0003hd-0S
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:03:41 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1iDlKO-0001ph-EN
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:10:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qi1.zhang@intel.com>) id 1iDlDy-0000EP-Ng
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:03:36 -0400
-Received: from mga06.intel.com ([134.134.136.31]:61562)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qi1.zhang@intel.com>) id 1iDlDy-00004u-81
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:03:34 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 27 Sep 2019 01:03:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,554,1559545200"; d="scan'208";a="201939772"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
- by orsmga002.jf.intel.com with ESMTP; 27 Sep 2019 01:03:24 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 27 Sep 2019 01:03:23 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.113]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.92]) with mapi id 14.03.0439.000;
- Fri, 27 Sep 2019 16:03:22 +0800
-From: "Zhang, Qi1" <qi1.zhang@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: RE: [PATCH V2] intel_iommu: TM field should not be in reserved bits
-Thread-Topic: [PATCH V2] intel_iommu: TM field should not be in reserved bits
-Thread-Index: AQHVdPGo8xxlixx6u0uh+e2QWzPmzKc+hHCAgAChAlA=
-Date: Fri, 27 Sep 2019 08:03:21 +0000
-Message-ID: <215440059103624D9AD9D1DCACBF45DD3E84E270@shsmsx102.ccr.corp.intel.com>
-References: <20190927045838.2968-1-qi1.zhang@intel.com>
- <20190927061011.GB9412@xz-x1>
-In-Reply-To: <20190927061011.GB9412@xz-x1>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMDEyNDU5YmQtOTU4NC00MWE1LWJiYzMtNGM2ZDFjMGI3NDY2IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibjlvT2QzYmw0Y2tBM25PdkxTejMzM3ZYMEs2RmRSVUNJZHRtYXFEcFFTcVhOclNNdVA5OG8wcUFVc0l3VlJheiJ9
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <borntraeger@de.ibm.com>) id 1iDlKN-00062V-6w
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:10:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:65078
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1iDlKN-0005zS-2c
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 04:10:11 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x8R878IS111655
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 04:10:08 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2v9cu2kn2u-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 04:10:08 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 27 Sep 2019 09:10:06 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 27 Sep 2019 09:10:03 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8R8A2l847448218
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 27 Sep 2019 08:10:02 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 320C95204F;
+ Fri, 27 Sep 2019 08:10:02 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AEC2652052;
+ Fri, 27 Sep 2019 08:10:01 +0000 (GMT)
+Subject: Re: [PATCH] s390: PCI: fix IOMMU region init
+To: Matthew Rosato <mjrosato@linux.ibm.com>, cohuck@redhat.com
+References: <1569507036-15314-1-git-send-email-mjrosato@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Fri, 27 Sep 2019 10:10:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
+In-Reply-To: <1569507036-15314-1-git-send-email-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19092708-0016-0000-0000-000002B13B31
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19092708-0017-0000-0000-000033120BCB
+Message-Id: <c04b3eda-bc3f-e061-7736-518935d4ffa6@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-09-27_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1909270077
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,124 +146,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Qi,
- Yadong" <yadong.qi@intel.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: "Collin L. Walling" <walling@linux.ibm.com>, fiuczy@linux.ibm.com,
+ pmorel@linux.ibm.com, david@redhat.com, stzi@linux.ibm.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, qemu-s390x@nongnu.org,
+ thuth@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgWHUgPHBldGVy
-eEByZWRoYXQuY29tPg0KPiBTZW50OiBGcmlkYXksIFNlcHRlbWJlciAyNywgMjAxOSAyOjEwIFBN
-DQo+IFRvOiBaaGFuZywgUWkxIDxxaTEuemhhbmdAaW50ZWwuY29tPg0KPiBDYzogcWVtdS1kZXZl
-bEBub25nbnUub3JnOyBlaGFia29zdEByZWRoYXQuY29tOyBtc3RAcmVkaGF0LmNvbTsNCj4gcGJv
-bnppbmlAcmVkaGF0LmNvbTsgcnRoQHR3aWRkbGUubmV0DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
-VjJdIGludGVsX2lvbW11OiBUTSBmaWVsZCBzaG91bGQgbm90IGJlIGluIHJlc2VydmVkIGJpdHMN
-Cj4gDQo+IE9uIEZyaSwgU2VwIDI3LCAyMDE5IGF0IDEyOjU4OjM4UE0gKzA4MDAsIHFpMS56aGFu
-Z0BpbnRlbC5jb20gd3JvdGU6DQo+ID4gRnJvbTogIlpoYW5nLCBRaSIgPHFpMS56aGFuZ0BpbnRl
-bC5jb20+DQo+ID4NCj4gPiBXaGVuIGR0IGlzIHN1cHBvcnRlZCwgVE0gZmllbGQgc2hvdWxkIG5v
-dCBiZSBSZXNlcnZlZCgwKS4NCj4gPg0KPiA+IFJlZmVyIHRvIFZULWQgU3BlYyA5LjgNCj4gPg0K
-PiA+IFNpZ25lZC1vZmYtYnk6IFpoYW5nLCBRaSA8cWkxLnpoYW5nQGludGVsLmNvbT4NCj4gPiBT
-aWduZWQtb2ZmLWJ5OiBRaSwgWWFkb25nIDx5YWRvbmcucWlAaW50ZWwuY29tPg0KPiA+IC0tLQ0K
-PiA+ICBody9pMzg2L2ludGVsX2lvbW11LmMgICAgICAgICAgfCAxMiArKysrKystLS0tLS0NCj4g
-PiAgaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oIHwgMjUgKysrKysrKysrKysrKysrKysr
-Ky0tLS0tLQ0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDI1IGluc2VydGlvbnMoKyksIDEyIGRlbGV0
-aW9ucygtKQ0KPiA+IC0tLQ0KPiA+IENoYW5nZWxvZyBWMjoNCj4gPiAgbW92ZSBkdF9zdXBwb3J0
-ZWQgZmxhZyB0byBWVERfU1BURV9QQUdFX0xYX1JTVkRfTUFTSyBhbmQNCj4gPiBWVERfU1BURV9M
-UEFHRV9MWF9SU1ZEX01BU0sNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9ody9pMzg2L2ludGVsX2lv
-bW11LmMgYi9ody9pMzg2L2ludGVsX2lvbW11LmMgaW5kZXgNCj4gPiBmMWRlOGZkYjc1Li4zNTIy
-MmNmNTVjIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ICsrKyBi
-L2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+IEBAIC0zNTQ4LDEzICszNTQ4LDEzIEBAIHN0YXRp
-YyB2b2lkIHZ0ZF9pbml0KEludGVsSU9NTVVTdGF0ZSAqcykNCj4gPiAgICAgICAqIFJzdmQgZmll
-bGQgbWFza3MgZm9yIHNwdGUNCj4gPiAgICAgICAqLw0KPiA+ICAgICAgdnRkX3BhZ2luZ19lbnRy
-eV9yc3ZkX2ZpZWxkWzBdID0gfjBVTEw7DQo+ID4gLSAgICB2dGRfcGFnaW5nX2VudHJ5X3JzdmRf
-ZmllbGRbMV0gPSBWVERfU1BURV9QQUdFX0wxX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7DQo+
-ID4gLSAgICB2dGRfcGFnaW5nX2VudHJ5X3JzdmRfZmllbGRbMl0gPSBWVERfU1BURV9QQUdFX0wy
-X1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7DQo+ID4gLSAgICB2dGRfcGFnaW5nX2VudHJ5X3Jz
-dmRfZmllbGRbM10gPSBWVERfU1BURV9QQUdFX0wzX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7
-DQo+ID4gKyAgICB2dGRfcGFnaW5nX2VudHJ5X3JzdmRfZmllbGRbMV0gPSBWVERfU1BURV9QQUdF
-X0wxX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cywgeDg2X2lvbW11LT5kdF9zdXBwb3J0ZWQpOw0K
-PiA+ICsgICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzJdID0gVlREX1NQVEVfUEFHRV9M
-Ml9SU1ZEX01BU0socy0NCj4gPmF3X2JpdHMsIHg4Nl9pb21tdS0+ZHRfc3VwcG9ydGVkKTsNCj4g
-PiArICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVsZFszXSA9DQo+ID4gKyBWVERfU1BURV9Q
-QUdFX0wzX1JTVkRfTUFTSyhzLT5hd19iaXRzLCB4ODZfaW9tbXUtDQo+ID5kdF9zdXBwb3J0ZWQp
-Ow0KPiA+ICAgICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzRdID0gVlREX1NQVEVfUEFH
-RV9MNF9SU1ZEX01BU0socy0NCj4gPmF3X2JpdHMpOw0KPiA+IC0gICAgdnRkX3BhZ2luZ19lbnRy
-eV9yc3ZkX2ZpZWxkWzVdID0gVlREX1NQVEVfTFBBR0VfTDFfUlNWRF9NQVNLKHMtDQo+ID5hd19i
-aXRzKTsNCj4gPiAtICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVsZFs2XSA9IFZURF9TUFRF
-X0xQQUdFX0wyX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7DQo+ID4gLSAgICB2dGRfcGFnaW5n
-X2VudHJ5X3JzdmRfZmllbGRbN10gPSBWVERfU1BURV9MUEFHRV9MM19SU1ZEX01BU0socy0NCj4g
-PmF3X2JpdHMpOw0KPiA+ICsgICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzVdID0NCj4g
-VlREX1NQVEVfTFBBR0VfTDFfUlNWRF9NQVNLKHMtPmF3X2JpdHMsIHg4Nl9pb21tdS0NCj4gPmR0
-X3N1cHBvcnRlZCk7DQo+ID4gKyAgICB2dGRfcGFnaW5nX2VudHJ5X3JzdmRfZmllbGRbNl0gPQ0K
-PiBWVERfU1BURV9MUEFHRV9MMl9SU1ZEX01BU0socy0+YXdfYml0cywgeDg2X2lvbW11LQ0KPiA+
-ZHRfc3VwcG9ydGVkKTsNCj4gPiArICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVsZFs3XSA9
-DQo+ID4gKyBWVERfU1BURV9MUEFHRV9MM19SU1ZEX01BU0socy0+YXdfYml0cywgeDg2X2lvbW11
-LQ0KPiA+ZHRfc3VwcG9ydGVkKTsNCj4gPiAgICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVs
-ZFs4XSA9DQo+ID4gVlREX1NQVEVfTFBBR0VfTDRfUlNWRF9NQVNLKHMtPmF3X2JpdHMpOw0KPiAN
-Cj4gU2hvdWxkIHRoaXMgVE0gYml0IG9ubHkgYWZmZWN0cyBsZWF2ZXM/ICBTYXksIGVudHJ5IDEg
-KDRLKSwgNSAoMk0pLCA2ICgxRykuDQo+IFdoaWxlIHRoaXMgcmVtaW5kZWQgbWUgdGhhdCBJJ20g
-dG90YWxseSBjb25mdXNlZCBvbiB3aHkgd2UgaGF2ZSBoYWQgZW50cnkNCj4gNywgOCBhZnRlciBh
-bGwuLi4gIEFyZSB0aGV5IHJlYWxseSB1c2VkPw0KWWVzLiBUTSBiaXQgb25seSBhZmZlY3RzLiBU
-byB0aGlzIGFycmF5LCBpbmRleCAxLCA1LDYsNyBtYXkgYmUgbGVhZi4gV2lsbCB1cGRhdGUgYSBu
-ZXcgcGF0Y2hzZXQgZm9yIGl0Lg0KPiANCj4gPg0KPiA+ICAgICAgaWYgKHg4Nl9pb21tdV9pcl9z
-dXBwb3J0ZWQoeDg2X2lvbW11KSkgeyBkaWZmIC0tZ2l0DQo+ID4gYS9ody9pMzg2L2ludGVsX2lv
-bW11X2ludGVybmFsLmggYi9ody9pMzg2L2ludGVsX2lvbW11X2ludGVybmFsLmgNCj4gPiBpbmRl
-eCBjMTIzNWE3MDYzLi4wMWYxYWE2Yzg2IDEwMDY0NA0KPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxf
-aW9tbXVfaW50ZXJuYWwuaA0KPiA+ICsrKyBiL2h3L2kzODYvaW50ZWxfaW9tbXVfaW50ZXJuYWwu
-aA0KPiA+IEBAIC0zODcsMTkgKzM4NywzMSBAQCB0eXBlZGVmIHVuaW9uIFZUREludkRlc2MgVlRE
-SW52RGVzYzsgICNkZWZpbmUNCj4gPiBWVERfSU5WX0RFU0NfREVWSUNFX0lPVExCX1JTVkRfTE8g
-MHhmZmZmMDAwMGZmZTBmZmY4DQo+ID4NCj4gPiAgLyogUnN2ZCBmaWVsZCBtYXNrcyBmb3Igc3B0
-ZSAqLw0KPiA+IC0jZGVmaW5lIFZURF9TUFRFX1BBR0VfTDFfUlNWRF9NQVNLKGF3KSBcDQo+ID4g
-KyNkZWZpbmUgVlREX1NQVEVfUEFHRV9MMV9SU1ZEX01BU0soYXcsIGR0X3N1cHBvcnRlZCkgXA0K
-PiA+ICsgICAgICAgIGR0X3N1cHBvcnRlZD8gXA0KPiA+ICsgICAgICAgICgweDgwMFVMTCB8IH4o
-VlREX0hBV19NQVNLKGF3KSB8IFZURF9TTF9JR05fQ09NIHwNCj4gVlREX1NMX1RNKSkNCj4gPiAr
-OiBcDQo+ID4gICAgICAgICAgKDB4ODAwVUxMIHwgfihWVERfSEFXX01BU0soYXcpIHwgVlREX1NM
-X0lHTl9DT00pKQ0KPiANCj4gVGhpcyBzZWVtcyBzdHJhbmdlIHRvbyBpbiB0aGF0IH5WVERfSEFX
-X01BU0soYXcpIHByb2JhYmx5IGNvdmVyZWQgYml0cw0KPiA2My00OCBmb3IgYXc9PTQ4IGNhc2Ug
-c28gaXQgc2hvdWxkIGFscmVhZHkgY292ZXIgVlREX1NMX1RNPw0KVlREX1NMX0lHTl9DT00gMHhi
-ZmYwMDAwMDAwMDAwMDAwVUxMLCBUTSBmaWVsZCBpcyBjbGVhcmVkIGJ5IH4gVlREX1NMX0lHTl9D
-T00NCj4gDQo+IE1lYW53aGlsZSB3aGVuIEknbSByZWFkaW5nIHRoZSBzcGVjIEkgc2VlIGF0IGxl
-YXN0IGJpdHMgNjEtNTIgaWdub3JlZCByYXRoZXINCj4gdGhhbiByZXNlcnZlZC4NClllcy4gQml0
-IDYxfjUyIGlzIGlnbm9yZWQuIFN1Y2ggYXMgdGhlIGluZGV4IDUgb2YgdGhpcyBhcnJheSBpcyAw
-eGZmZjgwMDAwMDA4MDAuDQo+IA0KPiBUaGFua3MsDQo+IA0KPiA+IC0jZGVmaW5lIFZURF9TUFRF
-X1BBR0VfTDJfUlNWRF9NQVNLKGF3KSBcDQo+ID4gKyNkZWZpbmUgVlREX1NQVEVfUEFHRV9MMl9S
-U1ZEX01BU0soYXcsIGR0X3N1cHBvcnRlZCkgXA0KPiA+ICsgICAgICAgIGR0X3N1cHBvcnRlZD8g
-XA0KPiA+ICsgICAgICAgICgweDgwMFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZURF9TTF9J
-R05fQ09NIHwNCj4gVlREX1NMX1RNKSkNCj4gPiArOiBcDQo+ID4gICAgICAgICAgKDB4ODAwVUxM
-IHwgfihWVERfSEFXX01BU0soYXcpIHwgVlREX1NMX0lHTl9DT00pKSAtI2RlZmluZQ0KPiA+IFZU
-RF9TUFRFX1BBR0VfTDNfUlNWRF9NQVNLKGF3KSBcDQo+ID4gKyNkZWZpbmUgVlREX1NQVEVfUEFH
-RV9MM19SU1ZEX01BU0soYXcsIGR0X3N1cHBvcnRlZCkgXA0KPiA+ICsgICAgICAgIGR0X3N1cHBv
-cnRlZD8gXA0KPiA+ICsgICAgICAgICgweDgwMFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZU
-RF9TTF9JR05fQ09NIHwNCj4gVlREX1NMX1RNKSkNCj4gPiArOiBcDQo+ID4gICAgICAgICAgKDB4
-ODAwVUxMIHwgfihWVERfSEFXX01BU0soYXcpIHwgVlREX1NMX0lHTl9DT00pKSAgI2RlZmluZQ0K
-PiA+IFZURF9TUFRFX1BBR0VfTDRfUlNWRF9NQVNLKGF3KSBcDQo+ID4gICAgICAgICAgKDB4ODgw
-VUxMIHwgfihWVERfSEFXX01BU0soYXcpIHwgVlREX1NMX0lHTl9DT00pKSAtI2RlZmluZQ0KPiA+
-IFZURF9TUFRFX0xQQUdFX0wxX1JTVkRfTUFTSyhhdykgXA0KPiA+ICsjZGVmaW5lIFZURF9TUFRF
-X0xQQUdFX0wxX1JTVkRfTUFTSyhhdywgZHRfc3VwcG9ydGVkKSBcDQo+ID4gKyAgICAgICAgZHRf
-c3VwcG9ydGVkPyBcDQo+ID4gKyAgICAgICAgKDB4ODAwVUxMIHwgfihWVERfSEFXX01BU0soYXcp
-IHwgVlREX1NMX0lHTl9DT00gfA0KPiBWVERfU0xfVE0pKQ0KPiA+ICs6IFwNCj4gPiAgICAgICAg
-ICAoMHg4MDBVTEwgfCB+KFZURF9IQVdfTUFTSyhhdykgfCBWVERfU0xfSUdOX0NPTSkpIC0jZGVm
-aW5lDQo+ID4gVlREX1NQVEVfTFBBR0VfTDJfUlNWRF9NQVNLKGF3KSBcDQo+ID4gKyNkZWZpbmUg
-VlREX1NQVEVfTFBBR0VfTDJfUlNWRF9NQVNLKGF3LCBkdF9zdXBwb3J0ZWQpIFwNCj4gPiArICAg
-ICAgICBkdF9zdXBwb3J0ZWQ/IFwNCj4gPiArICAgICAgICAoMHgxZmY4MDBVTEwgfCB+KFZURF9I
-QVdfTUFTSyhhdykgfCBWVERfU0xfSUdOX0NPTSB8DQo+ID4gK1ZURF9TTF9UTSkpIDogXA0KPiA+
-ICAgICAgICAgICgweDFmZjgwMFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZURF9TTF9JR05f
-Q09NKSkgLQ0KPiAjZGVmaW5lDQo+ID4gVlREX1NQVEVfTFBBR0VfTDNfUlNWRF9NQVNLKGF3KSBc
-DQo+ID4gKyNkZWZpbmUgVlREX1NQVEVfTFBBR0VfTDNfUlNWRF9NQVNLKGF3LCBkdF9zdXBwb3J0
-ZWQpIFwNCj4gPiArICAgICAgICBkdF9zdXBwb3J0ZWQ/IFwNCj4gPiArICAgICAgICAoMHgzZmZm
-ZjgwMFVMTCB8IH4oVlREX0hBV19NQVNLKGF3KSB8IFZURF9TTF9JR05fQ09NIHwNCj4gPiArVlRE
-X1NMX1RNKSkgOiBcDQo+ID4gICAgICAgICAgKDB4M2ZmZmY4MDBVTEwgfCB+KFZURF9IQVdfTUFT
-SyhhdykgfCBWVERfU0xfSUdOX0NPTSkpDQo+ID4gI2RlZmluZSBWVERfU1BURV9MUEFHRV9MNF9S
-U1ZEX01BU0soYXcpIFwNCj4gPiAgICAgICAgICAoMHg4ODBVTEwgfCB+KFZURF9IQVdfTUFTSyhh
-dykgfCBWVERfU0xfSUdOX0NPTSkpIEBAIC0NCj4gNTA2LDUNCj4gPiArNTE4LDYgQEAgdHlwZWRl
-ZiBzdHJ1Y3QgVlREUm9vdEVudHJ5IFZURFJvb3RFbnRyeTsNCj4gPiAgI2RlZmluZSBWVERfU0xf
-VyAgICAgICAgICAgICAgICAgICAgKDFVTEwgPDwgMSkNCj4gPiAgI2RlZmluZSBWVERfU0xfUFRf
-QkFTRV9BRERSX01BU0soYXcpICh+KFZURF9QQUdFX1NJWkUgLSAxKSAmDQo+IFZURF9IQVdfTUFT
-SyhhdykpDQo+ID4gICNkZWZpbmUgVlREX1NMX0lHTl9DT00gICAgICAgICAgICAgIDB4YmZmMDAw
-MDAwMDAwMDAwMFVMTA0KPiA+ICsjZGVmaW5lIFZURF9TTF9UTSAgICAgICAgICAgICAgICAgICAo
-MVVMTCA8PCA2MikNCj4gPg0KPiA+ICAjZW5kaWYNCj4gPiAtLQ0KPiA+IDIuMjAuMQ0KPiA+DQo+
-ID4NCj4gDQo+IC0tDQo+IFBldGVyIFh1DQo=
+On 26.09.19 16:10, Matthew Rosato wrote:
+> The fix in dbe9cf606c shrinks the IOMMU memory region to a size
+> that seems reasonable on the surface, however is actually too
+> small as it is based against a 0-mapped address space.  This
+> causes breakage with small guests as they can overrun the IOMMU window.
+> 
+> Let's go back to the prior method of initializing iommu for now.
+> 
+> Fixes: dbe9cf606c ("s390x/pci: Set the iommu region size mpcifc request")
+> Reported-by: Boris Fiuczynski <fiuczy@linux.ibm.com>
+> Reported-by: Stefan Zimmerman <stzi@linux.ibm.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+
+Matt can you also send a patch adding you as the PCI maintainer now
+that you have taken over from Collin?
+
+
+
+> ---
+>  hw/s390x/s390-pci-bus.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 963a41c..2d2f4a7 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+> @@ -695,10 +695,15 @@ static const MemoryRegionOps s390_msi_ctrl_ops = {
+>  
+>  void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
+>  {
+> +    /*
+> +     * The iommu region is initialized against a 0-mapped address space,
+> +     * so the smallest IOMMU region we can define runs from 0 to the end
+> +     * of the PCI address space.
+> +     */
+>      char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
+>      memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
+>                               TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
+> -                             name, iommu->pal - iommu->pba + 1);
+> +                             name, iommu->pal + 1);
+>      iommu->enabled = true;
+>      memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
+>      g_free(name);
+> 
+
 
