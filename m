@@ -2,82 +2,84 @@ Return-Path: <SRS0=ZVNi=XW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8914C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B93C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:35:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 779BC207E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:35:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779BC207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 98B30207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 09:35:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98B30207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDmeo-00057v-FO
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:35:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59449)
+	id 1iDmeu-0005G2-9l
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 05:35:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iDmcC-0003XG-Ul
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:42 -0400
+ (envelope-from <philmd@redhat.com>) id 1iDmcE-0003Xd-5V
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iDmc9-0001gn-VJ
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53344)
+ (envelope-from <philmd@redhat.com>) id 1iDmcC-0001kS-Rr
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39762)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iDmc8-0001dm-E7
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:37 -0400
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iDmcB-0001er-5I
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 05:32:40 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0B2465313A
+ by mx1.redhat.com (Postfix) with ESMTPS id 937FAC059B6F
  for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 09:32:35 +0000 (UTC)
-Received: by mail-pf1-f199.google.com with SMTP id 194so1521936pfu.3
+Received: by mail-wr1-f71.google.com with SMTP id n3so776795wrt.9
  for <qemu-devel@nongnu.org>; Fri, 27 Sep 2019 02:32:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=zPpXJBsgXCdgZO86UPMdugD/7JfMMFe/AjIloYQYWug=;
- b=k62ijUYUyIGdPQfmWVPrBsSupSl3Qy5PQYqCLAA6LhjIyMUFn1GdjvtRX50KyNUTfV
- B+2Qz/eY8E6Kgbo7aYc8Jq09U7Nj8pqimqCx73LdcBFvjzzW8nqM5nzLyALXhCHXRh2y
- kXmxPv2PDQElS98lSDIzMeJ7tmnGx6tU5YnWAPmecqDF6jMKoilAGPjDyC5wWtL0rWc4
- 8X8n10m/e1UcTddMWWYKfTCcCKcLK+7dwSAr/0j1xmqueDTqVQWUVomz0hgljm4rkdMR
- R+xjFAdHYViJHiNGzKvFgRwkNFLLrrPgyBastbhlQ2G/sUi58Ys1rlZqMUkle3VMUV1J
- AXnA==
-X-Gm-Message-State: APjAAAUVSb63bA0emZAzEqlzePtqNRl0ExgDYRb8IVc/JVHoEY3eV3IU
- 0HRhJvTz1IGsfpA0W2ftD/exxe7RdkiDAbUk0Rqod75E0AcRPa9R7EL6ey/8FP6MmyoXGRU7nhX
- dd/FBNwSy4t1XC/M=
-X-Received: by 2002:a17:90a:2086:: with SMTP id
- f6mr8816434pjg.104.1569576753574; 
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=DwpJhusv19Kf7uW/6SoPIovbTqqjFa9/hPT2GzD2GuI=;
+ b=M4nNQKT+0G9QHIhaIY1lunO+XRz8Yo2I/49mRsjsAHurUh+wOLrULtI2qxqcOsvlJY
+ C6yi/y2S0aS3kU+OsU9sdqt3SQcRZ58CMPSVl7PPKeZr/VMt7SKblamFv1cvaTkcZ+jo
+ L1ZLmLetD354L02SPzaj8hVZ5DnmoUNw2unDhX5uxxqz4eOBGtzOYy1+vchspiD1S+xG
+ 96lXkgR3a+tXHJ+Q+734MjjwyfuEbmVEobCB/XCFfj04j2mbrT4xtCJp3Wutiw72m9Ey
+ ukOOC8fCt+oOwfKIJTkgayGTxhrScMoRBwpgHsk/OJBS3IFqWD3zGUXphJ08EsWvB4pX
+ Ipqg==
+X-Gm-Message-State: APjAAAVCbbaBCT3N1CBD1cJSYaLTsMjqUCLsyhW1iR0JkvxW1XDeMXPr
+ PsPaDWevDEd5vfeDVGKzjlgraZ3Krc1PyHiPseE0ZBwDRrD+rwHchl7d5OarPaX8uh2zA3YkS8V
+ 3qAlsA3xegy/5cyI=
+X-Received: by 2002:a1c:4945:: with SMTP id w66mr6306619wma.40.1569576754296; 
+ Fri, 27 Sep 2019 02:32:34 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzWJDiWsnrCMIF9ZS+aY0tt36mVtCm2chLSZbHGD9ps9GDY8qehpnBOQYrH72QxmSQIv3W9bA==
+X-Received: by 2002:a1c:4945:: with SMTP id w66mr6306576wma.40.1569576754012; 
+ Fri, 27 Sep 2019 02:32:34 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id c10sm2967411wrf.58.2019.09.27.02.32.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
  Fri, 27 Sep 2019 02:32:33 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyz3UiS5nvzuqeXSjJLmzd6fvm7V8YIpGiFRgwCXq9rx7oE8mStrFQV/OYbUISEQGV2S24AaA==
-X-Received: by 2002:a17:90a:2086:: with SMTP id
- f6mr8816410pjg.104.1569576753307; 
- Fri, 27 Sep 2019 02:32:33 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id b5sm4182873pgb.68.2019.09.27.02.32.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 27 Sep 2019 02:32:32 -0700 (PDT)
-Date: Fri, 27 Sep 2019 17:32:23 +0800
-From: Peter Xu <peterx@redhat.com>
-To: "Zhang, Qi1" <qi1.zhang@intel.com>
-Subject: Re: [PATCH V2] intel_iommu: TM field should not be in reserved bits
-Message-ID: <20190927093223.GC9412@xz-x1>
-References: <20190927045838.2968-1-qi1.zhang@intel.com>
- <20190927061011.GB9412@xz-x1>
- <215440059103624D9AD9D1DCACBF45DD3E84E270@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [PATCH v13 0/9] hw/m68k: add Apple Machintosh Quadra 800 machine
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20190927090453.24712-1-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <93f44eff-bcb5-8dde-0b71-b3e3a8e8aacf@redhat.com>
+Date: Fri, 27 Sep 2019 11:32:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190927090453.24712-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <215440059103624D9AD9D1DCACBF45DD3E84E270@shsmsx102.ccr.corp.intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -92,127 +94,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Qi,
- Yadong" <yadong.qi@intel.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 27, 2019 at 08:03:21AM +0000, Zhang, Qi1 wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Peter Xu <peterx@redhat.com>
-> > Sent: Friday, September 27, 2019 2:10 PM
-> > To: Zhang, Qi1 <qi1.zhang@intel.com>
-> > Cc: qemu-devel@nongnu.org; ehabkost@redhat.com; mst@redhat.com;
-> > pbonzini@redhat.com; rth@twiddle.net
-> > Subject: Re: [PATCH V2] intel_iommu: TM field should not be in reserved bits
-> > 
-> > On Fri, Sep 27, 2019 at 12:58:38PM +0800, qi1.zhang@intel.com wrote:
-> > > From: "Zhang, Qi" <qi1.zhang@intel.com>
-> > >
-> > > When dt is supported, TM field should not be Reserved(0).
-> > >
-> > > Refer to VT-d Spec 9.8
-> > >
-> > > Signed-off-by: Zhang, Qi <qi1.zhang@intel.com>
-> > > Signed-off-by: Qi, Yadong <yadong.qi@intel.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c          | 12 ++++++------
-> > >  hw/i386/intel_iommu_internal.h | 25 +++++++++++++++++++------
-> > >  2 files changed, 25 insertions(+), 12 deletions(-)
-> > > ---
-> > > Changelog V2:
-> > >  move dt_supported flag to VTD_SPTE_PAGE_LX_RSVD_MASK and
-> > > VTD_SPTE_LPAGE_LX_RSVD_MASK
-> > >
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c index
-> > > f1de8fdb75..35222cf55c 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -3548,13 +3548,13 @@ static void vtd_init(IntelIOMMUState *s)
-> > >       * Rsvd field masks for spte
-> > >       */
-> > >      vtd_paging_entry_rsvd_field[0] = ~0ULL;
-> > > -    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s-
-> > >aw_bits);
-> > > -    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s-
-> > >aw_bits);
-> > > -    vtd_paging_entry_rsvd_field[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s-
-> > >aw_bits);
-> > > +    vtd_paging_entry_rsvd_field[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s-
-> > >aw_bits, x86_iommu->dt_supported);
-> > > +    vtd_paging_entry_rsvd_field[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s-
-> > >aw_bits, x86_iommu->dt_supported);
-> > > +    vtd_paging_entry_rsvd_field[3] =
-> > > + VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits, x86_iommu-
-> > >dt_supported);
-> > >      vtd_paging_entry_rsvd_field[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s-
-> > >aw_bits);
-> > > -    vtd_paging_entry_rsvd_field[5] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s-
-> > >aw_bits);
-> > > -    vtd_paging_entry_rsvd_field[6] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s-
-> > >aw_bits);
-> > > -    vtd_paging_entry_rsvd_field[7] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s-
-> > >aw_bits);
-> > > +    vtd_paging_entry_rsvd_field[5] =
-> > VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits, x86_iommu-
-> > >dt_supported);
-> > > +    vtd_paging_entry_rsvd_field[6] =
-> > VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits, x86_iommu-
-> > >dt_supported);
-> > > +    vtd_paging_entry_rsvd_field[7] =
-> > > + VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits, x86_iommu-
-> > >dt_supported);
-> > >      vtd_paging_entry_rsvd_field[8] =
-> > > VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
-> > 
-> > Should this TM bit only affects leaves?  Say, entry 1 (4K), 5 (2M), 6 (1G).
-> > While this reminded me that I'm totally confused on why we have had entry
-> > 7, 8 after all...  Are they really used?
-> Yes. TM bit only affects. To this array, index 1, 5,6,7 may be leaf. Will update a new patchset for it.
+On 9/27/19 11:04 AM, Laurent Vivier wrote:
+> I'm rebasing some of these patches for seven years now,
+> too many years...
+>=20
+> if you want to test the machine, I'm sorry, it doesn't boot
+> a MacROM, but you can boot a linux kernel from the command line.
+>=20
+> You can install your own disk using debian-installer, with:
+>=20
+>     ...
+>     -M q800 \
+>     -serial none -serial mon:stdio \
+>     -m 1000M \
+>     -net nic,model=3Ddp83932,addr=3D09:00:07:12:34:57 \
+>     -append "console=3DttyS0 vga=3Doff" \
+>     -kernel vmlinux-4.16.0-1-m68k \
+>     -initrd initrd.gz \
+>     -drive file=3Ddebian-10.0-m68k-NETINST-1.iso,media=3Dcdrom \
+>     -drive file=3Dm68k.qcow2,format=3Dqcow2 \
+>     -nographic
+>=20
+> If you use a graphic adapter instead of "-nographic", you can use "-g" =
+to set the
+> size of the display (I use "-g 1600x800x24").
+>=20
+> You can get the ISO from:
+>=20
+> https://cdimage.debian.org/cdimage/ports/10.0/m68k/iso-cd/debian-10.0-m=
+68k-NETINST-1.iso
+>=20
+> and extract the kernel and initrd.gz:
+>=20
+> guestfish --add debian-10.0-m68k-NETINST-1.iso --ro \
+>           --mount /dev/sda:/ <<_EOF_
+> copy-out /install/cdrom/initrd.gz .
+> copy-out /install/kernels/vmlinux-4.16.0-1-m68k .
+> _EOF_
+>=20
+> The mirror to use is: http://ftp.ports.debian.org/debian-ports/
+> when it fails, continue without boot loader.
+>=20
+> In the same way, you can extract the kernel and the initramfs from the =
+qcow2
+> image to use it with "-kernel" and "-initrd":
+>=20
+> guestfish --add m68k.qcow2 --mount /dev/sda2:/ <<_EOF_
+> copy-out /boot/vmlinux-4.16.0-1-m68k .
+> copy-out /boot/initrd.img-4.16.0-1-m68k .
+> _EOF_
+>=20
+> and boot with:
+>=20
+>    ...
+>    -append "root=3D/dev/sda2 rw console=3DttyS0 console=3Dtty \
+>    -kernel vmlinux-4.16.0-1-m68k \
+>    -initrd initrd.img-4.16.0-1-m68k
+>=20
+> NOTE: DHCP doesn't work but you can assign a static IP address.
 
-Could I ask why index 7 may be leaf?
-
-> > 
-> > >
-> > >      if (x86_iommu_ir_supported(x86_iommu)) { diff --git
-> > > a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-> > > index c1235a7063..01f1aa6c86 100644
-> > > --- a/hw/i386/intel_iommu_internal.h
-> > > +++ b/hw/i386/intel_iommu_internal.h
-> > > @@ -387,19 +387,31 @@ typedef union VTDInvDesc VTDInvDesc;  #define
-> > > VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
-> > >
-> > >  /* Rsvd field masks for spte */
-> > > -#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw) \
-> > > +#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw, dt_supported) \
-> > > +        dt_supported? \
-> > > +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM |
-> > VTD_SL_TM))
-> > > +: \
-> > >          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-> > 
-> > This seems strange too in that ~VTD_HAW_MASK(aw) probably covered bits
-> > 63-48 for aw==48 case so it should already cover VTD_SL_TM?
-> VTD_SL_IGN_COM 0xbff0000000000000ULL, TM field is cleared by ~ VTD_SL_IGN_COM
-> > 
-> > Meanwhile when I'm reading the spec I see at least bits 61-52 ignored rather
-> > than reserved.
-> Yes. Bit 61~52 is ignored. Such as the index 5 of this array is 0xfff8000000800.
-
-Oops, my poor eye obviously didn't see that the "~" operator is
-applied over the whole (VTD_HAW_MASK(aw) | VTD_SL_IGN_COM)... :)
-
-Btw, you should only touch up the macros that are leaves here.
-Non-leaves should still keep that bit as reserved.
-
-Thanks,
-
--- 
-Peter Xu
+Series:
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+(on x86 host)
 
