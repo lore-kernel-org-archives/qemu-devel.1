@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99824C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:57:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C031AC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:57:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 271B3207E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:57:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 271B3207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 9028D207E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 15:57:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9028D207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDscC-0000Ku-Kc
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:57:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40007)
+	id 1iDscz-0001NY-CL
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 11:57:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iDqaF-0001JX-11
+ (envelope-from <armbru@redhat.com>) id 1iDqaC-0001Go-H2
  for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iDqa9-00066B-NM
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44136)
+ (envelope-from <armbru@redhat.com>) id 1iDqa8-00065D-Q6
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:15629)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa9-00064N-3h
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iDqa8-00063d-Fp
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 09:46:48 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E18367F769;
+ by mx1.redhat.com (Postfix) with ESMTPS id 0E7B28AC6F6;
  Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E1C35D6B2;
- Fri, 27 Sep 2019 13:46:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D0A5C614C2;
+ Fri, 27 Sep 2019 13:46:46 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8981911385D5; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
+ id B2B9B1136424; Fri, 27 Sep 2019 15:46:39 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/26] qapi: Move check for reserved names out of add_name()
-Date: Fri, 27 Sep 2019 15:46:25 +0200
-Message-Id: <20190927134639.4284-13-armbru@redhat.com>
+Subject: [PATCH v2 24/26] qapi: Improve reporting of missing documentation
+ comment
+Date: Fri, 27 Sep 2019 15:46:37 +0200
+Message-Id: <20190927134639.4284-25-armbru@redhat.com>
 In-Reply-To: <20190927134639.4284-1-armbru@redhat.com>
 References: <20190927134639.4284-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Fri, 27 Sep 2019 13:46:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,101 +76,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The checks for reserved names are spread far and wide.  Move one from
-add_name() to new check_defn_name_str().  This is a first step towards
-collecting them all in dedicated name checking functions next to
-check_name().
-
-While there, drop the quotes around the meta-type in
-check_name_str()'s error messages: "'command' uses ... name 'NAME'"
-becomes "command uses ... name 'NAME'".
+Have check_exprs() check this later, so the error message gains an "in
+definition line".  Tweak the error message.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi/common.py                   | 16 ++++++++++------
- tests/qapi-schema/bad-ident.err          |  2 +-
- tests/qapi-schema/reserved-command-q.err |  2 +-
- 3 files changed, 12 insertions(+), 8 deletions(-)
+ scripts/qapi/common.py            | 18 ++++++++----------
+ tests/qapi-schema/doc-missing.err |  3 ++-
+ 2 files changed, 10 insertions(+), 11 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index a4cf41f13e..111a4bbe55 100644
+index fa354b3f1e..bd834270f8 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -741,6 +741,13 @@ def check_name_str(name, info, source,
-     assert not membername.startswith('*')
+@@ -933,10 +933,6 @@ def check_exprs(exprs):
+         if 'include' in expr:
+             continue
 =20
-=20
-+def check_defn_name_str(name, info, meta):
-+    check_name_str(name, info, meta, permit_upper=3DTrue)
-+    if name.endswith('Kind') or name.endswith('List'):
-+        raise QAPISemError(
-+            info, "%s '%s' should not end in '%s'" % (meta, name, name[-=
-4:]))
-+
-+
- def add_name(name, info, meta):
-     global all_names
-     # FIXME should reject names that differ only in '_' vs. '.'
-@@ -748,9 +755,6 @@ def add_name(name, info, meta):
-     if name in all_names:
-         raise QAPISemError(info, "%s '%s' is already defined"
-                            % (all_names[name], name))
--    if name.endswith('Kind') or name.endswith('List'):
--        raise QAPISemError(info, "%s '%s' should not end in '%s'"
--                           % (meta, name, name[-4:]))
-     all_names[name] =3D meta
-=20
-=20
-@@ -1162,7 +1166,7 @@ def check_exprs(exprs):
-         name =3D expr[meta]
-         check_name_is_str(name, info, "'%s'" % meta)
+-        if not doc and doc_required:
+-            raise QAPISemError(info,
+-                               "definition missing documentation comment=
+")
+-
+         if 'enum' in expr:
+             meta =3D 'enum'
+         elif 'union' in expr:
+@@ -957,9 +953,14 @@ def check_exprs(exprs):
          info.set_defn(meta, name)
--        check_name_str(name, info, "'%s'" % meta, permit_upper=3DTrue)
-+        check_defn_name_str(name, info, meta)
-         add_name(name, info, meta)
-         if doc and doc.symbol !=3D name:
-             raise QAPISemError(
-@@ -1889,13 +1893,13 @@ class QAPISchema(object):
+         check_defn_name_str(name, info, meta)
 =20
-     def _make_implicit_enum_type(self, name, info, ifcond, values):
-         # See also QAPISchemaObjectTypeMember.describe()
--        name =3D name + 'Kind'   # Use namespace reserved by add_name()
-+        name =3D name + 'Kind'    # reserved by check_defn_name_str()
-         self._def_entity(QAPISchemaEnumType(
-             name, info, None, ifcond, self._make_enum_members(values), N=
-one))
-         return name
+-        if doc and doc.symbol !=3D name:
+-            raise QAPISemError(
+-                info, "documentation comment is for '%s'" % doc.symbol)
++        if doc:
++            if doc.symbol !=3D name:
++                raise QAPISemError(
++                    info, "documentation comment is for '%s'" % doc.symb=
+ol)
++            doc.check_expr(expr)
++        elif doc_required:
++            raise QAPISemError(info,
++                               "documentation comment required")
 =20
-     def _make_array_type(self, element_type, info):
--        name =3D element_type + 'List'   # Use namespace reserved by add=
-_name()
-+        name =3D element_type + 'List'    # reserved by check_defn_name_=
-str()
-         if not self.lookup_type(name):
-             self._def_entity(QAPISchemaArrayType(name, info, element_typ=
-e))
-         return name
-diff --git a/tests/qapi-schema/bad-ident.err b/tests/qapi-schema/bad-iden=
-t.err
-index ddc96bd3a9..79d14758ce 100644
---- a/tests/qapi-schema/bad-ident.err
-+++ b/tests/qapi-schema/bad-ident.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/bad-ident.json: In struct '*oops':
--tests/qapi-schema/bad-ident.json:2: 'struct' uses invalid name '*oops'
-+tests/qapi-schema/bad-ident.json:2: struct uses invalid name '*oops'
-diff --git a/tests/qapi-schema/reserved-command-q.err b/tests/qapi-schema=
-/reserved-command-q.err
-index 0844e14b26..631cb5cdcc 100644
---- a/tests/qapi-schema/reserved-command-q.err
-+++ b/tests/qapi-schema/reserved-command-q.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/reserved-command-q.json: In command 'q-unix':
--tests/qapi-schema/reserved-command-q.json:5: 'command' uses invalid name=
- 'q-unix'
-+tests/qapi-schema/reserved-command-q.json:5: command uses invalid name '=
-q-unix'
+         if meta =3D=3D 'enum':
+             check_keys(expr, info, meta,
+@@ -1004,9 +1005,6 @@ def check_exprs(exprs):
+         check_if(expr, info, meta)
+         check_flags(expr, info)
+=20
+-        if doc:
+-            doc.check_expr(expr)
+-
+     return exprs
+=20
+=20
+diff --git a/tests/qapi-schema/doc-missing.err b/tests/qapi-schema/doc-mi=
+ssing.err
+index 08c827931a..7fbf54ff65 100644
+--- a/tests/qapi-schema/doc-missing.err
++++ b/tests/qapi-schema/doc-missing.err
+@@ -1 +1,2 @@
+-tests/qapi-schema/doc-missing.json:5: definition missing documentation c=
+omment
++tests/qapi-schema/doc-missing.json: In command 'undocumented':
++tests/qapi-schema/doc-missing.json:5: documentation comment required
 --=20
 2.21.0
 
