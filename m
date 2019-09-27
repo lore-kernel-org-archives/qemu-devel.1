@@ -6,50 +6,49 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C6DC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 18:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0007BC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 19:00:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E14C21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 18:32:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E14C21655
+	by mail.kernel.org (Postfix) with ESMTPS id B378D21655
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Sep 2019 19:00:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B378D21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iDv2l-0001my-CG
-	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 14:32:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38960)
+	id 1iDvTw-00013L-P7
+	for qemu-devel@archiver.kernel.org; Fri, 27 Sep 2019 15:00:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41753)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iDv15-0000qC-6W
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 14:30:56 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iDvSS-0000Vf-4h
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 14:59:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iDv13-0007av-GM
- for qemu-devel@nongnu.org; Fri, 27 Sep 2019 14:30:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51442)
+ (envelope-from <jsnow@redhat.com>) id 1iDvSQ-0005Ji-Lu
+ for qemu-devel@nongnu.org; Fri, 27 Sep 2019 14:59:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55794)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iDv0y-0007S4-F4; Fri, 27 Sep 2019 14:30:48 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1iDvSM-0005I7-D5; Fri, 27 Sep 2019 14:59:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 36ECC3003194;
- Fri, 27 Sep 2019 18:30:47 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E6BD310CC1F4;
+ Fri, 27 Sep 2019 18:59:04 +0000 (UTC)
 Received: from [10.18.17.231] (dhcp-17-231.bos.redhat.com [10.18.17.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3EB2E1001DC0;
- Fri, 27 Sep 2019 18:30:45 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH v4 03/10] iotests: add test-case to 165 to
- test reopening qcow2 bitmaps to RW
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0D7DA5D9C3;
+ Fri, 27 Sep 2019 18:59:03 +0000 (UTC)
+Subject: Re: [Qemu-devel] [PATCH v4 09/10] block/qcow2-bitmap: fix and improve
+ qcow2_reopen_bitmaps_rw
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
- <20190807141226.193501-4-vsementsov@virtuozzo.com>
- <6c308090-5841-fcba-d319-8b9d65b7d6b8@redhat.com>
- <0db3ca38-65db-c224-e718-210bb910116b@virtuozzo.com>
- <99db5bbd-6601-4a37-cca0-e211a945674b@virtuozzo.com>
+ <20190807141226.193501-10-vsementsov@virtuozzo.com>
+ <c3e11dc4-14ab-e6a4-26c3-ab0d66bda330@redhat.com>
+ <4fb89dc3-6eb6-bb86-2aaf-611881b82c39@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -125,18 +124,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <414b21c2-e09a-08ae-57c1-584efc56558b@redhat.com>
-Date: Fri, 27 Sep 2019 14:30:45 -0400
+Message-ID: <1c8f261a-bf38-ce70-fe0e-597ad9f7e66a@redhat.com>
+Date: Fri, 27 Sep 2019 14:59:03 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <99db5bbd-6601-4a37-cca0-e211a945674b@virtuozzo.com>
+In-Reply-To: <4fb89dc3-6eb6-bb86-2aaf-611881b82c39@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 27 Sep 2019 18:30:47 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Fri, 27 Sep 2019 18:59:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -161,183 +160,135 @@ Sender: "Qemu-devel"
 
 
 
-On 9/27/19 6:29 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 27.09.2019 10:28, Vladimir Sementsov-Ogievskiy wrote:
->> 27.09.2019 1:57, John Snow wrote:
->>>
->>>
->>> On 8/7/19 10:12 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Reopening bitmaps to RW was broken prior to previous commit. Check t=
-hat
->>>> it works now.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
->>>> ---
->>>> =C2=A0 tests/qemu-iotests/165=C2=A0=C2=A0=C2=A0=C2=A0 | 46 +++++++++=
-+++++++++++++++++++++++++++--
->>>> =C2=A0 tests/qemu-iotests/165.out |=C2=A0 4 ++--
->>>> =C2=A0 2 files changed, 46 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
->>>> index 88f62d3c6d..dd93b5a2d0 100755
->>>> --- a/tests/qemu-iotests/165
->>>> +++ b/tests/qemu-iotests/165
->>>> @@ -43,10 +43,10 @@ class TestPersistentDirtyBitmap(iotests.QMPTestC=
-ase):
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 os.remove(dis=
-k)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def mkVm(self):
->>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return iotests.VM().add_=
-drive(disk)
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return iotests.VM().add_=
-drive(disk, opts=3D'node-name=3Dnode0')
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def mkVmRo(self):
->>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return iotests.VM().add_=
-drive(disk, opts=3D'readonly=3Don')
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return iotests.VM().add_=
-drive(disk, opts=3D'readonly=3Don,node-name=3Dnode0')
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def getSha256(self):
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D se=
-lf.vm.qmp('x-debug-block-dirty-bitmap-sha256',
->>>> @@ -102,5 +102,47 @@ class TestPersistentDirtyBitmap(iotests.QMPTest=
-Case):
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.shutd=
-own()
->>>> +=C2=A0=C2=A0=C2=A0 def test_reopen_rw(self):
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm =3D self.mkVm()
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.launch()
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.qmpAddBitmap()
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Calculate sha256 corre=
-sponding to regions1
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.writeRegions(region=
-s1)
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sha256 =3D self.getSha25=
-6()
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D self.vm.qmp('=
-block-dirty-bitmap-clear', node=3D'drive0',
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 name=3D'bitmap0')
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assert_qmp(result, =
-'return', {})
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.shutdown()
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm =3D self.mkVmRo(=
-)
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.launch()
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # We've loaded empty bit=
-map
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert sha256 !=3D self.=
-getSha256()
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Check that we are in R=
-O mode
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.writeRegions(region=
-s1)
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert sha256 !=3D self.=
-getSha256()
->>>> +
->>>
->>> the HMP monitor lets you attempt writes to a Read Only drive...? Or d=
-oes
->>> it error out and we just don't check the reply?
+On 9/27/19 3:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 27.09.2019 2:21, John Snow wrote:
 >>
->> It must fail and we check this by comparing dirty bitmap hash.
 >>
+>> On 8/7/19 10:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> - Correct check for write access to file child, and in correct place
+>>>    (only if we want to write).
+>>> - Support reopen rw -> rw (which will be used in following commit),
+>>>    for example, !bdrv_dirty_bitmap_readonly() is not a corruption if
+>>>    bitmap is marked IN_USE in the image.
+>>> - Consider unexpected bitmap as a corruption and check other
+>>>    combinations of in-image and in-RAM bitmaps.
 >>>
->>> I would prefer we use an actual dirty sector count here instead; we h=
-ave
->>> the new API that should make it easy to do.
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>   block/qcow2-bitmap.c | 56 +++++++++++++++++++++++++++++---------------
+>>>   1 file changed, 37 insertions(+), 19 deletions(-)
 >>>
->>> If the debug SHA changes this might be a little fragile.
+>>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>>> index a636dc50ca..e276a95154 100644
+>>> --- a/block/qcow2-bitmap.c
+>>> +++ b/block/qcow2-bitmap.c
+>>> @@ -1108,18 +1108,14 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
+>>>       Qcow2BitmapList *bm_list;
+>>>       Qcow2Bitmap *bm;
+>>>       GSList *ro_dirty_bitmaps = NULL;
+>>> -    int ret = 0;
+>>> +    int ret = -EINVAL;
+>>> +    bool need_header_update = false;
+>>>   
+>>>       if (s->nb_bitmaps == 0) {
+>>>           /* No bitmaps - nothing to do */
+>>>           return 0;
+>>>       }
+>>>   
+>>> -    if (!can_write(bs)) {
+>>> -        error_setg(errp, "Can't write to the image on reopening bitmaps rw");
+>>> -        return -EINVAL;
+>>> -    }
+>>> -
+>>>       bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+>>>                                  s->bitmap_directory_size, errp);
+>>>       if (bm_list == NULL) {
+>>> @@ -1128,32 +1124,54 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
+>>>   
+>>>       QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+>>>           BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
+>>> -        if (bitmap == NULL) {
+>>> -            continue;
+>>> -        }
+>>>   
+>>> -        if (!bdrv_dirty_bitmap_readonly(bitmap)) {
+>>> -            error_setg(errp, "Bitmap %s was loaded prior to rw-reopen, but was "
+>>> -                       "not marked as readonly. This is a bug, something went "
+>>> -                       "wrong. All of the bitmaps may be corrupted", bm->name);
+>>> -            ret = -EINVAL;
+>>> +        if (!bitmap) {
+>>> +            error_setg(errp, "Unexpected bitmap '%s' in the image '%s'",
+>>> +                       bm->name, bs->filename);
+>>>               goto out;
+>>>           }
+>>>   
 >>
->> Hmm, I agree that checking that bitmap is empty by comparing with some=
- hash
->> is not very reliable. Will do.
+>> I think you can actually drop the definite article, because the image
+>> name is the specifier.
 >>
->>>
->>> ACK otherwise.
->>>
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D self.vm.qmp('=
-x-blockdev-reopen', **{
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-'node-name': 'node0',
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-'driver': iotests.imgfmt,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-'file': {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 'driver': 'file',
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 'filename': disk
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-},
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-'read-only': False
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 })
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.assert_qmp(result, =
-'return', {})
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Check that bitmap is r=
-eopened to RW and we can write to it.
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.writeRegions(region=
-s1)
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert sha256 =3D=3D sel=
-f.getSha256()
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.vm.shutdown()
->>>> +
->>>> +
->>>> =C2=A0 if __name__ =3D=3D '__main__':
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iotests.main(supported_fmts=3D['qcow2=
-'])
->>>> diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
->>>> index ae1213e6f8..fbc63e62f8 100644
->>>> --- a/tests/qemu-iotests/165.out
->>>> +++ b/tests/qemu-iotests/165.out
->>>> @@ -1,5 +1,5 @@
->>>> -.
->>>> +..
->>>> =C2=A0 -------------------------------------------------------------=
----------
->>>> -Ran 1 tests
->>>> +Ran 2 tests
->>>> =C2=A0 OK
->>>>
->>>
->>> This is a suggestion for an even more rigorous test:
->>>
->>> - Create bitmap
->>> - Write a region or two
->>> - Record the dirty count and the SHA; assert it is equal to known /
->>> predetermined values.
->>> - reopen RO
->>> - verify the bitmap still exists and that the hash and count are the =
-same.
->>> - Stop the VM
->>> - Start the VM in readonly mode
->>> - verify the bitmap still exists and that the hash and count are the =
-same.
->>> - Reopen-RW
->>> - verify the bitmap still exists and that the hash and count are the =
-same.
->>> - Write further region(s)
->>> - Get the new dirty count and SHA, and assert it is equal to known /
->>> predetermined values.
->>>
+>> "Unexpected bitmap '%s' in image '%s'" is sufficient.
 >>
->> OK
+>>> -        bm->flags |= BME_FLAG_IN_USE;
+>>> -        ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
+>>> +        if (!(bm->flags & BME_FLAG_IN_USE)) {
+>>> +            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
+>>> +                error_setg(errp, "Corruption: bitmap '%s' is not marked IN_USE "
+>>> +                           "in the image '%s' and not marked readonly in RAM",
+>>> +                           bm->name, bs->filename);
+>>> +                goto out;
+>>> +            }
+>>> +            if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
+>>> +                error_setg(errp, "Corruption: bitmap '%s' is inconsistent but "
+>>> +                           "is not marked IN_USE in the image '%s'", bm->name,
+>>> +                           bs->filename);
+>>> +                goto out;
+>>> +            }
 >>
->=20
-> Ah, stop. We can't check reopen RO at this point, as it will be fixed i=
-n later patch
->=20
+>> We support RW --> RW now, but what happens if something is marked IN_USE
+>> on RO --> RW? It's not obvious from this function alone why that's safe
+>> to ignore.
+> 
+> If bitmap is IN_USE in the image, it's always safe to ignore it, as it's marked as
+> invalid anyway.
+> 
 
-Oh :(
+Oh, okay -- we're relying on the initial open to have handled this for
+us. I only asked because you're doing a lot of additional "sanity
+checking" here and wondered.
 
-Is it a reopen bug, a qcow2 bug, or a qcow2-bitmap bug?
+(That's one drawback to doing sanity checking -- you give the impression
+that we expect these combinations to be able to occur.)
+
+> Consider RO->RW with IN_USE.
+> 
+> if corresponding BdrvDirtyBitmap is inconsistent, it's OK.
+> 
+> If not, how can that be? I can't imagine. But we have correct bitmap in RAM, should
+> we mark it inconsistent, because of bitmap in image? I don't know.
+> 
+
+Yeah, I wouldn't know what to make of this occurrence either. I don't
+expect it to be able to happen.
+
+If it's +ro -inconsistent and +in_use, we absolutely have a bug
+somewhere and we don't know what the right thing to do is because we're
+outside of the expected state machine.
+
+Hmm...
+
+If it was RO, then we know we wouldn't be able to have any changes to
+disk since we loaded the bitmap, and yet we have a clear state mismatch.
+
+1) We loaded the bitmap incorrectly. Not very likely, but very severe if
+true.
+2) The disk changed without QEMU's consent.
+
+It's probably the case that we shouldn't be working on this image
+anymore -- this would be a very high-level corruption event; the
+qcow2_signal_corruption kind.
+
+AKA: "I have no idea what the hell happened, and since it's not possible
+to know, please cease using this image immediately."
+
+--js
 
