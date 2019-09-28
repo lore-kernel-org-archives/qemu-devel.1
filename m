@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C41C4360C
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B12C4360C
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:57:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5218920866
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:57:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5218920866
+	by mail.kernel.org (Postfix) with ESMTPS id 4A61820866
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:57:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A61820866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEHuS-0000ml-Mt
-	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 14:57:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44036)
+	id 1iEHuV-0000pW-S1
+	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 14:57:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iEHdD-0008VE-Kz
+ (envelope-from <armbru@redhat.com>) id 1iEHdB-0008T9-Tm
  for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iEHd7-00041f-Vb
+ (envelope-from <armbru@redhat.com>) id 1iEHd7-00040h-K8
  for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57406)
+Received: from mx1.redhat.com ([209.132.183.28]:52470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iEHd7-0003uK-BB
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iEHd7-0003wJ-52
  for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:41 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6AE7F308FC20
+ by mx1.redhat.com (Postfix) with ESMTPS id EAC87307D8BE
  for <qemu-devel@nongnu.org>; Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3895E1000337;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 950C025261;
  Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6956F1138406; Sat, 28 Sep 2019 20:39:34 +0200 (CEST)
+ id 884E71136427; Sat, 28 Sep 2019 20:39:34 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/27] qapi: Move context-free checking to the proper place
-Date: Sat, 28 Sep 2019 20:39:25 +0200
-Message-Id: <20190928183934.12459-19-armbru@redhat.com>
+Subject: [PULL 27/27] qapi: Improve source file read error handling
+Date: Sat, 28 Sep 2019 20:39:34 +0200
+Message-Id: <20190928183934.12459-28-armbru@redhat.com>
 In-Reply-To: <20190928183934.12459-1-armbru@redhat.com>
 References: <20190928183934.12459-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -74,89 +74,130 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QAPISchemaCommand.check() and QAPISchemaEvent().check() check 'data'
-is present when 'boxed': true.  That's context-free.  Move to
-check_command() and check_event().
+qapi-gen.py crashes when it can't open the main schema file, and when
+it can't read from any schema file.  Lazy.
 
-Tweak the error message while there.
+Change QAPISchema.__init__() to take a file name instead of a file
+object.  Move the open code from _include() to __init__(), so it's
+used for the main schema file, too.
 
-check_exprs() & friends now check exactly what qapi-code-gen.txt calls
-the second layer of syntax.
+Move the read into the try for good measure, and rephrase the error
+message.
+
+Reporting open or read failure for the main schema file needs a
+QAPISourceInfo representing "no source".  Make QAPISourceInfo cope
+with fname=3DNone.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190927134639.4284-18-armbru@redhat.com>
+Message-Id: <20190927134639.4284-27-armbru@redhat.com>
 ---
- scripts/qapi/common.py                  | 16 ++++++++--------
- tests/qapi-schema/event-boxed-empty.err |  2 +-
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ scripts/qapi/common.py                | 46 +++++++++++++++------------
+ tests/qapi-schema/include-no-file.err |  2 +-
+ 2 files changed, 27 insertions(+), 21 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index f22e84c4a8..2e1d8158d6 100644
+index a74cd957d4..d6e00c80ea 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -768,10 +768,12 @@ def check_type(value, info, source,
+@@ -53,7 +53,12 @@ class QAPISourceInfo(object):
+         return info
 =20
- def check_command(expr, info):
-     name =3D expr['command']
-+    args =3D expr.get('data')
-     boxed =3D expr.get('boxed', False)
+     def loc(self):
+-        return '%s:%d' % (self.fname, self.line)
++        if self.fname is None:
++            return sys.argv[0]
++        ret =3D self.fname
++        if self.line is not None:
++            ret +=3D ':%d' % self.line
++        return ret
 =20
--    check_type(expr.get('data'), info,
--               "'data' for command '%s'" % name,
-+    if boxed and args is None:
-+        raise QAPISemError(info, "'boxed': true requires 'data'")
-+    check_type(args, info, "'data' for command '%s'" % name,
-                allow_dict=3Dnot boxed)
-     check_type(expr.get('returns'), info,
-                "'returns' for command '%s'" % name,
-@@ -780,10 +782,12 @@ def check_command(expr, info):
+     def in_defn(self):
+         if self.defn_name:
+@@ -383,14 +388,26 @@ class QAPIDoc(object):
 =20
- def check_event(expr, info):
-     name =3D expr['event']
-+    args =3D expr.get('data')
-     boxed =3D expr.get('boxed', False)
+ class QAPISchemaParser(object):
 =20
--    check_type(expr.get('data'), info,
--               "'data' for event '%s'" % name,
-+    if boxed and args is None:
-+        raise QAPISemError(info, "'boxed': true requires 'data'")
-+    check_type(args, info, "'data' for event '%s'" % name,
-                allow_dict=3Dnot boxed)
+-    def __init__(self, fp, previously_included=3D[], incl_info=3DNone):
+-        self.fname =3D fp.name
+-        previously_included.append(os.path.abspath(fp.name))
+-        self.src =3D fp.read()
++    def __init__(self, fname, previously_included=3D[], incl_info=3DNone=
+):
++        previously_included.append(os.path.abspath(fname))
++
++        try:
++            if sys.version_info[0] >=3D 3:
++                fp =3D open(fname, 'r', encoding=3D'utf-8')
++            else:
++                fp =3D open(fname, 'r')
++            self.src =3D fp.read()
++        except IOError as e:
++            raise QAPISemError(incl_info or QAPISourceInfo(None, None, N=
+one),
++                               "can't read %s file '%s': %s"
++                               % ("include" if incl_info else "schema",
++                                  fname,
++                                  e.strerror))
++
+         if self.src =3D=3D '' or self.src[-1] !=3D '\n':
+             self.src +=3D '\n'
+         self.cursor =3D 0
+-        self.info =3D QAPISourceInfo(self.fname, 1, incl_info)
++        self.info =3D QAPISourceInfo(fname, 1, incl_info)
+         self.line_pos =3D 0
+         self.exprs =3D []
+         self.docs =3D []
+@@ -414,7 +431,7 @@ class QAPISchemaParser(object):
+                 if not isinstance(include, str):
+                     raise QAPISemError(info,
+                                        "value of 'include' must be a str=
+ing")
+-                incl_fname =3D os.path.join(os.path.dirname(self.fname),
++                incl_fname =3D os.path.join(os.path.dirname(fname),
+                                           include)
+                 self.exprs.append({'expr': {'include': incl_fname},
+                                    'info': info})
+@@ -466,14 +483,7 @@ class QAPISchemaParser(object):
+         if incl_abs_fname in previously_included:
+             return None
 =20
+-        try:
+-            if sys.version_info[0] >=3D 3:
+-                fobj =3D open(incl_fname, 'r', encoding=3D'utf-8')
+-            else:
+-                fobj =3D open(incl_fname, 'r')
+-        except IOError as e:
+-            raise QAPISemError(info, "%s: %s" % (e.strerror, incl_fname)=
+)
+-        return QAPISchemaParser(fobj, previously_included, info)
++        return QAPISchemaParser(incl_fname, previously_included, info)
 =20
-@@ -1699,8 +1703,6 @@ class QAPISchemaCommand(QAPISchemaEntity):
-                     self.info,
-                     "command's 'data' can take %s only with 'boxed': tru=
-e"
-                     % self.arg_type.describe())
--        elif self.boxed:
--            raise QAPISemError(self.info, "use of 'boxed' requires 'data=
-'")
-         if self._ret_type_name:
-             self.ret_type =3D schema.resolve_type(
-                 self._ret_type_name, self.info, "command's 'returns'")
-@@ -1748,8 +1750,6 @@ class QAPISchemaEvent(QAPISchemaEntity):
-                     self.info,
-                     "event's 'data' can take %s only with 'boxed': true"
-                     % self.arg_type.describe())
--        elif self.boxed:
--            raise QAPISemError(self.info, "use of 'boxed' requires 'data=
-'")
-=20
-     def visit(self, visitor):
-         QAPISchemaEntity.visit(self, visitor)
-diff --git a/tests/qapi-schema/event-boxed-empty.err b/tests/qapi-schema/=
-event-boxed-empty.err
-index 9c691b7d97..931c10b036 100644
---- a/tests/qapi-schema/event-boxed-empty.err
-+++ b/tests/qapi-schema/event-boxed-empty.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/event-boxed-empty.json: In event 'FOO':
--tests/qapi-schema/event-boxed-empty.json:2: use of 'boxed' requires 'dat=
-a'
-+tests/qapi-schema/event-boxed-empty.json:2: 'boxed': true requires 'data=
-'
+     def _pragma(self, name, value, info):
+         global doc_required, returns_whitelist, name_case_whitelist
+@@ -1734,11 +1744,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
+ class QAPISchema(object):
+     def __init__(self, fname):
+         self.fname =3D fname
+-        if sys.version_info[0] >=3D 3:
+-            f =3D open(fname, 'r', encoding=3D'utf-8')
+-        else:
+-            f =3D open(fname, 'r')
+-        parser =3D QAPISchemaParser(f)
++        parser =3D QAPISchemaParser(fname)
+         exprs =3D check_exprs(parser.exprs)
+         self.docs =3D parser.docs
+         self._entity_list =3D []
+diff --git a/tests/qapi-schema/include-no-file.err b/tests/qapi-schema/in=
+clude-no-file.err
+index e42bcf4bc1..0a6c6bb4a9 100644
+--- a/tests/qapi-schema/include-no-file.err
++++ b/tests/qapi-schema/include-no-file.err
+@@ -1 +1 @@
+-tests/qapi-schema/include-no-file.json:1: No such file or directory: tes=
+ts/qapi-schema/include-no-file-sub.json
++tests/qapi-schema/include-no-file.json:1: can't read include file 'tests=
+/qapi-schema/include-no-file-sub.json': No such file or directory
 --=20
 2.21.0
 
