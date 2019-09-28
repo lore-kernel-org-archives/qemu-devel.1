@@ -2,83 +2,67 @@ Return-Path: <SRS0=JFFZ=XX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF34C4360C
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 17:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 517CFC4360C
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:05:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BE3320863
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 17:48:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAxc0ICn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE3320863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 24FC720866
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:05:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24FC720866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEGpE-00025W-9D
-	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 13:48:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39074)
+	id 1iEH68-0007Dg-7Z
+	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 14:05:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iEGnH-0001YH-Tw
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 13:46:10 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iEH5H-0006cw-F6
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:04:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iEGnG-0004de-Cp
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 13:46:07 -0400
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:43309)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iEGnB-0004Nt-Ra; Sat, 28 Sep 2019 13:46:02 -0400
-Received: by mail-ot1-x334.google.com with SMTP id o44so5003898ota.10;
- Sat, 28 Sep 2019 10:46:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=1qvsdEu2h+e8lIOH6xj3uU8yj9PpBQl/3jKWLql9DlU=;
- b=NAxc0ICnQHY7UlKtyOPzYaVplt59USy6kyPRouPc60vvoCnDNRJlh3VEGR56gn63xG
- 2Q4y3TCcvI9l4p0Y5BwTRWkLBCA1ymKb35ZwgkzocD5PGU2py8ZsZGaDPJv+5GHoXoM6
- Y8nK4V1bFUarfDknl8j/boydz4QBpIwatDBubnA0+mqVt4BkgiNM260mM9OLFK6L2KMp
- PtMm3OuTEkP6MNHGLoQnuiJlu43WHv+Bnh7srv+o2HrzO5Foy4tyy5iv47Sh0wVG93k2
- ++CEnAhdsnsmGDdvUDDUOyq1G/ptQE/YXljnrkcOIUyj0KSfFC+WAa4vNEXThC5DpqIw
- 2nOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=1qvsdEu2h+e8lIOH6xj3uU8yj9PpBQl/3jKWLql9DlU=;
- b=jmmkZm8MbuhlwcAHfjf7h6KVSnnRqMLaUaY8xJGNMDxDVUV/EQZLeRMIY51+V9AnjC
- EEtK/CNCIh61S1H7eMvkICuV+D7dJMlZQCAjO7MPjC4743YhePbHCmJ55X2tT/NICuZf
- 8wtCa1NcIvvdB/mYqI0WEGDth5vYl1lyu+eDSm8Ibq+if41W1dcLEuaMZ/h6CJq68hQs
- mrfeyUOZF0mhngNtZseUb/pqQ0IeDyEwv7xrDX4TYzmK1DgyjY2brHn1mGiW/P2udoEa
- XJ7zU+NZkvT/vEPuBHU7Q6zUgT3yJAR2ceNo9D2biVunyxiVOkPTxWyNf2NYpEWSTfMF
- OxUw==
-X-Gm-Message-State: APjAAAVkOIK9ZwBpTqIwDDJM07fSQ1OwM457VXXkMA8LgIv2pAnbZmsr
- 99/hGTY5RUwuPBdSR0xb0WwgG5LzRgWQYAtp7io=
-X-Google-Smtp-Source: APXvYqzPrbEHp7xWfhIr1mtX7eOSJ0X5gloy14RjO0cPb4ngbL+W8UoG2t/DSvWGH6R+/a5dOmCE3khILF20JW/pMxE=
-X-Received: by 2002:a9d:6b19:: with SMTP id g25mr7612129otp.64.1569692760124; 
- Sat, 28 Sep 2019 10:46:00 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1iEH5F-0002TZ-52
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:04:42 -0400
+Resent-Date: Sat, 28 Sep 2019 14:04:42 -0400
+Resent-Message-Id: <E1iEH5F-0002TZ-52@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21975)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iEH5D-0002IU-UQ
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:04:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1569693846; cv=none; d=zoho.com; s=zohoarc; 
+ b=k8Hc4fBbWdU/MFRTVYXc1mY1r+6t+1/7Tk7N3kNXKNxBwpzBu1Wi/tObmz/6BQPCiY4Kzoa5cDE2NbCYA3rnZ2Kwa+fKxg7KZeis8Y2CjYe2XWEsIltxp9AW7lGL8msgcaLkVY5PR0IlPV7g/pdF1xcF8TKLGxQvRs8CxUVCRlY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1569693846;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=b+jcXN/7TLS6fXyW/pLUnjKDBU+FaK3nWsAUHqvubwo=; 
+ b=hMDlE7rFadTTGH8ipoWnTsyTdX+IUT+27aXfb74+I/WXlV3kQvG0yRzoxJuHfn64nxWC1rwLMUxdFvhYZh59Q1bNFa1QpD0VZxn70RjoF3vjL9arrYvAfpr0HKtts7UigF0Zc27OqfRN3z5/P0j3RiAsCoVL+AMAOg4HF/qHcv0=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1569693845212831.9731030873223;
+ Sat, 28 Sep 2019 11:04:05 -0700 (PDT)
+Subject: Re: [PATCH v25 00/22] Add RX archtecture support
+In-Reply-To: <20190927062302.110144-1-ysato@users.sourceforge.jp>
+Message-ID: <156969384394.27524.545116850868267455@8230166b0665>
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sat, 28 Sep 2019 10:45:59
- -0700 (PDT)
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Sat, 28 Sep 2019 10:45:59
- -0700 (PDT)
-In-Reply-To: <bf30baf5-4d75-dc6f-c30a-57b80714999b@ilande.co.uk>
-References: <bf30baf5-4d75-dc6f-c30a-57b80714999b@ilande.co.uk>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 28 Sep 2019 19:45:59 +0200
-Message-ID: <CAL1e-=gcK2mdtrt9vibHGpbm4_FZgQWTA91+p=9ouuMYmZwPqQ@mail.gmail.com>
-Subject: Re: target/ppc: bug in optimised vsl/vsr implementation?
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Content-Type: multipart/alternative; boundary="0000000000005faf5a0593a0936a"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::334
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ysato@users.sourceforge.jp
+Date: Sat, 28 Sep 2019 11:04:05 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.59
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,151 +74,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefan.brankovic@rt-rk.com, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Paul Clarke <pc@us.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, ysato@users.sourceforge.jp,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, imammedo@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000005faf5a0593a0936a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyNzA2MjMwMi4xMTAx
+NDQtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcC8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwOTI3MDYy
+MzAyLjExMDE0NC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwClN1YmplY3Q6IFtQQVRDSCB2
+MjUgMDAvMjJdIEFkZCBSWCBhcmNodGVjdHVyZSBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
+c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxYTc0ZmZj
+IHFhcGkvbWFjaGluZS5qc29uOiBBZGQgUlggY3B1LgpjMTczZTY4IEJvb3RMaW51eENvbnNvbGVU
+ZXN0OiBUZXN0IHRoZSBSWC1WaXJ0IG1hY2hpbmUKYjRlOWE3YSBBZGQgcngtc29mdG1tdQo1YmRj
+MDdlIGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2Mk4gbWljcm9jb250cm9sbGVyIHRvIHRoZSBSWDYy
+TiBDUFUgY29yZQoyNDk2YWE0IGh3L3J4OiBIb25vciAtYWNjZWwgcXRlc3QKYjk3YTg0ZCBody9y
+eDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmluaXRpb24KZjgwNmUyNyBody9jaGFyOiBSWDYyTiBz
+ZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkKYmQ1OTIxMiBody90aW1lcjogUlg2
+Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcwpjYjIyZWZhIGh3L2ludGM6IFJYNjJOIGludGVycnVw
+dCBjb250cm9sbGVyIChJQ1VhKQphZTQzNTMxIHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFj
+aCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseQoyNmRkMWEyIHRhcmdldC9yeDogQ29sbGVjdCBhbGwg
+Ynl0ZXMgZHVyaW5nIGRpc2Fzc2VtYmx5CjE4YWVlYTIgdGFyZ2V0L3J4OiBFbWl0IGFsbCBkaXNh
+c3NlbWJseSBpbiBvbmUgcHJ0KCkKMTdkOWQyMSB0YXJnZXQvcng6IFVzZSBwcnRfbGRtaSBmb3Ig
+WENIR19tciBkaXNhc3NlbWJseQoyODgyNTcxIHRhcmdldC9yeDogUmVwbGFjZSBvcGVyYW5kIHdp
+dGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVyCmJmM2IzZjIgdGFyZ2V0L3J4OiBEaXNhc3NlbWJs
+ZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJpbmcKNzMxMDJjZSB0YXJnZXQvcng6IFJYIGRpc2Fz
+c2VtYmxlcgo5MGNiMTk3IHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24KNWMwMGRiYiB0YXJnZXQv
+cng6IFRDRyBoZWxwZXIKMmIxNTI3MiB0YXJnZXQvcng6IFRDRyB0cmFuc2xhdGlvbgoxNWYyOGYx
+IGh3L3JlZ2lzdGVyZmllbGRzLmg6IEFkZCA4Yml0IGFuZCAxNmJpdCByZWdpc3RlciBtYWNyb3MK
+ZmE1NzFjNyBxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3QxNgoxNWJmOTIz
+IE1BSU5UQUlORVJTOiBBZGQgUlgKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjIgQ2hlY2tpbmcg
+Y29tbWl0IDE1YmY5MjM0OGE1NiAoTUFJTlRBSU5FUlM6IEFkZCBSWCkKMi8yMiBDaGVja2luZyBj
+b21taXQgZmE1NzFjN2VmNmFmIChxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJh
+Y3QxNikKMy8yMiBDaGVja2luZyBjb21taXQgMTVmMjhmMTI5OWRlIChody9yZWdpc3RlcmZpZWxk
+cy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0ZXIgbWFjcm9zKQpVc2Ugb2YgdW5pbml0aWFs
+aXplZCB2YWx1ZSBpbiBjb25jYXRlbmF0aW9uICguKSBvciBzdHJpbmcgYXQgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgbGluZSAyNDg0LgpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVt
+ZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzI3OiBGSUxFOiBp
+bmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6MjU6CisjZGVmaW5lIFJFRzgocmVnLCBhZGRyKSAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVu
+dW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSB9OwoKRVJST1I6IE1h
+Y3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8g
+LSB3aGlsZSBsb29wCiMzMTogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI5Ogor
+I2RlZmluZSBSRUcxNihyZWcsIGFkZHIpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IEFfICMjIHJlZyA9IChhZGRyKSB9OyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBlbnVtIHsgUl8gIyMg
+cmVnID0gKGFkZHIpIC8gMiB9OwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NiBsaW5l
+cyBjaGVja2VkCgpQYXRjaCAzLzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzIyIENo
+ZWNraW5nIGNvbW1pdCAyYjE1MjcyMDM2NTIgKHRhcmdldC9yeDogVENHIHRyYW5zbGF0aW9uKQpX
+QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
+IG5lZWQgdXBkYXRpbmc/CiMyMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
+cnMsIDEgd2FybmluZ3MsIDMwNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8yMiBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgo1LzIyIENoZWNraW5nIGNvbW1pdCA1YzAwZGJiNWUzMDkgKHRhcmdl
+dC9yeDogVENHIGhlbHBlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
+KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjE6IApuZXcgZmlsZSBtb2RlIDEw
+MDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NTAgbGluZXMgY2hlY2tlZAoKUGF0
+Y2ggNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzIyIENoZWNraW5nIGNvbW1pdCA5
+MGNiMTk3MzhjMDAgKHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBt
+b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
+IzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
+NTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Ny8yMiBDaGVja2luZyBjb21taXQgNzMxMDJjZTEwZjZhICh0YXJnZXQvcng6IFJYIGRpc2Fzc2Vt
+YmxlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
+VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDk3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMjIgaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8yMiBDaGVja2luZyBjb21taXQgYmYzYjNmMjM2ZTBi
+ICh0YXJnZXQvcng6IERpc2Fzc2VtYmxlIHJ4X2luZGV4X2FkZHIgaW50byBhIHN0cmluZykKOS8y
+MiBDaGVja2luZyBjb21taXQgMjg4MjU3MWEyNDBkICh0YXJnZXQvcng6IFJlcGxhY2Ugb3BlcmFu
+ZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcikKMTAvMjIgQ2hlY2tpbmcgY29tbWl0IDE3
+ZDlkMjE3ZmU0OSAodGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1i
+bHkpCjExLzIyIENoZWNraW5nIGNvbW1pdCAxOGFlZWEyODVhOGIgKHRhcmdldC9yeDogRW1pdCBh
+bGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpKQoxMi8yMiBDaGVja2luZyBjb21taXQgMjZkZDFh
+MmNlZDU0ICh0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseSkK
+MTMvMjIgQ2hlY2tpbmcgY29tbWl0IGFlNDM1MzFjYTg0ZCAodGFyZ2V0L3J4OiBEdW1wIGJ5dGVz
+IGZvciBlYWNoIGluc24gZHVyaW5nIGRpc2Fzc2VtYmx5KQoxNC8yMiBDaGVja2luZyBjb21taXQg
+Y2IyMmVmYThhNzQzIChody9pbnRjOiBSWDYyTiBpbnRlcnJ1cHQgY29udHJvbGxlciAoSUNVYSkp
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzQwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
+cm9ycywgMSB3YXJuaW5ncywgNDQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0LzIyIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjE1LzIyIENoZWNraW5nIGNvbW1pdCBiZDU5MjEyOTY2MGUgKGh3
+L3RpbWVyOiBSWDYyTiBpbnRlcm5hbCB0aW1lciBtb2R1bGVzKQpXQVJOSU5HOiBhZGRlZCwgbW92
+ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1
+MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDg0
+NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgox
+Ni8yMiBDaGVja2luZyBjb21taXQgZjgwNmUyNzQ0ZTE2IChody9jaGFyOiBSWDYyTiBzZXJpYWwg
+Y29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQzOiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDAxIGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDE2LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIyIENo
+ZWNraW5nIGNvbW1pdCBiOTdhODRkMjJlOGUgKGh3L3J4OiBSWCBUYXJnZXQgaGFyZHdhcmUgZGVm
+aW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
+QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90
+YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0ODAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTcvMjIg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTgvMjIgQ2hlY2tpbmcgY29tbWl0IDI0OTZhYTQz
+M2VjYSAoaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdCkKMTkvMjIgQ2hlY2tpbmcgY29tbWl0IDVi
+ZGMwN2UzOTRlZiAoaHcvcng6IFJlc3RyaWN0IHRoZSBSWDYyTiBtaWNyb2NvbnRyb2xsZXIgdG8g
+dGhlIFJYNjJOIENQVSBjb3JlKQoyMC8yMiBDaGVja2luZyBjb21taXQgYjRlOWE3YWI5YzllIChB
+ZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
+ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTk6IApuZXcgZmlsZSBtb2RlIDEwMDY0
+NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAy
+MC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMS8yMiBDaGVja2luZyBjb21taXQgYzE3
+M2U2OGU3MGI3IChCb290TGludXhDb25zb2xlVGVzdDogVGVzdCB0aGUgUlgtVmlydCBtYWNoaW5l
+KQoyMi8yMiBDaGVja2luZyBjb21taXQgMWE3NGZmYzM1NzEwIChxYXBpL21hY2hpbmUuanNvbjog
+QWRkIFJYIGNwdS4pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMTkwOTI3MDYyMzAyLjExMDE0NC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpw
+L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-26.09.2019. 20.14, "Mark Cave-Ayland" <mark.cave-ayland@ilande.co.uk> =D1=
-=98=D0=B5
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> As part of the investigation into the DFP number issue reported at
-> https://bugs.launchpad.net/qemu/+bug/1841990 it appears that there may
-also be a bug
-> introduced by the new optimised vsl/vsr implementation:
->
-> commit 4e6d0920e7547e6af4bbac5ffe9adfe6ea621822
-> Author: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-> Date: Mon Jul 15 16:22:48 2019 +0200
->
->     target/ppc: Optimize emulation of vsl and vsr instructions
->
->
-
-(sorry in advance if the format of this message looks odd, I have some
-problems with mail settings related to recent qemu-devel mailer settings
-changes; I will adjust my mail settings in next few days)
-
-Mark and Paul (and Stefan),
-
-Thanks for spotting this and pinpointing the culprit commit. I guess Stefan
-is going to respond soon, but, in the meantime, I took a look at the commit
-in question:
-
-https://github.com/qemu/qemu/commit/4e6d0920e7547e6af4bbac5ffe9adfe6ea62182=
-2
-
-I don't have at the moment any dev/test environment handy, but I did manual
-inspection of the code, and here is what I found (in order of importance,
-perceived by me):
-
-1. The code will not work correctly if the shift ammount (variable 'sh') is
-0. This is because, in that case, one of succeeding invocations of TCG
-shift functions will be required to shift a 64-bit TCG variable by 64 bits,
-and the result of such TCG operation is undefined (shift amount must be 63
-or less) - see https://github.com/qemu/qemu/blob/master/tcg/README.
-
-2. Variable naming is better in the old helper than in the new translator.
-In that light, I would advise Stefan to change 'sh' to 'shift', and
-'shifted' to 'carry'.
-
-3. Lines
-
-tcg_gen_andi_i64(shifted, shifted, 0x7fULL);
-
-and
-
-tcg_gen_andi_i64(shifted, shifted, 0xfe00000000000000ULL);
-
-appear to be spurious (albait in a harmless way). Therefore, they should be
-deleted, or, alternatevely, a justification for them should be provided.
-
-4. In the commit message, variable names were used without quotation mark,
-resulting in puzzling and unclear wording.
-
-5. (a question for Mark) After all recent changes, does get_avr64(..., ...,
-true) always (for any endian configuration) return the "high" half of an
-Altivec register, and get_avr64(..., ..., false) the "low" one?
-
-Given all these circumstances, perhaps the most reasonable solution would
-be to revert the commit in question, and allow Stefan enough dev and test
-time to hopefully submit a new, better, version later on.
-
-Sincerely,
-Aleksandar
-
---0000000000005faf5a0593a0936a
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<p dir=3D"ltr"><br>
-26.09.2019. 20.14, &quot;Mark Cave-Ayland&quot; &lt;<a href=3D"mailto:mark.=
-cave-ayland@ilande.co.uk">mark.cave-ayland@ilande.co.uk</a>&gt; =D1=98=D0=
-=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
-&gt;<br>
-&gt; As part of the investigation into the DFP number issue reported at<br>
-&gt; <a href=3D"https://bugs.launchpad.net/qemu/+bug/1841990">https://bugs.=
-launchpad.net/qemu/+bug/1841990</a> it appears that there may also be a bug=
-<br>
-&gt; introduced by the new optimised vsl/vsr implementation:<br>
-&gt;<br>
-&gt; commit 4e6d0920e7547e6af4bbac5ffe9adfe6ea621822<br>
-&gt; Author: Stefan Brankovic &lt;<a href=3D"mailto:stefan.brankovic@rt-rk.=
-com">stefan.brankovic@rt-rk.com</a>&gt;<br>
-&gt; Date: Mon Jul 15 16:22:48 2019 +0200<br>
-&gt;<br>
-&gt; =C2=A0 =C2=A0 target/ppc: Optimize emulation of vsl and vsr instructio=
-ns<br>
-&gt;<br>
-&gt; =C2=A0 =C2=A0 </p>
-<p dir=3D"ltr">(sorry in advance if the format of this message looks odd, I=
- have some problems with mail settings related to recent qemu-devel mailer =
-settings changes; I will adjust my mail settings in next few days)</p>
-<p dir=3D"ltr">Mark and Paul (and Stefan),</p>
-<p dir=3D"ltr">Thanks for spotting this and pinpointing the culprit commit.=
- I guess Stefan is going to respond soon, but, in the meantime, I took a lo=
-ok at the commit in question:</p>
-<p dir=3D"ltr"><a href=3D"https://github.com/qemu/qemu/commit/4e6d0920e7547=
-e6af4bbac5ffe9adfe6ea621822">https://github.com/qemu/qemu/commit/4e6d0920e7=
-547e6af4bbac5ffe9adfe6ea621822</a></p>
-<p dir=3D"ltr">I don&#39;t have at the moment any dev/test environment hand=
-y, but I did manual inspection of the code, and here is what I found (in or=
-der of importance, perceived by me):</p>
-<p dir=3D"ltr">1. The code will not work correctly if the shift ammount (va=
-riable &#39;sh&#39;) is 0. This is because, in that case, one of succeeding=
- invocations of TCG shift functions will be required to shift a 64-bit TCG =
-variable by 64 bits, and the result of such TCG operation is undefined (shi=
-ft amount must be 63 or less) - see <a href=3D"https://github.com/qemu/qemu=
-/blob/master/tcg/README">https://github.com/qemu/qemu/blob/master/tcg/READM=
-E</a>.</p>
-<p dir=3D"ltr">2. Variable naming is better in the old helper than in the n=
-ew translator. In that light, I would advise Stefan to change &#39;sh&#39; =
-to &#39;shift&#39;, and &#39;shifted&#39; to &#39;carry&#39;.</p>
-<p dir=3D"ltr">3. Lines</p>
-<p dir=3D"ltr">tcg_gen_andi_i64(shifted, shifted, 0x7fULL);</p>
-<p dir=3D"ltr">and</p>
-<p dir=3D"ltr">tcg_gen_andi_i64(shifted, shifted, 0xfe00000000000000ULL);</=
-p>
-<p dir=3D"ltr">appear to be spurious (albait in a harmless way). Therefore,=
- they should be deleted, or, alternatevely, a justification for them should=
- be provided.</p>
-<p dir=3D"ltr">4. In the commit message, variable names were used without q=
-uotation mark, resulting in puzzling and unclear wording.</p>
-<p dir=3D"ltr">5. (a question for Mark) After all recent changes, does get_=
-avr64(..., ..., true) always (for any endian configuration) return the &quo=
-t;high&quot; half of an Altivec register, and get_avr64(..., ..., false) th=
-e &quot;low&quot; one?</p>
-<p dir=3D"ltr">Given all these circumstances, perhaps the most reasonable s=
-olution would be to revert the commit in question, and allow Stefan enough =
-dev and test time to hopefully submit a new, better, version later on.</p>
-<p dir=3D"ltr">Sincerely,<br>
-Aleksandar<br><br></p>
-
---0000000000005faf5a0593a0936a--
 
