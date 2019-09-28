@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE02FC4360C
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F12AC388F3
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B1E20866
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:54:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B1E20866
+	by mail.kernel.org (Postfix) with ESMTPS id 0FBD720866
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:54:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FBD720866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEHrq-0005bj-5q
+	id 1iEHrq-0005dQ-FA
 	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 14:54:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43940)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iEHd9-0008SI-CB
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:47 -0400
+ (envelope-from <armbru@redhat.com>) id 1iEHdB-0008Sp-Pj
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iEHd5-0003un-Or
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54158)
+ (envelope-from <armbru@redhat.com>) id 1iEHd7-0003z5-2r
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42984)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iEHd5-0003sa-7c
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iEHd6-0003vi-Mt
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:40 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6EB818763B
- for <qemu-devel@nongnu.org>; Sat, 28 Sep 2019 18:39:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BFF803086258
+ for <qemu-devel@nongnu.org>; Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A27060BF7;
- Sat, 28 Sep 2019 18:39:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 919BD1000337;
+ Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5358411385D5; Sat, 28 Sep 2019 20:39:34 +0200 (CEST)
+ id 81CC21136425; Sat, 28 Sep 2019 20:39:34 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/27] qapi: Report invalid '*' prefix like any other invalid
- name
-Date: Sat, 28 Sep 2019 20:39:19 +0200
-Message-Id: <20190928183934.12459-13-armbru@redhat.com>
+Subject: [PULL 25/27] qapi: Improve reporting of missing documentation comment
+Date: Sat, 28 Sep 2019 20:39:32 +0200
+Message-Id: <20190928183934.12459-26-armbru@redhat.com>
 In-Reply-To: <20190928183934.12459-1-armbru@redhat.com>
 References: <20190928183934.12459-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Sat, 28 Sep 2019 18:39:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,91 +74,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The special "does not allow optional name" error is well meant, but
-confusing in practice.  Drop it.
+Have check_exprs() check this later, so the error message gains an "in
+definition line".  Tweak the error message.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190927134639.4284-12-armbru@redhat.com>
+Message-Id: <20190927134639.4284-25-armbru@redhat.com>
 ---
- scripts/qapi/common.py                                   | 6 ++----
- tests/qapi-schema/bad-ident.err                          | 2 +-
- tests/qapi-schema/flat-union-discriminator-bad-name.err  | 2 +-
- tests/qapi-schema/flat-union-discriminator-bad-name.json | 2 +-
- tests/qapi-schema/union-optional-branch.err              | 2 +-
- 5 files changed, 6 insertions(+), 8 deletions(-)
+ scripts/qapi/common.py            | 18 ++++++++----------
+ tests/qapi-schema/doc-missing.err |  3 ++-
+ 2 files changed, 10 insertions(+), 11 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index d0d997f31c..a4cf41f13e 100644
+index fa354b3f1e..bd834270f8 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -724,11 +724,8 @@ def check_name_str(name, info, source,
-     global valid_name
-     membername =3D name
+@@ -933,10 +933,6 @@ def check_exprs(exprs):
+         if 'include' in expr:
+             continue
 =20
--    if name.startswith('*'):
-+    if allow_optional and name.startswith('*'):
-         membername =3D name[1:]
--        if not allow_optional:
--            raise QAPISemError(info, "%s does not allow optional name '%=
-s'"
--                               % (source, name))
-     # Enum members can start with a digit, because the generated C
-     # code always prefixes it with the enum name
-     if enum_member and membername[0].isdigit():
-@@ -741,6 +738,7 @@ def check_name_str(name, info, source,
-     if not permit_upper and name.lower() !=3D name:
-         raise QAPISemError(
-             info, "%s uses uppercase in name '%s'" % (source, name))
-+    assert not membername.startswith('*')
+-        if not doc and doc_required:
+-            raise QAPISemError(info,
+-                               "definition missing documentation comment=
+")
+-
+         if 'enum' in expr:
+             meta =3D 'enum'
+         elif 'union' in expr:
+@@ -957,9 +953,14 @@ def check_exprs(exprs):
+         info.set_defn(meta, name)
+         check_defn_name_str(name, info, meta)
+=20
+-        if doc and doc.symbol !=3D name:
+-            raise QAPISemError(
+-                info, "documentation comment is for '%s'" % doc.symbol)
++        if doc:
++            if doc.symbol !=3D name:
++                raise QAPISemError(
++                    info, "documentation comment is for '%s'" % doc.symb=
+ol)
++            doc.check_expr(expr)
++        elif doc_required:
++            raise QAPISemError(info,
++                               "documentation comment required")
+=20
+         if meta =3D=3D 'enum':
+             check_keys(expr, info, meta,
+@@ -1004,9 +1005,6 @@ def check_exprs(exprs):
+         check_if(expr, info, meta)
+         check_flags(expr, info)
+=20
+-        if doc:
+-            doc.check_expr(expr)
+-
+     return exprs
 =20
 =20
- def add_name(name, info, meta):
-diff --git a/tests/qapi-schema/bad-ident.err b/tests/qapi-schema/bad-iden=
-t.err
-index 6878889854..ddc96bd3a9 100644
---- a/tests/qapi-schema/bad-ident.err
-+++ b/tests/qapi-schema/bad-ident.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/bad-ident.json: In struct '*oops':
--tests/qapi-schema/bad-ident.json:2: 'struct' does not allow optional nam=
-e '*oops'
-+tests/qapi-schema/bad-ident.json:2: 'struct' uses invalid name '*oops'
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.err b/te=
-sts/qapi-schema/flat-union-discriminator-bad-name.err
-index f7f64c5c1a..44e41883b1 100644
---- a/tests/qapi-schema/flat-union-discriminator-bad-name.err
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/flat-union-discriminator-bad-name.json: In union 'MyUn=
-ion':
--tests/qapi-schema/flat-union-discriminator-bad-name.json:7: discriminato=
-r of flat union 'MyUnion' does not allow optional name '*switch'
-+tests/qapi-schema/flat-union-discriminator-bad-name.json:7: discriminato=
-r of flat union 'MyUnion' uses invalid name '*switch'
-diff --git a/tests/qapi-schema/flat-union-discriminator-bad-name.json b/t=
-ests/qapi-schema/flat-union-discriminator-bad-name.json
-index 66376084fc..ea84b75cac 100644
---- a/tests/qapi-schema/flat-union-discriminator-bad-name.json
-+++ b/tests/qapi-schema/flat-union-discriminator-bad-name.json
-@@ -1,5 +1,5 @@
- # discriminator '*switch' isn't a member of base, 'switch' is
--# reports "does not allow optional name", which is good enough
-+# reports "uses invalid name", which is good enough
- { 'enum': 'Enum', 'data': [ 'one', 'two' ] }
- { 'struct': 'Base',
-   'data': { '*switch': 'Enum' } }
-diff --git a/tests/qapi-schema/union-optional-branch.err b/tests/qapi-sch=
-ema/union-optional-branch.err
-index a5677f74bc..8e9b18d7c6 100644
---- a/tests/qapi-schema/union-optional-branch.err
-+++ b/tests/qapi-schema/union-optional-branch.err
-@@ -1,2 +1,2 @@
- tests/qapi-schema/union-optional-branch.json: In union 'Union':
--tests/qapi-schema/union-optional-branch.json:2: member of union 'Union' =
-does not allow optional name '*a'
-+tests/qapi-schema/union-optional-branch.json:2: member of union 'Union' =
-uses invalid name '*a'
+diff --git a/tests/qapi-schema/doc-missing.err b/tests/qapi-schema/doc-mi=
+ssing.err
+index 08c827931a..7fbf54ff65 100644
+--- a/tests/qapi-schema/doc-missing.err
++++ b/tests/qapi-schema/doc-missing.err
+@@ -1 +1,2 @@
+-tests/qapi-schema/doc-missing.json:5: definition missing documentation c=
+omment
++tests/qapi-schema/doc-missing.json: In command 'undocumented':
++tests/qapi-schema/doc-missing.json:5: documentation comment required
 --=20
 2.21.0
 
