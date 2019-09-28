@@ -6,66 +6,69 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 517CFC4360C
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B675C4360C
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:18:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24FC720866
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:05:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24FC720866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2092A2082F
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 18:18:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2092A2082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEH68-0007Dg-7Z
-	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 14:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41027)
+	id 1iEHIJ-0002Xc-3p
+	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 14:18:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iEH5H-0006cw-F6
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:04:45 -0400
+ (envelope-from <bounces@canonical.com>) id 1iEHFn-0001M6-Fw
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:15:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iEH5F-0002TZ-52
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:04:42 -0400
-Resent-Date: Sat, 28 Sep 2019 14:04:42 -0400
-Resent-Message-Id: <E1iEH5F-0002TZ-52@eggs.gnu.org>
-Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21975)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iEH5D-0002IU-UQ
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:04:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1569693846; cv=none; d=zoho.com; s=zohoarc; 
- b=k8Hc4fBbWdU/MFRTVYXc1mY1r+6t+1/7Tk7N3kNXKNxBwpzBu1Wi/tObmz/6BQPCiY4Kzoa5cDE2NbCYA3rnZ2Kwa+fKxg7KZeis8Y2CjYe2XWEsIltxp9AW7lGL8msgcaLkVY5PR0IlPV7g/pdF1xcF8TKLGxQvRs8CxUVCRlY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1569693846;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=b+jcXN/7TLS6fXyW/pLUnjKDBU+FaK3nWsAUHqvubwo=; 
- b=hMDlE7rFadTTGH8ipoWnTsyTdX+IUT+27aXfb74+I/WXlV3kQvG0yRzoxJuHfn64nxWC1rwLMUxdFvhYZh59Q1bNFa1QpD0VZxn70RjoF3vjL9arrYvAfpr0HKtts7UigF0Zc27OqfRN3z5/P0j3RiAsCoVL+AMAOg4HF/qHcv0=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1569693845212831.9731030873223;
- Sat, 28 Sep 2019 11:04:05 -0700 (PDT)
-Subject: Re: [PATCH v25 00/22] Add RX archtecture support
-In-Reply-To: <20190927062302.110144-1-ysato@users.sourceforge.jp>
-Message-ID: <156969384394.27524.545116850868267455@8230166b0665>
+ (envelope-from <bounces@canonical.com>) id 1iEHFm-0001Na-Bp
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:15:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55870)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iEHFm-0001Lc-4J
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:15:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iEHFk-0002bV-JX
+ for <qemu-devel@nongnu.org>; Sat, 28 Sep 2019 18:15:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 885B72E80CB
+ for <qemu-devel@nongnu.org>; Sat, 28 Sep 2019 18:15:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ysato@users.sourceforge.jp
-Date: Sat, 28 Sep 2019 11:04:05 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 28 Sep 2019 18:05:59 -0000
+From: Chris Schneider <1845580@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell shift838 th-huth
+X-Launchpad-Bug-Reporter: Chris Schneider (shift838)
+X-Launchpad-Bug-Modifier: Chris Schneider (shift838)
+References: <156954986411.15692.14551657231977154875.malonedeb@gac.canonical.com>
+Message-Id: <156969395943.16216.14813397855832852254.malone@chaenomeles.canonical.com>
+Subject: [Bug 1845580] Re: issue with QEMU on Raspberry Pi failing to access
+ CDROM
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19065";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 1f43537d302c5db3e60c7b12c1c1d279913ec9d6
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.59
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -74,142 +77,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, ysato@users.sourceforge.jp,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, imammedo@redhat.com,
- philmd@redhat.com
+Reply-To: Bug 1845580 <1845580@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkyNzA2MjMwMi4xMTAx
-NDQtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcC8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwOTI3MDYy
-MzAyLjExMDE0NC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwClN1YmplY3Q6IFtQQVRDSCB2
-MjUgMDAvMjJdIEFkZCBSWCBhcmNodGVjdHVyZSBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
-c3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxYTc0ZmZj
-IHFhcGkvbWFjaGluZS5qc29uOiBBZGQgUlggY3B1LgpjMTczZTY4IEJvb3RMaW51eENvbnNvbGVU
-ZXN0OiBUZXN0IHRoZSBSWC1WaXJ0IG1hY2hpbmUKYjRlOWE3YSBBZGQgcngtc29mdG1tdQo1YmRj
-MDdlIGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2Mk4gbWljcm9jb250cm9sbGVyIHRvIHRoZSBSWDYy
-TiBDUFUgY29yZQoyNDk2YWE0IGh3L3J4OiBIb25vciAtYWNjZWwgcXRlc3QKYjk3YTg0ZCBody9y
-eDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmluaXRpb24KZjgwNmUyNyBody9jaGFyOiBSWDYyTiBz
-ZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkKYmQ1OTIxMiBody90aW1lcjogUlg2
-Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcwpjYjIyZWZhIGh3L2ludGM6IFJYNjJOIGludGVycnVw
-dCBjb250cm9sbGVyIChJQ1VhKQphZTQzNTMxIHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFj
-aCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseQoyNmRkMWEyIHRhcmdldC9yeDogQ29sbGVjdCBhbGwg
-Ynl0ZXMgZHVyaW5nIGRpc2Fzc2VtYmx5CjE4YWVlYTIgdGFyZ2V0L3J4OiBFbWl0IGFsbCBkaXNh
-c3NlbWJseSBpbiBvbmUgcHJ0KCkKMTdkOWQyMSB0YXJnZXQvcng6IFVzZSBwcnRfbGRtaSBmb3Ig
-WENIR19tciBkaXNhc3NlbWJseQoyODgyNTcxIHRhcmdldC9yeDogUmVwbGFjZSBvcGVyYW5kIHdp
-dGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVyCmJmM2IzZjIgdGFyZ2V0L3J4OiBEaXNhc3NlbWJs
-ZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJpbmcKNzMxMDJjZSB0YXJnZXQvcng6IFJYIGRpc2Fz
-c2VtYmxlcgo5MGNiMTk3IHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24KNWMwMGRiYiB0YXJnZXQv
-cng6IFRDRyBoZWxwZXIKMmIxNTI3MiB0YXJnZXQvcng6IFRDRyB0cmFuc2xhdGlvbgoxNWYyOGYx
-IGh3L3JlZ2lzdGVyZmllbGRzLmg6IEFkZCA4Yml0IGFuZCAxNmJpdCByZWdpc3RlciBtYWNyb3MK
-ZmE1NzFjNyBxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3QxNgoxNWJmOTIz
-IE1BSU5UQUlORVJTOiBBZGQgUlgKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjIgQ2hlY2tpbmcg
-Y29tbWl0IDE1YmY5MjM0OGE1NiAoTUFJTlRBSU5FUlM6IEFkZCBSWCkKMi8yMiBDaGVja2luZyBj
-b21taXQgZmE1NzFjN2VmNmFmIChxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJh
-Y3QxNikKMy8yMiBDaGVja2luZyBjb21taXQgMTVmMjhmMTI5OWRlIChody9yZWdpc3RlcmZpZWxk
-cy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0ZXIgbWFjcm9zKQpVc2Ugb2YgdW5pbml0aWFs
-aXplZCB2YWx1ZSBpbiBjb25jYXRlbmF0aW9uICguKSBvciBzdHJpbmcgYXQgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgbGluZSAyNDg0LgpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlwbGUgc3RhdGVt
-ZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzI3OiBGSUxFOiBp
-bmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6MjU6CisjZGVmaW5lIFJFRzgocmVnLCBhZGRyKSAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVu
-dW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSB9OwoKRVJST1I6IE1h
-Y3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8g
-LSB3aGlsZSBsb29wCiMzMTogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxkcy5oOjI5Ogor
-I2RlZmluZSBSRUcxNihyZWcsIGFkZHIpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IEFfICMjIHJlZyA9IChhZGRyKSB9OyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBlbnVtIHsgUl8gIyMg
-cmVnID0gKGFkZHIpIC8gMiB9OwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NiBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAzLzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzIyIENo
-ZWNraW5nIGNvbW1pdCAyYjE1MjcyMDM2NTIgKHRhcmdldC9yeDogVENHIHRyYW5zbGF0aW9uKQpX
-QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
-IG5lZWQgdXBkYXRpbmc/CiMyMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
-cnMsIDEgd2FybmluZ3MsIDMwNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8yMiBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgo1LzIyIENoZWNraW5nIGNvbW1pdCA1YzAwZGJiNWUzMDkgKHRhcmdl
-dC9yeDogVENHIGhlbHBlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
-KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjE6IApuZXcgZmlsZSBtb2RlIDEw
-MDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NTAgbGluZXMgY2hlY2tlZAoKUGF0
-Y2ggNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzIyIENoZWNraW5nIGNvbW1pdCA5
-MGNiMTk3MzhjMDAgKHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24pCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
-NTg4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Ny8yMiBDaGVja2luZyBjb21taXQgNzMxMDJjZTEwZjZhICh0YXJnZXQvcng6IFJYIGRpc2Fzc2Vt
-YmxlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDk3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvMjIgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8yMiBDaGVja2luZyBjb21taXQgYmYzYjNmMjM2ZTBi
-ICh0YXJnZXQvcng6IERpc2Fzc2VtYmxlIHJ4X2luZGV4X2FkZHIgaW50byBhIHN0cmluZykKOS8y
-MiBDaGVja2luZyBjb21taXQgMjg4MjU3MWEyNDBkICh0YXJnZXQvcng6IFJlcGxhY2Ugb3BlcmFu
-ZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcikKMTAvMjIgQ2hlY2tpbmcgY29tbWl0IDE3
-ZDlkMjE3ZmU0OSAodGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1i
-bHkpCjExLzIyIENoZWNraW5nIGNvbW1pdCAxOGFlZWEyODVhOGIgKHRhcmdldC9yeDogRW1pdCBh
-bGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpKQoxMi8yMiBDaGVja2luZyBjb21taXQgMjZkZDFh
-MmNlZDU0ICh0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseSkK
-MTMvMjIgQ2hlY2tpbmcgY29tbWl0IGFlNDM1MzFjYTg0ZCAodGFyZ2V0L3J4OiBEdW1wIGJ5dGVz
-IGZvciBlYWNoIGluc24gZHVyaW5nIGRpc2Fzc2VtYmx5KQoxNC8yMiBDaGVja2luZyBjb21taXQg
-Y2IyMmVmYThhNzQzIChody9pbnRjOiBSWDYyTiBpbnRlcnJ1cHQgY29udHJvbGxlciAoSUNVYSkp
-CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
-UlMgbmVlZCB1cGRhdGluZz8KIzQwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
-cm9ycywgMSB3YXJuaW5ncywgNDQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0LzIyIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjE1LzIyIENoZWNraW5nIGNvbW1pdCBiZDU5MjEyOTY2MGUgKGh3
-L3RpbWVyOiBSWDYyTiBpbnRlcm5hbCB0aW1lciBtb2R1bGVzKQpXQVJOSU5HOiBhZGRlZCwgbW92
-ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1
-MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDg0
-NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgox
-Ni8yMiBDaGVja2luZyBjb21taXQgZjgwNmUyNzQ0ZTE2IChody9jaGFyOiBSWDYyTiBzZXJpYWwg
-Y29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQzOiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDAxIGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDE2LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIyIENo
-ZWNraW5nIGNvbW1pdCBiOTdhODRkMjJlOGUgKGh3L3J4OiBSWCBUYXJnZXQgaGFyZHdhcmUgZGVm
-aW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
-QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0ODAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTcvMjIg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTgvMjIgQ2hlY2tpbmcgY29tbWl0IDI0OTZhYTQz
-M2VjYSAoaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdCkKMTkvMjIgQ2hlY2tpbmcgY29tbWl0IDVi
-ZGMwN2UzOTRlZiAoaHcvcng6IFJlc3RyaWN0IHRoZSBSWDYyTiBtaWNyb2NvbnRyb2xsZXIgdG8g
-dGhlIFJYNjJOIENQVSBjb3JlKQoyMC8yMiBDaGVja2luZyBjb21taXQgYjRlOWE3YWI5YzllIChB
-ZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
-ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTk6IApuZXcgZmlsZSBtb2RlIDEwMDY0
-NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAy
-MC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMS8yMiBDaGVja2luZyBjb21taXQgYzE3
-M2U2OGU3MGI3IChCb290TGludXhDb25zb2xlVGVzdDogVGVzdCB0aGUgUlgtVmlydCBtYWNoaW5l
-KQoyMi8yMiBDaGVja2luZyBjb21taXQgMWE3NGZmYzM1NzEwIChxYXBpL21hY2hpbmUuanNvbjog
-QWRkIFJYIGNwdS4pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMTkwOTI3MDYyMzAyLjExMDE0NC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpw
-L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+I compiled 4.1.0 on the Raspberry, everything seemed to compile.
 
+I have verified with qemu-system-i386 --version displays 4.1.0
+
+Using the below basic command line:
+
+qemu-system-i386 -hda c.hda -cdrom FD12CD.iso -boot order=3Dd
+
+now when I try to execute the qemu I get only below as it just seems to
+hang:
+
+
+WARNING: Image format was not specified for 'c.hda' and probing guessed raw.
+         Automatically detecting the format is dangerous for raw images, wr=
+ite operations on block 0 will be restricted.
+         Specify the 'raw' format explicitly to remove the restrictions.
+VNC server running on ::1:5901
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1845580
+
+Title:
+  issue with QEMU on Raspberry Pi failing to access CDROM
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am trying to access the CDROM (iso) from QEMU using FreeDOS and I
+  get an error when doing a directory for:
+
+  i can boot from the iso but if i exit to access the files from the
+  CDROM ISO i get the attached error.
+
+  I believe there is an issue with the QEMU for the Raspberry Pi.
+
+  I am using a Raspberry Pi3 with the latest full Raspbian Buster load
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1845580/+subscriptions
 
