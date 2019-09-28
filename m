@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A643C4360C
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 19:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB19C4360C
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 19:06:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 479BB2082F
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 19:05:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 479BB2082F
+	by mail.kernel.org (Postfix) with ESMTPS id 39BAF2082F
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Sep 2019 19:06:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39BAF2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEI1r-0008HN-6o
-	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 15:05:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43993)
+	id 1iEI3P-0002O2-9f
+	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 15:06:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iEHdB-0008Sn-P3
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:49 -0400
+ (envelope-from <armbru@redhat.com>) id 1iEHdD-0008VL-O5
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iEHd7-0003zQ-5n
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55340)
+ (envelope-from <armbru@redhat.com>) id 1iEHd7-00040Q-Gr
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41676)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iEHd6-0003vg-Mv
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:40 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iEHd7-0003wC-2h
+ for qemu-devel@nongnu.org; Sat, 28 Sep 2019 14:39:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BFE607FDEC
+ by mx1.redhat.com (Postfix) with ESMTPS id E504E305B41C
  for <qemu-devel@nongnu.org>; Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 918295D6B2;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90BAD60852;
  Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 851821136426; Sat, 28 Sep 2019 20:39:34 +0200 (CEST)
+ id 7EA081136424; Sat, 28 Sep 2019 20:39:34 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/27] qapi: Improve reporting of redefinition
-Date: Sat, 28 Sep 2019 20:39:33 +0200
-Message-Id: <20190928183934.12459-27-armbru@redhat.com>
+Subject: [PULL 24/27] qapi: Eliminate check_keys(), rename check_known_keys()
+Date: Sat, 28 Sep 2019 20:39:31 +0200
+Message-Id: <20190928183934.12459-25-armbru@redhat.com>
 In-Reply-To: <20190928183934.12459-1-armbru@redhat.com>
 References: <20190928183934.12459-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Sat, 28 Sep 2019 18:39:39 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -74,72 +74,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Point to the previous definition, unless it's a built-in.
+check_keys() has become a trivial wrapper for check_known_keys().
+Eliminate it.
+
+This makes its name available.  Rename check_known_keys().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190927134639.4284-26-armbru@redhat.com>
+Message-Id: <20190927134639.4284-24-armbru@redhat.com>
 ---
- scripts/qapi/common.py                  | 5 +++++
- tests/qapi-schema/redefined-command.err | 4 +++-
- tests/qapi-schema/redefined-event.err   | 4 +++-
- tests/qapi-schema/redefined-type.err    | 4 +++-
- 4 files changed, 14 insertions(+), 3 deletions(-)
+ scripts/qapi/common.py | 40 +++++++++++++++++++++-------------------
+ 1 file changed, 21 insertions(+), 19 deletions(-)
 
 diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index bd834270f8..a74cd957d4 100644
+index 4bc8c807aa..fa354b3f1e 100644
 --- a/scripts/qapi/common.py
 +++ b/scripts/qapi/common.py
-@@ -1759,6 +1759,11 @@ class QAPISchema(object):
-         # because they're liable to clash in generated C.
-         other_ent =3D self._entity_dict.get(ent.name)
-         if other_ent:
-+            if other_ent.info:
-+                where =3D QAPIError(other_ent.info, None, "previous defi=
-nition")
-+                raise QAPISemError(
-+                    ent.info,
-+                    "'%s' is already defined\n%s" % (ent.name, where))
-             raise QAPISemError(
-                 ent.info, "%s is already defined" % other_ent.describe()=
-)
-         self._entity_dict[ent.name] =3D ent
-diff --git a/tests/qapi-schema/redefined-command.err b/tests/qapi-schema/=
-redefined-command.err
-index b77a05d354..54e366bbf3 100644
---- a/tests/qapi-schema/redefined-command.err
-+++ b/tests/qapi-schema/redefined-command.err
-@@ -1,2 +1,4 @@
- tests/qapi-schema/redefined-command.json: In command 'foo':
--tests/qapi-schema/redefined-command.json:3: command 'foo' is already def=
-ined
-+tests/qapi-schema/redefined-command.json:3: 'foo' is already defined
-+tests/qapi-schema/redefined-command.json: In command 'foo':
-+tests/qapi-schema/redefined-command.json:2: previous definition
-diff --git a/tests/qapi-schema/redefined-event.err b/tests/qapi-schema/re=
-defined-event.err
-index fd02d38157..606c6e4497 100644
---- a/tests/qapi-schema/redefined-event.err
-+++ b/tests/qapi-schema/redefined-event.err
-@@ -1,2 +1,4 @@
- tests/qapi-schema/redefined-event.json: In event 'EVENT_A':
--tests/qapi-schema/redefined-event.json:3: event 'EVENT_A' is already def=
-ined
-+tests/qapi-schema/redefined-event.json:3: 'EVENT_A' is already defined
-+tests/qapi-schema/redefined-event.json: In event 'EVENT_A':
-+tests/qapi-schema/redefined-event.json:2: previous definition
-diff --git a/tests/qapi-schema/redefined-type.err b/tests/qapi-schema/red=
-efined-type.err
-index 39f51c14ea..77786f98ae 100644
---- a/tests/qapi-schema/redefined-type.err
-+++ b/tests/qapi-schema/redefined-type.err
-@@ -1,2 +1,4 @@
- tests/qapi-schema/redefined-type.json: In enum 'foo':
--tests/qapi-schema/redefined-type.json:3: struct type 'foo' is already de=
-fined
-+tests/qapi-schema/redefined-type.json:3: 'foo' is already defined
-+tests/qapi-schema/redefined-type.json: In struct 'foo':
-+tests/qapi-schema/redefined-type.json:2: previous definition
+@@ -756,7 +756,7 @@ def check_type(value, info, source,
+                        allow_optional=3DTrue, permit_upper=3Dpermit_uppe=
+r)
+         if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswit=
+h('has_'):
+             raise QAPISemError(info, "%s uses reserved name" % key_sourc=
+e)
+-        check_known_keys(arg, info, key_source, ['type'], ['if'])
++        check_keys(arg, info, key_source, ['type'], ['if'])
+         check_if(arg, info, key_source)
+         normalize_if(arg)
+         check_type(arg['type'], info, key_source, allow_array=3DTrue)
+@@ -800,7 +800,7 @@ def check_union(expr, info):
+     for (key, value) in members.items():
+         source =3D "'data' member '%s'" % key
+         check_name_str(key, info, source)
+-        check_known_keys(value, info, source, ['type'], ['if'])
++        check_keys(value, info, source, ['type'], ['if'])
+         check_if(value, info, source)
+         normalize_if(value)
+         check_type(value['type'], info, source, allow_array=3Dnot base)
+@@ -814,7 +814,7 @@ def check_alternate(expr, info):
+     for (key, value) in members.items():
+         source =3D "'data' member '%s'" % key
+         check_name_str(key, info, source)
+-        check_known_keys(value, info, source, ['type'], ['if'])
++        check_keys(value, info, source, ['type'], ['if'])
+         check_if(value, info, source)
+         normalize_if(value)
+         check_type(value['type'], info, source)
+@@ -834,7 +834,7 @@ def check_enum(expr, info):
+=20
+     for member in members:
+         source =3D "'data' member"
+-        check_known_keys(member, info, source, ['name'], ['if'])
++        check_keys(member, info, source, ['name'], ['if'])
+         check_name_is_str(member['name'], info, source)
+         source =3D "%s '%s'" % (source, member['name'])
+         check_name_str(member['name'], info, source,
+@@ -857,7 +857,7 @@ def check_struct(expr, info):
+         for f in features:
+             source =3D "'features' member"
+             assert isinstance(f, dict)
+-            check_known_keys(f, info, source, ['name'], ['if'])
++            check_keys(f, info, source, ['name'], ['if'])
+             check_name_is_str(f['name'], info, source)
+             source =3D "%s '%s'" % (source, f['name'])
+             check_name_str(f['name'], info, source)
+@@ -865,7 +865,7 @@ def check_struct(expr, info):
+             normalize_if(f)
+=20
+=20
+-def check_known_keys(value, info, source, required, optional):
++def check_keys(value, info, source, required, optional):
+=20
+     def pprint(elems):
+         return ', '.join("'" + e + "'" for e in sorted(elems))
+@@ -887,10 +887,6 @@ def check_known_keys(value, info, source, required, =
+optional):
+                pprint(unknown), pprint(allowed)))
+=20
+=20
+-def check_keys(expr, info, meta, required, optional=3D[]):
+-    check_known_keys(expr, info, meta, required + [meta], optional)
+-
+-
+ def check_flags(expr, info):
+     for key in ['gen', 'success-response']:
+         if key in expr and expr[key] is not False:
+@@ -966,33 +962,39 @@ def check_exprs(exprs):
+                 info, "documentation comment is for '%s'" % doc.symbol)
+=20
+         if meta =3D=3D 'enum':
+-            check_keys(expr, info, 'enum', ['data'], ['if', 'prefix'])
++            check_keys(expr, info, meta,
++                       ['enum', 'data'], ['if', 'prefix'])
+             normalize_enum(expr)
+             check_enum(expr, info)
+         elif meta =3D=3D 'union':
+-            check_keys(expr, info, 'union', ['data'],
++            check_keys(expr, info, meta,
++                       ['union', 'data'],
+                        ['base', 'discriminator', 'if'])
+             normalize_members(expr.get('base'))
+             normalize_members(expr['data'])
+             check_union(expr, info)
+         elif meta =3D=3D 'alternate':
+-            check_keys(expr, info, 'alternate', ['data'], ['if'])
++            check_keys(expr, info, meta,
++                       ['alternate', 'data'], ['if'])
+             normalize_members(expr['data'])
+             check_alternate(expr, info)
+         elif meta =3D=3D 'struct':
+-            check_keys(expr, info, 'struct', ['data'],
+-                       ['base', 'if', 'features'])
++            check_keys(expr, info, meta,
++                       ['struct', 'data'], ['base', 'if', 'features'])
+             normalize_members(expr['data'])
+             normalize_features(expr.get('features'))
+             check_struct(expr, info)
+         elif meta =3D=3D 'command':
+-            check_keys(expr, info, 'command', [],
+-                       ['data', 'returns', 'gen', 'success-response',
+-                        'boxed', 'allow-oob', 'allow-preconfig', 'if'])
++            check_keys(expr, info, meta,
++                       ['command'],
++                       ['data', 'returns', 'boxed', 'if',
++                        'gen', 'success-response', 'allow-oob',
++                        'allow-preconfig'])
+             normalize_members(expr.get('data'))
+             check_command(expr, info)
+         elif meta =3D=3D 'event':
+-            check_keys(expr, info, 'event', [], ['data', 'boxed', 'if'])
++            check_keys(expr, info, meta,
++                       ['event'], ['data', 'boxed', 'if'])
+             normalize_members(expr.get('data'))
+             check_event(expr, info)
+         else:
 --=20
 2.21.0
 
