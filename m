@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DECC4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A323C4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:38:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16C64217F5
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:36:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16C64217F5
+	by mail.kernel.org (Postfix) with ESMTPS id 3BE2E217F5
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:38:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BE2E217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEcBU-0003Ka-Am
-	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 12:36:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55182)
+	id 1iEcDb-0005Tt-FS
+	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 12:38:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54854)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iEc8i-0001Kq-Fw
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:33:41 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1iEc7M-0000Cy-4R
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:32:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iEc8h-0004DO-BW
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:33:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54904)
+ (envelope-from <mlevitsk@redhat.com>) id 1iEc7L-0002LA-4I
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:32:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50056)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iEc8Z-0003nj-Kb; Sun, 29 Sep 2019 12:33:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iEc7I-0002Gs-UI; Sun, 29 Sep 2019 12:32:13 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 639AC8A218D;
- Sun, 29 Sep 2019 16:33:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 27DB810576CB;
+ Sun, 29 Sep 2019 16:32:12 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 277B460C05;
- Sun, 29 Sep 2019 16:33:28 +0000 (UTC)
-Message-ID: <1c6c86af32c3de1b473b48704cf506694c10c597.camel@redhat.com>
-Subject: Re: [PATCH 09/18] iotests: Drop IMGOPTS use in 267
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0F1819D70;
+ Sun, 29 Sep 2019 16:32:10 +0000 (UTC)
+Message-ID: <c4ee5a11101febfcf1dbc56e03f53375360b8042.camel@redhat.com>
+Subject: Re: [PATCH 03/18] iotests: Drop compat=1.1 in 050
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Sun, 29 Sep 2019 19:33:28 +0300
-In-Reply-To: <20190927094242.11152-10-mreitz@redhat.com>
+Date: Sun, 29 Sep 2019 19:32:09 +0300
+In-Reply-To: <20190927094242.11152-4-mreitz@redhat.com>
 References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-10-mreitz@redhat.com>
+ <20190927094242.11152-4-mreitz@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Sun, 29 Sep 2019 16:33:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Sun, 29 Sep 2019 16:32:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -75,60 +75,31 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
-> Overwriting IMGOPTS means ignoring all user-supplied options, which is
-> not what we want.  Replace the current IMGOPTS use by a new BACKING_FILE
-> variable.
+> IMGOPTS can never be empty for qcow2, because the check scripts adds
+> compat=1.1 unless the user specified any compat option themselves.
+> Thus, this block does not do anything and can be dropped.
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/267 | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+>  tests/qemu-iotests/050 | 4 ----
+>  1 file changed, 4 deletions(-)
 > 
-> diff --git a/tests/qemu-iotests/267 b/tests/qemu-iotests/267
-> index 95f885442f..529f5f9afe 100755
-> --- a/tests/qemu-iotests/267
-> +++ b/tests/qemu-iotests/267
-> @@ -68,7 +68,11 @@ size=128M
+> diff --git a/tests/qemu-iotests/050 b/tests/qemu-iotests/050
+> index 211fc00797..272ecab195 100755
+> --- a/tests/qemu-iotests/050
+> +++ b/tests/qemu-iotests/050
+> @@ -41,10 +41,6 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+>  _supported_fmt qcow2 qed
+>  _supported_proto file
 >  
->  run_test()
->  {
-> -    _make_test_img $size
-> +    if [ -n "$BACKING_FILE" ]; then
-> +        _make_test_img -b "$BACKING_FILE" $size
-> +    else
-> +        _make_test_img $size
-> +    fi
->      printf "savevm snap0\ninfo snapshots\nloadvm snap0\n" | run_qemu "$@" | _filter_date
->  }
->  
-> @@ -119,12 +123,12 @@ echo
->  
->  TEST_IMG="$TEST_IMG.base" _make_test_img $size
->  
-> -IMGOPTS="backing_file=$TEST_IMG.base" \
-> +BACKING_FILE="$TEST_IMG.base" \
->  run_test -blockdev driver=file,filename="$TEST_IMG.base",node-name=backing-file \
->           -blockdev driver=file,filename="$TEST_IMG",node-name=file \
->           -blockdev driver=$IMGFMT,file=file,backing=backing-file,node-name=fmt
->  
-> -IMGOPTS="backing_file=$TEST_IMG.base" \
-> +BACKING_FILE="$TEST_IMG.base" \
->  run_test -blockdev driver=file,filename="$TEST_IMG.base",node-name=backing-file \
->           -blockdev driver=$IMGFMT,file=backing-file,node-name=backing-fmt \
->           -blockdev driver=file,filename="$TEST_IMG",node-name=file \
-> @@ -141,7 +145,7 @@ echo
->  echo "=== -blockdev with NBD server on the backing file ==="
+> -if test "$IMGFMT" = qcow2 && test $IMGOPTS = ""; then
+> -  IMGOPTS=compat=1.1
+> -fi
+> -
 >  echo
+>  echo "== Creating images =="
 >  
-> -IMGOPTS="backing_file=$TEST_IMG.base" _make_test_img $size
-> +_make_test_img -b "$TEST_IMG.base" $size
->  cat <<EOF |
->  nbd_server_start unix:$TEST_DIR/nbd
->  nbd_server_add -w backing-fmt
-
-qemu's master (pulled today), don't have iotest 267,
-you probably based this on some not yet merged branch.
-Or I made some mistake with pulling the master branch.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
 	Maxim Levitsky
