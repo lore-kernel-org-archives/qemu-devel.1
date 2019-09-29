@@ -2,59 +2,59 @@ Return-Path: <SRS0=3J8r=XY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DD3C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF95EC4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:56:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 879442086A
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:55:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 879442086A
+	by mail.kernel.org (Postfix) with ESMTPS id A40282081B
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:56:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40282081B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEcTp-0002lw-FK
-	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 12:55:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56078)
+	id 1iEcUf-0003Y5-PN
+	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 12:56:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iEcE9-0006ae-To
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:39:19 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1iEcDs-0006Uo-Bw
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iEcE7-0003O9-Tk
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:39:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38059)
+ (envelope-from <mlevitsk@redhat.com>) id 1iEcDr-00039m-2o
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:39:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39112)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iEcE1-0003Hs-Sm; Sun, 29 Sep 2019 12:39:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iEcDo-00034S-L0; Sun, 29 Sep 2019 12:38:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F3CEB3DE04;
- Sun, 29 Sep 2019 16:39:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D8A721DB6;
+ Sun, 29 Sep 2019 16:38:55 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9185600F8;
- Sun, 29 Sep 2019 16:39:06 +0000 (UTC)
-Message-ID: <f75b8ef0b9ab5d3589f93d6a97790f8ec68df900.camel@redhat.com>
-Subject: Re: [PATCH 17/18] iotests: Disable data_file where it cannot be used
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9D6E960606;
+ Sun, 29 Sep 2019 16:38:54 +0000 (UTC)
+Message-ID: <b43d4d8f8c3b426d5d57dfc4c468c3aa8bfacf71.camel@redhat.com>
+Subject: Re: [PATCH 16/18] iotests: Make 198 work with data_file
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Sun, 29 Sep 2019 19:39:05 +0300
-In-Reply-To: <20190927094242.11152-18-mreitz@redhat.com>
+Date: Sun, 29 Sep 2019 19:38:53 +0300
+In-Reply-To: <20190927094242.11152-17-mreitz@redhat.com>
 References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-18-mreitz@redhat.com>
+ <20190927094242.11152-17-mreitz@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Sun, 29 Sep 2019 16:39:08 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Sun, 29 Sep 2019 16:38:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -75,57 +75,66 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/007 | 5 +++--
->  tests/qemu-iotests/014 | 2 ++
->  tests/qemu-iotests/015 | 5 +++--
->  tests/qemu-iotests/026 | 5 ++++-
->  tests/qemu-iotests/029 | 5 +++--
->  tests/qemu-iotests/031 | 6 +++---
->  tests/qemu-iotests/036 | 5 +++--
->  tests/qemu-iotests/039 | 3 +++
->  tests/qemu-iotests/046 | 2 ++
->  tests/qemu-iotests/048 | 2 ++
->  tests/qemu-iotests/051 | 5 +++--
->  tests/qemu-iotests/058 | 5 +++--
->  tests/qemu-iotests/060 | 6 ++++--
->  tests/qemu-iotests/061 | 6 ++++--
->  tests/qemu-iotests/062 | 2 +-
->  tests/qemu-iotests/066 | 2 +-
->  tests/qemu-iotests/067 | 6 ++++--
->  tests/qemu-iotests/068 | 5 +++--
->  tests/qemu-iotests/071 | 3 +++
->  tests/qemu-iotests/073 | 2 ++
->  tests/qemu-iotests/074 | 2 ++
->  tests/qemu-iotests/080 | 5 +++--
->  tests/qemu-iotests/090 | 2 ++
->  tests/qemu-iotests/098 | 4 +++-
->  tests/qemu-iotests/099 | 3 ++-
->  tests/qemu-iotests/103 | 5 +++--
->  tests/qemu-iotests/108 | 6 ++++--
->  tests/qemu-iotests/112 | 5 +++--
->  tests/qemu-iotests/114 | 2 ++
->  tests/qemu-iotests/121 | 3 +++
->  tests/qemu-iotests/138 | 2 ++
->  tests/qemu-iotests/156 | 2 ++
->  tests/qemu-iotests/176 | 7 +++++--
->  tests/qemu-iotests/191 | 2 ++
->  tests/qemu-iotests/201 | 6 +++---
->  tests/qemu-iotests/214 | 3 ++-
->  tests/qemu-iotests/217 | 3 ++-
->  tests/qemu-iotests/220 | 5 +++--
->  tests/qemu-iotests/243 | 6 ++++--
->  tests/qemu-iotests/244 | 5 +++--
->  tests/qemu-iotests/250 | 2 ++
->  tests/qemu-iotests/267 | 5 +++--
->  42 files changed, 116 insertions(+), 51 deletions(-)
-> 
-
-No iotest 267 on master branch, same as patch 9
+> We do not care about the json:{} filenames here, so we can just filter
+> them out and thus make the test work both with and without external data
+> files.
+Same comment as for iotest 110, this is more justification to move this
+outside to reduce duplication.
 
 Best regards,
 	Maxim Levitsky
+
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/198     | 6 ++++--
+>  tests/qemu-iotests/198.out | 4 ++--
+>  2 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
+> index c8f824cfae..d9981942a7 100755
+> --- a/tests/qemu-iotests/198
+> +++ b/tests/qemu-iotests/198
+> @@ -92,13 +92,15 @@ echo
+>  echo "== checking image base =="
+>  $QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info --format-specific \
+>      | sed -e "/^disk size:/ D" -e '/refcount bits:/ D' -e '/compat:/ D' \
+> -          -e '/lazy refcounts:/ D' -e '/corrupt:/ D'
+> +          -e '/lazy refcounts:/ D' -e '/corrupt:/ D' -e '/^\s*data file/ D' \
+> +          -e 's#image: json:.*#image: json:{ /* filtered */ }#'
+>  
+>  echo
+>  echo "== checking image layer =="
+>  $QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info --format-specific \
+>      | sed -e "/^disk size:/ D" -e '/refcount bits:/ D' -e '/compat:/ D' \
+> -          -e '/lazy refcounts:/ D' -e '/corrupt:/ D'
+> +          -e '/lazy refcounts:/ D' -e '/corrupt:/ D' -e '/^\s*data file/ D' \
+> +          -e 's#image: json:.*#image: json:{ /* filtered */ }#'
+>  
+>  
+>  # success, all done
+> diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
+> index e86b175e39..831ce3a289 100644
+> --- a/tests/qemu-iotests/198.out
+> +++ b/tests/qemu-iotests/198.out
+> @@ -32,7 +32,7 @@ read 16777216/16777216 bytes at offset 0
+>  16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  
+>  == checking image base ==
+> -image: json:{"encrypt.key-secret": "sec0", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}
+> +image: json:{ /* filtered */ }
+>  file format: IMGFMT
+>  virtual size: 16 MiB (16777216 bytes)
+>  Format specific information:
+> @@ -74,7 +74,7 @@ Format specific information:
+>          master key iters: 1024
+>  
+>  == checking image layer ==
+> -image: json:{"encrypt.key-secret": "sec1", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}
+> +image: json:{ /* filtered */ }
+>  file format: IMGFMT
+>  virtual size: 16 MiB (16777216 bytes)
+>  backing file: TEST_DIR/t.IMGFMT.base
 
 
 
