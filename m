@@ -2,90 +2,92 @@ Return-Path: <SRS0=3J8r=XY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4441DC4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 14:40:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2FB6C4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 15:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B70BA2086A
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 14:40:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1C082086A
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 15:28:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEWZSuuo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B70BA2086A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p2Jy6sPl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C082086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEaNH-0008FD-H1
-	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 10:40:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40981)
+	id 1iEb7m-0007Ld-Lv
+	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 11:28:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <estebanbosse@gmail.com>) id 1iEaMC-0007Th-DN
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 10:39:29 -0400
+ (envelope-from <estebanbosse@gmail.com>) id 1iEb6d-0006lq-Mm
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 11:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <estebanbosse@gmail.com>) id 1iEaMB-0006GR-4h
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 10:39:28 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45813)
+ (envelope-from <estebanbosse@gmail.com>) id 1iEb6c-0005Fe-2o
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 11:27:27 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51579)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
- id 1iEaMA-0006Do-UO; Sun, 29 Sep 2019 10:39:27 -0400
-Received: by mail-wr1-x443.google.com with SMTP id r5so8104979wrm.12;
- Sun, 29 Sep 2019 07:39:26 -0700 (PDT)
+ id 1iEb6b-0005Ee-Q0; Sun, 29 Sep 2019 11:27:26 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 7so10598945wme.1;
+ Sun, 29 Sep 2019 08:27:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=message-id:subject:from:to:cc:date:in-reply-to:references
  :user-agent:mime-version:content-transfer-encoding;
- bh=3Z/R1kHsTRJ7swG7MknTo7vDjiNZ5Rpu/Zr7b0aDuac=;
- b=HEWZSuuoa8jz+TIXBO0qM/EjX+oR9AiWfUhlFtI5OQqPoZtX8LmLwqYdkVMUWObsj6
- EX9IQE+dRsxOLfGFZKzRT6rRaTQYq5OMoUnL+/xqHbNbXmArd4nbntFGcVflqV8jbyuc
- AwBbGEQBgTDWQdmY9pDNBS6d/yAtWWCOmSB7jOXe8Ep2o60PGZaXV8A3oAOV5UfL5YSS
- J4wzNefzRoQJKM06L+q/3ITzj/vy0HFQOdalBK45NrlZfmxRR+oI0ULVOVxXI3Cy+kII
- TlpvEusbRHRKyPLwX0O7oWbVoCi6ILKBSMM0iJ2e3/dbDzTkk6ggKAs4qaMQ75GzkYON
- ouzg==
+ bh=bMCb6LOHd+fuDrO7vVmSdWgZerHv61tnmFL2VWlbIrw=;
+ b=p2Jy6sPlW3x/hcba8YeaMdXvj3CEX/Ad/aDNJoFGnrgb4jNWvBvPR4kFDZjzUXwSD8
+ W/fcUK+lsuON/8Qid0ocJMTNvt8iPYZCMl+C5d+vnrHuwNx6Z09TcV4nudx5jPzs3h2v
+ 9iB6nx0fMYwzojKvlp50FV2ksciApnFTVMZ/AYgcJuj3USUbruhJNHHMqsNC7KTlNYwK
+ mpdyLxwkZjYzn3WXXrea4PqvMWOgQMGadTiZ3lCptHQHfQon2ViqeBBm+UClViRC0Cb3
+ 6RuFKUrT44xw5B8XN42X8pPRToZrJ+INil7fz71DPxtHDZ4da7p6DwCKnjHIvNOoDhXZ
+ le/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
  :references:user-agent:mime-version:content-transfer-encoding;
- bh=3Z/R1kHsTRJ7swG7MknTo7vDjiNZ5Rpu/Zr7b0aDuac=;
- b=VLsq0aSFN3YoUcabYO/pCWr/H4EyZH4icdT3x+488eSFQvvpOH4WzaxHoaVSZeJmx3
- lJUgCmYnGgK5rtF6ErRbJi1apIUGB1SQNB4sq0X5XBjDOED6qhH+qAu0jOOucZdiEMYY
- QyRRm5W0VWNLCDsA3N+mOmc33aU8Na3hZhFLoSzlORwYmJR8rE1kFDgYCbJ181c9LW1D
- bTDktX+T16M777omAfM4Z/1o0Ng/atl/k/K7R80e2lPDh/sijQYFKzCHlr061UplEwTk
- 1OaHumlubP7eR3lh9bLL9BVZHTsjiAKPycG+H0mVQUBAG3+DBo26o1dKtIuHzBh/BPxd
- 6Ifg==
-X-Gm-Message-State: APjAAAU0DQUXKTkCMGeX4J+PonJCLaMm970Z8XYv464HkCDGzNaIS/qV
- j5Ce3IJ/HCLWJNJ6F665Z75w8xpGq2MzrMTX
-X-Google-Smtp-Source: APXvYqxTMU4U1H5iCs37W2DS8luOwMplm9bKZieBhC26gjcwhNIGfXxHS5LqYaaBsl2XKE8H9KzzzA==
-X-Received: by 2002:a5d:650d:: with SMTP id x13mr9741949wru.37.1569767965283; 
- Sun, 29 Sep 2019 07:39:25 -0700 (PDT)
+ bh=bMCb6LOHd+fuDrO7vVmSdWgZerHv61tnmFL2VWlbIrw=;
+ b=tIdBROv0oAhRAGLbZ1yZR9bw7XI2ZIiDj7/HP2LnzbqNexB0Qy3XgvGV5IoYfAkKOr
+ eNMRHwXjMLBmhpeHmt2K1rjmac58RTNmBKE+iIWPw3/FFGziHIwPU/QB4UehhatgdQC8
+ erj1ERLfe0wU0zE08WICf4ZUoj5uZVKrc8nBDH847W9vtskbHszlLSmBJF2brRRiTNkS
+ ISkyOQR961naj2biu/SyFXC2Gcln/Ra4C7QHSPAnNy1WIoAZO0Pg4NvVFCpECFy23ti4
+ ZjkH4be4tnCViYgEW2Ai9sfh3KBKUsUs1jCmbr0w42cY+xHywg3wvx5GMZWxvV88Fc7E
+ +lnw==
+X-Gm-Message-State: APjAAAUtMCya6OqvrNzMIJXEOODcpvnqVp5obF1Dmw+KkDmj3+PKB/gQ
+ J6/9WtC7nakQUMVzw2Y6ZfQ=
+X-Google-Smtp-Source: APXvYqxAKX++CBB2rHIz1gBuc5df7Kpeofg4L2dbDHDc1duUGn6GDwKrdAEfMJQHWGkOrrHJD6Ceyg==
+X-Received: by 2002:a7b:c92d:: with SMTP id h13mr14501729wml.169.1569770844282; 
+ Sun, 29 Sep 2019 08:27:24 -0700 (PDT)
 Received: from ?IPv6:2a01:c22:b04f:b200:7a70:bbc8:8101:45be?
  ([2a01:c22:b04f:b200:7a70:bbc8:8101:45be])
- by smtp.gmail.com with ESMTPSA id 79sm15159984wmb.7.2019.09.29.07.39.24
+ by smtp.gmail.com with ESMTPSA id u83sm25523519wme.0.2019.09.29.08.27.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 29 Sep 2019 07:39:24 -0700 (PDT)
-Message-ID: <c603fa19d006cbd7bdab476a677d7bf5da8b0451.camel@gmail.com>
-Subject: Re: [PATCH 08/14] hw/arm/bcm2836: Make the SoC code modular
+ Sun, 29 Sep 2019 08:27:23 -0700 (PDT)
+Message-ID: <40ddb83824dc19adea584fa8597884e5bdec0d11.camel@gmail.com>
+Subject: Re: [PATCH 10/14] hw/arm/raspi: Define various blocks base addresses
 From: Esteban Bosse <estebanbosse@gmail.com>
 To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter
  Maydell <peter.maydell@linaro.org>, Andrew Baumann
  <Andrew.Baumann@microsoft.com>,  qemu-devel@nongnu.org, Pekka Enberg
  <penberg@iki.fi>,  =?ISO-8859-1?Q?Zolt=E1n?= Baldaszti <bztemail@gmail.com>
-Date: Sun, 29 Sep 2019 16:39:14 +0200
-In-Reply-To: <20190904171315.8354-9-f4bug@amsat.org>
+Date: Sun, 29 Sep 2019 17:27:13 +0200
+In-Reply-To: <ba3fb4d4-0726-28ae-608b-95354107c2e6@amsat.org>
 References: <20190904171315.8354-1-f4bug@amsat.org>
- <20190904171315.8354-9-f4bug@amsat.org>
+ <20190904171315.8354-11-f4bug@amsat.org>
+ <ba3fb4d4-0726-28ae-608b-95354107c2e6@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.30.5-1.1 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,91 +108,146 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-El mié, 04-09-2019 a las 19:13 +0200, Philippe Mathieu-Daudé escribió:
-> This file creates the BCM2836/BCM2837 blocks.
-> The biggest differences with the BCM2838 we are going to add, are
-> the base addresses of the interrupt controller and the peripherals.
-> Add these addresses in the BCM283XInfo structure to make this
-> block more modular. Remove the MCORE_OFFSET offset as it is
-> not useful and rather confusing.
+El vie, 06-09-2019 a las 12:07 +0200, Philippe Mathieu-Daudé escribió:
+> On 9/4/19 7:13 PM, Philippe Mathieu-Daudé wrote:
+> > The Raspberry firmware is closed-source. While running it, it
+> > accesses various I/O registers. Logging these accesses as UNIMP
+> > (unimplemented) help to understand what the firmware is doing
+> > (ideally we want it able to boot a Linux kernel).
+> > 
+> > Document various blocks we might use later.
+> > 
+> > Adresses and names based on:
+> > https://github.com/hermanhermitage/videocoreiv/wiki/MMIO-Register-map
+> > 
+> > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> > ---
+> >  include/hw/arm/raspi_platform.h | 49 +++++++++++++++++++++++++++
+> > ------
+> >  1 file changed, 40 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/include/hw/arm/raspi_platform.h
+> > b/include/hw/arm/raspi_platform.h
+> > index 069edab526..c6f4985522 100644
+> > --- a/include/hw/arm/raspi_platform.h
+> > +++ b/include/hw/arm/raspi_platform.h
+> > @@ -25,42 +25,73 @@
+> >  #ifndef HW_ARM_RASPI_PLATFORM_H
+> >  #define HW_ARM_RASPI_PLATFORM_H
+> >  
+> > -#define MCORE_OFFSET            0x0000   /* Fake frame buffer
+> > device
+> > -                                          * (the multicore sync
+> > block) */
+> > -#define IC0_OFFSET              0x2000
+> > +#define MSYNC_OFFSET            0x0000   /* Multicore Sync Block
+> > */
+> > +#define CCPT_OFFSET             0x1000   /* Compact Camera Port 2
+> > TX */
+> > +#define INTE_OFFSET             0x2000   /* VC Interrupt
+> > controller */
+> >  #define ST_OFFSET               0x3000   /* System Timer */
+> > +#define TXP_OFFSET              0x4000
+> > +#define JPEG_OFFSET             0x5000
+> >  #define MPHI_OFFSET             0x6000   /* Message-based Parallel
+> > Host Intf. */
+> >  #define DMA_OFFSET              0x7000   /* DMA controller,
+> > channels 0-14 */
+> > -#define ARM_OFFSET              0xB000   /* BCM2708 ARM control
+> > block */
+> > +#define ARBA_OFFSET             0x9000
+> > +#define BRDG_OFFSET             0xa000
+> > +#define ARM_OFFSET              0xB000   /* ARM control block */
+> >  #define ARMCTRL_OFFSET          (ARM_OFFSET + 0x000)
+> >  #define ARMCTRL_IC_OFFSET       (ARM_OFFSET + 0x200) /* Interrupt
+> > controller */
+> > -#define ARMCTRL_TIMER0_1_OFFSET (ARM_OFFSET + 0x400) /* Timer 0
+> > and 1 */
+> > +#define ARMCTRL_TIMER0_1_OFFSET (ARM_OFFSET + 0x400) /* Timer 0
+> > and 1 (SP804) */
+> >  #define ARMCTRL_0_SBM_OFFSET    (ARM_OFFSET + 0x800) /* User 0
+> > (ARM) Semaphores
+> >                                                        * Doorbells
+> > & Mailboxes */
+> >  #define PM_OFFSET               0x100000 /* Power Management,
+> > Reset controller
+> >                                            * and Watchdog registers
+> > */
+> >  #define CPRMAN_OFFSET           0x101000 /* Clock Management */
+> > +#define A2W_OFFSET              0x102000
+> >  #define AVS_OFFSET              0x103000 /* Audio Video Standard
+> > */
+> >  #define RNG_OFFSET              0x104000
+> >  #define GPIO_OFFSET             0x200000
+> > -#define UART0_OFFSET            0x201000
+> > -#define MMCI0_OFFSET            0x202000
+> > -#define I2S_OFFSET              0x203000
+> > -#define SPI0_OFFSET             0x204000
+> > +#define UART0_OFFSET            0x201000 /* PL011 */
+> > +#define MMCI0_OFFSET            0x202000 /* Legacy MMC */
+> > +#define I2S_OFFSET              0x203000 /* PCM */
+> > +#define SPI0_OFFSET             0x204000 /* SPI master */
+> >  #define BSC0_OFFSET             0x205000 /* BSC0 I2C/TWI */
+> > +#define PIXV0_OFFSET            0x206000
+> > +#define PIXV1_OFFSET            0x207000
+> > +#define DPI_OFFSET              0x208000
+> > +#define DSI0_OFFSET             0x209000 /* Display Serial
+> > Interface */
+> > +#define PWM_OFFSET              0x20c000
+> > +#define PERM_OFFSET             0x20d000
+> > +#define TEC_OFFSET              0x20e000
+> >  #define OTP_OFFSET              0x20f000
+> > +#define SLIM_OFFSET             0x100000 /* SLIMbus */
+> > +#define CPG_OFFSET              0x110000
+> >  #define AVSP_OFFSET             0x130000
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/arm/bcm2836.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+> These should be:
 > 
-> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-> index 493a913f89..019e67b906 100644
-> --- a/hw/arm/bcm2836.c
-> +++ b/hw/arm/bcm2836.c
-> @@ -16,15 +16,11 @@
->  #include "hw/arm/raspi_platform.h"
->  #include "hw/sysbus.h"
->  
-> -/* Peripheral base address seen by the CPU */
-> -#define BCM2836_PERI_BASE       0x3F000000
-> -
-> -/* "QA7" (Pi2) interrupt controller and mailboxes etc. */
-> -#define BCM2836_CONTROL_BASE    0x40000000
-> -
->  struct BCM283XInfo {
->      const char *name;
->      const char *cpu_type;
-> +    hwaddr peri_base; /* Peripheral base address seen by the CPU */
-> +    hwaddr ctrl_base; /* Interrupt controller and mailboxes etc. */
->      int clusterid;
->  };
->  
-> @@ -32,12 +28,16 @@ static const BCM283XInfo bcm283x_socs[] = {
->      {
->          .name = TYPE_BCM2836,
->          .cpu_type = ARM_CPU_TYPE_NAME("cortex-a7"),
-> +        .peri_base = 0x3f000000,
-> +        .ctrl_base = 0x40000000,
->          .clusterid = 0xf,
->      },
->  #ifdef TARGET_AARCH64
->      {
->          .name = TYPE_BCM2837,
->          .cpu_type = ARM_CPU_TYPE_NAME("cortex-a53"),
-> +        .peri_base = 0x3f000000,
-> +        .ctrl_base = 0x40000000,
->          .clusterid = 0x0,
->      },
->  #endif
-> @@ -104,7 +104,7 @@ static void bcm2836_realize(DeviceState *dev,
-> Error **errp)
->      }
->  
->      sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
-> -                            BCM2836_PERI_BASE, 1);
-> +                            info->peri_base, 1);
->  
->      /* bcm2836 interrupt controller (and mailboxes, etc.) */
->      object_property_set_bool(OBJECT(&s->control), true, "realized",
-> &err);
-> @@ -113,7 +113,7 @@ static void bcm2836_realize(DeviceState *dev,
-> Error **errp)
->          return;
->      }
->  
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0,
-> BCM2836_CONTROL_BASE);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, info-
-> >ctrl_base);
->  
->      sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
->          qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-irq", 0));
-> @@ -126,7 +126,7 @@ static void bcm2836_realize(DeviceState *dev,
-> Error **errp)
->  
->          /* set periphbase/CBAR value for CPU-local registers */
->          object_property_set_int(OBJECT(&s->cpus[n]),
-> -                                BCM2836_PERI_BASE + MCORE_OFFSET,
-> +                                info->peri_base,
->                                  "reset-cbar", &err);
->          if (err) {
->              error_propagate(errp, err);
-Reviewed-by: Esteban Bosse <estebanbosse@gmail.com>
+> #define SLIM_OFFSET             0x210000 /* SLIMbus */
+> #define CPG_OFFSET              0x211000
+> #define AVSP_OFFSET             0x213000
+> 
+> >  #define BSC_SL_OFFSET           0x214000 /* SPI slave */
+Looking in 
+https://github.com/hermanhermitage/videocoreiv/wiki/MMIO-Register-map I
+found that 0x214000 is the "bootrom" register, why the difference?
+
+> > +#define THERMAL_OFFSET          0x212000
+> >  #define AUX_OFFSET              0x215000 /* AUX: UART1/SPI1/SPI2
+> > */
+> >  #define EMMC1_OFFSET            0x300000
+> > +#define EMMC2_OFFSET            0x340000
+> > +#define HVS_OFFSET              0x400000
+In github describe 7E400000 as ddrv register, ddrv is the same as HVS?
+> >  #define SMI_OFFSET              0x600000
+> > +#define DSI1_OFFSET             0x700000
+> > +#define UCAM_OFFSET             0x800000
+> > +#define CMI_OFFSET              0x802000
+> >  #define BSC1_OFFSET             0x804000 /* BSC1 I2C/TWI */
+> >  #define BSC2_OFFSET             0x805000 /* BSC2 I2C/TWI */
+> > +#define VECA_OFFSET             0x806000
+> > +#define PIXV2_OFFSET            0x807000
+> > +#define HDMI_OFFSET             0x808000
+> > +#define HDCP_OFFSET             0x809000
+> > +#define ARBR0_OFFSET            0x80a000
+> >  #define DBUS_OFFSET             0x900000
+> >  #define AVE0_OFFSET             0x910000
+> >  #define USB_OTG_OFFSET          0x980000 /* DTC_OTG USB controller
+> > */
+> > +#define V3D_OFFSET              0xc00000
+> >  #define SDRAMC_OFFSET           0xe00000
+> > +#define L2CC_OFFSET             0xe01000 /* Level 2 Cache
+> > controller */
+> > +#define L1CC_OFFSET             0xe02000 /* Level 1 Cache
+> > controller */
+> > +#define ARBR1_OFFSET            0xe04000
+> >  #define DMA15_OFFSET            0xE05000 /* DMA controller,
+> > channel 15 */
+> > +#define DCRC_OFFSET             0xe07000
+> > +#define AXIP_OFFSET             0xe08000
+> >  
+> >  /* GPU interrupts */
+> >  #define INTERRUPT_TIMER0               0
+> > 
 
 
