@@ -2,99 +2,62 @@ Return-Path: <SRS0=3J8r=XY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98657C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 18:14:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8838AC4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 18:14:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FC1C20815
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 18:14:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Brw5BfrU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FC1C20815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 642FD20815
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 18:14:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642FD20815
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEdhv-0003r4-CZ
-	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 14:14:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37940)
+	id 1iEdiN-0004Tb-Ju
+	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 14:14:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37969)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iEdgg-00037C-Ou
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:12:51 -0400
+ (envelope-from <samuel.thibault@ens-lyon.org>) id 1iEdhC-0003XK-Rr
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:13:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iEdgf-0000He-D8
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:12:50 -0400
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:36175)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iEdgf-0000CV-3a
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:12:49 -0400
-Received: by mail-wr1-x433.google.com with SMTP id y19so8518304wrd.3
- for <qemu-devel@nongnu.org>; Sun, 29 Sep 2019 11:12:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=X/aRNGmEubqqqJ2Obnnv7ec/BJj0Pg670lU/1ceOKRI=;
- b=Brw5BfrUt7btO8H2AuXsZJQMnybyW9FqND01f/LTxYMctbfxScpmSBWARQaV18jFXQ
- 4tDdNtfYtPLhxLxW6agrDr6iN6b2ctaZRinRqvFTQs55104e2w9f+oIglaqzjARb13D9
- 1mRC0I4H5aDypRHdWR2vdlKHl6Cslkpz/dZXXtIy7JEVrehKMzYl1zKuJOAi5TuzSukj
- clZKpHKYnS40oNjhB4WlhiOl4XTR8c2bzFhp8Wi9yUE17TEIqqFMrLcy8rC7CF+oGF+v
- hHrWEBCE2YIXqvXo6Wfr5ZS+bTG94n/ToBCUhM4GKz1da4+70h5jgc4TyckcFHR3yb0B
- 2kyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=X/aRNGmEubqqqJ2Obnnv7ec/BJj0Pg670lU/1ceOKRI=;
- b=sxKh4hjoBd1xOC66dc99fIkaFKwMNY8jzO6jRIIo47KUwXf1lsLmEkVKbvwy9UofZU
- O7UlAuDKZZu3nfh7q6PsxI0jQjbwcmXAt8PDJMs+krimq+WaVSdM+825xMcLIgzbYpNa
- EbRRdjdMiDM651HLCaDH7t7wvsJ+AfluilE4dpMwLGHrBd9H1buC+P38q747+4fV+WKT
- EkaR/f0LuIGRkl6qY0EuWUBTNZWxeKsuRON3Ym9942pEknm369iHlW8X66yVSWzlDu7c
- MO/rCo6oIQph4lbQYGpYMeSS4UUd5AJ+R/V5kz/g/ow87b2MOiMksjcEr2iYsygyzVEa
- jQ6A==
-X-Gm-Message-State: APjAAAXUP0kK+cZhDjcAOAc1hrHhkBv1Q7fpeRP6ZzVnKJiwGAX84GFb
- Lp7MAs5oBv0eVWYCzOj3SpHjgCKo
-X-Google-Smtp-Source: APXvYqxjYhfXdtWLrqP/GJOD7KzckoGoCRB/vejdTnyPCuZU8W5BKdau+5jgFAZ94Fl9HoLpaQZjrw==
-X-Received: by 2002:a5d:4fcf:: with SMTP id h15mr8139975wrw.237.1569780766168; 
- Sun, 29 Sep 2019 11:12:46 -0700 (PDT)
-Received: from ?IPv6:fd00:835b:d940:d4fc::5?
- (2a01-036c-0113-e8f4-0000-0000-0000-0005.pool6.digikabel.hu.
- [2a01:36c:113:e8f4::5])
- by smtp.googlemail.com with ESMTPSA id f66sm13280058wmg.2.2019.09.29.11.12.45
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 29 Sep 2019 11:12:45 -0700 (PDT)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
- <DirtY.iCE.hu@gmail.com>
-Subject: Re: [PATCH v4 21/24] paaudio: channel-map option
-To: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
- <8f650662fd6cc50baaede260581aeb560eed44fb.1568927990.git.DirtY.iCE.hu@gmail.com>
- <87o8zbma1m.fsf@dusky.pond.sub.org>
- <55ea6ac9-9651-e322-fd84-22b4bedb3a93@gmail.com>
- <87impgy3hw.fsf@dusky.pond.sub.org>
- <20190925141331.kjxraaw3ijzkbiq4@sirius.home.kraxel.org>
-Message-ID: <a32c555d-9315-7c3d-e7be-d196ad3dd0b1@gmail.com>
-Date: Sun, 29 Sep 2019 20:13:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <samuel.thibault@ens-lyon.org>) id 1iEdhB-00014M-B1
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:13:22 -0400
+Received: from hera.aquilenet.fr ([185.233.100.1]:35522)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+ id 1iEdhB-00012O-4N
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:13:21 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by hera.aquilenet.fr (Postfix) with ESMTP id 510EFA7AB0;
+ Sun, 29 Sep 2019 20:13:12 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at aquilenet.fr
+Received: from hera.aquilenet.fr ([127.0.0.1])
+ by localhost (hera.aquilenet.fr [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id jjT148heVnmF; Sun, 29 Sep 2019 20:13:11 +0200 (CEST)
+Received: from function (unknown [109.190.253.14])
+ by hera.aquilenet.fr (Postfix) with ESMTPSA id 713A3A7AD0;
+ Sun, 29 Sep 2019 20:13:10 +0200 (CEST)
+Received: from samy by function with local (Exim 4.92.2)
+ (envelope-from <samuel.thibault@ens-lyon.org>)
+ id 1iEdgy-0005Ci-K1; Sun, 29 Sep 2019 20:13:08 +0200
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: qemu-devel@nongnu.org,
+	jasowang@redhat.com
+Subject: [PATCH] slirp: Allow non-local DNS address when restrict is off
+Date: Sun, 29 Sep 2019 20:13:03 +0200
+Message-Id: <20190929181303.19960-1-samuel.thibault@ens-lyon.org>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <20190925141331.kjxraaw3ijzkbiq4@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::433
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 185.233.100.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,40 +69,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-09-25 16:13, Gerd Hoffmann wrote:
->    Hi,
-> 
->>> Oh now that I looked again at the pulseaudio docs, channel-map doesn't
->>> have to be a list, it can be also a "well-known mapping name".
->>
->> Unambiguous because the well-known mapping names are not valid channel
->> position list members.
-> 
-> Do we have well-known mapping names for the common use cases?
-> So maybe just support these?
-> 
-> cheers,
->    Gerd
-> 
+This can be used to set a DNS server to be used by the guest which is
+different from the one configured on the host.
 
-It's surprisingly hard to figure out what are these "well-known names", 
-I could only find them in the source:
-https://github.com/michaelwu/pulseaudio/blob/16e3dccfa88455ebd329de27a98a3d979a8bdc8e/src/pulse/channelmap.c#L538
+This fixes LP 1010484.
 
-It doesn't provide much over the "auto detect channel maps from the 
-number of channels" pulseaudio already has (the only ambiguous case is 
-surround-41 vs surround-50).  IIRC I originally added this feature 
-because USB audio and pulseaudio didn't agree about the order of 
-channels, for example in 5.1 pa defaults to 
-left,right,rear-left,rear-right,front-center,lfe while USB audio expects 
-left,right,center,lfe,rear-left,rear-right order. You can't specify this 
-with the well-known names.
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ net/slirp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards,
-Zoltan
+diff --git a/net/slirp.c b/net/slirp.c
+index f42f496641..4d158b0542 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -456,7 +456,7 @@ static int net_slirp_init(NetClientState *peer, const=
+ char *model,
+         error_setg(errp, "Failed to parse DNS");
+         return -1;
+     }
+-    if ((dns.s_addr & mask.s_addr) !=3D net.s_addr) {
++    if (restricted && (dns.s_addr & mask.s_addr) !=3D net.s_addr) {
+         error_setg(errp, "DNS doesn't belong to network");
+         return -1;
+     }
+--=20
+2.23.0
+
 
