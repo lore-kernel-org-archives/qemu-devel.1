@@ -2,86 +2,73 @@ Return-Path: <SRS0=3J8r=XY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4FD2C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 02:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C1EC4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 04:06:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A08D52082F
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 02:20:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A08D52082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BC2C4206BB
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 04:06:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="NjXr29e/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC2C4206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEOom-0002hi-LH
-	for qemu-devel@archiver.kernel.org; Sat, 28 Sep 2019 22:20:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58008)
+	id 1iEQTL-00037I-Uk
+	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 00:06:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iEOnx-0002Ex-Dt
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 22:19:22 -0400
+ (envelope-from <zhlb29@foxmail.com>) id 1iEQRm-00024W-DU
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 00:04:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iEOnu-0007Bd-RE
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 22:19:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52938)
+ (envelope-from <zhlb29@foxmail.com>) id 1iEQRe-0002L8-GS
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 00:04:28 -0400
+Received: from smtpbgeu1.qq.com ([52.59.177.22]:36660)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iEOnu-0007BR-Iy
- for qemu-devel@nongnu.org; Sat, 28 Sep 2019 22:19:18 -0400
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A54928763B
- for <qemu-devel@nongnu.org>; Sun, 29 Sep 2019 02:19:17 +0000 (UTC)
-Received: by mail-pg1-f200.google.com with SMTP id f10so5517801pgj.0
- for <qemu-devel@nongnu.org>; Sat, 28 Sep 2019 19:19:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=9TwgxL2tTxJWjrfcOfBUHXU+g8w+MicGlBJLbshdi2E=;
- b=SCV1KEFu1Pvc4bH9iy8ZFnW5ekjzhCnsX7RxbMxk44VuZ4kbTRsndBT0jtDSKa07y0
- DFCh6ic5lzdsWNoJj7iImKqJLFw1Hzma7CM/aT6HhBK5n6yfQpQf7qGkaWAOGJHDrwUX
- Kyv/iN03xTvY+OCrEjsEwC0g8ZjM/A56DR4lwOiPkoTuxyd2jeUIpky+xkGL8z0cG+yP
- mo/RHdBS9fuOjPdiniBhGDbT2w1cbNgz0RzZvosbszIFJeaDNdjFSAoMTfkbXXVRF0Lb
- v+KjdnmCPA9sFsKxuXF934rzGWfeSU63AYMw7jOOEQeAfXDahU6/1R8yvlSYO6cTq/L3
- 4fxQ==
-X-Gm-Message-State: APjAAAWCY4gEAADLzR+wZP7hsMlBiulENQkgTD969mGeolExB2BdxpaR
- CGt3QZhhHOIUjnXuYlJ091iEOmN++wZvwIQRNmdmHOevjM7kw0bFftUY9WKTUt8OE5JYFIBRzTs
- fc535sWOrHHU3kGU=
-X-Received: by 2002:a63:1912:: with SMTP id z18mr7648390pgl.390.1569723557011; 
- Sat, 28 Sep 2019 19:19:17 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzc8a4/KwQAKYezof5kSijmYpBuHXe+3reXLI9i3wiRNu6OnjfwT4OQdx23VxICJWfH4BZDLA==
-X-Received: by 2002:a63:1912:: with SMTP id z18mr7648368pgl.390.1569723556619; 
- Sat, 28 Sep 2019 19:19:16 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id o9sm8557053pfp.67.2019.09.28.19.19.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 28 Sep 2019 19:19:15 -0700 (PDT)
-Date: Sun, 29 Sep 2019 10:19:06 +0800
-From: Peter Xu <peterx@redhat.com>
-To: "Zhang, Qi1" <qi1.zhang@intel.com>
-Subject: Re: [PATCH V2] intel_iommu: TM field should not be in reserved bits
-Message-ID: <20190929021905.GB8286@xz-x1>
-References: <20190927045838.2968-1-qi1.zhang@intel.com>
- <20190927061011.GB9412@xz-x1>
- <215440059103624D9AD9D1DCACBF45DD3E84E270@shsmsx102.ccr.corp.intel.com>
- <20190927093223.GC9412@xz-x1>
- <215440059103624D9AD9D1DCACBF45DD3E853A42@shsmsx102.ccr.corp.intel.com>
- <20190929020220.GA8286@xz-x1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190929020220.GA8286@xz-x1>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+ (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1iEQRd-0002Gx-E7
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 00:04:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+ s=s201512; t=1569729851;
+ bh=t6B4yjDIptDZYWZ3YLUKAQC1J5/7xcRrf8WEw4ZRG/E=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=NjXr29e/itJiZ6StMOxz9rUjupj5ZYRcNedz3bsA0f9VB3I4ozQ6RQ/jjnugZQ628
+ 5kKJVYpI/ET0GDqU4yaS9t5++61uqwT04wNRiJHXjqWTM2yn6+2wMNdlO3N3Wl5s1o
+ fWmcUlG9bByJfafWkXrHbxyJHXaKEqqMuP/+ZstY=
+X-QQ-SSF: 00000000000000F000000000000000G
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 159.226.200.178
+X-QQ-STYLE: 
+X-QQ-mid: webenglish1t1569729849t832211
+From: "=?ISO-8859-1?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
+To: "=?ISO-8859-1?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
+Subject: Why on earth is this code giving me Segfaults?
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+Date: Sun, 29 Sep 2019 12:04:09 +0800
+X-Priority: 3
+Message-ID: <tencent_76DBE21F6D585D0B6F510084@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Sun, 29 Sep 2019 12:04:10 +0800 (CST)
+Feedback-ID: webenglish:foxmail.com:bgforeign:bgforeign2
+X-QQ-Bgrelay: 1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 52.59.177.22
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,105 +80,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Qi,
- Yadong" <yadong.qi@intel.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Sep 29, 2019 at 10:02:20AM +0800, Peter Xu wrote:
-> On Sun, Sep 29, 2019 at 01:11:12AM +0000, Zhang, Qi1 wrote:
-> > 
-> > 
-> > > -----Original Message-----
-> > > From: Peter Xu <peterx@redhat.com>
-> > > Sent: Friday, September 27, 2019 5:32 PM
-> > > To: Zhang, Qi1 <qi1.zhang@intel.com>
-> > > Cc: qemu-devel@nongnu.org; ehabkost@redhat.com; mst@redhat.com;
-> > > pbonzini@redhat.com; rth@twiddle.net; Qi, Yadong <yadong.qi@intel.com>
-> > > Subject: Re: [PATCH V2] intel_iommu: TM field should not be in reserved bits
-> > > 
-> > > On Fri, Sep 27, 2019 at 08:03:21AM +0000, Zhang, Qi1 wrote:
-> > > >
-> > > >
-> > > > > -----Original Message-----
-> > > > > From: Peter Xu <peterx@redhat.com>
-> > > > > Sent: Friday, September 27, 2019 2:10 PM
-> > > > > To: Zhang, Qi1 <qi1.zhang@intel.com>
-> > > > > Cc: qemu-devel@nongnu.org; ehabkost@redhat.com; mst@redhat.com;
-> > > > > pbonzini@redhat.com; rth@twiddle.net
-> > > > > Subject: Re: [PATCH V2] intel_iommu: TM field should not be in
-> > > > > reserved bits
-> > > > >
-> > > > > On Fri, Sep 27, 2019 at 12:58:38PM +0800, qi1.zhang@intel.com wrote:
-> > > > > > From: "Zhang, Qi" <qi1.zhang@intel.com>
-> > > > > >
-> > > > > > When dt is supported, TM field should not be Reserved(0).
-> > > > > >
-> > > > > > Refer to VT-d Spec 9.8
-> > > > > >
-> > > > > > Signed-off-by: Zhang, Qi <qi1.zhang@intel.com>
-> > > > > > Signed-off-by: Qi, Yadong <yadong.qi@intel.com>
-> > > > > > ---
-> > > > > >  hw/i386/intel_iommu.c          | 12 ++++++------
-> > > > > >  hw/i386/intel_iommu_internal.h | 25 +++++++++++++++++++------
-> > > > > >  2 files changed, 25 insertions(+), 12 deletions(-)
-> > > > > > ---
-> > > VTD_SPTE_PAGE_L2_RSVD_MASK(s-
-> > > > > >aw_bits);
-> > > > > > -    vtd_paging_entry_rsvd_field[3] =
-> > > > > >aw_bits);
-> > > > > > +    vtd_paging_entry_rsvd_field[5] =
-> > > > > VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits, x86_iommu-
-> > > > > >dt_supported);
-> > > > > > +    vtd_paging_entry_rsvd_field[6] =
-> > > > > VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits, x86_iommu-
-> > > > > >dt_supported);
-> > > > > > +    vtd_paging_entry_rsvd_field[7] =
-> > > > > > + VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits, x86_iommu-
-> > > > > >dt_supported);
-> > > > > >      vtd_paging_entry_rsvd_field[8] =
-> > > > > >VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
-> > > > >
-> > > > > Should this TM bit only affects leaves?  Say, entry 1 (4K), 5 (2M), 6 (1G).
-> 
-> [1]
-> 
-> > > > > While this reminded me that I'm totally confused on why we have had
-> > > > > entry 7, 8 after all...  Are they really used?
-> > > > Yes. TM bit only affects. To this array, index 1, 5,6,7 may be leaf. Will update
-> > > a new patchset for it.
-> > > 
-> > > Could I ask why index 7 may be leaf?
-> > Index 7 is PDPE 1G GB leaf.
-> 
-> I thought 1G was index 6.  I've listed my understanding above [1].
-> Would you please double confirm?  Thanks,
+SGkgQWxsLAoKSSBoYXZlIGEgY3VzdG9tIElTQSB0aGF0J3MgYmFzZWQgb24gTUlQUy4gVGhl
+IExXIGFuZCBTVyBpbnN0cnVjdGlvbnMnIG9wY29kZXMgYXJlIGNoYW5nZWQgaW50byAweDE3
+KE9QQ19CR1RaTCkgYW5kIDB4MUYoT1BDX1NQRUNJQUwzKS4KCkkgaGF2ZSBtYWRlIHRoZSBm
+b2xsb3dpbmcgY2hhbmdlcyBpbiB0YXJnZXQvbWlwcy90cmFuc2xhdGUuYzoKCkBAIC0yOTMz
+MSw3ICsyOTMzMSwxMSBAQCBzdGF0aWMgdm9pZCBkZWNvZGVfb3BjKENQVU1JUFNTdGF0ZSAq
+ZW52LCBEaXNhc0NvbnRleHQgKmN0eCkKICAgICAgICAgICAgIGRlY29kZV9vcGNfc3BlY2lh
+bDMoZW52LCBjdHgpOwogICAgICAgICB9CiAjZWxzZQotICAgICAgICBkZWNvZGVfb3BjX3Nw
+ZWNpYWwzKGVudiwgY3R4KTsKKyAgICAgICAgaWYgKGN0eC0+aW5zbl9mbGFncyAmIElOU05f
+TVlJU0EpIHsKKyAgICAgICAgICAgIGdlbl9zdChjdHgsIE9QQ19TVywgcnQsIHJzLCBpbW0p
+OyAvKiBPUENfTVlJU0FfU1cgKi8KKyAgICAgICAgfSBlbHNlIHsKKyAgICAgICAgICAgIGRl
+Y29kZV9vcGNfc3BlY2lhbDMoZW52LCBjdHgpOworICAgICAgICB9CiAjZW5kaWYKICAgICAg
+ICAgYnJlYWs7CiAgICAgY2FzZSBPUENfUkVHSU1NOgpAQCAtMjk1ODksNiArMjk2MDMsOCBA
+QCBzdGF0aWMgdm9pZCBkZWNvZGVfb3BjKENQVU1JUFNTdGF0ZSAqZW52LCBEaXNhc0NvbnRl
+eHQgKmN0eCkKICAgICAgICAgICAgIH0KICAgICAgICAgICAgIC8qIE9QQ19CR1RaQywgT1BD
+X0JMVFpDLCBPUENfQkxUQyAqLwogICAgICAgICAgICAgZ2VuX2NvbXB1dGVfY29tcGFjdF9i
+cmFuY2goY3R4LCBvcCwgcnMsIHJ0LCBpbW0gPDwgMik7CisgICAgICAgIH0gZWxzZSBpZiAo
+Y3R4LT5pbnNuX2ZsYWdzICYgSU5TTl9NWUlTQSkgeworICAgICAgICAgICAgZ2VuX2xkKGN0
+eCwgT1BDX0xXLCBydCwgcnMsIGltbSk7IC8qIE9QQ19NWUlTQV9MVyAqLwogICAgICAgICB9
+IGVsc2UgewogICAgICAgICAgICAgLyogT1BDX0JHVFpMICovCiAgICAgICAgICAgICBnZW5f
+Y29tcHV0ZV9icmFuY2goY3R4LCBvcCwgNCwgcnMsIHJ0LCBpbW0gPDwgMiwgNCk7CgpJIHVz
+ZWQgZ2Ric3R1YiB0byBzaW5nbGVzdGVwIG15IHByb2dyYW0sIGFuZCBJIGZvdW5kIHRoYXQg
+bXkgc3cgaW5zdHJ1Y3Rpb24gaXMgd29ya2luZyBmaW5lLCBidXQgbHcgZ2l2ZXMgbWUgYSBz
+ZWdmYXVsdC4gSSBoYXZlIGJlZW4gc3R1Y2sgb24gdGhpcyBmb3IgYSBsb25nIHdoaWxlLCBz
+aW5jZSBpdCBsb29rcyBsaWtlIEkgb25seSBuZWVkIHRvIGFkZCB0aGF0IG9uZSBsaW5lIG9m
+IGdlbl9sZCBmdW5jdGlvbi4gSSBhbHNvIHRyaWVkIGRlYnVnZ2luZyBRRU1VIHd0aWggZ2Ri
+LCBidXQgdGhlIHNlZ2ZhdWx0IHdhc24ndCB0aHJvd24gaW1tZWRpYXRlbHkgYWZ0ZXIgbHcg
+aW5zdHJ1Y3Rpb24gbGlrZSBnZGJzdHViIGRvZXMuCgpEb2VzIGFueW9uZSBoYXZlIGFueSBh
+ZHZpY2U/CgpUaGFua3MsCkxpYm8gWmhvdQ==
 
-Oh wait, You are right...  Index 6 should be for 1G because index 5
-seems to be unused as well.  However then again we should drop 5
-instead of 7?
 
-I think we can do this in two patches:
 
-Patch 1 to clean these up by only let vtd_paging_rsvd (we can rename
-it to shorter one like this if going to touch it) to keep reserved
-bits for non-huge pages.  Then we define a new struct
-(e.g. vtd_paging_rsvd_huge) to only keep the huge page entries.  The
-thing is that I see no point in keeping huge && non-huge in a single
-array (and I believe that's why it caused confusion so far...). That
-new one should be a size of 2 array.  Meanwhile we need to fix
-vtd_slpte_nonzero_rsvd() too using the new arrays.
-
-Then in patch 2 we do the DT bit change.
-
-Does that look ok?
-
-Thanks,
-
--- 
-Peter Xu
 
