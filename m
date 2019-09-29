@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C0AC4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C7BAC4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:44:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B97220673
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:42:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B97220673
+	by mail.kernel.org (Postfix) with ESMTPS id E4BBC20673
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:44:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4BBC20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEcHe-0000z2-6i
-	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 12:42:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54908)
+	id 1iEcJR-0002cV-6m
+	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 12:44:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55366)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iEc7b-0000N8-IJ
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:32:32 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1iEc9F-0001gv-JK
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:34:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iEc7a-0002cF-A4
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:32:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60340)
+ (envelope-from <mlevitsk@redhat.com>) id 1iEc9E-0005T8-0X
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:34:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51452)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iEc7U-0002RA-Fz; Sun, 29 Sep 2019 12:32:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1iEc9B-0005NE-Ba; Sun, 29 Sep 2019 12:34:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AD5D918C4262;
- Sun, 29 Sep 2019 16:32:23 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 69AA481F10;
+ Sun, 29 Sep 2019 16:34:07 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 71EB95C223;
- Sun, 29 Sep 2019 16:32:22 +0000 (UTC)
-Message-ID: <b55869998d7f35096615cf5f011b7104ee36940b.camel@redhat.com>
-Subject: Re: [PATCH 04/18] iotests: Let _make_test_img parse its parameters
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2DD2E60C05;
+ Sun, 29 Sep 2019 16:34:05 +0000 (UTC)
+Message-ID: <d49e9c30a858d1c9f1d340c38cbfc6bfb4827f05.camel@redhat.com>
+Subject: Re: [PATCH 13/18] iotests: Make 091 work with data_file
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Sun, 29 Sep 2019 19:32:21 +0300
-In-Reply-To: <20190927094242.11152-5-mreitz@redhat.com>
+Date: Sun, 29 Sep 2019 19:34:05 +0300
+In-Reply-To: <20190927094242.11152-14-mreitz@redhat.com>
 References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-5-mreitz@redhat.com>
+ <20190927094242.11152-14-mreitz@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Sun, 29 Sep 2019 16:32:23 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Sun, 29 Sep 2019 16:34:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -75,79 +75,46 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
-> This will allow us to add more options than just -b.
+> The image end offset as reported by qemu-img check is different when
+> using an external data file; we do not care about its value here, so we
+> can just filter it.
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/common.rc | 28 ++++++++++++++++++++--------
->  1 file changed, 20 insertions(+), 8 deletions(-)
+>  tests/qemu-iotests/091     | 3 ++-
+>  tests/qemu-iotests/091.out | 1 -
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-> index 12b4751848..3e7adc4834 100644
-> --- a/tests/qemu-iotests/common.rc
-> +++ b/tests/qemu-iotests/common.rc
-> @@ -282,12 +282,12 @@ _make_test_img()
->      # extra qemu-img options can be added by tests
->      # at least one argument (the image size) needs to be added
->      local extra_img_options=""
-> -    local image_size=$*
->      local optstr=""
->      local img_name=""
->      local use_backing=0
->      local backing_file=""
->      local object_options=""
-> +    local misc_params=()
+> diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
+> index f4b44659ae..7536ca4607 100755
+> --- a/tests/qemu-iotests/091
+> +++ b/tests/qemu-iotests/091
+> @@ -101,7 +101,8 @@ echo "Check image pattern"
+>  ${QEMU_IO} -c "read -P 0x22 0 4M" "${TEST_IMG}" | _filter_testdir | _filter_qemu_io
 >  
->      if [ -n "$TEST_IMG_FILE" ]; then
->          img_name=$TEST_IMG_FILE
-> @@ -303,11 +303,23 @@ _make_test_img()
->          optstr=$(_optstr_add "$optstr" "key-secret=keysec0")
->      fi
->  
-> -    if [ "$1" = "-b" ]; then
-> -        use_backing=1
-> -        backing_file=$2
-> -        image_size=$3
-> -    fi
-> +    for param; do
-> +        if [ "$use_backing" = "1" -a -z "$backing_file" ]; then
-> +            backing_file=$param
-> +            continue
-> +        fi
-> +
-> +        case "$param" in
-> +            -b)
-> +                use_backing=1
-> +                ;;
-> +
-> +            *)
-> +                misc_params=("${misc_params[@]}" "$param")
-> +                ;;
-> +        esac
-> +    done
-> +
->      if [ \( "$IMGFMT" = "qcow2" -o "$IMGFMT" = "qed" \) -a -n "$CLUSTER_SIZE" ]; then
->          optstr=$(_optstr_add "$optstr" "cluster_size=$CLUSTER_SIZE")
->      fi
-> @@ -323,9 +335,9 @@ _make_test_img()
->      # XXX(hch): have global image options?
->      (
->       if [ $use_backing = 1 ]; then
-> -        $QEMU_IMG create $object_options -f $IMGFMT $extra_img_options -b "$backing_file" "$img_name" $image_size 2>&1
-> +        $QEMU_IMG create $object_options -f $IMGFMT $extra_img_options -b "$backing_file" "$img_name" "${misc_params[@]}" 2>&1
->       else
-> -        $QEMU_IMG create $object_options -f $IMGFMT $extra_img_options "$img_name" $image_size 2>&1
-> +        $QEMU_IMG create $object_options -f $IMGFMT $extra_img_options "$img_name" "${misc_params[@]}" 2>&1
->       fi
->      ) | _filter_img_create
->  
+>  echo "Running 'qemu-img check -r all \$TEST_IMG'"
+> -"${QEMU_IMG}" check -r all "${TEST_IMG}" 2>&1 | _filter_testdir | _filter_qemu
+> +"${QEMU_IMG}" check -r all "${TEST_IMG}" 2>&1 | _filter_testdir | _filter_qemu \
+> +    | sed '/Image end offset/d'
 
-Look all right as far as I understand that code, and this is a very welcome change.
+Maybe use _filter_qemu_img_check instead? I see it actually filters this already.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+>  
+>  echo "*** done"
+>  rm -f $seq.full
+> diff --git a/tests/qemu-iotests/091.out b/tests/qemu-iotests/091.out
+> index 5017f8c2d9..343fac69e0 100644
+> --- a/tests/qemu-iotests/091.out
+> +++ b/tests/qemu-iotests/091.out
+> @@ -24,5 +24,4 @@ read 4194304/4194304 bytes at offset 0
+>  Running 'qemu-img check -r all $TEST_IMG'
+>  No errors were found on the image.
+>  80/16384 = 0.49% allocated, 0.00% fragmented, 0.00% compressed clusters
+> -Image end offset: 5570560
+>  *** done
 
 Best regards,
 	Maxim Levitsky
-
 
 
