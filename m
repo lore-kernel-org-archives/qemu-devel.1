@@ -2,62 +2,99 @@ Return-Path: <SRS0=3J8r=XY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF95EC4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98657C4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 18:14:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A40282081B
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 16:56:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40282081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5FC1C20815
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Sep 2019 18:14:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Brw5BfrU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FC1C20815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEcUf-0003Y5-PN
-	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 12:56:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56019)
+	id 1iEdhv-0003r4-CZ
+	for qemu-devel@archiver.kernel.org; Sun, 29 Sep 2019 14:14:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37940)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iEcDs-0006Uo-Bw
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:39:01 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iEdgg-00037C-Ou
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:12:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iEcDr-00039m-2o
- for qemu-devel@nongnu.org; Sun, 29 Sep 2019 12:39:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39112)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iEcDo-00034S-L0; Sun, 29 Sep 2019 12:38:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D8A721DB6;
- Sun, 29 Sep 2019 16:38:55 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9D6E960606;
- Sun, 29 Sep 2019 16:38:54 +0000 (UTC)
-Message-ID: <b43d4d8f8c3b426d5d57dfc4c468c3aa8bfacf71.camel@redhat.com>
-Subject: Re: [PATCH 16/18] iotests: Make 198 work with data_file
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Sun, 29 Sep 2019 19:38:53 +0300
-In-Reply-To: <20190927094242.11152-17-mreitz@redhat.com>
-References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-17-mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iEdgf-0000He-D8
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:12:50 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:36175)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
+ id 1iEdgf-0000CV-3a
+ for qemu-devel@nongnu.org; Sun, 29 Sep 2019 14:12:49 -0400
+Received: by mail-wr1-x433.google.com with SMTP id y19so8518304wrd.3
+ for <qemu-devel@nongnu.org>; Sun, 29 Sep 2019 11:12:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:subject:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=X/aRNGmEubqqqJ2Obnnv7ec/BJj0Pg670lU/1ceOKRI=;
+ b=Brw5BfrUt7btO8H2AuXsZJQMnybyW9FqND01f/LTxYMctbfxScpmSBWARQaV18jFXQ
+ 4tDdNtfYtPLhxLxW6agrDr6iN6b2ctaZRinRqvFTQs55104e2w9f+oIglaqzjARb13D9
+ 1mRC0I4H5aDypRHdWR2vdlKHl6Cslkpz/dZXXtIy7JEVrehKMzYl1zKuJOAi5TuzSukj
+ clZKpHKYnS40oNjhB4WlhiOl4XTR8c2bzFhp8Wi9yUE17TEIqqFMrLcy8rC7CF+oGF+v
+ hHrWEBCE2YIXqvXo6Wfr5ZS+bTG94n/ToBCUhM4GKz1da4+70h5jgc4TyckcFHR3yb0B
+ 2kyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=X/aRNGmEubqqqJ2Obnnv7ec/BJj0Pg670lU/1ceOKRI=;
+ b=sxKh4hjoBd1xOC66dc99fIkaFKwMNY8jzO6jRIIo47KUwXf1lsLmEkVKbvwy9UofZU
+ O7UlAuDKZZu3nfh7q6PsxI0jQjbwcmXAt8PDJMs+krimq+WaVSdM+825xMcLIgzbYpNa
+ EbRRdjdMiDM651HLCaDH7t7wvsJ+AfluilE4dpMwLGHrBd9H1buC+P38q747+4fV+WKT
+ EkaR/f0LuIGRkl6qY0EuWUBTNZWxeKsuRON3Ym9942pEknm369iHlW8X66yVSWzlDu7c
+ MO/rCo6oIQph4lbQYGpYMeSS4UUd5AJ+R/V5kz/g/ow87b2MOiMksjcEr2iYsygyzVEa
+ jQ6A==
+X-Gm-Message-State: APjAAAXUP0kK+cZhDjcAOAc1hrHhkBv1Q7fpeRP6ZzVnKJiwGAX84GFb
+ Lp7MAs5oBv0eVWYCzOj3SpHjgCKo
+X-Google-Smtp-Source: APXvYqxjYhfXdtWLrqP/GJOD7KzckoGoCRB/vejdTnyPCuZU8W5BKdau+5jgFAZ94Fl9HoLpaQZjrw==
+X-Received: by 2002:a5d:4fcf:: with SMTP id h15mr8139975wrw.237.1569780766168; 
+ Sun, 29 Sep 2019 11:12:46 -0700 (PDT)
+Received: from ?IPv6:fd00:835b:d940:d4fc::5?
+ (2a01-036c-0113-e8f4-0000-0000-0000-0005.pool6.digikabel.hu.
+ [2a01:36c:113:e8f4::5])
+ by smtp.googlemail.com with ESMTPSA id f66sm13280058wmg.2.2019.09.29.11.12.45
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 29 Sep 2019 11:12:45 -0700 (PDT)
+From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
+X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
+ <DirtY.iCE.hu@gmail.com>
+Subject: Re: [PATCH v4 21/24] paaudio: channel-map option
+To: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <8f650662fd6cc50baaede260581aeb560eed44fb.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <87o8zbma1m.fsf@dusky.pond.sub.org>
+ <55ea6ac9-9651-e322-fd84-22b4bedb3a93@gmail.com>
+ <87impgy3hw.fsf@dusky.pond.sub.org>
+ <20190925141331.kjxraaw3ijzkbiq4@sirius.home.kraxel.org>
+Message-ID: <a32c555d-9315-7c3d-e7be-d196ad3dd0b1@gmail.com>
+Date: Sun, 29 Sep 2019 20:13:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
+MIME-Version: 1.0
+In-Reply-To: <20190925141331.kjxraaw3ijzkbiq4@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Sun, 29 Sep 2019 16:38:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,72 +106,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
-> We do not care about the json:{} filenames here, so we can just filter
-> them out and thus make the test work both with and without external data
-> files.
-Same comment as for iotest 110, this is more justification to move this
-outside to reduce duplication.
-
-Best regards,
-	Maxim Levitsky
-
+On 2019-09-25 16:13, Gerd Hoffmann wrote:
+>    Hi,
 > 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/198     | 6 ++++--
->  tests/qemu-iotests/198.out | 4 ++--
->  2 files changed, 6 insertions(+), 4 deletions(-)
+>>> Oh now that I looked again at the pulseaudio docs, channel-map doesn't
+>>> have to be a list, it can be also a "well-known mapping name".
+>>
+>> Unambiguous because the well-known mapping names are not valid channel
+>> position list members.
 > 
-> diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
-> index c8f824cfae..d9981942a7 100755
-> --- a/tests/qemu-iotests/198
-> +++ b/tests/qemu-iotests/198
-> @@ -92,13 +92,15 @@ echo
->  echo "== checking image base =="
->  $QEMU_IMG info --image-opts $IMGSPECBASE | _filter_img_info --format-specific \
->      | sed -e "/^disk size:/ D" -e '/refcount bits:/ D' -e '/compat:/ D' \
-> -          -e '/lazy refcounts:/ D' -e '/corrupt:/ D'
-> +          -e '/lazy refcounts:/ D' -e '/corrupt:/ D' -e '/^\s*data file/ D' \
-> +          -e 's#image: json:.*#image: json:{ /* filtered */ }#'
->  
->  echo
->  echo "== checking image layer =="
->  $QEMU_IMG info --image-opts $IMGSPECLAYER | _filter_img_info --format-specific \
->      | sed -e "/^disk size:/ D" -e '/refcount bits:/ D' -e '/compat:/ D' \
-> -          -e '/lazy refcounts:/ D' -e '/corrupt:/ D'
-> +          -e '/lazy refcounts:/ D' -e '/corrupt:/ D' -e '/^\s*data file/ D' \
-> +          -e 's#image: json:.*#image: json:{ /* filtered */ }#'
->  
->  
->  # success, all done
-> diff --git a/tests/qemu-iotests/198.out b/tests/qemu-iotests/198.out
-> index e86b175e39..831ce3a289 100644
-> --- a/tests/qemu-iotests/198.out
-> +++ b/tests/qemu-iotests/198.out
-> @@ -32,7 +32,7 @@ read 16777216/16777216 bytes at offset 0
->  16 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  
->  == checking image base ==
-> -image: json:{"encrypt.key-secret": "sec0", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT.base"}}
-> +image: json:{ /* filtered */ }
->  file format: IMGFMT
->  virtual size: 16 MiB (16777216 bytes)
->  Format specific information:
-> @@ -74,7 +74,7 @@ Format specific information:
->          master key iters: 1024
->  
->  == checking image layer ==
-> -image: json:{"encrypt.key-secret": "sec1", "driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}}
-> +image: json:{ /* filtered */ }
->  file format: IMGFMT
->  virtual size: 16 MiB (16777216 bytes)
->  backing file: TEST_DIR/t.IMGFMT.base
+> Do we have well-known mapping names for the common use cases?
+> So maybe just support these?
+> 
+> cheers,
+>    Gerd
+> 
 
+It's surprisingly hard to figure out what are these "well-known names", 
+I could only find them in the source:
+https://github.com/michaelwu/pulseaudio/blob/16e3dccfa88455ebd329de27a98a3d979a8bdc8e/src/pulse/channelmap.c#L538
 
+It doesn't provide much over the "auto detect channel maps from the 
+number of channels" pulseaudio already has (the only ambiguous case is 
+surround-41 vs surround-50).  IIRC I originally added this feature 
+because USB audio and pulseaudio didn't agree about the order of 
+channels, for example in 5.1 pa defaults to 
+left,right,rear-left,rear-right,front-center,lfe while USB audio expects 
+left,right,center,lfe,rear-left,rear-right order. You can't specify this 
+with the well-known names.
+
+Regards,
+Zoltan
 
