@@ -2,68 +2,91 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86791C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:15:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75589C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:23:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CDA821855
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:15:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CDA821855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3DE7820679
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:23:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DE7820679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEwSW-0004sa-4m
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 10:15:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52153)
+	id 1iEwaf-0007Jr-6y
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 10:23:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iEwRS-00049w-MF
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:14:24 -0400
+ (envelope-from <jiewen.yao@intel.com>) id 1iEwZu-0006rp-PL
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:23:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iEwRR-000821-7z
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:14:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40096)
+ (envelope-from <jiewen.yao@intel.com>) id 1iEwZs-0003Tp-8P
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:23:05 -0400
+Received: from mga07.intel.com ([134.134.136.100]:1422)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iEwRO-00080Q-5g; Mon, 30 Sep 2019 10:14:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1DEFE20F4;
- Mon, 30 Sep 2019 14:14:17 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D4DBA5C219;
- Mon, 30 Sep 2019 14:14:15 +0000 (UTC)
-Message-ID: <a9ac9b3afa41a4595d3ed0dee4648a78650ac573.camel@redhat.com>
-Subject: Re: [PATCH 01/18] iotests: Filter refcount_order in 036
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Mon, 30 Sep 2019 17:14:14 +0300
-In-Reply-To: <5f8b9dd4-ba2e-0dbb-3216-3baa73a769c4@redhat.com>
-References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-2-mreitz@redhat.com>
- <f8db846b4dba5cd8febc09e871a932c7999f5403.camel@redhat.com>
- <d10fef7d-502a-d8c9-c548-bb6088d16c69@redhat.com>
- <4b3bea45194528716499d1624cdefa6cd3a56806.camel@redhat.com>
- <5e39c90a-1e78-6c07-e03b-cef23f566227@redhat.com>
- <97bc2bcdd0ba3582d8b937cd0de32e8419a5d104.camel@redhat.com>
- <5f8b9dd4-ba2e-0dbb-3216-3baa73a769c4@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Mon, 30 Sep 2019 14:14:17 +0000 (UTC)
+ (Exim 4.71) (envelope-from <jiewen.yao@intel.com>)
+ id 1iEwZr-0003Rn-W7
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:23:04 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 30 Sep 2019 07:22:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,567,1559545200"; d="scan'208";a="202899911"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by orsmga002.jf.intel.com with ESMTP; 30 Sep 2019 07:22:59 -0700
+Received: from fmsmsx152.amr.corp.intel.com (10.18.125.5) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Sep 2019 07:22:58 -0700
+Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
+ FMSMSX152.amr.corp.intel.com (10.18.125.5) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 30 Sep 2019 07:22:58 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.176]) by
+ SHSMSX103.ccr.corp.intel.com ([169.254.4.165]) with mapi id 14.03.0439.000;
+ Mon, 30 Sep 2019 22:22:55 +0800
+From: "Yao, Jiewen" <jiewen.yao@intel.com>
+To: "devel@edk2.groups.io" <devel@edk2.groups.io>, "imammedo@redhat.com"
+ <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Subject: RE: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K SMRAM
+ at default SMBASE address
+Thread-Topic: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K
+ SMRAM at default SMBASE address
+Thread-Index: AQHVcsoJd8i/V0oK70G7GW0woCa/SKdDny4AgAAMooCAAJ75IA==
+Date: Mon, 30 Sep 2019 14:22:54 +0000
+Message-ID: <74D8A39837DF1E4DA445A8C0B3885C503F7DFDB3@shsmsx102.ccr.corp.intel.com>
+References: <20190917130708.10281-1-imammedo@redhat.com>
+ <20190917130708.10281-2-imammedo@redhat.com>
+ <561f4440-7c06-10d7-80ce-bbfa810fec59@redhat.com>
+ <20190920102855.3fe2b689@redhat.com>
+ <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
+ <c18f1ada-3eca-d5f1-da4f-e74181c5a862@redhat.com>
+ <20190924131936.7dec5e6c@redhat.com>
+ <fb9c530c-f911-313d-6a79-5291e84327e5@redhat.com>
+ <20190930143659.6de53f70@redhat.com>
+In-Reply-To: <20190930143659.6de53f70@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzVhMjQ5YTktZTdlNC00ODA5LWI4N2MtYzM0NjViYmYxN2RjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiKzlvaUd2ek1DbDFIWGVOSTZYSWZ2c1p1MU5JTkxvWjczcHNDYWlsYjJcLzhcL3hLdkxMNko1SHZVRjhudkJJdFhWIn0=
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,178 +98,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ Brijesh Singh <brijesh.singh@amd.com>,
+ "phillip.goerl@oracle.com" <phillip.goerl@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Nakajima,
+ Jun" <jun.nakajima@intel.com>, "Kinney,
+ Michael D" <michael.d.kinney@intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+ "rfc@edk2.groups.io" <rfc@edk2.groups.io>,
+ "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-09-30 at 16:04 +0200, Max Reitz wrote:
-> On 30.09.19 15:58, Maxim Levitsky wrote:
-> > On Mon, 2019-09-30 at 15:44 +0200, Max Reitz wrote:
-> > > On 30.09.19 15:40, Maxim Levitsky wrote:
-> > > > On Mon, 2019-09-30 at 14:43 +0200, Max Reitz wrote:
-> > > > > On 29.09.19 18:31, Maxim Levitsky wrote:
-> > > > > > On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
-> > > > > > > This test can run just fine with other values for refcount_=
-bits, so we
-> > > > > > > should filter the value from qcow2.py's dump-header.
-> > > > > > >=20
-> > > > > > > (036 currently ignores user-specified image options, but th=
-at will be
-> > > > > > > fixed in the next patch.)
-> > > > > > >=20
-> > > > > > > Signed-off-by: Max Reitz <mreitz@redhat.com>
-> > > > > > > ---
-> > > > > > >  tests/qemu-iotests/036     | 9 ++++++---
-> > > > > > >  tests/qemu-iotests/036.out | 6 +++---
-> > > > > > >  2 files changed, 9 insertions(+), 6 deletions(-)
-> > > > > > >=20
-> > > > > > > diff --git a/tests/qemu-iotests/036 b/tests/qemu-iotests/03=
-6
-> > > > > > > index f06ff67408..69d0f9f903 100755
-> > > > > > > --- a/tests/qemu-iotests/036
-> > > > > > > +++ b/tests/qemu-iotests/036
-> > > > > > > @@ -55,7 +55,8 @@ $PYTHON qcow2.py "$TEST_IMG" set-feature-=
-bit incompatible 63
-> > > > > > > =20
-> > > > > > >  # Without feature table
-> > > > > > >  $PYTHON qcow2.py "$TEST_IMG" del-header-ext 0x6803f857
-> > > > > > > -$PYTHON qcow2.py "$TEST_IMG" dump-header
-> > > > > > > +$PYTHON qcow2.py "$TEST_IMG" dump-header \
-> > > > > > > +    | sed -e 's/^\(refcount_order\s*\).*/\1(filtered)/'
-> > > > > > >  _img_info
-> > > > > > > =20
-> > > > > > >  # With feature table containing bit 63
-> > > > > > > @@ -103,14 +104,16 @@ echo =3D=3D=3D Create image with unkn=
-own autoclear feature bit =3D=3D=3D
-> > > > > > >  echo
-> > > > > > >  _make_test_img 64M
-> > > > > > >  $PYTHON qcow2.py "$TEST_IMG" set-feature-bit autoclear 63
-> > > > > > > -$PYTHON qcow2.py "$TEST_IMG" dump-header
-> > > > > > > +$PYTHON qcow2.py "$TEST_IMG" dump-header \
-> > > > > > > +    | sed -e 's/^\(refcount_order\s*\).*/\1(filtered)/'
-> > > > > > > =20
-> > > > > > >  echo
-> > > > > > >  echo =3D=3D=3D Repair image =3D=3D=3D
-> > > > > > >  echo
-> > > > > > >  _check_test_img -r all
-> > > > > > > =20
-> > > > > > > -$PYTHON qcow2.py "$TEST_IMG" dump-header
-> > > > > > > +$PYTHON qcow2.py "$TEST_IMG" dump-header \
-> > > > > > > +    | sed -e 's/^\(refcount_order\s*\).*/\1(filtered)/'
-> > > > > > > =20
-> > > > > > >  # success, all done
-> > > > > > >  echo "*** done"
-> > > > > > > diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotest=
-s/036.out
-> > > > > > > index e489b44386..998c2a8a35 100644
-> > > > > > > --- a/tests/qemu-iotests/036.out
-> > > > > > > +++ b/tests/qemu-iotests/036.out
-> > > > > > > @@ -19,7 +19,7 @@ snapshot_offset           0x0
-> > > > > > >  incompatible_features     0x8000000000000000
-> > > > > > >  compatible_features       0x0
-> > > > > > >  autoclear_features        0x0
-> > > > > > > -refcount_order            4
-> > > > > > > +refcount_order            (filtered)
-> > > > > > >  header_length             104
-> > > > > > > =20
-> > > > > > >  qemu-img: Could not open 'TEST_DIR/t.IMGFMT': Unsupported =
-IMGFMT feature(s): Unknown incompatible feature: 8000000000000000
-> > > > > > > @@ -53,7 +53,7 @@ snapshot_offset           0x0
-> > > > > > >  incompatible_features     0x0
-> > > > > > >  compatible_features       0x0
-> > > > > > >  autoclear_features        0x8000000000000000
-> > > > > > > -refcount_order            4
-> > > > > > > +refcount_order            (filtered)
-> > > > > > >  header_length             104
-> > > > > > > =20
-> > > > > > >  Header extension:
-> > > > > > > @@ -81,7 +81,7 @@ snapshot_offset           0x0
-> > > > > > >  incompatible_features     0x0
-> > > > > > >  compatible_features       0x0
-> > > > > > >  autoclear_features        0x0
-> > > > > > > -refcount_order            4
-> > > > > > > +refcount_order            (filtered)
-> > > > > > >  header_length             104
-> > > > > > > =20
-> > > > > > >  Header extension:
-> > > > > >=20
-> > > > > > Minor notes:
-> > > > > >=20
-> > > > > > 1. Maybe put the sed command into a function to avoid duplica=
-tion?
-> > > > >=20
-> > > > > Hm, maybe, but that would increase the LoC, so I=E2=80=99m not =
-sure whether it
-> > > > > really would be a simplification.
-> > > >=20
-> > > > IMHO, in my opinion, regardless of LOC, duplicated code is almost=
- always
-> > > > bad. Common functions are mostly for the next guy that will be ab=
-le to use
-> > > > them instead of searching through code to see how this is done th=
-ere and there.
-> > >=20
-> > > In my experience, people write tests without scanning common.filter=
- for
-> > > whether anyone has written the same code already.  See the
-> > > _filter_qemu_img_check example in this series.
-> >=20
-> > Fair enough, but this can change.
+below
+
+> -----Original Message-----
+> From: devel@edk2.groups.io <devel@edk2.groups.io> On Behalf Of Igor
+> Mammedov
+> Sent: Monday, September 30, 2019 8:37 PM
+> To: Laszlo Ersek <lersek@redhat.com>
+> Cc: devel@edk2.groups.io; qemu-devel@nongnu.org; Chen, Yingwen
+> <yingwen.chen@intel.com>; phillip.goerl@oracle.com;
+> alex.williamson@redhat.com; Yao, Jiewen <jiewen.yao@intel.com>; Nakajima,
+> Jun <jun.nakajima@intel.com>; Kinney, Michael D
+> <michael.d.kinney@intel.com>; pbonzini@redhat.com;
+> boris.ostrovsky@oracle.com; rfc@edk2.groups.io; joao.m.martins@oracle.com=
+;
+> Brijesh Singh <brijesh.singh@amd.com>
+> Subject: Re: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K
+> SMRAM at default SMBASE address
 >=20
-> It won=E2=80=99t.
+> On Mon, 30 Sep 2019 13:51:46 +0200
+> "Laszlo Ersek" <lersek@redhat.com> wrote:
 >=20
-> It only changes when people use standardized functions that filter
-> automatically.  And writing that made me look into common.rc, and ah
-> yes, we have a _check_test_img.  So the correct thing to do is not to
-> use _filter_qemu_img_check (or to expect people to scan the filter file
-> for filters), but to use _check_test_img there.
+> > Hi Igor,
+> >
+> > On 09/24/19 13:19, Igor Mammedov wrote:
+> > > On Mon, 23 Sep 2019 20:35:02 +0200
+> > > "Laszlo Ersek" <lersek@redhat.com> wrote:
+> >
+> > >> I've got good results. For this (1/2) QEMU patch:
+> > >>
+> > >> Tested-by: Laszlo Ersek <lersek@redhat.com>
+> > >>
+> > >> I tested the following scenarios. In every case, I verified the OVMF
+> > >> log, and also the "info mtree" monitor command's result (i.e. whethe=
+r
+> > >> "smbase-blackhole" / "smbase-window" were disabled or enabled).
+> > >> Mostly, I diffed these text files between the test scenarios (lookin=
+g
+> > >> for desired / undesired differences). In the Linux guests, I checked
+> > >> / compared the dmesg too (wrt. the UEFI memmap).
+> > >>
+> > >> - unpatched OVMF (regression test), Fedora guest, normal boot and S3
+> > >>
+> > >> - patched OVMF, but feature disabled with "-global
+> > >>   mch.smbase-smram=3Doff" (another regression test), Fedora guest,
+> > >>   normal boot and S3
+> > >>
+> > >> - patched OVMF, feature enabled, Fedora and various Windows guests
+> > >>   (win7, win8, win10 families, client/server), normal boot and S3
+> > >>
+> > >> - a subset of the above guests, with S3 disabled (-global
+> > >>   ICH9-LPC.disable_s3=3D1), and obviously S3 resume not tested
+> > >>
+> > >> SEV: used 5.2-ish Linux guest, with S3 disabled (no support under SE=
+V
+> > >> for that now):
+> > >>
+> > >> - unpatched OVMF (regression test), normal boot
+> > >>
+> > >> - patched OVMF but feature disabled on the QEMU cmdline (another
+> > >>   regression test), normal boot
+> > >>
+> > >> - patched OVMF, feature enabled, normal boot.
+> > >>
+> > >> I plan to post the OVMF patches tomorrow, for discussion.
+> > >>
+> > >> (It's likely too early to push these QEMU / edk2 patches right now -=
+-
+> > >> we don't know yet if this path will take us to the destination. For
+> > >> now, it certainly looks great.)
+> > >
+> > > Laszlo, thanks for trying it out.
+> > > It's nice to hear that approach is somewhat usable.
+> > > Hopefully we won't have to invent 'paused' cpu mode.
+> > >
+> > > Pls CC me on your patches
+> > > (not that I qualify for reviewing,
+> > > but may be I could learn a thing or two from it)
+> >
+> > Considering the plan at [1], the two patch sets [2] [3] should cover
+> > step (01); at least as proof of concept.
+> >
+> > [1] [edk2-devel] CPU hotplug using SMM with QEMU+OVMF
+> >     http://mid.mail-archive.com/20190830164802.1b17ff26@redhat.com
+> >
+> > [2] The current thread:
+> >     [Qemu-devel] [PATCH 0/2] q35: mch: allow to lock down 128K RAM at
+> default SMBASE address
+> >     http://mid.mail-archive.com/20190917130708.10281-1-
+> imammedo@redhat.com
+> >
+> > [3] [edk2-devel] [PATCH wave 1 00/10] support QEMU's "SMRAM at default
+> SMBASE" feature
+> >     http://mid.mail-archive.com/20190924113505.27272-1-lersek@redhat.co=
+m
+> >
+> > (I'll have to figure out what SMI handler to put in place there, but I'=
+d
+> > like to experiment with that once we can cause a new CPU to start
+> > executing code there, in SMM.)
+> >
+> > So what's next?
+> >
+> > To me it looks like we need to figure out how QEMU can make the OS call
+> > into SMM (in the GPE cpu hotplug handler), passing in parameters and
+> > such. This would be step (03).
+> >
+> > Do you agree?
+> >
+> > If so, I'll ask Jiewen about such OS->SMM calls separately, because I
+> > seem to remember that there used to be an "SMM communcation table" of
+> > sorts, for flexible OS->SMM calls. However, it appears to be deprecated
+> > lately.
+> we can try to resurrect and put over it some kind of protocol
+> to describe which CPUs to where hotplugged.
 >=20
-> > > > > > 2. As I understand the test, it only checks the feature bits.
-> > > > > >    So maybe instead of blacklisting some of the values, white=
- list
-> > > > > >    only the feature bits in the output?
-> > > > >=20
-> > > > > Hm.  Seems reasonable, but then again I=E2=80=99d prefer a mini=
-mal change, and
-> > > > > changing it to a whitelist would be more change...
-> > > >=20
-> > > > I don't think this is bad, again in my eyes, the code should be a=
-s friendly
-> > > > as possible for the next guy that will have to change it, so addi=
-ng
-> > > > some more extra changes don't seem a problem to me.
-> > >=20
-> > > In my eyes tests aren=E2=80=99t code.
-> >=20
-> > And yet, writing tests is commonly known as a task=20
-> > that developers don't really like to do, so making that even a tinies=
-t bit
-> > easier, is a good thing IMHO,
+> or we could put a parameter into SMI status register (IO port 0xb3)
+> and the trigger SMI from GPE handler to tell SMI handler that cpu
+> hotplug happened and then use QEMU's cpu hotplug interface
+> to enumerate hotplugged CPUs for SMI handler.
 >=20
-> My problem is precisely that I don=E2=80=99t see how such a suggestion =
-makes it
-> easier to write test code.
->=20
-> The easiest way to write a test is to just dump ad-hoc code into a bash
-> file.  Sometimes that doesn=E2=80=99t work because what you want to tes=
-t is more
-> complex, so then you use Python.
->=20
->=20
-> What I felt you were arguing about is changing existing test code, whic=
-h
-> is a completely different thing.  In my experience, that happens much
-> more rarely and is thus a thing we don=E2=80=99t need to optimize for. =
- (And I=E2=80=99m
-> saying this as the one who wrote this series which is just about
-> changing existing test code.)
+> The later is probably simpler as we won't need to reinvent the wheel
+> (just reuse the interface that's already in use by GPE handler).
+
+[Jiewen] The PI specification Volume 4 - SMM defines EFI_MM_COMMUNICATION_P=
+ROTOCOL.Communicate() - It can be used to communicate between OS and SMM ha=
+ndler. But it requires the runtime protocol call. I am not sure how OS load=
+er passes this information to OS kernel.
+
+As such, I think using ACPI SCI/GPE -> software SMI handler is an easier wa=
+y to achieve this. I also recommend this way.
+For parameter passing, we can use 1) Port B2 (1 byte), 2) Port B3 (1 byte),=
+ 3) chipset scratch register (4 bytes or 8 bytes, based upon scratch regist=
+er size), 4) ACPI NVS OPREGION, if the data structure is complicated.
 
 
-I won't argue on this! It all depends on lot and lot of things.
 
-Best regards,
-	Maxim Levitsky
-
+> > Hmmm.... Yes, UEFI 2.8 has "Appendix O - UEFI ACPI Data Table", and it
+> > writes (after defining the table format):
+> >
+> >     The first use of this UEFI ACPI table format is the SMM
+> >     Communication ACPI Table. This table describes a special software
+> >     SMI that can be used to initiate inter-mode communication in the OS
+> >     present environment by non-firmware agents with SMM code.
+> >
+> >     Note: The use of the SMM Communication ACPI table is deprecated in
+> >           UEFI spec. 2.7. This is due to the lack of a use case for
+> >           inter-mode communication by non-firmware agents with SMM code
+> >           and support for initiating this form of communication in
+> >           common OSes.
+> >
+> > The changelog at the front of the UEFI spec also references the
+> > Mantis#1691 spec ticket, "Remove/Deprecate SMM Communication ACPI
+> Table"
+> > (addressed in UEFI 2.6B).
+> >
+> > (I think that must have been a security ticket, because, while I
+> > generally have access to Mantis tickets,
+> > <https://mantis.uefi.org/mantis/view.php?id=3D1631> gives me "Access
+> > Denied" :/ )
+> >
+> > Thanks,
+> > Laszlo
+> >
+> >
+> >
+>=20
+>=20
+> -=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-
+> Groups.io Links: You receive all messages sent to this group.
+>=20
+> View/Reply Online (#48283): https://edk2.groups.io/g/devel/message/48283
+> Mute This Topic: https://groups.io/mt/34201782/1772286
+> Group Owner: devel+owner@edk2.groups.io
+> Unsubscribe: https://edk2.groups.io/g/devel/unsub  [jiewen.yao@intel.com]
+> -=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-
 
 
