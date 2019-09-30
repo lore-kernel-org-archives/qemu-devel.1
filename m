@@ -2,64 +2,85 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E77DFC32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B4E5C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B753A20842
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:49:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B753A20842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C824020679
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:54:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FubzTzgg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C824020679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEwzL-0003fM-16
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 10:49:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56233)
+	id 1iEx4E-0006Bf-Ol
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 10:54:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57007)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iEwxo-0002rt-TT
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:47:50 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iEx34-0005Ks-9S
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:53:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iEwxn-000512-HA
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:47:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38580)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iEwxg-0004zi-ET; Mon, 30 Sep 2019 10:47:40 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CC83DC049E32;
- Mon, 30 Sep 2019 14:47:38 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C8E460C5E;
- Mon, 30 Sep 2019 14:47:37 +0000 (UTC)
-Message-ID: <0036fc62910635b0fec0e5ac5e78a19360c08e34.camel@redhat.com>
-Subject: Re: [PATCH 02/18] iotests: Replace IMGOPTS by _unsupported_imgopts
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Mon, 30 Sep 2019 17:47:36 +0300
-In-Reply-To: <54c5cff5-b9c9-4274-3ff7-77bfc586ed18@redhat.com>
-References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-3-mreitz@redhat.com>
- <456ed2bf18ee3033aa2115cc3b31bde1e0833348.camel@redhat.com>
- <54c5cff5-b9c9-4274-3ff7-77bfc586ed18@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 30 Sep 2019 14:47:38 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iEx33-0006H4-4M
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:53:14 -0400
+Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:37449)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iEx30-0006F1-OL; Mon, 30 Sep 2019 10:53:10 -0400
+Received: by mail-oi1-x22c.google.com with SMTP id i16so11364669oie.4;
+ Mon, 30 Sep 2019 07:53:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=EQXZaMSccg691kivGEp/+Qe69jQ8I8z61GVlgTpmQ9o=;
+ b=FubzTzggKLGmul1HBsqf/iPG2hlVI/ah9kcD5K4pftKpgs3+PGer5IGeoDXwR7Qp6T
+ 5CikBBjoHNMrQ3DvVbFurZ4qUoDQD5w1OpcvpDbVpT1+o7RwbaOMSp6P+sivODG49Yqk
+ p5jcBZ912ojzNy+TgVFjGhcvAA6SEGVmywDZfDzuhNxYcCzDQCdn6+zWBsWM/aqzTGwH
+ IMSWRvn20spgCQ+Uy4PNFr/gwVA9ioOo8eOuqVzVZlS0SSXuHG5FlF9PPK93WqvWlIi5
+ Aq4M/7naSCH69cVgIIH/uIeQBaZz6sMzSZbMJ3nELK6ypH+1HPyRpKgZXoZ58gjjtAnx
+ HRlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=EQXZaMSccg691kivGEp/+Qe69jQ8I8z61GVlgTpmQ9o=;
+ b=XhY7+u+k0T320uOf67vcqF/YBy5pdMVP2ZCYfFaHrOULxM07irj9t6XuOpn47Jnxu6
+ TLKIgC63P629s87XKY4+DTGZ9UymMzYA7RK45aYtmggHU2Fh9+kAJKFf11g6ha2LDrpq
+ df7SIGZ1zEILiXw8FhU5nGUxUNxGQPAWUoMrqsoHnAfGgWqxyFqLkUlKudbI+uGUl3c9
+ k6cRl3cG8VH3uhLsPlhMb+z+Ku0QRxn5qLLJiBNM0rV3EX6LUkM7fTzqIAGj2AtbXTYo
+ jW9ejB44r/0KWYkd2QMK3gtLtai8qnSvIf1OY9bcTWEIkhvRRvw1Axnq4pjS8bThcRw1
+ ISoA==
+X-Gm-Message-State: APjAAAUvx41Y4SbRJQGkaYyioCscjEzgi6yWHNuP7HYPUpRHj43o4jz9
+ dDCgPjHxID04K831Eg/B5s70q0+j1fc9LeVBy10=
+X-Google-Smtp-Source: APXvYqyH8/5V+RkG1XISmaKtmloZtDGJtCDTytl3HQnGQMbOD97NVvhd8ZgdFAVo33G1q5evhgIRAxSFCJ2LUbMumKg=
+X-Received: by 2002:aca:ba06:: with SMTP id k6mr18622436oif.136.1569855189905; 
+ Mon, 30 Sep 2019 07:53:09 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Mon, 30 Sep 2019 07:53:09
+ -0700 (PDT)
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Mon, 30 Sep 2019 07:53:09
+ -0700 (PDT)
+In-Reply-To: <18547009-8840-fc6f-1782-dc2b49f66c96@us.ibm.com>
+References: <bf30baf5-4d75-dc6f-c30a-57b80714999b@ilande.co.uk>
+ <CAL1e-=gcK2mdtrt9vibHGpbm4_FZgQWTA91+p=9ouuMYmZwPqQ@mail.gmail.com>
+ <CAL1e-=gXZxKUuNgasSb9d2t=LhDAHJb8ovLjKfQ1Zu9HHg2D3w@mail.gmail.com>
+ <18547009-8840-fc6f-1782-dc2b49f66c96@us.ibm.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 30 Sep 2019 16:53:09 +0200
+Message-ID: <CAL1e-=j68W7GyRwNB2WAPQTShQV5CRQ4NNV9qCd2kkLuFKw5RQ@mail.gmail.com>
+Subject: Re: Re: target/ppc: bug in optimised vsl/vsr implementation?
+To: Paul Clarke <pc@us.ibm.com>
+Content-Type: multipart/alternative; boundary="000000000000f176420593c664e0"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,193 +92,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: stefan.brankovic@rt-rk.com,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-09-30 at 14:59 +0200, Max Reitz wrote:
-> On 29.09.19 18:31, Maxim Levitsky wrote:
-> > On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
-> > > Some tests require compat=3D1.1 and thus set IMGOPTS=3D'compat=3D1.=
-1'
-> > > globally.  That is not how it should be done; instead, they should
-> > > simply set _unsupported_imgopts to compat=3D0.10 (compat=3D1.1 is t=
-he
-> > > default anyway).
-> > >=20
-> > > This makes the tests heed user-specified $IMGOPTS.  Some do not wor=
-k
-> > > with all image options, though, so we need to disable them accordin=
-gly.
-> > >=20
-> > > Signed-off-by: Max Reitz <mreitz@redhat.com>
-> > > ---
-> > >  tests/qemu-iotests/036 | 3 +--
-> > >  tests/qemu-iotests/060 | 4 ++--
-> > >  tests/qemu-iotests/062 | 3 ++-
-> > >  tests/qemu-iotests/066 | 3 ++-
-> > >  tests/qemu-iotests/068 | 3 ++-
-> > >  tests/qemu-iotests/098 | 3 +--
-> > >  6 files changed, 10 insertions(+), 9 deletions(-)
-> > >=20
-> > > diff --git a/tests/qemu-iotests/036 b/tests/qemu-iotests/036
-> > > index 69d0f9f903..57dda23b02 100755
-> > > --- a/tests/qemu-iotests/036
-> > > +++ b/tests/qemu-iotests/036
-> > > @@ -43,9 +43,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
-> > >  # This tests qcow2-specific low-level functionality
-> > >  _supported_fmt qcow2
-> > >  _supported_proto file
-> > > -
-> > >  # Only qcow2v3 and later supports feature bits
-> > > -IMGOPTS=3D"compat=3D1.1"
-> > > +_unsupported_imgopts 'compat=3D0.10'
-> > > =20
-> > >  echo
-> > >  echo =3D=3D=3D Image with unknown incompatible feature bit =3D=3D=3D
-> > > diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-> > > index b91d8321bb..9c2ef42522 100755
-> > > --- a/tests/qemu-iotests/060
-> > > +++ b/tests/qemu-iotests/060
-> > > @@ -48,6 +48,8 @@ _filter_io_error()
-> > >  _supported_fmt qcow2
-> > >  _supported_proto file
-> > >  _supported_os Linux
-> > > +# These tests only work for compat=3D1.1 images with refcount_bits=
-=3D16
-> > > +_unsupported_imgopts 'compat=3D0.10' 'refcount_bits=3D\([^1]\|.\([=
-^6]\|$\)\)'
-> > > =20
-> > >  rt_offset=3D65536  # 0x10000 (XXX: just an assumption)
-> > >  rb_offset=3D131072 # 0x20000 (XXX: just an assumption)
-> > > @@ -55,8 +57,6 @@ l1_offset=3D196608 # 0x30000 (XXX: just an assump=
-tion)
-> > >  l2_offset=3D262144 # 0x40000 (XXX: just an assumption)
-> > >  l2_offset_after_snapshot=3D524288 # 0x80000 (XXX: just an assumpti=
-on)
-> > > =20
-> > > -IMGOPTS=3D"compat=3D1.1"
-> > > -
-> > >  OPEN_RW=3D"open -o overlap-check=3Dall $TEST_IMG"
-> > >  # Overlap checks are done before write operations only, therefore =
-opening an
-> > >  # image read-only makes the overlap-check option irrelevant
-> > > diff --git a/tests/qemu-iotests/062 b/tests/qemu-iotests/062
-> > > index d5f818fcce..ac0d2a9a3b 100755
-> > > --- a/tests/qemu-iotests/062
-> > > +++ b/tests/qemu-iotests/062
-> > > @@ -40,8 +40,9 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
-> > >  # This tests qocw2-specific low-level functionality
-> > >  _supported_fmt qcow2
-> > >  _supported_proto generic
-> > > +# We need zero clusters and snapshots
-> > > +_unsupported_imgopts 'compat=3D0.10' 'refcount_bits=3D1[^0-9]'
-> > > =20
-> > > -IMGOPTS=3D"compat=3D1.1"
-> > >  IMG_SIZE=3D64M
-> > > =20
-> > >  echo
-> > > diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-> > > index 28f8c98412..9a15ba8027 100755
-> > > --- a/tests/qemu-iotests/066
-> > > +++ b/tests/qemu-iotests/066
-> > > @@ -39,9 +39,10 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
-> > >  # This tests qocw2-specific low-level functionality
-> > >  _supported_fmt qcow2
-> > >  _supported_proto generic
-> > > +# Weneed zero clusters and snapshots
-> >=20
-> > Typo
->=20
-> Indeed!
->=20
-> > > +_unsupported_imgopts 'compat=3D0.10' 'refcount_bits=3D1[^0-9]'
-> > > =20
-> > >  # Intentionally create an unaligned image
-> > > -IMGOPTS=3D"compat=3D1.1"
-> > >  IMG_SIZE=3D$((64 * 1024 * 1024 + 512))
-> > > =20
-> > >  echo
-> > > diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-> > > index 22f5ca3ba6..65650fca9a 100755
-> > > --- a/tests/qemu-iotests/068
-> > > +++ b/tests/qemu-iotests/068
-> > > @@ -39,8 +39,9 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
-> > >  # This tests qocw2-specific low-level functionality
-> > >  _supported_fmt qcow2
-> > >  _supported_proto generic
-> > > +# Internal snapshots are (currently) impossible with refcount_bits=
-=3D1
-> >=20
-> > Why currently? 1 bit will only allow to mark a cluser as used/unused =
-which
-> > is not enough for any snapshots?
->=20
-> It is, because in theory you can just copy the clusters at the time of
-> snapshotting.  We=E2=80=99ll never implement it, but, well...
-Fair enough, I didn't even thought of that. I fully agree that
-implementing this is silly.
+--000000000000f176420593c664e0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->=20
-> > > +_unsupported_imgopts 'compat=3D0.10' 'refcount_bits=3D1[^0-9]'
-> > > =20
-> > > -IMGOPTS=3D"compat=3D1.1"
-> > >  IMG_SIZE=3D128K
-> > > =20
-> > >  case "$QEMU_DEFAULT_MACHINE" in
-> > > diff --git a/tests/qemu-iotests/098 b/tests/qemu-iotests/098
-> > > index 1c1d1c468f..2d68dc7d6c 100755
-> > > --- a/tests/qemu-iotests/098
-> > > +++ b/tests/qemu-iotests/098
-> > > @@ -40,8 +40,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
-> > > =20
-> > >  _supported_fmt qcow2
-> > >  _supported_proto file
-> > > -
-> > > -IMGOPTS=3D"compat=3D1.1"
-> > > +_unsupported_imgopts 'compat=3D0.10'
-> >=20
-> > Any idea why? I am not familiar with qcow2 well enought to
-> > know but this misses a comment with justification.
->=20
-> Because the special bdrv_make_empty() version we want to test only work=
-s
-> with qcow2 v3 images.
-Just to understand this, we have
+30.09.2019. 16.35, "Paul Clarke" <pc@us.ibm.com> =D1=98=D0=B5 =D0=BD=D0=B0=
+=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On 9/28/19 5:17 PM, Aleksandar Markovic wrote:
+> > Also, check on the hardware the behavior listed as 'undefined' for
+vsl/vsr
+> > in the docs - even though it is tehnically irrelevant, I am courious
+> > whether the old or the new (or none of them) solution match the
+hardware.
+>
+> There does appear to be some odd behavior when one strays into the
+undefined.  For example:
+> source vector: 0102030405060708090a0b0c0d0e0f10
+> shift  vector: 01020101010101010101010101010101
+> after vsl:     020806080a0c0e10121416181a1c1e20
+> ...this appears to use the byte-respective shift values
+>
+> using vsr with that result and the same shift vector:
+> after vsr:     0182030405060708090a0b0c0d0e0f10
+> I expected to get back a result matching the source vector, but somehow,
+an extra bit got set.
+>
+> It would probably take some more thorough investigation to map out the
+undefined behavior, but I doubt there's any value to that.
+>
 
-compat=3D0.10, also known as v2, which is the classical qcow2 (and v1 is =
-basically qcow)
-and then we have compat=3D1.1 which is also known as v3, and once upon a =
-time was supposed
-to be called qcow3, but at the end remained qcow2.
+Absolutely agree. I thought if the 'undefined' behavior is something
+obviously simple, we could try to match it, assuming also that it remains
+constant across all implementations. But, this behaviour is not a simple
+one, so, imho, let's leave 'undefined' undefined.
 
+Thanks for a nice experiment!
 
+Aleksandar
 
->=20
-> > > =20
-> > >  for event in l1_update empty_image_prepare reftable_update refbloc=
-k_alloc; do
-> > > =20
-> >=20
-> >=20
-> > Best regards,
-> > 	Maxim Levitsky
-> >=20
->=20
-> Thanks for reviewing!
-Thanks to you too!
+> PC
 
-I will focus more on reviewing in next few months,
-since I really don't do this enough.
+--000000000000f176420593c664e0
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Best regards,
-	Maxim Levitsky
+<p dir=3D"ltr"><br>
+30.09.2019. 16.35, &quot;Paul Clarke&quot; &lt;<a href=3D"mailto:pc@us.ibm.=
+com">pc@us.ibm.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=
+=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; On 9/28/19 5:17 PM, Aleksandar Markovic wrote:<br>
+&gt; &gt; Also, check on the hardware the behavior listed as &#39;undefined=
+&#39; for vsl/vsr<br>
+&gt; &gt; in the docs - even though it is tehnically irrelevant, I am couri=
+ous<br>
+&gt; &gt; whether the old or the new (or none of them) solution match the h=
+ardware.<br>
+&gt;<br>
+&gt; There does appear to be some odd behavior when one strays into the und=
+efined.=C2=A0 For example:<br>
+&gt; source vector: 0102030405060708090a0b0c0d0e0f10<br>
+&gt; shift=C2=A0 vector: 01020101010101010101010101010101<br>
+&gt; after vsl:=C2=A0 =C2=A0 =C2=A0020806080a0c0e10121416181a1c1e20<br>
+&gt; ...this appears to use the byte-respective shift values<br>
+&gt;<br>
+&gt; using vsr with that result and the same shift vector:<br>
+&gt; after vsr:=C2=A0 =C2=A0 =C2=A00182030405060708090a0b0c0d0e0f10<br>
+&gt; I expected to get back a result matching the source vector, but someho=
+w, an extra bit got set.<br>
+&gt;<br>
+&gt; It would probably take some more thorough investigation to map out the=
+ undefined behavior, but I doubt there&#39;s any value to that.<br>
+&gt;</p>
+<p dir=3D"ltr">Absolutely agree. I thought if the &#39;undefined&#39; behav=
+ior is something obviously simple, we could try to match it, assuming also =
+that it remains constant across all implementations. But, this behaviour is=
+ not a simple one, so, imho, let&#39;s leave &#39;undefined&#39; undefined.=
+</p>
+<p dir=3D"ltr">Thanks for a nice experiment!</p>
+<p dir=3D"ltr">Aleksandar</p>
+<p dir=3D"ltr">&gt; PC<br>
+</p>
 
-
->=20
-> Max
->=20
-
-
+--000000000000f176420593c664e0--
 
