@@ -7,92 +7,89 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FACDC32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA34EC32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:34:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02003215EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:31:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02003215EA
+	by mail.kernel.org (Postfix) with ESMTPS id 8DBA6215EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:34:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DBA6215EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEvmI-000142-KW
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:31:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42292)
+	id 1iEvp1-0003Ql-VK
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:34:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1iEvbG-0004Nf-Lc
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:29 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1iEvbJ-0004PK-TD
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1iEvb6-00055d-Nf
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24874
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <borntraeger@de.ibm.com>) id 1iEvbH-0005BU-GB
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57464)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1iEvax-0004zS-Kk
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:14 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ id 1iEvb9-00051C-4o
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:21 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8UDIHEh134057
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 09:20:03 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vbjd70bqf-1
+ x8UDI4ng134331
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 09:20:07 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vbhfb3e1t-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 09:20:02 -0400
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 09:20:07 -0400
 Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 30 Sep 2019 14:20:00 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Mon, 30 Sep 2019 14:20:01 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 30 Sep 2019 14:19:58 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8UDJurM58654868
+ Mon, 30 Sep 2019 14:19:57 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x8UDJuNf60162264
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
  Mon, 30 Sep 2019 13:19:56 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B3C5A42045;
- Mon, 30 Sep 2019 13:19:56 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9D8CD42041;
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 58C9F52050;
  Mon, 30 Sep 2019 13:19:56 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 43DC45204F;
  Mon, 30 Sep 2019 13:19:56 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
- id 551C8E020F; Mon, 30 Sep 2019 15:19:56 +0200 (CEST)
+ id 0486BE01C8; Mon, 30 Sep 2019 15:19:56 +0200 (CEST)
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 03/12] s390x: sclp: refactor invalid command check
-Date: Mon, 30 Sep 2019 15:19:46 +0200
+Subject: [PULL 02/12] s390: PCI: fix IOMMU region init
+Date: Mon, 30 Sep 2019 15:19:45 +0200
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190930131955.101131-1-borntraeger@de.ibm.com>
 References: <20190930131955.101131-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19093013-0020-0000-0000-000003730FB9
+x-cbid: 19093013-0008-0000-0000-0000031C6F98
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19093013-0021-0000-0000-000021C8EA23
-Message-Id: <20190930131955.101131-4-borntraeger@de.ibm.com>
+x-cbparentid: 19093013-0009-0000-0000-00004A3B15FD
+Message-Id: <20190930131955.101131-3-borntraeger@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-09-30_08:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1909300138
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,10 +101,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+Cc: Thomas Huth <thuth@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ Stefan Zimmerman <stzi@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, qemu-stable@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  qemu-s390x <qemu-s390x@nongnu.org>, kvm@vger.kernel.org,
  Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -117,65 +116,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Janosch Frank <frankja@linux.ibm.com>
+From: Matthew Rosato <mjrosato@linux.ibm.com>
 
-Invalid command checking has to be done before the boundary check,
-refactoring it now allows to insert the boundary check at the correct
-place later.
+The fix in dbe9cf606c shrinks the IOMMU memory region to a size
+that seems reasonable on the surface, however is actually too
+small as it is based against a 0-mapped address space.  This
+causes breakage with small guests as they can overrun the IOMMU window.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
-Message-Id: <1569591203-15258-2-git-send-email-imbrenda@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Let's go back to the prior method of initializing iommu for now.
+
+Fixes: dbe9cf606c ("s390x/pci: Set the iommu region size mpcifc request")
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+Reported-by: Boris Fiuczynski <fiuczy@linux.ibm.com>
+Tested-by: Boris Fiuczynski <fiuczy@linux.ibm.com>
+Reported-by: Stefan Zimmerman <stzi@linux.ibm.com>
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Message-Id: <1569507036-15314-1-git-send-email-mjrosato@linux.ibm.com>
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- hw/s390x/event-facility.c |  3 ---
- hw/s390x/sclp.c           | 17 ++++++++++++++++-
- 2 files changed, 16 insertions(+), 4 deletions(-)
+ hw/s390x/s390-pci-bus.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 797ecbb7a9c8..66205697ae75 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -377,9 +377,6 @@ static void command_handler(SCLPEventFacility *ef, SCCB *sccb, uint64_t code)
-     case SCLP_CMD_WRITE_EVENT_MASK:
-         write_event_mask(ef, sccb);
-         break;
--    default:
--        sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
--        break;
-     }
- }
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 963a41c7f532..2d2f4a7c419c 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -695,10 +695,15 @@ static const MemoryRegionOps s390_msi_ctrl_ops = {
  
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index fac7c3bb6c02..95ebfe7bd2f1 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -219,8 +219,23 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
-         goto out;
-     }
- 
--    sclp_c->execute(sclp, &work_sccb, code);
-+    switch (code & SCLP_CMD_CODE_MASK) {
-+    case SCLP_CMDW_READ_SCP_INFO:
-+    case SCLP_CMDW_READ_SCP_INFO_FORCED:
-+    case SCLP_CMDW_READ_CPU_INFO:
-+    case SCLP_CMDW_CONFIGURE_IOA:
-+    case SCLP_CMDW_DECONFIGURE_IOA:
-+    case SCLP_CMD_READ_EVENT_DATA:
-+    case SCLP_CMD_WRITE_EVENT_DATA:
-+    case SCLP_CMD_WRITE_EVENT_MASK:
-+        break;
-+    default:
-+        work_sccb.h.response_code = cpu_to_be16(SCLP_RC_INVALID_SCLP_COMMAND);
-+        goto out_write;
-+    }
- 
-+    sclp_c->execute(sclp, &work_sccb, code);
-+out_write:
-     cpu_physical_memory_write(sccb, &work_sccb,
-                               be16_to_cpu(work_sccb.h.length));
- 
+ void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
+ {
++    /*
++     * The iommu region is initialized against a 0-mapped address space,
++     * so the smallest IOMMU region we can define runs from 0 to the end
++     * of the PCI address space.
++     */
+     char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
+     memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
+                              TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
+-                             name, iommu->pal - iommu->pba + 1);
++                             name, iommu->pal + 1);
+     iommu->enabled = true;
+     memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
+     g_free(name);
 -- 
 2.21.0
 
