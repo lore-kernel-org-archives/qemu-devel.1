@@ -2,120 +2,89 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28DD1C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 16:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A593C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 16:39:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E56A02075D
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 16:28:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35EE02168B
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 16:39:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QrZSiLHK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E56A02075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fetE1U2K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35EE02168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEyXD-0003rI-3J
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 12:28:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41281)
+	id 1iEyha-0007C9-Ad
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 12:39:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42875)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iEyVZ-0002TE-IP
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:26:47 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iEygn-0006mv-Md
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:38:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iEyVY-00009y-Ih
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:26:45 -0400
-Received: from mail-eopbgr150133.outbound.protection.outlook.com
- ([40.107.15.133]:55950 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iEyVM-0008SU-QQ; Mon, 30 Sep 2019 12:26:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XooqlKGfXTzdFBHchxFea52xZ3/s02ZYyoXXC1dvEX2lrOBi6Ne7zi4o4QQnY3Rjno3ocbVmgetyV9fu7SlcpNJOpsUbDbBnN+Se7xdL7+jLjuPoYheoYQxid2CmhmommMLyT+SqztVwDqbeBjQSL2lBVIdhYYbsTi1FGvonmvwS18nA4kpYJCGbuo7sR3CxYZDjz5t7BSXrPfnashxLVfh8O/Iio0glMHyu18D+Qz2xAZq8f53ubn4t30YsXRQCJRU1RcyOihioRA18OzAvt4HtPw0aefuWMr5SOsvzkhmK4Ny3XsGJV2Aijm7wZwbpFQwwd3fuGNx0d2mwEBBX+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E5L/eKWUPsjMH+s84jaQ9uOjWlsFjgaQd/QnB1uG9CM=;
- b=X4qV6EH4WsfIvkkq6EkS4LB79Qa/h+9xpai4ql/HALfrv5jrSIyXVdTRNqX+0m7bbBwgs1+zkWVTF7Qcx80s9VFx9bNbkD0TP6h+kkYApDrcSqMl75BcUd16Inxqc5fxRy0v1POciqvJj9vW9B6RKR1z9b+V/fnObVQHIuwNX0tfu2Ykxq/fg6qzzjQP8Zj3fJUIWFQ8nDXfeg5yi+o4+BtY/Sqc3awvvwJoWQXheqdrL5Y1nITYoakVBJZ/FX54heVIuq/DU85SRTuXA7qOZNH/GrpNTw3UIOzBOLOSAo+sqKn6mYZNK3u9ZEso4I77vWZ44jquqotovr3OYP+Jfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E5L/eKWUPsjMH+s84jaQ9uOjWlsFjgaQd/QnB1uG9CM=;
- b=QrZSiLHKh4jHf4WAUOvrqeIav9UB9zlruf5ppNa+s7EGA4vqabClUpOidjFvYy9EFrKYUjTh1i3pGJUTd8FCgmqbS3sWd+nDwBQ5lMzXaxdSIuU7fgwWiH/1b4gCWmhZB0fxknRzKFfL5MoDzPfYu/kqzP4pSb5XTfqdp0uBdl8=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB4010.eurprd08.prod.outlook.com (20.179.10.207) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.25; Mon, 30 Sep 2019 16:26:28 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.017; Mon, 30 Sep 2019
- 16:26:28 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v3 04/25] error: auto propagated local_err
-Thread-Topic: [PATCH v3 04/25] error: auto propagated local_err
-Thread-Index: AQHVcxQEcKETnqqn7ky5xEykJfDDyadEXLqAgAA0NoD//9lQgIAABzEA
-Date: Mon, 30 Sep 2019 16:26:28 +0000
-Message-ID: <495102b2-5d1a-f659-4387-5733ae34b3e2@virtuozzo.com>
-References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
- <20190924200902.4703-5-vsementsov@virtuozzo.com>
- <20190930151215.GB12777@linux.fritz.box>
- <ca629ae8-15c5-1685-1cbb-99283d37b0a1@virtuozzo.com>
- <20190930160039.GC12777@linux.fritz.box>
-In-Reply-To: <20190930160039.GC12777@linux.fritz.box>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR1001CA0023.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:3:f7::33) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190930192624256
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d062fd76-df61-4da9-baa3-08d745c2f20b
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:DB8PR08MB4010; 
-x-ms-traffictypediagnostic: DB8PR08MB4010:
-x-microsoft-antispam-prvs: <DB8PR08MB40108958E0142B0659425A21C1820@DB8PR08MB4010.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01762B0D64
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(366004)(376002)(136003)(396003)(39840400004)(199004)(189003)(486006)(316002)(7736002)(2906002)(54906003)(6246003)(66476007)(7406005)(64756008)(66946007)(36756003)(305945005)(81156014)(6116002)(6916009)(7416002)(66446008)(3846002)(386003)(31686004)(6506007)(66066001)(76176011)(81166006)(66556008)(102836004)(71200400001)(186003)(8676002)(71190400001)(8936002)(476003)(86362001)(446003)(26005)(4326008)(6486002)(14454004)(5660300002)(31696002)(99286004)(2616005)(14444005)(256004)(229853002)(478600001)(25786009)(52116002)(6436002)(6512007)(11346002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4010;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: TXMrBKqUhbwTXvVvTQYegyDgq5XRZ3wwVZVMP9mdL2AdTSyETyNODdBOtsb8l497f/FSoRyVbPr5AMQz+vd1A1C83F7gAO3mKpJwyPdNmriUSRyYsmv6xzcitIEwi0zc77IvijLwksKuDeGGeMNzTdJTv/sY3rNcPIl+JBy7q3M6rNNSLJ8a43xQnPuetKEezTTOnp7KYIdQGxen37sX6re/hvzzktjfcLyU+ZlcL4VIhifr2RJMqduecYtKWaVwzT2CGFCZ3bWUcZNTxSuJxoIN/xTNvFh3LFo2mHO/tJH3U7xDHC4+CWA3dKm8aqE0AuCf7hCXvGo0AEUkzEptgULm6oTHyT5akSM1ciAvfHRCGZyWJWWIfueTYziR72ZCkJTAyoQHnMD39WVSCi1w7JoVJVdL/8RJdx3IG67CFE4=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2552325C35593C42A8432D187B4C75C8@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <alex.bennee@linaro.org>) id 1iEygl-0006f3-Kp
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:38:21 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33179)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iEygl-0006eX-CE
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:38:19 -0400
+Received: by mail-wm1-x344.google.com with SMTP id r17so442011wme.0
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 09:38:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=MqcDsqob8zdpSQ9O51HTy+pHc2xxQyUuSFnvAW8fGV0=;
+ b=fetE1U2KlH19vBbBpv5sF9P1BNWRIFG/tj0f2SN866o5MBap/it29apegYEZJG/y0u
+ G9DLDM4rHVmUlhjP+Gz7ZaOUbxaaw9OmII/7YjV3Qj46KezaQ6JNVN4c7R2Qp8WJfrvd
+ fC7qqHj1vFk3r+kdm+zIwGmVJ2b83NexNlsxNbc4DzHd6rX8smvrw5Ewbxi5FTtWI8uz
+ fNP+cjQgdIRHJJuUycS3Htc/8nhnl8Fj4GjjFbCzvcieNM0XT4KVbDUcK2bfkoKQuQpx
+ pRl7xdhIQp5J+2sAl0H9tNmiNq08+PtyouEaJWI09AkAPyVvtRIiquS6iwM9z5PERFd+
+ AAAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=MqcDsqob8zdpSQ9O51HTy+pHc2xxQyUuSFnvAW8fGV0=;
+ b=Pe4rKWC4T54VInkokAUgdGzNOyFd/RjmOI8UJmAJGjltJlJIxgmgKrdEWcWDkxrNPF
+ c6iMRFTqK0BEjkbTe6uK9Xx7FrPKmOkFa9yFNPhkGd5hp1Tk0551kFFamr+r1zXtWFRy
+ sbZXp8vgGJ5N/cA6uvjSeTg5B/ERuujutIP8f9QsJ/HfkqExnuWShEr3rDhJAKMYLP82
+ 2204hTh1CEE+lq7QQ6AENjh7OzLxjk3+kjAK9hd1lGtYJfOD68TiuR1ZalIZ3qlCJYyH
+ KA7jXfpeKNAAXexRC0y6Uo3d22jv34LtThSLBcqkuTowSeQ21fcvv7jW0t9Z2Gxbw1eF
+ YD2Q==
+X-Gm-Message-State: APjAAAU/ls3zKKrW9B5nT4MaeKfxlDFXCw1jOe72blWLMybTmS20s6X3
+ mAsCLBTwCgKld+N5kIYWmuJkPw==
+X-Google-Smtp-Source: APXvYqzLUl/oZNxIMGof6pbHOs0K9ieW4bc2YopLxKzwC0NvcHkKHAvJLLMlo0qZmenI/CqsJ3E6cg==
+X-Received: by 2002:a1c:1bcf:: with SMTP id b198mr128630wmb.0.1569861497693;
+ Mon, 30 Sep 2019 09:38:17 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q19sm33426874wra.89.2019.09.30.09.38.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 30 Sep 2019 09:38:16 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 1946F1FF87;
+ Mon, 30 Sep 2019 17:38:16 +0100 (BST)
+References: <CAEfK_44VEF17nRgzNvVe+MPmAfS34kiJ_ozubWFkVYV0rm71sw@mail.gmail.com>
+ <CAFEAcA9nz9S4R+O9fwa0k38dB3r1smguG4bQRzwm1s0zJCvfDA@mail.gmail.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: Lockup with --accel tcg,thread=single
+In-reply-to: <CAFEAcA9nz9S4R+O9fwa0k38dB3r1smguG4bQRzwm1s0zJCvfDA@mail.gmail.com>
+Date: Mon, 30 Sep 2019 17:38:15 +0100
+Message-ID: <87h84tloy0.fsf@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d062fd76-df61-4da9-baa3-08d745c2f20b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2019 16:26:28.4072 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hpvNwp3TIb+nLMgmsjEvLID57CKak6C2DZ+XrE971C+V6+nS6oU5F46EPiMVCASIdTuIeZ25DppDIARdwvxj5o0wfs6EBT8fzTIrb0RuwL4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4010
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.133
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,62 +96,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Paul Burton <pburton@wavecomp.com>, Jeff Cody <codyprime@gmail.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
- Yuval Shaia <yuval.shaia@oracle.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- David Hildenbrand <david@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- "integration@gluster.org" <integration@gluster.org>,
- =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Doug Gale <doug16k@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MzAuMDkuMjAxOSAxOTowMCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMzAuMDkuMjAxOSB1bSAx
-NzoxOSBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDMw
-LjA5LjIwMTkgMTg6MTIsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMjQuMDkuMjAxOSB1bSAy
-MjowOCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+Pj4g
-SGVyZSBpcyBpbnRyb2R1Y2VkIEVSUlBfRlVOQ1RJT05fQkVHSU4gbWFjcm8sIHRvIGJlIHVzZWQg
-YXQgc3RhcnQgb2YNCj4+Pj4gZnVuY3Rpb25zIHdpdGggZXJycCBwYXJhbWV0ZXIuDQo+Pj4NCj4+
-PiBBIGJpdCBvZiBiaWtlIHNoZWRkaW5nLCBidXQgRk9PX0JFR0lOIHN1Z2dlc3RzIHRvIG1lIHRo
-YXQgYSBGT09fRU5EIHdpbGwNCj4+PiBmb2xsb3cuIENhbiB3ZSBmaW5kIGEgZGlmZmVyZW50IG5h
-bWUsIGVzcGVjaWFsbHkgbm93IHRoYXQgd2Ugd29uJ3QgdXNlDQo+Pj4gdGhpcyBtYWNybyBpbiBl
-dmVyeSBmdW5jdGlvbiB0aGF0IHVzZXMgYW4gZXJycCwgc28gZXZlbiB0aGUgImVycnANCj4+PiBm
-dW5jdGlvbiIgcGFydCBpc24ndCByZWFsbHkgY29ycmVjdCBhbnkgbW9yZT8NCj4+Pg0KPj4+IEhv
-dyBhYm91dCBFUlJQX0FVVE9fUFJPUEFHQVRFPw0KPj4NCj4+IEkgaGF2ZSBhbiBpZGVhIHRoYXQg
-d2l0aCB0aGlzIG1hY3JvIHdlIGNhbiAob3B0aW9uYWxseSkgZ2V0IHRoZSB3aG9sZSBjYWxsIHN0
-YWNrDQo+PiBvZiB0aGUgZXJyb3IgYW5kIHByaW50IGl0IHRvIGxvZywgc28gaXQncyBnb29kIHRv
-IGdpdmUgaXQgbW9yZSBnZW5lcmljIG5hbWUsIG5vdA0KPj4gbGltaXRlZCB0byBwcm9wYWdhdGlv
-bi4uDQo+IA0KPiBIbSwgd2hhdCdzIHRoZSBjb250ZXh0IGZvciB0aGlzIGZlYXR1cmU/DQo+IA0K
-PiBUaGUgb2J2aW91cyBvbmUgd2hlcmUgeW91IHdhbnQgdG8gaGF2ZSBhIHN0YWNrIHRyYWNlIGlz
-ICZlcnJvcl9hYm9ydCwNCj4gYnV0IHRoYXQgb25lIGNyYXNoZXMsIHNvIHlvdSBnZXQgaXQgYXV0
-b21hdGljYWxseS4gSWYgaXQncyBqdXN0IGEgbm9ybWFsDQo+IGVycm9yIChsaWtlIGEgUUFQSSBv
-cHRpb24gY29udGFpbnMgYW4gaW52YWxpZCB2YWx1ZSBhbmQgc29tZSBmdW5jdGlvbg0KPiBkb3du
-IHRoZSBjYWxsIGNoYWluIGNoZWNrcyBpdCksIHdoeSB3b3VsZCBhbnlvbmUgd2FudCB0byBrbm93
-IHdoYXQgdGhlDQo+IGNhbGwgY2hhaW4gaW4gdGhlIFFFTVUgY29kZSB3YXM/DQo+IA0KDQpXaGVu
-IEkgaGF2ZSBidWcgZnJvbSB0ZXN0ZXJzLCBjYWxsIHN0YWNrIHdvdWxkIGJlIGEgbG90IG1vcmUg
-ZGVzY3JpcHRpdmUsIHRoYW4ganVzdA0KYW4gZXJyb3IgbWVzc2FnZS4NCg0KV2UgbWF5IGFkZCB0
-cmFjZSBwb2ludCB3aGljaCB3aWxsIHByaW50IHRoaXMgaW5mb3JtYXRpb24sIHNvIHdpdGggZGlz
-YWJsZWQgdHJhY2UgcG9pbnQNCi0gbm8gZXh0cmEgb3V0cHV0Lg0KDQoNCg0KLS0gDQpCZXN0IHJl
-Z2FyZHMsDQpWbGFkaW1pcg0K
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On Mon, 30 Sep 2019 at 14:17, Doug Gale <doug16k@gmail.com> wrote:
+>>
+>> I found a lockup in single threaded TCG, with OVMF bios, 16 CPUs.
+>>
+>> qemu-system-x86_64 --accel tcg,thread=3Dsingle -smp cpus=3D16 -bios
+>> /usr/share/ovmf/OVMF.fd
+>>
+>> Using Ubuntu 18.04 LTS, default gnome desktop. There is no guest OS,
+>> there is no hard drive, just the OVMF firmware locks it up. (I
+>> narrowed it down to this from a much larger repro)
+>
+>> Peter Maydell helped me bisect it in IRC.
+>>  Works fine at commit 1e8a98b53867f61
+>>  Fails at commit 9458a9a1df1a4c7
+>>
+>> MTTCG works fine all the way up to master.
+>
+> Thanks for this bug report. I've reproduced it and think
+> I have figured out what is going on here.
+>
+> Commit 9458a9a1df1a4c719e245 is Paolo's commit that fixes the
+> TCG-vs-dirty-bitmap race by having the thread which is
+> doing a memory access wait for the vCPU thread to finish
+> its current TB using a no-op run_on_cpu() operation.
+>
+> In the case of the hang the thread doing the memory access
+> is the iothread, like this:
+>
+> #14 0x000055c150c0a98c in run_on_cpu (cpu=3D0x55c153801c60,
+> func=3D0x55c150bbb542 <do_nothing>, data=3D...)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/cpus.c:1205
+> #15 0x000055c150bbb58c in tcg_log_global_after_sync
+> (listener=3D0x55c1538410c8) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/exec.c:2963
+> #16 0x000055c150c1fe18 in memory_global_after_dirty_log_sync () at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/memory.c:2598
+> #17 0x000055c150c1e6b8 in memory_region_snapshot_and_clear_dirty
+> (mr=3D0x55c1541e82b0, addr=3D0, size=3D1920000, client=3D0)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/memory.c:2106
+> #18 0x000055c150c76c05 in vga_draw_graphic (s=3D0x55c1541e82a0, full_upda=
+te=3D0)
+>     at /home/petmay01/linaro/qemu-from-laptop/qemu/hw/display/vga.c:1661
+> #19 0x000055c150c771c4 in vga_update_display (opaque=3D0x55c1541e82a0)
+> at /home/petmay01/linaro/qemu-from-laptop/qemu/hw/display/vga.c:1785
+> #20 0x000055c151052a83 in graphic_hw_update (con=3D0x55c1536dfaa0) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/ui/console.c:268
+> #21 0x000055c151091490 in gd_refresh (dcl=3D0x55c1549af090) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/ui/gtk.c:484
+> #22 0x000055c151056571 in dpy_refresh (s=3D0x55c1542f9d90) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/ui/console.c:1629
+> #23 0x000055c1510527f0 in gui_update (opaque=3D0x55c1542f9d90) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/ui/console.c:206
+> #24 0x000055c1511ee67c in timerlist_run_timers
+> (timer_list=3D0x55c15370c280) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/util/qemu-timer.c:592
+> #25 0x000055c1511ee726 in qemu_clock_run_timers
+> (type=3DQEMU_CLOCK_REALTIME) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/util/qemu-timer.c:606
+> #26 0x000055c1511ee9e5 in qemu_clock_run_all_timers () at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/util/qemu-timer.c:692
+> #27 0x000055c1511ef181 in main_loop_wait (nonblocking=3D0) at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/util/main-loop.c:524
+> #28 0x000055c150db03fe in main_loop () at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/vl.c:1806
+>
+> run_on_cpu() adds the do_nothing function to a cpu queued-work list.
+>
+> However, the single-threaded TCG runloop qemu_tcg_rr_cpu_thread_fn()
+> has the basic structure:
+>
+>    while (1) {
+>        for (each vCPU) {
+>            run this vCPU for a timeslice;
+>        }
+>        qemu_tcg_rr_wait_io_event();
+>    }
+>
+> and it processes cpu work queues only in qemu_tcg_rr_wait_io_event().
+> This is a problem, because the thing which causes us to stop running
+> one vCPU when its timeslice ends and move on to the next is the
+> tcg_kick_vcpu_timer -- and the iothread will never process that timer
+> and kick the vcpu because it is currently blocked in run_on_cpu() !
+>
+> Not sure currently what the best fix is here.
+
+We seem to be repeating ourselves because:
+
+  a8efa60633575a2ee4dbf807a71cb44d44b0e0f8
+  Author:     Paolo Bonzini <pbonzini@redhat.com>
+  AuthorDate: Wed Nov 14 12:36:57 2018 +0100
+  cpus: run work items for all vCPUs if single-threaded
+
+However looking at the commit I can still see we have the problem of not
+advancing to the next vCPU if the kick timer (or some other event)
+doesn't bring the execution to an exit. I suspect you could get this in
+Linux but it's probably sufficiently busy to ensure vCPUs are always
+exiting for some reason or another.
+
+So options I can think of so far are:
+
+1. Kick 'em all when not inter-vCPU
+
+Something like this untested patch...
+
+--8<---------------cut here---------------start------------->8---
+1 file changed, 17 insertions(+), 5 deletions(-)
+cpus.c | 22 +++++++++++++++++-----
+
+modified   cpus.c
+@@ -949,8 +949,8 @@ static inline int64_t qemu_tcg_next_kick(void)
+     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + TCG_KICK_PERIOD;
+ }
+
+-/* Kick the currently round-robin scheduled vCPU */
+-static void qemu_cpu_kick_rr_cpu(void)
++/* Kick the currently round-robin scheduled vCPU to next */
++static void qemu_cpu_kick_rr_next_cpu(void)
+ {
+     CPUState *cpu;
+     do {
+@@ -961,6 +961,16 @@ static void qemu_cpu_kick_rr_cpu(void)
+     } while (cpu !=3D atomic_mb_read(&tcg_current_rr_cpu));
+ }
+
++/* Kick all RR vCPUs */
++static void qemu_cpu_kick_rr_cpus(void)
++{
++    CPUState *cpu;
++
++    CPU_FOREACH(cpu) {
++        cpu_exit(cpu);
++    };
++}
++
+ static void do_nothing(CPUState *cpu, run_on_cpu_data unused)
+ {
+ }
+@@ -993,7 +1003,7 @@ void qemu_timer_notify_cb(void *opaque, QEMUClockType =
+type)
+ static void kick_tcg_thread(void *opaque)
+ {
+     timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
+-    qemu_cpu_kick_rr_cpu();
++    qemu_cpu_kick_rr_next_cpu();
+ }
+
+ static void start_tcg_kick_timer(void)
+@@ -1828,9 +1838,11 @@ void qemu_cpu_kick(CPUState *cpu)
+ {
+     qemu_cond_broadcast(cpu->halt_cond);
+     if (tcg_enabled()) {
++        if (qemu_tcg_mttcg_enabled()) {
+         cpu_exit(cpu);
+-        /* NOP unless doing single-thread RR */
+-        qemu_cpu_kick_rr_cpu();
++        } else {
++            qemu_cpu_kick_rr_cpus();
++        }
+     } else {
+         if (hax_enabled()) {
+             /*
+--8<---------------cut here---------------end--------------->8---
+
+2. Add handling of kicking all VCPUs to do_run_on_cpu when current_cpu
+=3D=3D NULL
+
+Which would basically kick all vCPUs when events come from outside the
+emulation.
+
+3. Figure out multi-threaded icount and record/replay and drop the
+special RR case.
+
+This might take a while.
+
+> Side note -- this use of run_on_cpu() means that we now drop
+> the iothread lock within memory_region_snapshot_and_clear_dirty(),
+> which we didn't before. This means that a vCPU thread can now
+> get in and execute an access to the device registers of
+> hw/display/vga.c, updating its state in a way I suspect that the
+> device model code is not expecting... So maybe the right answer
+> here should be to come up with a fix for the race that 9458a9a1
+> addresses that doesn't require us to drop the iothread lock in
+> memory_region_snapshot_and_clear_dirty() ? Alternatively we need
+> to audit the callers and flag in the documentation that this
+> function has the unexpected side effect of briefly dropping the
+> iothread lock.
+
+There was a series Emilio posted to get rid of more of the BQL in place
+of per-CPU locks which IIRC also stopped some of the bouncing we do in
+the *_on_cpu functions. Each time we have to do a lock shuffle to get
+things moving is a bit of a red flag.
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
 
