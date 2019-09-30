@@ -2,84 +2,131 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5609C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 20:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C5F3C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 20:50:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C9FE22500
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 20:47:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24D46224FE
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 20:50:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mieC1GDe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C9FE22500
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="QGxeBW0x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24D46224FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iF2Zh-0003C8-5i
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 16:47:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45058)
+	id 1iF2cJ-0005Yv-6B
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 16:50:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45347)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iF2BC-00050M-43
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:21:59 -0400
+ (envelope-from <felipe@nutanix.com>) id 1iF2Da-0007kg-RR
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:24:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iF2BA-0005pW-SF
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:21:57 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38893)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iF2BA-0005p9-MX
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:21:56 -0400
-Received: by mail-pf1-x443.google.com with SMTP id h195so6232119pfe.5
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 13:21:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=BGOdnUQ7n88wshKpceGoTB4ILfGRgsQjpAICNmjMH9Y=;
- b=mieC1GDejv/UZEP3ApfvREDw5Bmg/f7WChqK9wp2Dqhm/fSkuwefySH+bVl1dIpvT7
- 5jeHSy5LNuxd1R24thDVO8ukY3Bjui5XYXduOATSrCCv5SPOqMyDOe7sokYlj1OLDlnw
- V+q2HJWQziD90WnGhdC79KxhizabEnUm2wK6BKbThWpYNdnm5QsZrjDmnHHD9NMThMYj
- UzlKsCybinoq5vDiH2TAx7q9VUlKYsGWl2Nn3UZssJsrOz4+TpxAb97T9XXDRmA1SIJq
- e3CK3RRZaUGgI7dBk8WybvIVVT1EM+Ehu7kpScgYcYxDynIpenG8l9gpyJqK3BOw4AjZ
- fSpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=BGOdnUQ7n88wshKpceGoTB4ILfGRgsQjpAICNmjMH9Y=;
- b=a8C62K5Z3qA0uS4xtTUzTS9xu4XM1jZuSmkyUOwaXJflk+b97tPFIpgFlku3hoYnB5
- w0wuVxwgT3RrydthGKHoCShtuJtudvhOlMrMVNhlyrP+IA89uxWCXD3b9nNULh98oqQq
- iPgQJWms+jNONHwBgMYnBtpQtVLz4BvQNtXpslp9Oo9uLsHRVxjRhCmXFFj8kxr1vldt
- AxEXwiD3VO/FQGt/G5yQ5fE9lPL3sfz8QuP+PzsRUuRNCJTAv5rtSO/JtzgG12VOedsI
- XbXZh0in7w9do30T1+nKpllo1gmL7TnbRET15toCW6pG8KCAMLYTELegLvq70LbSVPEB
- 4Hkw==
-X-Gm-Message-State: APjAAAUcsdODnH8CUgm+NWVJTSKaRYGdiLvMzoVr7auy9WrId6We69y7
- hb+uyOhbsRnYhG0wF53Q4xnJFMp2sxg=
-X-Google-Smtp-Source: APXvYqyao1mwnDBuz0kXimarnkqAgAAxi0vvirb8CZmni874A1EQOv5NakBFwC4FGZZmg41BBBl1Rw==
-X-Received: by 2002:a17:90a:2687:: with SMTP id
- m7mr1135371pje.25.1569874915433; 
- Mon, 30 Sep 2019 13:21:55 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id r28sm15336802pfg.62.2019.09.30.13.21.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 30 Sep 2019 13:21:54 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 22/22] tcg/ppc: Update vector support for v3.00 dup/dupi
-Date: Mon, 30 Sep 2019 13:21:25 -0700
-Message-Id: <20190930202125.21064-23-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190930202125.21064-1-richard.henderson@linaro.org>
-References: <20190930202125.21064-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+ (envelope-from <felipe@nutanix.com>) id 1iF2DY-0007bl-N9
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:24:25 -0400
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:63928)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1iF2DY-0007ZS-Cq
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:24:24 -0400
+Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
+ by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ x8UKAYLj030462; Mon, 30 Sep 2019 13:24:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=fbkR9JwKMR+QfkWH4Hn8TaV4+bjzZsbxEzUnYXtknrw=;
+ b=QGxeBW0x1AiuSPwwK49Qd7R9o5YnwkSQORs1i4j29l5zQ0VZtb5QSOSMnSPn/xQPvv3n
+ 1/nWNSCXQTL2NAJ6iU9H0qEIGk3OIZGzx7TuSg27SVRw1xWaLAg6AnMQ+kFJrbNmXTas
+ IgnwvnpjZSxK0E/+d+jnZfBqRyFlnw1NF0CmcLhzEfxDdnPJ8mcruJnRVE/hxfnbYR8E
+ qehXjdfVpPYaCFLFAK7dPAEC3tKGZpwfAGQ52QuT8v1tye0LZMiSQz+UiBFCxlmrllYD
+ 9eZ0p+E1LelCeTq+BiMsGO+DPzRn2xI4nafLjB+k0wRd62He/lwMYQgWuJVm7Hpc3OEN qw== 
+Received: from nam03-co1-obe.outbound.protection.outlook.com
+ (mail-co1nam03lp2057.outbound.protection.outlook.com [104.47.40.57])
+ by mx0a-002c1b01.pphosted.com with ESMTP id 2va3e8mq0t-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Mon, 30 Sep 2019 13:24:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WtBtnSQDvXHGwoFjogVmIMV4XwaOzB4JppDjZDVk3tHMuuJu7/TAQtRhjdpirhKNY92CKKu9tDVivmKufQw1kzDqGCLTT0l1WE3Xy95os7r8PiBvnpxbV6aZAmRNQd2e87DHXdWAIAZK6VQg01uWJCwuE54+rUz7dOL5eINbv7b7VmxScrk+6cTv8QhQ67DxrntQm7Xzgj9mK9ffyvXmWCsruUDW05y8avZrgUQ5uc8xrcVpiZAzcNG2Zh0Y+SqJsE5wkXDfYcw0QB3UhX0pihHaHSECWWFU+i8rA1/8XOE19a9QkwoKbcbGmZze6aBLUCr/VIXzyn9/hzfnIfOD1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fbkR9JwKMR+QfkWH4Hn8TaV4+bjzZsbxEzUnYXtknrw=;
+ b=j/JiB1mRJ6agvU6DHh+rb1tHR8NDrBBm8+nUNJyc7WucobAmirCBghmYLEh3dRwotRPkTY7xgW2C+Jm43n2lkp5ZkZhzlhWGMW6uOYdkDqPbjo4GmOTKjDqjwDsK9GiLaiMo/TGaGohSxu3ysYL3Mh03AULiv/kyOJ5JNi/u4wFRK51FfhxewAVdICgTdfhNt2yKeADEnBA9My/6WL+hZnTqlK58YqJ0rpPLzPJ3eX+loN2OMkz9KWurls3eqslMTjQ2ft2IZcaXm8LEUWrb0SodKdXEK/Rjup2uaEH7L6qPgpOKeB0Be2MPsgB5Z9LNR5VmWDSk5d0MFrxLrL5yqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
+ MWHPR02MB2382.namprd02.prod.outlook.com (10.168.243.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Mon, 30 Sep 2019 20:24:17 +0000
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::2867:91aa:a3e:e278]) by MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::2867:91aa:a3e:e278%2]) with mapi id 15.20.2305.017; Mon, 30 Sep 2019
+ 20:24:17 +0000
+From: Felipe Franciosi <felipe@nutanix.com>
+To: Rafael David Tinoco <rafaeldtinoco@ubuntu.com>
+Subject: Re: Thoughts on VM fence infrastructure
+Thread-Topic: Thoughts on VM fence infrastructure
+Thread-Index: AQHVd3oUrA00x04Zc0W5TGhiZaAe96dESBkAgAAVQwCAAATTAIAAD5wAgAADW4CAAAYcgIAAB1MAgAAdlwCAAArvAA==
+Date: Mon, 30 Sep 2019 20:24:17 +0000
+Message-ID: <4E3C4C6F-C6D2-473E-9D8D-F724EE37366A@nutanix.com>
+References: <42837590-2563-412B-ADED-57B8A10A8E68@nutanix.com>
+ <20190930142954.GA2801@work-vm>
+ <C5374DA3-A1FC-4F1A-AA36-DC02D350F5A1@nutanix.com>
+ <20190930160316.GH2759@work-vm>
+ <417D4B96-2641-4DA8-B00B-3302E211E939@nutanix.com>
+ <20190930171109.GL2759@work-vm>
+ <CA2CBDDF-99ED-4693-8622-89D4F2E71DE9@nutanix.com>
+ <20190930175914.GM2759@work-vm>
+ <8f83a36d-e88a-bbe9-a0e1-cbfc6278c063@ubuntu.com>
+In-Reply-To: <8f83a36d-e88a-bbe9-a0e1-cbfc6278c063@ubuntu.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [82.9.225.166]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 21dfa103-04c9-4e2e-e615-08d745e42b43
+x-ms-traffictypediagnostic: MWHPR02MB2382:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR02MB23825C4995EBEFE23B77CFA7D7820@MWHPR02MB2382.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 01762B0D64
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(396003)(366004)(376002)(39860400002)(346002)(189003)(199004)(54906003)(4326008)(186003)(66446008)(26005)(64756008)(478600001)(6246003)(71190400001)(71200400001)(8936002)(5660300002)(305945005)(2906002)(316002)(81156014)(8676002)(36756003)(561944003)(81166006)(53546011)(6506007)(102836004)(91956017)(33656002)(66476007)(66946007)(7736002)(76116006)(66556008)(76176011)(14454004)(66066001)(25786009)(229853002)(3846002)(6116002)(476003)(11346002)(6436002)(256004)(14444005)(2616005)(99286004)(6512007)(486006)(86362001)(446003)(6486002)(6916009)(64030200001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB2382;
+ H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: mdXZmW2ePlAeFYBpKtEhpwBctn+gNxeLQXaYu/U+wqRAKCVudrVruHWWv4U7NwT9/tYm3LST/Qv2QgeFRN9Xj8NrpY5oU/OjLzfl4HntVtoc55XFA1/a/DP0PDLh6d/+a3icvKKhJbYJN16kp2xmmN3+1JniZipL6Owtnrl0NQMpUV5E0I/7XEUePZ3Jp5FddqVz6bSBj+mz1ZwDlNInbaEg/SrOETvo3IK6qoiZfS4ONsQTZSyoqs+OKcvWz3PCcKdDE+vkMl3pbcKRtPGscpfAn9+gryGyIkgRjQ+ejG8rH1A6aPO1S2RlNpCXzQdQi/gNUNMQiNMfHwnO6Oc9elzZ/2CleHOje7JD1skqgbPQf5bXfFNgRqpVsG1OpP6dGToD0VFGmYaibhvcXMvMG+OuVvYYqbqq92R5CsBJsr0=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <0640F9EDDCE5374BAC55FB766954CD1A@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21dfa103-04c9-4e2e-e615-08d745e42b43
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2019 20:24:17.4825 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yZSoOK/mN4UqlGR76ZTRWyzS6owLa6ZLU+nZaypJYR572k1LXVUJg5+prp0PVF5htWU3y9sGNy8Jq29v2Cd3aoHhs685NMUh4xAaYh8blFg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2382
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,1.0.8
+ definitions=2019-09-30_11:2019-09-30,2019-09-30 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.151.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,93 +138,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.cave-ayland@ilande.co.uk, amarkovic@wavecomp.com, hsp.cat7@gmail.com
+Cc: Aditya Ramesh <aramesh@nutanix.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These new instructions are conditional on MSR.VEC for TX=1,
-so we can consider these Altivec instructions.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/ppc/tcg-target.inc.c | 28 ++++++++++++++++++++++++++--
- 1 file changed, 26 insertions(+), 2 deletions(-)
 
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 5b7d1bd2dc..d308d69aba 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -596,11 +596,14 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- 
- #define XXPERMDI   (OPCD(60) | (10 << 3) | 7)  /* v2.06, force ax=bx=tx=1 */
- #define XXSEL      (OPCD(60) | (3 << 4) | 0xf) /* v2.06, force ax=bx=cx=tx=1 */
-+#define XXSPLTIB   (OPCD(60) | (360 << 1) | 1) /* v3.00, force tx=1 */
- 
- #define MFVSRD     (XO31(51) | 1)   /* v2.07, force sx=1 */
- #define MFVSRWZ    (XO31(115) | 1)  /* v2.07, force sx=1 */
- #define MTVSRD     (XO31(179) | 1)  /* v2.07, force tx=1 */
- #define MTVSRWZ    (XO31(243) | 1)  /* v2.07, force tx=1 */
-+#define MTVSRDD    (XO31(435) | 1)  /* v3.00, force tx=1 */
-+#define MTVSRWS    (XO31(403) | 1)  /* v3.00, force tx=1 */
- 
- #define RT(r) ((r)<<21)
- #define RS(r) ((r)<<21)
-@@ -931,6 +934,10 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type, TCGReg ret,
-             return;
-         }
-     }
-+    if (have_isa_3_00 && val == (tcg_target_long)dup_const(MO_8, val)) {
-+        tcg_out32(s, XXSPLTIB | VRT(ret) | ((val & 0xff) << 11));
-+        return;
-+    }
- 
-     /*
-      * Otherwise we must load the value from the constant pool.
-@@ -3021,7 +3028,22 @@ static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
-                             TCGReg dst, TCGReg src)
- {
-     tcg_debug_assert(dst >= TCG_REG_V0);
--    tcg_debug_assert(src >= TCG_REG_V0);
-+
-+    /* Splat from integer reg allowed via constraints for v3.00.  */
-+    if (src < TCG_REG_V0) {
-+        tcg_debug_assert(have_isa_3_00);
-+        switch (vece) {
-+        case MO_64:
-+            tcg_out32(s, MTVSRDD | VRT(dst) | RA(src) | RB(src));
-+            return true;
-+        case MO_32:
-+            tcg_out32(s, MTVSRWS | VRT(dst) | RA(src));
-+            return true;
-+        default:
-+            /* Fail, so that we fall back on either dupm or mov+dup.  */
-+            return false;
-+        }
-+    }
- 
-     /*
-      * Recall we use (or emulate) VSX integer loads, so the integer is
-@@ -3482,6 +3504,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     static const TCGTargetOpDef sub2
-         = { .args_ct_str = { "r", "r", "rI", "rZM", "r", "r" } };
-     static const TCGTargetOpDef v_r = { .args_ct_str = { "v", "r" } };
-+    static const TCGTargetOpDef v_vr = { .args_ct_str = { "v", "vr" } };
-     static const TCGTargetOpDef v_v = { .args_ct_str = { "v", "v" } };
-     static const TCGTargetOpDef v_v_v = { .args_ct_str = { "v", "v", "v" } };
-     static const TCGTargetOpDef v_v_v_v
-@@ -3651,8 +3674,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-         return &v_v_v;
-     case INDEX_op_not_vec:
-     case INDEX_op_neg_vec:
--    case INDEX_op_dup_vec:
-         return &v_v;
-+    case INDEX_op_dup_vec:
-+        return have_isa_3_00 ? &v_vr : &v_v;
-     case INDEX_op_ld_vec:
-     case INDEX_op_st_vec:
-     case INDEX_op_dupm_vec:
--- 
-2.17.1
+> On Sep 30, 2019, at 8:45 PM, Rafael David Tinoco <rafaeldtinoco@ubuntu.co=
+m> wrote:
+>=20
+>=20
+>>>> There are times when the main loop can get blocked even though the CPU
+>>>> threads can be running and can in some configurations perform IO
+>>>> even without the main loop (I think!).
+>>> Ah, that's a very good point. Indeed, you can perform IO in those
+>>> cases specially when using vhost devices.
+>>>=20
+>>>> By setting a timer in the kernel that sends a signal to qemu, the kern=
+el
+>>>> will send that signal however broken qemu is.
+>>> Got you now. That's probably better. Do you reckon a signal is
+>>> preferable over SIGEV_THREAD?
+>> Not sure; probably the safest is getting the kernel to SIGKILL it - but
+>> that's a complete nightmare to debug - your process just goes *pop*
+>> with no apparent reason why.
+>> I've not used SIGEV_THREAD - it looks promising though.
+>=20
+> Sorry to "enter" the discussion, but, in "real" HW, its not by accident
+> that watchdog devices timeout generates a NMI to CPUs, causing the
+> kernel to handle the interrupt - and panic (or to take other action set
+> by specific watchdog drivers that re-implements the default ones).
 
+Not sure what you mean by "sorry"... thanks for joining. :)
+
+> Can't you simple "inject" a NMI in all guest vCPUs BEFORE you take any
+> action in QEMU itself? Just like the virtual watchdog device would do,
+> from inside the guest (/dev/watchdog), but capable of being updated by
+> outside, in this case of yours (if I understood correctly).
+
+It's unclear to me how this relates to this use case, perhaps that's
+not clear. The idea is that on various cloud deployments, a host could
+be temporarily unavailable. Imagine that a network cable snapped. A
+management layer could then restart the unreachable VMs elsewhere (as
+part of High Availability offerings), but it needs to ensure that
+disconnected host is not just going to come back from the dead with
+older incarnations of the VMs running. (Imagine that someone replaced
+the broken network cable.) That would result in lots of issues from
+colliding IP addresses to different writers on shared storage leading
+to data corruption.
+
+The ask is for a mechanism to fence the host, essentially causing all
+(or selected) VMs on that host to die. There are several mechanisms
+for that, mostly requiring some sort of HW support (eg. STONITH).
+Those are often focused on cases where the host requires manual
+intervention to recover or at least a reset.
+
+I'm looking to implement a mechanism for self-fencing, which doesn't
+require external hardware and cover most failure scenarios (from
+partially/totally broken hosts to simply a temporary network failure).
+In several cases rebooting the host is unnecessary; just ensuring the
+VMs are down is enough. That's almost always true on temporary network
+unavailability (eg. split network).
+
+> Possibly you would have to have a dedicated loop for this "watchdog
+> device" (AIO threads ?) not to compete with existing coroutines/BH Tasks
+> and their jittering on your "realtime watchdog needs".
+
+Only when this feature is needed (which isn't the case for most
+people), there would be an extra thread (according to the latest
+proposal) which is mostly idle. It would wake up every few seconds and
+stat() a file, which is a very lightweight operation. That would not
+measurably impact/jitter other work.
+
+> Regarding remaining existing I/OS for the guest's devices in question
+> (vhost/vhost-user etc), would be just like a real host where the "bus"
+> received commands, but sender died right after...
+
+I hope the above clarifies the idea.
+
+Cheers,
+F.=
 
