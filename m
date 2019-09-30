@@ -2,142 +2,82 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0253C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 11:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BB5C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 11:07:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FAD121855
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 11:03:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FAD121855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E3462216F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 11:07:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJzd9q0G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3462216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEtSU-0002H5-Gf
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 07:03:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46794)
+	id 1iEtWY-0004vB-VI
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 07:07:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47562)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1iEtQ2-0001es-2D
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:00:43 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iEtVT-0004SI-QF
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:06:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1iEtPz-0007In-LR
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:00:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30302)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1iEtPz-0007I6-Dj
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:00:39 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8UAvsFS027331
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 07:00:37 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vbfnw2d8w-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 07:00:36 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 30 Sep 2019 12:00:34 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 30 Sep 2019 12:00:30 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8UB0TJw34668698
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 30 Sep 2019 11:00:30 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C7AE8A405B;
- Mon, 30 Sep 2019 11:00:29 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 80DB0A406E;
- Mon, 30 Sep 2019 11:00:29 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 30 Sep 2019 11:00:29 +0000 (GMT)
-Subject: Re: [PATCH v7 0/4] s390: stop abusing
- memory_region_allocate_system_memory()
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20190924144751.24149-1-imammedo@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date: Mon, 30 Sep 2019 13:00:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iEtVR-0001a7-JL
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:06:19 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46145)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iEtVR-0001Zm-9h
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:06:17 -0400
+Received: by mail-wr1-x444.google.com with SMTP id o18so10741833wrv.13
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 04:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=1LzpV1uTlI9EptIYiIezVV5VeGGn9OgsFcgOA60SSoc=;
+ b=eJzd9q0GsbQfUZXYDyXtSLYQ5s76CZs7HW2mBb+E4QcOCNzojf6eDNEJRC4C0gRJZ2
+ ENfbOCU5qAoEWOeuEi0I04TFy7wO437v6wG9yEirNVPWyeupzSiv2bYOv2awEhvA6Xpu
+ 5SDfXqesGWnyBg8oRpuBo7mWFb5FYD6HM6mHrdLDcUG++n03chcaEgW7NRLUNoYQGBxd
+ CyhvkdT3N6YsPRfDjHg0/E70lcaVzx/L4OhA/lKYUibNNHp9LCOWqY9SFxSyB2iAL2oM
+ MHGalOSIfpgjZhV1+/1IPlbF+CHyyIbN/gVEVvF5BqsmqYU4U21Z/TeBM/O/30xO4R1b
+ hezA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=1LzpV1uTlI9EptIYiIezVV5VeGGn9OgsFcgOA60SSoc=;
+ b=sVK74Q5afrFqnewyP2ILGoVwOmkJMcv5x2QwGailDu4jOQIsM45W2C94TGPRr794IJ
+ oGRlHB1F3xFwSWzbNTR3x+bFOwDfHvdoD8JA4XGVnlLNqmf1NK2VtcGE7FBHn2mOKXIR
+ AYMS35gJb7hULngWwUcFbrrIZGhn9OushC4uGykUrsyeNKMXsovtoGKya/oHi2pdEUew
+ MztKeHX97JZVdRJTEnIbqjsXXv5Qa0AewMIljejW5o2anoTCxvCtDG3aanP+4JWGan7q
+ iLeRnbVCCF4XrxyRJ3ARJ6Dul56+svMZN3FN+gatbKLyv3pF58CcTEclte4W0TaszDWw
+ dxfA==
+X-Gm-Message-State: APjAAAUppuSOejfxja/IaMmsnCz+5f/N2UrJS9R9fx7tN8e9MfEYsaAZ
+ rkZ2NLq3lFy9Qvlw6yLgFJRmO6NUbIzwKoHs6So=
+X-Google-Smtp-Source: APXvYqxOxl+zCQoRemgFbCc8TKQ9xSeqKEJitiz27quAWOrYHxXBDwD9WvS+Tld0uTpsr9PvgDT2BkaX8ZjoQ4yxHeo=
+X-Received: by 2002:adf:fb87:: with SMTP id a7mr12010138wrr.370.1569841575667; 
+ Mon, 30 Sep 2019 04:06:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190924144751.24149-1-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19093011-0028-0000-0000-000003A3F136
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19093011-0029-0000-0000-0000246619DA
-Message-Id: <00cbdb6b-10a9-145a-2788-82b412add171@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-30_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909300117
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+References: <20190930105135.27244-1-dgilbert@redhat.com>
+ <20190930105135.27244-3-dgilbert@redhat.com>
+In-Reply-To: <20190930105135.27244-3-dgilbert@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 30 Sep 2019 15:06:02 +0400
+Message-ID: <CAJ+F1CJ0KoFay_yddvQRZ73VNECyjzdWL8rBj9pCdWncFZhMbA@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] virtio: add vhost-user-fs base device
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,69 +89,483 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com, peterx@redhat.com,
- qemu-s390x@nongnu.org, pbonzini@redhat.com
+Cc: mszeredi@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.09.19 16:47, Igor Mammedov wrote:
-> Changelog:
->   since v6:
->     - include and rebase on top of
->        [PATCH 0/2] kvm: clear dirty bitmaps from all overlapping memslots
->         https://www.mail-archive.com/qemu-devel@nongnu.org/msg646200.html
->     - minor fixups suggested during v6 review
->     - more testing incl. hacked x86
->   since v5:
->     - [1/2] fix migration that wasn't starting and make sure that KVM part
->       is able to handle 1:n MemorySection:memslot arrangement
->   since v3:
->     - fix compilation issue
->     - advance HVA along with GPA in kvm_set_phys_mem()
->   since v2:
->     - break migration from old QEMU (since 2.12-4.1) for guest with >8TB RAM
->       and drop migratable aliases patch as was agreed during v2 review
->     - drop 4.2 machines patch as it's not prerequisite anymore
->   since v1:
->     - include 4.2 machines patch for adding compat RAM layout on top
->     - 2/4 add missing in v1 patch for splitting too big MemorySection on
->           several memslots
->     - 3/4 amend code path on alias destruction to ensure that RAMBlock is
->           cleaned properly
->     - 4/4 add compat machine code to keep old layout (migration-wise) for
->           4.1 and older machines 
-> 
-> 
-> While looking into unifying guest RAM allocation to use hostmem backends
-> for initial RAM (especially when -mempath is used) and retiring
-> memory_region_allocate_system_memory() API, leaving only single hostmem backend,
-> I was inspecting how currently it is used by boards and it turns out several
-> boards abuse it by calling the function several times (despite documented contract
-> forbiding it).
-> 
-> s390 is one of such boards where KVM limitation on memslot size got propagated
-> to board design and memory_region_allocate_system_memory() was abused to satisfy
-> KVM requirement for max RAM chunk where memory region alias would suffice.
-> 
-> Unfortunately, memory_region_allocate_system_memory() usage created migration
-> dependency where guest RAM is transferred in migration stream as several RAMBlocks
-> if it's more than KVM_SLOT_MAX_BYTES. During v2 review it was agreed to ignore
-> migration breakage (documenting it in release notes) and leaving only KVM fix.
-> 
-> In order to replace these several RAM chunks with a single memdev and keep it
-> working with KVM memslot size limit, the later was modified to deal with 
-> memory section split on several KVMSlots and manual RAM splitting in s390
-> was replace by single memory_region_allocate_system_memory() call.
-> 
-> Tested:
->   * s390 with hacked KVM_SLOT_MAX_BYTES = 128Mb
->       - guest reboot cycle in ping-pong migration
->   * x86 with hacke max memslot = 128 and manual_dirty_log_protect enabled
->       - ping-pong migration with workload dirtying RAM around a split area
-> 
+Hi
 
-Thanks, v7 applied to s390-next.
+On Mon, Sep 30, 2019 at 2:52 PM Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+>
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The virtio-fs virtio device provides shared file system access using
+> the FUSE protocol carried over virtio.
+> The actual file server is implemented in an external vhost-user-fs device
+> backend process.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  configure                         |  13 ++
+>  hw/virtio/Makefile.objs           |   1 +
+>  hw/virtio/vhost-user-fs.c         | 299 ++++++++++++++++++++++++++++++
+>  include/hw/virtio/vhost-user-fs.h |  45 +++++
+>  4 files changed, 358 insertions(+)
+>  create mode 100644 hw/virtio/vhost-user-fs.c
+>  create mode 100644 include/hw/virtio/vhost-user-fs.h
+>
+> diff --git a/configure b/configure
+> index 542f6aea3f..204cbe351e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -381,6 +381,7 @@ vhost_crypto=3D""
+>  vhost_scsi=3D""
+>  vhost_vsock=3D""
+>  vhost_user=3D""
+> +vhost_user_fs=3D""
+>  kvm=3D"no"
+>  hax=3D"no"
+>  hvf=3D"no"
+> @@ -1293,6 +1294,10 @@ for opt do
+>    ;;
+>    --enable-vhost-vsock) vhost_vsock=3D"yes"
+>    ;;
+> +  --disable-vhost-user-fs) vhost_user_fs=3D"no"
+> +  ;;
+> +  --enable-vhost-user-fs) vhost_user_fs=3D"yes"
+> +  ;;
+>    --disable-opengl) opengl=3D"no"
+>    ;;
+>    --enable-opengl) opengl=3D"yes"
+> @@ -2236,6 +2241,10 @@ test "$vhost_crypto" =3D "" && vhost_crypto=3D$vho=
+st_user
+>  if test "$vhost_crypto" =3D "yes" && test "$vhost_user" =3D "no"; then
+>    error_exit "--enable-vhost-crypto requires --enable-vhost-user"
+>  fi
+> +test "$vhost_user_fs" =3D "" && vhost_user_fs=3D$vhost_user
+> +if test "$vhost_user_fs" =3D "yes" && test "$vhost_user" =3D "no"; then
+> +  error_exit "--enable-vhost-user-fs requires --enable-vhost-user"
+> +fi
+>
+>  # OR the vhost-kernel and vhost-user values for simplicity
+>  if test "$vhost_net" =3D ""; then
+> @@ -6377,6 +6386,7 @@ echo "vhost-crypto support $vhost_crypto"
+>  echo "vhost-scsi support $vhost_scsi"
+>  echo "vhost-vsock support $vhost_vsock"
+>  echo "vhost-user support $vhost_user"
+> +echo "vhost-user-fs support $vhost_user_fs"
+>  echo "Trace backends    $trace_backends"
+>  if have_backend "simple"; then
+>  echo "Trace output file $trace_file-<pid>"
+> @@ -6873,6 +6883,9 @@ fi
+>  if test "$vhost_user" =3D "yes" ; then
+>    echo "CONFIG_VHOST_USER=3Dy" >> $config_host_mak
+>  fi
+> +if test "$vhost_user_fs" =3D "yes" ; then
+> +  echo "CONFIG_VHOST_USER_FS=3Dy" >> $config_host_mak
+> +fi
+>  if test "$blobs" =3D "yes" ; then
+>    echo "INSTALL_BLOBS=3Dyes" >> $config_host_mak
+>  fi
+> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+> index 964ce78607..47ffbf22c4 100644
+> --- a/hw/virtio/Makefile.objs
+> +++ b/hw/virtio/Makefile.objs
+> @@ -11,6 +11,7 @@ common-obj-$(CONFIG_VIRTIO_PCI) +=3D virtio-pci.o
+>  common-obj-$(CONFIG_VIRTIO_MMIO) +=3D virtio-mmio.o
+>  obj-$(CONFIG_VIRTIO_BALLOON) +=3D virtio-balloon.o
+>  obj-$(CONFIG_VIRTIO_CRYPTO) +=3D virtio-crypto.o
+> +obj-$(CONFIG_VHOST_USER_FS) +=3D vhost-user-fs.o
+>  obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) +=3D virti=
+o-crypto-pci.o
+>  obj-$(CONFIG_VIRTIO_PMEM) +=3D virtio-pmem.o
+>  common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) +=3D =
+virtio-pmem-pci.o
+> diff --git a/hw/virtio/vhost-user-fs.c b/hw/virtio/vhost-user-fs.c
+> new file mode 100644
+> index 0000000000..f0df7f4746
+> --- /dev/null
+> +++ b/hw/virtio/vhost-user-fs.c
+> @@ -0,0 +1,299 @@
+> +/*
+> + * Vhost-user filesystem virtio device
+> + *
+> + * Copyright 2018-2019 Red Hat, Inc.
+> + *
+> + * Authors:
+> + *  Stefan Hajnoczi <stefanha@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.  See the COPYING file in the
+> + * top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include <sys/ioctl.h>
+> +#include "standard-headers/linux/virtio_fs.h"
+> +#include "qapi/error.h"
+> +#include "hw/qdev-properties.h"
+> +#include "hw/virtio/virtio-bus.h"
+> +#include "hw/virtio/virtio-access.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/virtio/vhost-user-fs.h"
+> +#include "monitor/monitor.h"
+> +
+> +static void vuf_get_config(VirtIODevice *vdev, uint8_t *config)
+> +{
+> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> +    struct virtio_fs_config fscfg =3D {};
+> +
+> +    memcpy((char *)fscfg.tag, fs->conf.tag,
+> +           MIN(strlen(fs->conf.tag) + 1, sizeof(fscfg.tag)));
+> +
+> +    virtio_stl_p(vdev, &fscfg.num_request_queues, fs->conf.num_request_q=
+ueues);
+> +
+> +    memcpy(config, &fscfg, sizeof(fscfg));
+> +}
+> +
+> +static void vuf_start(VirtIODevice *vdev)
+> +{
+> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(vdev)));
+> +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
+> +    int ret;
+> +    int i;
+> +
+> +    if (!k->set_guest_notifiers) {
+> +        error_report("binding does not support guest notifiers");
+> +        return;
+> +    }
+> +
+> +    ret =3D vhost_dev_enable_notifiers(&fs->vhost_dev, vdev);
+> +    if (ret < 0) {
+> +        error_report("Error enabling host notifiers: %d", -ret);
+> +        return;
+> +    }
+> +
+> +    ret =3D k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, tru=
+e);
+> +    if (ret < 0) {
+> +        error_report("Error binding guest notifier: %d", -ret);
+> +        goto err_host_notifiers;
+> +    }
+> +
+> +    fs->vhost_dev.acked_features =3D vdev->guest_features;
+> +    ret =3D vhost_dev_start(&fs->vhost_dev, vdev);
+> +    if (ret < 0) {
+> +        error_report("Error starting vhost: %d", -ret);
+> +        goto err_guest_notifiers;
+> +    }
+> +
+> +    /*
+> +     * guest_notifier_mask/pending not used yet, so just unmask
+> +     * everything here.  virtio-pci will do the right thing by
+> +     * enabling/disabling irqfd.
+> +     */
+> +    for (i =3D 0; i < fs->vhost_dev.nvqs; i++) {
+> +        vhost_virtqueue_mask(&fs->vhost_dev, vdev, i, false);
+> +    }
+> +
+> +    return;
+> +
+> +err_guest_notifiers:
+> +    k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, false);
+> +err_host_notifiers:
+> +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
+> +}
+> +
+> +static void vuf_stop(VirtIODevice *vdev)
+> +{
+> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(vdev)));
+> +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
+> +    int ret;
+> +
+> +    if (!k->set_guest_notifiers) {
+> +        return;
+> +    }
+> +
+> +    vhost_dev_stop(&fs->vhost_dev, vdev);
+> +
+> +    ret =3D k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, fal=
+se);
+> +    if (ret < 0) {
+> +        error_report("vhost guest notifier cleanup failed: %d", ret);
+> +        return;
+> +    }
+> +
+> +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
+> +}
+> +
+> +static void vuf_set_status(VirtIODevice *vdev, uint8_t status)
+> +{
+> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> +    bool should_start =3D status & VIRTIO_CONFIG_S_DRIVER_OK;
+> +
+> +    if (!vdev->vm_running) {
+> +        should_start =3D false;
+> +    }
+> +
+> +    if (fs->vhost_dev.started =3D=3D should_start) {
+> +        return;
+> +    }
+> +
+> +    if (should_start) {
+> +        vuf_start(vdev);
+> +    } else {
+> +        vuf_stop(vdev);
+> +    }
+> +}
+
+It looks like you could have benefited from backends/vhost-user.c
+
+This would allow to factor out some common code and properties used by
+vhost-user devices (currently gpu & input, but more could be
+converted).
+
+Advantage is that if we add a new mechanism, say to start helpers
+(like I propose earlier), all devices using that could benefit it more
+easily (in theory).
+
+> +
+> +static uint64_t vuf_get_features(VirtIODevice *vdev,
+> +                                      uint64_t requested_features,
+> +                                      Error **errp)
+> +{
+> +    /* No feature bits used yet */
+> +    return requested_features;
+> +}
+> +
+> +static void vuf_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+> +{
+> +    /*
+> +     * Not normally called; it's the daemon that handles the queue;
+> +     * however virtio's cleanup path can call this.
+> +     */
+> +}
+> +
+> +static void vuf_guest_notifier_mask(VirtIODevice *vdev, int idx,
+> +                                            bool mask)
+> +{
+> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> +
+> +    vhost_virtqueue_mask(&fs->vhost_dev, vdev, idx, mask);
+> +}
+> +
+> +static bool vuf_guest_notifier_pending(VirtIODevice *vdev, int idx)
+> +{
+> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> +
+> +    return vhost_virtqueue_pending(&fs->vhost_dev, idx);
+> +}
+> +
+> +static void vuf_device_realize(DeviceState *dev, Error **errp)
+> +{
+> +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+> +    VHostUserFS *fs =3D VHOST_USER_FS(dev);
+> +    unsigned int i;
+> +    size_t len;
+> +    int ret;
+> +
+> +    if (!fs->conf.chardev.chr) {
+> +        error_setg(errp, "missing chardev");
+> +        return;
+> +    }
+> +
+> +    if (!fs->conf.tag) {
+> +        error_setg(errp, "missing tag property");
+> +        return;
+> +    }
+> +    len =3D strlen(fs->conf.tag);
+> +    if (len =3D=3D 0) {
+> +        error_setg(errp, "tag property cannot be empty");
+> +        return;
+> +    }
+> +    if (len > sizeof_field(struct virtio_fs_config, tag)) {
+> +        error_setg(errp, "tag property must be %zu bytes or less",
+> +                   sizeof_field(struct virtio_fs_config, tag));
+> +        return;
+> +    }
+> +
+> +    if (fs->conf.num_request_queues =3D=3D 0) {
+> +        error_setg(errp, "num-request-queues property must be larger tha=
+n 0");
+> +        return;
+> +    }
+> +
+> +    if (!is_power_of_2(fs->conf.queue_size)) {
+> +        error_setg(errp, "queue-size property must be a power of 2");
+> +        return;
+> +    }
+> +
+> +    if (fs->conf.queue_size > VIRTQUEUE_MAX_SIZE) {
+> +        error_setg(errp, "queue-size property must be %u or smaller",
+> +                   VIRTQUEUE_MAX_SIZE);
+> +        return;
+> +    }
+> +
+> +    if (!vhost_user_init(&fs->vhost_user, &fs->conf.chardev, errp)) {
+> +        return;
+> +    }
+> +
+> +    virtio_init(vdev, "vhost-user-fs", VIRTIO_ID_FS,
+> +                sizeof(struct virtio_fs_config));
+> +
+> +    /* Hiprio queue */
+> +    virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> +
+> +    /* Request queues */
+> +    for (i =3D 0; i < fs->conf.num_request_queues; i++) {
+> +        virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
+> +    }
+> +
+> +    /* 1 high prio queue, plus the number configured */
+> +    fs->vhost_dev.nvqs =3D 1 + fs->conf.num_request_queues;
+> +    fs->vhost_dev.vqs =3D g_new0(struct vhost_virtqueue, fs->vhost_dev.n=
+vqs);
+> +    ret =3D vhost_dev_init(&fs->vhost_dev, &fs->vhost_user,
+> +                         VHOST_BACKEND_TYPE_USER, 0);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "vhost_dev_init failed");
+> +        goto err_virtio;
+> +    }
+> +
+> +    return;
+> +
+> +err_virtio:
+> +    vhost_user_cleanup(&fs->vhost_user);
+> +    virtio_cleanup(vdev);
+> +    g_free(fs->vhost_dev.vqs);
+> +    return;
+> +}
+> +
+> +static void vuf_device_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+> +    VHostUserFS *fs =3D VHOST_USER_FS(dev);
+> +
+> +    /* This will stop vhost backend if appropriate. */
+> +    vuf_set_status(vdev, 0);
+> +
+> +    vhost_dev_cleanup(&fs->vhost_dev);
+> +
+> +    vhost_user_cleanup(&fs->vhost_user);
+> +
+> +    virtio_cleanup(vdev);
+> +    g_free(fs->vhost_dev.vqs);
+> +    fs->vhost_dev.vqs =3D NULL;
+> +}
+> +
+> +static const VMStateDescription vuf_vmstate =3D {
+> +    .name =3D "vhost-user-fs",
+> +    .unmigratable =3D 1,
+> +};
+> +
+> +static Property vuf_properties[] =3D {
+> +    DEFINE_PROP_CHR("chardev", VHostUserFS, conf.chardev),
+> +    DEFINE_PROP_STRING("tag", VHostUserFS, conf.tag),
+> +    DEFINE_PROP_UINT16("num-request-queues", VHostUserFS,
+> +                       conf.num_request_queues, 1),
+> +    DEFINE_PROP_UINT16("queue-size", VHostUserFS, conf.queue_size, 128),
+> +    DEFINE_PROP_STRING("vhostfd", VHostUserFS, conf.vhostfd),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void vuf_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_CLASS(klass);
+> +
+> +    dc->props =3D vuf_properties;
+> +    dc->vmsd =3D &vuf_vmstate;
+> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+> +    vdc->realize =3D vuf_device_realize;
+> +    vdc->unrealize =3D vuf_device_unrealize;
+> +    vdc->get_features =3D vuf_get_features;
+> +    vdc->get_config =3D vuf_get_config;
+> +    vdc->set_status =3D vuf_set_status;
+> +    vdc->guest_notifier_mask =3D vuf_guest_notifier_mask;
+> +    vdc->guest_notifier_pending =3D vuf_guest_notifier_pending;
+> +}
+> +
+> +static const TypeInfo vuf_info =3D {
+> +    .name =3D TYPE_VHOST_USER_FS,
+> +    .parent =3D TYPE_VIRTIO_DEVICE,
+> +    .instance_size =3D sizeof(VHostUserFS),
+> +    .class_init =3D vuf_class_init,
+> +};
+> +
+> +static void vuf_register_types(void)
+> +{
+> +    type_register_static(&vuf_info);
+> +}
+> +
+> +type_init(vuf_register_types)
+> diff --git a/include/hw/virtio/vhost-user-fs.h b/include/hw/virtio/vhost-=
+user-fs.h
+> new file mode 100644
+> index 0000000000..539885b458
+> --- /dev/null
+> +++ b/include/hw/virtio/vhost-user-fs.h
+> @@ -0,0 +1,45 @@
+> +/*
+> + * Vhost-user filesystem virtio device
+> + *
+> + * Copyright 2018-2019 Red Hat, Inc.
+> + *
+> + * Authors:
+> + *  Stefan Hajnoczi <stefanha@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * (at your option) any later version.  See the COPYING file in the
+> + * top-level directory.
+> + */
+> +
+> +#ifndef _QEMU_VHOST_USER_FS_H
+> +#define _QEMU_VHOST_USER_FS_H
+> +
+> +#include "hw/virtio/virtio.h"
+> +#include "hw/virtio/vhost.h"
+> +#include "hw/virtio/vhost-user.h"
+> +#include "chardev/char-fe.h"
+> +
+> +#define TYPE_VHOST_USER_FS "vhost-user-fs-device"
+> +#define VHOST_USER_FS(obj) \
+> +        OBJECT_CHECK(VHostUserFS, (obj), TYPE_VHOST_USER_FS)
+> +
+> +typedef struct {
+> +    CharBackend chardev;
+> +    char *tag;
+> +    uint16_t num_request_queues;
+> +    uint16_t queue_size;
+> +    char *vhostfd;
+> +} VHostUserFSConf;
+> +
+> +typedef struct {
+> +    /*< private >*/
+> +    VirtIODevice parent;
+> +    VHostUserFSConf conf;
+> +    struct vhost_virtqueue *vhost_vqs;
+> +    struct vhost_dev vhost_dev;
+> +    VhostUserState vhost_user;
+> +
+> +    /*< public >*/
+> +} VHostUserFS;
+> +
+> +#endif /* _QEMU_VHOST_USER_FS_H */
+> --
+> 2.21.0
+>
+>
 
 
+--=20
+Marc-Andr=C3=A9 Lureau
 
