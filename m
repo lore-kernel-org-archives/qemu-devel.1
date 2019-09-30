@@ -2,80 +2,90 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2590C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 18:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4823C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 19:22:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A836224D2
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 18:06:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E86E224D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 19:22:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1vFB6Ws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A836224D2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NYR+XSuj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E86E224D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iF03p-00059v-Ea
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 14:06:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55623)
+	id 1iF1FM-0005iS-LG
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 15:22:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iF02v-0004ft-DU
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 14:05:18 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iF1EF-0005Ej-MV
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 15:21:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iF02u-0005fk-7p
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 14:05:17 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:36341)
+ (envelope-from <alex.bennee@linaro.org>) id 1iF1EE-0002OA-8s
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 15:21:03 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:46120)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iF02t-0005eq-W6; Mon, 30 Sep 2019 14:05:16 -0400
-Received: by mail-lf1-x142.google.com with SMTP id x80so7773013lff.3;
- Mon, 30 Sep 2019 11:05:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qbAWtxRsy/NMXfNeZQkP2QtBTIR7MRb2SHAvDdiJmtk=;
- b=Y1vFB6WsnMtQLjjNHBIPx+1BwTxrOgggLmZNDfN9tR4k2enYi6d9Kx2aq0ZkOGrnil
- LKSFF04HSxlohhDhSOCDsL5+UhwL86HtPDq/LBnN2m2bY0OmPiU1L8uHecuGpIDcn4uK
- A4gITZ8xz1j90/Q1uWFAyhdKrSwQDczhBhgXp6UnVWTXAIp+WXiTsBI4+9OOnH5U9hIi
- 7Wo9EEnnd2Jal8xhPeL1W3xClZujxOGTkZFbbTVZQMl9JGwRjvofpUV6qLII9h+JeNMV
- XREMb3HssE5DGb8zad2aFvBOTmxk4a9AsL0U8vi21sF3awaoCMU5XmCVzv0y74WRVOwi
- akvA==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iF1EE-0002NJ-2G
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 15:21:02 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id o18so12596006wrv.13
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 12:21:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=rU6MVBb5pA0BxfX5ZvVsarsL2G9lAzaVenRY/bLuZxc=;
+ b=NYR+XSuj704/zNkkfyPEF+2ZIFIRA3Irjr7zWp3VPa7WMkY6TlZUGnZmX5K0if2fFi
+ QTn72J3jCiHfspCwp9z58m8z871Aj5zkFxoEr6EpY3DRXjngUEXMBomQk+5U1+rJvgf5
+ jaSMuYCGLUgZgKJiVPDhWBftr57foBXCSjz3BWeLqZJGLTYnpls15Low/pMdDSdZiqBa
+ J+YMAGQTBEkhO1ThF6Ajzu2eUlzbF6BTiLsDP4O2VMLB/6zqYw9A2lJnpfEfaNcS5nrR
+ 1cdALk8bB2BCPKhVTjrMJip8/6t/jES50RyA+MfOoZb2rANMosgkmUn3Bs04Tw0pIvNL
+ uT8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qbAWtxRsy/NMXfNeZQkP2QtBTIR7MRb2SHAvDdiJmtk=;
- b=aboeRGHr9oyDqBSb8C5cmdiF9OEA9UTBAB3GreItrIiSEJPFeY4wDOcpYogf4Bgmlj
- 3AlZmyBd4/v6sMzscTKoiSZt5zUb7H4HHmHAm8r0uXkPmVX7tUEtYr/lzWzZsrm++mEe
- t4PSHsOziUSPylMat0CcETMVm54ykTkYC5EaI6xjJZUM+/kj00PhTO6oIkf/+jkJC04a
- NknIs6Iq9LE+PWsydGomeDsMLtcvENz5ogmlEWfTBNt5zGH/ygIECN4DTAubwlDM9m6T
- fN7NIdO6SsQMTAAg4kyW9+pDDodfXguhGNzDRzBN7Jm8UTQgn8f5PNWnGlJEvmLHLccx
- XD+w==
-X-Gm-Message-State: APjAAAWozHyaB+8ssf+ZE6QjW9Iueg0cMmj8oNu+cbJEB2BlPSbZUFqH
- j6e+uU3h8PirjOavJx4b2Xm12MATsmemSXl6N2c=
-X-Google-Smtp-Source: APXvYqz7ID+a97wUQ4Jyo7Xat5JoXYNb9m4AgmjlMLiU72asVMT3iSGnIISLcZPsNrLHh1xssug+Gx8VNadUSTOS4dw=
-X-Received: by 2002:a19:4912:: with SMTP id w18mr11814539lfa.93.1569866714364; 
- Mon, 30 Sep 2019 11:05:14 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=rU6MVBb5pA0BxfX5ZvVsarsL2G9lAzaVenRY/bLuZxc=;
+ b=tusfd9N1v49rnorpfItToXDmw5MzCqJtbOI1Qh1GSdMBKFNwxgZh2c2kG8cYRa3Ul8
+ fTMeHDUcSKI5sxUuKLnKbvfs2EElBdDxtGFKa2giewbFuVJn0UE5uwnYz8acsM/Pj6Uc
+ qSjeNKLm7duwFs2fM2TcYYHHZus2hL+OgWEiBqkW4gmlZMVMcw2m7vQsph0TbFqI+r0F
+ KHSx/WCRztiQJaCdah0dJ96JaeAbtjspKwX+Ykf1oeeL2a1IXNDaKRXjRXpxiTMtbHsU
+ 7sM++MLg3Ddb9PXl+Vz5YCvqnuccTCnktZTzstrKrVmEzbmzLpYDU1MChzAUUzxKTtzk
+ tKPQ==
+X-Gm-Message-State: APjAAAWxUoCTGwdjBnXi0/DOrOeLP5yuPn1DBNwj24DI7zqJPQ+5B3PJ
+ Gg/OfWbpPAGdUePZCQ7s3F1xfg==
+X-Google-Smtp-Source: APXvYqxKt1BTLeRBGu9gOSI4SfePHKFSjQc7o8sssEZExcgx+ruz3WgLOB26xYoeBss5AheW0Ssapw==
+X-Received: by 2002:adf:e545:: with SMTP id z5mr15420902wrm.263.1569871260417; 
+ Mon, 30 Sep 2019 12:21:00 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id r2sm18349058wrm.3.2019.09.30.12.20.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 30 Sep 2019 12:20:59 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A3D251FF87;
+ Mon, 30 Sep 2019 20:20:58 +0100 (BST)
+References: <CAEfK_44VEF17nRgzNvVe+MPmAfS34kiJ_ozubWFkVYV0rm71sw@mail.gmail.com>
+ <CAFEAcA9nz9S4R+O9fwa0k38dB3r1smguG4bQRzwm1s0zJCvfDA@mail.gmail.com>
+ <96703fc4-cbeb-5487-89b2-78c37b40237a@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: Lockup with --accel tcg,thread=single
+In-reply-to: <96703fc4-cbeb-5487-89b2-78c37b40237a@redhat.com>
+Date: Mon, 30 Sep 2019 20:20:58 +0100
+Message-ID: <87ftkdlhet.fsf@linaro.org>
 MIME-Version: 1.0
-References: <cover.1569545046.git.alistair.francis@wdc.com>
- <a24af06cea57073f4a75381755ab05e825679445.1569545046.git.alistair.francis@wdc.com>
- <CAEUhbmVvsujN-EG3hdpaAbf-OF-NvvQnX4k5KWS_MscPHhKg-A@mail.gmail.com>
-In-Reply-To: <CAEUhbmVvsujN-EG3hdpaAbf-OF-NvvQnX4k5KWS_MscPHhKg-A@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 30 Sep 2019 11:04:45 -0700
-Message-ID: <CAKmqyKPMOAq3oeU-_MQHBAbzTv__iKr=uR8WkCfGbH8yk4afFg@mail.gmail.com>
-Subject: Re: [PATCH v2 4/7] riscv/sifive_u: Add the start-in-flash property
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,109 +97,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Doug Gale <doug16k@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 27, 2019 at 12:57 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> On Fri, Sep 27, 2019 at 8:55 AM Alistair Francis
-> <alistair.francis@wdc.com> wrote:
-> >
-> > Add a property that when set to true QEMU will jump from the ROM code to
-> > the start of flash memory instead of DRAM which is the default
-> > behaviour.
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  hw/riscv/sifive_u.c         | 27 +++++++++++++++++++++++++++
-> >  include/hw/riscv/sifive_u.h |  2 ++
-> >  2 files changed, 29 insertions(+)
-> >
-> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> > index f5741e9a38..33b55d0d5b 100644
-> > --- a/hw/riscv/sifive_u.c
-> > +++ b/hw/riscv/sifive_u.c
-> > @@ -373,6 +373,10 @@ static void riscv_sifive_u_init(MachineState *machine)
-> >                                         /* dtb: */
-> >      };
-> >
-> > +    if (s->start_in_flash) {
-> > +        reset_vec[6] = memmap[SIFIVE_U_FLASH0].base; /* start: .dword FLASH0_BASE */
-> > +    }
->
-> Please change to use the way that patch "[v2,7/7] riscv/virt: Jump to
-> pflash if specified" does for consistency, ie:
->
->     if (s->start_in_flash) {
->         start_addr = memmap[SIFIVE_U_FLASH0].base; /* start: .dword
-> FLASH0_BASE */
->     }
->
-> > +
-> >      /* copy in the reset vector in little_endian byte order */
-> >      for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
-> >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
-> > @@ -432,8 +436,31 @@ static void riscv_sifive_u_soc_init(Object *obj)
-> >                            TYPE_CADENCE_GEM);
-> >  }
-> >
-> > +static bool virt_get_start_in_flash(Object *obj, Error **errp)
->
-> sifive_u_get_start_in_flash()
->
-> > +{
-> > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
-> > +
-> > +    return s->start_in_flash;
-> > +}
-> > +
-> > +static void virt_set_start_in_flash(Object *obj, bool value, Error **errp)
->
-> sifive_u_set_start_in_flash()
 
-Yep, I have fixed all of these.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Alistair
+> On 30/09/19 17:37, Peter Maydell wrote:
+>> Not sure currently what the best fix is here.
+>
+> Since thread=3Dsingle uses just one queued work list, could it be as
+> simple as
+
+Does it? I thought this was the case but:
+
+  static void queue_work_on_cpu(CPUState *cpu, struct qemu_work_item *wi)
+  {
+      qemu_mutex_lock(&cpu->work_mutex);
+      if (cpu->queued_work_first =3D=3D NULL) {
+          cpu->queued_work_first =3D wi;
+      } else {
+          cpu->queued_work_last->next =3D wi;
+      }
+      cpu->queued_work_last =3D wi;
+      wi->next =3D NULL;
+      wi->done =3D false;
+      qemu_mutex_unlock(&cpu->work_mutex);
+
+      qemu_cpu_kick(cpu);
+  }
+
+Does seem to imply the vCPU CPUState is where the queue is. That's not
+to say there shouldn't be a single work queue for thread=3Dsingle.
 
 >
-> > +{
-> > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
-> > +
-> > +    s->start_in_flash = value;
-> > +}
-> > +
-> >  static void riscv_sifive_u_machine_instance_init(Object *obj)
-> >  {
-> > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
-> > +
-> > +    s->start_in_flash = false;
-> > +    object_property_add_bool(obj, "start-in-flash", virt_get_start_in_flash,
-> > +                             virt_set_start_in_flash, NULL);
-> > +    object_property_set_description(obj, "start-in-flash",
-> > +                                    "Set on to tell QEMU's ROM to jump to " \
-> > +                                    "flash. Otherwise QEMU will jump to DRAM",
-> > +                                    NULL);
-> >  }
-> >
-> >  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-> > diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-> > index a921079fbe..2656b43c58 100644
-> > --- a/include/hw/riscv/sifive_u.h
-> > +++ b/include/hw/riscv/sifive_u.h
-> > @@ -57,6 +57,8 @@ typedef struct SiFiveUState {
-> >
-> >      void *fdt;
-> >      int fdt_size;
-> > +
-> > +    bool start_in_flash;
-> >  } SiFiveUState;
-> >
+> diff --git a/cpus.c b/cpus.c
+> index d2c61ff..314f9aa 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1539,7 +1539,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>              cpu =3D first_cpu;
+>          }
 >
-> Regards,
-> Bin
+> -        while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
+> +        while (cpu && !first_cpu->queued_work_first && !cpu->exit_reques=
+t) {
+>
+>              atomic_mb_set(&tcg_current_rr_cpu, cpu);
+>              current_cpu =3D cpu;
+>
+> or something like that?
+>
+>> Side note -- this use of run_on_cpu() means that we now drop
+>> the iothread lock within memory_region_snapshot_and_clear_dirty(),
+>> which we didn't before. This means that a vCPU thread can now
+>> get in and execute an access to the device registers of
+>> hw/display/vga.c, updating its state in a way I suspect that the
+>> device model code is not expecting... So maybe the right answer
+>> here should be to come up with a fix for the race that 9458a9a1
+>> addresses that doesn't require us to drop the iothread lock in
+>> memory_region_snapshot_and_clear_dirty() ? Alternatively we need
+>> to audit the callers and flag in the documentation that this
+>> function has the unexpected side effect of briefly dropping the
+>> iothread lock.
+>
+> Yes, this is intended.  There shouldn't be side effects other than
+> possibly a one-frame flash for all callers.
+>
+> Paolo
+
+
+--
+Alex Benn=C3=A9e
 
