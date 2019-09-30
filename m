@@ -2,53 +2,90 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12626C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD857C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:39:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4CAC20815
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:37:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4CAC20815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 828D8206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:39:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 828D8206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iExjS-0003LI-BC
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:37:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60188)
+	id 1iExlV-0005W7-O8
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:39:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60367)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iExOO-0004gJ-4d
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:15:17 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iExPh-0005S4-8U
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:16:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iExOM-000602-1h
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:15:15 -0400
-Received: from relay.sw.ru ([185.231.240.75]:46674)
+ (envelope-from <pbonzini@redhat.com>) id 1iExPd-0006Nb-8W
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:16:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53882)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iExOF-0005ou-8Y; Mon, 30 Sep 2019 11:15:07 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iExOC-0005tD-2g; Mon, 30 Sep 2019 18:15:04 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 06/10] block/dirty-bitmap: add _next_dirty API
-Date: Mon, 30 Sep 2019 18:14:58 +0300
-Message-Id: <20190930151502.7829-7-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190930151502.7829-1-vsementsov@virtuozzo.com>
-References: <20190930151502.7829-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iExPd-0006Mv-0D
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:16:33 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3E8BF85541
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 15:16:31 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id k9so6101166wmb.0
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 08:16:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=798MjSRN6q3iLl2pK77ByyQ3+NW/J3ezV/4MFSKJI4U=;
+ b=c3teU82i/doovKU3zHXBbgtFZaaELa7nDGGoykVUcaF9ZN5PBTht4vZtzFYMxuDAK0
+ TVKc8lPCNAslGXIaqUPjQdd3VMhTjdlRf07l2DHrYfmUSfpyvqRL4nfDSNPyi/Ut8FQD
+ V7TrIoT8kgnHIGkVCkjxZ4iG/AdDtdK0JjezopkqcW8VOr5Pis/TvisT4Yt3RnAa4wuT
+ j8kvZTj+f3aHyCLdAQsqJNmHQ4kqiTTi2RR7QIVnrJYnjg32IC5/wijFIxxn3YaAbOnX
+ FVqpgeHZlWj2tj194cxI90SuOxEnFm1tvrLEDtlcRMzq+HumEJGHmkKuwRNyXlDAcoVh
+ pDZg==
+X-Gm-Message-State: APjAAAV6rXdoZhxIWAyqJqLupSlIaoZmJ5QHhT/0FF0EqCFdUp+EuFX1
+ vZqUtg/t5Q2PVpFmmILeyaIZECm2+eV58U2Nmf5XeYNV9rskXKs/FyxeDbW9owgPkNU1tgGTkf/
+ cmUYPSreYqdyBBfg=
+X-Received: by 2002:adf:ebd0:: with SMTP id v16mr13203961wrn.352.1569856589893; 
+ Mon, 30 Sep 2019 08:16:29 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw/HpXhGwS+aAM34/IAB60iLhRxqAEs8PShtfWcEdU4pYcdsKCI06BR0v7UquRYSVIDlgCOtQ==
+X-Received: by 2002:adf:ebd0:: with SMTP id v16mr13203947wrn.352.1569856589612; 
+ Mon, 30 Sep 2019 08:16:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:9520:22e6:6416:5c36?
+ ([2001:b07:6468:f312:9520:22e6:6416:5c36])
+ by smtp.gmail.com with ESMTPSA id c18sm14507376wrn.45.2019.09.30.08.16.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 30 Sep 2019 08:16:29 -0700 (PDT)
+Subject: Re: [RFC] cpu_map: Remove pconfig from Icelake-Server CPU model
+To: "Hu, Robert" <robert.hu@intel.com>, Eduardo Habkost
+ <ehabkost@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+References: <20190926214305.17690-1-ehabkost@redhat.com>
+ <20190930102453.GO4884@orkuz.int.mamuti.net>
+ <20190930141104.GA4084@habkost.net>
+ <9E79D1C9A97CFD4097BCE431828FDD31173BCF76@SHSMSX104.ccr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <b9fbca16-9877-04b9-78fa-bf711c8f3053@redhat.com>
+Date: Mon, 30 Sep 2019 17:16:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <9E79D1C9A97CFD4097BCE431828FDD31173BCF76@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,350 +97,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "Kang,
+ Luwei" <luwei.kang@intel.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Robert Hoo <robert.hu@linux.intel.com>, "Huang, Kai" <kai.huang@intel.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have bdrv_dirty_bitmap_next_zero, let's add corresponding
-bdrv_dirty_bitmap_next_dirty, which is more comfortable to use than
-bitmap iterators in some cases.
+On 30/09/19 16:31, Hu, Robert wrote:
+>> This might be a problem if there are plans to eventually make KVM support
+>> pconfig, though.  Paolo, Robert, are there plans to support pconfig in KVM in the
+>> future?
+> [Robert Hoo] 
+> Thanks Eduardo for efforts in resolving this issue, introduced from my Icelake CPU
+> model patch.
+> I've no idea about PCONFIG's detail and plan. Let me sync with Huang, Kai and answer
+> you soon.
 
-For test modify test_hbitmap_next_zero_check_range to check both
-next_zero and next_dirty and add some new checks.
+It's really, really unlikely.  It's possible that some future processor
+overloads PCONFIG in such a way that it will become virtualizable, but
+not IceLake.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/dirty-bitmap.h |   2 +
- include/qemu/hbitmap.h       |  13 ++++
- block/dirty-bitmap.c         |   6 ++
- tests/test-hbitmap.c         | 130 ++++++++++++++++++++---------------
- util/hbitmap.c               |  60 ++++++++--------
- 5 files changed, 126 insertions(+), 85 deletions(-)
+Would it make sense for libvirt to treat absent CPU flags as "default
+off" during migration, so that it can leave out the flag in the command
+line if it's off?  If it's on, libvirt would pass pconfig=on as usual.
+This is a variant of [2], but more generally applicable:
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 96d3cc0800..333e44e793 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -103,6 +103,8 @@ for (bitmap = bdrv_dirty_bitmap_first(bs); bitmap; \
-      bitmap = bdrv_dirty_bitmap_next(bitmap))
- 
- char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
-+int64_t bdrv_dirty_bitmap_next_dirty(BdrvDirtyBitmap *bitmap, int64_t offset,
-+                                     int64_t bytes);
- int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
-                                     int64_t bytes);
- bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 6eb2728a21..eeecd33f01 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -304,6 +304,19 @@ void hbitmap_free(HBitmap *hb);
-  */
- void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
- 
-+/*
-+ * hbitmap_next_dirty:
-+ *
-+ * Find next dirty bit within selected range. If not found, return -1.
-+ *
-+ * @hb: The HBitmap to operate on
-+ * @start: The bit to start from.
-+ * @count: Number of bits to proceed. If @start+@count > bitmap size, the whole
-+ * bitmap is looked through. You can use UINT64_MAX as @count to search up to
-+ * the bitmap end.
-+ */
-+int64_t hbitmap_next_dirty(const HBitmap *hb, int64_t start, int64_t count);
-+
- /* hbitmap_next_zero:
-  *
-  * Find next not dirty bit within selected range. If not found, return -1.
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 01135f623e..fe2420b297 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -854,6 +854,12 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
-     return hbitmap_sha256(bitmap->bitmap, errp);
- }
- 
-+int64_t bdrv_dirty_bitmap_next_dirty(BdrvDirtyBitmap *bitmap, int64_t offset,
-+                                     int64_t bytes)
-+{
-+    return hbitmap_next_dirty(bitmap->bitmap, offset, bytes);
-+}
-+
- int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
-                                     int64_t bytes)
- {
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index 0e1e5c64dd..e3f1b3f361 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -816,92 +816,108 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
-     hbitmap_iter_next(&hbi);
- }
- 
--static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
--                                               uint64_t start,
--                                               uint64_t count)
-+static void test_hbitmap_next_x_check_range(TestHBitmapData *data,
-+                                            uint64_t start,
-+                                            uint64_t count)
- {
--    int64_t ret1 = hbitmap_next_zero(data->hb, start, count);
--    int64_t ret2 = start;
-+    int64_t next_zero = hbitmap_next_zero(data->hb, start, count);
-+    int64_t next_dirty = hbitmap_next_dirty(data->hb, start, count);
-+    int64_t next;
-     int64_t end = start >= data->size || data->size - start < count ?
-                 data->size : start + count;
-+    bool first_bit = hbitmap_get(data->hb, start);
- 
--    for ( ; ret2 < end && hbitmap_get(data->hb, ret2); ret2++) {
-+    for (next = start;
-+         next < end && hbitmap_get(data->hb, next) == first_bit;
-+         next++)
-+    {
-         ;
-     }
--    if (ret2 == end) {
--        ret2 = -1;
-+
-+    if (next == end) {
-+        next = -1;
-     }
- 
--    g_assert_cmpint(ret1, ==, ret2);
-+    g_assert_cmpint(next_dirty, ==, first_bit ? start : next);
-+    g_assert_cmpint(next_zero, ==, first_bit ? next : start);
- }
- 
--static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
-+static void test_hbitmap_next_x_check(TestHBitmapData *data, int64_t start)
- {
--    test_hbitmap_next_zero_check_range(data, start, INT64_MAX);
-+    test_hbitmap_next_x_check_range(data, start, INT64_MAX);
- }
- 
--static void test_hbitmap_next_zero_do(TestHBitmapData *data, int granularity)
-+static void test_hbitmap_next_x_do(TestHBitmapData *data, int granularity)
- {
-     hbitmap_test_init(data, L3, granularity);
--    test_hbitmap_next_zero_check(data, 0);
--    test_hbitmap_next_zero_check(data, L3 - 1);
--    test_hbitmap_next_zero_check_range(data, 0, 1);
--    test_hbitmap_next_zero_check_range(data, L3 - 1, 1);
-+    test_hbitmap_next_x_check(data, 0);
-+    test_hbitmap_next_x_check(data, L3 - 1);
-+    test_hbitmap_next_x_check_range(data, 0, 1);
-+    test_hbitmap_next_x_check_range(data, L3 - 1, 1);
- 
-     hbitmap_set(data->hb, L2, 1);
--    test_hbitmap_next_zero_check(data, 0);
--    test_hbitmap_next_zero_check(data, L2 - 1);
--    test_hbitmap_next_zero_check(data, L2);
--    test_hbitmap_next_zero_check(data, L2 + 1);
--    test_hbitmap_next_zero_check_range(data, 0, 1);
--    test_hbitmap_next_zero_check_range(data, 0, L2);
--    test_hbitmap_next_zero_check_range(data, L2 - 1, 1);
--    test_hbitmap_next_zero_check_range(data, L2 - 1, 2);
--    test_hbitmap_next_zero_check_range(data, L2, 1);
--    test_hbitmap_next_zero_check_range(data, L2 + 1, 1);
-+    test_hbitmap_next_x_check(data, 0);
-+    test_hbitmap_next_x_check(data, L2 - 1);
-+    test_hbitmap_next_x_check(data, L2);
-+    test_hbitmap_next_x_check(data, L2 + 1);
-+    test_hbitmap_next_x_check_range(data, 0, 1);
-+    test_hbitmap_next_x_check_range(data, 0, L2);
-+    test_hbitmap_next_x_check_range(data, L2 - 1, 1);
-+    test_hbitmap_next_x_check_range(data, L2 - 1, 2);
-+    test_hbitmap_next_x_check_range(data, L2, 1);
-+    test_hbitmap_next_x_check_range(data, L2 + 1, 1);
- 
-     hbitmap_set(data->hb, L2 + 5, L1);
--    test_hbitmap_next_zero_check(data, 0);
--    test_hbitmap_next_zero_check(data, L2 + 1);
--    test_hbitmap_next_zero_check(data, L2 + 2);
--    test_hbitmap_next_zero_check(data, L2 + 5);
--    test_hbitmap_next_zero_check(data, L2 + L1 - 1);
--    test_hbitmap_next_zero_check(data, L2 + L1);
--    test_hbitmap_next_zero_check_range(data, L2, 6);
--    test_hbitmap_next_zero_check_range(data, L2 + 1, 3);
--    test_hbitmap_next_zero_check_range(data, L2 + 4, L1);
--    test_hbitmap_next_zero_check_range(data, L2 + 5, L1);
-+    test_hbitmap_next_x_check(data, 0);
-+    test_hbitmap_next_x_check(data, L2 - L1);
-+    test_hbitmap_next_x_check(data, L2 + 1);
-+    test_hbitmap_next_x_check(data, L2 + 2);
-+    test_hbitmap_next_x_check(data, L2 + 5);
-+    test_hbitmap_next_x_check(data, L2 + L1 - 1);
-+    test_hbitmap_next_x_check(data, L2 + L1);
-+    test_hbitmap_next_x_check(data, L2 + L1 + 1);
-+    test_hbitmap_next_x_check_range(data, L2 - 2, L1);
-+    test_hbitmap_next_x_check_range(data, L2, 4);
-+    test_hbitmap_next_x_check_range(data, L2, 6);
-+    test_hbitmap_next_x_check_range(data, L2 + 1, 3);
-+    test_hbitmap_next_x_check_range(data, L2 + 4, L1);
-+    test_hbitmap_next_x_check_range(data, L2 + 5, L1);
-+    test_hbitmap_next_x_check_range(data, L2 + 5 + L1 - 1, 1);
-+    test_hbitmap_next_x_check_range(data, L2 + 5 + L1, 1);
-+    test_hbitmap_next_x_check_range(data, L2 + 5 + L1 + 1, 1);
- 
-     hbitmap_set(data->hb, L2 * 2, L3 - L2 * 2);
--    test_hbitmap_next_zero_check(data, L2 * 2 - L1);
--    test_hbitmap_next_zero_check(data, L2 * 2 - 2);
--    test_hbitmap_next_zero_check(data, L2 * 2 - 1);
--    test_hbitmap_next_zero_check(data, L2 * 2);
--    test_hbitmap_next_zero_check(data, L3 - 1);
--    test_hbitmap_next_zero_check_range(data, L2 * 2 - L1, L1 + 1);
--    test_hbitmap_next_zero_check_range(data, L2 * 2, L2);
-+    test_hbitmap_next_x_check(data, L2 * 2 - L1);
-+    test_hbitmap_next_x_check(data, L2 * 2 - 2);
-+    test_hbitmap_next_x_check(data, L2 * 2 - 1);
-+    test_hbitmap_next_x_check(data, L2 * 2);
-+    test_hbitmap_next_x_check(data, L2 * 2 + 1);
-+    test_hbitmap_next_x_check(data, L2 * 2 + L1);
-+    test_hbitmap_next_x_check(data, L3 - 1);
-+    test_hbitmap_next_x_check_range(data, L2 * 2 - L1, L1 + 1);
-+    test_hbitmap_next_x_check_range(data, L2 * 2, L2);
- 
-     hbitmap_set(data->hb, 0, L3);
--    test_hbitmap_next_zero_check(data, 0);
-+    test_hbitmap_next_x_check(data, 0);
- }
- 
--static void test_hbitmap_next_zero_0(TestHBitmapData *data, const void *unused)
-+static void test_hbitmap_next_x_0(TestHBitmapData *data, const void *unused)
- {
--    test_hbitmap_next_zero_do(data, 0);
-+    test_hbitmap_next_x_do(data, 0);
- }
- 
--static void test_hbitmap_next_zero_4(TestHBitmapData *data, const void *unused)
-+static void test_hbitmap_next_x_4(TestHBitmapData *data, const void *unused)
- {
--    test_hbitmap_next_zero_do(data, 4);
-+    test_hbitmap_next_x_do(data, 4);
- }
- 
--static void test_hbitmap_next_zero_after_truncate(TestHBitmapData *data,
--                                                  const void *unused)
-+static void test_hbitmap_next_x_after_truncate(TestHBitmapData *data,
-+                                               const void *unused)
- {
-     hbitmap_test_init(data, L1, 0);
-     hbitmap_test_truncate_impl(data, L1 * 2);
-     hbitmap_set(data->hb, 0, L1);
--    test_hbitmap_next_zero_check(data, 0);
-+    test_hbitmap_next_x_check(data, 0);
- }
- 
- static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
-@@ -1068,12 +1084,12 @@ int main(int argc, char **argv)
-     hbitmap_test_add("/hbitmap/iter/iter_and_reset",
-                      test_hbitmap_iter_and_reset);
- 
--    hbitmap_test_add("/hbitmap/next_zero/next_zero_0",
--                     test_hbitmap_next_zero_0);
--    hbitmap_test_add("/hbitmap/next_zero/next_zero_4",
--                     test_hbitmap_next_zero_4);
--    hbitmap_test_add("/hbitmap/next_zero/next_zero_after_truncate",
--                     test_hbitmap_next_zero_after_truncate);
-+    hbitmap_test_add("/hbitmap/next_zero/next_x_0",
-+                     test_hbitmap_next_x_0);
-+    hbitmap_test_add("/hbitmap/next_zero/next_x_4",
-+                     test_hbitmap_next_x_4);
-+    hbitmap_test_add("/hbitmap/next_zero/next_x_after_truncate",
-+                     test_hbitmap_next_x_after_truncate);
- 
-     hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_0",
-                      test_hbitmap_next_dirty_area_0);
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 6526d7b6c1..c089020ca3 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -193,6 +193,30 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
-     }
- }
- 
-+int64_t hbitmap_next_dirty(const HBitmap *hb, int64_t start, int64_t count)
-+{
-+    HBitmapIter hbi;
-+    int64_t firt_dirty_off;
-+    uint64_t end;
-+
-+    assert(start >= 0 && count >= 0);
-+
-+    if (start >= hb->orig_size || count == 0) {
-+        return -1;
-+    }
-+
-+    end = count > hb->orig_size - start ? hb->orig_size : start + count;
-+
-+    hbitmap_iter_init(&hbi, hb, start);
-+    firt_dirty_off = hbitmap_iter_next(&hbi);
-+
-+    if (firt_dirty_off < 0 || firt_dirty_off >= end) {
-+        return -1;
-+    }
-+
-+    return MAX(start, firt_dirty_off);
-+}
-+
- int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count)
- {
-     size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
-@@ -248,40 +272,20 @@ int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count)
- 
- bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t *start, int64_t *count)
- {
--    HBitmapIter hbi;
--    int64_t firt_dirty_off, area_end;
--    uint32_t granularity = 1UL << hb->granularity;
--    uint64_t end;
--
--    assert(*start >= 0 && *count >= 0);
--
--    if (*start >= hb->orig_size || *count == 0) {
--        return false;
--    }
--
--    end = *count > hb->orig_size - *start ? hb->orig_size : *start + *count;
--
--    hbitmap_iter_init(&hbi, hb, *start);
--    firt_dirty_off = hbitmap_iter_next(&hbi);
-+    int64_t area_start, area_end;
- 
--    if (firt_dirty_off < 0 || firt_dirty_off >= end) {
-+    area_start = hbitmap_next_dirty(hb, *start, *count);
-+    if (area_start < 0) {
-         return false;
-     }
- 
--    if (firt_dirty_off + granularity >= end) {
--        area_end = end;
--    } else {
--        area_end = hbitmap_next_zero(hb, firt_dirty_off + granularity,
--                                     end - firt_dirty_off - granularity);
--        if (area_end < 0) {
--            area_end = end;
--        }
-+    area_end = hbitmap_next_zero(hb, area_start, *start + *count - area_start);
-+    if (area_end < 0) {
-+        area_end = MIN(hb->orig_size, *start + *count);
-     }
- 
--    if (firt_dirty_off > *start) {
--        *start = firt_dirty_off;
--    }
--    *count = area_end - *start;
-+    *start = area_start;
-+    *count = area_end - area_start;
- 
-     return true;
- }
--- 
-2.21.0
+> [2] However starting a domain with Icelake-Server so that it can be
+> migrated or saved/restored on QEMU in 3.1.1 and 4.0.0 would be
+> impossible. This can be solved by a different hack, which would drop
+> pconfig=off from QEMU command line.
 
+
+Paolo
 
