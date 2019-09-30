@@ -2,68 +2,84 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 094E6C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 10:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 280F0C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 10:23:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6F2E21855
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 10:14:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6F2E21855
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id EB63B216F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 10:23:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB63B216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEshH-0003LZ-PY
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 06:14:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41666)
+	id 1iEsqM-00070f-2Q
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 06:23:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iEsgR-0002mN-Vy
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 06:13:36 -0400
+ (envelope-from <slp@redhat.com>) id 1iEsp6-0005mE-Ap
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 06:22:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iEsgO-00059n-Hj
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 06:13:33 -0400
-Received: from 19.mo4.mail-out.ovh.net ([87.98.179.66]:52402)
+ (envelope-from <slp@redhat.com>) id 1iEsp4-0002JR-2Z
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 06:22:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46084)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iEsgO-000597-BK
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 06:13:32 -0400
-Received: from player762.ha.ovh.net (unknown [10.109.143.238])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id BA2F92093D4
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 12:13:29 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player762.ha.ovh.net (Postfix) with ESMTPSA id 2EF40A61F950;
- Mon, 30 Sep 2019 10:13:18 +0000 (UTC)
-Subject: Re: [PATCH v2 21/33] spapr, xics, xive: Move cpu_intc_create from
- SpaprIrq to SpaprInterruptController
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
- <20190927055028.11493-22-david@gibson.dropbear.id.au>
- <20190927121649.5b9f3db7@bahia.lan> <20190930014904.GB11105@umbus.fritz.box>
- <adb67721-5c4e-50ac-f459-a48570a45d6e@kaod.org>
- <20190930061445.GG11105@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <75672a0f-6bae-406c-0f0c-d23cc58c9c9f@kaod.org>
-Date: Mon, 30 Sep 2019 12:13:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iEsp3-0002It-PA
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 06:22:30 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 643D14E908
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 10:22:28 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id s25so3730268wmh.1
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 03:22:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=gkviwrPRM28/SKeFSXpxkiSX22uaPzaZiKGGwAwdsxU=;
+ b=JNuTMSWNAZwy273ibZvsYttgxHRerBy5lxyKTg0EaZsMsE5i9IL0166hYkN09ySplu
+ zGZvZv7KxNV3BASJiQbqpInDIMPMEVndNc2AC9drQH9xZDG1TAXz6XsZOZs0LSweBmEH
+ fmnvFXNsMsMMs8L6MdYN3SUvgFChJWGpi7bFdA4Fo6wgOM9+4b85yG42jWnwMcvzH5Mi
+ q8hu/PH4XcGNXcBRRjcM09X0WB9w7qUYxzDTJVT8IIeO1imfANVXyNTiQ1QzRO1s+8Eb
+ beiGOxMNUvEP54VL5xo1Ic60eFnAq8BX+nHiGS9U2CVMfc/YFBzLM6SaAzufYWj8/5A0
+ gnXA==
+X-Gm-Message-State: APjAAAVKe5A/ld17BJHBj1ji8vkPAdib7Fn9s8N8m2RcLONGixIPqzun
+ HghPb+T+6K9yp3JjSOeaxEZdXI6P+QiYc9iVACIg03wV3zE4/uUl5y61jPb+/lXgtA83nTWKuV+
+ V+f68lb3mlAOC9p4=
+X-Received: by 2002:a05:6000:105:: with SMTP id
+ o5mr12241442wrx.51.1569838947107; 
+ Mon, 30 Sep 2019 03:22:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyJEOMZQC2HKmhf0OcLNAorVG0ufkpJ6epnIRNZLLdM5I1tZ9uzP7d2USim2CqyTfbDkZbuRA==
+X-Received: by 2002:a05:6000:105:: with SMTP id
+ o5mr12241417wrx.51.1569838946904; 
+ Mon, 30 Sep 2019 03:22:26 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id d78sm15480844wmd.47.2019.09.30.03.22.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 30 Sep 2019 03:22:26 -0700 (PDT)
+References: <87blv2i5ha.fsf@redhat.com> <87lfu6kuyo.fsf@linaro.org>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: alex.bennee@linaro.org
+Subject: Re: Arch info lost in "info cpus"
+In-reply-to: <87lfu6kuyo.fsf@linaro.org>
+Date: Mon, 30 Sep 2019 12:22:22 +0200
+Message-ID: <878sq6hyn5.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190930061445.GG11105@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-X-Ovh-Tracer-Id: 15368815205646961433
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgedvgddvvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.179.66
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,92 +91,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Laurent Vivier <laurent@vivier.eu>
+Cc: ehabkost@redhat.com, tao3.xu@intel.com, qemu-devel@nongnu.org,
+ mihajlov@linux.vnet.ibm.com, imammedo@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/09/2019 08:14, David Gibson wrote:
-> On Mon, Sep 30, 2019 at 07:28:45AM +0200, C=E9dric Le Goater wrote:
->> On 30/09/2019 03:49, David Gibson wrote:
->>> On Fri, Sep 27, 2019 at 12:16:49PM +0200, Greg Kurz wrote:
->>>> On Fri, 27 Sep 2019 15:50:16 +1000
->>>> David Gibson <david@gibson.dropbear.id.au> wrote:
->>>>
->>>>> This method essentially represents code which belongs to the interr=
-upt
->>>>> controller, but needs to be called on all possible intcs, rather th=
-an
->>>>> just the currently active one.  The "dual" version therefore calls
->>>>> into the xics and xive versions confusingly.
->>>>>
->>>>> Handle this more directly, by making it instead a method on the int=
-c
->>>>> backend, and always calling it on every backend that exists.
->>>>>
->>>>> While we're there, streamline the error reporting a bit.
->>>>>
->>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>> [snip]
->>>>> @@ -525,6 +469,30 @@ static void spapr_irq_check(SpaprMachineState =
-*spapr, Error **errp)
->>>>>  /*
->>>>>   * sPAPR IRQ frontend routines for devices
->>>>>   */
->>>>> +int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
->>>>> +                              PowerPCCPU *cpu, Error **errp)
->>>>> +{
->>>>> +    if (spapr->xive) {
->>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr->xive)=
-;
->>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLA=
-SS(intc);
->>>>> +
->>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
->>>>> +            return -1;
->>>>> +        }
->>>>> +    }
->>>>> +
->>>>> +    if (spapr->ics) {
->>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr->ics);
->>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLA=
-SS(intc);
->>>>> +
->>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
->>>>> +            return -1;
->>>>> +        }
->>>>> +    }
->>>>> +
->>>>
->>>> Instead of these hooks, what about open-coding spapr_xive_cpu_intc_c=
-reate()
->>>> and xics_spapr_cpu_intc_create() directly here, like you already did=
- for the
->>>> ICS and the XIVE objects in spapr_irq_init() ?
->>>
->>> I'd prefer not to.  The idea is I want to treat this as basically:
->>>
->>> 	foreach_possible_intc(intc)
->>> 		intc::cpu_intc_create(...)
->>>
->>> If I find time I might indeed replace the explicit ics and xive
->>> pointers with just an array of SpaprInterruptController *.
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+
+> Sergio Lopez <slp@redhat.com> writes:
+>
+>> Hi,
 >>
->> Or you could use object_child_foreach() and check for the type. If we =
-had
->> a helper object_child_foreach_type(), we could use it elsewhere.
->=20
-> I thought about that, but I don't think it quite works.  The
-> complication is that the xics device is made explicitly a child of the
-> machine, but the xive device has mmio, so it's a SusBusDevice sitting
-> on the root bus instead.
+>> Commit 137b5cb6ab565cb3781d5337591e155932b4230e (hmp: change
+>> hmp_info_cpus to use query-cpus-fast) updated the "info cpus" commit to
+>> make it more lightweight, but also removed the ability to get the
+>> architecture specific status of each vCPU.
+>>
+>> This information was really useful to diagnose certain Guest issues,
+>> without the need of using GDB, which is more intrusive and requires
+>> enabling it in advance.
+>
+> You can always enable the gdbserver from the HMP when you need it.
+>
+>> Is there an alternative way of getting something equivalent to what
+>> "info cpus" provided previously (in 2.10)?
+>
+> info registers
+>
+> should give you a full dump of the CPU state including the PC.
+>
 
-PnvXscom works fine with Devices and SysBusDevices.
+Both methods are less convenient that what we had before. Perhaps it'd
+be reasonable adding a flag to "info cpus" to give users the options of
+having the same behavior as before?
 
-C.=20
+Thanks,
+Sergio.
 
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2R114ACgkQ9GknjS8M
+AjUSIQ//eIojGiTDmWEPUfV77nIqXCSvk8/TFVuv2SoaSpFcqVJlWZ00Z4pMtN0f
+m2mfNiSRARLLzLt9ghG+qezLxHg1LSVllVizRxu4+DHLPimEyDF/eKtZD6lalrcj
+fx9irYjBl4PpG1sBSf4Sp5M+7EpZy+B4Dbveslzi4LeI7gtkUq2v8LpRofRHolLv
+5zWj6b/1QkCVkOI3YOE/ywoH2gt9Nng41v0e0g4dLsiMMou2na78NHSxRjbOZdbm
+Gd2SQLNKa+qAWqZo+6fB1XeLMBWdjmN72pSFja6E9nDWDn1dYIVq5IneTMSxUHbK
+op7nOjlyDwue3Dn6JbhIoYRHS745ggDzO+1OshE19q9HIpn2LRSJBZQlE4yJ2K02
+pH7hgcG3z4AMaRyyJAuBF7Rx1dlK/zNiZtw6C5M9D/tsTH9GgUACEyOkUpswTP91
+JDHaBUv9hZIY/yWzf035hWtWyfpBfDnQB9EvFuOz5qOCfiHmugFp/HY75jbEIijv
+PYSvu3VpIwmPXmRwDiIlt8zZUH1Z+uyXPRJOnIzWtaqHIC7g5aqSrINBgBOCLo6J
+qxrB38GyfPvSrlAX8HomGE6YioZ05prfLhnwZpZAnyhlPcS107w2JD/niqOHAP5J
+W5km1vyXAMh2XVvGfEKTZVuSd7szJVykZXUNWLGwyjV+F24veYg=
+=74gL
+-----END PGP SIGNATURE-----
+--=-=-=--
 
