@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CFD0C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 21:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC7EC32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 21:03:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45B81224FE
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 21:00:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83E0D22501
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 21:03:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/HvfcAt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45B81224FE
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Byr95vn0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83E0D22501
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iF2mZ-0006TS-EC
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 17:00:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45780)
+	id 1iF2pK-00084g-H7
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 17:03:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iF2He-00041A-MJ
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:28:39 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iF2Hh-00044U-0C
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iF2Hd-0002Zw-Ea
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:28:38 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42181)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iF2Hf-0002cn-Oe
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:28:40 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51244)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iF2Hd-0002Xx-8A
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:28:37 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n14so12800120wrw.9
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 13:28:37 -0700 (PDT)
+ id 1iF2Hf-0002bQ-Gq
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:28:39 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 7so874260wme.1
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 13:28:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8TTUthXqXhh1DdLxMpTCEbLpELmMAAhIVdhapb9+b1E=;
- b=c/HvfcAtu2AfeIeujP5gSRO41UANWoaXa+paKfq/UTeBh7oee8LgiklZNUuclrkAt2
- EfbMq2AeDpiEtb5Fos+SoTHub5R41mSTeCtUCZIDpxa3RjWwk4sa64Ml0Rii1RvhsF9Q
- fd2I5pbVCvtjd76BRTUoUDGy3A5babepdN4QeWWWFJbP67qChN3d9v4AuqlLKKlb4Cqn
- E83g1R/dXpbg0KBQFL2sVuFRhdqXDC2nmjrftRBO0yX5BB/M1Xv79irrtGBmHSnwz/zJ
- zVdJLEl8BLRkiWAPdca89pYwp8amqtBupgtxomXkCIzc2Bt8fRxklU5M6L/EBRE/mFOx
- yhkQ==
+ bh=9lJbQYocXSR3LzW21RYjme2hTgIUpvB0ikUNj0SmxGA=;
+ b=Byr95vn07831RUV2a4jbCWBZmItFbDeMuDk1Mcju/0Zg+6kj933+VAXsnAWiCIY+B2
+ Pde3MdmLmdSzbOnC7Y6k6dqDi1XBfYiasdfsvhYMKjUwkI/PJySqZ6DXiRQy+sjQhLki
+ GqWPEgwaFociTSP+fJoz/tbMnPVDncjMVBtcJfqtEF22vUXyEDbEhZ4Rr0CBdfVqi+gy
+ ZHSg9s7hKVZfj00d4zyoJRaIBaCAUMeagFKjlObAL7cg8TKy1Db0QrotPLjIlxCxFu2u
+ aXaSDi6cMgiQ1BL/Xy0x58LLmxIYaBcKmEkFqA6NuA7YtiH3K2kKL2ipHSvAL1vObSzt
+ pzEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8TTUthXqXhh1DdLxMpTCEbLpELmMAAhIVdhapb9+b1E=;
- b=NqOV2DVUPWuHDjDWE//TKU0eMUuKNwf8cxbNz2XgDpQXM/uQjXTQhX8jTyEQ0ozzCN
- Uncozpo5b8iteRIg82D+1Nmct7qEk1mwR79GM32QAFgRZ8S/jJqFJFaGGNchcjhpEWFG
- Mokffj9KuSYzu/uhLmtnWcGl1nURULMv7dzrlM3TVpoNR0vZ6BR1K+o+yd7ej/BFcvco
- jSjX729TGBwMhsWMZzT19exkfPefNR4CWrtGpfpnb7JDIPJjBJjC1BXC4CPEwVxH+KmM
- 3QQUUp+DpbuxIQG2N3PUecBAE1n3OTARgC5+rb/jAZ5ibdHUeW0iFyMAlcA3vnkNEQ8y
- W65A==
-X-Gm-Message-State: APjAAAUIt0+0TzobJzIuG4jdtTSmHUGPzLXVgetqUi/9ACQY1NHcpWP4
- 9xmQBujKRJRxQi64T6e/PYGfB3+T
-X-Google-Smtp-Source: APXvYqyp75ef/rIs78JqH+Xwrj8XPtSCu/aCYcCN4wpj5scu6ii3yreItD0IDFxI+q/AsD7jvabYNg==
-X-Received: by 2002:a5d:5352:: with SMTP id t18mr15344507wrv.72.1569875316076; 
- Mon, 30 Sep 2019 13:28:36 -0700 (PDT)
+ bh=9lJbQYocXSR3LzW21RYjme2hTgIUpvB0ikUNj0SmxGA=;
+ b=n5Xol6VIlDLumffXVnx8cvzsXZJTWxKnJ56WMmgaXgGrJxbj7yPTm2AUQoj6iRxVIE
+ NTVWeIYQKe1SzSzLHCnMQtFGNAjnLPMzXHO1Mz4NiRL5F3sjjewhFf91iePj0YxJP333
+ yMVDCys+e0cQyT7CRWC2g6AlJw5YiwPHyQN04r2omIyzda9KJhoBElX2SkszYRMuhtHA
+ Z0WbI72Lh69Z5WoagTO3cTCQr/jM4+0Dv1WjlCqtVe1N4f3ZVuYVBFdKOQKL8QBtlyjg
+ ziuzU48gEwzUyA1ka+xd15bQWBz9ECl5g2ODk7gDmMX+AcEC0vPRdHowYCRumPu+VxMp
+ a82w==
+X-Gm-Message-State: APjAAAVx+1KUt+rSss3ZDdqqXfmMzx4E09WZozfU70NmwyAIVhc+8sGr
+ YY8a0BhSgfQ3EOiz6lrGW8u2wihG
+X-Google-Smtp-Source: APXvYqzM8borh3GRSyhiCmeMRcxrsLXcASHKIBcuvqCaV5QgtreZXQMVWH8tuCvTpFdzdoAsth4rCg==
+X-Received: by 2002:a7b:ce91:: with SMTP id q17mr712482wmj.25.1569875318269;
+ Mon, 30 Sep 2019 13:28:38 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-e8f4-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:e8f4::5])
- by smtp.gmail.com with ESMTPSA id o9sm34402911wrh.46.2019.09.30.13.28.35
+ by smtp.gmail.com with ESMTPSA id o9sm34402911wrh.46.2019.09.30.13.28.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 30 Sep 2019 13:28:35 -0700 (PDT)
+ Mon, 30 Sep 2019 13:28:37 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 07/10] usb-audio: do not count on avail bytes actually
- available
-Date: Mon, 30 Sep 2019 22:29:00 +0200
-Message-Id: <4efbf065feca430f92c814aa71028df5571acb44.1569874641.git.DirtY.iCE.hu@gmail.com>
+Subject: [PATCH v5 10/10] paaudio: fix channel order for usb-audio 5.1 and 7.1
+ streams
+Date: Mon, 30 Sep 2019 22:29:03 +0200
+Message-Id: <e91c64e888a0bd7c7a3f3ac9381dbb07ed40d2d1.1569874641.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1569874641.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1569874641.git.DirtY.iCE.hu@gmail.com>
@@ -88,7 +88,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,82 +105,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This assumption is no longer true when mixeng is turned off.
-
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- hw/usb/dev-audio.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+ audio/paaudio.c | 50 ++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 45 insertions(+), 5 deletions(-)
 
-diff --git a/hw/usb/dev-audio.c b/hw/usb/dev-audio.c
-index ae42e5a2f1..74c99b1f12 100644
---- a/hw/usb/dev-audio.c
-+++ b/hw/usb/dev-audio.c
-@@ -319,30 +319,31 @@ static int streambuf_put(struct streambuf *buf, USBPacket *p)
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index d195b1caa8..6ff0d17537 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -338,17 +338,59 @@ static pa_stream *qpa_simple_new (
+         pa_stream_direction_t dir,
+         const char *dev,
+         const pa_sample_spec *ss,
+-        const pa_channel_map *map,
+         const pa_buffer_attr *attr,
+         int *rerror)
  {
-     uint32_t free = buf->size - (buf->prod - buf->cons);
+     int r;
+-    pa_stream *stream;
++    pa_stream *stream = NULL;
+     pa_stream_flags_t flags;
++    pa_channel_map map;
  
--    if (!free) {
-+    if (free < USBAUDIO_PACKET_SIZE) {
-         return 0;
-     }
-     if (p->iov.size != USBAUDIO_PACKET_SIZE) {
-         return 0;
-     }
--    assert(free >= USBAUDIO_PACKET_SIZE);
+     pa_threaded_mainloop_lock(c->mainloop);
+ 
+-    stream = pa_stream_new(c->context, name, ss, map);
++    pa_channel_map_init(&map);
++    map.channels = ss->channels;
 +
-     usb_packet_copy(p, buf->data + (buf->prod % buf->size),
-                     USBAUDIO_PACKET_SIZE);
-     buf->prod += USBAUDIO_PACKET_SIZE;
-     return USBAUDIO_PACKET_SIZE;
- }
- 
--static uint8_t *streambuf_get(struct streambuf *buf)
-+static uint8_t *streambuf_get(struct streambuf *buf, size_t *len)
- {
-     uint32_t used = buf->prod - buf->cons;
-     uint8_t *data;
- 
-     if (!used) {
-+        *len = 0;
-         return NULL;
++    /*
++     * TODO: This currently expects the only frontend supporting more than 2
++     * channels is the usb-audio.  We will need some means to set channel
++     * order when a new frontend gains multi-channel support.
++     */
++    switch (ss->channels) {
++    case 1:
++        map.map[0] = PA_CHANNEL_POSITION_MONO;
++        break;
++
++    case 2:
++        map.map[0] = PA_CHANNEL_POSITION_LEFT;
++        map.map[1] = PA_CHANNEL_POSITION_RIGHT;
++        break;
++
++    case 6:
++        map.map[0] = PA_CHANNEL_POSITION_FRONT_LEFT;
++        map.map[1] = PA_CHANNEL_POSITION_FRONT_RIGHT;
++        map.map[2] = PA_CHANNEL_POSITION_CENTER;
++        map.map[3] = PA_CHANNEL_POSITION_LFE;
++        map.map[4] = PA_CHANNEL_POSITION_REAR_LEFT;
++        map.map[5] = PA_CHANNEL_POSITION_REAR_RIGHT;
++        break;
++
++    case 8:
++        map.map[0] = PA_CHANNEL_POSITION_FRONT_LEFT;
++        map.map[1] = PA_CHANNEL_POSITION_FRONT_RIGHT;
++        map.map[2] = PA_CHANNEL_POSITION_CENTER;
++        map.map[3] = PA_CHANNEL_POSITION_LFE;
++        map.map[4] = PA_CHANNEL_POSITION_REAR_LEFT;
++        map.map[5] = PA_CHANNEL_POSITION_REAR_RIGHT;
++        map.map[6] = PA_CHANNEL_POSITION_SIDE_LEFT;
++        map.map[7] = PA_CHANNEL_POSITION_SIDE_RIGHT;
++
++    default:
++        dolog("Internal error: unsupported channel count %d\n", ss->channels);
++        goto fail;
++    }
++
++    stream = pa_stream_new(c->context, name, ss, &map);
+     if (!stream) {
+         goto fail;
      }
--    assert(used >= USBAUDIO_PACKET_SIZE);
-     data = buf->data + (buf->cons % buf->size);
--    buf->cons += USBAUDIO_PACKET_SIZE;
-+    *len = MIN(buf->prod - buf->cons,
-+               buf->size - (buf->cons % buf->size));
-     return data;
- }
- 
-@@ -374,16 +375,21 @@ static void output_callback(void *opaque, int avail)
-     USBAudioState *s = opaque;
-     uint8_t *data;
- 
--    for (;;) {
--        if (avail < USBAUDIO_PACKET_SIZE) {
-+    while (avail) {
-+        size_t written, len;
-+
-+        data = streambuf_get(&s->out.buf, &len);
-+        if (!data) {
-             return;
-         }
--        data = streambuf_get(&s->out.buf);
--        if (!data) {
-+
-+        written = AUD_write(s->out.voice, data, len);
-+        avail -= written;
-+        s->out.buf.cons += written;
-+
-+        if (written < len) {
-             return;
-         }
--        AUD_write(s->out.voice, data, USBAUDIO_PACKET_SIZE);
--        avail -= USBAUDIO_PACKET_SIZE;
-     }
- }
- 
+@@ -421,7 +463,6 @@ static int qpa_init_out(HWVoiceOut *hw, struct audsettings *as,
+         PA_STREAM_PLAYBACK,
+         ppdo->has_name ? ppdo->name : NULL,
+         &ss,
+-        NULL,                   /* channel map */
+         &ba,                    /* buffering attributes */
+         &error
+         );
+@@ -470,7 +511,6 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+         PA_STREAM_RECORD,
+         ppdo->has_name ? ppdo->name : NULL,
+         &ss,
+-        NULL,                   /* channel map */
+         &ba,                    /* buffering attributes */
+         &error
+         );
 -- 
 2.23.0
 
