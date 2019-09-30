@@ -2,59 +2,116 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 825DBC32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17663C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 504D2215EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:33:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504D2215EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id D39A820815
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:36:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="wRYXgDc1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D39A820815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iExfa-0008Gm-7J
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:33:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60622)
+	id 1iExjJ-00030k-Em
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:36:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alxndr@bu.edu>) id 1iExRt-0006Uh-Hk
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:18:54 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iExSS-00072l-56
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alxndr@bu.edu>) id 1iExRr-0007Bp-73
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:18:52 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:43700)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1iExRr-00078d-34
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:18:51 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: 144.121.20.163.lightower.net [144.121.20.163] (may be forged)
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id x8UFHx77021358
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO);
- Mon, 30 Sep 2019 11:17:59 -0400
-Subject: Re: [PATCH v3 17/22] fuzz: add support for fork-based fuzzing.
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190918231846.22538-1-alxndr@bu.edu>
- <20190918231846.22538-18-alxndr@bu.edu>
-From: Alexander Oleinik <alxndr@bu.edu>
-Message-ID: <b8d441a3-dc3b-8c91-7516-3c8162cc5a4d@bu.edu>
-Date: Mon, 30 Sep 2019 11:17:59 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
-MIME-Version: 1.0
-In-Reply-To: <20190918231846.22538-18-alxndr@bu.edu>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iExSR-0007T6-1Z
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:19:27 -0400
+Received: from mail-eopbgr50131.outbound.protection.outlook.com
+ ([40.107.5.131]:19618 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iExSG-0007Lr-RL; Mon, 30 Sep 2019 11:19:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PgshyEVVSAp5tiAchpOgpxuOQnk1pQ00mzEtNcbUgxxdPmc1yGTs+7Ykbd8fFkA4lsslGk2/rh10g9vMiXGQbvsvXBnHtCqOg3BALTZFDHbyAt/tiNSVEjx0OamOZuGBSpYX4kaEdTQvVU+J6MfMWB+GvCRyDneb6h6ApzTcjOgIjHVyZc6zg/T45Ds8tziSX2Ai2D45ylvLg4yrz+yS/KR0ln9EpoeE79svFq1kVEkEMwS0nQPSaS3oKakFesiAaagL/mIB7EPPrRU9qJw2gSZzi7rPsA5Q4Whl9DG8DfhKsZY00NjQ0zR94bKt3patmt9LQv5XXsYEIoILttdNxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QUGD7uxF68AjvUDWtECUGIgEwQddHyDkoH5B6ewjqFo=;
+ b=N1RfjNb/usKymiNC4tUbYZOeqECoVuzmAGvVkSnUrLxuQT6x21l9/JT8rGPL+mjswFyzy5DDZJ0/zHG99LRgvmxMu9B6x0SI/GYYeAjzL6cXwGrZcxGPJrg2XrBdSwAv+WvZAELZAF6zmgZfGlll6kAFnwqwDpdobw+NwxCB+defSug25Ju7tVDmki2lWU6m3+4xWVxLWOTUtc3xDt9YzVCPvc64FnyuIil8R2HxxJEsbx/psmdDOv3ZtbyzIs26kW6vAlfvsJU/EWR2JioHtXrMctPcGbnBfnI/6RcSlMoX4Y0QvVdoX+XeGSAJ9TDoV3sRX8c3CowQYslZSUFyrg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QUGD7uxF68AjvUDWtECUGIgEwQddHyDkoH5B6ewjqFo=;
+ b=wRYXgDc1ThLf8bgws4s1/paEZN7feMlhy3vEj24CwC1mGM6F0VDyd5PCAS/DogVkENDw6HL1bhbp31CzizTseRYYAVo5FRWxAw+EXxNoF343Hkf4f+wzq+8bd2S/a//y33Y3LKrs8PiAFPqO00PJ/Y7qnmHC/PfvruPLnYlv/28=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB3961.eurprd08.prod.outlook.com (20.179.11.92) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.17; Mon, 30 Sep 2019 15:19:12 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.017; Mon, 30 Sep 2019
+ 15:19:12 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v3 04/25] error: auto propagated local_err
+Thread-Topic: [PATCH v3 04/25] error: auto propagated local_err
+Thread-Index: AQHVcxQEcKETnqqn7ky5xEykJfDDyadEXLqAgAAB64A=
+Date: Mon, 30 Sep 2019 15:19:12 +0000
+Message-ID: <ca629ae8-15c5-1685-1cbb-99283d37b0a1@virtuozzo.com>
+References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
+ <20190924200902.4703-5-vsementsov@virtuozzo.com>
+ <20190930151215.GB12777@linux.fritz.box>
+In-Reply-To: <20190930151215.GB12777@linux.fritz.box>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.6.x [fuzzy]
-X-Received-From: 128.197.228.73
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0501CA0005.eurprd05.prod.outlook.com
+ (2603:10a6:3:1a::15) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190930181907771
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f3e67d9a-6170-40a9-b0cb-08d745b98c65
+x-ms-traffictypediagnostic: DB8PR08MB3961:
+x-microsoft-antispam-prvs: <DB8PR08MB3961234CBA443C2608C0B2C2C1820@DB8PR08MB3961.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 01762B0D64
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39840400004)(396003)(376002)(136003)(346002)(366004)(199004)(189003)(7736002)(52116002)(386003)(7406005)(76176011)(305945005)(6506007)(6486002)(26005)(6512007)(186003)(102836004)(4744005)(54906003)(99286004)(316002)(256004)(6436002)(7416002)(446003)(476003)(2616005)(486006)(11346002)(5660300002)(6916009)(6116002)(229853002)(3846002)(31686004)(478600001)(71190400001)(71200400001)(2906002)(66446008)(66066001)(66946007)(64756008)(66556008)(66476007)(6246003)(86362001)(81156014)(81166006)(4326008)(36756003)(14454004)(8676002)(8936002)(25786009)(31696002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB3961;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: epO2fAItlVvnb24ZK3Z+jIBbEiHOngemufx1Bhj9YTXp2weOY8NNLZnnk6s+2HeqUu3kviaX3jA+O0eKj/2EIMpfWVEniYkpuZ5vHUr4KvpLrb48Zmkv1hI+rMA2KGPwROWYPx87BWQJDp7k5WKoZEk7EOW/K+9uPvuwHAUrjvKsJR5DpfJ7rnV1Tv8LYwxBHCbGC5DIPAbeNvbNEsTj/yndVV1w8ceImnkSSofaSiFmp1oWTh7STIk69E0caHoQ2plbJbIzKt+DSOXoM19hOS0vaS83+u7HxX9Z7zH55mUoWBmx0+OTMuXJVf3Tv9k1xHjB89S++zEa3AdSzayu2WmSCayQo88iHegYuQGhYrPBJuJNlt/IsJHUvM3foCSz/IQ2gUY/SMDfwDJo6SC6E3UhCiP7iqmjBm/YA7Maiuo=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <18EBCAE8CB939D4996F6F991EB2DF3CA@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3e67d9a-6170-40a9-b0cb-08d745b98c65
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2019 15:19:12.4846 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Tev0aNW000uLgyUgy7WL/ZcFTDMO8Ie2j52Nkgo2C7sp9oNkqB292s/drkpH68gY3aHm+hd267JCDPrx41R03cRzYLjENVRJgc6MD7Gq7SI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB3961
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.5.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,182 +123,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Paul Burton <pburton@wavecomp.com>, Jeff Cody <codyprime@gmail.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Yuval Shaia <yuval.shaia@oracle.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ David Hildenbrand <david@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ "integration@gluster.org" <integration@gluster.org>,
+ =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/18/19 7:19 PM, Oleinik, Alexander wrote:
-> fork() is a simple way to ensure that state does not leak in between
-> fuzzing runs. Unfortunately, the fuzzer mutation engine relies on
-> bitmaps which contain coverage information for each fuzzing run, and
-> these bitmaps should be copied from the child to the parent(where the
-> mutation occurs). These bitmaps are created through compile-time
-> instrumentation and there seems to be no simple way to re-map them as
-> shared memory. As a workaround, we use a linker script modification to
-> place all of the bitmaps together and add some markers around them which
-> we can observe from our code. Then, we map shared memory and copy the
-> bimaps to the SHM (in the child) and out of the SHM(in the parent) after
-> each fuzzing run. Ram blocks are marked as DONTFORK in exec.c, which
-> breaks this approach. For now, avoid this with an #ifdef.
-> 
-> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
-> ---
->   exec.c                      |  2 ++
->   tests/fuzz/Makefile.include |  3 +++
->   tests/fuzz/fork_fuzz.c      | 27 ++++++++++++++++++++++
->   tests/fuzz/fork_fuzz.h      | 12 ++++++++++
->   tests/fuzz/fork_fuzz.ld     | 46 +++++++++++++++++++++++++++++++++++++
->   5 files changed, 90 insertions(+)
->   create mode 100644 tests/fuzz/fork_fuzz.c
->   create mode 100644 tests/fuzz/fork_fuzz.h
->   create mode 100644 tests/fuzz/fork_fuzz.ld
-> 
-> diff --git a/exec.c b/exec.c
-> index 235d6bc883..d3838f4ea4 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2295,7 +2295,9 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
->           qemu_ram_setup_dump(new_block->host, new_block->max_length);
->           qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_HUGEPAGE);
->           /* MADV_DONTFORK is also needed by KVM in absence of synchronous MMU */
-> +#ifndef CONFIG_FUZZ /* This conflicts with fork-based fuzzing */
->           qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_DONTFORK);
-> +#endif
->           ram_block_notify_add(new_block->host, new_block->max_length);
->       }
->   }
-> diff --git a/tests/fuzz/Makefile.include b/tests/fuzz/Makefile.include
-> index b415b056b0..687dacce04 100644
-> --- a/tests/fuzz/Makefile.include
-> +++ b/tests/fuzz/Makefile.include
-> @@ -2,3 +2,6 @@ QEMU_PROG_FUZZ=qemu-fuzz-$(TARGET_NAME)$(EXESUF)
->   fuzz-obj-y = $(libqos-obj-y)
->   fuzz-obj-y += tests/libqtest.o
->   fuzz-obj-y += tests/fuzz/fuzz.o
-> +fuzz-obj-y += tests/fuzz/fork_fuzz.o
-> +
-> +FUZZ_LDFLAGS += -Xlinker -T$(SRC_PATH)/tests/fuzz/fork_fuzz.ld
-> diff --git a/tests/fuzz/fork_fuzz.c b/tests/fuzz/fork_fuzz.c
-> new file mode 100644
-> index 0000000000..26d0b4b42e
-> --- /dev/null
-> +++ b/tests/fuzz/fork_fuzz.c
-> @@ -0,0 +1,27 @@
-> +#include "qemu/osdep.h"
-> +#include "fork_fuzz.h"
-> +
-> +uintptr_t feature_shm;
-> +
-> +void counter_shm_init(void)
-> +{
-> +    feature_shm = (uintptr_t)mmap(NULL,
-> +            &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START,
-> +            PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-> +    return;
-> +}
-> +
-> +void counter_shm_store(void)
-> +{
-> +    memcpy((void *)feature_shm,
-> +            &__FUZZ_COUNTERS_START,
-> +            &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START);
-> +}
-> +
-> +void counter_shm_load(void)
-> +{
-> +    memcpy(&__FUZZ_COUNTERS_START,
-> +            (void *)feature_shm,
-> +            &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START);
-> +}
-> +
-> diff --git a/tests/fuzz/fork_fuzz.h b/tests/fuzz/fork_fuzz.h
-> new file mode 100644
-> index 0000000000..b5f8b35015
-> --- /dev/null
-> +++ b/tests/fuzz/fork_fuzz.h
-> @@ -0,0 +1,12 @@
-> +#ifndef FORK_FUZZ_H
-> +#define FORK_FUZZ_H
-> +
-> +extern uint8_t __FUZZ_COUNTERS_START;
-> +extern uint8_t __FUZZ_COUNTERS_END;
-> +
-> +void counter_shm_init(void);
-> +void counter_shm_store(void);
-> +void counter_shm_load(void);
-> +
-> +#endif
-> +
-> diff --git a/tests/fuzz/fork_fuzz.ld b/tests/fuzz/fork_fuzz.ld
-> new file mode 100644
-> index 0000000000..ba0ba79570
-> --- /dev/null
-> +++ b/tests/fuzz/fork_fuzz.ld
-> @@ -0,0 +1,46 @@
-> +/* We adjust linker script modification to place all of the stuff that needs to
-> + * persist across fuzzing runs into a contiguous seciton of memory. Then, it is
-> + * easy to copy it to and from shared memory.
-> + *
-> + * Total Size : A5A00
-> + * Sancov counters: B26F
-> + * Coverage counters: 56D60
-> + * TracePC Object: 43C00
-> +*/
-> +
-> +SECTIONS
-> +{
-> +  .data.fuzz_start : ALIGN(4K)
-> +  {
-> +        __FUZZ_COUNTERS_START = .;
-> +  }
-> +  .data.fuzz_ordered :
-> +  {
-> +      /* Internal Libfuzzer TracePC object which contains the ValueProfileMap.
-> +       * Not optimal that we have to copy the rest of the TracePC object.
-> +       * */
-> +      __start___sancov_cntrs = .;
-> +      *(__sancov_cntrs*)
-> +      __stop___sancov_cntrs = .;
-> +  }
-> +  .data.fuzz_unordered :
-> +  {
-> +      /* Coverage counters. They're not necessary for fuzzing, but are useful
-> +       * for analyzing the fuzzing performance
-> +       * */
-> +      __start___llvm_prf_cnts = .;
-> +      *(*llvm_prf_cnts);
-> +      __stop___llvm_prf_cnts = .;
-> +
-> +      /* Lowest stack counter */
-> +      *(__sancov_lowest_stack);
-> +      /* Internal Libfuzzer TracePC object which contains the ValueProfileMap.
-> +       * Not optimal that we have to copy the rest of the TracePC object.
-> +       * */
-> +      *FuzzerTracePC*(.bss._ZN6fuzzer*)
-> +      __FUZZ_COUNTERS_END = .;
-> +  }
-> +}
-> +/* Dont overwrite the SECTIONS in the default linker script. Instead insert the
-> + * above into the default script */
-> +INSERT AFTER .data;
-> 
-The obvious issue with this are that we lose the threads created prior 
-to fork(). Over the past days I've been coverage of existing virtio-net 
-tests with and without fork(). With fork(), virtio_net_tx_bh doesn't get 
-scheduled, and never runs. Could this be due to the missing RCU thread?
-This is probably an even bigger problem for iothread devices, such as 
-virtio-blk...
-
-Does anyone have suggestions for how to approach the thread problem, or 
-at least the RCU part of it?
-I know Paolo made some fork-related changes in 
-21b7cf9e07e5991c57b461181cfb5bbb6fe7a9d6 rcu: handle forks safely
-and
-2a96a552f9502ac34c29da2f3a39788db5ee5692 ,
-but from what I can tell, this is mostly for qemu-user.
-
--Alex
+MzAuMDkuMjAxOSAxODoxMiwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMjQuMDkuMjAxOSB1bSAy
+MjowOCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IEhl
+cmUgaXMgaW50cm9kdWNlZCBFUlJQX0ZVTkNUSU9OX0JFR0lOIG1hY3JvLCB0byBiZSB1c2VkIGF0
+IHN0YXJ0IG9mDQo+PiBmdW5jdGlvbnMgd2l0aCBlcnJwIHBhcmFtZXRlci4NCj4gDQo+IEEgYml0
+IG9mIGJpa2Ugc2hlZGRpbmcsIGJ1dCBGT09fQkVHSU4gc3VnZ2VzdHMgdG8gbWUgdGhhdCBhIEZP
+T19FTkQgd2lsbA0KPiBmb2xsb3cuIENhbiB3ZSBmaW5kIGEgZGlmZmVyZW50IG5hbWUsIGVzcGVj
+aWFsbHkgbm93IHRoYXQgd2Ugd29uJ3QgdXNlDQo+IHRoaXMgbWFjcm8gaW4gZXZlcnkgZnVuY3Rp
+b24gdGhhdCB1c2VzIGFuIGVycnAsIHNvIGV2ZW4gdGhlICJlcnJwDQo+IGZ1bmN0aW9uIiBwYXJ0
+IGlzbid0IHJlYWxseSBjb3JyZWN0IGFueSBtb3JlPw0KPiANCj4gSG93IGFib3V0IEVSUlBfQVVU
+T19QUk9QQUdBVEU/DQo+IA0KDQpJIGhhdmUgYW4gaWRlYSB0aGF0IHdpdGggdGhpcyBtYWNybyB3
+ZSBjYW4gKG9wdGlvbmFsbHkpIGdldCB0aGUgd2hvbGUgY2FsbCBzdGFjaw0Kb2YgdGhlIGVycm9y
+IGFuZCBwcmludCBpdCB0byBsb2csIHNvIGl0J3MgZ29vZCB0byBnaXZlIGl0IG1vcmUgZ2VuZXJp
+YyBuYW1lLCBub3QNCmxpbWl0ZWQgdG8gcHJvcGFnYXRpb24uLg0KDQpXUkFQX0VSUlANCg0KQVVU
+T19FUlJQDQoNCkFVVE9NQVRFX0VSUlANCg0Kb3Igd2hhdCBkbyB5b3UgdGhpbms/DQoNCi0tIA0K
+QmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
