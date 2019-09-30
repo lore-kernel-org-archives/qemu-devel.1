@@ -2,65 +2,96 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8B7C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 16:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A566C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 16:17:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DCAB215EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 16:08:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DCAB215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03FA720815
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 16:17:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uotHlmcJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03FA720815
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEyDs-00028j-63
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 12:08:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38317)
+	id 1iEyN0-00069P-RU
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 12:17:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iEy6r-0004l6-9b
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:01:15 -0400
+ (envelope-from <rth7680@gmail.com>) id 1iEyL6-0005OD-AK
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iEy6q-0003o0-5B
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:01:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47294)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iEy6h-0003du-2I; Mon, 30 Sep 2019 12:01:03 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 13E71307D844;
- Mon, 30 Sep 2019 16:00:51 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-86.ams2.redhat.com [10.36.116.86])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7358426327;
- Mon, 30 Sep 2019 16:00:41 +0000 (UTC)
-Date: Mon, 30 Sep 2019 18:00:39 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v3 04/25] error: auto propagated local_err
-Message-ID: <20190930160039.GC12777@linux.fritz.box>
-References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
- <20190924200902.4703-5-vsementsov@virtuozzo.com>
- <20190930151215.GB12777@linux.fritz.box>
- <ca629ae8-15c5-1685-1cbb-99283d37b0a1@virtuozzo.com>
+ (envelope-from <rth7680@gmail.com>) id 1iEyL5-0002YA-Fb
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 12:15:56 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38383)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rth7680@gmail.com>)
+ id 1iEyL3-0002XI-Gy; Mon, 30 Sep 2019 12:15:53 -0400
+Received: by mail-pf1-x443.google.com with SMTP id h195so5888000pfe.5;
+ Mon, 30 Sep 2019 09:15:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:openpgp:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Hrsxb9shmqjuLgoyRHrpfj1dyfrKbam6K5QABnrnzaM=;
+ b=uotHlmcJ0et/mZ7C4no8ocTyFbHnw4zXYt1PatnNAWBPgecyUUyqBN0lDQQgpaQGIu
+ Gd9GzaB74WQQkTVqLtJvJEKaCeur7ETHqTuIFmZPlL5sYxfu7jLChwyPX8BsorHLCtMm
+ l4IUl/Lwmiy0krkbf3lbKWO9UWOzHB36Jpizon9pyG5Yy8JvUXjdAg7KdEj6WauOwWMi
+ Xpb3kWX5c+SmMdpjussNDrZUFtt7gn2oQkUrvHwxrPidRgkgbHsD/Z2p+/XLZgS4WNe4
+ Ty0HdNuLm1///oP2QgpNuWun4/cewpbui30VzZa41dYTSpJmQUUDLYAH9RsEn3x0ymMy
+ 05hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=Hrsxb9shmqjuLgoyRHrpfj1dyfrKbam6K5QABnrnzaM=;
+ b=Ua0ktE/O+/4zqKvoMu9oBpLwwAkyrftx1EQmkybz1A889BEOExTbl3t7vt7KgX26pi
+ WYI7NBR8F0IB24oy6zwP6nzZVtXt8o3nFA/9Hz7DA+8MCcWTB6n/JynkiTiMb9r1p/Xb
+ hgRkHn1qw3n/pzTzN71gUcup3NSabQtsDSIajeFkZ1WLdFZybiIYjMUCGKBww6nRk1xg
+ LPR8Ox8ZHkJKsEuptsr9N1yVCtoFZ2lZXox3W//+3rNPpHNEo37eWjXTo+D/8WhKMqdk
+ VxVpWVl44ZrUP/RQd95alEkwyFcVUtBINomy4erTH41iIRzZXOsyOCJMGsSUR2X7GWRV
+ eq8A==
+X-Gm-Message-State: APjAAAWmTfqI7ogOQzI85HlmNchzWQ76zfZ0tpZr7wkCNEvQQipTmiim
+ 2kEO3SU6EIFzhnNFa76hNPQ+X3tK
+X-Google-Smtp-Source: APXvYqwk/X+J/CiVn8AGIqJYDNGI+VFeeaIEEiKyGfreEn0xtLnTCicqYZ0qnJLrbTrjNCUVVHAXrQ==
+X-Received: by 2002:a65:4002:: with SMTP id f2mr25321298pgp.447.1569860151857; 
+ Mon, 30 Sep 2019 09:15:51 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.googlemail.com with ESMTPSA id s1sm12299201pjs.31.2019.09.30.09.15.49
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 30 Sep 2019 09:15:50 -0700 (PDT)
+Subject: Re: [PATCH v3 02/18] target/s390x: Add ilen to unwind data
+To: David Hildenbrand <david@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190926162615.31168-1-richard.henderson@linaro.org>
+ <20190926162615.31168-3-richard.henderson@linaro.org>
+ <4d1f9fbc-a6b3-cb7d-63a7-8d9568bc7406@redhat.com>
+ <164856f8-fc7e-7a97-65b8-e1be2cf354be@linaro.org>
+ <6557ae81-1e25-38bc-dff5-2d15b45284c5@redhat.com>
+ <1ab7a5b3-40e8-c3ae-0877-07b8b50b90d1@twiddle.net>
+ <db4233d2-607a-5d37-50a8-bda57234a6c7@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Openpgp: preference=signencrypt
+Message-ID: <98872765-9f61-abc6-863e-63e7c540d351@twiddle.net>
+Date: Mon, 30 Sep 2019 09:15:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ca629ae8-15c5-1685-1cbb-99283d37b0a1@virtuozzo.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Mon, 30 Sep 2019 16:00:51 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <db4233d2-607a-5d37-50a8-bda57234a6c7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,61 +103,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Paul Burton <pburton@wavecomp.com>, Jeff Cody <codyprime@gmail.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
- Yuval Shaia <yuval.shaia@oracle.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- David Hildenbrand <david@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- "integration@gluster.org" <integration@gluster.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 30.09.2019 um 17:19 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 30.09.2019 18:12, Kevin Wolf wrote:
-> > Am 24.09.2019 um 22:08 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >> Here is introduced ERRP_FUNCTION_BEGIN macro, to be used at start of
-> >> functions with errp parameter.
-> > 
-> > A bit of bike shedding, but FOO_BEGIN suggests to me that a FOO_END will
-> > follow. Can we find a different name, especially now that we won't use
-> > this macro in every function that uses an errp, so even the "errp
-> > function" part isn't really correct any more?
-> > 
-> > How about ERRP_AUTO_PROPAGATE?
-> 
-> I have an idea that with this macro we can (optionally) get the whole call stack
-> of the error and print it to log, so it's good to give it more generic name, not
-> limited to propagation..
+On 9/30/19 8:42 AM, David Hildenbrand wrote:
+>> Of course, but it's no different with this case than any other.  If the
+>> interrupt has already been handled, then we will simply restart the next TB as
+>> per normal.
+> Yeah, I was mostly concerned that "the next TB" will be "the next
+> instruction" and not "the original instruction again".
 
-Hm, what's the context for this feature?
+Ah, well, that's easy.  The next TB will start from psw.addr, and when we
+cpu_loop_exit_restore(), psw.addr will be set to the current instruction.
 
-The obvious one where you want to have a stack trace is &error_abort,
-but that one crashes, so you get it automatically. If it's just a normal
-error (like a QAPI option contains an invalid value and some function
-down the call chain checks it), why would anyone want to know what the
-call chain in the QEMU code was?
+This is exactly the same as when we raise a PGM_ADDRESSING exception which
+needs to be restarted after the kernel swaps in the page.
 
-Kevin
+
+r~
+
 
