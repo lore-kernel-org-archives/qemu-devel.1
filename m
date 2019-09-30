@@ -2,67 +2,111 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0F8C4360C
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59161C4360C
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:52:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A69F02081B
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:30:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IxfHCAHh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A69F02081B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 2C1BC218DE
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:52:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1BC218DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEq8g-0004Z4-Ps
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 03:30:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43306)
+	id 1iEqTp-0002K7-CJ
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 03:52:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iEq78-0003TD-O0
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:29:00 -0400
+ (envelope-from <david@redhat.com>) id 1iEqSd-0001ry-9T
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iEq77-00006v-A0
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:28:58 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:46789 helo=ozlabs.org)
+ (envelope-from <david@redhat.com>) id 1iEqSc-0005EV-BH
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:51:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53411)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iEq76-0008V7-4c; Mon, 30 Sep 2019 03:28:57 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46hYtC3cwlz9sPG; Mon, 30 Sep 2019 17:28:51 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569828531;
- bh=Ve9Z++CMgcUBRdRvovNGbR1AxqHdpxKndYnsZqGY9Zs=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=IxfHCAHhLMZ3EISz+4xcvSpuPeys+z/Fg5LHLzLH88nWITarY1fMGqfsRDLDQYtjI
- 8TKiL5v+vLO3AXRAucYBpFDUZ92l86/n73mFa54oURniWMJukzqDImN9SkLPnJEZhZ
- MTj5O8VUvPXuxuqed1Mb/n/c14dIwIDmAA4ckfQU=
-Date: Mon, 30 Sep 2019 16:14:45 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v2 21/33] spapr, xics, xive: Move cpu_intc_create from
- SpaprIrq to SpaprInterruptController
-Message-ID: <20190930061445.GG11105@umbus.fritz.box>
-References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
- <20190927055028.11493-22-david@gibson.dropbear.id.au>
- <20190927121649.5b9f3db7@bahia.lan>
- <20190930014904.GB11105@umbus.fritz.box>
- <adb67721-5c4e-50ac-f459-a48570a45d6e@kaod.org>
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iEqSc-0005E3-38; Mon, 30 Sep 2019 03:51:10 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0F759C049E23;
+ Mon, 30 Sep 2019 07:51:08 +0000 (UTC)
+Received: from [10.36.117.170] (ovpn-117-170.ams2.redhat.com [10.36.117.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 075DD600CC;
+ Mon, 30 Sep 2019 07:51:05 +0000 (UTC)
+Subject: Re: [PATCH] configure: Remove s390 (31-bit mode) from the list of
+ supported CPUs
+To: Thomas Huth <thuth@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+References: <20190928190334.6897-1-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwX4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
+ BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
+ 8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
+ xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
+ jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
+ s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
+ m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
+ MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
+ z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
+ dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
+ UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
+ 7ut6OL64oAq+zsFNBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
+ uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
+ 0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
+ 2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
+ xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
+ 8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
+ hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
+ u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
+ gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
+ rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABwsFl
+ BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
+ KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
+ NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
+ YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
+ lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
+ qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
+ C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
+ W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
+ TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
+ +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <24cce055-aeda-2328-47da-dc8a826bad45@redhat.com>
+Date: Mon, 30 Sep 2019 09:51:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="L1c6L/cjZjI9d0Eq"
-Content-Disposition: inline
-In-Reply-To: <adb67721-5c4e-50ac-f459-a48570a45d6e@kaod.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20190928190334.6897-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 30 Sep 2019 07:51:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,115 +118,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 28.09.19 21:03, Thomas Huth wrote:
+> On IBM Z, KVM in the kernel is only implemented for 64-bit mode, and
+> with regards to TCG, we also only support 64-bit host CPUs (see the
+> check at the beginning of tcg/s390/tcg-target.inc.c), so we should
+> remove s390 (without "x", i.e. the old 31-bit mode CPUs) from the
+> list of supported CPUs.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 397bb476e1..a4488c6705 100755
+> --- a/configure
+> +++ b/configure
+> @@ -728,7 +728,7 @@ ARCH=
+>  # Normalise host CPU name and set ARCH.
+>  # Note that this case should only have supported host CPUs, not guests.
+>  case "$cpu" in
+> -  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
+> +  ppc|ppc64|s390x|sparc64|x32|riscv32|riscv64)
+>      supported_cpu="yes"
+>    ;;
+>    ppc64le)
+> 
 
---L1c6L/cjZjI9d0Eq
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Not sure if that ever worked
 
-On Mon, Sep 30, 2019 at 07:28:45AM +0200, C=E9dric Le Goater wrote:
-> On 30/09/2019 03:49, David Gibson wrote:
-> > On Fri, Sep 27, 2019 at 12:16:49PM +0200, Greg Kurz wrote:
-> >> On Fri, 27 Sep 2019 15:50:16 +1000
-> >> David Gibson <david@gibson.dropbear.id.au> wrote:
-> >>
-> >>> This method essentially represents code which belongs to the interrupt
-> >>> controller, but needs to be called on all possible intcs, rather than
-> >>> just the currently active one.  The "dual" version therefore calls
-> >>> into the xics and xive versions confusingly.
-> >>>
-> >>> Handle this more directly, by making it instead a method on the intc
-> >>> backend, and always calling it on every backend that exists.
-> >>>
-> >>> While we're there, streamline the error reporting a bit.
-> >>>
-> >>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > [snip]
-> >>> @@ -525,6 +469,30 @@ static void spapr_irq_check(SpaprMachineState *s=
-papr, Error **errp)
-> >>>  /*
-> >>>   * sPAPR IRQ frontend routines for devices
-> >>>   */
-> >>> +int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
-> >>> +                              PowerPCCPU *cpu, Error **errp)
-> >>> +{
-> >>> +    if (spapr->xive) {
-> >>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr->xive);
-> >>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-> >>> +
-> >>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
-> >>> +            return -1;
-> >>> +        }
-> >>> +    }
-> >>> +
-> >>> +    if (spapr->ics) {
-> >>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr->ics);
-> >>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_CLASS=
-(intc);
-> >>> +
-> >>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
-> >>> +            return -1;
-> >>> +        }
-> >>> +    }
-> >>> +
-> >>
-> >> Instead of these hooks, what about open-coding spapr_xive_cpu_intc_cre=
-ate()
-> >> and xics_spapr_cpu_intc_create() directly here, like you already did f=
-or the
-> >> ICS and the XIVE objects in spapr_irq_init() ?
-> >=20
-> > I'd prefer not to.  The idea is I want to treat this as basically:
-> >=20
-> > 	foreach_possible_intc(intc)
-> > 		intc::cpu_intc_create(...)
-> >=20
-> > If I find time I might indeed replace the explicit ics and xive
-> > pointers with just an array of SpaprInterruptController *.
->=20
-> Or you could use object_child_foreach() and check for the type. If we had
-> a helper object_child_foreach_type(), we could use it elsewhere.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-I thought about that, but I don't think it quite works.  The
-complication is that the xics device is made explicitly a child of the
-machine, but the xive device has mmio, so it's a SusBusDevice sitting
-on the root bus instead.
+-- 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks,
 
---L1c6L/cjZjI9d0Eq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2RnVIACgkQbDjKyiDZ
-s5JMSA/+IkuL/ZUHBTp4uo7sbDAl/QZAENvgJrVz4tE+DRXWSTsrNpBl3wrXQr38
-8zF2G++61eRTLEIuxB4aSL3skkMhaf+YRyDaCnHlGETpdRZ0H8UqGeJKHi2Y8RSr
-wzVPqO49wDeMWYA/miu5YxbIbXzIjfgB+QcJX5MV+XThls0kfdyiTZdEdG/zKwaq
-fg7qwRWqxb7/k7VCbOasDzvNmDTov6tXKWvYNGqM97xJWjlhP0NMGxHdPnSeAQvW
-3HJEUJlVcsuQOTwDjU6xjQCi46PrmNXKjJqJEhI0Sf2CSC0XnQ3SZFCFDfksvwAP
-mne0Cl6VRwRpJCLSuOOmVSPDkxlH+X6IBmjRB8BbrO6Ghl+UbjbLTQz7MQSw76DV
-k7KWxHyCs2LIarTAeKrV1g3pAg5jc6BMamiTRZ05Ey4IPaVvUHVOxpYuSZrHme6p
-ieSu5hILkxrkrOV7SaY1jx8sV7bumkwlpTx8II6wDys0MWMFPNuUoq9Vm6M0Lr07
-nK1CvcilvmwD2erMnQ6QRchprUY/J2orsgNMN22hB8eYvKtK6BZF3GHQ9WdSYpQ/
-MjFpzdnDfyfNkqha3qnTGx0FyesbHR4vBwirsCqi3ZFer8u5HqBqRbm9j7fTLJ90
-zOmgcKxJ6crC1SkLeq2AoydrL6jKGvWBV6eRVHjzIEe7a75JpyU=
-=2JkR
------END PGP SIGNATURE-----
-
---L1c6L/cjZjI9d0Eq--
+David / dhildenb
 
