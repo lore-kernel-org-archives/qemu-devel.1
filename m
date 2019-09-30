@@ -2,72 +2,68 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B77C4360C
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 08:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF4A5C4360C
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 08:27:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E98452075D
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 08:06:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E98452075D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 676E021855
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 08:27:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YRg3DM/N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 676E021855
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEqhs-0002Dk-2F
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 04:06:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48636)
+	id 1iEr1a-0007Da-7v
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 04:27:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50997)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iEqh4-0001n7-KS
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 04:06:07 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iEr0Q-0006UX-AR
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 04:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iEqh3-0003IS-EP
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 04:06:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57070)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iEqh3-0003ID-9K
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 04:06:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iEqh2-0004EB-10
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 08:06:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F1B872E8025
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 08:06:03 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1iEr0O-0003dT-GI
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 04:26:05 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:38649)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iEr0N-0003cC-2n; Mon, 30 Sep 2019 04:26:04 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46hb842Hm3z9sDB; Mon, 30 Sep 2019 18:25:56 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569831956;
+ bh=pieiujA26YbvNyFUiNzXCY2SV5f89dLeseMclkucl0E=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=YRg3DM/N77s9iEK6VmsD5SdGxliUsAaXG0AfPzG71IVZtVLACT1GhGWlYVYYVI/AC
+ MS0XOkftcY2vhRzaOsbR1RpPTnTGX7ve8O9MM6z4A97nGKiWdlqeCvgHoK8ZcfGn5S
+ NRDnJEOAb8gUzG13HRrZxeU2j+LXWy4Fe5F0aqX8=
+Date: Mon, 30 Sep 2019 18:25:43 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 29/33] spapr, xics, xive: Move SpaprIrq::reset hook
+ logic into activate/deactivate
+Message-ID: <20190930082543.GH11105@umbus.fritz.box>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-30-david@gibson.dropbear.id.au>
+ <f64cc1b3-95b1-08e8-8059-35cdf2e5153b@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 30 Sep 2019 07:45:39 -0000
-From: Roland Christmann <1101210@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bkerler roc007 sven-koehler th-huth untio
-X-Launchpad-Bug-Reporter: Sven (sven-koehler)
-X-Launchpad-Bug-Modifier: Roland Christmann (roc007)
-References: <20130118141238.13697.51258.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156982953996.18605.3173981636140443611.malone@gac.canonical.com>
-Subject: [Bug 1101210] Re: qemu 1.4.2: usb keyboard not fully working
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19065";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f0c5eb43e9f842f8f16ebe375f97353cc2c6dfa1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="NzX0AQGjRQPusK/O"
+Content-Disposition: inline
+In-Reply-To: <f64cc1b3-95b1-08e8-8059-35cdf2e5153b@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,57 +72,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1101210 <1101210@bugs.launchpad.net>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Same issue with the qemu version 4.1.0
-Host: Windows 10
-Guest: Archlinux 5.0.10
 
-showkey output :
+--NzX0AQGjRQPusK/O
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-keycode 100   # Alt Gr
-keycode 29    # Left Control
-keycode 97    # Right Contol
-keycode 56    # Left Alt
-no output     # '> < \' key, should be 86
+On Mon, Sep 30, 2019 at 08:11:56AM +0200, C=E9dric Le Goater wrote:
+> On 27/09/2019 07:50, David Gibson wrote:
+> > It turns out that all the logic in the SpaprIrq::reset hooks (and some =
+in
+> > the SpaprIrq::post_load hooks) isn't really related to resetting the irq
+> > backend (that's handled by the backends' own reset routines).  Rather i=
+ts
+> > about getting the backend ready to be the active interrupt controller or
+> > stopping being the active interrupt controller - reset (and post_load) =
+is
+> > just the only time that changes at present.
+>=20
+> This is a 'critical' part which impacts all the migration cases:=20
+>=20
+> ic-mode=3Dxics,xive,dual + kernel_irqchip=3Don/off + TCG
 
-If I change the keyboard layout on the Host (Windows 10), showkey
-reports different keycode:
+Yes... and?
 
-Keyboard layout Belgian (Comma) AZERTY
-key 'A' keycode 30 (VirtualBox reports keycode 16)
+> > To make this flow clearer, move the logic into the explicit backend
+> > activate and deactivate hooks.
+>=20
+> I don't see where the hooks are called ?
 
-Keyboard layout US QWERTY
-key 'A' keycode 16
+spapr_irq_reset()
+  -> spapr_irq_update_active_intc()
+    -> set_active_intc()
+      -> activate/deactivate hooks
 
--- =
+Similarly via spapr_irq_post_load().
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1101210
+I'm hoping to add one at CAS time to avoid the CAS reboot, too.
 
-Title:
-  qemu 1.4.2: usb keyboard not fully working
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Status in QEMU:
-  New
+--NzX0AQGjRQPusK/O
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  When using the usb keyboard, I can't type the | character. I'm using
-  german keyboard layout (de) on the host and inside the guest. As a
-  guest OS, I use Linux (e.g. a recent KNOPPIX cd). To obtain the |
-  character on a german keyboard, I need to press AltGr + the < or >
-  key, i.e. the key right to the left shift.
+-----BEGIN PGP SIGNATURE-----
 
-  The qemu command line is something like this:
-  ./qemu-system-i386 -device pci-ohci -device usb-kbd
-  I also tried
-  ./qemu-system-i386 -usb -usbdevice keyboard
-  with the same effect.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2RvAUACgkQbDjKyiDZ
+s5K/nA//bjXYiOeBNCRkEt5NePgK+Brx6PuM+BUbPo83vsUODg/Cv1FNluahOJEm
+16oqRT61WJ/WllCSWEk2lcpueBxTTR93zaUk47sHyJ0Ko/YC37bufbZASg6ksSxK
+E+ho3Gc0J27UVM/Rvl8jp9J/Kw6MZdR9W51O4PK6EbW+9vE4tb/sRIz6Daq9dKgG
+Uo1ADfNCwX9ognwpFK62bUCMZIMn/CeremKbGqOguv/8CJ2xhQPlx4dwxwtynZhy
+XW/yhBmP/71nPdliZGt2gPQAa0ki+h3zyqfSXfMJ9NsZVRdkDBY+nTeC/D/naVsL
+W1IMioV2FnkyFTi+KS2j2TlE+AOgGmc+PCKa6JZxHFRn6YgxwfNreOenOvNZwc5n
+tNxuMgYUJ4heT/dDlgLJpQfyiD8T/p1xubrL/WFDx5veRxQTL0p1cGWCEf+N5fNd
+zfuPl/aASxsVEtOKX/sRm6K5KZRO9bcAy/IR1onDliTb2MDxwMtihnpKdVZKq41p
+g/chb3nZ8YAqUeHHNlFN/l3nwbpYfbYLjnYjMXW8Uyps2wJEoFmSV3L01qyFhHwe
+LW9cgtWk0IkP9YjeepEppobWL37Pe2y+s570RGPHlPEl1T+RTWAGZppIUUQYKbnx
++AZOPl/2Gbuu0yhFKbhEoVlnq1/D9v233OMi61bn6u8WnEUgdDY=
+=jaIZ
+-----END PGP SIGNATURE-----
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1101210/+subscriptions
+--NzX0AQGjRQPusK/O--
 
