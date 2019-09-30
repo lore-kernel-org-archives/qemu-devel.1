@@ -4,143 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F163BC4360C
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD739C4360C
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:23:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C61E32086A
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:11:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C61E32086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 81AD42081B
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:23:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81AD42081B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEpq5-0005d5-2r
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 03:11:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41221)
+	id 1iEq1o-0000n4-Kt
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 03:23:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42333)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1iEpoz-0004vM-8A
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:10:14 -0400
+ (envelope-from <groug@kaod.org>) id 1iEq15-0000DW-9f
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1iEpox-0008On-SM
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:10:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40714)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1iEpox-0008NT-LD
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:10:11 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8U78txP139716
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 03:10:07 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vb9uypjk6-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 03:10:06 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 30 Sep 2019 08:10:04 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 30 Sep 2019 08:10:01 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x8U79VKV23396832
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 30 Sep 2019 07:09:31 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1191B11C05C;
- Mon, 30 Sep 2019 07:10:00 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BC91711C04A;
- Mon, 30 Sep 2019 07:09:59 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 30 Sep 2019 07:09:59 +0000 (GMT)
-Subject: Re: [PATCH v7 4/4] s390: do not call
- memory_region_allocate_system_memory() multiple times
-To: Peter Xu <peterx@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-References: <20190924144751.24149-1-imammedo@redhat.com>
- <20190924144751.24149-5-imammedo@redhat.com> <20190925032700.GI28074@xz-x1>
- <20190925135105.6e5f249a@redhat.com> <20190925235235.GV28074@xz-x1>
- <20190927153320.2edc683c@redhat.com> <20190928012808.GA31218@xz-x1>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- mQINBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
- J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
- CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
- 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
- 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
- +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
- T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
- OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
- /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
- IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABtDRDaHJpc3RpYW4g
- Qm9ybnRyYWVnZXIgKElCTSkgPGJvcm50cmFlZ2VyQGRlLmlibS5jb20+iQI4BBMBAgAiBQJO
- nDz4AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRARe7yAtaYcfOYVD/9sqc6ZdYKD
- bmDIvc2/1LL0g7OgiA8pHJlYN2WHvIhUoZUIqy8Sw2EFny/nlpPVWfG290JizNS2LZ0mCeGZ
- 80yt0EpQNR8tLVzLSSr0GgoY0lwsKhAnx3p3AOrA8WXsPL6prLAu3yJI5D0ym4MJ6KlYVIjU
- ppi4NLWz7ncA2nDwiIqk8PBGxsjdc/W767zOOv7117rwhaGHgrJ2tLxoGWj0uoH3ZVhITP1z
- gqHXYaehPEELDV36WrSKidTarfThCWW0T3y4bH/mjvqi4ji9emp1/pOWs5/fmd4HpKW+44tD
- Yt4rSJRSa8lsXnZaEPaeY3nkbWPcy3vX6qafIey5d8dc8Uyaan39WslnJFNEx8cCqJrC77kI
- vcnl65HaW3y48DezrMDH34t3FsNrSVv5fRQ0mbEed8hbn4jguFAjPt4az1xawSp0YvhzwATJ
- YmZWRMa3LPx/fAxoolq9cNa0UB3D3jmikWktm+Jnp6aPeQ2Db3C0cDyxcOQY/GASYHY3KNra
- z8iwS7vULyq1lVhOXg1EeSm+lXQ1Ciz3ub3AhzE4c0ASqRrIHloVHBmh4favY4DEFN19Xw1p
- 76vBu6QjlsJGjvROW3GRKpLGogQTLslbjCdIYyp3AJq2KkoKxqdeQYm0LZXjtAwtRDbDo71C
- FxS7i/qfvWJv8ie7bE9A6Wsjn7kCDQROnDz4ARAAmPI1e8xB0k23TsEg8O1sBCTXkV8HSEq7
- JlWz7SWyM8oFkJqYAB7E1GTXV5UZcr9iurCMKGSTrSu3ermLja4+k0w71pLxws859V+3z1jr
- nhB3dGzVZEUhCr3EuN0t8eHSLSMyrlPL5qJ11JelnuhToT6535cLOzeTlECc51bp5Xf6/XSx
- SMQaIU1nDM31R13o98oRPQnvSqOeljc25aflKnVkSfqWSrZmb4b0bcWUFFUKVPfQ5Z6JEcJg
- Hp7qPXHW7+tJTgmI1iM/BIkDwQ8qe3Wz8R6rfupde+T70NiId1M9w5rdo0JJsjKAPePKOSDo
- RX1kseJsTZH88wyJ30WuqEqH9zBxif0WtPQUTjz/YgFbmZ8OkB1i+lrBCVHPdcmvathknAxS
- bXL7j37VmYNyVoXez11zPYm+7LA2rvzP9WxR8bPhJvHLhKGk2kZESiNFzP/E4r4Wo24GT4eh
- YrDo7GBHN82V4O9JxWZtjpxBBl8bH9PvGWBmOXky7/bP6h96jFu9ZYzVgIkBP3UYW+Pb1a+b
- w4A83/5ImPwtBrN324bNUxPPqUWNW0ftiR5b81ms/rOcDC/k/VoN1B+IHkXrcBf742VOLID4
- YP+CB9GXrwuF5KyQ5zEPCAjlOqZoq1fX/xGSsumfM7d6/OR8lvUPmqHfAzW3s9n4lZOW5Jfx
- bbkAEQEAAYkCHwQYAQIACQUCTpw8+AIbDAAKCRARe7yAtaYcfPzbD/9WNGVf60oXezNzSVCL
- hfS36l/zy4iy9H9rUZFmmmlBufWOATjiGAXnn0rr/Jh6Zy9NHuvpe3tyNYZLjB9pHT6mRZX7
- Z1vDxeLgMjTv983TQ2hUSlhRSc6e6kGDJyG1WnGQaqymUllCmeC/p9q5m3IRxQrd0skfdN1V
- AMttRwvipmnMduy5SdNayY2YbhWLQ2wS3XHJ39a7D7SQz+gUQfXgE3pf3FlwbwZhRtVR3z5u
- aKjxqjybS3Ojimx4NkWjidwOaUVZTqEecBV+QCzi2oDr9+XtEs0m5YGI4v+Y/kHocNBP0myd
- pF3OoXvcWdTb5atk+OKcc8t4TviKy1WCNujC+yBSq3OM8gbmk6NwCwqhHQzXCibMlVF9hq5a
- FiJb8p4QKSVyLhM8EM3HtiFqFJSV7F+h+2W0kDyzBGyE0D8z3T+L3MOj3JJJkfCwbEbTpk4f
- n8zMboekuNruDw1OADRMPlhoWb+g6exBWx/YN4AY9LbE2KuaScONqph5/HvJDsUldcRN3a5V
- RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
- oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
- syiRa+UVlsKmx1hsEg==
-Date: Mon, 30 Sep 2019 09:09:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <groug@kaod.org>) id 1iEq13-0005cJ-Hs
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:22:43 -0400
+Received: from 7.mo3.mail-out.ovh.net ([46.105.57.200]:47156)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iEq13-0005aM-B4
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:22:41 -0400
+Received: from player789.ha.ovh.net (unknown [10.108.35.110])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 331A32296EE
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 09:22:30 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player789.ha.ovh.net (Postfix) with ESMTPSA id 624EEA51FE74;
+ Mon, 30 Sep 2019 07:22:17 +0000 (UTC)
+Date: Mon, 30 Sep 2019 09:22:16 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v2 24/33] spapr, xics, xive: Move set_irq from SpaprIrq
+ to SpaprInterruptController
+Message-ID: <20190930092216.544312b9@bahia.w3ibm.bluemix.net>
+In-Reply-To: <20190930024139.GE11105@umbus.fritz.box>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-25-david@gibson.dropbear.id.au>
+ <20190927162712.049286e1@bahia.lan>
+ <20190930024139.GE11105@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190928012808.GA31218@xz-x1>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19093007-0016-0000-0000-000002B1F59E
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19093007-0017-0000-0000-00003312CED8
-Message-Id: <63e706b4-4a6a-3be5-6bb7-9c744d269d98@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-30_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909300075
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: multipart/signed; boundary="Sig_/pQb74cdpAdhHzNMAw6dJecV";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 12481163417448061414
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgedugdduudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.57.200
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,134 +72,319 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, pbonzini@redhat.com
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28.09.19 03:28, Peter Xu wrote:
-> On Fri, Sep 27, 2019 at 03:33:20PM +0200, Igor Mammedov wrote:
->> On Thu, 26 Sep 2019 07:52:35 +0800
->> Peter Xu <peterx@redhat.com> wrote:
->>
->>> On Wed, Sep 25, 2019 at 01:51:05PM +0200, Igor Mammedov wrote:
->>>> On Wed, 25 Sep 2019 11:27:00 +0800
->>>> Peter Xu <peterx@redhat.com> wrote:
->>>>   
->>>>> On Tue, Sep 24, 2019 at 10:47:51AM -0400, Igor Mammedov wrote:  
->>>>>> s390 was trying to solve limited KVM memslot size issue by abusing
->>>>>> memory_region_allocate_system_memory(), which breaks API contract
->>>>>> where the function might be called only once.
->>>>>>
->>>>>> Beside an invalid use of API, the approach also introduced migration
->>>>>> issue, since RAM chunks for each KVM_SLOT_MAX_BYTES are transferred in
->>>>>> migration stream as separate RAMBlocks.
->>>>>>
->>>>>> After discussion [1], it was agreed to break migration from older
->>>>>> QEMU for guest with RAM >8Tb (as it was relatively new (since 2.12)
->>>>>> and considered to be not actually used downstream).
->>>>>> Migration should keep working for guests with less than 8TB and for
->>>>>> more than 8TB with QEMU 4.2 and newer binary.
->>>>>> In case user tries to migrate more than 8TB guest, between incompatible
->>>>>> QEMU versions, migration should fail gracefully due to non-exiting
->>>>>> RAMBlock ID or RAMBlock size mismatch.
->>>>>>
->>>>>> Taking in account above and that now KVM code is able to split too
->>>>>> big MemorySection into several memslots, partially revert commit
->>>>>>  (bb223055b s390-ccw-virtio: allow for systems larger that 7.999TB)
->>>>>> and use kvm_set_max_memslot_size() to set KVMSlot size to
->>>>>> KVM_SLOT_MAX_BYTES.
->>>>>>
->>>>>> 1) [PATCH RFC v2 4/4] s390: do not call  memory_region_allocate_system_memory() multiple times
->>>>>>
->>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>    
->>>>>
->>>>> Acked-by: Peter Xu <peterx@redhat.com>
->>>>>
->>>>> IMHO it would be good to at least mention bb223055b9 in the commit
->>>>> message even if not with a "Fixed:" tag.  May be amended during commit
->>>>> if anyone prefers.  
->>>>
->>>> /me confused, bb223055b9 is mentioned in commit message  
->>>
->>> I'm sorry, I overlooked that.
->>>
->>>>    
->>>>> Also, this only applies the split limitation to s390.  Would that be a
->>>>> good thing to some other archs as well?  
->>>>
->>>> Don't we have the similar bitmap size issue in KVM for other archs?  
->>>
->>> Yes I thought we had.  So I feel like it would be good to also allow
->>> other archs to support >8TB mem as well.  Thanks,
->> Another question, Is there another archs with that much RAM that are
->> available/used in real life (if not I'd wait for demand to arise first)?
-> 
-> I don't know, so it was a pure question besides the series.  Sorry if
-> that holds your series somehow, it was not my intention.
-> 
->>
->> If we are to generalize it to other targets, then instead of using
->> arbitrary memslot max size per target, we could just hardcode or get
->> from KVM, max supported size of bitmap and use that to calculate
->> kvm_max_slot_size depending on target page size.
-> 
-> Right, I think if so hard code would be fine for now, and probably can
-> with a smallest one across all archs (should depend on the smallest
-> page size, I guess).
-> 
->>
->> Then there wouldn't be need for having machine specific code
->> to care about it and pick/set arbitrary values.
->>
->> Another aspect to think about if we are to enable it for
->> other targets is memslot accounting. It doesn't affect s390
->> but other targets that support memory hotplug now assume 1:1
->> relation between memoryregion:memslot, which currently holds
->> true but would need to amended in case split is enabled there.
-> 
-> I didn't know this.  So maybe it makes more sense to have s390 only
-> here.  Thanks,
+--Sig_/pQb74cdpAdhHzNMAw6dJecV
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-OK. So shall I take the series as is via the s390 tree?
-I would like to add the following patch on top if nobody minds:
+On Mon, 30 Sep 2019 12:41:39 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Subject: [PATCH 1/1] s390/kvm: split kvm mem slots at 4TB
+> On Fri, Sep 27, 2019 at 04:27:12PM +0200, Greg Kurz wrote:
+> > On Fri, 27 Sep 2019 15:50:19 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >=20
+> > > This method depends only on the active irq controller.  Now that we've
+> > > formalized the notion of active controller we can dispatch directly t=
+hrough
+> > > that, rather than dispatching via SpaprIrq with the dual version havi=
+ng
+> > > to do a second conditional dispatch.
+> > >=20
+> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > ---
+> > >  hw/intc/spapr_xive.c       | 12 +++++++++++
+> > >  hw/intc/xics_spapr.c       |  9 +++++++++
+> > >  hw/ppc/spapr_irq.c         | 41 ++++++++++--------------------------=
+--
+> > >  include/hw/ppc/spapr_irq.h |  4 +++-
+> > >  4 files changed, 34 insertions(+), 32 deletions(-)
+> > >=20
+> > > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> > > index ff1a175b44..52d5e71793 100644
+> > > --- a/hw/intc/spapr_xive.c
+> > > +++ b/hw/intc/spapr_xive.c
+> > > @@ -553,6 +553,17 @@ static int spapr_xive_cpu_intc_create(SpaprInter=
+ruptController *intc,
+> > >      return 0;
+> > >  }
+> > > =20
+> > > +static void spapr_xive_set_irq(SpaprInterruptController *intc, int i=
+rq, int val)
+> > > +{
+> > > +    SpaprXive *xive =3D SPAPR_XIVE(intc);
+> > > +
+> > > +    if (kvm_irqchip_in_kernel()) {
+> > > +        kvmppc_xive_source_set_irq(&xive->source, irq, val);
+> > > +    } else {
+> > > +        xive_source_set_irq(&xive->source, irq, val);
+> > > +    }
+> > > +}
+> > > +
+> > >  static void spapr_xive_class_init(ObjectClass *klass, void *data)
+> > >  {
+> > >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > > @@ -574,6 +585,7 @@ static void spapr_xive_class_init(ObjectClass *kl=
+ass, void *data)
+> > >      sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
+> > >      sicc->claim_irq =3D spapr_xive_claim_irq;
+> > >      sicc->free_irq =3D spapr_xive_free_irq;
+> > > +    sicc->set_irq =3D spapr_xive_set_irq;
+> > >  }
+> > > =20
+> > >  static const TypeInfo spapr_xive_info =3D {
+> > > diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> > > index 224fe1efcd..02372697f6 100644
+> > > --- a/hw/intc/xics_spapr.c
+> > > +++ b/hw/intc/xics_spapr.c
+> > > @@ -373,6 +373,14 @@ static void xics_spapr_free_irq(SpaprInterruptCo=
+ntroller *intc, int irq)
+> > >      memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
+> > >  }
+> > > =20
+> > > +static void xics_spapr_set_irq(SpaprInterruptController *intc, int i=
+rq, int val)
+> > > +{
+> > > +    ICSState *ics =3D ICS_SPAPR(intc);
+> > > +    uint32_t srcno =3D irq - ics->offset;
+> > > +
+> > > +    ics_set_irq(ics, srcno, val);
+> >=20
+> > And we have:
+> >=20
+> > void ics_set_irq(void *opaque, int srcno, int val)
+> > {
+> >     ICSState *ics =3D (ICSState *)opaque;
+> >=20
+> >     if (kvm_irqchip_in_kernel()) {
+> >         ics_kvm_set_irq(ics, srcno, val);
+> >         return;
+> >     }
+> >=20
+> >     if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
+> >         ics_set_irq_lsi(ics, srcno, val);
+> >     } else {
+> >         ics_set_irq_msi(ics, srcno, val);
+> >     }
+> > }
+> >=20
+> > The kvm_irqchip_in_kernel() block would fit better in xics_spapr_set_ir=
+q(),
+> > like it is already the case for XIVE.
+>=20
+> Hmm.. I don't really see why you say that.
+>=20
 
-Instead of splitting at an unaligned address, we can simply split at
-4TB.
+I mean this:
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- target/s390x/kvm.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+static void xics_spapr_set_irq(SpaprInterruptController *intc, int irq, int=
+ val)
+{
+    IcsSpapr *icss =3D ICS_SPAPR(intc);
+    ICSState *ics =3D &icss->parent;
+    uint32_t srcno =3D irq - ics->offset;
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index ad2dd14f7e78..611f56f4b5ac 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -126,12 +126,11 @@
- /*
-  * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-  * as the dirty bitmap must be managed by bitops that take an int as
-- * position indicator. If we have a guest beyond that we will split off
-- * new subregions. The split must happen on a segment boundary (1MB).
-+ * position indicator. This would end at an unaligned  address
-+ * (0x7fffff00000). As future variants might provide larger pages
-+ * and to make all addresses properly aligned, let us split at 4TB.
-  */
--#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
--#define SEG_MSK (~0xfffffULL)
--#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
-+#define KVM_SLOT_MAX_BYTES 4096UL*1024*1024*1024
- 
- static CPUWatchpoint hw_watchpoint;
- /*
--- 
-2.21.0
+    if (kvm_irqchip_in_kernel()) {
+        ics_kvm_set_irq(ics, srcno, val);
+    } else {
+        ics_set_irq(ics, srcno, val);
+    }
+}
+
+It is very similar to spapr_xive_set_irq() and looks nicer to me.
+
+> > Maybe do it now while here ?
+> >=20
+> > Anyway,
+> >=20
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> >=20
+> > > +}
+> > > +
+> > >  static void ics_spapr_class_init(ObjectClass *klass, void *data)
+> > >  {
+> > >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > > @@ -384,6 +392,7 @@ static void ics_spapr_class_init(ObjectClass *kla=
+ss, void *data)
+> > >      sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
+> > >      sicc->claim_irq =3D xics_spapr_claim_irq;
+> > >      sicc->free_irq =3D xics_spapr_free_irq;
+> > > +    sicc->set_irq =3D xics_spapr_set_irq;
+> > >  }
+> > > =20
+> > >  static const TypeInfo ics_spapr_info =3D {
+> > > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > > index dfa875b7cd..4922062908 100644
+> > > --- a/hw/ppc/spapr_irq.c
+> > > +++ b/hw/ppc/spapr_irq.c
+> > > @@ -123,14 +123,6 @@ static int spapr_irq_post_load_xics(SpaprMachine=
+State *spapr, int version_id)
+> > >      return 0;
+> > >  }
+> > > =20
+> > > -static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
+> > > -{
+> > > -    SpaprMachineState *spapr =3D opaque;
+> > > -    uint32_t srcno =3D irq - spapr->ics->offset;
+> > > -
+> > > -    ics_set_irq(spapr->ics, srcno, val);
+> > > -}
+> > > -
+> > >  static void spapr_irq_reset_xics(SpaprMachineState *spapr, Error **e=
+rrp)
+> > >  {
+> > >      Error *local_err =3D NULL;
+> > > @@ -159,7 +151,6 @@ SpaprIrq spapr_irq_xics =3D {
+> > >      .dt_populate =3D spapr_dt_xics,
+> > >      .post_load   =3D spapr_irq_post_load_xics,
+> > >      .reset       =3D spapr_irq_reset_xics,
+> > > -    .set_irq     =3D spapr_irq_set_irq_xics,
+> > >      .init_kvm    =3D spapr_irq_init_kvm_xics,
+> > >  };
+> > > =20
+> > > @@ -208,17 +199,6 @@ static void spapr_irq_reset_xive(SpaprMachineSta=
+te *spapr, Error **errp)
+> > >      spapr_xive_mmio_set_enabled(spapr->xive, true);
+> > >  }
+> > > =20
+> > > -static void spapr_irq_set_irq_xive(void *opaque, int irq, int val)
+> > > -{
+> > > -    SpaprMachineState *spapr =3D opaque;
+> > > -
+> > > -    if (kvm_irqchip_in_kernel()) {
+> > > -        kvmppc_xive_source_set_irq(&spapr->xive->source, irq, val);
+> > > -    } else {
+> > > -        xive_source_set_irq(&spapr->xive->source, irq, val);
+> > > -    }
+> > > -}
+> > > -
+> > >  static void spapr_irq_init_kvm_xive(SpaprMachineState *spapr, Error =
+**errp)
+> > >  {
+> > >      if (kvm_enabled()) {
+> > > @@ -236,7 +216,6 @@ SpaprIrq spapr_irq_xive =3D {
+> > >      .dt_populate =3D spapr_dt_xive,
+> > >      .post_load   =3D spapr_irq_post_load_xive,
+> > >      .reset       =3D spapr_irq_reset_xive,
+> > > -    .set_irq     =3D spapr_irq_set_irq_xive,
+> > >      .init_kvm    =3D spapr_irq_init_kvm_xive,
+> > >  };
+> > > =20
+> > > @@ -316,13 +295,6 @@ static void spapr_irq_reset_dual(SpaprMachineSta=
+te *spapr, Error **errp)
+> > >      spapr_irq_current(spapr)->reset(spapr, errp);
+> > >  }
+> > > =20
+> > > -static void spapr_irq_set_irq_dual(void *opaque, int irq, int val)
+> > > -{
+> > > -    SpaprMachineState *spapr =3D opaque;
+> > > -
+> > > -    spapr_irq_current(spapr)->set_irq(spapr, irq, val);
+> > > -}
+> > > -
+> > >  /*
+> > >   * Define values in sync with the XIVE and XICS backend
+> > >   */
+> > > @@ -336,7 +308,6 @@ SpaprIrq spapr_irq_dual =3D {
+> > >      .dt_populate =3D spapr_irq_dt_populate_dual,
+> > >      .post_load   =3D spapr_irq_post_load_dual,
+> > >      .reset       =3D spapr_irq_reset_dual,
+> > > -    .set_irq     =3D spapr_irq_set_irq_dual,
+> > >      .init_kvm    =3D NULL, /* should not be used */
+> > >  };
+> > > =20
+> > > @@ -422,6 +393,15 @@ int spapr_irq_cpu_intc_create(SpaprMachineState =
+*spapr,
+> > >      return 0;
+> > >  }
+> > > =20
+> > > +static void spapr_set_irq(void *opaque, int irq, int level)
+> > > +{
+> > > +    SpaprMachineState *spapr =3D SPAPR_MACHINE(opaque);
+> > > +    SpaprInterruptControllerClass *sicc
+> > > +        =3D SPAPR_INTC_GET_CLASS(spapr->active_intc);
+> > > +
+> > > +    sicc->set_irq(spapr->active_intc, irq, level);
+> > > +}
+> > > +
+> > >  void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+> > >  {
+> > >      MachineState *machine =3D MACHINE(spapr);
+> > > @@ -510,7 +490,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Err=
+or **errp)
+> > >          spapr_xive_hcall_init(spapr);
+> > >      }
+> > > =20
+> > > -    spapr->qirqs =3D qemu_allocate_irqs(spapr->irq->set_irq, spapr,
+> > > +    spapr->qirqs =3D qemu_allocate_irqs(spapr_set_irq, spapr,
+> > >                                        spapr->irq->nr_xirqs + SPAPR_X=
+IRQ_BASE);
+> > > =20
+> > >  out:
+> > > @@ -744,7 +724,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+> > >      .dt_populate =3D spapr_dt_xics,
+> > >      .post_load   =3D spapr_irq_post_load_xics,
+> > >      .reset       =3D spapr_irq_reset_xics,
+> > > -    .set_irq     =3D spapr_irq_set_irq_xics,
+> > >      .init_kvm    =3D spapr_irq_init_kvm_xics,
+> > >  };
+> > > =20
+> > > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> > > index 3102d152b2..8286a9aa63 100644
+> > > --- a/include/hw/ppc/spapr_irq.h
+> > > +++ b/include/hw/ppc/spapr_irq.h
+> > > @@ -56,6 +56,9 @@ typedef struct SpaprInterruptControllerClass {
+> > >      int (*claim_irq)(SpaprInterruptController *intc, int irq, bool l=
+si,
+> > >                       Error **errp);
+> > >      void (*free_irq)(SpaprInterruptController *intc, int irq);
+> > > +
+> > > +    /* These methods should only be called on the active intc */
+> > > +    void (*set_irq)(SpaprInterruptController *intc, int irq, int val=
+);
+> > >  } SpaprInterruptControllerClass;
+> > > =20
+> > >  void spapr_irq_update_active_intc(SpaprMachineState *spapr);
+> > > @@ -83,7 +86,6 @@ typedef struct SpaprIrq {
+> > >                          void *fdt, uint32_t phandle);
+> > >      int (*post_load)(SpaprMachineState *spapr, int version_id);
+> > >      void (*reset)(SpaprMachineState *spapr, Error **errp);
+> > > -    void (*set_irq)(void *opaque, int srcno, int val);
+> > >      void (*init_kvm)(SpaprMachineState *spapr, Error **errp);
+> > >  } SpaprIrq;
+> > > =20
+> >=20
+>=20
 
 
+--Sig_/pQb74cdpAdhHzNMAw6dJecV
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2RrSgACgkQcdTV5YIv
+c9YhCw/+P+3p6QrakWFhBi5Vx+0MwkxB+PvzqulLfTEE9mXpxu5IGTmadqMlZLj5
+Z1rwbPG7LGLCCRANZDZnom7GCplBiG9R6I2WfQZFSUtdcLDuBXKWFn4godwjGQnY
+0fPNKLYuFKljTmRXnhCkp/64FVKB6arp5k0ALvcTwDQQB+TgMZnjL59iDPVqoWpZ
+4VsV5AfRCTAIaSvx6nTduGxaAsLST9bIMHYOh8xrjZVSbeSxwIBVXOOZ3Fkyft19
+ZQ8EkGY/4J9ijF21RaS32Ty/yXHJC0DTvFBHViyIvQZ9wmAbA+lSgQK+Ta5Btjo9
+yd8mS3toGUF8zj7npA8NbO9z1/29xIKRjLuAQq2g2LRSwMqvWN5ulH3SI4Ana5Ot
+iWQT4N8nhmo7hKsSoJUH7ag5UKLybjfHEmLHfVCjS6BqBV9FAQHEKf/XFa+g5KW7
+CeGP4CbVoGGPuzqQaDijnZ8dNLqtjuUZ1d1RFfLpSYUpnFkWV7NUR2panZjb3DtN
+Jvkv+JGMJORwVtqXpn8rS3/cnNJpFwlJZRTjA6MPDJ5wqdPe1IJZP9xn+fTJR3Us
+/TEzkHvkJxGgJ/EX4s6oA7lsJa/slcjn+pmsx71XT74y+YX8GoUQattehhe6kdKe
+MNdAWdNC0DmGyi2iVWa/nxLDdFg45TqxptlWpR7bJqKBnMK1OpI=
+=fOdB
+-----END PGP SIGNATURE-----
+
+--Sig_/pQb74cdpAdhHzNMAw6dJecV--
 
