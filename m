@@ -2,85 +2,83 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F122BC32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 20:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F5AC32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 20:23:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC8B02245A
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 20:16:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC8B02245A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19BDF22501
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 20:23:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A7wTKz4t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BDF22501
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iF25Q-00036s-RX
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 16:16:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43938)
+	id 1iF2Co-00065j-Qs
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 16:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1iF23G-0001W6-B7
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:13:47 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iF2Al-0004So-SQ
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:21:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1iF23E-0001qI-6h
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:13:46 -0400
-Received: from mga02.intel.com ([134.134.136.20]:51718)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1iF23D-0001pc-FQ
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:13:44 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 30 Sep 2019 13:13:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,568,1559545200"; d="scan'208";a="194303899"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by orsmga003.jf.intel.com with ESMTP; 30 Sep 2019 13:13:41 -0700
-Received: from fmsmsx153.amr.corp.intel.com (10.18.125.6) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Sep 2019 13:13:40 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- FMSMSX153.amr.corp.intel.com (10.18.125.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 30 Sep 2019 13:13:40 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.176]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.119]) with mapi id 14.03.0439.000;
- Tue, 1 Oct 2019 04:13:38 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Subject: RE: [PATCH v5 3/4] net/filter.c: Add Options to insert filters
- anywhere in the filter list
-Thread-Topic: [PATCH v5 3/4] net/filter.c: Add Options to insert filters
- anywhere in the filter list
-Thread-Index: AQHVa/qhID4wVq1ufUOgz01/uZUmDKc+PZ9ggAI3wgCAAX5EQA==
-Date: Mon, 30 Sep 2019 20:13:38 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D780629560A@shsmsx102.ccr.corp.intel.com>
-References: <cover.1568574478.git.lukasstraub2@web.de>
- <b4241e918682c83163857da3aaab5c14ec1c81f8.1568574478.git.lukasstraub2@web.de>
- <9CFF81C0F6B98A43A459C9EDAD400D780627E646@shsmsx102.ccr.corp.intel.com>
- <20190928124438.260668cf@luklap>
-In-Reply-To: <20190928124438.260668cf@luklap>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzU4MWM3OTAtOTQyOC00NGNhLTg0OTUtZjRmODRhOWM4Yzc0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiQ1pjc0RZV0R2eHJGQThBbnpLTTQ3bTZTWmNUYjBUVFphVTJ6UVdvaDFWbzVMXC9ONTJLVWw1Q25cL2I4XC8xd1pKWiJ9
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
+ (envelope-from <richard.henderson@linaro.org>) id 1iF2Ak-0005WV-V0
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:21:31 -0400
+Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:34003)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iF2Ak-0005WD-Pl
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 16:21:30 -0400
+Received: by mail-pf1-x429.google.com with SMTP id b128so6246246pfa.1
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 13:21:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Sg+1BNlUkd68yFef7dmXTKIYOAnPSKke44HmN/xx+JE=;
+ b=A7wTKz4tl834f4hFOk1ubqMUF86wjT2ZJQ0ZYUpwo83HXup3na1a16G4SqKHdMdnGr
+ EvaCl+o3KCGuKSnJlq7RNuipIbxNcgyoFL2iUPi1PWGjY6xcZlQfttOQTfi7LA0TqyU5
+ qiI90S7yNpLgBsgJtjIMz+pU6IR777kCC5PRvItN2Wg1Hih3aVv4778Y4cKGiihwwvj/
+ Q9+B1wNCXFd9N1RVXDvXiVzuLETQl8aq6BxfHn6f9bxk5q3FA5KVKMEL3e4WNfdV002c
+ OwxA/ibcgvOiSTHGXXihrEvHRG8SQ6+5BWWMYhf150Jn/HuCIHGakNL+ZID0nCzcfnTg
+ MqxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=Sg+1BNlUkd68yFef7dmXTKIYOAnPSKke44HmN/xx+JE=;
+ b=E1cyz9NUKA1KSSCW5yjbdvq1Li0uzRwT1e7cMjMtuogaGvsz7418mOzLXaBjCzQmJG
+ 9YtyYtNsPuWOv3vZbdJ7i+xtKFXouBPmMyxVK42SJch0V3pyxWUbOVNpSN9Vr4N5lpNk
+ 4JLKZ8se+Oa0DXCAp+OCgh9pF/Ck7lxh4Qc+VBIdbmGSzjsQuwZJ/xdRjDsOPRadiPw2
+ 4KlbKKU8F60IQejbRUU8dijiTJKjOnJyuURcTfTjbRKWT6b+ktWL6e4c4IwpjGhFh3DS
+ eXvvnyWphgDJtcvKDsEzLXcikHDbA1WFnYLMye9VT8ffX510J7lZ8ytHoxPXYgwlU1TH
+ /3ew==
+X-Gm-Message-State: APjAAAW/ilrUYSbqQaE6vu2GN4cGrvrTOG/CGaUSCJoDdJnst49XgFpj
+ Dz4+/MA9NfF7xQNlfxUCwDbWlqUjdR4=
+X-Google-Smtp-Source: APXvYqx1gmmv76p0r+gt3gWTbqiZTplCVCKMKRIf7HmYMlkGgIsoNPLP0/1iamTK8XCP03lSIGil2Q==
+X-Received: by 2002:a62:870a:: with SMTP id i10mr23240492pfe.259.1569874889503; 
+ Mon, 30 Sep 2019 13:21:29 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id r28sm15336802pfg.62.2019.09.30.13.21.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 30 Sep 2019 13:21:28 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 02/22] tcg/ppc: Introduce macro VX4()
+Date: Mon, 30 Sep 2019 13:21:05 -0700
+Message-Id: <20190930202125.21064-3-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190930202125.21064-1-richard.henderson@linaro.org>
+References: <20190930202125.21064-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.20
+X-Received-From: 2607:f8b0:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,166 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, "mreitz@redhat.com" <mreitz@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>
+Cc: mark.cave-ayland@ilande.co.uk, amarkovic@wavecomp.com, hsp.cat7@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Lukas Straub <lukasstraub2@web.de>
-> Sent: Saturday, September 28, 2019 6:45 PM
-> To: Zhang, Chen <chen.zhang@intel.com>
-> Cc: qemu-devel <qemu-devel@nongnu.org>; Jason Wang
-> <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
-> Xie Changlong <xiechanglong.d@gmail.com>; kwolf@redhat.com;
-> mreitz@redhat.com
-> Subject: Re: [PATCH v5 3/4] net/filter.c: Add Options to insert filters
-> anywhere in the filter list
->=20
-> On Thu, 26 Sep 2019 17:02:58 +0000
-> "Zhang, Chen" <chen.zhang@intel.com> wrote:
-> > > diff --git a/qemu-options.hx b/qemu-options.hx index
-> > > 08749a3391..23fa5a344e 100644
-> > > --- a/qemu-options.hx
-> > > +++ b/qemu-options.hx
-> > > @@ -4368,7 +4368,7 @@ applications, they can do this through this
-> > > parameter. Its format is  a gnutls priority string as described at
-> > > @url{https://gnutls.org/manual/html_node/Priority-Strings.html}.
-> > >
-> > > -@item -object filter-
-> > >
-> buffer,id=3D@var{id},netdev=3D@var{netdevid},interval=3D@var{t}[,queue=3D=
-@va
-> > > r{
-> > > all|rx|tx}][,status=3D@var{on|off}]
-> > > +@item -object
-> > > +filter-buffer,id=3D@var{id},netdev=3D@var{netdevid},interval=3D@var{=
-t}[,q
-> > > +ueue
-> > > +=3D@var{all|rx|tx}][,status=3D@var{on|off}][,position=3D@var{head|ta=
-il|id
-> > > +=3D<id
-> > > +>}][,insert=3D@var{behind|before}]
-> > >
-> > >  Interval @var{t} can't be 0, this filter batches the packet
-> > > delivery: all  packets arriving in a given interval on netdev
-> > > @var{netdevid} are delayed @@ -
-> > > 4387,11 +4387,11 @@ queue @var{all|rx|tx} is an option that can be
-> > > applied to any netfilter.
-> > >  @option{tx}: the filter is attached to the transmit queue of the net=
-dev,
-> > >               where it will receive packets sent by the netdev.
-> > >
-> > > -@item -object filter-
-> > >
-> mirror,id=3D@var{id},netdev=3D@var{netdevid},outdev=3D@var{chardevid},que=
-u
-> > > e
-> > > =3D@var{all|rx|tx}[,vnet_hdr_support]
-> > > +@item -object
-> > > +filter-
-> mirror,id=3D@var{id},netdev=3D@var{netdevid},outdev=3D@var{chardev
-> > > +id},
-> > > +queue=3D@var{all|rx|tx}[,vnet_hdr_support][,position=3D@var{head|tai=
-l|i
-> > > +d=3D<
-> > > i
-> > > +d>}][,insert=3D@var{behind|before}]
-> > >
-> > >  filter-mirror on netdev @var{netdevid},mirror net packet to
-> > > chardev@var{chardevid}, if it has the vnet_hdr_support flag,
-> > > filter-mirror will mirror packet with vnet_hdr_len.
-> > >
-> >
-> > Please add description for the newly added parameter in each filter.
-> > After that:
-> > Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-> >
-> > Thanks
-> > Zhang Chen
->=20
-> Hi,
-> I will add a single description like its currently done with the "queue" =
-option,
-> noting that it applies to any netfilter. Is that Ok?
+Introduce macro VX4() used for encoding Altivec instructions.
 
-It is enough for me.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ tcg/ppc/tcg-target.inc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks
-Zhang Chen
-
->=20
-> Regards,
-> Lukas Straub
->=20
-> >
-> > > -@item -object filter-
-> > >
-> redirector,id=3D@var{id},netdev=3D@var{netdevid},indev=3D@var{chardevid},=
-o
-> > > ut dev=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vnet_hdr_support]
-> > > +@item -object
-> > > +filter-redirector,id=3D@var{id},netdev=3D@var{netdevid},indev=3D@var=
-{char
-> > > +devi
-> > >
-> +d},outdev=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vnet_hdr_support][
-> > > +,p
-> > > os
-> > > +ition=3D@var{head|tail|id=3D<id>}][,insert=3D@var{behind|before}]
-> > >
-> > >  filter-redirector on netdev @var{netdevid},redirect filter's net
-> > > packet to chardev  @var{chardevid},and redirect indev's packet to
-> > > filter.if it has the vnet_hdr_support flag, @@ -4400,7 +4400,7 @@
-> > > Create a filter-redirector we need to differ outdev id from indev
-> > > id, id can not  be the same. we can just use indev or outdev, but at
-> > > least one of indev or outdev  need to be specified.
-> > >
-> > > -@item -object filter-
-> > > rewriter,id=3D@var{id},netdev=3D@var{netdevid},queue=3D@var{all|rx|tx=
-},[vn
-> > > et_
-> > > hdr_support]
-> > > +@item -object
-> > > +filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},queue=3D@var{a=
-ll|rx
-> > > +|tx}
-> > > +,[vnet_hdr_support][,position=3D@var{head|tail|id=3D<id>}][,insert=
-=3D@var
-> > > +{beh
-> > > +ind|before}]
-> > >
-> > >  Filter-rewriter is a part of COLO project.It will rewrite tcp
-> > > packet to secondary from primary to keep secondary tcp
-> > > connection,and rewrite @@ -
-> > > 4413,7 +4413,7 @@ colo secondary:
-> > >  -object filter-redirector,id=3Df2,netdev=3Dhn0,queue=3Drx,outdev=3Dr=
-ed1
-> > >  -object filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall
-> > >
-> > > -@item -object filter-
-> > >
-> dump,id=3D@var{id},netdev=3D@var{dev}[,file=3D@var{filename}][,maxlen=3D@=
-var
-> > > {
-> > > len}]
-> > > +@item -object
-> > > +filter-
-> > > dump,id=3D@var{id},netdev=3D@var{dev}[,file=3D@var{filename}][,maxlen=
-=3D
-> > > +@var{len}][,position=3D@var{head|tail|id=3D<id>}][,insert=3D@var{beh=
-ind|b
-> > > +efor
-> > > +e}]
-> > >
-> > >  Dump the network traffic on netdev @var{dev} to the file specified
-> > > by @var{filename}. At most @var{len} bytes (64k by default) per
-> > > packet are stored.
-> > > --
-> > > 2.20.1
-> >
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 9d678c3bf1..8dc5455600 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -319,6 +319,7 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define XO31(opc) (OPCD(31)|((opc)<<1))
+ #define XO58(opc) (OPCD(58)|(opc))
+ #define XO62(opc) (OPCD(62)|(opc))
++#define VX4(opc)  (OPCD(4)|(opc))
+ 
+ #define B      OPCD( 18)
+ #define BC     OPCD( 16)
+-- 
+2.17.1
 
 
