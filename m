@@ -2,54 +2,59 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B387C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 825DBC32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:33:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F092F20815
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:32:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F092F20815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 504D2215EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:33:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 504D2215EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iExfD-000822-Iy
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:32:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60168)
+	id 1iExfa-0008Gm-7J
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:33:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iExOM-0004eK-MV
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:15:16 -0400
+ (envelope-from <alxndr@bu.edu>) id 1iExRt-0006Uh-Hk
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iExOK-0005xe-HT
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:15:14 -0400
-Received: from relay.sw.ru ([185.231.240.75]:46686)
+ (envelope-from <alxndr@bu.edu>) id 1iExRr-0007Bp-73
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:18:52 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:43700)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iExOF-0005ow-9N; Mon, 30 Sep 2019 11:15:07 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iExOB-0005tD-RM; Mon, 30 Sep 2019 18:15:03 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 05/10] block/dirty-bitmap: switch _next_dirty_area and
- _next_zero to int64_t
-Date: Mon, 30 Sep 2019 18:14:57 +0300
-Message-Id: <20190930151502.7829-6-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190930151502.7829-1-vsementsov@virtuozzo.com>
-References: <20190930151502.7829-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1iExRr-00078d-34
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:18:51 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: 144.121.20.163.lightower.net [144.121.20.163] (may be forged)
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id x8UFHx77021358
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO);
+ Mon, 30 Sep 2019 11:17:59 -0400
+Subject: Re: [PATCH v3 17/22] fuzz: add support for fork-based fuzzing.
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190918231846.22538-1-alxndr@bu.edu>
+ <20190918231846.22538-18-alxndr@bu.edu>
+From: Alexander Oleinik <alxndr@bu.edu>
+Message-ID: <b8d441a3-dc3b-8c91-7516-3c8162cc5a4d@bu.edu>
+Date: Mon, 30 Sep 2019 11:17:59 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <20190918231846.22538-18-alxndr@bu.edu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.6.x [fuzzy]
+X-Received-From: 128.197.228.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,271 +66,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to introduce bdrv_dirty_bitmap_next_dirty so that same
-variable may be used to store its return value and to be its parameter,
-so it would int64_t.
+On 9/18/19 7:19 PM, Oleinik, Alexander wrote:
+> fork() is a simple way to ensure that state does not leak in between
+> fuzzing runs. Unfortunately, the fuzzer mutation engine relies on
+> bitmaps which contain coverage information for each fuzzing run, and
+> these bitmaps should be copied from the child to the parent(where the
+> mutation occurs). These bitmaps are created through compile-time
+> instrumentation and there seems to be no simple way to re-map them as
+> shared memory. As a workaround, we use a linker script modification to
+> place all of the bitmaps together and add some markers around them which
+> we can observe from our code. Then, we map shared memory and copy the
+> bimaps to the SHM (in the child) and out of the SHM(in the parent) after
+> each fuzzing run. Ram blocks are marked as DONTFORK in exec.c, which
+> breaks this approach. For now, avoid this with an #ifdef.
+> 
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> ---
+>   exec.c                      |  2 ++
+>   tests/fuzz/Makefile.include |  3 +++
+>   tests/fuzz/fork_fuzz.c      | 27 ++++++++++++++++++++++
+>   tests/fuzz/fork_fuzz.h      | 12 ++++++++++
+>   tests/fuzz/fork_fuzz.ld     | 46 +++++++++++++++++++++++++++++++++++++
+>   5 files changed, 90 insertions(+)
+>   create mode 100644 tests/fuzz/fork_fuzz.c
+>   create mode 100644 tests/fuzz/fork_fuzz.h
+>   create mode 100644 tests/fuzz/fork_fuzz.ld
+> 
+> diff --git a/exec.c b/exec.c
+> index 235d6bc883..d3838f4ea4 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2295,7 +2295,9 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
+>           qemu_ram_setup_dump(new_block->host, new_block->max_length);
+>           qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_HUGEPAGE);
+>           /* MADV_DONTFORK is also needed by KVM in absence of synchronous MMU */
+> +#ifndef CONFIG_FUZZ /* This conflicts with fork-based fuzzing */
+>           qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_DONTFORK);
+> +#endif
+>           ram_block_notify_add(new_block->host, new_block->max_length);
+>       }
+>   }
+> diff --git a/tests/fuzz/Makefile.include b/tests/fuzz/Makefile.include
+> index b415b056b0..687dacce04 100644
+> --- a/tests/fuzz/Makefile.include
+> +++ b/tests/fuzz/Makefile.include
+> @@ -2,3 +2,6 @@ QEMU_PROG_FUZZ=qemu-fuzz-$(TARGET_NAME)$(EXESUF)
+>   fuzz-obj-y = $(libqos-obj-y)
+>   fuzz-obj-y += tests/libqtest.o
+>   fuzz-obj-y += tests/fuzz/fuzz.o
+> +fuzz-obj-y += tests/fuzz/fork_fuzz.o
+> +
+> +FUZZ_LDFLAGS += -Xlinker -T$(SRC_PATH)/tests/fuzz/fork_fuzz.ld
+> diff --git a/tests/fuzz/fork_fuzz.c b/tests/fuzz/fork_fuzz.c
+> new file mode 100644
+> index 0000000000..26d0b4b42e
+> --- /dev/null
+> +++ b/tests/fuzz/fork_fuzz.c
+> @@ -0,0 +1,27 @@
+> +#include "qemu/osdep.h"
+> +#include "fork_fuzz.h"
+> +
+> +uintptr_t feature_shm;
+> +
+> +void counter_shm_init(void)
+> +{
+> +    feature_shm = (uintptr_t)mmap(NULL,
+> +            &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START,
+> +            PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+> +    return;
+> +}
+> +
+> +void counter_shm_store(void)
+> +{
+> +    memcpy((void *)feature_shm,
+> +            &__FUZZ_COUNTERS_START,
+> +            &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START);
+> +}
+> +
+> +void counter_shm_load(void)
+> +{
+> +    memcpy(&__FUZZ_COUNTERS_START,
+> +            (void *)feature_shm,
+> +            &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START);
+> +}
+> +
+> diff --git a/tests/fuzz/fork_fuzz.h b/tests/fuzz/fork_fuzz.h
+> new file mode 100644
+> index 0000000000..b5f8b35015
+> --- /dev/null
+> +++ b/tests/fuzz/fork_fuzz.h
+> @@ -0,0 +1,12 @@
+> +#ifndef FORK_FUZZ_H
+> +#define FORK_FUZZ_H
+> +
+> +extern uint8_t __FUZZ_COUNTERS_START;
+> +extern uint8_t __FUZZ_COUNTERS_END;
+> +
+> +void counter_shm_init(void);
+> +void counter_shm_store(void);
+> +void counter_shm_load(void);
+> +
+> +#endif
+> +
+> diff --git a/tests/fuzz/fork_fuzz.ld b/tests/fuzz/fork_fuzz.ld
+> new file mode 100644
+> index 0000000000..ba0ba79570
+> --- /dev/null
+> +++ b/tests/fuzz/fork_fuzz.ld
+> @@ -0,0 +1,46 @@
+> +/* We adjust linker script modification to place all of the stuff that needs to
+> + * persist across fuzzing runs into a contiguous seciton of memory. Then, it is
+> + * easy to copy it to and from shared memory.
+> + *
+> + * Total Size : A5A00
+> + * Sancov counters: B26F
+> + * Coverage counters: 56D60
+> + * TracePC Object: 43C00
+> +*/
+> +
+> +SECTIONS
+> +{
+> +  .data.fuzz_start : ALIGN(4K)
+> +  {
+> +        __FUZZ_COUNTERS_START = .;
+> +  }
+> +  .data.fuzz_ordered :
+> +  {
+> +      /* Internal Libfuzzer TracePC object which contains the ValueProfileMap.
+> +       * Not optimal that we have to copy the rest of the TracePC object.
+> +       * */
+> +      __start___sancov_cntrs = .;
+> +      *(__sancov_cntrs*)
+> +      __stop___sancov_cntrs = .;
+> +  }
+> +  .data.fuzz_unordered :
+> +  {
+> +      /* Coverage counters. They're not necessary for fuzzing, but are useful
+> +       * for analyzing the fuzzing performance
+> +       * */
+> +      __start___llvm_prf_cnts = .;
+> +      *(*llvm_prf_cnts);
+> +      __stop___llvm_prf_cnts = .;
+> +
+> +      /* Lowest stack counter */
+> +      *(__sancov_lowest_stack);
+> +      /* Internal Libfuzzer TracePC object which contains the ValueProfileMap.
+> +       * Not optimal that we have to copy the rest of the TracePC object.
+> +       * */
+> +      *FuzzerTracePC*(.bss._ZN6fuzzer*)
+> +      __FUZZ_COUNTERS_END = .;
+> +  }
+> +}
+> +/* Dont overwrite the SECTIONS in the default linker script. Instead insert the
+> + * above into the default script */
+> +INSERT AFTER .data;
+> 
+The obvious issue with this are that we lose the threads created prior 
+to fork(). Over the past days I've been coverage of existing virtio-net 
+tests with and without fork(). With fork(), virtio_net_tx_bh doesn't get 
+scheduled, and never runs. Could this be due to the missing RCU thread?
+This is probably an even bigger problem for iothread devices, such as 
+virtio-blk...
 
-Similarly, we are going to refactor hbitmap_next_dirty_area to use
-hbitmap_next_dirty together with hbitmap_next_zero, therefore we want
-hbitmap_next_zero parameter type to be int64_t too.
+Does anyone have suggestions for how to approach the thread problem, or 
+at least the RCU part of it?
+I know Paolo made some fork-related changes in 
+21b7cf9e07e5991c57b461181cfb5bbb6fe7a9d6 rcu: handle forks safely
+and
+2a96a552f9502ac34c29da2f3a39788db5ee5692 ,
+but from what I can tell, this is mostly for qemu-user.
 
-So, for convenience update all parameters of *_next_zero and
-*_next_dirty_area to be int64_t.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/dirty-bitmap.h |  6 +++---
- include/qemu/hbitmap.h       |  7 +++----
- block/dirty-bitmap.c         |  6 +++---
- block/mirror.c               |  4 ++--
- nbd/server.c                 |  2 +-
- tests/test-hbitmap.c         | 32 ++++++++++++++++----------------
- util/hbitmap.c               | 13 ++++++++-----
- 7 files changed, 36 insertions(+), 34 deletions(-)
-
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 958e7474fb..96d3cc0800 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -103,10 +103,10 @@ for (bitmap = bdrv_dirty_bitmap_first(bs); bitmap; \
-      bitmap = bdrv_dirty_bitmap_next(bitmap))
- 
- char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
--int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
--                                    uint64_t bytes);
-+int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
-+                                    int64_t bytes);
- bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
--                                       uint64_t *offset, uint64_t *bytes);
-+                                       int64_t *offset, int64_t *bytes);
- BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                                   Error **errp);
- 
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index cf3dbf8b39..6eb2728a21 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -311,10 +311,10 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
-  * @hb: The HBitmap to operate on
-  * @start: The bit to start from.
-  * @count: Number of bits to proceed. If @start+@count > bitmap size, the whole
-- * bitmap is looked through. You can use UINT64_MAX as @count to search up to
-+ * bitmap is looked through. You can use INT64_MAX as @count to search up to
-  * the bitmap end.
-  */
--int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count);
-+int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count);
- 
- /* hbitmap_next_dirty_area:
-  * @hb: The HBitmap to operate on
-@@ -329,8 +329,7 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count);
-  * @offset and @bytes appropriately. Otherwise returns false and leaves @offset
-  * and @bytes unchanged.
-  */
--bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *start,
--                             uint64_t *count);
-+bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t *start, int64_t *count);
- 
- /**
-  * hbitmap_iter_next:
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 4bbb251b2c..01135f623e 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -854,14 +854,14 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
-     return hbitmap_sha256(bitmap->bitmap, errp);
- }
- 
--int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset,
--                                    uint64_t bytes)
-+int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
-+                                    int64_t bytes)
- {
-     return hbitmap_next_zero(bitmap->bitmap, offset, bytes);
- }
- 
- bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
--                                       uint64_t *offset, uint64_t *bytes)
-+                                       int64_t *offset, int64_t *bytes)
- {
-     return hbitmap_next_dirty_area(bitmap->bitmap, offset, bytes);
- }
-diff --git a/block/mirror.c b/block/mirror.c
-index a6c50caea4..d6b3a898ed 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1182,8 +1182,8 @@ do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
-                      QEMUIOVector *qiov, int flags)
- {
-     QEMUIOVector target_qiov;
--    uint64_t dirty_offset = offset;
--    uint64_t dirty_bytes;
-+    int64_t dirty_offset = offset;
-+    int64_t dirty_bytes;
- 
-     if (qiov) {
-         qemu_iovec_init(&target_qiov, qiov->niov);
-diff --git a/nbd/server.c b/nbd/server.c
-index d8d1e62455..cc0069c15b 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2040,7 +2040,7 @@ static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
-         bool next_dirty = !dirty;
- 
-         if (dirty) {
--            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, UINT64_MAX);
-+            end = bdrv_dirty_bitmap_next_zero(bitmap, begin, INT64_MAX);
-         } else {
-             bdrv_set_dirty_iter(it, begin);
-             end = bdrv_dirty_iter_next(it);
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index aeaa0b3f22..0e1e5c64dd 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -837,7 +837,7 @@ static void test_hbitmap_next_zero_check_range(TestHBitmapData *data,
- 
- static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
- {
--    test_hbitmap_next_zero_check_range(data, start, UINT64_MAX);
-+    test_hbitmap_next_zero_check_range(data, start, INT64_MAX);
- }
- 
- static void test_hbitmap_next_zero_do(TestHBitmapData *data, int granularity)
-@@ -905,11 +905,11 @@ static void test_hbitmap_next_zero_after_truncate(TestHBitmapData *data,
- }
- 
- static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
--                                               uint64_t offset,
--                                               uint64_t count)
-+                                               int64_t offset,
-+                                               int64_t count)
- {
--    uint64_t off1, off2;
--    uint64_t len1 = 0, len2;
-+    int64_t off1, off2;
-+    int64_t len1 = 0, len2;
-     bool ret1, ret2;
-     int64_t end;
- 
-@@ -945,24 +945,24 @@ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
-                                             int granularity)
- {
-     hbitmap_test_init(data, L3, granularity);
--    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
-     test_hbitmap_next_dirty_area_check(data, 0, 1);
-     test_hbitmap_next_dirty_area_check(data, L3 - 1, 1);
- 
-     hbitmap_set(data->hb, L2, 1);
-     test_hbitmap_next_dirty_area_check(data, 0, 1);
-     test_hbitmap_next_dirty_area_check(data, 0, L2);
--    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
--    test_hbitmap_next_dirty_area_check(data, L2 - 1, UINT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, L2 - 1, INT64_MAX);
-     test_hbitmap_next_dirty_area_check(data, L2 - 1, 1);
-     test_hbitmap_next_dirty_area_check(data, L2 - 1, 2);
-     test_hbitmap_next_dirty_area_check(data, L2 - 1, 3);
--    test_hbitmap_next_dirty_area_check(data, L2, UINT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, L2, INT64_MAX);
-     test_hbitmap_next_dirty_area_check(data, L2, 1);
-     test_hbitmap_next_dirty_area_check(data, L2 + 1, 1);
- 
-     hbitmap_set(data->hb, L2 + 5, L1);
--    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
-     test_hbitmap_next_dirty_area_check(data, L2 - 2, 8);
-     test_hbitmap_next_dirty_area_check(data, L2 + 1, 5);
-     test_hbitmap_next_dirty_area_check(data, L2 + 1, 3);
-@@ -974,16 +974,16 @@ static void test_hbitmap_next_dirty_area_do(TestHBitmapData *data,
-     test_hbitmap_next_dirty_area_check(data, L2 + 1, 0);
- 
-     hbitmap_set(data->hb, L2 * 2, L3 - L2 * 2);
--    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
--    test_hbitmap_next_dirty_area_check(data, L2, UINT64_MAX);
--    test_hbitmap_next_dirty_area_check(data, L2 + 1, UINT64_MAX);
--    test_hbitmap_next_dirty_area_check(data, L2 + 5 + L1 - 1, UINT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, L2, INT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, L2 + 1, INT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, L2 + 5 + L1 - 1, INT64_MAX);
-     test_hbitmap_next_dirty_area_check(data, L2 + 5 + L1, 5);
-     test_hbitmap_next_dirty_area_check(data, L2 * 2 - L1, L1 + 1);
-     test_hbitmap_next_dirty_area_check(data, L2 * 2, L2);
- 
-     hbitmap_set(data->hb, 0, L3);
--    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
- }
- 
- static void test_hbitmap_next_dirty_area_0(TestHBitmapData *data,
-@@ -1010,7 +1010,7 @@ static void test_hbitmap_next_dirty_area_after_truncate(TestHBitmapData *data,
-     hbitmap_test_init(data, L1, 0);
-     hbitmap_test_truncate_impl(data, L1 * 2);
-     hbitmap_set(data->hb, L1 + 1, 1);
--    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
-+    test_hbitmap_next_dirty_area_check(data, 0, INT64_MAX);
- }
- 
- int main(int argc, char **argv)
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 75d72d7203..6526d7b6c1 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -193,7 +193,7 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
-     }
- }
- 
--int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count)
-+int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count)
- {
-     size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
-     unsigned long *last_lev = hb->levels[HBITMAP_LEVELS - 1];
-@@ -202,6 +202,8 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count)
-     uint64_t end_bit, sz;
-     int64_t res;
- 
-+    assert(start >= 0 && count >= 0);
-+
-     if (start >= hb->orig_size || count == 0) {
-         return -1;
-     }
-@@ -244,14 +246,15 @@ int64_t hbitmap_next_zero(const HBitmap *hb, uint64_t start, uint64_t count)
-     return res;
- }
- 
--bool hbitmap_next_dirty_area(const HBitmap *hb, uint64_t *start,
--                             uint64_t *count)
-+bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t *start, int64_t *count)
- {
-     HBitmapIter hbi;
-     int64_t firt_dirty_off, area_end;
-     uint32_t granularity = 1UL << hb->granularity;
-     uint64_t end;
- 
-+    assert(*start >= 0 && *count >= 0);
-+
-     if (*start >= hb->orig_size || *count == 0) {
-         return false;
-     }
-@@ -826,8 +829,8 @@ bool hbitmap_can_merge(const HBitmap *a, const HBitmap *b)
-  */
- static void hbitmap_sparse_merge(HBitmap *dst, const HBitmap *src)
- {
--    uint64_t offset = 0;
--    uint64_t count = src->orig_size;
-+    int64_t offset = 0;
-+    int64_t count = src->orig_size;
- 
-     while (hbitmap_next_dirty_area(src, &offset, &count)) {
-         hbitmap_set(dst, offset, count);
--- 
-2.21.0
-
+-Alex
 
