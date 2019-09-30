@@ -6,59 +6,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4B3C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27844C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:12:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E07A3216F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:08:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E07A3216F4
+	by mail.kernel.org (Postfix) with ESMTPS id F26BF20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 14:11:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F26BF20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEwLJ-00017C-3Z
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 10:08:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51263)
+	id 1iEwP9-0002aK-25
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 10:11:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iEwKO-0000Yw-EU
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:07:05 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iEwOP-0002Ay-JE
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iEwKN-0002vC-6k
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:07:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40130)
+ (envelope-from <ehabkost@redhat.com>) id 1iEwOO-0006I2-0X
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:11:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42354)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1iEwKK-0002sl-Ip; Mon, 30 Sep 2019 10:07:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iEwON-0006HV-OG
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 10:11:11 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CA4CF3680A;
- Mon, 30 Sep 2019 14:06:59 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8922C5C22C;
- Mon, 30 Sep 2019 14:06:55 +0000 (UTC)
-Message-ID: <1525214f57b58d414ce00bda6df42f39438c583a.camel@redhat.com>
-Subject: Re: [PATCH 15/18] iotests: Make 137 work with data_file
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Mon, 30 Sep 2019 17:06:54 +0300
-In-Reply-To: <7a200f05-9233-5f70-10d4-f377d2db6a23@redhat.com>
-References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-16-mreitz@redhat.com>
- <7e9c44bc0ca4b195939b0723db11eebc3fe11e2e.camel@redhat.com>
- <5dff56b6-dca2-a28a-4a6a-2a6638300ff3@redhat.com>
- <4067372d453e08515b079cff564f9d56fba2a21b.camel@redhat.com>
- <7a200f05-9233-5f70-10d4-f377d2db6a23@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ by mx1.redhat.com (Postfix) with ESMTPS id 380AD368DA;
+ Mon, 30 Sep 2019 14:11:10 +0000 (UTC)
+Received: from localhost (ovpn-116-88.gru2.redhat.com [10.97.116.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 234E01001B05;
+ Mon, 30 Sep 2019 14:11:05 +0000 (UTC)
+Date: Mon, 30 Sep 2019 11:11:04 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Jiri Denemark <jdenemar@redhat.com>
+Subject: Re: [RFC] cpu_map: Remove pconfig from Icelake-Server CPU model
+Message-ID: <20190930141104.GA4084@habkost.net>
+References: <20190926214305.17690-1-ehabkost@redhat.com>
+ <20190930102453.GO4884@orkuz.int.mamuti.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190930102453.GO4884@orkuz.int.mamuti.net>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 30 Sep 2019 14:06:59 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.30]); Mon, 30 Sep 2019 14:11:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,109 +69,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: thomas.lendacky@amd.com,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ libvir-list@redhat.com, qemu-devel@nongnu.org, luwei.kang@intel.com,
+ Robert Hoo <robert.hu@linux.intel.com>, kai.huang@intel.com,
+ robert.hu@intel.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-09-30 at 15:57 +0200, Max Reitz wrote:
-> On 30.09.19 15:46, Maxim Levitsky wrote:
-> > On Mon, 2019-09-30 at 15:38 +0200, Max Reitz wrote:
-> > > On 29.09.19 18:38, Maxim Levitsky wrote:
-> > > > On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
-> > > > > When using an external data file, there are no refcounts for da=
-ta
-> > > > > clusters.  We thus have to adjust the corruption test in this p=
-atch to
-> > > > > not be based around a data cluster allocation, but the L2 table
-> > > > > allocation (L2 tables are still refcounted with external data f=
-iles).
-> > > > >=20
-> > > > > Doing so means this test works both with and without external d=
-ata
-> > > > > files.
-> > > > >=20
-> > > > > Signed-off-by: Max Reitz <mreitz@redhat.com>
-> > > > > ---
-> > > > >  tests/qemu-iotests/137     | 10 ++++++----
-> > > > >  tests/qemu-iotests/137.out |  4 +---
-> > > > >  2 files changed, 7 insertions(+), 7 deletions(-)
-> > > > >=20
-> > > > > diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-> > > > > index 6cf2997577..dd3484205e 100755
-> > > > > --- a/tests/qemu-iotests/137
-> > > > > +++ b/tests/qemu-iotests/137
-> > > > > @@ -138,14 +138,16 @@ $QEMU_IO \
-> > > > >      "$TEST_IMG" 2>&1 | _filter_qemu_io
-> > > > > =20
-> > > > >  # The dirty bit must not be set
-> > > > > -$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_f=
-eatures
-> > > > > +# (Filter the external data file bit)
-> > > > > +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_f=
-eatures \
-> > > > > +    | sed -e 's/0x4/0x0/'
-> > > >=20
-> > > > Maybe it is better to filter all the feature bits, but the dirty =
-bit,
-> > > > since only it is needed here, so that when we start running tests=
- with
-> > > > more features, we won't need to do this again?
-> > >=20
-> > > I=E2=80=99d hate a filter s/[02468ace]$/no dirty bit/ though.
-> >=20
-> > Nothing a helper function can't solve IMHO, I would convert this to a=
- number,
-> > and then check bitwise the bit 2, assuming that is the dirty bit)
-> > Again, note that my approach to code is to make it as easy as possibl=
-e for the
-> > next guy to change, so I am noticing such places. Eventually someone =
-of us,
-> > will be that next guy. Then again, I don't mind leaving this as is, j=
-ust noting this.
->=20
-> Again, my approach to tests is that they aren=E2=80=99t classical code.
->=20
-> This is a very personal opinion, but I have found that tests that have
-> the most ad-hoc code with the least function calls are the easiest to
-> work with.
->=20
-> Tests that have a whole lot of infrastructure and try to have nice code
-> are a horror to work with because you first have to understand how they
-> work.
+CCing qemu-devel and QEMU developers.
 
-I guess everything should be in balance, but I understand very well
-what you mean.
+On Mon, Sep 30, 2019 at 12:24:53PM +0200, Jiri Denemark wrote:
+> On Thu, Sep 26, 2019 at 18:43:05 -0300, Eduardo Habkost wrote:
+> > The pconfig feature never worked, and adding "pconfig=off" to the
+> > QEMU command-line triggers a regression in QEMU 3.1.1 and 4.0.0.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > I'm sending this as an RFC because I couldn't test it properly,
+> > and because I don't know what are the consequences of changing
+> > cpu_map between libvirt versions.
+> > ---
+> >  src/cpu_map/x86_Icelake-Server.xml | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/src/cpu_map/x86_Icelake-Server.xml b/src/cpu_map/x86_Icelake-Server.xml
+> > index fb15977a59..188a781282 100644
+> > --- a/src/cpu_map/x86_Icelake-Server.xml
+> > +++ b/src/cpu_map/x86_Icelake-Server.xml
+> > @@ -56,7 +56,9 @@
+> >      <feature name='pat'/>
+> >      <feature name='pcid'/>
+> >      <feature name='pclmuldq'/>
+> > -    <feature name='pconfig'/>
+> > +    <!-- 'pconfig' was added by accident in QEMU 3.1.0 but never worked.
+> > +         It was removed in QEMU 3.1.1 and 4.0.0.  See QEMU commits
+> > +         76e5a4d58357 and 712f807e1965 for details -->
+> >      <feature name='pdpe1gb'/>
+> >      <feature name='pge'/>
+> >      <feature name='pku'/>
+> 
+> IIUC this never worked and a domain started with Icelake-Server CPU
+> model would actually end up running with pconfig=off, right? In that
+> case removing pconfig from Icelake-Server would not cause any issues
+> when a domain is started. However, I'm afraid migration would be broken.
+> 
+> If a domain is started by new libvirt (with this patch in) using
+> Icelake-Server CPU model possibly with additional features added or
+> removed, but without pconfig being explicitly mentioned, libvirt would
+> not disable pconfig when updating active definition according to the
+> actual CPU created by QEMU. This is because libvirt did not ask for
+> pconfig (either explicitly or implicitly via the CPU model). When such
+> domain gets migrated to an older libvirt (which thinks pconfig is part
+> of Icelake-Server), it will complain that QEMU disabled pconfig while
+> the source domain was running with pconfig enabled (which is an
+> incorrect result caused by inconsistent view of the CPU model).
+> 
+> Thus we would need to add a hack which would explicitly disable pconfig
+> in the domain definition used for migration to make sure the destination
+> libvirtd knows pconfig was disabled. New libvirt would just drop the
+> disabled pconfig feature from the CPU definition before starting a
+> domain.
+> 
+> [1] From this point of view we could just keep the CPU model in libvirt
+> untouched. This way pconfig would always be explicitly disabled when a
+> domain is running and the host-model CPU definition would also show it
+> as explicitly disabled.
+> 
+> [2] However starting a domain with Icelake-Server so that it can be
+> migrated or saved/restored on QEMU in 3.1.1 and 4.0.0 would be
+> impossible. This can be solved by a different hack, which would drop
+> pconfig=off from QEMU command line.
+> 
+> [3] But if pconfig was removed from QEMU and never returned back, we
+> could remove it from any domain XML we see (virQEMUCapsCPUFilterFeatures
+> mentions several other features which we handle this way).
+> 
+> That said, I think [3] would be the best option. But if QEMU cannot or
+> doesn't want to remove pconfig completely, I'd go with [1] as the hack
+> in [2] would be too ugly and confusing.
 
->=20
-> Tests should be simple, not complex.  Some ad-hoc filters do not make
-> them complex as long as it=E2=80=99s obvious what they do.
+From the QEMU side, [3] is better, as pconfig was added by
+accident in 3.1.0 and it would be simpler to not re-add it.
 
-Yea, but the point is that it makes it harder to test new features,
-that slightly change the output of the tests, and break various tests tha=
-t hardcode unneeded things.
+This might be a problem if there are plans to eventually make KVM
+support pconfig, though.  Paolo, Robert, are there plans to
+support pconfig in KVM in the future?
 
-Pretty much exactly what this patch series does,=20
-is to remove some of the ad-hoc stuff to make the
-tests work with a new feature.=20
-
-A bit more generic tests, might be able
-to reduce this work. Anyway I won't argue with this as well, its all matt=
-er of
-balance, both extremes are no doubt bad.
-
->=20
->=20
-> Also, the correct approach here is not to do number crunching in bash.
-> It is to change qcow2.py to emit more easily filterable information.
-100% agree.=20
-
->=20
-> Max
->=20
-
-Best regards,
-	Maxim Levitsky
-
-
+-- 
+Eduardo
 
