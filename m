@@ -2,96 +2,66 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95004C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54738C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:37:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E684216F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:36:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E684216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2752F215EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:37:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2752F215EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEvqO-0004oK-8h
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:36:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38859)
+	id 1iEvsB-0006rB-0q
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:37:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mihajlov@linux.ibm.com>) id 1iEvCu-0000nX-TS
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 08:55:17 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iEvr0-0005ub-O5
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mihajlov@linux.ibm.com>) id 1iEvCt-0005Yk-P7
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 08:55:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45976)
+ (envelope-from <no-reply@patchew.org>) id 1iEvqz-0004d3-AJ
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:36:42 -0400
+Resent-Date: Mon, 30 Sep 2019 09:36:42 -0400
+Resent-Message-Id: <E1iEvqz-0004d3-AJ@eggs.gnu.org>
+Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21872)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mihajlov@linux.ibm.com>)
- id 1iEvCt-0005Ww-Ga
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 08:55:15 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8UCkog7088801
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 08:55:11 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2va35s4em2-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 08:55:09 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <mihajlov@linux.ibm.com>;
- Mon, 30 Sep 2019 13:54:56 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 30 Sep 2019 13:54:53 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8UCsqKo50462818
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 30 Sep 2019 12:54:52 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EE09952057;
- Mon, 30 Sep 2019 12:54:51 +0000 (GMT)
-Received: from oc6604088431.ibm.com (unknown [9.152.222.35])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A547A52051;
- Mon, 30 Sep 2019 12:54:51 +0000 (GMT)
-Subject: Re: Arch info lost in "info cpus"
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Sergio Lopez <slp@redhat.com>
-References: <87blv2i5ha.fsf@redhat.com> <20190930084551.GB2759@work-vm>
-From: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Date: Mon, 30 Sep 2019 14:54:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iEvqz-0004aV-27; Mon, 30 Sep 2019 09:36:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1569850586; cv=none; d=zoho.com; s=zohoarc; 
+ b=kaAGuN/zPRiiSnQkSJ/uRCjkf8ZevNm6u8biaRjSmSd02TjoMVrGPdoUZ2ytbFTDiLNjUqBcnEWDdg4qzDJAi8rjyKJoE88m/oQwmEZ8gc/ILuARQznu54cZqGsGQzsBYORrRMJjGf37RhxcUtInynjHJw5Q+mCr9rD2U5V8bXY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1569850586;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=7YOtdzTbUmhyw61CWjioveVTZcO23ciSq+AlHDsWvzw=; 
+ b=A5wTZ/07tdif0oddB4j0nG1XXKgzswE1kTxKo1VX8pXlJF+Ra8oArISf0ArkngYHBLRFqBx2DUWgGsUUfyIfqMYuwcWl7+ACk/HPE299En70htYeRo54Sp5YqeNZDllykfpf3SiSuGICajg5N/UOczMezzhk6b2InZTAIukQLjo=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 15698505840440.2914529937745556;
+ Mon, 30 Sep 2019 06:36:24 -0700 (PDT)
+Subject: Re: [PATCH v2] Disallow colons in the parameter of "-accel"
+In-Reply-To: <20190930123505.11607-1-thuth@redhat.com>
+Message-ID: <156985058289.27524.2467247182936493897@8230166b0665>
 MIME-Version: 1.0
-In-Reply-To: <20190930084551.GB2759@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19093012-0016-0000-0000-000002B21114
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19093012-0017-0000-0000-00003312EC32
-Message-Id: <ff9deaa5-8bb6-cd58-6921-31729288e448@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-30_08:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909300133
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
-X-Mailman-Approved-At: Mon, 30 Sep 2019 09:34:24 -0400
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: thuth@redhat.com
+Date: Mon, 30 Sep 2019 06:36:24 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.58
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,47 +73,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, tao3.xu@intel.com, mihajlov@linux.vnet.ibm.com,
- qemu-devel@nongnu.org, ehabkost@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 9/30/19 10:45 AM, Dr. David Alan Gilbert wrote:
-> * Sergio Lopez (slp@redhat.com) wrote:
->> Hi,
->>
->> Commit 137b5cb6ab565cb3781d5337591e155932b4230e (hmp: change
->> hmp_info_cpus to use query-cpus-fast) updated the "info cpus" commit to
->> make it more lightweight, but also removed the ability to get the
->> architecture specific status of each vCPU.
->>
->> This information was really useful to diagnose certain Guest issues,
->> without the need of using GDB, which is more intrusive and requires
->> enabling it in advance.
->>
->> Is there an alternative way of getting something equivalent to what
->> "info cpus" provided previously (in 2.10)?
-> Even the qemp equivalent, query-cpus is deprecated.
-> (Although we do call the underlying query-cpus in 'info numa' as well)
-This obviously went by unnoticed back then. Query-cpus-fast should serve
-the same purpose as query-cpus there, being less intrusive on the VM and
-allow to complete the deprecation process, if this is still wanted. If
-not, adding an option that lets hmp 'info cpus' call the old API doesn't
-seem unreasonable.
-
->
-> Dave
->
->> Thanks,
->> Sergio.
->
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
--- 
-Kind Regards,
-   Viktor
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDkzMDEyMzUwNS4xMTYw
+Ny0xLXRodXRoQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1h
+Z2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9y
+YSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9n
+IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDkzMDEyMzUwNS4x
+MTYwNy0xLXRodXRoQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBl
+PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
 
 
