@@ -2,57 +2,66 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBFB3C4360C
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 05:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EC6C4360C
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 05:25:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B770420815
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 05:16:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B770420815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F0E720815
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 05:25:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F0E720815
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEo2j-0003kY-TU
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 01:16:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56156)
+	id 1iEoBo-0005aG-92
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 01:25:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57326)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qi1.zhang@intel.com>) id 1iEo1a-0003Do-Ba
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:15:07 -0400
+ (envelope-from <clg@kaod.org>) id 1iEoAo-0004sd-23
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:24:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qi1.zhang@intel.com>) id 1iEo1Y-0005tV-1B
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:15:05 -0400
-Received: from mga17.intel.com ([192.55.52.151]:58445)
+ (envelope-from <clg@kaod.org>) id 1iEoAm-0006XC-Df
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:24:37 -0400
+Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:44823)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qi1.zhang@intel.com>) id 1iEo1W-0005qQ-PC
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:15:03 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Sep 2019 22:15:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,565,1559545200"; d="scan'208";a="215599285"
-Received: from a23004-02.sh.intel.com ([10.239.9.19])
- by fmsmga004.fm.intel.com with ESMTP; 29 Sep 2019 22:14:59 -0700
-From: qi1.zhang@intel.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4] intel_iommu: TM field should not be in reserved bits
-Date: Mon, 30 Sep 2019 13:04:51 +0800
-Message-Id: <20190930050451.13618-1-qi1.zhang@intel.com>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iEoAm-0006OE-70
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:24:36 -0400
+Received: from player779.ha.ovh.net (unknown [10.109.160.217])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 6D9FD6985D
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 07:24:27 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player779.ha.ovh.net (Postfix) with ESMTPSA id 43A9FA416B78;
+ Mon, 30 Sep 2019 05:24:16 +0000 (UTC)
+Subject: Re: [PATCH v2 20/33] spapr, xics, xive: Introduce
+ SpaprInterruptController QOM interface
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-21-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f2257946-c83e-ec16-f31e-25da5c31eb03@kaod.org>
+Date: Mon, 30 Sep 2019 07:24:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.151
+In-Reply-To: <20190927055028.11493-21-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 10487194684834417433
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgedugdelgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.73.241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,104 +73,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qi1.zhang@intel.com, ehabkost@redhat.com, mst@redhat.com,
- pbonzini@redhat.com, yadong.qi@intel.com, rth@twiddle.net
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, groug@kaod.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Zhang, Qi" <qi1.zhang@intel.com>
+On 27/09/2019 07:50, David Gibson wrote:
+> The SpaprIrq structure is used to represent ths spapr machine's irq
+> backend.  Except that it kind of conflates two concepts: one is the
+> backend proper - a specific interrupt controller that we might or
+> might not be using, the other is the irq configuration which covers
+> the layout of irq space and which interrupt controllers are allowed.
+>=20
+> This leads to some pretty confusing code paths for the "dual"
+> configuration where its hooks redirect to other SpaprIrq structures
+> depending on the currently active irq controller.
+>=20
+> To clean this up, we start by introducing a new
+> SpaprInterruptController QOM interface to represent strictly an
+> interrupt controller backend, not counting anything configuration
+> related.  We implement this interface in the XICs and XIVE interrupt
+> controllers, and in future we'll move relevant methods from SpaprIrq
+> into it.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-When dt is supported, TM field should not be Reserved(0).
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Refer to VT-d Spec 9.8
-
-Signed-off-by: Zhang, Qi <qi1.zhang@intel.com>
-Signed-off-by: Qi, Yadong <yadong.qi@intel.com>
----
- hw/i386/intel_iommu.c          | 12 ++++++++----
- hw/i386/intel_iommu_internal.h | 17 +++++++++++++----
- 2 files changed, 21 insertions(+), 8 deletions(-)
----
-Changelog V2:
- move dt_supported flag to VTD_SPTE_PAGE_LX_RSVD_MASK and VTD_SPTE_LPAGE_LX_RSVD_MASK
-Changelog V3:
- based on the change to split the arrays into two ones
-Changelog V4:
- style error check
-
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index a118efaeaf..d62604ece3 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -3549,15 +3549,19 @@ static void vtd_init(IntelIOMMUState *s)
-      * Rsvd field masks for spte
-      */
-     vtd_spte_rsvd[0] = ~0ULL;
--    vtd_spte_rsvd[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
-+    vtd_spte_rsvd[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits,
-+                                                  x86_iommu->dt_supported);
-     vtd_spte_rsvd[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
-     vtd_spte_rsvd[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
-     vtd_spte_rsvd[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
- 
-     vtd_spte_rsvd_large[0] = ~0ULL;
--    vtd_spte_rsvd_large[1] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
--    vtd_spte_rsvd_large[2] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
--    vtd_spte_rsvd_large[3] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
-+    vtd_spte_rsvd_large[1] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits,
-+                                                         x86_iommu->dt_supported);
-+    vtd_spte_rsvd_large[2] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits,
-+                                                         x86_iommu->dt_supported);
-+    vtd_spte_rsvd_large[3] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits,
-+                                                         x86_iommu->dt_supported);
-     vtd_spte_rsvd_large[4] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
- 
-     if (x86_iommu_ir_supported(x86_iommu)) {
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index c1235a7063..3a839a8925 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -387,7 +387,9 @@ typedef union VTDInvDesc VTDInvDesc;
- #define VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
- 
- /* Rsvd field masks for spte */
--#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw) \
-+#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw, dt_supported) \
-+        dt_supported ? \
-+        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
-         (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- #define VTD_SPTE_PAGE_L2_RSVD_MASK(aw) \
-         (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-@@ -395,11 +397,17 @@ typedef union VTDInvDesc VTDInvDesc;
-         (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- #define VTD_SPTE_PAGE_L4_RSVD_MASK(aw) \
-         (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
--#define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw) \
-+#define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw, dt_supported) \
-+        dt_supported ? \
-+        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
-         (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
--#define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw) \
-+#define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw, dt_supported) \
-+        dt_supported ? \
-+        (0x1ff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
-         (0x1ff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
--#define VTD_SPTE_LPAGE_L3_RSVD_MASK(aw) \
-+#define VTD_SPTE_LPAGE_L3_RSVD_MASK(aw, dt_supported) \
-+        dt_supported ? \
-+        (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
-         (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
- #define VTD_SPTE_LPAGE_L4_RSVD_MASK(aw) \
-         (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
-@@ -506,5 +514,6 @@ typedef struct VTDRootEntry VTDRootEntry;
- #define VTD_SL_W                    (1ULL << 1)
- #define VTD_SL_PT_BASE_ADDR_MASK(aw) (~(VTD_PAGE_SIZE - 1) & VTD_HAW_MASK(aw))
- #define VTD_SL_IGN_COM              0xbff0000000000000ULL
-+#define VTD_SL_TM                   (1ULL << 62)
- 
- #endif
--- 
-2.20.1
+> ---
+>  hw/intc/spapr_xive.c       |  4 ++++
+>  hw/intc/xics_spapr.c       |  4 ++++
+>  hw/ppc/spapr_irq.c         | 13 +++++++++++++
+>  include/hw/ppc/spapr_irq.h | 14 ++++++++++++++
+>  4 files changed, 35 insertions(+)
+>=20
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 04879abf2e..b67e9c3245 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -519,6 +519,10 @@ static const TypeInfo spapr_xive_info =3D {
+>      .instance_init =3D spapr_xive_instance_init,
+>      .instance_size =3D sizeof(SpaprXive),
+>      .class_init =3D spapr_xive_class_init,
+> +    .interfaces =3D (InterfaceInfo[]) {
+> +        { TYPE_SPAPR_INTC },
+> +        { }
+> +    },
+>  };
+> =20
+>  static void spapr_xive_register_types(void)
+> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> index 6e5eb24b3c..4874e6be55 100644
+> --- a/hw/intc/xics_spapr.c
+> +++ b/hw/intc/xics_spapr.c
+> @@ -343,6 +343,10 @@ static const TypeInfo ics_spapr_info =3D {
+>      .name =3D TYPE_ICS_SPAPR,
+>      .parent =3D TYPE_ICS,
+>      .class_init =3D ics_spapr_class_init,
+> +    .interfaces =3D (InterfaceInfo[]) {
+> +        { TYPE_SPAPR_INTC },
+> +        { }
+> +    },
+>  };
+> =20
+>  static void xics_spapr_register_types(void)
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 5e448b1fd4..0603c82fe8 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -23,6 +23,12 @@
+> =20
+>  #include "trace.h"
+> =20
+> +static const TypeInfo spapr_intc_info =3D {
+> +    .name =3D TYPE_SPAPR_INTC,
+> +    .parent =3D TYPE_INTERFACE,
+> +    .class_size =3D sizeof(SpaprInterruptControllerClass),
+> +};
+> +
+>  void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis)
+>  {
+>      spapr->irq_map_nr =3D nr_msis;
+> @@ -763,3 +769,10 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+>      .set_irq     =3D spapr_irq_set_irq_xics,
+>      .init_kvm    =3D spapr_irq_init_kvm_xics,
+>  };
+> +
+> +static void spapr_irq_register_types(void)
+> +{
+> +    type_register_static(&spapr_intc_info);
+> +}
+> +
+> +type_init(spapr_irq_register_types)
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 69a37f608e..b9398e0be3 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -31,6 +31,20 @@
+> =20
+>  typedef struct SpaprMachineState SpaprMachineState;
+> =20
+> +typedef struct SpaprInterruptController SpaprInterruptController;
+> +
+> +#define TYPE_SPAPR_INTC "spapr-interrupt-controller"
+> +#define SPAPR_INTC(obj)                                     \
+> +    INTERFACE_CHECK(SpaprInterruptController, (obj), TYPE_SPAPR_INTC)
+> +#define SPAPR_INTC_CLASS(klass)                                     \
+> +    OBJECT_CLASS_CHECK(SpaprInterruptControllerClass, (klass), TYPE_SP=
+APR_INTC)
+> +#define SPAPR_INTC_GET_CLASS(obj)                                   \
+> +    OBJECT_GET_CLASS(SpaprInterruptControllerClass, (obj), TYPE_SPAPR_=
+INTC)
+> +
+> +typedef struct SpaprInterruptControllerClass {
+> +    InterfaceClass parent;
+> +} SpaprInterruptControllerClass;
+> +
+>  void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis);
+>  int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool a=
+lign,
+>                          Error **errp);
+>=20
 
 
