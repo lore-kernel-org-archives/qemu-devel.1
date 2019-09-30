@@ -2,99 +2,80 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A9DC32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9314EC32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:23:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E638720842
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:22:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E638720842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1772B20842
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:23:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PO3eOfC/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1772B20842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEvdA-0006KS-Ln
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:22:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42291)
+	id 1iEveT-00088j-II
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:23:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1iEvbG-0004Ne-LQ
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:27 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iEvaL-0003rY-Mt
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1iEvb6-00055F-MW
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40644
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1iEvax-000504-Jh
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:20:09 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x8UDI8JX099334
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 09:20:06 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vbgwk54u4-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 09:20:05 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Mon, 30 Sep 2019 14:20:03 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 30 Sep 2019 14:19:58 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x8UDJvfI46203038
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 30 Sep 2019 13:19:57 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 59178A4040;
- Mon, 30 Sep 2019 13:19:57 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4357AA4051;
- Mon, 30 Sep 2019 13:19:57 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Mon, 30 Sep 2019 13:19:57 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
- id 0213FE020F; Mon, 30 Sep 2019 15:19:57 +0200 (CEST)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 05/12] s390x: sclp: fix error handling for oversize control
- blocks
-Date: Mon, 30 Sep 2019 15:19:48 +0200
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190930131955.101131-1-borntraeger@de.ibm.com>
-References: <20190930131955.101131-1-borntraeger@de.ibm.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iEvaJ-0004Pp-Nh
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:19:29 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45899)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iEvaI-0004Or-QV
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:19:26 -0400
+Received: by mail-oi1-x242.google.com with SMTP id o205so11021781oib.12
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 06:19:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tvF2rhjIU40oHZTkD8AiJlAuhk6N45ACdpW2yo/HLqU=;
+ b=PO3eOfC/q3wl/KRr0kWCAelNHERyjJNf3sYliZiXHahyxh4ZRx2ySTuhPxn1dLYQtz
+ Ye7DkO0wnQTjwjmUaxO8t8JgHdk/PerRiFSCyrNFh5SbjlOxqUbk17JiIevIdEtWEmqn
+ D+03S22BPz+8zeYwZv2Bei/nLUk1RNyudNjaeErSn+O9FIlqczoufsYOsZOoGm5F3MtH
+ oAOfw9c/il8g2OxXfN5HbM+5V+PC16ESN+8dUaf3o354nFgG9uXH+SoowTtN6gelXjGF
+ 2f7a0ilmT8oGOJV2PKIB+OsJ1h0c3lxdDtGuZ78Fa7qJuhxDICK5hsWj3CFXe07wW8IK
+ nuJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tvF2rhjIU40oHZTkD8AiJlAuhk6N45ACdpW2yo/HLqU=;
+ b=mgIlghk9hqXLS3z7XzWuoSu/UB+HPh/FMLjb9vz3gUe1x7EmZK1Id0FV2wU+k6Yf0N
+ Op0p3D71lMChrGtLY+vKeMYenBXbaBlmowUQGMwhFQEAHRlhFSOXzRKB1l/I99eu8ZP4
+ KQGfgJ2Yb9WovdjoS6KTbjbhhOGXG2IglQDhxWVer5BUWFIKjuOdPRa3LlNYviADBtef
+ C+JOx3JfVFKlPoSEdcKTRJY/XHKPvsHOvVFnlGi8+zGb5zshNuN+MllVVVE7DxMVGfFs
+ TnN6UlLITa9IJa9nf+IYGuURMujnuAGXa+j3bIYVbNXl9qVkq+kQrxRPC0huu4XGWbuP
+ 1dbw==
+X-Gm-Message-State: APjAAAW2sijRkXiOe5f+Z3Nu0rP7RIKBo0eN3wzZ5kxxTGidqobiqzWs
+ DVE/XuXuO4bjVfkVYM8Y4zBC6CYmCGd5RsIDVMaOPA==
+X-Google-Smtp-Source: APXvYqxkDA2j7mElW4UnsVMO8OvEuYOnFf4j7HG8KejxC44MOi2OBa9meGhMJ+mXVoFqHVS5fsi1jnMYUOeVkuK8Ih4=
+X-Received: by 2002:aca:b48a:: with SMTP id d132mr18336111oif.98.1569849565968; 
+ Mon, 30 Sep 2019 06:19:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19093013-0012-0000-0000-00000352126D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19093013-0013-0000-0000-0000218CB4ED
-Message-Id: <20190930131955.101131-6-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-09-30_08:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1909300138
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+References: <1569338511-3572-1-git-send-email-guoheyi@huawei.com>
+ <1569338511-3572-8-git-send-email-guoheyi@huawei.com>
+In-Reply-To: <1569338511-3572-8-git-send-email-guoheyi@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 30 Sep 2019 14:19:15 +0100
+Message-ID: <CAFEAcA9ZHs=GdJ-_Ap1PWdgDjSDBnnRqG1UkMGx_FiqCJ5ZyGw@mail.gmail.com>
+Subject: Re: [RFC PATCH 07/12] arm/sdei: override qemu_irq handler when
+ binding interrupt
+To: Heyi Guo <guoheyi@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,47 +87,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, kvm@vger.kernel.org,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu,
+ qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
+ wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>,
+ arm-mail-list <linux-arm-kernel@lists.infradead.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Janosch Frank <frankja@linux.ibm.com>
+On Tue, 24 Sep 2019 at 16:23, Heyi Guo <guoheyi@huawei.com> wrote:
+>
+> Override qemu_irq handler to support trigger SDEI event transparently
+> after guest binds interrupt to SDEI event. We don't have good way to
+> get GIC device and to guarantee SDEI device is initialized after GIC,
+> so we search GIC in system bus when the first SDEI request happens or
+> in VMSTATE post_load().
+>
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Dave Martin <Dave.Martin@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: James Morse <james.morse@arm.com>
 
-Requests over 4k are not a spec exception.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
-Message-Id: <1569591203-15258-4-git-send-email-imbrenda@linux.ibm.com>
-Acked-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/sclp.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> +static void override_qemu_irq(QemuSDEState *s, int32_t event, uint32_t intid)
+> +{
+> +    qemu_irq irq;
+> +    QemuSDE *sde;
+> +    CPUState *cs;
+> +    int cpu;
+> +
+> +    /* SPI */
+> +    if (intid >= GIC_INTERNAL) {
+> +        cs = arm_get_cpu_by_id(0);
+> +        irq = qdev_get_gpio_in(s->gic_dev,
+> +                               gic_int_to_irq(s->num_irq, intid, 0));
+> +        if (irq) {
+> +            qemu_irq_intercept_in(&irq, qemu_sdei_irq_handler, 1);
+> +        }
 
-diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-index 73244c938b10..abb6e5011f9c 100644
---- a/hw/s390x/sclp.c
-+++ b/hw/s390x/sclp.c
-@@ -213,8 +213,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
-     cpu_physical_memory_read(sccb, &work_sccb, sccb_len);
- 
-     /* Valid sccb sizes */
--    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader) ||
--        be16_to_cpu(work_sccb.h.length) > SCCB_SIZE) {
-+    if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
-         r = -PGM_SPECIFICATION;
-         goto out;
-     }
--- 
-2.21.0
+I'm not sure what this code is trying to do, but
+qemu_irq_intercept_in() is a function for internal use
+by the qtest testing infrastructure, so it shouldn't be
+used in 'real' QEMU code.
 
+> +        sde = get_sde_no_check(s, event, cs);
+> +        sde->irq = irq;
+> +        put_sde(sde, cs);
+> +        return;
+> +    }
+
+> @@ -1042,6 +1152,17 @@ void sdei_handle_request(CPUState *cs, struct kvm_run *run)
+>          return;
+>      }
+>
+> +    if (!sde_state->gic_dev) {
+> +        /* Search for ARM GIC device */
+> +        qbus_walk_children(sysbus_get_default(), dev_walkerfn,
+> +                           NULL, NULL, NULL, sde_state);
+> +        if (!sde_state->gic_dev) {
+> +            error_report("Cannot find ARM GIC device!");
+> +            run->hypercall.args[0] = SDEI_NOT_SUPPORTED;
+> +            return;
+> +        }
+> +    }
+
+Walking through the qbus tree looking for particular devices
+isn't really something I'd recommend either.
+
+thanks
+-- PMM
 
