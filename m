@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-10.0 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D397BC4360C
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 05:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBFB3C4360C
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 05:16:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A79E92086A
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 05:08:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A79E92086A
+	by mail.kernel.org (Postfix) with ESMTPS id B770420815
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 05:16:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B770420815
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEnuw-0001ao-P8
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 01:08:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55331)
+	id 1iEo2j-0003kY-TU
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 01:16:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56156)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qi1.zhang@intel.com>) id 1iEnuI-00019u-4L
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:07:35 -0400
+ (envelope-from <qi1.zhang@intel.com>) id 1iEo1a-0003Do-Ba
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:15:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qi1.zhang@intel.com>) id 1iEnuG-0001jd-67
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:07:33 -0400
-Received: from mga06.intel.com ([134.134.136.31]:61001)
+ (envelope-from <qi1.zhang@intel.com>) id 1iEo1Y-0005tV-1B
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:15:05 -0400
+Received: from mga17.intel.com ([192.55.52.151]:58445)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qi1.zhang@intel.com>) id 1iEnuF-0001iC-U1
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:07:32 -0400
+ (Exim 4.71) (envelope-from <qi1.zhang@intel.com>) id 1iEo1W-0005qQ-PC
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 01:15:03 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Sep 2019 22:07:27 -0700
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 29 Sep 2019 22:15:00 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,565,1559545200"; d="scan'208";a="365888247"
+X-IronPort-AV: E=Sophos;i="5.64,565,1559545200"; d="scan'208";a="215599285"
 Received: from a23004-02.sh.intel.com ([10.239.9.19])
- by orsmga005.jf.intel.com with ESMTP; 29 Sep 2019 22:07:25 -0700
+ by fmsmga004.fm.intel.com with ESMTP; 29 Sep 2019 22:14:59 -0700
 From: qi1.zhang@intel.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3] intel_iommu: TM field should not be in reserved bits
-Date: Mon, 30 Sep 2019 12:57:18 +0800
-Message-Id: <20190930045718.11431-1-qi1.zhang@intel.com>
+Subject: [PATCH v4] intel_iommu: TM field should not be in reserved bits
+Date: Mon, 30 Sep 2019 13:04:51 +0800
+Message-Id: <20190930050451.13618-1-qi1.zhang@intel.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.31
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,25 +79,28 @@ Refer to VT-d Spec 9.8
 Signed-off-by: Zhang, Qi <qi1.zhang@intel.com>
 Signed-off-by: Qi, Yadong <yadong.qi@intel.com>
 ---
- hw/i386/intel_iommu.c          |  8 ++++----
+ hw/i386/intel_iommu.c          | 12 ++++++++----
  hw/i386/intel_iommu_internal.h | 17 +++++++++++++----
- 2 files changed, 17 insertions(+), 8 deletions(-)
+ 2 files changed, 21 insertions(+), 8 deletions(-)
 ---
 Changelog V2:
  move dt_supported flag to VTD_SPTE_PAGE_LX_RSVD_MASK and VTD_SPTE_LPAGE_LX_RSVD_MASK
 Changelog V3:
  based on the change to split the arrays into two ones
+Changelog V4:
+ style error check
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index a118efaeaf..69dced4fbd 100644
+index a118efaeaf..d62604ece3 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -3549,15 +3549,15 @@ static void vtd_init(IntelIOMMUState *s)
+@@ -3549,15 +3549,19 @@ static void vtd_init(IntelIOMMUState *s)
       * Rsvd field masks for spte
       */
      vtd_spte_rsvd[0] = ~0ULL;
 -    vtd_spte_rsvd[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
-+    vtd_spte_rsvd[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits, x86_iommu->dt_supported);
++    vtd_spte_rsvd[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits,
++                                                  x86_iommu->dt_supported);
      vtd_spte_rsvd[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
      vtd_spte_rsvd[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
      vtd_spte_rsvd[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
@@ -106,9 +109,12 @@ index a118efaeaf..69dced4fbd 100644
 -    vtd_spte_rsvd_large[1] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
 -    vtd_spte_rsvd_large[2] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
 -    vtd_spte_rsvd_large[3] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
-+    vtd_spte_rsvd_large[1] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits, x86_iommu->dt_supported);
-+    vtd_spte_rsvd_large[2] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits, x86_iommu->dt_supported);
-+    vtd_spte_rsvd_large[3] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits, x86_iommu->dt_supported);
++    vtd_spte_rsvd_large[1] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits,
++                                                         x86_iommu->dt_supported);
++    vtd_spte_rsvd_large[2] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits,
++                                                         x86_iommu->dt_supported);
++    vtd_spte_rsvd_large[3] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits,
++                                                         x86_iommu->dt_supported);
      vtd_spte_rsvd_large[4] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
  
      if (x86_iommu_ir_supported(x86_iommu)) {
