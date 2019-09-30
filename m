@@ -2,51 +2,52 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB9A9C4360C
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D750C4360C
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE65821855
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:57:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE65821855
+	by mail.kernel.org (Postfix) with ESMTPS id 6F0DC21855
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:58:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0DC21855
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEqZ5-0005W0-FW
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 03:57:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47282)
+	id 1iEqZW-0006Nt-CF
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 03:58:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47385)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iEqX7-0004AR-PG
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:55:50 -0400
+ (envelope-from <david@redhat.com>) id 1iEqXc-0004fK-VP
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:56:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iEqX6-0006wZ-Ht
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:55:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42316)
+ (envelope-from <david@redhat.com>) id 1iEqXb-00075r-Ss
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:56:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40094)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iEqX6-0006wI-9D; Mon, 30 Sep 2019 03:55:48 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iEqXb-00075i-KQ; Mon, 30 Sep 2019 03:56:19 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 56CEF300C72A;
- Mon, 30 Sep 2019 07:55:47 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C6147A44AE0;
+ Mon, 30 Sep 2019 07:56:18 +0000 (UTC)
 Received: from [10.36.117.170] (ovpn-117-170.ams2.redhat.com [10.36.117.170])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 59CD460C5E;
- Mon, 30 Sep 2019 07:55:46 +0000 (UTC)
-Subject: Re: [PATCH v3 02/18] target/s390x: Add ilen to unwind data
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BF7485D9C3;
+ Mon, 30 Sep 2019 07:56:17 +0000 (UTC)
+Subject: Re: [PATCH v3 14/18] target/s390x: Rely on unwinding in
+ s390_cpu_tlb_fill
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190926162615.31168-1-richard.henderson@linaro.org>
- <20190926162615.31168-3-richard.henderson@linaro.org>
- <4d1f9fbc-a6b3-cb7d-63a7-8d9568bc7406@redhat.com>
- <164856f8-fc7e-7a97-65b8-e1be2cf354be@linaro.org>
+ <20190926162615.31168-15-richard.henderson@linaro.org>
+ <f3277035-17b8-59a6-e4ae-7b1a95ea0c84@redhat.com>
+ <fb1096e8-1b3d-ff46-97c5-c03e8f838e34@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -93,18 +94,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <6557ae81-1e25-38bc-dff5-2d15b45284c5@redhat.com>
-Date: Mon, 30 Sep 2019 09:55:45 +0200
+Message-ID: <21d14edf-59de-d928-7070-28166434af6a@redhat.com>
+Date: Mon, 30 Sep 2019 09:56:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <164856f8-fc7e-7a97-65b8-e1be2cf354be@linaro.org>
+In-Reply-To: <fb1096e8-1b3d-ff46-97c5-c03e8f838e34@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 30 Sep 2019 07:55:47 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Mon, 30 Sep 2019 07:56:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -119,57 +120,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.09.19 18:02, Richard Henderson wrote:
-> On 9/27/19 3:30 AM, David Hildenbrand wrote:
->>> +    /* Update ILEN, except for breakpoint, where we didn't load an insn.  */
->>> +    if (ilen) {
->>> +        env->int_pgm_ilen = ilen;
->>> +    }
+On 27.09.19 18:16, Richard Henderson wrote:
+> On 9/27/19 4:02 AM, David Hildenbrand wrote:
+>> On 26.09.19 18:26, Richard Henderson wrote:
+>>> We currently set ilen to AUTO, then overwrite that during
+>>> unwinding, then overwrite that for the code access case.
+>>>
+>>> This can be simplified to setting ilen to our arbitrary
+>>> value for the (undefined) code access case, then rely on
+>>> unwinding to overwrite that with the correct value for
+>>> the data access case.
+>>>
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  target/s390x/excp_helper.c | 23 +++++++----------------
+>>>  1 file changed, 7 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+>>> index 98a1ee8317..8ce992e639 100644
+>>> --- a/target/s390x/excp_helper.c
+>>> +++ b/target/s390x/excp_helper.c
+>>> @@ -96,7 +96,7 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+>>>  {
+>>>      S390CPU *cpu = S390_CPU(cs);
+>>>  
+>>> -    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_AUTO);
+>>> +    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_UNWIND);
 >>
->> I am not completely sure about breakpoint handling and which
->> implications we'll have when not setting int_pgm_ilen ...
+>> Hmm, we always trigger a pgm exceptions, meaning we set
+>> cs->exception_index even if we have probe = true. Confused by that.
 > 
-> Yeah.  Possibly to make it simple I should simply assign 2 as the length of a
-> breakpoint, bearing in mind that there is no a s390 exception to be delivered
-> -- this is purely a qemu-internal thing, raising EXCP_DEBUG to get back to the
-> gdbstub interface.
+> This is the CONFIG_USER_ONLY version, for which probe is always false.  Perhaps
+> I shouldn't have made the function interface identical, but it did appear to
+> make things cleaner for most targets.
 > 
->> I wonder if that change can help to better handle exceptions during
->> EXECUTE, whereby we have to indicate the EXECUTE instruction and the
->> ilen of the EXECUTE instruction (so the pc and ilen of the original
->> EXECUTE function, not of the EXECUTE target).
+>>> +    trigger_pgm_exception(env, excp, 2);
+>>
+>> I wonder if it is still worth setting this only conditionally. Most
+>> probably not.
 > 
-> Yes, that's already there.  The ilen of the execute insn is placed in the low 4
-> bits of env->ex_value, and that's what we record as ilen within extract_insn().
+> I don't see that it would be.  I hope the comment is clear about this arbitrary
+> value is overwritten during unwinding.
 
-Ah, good to know. I'll have to review PGM injection, which ILEN we
-currently indicate and which one we are supposed to indicate.
-
-> 
->> I don't completely like the current interrupt handling when we have
->> "env->ex_value" in "s390_cpu_exec_interrupt()". I'd love to see that
->> check go, then we can reuse that function easily e.g., in MVC to test
->> and inject exceptions while processing such an interruptible instruction
->> - like MVC.
-> 
-> I don't think that reusing s390_cpu_exec_interrupt directly is a good idea.
-> There's other cleanup that needs to happen when exiting a TB.
-> 
-> What I think you should do instead is check env_neg(env)->icount_decr, exactly
-> like we do at the start of every basic block, and use that as an indication
-> that you should exit back to the main loop.
-
-The issue is that when we return to the main loop we really have to
-inject an interrupt - otherwise we might simply skip parts of the
-(interruptible) instruction and continue with the next one.
-
-However, with I/O interrupts, we can actually race against other VCPUs.
-So the I/O interrupt might be gone by the time we arrive in the main loop.
+It's confusing, but I get it :)
 
 -- 
 
