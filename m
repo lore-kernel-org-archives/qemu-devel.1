@@ -2,85 +2,74 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BB5C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 11:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F970C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 11:08:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3462216F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 11:07:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJzd9q0G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3462216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 742AF216F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 11:08:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 742AF216F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEtWY-0004vB-VI
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 07:07:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47562)
+	id 1iEtXh-0005qC-IP
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 07:08:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47656)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iEtVT-0004SI-QF
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:06:21 -0400
+ (envelope-from <bounces@canonical.com>) id 1iEtWS-0004zy-PM
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:07:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iEtVR-0001a7-JL
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:06:19 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46145)
+ (envelope-from <bounces@canonical.com>) id 1iEtWR-0001yR-KO
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:07:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60124)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iEtVR-0001Zm-9h
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:06:17 -0400
-Received: by mail-wr1-x444.google.com with SMTP id o18so10741833wrv.13
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 04:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=1LzpV1uTlI9EptIYiIezVV5VeGGn9OgsFcgOA60SSoc=;
- b=eJzd9q0GsbQfUZXYDyXtSLYQ5s76CZs7HW2mBb+E4QcOCNzojf6eDNEJRC4C0gRJZ2
- ENfbOCU5qAoEWOeuEi0I04TFy7wO437v6wG9yEirNVPWyeupzSiv2bYOv2awEhvA6Xpu
- 5SDfXqesGWnyBg8oRpuBo7mWFb5FYD6HM6mHrdLDcUG++n03chcaEgW7NRLUNoYQGBxd
- CyhvkdT3N6YsPRfDjHg0/E70lcaVzx/L4OhA/lKYUibNNHp9LCOWqY9SFxSyB2iAL2oM
- MHGalOSIfpgjZhV1+/1IPlbF+CHyyIbN/gVEVvF5BqsmqYU4U21Z/TeBM/O/30xO4R1b
- hezA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=1LzpV1uTlI9EptIYiIezVV5VeGGn9OgsFcgOA60SSoc=;
- b=sVK74Q5afrFqnewyP2ILGoVwOmkJMcv5x2QwGailDu4jOQIsM45W2C94TGPRr794IJ
- oGRlHB1F3xFwSWzbNTR3x+bFOwDfHvdoD8JA4XGVnlLNqmf1NK2VtcGE7FBHn2mOKXIR
- AYMS35gJb7hULngWwUcFbrrIZGhn9OushC4uGykUrsyeNKMXsovtoGKya/oHi2pdEUew
- MztKeHX97JZVdRJTEnIbqjsXXv5Qa0AewMIljejW5o2anoTCxvCtDG3aanP+4JWGan7q
- iLeRnbVCCF4XrxyRJ3ARJ6Dul56+svMZN3FN+gatbKLyv3pF58CcTEclte4W0TaszDWw
- dxfA==
-X-Gm-Message-State: APjAAAUppuSOejfxja/IaMmsnCz+5f/N2UrJS9R9fx7tN8e9MfEYsaAZ
- rkZ2NLq3lFy9Qvlw6yLgFJRmO6NUbIzwKoHs6So=
-X-Google-Smtp-Source: APXvYqxOxl+zCQoRemgFbCc8TKQ9xSeqKEJitiz27quAWOrYHxXBDwD9WvS+Tld0uTpsr9PvgDT2BkaX8ZjoQ4yxHeo=
-X-Received: by 2002:adf:fb87:: with SMTP id a7mr12010138wrr.370.1569841575667; 
- Mon, 30 Sep 2019 04:06:15 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iEtWR-0001yB-FA
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 07:07:19 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iEtWP-00031e-Sw
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 11:07:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B110F2E80CC
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 11:07:17 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190930105135.27244-1-dgilbert@redhat.com>
- <20190930105135.27244-3-dgilbert@redhat.com>
-In-Reply-To: <20190930105135.27244-3-dgilbert@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 30 Sep 2019 15:06:02 +0400
-Message-ID: <CAJ+F1CJ0KoFay_yddvQRZ73VNECyjzdWL8rBj9pCdWncFZhMbA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] virtio: add vhost-user-fs base device
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+Date: Mon, 30 Sep 2019 10:58:43 -0000
+From: Thomas Huth <1633508@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: libvirt
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: havok4u th-huth
+X-Launchpad-Bug-Reporter: Tim Epkes (havok4u)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20161014143633.7783.6982.malonedeb@gac.canonical.com>
+Message-Id: <156984112379.11375.17922477998911764239.malone@soybean.canonical.com>
+Subject: [Bug 1633508] Re: libvirt cannot hot insert interfaces to qemu
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19065";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ac223f706e2b1ef6acbe14d3e1f2dda96c919eaf
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,483 +78,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mszeredi@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, vgoyal@redhat.com
+Reply-To: Bug 1633508 <1633508@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+This looks like a libvirt bug at a first glance. Have you tried to
+report it to the libvirt project? (See https://libvirt.org/bugs.html )
+... also, can you re-create the bug with the very latest upstream
+version of libvirt and qemu, or does it only occur with an (older?)
+version of Ubuntu?
 
-On Mon, Sep 30, 2019 at 2:52 PM Dr. David Alan Gilbert (git)
-<dgilbert@redhat.com> wrote:
->
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> The virtio-fs virtio device provides shared file system access using
-> the FUSE protocol carried over virtio.
-> The actual file server is implemented in an external vhost-user-fs device
-> backend process.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  configure                         |  13 ++
->  hw/virtio/Makefile.objs           |   1 +
->  hw/virtio/vhost-user-fs.c         | 299 ++++++++++++++++++++++++++++++
->  include/hw/virtio/vhost-user-fs.h |  45 +++++
->  4 files changed, 358 insertions(+)
->  create mode 100644 hw/virtio/vhost-user-fs.c
->  create mode 100644 include/hw/virtio/vhost-user-fs.h
->
-> diff --git a/configure b/configure
-> index 542f6aea3f..204cbe351e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -381,6 +381,7 @@ vhost_crypto=3D""
->  vhost_scsi=3D""
->  vhost_vsock=3D""
->  vhost_user=3D""
-> +vhost_user_fs=3D""
->  kvm=3D"no"
->  hax=3D"no"
->  hvf=3D"no"
-> @@ -1293,6 +1294,10 @@ for opt do
->    ;;
->    --enable-vhost-vsock) vhost_vsock=3D"yes"
->    ;;
-> +  --disable-vhost-user-fs) vhost_user_fs=3D"no"
-> +  ;;
-> +  --enable-vhost-user-fs) vhost_user_fs=3D"yes"
-> +  ;;
->    --disable-opengl) opengl=3D"no"
->    ;;
->    --enable-opengl) opengl=3D"yes"
-> @@ -2236,6 +2241,10 @@ test "$vhost_crypto" =3D "" && vhost_crypto=3D$vho=
-st_user
->  if test "$vhost_crypto" =3D "yes" && test "$vhost_user" =3D "no"; then
->    error_exit "--enable-vhost-crypto requires --enable-vhost-user"
->  fi
-> +test "$vhost_user_fs" =3D "" && vhost_user_fs=3D$vhost_user
-> +if test "$vhost_user_fs" =3D "yes" && test "$vhost_user" =3D "no"; then
-> +  error_exit "--enable-vhost-user-fs requires --enable-vhost-user"
-> +fi
->
->  # OR the vhost-kernel and vhost-user values for simplicity
->  if test "$vhost_net" =3D ""; then
-> @@ -6377,6 +6386,7 @@ echo "vhost-crypto support $vhost_crypto"
->  echo "vhost-scsi support $vhost_scsi"
->  echo "vhost-vsock support $vhost_vsock"
->  echo "vhost-user support $vhost_user"
-> +echo "vhost-user-fs support $vhost_user_fs"
->  echo "Trace backends    $trace_backends"
->  if have_backend "simple"; then
->  echo "Trace output file $trace_file-<pid>"
-> @@ -6873,6 +6883,9 @@ fi
->  if test "$vhost_user" =3D "yes" ; then
->    echo "CONFIG_VHOST_USER=3Dy" >> $config_host_mak
->  fi
-> +if test "$vhost_user_fs" =3D "yes" ; then
-> +  echo "CONFIG_VHOST_USER_FS=3Dy" >> $config_host_mak
-> +fi
->  if test "$blobs" =3D "yes" ; then
->    echo "INSTALL_BLOBS=3Dyes" >> $config_host_mak
->  fi
-> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> index 964ce78607..47ffbf22c4 100644
-> --- a/hw/virtio/Makefile.objs
-> +++ b/hw/virtio/Makefile.objs
-> @@ -11,6 +11,7 @@ common-obj-$(CONFIG_VIRTIO_PCI) +=3D virtio-pci.o
->  common-obj-$(CONFIG_VIRTIO_MMIO) +=3D virtio-mmio.o
->  obj-$(CONFIG_VIRTIO_BALLOON) +=3D virtio-balloon.o
->  obj-$(CONFIG_VIRTIO_CRYPTO) +=3D virtio-crypto.o
-> +obj-$(CONFIG_VHOST_USER_FS) +=3D vhost-user-fs.o
->  obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) +=3D virti=
-o-crypto-pci.o
->  obj-$(CONFIG_VIRTIO_PMEM) +=3D virtio-pmem.o
->  common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) +=3D =
-virtio-pmem-pci.o
-> diff --git a/hw/virtio/vhost-user-fs.c b/hw/virtio/vhost-user-fs.c
-> new file mode 100644
-> index 0000000000..f0df7f4746
-> --- /dev/null
-> +++ b/hw/virtio/vhost-user-fs.c
-> @@ -0,0 +1,299 @@
-> +/*
-> + * Vhost-user filesystem virtio device
-> + *
-> + * Copyright 2018-2019 Red Hat, Inc.
-> + *
-> + * Authors:
-> + *  Stefan Hajnoczi <stefanha@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> + * (at your option) any later version.  See the COPYING file in the
-> + * top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include <sys/ioctl.h>
-> +#include "standard-headers/linux/virtio_fs.h"
-> +#include "qapi/error.h"
-> +#include "hw/qdev-properties.h"
-> +#include "hw/virtio/virtio-bus.h"
-> +#include "hw/virtio/virtio-access.h"
-> +#include "qemu/error-report.h"
-> +#include "hw/virtio/vhost-user-fs.h"
-> +#include "monitor/monitor.h"
-> +
-> +static void vuf_get_config(VirtIODevice *vdev, uint8_t *config)
-> +{
-> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
-> +    struct virtio_fs_config fscfg =3D {};
-> +
-> +    memcpy((char *)fscfg.tag, fs->conf.tag,
-> +           MIN(strlen(fs->conf.tag) + 1, sizeof(fscfg.tag)));
-> +
-> +    virtio_stl_p(vdev, &fscfg.num_request_queues, fs->conf.num_request_q=
-ueues);
-> +
-> +    memcpy(config, &fscfg, sizeof(fscfg));
-> +}
-> +
-> +static void vuf_start(VirtIODevice *vdev)
-> +{
-> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
-> +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(vdev)));
-> +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-> +    int ret;
-> +    int i;
-> +
-> +    if (!k->set_guest_notifiers) {
-> +        error_report("binding does not support guest notifiers");
-> +        return;
-> +    }
-> +
-> +    ret =3D vhost_dev_enable_notifiers(&fs->vhost_dev, vdev);
-> +    if (ret < 0) {
-> +        error_report("Error enabling host notifiers: %d", -ret);
-> +        return;
-> +    }
-> +
-> +    ret =3D k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, tru=
-e);
-> +    if (ret < 0) {
-> +        error_report("Error binding guest notifier: %d", -ret);
-> +        goto err_host_notifiers;
-> +    }
-> +
-> +    fs->vhost_dev.acked_features =3D vdev->guest_features;
-> +    ret =3D vhost_dev_start(&fs->vhost_dev, vdev);
-> +    if (ret < 0) {
-> +        error_report("Error starting vhost: %d", -ret);
-> +        goto err_guest_notifiers;
-> +    }
-> +
-> +    /*
-> +     * guest_notifier_mask/pending not used yet, so just unmask
-> +     * everything here.  virtio-pci will do the right thing by
-> +     * enabling/disabling irqfd.
-> +     */
-> +    for (i =3D 0; i < fs->vhost_dev.nvqs; i++) {
-> +        vhost_virtqueue_mask(&fs->vhost_dev, vdev, i, false);
-> +    }
-> +
-> +    return;
-> +
-> +err_guest_notifiers:
-> +    k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, false);
-> +err_host_notifiers:
-> +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
-> +}
-> +
-> +static void vuf_stop(VirtIODevice *vdev)
-> +{
-> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
-> +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(vdev)));
-> +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-> +    int ret;
-> +
-> +    if (!k->set_guest_notifiers) {
-> +        return;
-> +    }
-> +
-> +    vhost_dev_stop(&fs->vhost_dev, vdev);
-> +
-> +    ret =3D k->set_guest_notifiers(qbus->parent, fs->vhost_dev.nvqs, fal=
-se);
-> +    if (ret < 0) {
-> +        error_report("vhost guest notifier cleanup failed: %d", ret);
-> +        return;
-> +    }
-> +
-> +    vhost_dev_disable_notifiers(&fs->vhost_dev, vdev);
-> +}
-> +
-> +static void vuf_set_status(VirtIODevice *vdev, uint8_t status)
-> +{
-> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
-> +    bool should_start =3D status & VIRTIO_CONFIG_S_DRIVER_OK;
-> +
-> +    if (!vdev->vm_running) {
-> +        should_start =3D false;
-> +    }
-> +
-> +    if (fs->vhost_dev.started =3D=3D should_start) {
-> +        return;
-> +    }
-> +
-> +    if (should_start) {
-> +        vuf_start(vdev);
-> +    } else {
-> +        vuf_stop(vdev);
-> +    }
-> +}
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-It looks like you could have benefited from backends/vhost-user.c
+-- =
 
-This would allow to factor out some common code and properties used by
-vhost-user devices (currently gpu & input, but more could be
-converted).
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1633508
 
-Advantage is that if we add a new mechanism, say to start helpers
-(like I propose earlier), all devices using that could benefit it more
-easily (in theory).
+Title:
+  libvirt cannot hot insert interfaces to qemu
 
-> +
-> +static uint64_t vuf_get_features(VirtIODevice *vdev,
-> +                                      uint64_t requested_features,
-> +                                      Error **errp)
-> +{
-> +    /* No feature bits used yet */
-> +    return requested_features;
-> +}
-> +
-> +static void vuf_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-> +{
-> +    /*
-> +     * Not normally called; it's the daemon that handles the queue;
-> +     * however virtio's cleanup path can call this.
-> +     */
-> +}
-> +
-> +static void vuf_guest_notifier_mask(VirtIODevice *vdev, int idx,
-> +                                            bool mask)
-> +{
-> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
-> +
-> +    vhost_virtqueue_mask(&fs->vhost_dev, vdev, idx, mask);
-> +}
-> +
-> +static bool vuf_guest_notifier_pending(VirtIODevice *vdev, int idx)
-> +{
-> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
-> +
-> +    return vhost_virtqueue_pending(&fs->vhost_dev, idx);
-> +}
-> +
-> +static void vuf_device_realize(DeviceState *dev, Error **errp)
-> +{
-> +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> +    VHostUserFS *fs =3D VHOST_USER_FS(dev);
-> +    unsigned int i;
-> +    size_t len;
-> +    int ret;
-> +
-> +    if (!fs->conf.chardev.chr) {
-> +        error_setg(errp, "missing chardev");
-> +        return;
-> +    }
-> +
-> +    if (!fs->conf.tag) {
-> +        error_setg(errp, "missing tag property");
-> +        return;
-> +    }
-> +    len =3D strlen(fs->conf.tag);
-> +    if (len =3D=3D 0) {
-> +        error_setg(errp, "tag property cannot be empty");
-> +        return;
-> +    }
-> +    if (len > sizeof_field(struct virtio_fs_config, tag)) {
-> +        error_setg(errp, "tag property must be %zu bytes or less",
-> +                   sizeof_field(struct virtio_fs_config, tag));
-> +        return;
-> +    }
-> +
-> +    if (fs->conf.num_request_queues =3D=3D 0) {
-> +        error_setg(errp, "num-request-queues property must be larger tha=
-n 0");
-> +        return;
-> +    }
-> +
-> +    if (!is_power_of_2(fs->conf.queue_size)) {
-> +        error_setg(errp, "queue-size property must be a power of 2");
-> +        return;
-> +    }
-> +
-> +    if (fs->conf.queue_size > VIRTQUEUE_MAX_SIZE) {
-> +        error_setg(errp, "queue-size property must be %u or smaller",
-> +                   VIRTQUEUE_MAX_SIZE);
-> +        return;
-> +    }
-> +
-> +    if (!vhost_user_init(&fs->vhost_user, &fs->conf.chardev, errp)) {
-> +        return;
-> +    }
-> +
-> +    virtio_init(vdev, "vhost-user-fs", VIRTIO_ID_FS,
-> +                sizeof(struct virtio_fs_config));
-> +
-> +    /* Hiprio queue */
-> +    virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
-> +
-> +    /* Request queues */
-> +    for (i =3D 0; i < fs->conf.num_request_queues; i++) {
-> +        virtio_add_queue(vdev, fs->conf.queue_size, vuf_handle_output);
-> +    }
-> +
-> +    /* 1 high prio queue, plus the number configured */
-> +    fs->vhost_dev.nvqs =3D 1 + fs->conf.num_request_queues;
-> +    fs->vhost_dev.vqs =3D g_new0(struct vhost_virtqueue, fs->vhost_dev.n=
-vqs);
-> +    ret =3D vhost_dev_init(&fs->vhost_dev, &fs->vhost_user,
-> +                         VHOST_BACKEND_TYPE_USER, 0);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "vhost_dev_init failed");
-> +        goto err_virtio;
-> +    }
-> +
-> +    return;
-> +
-> +err_virtio:
-> +    vhost_user_cleanup(&fs->vhost_user);
-> +    virtio_cleanup(vdev);
-> +    g_free(fs->vhost_dev.vqs);
-> +    return;
-> +}
-> +
-> +static void vuf_device_unrealize(DeviceState *dev, Error **errp)
-> +{
-> +    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-> +    VHostUserFS *fs =3D VHOST_USER_FS(dev);
-> +
-> +    /* This will stop vhost backend if appropriate. */
-> +    vuf_set_status(vdev, 0);
-> +
-> +    vhost_dev_cleanup(&fs->vhost_dev);
-> +
-> +    vhost_user_cleanup(&fs->vhost_user);
-> +
-> +    virtio_cleanup(vdev);
-> +    g_free(fs->vhost_dev.vqs);
-> +    fs->vhost_dev.vqs =3D NULL;
-> +}
-> +
-> +static const VMStateDescription vuf_vmstate =3D {
-> +    .name =3D "vhost-user-fs",
-> +    .unmigratable =3D 1,
-> +};
-> +
-> +static Property vuf_properties[] =3D {
-> +    DEFINE_PROP_CHR("chardev", VHostUserFS, conf.chardev),
-> +    DEFINE_PROP_STRING("tag", VHostUserFS, conf.tag),
-> +    DEFINE_PROP_UINT16("num-request-queues", VHostUserFS,
-> +                       conf.num_request_queues, 1),
-> +    DEFINE_PROP_UINT16("queue-size", VHostUserFS, conf.queue_size, 128),
-> +    DEFINE_PROP_STRING("vhostfd", VHostUserFS, conf.vhostfd),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void vuf_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +    VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_CLASS(klass);
-> +
-> +    dc->props =3D vuf_properties;
-> +    dc->vmsd =3D &vuf_vmstate;
-> +    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-> +    vdc->realize =3D vuf_device_realize;
-> +    vdc->unrealize =3D vuf_device_unrealize;
-> +    vdc->get_features =3D vuf_get_features;
-> +    vdc->get_config =3D vuf_get_config;
-> +    vdc->set_status =3D vuf_set_status;
-> +    vdc->guest_notifier_mask =3D vuf_guest_notifier_mask;
-> +    vdc->guest_notifier_pending =3D vuf_guest_notifier_pending;
-> +}
-> +
-> +static const TypeInfo vuf_info =3D {
-> +    .name =3D TYPE_VHOST_USER_FS,
-> +    .parent =3D TYPE_VIRTIO_DEVICE,
-> +    .instance_size =3D sizeof(VHostUserFS),
-> +    .class_init =3D vuf_class_init,
-> +};
-> +
-> +static void vuf_register_types(void)
-> +{
-> +    type_register_static(&vuf_info);
-> +}
-> +
-> +type_init(vuf_register_types)
-> diff --git a/include/hw/virtio/vhost-user-fs.h b/include/hw/virtio/vhost-=
-user-fs.h
-> new file mode 100644
-> index 0000000000..539885b458
-> --- /dev/null
-> +++ b/include/hw/virtio/vhost-user-fs.h
-> @@ -0,0 +1,45 @@
-> +/*
-> + * Vhost-user filesystem virtio device
-> + *
-> + * Copyright 2018-2019 Red Hat, Inc.
-> + *
-> + * Authors:
-> + *  Stefan Hajnoczi <stefanha@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> + * (at your option) any later version.  See the COPYING file in the
-> + * top-level directory.
-> + */
-> +
-> +#ifndef _QEMU_VHOST_USER_FS_H
-> +#define _QEMU_VHOST_USER_FS_H
-> +
-> +#include "hw/virtio/virtio.h"
-> +#include "hw/virtio/vhost.h"
-> +#include "hw/virtio/vhost-user.h"
-> +#include "chardev/char-fe.h"
-> +
-> +#define TYPE_VHOST_USER_FS "vhost-user-fs-device"
-> +#define VHOST_USER_FS(obj) \
-> +        OBJECT_CHECK(VHostUserFS, (obj), TYPE_VHOST_USER_FS)
-> +
-> +typedef struct {
-> +    CharBackend chardev;
-> +    char *tag;
-> +    uint16_t num_request_queues;
-> +    uint16_t queue_size;
-> +    char *vhostfd;
-> +} VHostUserFSConf;
-> +
-> +typedef struct {
-> +    /*< private >*/
-> +    VirtIODevice parent;
-> +    VHostUserFSConf conf;
-> +    struct vhost_virtqueue *vhost_vqs;
-> +    struct vhost_dev vhost_dev;
-> +    VhostUserState vhost_user;
-> +
-> +    /*< public >*/
-> +} VHostUserFS;
-> +
-> +#endif /* _QEMU_VHOST_USER_FS_H */
-> --
-> 2.21.0
->
->
+Status in QEMU:
+  Incomplete
 
+Bug description:
+  When attempting to hot insert an interface using Ubuntu 16.04.1, I get th=
+e following
+  $ virsh attach-interface --domain gluster1 --type direct \
+  >         --source test0 --model virtio \
+  >         --mac 2a:b6:b0:dc:c7:c4 --config --live
+  error: Failed to attach interface
+  error: internal error: unable to execute QEMU command 'getfd': No file de=
+scriptor supplied via SCM_RIGHTS
 
---=20
-Marc-Andr=C3=A9 Lureau
+  test0 exists:
+  $ ip link show test0
+  35: test0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc pfifo_fast =
+state DOWN mode DEFAULT group default qlen 1000
+      link/ether aa:8c:65:2e:79:61 brd ff:ff:ff:ff:ff:ff
+
+  Just in case I did it wrong with direct, I did network
+  $ virsh net-list
+   Name                 State      Autostart     Persistent
+  ----------------------------------------------------------
+   default              active     yes           yes
+   mgmtnet0             active     yes           yes
+
+  $ virsh attach-interface --domain gluster1 --type network \
+  >         --source default --model virtio \
+  >         --mac 2a:b6:b0:dc:c7:c4 --config --live
+  error: Failed to attach interface
+  error: internal error: unable to execute QEMU command 'getfd': No file de=
+scriptor supplied via SCM_RIGHTS
+
+  =
+
+  This seems to be an old bug, but is still present.  Other relevant inform=
+ation:
+  $ qemu-system-x86_64 --version
+  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.5), Copyright (c=
+) 2003-2008 Fabrice Bellard
+  $ virsh -v
+  1.3.1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1633508/+subscriptions
 
