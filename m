@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34AE5C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2195C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:51:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07B922075D
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:50:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07B922075D
+	by mail.kernel.org (Postfix) with ESMTPS id 71E2A2075D
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:51:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71E2A2075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iExwL-0002US-Pf
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:50:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35723)
+	id 1iExxt-0004K4-Pr
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:51:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35970)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iExq8-0008SR-Ke
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:43:57 -0400
+ (envelope-from <david@redhat.com>) id 1iExrp-0001Fs-JF
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iExq7-0004Ql-BA
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:43:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41822)
+ (envelope-from <david@redhat.com>) id 1iExrn-000537-Ub
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:45:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39584)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iExq7-0004QP-38; Mon, 30 Sep 2019 11:43:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1iExrn-00052W-M7; Mon, 30 Sep 2019 11:45:39 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 43D298A1C8E;
- Mon, 30 Sep 2019 15:43:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 79D4A30034A4;
+ Mon, 30 Sep 2019 15:45:37 +0000 (UTC)
 Received: from [10.36.117.170] (ovpn-117-170.ams2.redhat.com [10.36.117.170])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A3515C219;
- Mon, 30 Sep 2019 15:43:53 +0000 (UTC)
-Subject: Re: [PATCH v4 01/18] target/s390x: Add ilen to unwind data
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9E5B85D6D0;
+ Mon, 30 Sep 2019 15:45:36 +0000 (UTC)
+Subject: Re: [PATCH v4 18/18] target/s390x: Remove ILEN_UNWIND
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190927193925.23567-1-richard.henderson@linaro.org>
- <20190927193925.23567-2-richard.henderson@linaro.org>
+ <20190927193925.23567-19-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -91,18 +91,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <e3fc97b7-8ba6-1869-3aba-35c60a171bb6@redhat.com>
-Date: Mon, 30 Sep 2019 17:43:52 +0200
+Message-ID: <447cffaf-baab-abde-2b63-61b9ae6f7575@redhat.com>
+Date: Mon, 30 Sep 2019 17:45:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190927193925.23567-2-richard.henderson@linaro.org>
+In-Reply-To: <20190927193925.23567-19-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Mon, 30 Sep 2019 15:43:54 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 30 Sep 2019 15:45:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -117,116 +117,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 27.09.19 21:39, Richard Henderson wrote:
-> From: Richard Henderson <rth@twiddle.net>
+> This setting is no longer used.
 > 
-> Use ILEN_UNWIND to signal that we have in fact that cpu_restore_state
-> will have been called by the time we arrive in do_program_interrupt.
-> 
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/s390x/cpu.h       |  4 +++-
->  target/s390x/interrupt.c |  5 ++++-
->  target/s390x/translate.c | 20 +++++++++++++++++---
->  3 files changed, 24 insertions(+), 5 deletions(-)
+>  target/s390x/cpu.h | 2 --
+>  1 file changed, 2 deletions(-)
 > 
 > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 1996f44baa..b7d408bf81 100644
+> index 686cbe41e0..fe1bf746f3 100644
 > --- a/target/s390x/cpu.h
 > +++ b/target/s390x/cpu.h
-> @@ -30,7 +30,7 @@
->  /* The z/Architecture has a strong memory model with some store-after-load re-ordering */
->  #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
->  
-> -#define TARGET_INSN_START_EXTRA_WORDS 1
-> +#define TARGET_INSN_START_EXTRA_WORDS 2
->  
->  #define MMU_MODE0_SUFFIX _primary
->  #define MMU_MODE1_SUFFIX _secondary
-> @@ -803,6 +803,8 @@ int cpu_s390x_signal_handler(int host_signum, void *pinfo, void *puc);
+> @@ -803,8 +803,6 @@ int cpu_s390x_signal_handler(int host_signum, void *pinfo, void *puc);
 >  void s390_crw_mchk(void);
 >  void s390_io_interrupt(uint16_t subchannel_id, uint16_t subchannel_nr,
 >                         uint32_t io_int_parm, uint32_t io_int_word);
-> +/* instruction length set by unwind info */
-> +#define ILEN_UNWIND                 0
->  /* automatically detect the instruction length */
->  #define ILEN_AUTO                   0xff
+> -/* instruction length set by unwind info */
+> -#define ILEN_UNWIND                 0
 >  #define RA_IGNORED                  0
-> diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-> index a841f7187d..30a9fb8852 100644
-> --- a/target/s390x/interrupt.c
-> +++ b/target/s390x/interrupt.c
-> @@ -28,7 +28,10 @@ void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
->  
->      cs->exception_index = EXCP_PGM;
->      env->int_pgm_code = code;
-> -    env->int_pgm_ilen = ilen;
-> +    /* If ILEN_UNWIND, int_pgm_ilen already has the correct value.  */
-> +    if (ilen != ILEN_UNWIND) {
-> +        env->int_pgm_ilen = ilen;
-> +    }
->  }
->  
->  void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index a3e43ff9ec..151dfa91fb 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -6309,6 +6309,9 @@ static DisasJumpType translate_one(CPUS390XState *env, DisasContext *s)
->      /* Search for the insn in the table.  */
->      insn = extract_insn(env, s, &f);
->  
-> +    /* Emit insn_start now that we know the ILEN.  */
-> +    tcg_gen_insn_start(s->base.pc_next, s->cc_op, s->ilen);
-> +
->      /* Not found means unimplemented/illegal opcode.  */
->      if (insn == NULL) {
->          qemu_log_mask(LOG_UNIMP, "unimplemented opcode 0x%02x%02x\n",
-> @@ -6463,9 +6466,6 @@ static void s390x_tr_tb_start(DisasContextBase *db, CPUState *cs)
->  
->  static void s390x_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
->  {
-> -    DisasContext *dc = container_of(dcbase, DisasContext, base);
-> -
-> -    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
->  }
->  
->  static bool s390x_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
-> @@ -6473,6 +6473,14 @@ static bool s390x_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cs,
->  {
->      DisasContext *dc = container_of(dcbase, DisasContext, base);
->  
-> +    /*
-> +     * Emit an insn_start to accompany the breakpoint exception.
-> +     * The ILEN value is a dummy, since this does not result in
-> +     * an s390x exception, but an internal qemu exception which
-> +     * brings us back to interact with the gdbstub.
-> +     */
-> +    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op, 2);
-> +
->      dc->base.is_jmp = DISAS_PC_STALE;
->      dc->do_debug = true;
->      /* The address covered by the breakpoint must be included in
-> @@ -6567,8 +6575,14 @@ void restore_state_to_opc(CPUS390XState *env, TranslationBlock *tb,
->                            target_ulong *data)
->  {
->      int cc_op = data[1];
-> +
->      env->psw.addr = data[0];
-> +
-> +    /* Update the CC opcode if it is not already up-to-date.  */
->      if ((cc_op != CC_OP_DYNAMIC) && (cc_op != CC_OP_STATIC)) {
->          env->cc_op = cc_op;
->      }
-> +
-> +    /* Record ILEN.  */
-> +    env->int_pgm_ilen = data[2];
->  }
+>  void s390_program_interrupt(CPUS390XState *env, uint32_t code, uintptr_t ra);
+>  /* service interrupts are floating therefore we must not pass an cpustate */
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
