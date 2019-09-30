@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5F9C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B1F7C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:39:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72526215EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:38:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72526215EA
+	by mail.kernel.org (Postfix) with ESMTPS id 90D062086A
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:39:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90D062086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEvst-0007sY-Hv
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:38:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45163)
+	id 1iEvtr-0000L0-GD
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:39:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45728)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iEvpS-0004Bs-Cq
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:35:07 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iEvsQ-0007ZL-UJ
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:38:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iEvpR-00045o-4c
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:35:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57122)
+ (envelope-from <mreitz@redhat.com>) id 1iEvsP-0005LD-Pt
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:38:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49730)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iEvpN-00043M-3l; Mon, 30 Sep 2019 09:35:01 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iEvsM-0005KL-HR; Mon, 30 Sep 2019 09:38:06 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 442598980E2;
- Mon, 30 Sep 2019 13:34:59 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 56395307D84B;
+ Mon, 30 Sep 2019 13:38:05 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-240.brq.redhat.com
  [10.40.204.240])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 181F3261B9;
- Mon, 30 Sep 2019 13:34:57 +0000 (UTC)
-Subject: Re: [PATCH 14/18] iotests: Make 110 work with data_file
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2827B60CD0;
+ Mon, 30 Sep 2019 13:38:03 +0000 (UTC)
+Subject: Re: [PATCH 15/18] iotests: Make 137 work with data_file
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-block@nongnu.org
 References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-15-mreitz@redhat.com>
- <037a6ded4b29435dec32fe71f12613315915aeca.camel@redhat.com>
+ <20190927094242.11152-16-mreitz@redhat.com>
+ <7e9c44bc0ca4b195939b0723db11eebc3fe11e2e.camel@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <80d3ceb9-37f6-9b20-ee04-2376ed66e0f8@redhat.com>
-Date: Mon, 30 Sep 2019 15:34:56 +0200
+Message-ID: <5dff56b6-dca2-a28a-4a6a-2a6638300ff3@redhat.com>
+Date: Mon, 30 Sep 2019 15:38:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <037a6ded4b29435dec32fe71f12613315915aeca.camel@redhat.com>
+In-Reply-To: <7e9c44bc0ca4b195939b0723db11eebc3fe11e2e.camel@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="7ACBVYQxUrpWtdrhz64NBT905XVJWV3O2"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 30 Sep 2019 13:34:59 +0000 (UTC)
+ boundary="iQMngPyY8udhRH3HIHfzebjt3Z3W4U1mk"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Mon, 30 Sep 2019 13:38:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -104,133 +104,100 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7ACBVYQxUrpWtdrhz64NBT905XVJWV3O2
-Content-Type: multipart/mixed; boundary="rTQHA6QlfB10SwfSQxpN7II9EgizLNQMV"
+--iQMngPyY8udhRH3HIHfzebjt3Z3W4U1mk
+Content-Type: multipart/mixed; boundary="Xgpyx83N5HVhqGY26Xfm1EUNB7GCcE1xV"
 
---rTQHA6QlfB10SwfSQxpN7II9EgizLNQMV
+--Xgpyx83N5HVhqGY26Xfm1EUNB7GCcE1xV
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 29.09.19 18:34, Maxim Levitsky wrote:
+On 29.09.19 18:38, Maxim Levitsky wrote:
 > On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
->> The only difference is that the json:{} filename of the image looks
->> different.  We actually do not care about that filename in this test, =
-we
->> are only interested in (1) that there is a json:{} filename, and (2)
->> whether the backing filename can be constructed.
+>> When using an external data file, there are no refcounts for data
+>> clusters.  We thus have to adjust the corruption test in this patch to=
+
+>> not be based around a data cluster allocation, but the L2 table
+>> allocation (L2 tables are still refcounted with external data files).
 >>
->> So just filter out the json:{} data, thus making this test pass both
->> with and without data_file.
+>> Doing so means this test works both with and without external data
+>> files.
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>  tests/qemu-iotests/110     | 7 +++++--
->>  tests/qemu-iotests/110.out | 4 ++--
->>  2 files changed, 7 insertions(+), 4 deletions(-)
+>>  tests/qemu-iotests/137     | 10 ++++++----
+>>  tests/qemu-iotests/137.out |  4 +---
+>>  2 files changed, 7 insertions(+), 7 deletions(-)
 >>
->> diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
->> index f78df0e6e1..34459dcd60 100755
->> --- a/tests/qemu-iotests/110
->> +++ b/tests/qemu-iotests/110
->> @@ -67,6 +67,7 @@ echo
->>  # Across blkdebug without a config file, you cannot reconstruct filen=
-ames, so
->>  # qemu is incapable of knowing the directory of the top image from th=
-e filename
->>  # alone. However, using bdrv_dirname(), it should still work.
->> +# (Filter out the json:{} filename so this test works with external d=
-ata files)
->>  TEST_IMG=3D"json:{
->>      'driver': '$IMGFMT',
->>      'file': {
->> @@ -82,7 +83,8 @@ TEST_IMG=3D"json:{
->>              }
->>          ]
->>      }
->> -}" _img_info | _filter_img_info | grep -v 'backing file format'
->> +}" _img_info | _filter_img_info | grep -v 'backing file format' \
->> +    | sed -e 's#^image: json:.*#image: json:{ /* filtered */ }#'
+>> diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+>> index 6cf2997577..dd3484205e 100755
+>> --- a/tests/qemu-iotests/137
+>> +++ b/tests/qemu-iotests/137
+>> @@ -138,14 +138,16 @@ $QEMU_IO \
+>>      "$TEST_IMG" 2>&1 | _filter_qemu_io
 >> =20
->>  echo
->>  echo '=3D=3D=3D Backing name is always relative to the backed image =3D=
-=3D=3D'
->> @@ -114,7 +116,8 @@ TEST_IMG=3D"json:{
->>              }
->>          ]
->>      }
->> -}" _img_info | _filter_img_info | grep -v 'backing file format'
->> +}" _img_info | _filter_img_info | grep -v 'backing file format' \
->> +    | sed -e 's#^image: json:.*#image: json:{ /* filtered */ }#'
+>>  # The dirty bit must not be set
+>> -$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features=
+
+>> +# (Filter the external data file bit)
+>> +$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features=
+ \
+>> +    | sed -e 's/0x4/0x0/'
+> Maybe it is better to filter all the feature bits, but the dirty bit,
+> since only it is needed here, so that when we start running tests with
+> more features, we won't need to do this again?
+
+I=E2=80=99d hate a filter s/[02468ace]$/no dirty bit/ though.
+
 >> =20
->> =20
->>  # success, all done
->> diff --git a/tests/qemu-iotests/110.out b/tests/qemu-iotests/110.out
->> index f60b26390e..f835553a99 100644
->> --- a/tests/qemu-iotests/110.out
->> +++ b/tests/qemu-iotests/110.out
->> @@ -11,7 +11,7 @@ backing file: t.IMGFMT.base (actual path: TEST_DIR/t=
-=2EIMGFMT.base)
->> =20
->>  =3D=3D=3D Non-reconstructable filename =3D=3D=3D
->> =20
->> -image: json:{"driver": "IMGFMT", "file": {"set-state.0.event": "read_=
-aio", "image": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "driv=
-er": "blkdebug", "set-state.0.new_state": 42}}
->> +image: json:{ /* filtered */ }
->>  file format: IMGFMT
->>  virtual size: 64 MiB (67108864 bytes)
->>  backing file: t.IMGFMT.base (actual path: TEST_DIR/t.IMGFMT.base)
->> @@ -22,7 +22,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D=
-67108864 backing_file=3Dt.IMGFMT.b
->> =20
->>  =3D=3D=3D Nodes without a common directory =3D=3D=3D
->> =20
->> -image: json:{"driver": "IMGFMT", "file": {"children": [{"driver": "fi=
-le", "filename": "TEST_DIR/t.IMGFMT"}, {"driver": "file", "filename": "TE=
-ST_DIR/t.IMGFMT.copy"}], "driver": "quorum", "vote-
->> threshold": 1}}
->> +image: json:{ /* filtered */ }
->>  file format: IMGFMT
->>  virtual size: 64 MiB (67108864 bytes)
->>  backing file: t.IMGFMT.base (cannot determine actual path)
+>>  # Similarly we can test whether corruption detection has been enabled=
+:
+>> -# Create L1/L2, overwrite first entry in refcount block, allocate som=
+ething.
+>> +# Create L1, overwrite refcounts, force allocation of L2 by writing
+>> +# data.
+>>  # Disabling the checks should fail, so the corruption must be detecte=
+d.
+>>  _make_test_img 64M
+>> -$QEMU_IO -c "write 0 64k" "$TEST_IMG" | _filter_qemu_io
+>> -poke_file "$TEST_IMG" "$((0x20000))" "\x00\x00"
+>> +poke_file "$TEST_IMG" "$((0x20000))" "\x00\x00\x00\x00\x00\x00\x00\x0=
+0"
 >=20
-> Again, maybe put that into the common.filter, so new tests won't need t=
-o copy&paste this?
+> I am wondering if there is any better way to do this (regardless of thi=
+s patch),
+> Basically the above code pokes into the 3rd cluster on the disk I *thin=
+k*, and I don't
+> understand why it has to contain refcounts. Hmm...
+> First cluster I can guess will have the header, 2nd cluster probably L1=
+ table, and 3rd, refcounts?
+> If so, the test should specify that it needs 64K clusters, because the =
+day will come when
+> we will need to test this as well, but I guess in a separate patch,
 
-Good idea.
-
-> Also maybe remove the image name completely from output, thus not needi=
-ng the more complex regex?
-
-I=E2=80=99d prefer to still see that there is a json:{} filename instead =
-of a
-plain one.  (This is important in this test because for plain filenames,
-it=E2=80=99s generally easy to reconstruct the backing file path; it=E2=80=
-=99s only
-difficult for json:{} filenames.)
+When that day comes, a whole lot of other stuff will break, too.
 
 Max
 
 
---rTQHA6QlfB10SwfSQxpN7II9EgizLNQMV--
+--Xgpyx83N5HVhqGY26Xfm1EUNB7GCcE1xV--
 
---7ACBVYQxUrpWtdrhz64NBT905XVJWV3O2
+--iQMngPyY8udhRH3HIHfzebjt3Z3W4U1mk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2SBIAACgkQ9AfbAGHV
-z0C7ugf/UNsGLgpLyOjuxuoDi+s07tsX3TMTGKOFh4C8V43UZDd0rkIvSkv1c5Js
-CT/DneCFA4x/QKDq9yvm4X7n52+qph7jVoNP2S1duSRCcxfocnDu6qSwRq/9x7wQ
-8zdC1jjESCuMp7cuotLEZ6w3yIXI6lv0Jhrw5qFXe9AIoRKlr1obGcSqGh1QkNP4
-2Kp1PSxOBmxCAX8MTbhwh5CPpUfyZ0CA7PJSYjI+c/jbngcdyyK/wenH1P0UtlRL
-vQ4z9JQEd8N+cxLxnPlRmyZzPEeB7vSV3JYkC7pBAKMChPx5fDEYn+c1H5vRzXyX
-TCIkEMDs7T2Ah6k7ntxY9Fp/KCvy5g==
-=SXJL
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2SBToACgkQ9AfbAGHV
+z0CiWAgAn5ydVkcnvdKEKeF3I3r/FzfOXR0MOwlevcaRNNjCZVgZ4fKoK+n2I9bv
+o6TA/rbMr39FPRcUjbYc8okP1XhTGxwRC59Z/K4G90rrGS+5KmJ7xulCTR/sLtkz
+QazsKKa4tiEBqifnf5wlOp42Sn+Uo9q7LEUsgUp37B65rinz3XHP0myH49YYpFLx
+0+uqPlQyVlAhai3dE1CaOMkbDKqI3Ca3vAO+7VER7Px+OscHE6+zTyQa3gNWT0/z
++P1bbWszgLLsUoWm+4kLSkSQqrKyzrWzY2cHOos1t+sKkN/h0yMu+yIIZ8thnM0U
+vD+g1nu0wqYhbNPNS3VwwT15XDDD0Q==
+=aTE4
 -----END PGP SIGNATURE-----
 
---7ACBVYQxUrpWtdrhz64NBT905XVJWV3O2--
+--iQMngPyY8udhRH3HIHfzebjt3Z3W4U1mk--
 
