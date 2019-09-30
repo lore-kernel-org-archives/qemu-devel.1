@@ -2,108 +2,77 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59161C4360C
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B9C9C388F3
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C1BC218DE
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:52:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1BC218DE
+	by mail.kernel.org (Postfix) with ESMTPS id E791021855
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 07:55:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E791021855
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEqTp-0002K7-CJ
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 03:52:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46688)
+	id 1iEqWx-0003rJ-2E
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 03:55:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47114)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iEqSd-0001ry-9T
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:51:12 -0400
+ (envelope-from <slp@redhat.com>) id 1iEqW7-0003KV-ON
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iEqSc-0005EV-BH
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:51:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53411)
+ (envelope-from <slp@redhat.com>) id 1iEqW6-0006fH-RU
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:54:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52796)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iEqSc-0005E3-38; Mon, 30 Sep 2019 03:51:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iEqW6-0006f3-M0
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 03:54:46 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0F759C049E23;
- Mon, 30 Sep 2019 07:51:08 +0000 (UTC)
-Received: from [10.36.117.170] (ovpn-117-170.ams2.redhat.com [10.36.117.170])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 075DD600CC;
- Mon, 30 Sep 2019 07:51:05 +0000 (UTC)
-Subject: Re: [PATCH] configure: Remove s390 (31-bit mode) from the list of
- supported CPUs
-To: Thomas Huth <thuth@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-References: <20190928190334.6897-1-thuth@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <24cce055-aeda-2328-47da-dc8a826bad45@redhat.com>
-Date: Mon, 30 Sep 2019 09:51:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id C8E8E85538
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 07:54:45 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id t11so4140653wrq.19
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 00:54:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:user-agent:from:to:cc:subject:date:message-id
+ :mime-version;
+ bh=GwBewE7NUtEdrhA2330PbdenQD0mDRvOZP38FRTgXFM=;
+ b=iyURfFyjvC7U64/O6NeQeQXq4urZP7tSRA+l2hLNJd4UMZUo2rKZXWRmj9hphtvkM8
+ IucMgXFByBxevYqWG8/aE0vxFr/5oNpNipu5Z1p4p8Q4L4vWJ61HUO/409tEKJljaVqd
+ 7asp9IYn1JdsZZ5bcWYmMbAu7XGHbpH/hO7Yp6lSMQWuSJDaIoNlM4OGWQsUR0ICodPC
+ vCmreEUy8d2Y7LIFWdkRv2UUsnsAqmIaQz9hCNBulGZyiF7pBjHimDwobd40K55uCQJK
+ 2cg9NFdQ6KhHvJvWbx/EaJp3UZQARMyr3SijDKykmmTr8K1DuYKIeINw/XuYIA9gxonm
+ 8DOg==
+X-Gm-Message-State: APjAAAWv0RJcpDkgZSW3RoYQtHDIo6Imm/KeMcCMTlp1DVf4+s9RuAET
+ A/gR9QTX/mxg1RVMt1qmGUmj22glSKhYsNDlM85czpS7ZD2ATqHKAAq0oZUsl4tPv5fqraPxGHV
+ qXU9gitWpz/6An3I=
+X-Received: by 2002:adf:f008:: with SMTP id j8mr11960642wro.75.1569830084619; 
+ Mon, 30 Sep 2019 00:54:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw5lK0JEwUGiu5E4lIZlY/tOcOvNsLqrcVXlIg2jQJiSSNpEDLkTEYwtNxI1CTaKHSyu18PQw==
+X-Received: by 2002:adf:f008:: with SMTP id j8mr11960622wro.75.1569830084452; 
+ Mon, 30 Sep 2019 00:54:44 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id y186sm39017515wmb.41.2019.09.30.00.54.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 30 Sep 2019 00:54:43 -0700 (PDT)
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: mihajlov@linux.vnet.ibm.com
+Subject: Arch info lost in "info cpus"
+Date: Mon, 30 Sep 2019 09:54:41 +0200
+Message-ID: <87blv2i5ha.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190928190334.6897-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 30 Sep 2019 07:51:08 +0000 (UTC)
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -118,46 +87,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: imammedo@redhat.com, tao3.xu@intel.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28.09.19 21:03, Thomas Huth wrote:
-> On IBM Z, KVM in the kernel is only implemented for 64-bit mode, and
-> with regards to TCG, we also only support 64-bit host CPUs (see the
-> check at the beginning of tcg/s390/tcg-target.inc.c), so we should
-> remove s390 (without "x", i.e. the old 31-bit mode CPUs) from the
-> list of supported CPUs.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index 397bb476e1..a4488c6705 100755
-> --- a/configure
-> +++ b/configure
-> @@ -728,7 +728,7 @@ ARCH=
->  # Normalise host CPU name and set ARCH.
->  # Note that this case should only have supported host CPUs, not guests.
->  case "$cpu" in
-> -  ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
-> +  ppc|ppc64|s390x|sparc64|x32|riscv32|riscv64)
->      supported_cpu="yes"
->    ;;
->    ppc64le)
-> 
+--=-=-=
+Content-Type: text/plain
 
-Not sure if that ever worked
+Hi,
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Commit 137b5cb6ab565cb3781d5337591e155932b4230e (hmp: change
+hmp_info_cpus to use query-cpus-fast) updated the "info cpus" commit to
+make it more lightweight, but also removed the ability to get the
+architecture specific status of each vCPU.
 
--- 
+This information was really useful to diagnose certain Guest issues,
+without the need of using GDB, which is more intrusive and requires
+enabling it in advance.
+
+Is there an alternative way of getting something equivalent to what
+"info cpus" provided previously (in 2.10)?
 
 Thanks,
+Sergio.
 
-David / dhildenb
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2RtMEACgkQ9GknjS8M
+AjXJcBAAl5vlAi9N4f8zSiHtRst4vyaBbIf3BL1waeBKmec3bP5brTvGEyvo4Zo9
+xZ285lw/unr/imsjUtsFJ7OvnzzCjWKgq+jQs0MUFhMIF4JeHDxlDQZ+swUUAM/o
+sMKwzeMy7JQyKGk1eBEF6SpYHVYVEpyVZuk42ikzC7NhPy1l6hHvu78QAQomw6xK
+G6FM+u9OTEgCTdPNKbLyyVD+2VBtAkfdKYQVqu6553jCWe2z6WQAq36+rfwPC+PI
+q2ttcAoNwwTHrCrPHGy/WP/Mldzs5cQeDEARyi2t+cNGlO5T/0EOe47t7CChOawj
+AAUEwWE25nTk9E2un33GTJrofgC7DQFu9ZXZdzaIwSA5NpJStK80qWk/YkE44evu
+BiGBfhz20qkbyaeu4dOJCFCzlGHevOZpSuNi2XC4zN0zTWekEipaFLhY662HS5Ft
+ipaX8pjc0RDZLgq251dhCjHdLQMyNiq+v5h9A+wYWJOqjDx3eveNpsMDlQ8oSSBB
+LLAVh/ISwNg9OACUTmCVhfXRmTxf9kCqulCy3NqVlrgCtZtSmCgZxHh8NcXH3Lat
+22M3DVFqQMcEJlfWQ8B7OkiCxsti8y5NsbwyGSmiG+4tZ2GEOZ02/5UqptjhXPYi
+R8rFJCkLrsA3qDtLxKJubdGI5wUBpQVtyW0WP02r10r+YN8QbIc=
+=ladd
+-----END PGP SIGNATURE-----
+--=-=-=--
 
