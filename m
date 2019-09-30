@@ -2,91 +2,75 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D56C32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC008C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:13:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DFF120842
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:08:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DFF120842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5D3520842
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 13:13:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhxA2WYr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5D3520842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iEvQ1-0007DX-HZ
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:08:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40522)
+	id 1iEvUw-00010i-Om
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 09:13:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41114)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iEvP7-0006hZ-Cb
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:07:54 -0400
+ (envelope-from <doug16k@gmail.com>) id 1iEvUD-0000ZC-Mz
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:13:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iEvP6-0005CQ-Ak
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:07:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49798)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iEvP4-0005B0-1y; Mon, 30 Sep 2019 09:07:50 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4BFC810DCC87;
- Mon, 30 Sep 2019 13:07:49 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-240.brq.redhat.com
- [10.40.204.240])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CF0D60C63;
- Mon, 30 Sep 2019 13:07:48 +0000 (UTC)
-Subject: Re: [PATCH 13/18] iotests: Make 091 work with data_file
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-block@nongnu.org
-References: <20190927094242.11152-1-mreitz@redhat.com>
- <20190927094242.11152-14-mreitz@redhat.com>
- <d49e9c30a858d1c9f1d340c38cbfc6bfb4827f05.camel@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a7526ae3-5cd6-d5ed-3c5c-8bea8212a2b9@redhat.com>
-Date: Mon, 30 Sep 2019 15:07:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <doug16k@gmail.com>) id 1iEvUC-0007vC-7i
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:13:09 -0400
+Received: from mail-io1-xd2b.google.com ([2607:f8b0:4864:20::d2b]:38928)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <doug16k@gmail.com>) id 1iEvUC-0007uN-0Y
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 09:13:08 -0400
+Received: by mail-io1-xd2b.google.com with SMTP id a1so38133128ioc.6
+ for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 06:13:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=enRDTM5wM41Khon371+1GhlCBgGbJgd6B7P51I0+lV4=;
+ b=dhxA2WYrQyND3xwUFDk9285yg4q/dgzCRx1uRdyAgwn2Ki2oEBoGRZdxXhE33BcdD2
+ U7fMFNzaM40ep++xp9y2KKseOOUmsnjptLyH0M45okjN2iicCfy0ajinvd2b0rtSpoUY
+ 9OJoyEcgjgwFqvEtiSiHKLQYJixd+z09tissZYbsJtiKalJ8aKdweBO4uOprgG8h6vlh
+ AFNUgim2lvwHKscbrQTdCXJsKPqEwH3DwfonoEn6IlZUZki1W3fwwgEFcvZRrx/ZfKoL
+ rrnluIJta8wj4vKAhEKsKa0If9W70WhQVszheocf+XR9fHvCiV8j2Q85P90VKAGxqsBL
+ shgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=enRDTM5wM41Khon371+1GhlCBgGbJgd6B7P51I0+lV4=;
+ b=JfkYauOKNJIQKuq4nUtkShf8Gd10SaWEe493fkV2i5VEWKWetsd6999Dudglna9MrC
+ Q5AQe7lPwKePR409VmjldzC/Dwgm5S+BAcuNa83yoQ9SzZg5tMy1Wlabi7C05ZJvz3Db
+ iUwHqsi0w1/SA852amspgjYEOKiE9eOvbs9DDt+sgNa6s5w6G8/iNXFEcUpylGnH52v9
+ hcpvXh7fgXQHzg9o7dsSAtqIyC4Mbmrv8Ln0wRRxVwywADcMZ+aFa1craymKj+SF6WgI
+ GBvOvHRPz2yQfYZXpvWD6ILOOYIQxRGJf+8FTPvbiBxyvgYjxlDql3pYmAyM7ub/7IKe
+ +Ndg==
+X-Gm-Message-State: APjAAAUar4MC2xiublouXD163aknFzxIc9657snq4M/uyt7lZ7E6wQI3
+ Zsf39YRCk3feyne4pqrA+Lhqo5xt+YalZkvrhTJWi5K4uTY=
+X-Google-Smtp-Source: APXvYqw75BIPodWSFPrImp6L17KukK2nHzX4dEXolvWB08hrQkrpcnRVNBt1hv5d1kiqdq/kDpKgHr7rnWdBy+IcMjM=
+X-Received: by 2002:a02:55c4:: with SMTP id e187mr19753719jab.32.1569849186599; 
+ Mon, 30 Sep 2019 06:13:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d49e9c30a858d1c9f1d340c38cbfc6bfb4827f05.camel@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ERYw58UGXShw66gUgWgSBeTyDRQ5PxWTM"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 30 Sep 2019 13:07:49 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+From: Doug Gale <doug16k@gmail.com>
+Date: Mon, 30 Sep 2019 09:12:55 -0400
+Message-ID: <CAEfK_46vgiqzy30gK41fZ7uz5fTe5ktKWLu345VJaw9PJaw3xw@mail.gmail.com>
+Subject: Lockup with --accel tcg,thread=single
+To: qemu-devel <qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary="0000000000001e45800593c4ff1b"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d2b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,74 +82,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ERYw58UGXShw66gUgWgSBeTyDRQ5PxWTM
-Content-Type: multipart/mixed; boundary="FxywA7omfIbxqA3klJOy1dJhGAHUjgpEM"
+--0000000000001e45800593c4ff1b
+Content-Type: text/plain; charset="UTF-8"
 
---FxywA7omfIbxqA3klJOy1dJhGAHUjgpEM
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+I found a lockup in single threaded TCG, with OVMF bios, 16 CPUs.
+
+qemu-system-x86_64 --accel tcg,thread=single -smp cpus=16 -bios
+/usr/share/ovmf/OVMF.fd
+
+Using Ubuntu 18.04 LTS, default gnome desktop. There is no guest OS, there
+is no hard drive, just the OVMF firmware locks it up. (I narrowed it down
+to this from a much larger repro)
+
+Let that run for about 10 seconds or so, then attempt to Ctrl-C in the
+terminal that launched qemu. You should see the hung program thing (wait or
+force quit) appear on the qemu window, and the terminal just prints ^C
+without interrupting qemu. DO NOT click force quit or wait. Use killall -9
+qemu-system-x86_64 to kill it if you must, gdb kill is also okay. If you
+force quit you will likely freeze the entire gnome desktop. This is what
+kmsg reports:
+https://gist.githubusercontent.com/doug65536/810e0471c11008c97edb4aa0d86ddd66/raw/40038a355542f0edb1f14a7c7fb7c2db60da0025/end%2520of%2520syslog%2520after%2520desktop%2520lockup,
+this is what syslog reports:
+https://gist.githubusercontent.com/doug65536/810e0471c11008c97edb4aa0d86ddd66/raw/40038a355542f0edb1f14a7c7fb7c2db60da0025/the%2520end%2520of%2520dmesg%2520after%2520desktop%2520lockup.
+Probably bugs in gnome but just warning about locking up your machines when
+reproducing.
+
+Peter Maydell helped me bisect it in IRC.
+ Works fine at commit 1e8a98b53867f61
+ Fails at commit 9458a9a1df1a4c7
+
+MTTCG works fine all the way up to master.
+
+Configure command line:
+
+../qemu/configure --target-list=x86_64-softmmu,i386-softmmu
+--audio-drv-list=pa --enable-libusb --disable-libssh --enable-virglrenderer
+--enable-opengl --enable-debug
+
+The issue occurs without --enable-debug. I didn't strip the configure down
+though, it may not need all of those configure options exactly.
+
+OVMF from ubuntu package manager, package named ovmf, exact version
+is 0~20180205.c0d9813c-2ubuntu0.1
+
+Stack trace at lockup at
+https://gist.githubusercontent.com/doug65536/810e0471c11008c97edb4aa0d86ddd66/raw/40038a355542f0edb1f14a7c7fb7c2db60da0025/backtrace%2520all
+
+--0000000000001e45800593c4ff1b
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 29.09.19 18:34, Maxim Levitsky wrote:
-> On Fri, 2019-09-27 at 11:42 +0200, Max Reitz wrote:
->> The image end offset as reported by qemu-img check is different when
->> using an external data file; we do not care about its value here, so w=
-e
->> can just filter it.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/091     | 3 ++-
->>  tests/qemu-iotests/091.out | 1 -
->>  2 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
->> index f4b44659ae..7536ca4607 100755
->> --- a/tests/qemu-iotests/091
->> +++ b/tests/qemu-iotests/091
->> @@ -101,7 +101,8 @@ echo "Check image pattern"
->>  ${QEMU_IO} -c "read -P 0x22 0 4M" "${TEST_IMG}" | _filter_testdir | _=
-filter_qemu_io
->> =20
->>  echo "Running 'qemu-img check -r all \$TEST_IMG'"
->> -"${QEMU_IMG}" check -r all "${TEST_IMG}" 2>&1 | _filter_testdir | _fi=
-lter_qemu
->> +"${QEMU_IMG}" check -r all "${TEST_IMG}" 2>&1 | _filter_testdir | _fi=
-lter_qemu \
->> +    | sed '/Image end offset/d'
->=20
-> Maybe use _filter_qemu_img_check instead? I see it actually filters thi=
-s already.
+<div dir=3D"ltr"><div class=3D"gmail_default" style=3D"font-family:times ne=
+w roman,serif">I found a lockup in single threaded TCG, with OVMF bios, 16 =
+CPUs.</div><div class=3D"gmail_default" style=3D"font-family:times new roma=
+n,serif"><br></div><div class=3D"gmail_default" style=3D""><font face=3D"mo=
+nospace">qemu-system-x86_64 --accel tcg,thread=3Dsingle -smp cpus=3D16 -bio=
+s /usr/share/ovmf/OVMF.fd<br></font></div><div class=3D"gmail_default" styl=
+e=3D"font-family:times new roman,serif"><br></div><div class=3D"gmail_defau=
+lt" style=3D"font-family:times new roman,serif">Using Ubuntu 18.04 LTS, def=
+ault gnome desktop. There is no guest OS, there is no hard drive, just the =
+OVMF firmware locks it up. (I narrowed it down to this from a much larger r=
+epro)</div><div class=3D"gmail_default" style=3D"font-family:times new roma=
+n,serif"><br></div><div class=3D"gmail_default" style=3D"font-family:times =
+new roman,serif">Let that run for about 10 seconds or so, then attempt to C=
+trl-C in the terminal that launched qemu. You should see the hung program t=
+hing (wait or force quit) appear on the qemu window, and the terminal just =
+prints ^C without interrupting qemu. DO NOT click force quit or wait. Use k=
+illall -9 qemu-system-x86_64 to kill it if you must, gdb kill is also okay.=
+ If you force quit you will likely freeze the entire gnome desktop. This is=
+ what kmsg reports:=C2=A0<a href=3D"https://gist.githubusercontent.com/doug=
+65536/810e0471c11008c97edb4aa0d86ddd66/raw/40038a355542f0edb1f14a7c7fb7c2db=
+60da0025/end%2520of%2520syslog%2520after%2520desktop%2520lockup" style=3D"f=
+ont-family:Arial,Helvetica,sans-serif">https://gist.githubusercontent.com/d=
+oug65536/810e0471c11008c97edb4aa0d86ddd66/raw/40038a355542f0edb1f14a7c7fb7c=
+2db60da0025/end%2520of%2520syslog%2520after%2520desktop%2520lockup</a>, thi=
+s is what syslog reports:=C2=A0<a href=3D"https://gist.githubusercontent.co=
+m/doug65536/810e0471c11008c97edb4aa0d86ddd66/raw/40038a355542f0edb1f14a7c7f=
+b7c2db60da0025/the%2520end%2520of%2520dmesg%2520after%2520desktop%2520locku=
+p" style=3D"font-family:Arial,Helvetica,sans-serif">https://gist.githubuser=
+content.com/doug65536/810e0471c11008c97edb4aa0d86ddd66/raw/40038a355542f0ed=
+b1f14a7c7fb7c2db60da0025/the%2520end%2520of%2520dmesg%2520after%2520desktop=
+%2520lockup</a>. Probably bugs in gnome but just warning about locking up y=
+our machines when reproducing.</div><div class=3D"gmail_default" style=3D"f=
+ont-family:times new roman,serif"><br></div><div class=3D"gmail_default" st=
+yle=3D"font-family:times new roman,serif">Peter Maydell helped me bisect it=
+ in IRC.=C2=A0</div><div class=3D"gmail_default" style=3D"font-family:times=
+ new roman,serif">=C2=A0Works fine at commit=C2=A01e8a98b53867f61</div><div=
+ class=3D"gmail_default" style=3D"font-family:times new roman,serif">=C2=A0=
+Fails at commit=C2=A09458a9a1df1a4c7</div><div class=3D"gmail_default" styl=
+e=3D"font-family:times new roman,serif"><br></div><div class=3D"gmail_defau=
+lt" style=3D"font-family:times new roman,serif">MTTCG works fine all the wa=
+y up to master.</div><div class=3D"gmail_default" style=3D"font-family:time=
+s new roman,serif"><br></div><div class=3D"gmail_default" style=3D"font-fam=
+ily:times new roman,serif">Configure command line:</div><div class=3D"gmail=
+_default" style=3D"font-family:times new roman,serif"><br></div><div class=
+=3D"gmail_default" style=3D""><font face=3D"monospace">../qemu/configure --=
+target-list=3Dx86_64-softmmu,i386-softmmu --audio-drv-list=3Dpa --enable-li=
+busb --disable-libssh --enable-virglrenderer --enable-opengl --enable-debug=
+</font><br></div><div class=3D"gmail_default" style=3D"font-family:times ne=
+w roman,serif"><br></div><div class=3D"gmail_default" style=3D"font-family:=
+times new roman,serif">The issue occurs without --enable-debug. I didn&#39;=
+t strip the configure down though, it may not need all of those configure o=
+ptions exactly.</div><div class=3D"gmail_default" style=3D"font-family:time=
+s new roman,serif"><br></div><div class=3D"gmail_default" style=3D"font-fam=
+ily:times new roman,serif">OVMF from ubuntu package manager, package named =
+ovmf, exact version is=C2=A00~20180205.c0d9813c-2ubuntu0.1</div><div class=
+=3D"gmail_default" style=3D"font-family:times new roman,serif"><br></div><d=
+iv class=3D"gmail_default" style=3D"font-family:times new roman,serif">Stac=
+k trace at lockup at=C2=A0<a href=3D"https://gist.githubusercontent.com/dou=
+g65536/810e0471c11008c97edb4aa0d86ddd66/raw/40038a355542f0edb1f14a7c7fb7c2d=
+b60da0025/backtrace%2520all" style=3D"font-family:Arial,Helvetica,sans-seri=
+f">https://gist.githubusercontent.com/doug65536/810e0471c11008c97edb4aa0d86=
+ddd66/raw/40038a355542f0edb1f14a7c7fb7c2db60da0025/backtrace%2520all</a></d=
+iv><div class=3D"gmail_default" style=3D"font-family:times new roman,serif"=
+><br></div><div class=3D"gmail_default" style=3D"font-family:times new roma=
+n,serif"><br></div></div>
 
-Uh, nice.  Will do, thanks.
-
-Max
-
-
---FxywA7omfIbxqA3klJOy1dJhGAHUjgpEM--
-
---ERYw58UGXShw66gUgWgSBeTyDRQ5PxWTM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2R/iIACgkQ9AfbAGHV
-z0CYUwf/UtMPtJlsHxrOXSPa4H40RNtHZM66XvzLpOmppXUR1sfQAmI4q8dQYiJz
-aCv1Ci9Cnoev35F+ltLMl7V3Svbk2TBjGqnINs4bWSSWarfIwhNHYLHLVk7gzUVk
-vg8ieQAdrEwAyp+oltMkkUsxPVIvMt51TuHGrcPSn/NIICo8DTXuddmBBPWlx46N
-UlYykfdRxqEOIBlfyIkSwk/VCeP0RTVrhCM6u6zyEYWxIB7D+tbmGWy6P9ID0TSf
-fPwM47nmiv3UIwsc4K4a3KhbvsCyzaaGOz2UgMpFQ5a9qF8yC5chxiO6VDN860Pa
-Y9rli76bc5QBRlps0kOrisjrZIWCAg==
-=vxyu
------END PGP SIGNATURE-----
-
---ERYw58UGXShw66gUgWgSBeTyDRQ5PxWTM--
+--0000000000001e45800593c4ff1b--
 
