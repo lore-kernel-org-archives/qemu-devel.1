@@ -2,78 +2,115 @@ Return-Path: <SRS0=LaQQ=XZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB1EC32792
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07329C32792
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49ADF206BB
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:39:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HofOwv+d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49ADF206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D0996206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Sep 2019 15:45:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0996206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iExlr-0005dx-Sq
-	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:39:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34882)
+	id 1iExrP-0000OT-KD
+	for qemu-devel@archiver.kernel.org; Mon, 30 Sep 2019 11:45:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iExkA-0004cj-Jr
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:37:47 -0400
+ (envelope-from <david@redhat.com>) id 1iExoc-0007jy-IQ
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:42:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iExk8-0001xs-UR
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:37:46 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35739)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iExk5-0001vv-Rj
- for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:37:43 -0400
-Received: by mail-ot1-x344.google.com with SMTP id z6so8721450otb.2
- for <qemu-devel@nongnu.org>; Mon, 30 Sep 2019 08:37:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=M49gzAp64BIWlMk0OyRdsJYVwUw9fk4RCVY5HqH4iZM=;
- b=HofOwv+djGt6XlQOgDxuw2lp18vznZPsaVLiCJM4V5keqiXzI3roJIJqQ69FGZ5nQ1
- DuuDgNKWNaL6c+/7JD3jdQUBmfhFEkh4zgrntU+83m3ccfaBr0FyHm+ZXb4nEerI2UrR
- XgtyCq7XPP3ry3+66744yy3uVwbF5gkMqf6UVfMs37/7qrR1r/Y1GV3vmGdEJyQifycC
- wbN3aQ2s1NcmuRYaIyEmpQvKAB06SmGA+jTL40QR3JCF5QiLPf/JPHEHqFo15nWvYgpI
- dvViH+R0TYE49GjG/2lBBSFAdnEs2WiUUSZvE8BYTuaw2FDQftTXriEHxlsO3LTN1KwM
- 8PVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=M49gzAp64BIWlMk0OyRdsJYVwUw9fk4RCVY5HqH4iZM=;
- b=SsYmkZ4cFNjTSdnA41Jnf+lKJpCAAfJZs19FyGAElZF+YSa+i6kuIeolgl/qSDmDjt
- H0qUcVa3ptZWr9sMToqO9IOx36eFHx9pAtpBx5cqxl3GFBZ9zLi5iUu84p8m5fF9Z1Li
- kHZmVLHY8hx/p7L1X4UDp7cCJoIEBO3vivmaRmlVt/54vKGl3NaE6RKNzfD2Lpew2InI
- wS8iT6jOSrTnsUkH8iZoXDweAjiMR8F4RM6cPfVLEa/pKXl/rWXb0oMZOWGR2hI0DyM0
- jCUk6bMswwvoYUo3PJjOBvDb4iWQPngPZ4QaOfSy1eNjf7jt/pPLFvK5J/Od0B1PlxCp
- xIsw==
-X-Gm-Message-State: APjAAAUb+DM65FWToVRy3wVD2Hx/gGjpnXCEJGF+jUx/EFDfcucQVYLp
- X8Qo0bJV+4xHUaCWgfJPhrh+s0E1V8iwISZ0FvAvYg==
-X-Google-Smtp-Source: APXvYqyspbgqZuofR3Xk2hoL61LkmhCAbxmzNps27k3xUpWWB2aP00CHvx52zjjisTGJLepzK1WK6Mj1yTeDtGQCxSY=
-X-Received: by 2002:a9d:73ce:: with SMTP id m14mr9591398otk.135.1569857860761; 
- Mon, 30 Sep 2019 08:37:40 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1iExoZ-0003qU-Nw
+ for qemu-devel@nongnu.org; Mon, 30 Sep 2019 11:42:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50730)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iExoZ-0003q1-F8; Mon, 30 Sep 2019 11:42:19 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4B7C736961;
+ Mon, 30 Sep 2019 15:42:18 +0000 (UTC)
+Received: from [10.36.117.170] (ovpn-117-170.ams2.redhat.com [10.36.117.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 436EC19C6A;
+ Mon, 30 Sep 2019 15:42:17 +0000 (UTC)
+Subject: Re: [PATCH v3 02/18] target/s390x: Add ilen to unwind data
+To: Richard Henderson <rth@twiddle.net>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190926162615.31168-1-richard.henderson@linaro.org>
+ <20190926162615.31168-3-richard.henderson@linaro.org>
+ <4d1f9fbc-a6b3-cb7d-63a7-8d9568bc7406@redhat.com>
+ <164856f8-fc7e-7a97-65b8-e1be2cf354be@linaro.org>
+ <6557ae81-1e25-38bc-dff5-2d15b45284c5@redhat.com>
+ <1ab7a5b3-40e8-c3ae-0877-07b8b50b90d1@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <db4233d2-607a-5d37-50a8-bda57234a6c7@redhat.com>
+Date: Mon, 30 Sep 2019 17:42:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <CAEfK_44VEF17nRgzNvVe+MPmAfS34kiJ_ozubWFkVYV0rm71sw@mail.gmail.com>
-In-Reply-To: <CAEfK_44VEF17nRgzNvVe+MPmAfS34kiJ_ozubWFkVYV0rm71sw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 30 Sep 2019 16:37:29 +0100
-Message-ID: <CAFEAcA9nz9S4R+O9fwa0k38dB3r1smguG4bQRzwm1s0zJCvfDA@mail.gmail.com>
-Subject: Re: Lockup with --accel tcg,thread=single
-To: Doug Gale <doug16k@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <1ab7a5b3-40e8-c3ae-0877-07b8b50b90d1@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Mon, 30 Sep 2019 15:42:18 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,110 +122,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 30 Sep 2019 at 14:17, Doug Gale <doug16k@gmail.com> wrote:
->
-> I found a lockup in single threaded TCG, with OVMF bios, 16 CPUs.
->
-> qemu-system-x86_64 --accel tcg,thread=single -smp cpus=16 -bios
-> /usr/share/ovmf/OVMF.fd
->
-> Using Ubuntu 18.04 LTS, default gnome desktop. There is no guest OS,
-> there is no hard drive, just the OVMF firmware locks it up. (I
-> narrowed it down to this from a much larger repro)
+On 30.09.19 17:03, Richard Henderson wrote:
+> On 9/30/19 12:55 AM, David Hildenbrand wrote:
+>>> What I think you should do instead is check env_neg(env)->icount_decr, exactly
+>>> like we do at the start of every basic block, and use that as an indication
+>>> that you should exit back to the main loop.
+>>
+>> The issue is that when we return to the main loop we really have to
+>> inject an interrupt - otherwise we might simply skip parts of the
+>> (interruptible) instruction and continue with the next one.
+> 
+> Do we?  We will return to the main loop with psw.addr still pointing at MVCL,
+> so the interrupt is delivered, and when the exception returns we restart the
+> MVCL.  Or, an interrupt is not delivered and we restart from psw.addr and still
+> restart the MVCL.
 
-> Peter Maydell helped me bisect it in IRC.
->  Works fine at commit 1e8a98b53867f61
->  Fails at commit 9458a9a1df1a4c7
->
-> MTTCG works fine all the way up to master.
+If that's the case, then this should indeed work.
 
-Thanks for this bug report. I've reproduced it and think
-I have figured out what is going on here.
+> 
+> We probably would have to take a hard look at EXECUTE of MVCL to see if that is
+> actually restartable.  Not that it makes particular sense to want that combo,
+> but it's required to work.
+> 
 
-Commit 9458a9a1df1a4c719e245 is Paolo's commit that fixes the
-TCG-vs-dirty-bitmap race by having the thread which is
-doing a memory access wait for the vCPU thread to finish
-its current TB using a no-op run_on_cpu() operation.
+Yes, this has to work. I'll look into that once I have some time.
 
-In the case of the hang the thread doing the memory access
-is the iothread, like this:
+>> However, with I/O interrupts, we can actually race against other VCPUs.
+>> So the I/O interrupt might be gone by the time we arrive in the main loop.
+> 
+> Of course, but it's no different with this case than any other.  If the
+> interrupt has already been handled, then we will simply restart the next TB as
+> per normal.
+Yeah, I was mostly concerned that "the next TB" will be "the next
+instruction" and not "the original instruction again".
 
-#14 0x000055c150c0a98c in run_on_cpu (cpu=0x55c153801c60,
-func=0x55c150bbb542 <do_nothing>, data=...)
-    at /home/petmay01/linaro/qemu-from-laptop/qemu/cpus.c:1205
-#15 0x000055c150bbb58c in tcg_log_global_after_sync
-(listener=0x55c1538410c8) at
-/home/petmay01/linaro/qemu-from-laptop/qemu/exec.c:2963
-#16 0x000055c150c1fe18 in memory_global_after_dirty_log_sync () at
-/home/petmay01/linaro/qemu-from-laptop/qemu/memory.c:2598
-#17 0x000055c150c1e6b8 in memory_region_snapshot_and_clear_dirty
-(mr=0x55c1541e82b0, addr=0, size=1920000, client=0)
-    at /home/petmay01/linaro/qemu-from-laptop/qemu/memory.c:2106
-#18 0x000055c150c76c05 in vga_draw_graphic (s=0x55c1541e82a0, full_update=0)
-    at /home/petmay01/linaro/qemu-from-laptop/qemu/hw/display/vga.c:1661
-#19 0x000055c150c771c4 in vga_update_display (opaque=0x55c1541e82a0)
-at /home/petmay01/linaro/qemu-from-laptop/qemu/hw/display/vga.c:1785
-#20 0x000055c151052a83 in graphic_hw_update (con=0x55c1536dfaa0) at
-/home/petmay01/linaro/qemu-from-laptop/qemu/ui/console.c:268
-#21 0x000055c151091490 in gd_refresh (dcl=0x55c1549af090) at
-/home/petmay01/linaro/qemu-from-laptop/qemu/ui/gtk.c:484
-#22 0x000055c151056571 in dpy_refresh (s=0x55c1542f9d90) at
-/home/petmay01/linaro/qemu-from-laptop/qemu/ui/console.c:1629
-#23 0x000055c1510527f0 in gui_update (opaque=0x55c1542f9d90) at
-/home/petmay01/linaro/qemu-from-laptop/qemu/ui/console.c:206
-#24 0x000055c1511ee67c in timerlist_run_timers
-(timer_list=0x55c15370c280) at
-/home/petmay01/linaro/qemu-from-laptop/qemu/util/qemu-timer.c:592
-#25 0x000055c1511ee726 in qemu_clock_run_timers
-(type=QEMU_CLOCK_REALTIME) at
-/home/petmay01/linaro/qemu-from-laptop/qemu/util/qemu-timer.c:606
-#26 0x000055c1511ee9e5 in qemu_clock_run_all_timers () at
-/home/petmay01/linaro/qemu-from-laptop/qemu/util/qemu-timer.c:692
-#27 0x000055c1511ef181 in main_loop_wait (nonblocking=0) at
-/home/petmay01/linaro/qemu-from-laptop/qemu/util/main-loop.c:524
-#28 0x000055c150db03fe in main_loop () at
-/home/petmay01/linaro/qemu-from-laptop/qemu/vl.c:1806
+-- 
 
-run_on_cpu() adds the do_nothing function to a cpu queued-work list.
+Thanks,
 
-However, the single-threaded TCG runloop qemu_tcg_rr_cpu_thread_fn()
-has the basic structure:
-
-   while (1) {
-       for (each vCPU) {
-           run this vCPU for a timeslice;
-       }
-       qemu_tcg_rr_wait_io_event();
-   }
-
-and it processes cpu work queues only in qemu_tcg_rr_wait_io_event().
-This is a problem, because the thing which causes us to stop running
-one vCPU when its timeslice ends and move on to the next is the
-tcg_kick_vcpu_timer -- and the iothread will never process that timer
-and kick the vcpu because it is currently blocked in run_on_cpu() !
-
-Not sure currently what the best fix is here.
-
-Side note -- this use of run_on_cpu() means that we now drop
-the iothread lock within memory_region_snapshot_and_clear_dirty(),
-which we didn't before. This means that a vCPU thread can now
-get in and execute an access to the device registers of
-hw/display/vga.c, updating its state in a way I suspect that the
-device model code is not expecting... So maybe the right answer
-here should be to come up with a fix for the race that 9458a9a1
-addresses that doesn't require us to drop the iothread lock in
-memory_region_snapshot_and_clear_dirty() ? Alternatively we need
-to audit the callers and flag in the documentation that this
-function has the unexpected side effect of briefly dropping the
-iothread lock.
-
-thanks
--- PMM
+David / dhildenb
 
