@@ -2,114 +2,59 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD03C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 08:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA49C388F3
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 08:59:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DCDF215EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 08:59:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DCDF215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A333F215EA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 08:59:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A333F215EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFDzs-0006CX-TR
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 04:59:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59025)
+	id 1iFE0e-0007HZ-Fb
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 04:59:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iFDxY-0004na-CO
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 04:56:41 -0400
+ (envelope-from <clg@kaod.org>) id 1iFDyb-00057R-7e
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 04:57:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iFDxX-0003ZK-7h
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 04:56:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58870)
+ (envelope-from <clg@kaod.org>) id 1iFDyY-00042J-Uk
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 04:57:44 -0400
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:34320)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iFDxW-0003Yr-VR; Tue, 01 Oct 2019 04:56:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 10CD810DCC94;
- Tue,  1 Oct 2019 08:56:38 +0000 (UTC)
-Received: from [10.36.117.182] (ovpn-117-182.ams2.redhat.com [10.36.117.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 631155D9C9;
- Tue,  1 Oct 2019 08:56:36 +0000 (UTC)
-Subject: Re: [PATCH v1 1/5] s390x/mmu: Add EDAT2 translation support
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20190926101627.23376-1-david@redhat.com>
- <20190926101627.23376-2-david@redhat.com>
- <4921a826-d1dd-7e98-3749-33d32f01b251@redhat.com>
- <26665f90-e821-c103-0178-7c1ca51de647@redhat.com>
- <fc003b6e-a38c-ced7-0c84-a64ebc26e91b@redhat.com>
- <4fa882e3-04d5-5c73-2266-31b822f1ae3c@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <f9f00eb4-ff31-87e9-0d48-a013dc2a4611@redhat.com>
-Date: Tue, 1 Oct 2019 10:56:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iFDyX-00040d-PZ
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 04:57:41 -0400
+Received: from player762.ha.ovh.net (unknown [10.108.35.185])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 90CB211B43D
+ for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 10:57:38 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player762.ha.ovh.net (Postfix) with ESMTPSA id 8AC85A6D6C0C;
+ Tue,  1 Oct 2019 08:57:32 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] spapr/xive: skip partially initialized vCPUs in presenter
+Date: Tue,  1 Oct 2019 10:57:22 +0200
+Message-Id: <20191001085722.32755-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <4fa882e3-04d5-5c73-2266-31b822f1ae3c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Tue, 01 Oct 2019 08:56:38 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 1513772427037412326
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeeggddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 46.105.40.148
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,108 +66,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01.10.19 10:55, Thomas Huth wrote:
-> On 01/10/2019 10.51, David Hildenbrand wrote:
->> On 01.10.19 10:41, Thomas Huth wrote:
->>> On 26/09/2019 12.18, David Hildenbrand wrote:
->>>> On 26.09.19 12:16, David Hildenbrand wrote:
->>>>> This only adds basic support to the DAT translation, but no EDAT2 support
->>>>> for TCG. E.g., the gdbstub under kvm uses this function, too, to
->>>>> translate virtual addresses.
->>>>>
->>>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>>> ---
->>>>>  target/s390x/mmu_helper.c | 9 +++++++++
->>>>>  1 file changed, 9 insertions(+)
->>>>>
->>>>> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
->>>>> index 6b34c4c7b4..54f54137ec 100644
->>>>> --- a/target/s390x/mmu_helper.c
->>>>> +++ b/target/s390x/mmu_helper.c
->>>>> @@ -120,6 +120,7 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
->>>>>  {
->>>>>      const bool edat1 = (env->cregs[0] & CR0_EDAT) &&
->>>>>                         s390_has_feat(S390_FEAT_EDAT);
->>>>> +    const bool edat2 = edat1 && s390_has_feat(S390_FEAT_EDAT_2);
->>>>>      const int asce_tl = asce & ASCE_TABLE_LENGTH;
->>>>>      const int asce_p = asce & ASCE_PRIVATE_SPACE;
->>>>>      hwaddr gaddr = asce & ASCE_ORIGIN;
->>>>> @@ -219,9 +220,17 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
->>>>>          if ((entry & REGION_ENTRY_TT) != REGION_ENTRY_TT_REGION3) {
->>>>>              return PGM_TRANS_SPEC;
->>>>>          }
->>>>> +        if (edat2 && (entry & REGION3_ENTRY_CR) && asce_p) {
->>>>> +            return PGM_TRANS_SPEC;
->>>>> +        }
->>>>>          if (edat1 && (entry & REGION_ENTRY_P)) {
->>>>>              *flags &= ~PAGE_WRITE;
->>>>>          }
->>>>> +        if (edat2 && (entry & REGION3_ENTRY_FC)) {
->>>>> +            *raddr = (entry & REGION3_ENTRY_RFAA) |
->>>>> +                     (vaddr & REGION3_ENTRY_RFAA);
->>>>
->>>> Messed up
->>>>
->>>> (vaddr & ~REGION3_ENTRY_RFAA)
->>>>
->>>> it is.
->>>
->>> With that fix:
->>>
->>> Reviewed-by: Thomas Huth <thuth@redhat.com>
->>>
->>
->> BTW, this change explains the different order of checks you mentioned. I now have here:
->>
->> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
->> index dc33c63b1d..dcbffb682f 100644
->> --- a/target/s390x/mmu_helper.c
->> +++ b/target/s390x/mmu_helper.c
->> @@ -120,6 +120,7 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
->>  {
->>      const bool edat1 = (env->cregs[0] & CR0_EDAT) &&
->>                         s390_has_feat(S390_FEAT_EDAT);
->> +    const bool edat2 = edat1 && s390_has_feat(S390_FEAT_EDAT_2);
->>      const int asce_tl = asce & ASCE_TABLE_LENGTH;
->>      const int asce_p = asce & ASCE_PRIVATE_SPACE;
->>      hwaddr gaddr = asce & ASCE_ORIGIN;
->> @@ -217,6 +218,17 @@ static int mmu_translate_asce(CPUS390XState *env, target_ulong vaddr,
->>          if ((entry & REGION_ENTRY_TT) != REGION_ENTRY_TT_REGION3) {
->>              return PGM_TRANS_SPEC;
->>          }
->> +        if (edat2 && (entry & REGION3_ENTRY_CR) && asce_p) {
->> +            return PGM_TRANS_SPEC;
->> +        }
->> +        if (edat2 && (entry & REGION3_ENTRY_FC)) {
->> +            if (entry & REGION_ENTRY_P) {
->> +                *flags &= ~PAGE_WRITE;
->> +            }
->> +            *raddr = (entry & REGION3_ENTRY_RFAA) |
->> +                     (vaddr & ~REGION3_ENTRY_RFAA);
->> +            return 0;
->> +        }
->>          if (VADDR_SEGMENT_TL(vaddr) < (entry & REGION_ENTRY_TF) >> 6 ||
->>              VADDR_SEGMENT_TL(vaddr) > (entry & REGION_ENTRY_TL)) {
->>              return PGM_SEGMENT_TRANS;
-> 
-> Ah, ok, and the *flags have to be set first, of course. So better keep
-> it the original way round in your other patch.
+When vCPUs are hotplugged, they are added to the QEMU CPU list before
+being fully realized. This can crash the XIVE presenter because the
+'tctx' pointer is not necessarily initialized when looking for a
+matching target.
 
-I can just move it in this patch, then it's clearer why a different
-order is needed.
+These vCPUs are not valid targets for the presenter. Skip them.
 
--- 
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/intc/xive.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Thanks,
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index b7417210d817..29df06df1136 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1396,6 +1396,14 @@ static bool xive_presenter_match(XiveRouter *xrtr,=
+ uint8_t format,
+         XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
+         int ring;
+=20
++        /*
++         * Skip partially initialized vCPUs. This can happen when
++         * vCPUs are hotplugged.
++         */
++        if (!tctx) {
++            continue;
++        }
++
+         /*
+          * HW checks that the CPU is enabled in the Physical Thread
+          * Enable Register (PTER).
+--=20
+2.21.0
 
-David / dhildenb
 
