@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D608ECE58A
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79862ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7244621855
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:07:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7244621855
+	by mail.kernel.org (Postfix) with ESMTPS id 5059721783
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:08:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5059721783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKgl-0006Bp-Ur
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:07:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49970)
+	id 1iFKh8-0006fm-16
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:08:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT2-00084y-Tp
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:38 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTG-0008La-EJ
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT1-0006Yq-59
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:36 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38394)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTF-0006mj-4k
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:50 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38500)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKT0-0006X5-Tx; Tue, 01 Oct 2019 11:53:35 -0400
+ id 1iFKTE-0006bI-18
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:48 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKSx-0004xb-Vt; Tue, 01 Oct 2019 18:53:32 +0300
+ id 1iFKT1-0004xb-Vq; Tue, 01 Oct 2019 18:53:36 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 09/31] PowerPC TCG CPUs: Fix
- error_append_hint/error_prepend usage
-Date: Tue,  1 Oct 2019 18:52:57 +0300
-Message-Id: <20191001155319.8066-10-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 24/31] chardev: Fix error_append_hint/error_prepend usage
+Date: Tue,  1 Oct 2019 18:53:12 +0300
+Message-Id: <20191001155319.8066-25-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
@@ -60,10 +60,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Greg Kurz <groug@kaod.org>,
- qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -96,107 +95,21 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/ppc/mac_newworld.c | 1 +
- hw/ppc/pnv_lpc.c      | 1 +
- hw/ppc/pnv_occ.c      | 1 +
- hw/ppc/spapr.c        | 1 +
- hw/ppc/spapr_irq.c    | 1 +
- hw/ppc/spapr_pci.c    | 1 +
- target/ppc/kvm.c      | 2 ++
- 7 files changed, 8 insertions(+)
+ chardev/spice.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index c5bbcc7433..1a37412d31 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -609,6 +609,7 @@ static char *core99_get_via_config(Object *obj, Error **errp)
- 
- static void core99_set_via_config(Object *obj, const char *value, Error **errp)
+diff --git a/chardev/spice.c b/chardev/spice.c
+index 241e2b7770..ce2145fb19 100644
+--- a/chardev/spice.c
++++ b/chardev/spice.c
+@@ -267,6 +267,7 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
+                                     bool *be_opened,
+                                     Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     Core99MachineState *cms = CORE99_MACHINE(obj);
- 
-     if (!strcmp(value, "cuda")) {
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index 9466d4a1be..5022afa2a8 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -681,6 +681,7 @@ static const TypeInfo pnv_lpc_power9_info = {
- 
- static void pnv_lpc_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PnvLpcController *lpc = PNV_LPC(dev);
-     Object *obj;
-     Error *local_err = NULL;
-diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
-index 8bead2c930..735e5655da 100644
---- a/hw/ppc/pnv_occ.c
-+++ b/hw/ppc/pnv_occ.c
-@@ -181,6 +181,7 @@ static const TypeInfo pnv_occ_power9_type_info = {
- 
- static void pnv_occ_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PnvOCC *occ = PNV_OCC(dev);
-     PnvOCCClass *poc = PNV_OCC_GET_CLASS(occ);
-     Object *obj;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 08a2a5a770..617afb722c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4330,6 +4330,7 @@ int spapr_get_vcpu_id(PowerPCCPU *cpu)
- 
- void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     MachineState *ms = MACHINE(spapr);
-     int vcpu_id;
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 06fe2432ba..679f1306e4 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -549,6 +549,7 @@ static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int version_id)
- 
- static void spapr_irq_reset_dual(SpaprMachineState *spapr, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     Error *local_err = NULL;
- 
-     /*
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 7b71ad7c74..012ecdd40a 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1817,6 +1817,7 @@ static void spapr_phb_destroy_msi(gpointer opaque)
- 
- static void spapr_phb_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
-      * tries to add a sPAPR PHB to a non-pseries machine.
-      */
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8c5b1f25cc..6ea7502cb9 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -237,6 +237,7 @@ static int kvm_booke206_tlb_init(PowerPCCPU *cpu)
- #if defined(TARGET_PPC64)
- static void kvm_get_smmu_info(struct kvm_ppc_smmu_info *info, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret;
- 
-     assert(kvm_state != NULL);
-@@ -2073,6 +2074,7 @@ int kvmppc_set_smt_threads(int smt)
- 
- void kvmppc_hint_smt_possible(Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int i;
-     GString *g;
-     char *s;
+     ChardevSpiceChannel *spicevmc = backend->u.spicevmc.data;
+     const char *type = spicevmc->type;
+     const char **psubtype = spice_server_char_device_recognized_subtypes();
 -- 
 2.21.0
 
