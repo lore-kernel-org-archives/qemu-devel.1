@@ -2,66 +2,61 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2128EECE587
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BACC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:02:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E026420815
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:58:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MyvJTkpY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E026420815
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 0B7892086A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:02:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B7892086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFTua-0003iL-61
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:58:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59791)
+	id 1iFTxx-0006kM-EV
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:02:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46821)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFT2t-0007mu-Vt
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:03:14 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iFS0k-0001Lw-1E
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFT2q-0007PG-KN
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:03:11 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50443 helo=ozlabs.org)
+ (envelope-from <jsnow@redhat.com>) id 1iFS0i-0002qf-IX
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54474)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFT2l-0007J1-Va; Tue, 01 Oct 2019 21:03:06 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46jdD327dcz9sPk; Wed,  2 Oct 2019 11:02:59 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569978179;
- bh=ToJkGaiWKKb4yJHLkhlNi2eQqGgd7t2rBI4ENm/jlOA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=MyvJTkpYjtRBImIW6p8qwLZra8fTrbOoEdnN6OfISKhA8CjfDgzLy/7Y5tCT2Kdv/
- jZ8JuIiJa6JtyZnE43Jl2vezruErZmepDhPJXMQdaLaTD38VUOXBawFFXB7VOdoM48
- jSUHcpWYLZSr0uQE1zdRyxG5TyijttzZ8w69gRLo=
-Date: Wed, 2 Oct 2019 11:02:45 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] spapr/xive: skip partially initialized vCPUs in presenter
-Message-ID: <20191002010245.GT11105@umbus.fritz.box>
-References: <20191001085722.32755-1-clg@kaod.org>
- <20191001130614.226ef6a2@bahia.w3ibm.bluemix.net>
- <fad6aae9-8722-498c-730d-fa204f07e3c5@kaod.org>
- <20191001185629.0b284ba1@bahia.lan>
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iFS0d-0002hS-M3; Tue, 01 Oct 2019 19:56:49 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3FE9218C4266;
+ Tue,  1 Oct 2019 23:56:46 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-165.bos.redhat.com [10.18.17.165])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 78E8360BE0;
+ Tue,  1 Oct 2019 23:56:44 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Subject: [PULL 7/8] bootdevice: FW_CFG interface for LCHS values
+Date: Tue,  1 Oct 2019 19:55:51 -0400
+Message-Id: <20191001235552.17790-8-jsnow@redhat.com>
+In-Reply-To: <20191001235552.17790-1-jsnow@redhat.com>
+References: <20191001235552.17790-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2wYUONsACSj9OMJp"
-Content-Disposition: inline
-In-Reply-To: <20191001185629.0b284ba1@bahia.lan>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Tue, 01 Oct 2019 23:56:46 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,210 +68,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Arbel Moshe <arbel.moshe@oracle.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>, "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ Sam Eiderman <shmuel.eiderman@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, Karl Heubaum <karl.heubaum@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
 
---2wYUONsACSj9OMJp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Using fw_cfg, supply logical CHS values directly from QEMU to the BIOS.
 
-On Tue, Oct 01, 2019 at 06:56:28PM +0200, Greg Kurz wrote:
-> On Tue, 1 Oct 2019 13:56:10 +0200
-> C=E9dric Le Goater <clg@kaod.org> wrote:
->=20
-> > On 01/10/2019 13:06, Greg Kurz wrote:
-> > > On Tue,  1 Oct 2019 10:57:22 +0200
-> > > C=E9dric Le Goater <clg@kaod.org> wrote:
-> > >=20
-> > >> When vCPUs are hotplugged, they are added to the QEMU CPU list before
-> > >> being fully realized. This can crash the XIVE presenter because the
-> > >> 'tctx' pointer is not necessarily initialized when looking for a
-> > >> matching target.
-> > >>
-> > >=20
-> > > Ouch... :-\
-> > >=20
-> > >> These vCPUs are not valid targets for the presenter. Skip them.
-> > >>
-> > >=20
-> > > This likely fixes this specific issue, but more generally, this
-> > > seems to indicate that using CPU_FOREACH() is rather fragile.
-> > >=20
-> > > What about tracking XIVE TM contexts with a QLIST in xive.c ?
-> >=20
-> > This is a good idea. =20
-> >=20
-> > On HW, the thread interrupt contexts belong to the XIVE presenter=20
-> > subengine. This is the logic doing the CAM line matching to find
-> > a target for an event notification. So we should model the context=20
-> > list below the XiveRouter in QEMU which models both router and=20
-> > presenter subengines. We have done without a presenter model for=20
-> > the moment and I don't think we will need to introduce one. =20
-> >=20
-> > This would be a nice improvements of my patchset adding support
-> > for xive escalations and better support of multi chip systems.=20
-> > I have introduced a PNV_CHIP_CPU_FOREACH in this patchset which=20
-> > would become useless with a list of tctx under the XIVE interrupt
-> > controller, XiveRouter, SpaprXive, PnvXive.
-> >=20
->=20
-> I agree. It makes more sense to have the list below the XiveRouter,
-> rather than relying on CPU_FOREACH(), which looks a bit weird from
-> a device emulation code perspective.
+Non-standard logical geometries break under QEMU.
 
-That does sound like a better idea long term.  However, for now, I
-think the NULL check is a reasonable way of fixing the real error
-we're hitting, so I've applied the patch here.
+A virtual disk which contains an operating system which depends on
+logical geometries (consistent values being reported from BIOS INT13
+AH=3D08) will most likely break under QEMU/SeaBIOS if it has non-standard
+logical geometries - for example 56 SPT (sectors per track).
+No matter what QEMU will report - SeaBIOS, for large enough disks - will
+use LBA translation, which will report 63 SPT instead.
 
-Future cleanups to a different approach remain welcome, of course.
+In addition we cannot force SeaBIOS to rely on physical geometries at
+all. A virtio-blk-pci virtual disk with 255 phyiscal heads cannot
+report more than 16 physical heads when moved to an IDE controller,
+since the ATA spec allows a maximum of 16 heads - this is an artifact of
+virtualization.
 
-> > Next step would be to get rid of the tctx->cs pointer. In my latest
-> > patches, it is only used to calculate the HW CAM line.=20
-> >=20
-> > There might be some consequences on the object hierarchy and it will
-> > break migration.
-> >=20
->=20
-> This could break if the contexts were devices sitting in a bus, which
-> isn't the case here. I'll try to come up with a proposal for spapr,
-> and we can work out the changes on your recent XIVE series for pnv.
->=20
-> > Thanks,
-> >=20
-> > C.
-> >=20
-> > >=20
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-> > > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> > > index 6d38755f8459..89b9ef7f20b1 100644
-> > > --- a/include/hw/ppc/xive.h
-> > > +++ b/include/hw/ppc/xive.h
-> > > @@ -319,6 +319,8 @@ typedef struct XiveTCTX {
-> > >      qemu_irq    os_output;
-> > > =20
-> > >      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
-> > > +
-> > > +    QTAILQ_ENTRY(XiveTCTX) next;
-> > >  } XiveTCTX;
-> > > =20
-> > >  /*
-> > > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> > > index b7417210d817..f7721c711041 100644
-> > > --- a/hw/intc/xive.c
-> > > +++ b/hw/intc/xive.c
-> > > @@ -568,6 +568,8 @@ static void xive_tctx_reset(void *dev)
-> > >          ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
-> > >  }
-> > > =20
-> > > +static QTAILQ_HEAD(, XiveTCTX) xive_tctx_list =3D QTAILQ_HEAD_INITIA=
-LIZER(xive_tctx_list);
-> > > +
-> > >  static void xive_tctx_realize(DeviceState *dev, Error **errp)
-> > >  {
-> > >      XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> > > @@ -609,10 +611,14 @@ static void xive_tctx_realize(DeviceState *dev,=
- Error **errp)
-> > >      }
-> > > =20
-> > >      qemu_register_reset(xive_tctx_reset, dev);
-> > > +    QTAILQ_INSERT_HEAD(&xive_tctx_list, tctx, next);
-> > >  }
-> > > =20
-> > >  static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
-> > >  {
-> > > +    XiveTCTX *tctx =3D XIVE_TCTX(dev);
-> > > +
-> > > +    QTAILQ_REMOVE(&xive_tctx_list, tctx, next);
-> > >      qemu_unregister_reset(xive_tctx_reset, dev);
-> > >  }
-> > > =20
-> > > @@ -1385,15 +1391,14 @@ static bool xive_presenter_match(XiveRouter *=
-xrtr, uint8_t format,
-> > >                                   bool cam_ignore, uint8_t priority,
-> > >                                   uint32_t logic_serv, XiveTCTXMatch =
-*match)
-> > >  {
-> > > -    CPUState *cs;
-> > > +    XiveTCTX *tctx;
-> > > =20
-> > >      /*
-> > >       * TODO (PowerNV): handle chip_id overwrite of block field for
-> > >       * hardwired CAM compares
-> > >       */
-> > > =20
-> > > -    CPU_FOREACH(cs) {
-> > > -        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
-> > > +    QTAILQ_FOREACH(tctx, &xive_tctx_list, next) {
-> > >          int ring;
-> > > =20
-> > >          /*
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-> > >=20
-> > >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> > >> ---
-> > >>  hw/intc/xive.c | 8 ++++++++
-> > >>  1 file changed, 8 insertions(+)
-> > >>
-> > >> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> > >> index b7417210d817..29df06df1136 100644
-> > >> --- a/hw/intc/xive.c
-> > >> +++ b/hw/intc/xive.c
-> > >> @@ -1396,6 +1396,14 @@ static bool xive_presenter_match(XiveRouter *=
-xrtr, uint8_t format,
-> > >>          XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
-> > >>          int ring;
-> > >> =20
-> > >> +        /*
-> > >> +         * Skip partially initialized vCPUs. This can happen when
-> > >> +         * vCPUs are hotplugged.
-> > >> +         */
-> > >> +        if (!tctx) {
-> > >> +            continue;
-> > >> +        }
-> > >> +
-> > >>          /*
-> > >>           * HW checks that the CPU is enabled in the Physical Thread
-> > >>           * Enable Register (PTER).
-> > >=20
-> >=20
->=20
+By supplying the logical geometries directly we are able to support such
+"exotic" disks.
 
+We serialize this information in a similar way to the "bootorder"
+interface.
+The new fw_cfg entry is "bios-geometry".
+
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+Message-id: 20190925110639.100699-8-sameid@google.com
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ include/sysemu/sysemu.h |  1 +
+ bootdevice.c            | 32 ++++++++++++++++++++++++++++++++
+ hw/nvram/fw_cfg.c       | 14 +++++++++++---
+ 3 files changed, 44 insertions(+), 3 deletions(-)
+
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 5bc5c79cbc..80c57fdc4e 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -106,6 +106,7 @@ void validate_bootdevices(const char *devices, Error =
+**errp);
+ void add_boot_device_lchs(DeviceState *dev, const char *suffix,
+                           uint32_t lcyls, uint32_t lheads, uint32_t lsec=
+s);
+ void del_boot_device_lchs(DeviceState *dev, const char *suffix);
++char *get_boot_devices_lchs_list(size_t *size);
+=20
+ /* handler to set the boot_device order for a specific type of MachineCl=
+ass */
+ typedef void QEMUBootSetHandler(void *opaque, const char *boot_order,
+diff --git a/bootdevice.c b/bootdevice.c
+index 2b12fb85a4..b034ad7bdc 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -405,3 +405,35 @@ void del_boot_device_lchs(DeviceState *dev, const ch=
+ar *suffix)
+         }
+     }
+ }
++
++/* Serialized as: (device name\0 + lchs struct) x devices */
++char *get_boot_devices_lchs_list(size_t *size)
++{
++    FWLCHSEntry *i;
++    size_t total =3D 0;
++    char *list =3D NULL;
++
++    QTAILQ_FOREACH(i, &fw_lchs, link) {
++        char *bootpath;
++        char *chs_string;
++        size_t len;
++
++        bootpath =3D get_boot_device_path(i->dev, false, i->suffix);
++        chs_string =3D g_strdup_printf("%s %" PRIu32 " %" PRIu32 " %" PR=
+Iu32,
++                                     bootpath, i->lcyls, i->lheads, i->l=
+secs);
++
++        if (total) {
++            list[total - 1] =3D '\n';
++        }
++        len =3D strlen(chs_string) + 1;
++        list =3D g_realloc(list, total + len);
++        memcpy(&list[total], chs_string, len);
++        total +=3D len;
++        g_free(chs_string);
++        g_free(bootpath);
++    }
++
++    *size =3D total;
++
++    return list;
++}
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 7dc3ac378e..18aff658c0 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -920,13 +920,21 @@ void *fw_cfg_modify_file(FWCfgState *s, const char =
+*filename,
+=20
+ static void fw_cfg_machine_reset(void *opaque)
+ {
++    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
++    FWCfgState *s =3D opaque;
+     void *ptr;
+     size_t len;
+-    FWCfgState *s =3D opaque;
+-    char *bootindex =3D get_boot_devices_list(&len);
++    char *buf;
+=20
+-    ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)bootindex, len=
+);
++    buf =3D get_boot_devices_list(&len);
++    ptr =3D fw_cfg_modify_file(s, "bootorder", (uint8_t *)buf, len);
+     g_free(ptr);
++
++    if (!mc->legacy_fw_cfg_order) {
++        buf =3D get_boot_devices_lchs_list(&len);
++        ptr =3D fw_cfg_modify_file(s, "bios-geometry", (uint8_t *)buf, l=
+en);
++        g_free(ptr);
++    }
+ }
+=20
+ static void fw_cfg_machine_ready(struct Notifier *n, void *data)
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+2.21.0
 
---2wYUONsACSj9OMJp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2T9zMACgkQbDjKyiDZ
-s5KY+g/+IAlHnz7hpfvnxWK+HBcWhakc0Zdt8nlaeAl7ZnpVwy36DmvWUvXLvpZs
-PeIEp2C9ANwfkcleRV80avQttiDn3/XvzuXvBKTnNcz2gIh3RknAiQjDJGleyj0d
-xjbVT3SXaJOfsudvR+OWYQ+sAn5JsYOpfaCziY3Xl/9hP/DJiG5GkEYyy78mMPXO
-Bjj/Yng8uo9CHz1en8ZJCIr4SV0VHJHuC7SQ1qr+YPleh20koh/XtjbgYDIM0rtL
-ei55T7C76bUfHgrjs7d76zKPA9+bp/UuKgHkVZWKiNzfKTYpGvtNzWCsR+lfATHe
-MIIkt4XEFxnc2bN+Bt3DgD1Y6gzBf4HRQlIZJkxls6ckuF1303owZQZrDZPfzsYz
-wk588VEn9sJgEXd95B4u3JEKj8sAWNB3pgh1u5zH8HyWcnADUWxIQDXO9RCd0nqf
-2nbUCHrsM+sziDonsgeiyy7ojiQUPR+4XiJD9OW97HLjA/OBc+Mf8fxeX/aolKhQ
-eCK7Yebj0gSw0CkaFCWHd/HvmNnH/hGn6IdzQ+hEUx9Cb9yBDSqooP+Nz+chjKj9
-Ll2enaJedCf8hQv+ClmVWn44SK6Rqos2y2LlYxIBgj8VwvBKncUI6e1R6r331CWJ
-CS9/bJt0GLd3GtCufArTB+TpDxnpFrCfr8Axn5CQ3Mvp1I6YFQ8=
-=ThYT
------END PGP SIGNATURE-----
-
---2wYUONsACSj9OMJp--
 
