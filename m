@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29CD7ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B24A5C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:12:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 027DA2168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:11:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 027DA2168B
+	by mail.kernel.org (Postfix) with ESMTPS id 826932168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:12:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 826932168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKkT-0001yr-Mq
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:11:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50181)
+	id 1iFKl5-0002jx-Iz
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:12:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTJ-0008N9-4u
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:55 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT2-00084r-Qt
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTG-0006nm-96
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:52 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38528)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT0-0006Ya-VJ
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:36 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38390)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKTE-0006cK-Jb
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:49 -0400
+ id 1iFKT0-0006Wr-Lq; Tue, 01 Oct 2019 11:53:34 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKT3-0004xb-13; Tue, 01 Oct 2019 18:53:37 +0300
+ id 1iFKSy-0004xb-Ps; Tue, 01 Oct 2019 18:53:32 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 28/31] Sockets: Fix error_append_hint/error_prepend usage
-Date: Tue,  1 Oct 2019 18:53:16 +0300
-Message-Id: <20191001155319.8066-29-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 14/31] PowerNV (Non-Virtualized): Fix
+ error_append_hint/error_prepend usage
+Date: Tue,  1 Oct 2019 18:53:02 +0300
+Message-Id: <20191001155319.8066-15-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
@@ -60,9 +60,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -95,29 +95,21 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- util/qemu-sockets.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/intc/pnv_xive.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index bcc06d0e01..396e028ae0 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -861,6 +861,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
-                              int num,
-                              Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     struct sockaddr_un un;
-     int sock, fd;
-     char *pathbuf = NULL;
-@@ -936,6 +937,7 @@ err:
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index ed6e9d71bb..61ad7d46fe 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -1659,6 +1659,7 @@ static void pnv_xive_init(Object *obj)
  
- static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+ static void pnv_xive_realize(DeviceState *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     struct sockaddr_un un;
-     int sock, rc;
-     size_t pathlen;
+     PnvXive *xive = PNV_XIVE(dev);
+     XiveSource *xsrc = &xive->ipi_source;
+     XiveENDSource *end_xsrc = &xive->end_source;
 -- 
 2.21.0
 
