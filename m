@@ -2,50 +2,118 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A060AC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC94DECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79B2B20B7C
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:43:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79B2B20B7C
+	by mail.kernel.org (Postfix) with ESMTPS id B5B20205C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:44:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IiVGhx9J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B20205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFLFS-0000uD-VT
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:43:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50411)
+	id 1iFLGW-0001v7-Dk
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:44:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53816)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKU0-0000jP-CA
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:37 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKq3-0008KY-3a
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTy-0007Et-93
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:36 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38478)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKpx-0004aA-C9
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:17:22 -0400
+Received: from mail-eopbgr50121.outbound.protection.outlook.com
+ ([40.107.5.121]:42885 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKTr-0006Zp-Vr; Tue, 01 Oct 2019 11:54:34 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKSv-0004xb-Vc; Tue, 01 Oct 2019 18:53:30 +0300
+ id 1iFKpl-0004SE-9g; Tue, 01 Oct 2019 12:17:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dc0N3u1OnJLOxXom9XSLhqj1kcvKnbkX3Ukixoe2K0ak0NiPZz33bLKcpoC0IHAnk/d3kDqN6y6BHgMfv9ywJvQwim8WREy9KPuKKxe62t3Ur3MLOo7esogDn2IiYftkljOLtdc6iDSM7gU2+YPsrEXCH5uJlCCaX8yzkjhGSFKptBqL70aIInjj/gdzOJzwvfOt4RAEAIDiEEwOX0tHTxMVq0zW8b/oz30Jeg1IPQhHzBfb2nTwY/NqKQX7xhonzJLC2n9ZOxPD+lsOhlMRbcazDoH477F9vsIGWO1IAqrjru6K62sxZvcxgzRu3fvJ4mMm+T4gjg61rbDxgP1eww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nLZq8D9TYngK9IZnSZgU0/j8GukMz9nVYgFOUp0JrTc=;
+ b=eaQ95UWlDASdu8CbkNwPQlV2JIqGPCYCgB44ArzOz0UhvmqtM9vQQgYlHvDQYPJycAGeKXxEDZF/T1L3PxYZEbJ+D8OL1m0L6WLgmuRHRojULnaslYkmpd17rNquyGw7eEBM6tADoX8ySCOzLUeyHjwQBgQGCs4I0RAZdcMIkZa5YCw9uKBKb9GU25eWshQWsD2ZwSOhUAazptkZ4SI4sMaBVNJJbhay71E62Th9V2d4luPuvccd6dK1eRhEaomcK1p+Z3vM4cp4u/zj917qMtf/yB0n/oJBiUmuA0UQ3AmHmuJVSj/vncs33r9mEX7xI0lZKmVRP2Fu+tC6FYyNKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nLZq8D9TYngK9IZnSZgU0/j8GukMz9nVYgFOUp0JrTc=;
+ b=IiVGhx9JAGJNrUoZfzHx02rzem9TSkOqm3l7OB9mr7cEM0ee0osOwauji0MgOeM2UIfaK6QlW71OIX0QGAPt8djiECBffdwiA7vRZZolfP05wJA06Dty3TtuDtZHAuNqrwKawm6lpFhpOVCIBjiUund0H1CMrfNRu43ZpO6wXEk=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5035.eurprd08.prod.outlook.com (10.255.18.214) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Tue, 1 Oct 2019 16:17:02 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.017; Tue, 1 Oct 2019
+ 16:17:02 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 00/31] error: auto propagated local_err
-Date: Tue,  1 Oct 2019 18:52:48 +0300
-Message-Id: <20191001155319.8066-1-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: bitmap migration bug with -drive while block mirror runs
+Thread-Topic: bitmap migration bug with -drive while block mirror runs
+Thread-Index: AQHVd+yDiWNDoVbdB0u/++2NVEJq8qdF0TUAgAAC+ICAAB3ngIAABSUAgAAAPAA=
+Date: Tue, 1 Oct 2019 16:17:02 +0000
+Message-ID: <03c6fbd9-216c-d8d0-00ff-48ae34f76619@virtuozzo.com>
+References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
+ <d897c755-40e7-6392-23e3-c06b1a371f28@virtuozzo.com>
+ <4bc910ef-0bec-cfd6-89f6-a93d35367218@redhat.com>
+ <9431d242-bfe1-b9db-17d0-6c1a280a05da@virtuozzo.com>
+ <20191001161610.GG4688@linux.fritz.box>
+In-Reply-To: <20191001161610.GG4688@linux.fritz.box>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P190CA0037.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::26)
+ To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191001191700327
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b720609b-a2a1-4cf3-d83a-08d7468acb19
+x-ms-traffictypediagnostic: DB8PR08MB5035:
+x-microsoft-antispam-prvs: <DB8PR08MB503515F35BB446B0EDE6FE93C19D0@DB8PR08MB5035.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0177904E6B
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(346002)(39840400004)(376002)(396003)(366004)(189003)(199004)(31686004)(478600001)(2906002)(102836004)(6116002)(25786009)(386003)(5660300002)(52116002)(76176011)(26005)(3846002)(6916009)(305945005)(6506007)(7736002)(53546011)(99286004)(486006)(8676002)(81156014)(8936002)(81166006)(476003)(2616005)(256004)(5024004)(11346002)(186003)(54906003)(6246003)(316002)(66476007)(66556008)(446003)(6512007)(36756003)(229853002)(31696002)(86362001)(6436002)(71190400001)(66066001)(6486002)(4326008)(14454004)(64756008)(66446008)(71200400001)(66946007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5035;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZjLr3X05LrTOMMITXjraCumMBS8nOGAXkXB38NYKUBYJyvi4O3L966v6QIriJu7y25E7/CBXncmm44g7KbHFD1whzCHBNwpn0ta6pT2C7zhCwURiOWXf2gIyFjUAKJ6U1ubw0PceBjp8gjkb0ok89W2IZ8668uZFxHOSeVQnOLDT3GKcKK4RHySn3wC70waGuZKX1zTDP6GUVPN+viu5P3ggo1n38vUisvUWSgvNa8sxJ1by+HCyImY/d+piYJn8T017hbstZxAUbFDDEq2xs7T8Y6lw9X5XHzuuinFGOmxWss0HuSOIKsxZbHKxbkE4x5z5y9MlOnY0jJGrJHtKUCQxTpHrCObKp2bmlUrpfLoqu0GuUgr9h52Z56n6Zz29rGzdh3rXoSJ3tyFIXRTTcOhTmc0W/RyDvG0h+eGiH4A=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <922FC85DE443E94AB194BED9C72F2147@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b720609b-a2a1-4cf3-d83a-08d7468acb19
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Oct 2019 16:17:02.3924 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ZtNifRdBVFgTGV8KQOrhR7+brUhUDX7YGGEr2x0eSsBz8rgdYujBxAtq+ClWgTRxVlkuYfnt5JcEor7vz/XqUqKmqF3jKrVwA+g8E6lu6HE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5035
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.5.121
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,213 +125,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, pburton@wavecomp.com, peter.maydell@linaro.org,
- codyprime@gmail.com, jasowang@redhat.com, mark.cave-ayland@ilande.co.uk,
- mdroth@linux.vnet.ibm.com, kraxel@redhat.com, sundeep.lkml@gmail.com,
- qemu-block@nongnu.org, quintela@redhat.com, arikalo@wavecomp.com,
- mst@redhat.com, armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- joel@jms.id.au, marcandre.lureau@redhat.com, rth@twiddle.net,
- farman@linux.ibm.com, ehabkost@redhat.com, sw@weilnetz.de, groug@kaod.org,
- yuval.shaia@oracle.com, dgilbert@redhat.com, alex.williamson@redhat.com,
- integration@gluster.org, clg@kaod.org, stefanha@redhat.com, david@redhat.com,
- jsnow@redhat.com, david@gibson.dropbear.id.au, kwolf@redhat.com,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, berrange@redhat.com,
- andrew@aj.id.au, cohuck@redhat.com, qemu-s390x@nongnu.org, mreitz@redhat.com,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com
+Cc: John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
-
-Here is a proposal of auto propagation for local_err, to not call
-error_propagate on every exit point, when we deal with local_err.
-
-There are also two issues with errp:
-
-1. error_fatal & error_append_hint/error_prepend: user can't see this
-additional info, because exit() happens in error_setg earlier than info
-is added. [Reported by Greg Kurz]
-
-2. error_abort & error_propagate: when we wrap
-error_abort by local_err+error_propagate, resulting coredump will
-refer to error_propagate and not to the place where error happened.
-(the macro itself don't fix the issue, but it allows to [3.] drop all
-local_err+error_propagate pattern, which will definitely fix the issue)
-[Reported by Kevin Wolf]
-
-Still, applying new macro to all errp-functions is a huge task, which is
-impossible to solve in one series.
-
-So, here is a minimum: solve only [1.], by adding new macro to all
-errp-functions which wants to call error_append_hint.
-
-v4;
-02: - check errp to be not NULL
-    - drop Eric's r-b
-03: add Eric's r-b
-04: - rename macro to ERRP_AUTO_PROPAGATE [Kevin]
-    - improve comment and commit msg, mention
-      error_prepend
-05: - handle error_prepend too
-    - use new macro name
-    - drop empty line at the end
-
-commit message for auto-generated commits updated,
-commits regenerated.
-
-I'll use cc-cmd to cc appropriate recipients per patch, still
-cover-letter together with 04-06 patches should be interesting for
-all:
-
-CC: kwolf@redhat.com
-CC: mreitz@redhat.com
-CC: jsnow@redhat.com
-CC: fam@euphon.net
-CC: sw@weilnetz.de
-CC: codyprime@gmail.com
-CC: marcandre.lureau@redhat.com
-CC: pbonzini@redhat.com
-CC: groug@kaod.org
-CC: sundeep.lkml@gmail.com
-CC: peter.maydell@linaro.org
-CC: stefanha@redhat.com
-CC: pburton@wavecomp.com
-CC: arikalo@wavecomp.com
-CC: berrange@redhat.com
-CC: ehabkost@redhat.com
-CC: david@gibson.dropbear.id.au
-CC: clg@kaod.org
-CC: mst@redhat.com
-CC: marcel.apfelbaum@gmail.com
-CC: mark.cave-ayland@ilande.co.uk
-CC: yuval.shaia@oracle.com
-CC: cohuck@redhat.com
-CC: farman@linux.ibm.com
-CC: rth@twiddle.net
-CC: david@redhat.com
-CC: pasic@linux.ibm.com
-CC: borntraeger@de.ibm.com
-CC: kraxel@redhat.com
-CC: alex.williamson@redhat.com
-CC: andrew@aj.id.au
-CC: joel@jms.id.au
-CC: eblake@redhat.com
-CC: armbru@redhat.com
-CC: mdroth@linux.vnet.ibm.com
-CC: quintela@redhat.com
-CC: dgilbert@redhat.com
-CC: jasowang@redhat.com
-CC: qemu-block@nongnu.org
-CC: integration@gluster.org
-CC: qemu-arm@nongnu.org
-CC: qemu-ppc@nongnu.org
-CC: qemu-s390x@nongnu.org
-
-
-Vladimir Sementsov-Ogievskiy (31):
-  errp: rename errp to errp_in where it is IN-argument
-  hw/core/loader-fit: fix freeing errp in fit_load_fdt
-  net/net: fix local variable shadowing in net_client_init
-  error: auto propagated local_err
-  scripts: add script to fix error_append_hint/error_prepend usage
-  python: add commit-per-subsystem.py
-  s390: Fix error_append_hint/error_prepend usage
-  ARM TCG CPUs: Fix error_append_hint/error_prepend usage
-  PowerPC TCG CPUs: Fix error_append_hint/error_prepend usage
-  arm: Fix error_append_hint/error_prepend usage
-  SmartFusion2: Fix error_append_hint/error_prepend usage
-  ASPEED BMCs: Fix error_append_hint/error_prepend usage
-  Boston: Fix error_append_hint/error_prepend usage
-  PowerNV (Non-Virtualized): Fix error_append_hint/error_prepend usage
-  PCI: Fix error_append_hint/error_prepend usage
-  SCSI: Fix error_append_hint/error_prepend usage
-  USB: Fix error_append_hint/error_prepend usage
-  VFIO: Fix error_append_hint/error_prepend usage
-  vhost: Fix error_append_hint/error_prepend usage
-  virtio: Fix error_append_hint/error_prepend usage
-  virtio-9p: Fix error_append_hint/error_prepend usage
-  XIVE: Fix error_append_hint/error_prepend usage
-  block: Fix error_append_hint/error_prepend usage
-  chardev: Fix error_append_hint/error_prepend usage
-  cmdline: Fix error_append_hint/error_prepend usage
-  QOM: Fix error_append_hint/error_prepend usage
-  Migration: Fix error_append_hint/error_prepend usage
-  Sockets: Fix error_append_hint/error_prepend usage
-  nbd: Fix error_append_hint/error_prepend usage
-  PVRDMA: Fix error_append_hint/error_prepend usage
-  ivshmem: Fix error_append_hint/error_prepend usage
-
- include/block/nbd.h                         |  1 +
- include/monitor/hmp.h                       |  2 +-
- include/qapi/error.h                        | 39 +++++++++++-
- ui/vnc.h                                    |  2 +-
- block.c                                     |  3 +
- block/backup.c                              |  1 +
- block/dirty-bitmap.c                        |  1 +
- block/file-posix.c                          |  4 ++
- block/gluster.c                             |  2 +
- block/qcow.c                                |  1 +
- block/qcow2-bitmap.c                        |  1 +
- block/qcow2.c                               |  3 +
- block/vdi.c                                 |  1 +
- block/vhdx-log.c                            |  1 +
- block/vmdk.c                                |  1 +
- block/vpc.c                                 |  1 +
- chardev/spice.c                             |  1 +
- hw/9pfs/9p-local.c                          |  1 +
- hw/9pfs/9p-proxy.c                          |  1 +
- hw/9pfs/9p.c                                |  1 +
- hw/arm/msf2-soc.c                           |  1 +
- hw/arm/virt.c                               |  2 +
- hw/block/dataplane/virtio-blk.c             |  1 +
- hw/core/loader-fit.c                        |  7 ++-
- hw/core/qdev-properties-system.c            |  1 +
- hw/intc/arm_gicv3_kvm.c                     |  1 +
- hw/intc/pnv_xive.c                          |  1 +
- hw/intc/xive.c                              |  3 +
- hw/misc/ivshmem.c                           |  1 +
- hw/misc/msf2-sysreg.c                       |  1 +
- hw/pci-bridge/pcie_root_port.c              |  1 +
- hw/ppc/mac_newworld.c                       |  1 +
- hw/ppc/pnv_lpc.c                            |  1 +
- hw/ppc/pnv_occ.c                            |  1 +
- hw/ppc/spapr.c                              |  1 +
- hw/ppc/spapr_irq.c                          |  1 +
- hw/ppc/spapr_pci.c                          |  1 +
- hw/rdma/vmw/pvrdma_main.c                   |  1 +
- hw/s390x/s390-ccw.c                         |  1 +
- hw/scsi/scsi-disk.c                         |  1 +
- hw/scsi/scsi-generic.c                      |  1 +
- hw/scsi/vhost-scsi.c                        |  1 +
- hw/usb/ccid-card-emulated.c                 |  1 +
- hw/vfio/common.c                            |  3 +
- hw/vfio/pci-quirks.c                        |  1 +
- hw/vfio/pci.c                               |  3 +
- hw/vfio/platform.c                          |  1 +
- hw/virtio/vhost-vsock.c                     |  1 +
- hw/virtio/virtio-pci.c                      |  2 +
- hw/watchdog/wdt_aspeed.c                    |  1 +
- migration/migration.c                       |  1 +
- migration/savevm.c                          |  2 +
- monitor/hmp-cmds.c                          |  8 +--
- nbd/client.c                                |  5 ++
- nbd/server.c                                |  4 ++
- net/net.c                                   | 17 +++--
- qdev-monitor.c                              |  2 +
- target/ppc/kvm.c                            |  2 +
- target/s390x/cpu_models.c                   |  2 +
- ui/vnc.c                                    | 10 +--
- util/error.c                                |  8 +--
- util/qemu-option.c                          |  2 +
- util/qemu-sockets.c                         |  2 +
- python/commit-per-subsystem.py              | 69 +++++++++++++++++++++
- scripts/coccinelle/fix-error-add-info.cocci | 28 +++++++++
- 65 files changed, 247 insertions(+), 27 deletions(-)
- create mode 100755 python/commit-per-subsystem.py
- create mode 100644 scripts/coccinelle/fix-error-add-info.cocci
-
--- 
-2.21.0
-
+MDEuMTAuMjAxOSAxOToxNiwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDEuMTAuMjAxOSB1bSAx
+Nzo1NyBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDAx
+LjEwLjIwMTkgMTc6MTAsIEpvaG4gU25vdyB3cm90ZToNCj4+Pg0KPj4+DQo+Pj4gT24gMTAvMS8x
+OSAxMDowMCBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4+IE90
+aGVyd2lzZTogSSBoYXZlIGEgbG90IG9mIGNsb3VkeSBpZGVhcyBvbiBob3cgdG8gc29sdmUgdGhp
+cywgYnV0DQo+Pj4+PiB1bHRpbWF0ZWx5IHdoYXQgd2Ugd2FudCBpcyB0byBiZSBhYmxlIHRvIGZp
+bmQgdGhlICJhZGRyZXNzYWJsZSIgbmFtZSBmb3INCj4+Pj4+IHRoZSBub2RlIHRoZSBiaXRtYXAg
+aXMgYXR0YWNoZWQgdG8sIHdoaWNoIHdvdWxkIGJlIHRoZSBuYW1lIG9mIHRoZSBmaXJzdA0KPj4+
+Pj4gYW5jZXN0b3Igbm9kZSB0aGF0IGlzbid0IGEgZmlsdGVyLiAoT1IsIHRoZSBuYW1lIG9mIHRo
+ZSBibG9jay1iYWNrZW5kDQo+Pj4+PiBhYm92ZSB0aGF0IG5vZGUuKQ0KPj4+PiBOb3QgdGhlIG5h
+bWUgb2YgYW5jZXN0b3Igbm9kZSwgaXQgd2lsbCBicmVhayBtYXBwaW5nOiBpdCBtdXN0IGJlIG5h
+bWUgb2YgdGhlDQo+Pj4+IG5vZGUgaXRzZWxmIG9yIG5hbWUgb2YgcGFyZW50IChtYXkgYmUgdGhy
+b3VnaCBzZXZlcmFsIGZpbHRlcnMpIGJsb2NrLWJhY2tlbmQNCj4+Pj4NCj4+Pg0KPj4+IEFoLCB5
+b3UgYXJlIHJpZ2h0IG9mIGNvdXJzZSAtLSBiZWNhdXNlIGJsb2NrLWJhY2tlbmRzIGFyZSB0aGUg
+b25seQ0KPj4+ICJub2RlcyIgZm9yIHdoaWNoIHdlIGFjdHVhbGx5IGRlc2NlbmQgdGhlIGdyYXBo
+IGFuZCBhZGQgdGhlIGJpdG1hcCB0bw0KPj4+IGl0cyBjaGlsZC4NCj4+Pg0KPj4+IFNvIHRoZSBy
+ZWFsIGJhY2stcmVzb2x1dGlvbiBtZWNoYW5pc20gaXM6DQo+Pj4NCj4+PiAtIEZpbmQgdGhlIGZp
+cnN0IG5vbi1maWx0ZXIgYW5jZXN0b3IsIEENCj4+PiAtIGlmIEEgaXMgbm90IGEgYmxvY2stYmFj
+a2VuZCwgd2UgbXVzdCB1c2Ugb3VyIG5vZGUtbG9jYWwgbmFtZS4NCj4+PiAtIGlmIEEncyBuYW1l
+IGlzIGVtcHR5LCB3ZSBtdXN0IHVzZSBvdXIgbm9kZS1sb2NhbCBuYW1lLg0KPj4+IC0gSWYgdGhl
+IG5hbWUgd2UgaGF2ZSBjaG9zZW4gaXMgbm90IGlkX3dlbGxmb3JtZWQsIHdlIGhhdmUgbm8NCj4+
+PiBtaWdyYXRpb24tc3RhYmxlIGFkZHJlc3NhYmxlIG5hbWUgZm9yIHRoaXMgYml0bWFwIGFuZCB0
+aGUgbWlncmF0aW9uIG11c3QNCj4+PiBmYWlsIQ0KPj4+DQo+Pj4NCj4+PiBGb3IgcmVzb2x2aW5n
+IGJpdG1hcCBhZGRyZXNzZXMgdmlhIFFNUCAobm9kZSwgbmFtZSkgcGFpcnM7IHRoZQ0KPj4+IHJl
+c29sdXRpb24gbWV0aG9kIHdvdWxkIGJlIHRoaXM6DQo+Pj4NCj4+PiAtIGlmIHRoZSBub2RlLW5h
+bWUgTiBpcyBhIGJsb2NrLWJhY2tlbmQsIGRlc2NlbmQgdGhlIHRyZWUgdW50aWwgd2UgZmluZA0K
+Pj4+IHRoZSBmaXJzdCBub24tZmlsdGVyIG5vZGUgVi4NCj4+PiAtIGlmIHRoZSBub2RlLW5hbWUg
+TiBpcyBhIEJsb2NrRHJpdmVyU3RhdGUsIHVzZSB0aGlzIG5vZGUgZGlyZWN0bHkuDQo+Pj4NCj4+
+DQo+PiBMb29rcyBnb29kIGZvciBtZS4NCj4+DQo+PiBJIGFsc28gdGhpbmsgaWYgb24gZGVzdGlu
+YXRpb24gd2UgaGF2ZSBib3RoIGJsb2NrLWJhY2tlbmQgd2l0aCBuYW1lIE4gYW5kDQo+PiBibG9j
+ay1ub2RlIHdpdGggbmFtZSBOIGFuZCB0aGUgbGF0dGVyIGlzIG5vdCAoZmlsdGVyZWQpIGNoaWxk
+IG9mIHRoZSBmb3JtZXIsDQo+PiB3ZSBzaG91bGQgZmFpbCBtaWdyYXRpb24gb2YgYXQgbGVhc3Qg
+dGhhdCBiaXRtYXAuIChIb3BlLCBub2JvZHkgcmV1c2UNCj4+IGJsb2NrLWJhY2tlbmQgbmFtZXMg
+YXMgbm9kZS1uYW1lcyBpbiBwcmFjdGljZS4uIChzaG91bGQgd2UgcmVzdHJpY3QgaXQNCj4+IGV4
+cGxpY2l0bHkgPykpDQo+IA0KPiBZb3UgY2FuJ3QgaGF2ZSBhIG5vZGUgYW5kIGEgQmxvY2tCYWNr
+ZW5kIG9mIHRoZSBzYW1lIG5hbWUsIHRoZXkgc2hhcmUgYQ0KPiBzaW5nbGUgbmFtZXNwYWNlLiBJ
+ZiB5b3UgdHJ5IHRvIGRvIHNvLCB5b3UgZ2V0IGFuIGVycm9yLg0KPiANCg0KDQpPaCwgdGhhbmtz
+LCB0aGF0J3MgY29vbC4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
