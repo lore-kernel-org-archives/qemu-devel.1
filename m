@@ -2,49 +2,49 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1,WEIRD_QUOTING autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61DE5C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F13D7C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 23:22:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34466215EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:48:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34466215EA
+	by mail.kernel.org (Postfix) with ESMTPS id C2EA221920
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 23:22:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2EA221920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFQwH-0002wh-92
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 18:48:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39183)
+	id 1iFRT2-0002et-T5
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 19:22:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iFQU2-0004SQ-QV
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 18:19:03 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iFRRu-00022i-Q8
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iFQU1-0006tK-EL
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 18:19:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49958)
+ (envelope-from <jsnow@redhat.com>) id 1iFRRt-0004Hx-Fn
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:20:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57418)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iFQTz-0006nJ-3x; Tue, 01 Oct 2019 18:18:59 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iFRRo-0004AP-MN; Tue, 01 Oct 2019 19:20:48 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 57F15308FBA0;
- Tue,  1 Oct 2019 22:18:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1A69B3090FC9;
+ Tue,  1 Oct 2019 23:20:47 +0000 (UTC)
 Received: from [10.18.17.165] (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CBB5B60BE0;
- Tue,  1 Oct 2019 22:18:57 +0000 (UTC)
-Subject: Re: [PATCH 03/67] iotests.py: Add unsupported_imgopts
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8D0E160167;
+ Tue,  1 Oct 2019 23:20:46 +0000 (UTC)
+Subject: Re: [PATCH 04/67] iotests.py: create_test_image, remove_test_image
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20191001194715.2796-1-mreitz@redhat.com>
- <20191001194715.2796-4-mreitz@redhat.com>
+ <20191001194715.2796-5-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -120,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <69b366d3-08f0-e94d-ae11-a64b5be5e30e@redhat.com>
-Date: Tue, 1 Oct 2019 18:18:57 -0400
+Message-ID: <a65b0919-66ee-d1e6-2ba1-94e7ec8fb184@redhat.com>
+Date: Tue, 1 Oct 2019 19:20:46 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191001194715.2796-4-mreitz@redhat.com>
+In-Reply-To: <20191001194715.2796-5-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 01 Oct 2019 22:18:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Tue, 01 Oct 2019 23:20:47 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -154,40 +154,152 @@ Sender: "Qemu-devel"
 
 
 On 10/1/19 3:46 PM, Max Reitz wrote:
+> Python tests should use these two new functions instead of
+> qemu_img('create', ...) + os.remove(), so that user-supplied image
+> options are interpreted and handled correctly.
+> 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/iotests.py | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  tests/qemu-iotests/iotests.py | 56 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 56 insertions(+)
 > 
 > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index cdcb62c4ac..b5ea424de4 100644
+> index b5ea424de4..fce1ab04c9 100644
 > --- a/tests/qemu-iotests/iotests.py
 > +++ b/tests/qemu-iotests/iotests.py
-> @@ -998,7 +998,8 @@ def execute_setup_common(supported_fmts=[],
->                           supported_cache_modes=[],
->                           unsupported_fmts=[],
->                           supported_protocols=[],
-> -                         unsupported_protocols=[]):
-> +                         unsupported_protocols=[],
-> +                         unsupported_imgopts=[]):
->      """
->      Perform necessary setup for either script-style or unittest-style tests.
->      """
-> @@ -1016,6 +1017,10 @@ def execute_setup_common(supported_fmts=[],
->      verify_platform(supported=supported_platforms)
->      verify_cache_mode(supported_cache_modes)
+> @@ -122,6 +122,62 @@ def qemu_img_create(*args):
 >  
-> +    for opt in imgopts:
-> +        if any(unsupported in opt for unsupported in unsupported_imgopts):
+>      return qemu_img(*args)
+>  
+> +def create_test_image(filename, size=None, fmt=imgfmt, opts=[],
+> +                      backing_file=None, backing_fmt=None,
+> +                      objects=[], unsafe=False):
 
-any() is cool and I don't use it as often as I should.
+Python! It's the language that everybody loves and can do no wrong!
 
-> +            notrun('not suitable for this option: %s' % opt)
+Ah, wait, no, maybe the opposite.
+
+You want this:
+
+(..., opts=None, ...):
+    opts = opts or []
+
+because, unfortunately, default parameters are bound at definition time
+and not at call time, so the default list here is like a static local.
+
+> +    if fmt == imgfmt:
+> +        # Only use imgopts for the default format
+> +        opts = imgopts + opts
 > +
->      debug = '-d' in sys.argv
->      if debug:
->          sys.argv.remove('-d')
+> +    for i, opt in enumerate(opts):
+> +        if '$TEST_IMG' in opt:
+> +            opts[i] = opt.replace('$TEST_IMG', filename)
+> +
+> +    # default luks support
+> +    if fmt == 'luks':
+> +        if not any('key-secret' in opt for opt in opts):
+
+You can write "if not 'key-secret' in opts"
+
+> +            opts.append(luks_default_key_secret_opt)
+
+And here we might modify that default list.
+
+> +        objects.append(luks_default_secret_object)
+> +
+> +    args = ['create', '-f', fmt]
+> +
+> +    if len(opts) > 0:
+> +        args += ['-o', ','.join(opts)]
+> +
+> +    if backing_file is not None:
+> +        args += ['-b', backing_file]
+> +
+> +    if backing_fmt is not None:
+> +        args += ['-F', backing_fmt]
+> +
+> +    if len(objects) > 0:
+> +        # Generate a [['--object', $obj], [...], ...] list and flatten it
+> +        args += [arg for objarg in (['--object', obj] for obj in objects) \
+> +                     for arg in objarg]
+
+I may have mentioned at one point that I love comprehensions, but
+dislike nested comprehensions. At this point, I think it's far simpler
+to say:
+
+for obj in objects:
+    args.extend(['--object', obj])
+
+or, even shorter:
+    args += ['--object', obj]
+
+> +
+> +    if unsafe:
+> +        args.append('-u')
+> +
+> +    args.append(filename)
+> +    if size is not None:
+> +        args.append(str(size))
+> +
+> +    return qemu_img(*args)
+> +
+> +# Use this to remove images create with create_test_image in the
+
+created
+
+and you might as well move the # comment to a """docstring""" while
+you're here.
+
+> +# default image format (iotests.imgfmt)
+> +def remove_test_image(filename):
+> +    try:
+> +        os.remove(filename)
+> +
+> +        data_file = next(opt.replace('data_file=', '') \
+> +                            .replace('$TEST_IMG', filename) \
+> +                         for opt in imgopts if opt.startswith('data_file='))
+> +
+
+Learned something today: you can use next() to get the first value from
+a generator expression.
+
+> +        os.remove(data_file)
+
+Keep in mind that if the generator expression returns no results, that
+next() will throw an exception and we won't make it here. That's ok, but,
+
+> +    except:
+> +        pass
+> +
+
+The unqualified except doesn't help me know which errors you expected
+and which you didn't.
+
+We have a function like this elsewhere in the python directory:
+
+def remove_if_exists(filename):
+    try:
+        os.remove(filename)
+    except FileNotFoundError:
+        pass
+
+Can we use that here and remove the try:/except: from this function? It
+will require you to change the list search to something like this instead:
+
+remove_if_exists(filename)
+for opt in (x for x in imgopts if etc):
+    data_file = opt.replace('etc', 'etc')
+    remove_if_exists(data_file)
+
+to avoid the exception when you call next().
+
+>  def qemu_img_verbose(*args):
+>      '''Run qemu-img without suppressing its output and return the exit code'''
+>      exitcode = subprocess.call(qemu_img_args + list(args))
 > 
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+My fussiness with the remove() function is just optional picky stuff,
+but the rest matters, I think.
+
+--js
 
