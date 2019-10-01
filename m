@@ -2,86 +2,89 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DCDC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC174ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:06:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83EA820815
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:05:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83EA820815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 91CFD20815
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:06:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MLz+zj/S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91CFD20815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFImr-0001da-D9
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 10:05:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34849)
+	id 1iFInA-0001sK-G9
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 10:06:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34691)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iFIlf-0000Ok-Kh
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:04:44 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iFIkT-0007oE-SZ
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:03:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iFIle-0007gE-8A
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:04:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47198)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iFIle-0007fl-0Z
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:04:42 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 08AF9C056808
- for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 14:04:41 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id q9so1459605wmj.9
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 07:04:40 -0700 (PDT)
+ (envelope-from <alex.bennee@linaro.org>) id 1iFIkS-0006xx-CY
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:03:29 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41223)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iFIkS-0006wH-4B
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:03:28 -0400
+Received: by mail-wr1-x442.google.com with SMTP id h7so15698373wrw.8
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 07:03:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=SBk+mw3TOLHz533KkD7hOTuvVUzZ0AmohD2RXnzjixQ=;
+ b=MLz+zj/Sr06ei3Yayen/aKt7HP711Dr0aMLZz3KCKbuDL4AmiSMRIYLMqPWrtZU8T1
+ Mo+9688zcf6Dh5H78/+kbl4HMpOvt9NYN+VELgpn2bGPjN1tB5CtBQ/gEWxneKj5o6yO
+ v6Y5R4H2xGNpCyRS4+5iXbW5qK80I8JqfNr8QHBBK5lZRu6tvWknFSN9PXPW/LIul3Dg
+ eYt+J/rVS8+KXISt2ssQJ3f+Qz759HtFl4ViNfUWUsS8MMrwy8d2zloIkkw2vvl4A9Cd
+ dberucgn0BALO2ZL2vgDmnSeFPW3yKvN3jkz+x8Da6AHdleN3B6IJULYF1uKVqUSQ+mM
+ YQ9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NwCNBax/BCJ3LWDkFw2oWrLRTl+HbS0wPMa8AHlid7k=;
- b=Ba0EPiYg6k0hcF5XxyQaKinIxV+n8lP8nIelbPzzkAKY5zOC7BcmcHKzveRKPHdwD1
- E5OW4PupOKvdx/olvNoRtfBkNZPfwjnaPwL82fTijgEPFikzG3IHxnOOUcqKchFPOAOg
- tUMQC7FRJBECa5B9kLfzO1/d8hAk8fgWphzEpe4ueul86nm7hpWMdpX+hQL6qwwodhUQ
- buJdMi5NXTdyhkZ/4hPp7zA09iyM9Ouspurs47lhK5kHxX/+Ytjh9veffudYpXvCN2km
- oCpi5DsDrsdNmbUf94UCxXjS4t0J6EP5AXY04ygFiQ5bTKIEfJFvg7eVnAzrnzFhBYg5
- CZng==
-X-Gm-Message-State: APjAAAURi5e4WRL+0Sj9SwbfCw18b1UwKqpHN6eWLyT/aezZ2jPpeSl1
- ooSnFMObjYMe+HXrbjczpL2DKqnWtac1ygsh1R/tiyc2ZPLenPGisszw3NaMWPyg2cdmt4YQZjC
- gGJYDnzeC5u9cZs8=
-X-Received: by 2002:adf:dd41:: with SMTP id u1mr18755854wrm.49.1569938679194; 
- Tue, 01 Oct 2019 07:04:39 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyC5DwcsrvXyYQ58D9AYuxfVlMDLSNgV4Nzg+RrwjHDgP+o1DHWDTaIxyXtdjzE5ChBDpdgyA==
-X-Received: by 2002:adf:dd41:: with SMTP id u1mr18755832wrm.49.1569938678993; 
- Tue, 01 Oct 2019 07:04:38 -0700 (PDT)
-Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id s1sm22379139wrg.80.2019.10.01.07.04.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Oct 2019 07:04:38 -0700 (PDT)
-Subject: Re: [PATCH 7/8] lm32: do not leak memory on object_new/object_unref
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1569936988-635-1-git-send-email-pbonzini@redhat.com>
- <1569936988-635-8-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4d56a237-f90c-2cfd-656e-86abad0b9d0b@redhat.com>
-Date: Tue, 1 Oct 2019 16:04:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=SBk+mw3TOLHz533KkD7hOTuvVUzZ0AmohD2RXnzjixQ=;
+ b=D/JLs1uWTWVofCe6+/KTP08sGM83VLECcnXZ+eXCi+tvB0KtF2zAqsh9XGvXaO9zYt
+ 2Nlf4xl53zUIzlmkQY2imOo9p4A+TuA5aWsHYEyhYvSoG/DYMjinGzwbrdB2KJE4/5r0
+ mmvMUJRK1VfhwZAvkzEKSC5r42//2fp8UMKgj7PWoejfZ6r100zKoL4DaLSOa3ZJcM65
+ fE2CRTfyhHjPeFFAa0hmG1RSmbU0jvg9XRmatv27qhf0LUIPydAiM1EIJkniDeZ3AckX
+ G3Hn8ZS9/Lpp2iuL+fcGNYuMODxIk24ciiAkTdAlKYe3ZawYyyfP2/RTutSb+yMF3mn9
+ 1+5Q==
+X-Gm-Message-State: APjAAAWGgfFDjW35LiAP+cgSV389PIu/1sd0d/rEM5akgDRZzwJf6e/r
+ 9FR5HjDhJKBUj3ekNpnBbFaRiQ8gCHI=
+X-Google-Smtp-Source: APXvYqx2nVz2IiegpLV6abg2e2wIrNmZjgCzrc+OiRF7LFajxR3ybawL3Hy0YG6ZSUUlN5Ng5LadbQ==
+X-Received: by 2002:a05:6000:186:: with SMTP id
+ p6mr16735866wrx.136.1569938605342; 
+ Tue, 01 Oct 2019 07:03:25 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c9sm2931641wrt.7.2019.10.01.07.03.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Oct 2019 07:03:24 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 877221FF87;
+ Tue,  1 Oct 2019 15:03:23 +0100 (BST)
+References: <20191001132609.23184-1-marcandre.lureau@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH 0/3] Some win32 fixes
+In-reply-to: <20191001132609.23184-1-marcandre.lureau@redhat.com>
+Date: Tue, 01 Oct 2019 15:03:23 +0100
+Message-ID: <878sq4lg0k.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1569936988-635-8-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,79 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pbonzini@redhat.com, sw@weilnetz.de, berrange@redhat.com,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/19 3:36 PM, Paolo Bonzini wrote:
-> Bottom halves and ptimers are malloced, but nothing in these
-> files is freeing memory allocated by instance_init.  Since
-> these are sysctl devices that are never unrealized, just moving
-> the allocations to realize is enough to avoid the leak in
-> practice (and also to avoid upsetting asan when running
-> device-introspect-test).
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   hw/timer/lm32_timer.c       |  6 +++---
->   hw/timer/milkymist-sysctl.c | 10 +++++-----
->   2 files changed, 8 insertions(+), 8 deletions(-)
->=20
-> diff --git a/hw/timer/lm32_timer.c b/hw/timer/lm32_timer.c
-> index ac3edaf..cf316ed 100644
-> --- a/hw/timer/lm32_timer.c
-> +++ b/hw/timer/lm32_timer.c
-> @@ -186,9 +186,6 @@ static void lm32_timer_init(Object *obj)
->  =20
->       sysbus_init_irq(dev, &s->irq);
->  =20
-> -    s->bh =3D qemu_bh_new(timer_hit, s);
-> -    s->ptimer =3D ptimer_init(s->bh, PTIMER_POLICY_DEFAULT);
-> -
->       memory_region_init_io(&s->iomem, obj, &timer_ops, s,
->                             "timer", R_MAX * 4);
->       sysbus_init_mmio(dev, &s->iomem);
-> @@ -198,6 +195,9 @@ static void lm32_timer_realize(DeviceState *dev, Er=
-ror **errp)
->   {
->       LM32TimerState *s =3D LM32_TIMER(dev);
->  =20
-> +    s->bh =3D qemu_bh_new(timer_hit, s);
-> +    s->ptimer =3D ptimer_init(s->bh, PTIMER_POLICY_DEFAULT);
-> +
->       ptimer_set_freq(s->ptimer, s->freq_hz);
->   }
->  =20
-> diff --git a/hw/timer/milkymist-sysctl.c b/hw/timer/milkymist-sysctl.c
-> index 9583507..6aedc11 100644
-> --- a/hw/timer/milkymist-sysctl.c
-> +++ b/hw/timer/milkymist-sysctl.c
-> @@ -283,11 +283,6 @@ static void milkymist_sysctl_init(Object *obj)
->       sysbus_init_irq(dev, &s->timer0_irq);
->       sysbus_init_irq(dev, &s->timer1_irq);
->  =20
-> -    s->bh0 =3D qemu_bh_new(timer0_hit, s);
-> -    s->bh1 =3D qemu_bh_new(timer1_hit, s);
-> -    s->ptimer0 =3D ptimer_init(s->bh0, PTIMER_POLICY_DEFAULT);
-> -    s->ptimer1 =3D ptimer_init(s->bh1, PTIMER_POLICY_DEFAULT);
-> -
->       memory_region_init_io(&s->regs_region, obj, &sysctl_mmio_ops, s,
->               "milkymist-sysctl", R_MAX * 4);
->       sysbus_init_mmio(dev, &s->regs_region);
-> @@ -297,6 +292,11 @@ static void milkymist_sysctl_realize(DeviceState *=
-dev, Error **errp)
->   {
->       MilkymistSysctlState *s =3D MILKYMIST_SYSCTL(dev);
->  =20
-> +    s->bh0 =3D qemu_bh_new(timer0_hit, s);
-> +    s->bh1 =3D qemu_bh_new(timer1_hit, s);
-> +    s->ptimer0 =3D ptimer_init(s->bh0, PTIMER_POLICY_DEFAULT);
-> +    s->ptimer1 =3D ptimer_init(s->bh1, PTIMER_POLICY_DEFAULT);
-> +
->       ptimer_set_freq(s->ptimer0, s->freq_hz);
->       ptimer_set_freq(s->ptimer1, s->freq_hz);
->   }
->=20
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+
+> Hi,
+>
+> Here are a few patches that should fix some busy looping issues
+> already reported >2y ago
+> (https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg00420.html),
+> and fixing test-char on win32.
+>
+> hmm, do we have any automated testing/CI on Windows (beside just
+> cross-compilation)?
+
+Not that I'm aware of. I did briefly look at CircleCI but never beyond
+playing with my own experiments. Ultimately I find it hard to care about
+Windows as I don't have a copy myself. Maybe someone else does care and
+would like to explore further?
+
+FWIW I believe Travis has Windows support now and there is also
+AppVeyor. It's probably worth spreading the love around given how loaded
+our Travis jobs are.
+
+>
+> thanks
+>
+> Marc-Andr=C3=A9 Lureau (3):
+>   util: WSAEWOULDBLOCK on connect should map to EINPROGRESS
+>   tests: skip serial test on windows
+>   win32: fix main-loop busy loop on socket/fd event
+>
+>  tests/test-char.c  | 4 ++--
+>  util/async.c       | 6 +++++-
+>  util/oslib-win32.c | 6 +++++-
+>  3 files changed, 12 insertions(+), 4 deletions(-)
+
+
+--
+Alex Benn=C3=A9e
 
