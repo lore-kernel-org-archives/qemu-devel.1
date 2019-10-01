@@ -2,91 +2,84 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FAEECE58A
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8EC3ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:57:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 581572168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 717DF2168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:57:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cwl9Ha0W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 581572168B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z+ThUQ+x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 717DF2168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFLSD-0007rk-7r
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:56:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54476)
+	id 1iFLSZ-0008J4-4m
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:57:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55780)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iFKtt-0002rL-G4
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:21:22 -0400
+ (envelope-from <ard.biesheuvel@linaro.org>) id 1iFL35-0004Uu-Tm
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iFKts-0007jC-0Y
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:21:20 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34005)
+ (envelope-from <ard.biesheuvel@linaro.org>) id 1iFL33-0007um-Lu
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:30:51 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55917)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iFKtr-0007hz-NC
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:21:19 -0400
-Received: by mail-pg1-x542.google.com with SMTP id y35so10010457pgl.1
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 09:21:19 -0700 (PDT)
+ (Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+ id 1iFL31-0007qS-JR
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:30:49 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a6so4065789wma.5
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 09:30:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=MVWLUa58yr8Pk5/U60QLji+ouS0ZyXlMTMpvCvRvkQQ=;
- b=Cwl9Ha0W28ir6lhSI0zEEN5lPPsoGDw1gtt0pe9aRZ5TJz8DFyzkRJR66siAJA3kZO
- z87xKyJgzkUS0opyeR4oGOfCFPryrTGErsLtTA1cu06FChIYxPRwekluJzslp3jnhtc4
- DrzT9X+ln+XzektpS7IqFo3IJZlTrVion6Sg/CtMiwbJPoVikDCkEayZVhdjgBeGuSGR
- EjLhr21OQkp7nqPkDhWUX4me1OjJVJfMKcLqvFwZPcMUBq/nwsSF9ueiVeA/vSaMIUvX
- nmG0+DTI5IKEdxsm35ElxShLjNIhDc2Q5s/Bm+XIPKIF7EQJ1qj6e78P/hBT3NPVOY6d
- jkvA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=iDE3NPxK2YgasB7/UtWZn8dDQ9EAgUrKIEWxXkVOJEs=;
+ b=Z+ThUQ+xug7orDJ6yRzSKmboswm1kWjiB2agoyiTUNh4x3wAf0YD0YcWjh22THsmtQ
+ gn/f0sQRWXAYFaCtstRqGFFxGkc1RK1jt0O3BAo7wctY8ntLdu2YZbwnHpjiwMzOx0LX
+ 5jQmCOzvAnn2W6GyqDcD3S2CTvVFY2HnEe0SNHRlwnIgm6sPBopaOXXhJxTaILtdONN0
+ lbrD+Y1rbRQNV2RVo7bwc70M3WpSGXY7gEYRBraS4H+9wy9d+eqZbKG5TTAbFlchfX/q
+ 6ddW+REWFJJewJkinmVhOsU2Bl4Ite9mzoIFArQL8A4/c3Zd6w5/DMDc//i/ChKjN8g3
+ LV9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MVWLUa58yr8Pk5/U60QLji+ouS0ZyXlMTMpvCvRvkQQ=;
- b=S07SkiDq88kVA8XmG3VjRG/KcpWqA1CmJYjL1xTdjJZWsInP6ge+PpFGqUI+x4RnGC
- exE1CAhR5UxevIqLtGgkIxwDbaNshIL1eZKAeP88hKXdOQZjXmHR8Sukz5rK3LVi8TTg
- HbkGuMMheFk0832AUwRECoUutwBDeY7ii5/cHdpbbv1t11G6S5Ucg5IMQoBvEyonzsK5
- 04Cggp+0tZZ/3B246Rs65ztpxGBOuLZWHWEvgv7hMWPulvpTS4Klh62dOwwByaQ9jvsm
- Rb+Nv1gXWWTEteBRTJiq4oE/fLi5Vo8Kk1/N6PeVaJQjGLt9Gi/QvSk3S4H9ha+M8Tyb
- 3QAg==
-X-Gm-Message-State: APjAAAX7KrV6KzbHXge6S6tJ8e+ouPyGtPrrMw47haKwG4GyC0OrRPZt
- llaJDhoquL71lGW5LRtXm1K1vA==
-X-Google-Smtp-Source: APXvYqwz9yGSVgpikBPwXBqsXtT5tdviXokaugGSuLOE4vWSvJJPq8m4B5P27aYsdS+7ToWL0gnQBA==
-X-Received: by 2002:a65:5186:: with SMTP id h6mr30849410pgq.304.1569946878227; 
- Tue, 01 Oct 2019 09:21:18 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id a16sm5255539pfa.53.2019.10.01.09.21.16
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 01 Oct 2019 09:21:17 -0700 (PDT)
-Subject: Re: [PATCH v4 09/18] target/s390x: Return exception from mmu_translate
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190927193925.23567-1-richard.henderson@linaro.org>
- <20190927193925.23567-10-richard.henderson@linaro.org>
- <68d9b84b-7c89-46c3-a97d-2c67d75aeddf@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <c1ab1031-e8ea-a472-e1df-1dc68905ad04@linaro.org>
-Date: Tue, 1 Oct 2019 09:21:15 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=iDE3NPxK2YgasB7/UtWZn8dDQ9EAgUrKIEWxXkVOJEs=;
+ b=ZNZ7ojID41fupWmj4l5wm5en8Ij3lzcAjvAXh/5RWUsfmhhrsI0u9h4AJ5oGIv/RqM
+ eyo7HPB7HfZevhshSsDO8AHpeXH0uaGUVYXmixCqmcO8U3rvYOvJF5dmkCZqqfn6kySL
+ Ie14vkruLiWjjgn7qqqrrYxKejfHFqsMDYZuEXt9pgZjkis/e4dzFPXODIRlhFwog/VW
+ oWHW4obHqZ1CsMYYlDqjuEkebrOAXO2nmy/AkkBoohdUCMPQ2+Xq7ZcnMv5vNRTecxuX
+ HIMPlw8TUvu2qfulKoeWAR9ISoAgGX1KSmzjuymvKfC+0IuZKd78CrzvKhKej0xbSYXy
+ e8kg==
+X-Gm-Message-State: APjAAAVQ7sixpfLQn7dhCVL4UkS8nXrJkwQ3zAl4mwwxCqLhdXlnWvQa
+ 3s+8yd9Id0vPkkJ9qdK9WduNaPcJn1XwrciHYoSQNA==
+X-Google-Smtp-Source: APXvYqwipksf2TwEi2e68Whm0YBn1mVgixnRiNECnv3He5K5g1x0UStfqNvDR5EZOcqecODCsX04tSrjHC7XFo34klA=
+X-Received: by 2002:a7b:cb55:: with SMTP id v21mr4537934wmj.53.1569947443269; 
+ Tue, 01 Oct 2019 09:30:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <68d9b84b-7c89-46c3-a97d-2c67d75aeddf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <21633062-b021-a8e7-0cc8-062f4c29dde5@linux.microsoft.com>
+ <ca5c74db-cf5d-0c3f-eb6f-27d1092420ae@linux.microsoft.com>
+ <65b49cb0-c9fb-d966-8dec-1e39d09ab8c7@redhat.com>
+ <88878b22-803f-41fc-9df2-2c6eb551b98d@linux.microsoft.com>
+In-Reply-To: <88878b22-803f-41fc-9df2-2c6eb551b98d@linux.microsoft.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Tue, 1 Oct 2019 18:30:31 +0200
+Message-ID: <CAKv+Gu8kwg_tsrH7qne3H11hUPyA6zw-J_jpUmiyJMvXo3-SNQ@mail.gmail.com>
+Subject: Re: Is kexec supported in QEMU for ARM64 (qemu-system-aarch64) with
+ arm-trusted-firmware, optee, and u-boot.
+To: Lakshmi Ramasubramanian <nramas@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,34 +91,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/19 8:30 AM, David Hildenbrand wrote:
->   TEST    check-qtest-s390x: tests/test-hmp
-> Broken pipe
-> tests/libqtest.c:149: kill_qemu() detected QEMU death from signal 11
-> (Segmentation fault) (core dumped)
+On Tue, 1 Oct 2019 at 00:27, Lakshmi Ramasubramanian
+<nramas@linux.microsoft.com> wrote:
+>
+> On 9/27/19 2:15 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>
+> > Cc'ing Ard too
+> >>
+> >> https://salsa.debian.org/debian/atf-allwinner/commit/b6b671c4ac4bd5595=
+306863225bb3bece1e6135c
+> >>
+> >>
+> >> Current limitations:
+> >> * Only cold boot is supported
+> >> * No build instructions for QEMU_EFI.fd and rootfs-arm64.cpio.gz
+> >> * No instructions for how to load a BL32 (Secure Payload)
+> >>
+> >> So looks like only cold boot is supported (no kexec support)
+> >> Is this correct?
+>
+> Just wanted to check again -
+>
+> Does ATF and QEMU (for ARM64) support cold boot only and does not have
+> support for kexec?
+>
 
-Missed a change to s390_cpu_get_phys_page_debug:
-
-(gdb) bt 4
-#0  0x00005555557a4923 in mmu_translate (env=0x555555f7c330,
-vaddr=vaddr@entry=0, rw=rw@entry=0, asc=0, raddr=raddr@entry=0x7fffffffd010,
-flags=flags@entry=0x7fffffffd00c, tec=0x0) at
-/home/rth/qemu/qemu/target/s390x/mmu_helper.c:376
-#1  0x000055555575a135 in s390_cpu_get_phys_page_debug (cs=<optimized out>,
-vaddr=0) at /home/rth/qemu/qemu/target/s390x/helper.c:70
-#2  0x0000555555752219 in cpu_get_phys_page_attrs_debug (attrs=0x7fffffffd034,
-addr=0, cpu=<optimized out>) at /home/rth/qemu/qemu/include/hw/core/cpu.h:605
-#3  0x0000555555752219 in hmp_gva2gpa (mon=0x555555f53310, qdict=<optimized
-out>) at /home/rth/qemu/qemu/monitor/misc.c:850
-
-Irritating that the "0" produced an implicit null instead of a compile-time
-failure.  Anyway, will fix and rebase on your mmu branch.
-
-
-r~
+kexec is a linux concept, so whether it is supported should not depend
+on the secure world firmware or the underlying host.
 
