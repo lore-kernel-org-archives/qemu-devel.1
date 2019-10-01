@@ -2,52 +2,68 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 110CCC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:37:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B02AECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:38:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D58512168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:37:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58512168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7533D21906
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:38:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7533D21906
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFL9q-0001Bm-BJ
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:37:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50272)
+	id 1iFLAi-0002iv-1M
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:38:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53176)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTQ-0008Vk-GX
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:01 -0400
+ (envelope-from <eblake@redhat.com>) id 1iFKmk-0005Mz-MH
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:13:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTO-0006tw-7r
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:59 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38464)
+ (envelope-from <eblake@redhat.com>) id 1iFKmj-0002Zi-NC
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:13:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41778)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKTN-0006ZZ-W0; Tue, 01 Oct 2019 11:53:58 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKT1-0004xb-Eu; Tue, 01 Oct 2019 18:53:35 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 22/31] XIVE: Fix error_append_hint/error_prepend usage
-Date: Tue,  1 Oct 2019 18:53:10 +0300
-Message-Id: <20191001155319.8066-23-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iFKmj-0002Yz-HS
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:13:57 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7C1A1308FBA6;
+ Tue,  1 Oct 2019 16:13:56 +0000 (UTC)
+Received: from [10.3.116.201] (ovpn-116-201.phx2.redhat.com [10.3.116.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2686B5C22C;
+ Tue,  1 Oct 2019 16:13:56 +0000 (UTC)
+Subject: Re: [PATCH v4 02/31] hw/core/loader-fit: fix freeing errp in
+ fit_load_fdt
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <c03a20b1-a9a4-25a9-67a2-7a2a86f7f504@redhat.com>
+Date: Tue, 1 Oct 2019 11:13:55 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <20191001155319.8066-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Tue, 01 Oct 2019 16:13:56 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,73 +75,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Paul Burton <pburton@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+On 10/1/19 10:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+> fit_load_fdt forget to check that errp is not NULL and to zero it after
+> freeing. Fix it.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   hw/core/loader-fit.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
 
-This commit (together with its neighbors) was generated by
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-git grep -l 'error_\(append_hint\|prepend\)(errp' | while read f; do \
-spatch --sp-file scripts/coccinelle/fix-error-add-info.cocci \
---in-place $f; done
+> 
+> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
+> index 953b16bc82..3ee9fb2f2e 100644
+> --- a/hw/core/loader-fit.c
+> +++ b/hw/core/loader-fit.c
+> @@ -200,7 +200,10 @@ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
+>       err = fit_image_addr(itb, img_off, "load", &load_addr, errp);
+>       if (err == -ENOENT) {
+>           load_addr = ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
+> -        error_free(*errp);
+> +        if (errp) {
+> +            error_free(*errp);
+> +            *errp = NULL;
+> +        }
+>       } else if (err) {
+>           error_prepend(errp, "unable to read FDT load address from FIT: ");
+>           ret = err;
+> 
 
-and then
-
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-and then by hand, for not maintained changed files:
-
-git commit -m "<SUB-SYSTEM>: $(< auto-msg)" <FILES>
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- hw/intc/xive.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index b7417210d8..926cb6741d 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -570,6 +570,7 @@ static void xive_tctx_reset(void *dev)
- 
- static void xive_tctx_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     XiveTCTX *tctx = XIVE_TCTX(dev);
-     PowerPCCPU *cpu;
-     CPUPPCState *env;
-@@ -1050,6 +1051,7 @@ static void xive_source_reset(void *dev)
- 
- static void xive_source_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     XiveSource *xsrc = XIVE_SOURCE(dev);
-     Object *obj;
-     Error *local_err = NULL;
-@@ -1798,6 +1800,7 @@ static const MemoryRegionOps xive_end_source_ops = {
- 
- static void xive_end_source_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     XiveENDSource *xsrc = XIVE_END_SOURCE(dev);
-     Object *obj;
-     Error *local_err = NULL;
 -- 
-2.21.0
-
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
