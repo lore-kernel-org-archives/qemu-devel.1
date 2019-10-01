@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0877ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D79BECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:15:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B862F2133F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:11:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B862F2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 6262F2070B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:15:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6262F2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFOUg-0000Aq-6V
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 16:11:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54613)
+	id 1iFOYt-0003ZJ-31
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 16:15:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54255)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFO8I-00050Q-OY
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:48:28 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFO7q-0004dI-20
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:47:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFO8H-00089W-4G
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:48:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60188)
+ (envelope-from <mreitz@redhat.com>) id 1iFO7o-0007tf-B8
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:47:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44048)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFO89-00085M-Kv; Tue, 01 Oct 2019 15:48:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iFO7j-0007nP-I1; Tue, 01 Oct 2019 15:47:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 493DA10DCC92;
- Tue,  1 Oct 2019 19:48:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A10373018FC5;
+ Tue,  1 Oct 2019 19:47:50 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D7C4519C6A;
- Tue,  1 Oct 2019 19:48:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D78B6012C;
+ Tue,  1 Oct 2019 19:47:49 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 25/67] iotests/118: Honor $IMGOPTS
-Date: Tue,  1 Oct 2019 21:46:33 +0200
-Message-Id: <20191001194715.2796-26-mreitz@redhat.com>
+Subject: [PATCH 14/67] iotests: Use unsupported_imgopts in Python tests
+Date: Tue,  1 Oct 2019 21:46:22 +0200
+Message-Id: <20191001194715.2796-15-mreitz@redhat.com>
 In-Reply-To: <20191001194715.2796-1-mreitz@redhat.com>
 References: <20191001194715.2796-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Tue, 01 Oct 2019 19:48:16 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Tue, 01 Oct 2019 19:47:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,109 +73,242 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Set unsupported_imgopts as appropriate for all tests that should make
+use of it.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/118 | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ tests/qemu-iotests/044 | 5 ++++-
+ tests/qemu-iotests/057 | 4 +++-
+ tests/qemu-iotests/065 | 4 +++-
+ tests/qemu-iotests/163 | 5 ++++-
+ tests/qemu-iotests/165 | 4 +++-
+ tests/qemu-iotests/196 | 4 +++-
+ tests/qemu-iotests/206 | 5 ++++-
+ tests/qemu-iotests/222 | 3 ++-
+ tests/qemu-iotests/237 | 4 +++-
+ tests/qemu-iotests/242 | 4 +++-
+ tests/qemu-iotests/245 | 4 +++-
+ tests/qemu-iotests/246 | 5 ++++-
+ tests/qemu-iotests/248 | 6 +++++-
+ tests/qemu-iotests/254 | 4 +++-
+ tests/qemu-iotests/257 | 4 +++-
+ 15 files changed, 50 insertions(+), 15 deletions(-)
 
-diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-index ea0b326ae0..634a0b6445 100755
---- a/tests/qemu-iotests/118
-+++ b/tests/qemu-iotests/118
-@@ -23,7 +23,7 @@ import os
- import stat
- import time
+diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
+index 8b2afa2a11..97ba98e628 100755
+--- a/tests/qemu-iotests/044
++++ b/tests/qemu-iotests/044
+@@ -116,4 +116,7 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['qcow2'],
+-                 supported_protocols=3D['file'])
++                 supported_protocols=3D['file'],
++                 # These refcount calculations do not work with data_fil=
+e or
++                 # with any refcount width but the default (of 16)
++                 unsupported_imgopts=3D['data_file', 'refcount_bits'])
+diff --git a/tests/qemu-iotests/057 b/tests/qemu-iotests/057
+index 9fbba759b6..f5aa5929dc 100755
+--- a/tests/qemu-iotests/057
++++ b/tests/qemu-iotests/057
+@@ -257,4 +257,6 @@ class TestSnapshotDelete(ImageSnapshotTestCase):
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['qcow2'],
+-                 supported_protocols=3D['file'])
++                 supported_protocols=3D['file'],
++                 # Snapshots do not work with data_file
++                 unsupported_imgopts=3D['data_file'])
+diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
+index 5b21eb96bd..9db9552784 100755
+--- a/tests/qemu-iotests/065
++++ b/tests/qemu-iotests/065
+@@ -130,4 +130,6 @@ TestQMP =3D None
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['qcow2'],
+-                 supported_protocols=3D['file'])
++                 supported_protocols=3D['file'],
++                 # Neither of these options would work with compat=3D0.1=
+0
++                 unsupported_imgopts=3D['refcount_bits', 'data_file'])
+diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
+index d94728e080..92633f1b21 100755
+--- a/tests/qemu-iotests/163
++++ b/tests/qemu-iotests/163
+@@ -168,4 +168,7 @@ ShrinkBaseClass =3D None
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['raw', 'qcow2'],
+-                 supported_protocols=3D['file'])
++                 supported_protocols=3D['file'],
++                 # We want to set our own refcount_bits, and that will
++                 # not work with compat=3D0.10
++                 unsupported_imgopts=3D['refcount_bits', 'compat=3D0.10'=
+])
+diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+index 5650dc7c87..97dd7102c3 100755
+--- a/tests/qemu-iotests/165
++++ b/tests/qemu-iotests/165
+@@ -104,4 +104,6 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['qcow2'],
+-                 supported_protocols=3D['file'])
++                 supported_protocols=3D['file'],
++                 # compat=3D1.1 is needed for dirty bitmaps
++                 unsupported_imgopts=3D['compat=3D0.10'])
+diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
+index 92fe9244f8..ec4852a19c 100755
+--- a/tests/qemu-iotests/196
++++ b/tests/qemu-iotests/196
+@@ -64,4 +64,6 @@ class TestInvalidateAutoclear(iotests.QMPTestCase):
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['qcow2'],
+-                 supported_protocols=3D['file'])
++                 supported_protocols=3D['file'],
++                 # compat=3D1.1 is needed for autoclear flags
++                 unsupported_imgopts=3D['compat=3D0.10'])
+diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
+index 23ff2f624b..91dd6ee176 100755
+--- a/tests/qemu-iotests/206
++++ b/tests/qemu-iotests/206
+@@ -23,7 +23,10 @@
  import iotests
--from iotests import qemu_img
-+from iotests import create_test_image, remove_test_image
+ from iotests import imgfmt
 =20
- old_img =3D os.path.join(iotests.test_dir, 'test0.img')
- new_img =3D os.path.join(iotests.test_dir, 'test1.img')
-@@ -301,8 +301,8 @@ class TestInitiallyFilled(GeneralChangeTestsBaseClass=
-):
-     was_empty =3D False
+-iotests.script_initialize(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          # All options are ignored
++                          unsupported_imgopts=3D['compat=3D0.10', 'refco=
+unt_bits',
++                                               'data_file'])
 =20
-     def setUp(self):
--        qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
--        qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
-+        create_test_image(old_img, '1440k')
-+        create_test_image(new_img, '1440k')
-         self.vm =3D iotests.VM()
-         if self.use_drive:
-             self.vm.add_drive(old_img, 'media=3D%s' % self.media, 'none'=
-)
-@@ -320,8 +320,8 @@ class TestInitiallyFilled(GeneralChangeTestsBaseClass=
-):
+ def blockdev_create(vm, options):
+     result =3D vm.qmp_log('blockdev-create',
+diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
+index 6788979ed3..ffa88d4bb9 100644
+--- a/tests/qemu-iotests/222
++++ b/tests/qemu-iotests/222
+@@ -25,7 +25,8 @@ import iotests
+ from iotests import log, qemu_img, qemu_io, qemu_io_silent
 =20
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(old_img)
--        os.remove(new_img)
-+        remove_test_image(old_img)
-+        remove_test_image(new_img)
+ iotests.script_initialize(supported_fmts=3D['qcow2', 'qcow', 'qed', 'vmd=
+k',
+-                                          'vhdx', 'raw'])
++                                          'vhdx', 'raw'],
++                          unsupported_imgopts=3D['streamOptimized'])
 =20
-     def test_insert_on_filled(self):
-         result =3D self.vm.qmp('blockdev-add',
-@@ -344,7 +344,7 @@ class TestInitiallyEmpty(GeneralChangeTestsBaseClass)=
-:
-     was_empty =3D True
+ patterns =3D [("0x5d", "0",         "64k"),
+             ("0xd5", "1M",        "64k"),
+diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
+index 3758ace0bc..34ff4b55db 100755
+--- a/tests/qemu-iotests/237
++++ b/tests/qemu-iotests/237
+@@ -24,7 +24,9 @@ import math
+ import iotests
+ from iotests import imgfmt
 =20
-     def setUp(self):
--        qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
-+        create_test_image(new_img, '1440k')
-         self.vm =3D iotests.VM()
-         if self.use_drive:
-             self.vm.add_drive(None, 'media=3D%s' % self.media, 'none')
-@@ -358,7 +358,7 @@ class TestInitiallyEmpty(GeneralChangeTestsBaseClass)=
-:
+-iotests.script_initialize(supported_fmts=3D['vmdk'])
++iotests.script_initialize(supported_fmts=3D['vmdk'],
++                          # All options are ignored
++                          unsupported_imgopts=3D['subformat'])
 =20
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(new_img)
-+        remove_test_image(new_img)
+ def blockdev_create(vm, options):
+     result =3D vm.qmp_log('blockdev-create', job_id=3D'job0', options=3D=
+options,
+diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
+index 21f69a0d2c..333fb8b56c 100755
+--- a/tests/qemu-iotests/242
++++ b/tests/qemu-iotests/242
+@@ -24,7 +24,9 @@ import struct
+ from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
+     file_path, img_info_log, log, filter_qemu_io
 =20
-     def test_remove_on_empty(self):
-         result =3D self.vm.qmp('blockdev-open-tray', id=3Dself.device_na=
-me)
-@@ -394,16 +394,16 @@ class TestChangeReadOnly(ChangeBaseClass):
-     device_name =3D 'qdev0'
+-iotests.script_initialize(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          # compat=3D1.1 is needed for dirty bitmaps
++                          unsupported_imgopts=3D['compat=3D0.10'])
 =20
-     def setUp(self):
--        qemu_img('create', '-f', iotests.imgfmt, old_img, '1440k')
--        qemu_img('create', '-f', iotests.imgfmt, new_img, '1440k')
-+        create_test_image(old_img, '1440k')
-+        create_test_image(new_img, '1440k')
-         self.vm =3D iotests.VM()
+ disk =3D file_path('disk')
+ chunk =3D 256 * 1024
+diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
+index 50544a7836..72ab2a248d 100644
+--- a/tests/qemu-iotests/245
++++ b/tests/qemu-iotests/245
+@@ -1002,4 +1002,6 @@ class TestBlockdevReopen(iotests.QMPTestCase):
+ if __name__ =3D=3D '__main__':
+     iotests.activate_logging()
+     iotests.main(supported_fmts=3D["qcow2"],
+-                 supported_protocols=3D["file"])
++                 supported_protocols=3D["file"],
++                 # reopen options differ with an external data file
++                 unsupported_imgopts=3D['data_file'])
+diff --git a/tests/qemu-iotests/246 b/tests/qemu-iotests/246
+index 1d7747d62d..d1364d5901 100755
+--- a/tests/qemu-iotests/246
++++ b/tests/qemu-iotests/246
+@@ -22,7 +22,10 @@
+ import iotests
+ from iotests import log
 =20
-     def tearDown(self):
-         self.vm.shutdown()
-         os.chmod(old_img, 0o666)
-         os.chmod(new_img, 0o666)
--        os.remove(old_img)
--        os.remove(new_img)
-+        remove_test_image(old_img)
-+        remove_test_image(new_img)
+-iotests.script_initialize(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          # compat=3D1.1 is needed for dirty bitmaps
++                          unsupported_imgopts=3D['compat=3D0.10'])
++
+ size =3D 64 * 1024 * 1024 * 1024
+ gran_small =3D 32 * 1024
+ gran_large =3D 128 * 1024
+diff --git a/tests/qemu-iotests/248 b/tests/qemu-iotests/248
+index 781b21b227..0adc4da802 100755
+--- a/tests/qemu-iotests/248
++++ b/tests/qemu-iotests/248
+@@ -21,7 +21,11 @@
+ import iotests
+ from iotests import qemu_img_create, qemu_io, file_path, filter_qmp_test=
+files
 =20
-     def test_ro_ro_retain(self):
-         os.chmod(old_img, 0o444)
-@@ -640,7 +640,7 @@ class TestBlockJobsAfterCycle(ChangeBaseClass):
-     device_name =3D 'qdev0'
+-iotests.script_initialize(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          # With an external data file, we would need
++                          # to impose the limit on @data-file instead
++                          # of @file
++                          unsupported_imgopts=3D['data_file'])
 =20
-     def setUp(self):
--        qemu_img('create', '-f', iotests.imgfmt, old_img, '1440K')
-+        create_test_image(old_img, '1440k')
+ source, target =3D file_path('source', 'target')
+ size =3D 5 * 1024 * 1024
+diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
+index 43b40f4f71..0404faf853 100755
+--- a/tests/qemu-iotests/254
++++ b/tests/qemu-iotests/254
+@@ -21,7 +21,9 @@
+ import iotests
+ from iotests import qemu_img_create, file_path, log
 =20
-         self.vm =3D iotests.VM()
-         self.vm.add_drive_raw("id=3Ddrive0,driver=3Dnull-co,if=3Dnone")
-@@ -674,7 +674,7 @@ class TestBlockJobsAfterCycle(ChangeBaseClass):
+-iotests.script_initialize(supported_fmts=3D['qcow2'])
++iotests.script_initialize(supported_fmts=3D['qcow2'],
++                          # compat=3D1.1 is needed for dirty bitmaps
++                          unsupported_imgopts=3D['compat=3D0.10'])
 =20
-     def tearDown(self):
-         self.vm.shutdown()
--        os.remove(old_img)
-+        remove_test_image(old_img)
-         try:
-             os.remove(new_img)
-         except OSError:
+ disk, top =3D file_path('disk', 'top')
+ size =3D 1024 * 1024
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index de8b45f094..82c10e9b52 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -526,4 +526,6 @@ def main():
+=20
+ if __name__ =3D=3D '__main__':
+     iotests.script_main(main, supported_fmts=3D['qcow2'],
+-                        supported_protocols=3D['file'])
++                        supported_protocols=3D['file'],
++                        # blkdebug does not work with an external data f=
+ile
++                        unsupported_imgopts=3D['data_file'])
 --=20
 2.21.0
 
