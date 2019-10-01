@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79862ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B27ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:08:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5059721783
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:08:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5059721783
+	by mail.kernel.org (Postfix) with ESMTPS id 476F62168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:08:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 476F62168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKh8-0006fm-16
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:08:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50123)
+	id 1iFKhc-0007CF-8C
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:08:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49924)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTG-0008La-EJ
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:52 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT1-00083H-Ux
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTF-0006mj-4k
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:50 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38500)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT0-0006YC-Nc
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:35 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38386)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKTE-0006bI-18
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:48 -0400
+ id 1iFKT0-0006Wc-CP
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:34 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKT1-0004xb-Vq; Tue, 01 Oct 2019 18:53:36 +0300
+ id 1iFKSz-0004xb-4e; Tue, 01 Oct 2019 18:53:33 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 24/31] chardev: Fix error_append_hint/error_prepend usage
-Date: Tue,  1 Oct 2019 18:53:12 +0300
-Message-Id: <20191001155319.8066-25-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 15/31] PCI: Fix error_append_hint/error_prepend usage
+Date: Tue,  1 Oct 2019 18:53:03 +0300
+Message-Id: <20191001155319.8066-16-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
@@ -60,9 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Greg Kurz <groug@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -95,21 +94,21 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- chardev/spice.c | 1 +
+ hw/pci-bridge/pcie_root_port.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/chardev/spice.c b/chardev/spice.c
-index 241e2b7770..ce2145fb19 100644
---- a/chardev/spice.c
-+++ b/chardev/spice.c
-@@ -267,6 +267,7 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
-                                     bool *be_opened,
-                                     Error **errp)
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+index 012c2cb12c..a1b4989534 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -60,6 +60,7 @@ static void rp_reset(DeviceState *qdev)
+ 
+ static void rp_realize(PCIDevice *d, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     ChardevSpiceChannel *spicevmc = backend->u.spicevmc.data;
-     const char *type = spicevmc->type;
-     const char **psubtype = spice_server_char_device_recognized_subtypes();
+     PCIEPort *p = PCIE_PORT(d);
+     PCIESlot *s = PCIE_SLOT(d);
+     PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
 -- 
 2.21.0
 
