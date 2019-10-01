@@ -2,95 +2,91 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA30C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18BE6ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:04:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75DE820842
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89AE020679
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:04:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UMQ8zBfP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75DE820842
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j4zixZk6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89AE020679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFJcb-0002YQ-Gz
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 10:59:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41878)
+	id 1iFJhF-0004ov-FV
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 11:04:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iFJbp-00023M-3F
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:58:38 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iFJfu-0004F8-Ri
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iFJbn-0001Fo-EO
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:58:36 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39519)
+ (envelope-from <richard.henderson@linaro.org>) id 1iFJft-0005ok-KO
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:02:50 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33591)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iFJbm-0001DN-Se
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:58:35 -0400
-Received: by mail-pf1-x442.google.com with SMTP id v4so8189336pff.6
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 07:58:34 -0700 (PDT)
+ id 1iFJft-0005nq-AJ
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:02:49 -0400
+Received: by mail-pf1-x443.google.com with SMTP id q10so8215787pfl.0
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 08:02:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=/JL+zK5aB05w59Mhh8gwF+qq5BJ2HD/AYUdSpTxnNjY=;
- b=UMQ8zBfPOToVJLve+NOXc1Wt34sVlASxStZZy4u9CInuLQgyEmTl6uw6cJ983b4ldS
- W5823qYifukAkdAIakS1JN1FJ7PY7bnU4Ao/W6YlQT15Zfl+I2gRDvncWpmNEEi6WlMX
- W/Ot9xDiKqXuP3U2sjuIYP0R36z7prnCHv3apNBBKowtjGeIsgnst3J6SOstJbWtICep
- r2FPaQB8EMFA14IZHfLq4XgjAlh/0vmYDpTArFwrMfhjc20POkcxp2XqW68IY26rpKdv
- 1I8cAyuTyGAGzzi8EDWZkgtkRv/f5q+iQHk9AHSeL1JCnmvJmVbUlq3fRNZz2KORpZh+
- xZZg==
+ bh=uUlH9siQyuFoZKL5TvfF0WXHYXLRpTR6mgnVnxWFD3w=;
+ b=j4zixZk6Yd/Dy/PBG4I+QxYknHXieQlH+h4pcLbeJ5vHX6qN1H+vsiTVl27X9Ly5GC
+ 9E13R7hrF/itIqEPt++kIT/xySs8TzGAc1sYoqNBu/Y9wZ4RRMsXlD+muNtjK1LxqnBK
+ cv5VqH+1UwZsKmUmgSuT7/H993jj8K7ApcyPN6Lq7VqlrB2iBf45hbtlS7KGXiSDzSkO
+ 16uNm3hr/2L1EiHu9HluDJN0zUyIPYAdZgzYZOiYDzMBAlJYUcs6Xrjm1VZh0yOFTeQg
+ vVfq8ygycGOWJIl/0oXagqZ+oYwRqOoHx2uOS/ALXJHLU4mtMgvkps/6zrTBUU/egBJD
+ 4J3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=/JL+zK5aB05w59Mhh8gwF+qq5BJ2HD/AYUdSpTxnNjY=;
- b=txlyAdw/br0XzXIRmGMEv6jgg+Kxi9JSt42ORsaBNySkZYa1NgwWv4Crtph9QYJ2DL
- xpup785HIoFdfRoSL83Y+EA5AnnjKFVVjUiY6Jltg0xMaMJUa3Rqj/ikXs3jtg3lIh0O
- MSS4vF3W5eCPGFLyNbsmqgvQ9CbhsB9GaNbi85nSvXYQn6IoCPmkGIOVG4GnRgC5IeFq
- QOoy28bdBzrjB5swe5pYyidHoYvy8228lwSxAGjqvxwBWMSDUDrpbsNOMa8N5KtI8uSW
- /dKKARmid6M6nM4myxMxdDT3CndBHaRtDwjLbO7ZdaNz3pnD41AfjTgqj5Nq95Ak22+w
- 0B0Q==
-X-Gm-Message-State: APjAAAXgLwJ3Rs7G+9OzXnmUBnLHHM9f1CsK+WaJGVVcBXmvR5rG/uIt
- WfSVYVp8cfuOG5T7Hwf4Bumsag==
-X-Google-Smtp-Source: APXvYqxwTLXIJiVNlJJ0gRcdTUB4TEJllO1bxiVNvTHJHNgAE1c8059L3pZFPKheG9TTtedmQ+DnDQ==
-X-Received: by 2002:aa7:9ab5:: with SMTP id x21mr27768245pfi.252.1569941913690; 
- Tue, 01 Oct 2019 07:58:33 -0700 (PDT)
+ bh=uUlH9siQyuFoZKL5TvfF0WXHYXLRpTR6mgnVnxWFD3w=;
+ b=WGFafVamM8uxaZeAqCn44FnsJsBHrUFOST3nln54XZbEMyaWXjzsLBcuNEIYDcMANZ
+ 67//Qz/eSQo2o5jut3RUjaCMt8GEnwIdiGFroU6CFcwKRuLn2ziq5tC9boJVvPYJHAUA
+ lAjthroMqmhv9sFFi9OhdsWeVEWTHPqxUhR7GmnB77FT0xXmv5Ujqn3zC3NOvPJQ46Wp
+ YUz0XGB/Z7A2B5D11kk+n25n+7mJC24k0nMCNte2mZdvKz4plAsATLcUtGdODSGPrxLf
+ 5aG0IKEzn+DWksvmAPspQEDqkmT9x6yVljpPix3QcuTDXjz8NklXc0ob3NjToMjADGJz
+ /0cg==
+X-Gm-Message-State: APjAAAXBk87p9sjRvbLKphwhBFXlJm7aeWJn5n1/icdOsfp/4Z7OmCkZ
+ U/I1YSbvamsUvozpkcUDVWy8sw==
+X-Google-Smtp-Source: APXvYqxnZE9IWeGItUIK77oBnUBdby4pSw9cnVBd5+rVuyhAt4VESw1/GM1jjsmhl2c+Mle5RBOdEQ==
+X-Received: by 2002:a63:4e44:: with SMTP id o4mr30498248pgl.103.1569942167937; 
+ Tue, 01 Oct 2019 08:02:47 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id f62sm19014436pfg.74.2019.10.01.07.58.31
+ by smtp.gmail.com with ESMTPSA id r185sm16865666pfr.68.2019.10.01.08.02.46
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 01 Oct 2019 07:58:32 -0700 (PDT)
-Subject: Re: [PATCH] user-exec: Do not filter the signal on si_code
-To: Laurent Vivier <laurent@vivier.eu>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20190930192931.20509-1-richard.henderson@linaro.org>
- <ec1ace6c-49db-e769-e43e-6b0e059d6705@linaro.org>
- <CAFEAcA9r+N5Q076kWYyu0a+_VvnzU0FRXZK7hZ4t52JO=a3qTA@mail.gmail.com>
- <7315e0ed-0d33-e998-1dc4-01664c300723@vivier.eu>
- <CAFEAcA9xT7rRCaP5hwvhzLH0GgMqp+Uk55vq=4TT7d-65Yogkg@mail.gmail.com>
- <ba9c069b-fb56-2438-07f9-bb0c5eb97058@vivier.eu>
+ Tue, 01 Oct 2019 08:02:47 -0700 (PDT)
+Subject: Re: [PATCH v4 00/18] target/s390: Use tcg unwinding for ilen
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190927193925.23567-1-richard.henderson@linaro.org>
+ <82c5292f-3c57-24d2-2237-d8058014243a@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <b2496351-b7ae-55e7-611c-4e7eda48c02b@linaro.org>
-Date: Tue, 1 Oct 2019 07:58:30 -0700
+Message-ID: <1058cc2e-6ec3-384a-ac70-1be46312dc96@linaro.org>
+Date: Tue, 1 Oct 2019 08:02:45 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <ba9c069b-fb56-2438-07f9-bb0c5eb97058@vivier.eu>
+In-Reply-To: <82c5292f-3c57-24d2-2237-d8058014243a@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,33 +98,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/19 6:15 AM, Laurent Vivier wrote:
-> Le 01/10/2019 à 13:46, Peter Maydell a écrit :
->> On Tue, 1 Oct 2019 at 12:19, Laurent Vivier <laurent@vivier.eu> wrote:
->>> Is it possible to update the farm to Centos 8?
->>>
->>> Or as the kernel involved is specifically for POWER9, is it possible to
->>> use only POWER8?
+On 10/1/19 1:07 AM, David Hildenbrand wrote:
+> On 27.09.19 21:39, Richard Henderson wrote:
+>> Based-on: <20190925125236.4043-1-david@redhat.com> \
+>>   ("s390x/mmu: DAT translation rewrite")
 >>
->> My experience is that the gcc cfarm admins aren't in
->> principle against the idea of upgrading farm machines,
->> but in practice they tend to have a shortage of effort.
->> If there's a centos-7-kernel-update package that could
->> be installed without doing a full distro upgrade that
->> would probably be pretty easy to ask them to arrange.
+>> Based-on: <20190926101627.23376-1-david@redhat.com> \
+>>   ("s390x/mmu: Implement more facilities") \
+>>   With the suggested follow-up for patch 2 re ilen.
+>>
+>> Which should mean that this applies on top of David's
+>> current s390x tree.  ;-)
 > 
-> It seems Centos provides a 4.18 kernel for POWER9 on Centos 7:
+> Indeed, both are located at
+> 	https://github.com/davidhildenbrand/qemu/tree/mmu
 > 
-> http://mirror.centos.org/altarch/7/os/power9/Packages/kernel-4.18.0-80.7.2.el7.ppc64le.rpm
+> Once I have more feedback on "s390x/mmu: Implement more facilities", I
+> am going to pick up this series and give it a good test. Then send it
+> upstream (either via Conny, due to the CPU model change, or directly).
+> Sounds good?
+> 
 
-Thanks guys.  I've sent a message to the admins asking for an update on gcc135.
+Yep, thanks!
 
 
 r~
