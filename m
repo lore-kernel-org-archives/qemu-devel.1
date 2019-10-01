@@ -2,67 +2,73 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69271C388F3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 11:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1C66C388F3
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 11:44:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40E4C21906
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 11:44:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40E4C21906
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C34F21855
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 11:44:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C34F21855
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFGa1-0000rE-84
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 07:44:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34212)
+	id 1iFGaI-0001D8-NY
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 07:44:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34297)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1iFGYq-0008Sq-BN
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 07:43:21 -0400
+ (envelope-from <clg@kaod.org>) id 1iFGZ2-0000D4-Kh
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 07:43:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1iFGYp-0004a0-6Y
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 07:43:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37434)
+ (envelope-from <clg@kaod.org>) id 1iFGZ1-0004jY-1j
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 07:43:32 -0400
+Received: from 5.mo177.mail-out.ovh.net ([46.105.39.154]:47913)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>)
- id 1iFGYj-0004UU-10; Tue, 01 Oct 2019 07:43:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B3476C0546FE;
- Tue,  1 Oct 2019 11:43:11 +0000 (UTC)
-Received: from angien.pipo.sk (unknown [10.43.2.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CB9E05D9DC;
- Tue,  1 Oct 2019 11:43:06 +0000 (UTC)
-Date: Tue, 1 Oct 2019 13:43:04 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: Qemu Dirty Bitmap backup to encrypted target
-Message-ID: <20191001114304.GZ9210@angien.pipo.sk>
-References: <OFADB7E923.8BF08D6B-ON00258485.0069D537-00258485.006AC672@notes.na.collabserv.com>
- <facf5e37-18e0-7de5-09cf-a088f471d8ad@redhat.com>
- <20191001084553.GA4688@linux.fritz.box>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iFGZ0-0004i9-Qr
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 07:43:30 -0400
+Received: from player772.ha.ovh.net (unknown [10.108.54.72])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 7612710CA6A
+ for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 13:43:28 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id B0909A69B999;
+ Tue,  1 Oct 2019 11:43:14 +0000 (UTC)
+Subject: Re: [PATCH v2 21/33] spapr, xics, xive: Move cpu_intc_create from
+ SpaprIrq to SpaprInterruptController
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190927055028.11493-22-david@gibson.dropbear.id.au>
+ <20190927121649.5b9f3db7@bahia.lan> <20190930014904.GB11105@umbus.fritz.box>
+ <adb67721-5c4e-50ac-f459-a48570a45d6e@kaod.org>
+ <20190930061445.GG11105@umbus.fritz.box>
+ <75672a0f-6bae-406c-0f0c-d23cc58c9c9f@kaod.org>
+ <20191001023102.GN11105@umbus.fritz.box>
+ <9c6c7e17-0578-2313-4324-a5ca75149762@kaod.org>
+ <20191001064726.GP11105@umbus.fritz.box>
+ <5d1910be-7bb7-19d9-73c3-269f2d0c2ee7@kaod.org>
+ <20191001081135.GQ11105@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <2273d09c-1379-cdbe-0aa9-76f3f4ece349@kaod.org>
+Date: Tue, 1 Oct 2019 13:43:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20191001081135.GQ11105@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 4314166971525794585
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeeggdegvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20191001084553.GA4688@linux.fritz.box>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 01 Oct 2019 11:43:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 46.105.39.154
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,110 +80,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Craig Mull <cmull@us.ibm.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>,
- Leo Luan <leoluan@us.ibm.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 01, 2019 at 10:45:53 +0200, Kevin Wolf wrote:
-> Am 01.10.2019 um 02:24 hat John Snow geschrieben:
-> >=20
-> >=20
-> > On 9/30/19 3:26 PM, Craig Mull wrote:
-> > > How can have QEMU backup write the output=A0to an encrypted target?
-> > > =A0
-> > > Blocks in the dirty bitmap are unencrypted, and as such when I write
-> > > them with QEMU backup they are written to the target unencrypted.
-> > > =A0
-> > > I've experimented with providing a json string as the target but with=
- no
-> > > luck.
-> > > =A0
-> > >=20
-> > > transaction=3D'{ "execute": "transaction",=A0
-> > >=20
-> > > =A0 "arguments": {=A0
-> > >=20
-> > > =A0 =A0 "actions": [
-> > >=20
-> > > =A0 =A0 =A0 {"type": "block-dirty-bitmap-add",=A0
-> > >=20
-> > > =A0=A0 =A0 =A0 "data": {"node": "drive-virtio-disk0", "granularity": =
-2097152,
-> > > "name": "mybitmap"} },
-> > >=20
-> > > =A0 =A0 =A0 {"type": "drive-backup",
-> > >=20
-> > > =A0=A0 =A0 =A0 "data": {"device": "drive-virtio-disk0", "target":
-> > > "json:{\"encrypt.format\": \"luks\", \"encrypt.key-secret\":
-> > > \"virtio-disk0-luks-secret0\", \"driver\": \"qcow2\", \"file\":
-> > > {\"driver\": \"file\", \"filename\": \"/tmp/target-encrypt-test.qcow2=
-\"}}",
-> > >=20
-> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "sync": "full", "format": "qcow2"} }=
-=A0
-> > >=20
-> > > =A0 =A0 ]=A0
-> > >=20
-> > > =A0 }=A0
-> > >=20
-> > > }'
-> > >=20
-> > > =A0
-> > >=20
-> > > virsh -c qemu:///system qemu-monitor-command --pretty 28 $transaction
-> > >=20
-> > > =A0
-> > >=20
-> > > {
-> > >=20
-> > > =A0 "id": "libvirt-45",
-> > >=20
-> > > =A0 "error": {
-> > >=20
-> > > =A0 =A0 "class": "GenericError",
-> > >=20
-> > > =A0 =A0 "desc": "Unknown protocol 'json'"
-> > >=20
-> > > =A0 }
-> > >=20
-> > > }
-> > >=20
-> > >
-> >=20
-> > I'll be honest, I'm not very good at the json specifications and don't
-> > really know when they're appropriate to use. At the basic level,
-> > drive-backup expects a filename. Sometimes the filename can get fancy,
-> > but... I stay away from that.
-> >=20
-> > Try using qmp-blockdev-create to create the target node instead, and
-> > then using blockdev-backup to backup to that target.
+On 01/10/2019 10:11, David Gibson wrote:
+> On Tue, Oct 01, 2019 at 09:41:27AM +0200, C=E9dric Le Goater wrote:
+>> On 01/10/2019 08:47, David Gibson wrote:
+>>> On Tue, Oct 01, 2019 at 07:43:51AM +0200, C=E9dric Le Goater wrote:
+>>>> On 01/10/2019 04:31, David Gibson wrote:
+>>>>> On Mon, Sep 30, 2019 at 12:13:14PM +0200, C=E9dric Le Goater wrote:
+>>>>>> On 30/09/2019 08:14, David Gibson wrote:
+>>>>>>> On Mon, Sep 30, 2019 at 07:28:45AM +0200, C=E9dric Le Goater wrot=
+e:
+>>>>>>>> On 30/09/2019 03:49, David Gibson wrote:
+>>>>>>>>> On Fri, Sep 27, 2019 at 12:16:49PM +0200, Greg Kurz wrote:
+>>>>>>>>>> On Fri, 27 Sep 2019 15:50:16 +1000
+>>>>>>>>>> David Gibson <david@gibson.dropbear.id.au> wrote:
+>>>>>>>>>>
+>>>>>>>>>>> This method essentially represents code which belongs to the =
+interrupt
+>>>>>>>>>>> controller, but needs to be called on all possible intcs, rat=
+her than
+>>>>>>>>>>> just the currently active one.  The "dual" version therefore =
+calls
+>>>>>>>>>>> into the xics and xive versions confusingly.
+>>>>>>>>>>>
+>>>>>>>>>>> Handle this more directly, by making it instead a method on t=
+he intc
+>>>>>>>>>>> backend, and always calling it on every backend that exists.
+>>>>>>>>>>>
+>>>>>>>>>>> While we're there, streamline the error reporting a bit.
+>>>>>>>>>>>
+>>>>>>>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>>>>>>> [snip]
+>>>>>>>>>>> @@ -525,6 +469,30 @@ static void spapr_irq_check(SpaprMachine=
+State *spapr, Error **errp)
+>>>>>>>>>>>  /*
+>>>>>>>>>>>   * sPAPR IRQ frontend routines for devices
+>>>>>>>>>>>   */
+>>>>>>>>>>> +int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+>>>>>>>>>>> +                              PowerPCCPU *cpu, Error **errp)
+>>>>>>>>>>> +{
+>>>>>>>>>>> +    if (spapr->xive) {
+>>>>>>>>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr-=
+>xive);
+>>>>>>>>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_G=
+ET_CLASS(intc);
+>>>>>>>>>>> +
+>>>>>>>>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
+>>>>>>>>>>> +            return -1;
+>>>>>>>>>>> +        }
+>>>>>>>>>>> +    }
+>>>>>>>>>>> +
+>>>>>>>>>>> +    if (spapr->ics) {
+>>>>>>>>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr-=
+>ics);
+>>>>>>>>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_G=
+ET_CLASS(intc);
+>>>>>>>>>>> +
+>>>>>>>>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
+>>>>>>>>>>> +            return -1;
+>>>>>>>>>>> +        }
+>>>>>>>>>>> +    }
+>>>>>>>>>>> +
+>>>>>>>>>>
+>>>>>>>>>> Instead of these hooks, what about open-coding spapr_xive_cpu_=
+intc_create()
+>>>>>>>>>> and xics_spapr_cpu_intc_create() directly here, like you alrea=
+dy did for the
+>>>>>>>>>> ICS and the XIVE objects in spapr_irq_init() ?
+>>>>>>>>>
+>>>>>>>>> I'd prefer not to.  The idea is I want to treat this as basical=
+ly:
+>>>>>>>>>
+>>>>>>>>> 	foreach_possible_intc(intc)
+>>>>>>>>> 		intc::cpu_intc_create(...)
+>>>>>>>>>
+>>>>>>>>> If I find time I might indeed replace the explicit ics and xive
+>>>>>>>>> pointers with just an array of SpaprInterruptController *.
+>>>>>>>>
+>>>>>>>> Or you could use object_child_foreach() and check for the type. =
+If we had
+>>>>>>>> a helper object_child_foreach_type(), we could use it elsewhere.
+>>>>>>>
+>>>>>>> I thought about that, but I don't think it quite works.  The
+>>>>>>> complication is that the xics device is made explicitly a child o=
+f the
+>>>>>>> machine, but the xive device has mmio, so it's a SusBusDevice sit=
+ting
+>>>>>>> on the root bus instead.
+>>>>>>
+>>>>>> PnvXscom works fine with Devices and SysBusDevices.
+>>>>>
+>>>>> Uh... what's an example of it working with a SysBusDevice?  All the
+>>>>> implementors of PNV_XSCOM_INTERFACE I could find were instantiated
+>>>>> with object_initialize_child() making them explicitly children of t=
+he
+>>>>> chip.  The SPAPR_XIVE is instantiated with qdev_create(NULL,
+>>>>> TYPE_SPAPR_XIVE), making it a child of the root bus, not the machin=
+e,
+>>>>> I believe.
+>>>>
+>>>> I see. We should reparent the interrupt controller then.
+>>>
+>>> Well, maybe.  It's not obvious to me that that's the right approach
+>>> just because of this.
+>>>
+>>>
+>>>> Could we rework=20
+>>>> the code to instantiate and realize the XICS and XIVE model objects =
+?=20
+>>>> We have the handlers spapr_instance_init() and spapr_machine_init().=
+=20
+>>>
+>>> I'm not really sure what you're suggesting here.
+>>
+>> Define the device model objects under the machine and not pointers :
+>>
+>> 	struct SpaprMachineState {
+>> 		...
+>> 		ICSState ics;
+>> 		SpaprXive  xive;
+>> 		...
+>> 	};
+>>
+>> in spapr_instance_init() :
+>>
+>> 	object_initialize_child(obj, "ics",  &spapr->ics, sizeof(spapr->ics),
+>>                             TYPE_ICS, &error_abort, NULL);
+>> 	object_property_add_const_link(OBJECT(&spapr->ics), "xics", obj,
+>>                                    &error_abort);
+>>
+>> 	object_initialize_child(obj, "xive",  &spapr->xive, sizeof(spapr->xiv=
+e),
+>>                             TYPE_SPAPR_XIVE, &error_abort, NULL);
+>>
+>>
+>> in spapr_machine_init(), call the realize handler depending on the cho=
+sen=20
+>> 'ic-mode'.
 >=20
-> As the actual invocation is a virsh command, I think this is more of a
-> libvirt question than a QEMU one.
+> Hm, yeah, maybe.  I don't love having a whole structure in there
+> that's unused when ic-mode !=3D dual.
+>=20
 
-The above virsh command is a direct (unsupported/experimental) command
-passthrough to qemu, thus the syntax is identical to raw QMP.
+This is the pattern followed in the ARM SoC models. Enough room is=20
+provisioned for the maximum controllers and depending on the SoC
+configuration only some are realized.
 
-You must use blockdev-backup as outlined above along with any management
-necessary for adding the devices previously. Obviously this may
-desynchronize state with libvirt.
+C.=20
+ =20
 
-> I suspect that libvirt won't support this without -blockdev support
-> (which will enable blockdev-backup instead of drive-backup), but even
-> then libvirt might not even offer an API for an encrypted target. Not
-> sure, though, so CCing Peter.
-
-The current state is that libvirt will support backup only with
--blockdev. In that case everything including encrypted images should be
-supported same way as we (will [1]) support them with snapshots or
-normal disks.
-
-This is currently being worked on.
-
-[1] All the code for blockdev is in but it's not enabled yet as we are
-waiting for the possibility to detect the fix for 'savevm' done
-recently. -blockdev will be supported with qemu-4.2.
 
