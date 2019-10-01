@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CB9C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:14:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 227B6C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:14:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7D7720815
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:14:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7D7720815
+	by mail.kernel.org (Postfix) with ESMTPS id E951420815
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:14:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E951420815
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFTDY-0000cE-4M
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:14:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40419)
+	id 1iFTEC-0001WS-EO
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:14:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40984)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0001tR-BR
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:29 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsi-00029U-Kt
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsL-0002O2-5R
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34234)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsc-0002kw-S3
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44866)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsJ-0001tL-FO; Tue, 01 Oct 2019 19:48:12 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ id 1iFRsc-00028T-DG; Tue, 01 Oct 2019 19:48:30 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlPuK053509; Tue, 1 Oct 2019 19:47:50 -0400
+ x91NlOon074757; Tue, 1 Oct 2019 19:48:04 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcg1716bk-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdv2vq6q-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:50 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91Nla2J053831;
- Tue, 1 Oct 2019 19:47:50 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcg1716b7-1
+ Tue, 01 Oct 2019 19:48:04 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91Nm3Fq076153;
+ Tue, 1 Oct 2019 19:48:03 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdv2vq6a-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:50 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Njofd032175;
- Tue, 1 Oct 2019 23:47:50 GMT
+ Tue, 01 Oct 2019 19:48:03 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlPR031629;
+ Tue, 1 Oct 2019 23:48:02 GMT
 Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma01wdc.us.ibm.com with ESMTP id 2v9y57fgc4-1
+ [9.57.198.26]) by ppma02wdc.us.ibm.com with ESMTP id 2v9y587fdd-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:50 +0000
+ Tue, 01 Oct 2019 23:48:02 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
  by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NlmlR40173988
+ x91Nm2gZ38011304
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:48 GMT
+ Tue, 1 Oct 2019 23:48:02 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 82EDD28059;
- Tue,  1 Oct 2019 23:47:48 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 0F7B528059;
+ Tue,  1 Oct 2019 23:48:02 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 66A4C2805A;
- Tue,  1 Oct 2019 23:47:48 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id E779828058;
+ Tue,  1 Oct 2019 23:48:01 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:48 +0000 (GMT)
+ Tue,  1 Oct 2019 23:48:01 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 67/97] mirror: Only mirror granularity-aligned chunks
-Date: Tue,  1 Oct 2019 18:45:46 -0500
-Message-Id: <20191001234616.7825-68-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 91/97] curl: Handle success in multi_check_completion
+Date: Tue,  1 Oct 2019 18:46:10 -0500
+Message-Id: <20191001234616.7825-92-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -82,7 +82,7 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-10-01_10:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
@@ -106,82 +106,147 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-In write-blocking mode, all writes to the top node directly go to the
-target.  We must only mirror chunks of data that are aligned to the
-job's granularity, because that is how the dirty bitmap works.
-Therefore, the request alignment for writes must be the job's
-granularity (in write-blocking mode).
+Background: As of cURL 7.59.0, it verifies that several functions are
+not called from within a callback.  Among these functions is
+curl_multi_add_handle().
 
-Unfortunately, this forces all reads and writes to have the same
-granularity (we only need this alignment for writes to the target, not
-the source), but that is something to be fixed another time.
+curl_read_cb() is a callback from cURL and not a coroutine.  Waking up
+acb->co will lead to entering it then and there, which means the current
+request will settle and the caller (if it runs in the same coroutine)
+may then issue the next request.  In such a case, we will enter
+curl_setup_preadv() effectively from within curl_read_cb().
 
+Calling curl_multi_add_handle() will then fail and the new request will
+not be processed.
+
+Fix this by not letting curl_read_cb() wake up acb->co.  Instead, leave
+the whole business of settling the AIOCB objects to
+curl_multi_check_completion() (which is called from our timer callback
+and our FD handler, so not from any cURL callbacks).
+
+Reported-by: Natalie Gavrielov <ngavrilo@redhat.com>
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1740193
 Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190805153308.2657-1-mreitz@redhat.com
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Fixes: d06107ade0ce74dc39739bac80de84b51ec18546
+Message-id: 20190910124136.10565-7-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 9adc1cb49af8d4e54f57980b1eed5c0a4b2dafa6)
+(cherry picked from commit bfb23b480a49114315877aacf700b49453e0f9d9)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/mirror.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ block/curl.c | 69 ++++++++++++++++++++++------------------------------
+ 1 file changed, 29 insertions(+), 40 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index ff15cfb197..062dc42867 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1477,6 +1477,15 @@ static void bdrv_mirror_top_child_perm(BlockDriverState *bs, BdrvChild *c,
-     *nshared = BLK_PERM_ALL;
- }
+diff --git a/block/curl.c b/block/curl.c
+index de0cebd361..af40203711 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -228,7 +228,6 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+ {
+     CURLState *s = ((CURLState*)opaque);
+     size_t realsize = size * nmemb;
+-    int i;
  
-+static void bdrv_mirror_top_refresh_limits(BlockDriverState *bs, Error **errp)
-+{
-+    MirrorBDSOpaque *s = bs->opaque;
-+
-+    if (s && s->job && s->job->copy_mode == MIRROR_COPY_MODE_WRITE_BLOCKING) {
-+        bs->bl.request_alignment = s->job->granularity;
-+    }
-+}
-+
- /* Dummy node that provides consistent read to its users without requiring it
-  * from its backing file and that allows writes on the backing file chain. */
- static BlockDriver bdrv_mirror_top = {
-@@ -1489,6 +1498,7 @@ static BlockDriver bdrv_mirror_top = {
-     .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
-     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
-     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
-+    .bdrv_refresh_limits        = bdrv_mirror_top_refresh_limits,
- };
+     trace_curl_read_cb(realsize);
  
- static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-@@ -1627,6 +1637,25 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-         s->should_complete = true;
-     }
+@@ -244,32 +243,6 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+     memcpy(s->orig_buf + s->buf_off, ptr, realsize);
+     s->buf_off += realsize;
  
-+    /*
-+     * Must be called before we start tracking writes, but after
-+     *
-+     *     ((MirrorBlockJob *)
-+     *         ((MirrorBDSOpaque *)
-+     *             mirror_top_bs->opaque
-+     *         )->job
-+     *     )->copy_mode
-+     *
-+     * has the correct value.
-+     * (We start tracking writes as of the following
-+     * bdrv_create_dirty_bitmap() call.)
-+     */
-+    bdrv_refresh_limits(mirror_top_bs, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto fail;
-+    }
+-    for(i=0; i<CURL_NUM_ACB; i++) {
+-        CURLAIOCB *acb = s->acb[i];
+-
+-        if (!acb)
+-            continue;
+-
+-        if ((s->buf_off >= acb->end)) {
+-            size_t request_length = acb->bytes;
+-
+-            qemu_iovec_from_buf(acb->qiov, 0, s->orig_buf + acb->start,
+-                                acb->end - acb->start);
+-
+-            if (acb->end - acb->start < request_length) {
+-                size_t offset = acb->end - acb->start;
+-                qemu_iovec_memset(acb->qiov, offset, 0,
+-                                  request_length - offset);
+-            }
+-
+-            acb->ret = 0;
+-            s->acb[i] = NULL;
+-            qemu_mutex_unlock(&s->s->mutex);
+-            aio_co_wake(acb->co);
+-            qemu_mutex_lock(&s->s->mutex);
+-        }
+-    }
+-
+ read_end:
+     /* curl will error out if we do not return this value */
+     return size * nmemb;
+@@ -350,13 +323,14 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+             break;
+ 
+         if (msg->msg == CURLMSG_DONE) {
++            int i;
+             CURLState *state = NULL;
++            bool error = msg->data.result != CURLE_OK;
 +
-     s->dirty_bitmap = bdrv_create_dirty_bitmap(bs, granularity, NULL, errp);
-     if (!s->dirty_bitmap) {
-         goto fail;
+             curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE,
+                               (char **)&state);
+ 
+-            /* ACBs for successful messages get completed in curl_read_cb */
+-            if (msg->data.result != CURLE_OK) {
+-                int i;
++            if (error) {
+                 static int errcount = 100;
+ 
+                 /* Don't lose the original error message from curl, since
+@@ -368,20 +342,35 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+                         error_report("curl: further errors suppressed");
+                     }
+                 }
++            }
+ 
+-                for (i = 0; i < CURL_NUM_ACB; i++) {
+-                    CURLAIOCB *acb = state->acb[i];
++            for (i = 0; i < CURL_NUM_ACB; i++) {
++                CURLAIOCB *acb = state->acb[i];
+ 
+-                    if (acb == NULL) {
+-                        continue;
+-                    }
++                if (acb == NULL) {
++                    continue;
++                }
++
++                if (!error) {
++                    /* Assert that we have read all data */
++                    assert(state->buf_off >= acb->end);
++
++                    qemu_iovec_from_buf(acb->qiov, 0,
++                                        state->orig_buf + acb->start,
++                                        acb->end - acb->start);
+ 
+-                    acb->ret = -EIO;
+-                    state->acb[i] = NULL;
+-                    qemu_mutex_unlock(&s->mutex);
+-                    aio_co_wake(acb->co);
+-                    qemu_mutex_lock(&s->mutex);
++                    if (acb->end - acb->start < acb->bytes) {
++                        size_t offset = acb->end - acb->start;
++                        qemu_iovec_memset(acb->qiov, offset, 0,
++                                          acb->bytes - offset);
++                    }
+                 }
++
++                acb->ret = error ? -EIO : 0;
++                state->acb[i] = NULL;
++                qemu_mutex_unlock(&s->mutex);
++                aio_co_wake(acb->co);
++                qemu_mutex_lock(&s->mutex);
+             }
+ 
+             curl_clean_state(state);
 -- 
 2.17.1
 
