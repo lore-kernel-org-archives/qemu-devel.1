@@ -6,54 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA7DC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF44C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:06:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22FBD205C9
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:06:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22FBD205C9
+	by mail.kernel.org (Postfix) with ESMTPS id 857A0205C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:06:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857A0205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFHrL-0003tX-PW
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:06:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48065)
+	id 1iFHrT-00040f-Mz
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:06:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iFHk9-0006Z9-Fs
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:59:07 -0400
+ (envelope-from <drjones@redhat.com>) id 1iFHkW-0006tM-P6
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iFHk7-0005OT-E2
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:59:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54881)
+ (envelope-from <drjones@redhat.com>) id 1iFHkS-0005yH-Tt
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:59:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33438)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1iFHk2-0005Ge-UT; Tue, 01 Oct 2019 08:58:59 -0400
+ id 1iFHkH-0005ci-Tp; Tue, 01 Oct 2019 08:59:14 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2022718C427B;
- Tue,  1 Oct 2019 12:58:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 169A110CC20A;
+ Tue,  1 Oct 2019 12:59:13 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E78D261D1;
- Tue,  1 Oct 2019 12:58:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7AAB946;
+ Tue,  1 Oct 2019 12:59:08 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Subject: [PATCH v5 1/9] target/arm/monitor: Introduce
- qmp_query_cpu_model_expansion
-Date: Tue,  1 Oct 2019 14:58:37 +0200
-Message-Id: <20191001125845.8793-2-drjones@redhat.com>
+Subject: [PATCH v5 5/9] target/arm/kvm64: Add kvm_arch_get/put_sve
+Date: Tue,  1 Oct 2019 14:58:41 +0200
+Message-Id: <20191001125845.8793-6-drjones@redhat.com>
 In-Reply-To: <20191001125845.8793-1-drjones@redhat.com>
 References: <20191001125845.8793-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Tue, 01 Oct 2019 12:58:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.65]); Tue, 01 Oct 2019 12:59:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -76,403 +75,295 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add support for the query-cpu-model-expansion QMP command to Arm. We
-do this selectively, only exposing CPU properties which represent
-optional CPU features which the user may want to enable/disable.
-Additionally we restrict the list of queryable cpu models to 'max',
-'host', or the current type when KVM is in use. And, finally, we only
-implement expansion type 'full', as Arm does not yet have a "base"
-CPU type. More details and example queries are described in a new
-document (docs/arm-cpu-features.rst).
-
-Note, certainly more features may be added to the list of advertised
-features, e.g. 'vfp' and 'neon'. The only requirement is that we can
-detect invalid configurations and emit failures at QMP query time.
-For 'vfp' and 'neon' this will require some refactoring to share a
-validation function between the QMP query and the CPU realize
-functions.
+These are the SVE equivalents to kvm_arch_get/put_fpsimd. Note, the
+swabbing is different than it is for fpsmid because the vector format
+is a little-endian stream of words.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- docs/arm-cpu-features.rst | 137 +++++++++++++++++++++++++++++++++++
- qapi/machine-target.json  |   6 +-
- target/arm/monitor.c      | 145 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 285 insertions(+), 3 deletions(-)
- create mode 100644 docs/arm-cpu-features.rst
+ target/arm/kvm64.c | 183 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 155 insertions(+), 28 deletions(-)
 
-diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
-new file mode 100644
-index 000000000000..c79dcffb5556
---- /dev/null
-+++ b/docs/arm-cpu-features.rst
-@@ -0,0 +1,137 @@
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ARM CPU Features
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Examples of probing and using ARM CPU features
-+
-+Introduction
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+CPU features are optional features that a CPU of supporting type may
-+choose to implement or not.  In QEMU, optional CPU features have
-+corresponding boolean CPU proprieties that, when enabled, indicate
-+that the feature is implemented, and, conversely, when disabled,
-+indicate that it is not implemented. An example of an ARM CPU feature
-+is the Performance Monitoring Unit (PMU).  CPU types such as the
-+Cortex-A15 and the Cortex-A57, which respectively implement ARM
-+architecture reference manuals ARMv7-A and ARMv8-A, may both optionally
-+implement PMUs.  For example, if a user wants to use a Cortex-A15 withou=
-t
-+a PMU, then the `-cpu` parameter should contain `pmu=3Doff` on the QEMU
-+command line, i.e. `-cpu cortex-a15,pmu=3Doff`.
-+
-+As not all CPU types support all optional CPU features, then whether or
-+not a CPU property exists depends on the CPU type.  For example, CPUs
-+that implement the ARMv8-A architecture reference manual may optionally
-+support the AArch32 CPU feature, which may be enabled by disabling the
-+`aarch64` CPU property.  A CPU type such as the Cortex-A15, which does
-+not implement ARMv8-A, will not have the `aarch64` CPU property.
-+
-+QEMU's support may be limited for some CPU features, only partially
-+supporting the feature or only supporting the feature under certain
-+configurations.  For example, the `aarch64` CPU feature, which, when
-+disabled, enables the optional AArch32 CPU feature, is only supported
-+when using the KVM accelerator and when running on a host CPU type that
-+supports the feature.
-+
-+CPU Feature Probing
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Determining which CPU features are available and functional for a given
-+CPU type is possible with the `query-cpu-model-expansion` QMP command.
-+Below are some examples where `scripts/qmp/qmp-shell` (see the top comme=
-nt
-+block in the script for usage) is used to issue the QMP commands.
-+
-+(1) Determine which CPU features are available for the `max` CPU type
-+    (Note, we started QEMU with qemu-system-aarch64, so `max` is
-+     implementing the ARMv8-A reference manual in this case)::
-+
-+      (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"max"=
-}
-+      { "return": {
-+        "model": { "name": "max", "props": {
-+        "pmu": true, "aarch64": true
-+      }}}}
-+
-+We see that the `max` CPU type has the `pmu` and `aarch64` CPU features.
-+We also see that the CPU features are enabled, as they are all `true`.
-+
-+(2) Let's try to disable the PMU::
-+
-+      (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"max"=
-,"props":{"pmu":false}}
-+      { "return": {
-+        "model": { "name": "max", "props": {
-+        "pmu": false, "aarch64": true
-+      }}}}
-+
-+We see it worked, as `pmu` is now `false`.
-+
-+(3) Let's try to disable `aarch64`, which enables the AArch32 CPU featur=
-e::
-+
-+      (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"max"=
-,"props":{"aarch64":false}}
-+      {"error": {
-+       "class": "GenericError", "desc":
-+       "'aarch64' feature cannot be disabled unless KVM is enabled and 3=
-2-bit EL1 is supported"
-+      }}
-+
-+It looks like this feature is limited to a configuration we do not
-+currently have.
-+
-+(4) Let's try probing CPU features for the Cortex-A15 CPU type::
-+
-+      (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"cort=
-ex-a15"}
-+      {"return": {"model": {"name": "cortex-a15", "props": {"pmu": true}=
-}}}
-+
-+Only the `pmu` CPU feature is available.
-+
-+A note about CPU feature dependencies
-+-------------------------------------
-+
-+It's possible for features to have dependencies on other features. I.e.
-+it may be possible to change one feature at a time without error, but
-+when attempting to change all features at once an error could occur
-+depending on the order they are processed.  It's also possible changing
-+all at once doesn't generate an error, because a feature's dependencies
-+are satisfied with other features, but the same feature cannot be change=
-d
-+independently without error.  For these reasons callers should always
-+attempt to make their desired changes all at once in order to ensure the
-+collection is valid.
-+
-+A note about CPU models and KVM
-+-------------------------------
-+
-+Named CPU models generally do not work with KVM.  There are a few cases
-+that do work, e.g. using the named CPU model `cortex-a57` with KVM on a
-+seattle host, but mostly if KVM is enabled the `host` CPU type must be
-+used.  This means the guest is provided all the same CPU features as the
-+host CPU type has.  And, for this reason, the `host` CPU type should
-+enable all CPU features that the host has by default.  Indeed it's even
-+a bit strange to allow disabling CPU features that the host has when usi=
-ng
-+the `host` CPU type, but in the absence of CPU models it's the best we c=
-an
-+do if we want to launch guests without all the host's CPU features enabl=
-ed.
-+
-+Enabling KVM also affects the `query-cpu-model-expansion` QMP command.  =
-The
-+affect is not only limited to specific features, as pointed out in examp=
-le
-+(3) of "CPU Feature Probing", but also to which CPU types may be expande=
-d.
-+When KVM is enabled, only the `max`, `host`, and current CPU type may be
-+expanded.  This restriction is necessary as it's not possible to know al=
-l
-+CPU types that may work with KVM, but it does impose a small risk of use=
-rs
-+experiencing unexpected errors.  For example on a seattle, as mentioned
-+above, the `cortex-a57` CPU type is also valid when KVM is enabled.
-+Therefore a user could use the `host` CPU type for the current type, but
-+then attempt to query `cortex-a57`, however that query will fail with ou=
-r
-+restrictions.  This shouldn't be an issue though as management layers an=
-d
-+users have been preferring the `host` CPU type for use with KVM for quit=
-e
-+some time.  Additionally, if the KVM-enabled QEMU instance running on a
-+seattle host is using the `cortex-a57` CPU type, then querying `cortex-a=
-57`
-+will work.
-+
-+Using CPU Features
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+After determining which CPU features are available and supported for a
-+given CPU type, then they may be selectively enabled or disabled on the
-+QEMU command line with that CPU type::
-+
-+  $ qemu-system-aarch64 -M virt -cpu max,pmu=3Doff
-+
-+The example above disables the PMU for the `max` CPU type.
-+
-diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-index 55310a6aa226..04623224720d 100644
---- a/qapi/machine-target.json
-+++ b/qapi/machine-target.json
-@@ -212,7 +212,7 @@
- ##
- { 'struct': 'CpuModelExpansionInfo',
-   'data': { 'model': 'CpuModelInfo' },
--  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-+  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET=
-_ARM)' }
-=20
- ##
- # @query-cpu-model-expansion:
-@@ -237,7 +237,7 @@
- #   query-cpu-model-expansion while using these is not advised.
- #
- # Some architectures may not support all expansion types. s390x supports
--# "full" and "static".
-+# "full" and "static". Arm only supports "full".
- #
- # Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU mo=
-dels is
- #          not supported, if the model cannot be expanded, if the model =
-contains
-@@ -251,7 +251,7 @@
-   'data': { 'type': 'CpuModelExpansionType',
-             'model': 'CpuModelInfo' },
-   'returns': 'CpuModelExpansionInfo',
--  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-+  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET=
-_ARM)' }
-=20
- ##
- # @CpuDefinitionInfo:
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index 6457c3c87f7c..edca8aa885f0 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -21,8 +21,16 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "hw/boards.h"
- #include "kvm_arm.h"
-+#include "qapi/error.h"
-+#include "qapi/visitor.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi/qapi-commands-machine-target.h"
- #include "qapi/qapi-commands-misc-target.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qom/qom-qobject.h"
-=20
- static GICCapability *gic_cap_new(int version)
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 28f6db57d5ee..4c0b11d105a4 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -671,11 +671,12 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
  {
-@@ -81,3 +89,140 @@ GICCapabilityList *qmp_query_gic_capabilities(Error *=
-*errp)
+     /* Return true if the regidx is a register we should synchronize
+-     * via the cpreg_tuples array (ie is not a core reg we sync by
+-     * hand in kvm_arch_get/put_registers())
++     * via the cpreg_tuples array (ie is not a core or sve reg that
++     * we sync by hand in kvm_arch_get/put_registers())
+      */
+     switch (regidx & KVM_REG_ARM_COPROC_MASK) {
+     case KVM_REG_ARM_CORE:
++    case KVM_REG_ARM64_SVE:
+         return false;
+     default:
+         return true;
+@@ -721,10 +722,8 @@ int kvm_arm_cpreg_level(uint64_t regidx)
 =20
-     return head;
- }
+ static int kvm_arch_put_fpsimd(CPUState *cs)
+ {
+-    ARMCPU *cpu =3D ARM_CPU(cs);
+-    CPUARMState *env =3D &cpu->env;
++    CPUARMState *env =3D &ARM_CPU(cs)->env;
+     struct kvm_one_reg reg;
+-    uint32_t fpr;
+     int i, ret;
+=20
+     for (i =3D 0; i < 32; i++) {
+@@ -742,17 +741,73 @@ static int kvm_arch_put_fpsimd(CPUState *cs)
+         }
+     }
+=20
+-    reg.addr =3D (uintptr_t)(&fpr);
+-    fpr =3D vfp_get_fpsr(env);
+-    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
+-    ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+-    if (ret) {
+-        return ret;
++    return 0;
++}
 +
 +/*
-+ * These are cpu model features we want to advertise. The order here
-+ * matters as this is the order in which qmp_query_cpu_model_expansion
-+ * will attempt to set them. If there are dependencies between features,
-+ * then the order that considers those dependencies must be used.
++ * SVE registers are encoded in KVM's memory in an endianness-invariant =
+format.
++ * The byte at offset i from the start of the in-memory representation c=
+ontains
++ * the bits [(7 + 8 * i) : (8 * i)] of the register value. As this means=
+ the
++ * lowest offsets are stored in the lowest memory addresses, then that n=
+early
++ * matches QEMU's representation, which is to use an array of host-endia=
+n
++ * uint64_t's, where the lower offsets are at the lower indices. To comp=
+lete
++ * the translation we just need to byte swap the uint64_t's on big-endia=
+n hosts.
 + */
-+static const char *cpu_model_advertised_features[] =3D {
-+    "aarch64", "pmu",
-+    NULL
-+};
-+
-+CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionTy=
-pe type,
-+                                                     CpuModelInfo *model=
-,
-+                                                     Error **errp)
++static uint64_t *sve_bswap64(uint64_t *dst, uint64_t *src, int nr)
 +{
-+    CpuModelExpansionInfo *expansion_info;
-+    const QDict *qdict_in =3D NULL;
-+    QDict *qdict_out;
-+    ObjectClass *oc;
-+    Object *obj;
-+    const char *name;
++#ifdef HOST_WORDS_BIGENDIAN
 +    int i;
 +
-+    if (type !=3D CPU_MODEL_EXPANSION_TYPE_FULL) {
-+        error_setg(errp, "The requested expansion type is not supported"=
-);
-+        return NULL;
-+    }
-+
-+    if (!kvm_enabled() && !strcmp(model->name, "host")) {
-+        error_setg(errp, "The CPU type '%s' requires KVM", model->name);
-+        return NULL;
-+    }
-+
-+    oc =3D cpu_class_by_name(TYPE_ARM_CPU, model->name);
-+    if (!oc) {
-+        error_setg(errp, "The CPU type '%s' is not a recognized ARM CPU =
-type",
-+                   model->name);
-+        return NULL;
-+    }
-+
-+    if (kvm_enabled()) {
-+        const char *cpu_type =3D current_machine->cpu_type;
-+        int len =3D strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
-+        bool supported =3D false;
-+
-+        if (!strcmp(model->name, "host") || !strcmp(model->name, "max"))=
- {
-+            /* These are kvmarm's recommended cpu types */
-+            supported =3D true;
-+        } else if (strlen(model->name) =3D=3D len &&
-+                   !strncmp(model->name, cpu_type, len)) {
-+            /* KVM is enabled and we're using this type, so it works. */
-+            supported =3D true;
-+        }
-+        if (!supported) {
-+            error_setg(errp, "We cannot guarantee the CPU type '%s' work=
-s "
-+                             "with KVM on this host", model->name);
-+            return NULL;
-+        }
-+    }
-+
-+    if (model->props) {
-+        qdict_in =3D qobject_to(QDict, model->props);
-+        if (!qdict_in) {
-+            error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "props", "dict=
-");
-+            return NULL;
-+        }
-+    }
-+
-+    obj =3D object_new(object_class_get_name(oc));
-+
-+    if (qdict_in) {
-+        Visitor *visitor;
-+        Error *err =3D NULL;
-+
-+        visitor =3D qobject_input_visitor_new(model->props);
-+        visit_start_struct(visitor, NULL, NULL, 0, &err);
-+        if (err) {
-+            object_unref(obj);
-+            error_propagate(errp, err);
-+            return NULL;
-+        }
-+
-+        i =3D 0;
-+        while ((name =3D cpu_model_advertised_features[i++]) !=3D NULL) =
-{
-+            if (qdict_get(qdict_in, name)) {
-+                object_property_set(obj, visitor, name, &err);
-+                if (err) {
-+                    break;
-+                }
-+            }
-+        }
-+
-+        if (!err) {
-+            visit_check_struct(visitor, &err);
-+        }
-+        visit_end_struct(visitor, NULL);
-+        visit_free(visitor);
-+        if (err) {
-+            object_unref(obj);
-+            error_propagate(errp, err);
-+            return NULL;
-+        }
-+    }
-+
-+    expansion_info =3D g_new0(CpuModelExpansionInfo, 1);
-+    expansion_info->model =3D g_malloc0(sizeof(*expansion_info->model));
-+    expansion_info->model->name =3D g_strdup(model->name);
-+
-+    qdict_out =3D qdict_new();
-+
-+    i =3D 0;
-+    while ((name =3D cpu_model_advertised_features[i++]) !=3D NULL) {
-+        ObjectProperty *prop =3D object_property_find(obj, name, NULL);
-+        if (prop) {
-+            Error *err =3D NULL;
-+            QObject *value;
-+
-+            assert(prop->get);
-+            value =3D object_property_get_qobject(obj, name, &err);
-+            assert(!err);
-+
-+            qdict_put_obj(qdict_out, name, value);
-+        }
-+    }
-+
-+    if (!qdict_size(qdict_out)) {
-+        qobject_unref(qdict_out);
-+    } else {
-+        expansion_info->model->props =3D QOBJECT(qdict_out);
-+        expansion_info->model->has_props =3D true;
-+    }
-+
-+    object_unref(obj);
-+
-+    return expansion_info;
++    for (i =3D 0; i < nr; ++i) {
++        dst[i] =3D bswap64(src[i]);
+     }
+=20
+-    reg.addr =3D (uintptr_t)(&fpr);
+-    fpr =3D vfp_get_fpcr(env);
+-    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
++    return dst;
++#else
++    return src;
++#endif
 +}
++
++/*
++ * KVM SVE registers come in slices where ZREGs have a slice size of 204=
+8 bits
++ * and PREGS and the FFR have a slice size of 256 bits. However we simpl=
+y hard
++ * code the slice index to zero for now as it's unlikely we'll need more=
+ than
++ * one slice for quite some time.
++ */
++static int kvm_arch_put_sve(CPUState *cs)
++{
++    ARMCPU *cpu =3D ARM_CPU(cs);
++    CPUARMState *env =3D &cpu->env;
++    uint64_t tmp[ARM_MAX_VQ * 2];
++    uint64_t *r;
++    struct kvm_one_reg reg;
++    int n, ret;
++
++    for (n =3D 0; n < KVM_ARM64_SVE_NUM_ZREGS; ++n) {
++        r =3D sve_bswap64(tmp, &env->vfp.zregs[n].d[0], cpu->sve_max_vq =
+* 2);
++        reg.addr =3D (uintptr_t)r;
++        reg.id =3D KVM_REG_ARM64_SVE_ZREG(n, 0);
++        ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    for (n =3D 0; n < KVM_ARM64_SVE_NUM_PREGS; ++n) {
++        r =3D sve_bswap64(tmp, r =3D &env->vfp.pregs[n].p[0],
++                        DIV_ROUND_UP(cpu->sve_max_vq * 2, 8));
++        reg.addr =3D (uintptr_t)r;
++        reg.id =3D KVM_REG_ARM64_SVE_PREG(n, 0);
++        ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    r =3D sve_bswap64(tmp, &env->vfp.pregs[FFR_PRED_NUM].p[0],
++                    DIV_ROUND_UP(cpu->sve_max_vq * 2, 8));
++    reg.addr =3D (uintptr_t)r;
++    reg.id =3D KVM_REG_ARM64_SVE_FFR(0);
+     ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+     if (ret) {
+         return ret;
+@@ -765,6 +820,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+ {
+     struct kvm_one_reg reg;
+     uint64_t val;
++    uint32_t fpr;
+     int i, ret;
+     unsigned int el;
+=20
+@@ -855,7 +911,27 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         }
+     }
+=20
+-    ret =3D kvm_arch_put_fpsimd(cs);
++    if (cpu_isar_feature(aa64_sve, cpu)) {
++        ret =3D kvm_arch_put_sve(cs);
++    } else {
++        ret =3D kvm_arch_put_fpsimd(cs);
++    }
++    if (ret) {
++        return ret;
++    }
++
++    reg.addr =3D (uintptr_t)(&fpr);
++    fpr =3D vfp_get_fpsr(env);
++    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
++    ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg.addr =3D (uintptr_t)(&fpr);
++    fpr =3D vfp_get_fpcr(env);
++    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
++    ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+     if (ret) {
+         return ret;
+     }
+@@ -878,10 +954,8 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+=20
+ static int kvm_arch_get_fpsimd(CPUState *cs)
+ {
+-    ARMCPU *cpu =3D ARM_CPU(cs);
+-    CPUARMState *env =3D &cpu->env;
++    CPUARMState *env =3D &ARM_CPU(cs)->env;
+     struct kvm_one_reg reg;
+-    uint32_t fpr;
+     int i, ret;
+=20
+     for (i =3D 0; i < 32; i++) {
+@@ -899,21 +973,53 @@ static int kvm_arch_get_fpsimd(CPUState *cs)
+         }
+     }
+=20
+-    reg.addr =3D (uintptr_t)(&fpr);
+-    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
+-    ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+-    if (ret) {
+-        return ret;
++    return 0;
++}
++
++/*
++ * KVM SVE registers come in slices where ZREGs have a slice size of 204=
+8 bits
++ * and PREGS and the FFR have a slice size of 256 bits. However we simpl=
+y hard
++ * code the slice index to zero for now as it's unlikely we'll need more=
+ than
++ * one slice for quite some time.
++ */
++static int kvm_arch_get_sve(CPUState *cs)
++{
++    ARMCPU *cpu =3D ARM_CPU(cs);
++    CPUARMState *env =3D &cpu->env;
++    struct kvm_one_reg reg;
++    uint64_t *r;
++    int n, ret;
++
++    for (n =3D 0; n < KVM_ARM64_SVE_NUM_ZREGS; ++n) {
++        r =3D &env->vfp.zregs[n].d[0];
++        reg.addr =3D (uintptr_t)r;
++        reg.id =3D KVM_REG_ARM64_SVE_ZREG(n, 0);
++        ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++        sve_bswap64(r, r, cpu->sve_max_vq * 2);
+     }
+-    vfp_set_fpsr(env, fpr);
+=20
+-    reg.addr =3D (uintptr_t)(&fpr);
+-    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
++    for (n =3D 0; n < KVM_ARM64_SVE_NUM_PREGS; ++n) {
++        r =3D &env->vfp.pregs[n].p[0];
++        reg.addr =3D (uintptr_t)r;
++        reg.id =3D KVM_REG_ARM64_SVE_PREG(n, 0);
++        ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++        sve_bswap64(r, r, DIV_ROUND_UP(cpu->sve_max_vq * 2, 8));
++    }
++
++    r =3D &env->vfp.pregs[FFR_PRED_NUM].p[0];
++    reg.addr =3D (uintptr_t)r;
++    reg.id =3D KVM_REG_ARM64_SVE_FFR(0);
+     ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+     if (ret) {
+         return ret;
+     }
+-    vfp_set_fpcr(env, fpr);
++    sve_bswap64(r, r, DIV_ROUND_UP(cpu->sve_max_vq * 2, 8));
+=20
+     return 0;
+ }
+@@ -923,6 +1029,7 @@ int kvm_arch_get_registers(CPUState *cs)
+     struct kvm_one_reg reg;
+     uint64_t val;
+     unsigned int el;
++    uint32_t fpr;
+     int i, ret;
+=20
+     ARMCPU *cpu =3D ARM_CPU(cs);
+@@ -1012,10 +1119,30 @@ int kvm_arch_get_registers(CPUState *cs)
+         env->spsr =3D env->banked_spsr[i];
+     }
+=20
+-    ret =3D kvm_arch_get_fpsimd(cs);
++    if (cpu_isar_feature(aa64_sve, cpu)) {
++        ret =3D kvm_arch_get_sve(cs);
++    } else {
++        ret =3D kvm_arch_get_fpsimd(cs);
++    }
++    if (ret) {
++        return ret;
++    }
++
++    reg.addr =3D (uintptr_t)(&fpr);
++    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
++    ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++    vfp_set_fpsr(env, fpr);
++
++    reg.addr =3D (uintptr_t)(&fpr);
++    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
++    ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+     if (ret) {
+         return ret;
+     }
++    vfp_set_fpcr(env, fpr);
+=20
+     ret =3D kvm_get_vcpu_events(cpu);
+     if (ret) {
 --=20
 2.20.1
 
