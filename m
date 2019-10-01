@@ -2,83 +2,107 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF569C388F3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F09A4C388F3
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:10:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F1032190F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:09:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F1032190F
+	by mail.kernel.org (Postfix) with ESMTPS id C274C21920
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:10:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C274C21920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFE9l-0008Kq-AV
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 05:09:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60319)
+	id 1iFEBN-000226-03
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 05:10:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60590)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iFE5N-0003Lx-5B
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:04:47 -0400
+ (envelope-from <thuth@redhat.com>) id 1iFE70-0005M9-Al
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:06:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iFE5J-0007LN-JQ
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:04:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57212)
+ (envelope-from <thuth@redhat.com>) id 1iFE6z-00088c-BW
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:06:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45474)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iFE5H-0007JJ-Hi
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:04:39 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iFE6z-00087x-2p; Tue, 01 Oct 2019 05:06:25 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BCE4981DE1
- for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 09:04:35 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id q9so1094278wmj.9
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 02:04:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:cc:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Nf75tsytWvVa5P211CUNaR1QAPyTR04F82rf9r4wK14=;
- b=ctfO4ENaxqmZZu+0hcj4kAson2pkVONLufOPiHZKWwg94IxXfDLLEhxTmWHSAHo4m4
- rppVl29Za+5orMeccM330XS7OX5cRVsVjSsdIXAxO+cbU/LtzsdG2RXD27yLuzxkAMJ8
- kRnqCcL4AY8W0fRN25vJf88Dp/K5jM1lU7kVbY6XsDAOd51AtCAcMQojgRxpiuH3Nzl8
- bd4edLK6M9yxq8XDeMO62mOrVfLadHrYgOEp2QufVH/8VgbYatrS7oD+4SxxdqiNdBSV
- gX6dWNSkPDd34GVwzAc3KSAjCkxCKmYWASVc0ioazziApglIYCanW0wsxpq7mW2QFqbr
- cgNg==
-X-Gm-Message-State: APjAAAVjFcmQomaKLmUqfgn43W5VAwZ5BRRoF7Jw5u6OLnYhslFsXn80
- jtpWXAvK4iSBM4eujLY1cm87qbt+3yWYH3Wio5eooeN3JXgnTy6FJAJZFcD2rd8Mu2ZIkkUr8N9
- oyqd0Ii6+xL+EV9c=
-X-Received: by 2002:adf:e387:: with SMTP id e7mr3403134wrm.306.1569920674570; 
- Tue, 01 Oct 2019 02:04:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqygadFdU2jgr0Hgc4B9WtbBBfEto1389QeZVeWsFBXEQkl3QjTCygkfWyhOQseAFqQrvTVF5w==
-X-Received: by 2002:adf:e387:: with SMTP id e7mr3403121wrm.306.1569920674400; 
- Tue, 01 Oct 2019 02:04:34 -0700 (PDT)
-Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id i5sm2315426wmd.21.2019.10.01.02.04.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Oct 2019 02:04:33 -0700 (PDT)
-Subject: Re: [PATCH] slirp: Allow non-local DNS address when restrict is off
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org,
- jasowang@redhat.com
-References: <20190929181303.19960-1-samuel.thibault@ens-lyon.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b49bd2a3-5280-136a-cc35-3d7c14b0a19c@redhat.com>
-Date: Tue, 1 Oct 2019 11:04:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 5075E309BDA3;
+ Tue,  1 Oct 2019 09:06:24 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 834C35C223;
+ Tue,  1 Oct 2019 09:06:17 +0000 (UTC)
+Subject: Re: [PATCH v1 3/5] s390x/mmu: Implement
+ Instruction-Execution-Protection Facility
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190926101627.23376-1-david@redhat.com>
+ <20190926101627.23376-4-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <10a399fe-9933-c62c-8ac2-cc02ad5ec472@redhat.com>
+Date: Tue, 1 Oct 2019 11:06:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20190929181303.19960-1-samuel.thibault@ens-lyon.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190926101627.23376-4-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Tue, 01 Oct 2019 09:06:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -93,49 +117,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Samuel,
-
-On 9/29/19 8:13 PM, Samuel Thibault wrote:
-> This can be used to set a DNS server to be used by the guest which is
-> different from the one configured on the host.
+On 26/09/2019 12.16, David Hildenbrand wrote:
+> IEP support in the mmu is fairly easy. Set the right permissions for TLB
+> entries and properly report an exception.
 > 
-> This fixes LP 1010484.
-
-Wow, 7 years old...
-
-Can you use this format, easier to understand for newcomers:
-
-Fixes: https://bugs.launchpad.net/qemu/+bug/1010484
-
+> Make sure to handle EDAT-2 by setting bit 56/60/61 of the TEID (TEC) to
+> the right values.
 > 
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> Let's keep s390_cpu_get_phys_page_debug() working even if IEP is
+> active. Switch MMU_DATA_LOAD - this has no other effects any more as the
+> ASC to be used is now fully selected outside of mmu_translate().
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->   net/slirp.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/slirp.c b/net/slirp.c
-> index f42f496641..4d158b0542 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -456,7 +456,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
->           error_setg(errp, "Failed to parse DNS");
->           return -1;
->       }
-> -    if ((dns.s_addr & mask.s_addr) != net.s_addr) {
-> +    if (restricted && (dns.s_addr & mask.s_addr) != net.s_addr) {
->           error_setg(errp, "DNS doesn't belong to network");
->           return -1;
->       }
-> 
+>  target/s390x/cpu.h        |  1 +
+>  target/s390x/helper.c     |  6 +++++-
+>  target/s390x/mmu_helper.c | 21 +++++++++++++++++++++
+>  3 files changed, 27 insertions(+), 1 deletion(-)
 
-What about the IPv6 DNS?
-
-Regards,
-
-Phil.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
