@@ -2,63 +2,73 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 331D8C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 21:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3167DC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 21:46:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0513421920
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 21:42:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0513421920
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07C982133F
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 21:46:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C982133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFPuS-0005sb-OF
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 17:42:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55472)
+	id 1iFPya-0007yF-QM
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 17:46:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFO9N-0006Oc-32
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:49:36 -0400
+ (envelope-from <bounces@canonical.com>) id 1iFPk2-0000Ew-Bx
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 17:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFO9K-0000JH-QN
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:49:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60218)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFO9I-0000Ho-8p; Tue, 01 Oct 2019 15:49:28 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 88B3E18C427F;
- Tue,  1 Oct 2019 19:49:27 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E16D1001B05;
- Tue,  1 Oct 2019 19:49:26 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 56/67] iotests/242: Honor $IMGOPTS
-Date: Tue,  1 Oct 2019 21:47:04 +0200
-Message-Id: <20191001194715.2796-57-mreitz@redhat.com>
-In-Reply-To: <20191001194715.2796-1-mreitz@redhat.com>
-References: <20191001194715.2796-1-mreitz@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iFPk0-0004tv-WD
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 17:31:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33654)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iFPk0-0004sV-PX
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 17:31:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iFPjy-000611-Bt
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 21:31:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 31ACD2E80D8
+ for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 21:31:26 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Tue, 01 Oct 2019 19:49:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Oct 2019 21:25:22 -0000
+From: Saverio Miroddi <1714331@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: chrisu lersek pmdj saveriomiroddi stefanha
+X-Launchpad-Bug-Reporter: Saverio Miroddi (saveriomiroddi)
+X-Launchpad-Bug-Modifier: Saverio Miroddi (saveriomiroddi)
+References: <150420685550.8035.5310753798215250364.malonedeb@soybean.canonical.com>
+Message-Id: <156996512355.21009.1626452635528410149.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1714331] Re: Virtual machines not working anymore on 2.10
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19066";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 760add5a6ebf59f4d0aaea93d37ff65cf8971ff6
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,60 +77,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1714331 <1714331@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/242 | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
-index 333fb8b56c..bccd8a9fdf 100755
---- a/tests/qemu-iotests/242
-+++ b/tests/qemu-iotests/242
-@@ -21,14 +21,14 @@
- import iotests
- import json
- import struct
--from iotests import qemu_img_create, qemu_io, qemu_img_pipe, \
--    file_path, img_info_log, log, filter_qemu_io
-+from iotests import create_test_image, remove_test_image, qemu_io, \
-+    qemu_img_pipe, image_path, img_info_log, log, filter_qemu_io
-=20
- iotests.script_initialize(supported_fmts=3D['qcow2'],
-                           # compat=3D1.1 is needed for dirty bitmaps
-                           unsupported_imgopts=3D['compat=3D0.10'])
-=20
--disk =3D file_path('disk')
-+disk =3D image_path('disk')
- chunk =3D 256 * 1024
- bitmap_flag_unknown =3D 1 << 2
- # flag_offset =3D 5*cluster_size + flag_offset_in_bitmap_directory_entry
-@@ -74,7 +74,7 @@ def toggle_flag(offset):
-         f.write(struct.pack("B", toggled))
-=20
-=20
--qemu_img_create('-f', iotests.imgfmt, disk, '1M')
-+create_test_image(disk, '1M')
-=20
- for num in range(1, 4):
-     disabled =3D False
-@@ -95,7 +95,8 @@ vm.shutdown()
-=20
- num +=3D 1
- log('\nTest {}'.format(num))
--qemu_img_create('-f', iotests.imgfmt, disk, '1M')
-+remove_test_image(disk)
-+create_test_image(disk, '1M')
- add_bitmap(1, True, False)
- log('Write an unknown bitmap flag \'{}\' into a new QCOW2 image at offse=
-t {}'
-     .format(hex(bitmap_flag_unknown), flag_offset))
---=20
-2.21.0
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1714331
+
+Title:
+  Virtual machines not working anymore on 2.10
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Using 2.10, my virtual machine(s) don't work anymore. This happens
+  100% of the times.
+
+  -----
+
+  I use QEMU compiling it from source, on Ubuntu 16.04 amd64. This is
+  the configure command:
+
+      configure --target-list=3Dx86_64-softmmu --enable-debug --enable-gtk
+  --enable-spice --audio-drv-list=3Dpa
+
+  I have one virtual disk, with a Windows 10 64-bit, which I launch in
+  two different ways; both work perfectly on 2.9 (and used to do on 2.8,
+  but I haven't used it for a long time).
+
+  This is the first way:
+
+      qemu-system-x86_64
+        -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.=
+fd
+        -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+        -enable-kvm
+        -machine q35,accel=3Dkvm,mem-merge=3Doff
+        -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinloc=
+ks=3D0x1fff,hv_vapic,hv_time
+        -smp 4,cores=3D4,sockets=3D1,threads=3D1
+        -m 4096
+        -display gtk
+        -vga qxl
+        -rtc base=3Dlocaltime
+        -serial none
+        -parallel none
+        -usb
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device virtio-scsi-pci,id=3Dscsi
+        -drive file=3D/path/to/image-diff.img,id=3Dhdd1,format=3Dqcow2,if=
+=3Dnone,cache=3Dwriteback
+        -device scsi-hd,drive=3Dhdd1
+        -net nic,model=3Dvirtio
+        -net user
+
+  On QEMU 2.10, I get the `Recovery - Your PC/Device needs to be
+  repaired` windows screen; on 2.9, it boots regularly.
+
+  This is the second way:
+
+      qemu-system-x86_64
+        -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.=
+fd
+        -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+        -enable-kvm
+        -machine q35,accel=3Dkvm,mem-merge=3Doff
+        -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinloc=
+ks=3D0x1fff,hv_vapic,hv_time
+        -smp 4,cores=3D4,sockets=3D1,threads=3D1
+        -m 10240
+        -vga none
+        -rtc base=3Dlocaltime
+        -serial none
+        -parallel none
+        -usb
+        -device vfio-pci,host=3D01:00.0,multifunction=3Don
+        -device vfio-pci,host=3D01:00.1
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device virtio-scsi-pci,id=3Dscsi
+        -drive file=3D/path/to/image-diff.img,id=3Dhdd1,format=3Dqcow2,if=
+=3Dnone,cache=3Dwriteback
+        -device scsi-hd,drive=3Dhdd1
+        -net nic,model=3Dvirtio
+        -net user
+
+  On QEMU 2.10, I get the debug window on the linux monitor, and blank scre=
+en on VFIO one (no BIOS screen at all); after 10/20 seconds, QEMU crashes w=
+ithout any message.
+  On 2.9, this works perfectly.
+
+  -----
+
+  I am able to perform a git bisect, if that helps, but if this is the
+  case, I'd need this issue to be reviewed, since bisecting is going to
+  take me a lot of time.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1714331/+subscriptions
 
