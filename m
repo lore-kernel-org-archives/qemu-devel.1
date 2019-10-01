@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED1B3C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD23C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:59:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0B842053B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:59:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0B842053B
+	by mail.kernel.org (Postfix) with ESMTPS id 2F5372053B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:59:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F5372053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKYe-0006DI-9J
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 11:59:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50116)
+	id 1iFKYl-0006KN-BS
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 11:59:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTG-0008LV-A9
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:52 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT0-00080S-7m
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTE-0006lM-KL
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:50 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38412)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKSy-0006Vv-Te
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:34 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKTD-0006YI-T0
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:48 -0400
+ id 1iFKSy-0006UX-KV
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:32 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKSz-0004xb-Al; Tue, 01 Oct 2019 18:53:33 +0300
+ id 1iFKSw-0004xb-7y; Tue, 01 Oct 2019 18:53:30 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 16/31] SCSI: Fix error_append_hint/error_prepend usage
-Date: Tue,  1 Oct 2019 18:53:04 +0300
-Message-Id: <20191001155319.8066-17-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 01/31] errp: rename errp to errp_in where it is IN-argument
+Date: Tue,  1 Oct 2019 18:52:49 +0300
+Message-Id: <20191001155319.8066-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
@@ -60,82 +60,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Greg Kurz <groug@kaod.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+Error **errp is almost always OUT-argument: it's assumed to be NULL, or
+pointer to NULL-initialized pointer, or pointer to error_abort or
+error_fatal, for callee to report error.
 
-This commit (together with its neighbors) was generated by
+But very few functions instead get Error **errp as IN-argument:
+it's assumed to be set, and callee should clean it.
+In such cases, rename errp to errp_in.
 
-git grep -l 'error_\(append_hint\|prepend\)(errp' | while read f; do \
-spatch --sp-file scripts/coccinelle/fix-error-add-info.cocci \
---in-place $f; done
-
-and then
-
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-and then by hand, for not maintained changed files:
-
-git commit -m "<SUB-SYSTEM>: $(< auto-msg)" <FILES>
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/scsi/scsi-disk.c    | 1 +
- hw/scsi/scsi-generic.c | 1 +
- hw/scsi/vhost-scsi.c   | 1 +
- 3 files changed, 3 insertions(+)
+ include/monitor/hmp.h |  2 +-
+ include/qapi/error.h  |  2 +-
+ ui/vnc.h              |  2 +-
+ monitor/hmp-cmds.c    |  8 ++++----
+ ui/vnc.c              | 10 +++++-----
+ util/error.c          |  8 ++++----
+ 6 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 915641a0f1..48165dc128 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2597,6 +2597,7 @@ static int get_device_type(SCSIDiskState *s)
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index a0e9511440..f929814f1a 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -16,7 +16,7 @@
  
- static void scsi_block_realize(SCSIDevice *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-     AioContext *ctx;
-     int sg_version;
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index e7798ebcd0..4c7543801f 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -653,6 +653,7 @@ static void scsi_generic_reset(DeviceState *dev)
+ #include "qemu/readline.h"
  
- static void scsi_generic_realize(SCSIDevice *s, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int rc;
-     int sg_version;
-     struct sg_scsi_id scsiid;
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index c693fc748a..c01c6dfbe2 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -165,6 +165,7 @@ static const VMStateDescription vmstate_virtio_vhost_scsi = {
+-void hmp_handle_error(Monitor *mon, Error **errp);
++void hmp_handle_error(Monitor *mon, Error **errp_in);
  
- static void vhost_scsi_realize(DeviceState *dev, Error **errp)
+ void hmp_info_name(Monitor *mon, const QDict *qdict);
+ void hmp_info_version(Monitor *mon, const QDict *qdict);
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 3f95141a01..9376f59c35 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -283,7 +283,7 @@ void error_free(Error *err);
+ /*
+  * Convenience function to assert that *@errp is set, then silently free it.
+  */
+-void error_free_or_abort(Error **errp);
++void error_free_or_abort(Error **errp_in);
+ 
+ /*
+  * Convenience function to warn_report() and free @err.
+diff --git a/ui/vnc.h b/ui/vnc.h
+index fea79c2fc9..00e0b48f2f 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -547,7 +547,7 @@ uint32_t read_u32(uint8_t *data, size_t offset);
+ 
+ /* Protocol stage functions */
+ void vnc_client_error(VncState *vs);
+-size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp);
++size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp_in);
+ 
+ void start_client_init(VncState *vs);
+ void start_auth_vnc(VncState *vs);
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index b2551c16d1..941d5d0a45 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -60,11 +60,11 @@
+ #include <spice/enums.h>
+ #endif
+ 
+-void hmp_handle_error(Monitor *mon, Error **errp)
++void hmp_handle_error(Monitor *mon, Error **errp_in)
  {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(dev);
-     Error *err = NULL;
+-    assert(errp);
+-    if (*errp) {
+-        error_reportf_err(*errp, "Error: ");
++    assert(errp_in);
++    if (*errp_in) {
++        error_reportf_err(*errp_in, "Error: ");
+     }
+ }
+ 
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 87b8045afe..9d6384d9b1 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1312,7 +1312,7 @@ void vnc_disconnect_finish(VncState *vs)
+     g_free(vs);
+ }
+ 
+-size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
++size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp_in)
+ {
+     if (ret <= 0) {
+         if (ret == 0) {
+@@ -1320,14 +1320,14 @@ size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
+             vnc_disconnect_start(vs);
+         } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
+             trace_vnc_client_io_error(vs, vs->ioc,
+-                                      errp ? error_get_pretty(*errp) :
++                                      errp_in ? error_get_pretty(*errp_in) :
+                                       "Unknown");
+             vnc_disconnect_start(vs);
+         }
+ 
+-        if (errp) {
+-            error_free(*errp);
+-            *errp = NULL;
++        if (errp_in) {
++            error_free(*errp_in);
++            *errp_in = NULL;
+         }
+         return 0;
+     }
+diff --git a/util/error.c b/util/error.c
+index d4532ce318..b3ff3832d6 100644
+--- a/util/error.c
++++ b/util/error.c
+@@ -271,11 +271,11 @@ void error_free(Error *err)
+     }
+ }
+ 
+-void error_free_or_abort(Error **errp)
++void error_free_or_abort(Error **errp_in)
+ {
+-    assert(errp && *errp);
+-    error_free(*errp);
+-    *errp = NULL;
++    assert(errp_in && *errp_in);
++    error_free(*errp_in);
++    *errp_in = NULL;
+ }
+ 
+ void error_propagate(Error **dst_errp, Error *local_err)
 -- 
 2.21.0
 
