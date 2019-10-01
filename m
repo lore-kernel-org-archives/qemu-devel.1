@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A79CDC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:46:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8249C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:48:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3026B2168B
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:46:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3026B2168B
+	by mail.kernel.org (Postfix) with ESMTPS id B896E2070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:48:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B896E2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFSn8-0008UX-HW
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:46:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39980)
+	id 1iFSoL-0001dJ-JA
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:48:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsG-0001fh-8l
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:13 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsE-0001df-Mb
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsB-00027Y-Ke
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20080
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsB-000274-FL
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3240)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsB-0001fC-9F; Tue, 01 Oct 2019 19:48:03 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlPOb179355; Tue, 1 Oct 2019 19:47:42 -0400
+ id 1iFRsA-0001dh-S6; Tue, 01 Oct 2019 19:48:03 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x91NlPJA088120; Tue, 1 Oct 2019 19:47:41 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcdgpncwc-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vbsjt6bxe-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:42 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NlgWk180245;
- Tue, 1 Oct 2019 19:47:42 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcdgpncw2-1
+ Tue, 01 Oct 2019 19:47:41 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NlWuq088382;
+ Tue, 1 Oct 2019 19:47:41 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vbsjt6bwh-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:42 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlU5029385;
- Tue, 1 Oct 2019 23:47:41 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma01dal.us.ibm.com with ESMTP id 2v9y59fajb-1
+ Tue, 01 Oct 2019 19:47:41 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjmlK023578;
+ Tue, 1 Oct 2019 23:47:39 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
+ [9.57.198.24]) by ppma05wdc.us.ibm.com with ESMTP id 2v9y577gyj-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:41 +0000
+ Tue, 01 Oct 2019 23:47:39 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
- by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NleBa41288190
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91Nldda40304954
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:40 GMT
+ Tue, 1 Oct 2019 23:47:39 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6884428058;
- Tue,  1 Oct 2019 23:47:40 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id E70A928059;
+ Tue,  1 Oct 2019 23:47:38 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4C54B2805A;
- Tue,  1 Oct 2019 23:47:40 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id CAA692805A;
+ Tue,  1 Oct 2019 23:47:38 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:40 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:38 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 52/97] virtio-balloon: Use temporary PBP only
-Date: Tue,  1 Oct 2019 18:45:31 -0500
-Message-Id: <20191001234616.7825-53-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 50/97] virtio-balloon: Better names for offset variables in
+ inflate/deflate code
+Date: Tue,  1 Oct 2019 18:45:29 -0500
+Message-Id: <20191001234616.7825-51-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -83,12 +83,12 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-10-01_10:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=4 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,134 +108,111 @@ Sender: "Qemu-devel"
 
 From: David Hildenbrand <david@redhat.com>
 
-We still have multiple issues in the current code
-- The PBP is not freed during unrealize()
-- The PBP is not reset on device resets: After a reset, the PBP is stale.
-- We are not indicating VIRTIO_BALLOON_F_MUST_TELL_HOST, therefore
-  guests (esp. legacy guests) will reuse pages without deflating,
-  turning the PBP stale. Adding that would require compat handling.
+"host_page_base" is really confusing, let's make this clearer, also
+rename the other offsets to indicate to which base they apply.
 
-Instead, let's use the PBP only temporarily, when processing one bulk of
-inflation requests. This will keep guest_page_size > 4k working (with
-Linux guests). There is nothing to do for deflation requests anymore.
-The pbp is only used for a limited amount of time.
+offset -> mr_offset
+ram_offset -> rb_offset
+host_page_base -> rb_aligned_offset
 
-Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size")
-Cc: qemu-stable@nongnu.org #v4.0.0
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+While at it, use QEMU_ALIGN_DOWN() instead of a handcrafted computation
+and move the computation to the place where it is needed.
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190722134108.22151-7-david@redhat.com>
+Message-Id: <20190722134108.22151-5-david@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit a8cd64d488325f3be5c4ddec4bf07efb3b8c7330)
+(cherry picked from commit e6129b271b9dccca22c84870e313c315f2c70063)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio-balloon.c         | 21 +++++++++------------
- include/hw/virtio/virtio-balloon.h |  3 ---
- 2 files changed, 9 insertions(+), 15 deletions(-)
+ hw/virtio/virtio-balloon.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 49999d0bbe..bd54e302de 100644
+index 4f42d3f2b0..76b4c58206 100644
 --- a/hw/virtio/virtio-balloon.c
 +++ b/hw/virtio/virtio-balloon.c
-@@ -34,11 +34,11 @@
- 
- #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
- 
--struct PartiallyBalloonedPage {
-+typedef struct PartiallyBalloonedPage {
-     ram_addr_t base_gpa;
-     long subpages;
-     unsigned long *bitmap;
--};
-+} PartiallyBalloonedPage;
- 
- static void virtio_balloon_pbp_free(PartiallyBalloonedPage *pbp)
- {
-@@ -68,11 +68,11 @@ static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
- }
+@@ -41,24 +41,23 @@ struct PartiallyBalloonedPage {
+ };
  
  static void balloon_inflate_page(VirtIOBalloon *balloon,
--                                 MemoryRegion *mr, hwaddr mr_offset)
-+                                 MemoryRegion *mr, hwaddr mr_offset,
-+                                 PartiallyBalloonedPage **pbp)
+-                                 MemoryRegion *mr, hwaddr offset)
++                                 MemoryRegion *mr, hwaddr mr_offset)
  {
-     void *addr = memory_region_get_ram_ptr(mr) + mr_offset;
-     ram_addr_t rb_offset, rb_aligned_offset, base_gpa;
--    PartiallyBalloonedPage **pbp = &balloon->pbp;
+-    void *addr = memory_region_get_ram_ptr(mr) + offset;
++    void *addr = memory_region_get_ram_ptr(mr) + mr_offset;
++    ram_addr_t rb_offset, rb_aligned_offset;
      RAMBlock *rb;
      size_t rb_page_size;
      int subpages;
-@@ -149,12 +149,6 @@ static void balloon_deflate_page(VirtIOBalloon *balloon,
-     rb = qemu_ram_block_from_host(addr, false, &rb_offset);
+-    ram_addr_t ram_offset, host_page_base;
+ 
+     /* XXX is there a better way to get to the RAMBlock than via a
+      * host address? */
+-    rb = qemu_ram_block_from_host(addr, false, &ram_offset);
++    rb = qemu_ram_block_from_host(addr, false, &rb_offset);
      rb_page_size = qemu_ram_pagesize(rb);
+-    host_page_base = ram_offset & ~(rb_page_size - 1);
  
--    if (balloon->pbp) {
--        /* Let's play safe and always reset the pbp on deflation requests. */
--        virtio_balloon_pbp_free(balloon->pbp);
--        balloon->pbp = NULL;
--    }
--
-     host_addr = (void *)((uintptr_t)addr & ~(rb_page_size - 1));
+     if (rb_page_size == BALLOON_PAGE_SIZE) {
+         /* Easy case */
  
-     /* When a page is deflated, we hint the whole host page it lives
-@@ -336,6 +330,7 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
-+    PartiallyBalloonedPage *pbp = NULL;
-     VirtQueueElement *elem;
-     MemoryRegionSection section;
+-        ram_block_discard_range(rb, ram_offset, rb_page_size);
++        ram_block_discard_range(rb, rb_offset, rb_page_size);
+         /* We ignore errors from ram_block_discard_range(), because it
+          * has already reported them, and failing to discard a balloon
+          * page is not fatal */
+@@ -74,11 +73,12 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
+     warn_report_once(
+ "Balloon used with backing page size > 4kiB, this may not be reliable");
  
-@@ -344,7 +339,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-         uint32_t pfn;
-         elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-         if (!elem) {
--            return;
-+            break;
-         }
++    rb_aligned_offset = QEMU_ALIGN_DOWN(rb_offset, rb_page_size);
+     subpages = rb_page_size / BALLOON_PAGE_SIZE;
  
-         while (iov_to_buf(elem->out_sg, elem->out_num, offset, &pfn, 4) == 4) {
-@@ -373,7 +368,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-             if (!qemu_balloon_is_inhibited()) {
-                 if (vq == s->ivq) {
-                     balloon_inflate_page(s, section.mr,
--                                         section.offset_within_region);
-+                                         section.offset_within_region, &pbp);
-                 } else if (vq == s->dvq) {
-                     balloon_deflate_page(s, section.mr, section.offset_within_region);
-                 } else {
-@@ -387,6 +382,8 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-         virtio_notify(vdev, vq);
-         g_free(elem);
+     if (balloon->pbp
+         && (rb != balloon->pbp->rb
+-            || host_page_base != balloon->pbp->base)) {
++            || rb_aligned_offset != balloon->pbp->base)) {
+         /* We've partially ballooned part of a host page, but now
+          * we're trying to balloon part of a different one.  Too hard,
+          * give up on the old partial page */
+@@ -91,10 +91,10 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
+         size_t bitlen = BITS_TO_LONGS(subpages) * sizeof(unsigned long);
+         balloon->pbp = g_malloc0(sizeof(PartiallyBalloonedPage) + bitlen);
+         balloon->pbp->rb = rb;
+-        balloon->pbp->base = host_page_base;
++        balloon->pbp->base = rb_aligned_offset;
      }
-+
-+    virtio_balloon_pbp_free(pbp);
+ 
+-    set_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
++    set_bit((rb_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
+             balloon->pbp->bitmap);
+ 
+     if (bitmap_full(balloon->pbp->bitmap, subpages)) {
+@@ -112,18 +112,18 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
  }
  
- static void virtio_balloon_receive_stats(VirtIODevice *vdev, VirtQueue *vq)
-diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
-index 5a99293a45..d1c968d237 100644
---- a/include/hw/virtio/virtio-balloon.h
-+++ b/include/hw/virtio/virtio-balloon.h
-@@ -33,8 +33,6 @@ typedef struct virtio_balloon_stat_modern {
-        uint64_t val;
- } VirtIOBalloonStatModern;
+ static void balloon_deflate_page(VirtIOBalloon *balloon,
+-                                 MemoryRegion *mr, hwaddr offset)
++                                 MemoryRegion *mr, hwaddr mr_offset)
+ {
+-    void *addr = memory_region_get_ram_ptr(mr) + offset;
++    void *addr = memory_region_get_ram_ptr(mr) + mr_offset;
++    ram_addr_t rb_offset;
+     RAMBlock *rb;
+     size_t rb_page_size;
+-    ram_addr_t ram_offset;
+     void *host_addr;
+     int ret;
  
--typedef struct PartiallyBalloonedPage PartiallyBalloonedPage;
--
- enum virtio_balloon_free_page_report_status {
-     FREE_PAGE_REPORT_S_STOP = 0,
-     FREE_PAGE_REPORT_S_REQUESTED = 1,
-@@ -70,7 +68,6 @@ typedef struct VirtIOBalloon {
-     int64_t stats_last_update;
-     int64_t stats_poll_interval;
-     uint32_t host_features;
--    PartiallyBalloonedPage *pbp;
+     /* XXX is there a better way to get to the RAMBlock than via a
+      * host address? */
+-    rb = qemu_ram_block_from_host(addr, false, &ram_offset);
++    rb = qemu_ram_block_from_host(addr, false, &rb_offset);
+     rb_page_size = qemu_ram_pagesize(rb);
  
-     bool qemu_4_0_config_size;
- } VirtIOBalloon;
+     if (balloon->pbp) {
 -- 
 2.17.1
 
