@@ -6,80 +6,77 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B9BECE587
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73081C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C46F20842
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:41:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C46F20842
+	by mail.kernel.org (Postfix) with ESMTPS id 41CC620842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:43:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41CC620842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFTe7-0003J6-WB
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:41:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41539)
+	id 1iFTfq-0005Oz-1p
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:43:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsw-0002Ja-T6
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:52 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRse-00024t-G8
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRst-00038W-8s
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29070
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0002bH-SH
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:32 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34394)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsr-0002bN-GN; Tue, 01 Oct 2019 19:48:46 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NmLsK132821; Tue, 1 Oct 2019 19:48:24 -0400
+ id 1iFRsV-00025n-Sq; Tue, 01 Oct 2019 19:48:24 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x91NlP0V088131; Tue, 1 Oct 2019 19:48:02 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcdj4deca-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vbsjt6c5j-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:48:24 -0400
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NmN88132956;
- Tue, 1 Oct 2019 19:48:23 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcdj4de70-1
+ Tue, 01 Oct 2019 19:48:02 -0400
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NlaS9088480;
+ Tue, 1 Oct 2019 19:48:01 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vbsjt6c52-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:48:22 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Njoff032175;
- Tue, 1 Oct 2019 23:47:55 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma01wdc.us.ibm.com with ESMTP id 2v9y57fgcc-1
+ Tue, 01 Oct 2019 19:48:01 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlKw027161;
+ Tue, 1 Oct 2019 23:48:00 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma03dal.us.ibm.com with ESMTP id 2v9y587bjr-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:55 +0000
+ Tue, 01 Oct 2019 23:48:00 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NlrFg43778512
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91NlxtF45089126
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:53 GMT
+ Tue, 1 Oct 2019 23:47:59 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0EEAB2805C;
- Tue,  1 Oct 2019 23:47:53 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 856A528064;
+ Tue,  1 Oct 2019 23:47:59 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E684D28058;
- Tue,  1 Oct 2019 23:47:52 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 72D0A2805E;
+ Tue,  1 Oct 2019 23:47:59 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:52 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:59 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 75/97] pr-manager: Fix invalid g_free() crash bug
-Date: Tue,  1 Oct 2019 18:45:54 -0500
-Message-Id: <20191001234616.7825-76-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 87/97] curl: Keep *socket until the end of curl_sock_cb()
+Date: Tue,  1 Oct 2019 18:46:06 -0500
+Message-Id: <20191001234616.7825-88-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-10-01_10:, , signatures=0
@@ -89,11 +86,8 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id x91NmLsK132821
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,44 +99,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Markus Armbruster <armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-pr_manager_worker() passes its @opaque argument to g_free().  Wrong;
-it points to pr_manager_worker()'s automatic @data.  Broken when
-commit 2f3a7ab39be converted @data from heap- to stack-allocated.  Fix
-by deleting the g_free().
+This does not really change anything, but it makes the code a bit easier
+to follow once we use @socket as the opaque pointer for
+aio_set_fd_handler().
 
-Fixes: 2f3a7ab39bec4ba8022dc4d42ea641165b004e3e
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit 6b9d62c2a9e83bbad73fb61406f0ff69b46ff6f3)
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190910124136.10565-3-mreitz@redhat.com
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+(cherry picked from commit 007f339b1099af46a008dac438ca0943e31dba72)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- scsi/pr-manager.c | 1 -
- 1 file changed, 1 deletion(-)
+ block/curl.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/scsi/pr-manager.c b/scsi/pr-manager.c
-index d9f4e8c3ad..227bdfaad2 100644
---- a/scsi/pr-manager.c
-+++ b/scsi/pr-manager.c
-@@ -38,7 +38,6 @@ static int pr_manager_worker(void *opaque)
-     int fd =3D data->fd;
-     int r;
-=20
--    g_free(data);
-     trace_pr_manager_run(fd, hdr->cmdp[0], hdr->cmdp[1]);
-=20
-     /* The reference was taken in pr_manager_execute.  */
---=20
+diff --git a/block/curl.c b/block/curl.c
+index 4eaae9e211..a0381ae0b4 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -171,10 +171,6 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+ 
+     QLIST_FOREACH(socket, &state->sockets, next) {
+         if (socket->fd == fd) {
+-            if (action == CURL_POLL_REMOVE) {
+-                QLIST_REMOVE(socket, next);
+-                g_free(socket);
+-            }
+             break;
+         }
+     }
+@@ -184,7 +180,6 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+         socket->state = state;
+         QLIST_INSERT_HEAD(&state->sockets, socket, next);
+     }
+-    socket = NULL;
+ 
+     trace_curl_sock_cb(action, (int)fd);
+     switch (action) {
+@@ -206,6 +201,11 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+             break;
+     }
+ 
++    if (action == CURL_POLL_REMOVE) {
++        QLIST_REMOVE(socket, next);
++        g_free(socket);
++    }
++
+     return 0;
+ }
+ 
+-- 
 2.17.1
 
 
