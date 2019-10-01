@@ -2,61 +2,93 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2131C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:07:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DB3C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:07:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B39D2086A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:07:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B39D2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.microsoft.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF08020B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:07:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF08020B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFU2g-0004Az-50
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:07:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52668)
+	id 1iFU3V-00050x-Mr
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:07:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nramas@linux.microsoft.com>) id 1iFTVH-000250-Hc
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:32:32 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsz-0002MH-3r
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nramas@linux.microsoft.com>) id 1iFTVG-0005kC-4G
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:32:31 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:35386)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <nramas@linux.microsoft.com>)
- id 1iFTVC-0005eU-KQ; Tue, 01 Oct 2019 21:32:26 -0400
-Received: from [10.200.157.26] (unknown [131.107.147.154])
- by linux.microsoft.com (Postfix) with ESMTPSA id 075762007698;
- Tue,  1 Oct 2019 18:32:25 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 075762007698
-Subject: Re: Is kexec supported in QEMU for ARM64 (qemu-system-aarch64) with
- arm-trusted-firmware, optee, and u-boot.
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-References: <21633062-b021-a8e7-0cc8-062f4c29dde5@linux.microsoft.com>
- <ca5c74db-cf5d-0c3f-eb6f-27d1092420ae@linux.microsoft.com>
- <65b49cb0-c9fb-d966-8dec-1e39d09ab8c7@redhat.com>
- <88878b22-803f-41fc-9df2-2c6eb551b98d@linux.microsoft.com>
- <CAKv+Gu8kwg_tsrH7qne3H11hUPyA6zw-J_jpUmiyJMvXo3-SNQ@mail.gmail.com>
-From: Lakshmi Ramasubramanian <nramas@linux.microsoft.com>
-Message-ID: <5938a592-1494-ca0c-8a34-7df38dbbea0c@linux.microsoft.com>
-Date: Tue, 1 Oct 2019 18:32:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu8kwg_tsrH7qne3H11hUPyA6zw-J_jpUmiyJMvXo3-SNQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 13.77.154.182
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsx-0003Ci-3N
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32100
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+ id 1iFRsv-0002fZ-5A; Tue, 01 Oct 2019 19:48:50 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x91NmMfp132829; Tue, 1 Oct 2019 19:48:27 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2vcdj4ded0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Oct 2019 19:48:26 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NmQaS133438;
+ Tue, 1 Oct 2019 19:48:26 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2vcdj4de64-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Oct 2019 19:48:25 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjkEN027150;
+ Tue, 1 Oct 2019 23:47:47 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
+ [9.57.198.24]) by ppma03dal.us.ibm.com with ESMTP id 2v9y587bhn-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Oct 2019 23:47:47 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91Nlkwx41746920
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 1 Oct 2019 23:47:46 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 733F428058;
+ Tue,  1 Oct 2019 23:47:46 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 57AD52805A;
+ Tue,  1 Oct 2019 23:47:46 +0000 (GMT)
+Received: from localhost (unknown [9.53.179.213])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue,  1 Oct 2019 23:47:46 +0000 (GMT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 63/97] backup: Copy only dirty areas
+Date: Tue,  1 Oct 2019 18:45:42 -0500
+Message-Id: <20191001234616.7825-64-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-01_10:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,41 +100,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/19 9:30 AM, Ard Biesheuvel wrote:
+From: Max Reitz <mreitz@redhat.com>
 
-> 
-> kexec is a linux concept, so whether it is supported should not depend
-> on the secure world firmware or the underlying host.
+The backup job must only copy areas that the copy_bitmap reports as
+dirty.  This is always the case when using traditional non-offloading
+backup, because it copies each cluster separately.  When offloading the
+copy operation, we sometimes copy more than one cluster at a time, but
+we only check whether the first one is dirty.
 
-I agree Ard.
-When I don't use ATF I am able to do kexec in QEMU and successfully boot 
-into the new kernel.
-Is the following expected?
+Therefore, whenever copy offloading is possible, the backup job
+currently produces wrong output when the guest writes to an area of
+which an inner part has already been backed up, because that inner part
+will be re-copied.
 
-When I execute kexec ("kexec -l <kernel>", followed by "kexec -e") I hit 
-the following assert in ATF (in the file
-arm-trusted-firmware/plat/qemu/qemu_pm.c)
+Fixes: 9ded4a0114968e98b41494fc035ba14f84cdf700
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190801173900.23851-2-mreitz@redhat.com
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+(cherry picked from commit 4a5b91ca024fc6fd87021c54655af76a35f2ef1e)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ block/backup.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-/*******************************************************************************
-   * Platform handler called when a power domain is about to be turned
-   * off. The target_state encodes the power state that each level should
-   * transition to.
-******************************************************************************/
-void qemu_pwr_domain_off(const psci_power_state_t *target_state)
-{
-      assert(0);
-}
-
-Thanks,
-  -lakshmi
-
+diff --git a/block/backup.c b/block/backup.c
+index d1b94a6dbe..f67c208cf0 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -204,22 +204,31 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+     cow_request_begin(&cow_request, job, start, end);
+ 
+     while (start < end) {
++        int64_t dirty_end;
++
+         if (!hbitmap_get(job->copy_bitmap, start)) {
+             trace_backup_do_cow_skip(job, start);
+             start += job->cluster_size;
+             continue; /* already copied */
+         }
+ 
++        dirty_end = hbitmap_next_zero(job->copy_bitmap, start, (end - start));
++        if (dirty_end < 0) {
++            dirty_end = end;
++        }
++
+         trace_backup_do_cow_process(job, start);
+ 
+         if (job->use_copy_range) {
+-            ret = backup_cow_with_offload(job, start, end, is_write_notifier);
++            ret = backup_cow_with_offload(job, start, dirty_end,
++                                          is_write_notifier);
+             if (ret < 0) {
+                 job->use_copy_range = false;
+             }
+         }
+         if (!job->use_copy_range) {
+-            ret = backup_cow_with_bounce_buffer(job, start, end, is_write_notifier,
++            ret = backup_cow_with_bounce_buffer(job, start, dirty_end,
++                                                is_write_notifier,
+                                                 error_is_read, &bounce_buffer);
+         }
+         if (ret < 0) {
+-- 
+2.17.1
 
 
