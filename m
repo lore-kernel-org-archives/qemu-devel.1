@@ -2,66 +2,64 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 954BFC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F95ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:11:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 669422086A
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:11:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669422086A
+	by mail.kernel.org (Postfix) with ESMTPS id 5CE2A2086A
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:11:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CE2A2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFLfv-0006yr-Il
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 13:10:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60123)
+	id 1iFLg6-0007F0-FH
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 13:11:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iFLeK-0005aI-8g
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:09:21 -0400
+ (envelope-from <eblake@redhat.com>) id 1iFLeb-0005sH-7X
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:09:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iFLeJ-0002eU-73
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:09:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60910)
+ (envelope-from <eblake@redhat.com>) id 1iFLea-0002ue-0a
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:09:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57688)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iFLeD-0002b3-8p; Tue, 01 Oct 2019 13:09:13 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iFLeX-0002r0-Ac; Tue, 01 Oct 2019 13:09:33 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BD9B0898111;
- Tue,  1 Oct 2019 17:09:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 766EB811A9;
+ Tue,  1 Oct 2019 17:09:32 +0000 (UTC)
 Received: from [10.3.116.201] (ovpn-116-201.phx2.redhat.com [10.3.116.201])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FE0E6012C;
- Tue,  1 Oct 2019 17:08:51 +0000 (UTC)
-Subject: Re: [PATCH v4 05/31] scripts: add script to fix
- error_append_hint/error_prepend usage
-From: Eric Blake <eblake@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A085360BE0;
+ Tue,  1 Oct 2019 17:09:31 +0000 (UTC)
+Subject: Re: [PATCH v4 23/31] block: Fix error_append_hint/error_prepend usage
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
- <20191001155319.8066-6-vsementsov@virtuozzo.com>
- <5c4788f0-0ba9-94bb-b677-d7d34f064cde@redhat.com>
+ <20191001155319.8066-24-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <11bc4202-2230-52ad-eac2-663649429072@redhat.com>
-Date: Tue, 1 Oct 2019 12:08:50 -0500
+Message-ID: <f6456405-3128-a530-7039-45671d8f2508@redhat.com>
+Date: Tue, 1 Oct 2019 12:09:31 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <5c4788f0-0ba9-94bb-b677-d7d34f064cde@redhat.com>
+In-Reply-To: <20191001155319.8066-24-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 01 Oct 2019 17:09:12 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 01 Oct 2019 17:09:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -76,62 +74,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, pburton@wavecomp.com, peter.maydell@linaro.org,
- jasowang@redhat.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com,
- kraxel@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
- quintela@redhat.com, arikalo@wavecomp.com, mst@redhat.com, armbru@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, joel@jms.id.au,
- marcandre.lureau@redhat.com, david@gibson.dropbear.id.au, ehabkost@redhat.com,
- sw@weilnetz.de, groug@kaod.org, yuval.shaia@oracle.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, clg@kaod.org,
- stefanha@redhat.com, david@redhat.com, rth@twiddle.net, kwolf@redhat.com,
- integration@gluster.org, berrange@redhat.com, andrew@aj.id.au,
- cohuck@redhat.com, qemu-s390x@nongnu.org, sundeep.lkml@gmail.com,
- qemu-ppc@nongnu.org, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ integration@gluster.org, qemu-block@nongnu.org,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/19 11:50 AM, Eric Blake wrote:
-> On 10/1/19 10:52 AM, Vladimir Sementsov-Ogievskiy wrote:
->> error_append_hint and error_prepend will not work, if errp ==
->> &fatal_error, as program will exit before error_append_hint or
->> error_prepend call. Fix this by use of special macro
->> ERRP_AUTO_PROPAGATE.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>
+On 10/1/19 10:53 AM, Vladimir Sementsov-Ogievskiy wrote:
+> If we want to add some info to errp (by error_prepend() or
+> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+> Otherwise, this info will not be added when errp == &fatal_err
+> (the program will exit prior to the error_append_hint() or
+> error_prepend() call).  Fix such cases.
 > 
->> +++ b/scripts/coccinelle/fix-error-add-info.cocci
->> @@ -0,0 +1,28 @@
->> +@rule0@
->> +// Add invocation to errp-functions
->> +identifier fn;
-
-Adding:
-
-symbol errp;
-
-to this section appears to be the correct solution for...
-
->> +@@
->> +
->> + fn(..., Error **errp, ...)
->> + {
+> This commit (together with its neighbors) was generated by
 > 
-> When running this script, I get lots of warnings:
+> git grep -l 'error_\(append_hint\|prepend\)(errp' | while read f; do \
+> spatch --sp-file scripts/coccinelle/fix-error-add-info.cocci \
+> --in-place $f; done
 > 
-> init_defs_builtins: /usr/lib64/coccinelle/standard.h
-> warning: line 6: should errp be a metavariable?
-> warning: line 11: should errp be a metavariable?
-> warning: line 13: should errp be a metavariable?
-> HANDLING: include/block/nbd.h
+> and then
 > 
+> ./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+> 
+> (auto-msg was a file with this commit message)
+> 
+> and then by hand, for not maintained changed files:
+> 
+> git commit -m "<SUB-SYSTEM>: $(< auto-msg)" <FILES>
+> 
+> Still, for backporting it may be more comfortable to use only the first
+> command and then do one huge commit.
+> 
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   include/block/nbd.h  | 1 +
+>   block.c              | 3 +++
+>   block/backup.c       | 1 +
+>   block/dirty-bitmap.c | 1 +
+>   block/file-posix.c   | 4 ++++
+>   block/gluster.c      | 2 ++
+>   block/qcow.c         | 1 +
+>   block/qcow2-bitmap.c | 1 +
+>   block/qcow2.c        | 3 +++
+>   block/vdi.c          | 1 +
+>   block/vhdx-log.c     | 1 +
+>   block/vmdk.c         | 1 +
+>   block/vpc.c          | 1 +
+>   13 files changed, 21 insertions(+)
 
-silencing these warnings.  But it's still not enough to fix the issue 
-I'm pointing out in patch 23 being incomplete.
+The addition of error_prepend() checking makes this patch larger than in v3.
 
+But similar to v3, I was able to come up with a matching grep query:
+
+$ git grep -np 'error_\(append_hint\|prepend\)(errp' \
+    block.c block/ include/block/ \
+   | grep '\.[ch]=' | wc -l
+22
+
+and see that grep found one more instance than coccinelle.  Looking 
+closer, I see where my diff found a spot you missed:
+
+block/qcow2-bitmap.c=1448=void 
+qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+block/qcow2-bitmap.c=1671=fail:
+
+[Ouch - there's a REASON that emacs prefers indenting labels at column 
+'2, 5, 9, 13, ...' rather than '1, 5, 9, 13' - that's because anything 
+at column 1 messes up determination of 'grep -p' for which function owns 
+the code, showing the label at 1671 instead of the function 
+qcow2_can_store_new_dirty_bitmap at 1618 - but that's a side point]
+
+
+> +++ b/block/qcow2-bitmap.c
+> @@ -1618,6 +1618,7 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>                                         uint32_t granularity,
+>                                         Error **errp)
+>   {
+> +    ERRP_AUTO_PROPAGATE();
+>       BDRVQcow2State *s = bs->opaque;
+>       bool found;
+>       Qcow2BitmapList *bm_list;
+> diff --git a/block/qcow2.c b/block/qcow2.c
+
+Your patch is missing a patch to qcow2_store_persistent_dirty_bitmaps(), 
+which calls error_prepend(errp, ...).  However, when I manually ran the 
+same spatch command line, I also got the same failure to include a fix 
+in that function.
+
+I'm not sure what's wrong with the .cocci script to miss that instance; 
+I've tried fiddling around with the .cocci file to see if I can spot any 
+change to make (for example, using ... instead of <+...), but so far, 
+with no success at getting the second function patched.
 
 -- 
 Eric Blake, Principal Software Engineer
