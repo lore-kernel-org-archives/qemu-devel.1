@@ -2,53 +2,119 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A84B1ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC5AC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:23:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82D74205F4
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:22:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82D74205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id F32BD205F4
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:23:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F32BD205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFI70-0003fz-EN
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53478)
+	id 1iFI7t-0004je-44
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:23:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53772)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFHyx-0004bX-QV
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:14:25 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iFI00-0005fD-Fw
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:15:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFHyw-0006Na-I5
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:14:23 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60984)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFHyr-0006DE-9i; Tue, 01 Oct 2019 09:14:19 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFHyk-00040D-M1; Tue, 01 Oct 2019 16:14:10 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v15 3/5] block/block-copy: split block_copy_set_callbacks
- function
-Date: Tue,  1 Oct 2019 16:14:07 +0300
-Message-Id: <20191001131409.14202-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191001131409.14202-1-vsementsov@virtuozzo.com>
-References: <20191001131409.14202-1-vsementsov@virtuozzo.com>
+ (envelope-from <laurent@vivier.eu>) id 1iFHzz-0007Qw-83
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:15:28 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:47987)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iFHzy-0007Ou-VK
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:15:27 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MBUuV-1iQbzT20oZ-00Cxit; Tue, 01 Oct 2019 15:15:20 +0200
+Subject: Re: [PATCH] user-exec: Do not filter the signal on si_code
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190930192931.20509-1-richard.henderson@linaro.org>
+ <ec1ace6c-49db-e769-e43e-6b0e059d6705@linaro.org>
+ <CAFEAcA9r+N5Q076kWYyu0a+_VvnzU0FRXZK7hZ4t52JO=a3qTA@mail.gmail.com>
+ <7315e0ed-0d33-e998-1dc4-01664c300723@vivier.eu>
+ <CAFEAcA9xT7rRCaP5hwvhzLH0GgMqp+Uk55vq=4TT7d-65Yogkg@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <ba9c069b-fb56-2438-07f9-bb0c5eb97058@vivier.eu>
+Date: Tue, 1 Oct 2019 15:15:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9xT7rRCaP5hwvhzLH0GgMqp+Uk55vq=4TT7d-65Yogkg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+X-Provags-ID: V03:K1:VS5mI6jzS4l3buOllTBvmrLOmbaMrpf9sUc/bSvoqc4TL8u49M7
+ 1I9gAOtNvlHvfrOrMANdndC82bkbdeii8fSSCwU4ncryeuZPmwJ9tY6ZEDvY7TE91mUeb4V
+ CboLqCt9IQNfB//a5NO1W/p0+PW9Hwoxo6RJ92kquwFZg68ef+o/qNgPf84eWYXpfAr1DWU
+ A6DhOHhmxYqjVl+pQyWVg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:aQxYImysqs8=:8+rQ/o3Jm/Xar21Hiev2Hv
+ vmCdgElKl9PAjLILzO5cKgd5nd914GAy0qELqHqDBP7fkwiwsiqUDyEulrd1ugtlTjE91gDAg
+ q+f7Ncftp9rkIoxWO4GAPFIllGQRVj5KZ6SUo1jXAA+qTWXaHuKgaaDkFimVJ8MZtTcnFEnpK
+ 7Y5oXNWBjMLHtMSxRz5IjLxDovAqQpiWgcPs9xnbhxHoXQiVpmnZbwDBPnogIGyGwAhiQML5M
+ EhCNsw0dPsNgJQE2DLTWQ7nlz9iP9UYT5PjCkcC7fCsYszM91dFIqrwTbHbU2zcizJTqt+e37
+ S4tWaeJVdYOc9pU7GHKtws1fqFmXVp4nVnC9iaVVM93I8t5Xnxdl2HdpoOZgEI0g+ZL5Lx2KA
+ Wk9ylgryi2mT2+Bi839cSDvC4J0bFz8H5RqZlpSxLD8sUKg3hmVG3dAPLuUNVWuFBLw2or2CC
+ OQQj3MxHgJG96BsjTRD3RB9iW4oxikHg1fAXm9ozRdHv+0NS8FeVA7OQ3hQOTBHn4eg9qJBdE
+ /GwMQ/1IGAxM1H4DeefPNUGp5dYCDTGiJaIochnNfevUBwNJRYq/GmGsDsvF0uyusa9oNs6aB
+ ruOEFJFmzqe89MJ7erK67xbmjw9rHt55lV7S9UwTsA0c/V11jfxbWzZilLlA2Usau3UCK2sOp
+ zSOfefqsP3PU3QAkwvNBaqMoN6t4aMMtiIj/dzKU14x3mjUATKQSAQ4UJy/Z1i9pC3piWDKQv
+ LmB7jWmbXAN6e3Skcr5VTTWPV7NgjpbZJRNv7nGDcg7LIE0oAUcxX6iPE3axp4BS15qxtnOqn
+ yPRqfOjP4CtRto2ckWZcQXVs3sGPTOcCEepA/o5C69GCTB32KdWNoPI0RniJl1gyVPyO6uLJ0
+ 8EK9LHmHiMlyEA8MLDAmUY8YwmjXkKnChGpDEqZVw=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,126 +126,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, wencongyang2@huawei.com,
- xiechanglong.d@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com,
- den@openvz.org, mreitz@redhat.com, jsnow@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Split block_copy_set_callbacks out of block_copy_state_new. It's needed
-for further commit: block-copy will use BdrvChildren of backup-top
-filter, so it will be created from backup-top filter creation function.
-But callbacks will still belong to backup job and will be set in
-separate.
+Le 01/10/2019 à 13:46, Peter Maydell a écrit :
+> On Tue, 1 Oct 2019 at 12:19, Laurent Vivier <laurent@vivier.eu> wrote:
+>> Is it possible to update the farm to Centos 8?
+>>
+>> Or as the kernel involved is specifically for POWER9, is it possible to
+>> use only POWER8?
+> 
+> My experience is that the gcc cfarm admins aren't in
+> principle against the idea of upgrading farm machines,
+> but in practice they tend to have a shortage of effort.
+> If there's a centos-7-kernel-update package that could
+> be installed without doing a full distro upgrade that
+> would probably be pretty easy to ask them to arrange.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/block-copy.h | 13 +++++++++----
- block/backup.c             |  6 ++++--
- block/block-copy.c         | 24 +++++++++++++++---------
- 3 files changed, 28 insertions(+), 15 deletions(-)
+It seems Centos provides a 4.18 kernel for POWER9 on Centos 7:
 
-diff --git a/include/block/block-copy.h b/include/block/block-copy.h
-index 962f91056a..340d856246 100644
---- a/include/block/block-copy.h
-+++ b/include/block/block-copy.h
-@@ -66,12 +66,17 @@ typedef struct BlockCopyState {
-     void *progress_opaque;
- } BlockCopyState;
- 
--BlockCopyState *block_copy_state_new(
--        BlockDriverState *source, BlockDriverState *target,
--        int64_t cluster_size, BdrvRequestFlags write_flags,
-+BlockCopyState *block_copy_state_new(BlockDriverState *source,
-+                                     BlockDriverState *target,
-+                                     int64_t cluster_size,
-+                                     BdrvRequestFlags write_flags,
-+                                     Error **errp);
-+
-+void block_copy_set_callbacks(
-+        BlockCopyState *s,
-         ProgressBytesCallbackFunc progress_bytes_callback,
-         ProgressResetCallbackFunc progress_reset_callback,
--        void *progress_opaque, Error **errp);
-+        void *progress_opaque);
- 
- void block_copy_state_free(BlockCopyState *s);
- 
-diff --git a/block/backup.c b/block/backup.c
-index b5b7939356..1057ed0a4e 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -478,8 +478,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     job->bitmap_mode = bitmap_mode;
- 
-     job->bcs = block_copy_state_new(bs, target, cluster_size, write_flags,
--                                    backup_progress_bytes_callback,
--                                    backup_progress_reset_callback, job, errp);
-+                                    errp);
-     if (!job->bcs) {
-         goto error;
-     }
-@@ -487,6 +486,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     job->cluster_size = cluster_size;
-     job->len = len;
- 
-+    block_copy_set_callbacks(job->bcs, backup_progress_bytes_callback,
-+                             backup_progress_reset_callback, job);
-+
-     /* Required permissions are already taken by block-copy-state target */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-                        &error_abort);
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 61e5ea5f46..fcb112da14 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -66,12 +66,10 @@ void block_copy_state_free(BlockCopyState *s)
-     g_free(s);
- }
- 
--BlockCopyState *block_copy_state_new(
--        BlockDriverState *source, BlockDriverState *target,
--        int64_t cluster_size, BdrvRequestFlags write_flags,
--        ProgressBytesCallbackFunc progress_bytes_callback,
--        ProgressResetCallbackFunc progress_reset_callback,
--        void *progress_opaque, Error **errp)
-+BlockCopyState *block_copy_state_new(BlockDriverState *source,
-+                                     BlockDriverState *target,
-+                                     int64_t cluster_size,
-+                                     BdrvRequestFlags write_flags, Error **errp)
- {
-     BlockCopyState *s;
-     int ret;
-@@ -95,9 +93,6 @@ BlockCopyState *block_copy_state_new(
-         .cluster_size = cluster_size,
-         .len = bdrv_dirty_bitmap_size(copy_bitmap),
-         .write_flags = write_flags,
--        .progress_bytes_callback = progress_bytes_callback,
--        .progress_reset_callback = progress_reset_callback,
--        .progress_opaque = progress_opaque,
-     };
- 
-     s->copy_range_size = QEMU_ALIGN_DOWN(MIN(blk_get_max_transfer(s->source),
-@@ -144,6 +139,17 @@ fail:
-     return NULL;
- }
- 
-+void block_copy_set_callbacks(
-+        BlockCopyState *s,
-+        ProgressBytesCallbackFunc progress_bytes_callback,
-+        ProgressResetCallbackFunc progress_reset_callback,
-+        void *progress_opaque)
-+{
-+    s->progress_bytes_callback = progress_bytes_callback;
-+    s->progress_reset_callback = progress_reset_callback;
-+    s->progress_opaque = progress_opaque;
-+}
-+
- /*
-  * Copy range to target with a bounce buffer and return the bytes copied. If
-  * error occurred, return a negative error number
--- 
-2.21.0
+http://mirror.centos.org/altarch/7/os/power9/Packages/kernel-4.18.0-80.7.2.el7.ppc64le.rpm
 
+Thanks,
+Laurent
 
