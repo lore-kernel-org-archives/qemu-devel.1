@@ -2,87 +2,67 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67FD8C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FAFECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:03:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 330E82168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:59:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WrJ8FCvv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 330E82168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D9C32168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:03:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D9C32168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFLUt-00037T-WF
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:59:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56593)
+	id 1iFLYa-0006sD-Al
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 13:03:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55007)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thatlemon@gmail.com>) id 1iFLBv-0004g6-Jq
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:40:01 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iFKxA-0006OU-IN
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thatlemon@gmail.com>) id 1iFLBt-0008NI-TG
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:39:59 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40520)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <thatlemon@gmail.com>) id 1iFLBs-0008Dx-8E
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:39:57 -0400
-Received: by mail-wm1-x344.google.com with SMTP id b24so3962095wmj.5
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 09:39:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=to:from:subject:message-id:date:user-agent:mime-version
- :content-language:content-transfer-encoding;
- bh=GAJjguWUwmP/WsVKo8gF3+A3WszXHwQvwqITmyrIgjQ=;
- b=WrJ8FCvvEjBuHbQZbe7yqlacPi6BOY0SAeZfbxZGerta7gZJfS471ayvzyAft0xrkS
- uuGWZ4xRNb57slpf/peylD0qL7cMxOug5YUmLxQcmhrBBgOnMArD03omFRygU2zvAvxy
- roT6uTSIx1xF3ZbF8SUvJPmAOU13ZoqrSwRVHRxMpb1QQ/t690i+YaeC6A+UnmlSlVGg
- luxGqVaZ58VTRBm6xiTrqufqTOd2TeRzdUg9Dk9QVqM/86Zur29y441ytq1PxU5Ce3JV
- PvUb6wzufDV4MXfKUNcB1mgUw656KSyi1rMQ1PoqQrbtctigFt8QIwVO0CM6ojMZKl9w
- rhyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:from:subject:message-id:date:user-agent
- :mime-version:content-language:content-transfer-encoding;
- bh=GAJjguWUwmP/WsVKo8gF3+A3WszXHwQvwqITmyrIgjQ=;
- b=QPjWS4bxouCASFx67DjM7dXN6q5KboGkGqr4in1yu/6XM0M8V2FzLmDK8WNasrW/rn
- tK/oqHcZX6jyGHCCRxygBh77C049YSaBoGZ7sMXxTzwYr748HfMq3G/KBfWDiom3nO78
- JGA0fYTqMB8MJcegbBpPrkTmsXFa5yiHoRhKqWKZZUhr9ktgEhDJUUV9/h3mdiM5MnFs
- VcLOhKm9phWE4aOPr7NsPHLJ06elHynKcqb+HvWLH8M8hQ69apA30wOKHv5OKJe10+Fh
- Rsh+/X4Z0Hs7p8oqNqorJP4m+tmqGl6HjpEth6YYGcI7EHkWsiiKD/CjIQKL8/gTE4gt
- EgeA==
-X-Gm-Message-State: APjAAAUkA93vZr5h9gSb+s5iFx70OZUt1FZATEMqa1FodJIFdGxzEA2a
- vnuiMFXMW3mlLGT6cTulMa0ZsIjS
-X-Google-Smtp-Source: APXvYqy9LB6x8l4ZKER29GS4mYgzqAPCmqBotwLnAbyfPSDPH8SVmGCQXlY5au/VcAHFmiSCoi2PAg==
-X-Received: by 2002:a1c:6609:: with SMTP id a9mr4806218wmc.127.1569947993975; 
- Tue, 01 Oct 2019 09:39:53 -0700 (PDT)
-Received: from [192.168.1.103] ([151.33.120.151])
- by smtp.gmail.com with ESMTPSA id o9sm41071957wrh.46.2019.10.01.09.39.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Oct 2019 09:39:53 -0700 (PDT)
-To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>
-From: LemonBoy <thatlemon@gmail.com>
-Subject: [PATCH] linux-user/riscv: Propagate fault address
-Message-ID: <5059f7eb-07c4-62c7-542b-e71315a4f675@gmail.com>
-Date: Tue, 1 Oct 2019 18:39:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <kwolf@redhat.com>) id 1iFKx8-000294-R9
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:24:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33940)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iFKx3-00025j-OK; Tue, 01 Oct 2019 12:24:39 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C8C7210C0947;
+ Tue,  1 Oct 2019 16:24:36 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-215.ams2.redhat.com [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C98419C7F;
+ Tue,  1 Oct 2019 16:24:32 +0000 (UTC)
+Date: Tue, 1 Oct 2019 18:24:31 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: bitmap migration bug with -drive while block mirror runs
+Message-ID: <20191001162431.GH4688@linux.fritz.box>
+References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
+ <f84745dc-68df-c10a-a91b-a28498e54870@virtuozzo.com>
+ <20191001095416.GC4688@linux.fritz.box>
+ <c051fd5c-31be-c98b-8155-70fe1b6c1283@redhat.com>
+ <20191001155859.GE4688@linux.fritz.box>
+ <296167e0-396d-5f0a-456c-2747c6ad770d@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <296167e0-396d-5f0a-456c-2747c6ad770d@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Tue, 01 Oct 2019 16:24:36 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,73 +74,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The CPU loop tagged all the queued signals as QEMU_SI_KILL while it was
-filling the `_sigfault` part of `siginfo`: this caused QEMU to copy the
-wrong fields over to the userspace program.
+Am 01.10.2019 um 18:12 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 01.10.2019 18:58, Kevin Wolf wrote:
+> > Am 01.10.2019 um 17:09 hat John Snow geschrieben:
+> >>
+> >>
+> >> On 10/1/19 5:54 AM, Kevin Wolf wrote:
+> >>> Am 01.10.2019 um 10:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> >>>> 01.10.2019 3:09, John Snow wrote:
+> >>>>> Hi folks, I identified a problem with the migration code that Red Hat QE
+> >>>>> found and thought you'd like to see it:
+> >>>>>
+> >>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1652424#c20
+> >>>>>
+> >>>>> Very, very briefly: drive-mirror inserts a filter node that changes what
+> >>>>> bdrv_get_device_or_node_name() returns, which causes a migration problem.
+> >>>>>
+> >>>>>
+> >>>>> Ignorant question #1: Can we multi-parent the filter node and
+> >>>>> source-node? It looks like at the moment both consider their only parent
+> >>>>> to be the block-job and don't have a link back to their parents otherwise.
+> >>>>>
+> >>>>>
+> >>>>> Otherwise: I have a lot of cloudy ideas on how to solve this, but
+> >>>>> ultimately what we want is to be able to find the "addressable" name for
+> >>>>> the node the bitmap is attached to, which would be the name of the first
+> >>>>> ancestor node that isn't a filter. (OR, the name of the block-backend
+> >>>>> above that node.)
+> >>>>
+> >>>>
+> >>>> Better would be to migrate by node-name only.. But am I right that
+> >>>> node-names are different on source and destination? Or this situation
+> >>>> changed?
+> >>>
+> >>> Traditionally, I think migration assumes that frontends (guest devices)
+> >>> must match exactly, but backends may and usually will differ.
+> >>>
+> >>> Of course, dirty bitmaps are a backend feature that isn't really related
+> >>> to guest devices, so this doesn't really work out any more in your case.
+> >>> BlockBackend names are unusable for this purpose (especially as we're
+> >>> moving towards anonymous BlockBackends everywhere), which I guess
+> >>> essentially means node-name is the only option left.
+> >>>
+> >>
+> >> The problem as I see it involves API stability.
+> >>
+> >> We allow block-dirty-bitmap-add against e.g. "drive1" through the
+> >> block-backend name (the name of the "drive" as the user sees it.)
+> >>
+> >> Of course, once you start mirror, you aren't able to access that bitmap
+> >> through that namepair anymore -- the "address" of the bitmap has "changed"!
+> >>
+> >> (In actual fact, the bitmap always had two addresses; and simply we lost
+> >> an alias -- but it's the one that the user likely used to create the
+> >> bitmap, so that's bad.)
+> > 
+> > So if I understand correctly, the problem is that without a filter, in
+> > some setups we get a usable BlockBackend name like "drive1", but when a
+> > filter is added, we return the node-name instead which is
+> > auto-generated and will be different on the destination.
+> > 
+> > Looking at the ChildRole documentation:
+> > 
+> >      /* Returns a name that is supposedly more useful for human users than the
+> >       * node name for identifying the node in question (in particular, a BB
+> >       * name), or NULL if the parent can't provide a better name. */
+> >      const char *(*get_name)(BdrvChild *child);
+> > 
+> > I'd argue that a BlockBackend name is more useful for a human user even
+> > across filter, so I'd support a .get_name implementation for a filter
+> > child role (which Max wanted to introduce anyway for his filter series).
+> > 
+> > Of course, if you have a function that is made to return a convenient
+> > text for human users, and you use it for a stable ABI like the migration
+> > stream, this is an idea that would certainly have caused an entertaining
+> > Linus rant in the good old kernel times.
+> > 
+> >>> Is bitmap migration something that must be enabled explicitly or does
+> >>> it happen automatically? If it's explicit, then making an additional
+> >>> requirement (matching node-names) shouldn't be a problem.
+> >>
+> >> This means that bitmap migration becomes a blockdev-only feature.
+> > 
+> > I meant this more as the preferred way for the future rather than the
+> > only thing supported.
+> > 
+> > But Peter has actually mentioned that for libvirt it will be
+> > blockdev-only anyway. So do we even have a good reason to invest much
+> > for the non-blockdev case?
+> > 
+> > Maybe making it blockdev-only is actually pretty reasonable.
+> 
+> We in Virtuozzo use bitmap migration, so I'd have to fix it at least
+> downstream (it seems easier than switch downstream libvirt to blockdev now).
+> 
+> And what about original bug
+> https://bugzilla.redhat.com/show_bug.cgi?id=1652424#c20
+> ?
+> 
+> Also, if we make it blockdev-only upstream, what we mean by that? Node names
+> on destination must match, or we add additional qmp command
+> migration-set-bitmap-node-mapping, to specify mapping between node names on
+> source and target?
 
-Make sure the fault address recorded by the MMU is is stored in the CPU
-environment structure.
+Good question. :-)
 
-In case of memory faults store the exception address into `siginfo`.
+I would have thought that just having matching node-names would be
+pretty convenient for users, but Peter seems to disagree.
 
-Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
----
- linux-user/riscv/cpu_loop.c | 3 ++-
- target/riscv/cpu_helper.c   | 5 ++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+With a separate migration-set-bitmap-node-mapping, what would we do if
+migrate is called before a mapping is configured? Would this cause
+migration failure? I would find that pretty heavy.
 
-diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
-index 12aa3c0f16..aa9e437875 100644
---- a/linux-user/riscv/cpu_loop.c
-+++ b/linux-user/riscv/cpu_loop.c
-@@ -89,6 +89,7 @@ void cpu_loop(CPURISCVState *env)
-         case RISCV_EXCP_STORE_PAGE_FAULT:
-             signum = TARGET_SIGSEGV;
-             sigcode = TARGET_SEGV_MAPERR;
-+            sigaddr = env->badaddr;
-             break;
-         case EXCP_DEBUG:
-         gdbstep:
-@@ -108,7 +109,7 @@ void cpu_loop(CPURISCVState *env)
-                 .si_code = sigcode,
-                 ._sifields._sigfault._addr = sigaddr
-             };
--            queue_signal(env, info.si_signo, QEMU_SI_KILL, &info);
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-         }
- 
-         process_pending_signals(env);
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 87dd6a6ece..58e40e9824 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -446,9 +446,9 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                         MMUAccessType access_type, int mmu_idx,
-                         bool probe, uintptr_t retaddr)
- {
--#ifndef CONFIG_USER_ONLY
-     RISCVCPU *cpu = RISCV_CPU(cs);
-     CPURISCVState *env = &cpu->env;
-+#ifndef CONFIG_USER_ONLY
-     hwaddr pa = 0;
-     int prot;
-     bool pmp_violation = false;
-@@ -499,7 +499,10 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     case MMU_DATA_STORE:
-         cs->exception_index = RISCV_EXCP_STORE_PAGE_FAULT;
-         break;
-+    default:
-+        g_assert_not_reached();
-     }
-+    env->badaddr = address;
-     cpu_loop_exit_restore(cs, retaddr);
- #endif
- }
--- 
-2.20.1
+Maybe default to a 1:1 mapping and allow the user to override it? (And
+if so, do we do the mapping on the source or the destination?)
 
+Kevin
 
