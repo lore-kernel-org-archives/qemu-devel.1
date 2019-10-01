@@ -2,87 +2,83 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 772EFC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F262C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:45:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4871720815
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:43:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4871720815
+	by mail.kernel.org (Postfix) with ESMTPS id 4824121906
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:45:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6FssrIe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4824121906
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFIR0-0004u0-Vr
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:43:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58780)
+	id 1iFISu-0006tG-VO
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:45:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58081)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iFINZ-0001IX-98
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:39:50 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFIKT-000672-My
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iFINV-0004Pe-EQ
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:39:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41530)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iFINV-0004Ni-8w
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:39:45 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D0E6BCFE0
- for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 13:39:43 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id 124so880012wmz.1
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 06:39:43 -0700 (PDT)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFIKS-0001gd-Lt
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:36:37 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38776)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iFIKS-0001fU-E6
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:36:36 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 3so3296263wmi.3
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 06:36:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=tpNzkqUfps0EVOpJsON6N0dLvxr0SOw+FOhA9QOcvjg=;
+ b=e6FssrIejDBX0NLR1YTnlI8KiYgI6QnlkBuMSBmtX7Q1QHy2FDNv9j9p0rioddWfOO
+ mVcTq7J9idwU2yKcCWi6pjyh/8BKuvnFcU6kCaBIHiuIg5wh3i+Xc5VyYLIOoYh2bkc5
+ XYUaTmjTd5aovlidUtQHqoKe9oaUYfVmre28e96C1VC691ZWhq8ivvPH0LpNNFdHjgPJ
+ dIJYvL2xyacJiAME76ft8SwmN3ofxOc2WMxjygj+nSscbWhP5DB9vE0Fi514Zpq8paqU
+ F+sofqluwulx6EuiMBV7aKcbmPHLkEdIsl7zHpm3n9wtcz9uIWeuM7w+7a45fCo0jS6B
+ t0OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mJ1vZ2IgU021iQiANKrtx1JtMBnDDg1nJShflutE3u4=;
- b=QUiZarF7VJeHD+Zmmaaq3QSifATWiny7LvDymZ/nnbUMJDxMOSXb6er9oWJmORsoeu
- GOkUwT4Wu5QD0CJb5TK1l10HvC4w46atZDQu+Ddc7hiDA7J9lwFrMxmLHIOlqMkt4EG6
- GSjbnZyZppg66leQ98NRGg3SB9p4/2Zk2ddf+4Gp4rUxqpKmEDgoniNJRvQVgGKPfaMh
- TD87BBdP7TK3+hHxzsJMTamgdcnJ8g45ZUixEnobwnjDRTDJ5+iBCcXXQJGi2OMY1i6v
- dK7EAf0SDYWh+5vCH4hKKe6GkaH1oGaqE57yPqsbECvwYp+zF4n2nxVon6gtZESvB/Sx
- xcmg==
-X-Gm-Message-State: APjAAAVDhKmjEb/fq3yAUWsAnk48OEtMqxxJyGymVp/2+EkXNehvA3xB
- Whn/68cuqVRUG1/xO2SXg00oq9+MteQR61xMllVu8meGitSN5/WKsZ3s3Fdk8qFT3mxA4gZ/ZZv
- JbcxsbOYJtt7nggM=
-X-Received: by 2002:adf:f343:: with SMTP id e3mr17933442wrp.268.1569937181736; 
- Tue, 01 Oct 2019 06:39:41 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxjfxY7dXxnhUjTv7FXsXFzWqClVXETOp5AfbbMeUkVuGlJlhEKHmknwujN545KDnyuIuVCpQ==
-X-Received: by 2002:adf:f343:: with SMTP id e3mr17933424wrp.268.1569937181460; 
- Tue, 01 Oct 2019 06:39:41 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:dd94:29a5:6c08:c3b5?
- ([2001:b07:6468:f312:dd94:29a5:6c08:c3b5])
- by smtp.gmail.com with ESMTPSA id q66sm1915005wme.39.2019.10.01.06.39.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Oct 2019 06:39:40 -0700 (PDT)
-Subject: Re: [PATCH 0/3] Some win32 fixes
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191001132609.23184-1-marcandre.lureau@redhat.com>
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references;
+ bh=tpNzkqUfps0EVOpJsON6N0dLvxr0SOw+FOhA9QOcvjg=;
+ b=jYLl85sDrzWneofg2P+updfZcfDJ3TXP40zCEq+kSafr9BI1Iqgr8Kld707USJ+24J
+ fUbdEcKSY5Kavoa4GWRjLQ1OeV8Meju3i1OPbXJ5VDi/aylN0vttV3oT32ZGnEhrK9Wm
+ lZepUbDmD8RbEdGYZhDBmU6N8UxMQlSYCM8YeSZvkgOloOZBqiIz7SAAERMpHY6YEOsf
+ Cy3xq9YhopVjhhqNT4uD001tc9G5dz9nCp2CrP9z0Tu6vYZd4ZxGCva+tC0RchuUaB7C
+ M83pRWOOMJnIO9/+ODkrV38qRgIvt6pxhlnDjDwar92tBnmZ62G38DTxBQTovC3+cpw0
+ 58HQ==
+X-Gm-Message-State: APjAAAXh1hAY5IZmRnfinOube7rM4eC7vcMhBZgvdhTstptqM1B5AKCs
+ G7bA0pXZtqbrDZlz1S1L+AJOpaCZ
+X-Google-Smtp-Source: APXvYqxIg2uZIsI8eoULq10pSU1idgjjrU4pHfil7TIhIpgMMx6d03DxgaY7v5e1k0RmHn6q48qbYw==
+X-Received: by 2002:a1c:8097:: with SMTP id b145mr3912364wmd.29.1569936994124; 
+ Tue, 01 Oct 2019 06:36:34 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id q192sm4424575wme.23.2019.10.01.06.36.33
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 01 Oct 2019 06:36:33 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8bc51230-963b-e9e2-25ea-9719223c5c79@redhat.com>
-Date: Tue, 1 Oct 2019 15:39:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191001132609.23184-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+To: qemu-devel@nongnu.org
+Subject: [PATCH 4/8] hppa: fix leak from g_strdup_printf
+Date: Tue,  1 Oct 2019 15:36:24 +0200
+Message-Id: <1569936988-635-5-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1569936988-635-1-git-send-email-pbonzini@redhat.com>
+References: <1569936988-635-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,26 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sw@weilnetz.de, berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/10/19 15:26, Marc-Andr=C3=A9 Lureau wrote:
-> Hi,
->=20
-> Here are a few patches that should fix some busy looping issues
-> already reported >2y ago
-> (https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg00420.html),
-> and fixing test-char on win32.
+memory_region_init_* takes care of copying the name into memory it owns.
+Free it in the caller.
 
-Queued thanks (with s/fix/work around/ in the commit subject of
-patch 3).
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/hppa/dino.c    | 1 +
+ hw/hppa/machine.c | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-> hmm, do we have any automated testing/CI on Windows (beside just
-> cross-compilation)?
+diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
+index e0466ee..ab6969b 100644
+--- a/hw/hppa/dino.c
++++ b/hw/hppa/dino.c
+@@ -485,6 +485,7 @@ PCIBus *dino_init(MemoryRegion *addr_space,
+         memory_region_init_alias(&s->pci_mem_alias[i], OBJECT(s),
+                                  name, &s->pci_mem, addr,
+                                  DINO_MEM_CHUNK_SIZE);
++        g_free(name);
+     }
+ 
+     /* Set up PCI view of memory: Bus master address space.  */
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index 2736ce8..7e23675 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -78,13 +78,15 @@ static void machine_hppa_init(MachineState *machine)
+ 
+     /* Create CPUs.  */
+     for (i = 0; i < smp_cpus; i++) {
++        char *name = g_strdup_printf("cpu%ld-io-eir", i);
+         cpu[i] = HPPA_CPU(cpu_create(machine->cpu_type));
+ 
+         cpu_region = g_new(MemoryRegion, 1);
+         memory_region_init_io(cpu_region, OBJECT(cpu[i]), &hppa_io_eir_ops,
+-                              cpu[i], g_strdup_printf("cpu%ld-io-eir", i), 4);
++                              cpu[i], name, 4);
+         memory_region_add_subregion(addr_space, CPU_HPA + i * 0x1000,
+                                     cpu_region);
++        g_free(name);
+     }
+ 
+     /* Limit main memory. */
+-- 
+1.8.3.1
 
-Nope. :(
 
-Paolo
 
