@@ -2,79 +2,62 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C80C3C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 12:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 832D4ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 12:57:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9430E21A4A
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 12:54:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N37QnV4d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9430E21A4A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 57C4821872
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 12:57:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57C4821872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFHg5-0003p8-Nd
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 08:54:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47386)
+	id 1iFHiI-00053z-HP
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 08:57:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47623)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iFHfC-0003Lh-AR
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:53:59 -0400
+ (envelope-from <berrange@redhat.com>) id 1iFHhR-0004YP-6e
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iFHfA-0007cW-1D
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:53:57 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33119)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iFHf8-0007Y4-FI
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:53:55 -0400
-Received: by mail-oi1-x242.google.com with SMTP id e18so14298162oii.0
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 05:53:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=62cdd8whoUsIcuO8Bop7ENGYNGZyziZSLqVWv1hBCDI=;
- b=N37QnV4dE9iJJRB6rAcSkoouEDChP6OL8l5NGtEXQ1+VgYUc0yh6Pnhp67zgbr7Klq
- HIxZVh8G5xzH3qVkNCPAcuQi0f3hmUsMjO4Cand2Ncha5TRkgiMzlFC8H+L0Q2FxiCfF
- BG1JuBZwAA2fAkZfyhoJgafjnZ/rK4ZDNzEXECqsTJMlsriPQ2P5mblzl0Q9d1cvnYt3
- v5kJeBN7bbQoRDZtGgPhnQzcXNm6mX6mhTErbLvWdHjnHKjjmyPFGbYCu5ZjkLatsXtV
- CqVhp3oYj7NXTwb/zIyDigYkT18kReVAKv6pusqZi2rYXXZRza4UBI4wga1txp8iIxNc
- vR5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=62cdd8whoUsIcuO8Bop7ENGYNGZyziZSLqVWv1hBCDI=;
- b=Hn+gXLwng2buS0n3L1yAqIC5E1RubZdpVucUG46rSH6PfRE1H5wEY2oW/WnJ31vodJ
- o/5To3QcOx4VOI+VnN19zJkFSReM7wXpIAleHBLMiWf5jKLuHAuk9REFkm+tmLwo5Lkd
- H4Z/k2FDPQR/IOq94DPH4jOIlZhMHgCaHEx4J5UB9aDLMN5f400MuNFBG1/S7I3MtbvF
- KSnFAqV77ov1wHxI2+ZojgeFaQVe0ToK0EB0sAxYN1eDKMkUmALxjK0jSbiGB0h330eJ
- eL2+Jo+87Fp0hTNAH8JamreVzWuzVo+Ygh7ShpN+U5IQ3NSbWiiFjnO2bq1HUMnO9q26
- mcOw==
-X-Gm-Message-State: APjAAAXPFQJMLWwA8BnWCvP3c/l3YLvH/xBrth7z0rAbAH3fedFpV8MC
- ipKVOLF5t3akwRSUK/BJ3icqP0uUzJlQggoxy3oUkA==
-X-Google-Smtp-Source: APXvYqzHkzBdwcvUMHyXI4cqg+hyG4CD7NpSkt8tXJ/zVRy0debD6BnJ9zX+qF/ngO3Gf2mwv05yeJA5WiomyTTcWFE=
-X-Received: by 2002:aca:50d8:: with SMTP id e207mr3416667oib.48.1569934432820; 
- Tue, 01 Oct 2019 05:53:52 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1iFHhP-000267-0Z
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:56:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60996)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iFHhO-00025I-RW
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:56:14 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1D0F2307D931;
+ Tue,  1 Oct 2019 12:56:14 +0000 (UTC)
+Received: from redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5681E5D9C9;
+ Tue,  1 Oct 2019 12:56:13 +0000 (UTC)
+Date: Tue, 1 Oct 2019 13:56:10 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Toe Dev <devtoe82@gmail.com>
+Subject: Re: header not included but used in vl.c
+Message-ID: <20191001125610.GN26133@redhat.com>
+References: <CAN+O=TJkZEqHs50gYZgp3n0AeV1h6Wd8UYo+kxss5LUVJqxULQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20191001105057.3949-1-thuth@redhat.com>
-In-Reply-To: <20191001105057.3949-1-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 Oct 2019 13:53:41 +0100
-Message-ID: <CAFEAcA-Nfo2zot5W+j0KYqkruWQ34FL=tf42i3BoK_cWTkSTiA@mail.gmail.com>
-Subject: Re: [PULL 0/5] qtest and misc patches
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAN+O=TJkZEqHs50gYZgp3n0AeV1h6Wd8UYo+kxss5LUVJqxULQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 01 Oct 2019 12:56:14 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,39 +69,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 1 Oct 2019 at 11:51, Thomas Huth <thuth@redhat.com> wrote:
->
->  Hi Peter!
->
-> The following changes since commit 95e9d74fe4281f7ad79a5a7511400541729aa44a:
->
->   Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20190930' into staging (2019-09-30 14:21:56 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2019-10-01
->
-> for you to fetch changes up to 3d5e90a50bd4ffa199166e01a365f5c5995534ae:
->
->   Disallow colons in the parameter of "-accel" (2019-10-01 11:54:17 +0200)
->
-> ----------------------------------------------------------------
-> - Fix and re-enable the usb-hcd-ehci-test
-> - Silence a Coverity warning in hw/m68k/next-cube.c
-> - Fix crash that can occur when using bad binaries with "-kernel"
-> - Disallow colons in the "-accel" parameter
-> ----------------------------------------------------------------
+On Tue, Oct 01, 2019 at 03:12:17PM +0300, Toe Dev wrote:
+> Hello,
+>  does it have a reason why the file vl.c lacks reference
+>  #include "qemu/module.h" ?
+>  but still uses the defines include their(for example the enum value:
+> MODULE_INIT_OPTS)?
 
+qemu/module.h is included by qom/object.h which is included by many
+many things in QEMU, so vl.c gets module.h indirectly which is fine.
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
