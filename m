@@ -2,62 +2,65 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E6F3ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28401ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6837D21855
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:41:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6837D21855
+	by mail.kernel.org (Postfix) with ESMTPS id F27F0222C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:43:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F27F0222C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFLDd-0006aA-N3
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:41:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53691)
+	id 1iFLF0-00008c-BM
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:43:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iFKp3-0007jC-90
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:16:22 -0400
+ (envelope-from <eblake@redhat.com>) id 1iFKvK-0004Cm-9Q
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iFKp1-00045c-3a
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:16:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54254)
+ (envelope-from <eblake@redhat.com>) id 1iFKvJ-0000Qf-2P
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:22:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33972)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iFKoy-00043g-QI; Tue, 01 Oct 2019 12:16:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iFKvB-0000I9-W9; Tue, 01 Oct 2019 12:22:42 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 10C1F30917EF;
- Tue,  1 Oct 2019 16:16:16 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-215.ams2.redhat.com [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2957B5D712;
- Tue,  1 Oct 2019 16:16:12 +0000 (UTC)
-Date: Tue, 1 Oct 2019 18:16:10 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: bitmap migration bug with -drive while block mirror runs
-Message-ID: <20191001161610.GG4688@linux.fritz.box>
-References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
- <d897c755-40e7-6392-23e3-c06b1a371f28@virtuozzo.com>
- <4bc910ef-0bec-cfd6-89f6-a93d35367218@redhat.com>
- <9431d242-bfe1-b9db-17d0-6c1a280a05da@virtuozzo.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 762FF3082A98;
+ Tue,  1 Oct 2019 16:22:40 +0000 (UTC)
+Received: from [10.3.116.201] (ovpn-116-201.phx2.redhat.com [10.3.116.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A92919D70;
+ Tue,  1 Oct 2019 16:22:14 +0000 (UTC)
+Subject: Re: [PATCH v4 05/31] scripts: add script to fix
+ error_append_hint/error_prepend usage
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-6-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <cc20df9c-75e4-6139-c6ff-de0622b59104@redhat.com>
+Date: Tue, 1 Oct 2019 11:22:13 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9431d242-bfe1-b9db-17d0-6c1a280a05da@virtuozzo.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20191001155319.8066-6-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Tue, 01 Oct 2019 16:16:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Tue, 01 Oct 2019 16:22:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -72,58 +75,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: fam@euphon.net, pburton@wavecomp.com, peter.maydell@linaro.org,
+ codyprime@gmail.com, jasowang@redhat.com, mark.cave-ayland@ilande.co.uk,
+ mdroth@linux.vnet.ibm.com, kraxel@redhat.com, sundeep.lkml@gmail.com,
+ qemu-block@nongnu.org, quintela@redhat.com, arikalo@wavecomp.com,
+ mst@redhat.com, armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ joel@jms.id.au, marcandre.lureau@redhat.com, rth@twiddle.net,
+ farman@linux.ibm.com, ehabkost@redhat.com, sw@weilnetz.de, groug@kaod.org,
+ yuval.shaia@oracle.com, dgilbert@redhat.com, alex.williamson@redhat.com,
+ qemu-arm@nongnu.org, clg@kaod.org, stefanha@redhat.com, david@redhat.com,
+ jsnow@redhat.com, david@gibson.dropbear.id.au, kwolf@redhat.com,
+ integration@gluster.org, berrange@redhat.com, andrew@aj.id.au,
+ cohuck@redhat.com, qemu-s390x@nongnu.org, mreitz@redhat.com,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 01.10.2019 um 17:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 01.10.2019 17:10, John Snow wrote:
-> > 
-> > 
-> > On 10/1/19 10:00 AM, Vladimir Sementsov-Ogievskiy wrote:
-> >>> Otherwise: I have a lot of cloudy ideas on how to solve this, but
-> >>> ultimately what we want is to be able to find the "addressable" name for
-> >>> the node the bitmap is attached to, which would be the name of the first
-> >>> ancestor node that isn't a filter. (OR, the name of the block-backend
-> >>> above that node.)
-> >> Not the name of ancestor node, it will break mapping: it must be name of the
-> >> node itself or name of parent (may be through several filters) block-backend
-> >>
-> > 
-> > Ah, you are right of course -- because block-backends are the only
-> > "nodes" for which we actually descend the graph and add the bitmap to
-> > its child.
-> > 
-> > So the real back-resolution mechanism is:
-> > 
-> > - Find the first non-filter ancestor, A
-> > - if A is not a block-backend, we must use our node-local name.
-> > - if A's name is empty, we must use our node-local name.
-> > - If the name we have chosen is not id_wellformed, we have no
-> > migration-stable addressable name for this bitmap and the migration must
-> > fail!
-> > 
-> > 
-> > For resolving bitmap addresses via QMP (node, name) pairs; the
-> > resolution method would be this:
-> > 
-> > - if the node-name N is a block-backend, descend the tree until we find
-> > the first non-filter node V.
-> > - if the node-name N is a BlockDriverState, use this node directly.
-> > 
-> 
-> Looks good for me.
-> 
-> I also think if on destination we have both block-backend with name N and
-> block-node with name N and the latter is not (filtered) child of the former,
-> we should fail migration of at least that bitmap. (Hope, nobody reuse
-> block-backend names as node-names in practice.. (should we restrict it
-> explicitly ?))
+On 10/1/19 10:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+> error_append_hint and error_prepend will not work, if errp ==
+> &fatal_error, as program will exit before error_append_hint or
+> error_prepend call. Fix this by use of special macro
+> ERRP_AUTO_PROPAGATE.
 
-You can't have a node and a BlockBackend of the same name, they share a
-single namespace. If you try to do so, you get an error.
+This patch doesn't actually fix any code, but adds the script to enable 
+automating the fixing of the code in subsequent patches.  Tweaking the 
+commit message to make that point clear might be helpful.
 
-Kevin
+
+>   scripts/coccinelle/fix-error-add-info.cocci | 28 +++++++++++++++++++++
+>   1 file changed, 28 insertions(+)
+>   create mode 100644 scripts/coccinelle/fix-error-add-info.cocci
+> 
+> diff --git a/scripts/coccinelle/fix-error-add-info.cocci b/scripts/coccinelle/fix-error-add-info.cocci
+> new file mode 100644
+> index 0000000000..34fa3be720
+> --- /dev/null
+> +++ b/scripts/coccinelle/fix-error-add-info.cocci
+> @@ -0,0 +1,28 @@
+> +@rule0@
+> +// Add invocation to errp-functions
+> +identifier fn;
+> +@@
+> +
+> + fn(..., Error **errp, ...)
+> + {
+> ++   ERRP_AUTO_PROPAGATE();
+> +    <+...
+> +(
+> +    error_append_hint(errp, ...);
+> +|
+> +    error_prepend(errp, ...);
+> +)
+
+So, for now, you aren't addressing any *errp usage, or any potential 
+cleanups of error_propagate.  But that's okay; your cover letter did 
+call out that you were only addressing 1 part out of 3 potential uses 
+just to get some motion, based on the size of the effort.
+
+> +    ...+>
+> + }
+> +
+> +@@
+> +// Drop doubled invocation
+> +identifier rule0.fn;
+> +@@
+> +
+> + fn(...)
+> +{
+> +    ERRP_AUTO_PROPAGATE();
+> +-   ERRP_AUTO_PROPAGATE();
+> +    ...
+> +}
+> 
+
+This looks idempotent once a file is patched, and safe to rerun as many 
+times in the future as needed.  I'm still hoping we can find a way to 
+make scripts/checkpatch.pl also do a sanity check, but as it's harder to 
+parse C in perl than in Coccinelle, I can live with just the .cocci 
+script in-tree as long as we remember to manually run it periodically.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
