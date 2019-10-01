@@ -2,79 +2,68 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 891CFC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CEE9ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:19:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 558E220815
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:15:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdCv/Q/d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 558E220815
+	by mail.kernel.org (Postfix) with ESMTPS id 5EB2E21906
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:19:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EB2E21906
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFIw0-0008Ua-BZ
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 10:15:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36776)
+	id 1iFIze-0001YV-Dt
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 10:19:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFIv6-00082I-NH
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:14:29 -0400
+ (envelope-from <pkrempa@redhat.com>) id 1iFIyY-00017H-Aa
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFIv5-0007XE-Dg
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:14:28 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35525)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iFIv5-0007WE-8E
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:14:27 -0400
-Received: by mail-wr1-x443.google.com with SMTP id v8so15773292wrt.2
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 07:14:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id;
- bh=9FxYLphVXY4uST+nxeWKafzobQ3LpK2O54/JNRyeh/U=;
- b=fdCv/Q/dTLgezGEhIPLvhVJlLd9+DpFU6sk0HKZYpk8TKeeCZ4pDSuhTnNphjuQPaI
- ZQNLK7MaiEq303/2SO/a8Jl2l+cmB9yDAugNbcDCbdZ6zJ+3CuFmuNC9SBN8Ii94/VHM
- aUig1EUAvWNVXICxl5bdxvoYoYqLSdsUtGm1LH/hwGeq4K5/2quT4RegL+DLzsmssIZC
- fNCNmze4DOZH8ZFxqHYsiuIkkTXJWuG0lFiD6B39iLKuO+Bb4h5fT5KZxtm3uXYtQU6f
- 6ly+5sGke04tu4/92WJYmk23Z0DVxURRRGpsxioLtai9AbRbB+Kbffv99R+j3ckDHpFL
- 89HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=9FxYLphVXY4uST+nxeWKafzobQ3LpK2O54/JNRyeh/U=;
- b=k+aw6t4HdSkhiTPd6Snw8VvDahKtPEZd5S/WA2dBS63/Ybhkr7KNHrWBn0ZixoTS+n
- UUdy/DsVopAGiFPZu/5qcfq+Z/JK13R+z649x4J1C1v+vRT1yAY1mi5qZL5NFtORFbal
- kIGuvsXpa+w0c5s2QBKYtavpnwryLwV5EArHoiElXwOwTF167P62h/7HMgtKU/LbIGb+
- Y6NLXk2S8kECzOz7DHCqzXRnVBA46qW5SsnfflzPwpXIXIRnXXSdXkngaVagOZD0hs7h
- gF8Gjf59yl9fQynsfKLwRasbbHS3tiAu+8ngQT/5rJbcR0IteAByn6/iqvt8+Z7e7qe+
- HYBA==
-X-Gm-Message-State: APjAAAVp4VgoJJkcudLV642vKII3G/S4s7fg+2yv/QaWuxi2xI4VvHiS
- UNmZPCTonSIR8epZlyU1f4Pnj8Bv
-X-Google-Smtp-Source: APXvYqzSPwv8F2Zg9b1wO5PHkvp3DttgQ6kUJxXijqcqr4zxacsIAyRlMNmpOR1Hrw+0rCzxCOZRnw==
-X-Received: by 2002:adf:f00d:: with SMTP id j13mr2429087wro.140.1569939265725; 
- Tue, 01 Oct 2019 07:14:25 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g185sm4003903wme.10.2019.10.01.07.14.24
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 01 Oct 2019 07:14:25 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tests/docker: only enable ubsan for test-clang
-Date: Tue,  1 Oct 2019 16:14:24 +0200
-Message-Id: <1569939264-12539-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+ (envelope-from <pkrempa@redhat.com>) id 1iFIyX-0002CD-9Y
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:18:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37040)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iFIyX-0002Ar-3h
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:18:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5700910C0944;
+ Tue,  1 Oct 2019 14:18:00 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.43.2.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5CC3C5D9CC;
+ Tue,  1 Oct 2019 14:17:59 +0000 (UTC)
+Date: Tue, 1 Oct 2019 16:17:56 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 1/2] qapi: Add feature flags to commands in qapi
+ introspection
+Message-ID: <20191001141756.GA6129@angien.pipo.sk>
+References: <cover.1568989362.git.pkrempa@redhat.com>
+ <96cc954e1cba111a4565123badb42c36e534a5d3.1568989362.git.pkrempa@redhat.com>
+ <87r23x55pm.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87r23x55pm.fsf@dusky.pond.sub.org>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Tue, 01 Oct 2019 14:18:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,37 +75,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, jsnow@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
--fsanitize=undefined is not the same thing as --enable-sanitizers.  After
-commit 47c823e ("tests/docker: add sanitizers back to clang build", 2019-09-11)
-test-clang is almost duplicating the asan (test-debug) test, so
-partly revert commit 47c823e5b while leaving ubsan enabled.
+On Tue, Oct 01, 2019 at 08:40:21 +0200, Markus Armbruster wrote:
+> Peter Krempa <pkrempa@redhat.com> writes:
+>=20
+> > Similarly to features for struct types introduce the feature flags also
+> > for commands. This will allow notifying management layers of fixes and
+> > compatible changes in the behaviour of a command which may not be
+> > detectable any other way.
+> >
+> > The changes were heavily inspired by commit 6a8c0b51025.
+> >
+> > Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+>=20
+> +1 on adding features to commands.
+>=20
+> Patch conflicts with the technical debt payback work I posted before and
+> after this series, although not nearly as badly as I expected.  It'll
+> conflict some more with the parts I haven't flushed.  The funny bit: I
+> went on that rampage in preparation of QAPI language extensions
+> including "features everywhere, not just structs".
+>=20
+> I'll look into how to best fit your work into mine.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/docker/test-clang | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/tests/docker/test-clang b/tests/docker/test-clang
-index db9e697..8c51ead 100755
---- a/tests/docker/test-clang
-+++ b/tests/docker/test-clang
-@@ -17,7 +17,9 @@ requires clang
- 
- cd "$BUILD_DIR"
- 
--OPTS="--cxx=clang++ --cc=clang --host-cc=clang --enable-sanitizers"
-+OPTS="--cxx=clang++ --cc=clang --host-cc=clang"
-+OPTS="$OPTS --extra-cflags=-fsanitize=undefined \
-+    --extra-cflags=-fno-sanitize=float-divide-by-zero"
- build_qemu $OPTS
- check_qemu
- install_qemu
--- 
-1.8.3.1
-
+Thanks. I have patches ready which depend on this to enable blockdev so
+please let me know if the design changes somehow.
 
