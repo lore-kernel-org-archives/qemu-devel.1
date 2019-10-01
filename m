@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1308C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 12:15:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C80C3C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 12:54:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8D4D21920
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 12:15:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9430E21A4A
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 12:54:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EwRDaFpZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D4D21920
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N37QnV4d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9430E21A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFH3y-0006un-LN
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 08:15:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40865)
+	id 1iFHg5-0003p8-Nd
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 08:54:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iFH26-0005lf-5n
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:13:35 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iFHfC-0003Lh-AR
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:53:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iFH24-0000Xc-SI
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:13:34 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:44611)
+ (envelope-from <peter.maydell@linaro.org>) id 1iFHfA-0007cW-1D
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:53:57 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33119)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iFH24-0000XC-MD
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:13:32 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w6so14131821oie.11
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 05:13:32 -0700 (PDT)
+ id 1iFHf8-0007Y4-FI
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:53:55 -0400
+Received: by mail-oi1-x242.google.com with SMTP id e18so14298162oii.0
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 05:53:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=EqPJvGfvde5raidNpo+Iag6DTCRENREzMrRH18wNc6Q=;
- b=EwRDaFpZVQYRCaz9/ibU4DBMJ6HhOLNpbZ3q74GLy7eteeMX8SkKfWOeBDDFBMpf2x
- btY4HVumcqWYQbyHAB1I62WFYEj7+390YX+Pw6xhgDHrgqVxgAcuxrbVdk8LlMh+4Px8
- ylp/fnrnqESjJkXPZ5kAYFyOGytXyTF1Yg3VHH4BXSzuOpSKsWkarU3hvNjSNoWF1y/v
- +/mWRnV8PBBsg2LseF+QsUiNI7V3LvYqB4TOnSuODte16Hj/EHCWeyIDfEjolzTHtPuB
- 2Tw36OF3qioJGdatVfCDhr5JoN5eqjVRXfxmOLIK8VSzCeuuiG9nP/+wDyrdR56Vx6MY
- AOhw==
+ :cc; bh=62cdd8whoUsIcuO8Bop7ENGYNGZyziZSLqVWv1hBCDI=;
+ b=N37QnV4dE9iJJRB6rAcSkoouEDChP6OL8l5NGtEXQ1+VgYUc0yh6Pnhp67zgbr7Klq
+ HIxZVh8G5xzH3qVkNCPAcuQi0f3hmUsMjO4Cand2Ncha5TRkgiMzlFC8H+L0Q2FxiCfF
+ BG1JuBZwAA2fAkZfyhoJgafjnZ/rK4ZDNzEXECqsTJMlsriPQ2P5mblzl0Q9d1cvnYt3
+ v5kJeBN7bbQoRDZtGgPhnQzcXNm6mX6mhTErbLvWdHjnHKjjmyPFGbYCu5ZjkLatsXtV
+ CqVhp3oYj7NXTwb/zIyDigYkT18kReVAKv6pusqZi2rYXXZRza4UBI4wga1txp8iIxNc
+ vR5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=EqPJvGfvde5raidNpo+Iag6DTCRENREzMrRH18wNc6Q=;
- b=gZSJh0b+5lZ6yT3323wN/h53oNSHsn8D85WhVvqS65yU8ilnPBrVyhm4d4tPXXr2j/
- JX2GaqIEYVvjQmvvNcHj+ww2xoCjXRMFHKapmZg50ds7B4P+72msyFbDoML7UQcEUlgg
- aQ99HJVtNUSlkC7Eg9uPETHDjNvY5Jndxw5hsi69A8KhdxjijQ3MS5w0zcEK6Gq5swEe
- bEG6XcGu/wLQUHWrmJSmVZ2BdLNS/vGVJ9fOh3W0d1KlK7FYYW4Opmtn+HqettubH/IH
- vSGSxwgltna+/4lX4BpdPJZeAE7kCD7dVvmVAVm49WSiAqoBMIIJRlp76bi3xyTR//zg
- RGAg==
-X-Gm-Message-State: APjAAAV7OE8q52Ok3dwyd63H+KtsEVArOnUleQVN0bG6ETE7oOsRijci
- 5ndjaO3s81+1brPgf0gfr3q7sPvcGEippmirx/+TAQ==
-X-Google-Smtp-Source: APXvYqx+8Wn6LPWgKTVqP1BBjicRLX+uyofGNEg4OGLip2uszqPHU+sLs7vPwuKQX8qNeQ55EOSCmK2ZEpD4i1tApuQ=
-X-Received: by 2002:aca:50d8:: with SMTP id e207mr3284565oib.48.1569932011855; 
- Tue, 01 Oct 2019 05:13:31 -0700 (PDT)
+ bh=62cdd8whoUsIcuO8Bop7ENGYNGZyziZSLqVWv1hBCDI=;
+ b=Hn+gXLwng2buS0n3L1yAqIC5E1RubZdpVucUG46rSH6PfRE1H5wEY2oW/WnJ31vodJ
+ o/5To3QcOx4VOI+VnN19zJkFSReM7wXpIAleHBLMiWf5jKLuHAuk9REFkm+tmLwo5Lkd
+ H4Z/k2FDPQR/IOq94DPH4jOIlZhMHgCaHEx4J5UB9aDLMN5f400MuNFBG1/S7I3MtbvF
+ KSnFAqV77ov1wHxI2+ZojgeFaQVe0ToK0EB0sAxYN1eDKMkUmALxjK0jSbiGB0h330eJ
+ eL2+Jo+87Fp0hTNAH8JamreVzWuzVo+Ygh7ShpN+U5IQ3NSbWiiFjnO2bq1HUMnO9q26
+ mcOw==
+X-Gm-Message-State: APjAAAXPFQJMLWwA8BnWCvP3c/l3YLvH/xBrth7z0rAbAH3fedFpV8MC
+ ipKVOLF5t3akwRSUK/BJ3icqP0uUzJlQggoxy3oUkA==
+X-Google-Smtp-Source: APXvYqzHkzBdwcvUMHyXI4cqg+hyG4CD7NpSkt8tXJ/zVRy0debD6BnJ9zX+qF/ngO3Gf2mwv05yeJA5WiomyTTcWFE=
+X-Received: by 2002:aca:50d8:: with SMTP id e207mr3416667oib.48.1569934432820; 
+ Tue, 01 Oct 2019 05:53:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190928183934.12459-1-armbru@redhat.com>
- <CAFEAcA8tQde=o0FaezJuRb+fw_gt-7sq5pQSr_3RNjqc9jenaQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA8tQde=o0FaezJuRb+fw_gt-7sq5pQSr_3RNjqc9jenaQ@mail.gmail.com>
+References: <20191001105057.3949-1-thuth@redhat.com>
+In-Reply-To: <20191001105057.3949-1-thuth@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 Oct 2019 13:13:20 +0100
-Message-ID: <CAFEAcA9+0XFTEZ=SV_N9h=+V+yyiVgNjLVqBfX=GZm2_Pg+vCQ@mail.gmail.com>
-Subject: Re: [PULL 00/27] QAPI patches for 2019-09-28
-To: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 1 Oct 2019 13:53:41 +0100
+Message-ID: <CAFEAcA-Nfo2zot5W+j0KYqkruWQ34FL=tf42i3BoK_cWTkSTiA@mail.gmail.com>
+Subject: Re: [PULL 0/5] qtest and misc patches
+To: Thomas Huth <thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -92,30 +91,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 30 Sep 2019 at 11:48, Peter Maydell <peter.maydell@linaro.org> wrote:
+On Tue, 1 Oct 2019 at 11:51, Thomas Huth <thuth@redhat.com> wrote:
 >
-> On Sat, 28 Sep 2019 at 19:45, Markus Armbruster <armbru@redhat.com> wrote:
-> >
-> > The following changes since commit c6f5012ba5fa834cbd5274b1b8369e2c5d2f5933:
-> >
-> >   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-next-260919-1' into staging (2019-09-27 15:43:41 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2019-09-28
-> >
-> > for you to fetch changes up to c615550df306a7b16e75d21f65ee38898c756bac:
-> >
-> >   qapi: Improve source file read error handling (2019-09-28 17:17:48 +0200)
-> >
-> > ----------------------------------------------------------------
-> > QAPI patches for 2019-09-28
-> >
+>  Hi Peter!
 >
-> Just a note that repo.or.cz seems to be down currently;
-> I'll retry this pullreq later in the week.
+> The following changes since commit 95e9d74fe4281f7ad79a5a7511400541729aa44a:
+>
+>   Merge remote-tracking branch 'remotes/borntraeger/tags/s390x-20190930' into staging (2019-09-30 14:21:56 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-10-01
+>
+> for you to fetch changes up to 3d5e90a50bd4ffa199166e01a365f5c5995534ae:
+>
+>   Disallow colons in the parameter of "-accel" (2019-10-01 11:54:17 +0200)
+>
+> ----------------------------------------------------------------
+> - Fix and re-enable the usb-hcd-ehci-test
+> - Silence a Coverity warning in hw/m68k/next-cube.c
+> - Fix crash that can occur when using bad binaries with "-kernel"
+> - Disallow colons in the "-accel" parameter
+> ----------------------------------------------------------------
 
-Today it seems to be back, so applied, thanks.
+
+Applied, thanks.
 
 Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
 for any user-visible changes.
