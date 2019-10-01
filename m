@@ -2,49 +2,66 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 691AAC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:40:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2112C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:41:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FC2B20700
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:40:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FC2B20700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id BAA0A205C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:41:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAA0A205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFO0Y-0006FN-5S
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 15:40:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48310)
+	id 1iFO1S-00077A-TG
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 15:41:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49116)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFNo8-0004i7-Fz
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:27:37 -0400
+ (envelope-from <armbru@redhat.com>) id 1iFNuT-0000yM-Jn
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:34:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFNo7-0001SI-2F
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:27:36 -0400
-Received: from relay.sw.ru ([185.231.240.75]:45294)
+ (envelope-from <armbru@redhat.com>) id 1iFNuQ-0004tP-TU
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:34:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55086)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iFNo6-0001Qf-Qd; Tue, 01 Oct 2019 15:27:34 -0400
-Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iFNo2-00060a-Oc; Tue, 01 Oct 2019 22:27:30 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Subject: [PATCH 0/6] qcow2: advanced compression options
-Date: Tue,  1 Oct 2019 22:27:14 +0300
-Message-Id: <1569958040-697220-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iFNuQ-0004sR-OH
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:34:06 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B22142CE905;
+ Tue,  1 Oct 2019 19:34:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 807C060579;
+ Tue,  1 Oct 2019 19:34:04 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 02DC3113864A; Tue,  1 Oct 2019 21:34:02 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Krempa <pkrempa@redhat.com>
+Subject: Re: [PATCH v2 2/2] qapi: Allow introspecting fix for savevm's
+ cooperation with blockdev
+References: <cover.1568989362.git.pkrempa@redhat.com>
+ <992ea9ca130b4fb6dbf82726aa3b1d8040c16944.1568989362.git.pkrempa@redhat.com>
+Date: Tue, 01 Oct 2019 21:34:02 +0200
+In-Reply-To: <992ea9ca130b4fb6dbf82726aa3b1d8040c16944.1568989362.git.pkrempa@redhat.com>
+ (Peter Krempa's message of "Fri, 20 Sep 2019 16:26:45 +0200")
+Message-ID: <87r23w2rbp.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Tue, 01 Oct 2019 19:34:04 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,48 +73,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- jsnow@redhat.com, armbru@redhat.com, dgilbert@redhat.com, stefanha@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-New enhancements of writing compressed data to QCOW2 image.
+Peter Krempa <pkrempa@redhat.com> writes:
 
-Based on: message ID <20190916175324.18478-1-vsementsov@virtuozzo.com>
-          https://lists.nongnu.org/archive/html/qemu-block/2019-09/msg00751.html
+> savevm was buggy as it considered all monitor owned block device nodes
 
-Andrey Shinkevich (6):
-  qcow2: multiple clusters write compressed
-  tests/qemu-iotests: add case of writing compressed data to multiple
-    clusters.
-  block: support compressed write for copy-on-read
-  qemu-nbd: add compression flag support
-  block-stream: add compress option
-  tests/qemu-iotests: add case for block-stream compress
+Recommend "monitor-owned block device nodes" or "block device nodes
+owned by a monitor"
 
- block/io.c                 |  21 +++++++--
- block/qcow2.c              | 113 ++++++++++++++++++++++++++++++++++-----------
- block/stream.c             |  19 +++++---
- block/trace-events         |   2 +-
- blockdev-nbd.c             |   2 +-
- blockdev.c                 |  14 +++++-
- hmp-commands.hx            |   4 +-
- include/block/block_int.h  |   3 +-
- include/block/nbd.h        |   7 ++-
- monitor/hmp-cmds.c         |   5 +-
- nbd/server.c               |   8 +++-
- qapi/block-core.json       |   5 +-
- qemu-nbd.c                 |  18 +++++++-
- qemu-nbd.texi              |   2 +
- tests/qemu-iotests/030     |  49 +++++++++++++++++++-
- tests/qemu-iotests/030.out |   4 +-
- tests/qemu-iotests/214     |   9 ++++
- tests/qemu-iotests/214.out |   6 +++
- 18 files changed, 236 insertions(+), 55 deletions(-)
+> for snapshot. With introduction of -blockdev the common usage made all
+> nodes including protocol nodes monitor owned and thus considered for
+> snapshot.
 
--- 
-1.8.3.1
+What exactly is / was the problem?
 
+>           This was fixed but clients need to be able to detect whether
+> this fix is present.
+
+Fixed where?  Commit hash, if possible.
+
+>
+> Since savevm does not have an QMP alternative add the feature for the
+
+Comma after alternative.
+
+> 'human-monitor-command' backdoor which is used to call this command in
+> modern use.
+
+Eww.  I don't have better ideas short of "design and implement a sane
+QMP interface to internal snapshots", which is too much work.
+
+> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+> ---
+>  qapi/misc.json | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 6bd11f50e6..673445dfa9 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1020,6 +1020,12 @@
+>  #
+>  # @cpu-index: The CPU to use for commands that require an implicit CPU
+>  #
+> +# Features:
+> +# @savevm-blockdev-monitor-nodes: If present, the savevm monitor command only
+
+Maybe s/the savevm monitor command/HMP command savevm/
+
+> +#                                 snapshots monitor owned nodes if they have no
+
+monitor-owned or owner by a monitor again.
+
+> +#                                 parents. This allows to use 'savevm' with
+> +#                                 -blockdev. (since 4.2)
+> +#
+>  # Returns: the output of the command as a string
+>  #
+>  # Since: 0.14.0
+> @@ -1047,7 +1053,8 @@
+>  ##
+>  { 'command': 'human-monitor-command',
+>    'data': {'command-line': 'str', '*cpu-index': 'int'},
+> -  'returns': 'str' }
+> +  'returns': 'str',
+> +  'features' : [ { 'name': 'savevm-blockdev-monitor-nodes' } ] }
+
+No space before ':'.
+
+Short form would do:
+
+     'features': [ 'savevm-blockdev-monitor-nodes' ]
+
+>
+>  ##
+>  # @change:
 
