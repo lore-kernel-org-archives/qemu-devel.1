@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB362C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C3F6ECE58A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:52:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE0E720842
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:50:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE0E720842
+	by mail.kernel.org (Postfix) with ESMTPS id 9482220842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:52:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9482220842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFSqy-0003uO-An
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:50:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40417)
+	id 1iFSs2-000540-MD
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:51:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40242)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0001tQ-AQ
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:26 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsL-0002O7-5W
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsL-0001nv-99
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56160
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsG-0002H9-MZ
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10548
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsJ-0001rk-Ba; Tue, 01 Oct 2019 19:48:11 -0400
+ id 1iFRsG-0001mJ-Am; Tue, 01 Oct 2019 19:48:08 -0400
 Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlOgJ098927; Tue, 1 Oct 2019 19:47:49 -0400
+ x91NlOTR098881; Tue, 1 Oct 2019 19:47:46 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcfjp9v2y-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2vcfjp9v22-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:49 -0400
+ Tue, 01 Oct 2019 19:47:46 -0400
 Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91Nlnhw099831;
- Tue, 1 Oct 2019 19:47:49 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcfjp9v2q-1
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NljeE099480;
+ Tue, 1 Oct 2019 19:47:45 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2vcfjp9v1w-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:49 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlrD001420;
- Tue, 1 Oct 2019 23:47:48 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma03wdc.us.ibm.com with ESMTP id 2v9y56yf88-1
+ Tue, 01 Oct 2019 19:47:45 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjkYK031624;
+ Tue, 1 Oct 2019 23:47:45 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma02wdc.us.ibm.com with ESMTP id 2v9y587fca-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:48 +0000
+ Tue, 01 Oct 2019 23:47:45 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NlmTC11076576
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91NljYs47513972
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:48 GMT
+ Tue, 1 Oct 2019 23:47:45 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0256C2805A;
- Tue,  1 Oct 2019 23:47:48 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id E97902805A;
+ Tue,  1 Oct 2019 23:47:44 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id DA63228059;
- Tue,  1 Oct 2019 23:47:47 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id CDE4228059;
+ Tue,  1 Oct 2019 23:47:44 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:47 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:44 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 66/97] iotests: Test incremental backup after truncation
-Date: Tue,  1 Oct 2019 18:45:45 -0500
-Message-Id: <20191001234616.7825-67-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 05/97] qcow2: Fix qcow2_make_empty() with external data file
+Date: Tue,  1 Oct 2019 18:44:44 -0500
+Message-Id: <20191001234616.7825-6-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -85,7 +85,7 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
  malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=838 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 148.163.158.5
@@ -100,106 +100,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Kevin Wolf <kwolf@redhat.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190805152840.32190-1-mreitz@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 8a9cb864086269af14bbd13f395472703cf99f8c)
+make_completely_empty() is an optimisated path for bdrv_make_empty()
+where completely new metadata is created inside the image file instead
+of going through all clusters and discarding them. For an external data
+file, however, we actually need to do discard operations on the data
+file; just overwriting the qcow2 file doesn't get rid of the data.
+
+The necessary slow path with an explicit discard operation already
+exists for other cases. Use it for external data files, too.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+(cherry picked from commit db04524f820582ebf1189223b6378de238511da1)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/124     | 38 ++++++++++++++++++++++++++++++++++----
- tests/qemu-iotests/124.out |  4 ++--
- 2 files changed, 36 insertions(+), 6 deletions(-)
+ block/qcow2.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-index 80b356f7bb..3440f54781 100755
---- a/tests/qemu-iotests/124
-+++ b/tests/qemu-iotests/124
-@@ -212,25 +212,28 @@ class TestIncrementalBackupBase(iotests.QMPTestCase):
-         return bitmap
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7fbef97aab..840f289a48 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4384,14 +4384,17 @@ static int qcow2_make_empty(BlockDriverState *bs)
  
+     if (s->qcow_version >= 3 && !s->snapshots && !s->nb_bitmaps &&
+         3 + l1_clusters <= s->refcount_block_size &&
+-        s->crypt_method_header != QCOW_CRYPT_LUKS) {
++        s->crypt_method_header != QCOW_CRYPT_LUKS &&
++        !has_data_file(bs)) {
+         /* The following function only works for qcow2 v3 images (it
+          * requires the dirty flag) and only as long as there are no
+          * features that reserve extra clusters (such as snapshots,
+          * LUKS header, or persistent bitmaps), because it completely
+          * empties the image.  Furthermore, the L1 table and three
+          * additional clusters (image header, refcount table, one
+-         * refcount block) have to fit inside one refcount block. */
++         * refcount block) have to fit inside one refcount block. It
++         * only resets the image file, i.e. does not work with an
++         * external data file. */
+         return make_completely_empty(bs);
+     }
  
--    def prepare_backup(self, bitmap=None, parent=None):
-+    def prepare_backup(self, bitmap=None, parent=None, **kwargs):
-         if bitmap is None:
-             bitmap = self.bitmaps[-1]
-         if parent is None:
-             parent, _ = bitmap.last_target()
- 
-         target, _ = bitmap.new_target()
--        self.img_create(target, bitmap.drive['fmt'], parent=parent)
-+        self.img_create(target, bitmap.drive['fmt'], parent=parent,
-+                        **kwargs)
-         return target
- 
- 
-     def create_incremental(self, bitmap=None, parent=None,
--                           parentFormat=None, validate=True):
-+                           parentFormat=None, validate=True,
-+                           target=None):
-         if bitmap is None:
-             bitmap = self.bitmaps[-1]
-         if parent is None:
-             parent, _ = bitmap.last_target()
- 
--        target = self.prepare_backup(bitmap, parent)
-+        if target is None:
-+            target = self.prepare_backup(bitmap, parent)
-         res = self.do_qmp_backup(job_id=bitmap.drive['id'],
-                                  device=bitmap.drive['id'],
-                                  sync='incremental', bitmap=bitmap.name,
-@@ -572,6 +575,33 @@ class TestIncrementalBackup(TestIncrementalBackupBase):
-                           'bitmap0', self.drives[0],
-                           granularity=64000)
- 
-+    def test_growing_before_backup(self):
-+        '''
-+        Test: Add a bitmap, truncate the image, write past the old
-+              end, do a backup.
-+
-+        Incremental backup should not ignore dirty bits past the old
-+        image end.
-+        '''
-+        self.assert_no_active_block_jobs()
-+
-+        self.create_anchor_backup()
-+
-+        self.add_bitmap('bitmap0', self.drives[0])
-+
-+        res = self.vm.qmp('block_resize', device=self.drives[0]['id'],
-+                          size=(65 * 1048576))
-+        self.assert_qmp(res, 'return', {})
-+
-+        # Dirty the image past the old end
-+        self.vm.hmp_qemu_io(self.drives[0]['id'], 'write 64M 64k')
-+
-+        target = self.prepare_backup(size='65M')
-+        self.create_incremental(target=target)
-+
-+        self.vm.shutdown()
-+        self.check_backups()
-+
- 
- class TestIncrementalBackupBlkdebug(TestIncrementalBackupBase):
-     '''Incremental backup tests that utilize a BlkDebug filter on drive0.'''
-diff --git a/tests/qemu-iotests/124.out b/tests/qemu-iotests/124.out
-index 281b69efea..fa16b5ccef 100644
---- a/tests/qemu-iotests/124.out
-+++ b/tests/qemu-iotests/124.out
-@@ -1,5 +1,5 @@
--............
-+.............
- ----------------------------------------------------------------------
--Ran 12 tests
-+Ran 13 tests
- 
- OK
 -- 
 2.17.1
 
