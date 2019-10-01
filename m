@@ -2,116 +2,119 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA00C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C2BC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:15:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FEEB2168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:13:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FEEB2168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C851421783
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:15:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="t2/8UnkH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C851421783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFNaU-0002M9-Kc
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 15:13:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46113)
+	id 1iFNbv-00041L-Sq
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 15:14:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46263)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iFNYq-00011K-2Y
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:11:50 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFNZf-0001sF-Vt
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iFNYn-0001iF-PC
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:11:47 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:47059)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iFNYi-0001eY-Mx; Tue, 01 Oct 2019 15:11:41 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MY5s5-1ieSWY1kqr-00YOz1; Tue, 01 Oct 2019 21:11:11 +0200
-Subject: Re: [PATCH v13 1/9] esp: add pseudo-DMA as used by Macintosh
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20190927090453.24712-1-laurent@vivier.eu>
- <20190927090453.24712-2-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <c37baff9-fd0b-ad89-97d2-3780bee20f20@vivier.eu>
-Date: Tue, 1 Oct 2019 21:11:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFNZe-00026I-AM
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:12:39 -0400
+Received: from mail-eopbgr50136.outbound.protection.outlook.com
+ ([40.107.5.136]:36417 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iFNZZ-00024V-1B; Tue, 01 Oct 2019 15:12:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XD9aMxuTcz+9ybFaHd92jvqyHMTHGzjy7YOXoBJHN+LV/r2Idm+mj25DK/hnd9CnvkEr7yImYyaleg5xirW0vS8bIvSPtnKqzgWTNHNlu9lzdQSHpnLVpgaXTbeaae+T40UULzoIw1fkZygW3rZZqI6DQZIsRjQOawMZeqJ2vmYNfUWeM0Yvh8jVTdnMZalTb1FK5oOLqH02i1QJQ/FdyV5ge3/kmCECL9BzdS7KIb5555OTewfGBXW5R7XNtvjETnGlZSv3fI7dgIlVeRt2TtWkMaCnUSOHaaxxSH406jG+CIgv6NtsvBRVT5nBfNRs95+Vw8zO8gSvbW7TUou5tw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LzyYn9mZCpJcpTi5f9bVt7gOmga2cd8RgQLkdN9b/Ng=;
+ b=FHJHdBkFKvNN2zUo47jYWhBKW7RGR35UH4xT+Uq77HsoIfA7t+ddzBZm6BVHOMLmr2TenwZfWPDopEWoo1tkjkdKmKrGOZEqHmHQvtIhC7MUw1qpbkzGy2f7p4NLm0BPtZq7Ax9WQsJ6oVdEyx+Zx3MYdIDfkSWY6PjxcWrc0OcgujHbvJD59ZYk8nTQm8bH3c7l9nGaNVLq8AmOz1YW3Nhm4nyOfU2TsCqU/VkXkyuonGZ5BMOGMEMwvWMeUDlT55hvX6m/HiMfRejoMTHpMRcszWHUKTUmWpolyVCBZ/XIRLvdhlzgLrrkXMKg5PwrIiCrbW2oIWoWjgWIaNWZXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LzyYn9mZCpJcpTi5f9bVt7gOmga2cd8RgQLkdN9b/Ng=;
+ b=t2/8UnkHBFfr8UgVog5xwJ18bIqshiU2IcpZu0ELNQtlCnUy3h7ovk2gKhTmjSFjJbrfdCyJ9GGyhzCbHyQaNfbI9ehCwLqkxEznyNuYEKmvdca+BXgnmvfuldYFD2Q7lyqTRYV/lrqP/iPDxOSfjTCQozO7NvjB39/1k/0Azr0=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5195.eurprd08.prod.outlook.com (20.179.15.207) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Tue, 1 Oct 2019 19:12:27 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.017; Tue, 1 Oct 2019
+ 19:12:27 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v4 23/31] block: Fix error_append_hint/error_prepend usage
+Thread-Topic: [PATCH v4 23/31] block: Fix error_append_hint/error_prepend usage
+Thread-Index: AQHVeHBjaPIeroN7AUSxC2G0RpvjJadGBRqAgAAdeYCAAATdgA==
+Date: Tue, 1 Oct 2019 19:12:27 +0000
+Message-ID: <e4bf79cb-08ab-0f70-7631-70590356cb2c@virtuozzo.com>
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-24-vsementsov@virtuozzo.com>
+ <f6456405-3128-a530-7039-45671d8f2508@redhat.com>
+ <e626f8ca-e0f6-ef0d-1d09-3b7fcbde8cb3@virtuozzo.com>
+In-Reply-To: <e626f8ca-e0f6-ef0d-1d09-3b7fcbde8cb3@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR1001CA0019.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:3:f7::29) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191001221225009
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f3faef9a-5899-40d2-e599-08d746a34ca8
+x-ms-traffictypediagnostic: DB8PR08MB5195:
+x-microsoft-antispam-prvs: <DB8PR08MB519580C6844448CAF4B21265C19D0@DB8PR08MB5195.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:161;
+x-forefront-prvs: 0177904E6B
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(136003)(39850400004)(366004)(376002)(396003)(51444003)(199004)(189003)(66556008)(54906003)(305945005)(66446008)(4326008)(6246003)(71190400001)(7416002)(71200400001)(110136005)(8936002)(5660300002)(64756008)(186003)(316002)(36756003)(81166006)(81156014)(8676002)(53546011)(386003)(478600001)(26005)(6506007)(2906002)(52116002)(102836004)(66476007)(66946007)(7736002)(76176011)(14454004)(25786009)(229853002)(31696002)(3846002)(19627235002)(66066001)(6116002)(476003)(31686004)(11346002)(6436002)(256004)(14444005)(2616005)(99286004)(6512007)(486006)(86362001)(446003)(6486002)(2501003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5195;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: B46lHe/L/n53zZZ/0MeivEvoDryWxTvGWKlVtE7br3cmM9w0R20MoqHyaL8xh1RU8j57ih09s5M+9t4cRj7kcdSVRjGPQrg9vYWAQhapHM1h+FBT7Luu94WtoYBoZFbSUAExJ2ERAm29S6I70LyhsuQLpsNznPmLpKUiIg1AQ0aVTovZUMKYXKA5ddTzczo8Yr/7cAcaS6gU/ha/lZyUGyPMBnLuITtQfzyOIsCXcDJ4FpoilGpAzzADpEtArQzWy4CmfwfMjBHIol+KkQ7YZ600flA9DAuqgbd3ZGC+Q4Y6rRV+0qv4FnOPb140a2sYvOIFeGY/BVUVCyLHAOC70r2eH8itbu+VO2bVLdMI9VzR/6EKvz1SoX599sd3VbItZXP26kOPHAgb1ksY4wV3C7rogP0m8pDwpex82W/Gpbo=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5E8047286B0DB441A52223BC80BDBE8E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190927090453.24712-2-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:l3FzQxeM18QwZGXKloI7GvZKpK2lhu6ekoz8ir3wGrMku9MAI4C
- xVrlyp0N3x4uxLcFBKp3rT969JTP0wVlUnRILAPtAnF3Qgd3gfFrST3TOLaefdY/sNjn/7T
- HauwzeIjEd/OvcQQdQvVV4FyyCJku4zUGcCbayCIxSCyB+wuY8gW/DntYhgJjZKYENiPqQJ
- BdviisTU+l3+oNTEit1ow==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zEwIzCIXzMM=:mG3hwcEgIoo72CHiggLfFH
- msN4a5Eios9zQuxknOE+TSm9OF4oaQbrILMdDIKcO2qNv2XwaoefaAVJTRyFbECvCIQqgLq3y
- Db0NK/L5Wa3Rqda1FZj0rzEBKWWL7AAAKtFbgeAJ/XI0SbO2B76YOpiJAR25S3s1Pr1G0SIgq
- N2pM3SuPq1SjWKsoDTgnZaDWm9I2qFY9WZHx9IuGXmScTawMXMrFliPrJHW9ZZMkDC2KYbHtN
- sSjBzC5ODtWJRONRgjBgw9HdFksIOf3cDdP2gf5FpTk8CMpqVEik3uUaYbPG8+Fm+E0EobivD
- o8RHP+knq/BFQ7w5scjnH7pc6Fe97hUrg/6FAxbT3Vhvw37o40gqLfEoDP6Fq04NbL87fMLBy
- K2eWTZZfGaR+3kCQz2x+CmVsBSgIbliDrCd5yJJEE3aJMwIUgaBdrtFUN87jLbpzEB406pwRs
- BQ0P5AiEa6DRUUYW5iLxbgpMYU0nZJ+wTMiFraietP6/J6XZfqKasXB+v5uLC13lKD7VZ5fvL
- ofxskCkbJc8SVbiQUeFKlp4SyW+xWrqVU+MBUUpav9i7AE+/z53e3wRGDNeNMD+LymPICTix3
- vvUmIotbDaz9zDR5CNPX2WFef+HX5PGlpb7vEVH5u74E8GjFQrLr+HjnnEK2ZllPfDhtGo1cH
- hOmOiRyldvrzOBBK7C71EJuajOytdnfGtE5iYp10CqhNkR9y2Bn3/TYkMkoVPu6d+kfh/SC6S
- /QilwYg7hxTRJy72rdMloIiJ9UJFHLoOv+F8+1WCtWT3UfhL5DWjKtefnBvPvZAAOtc74DkyN
- fd+acFT/C5aOBz5HZPaJuqzsVdpL4tn7h42VnSV2HfhUVhc7buQxYj/e2KIUlTBn09x06b84G
- EV8aVx1HEni12VqWU0479N1BO+Kpax1xNDtTAdugU=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.126.130
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3faef9a-5899-40d2-e599-08d746a34ca8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Oct 2019 19:12:27.6976 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ybAEdgMo1DCqn8ohN8gW/4pMOQ80mtTOeqFU7YZpEDFf1/BEGiDdH32DUtd7vG8wDtw6u3ZKKG/ZsllNIr3tk6oDkgXASgpxhw+klbtPGHg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5195
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.5.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,606 +127,174 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+ "integration@gluster.org" <integration@gluster.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo,
-
-this patch is the only that is not specific to Q800 and has not been
-"acked" or reviewed by the maintainer.
-
-If you ack it I will be ready to send a PR for the Q800 series.
-
-Thanks,
-Laurent
-
-Le 27/09/2019 à 11:04, Laurent Vivier a écrit :
-> There is no DMA in Quadra 800, so the CPU reads/writes the data from the
-> PDMA register (offset 0x100, ESP_PDMA in hw/m68k/q800.c) and copies them
-> to/from the memory.
-> 
-> There is a nice assembly loop in the kernel to do that, see
-> linux/drivers/scsi/mac_esp.c:MAC_ESP_PDMA_LOOP().
-> 
-> The start of the transfer is triggered by the DREQ interrupt (see linux
-> mac_esp_send_pdma_cmd()), the CPU polls on the IRQ flag to start the
-> transfer after a SCSI command has been sent (in Quadra 800 it goes
-> through the VIA2, the via2-irq line and the vIFR register)
-> 
-> The Macintosh hardware includes hardware handshaking to prevent the CPU
-> from reading invalid data or writing data faster than the peripheral
-> device can accept it.
-> 
-> This is the "blind mode", and from the doc:
-> "Approximate maximum SCSI transfer rates within a blocks are 1.4 MB per
-> second for blind transfers in the Macintosh II"
-> 
-> Some references can be found in:
->   Apple Macintosh Family Hardware Reference, ISBN 0-201-19255-1
->   Guide to the Macintosh Family Hardware, ISBN-0-201-52405-8
-> 
-> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  hw/scsi/esp.c         | 338 ++++++++++++++++++++++++++++++++++++++----
->  include/hw/scsi/esp.h |  15 ++
->  2 files changed, 324 insertions(+), 29 deletions(-)
-> 
-> diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-> index 841d79b60e..90b40c4cb5 100644
-> --- a/hw/scsi/esp.c
-> +++ b/hw/scsi/esp.c
-> @@ -38,6 +38,8 @@
->   * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR89C100.txt
->   * and
->   * http://www.ibiblio.org/pub/historic-linux/early-ports/Sparc/NCR/NCR53C9X.txt
-> + *
-> + * On Macintosh Quadra it is a NCR53C96.
->   */
->  
->  static void esp_raise_irq(ESPState *s)
-> @@ -58,6 +60,16 @@ static void esp_lower_irq(ESPState *s)
->      }
->  }
->  
-> +static void esp_raise_drq(ESPState *s)
-> +{
-> +    qemu_irq_raise(s->irq_data);
-> +}
-> +
-> +static void esp_lower_drq(ESPState *s)
-> +{
-> +    qemu_irq_lower(s->irq_data);
-> +}
-> +
->  void esp_dma_enable(ESPState *s, int irq, int level)
->  {
->      if (level) {
-> @@ -84,29 +96,35 @@ void esp_request_cancelled(SCSIRequest *req)
->      }
->  }
->  
-> -static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-> +static void set_pdma(ESPState *s, enum pdma_origin_id origin,
-> +                     uint32_t index, uint32_t len)
-> +{
-> +    s->pdma_origin = origin;
-> +    s->pdma_start = index;
-> +    s->pdma_cur = index;
-> +    s->pdma_len = len;
-> +}
-> +
-> +static uint8_t *get_pdma_buf(ESPState *s)
-> +{
-> +    switch (s->pdma_origin) {
-> +    case PDMA:
-> +        return s->pdma_buf;
-> +    case TI:
-> +        return s->ti_buf;
-> +    case CMD:
-> +        return s->cmdbuf;
-> +    case ASYNC:
-> +        return s->async_buf;
-> +    }
-> +    return NULL;
-> +}
-> +
-> +static int get_cmd_cb(ESPState *s)
->  {
-> -    uint32_t dmalen;
->      int target;
->  
->      target = s->wregs[ESP_WBUSID] & BUSID_DID;
-> -    if (s->dma) {
-> -        dmalen = s->rregs[ESP_TCLO];
-> -        dmalen |= s->rregs[ESP_TCMID] << 8;
-> -        dmalen |= s->rregs[ESP_TCHI] << 16;
-> -        if (dmalen > buflen) {
-> -            return 0;
-> -        }
-> -        s->dma_memory_read(s->dma_opaque, buf, dmalen);
-> -    } else {
-> -        dmalen = s->ti_size;
-> -        if (dmalen > TI_BUFSZ) {
-> -            return 0;
-> -        }
-> -        memcpy(buf, s->ti_buf, dmalen);
-> -        buf[0] = buf[2] >> 5;
-> -    }
-> -    trace_esp_get_cmd(dmalen, target);
->  
->      s->ti_size = 0;
->      s->ti_rptr = 0;
-> @@ -125,8 +143,46 @@ static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
->          s->rregs[ESP_RINTR] = INTR_DC;
->          s->rregs[ESP_RSEQ] = SEQ_0;
->          esp_raise_irq(s);
-> +        return -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-> +{
-> +    int target;
-> +    uint32_t dmalen;
-> +
-> +    target = s->wregs[ESP_WBUSID] & BUSID_DID;
-> +    if (s->dma) {
-> +        dmalen = s->rregs[ESP_TCLO];
-> +        dmalen |= s->rregs[ESP_TCMID] << 8;
-> +        dmalen |= s->rregs[ESP_TCHI] << 16;
-> +        if (dmalen > buflen) {
-> +            return 0;
-> +        }
-> +        if (s->dma_memory_read) {
-> +            s->dma_memory_read(s->dma_opaque, buf, dmalen);
-> +        } else {
-> +            memcpy(s->pdma_buf, buf, dmalen);
-> +            set_pdma(s, PDMA, 0, dmalen);
-> +            esp_raise_drq(s);
-> +            return 0;
-> +        }
-> +    } else {
-> +        dmalen = s->ti_size;
-> +        if (dmalen > TI_BUFSZ) {
-> +            return 0;
-> +        }
-> +        memcpy(buf, s->ti_buf, dmalen);
-> +        buf[0] = buf[2] >> 5;
-> +    }
-> +    trace_esp_get_cmd(dmalen, target);
-> +
-> +    if (get_cmd_cb(s) < 0) {
->          return 0;
->      }
-> +
->      return dmalen;
->  }
->  
-> @@ -165,6 +221,16 @@ static void do_cmd(ESPState *s, uint8_t *buf)
->      do_busid_cmd(s, &buf[1], busid);
->  }
->  
-> +static void satn_pdma_cb(ESPState *s)
-> +{
-> +    if (get_cmd_cb(s) < 0) {
-> +        return;
-> +    }
-> +    if (s->pdma_cur != s->pdma_start) {
-> +        do_cmd(s, get_pdma_buf(s) + s->pdma_start);
-> +    }
-> +}
-> +
->  static void handle_satn(ESPState *s)
->  {
->      uint8_t buf[32];
-> @@ -174,11 +240,22 @@ static void handle_satn(ESPState *s)
->          s->dma_cb = handle_satn;
->          return;
->      }
-> +    s->pdma_cb = satn_pdma_cb;
->      len = get_cmd(s, buf, sizeof(buf));
->      if (len)
->          do_cmd(s, buf);
->  }
->  
-> +static void s_without_satn_pdma_cb(ESPState *s)
-> +{
-> +    if (get_cmd_cb(s) < 0) {
-> +        return;
-> +    }
-> +    if (s->pdma_cur != s->pdma_start) {
-> +        do_busid_cmd(s, get_pdma_buf(s) + s->pdma_start, 0);
-> +    }
-> +}
-> +
->  static void handle_s_without_atn(ESPState *s)
->  {
->      uint8_t buf[32];
-> @@ -188,18 +265,36 @@ static void handle_s_without_atn(ESPState *s)
->          s->dma_cb = handle_s_without_atn;
->          return;
->      }
-> +    s->pdma_cb = s_without_satn_pdma_cb;
->      len = get_cmd(s, buf, sizeof(buf));
->      if (len) {
->          do_busid_cmd(s, buf, 0);
->      }
->  }
->  
-> +static void satn_stop_pdma_cb(ESPState *s)
-> +{
-> +    if (get_cmd_cb(s) < 0) {
-> +        return;
-> +    }
-> +    s->cmdlen = s->pdma_cur - s->pdma_start;
-> +    if (s->cmdlen) {
-> +        trace_esp_handle_satn_stop(s->cmdlen);
-> +        s->do_cmd = 1;
-> +        s->rregs[ESP_RSTAT] = STAT_TC | STAT_CD;
-> +        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-> +        s->rregs[ESP_RSEQ] = SEQ_CD;
-> +        esp_raise_irq(s);
-> +    }
-> +}
-> +
->  static void handle_satn_stop(ESPState *s)
->  {
->      if (s->dma && !s->dma_enabled) {
->          s->dma_cb = handle_satn_stop;
->          return;
->      }
-> +    s->pdma_cb = satn_stop_pdma_cb;;
->      s->cmdlen = get_cmd(s, s->cmdbuf, sizeof(s->cmdbuf));
->      if (s->cmdlen) {
->          trace_esp_handle_satn_stop(s->cmdlen);
-> @@ -211,16 +306,31 @@ static void handle_satn_stop(ESPState *s)
->      }
->  }
->  
-> +static void write_response_pdma_cb(ESPState *s)
-> +{
-> +    s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-> +    s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-> +    s->rregs[ESP_RSEQ] = SEQ_CD;
-> +    esp_raise_irq(s);
-> +}
-> +
->  static void write_response(ESPState *s)
->  {
->      trace_esp_write_response(s->status);
->      s->ti_buf[0] = s->status;
->      s->ti_buf[1] = 0;
->      if (s->dma) {
-> -        s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
-> -        s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-> -        s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-> -        s->rregs[ESP_RSEQ] = SEQ_CD;
-> +        if (s->dma_memory_write) {
-> +            s->dma_memory_write(s->dma_opaque, s->ti_buf, 2);
-> +            s->rregs[ESP_RSTAT] = STAT_TC | STAT_ST;
-> +            s->rregs[ESP_RINTR] = INTR_BS | INTR_FC;
-> +            s->rregs[ESP_RSEQ] = SEQ_CD;
-> +        } else {
-> +            set_pdma(s, TI, 0, 2);
-> +            s->pdma_cb = write_response_pdma_cb;
-> +            esp_raise_drq(s);
-> +            return;
-> +        }
->      } else {
->          s->ti_size = 2;
->          s->ti_rptr = 0;
-> @@ -242,6 +352,41 @@ static void esp_dma_done(ESPState *s)
->      esp_raise_irq(s);
->  }
->  
-> +static void do_dma_pdma_cb(ESPState *s)
-> +{
-> +    int to_device = (s->ti_size < 0);
-> +    int len = s->pdma_cur - s->pdma_start;
-> +    if (s->do_cmd) {
-> +        s->ti_size = 0;
-> +        s->cmdlen = 0;
-> +        s->do_cmd = 0;
-> +        do_cmd(s, s->cmdbuf);
-> +        return;
-> +    }
-> +    s->dma_left -= len;
-> +    s->async_buf += len;
-> +    s->async_len -= len;
-> +    if (to_device) {
-> +        s->ti_size += len;
-> +    } else {
-> +        s->ti_size -= len;
-> +    }
-> +    if (s->async_len == 0) {
-> +        scsi_req_continue(s->current_req);
-> +        /*
-> +         * If there is still data to be read from the device then
-> +         * complete the DMA operation immediately.  Otherwise defer
-> +         * until the scsi layer has completed.
-> +         */
-> +        if (to_device || s->dma_left != 0 || s->ti_size == 0) {
-> +            return;
-> +        }
-> +    }
-> +
-> +    /* Partially filled a scsi buffer. Complete immediately.  */
-> +    esp_dma_done(s);
-> +}
-> +
->  static void esp_do_dma(ESPState *s)
->  {
->      uint32_t len;
-> @@ -252,10 +397,25 @@ static void esp_do_dma(ESPState *s)
->          trace_esp_do_dma(s->cmdlen, len);
->          assert (s->cmdlen <= sizeof(s->cmdbuf) &&
->                  len <= sizeof(s->cmdbuf) - s->cmdlen);
-> -        s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-> +        if (s->dma_memory_read) {
-> +            s->dma_memory_read(s->dma_opaque, &s->cmdbuf[s->cmdlen], len);
-> +        } else {
-> +            set_pdma(s, CMD, s->cmdlen, len);
-> +            s->pdma_cb = do_dma_pdma_cb;
-> +            esp_raise_drq(s);
-> +            return;
-> +        }
-> +        trace_esp_handle_ti_cmd(s->cmdlen);
-> +        s->ti_size = 0;
-> +        s->cmdlen = 0;
-> +        s->do_cmd = 0;
-> +        do_cmd(s, s->cmdbuf);
->          return;
->      }
->      if (s->async_len == 0) {
-> +        if (s->dma_left == 0) {
-> +            esp_dma_done(s);
-> +        }
->          /* Defer until data is available.  */
->          return;
->      }
-> @@ -264,9 +424,23 @@ static void esp_do_dma(ESPState *s)
->      }
->      to_device = (s->ti_size < 0);
->      if (to_device) {
-> -        s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-> +        if (s->dma_memory_read) {
-> +            s->dma_memory_read(s->dma_opaque, s->async_buf, len);
-> +        } else {
-> +            set_pdma(s, ASYNC, 0, len);
-> +            s->pdma_cb = do_dma_pdma_cb;
-> +            esp_raise_drq(s);
-> +            return;
-> +        }
->      } else {
-> -        s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-> +        if (s->dma_memory_write) {
-> +            s->dma_memory_write(s->dma_opaque, s->async_buf, len);
-> +        } else {
-> +            set_pdma(s, ASYNC, 0, len);
-> +            s->pdma_cb = do_dma_pdma_cb;
-> +            esp_raise_drq(s);
-> +            return;
-> +        }
->      }
->      s->dma_left -= len;
->      s->async_buf += len;
-> @@ -373,8 +547,7 @@ static void handle_ti(ESPState *s)
->          s->dma_left = minlen;
->          s->rregs[ESP_RSTAT] &= ~STAT_TC;
->          esp_do_dma(s);
-> -    }
-> -    if (s->do_cmd) {
-> +    } else if (s->do_cmd) {
->          trace_esp_handle_ti_cmd(s->cmdlen);
->          s->ti_size = 0;
->          s->cmdlen = 0;
-> @@ -401,6 +574,7 @@ void esp_hard_reset(ESPState *s)
->  static void esp_soft_reset(ESPState *s)
->  {
->      qemu_irq_lower(s->irq);
-> +    qemu_irq_lower(s->irq_data);
->      esp_hard_reset(s);
->  }
->  
-> @@ -590,6 +764,28 @@ static bool esp_mem_accepts(void *opaque, hwaddr addr,
->      return (size == 1) || (is_write && size == 4);
->  }
->  
-> +static bool esp_pdma_needed(void *opaque)
-> +{
-> +    ESPState *s = opaque;
-> +    return s->dma_memory_read == NULL && s->dma_memory_write == NULL &&
-> +           s->dma_enabled;
-> +}
-> +
-> +static const VMStateDescription vmstate_esp_pdma = {
-> +    .name = "esp/pdma",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .needed = esp_pdma_needed,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_BUFFER(pdma_buf, ESPState),
-> +        VMSTATE_INT32(pdma_origin, ESPState),
-> +        VMSTATE_UINT32(pdma_len, ESPState),
-> +        VMSTATE_UINT32(pdma_start, ESPState),
-> +        VMSTATE_UINT32(pdma_cur, ESPState),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
->  const VMStateDescription vmstate_esp = {
->      .name ="esp",
->      .version_id = 4,
-> @@ -611,6 +807,10 @@ const VMStateDescription vmstate_esp = {
->          VMSTATE_UINT32(do_cmd, ESPState),
->          VMSTATE_UINT32(dma_left, ESPState),
->          VMSTATE_END_OF_LIST()
-> +    },
-> +    .subsections = (const VMStateDescription * []) {
-> +        &vmstate_esp_pdma,
-> +        NULL
->      }
->  };
->  
-> @@ -641,6 +841,82 @@ static const MemoryRegionOps sysbus_esp_mem_ops = {
->      .valid.accepts = esp_mem_accepts,
->  };
->  
-> +static void sysbus_esp_pdma_write(void *opaque, hwaddr addr,
-> +                                  uint64_t val, unsigned int size)
-> +{
-> +    SysBusESPState *sysbus = opaque;
-> +    ESPState *s = &sysbus->esp;
-> +    uint32_t dmalen;
-> +    uint8_t *buf = get_pdma_buf(s);
-> +
-> +    dmalen = s->rregs[ESP_TCLO];
-> +    dmalen |= s->rregs[ESP_TCMID] << 8;
-> +    dmalen |= s->rregs[ESP_TCHI] << 16;
-> +    if (dmalen == 0 || s->pdma_len == 0) {
-> +        return;
-> +    }
-> +    switch (size) {
-> +    case 1:
-> +        buf[s->pdma_cur++] = val;
-> +        s->pdma_len--;
-> +        dmalen--;
-> +        break;
-> +    case 2:
-> +        buf[s->pdma_cur++] = val >> 8;
-> +        buf[s->pdma_cur++] = val;
-> +        s->pdma_len -= 2;
-> +        dmalen -= 2;
-> +        break;
-> +    }
-> +    s->rregs[ESP_TCLO] = dmalen & 0xff;
-> +    s->rregs[ESP_TCMID] = dmalen >> 8;
-> +    s->rregs[ESP_TCHI] = dmalen >> 16;
-> +    if (s->pdma_len == 0 && s->pdma_cb) {
-> +        esp_lower_drq(s);
-> +        s->pdma_cb(s);
-> +        s->pdma_cb = NULL;
-> +    }
-> +}
-> +
-> +static uint64_t sysbus_esp_pdma_read(void *opaque, hwaddr addr,
-> +                                     unsigned int size)
-> +{
-> +    SysBusESPState *sysbus = opaque;
-> +    ESPState *s = &sysbus->esp;
-> +    uint8_t *buf = get_pdma_buf(s);
-> +    uint64_t val = 0;
-> +
-> +    if (s->pdma_len == 0) {
-> +        return 0;
-> +    }
-> +    switch (size) {
-> +    case 1:
-> +        val = buf[s->pdma_cur++];
-> +        s->pdma_len--;
-> +        break;
-> +    case 2:
-> +        val = buf[s->pdma_cur++];
-> +        val = (val << 8) | buf[s->pdma_cur++];
-> +        s->pdma_len -= 2;
-> +        break;
-> +    }
-> +
-> +    if (s->pdma_len == 0 && s->pdma_cb) {
-> +        esp_lower_drq(s);
-> +        s->pdma_cb(s);
-> +        s->pdma_cb = NULL;
-> +    }
-> +    return val;
-> +}
-> +
-> +static const MemoryRegionOps sysbus_esp_pdma_ops = {
-> +    .read = sysbus_esp_pdma_read,
-> +    .write = sysbus_esp_pdma_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid.min_access_size = 1,
-> +    .valid.max_access_size = 2,
-> +};
-> +
->  static const struct SCSIBusInfo esp_scsi_info = {
->      .tcq = false,
->      .max_target = ESP_MAX_DEVS,
-> @@ -673,12 +949,16 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
->      ESPState *s = &sysbus->esp;
->  
->      sysbus_init_irq(sbd, &s->irq);
-> +    sysbus_init_irq(sbd, &s->irq_data);
->      assert(sysbus->it_shift != -1);
->  
->      s->chip_id = TCHI_FAS100A;
->      memory_region_init_io(&sysbus->iomem, OBJECT(sysbus), &sysbus_esp_mem_ops,
-> -                          sysbus, "esp", ESP_REGS << sysbus->it_shift);
-> +                          sysbus, "esp-regs", ESP_REGS << sysbus->it_shift);
->      sysbus_init_mmio(sbd, &sysbus->iomem);
-> +    memory_region_init_io(&sysbus->pdma, OBJECT(sysbus), &sysbus_esp_pdma_ops,
-> +                          sysbus, "esp-pdma", 2);
-> +    sysbus_init_mmio(sbd, &sysbus->pdma);
->  
->      qdev_init_gpio_in(dev, sysbus_esp_gpio_demux, 2);
->  
-> diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-> index adab63d1c9..6ba47dac41 100644
-> --- a/include/hw/scsi/esp.h
-> +++ b/include/hw/scsi/esp.h
-> @@ -14,10 +14,18 @@ typedef void (*ESPDMAMemoryReadWriteFunc)(void *opaque, uint8_t *buf, int len);
->  
->  typedef struct ESPState ESPState;
->  
-> +enum pdma_origin_id {
-> +    PDMA,
-> +    TI,
-> +    CMD,
-> +    ASYNC,
-> +};
-> +
->  struct ESPState {
->      uint8_t rregs[ESP_REGS];
->      uint8_t wregs[ESP_REGS];
->      qemu_irq irq;
-> +    qemu_irq irq_data;
->      uint8_t chip_id;
->      bool tchi_written;
->      int32_t ti_size;
-> @@ -48,6 +56,12 @@ struct ESPState {
->      ESPDMAMemoryReadWriteFunc dma_memory_write;
->      void *dma_opaque;
->      void (*dma_cb)(ESPState *s);
-> +    uint8_t pdma_buf[32];
-> +    int pdma_origin;
-> +    uint32_t pdma_len;
-> +    uint32_t pdma_start;
-> +    uint32_t pdma_cur;
-> +    void (*pdma_cb)(ESPState *s);
->  };
->  
->  #define TYPE_ESP "esp"
-> @@ -59,6 +73,7 @@ typedef struct {
->      /*< public >*/
->  
->      MemoryRegion iomem;
-> +    MemoryRegion pdma;
->      uint32_t it_shift;
->      ESPState esp;
->  } SysBusESPState;
-> 
-
+MDEuMTAuMjAxOSAyMTo1NSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MDEuMTAuMjAxOSAyMDowOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDEwLzEvMTkgMTA6NTMg
+QU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pj4gSWYgd2Ugd2FudCB0
+byBhZGQgc29tZSBpbmZvIHRvIGVycnAgKGJ5IGVycm9yX3ByZXBlbmQoKSBvcg0KPj4+IGVycm9y
+X2FwcGVuZF9oaW50KCkpLCB3ZSBtdXN0IHVzZSB0aGUgRVJSUF9BVVRPX1BST1BBR0FURSBtYWNy
+by4NCj4+PiBPdGhlcndpc2UsIHRoaXMgaW5mbyB3aWxsIG5vdCBiZSBhZGRlZCB3aGVuIGVycnAg
+PT0gJmZhdGFsX2Vycg0KPj4+ICh0aGUgcHJvZ3JhbSB3aWxsIGV4aXQgcHJpb3IgdG8gdGhlIGVy
+cm9yX2FwcGVuZF9oaW50KCkgb3INCj4+PiBlcnJvcl9wcmVwZW5kKCkgY2FsbCkuwqAgRml4IHN1
+Y2ggY2FzZXMuDQo+Pj4NCj4+PiBUaGlzIGNvbW1pdCAodG9nZXRoZXIgd2l0aCBpdHMgbmVpZ2hi
+b3JzKSB3YXMgZ2VuZXJhdGVkIGJ5DQo+Pj4NCj4+PiBnaXQgZ3JlcCAtbCAnZXJyb3JfXChhcHBl
+bmRfaGludFx8cHJlcGVuZFwpKGVycnAnIHwgd2hpbGUgcmVhZCBmOyBkbyBcDQo+Pj4gc3BhdGNo
+IC0tc3AtZmlsZSBzY3JpcHRzL2NvY2NpbmVsbGUvZml4LWVycm9yLWFkZC1pbmZvLmNvY2NpIFwN
+Cj4+PiAtLWluLXBsYWNlICRmOyBkb25lDQo+Pj4NCj4+PiBhbmQgdGhlbg0KPj4+DQo+Pj4gLi9w
+eXRob24vY29tbWl0LXBlci1zdWJzeXN0ZW0ucHkgTUFJTlRBSU5FUlMgIiQoPCBhdXRvLW1zZyki
+DQo+Pj4NCj4+PiAoYXV0by1tc2cgd2FzIGEgZmlsZSB3aXRoIHRoaXMgY29tbWl0IG1lc3NhZ2Up
+DQo+Pj4NCj4+PiBhbmQgdGhlbiBieSBoYW5kLCBmb3Igbm90IG1haW50YWluZWQgY2hhbmdlZCBm
+aWxlczoNCj4+Pg0KPj4+IGdpdCBjb21taXQgLW0gIjxTVUItU1lTVEVNPjogJCg8IGF1dG8tbXNn
+KSIgPEZJTEVTPg0KPj4+DQo+Pj4gU3RpbGwsIGZvciBiYWNrcG9ydGluZyBpdCBtYXkgYmUgbW9y
+ZSBjb21mb3J0YWJsZSB0byB1c2Ugb25seSB0aGUgZmlyc3QNCj4+PiBjb21tYW5kIGFuZCB0aGVu
+IGRvIG9uZSBodWdlIGNvbW1pdC4NCj4+Pg0KPj4+IFJlcG9ydGVkLWJ5OiBHcmVnIEt1cnogPGdy
+b3VnQGthb2Qub3JnPg0KPj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2ll
+dnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+PiAtLS0NCj4+PiDCoCBpbmNsdWRl
+L2Jsb2NrL25iZC5owqAgfCAxICsNCj4+PiDCoCBibG9jay5jwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgfCAzICsrKw0KPj4+IMKgIGJsb2NrL2JhY2t1cC5jwqDCoMKgwqDCoMKgIHwgMSArDQo+
+Pj4gwqAgYmxvY2svZGlydHktYml0bWFwLmMgfCAxICsNCj4+PiDCoCBibG9jay9maWxlLXBvc2l4
+LmPCoMKgIHwgNCArKysrDQo+Pj4gwqAgYmxvY2svZ2x1c3Rlci5jwqDCoMKgwqDCoCB8IDIgKysN
+Cj4+PiDCoCBibG9jay9xY293LmPCoMKgwqDCoMKgwqDCoMKgIHwgMSArDQo+Pj4gwqAgYmxvY2sv
+cWNvdzItYml0bWFwLmMgfCAxICsNCj4+PiDCoCBibG9jay9xY293Mi5jwqDCoMKgwqDCoMKgwqAg
+fCAzICsrKw0KPj4+IMKgIGJsb2NrL3ZkaS5jwqDCoMKgwqDCoMKgwqDCoMKgIHwgMSArDQo+Pj4g
+wqAgYmxvY2svdmhkeC1sb2cuY8KgwqDCoMKgIHwgMSArDQo+Pj4gwqAgYmxvY2svdm1kay5jwqDC
+oMKgwqDCoMKgwqDCoCB8IDEgKw0KPj4+IMKgIGJsb2NrL3ZwYy5jwqDCoMKgwqDCoMKgwqDCoMKg
+IHwgMSArDQo+Pj4gwqAgMTMgZmlsZXMgY2hhbmdlZCwgMjEgaW5zZXJ0aW9ucygrKQ0KPj4NCj4+
+IFRoZSBhZGRpdGlvbiBvZiBlcnJvcl9wcmVwZW5kKCkgY2hlY2tpbmcgbWFrZXMgdGhpcyBwYXRj
+aCBsYXJnZXIgdGhhbiBpbiB2My4NCj4+DQo+PiBCdXQgc2ltaWxhciB0byB2MywgSSB3YXMgYWJs
+ZSB0byBjb21lIHVwIHdpdGggYSBtYXRjaGluZyBncmVwIHF1ZXJ5Og0KPj4NCj4+ICQgZ2l0IGdy
+ZXAgLW5wICdlcnJvcl9cKGFwcGVuZF9oaW50XHxwcmVwZW5kXCkoZXJycCcgXA0KPj4gwqDCoMKg
+IGJsb2NrLmMgYmxvY2svIGluY2x1ZGUvYmxvY2svIFwNCj4+IMKgwqAgfCBncmVwICdcLltjaF09
+JyB8IHdjIC1sDQo+PiAyMg0KPj4NCj4+IGFuZCBzZWUgdGhhdCBncmVwIGZvdW5kIG9uZSBtb3Jl
+IGluc3RhbmNlIHRoYW4gY29jY2luZWxsZS7CoCBMb29raW5nIGNsb3NlciwgSSBzZWUgd2hlcmUg
+bXkgZGlmZiBmb3VuZCBhIHNwb3QgeW91IG1pc3NlZDoNCj4+DQo+PiBibG9jay9xY293Mi1iaXRt
+YXAuYz0xNDQ4PXZvaWQgcWNvdzJfc3RvcmVfcGVyc2lzdGVudF9kaXJ0eV9iaXRtYXBzKEJsb2Nr
+RHJpdmVyU3RhdGUgKmJzLCBFcnJvciAqKmVycnApDQo+PiBibG9jay9xY293Mi1iaXRtYXAuYz0x
+NjcxPWZhaWw6DQo+Pg0KPj4gW091Y2ggLSB0aGVyZSdzIGEgUkVBU09OIHRoYXQgZW1hY3MgcHJl
+ZmVycyBpbmRlbnRpbmcgbGFiZWxzIGF0IGNvbHVtbiAnMiwgNSwgOSwgMTMsIC4uLicgcmF0aGVy
+IHRoYW4gJzEsIDUsIDksIDEzJyAtIHRoYXQncyBiZWNhdXNlIGFueXRoaW5nIGF0IGNvbHVtbiAx
+IG1lc3NlcyB1cCBkZXRlcm1pbmF0aW9uIG9mICdncmVwIC1wJyBmb3Igd2hpY2ggZnVuY3Rpb24g
+b3ducyB0aGUgY29kZSwgc2hvd2luZyB0aGUgbGFiZWwgYXQgMTY3MSBpbnN0ZWFkIG9mIHRoZSBm
+dW5jdGlvbiBxY293Ml9jYW5fc3RvcmVfbmV3X2RpcnR5X2JpdG1hcCBhdCAxNjE4IC0gYnV0IHRo
+YXQncyBhIHNpZGUgcG9pbnRdDQo+Pg0KPj4NCj4+PiArKysgYi9ibG9jay9xY293Mi1iaXRtYXAu
+Yw0KPj4+IEBAIC0xNjE4LDYgKzE2MTgsNyBAQCBib29sIHFjb3cyX2Nhbl9zdG9yZV9uZXdfZGly
+dHlfYml0bWFwKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCB1aW50MzJfdCBncmFudWxhcml0eSwNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgRXJyb3Ig
+KiplcnJwKQ0KPj4+IMKgIHsNCj4+PiArwqDCoMKgIEVSUlBfQVVUT19QUk9QQUdBVEUoKTsNCj4+
+PiDCoMKgwqDCoMKgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9wYXF1ZTsNCj4+PiDCoMKgwqDC
+oMKgIGJvb2wgZm91bmQ7DQo+Pj4gwqDCoMKgwqDCoCBRY293MkJpdG1hcExpc3QgKmJtX2xpc3Q7
+DQo+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrL3Fjb3cyLmMgYi9ibG9jay9xY293Mi5jDQo+Pg0KPj4g
+WW91ciBwYXRjaCBpcyBtaXNzaW5nIGEgcGF0Y2ggdG8gcWNvdzJfc3RvcmVfcGVyc2lzdGVudF9k
+aXJ0eV9iaXRtYXBzKCksIHdoaWNoIGNhbGxzIGVycm9yX3ByZXBlbmQoZXJycCwgLi4uKS7CoCBI
+b3dldmVyLCB3aGVuIEkgbWFudWFsbHkgcmFuIHRoZSBzYW1lIHNwYXRjaCBjb21tYW5kIGxpbmUs
+IEkgYWxzbyBnb3QgdGhlIHNhbWUgZmFpbHVyZSB0byBpbmNsdWRlIGEgZml4IGluIHRoYXQgZnVu
+Y3Rpb24uDQo+Pg0KPj4gSSdtIG5vdCBzdXJlIHdoYXQncyB3cm9uZyB3aXRoIHRoZSAuY29jY2kg
+c2NyaXB0IHRvIG1pc3MgdGhhdCBpbnN0YW5jZTsgSSd2ZSB0cmllZCBmaWRkbGluZyBhcm91bmQg
+d2l0aCB0aGUgLmNvY2NpIGZpbGUgdG8gc2VlIGlmIEkgY2FuIHNwb3QgYW55IGNoYW5nZSB0byBt
+YWtlIChmb3IgZXhhbXBsZSwgdXNpbmcgLi4uIGluc3RlYWQgb2YgPCsuLi4pLCBidXQgc28gZmFy
+LCB3aXRoIG5vIHN1Y2Nlc3MgYXQgZ2V0dGluZyB0aGUgc2Vjb25kIGZ1bmN0aW9uIHBhdGNoZWQu
+DQo+Pg0KPiANCj4gDQo+IEhtbSwgaW50ZXJlc3RpbmcuIEFjdHVhbGx5IEkgdGhpbmsgdGhhdCBj
+b2NjaW5lbGxlIGlzIHNvbWV0aGluZyB0aGF0IGp1c3Qgd29ya3MgYmFkIGZyb20gdGhlIGJlZ2lu
+bmluZyBvZiB0aGVzZSBzZXJpZXMuIEFuZCBoZXJlOg0KPiANCj4gY29jY2luZWxsZSB3b3JrcyB3
+aXRoDQo+IA0KPiB2b2lkIHFjb3cyX3N0b3JlX3BlcnNpc3RlbnRfZGlydHlfYml0bWFwcyhCbG9j
+a0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKQ0KPiB7DQo+ICDCoMKgwqAgZXJyb3JfcHJl
+cGVuZChlcnJwLCAiQml0bWFwICclcycgZG9lc24ndCBzYXRpc2Z5IHRoZSBjb25zdHJhaW50czog
+IiwNCj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbmFtZSk7DQo+IH0NCj4g
+DQo+IA0KPiBidXQgZmFpbGVzIHdpdGg6DQo+IA0KPiB2b2lkIHFjb3cyX3N0b3JlX3BlcnNpc3Rl
+bnRfZGlydHlfYml0bWFwcyhCbG9ja0RyaXZlclN0YXRlICpicywgRXJyb3IgKiplcnJwKQ0KPiB7
+DQo+ICDCoMKgwqAgUVNJTVBMRVFfSEVBRCgsIFFjb3cyQml0bWFwVGFibGUpIGRyb3BfdGFibGVz
+Ow0KPiANCj4gIMKgwqDCoCBlcnJvcl9wcmVwZW5kKGVycnAsICJCaXRtYXAgJyVzJyBkb2Vzbid0
+IHNhdGlzZnkgdGhlIGNvbnN0cmFpbnRzOiAiLA0KPiAgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCBuYW1lKTsNCj4gfQ0KPiANCj4gU28sIGl0IGNhbid0IHBhcnNlICJRU0lNUExF
+UV9IRUFEKCwgUWNvdzJCaXRtYXBUYWJsZSkgZHJvcF90YWJsZXMiIHRoaW5nLi4NCj4gSXQgZXZl
+biBjYW4ndCBwYXJzZSBpdCB3aXRob3V0IGNvbW1hOg0KPiANCj4gdm9pZCBxY293Ml9zdG9yZV9w
+ZXJzaXN0ZW50X2RpcnR5X2JpdG1hcHMoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEVycm9yICoqZXJy
+cCkNCj4gew0KPiAgwqDCoMKgIFFTSU1QTEVRX0hFQUQoUWNvdzJCaXRtYXBUYWJsZSkgZHJvcF90
+YWJsZXM7DQo+IA0KPiAgwqDCoMKgIGVycm9yX3ByZXBlbmQoZXJycCwgIkJpdG1hcCAnJXMnIGRv
+ZXNuJ3Qgc2F0aXNmeSB0aGUgY29uc3RyYWludHM6ICIsDQo+ICDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIG5hbWUpOw0KPiB9DQo+IA0KPiAtLS0tDQo+IA0KPiBhaGEsIGl0IHdv
+cmtzIGlmIEkgYWRkIGRlZmluaXRpb24gb2YgUVNJTVBMRVFfSEVBRC4gU28sIHdlIG1heSBtaXNz
+IGluY2x1ZGVzPw0KPiANCj4gYWRkaW5nIC0tcmVjdXJzaXZlLWluY2x1ZGVzIHBhcmFtZXRlciB0
+byBzcGF0Y2ggbGVhZHMgdG8gZXJyb3I6DQo+IA0KPiBbLi4gYSBsb3Qgb2YgZmFpbHVyZXNdDQo+
+IGZhaWxlZCBvbiBzeXMvc2htLmgNCj4gZmFpbGVkIG9uIHN5cy91aW8uaA0KPiBmYWlsZWQgb24g
+cWFwaS9xYXBpLXR5cGVzLWVycm9yLmgNCj4gZmFpbGVkIG9uIHFhcGkvcWFwaS10eXBlcy1jcnlw
+dG8uaA0KPiBmYWlsZWQgb24gc3lzL2VuZGlhbi5oDQo+IGZhaWxlZCBvbiBtYWNoaW5lL2Jzd2Fw
+LmgNCj4gZmFpbGVkIG9uIGJ5dGVzd2FwLmgNCj4gZmFpbGVkIG9uIHB0aHJlYWQuaA0KPiBmYWls
+ZWQgb24gc2VtYXBob3JlLmgNCj4gZmFpbGVkIG9uIHFhcGkvcWFwaS1idWlsdGluLXR5cGVzLmgN
+Cj4gZmFpbGVkIG9uIHFhcGkvcWFwaS10eXBlcy1ibG9jay1jb3JlLmgNCj4gZmFpbGVkIG9uIHFh
+cGkvcWFwaS10eXBlcy1qb2IuaA0KPiBmYWlsZWQgb24gcWNvdzIuaA0KPiBJbXBvc3NpYmxlOiBI
+b3cgY2FuIGRpZmYgYmUgbnVsbCBhbmQgaGF2ZSBub3QgQ29ycmVjdCBpbiBjb21wYXJlX2M/IFRh
+ZzEgKCJkaWZmIHRva2VuOiBRRU1VX1BBQ0tFRCBWUyBRRU1VX1BBQ0tFRFxuRmlsZSBcImJsb2Nr
+L3Fjb3cyLWJpdG1hcC5jXCIsIGxpbmUgNTksIGNvbHVtbiAxNSwgY2hhcnBvcyA9IDIzMzRcbsKg
+IGFyb3VuZCA9ICdRRU1VX1BBQ0tFRCcsXG7CoCB3aG9sZSBjb250ZW50ID0gdHlwZWRlZiBzdHJ1
+Y3QgUUVNVV9QQUNLRUQgUWNvdzJCaXRtYXBEaXJFbnRyeSB7XG5GaWxlIFwiL3RtcC9jb2NjaS1v
+dXRwdXQtMTAzMTEtY2M0ZTQ1LXFjb3cyLWJpdG1hcC5jXCIsIGxpbmUgNTksIGNvbHVtbiAxNSwg
+Y2hhcnBvcyA9IDIzMzRcbsKgIGFyb3VuZCA9ICdRRU1VX1BBQ0tFRCcsXG7CoCB3aG9sZSBjb250
+ZW50ID0gdHlwZWRlZiBzdHJ1Y3QgUUVNVV9QQUNLRUQgUWNvdzJCaXRtYXBEaXJFbnRyeSB7XG4i
+KQ0KPiANCj4gQWhhLCB3ZSBuZWVkIC1JIG9wdGlvbi4gU29tZXRoaW5nIGxpa2UNCj4gDQo+IHNw
+YXRjaCAtLXZlcmJvc2UtcGFyc2luZyAtLXZlcmJvc2UtaW5jbHVkZXMgLUkgaW5jbHVkZSAtSSAn
+LicgLUkgYmxvY2sgLS1yZWN1cnNpdmUtaW5jbHVkZXMgLS1zcC1maWxlIHNjcmlwdHMvY29jY2lu
+ZWxsZS9maXgtZXJyb3ItYWRkLWluZm8uY29jY2kgYmxvY2svcWNvdzItYml0bWFwLmMgMj4mMQ0K
+PiANCj4gDQo+IEFuZCBpdCBqdXN0IGNhbid0IHBhcnNlIG91ciBpbmNsdWRlcywgcXVldWUuaCBm
+b3IgZXhhbXBsZS4uIFNvIG1hbnkgcGFyc2luZyBlcnJvcnMuDQo+IA0KPiAuLi4NCj4gDQo+IGlu
+Y2x1ZGluZyBpbmNsdWRlL3FlbXUvcXVldWUuaA0KPiBFUlJPUi1SRUNPVjogZm91bmQgc3luYyBl
+bmQgb2YgI2RlZmluZSwgbGluZSA5MA0KPiBwYXJzaW5nIHBhc3MyOiB0cnkgYWdhaW4NCj4gRVJS
+T1ItUkVDT1Y6IGZvdW5kIHN5bmMgZW5kIG9mICNkZWZpbmUsIGxpbmUgOTANCj4gcGFyc2UgZXJy
+b3INCj4gIMKgPSBGaWxlICJpbmNsdWRlL3FlbXUvcXVldWUuaCIsIGxpbmUgOTAsIGNvbHVtbiAx
+NSwgY2hhcnBvcyA9IDQzNTkNCj4gIMKgIGFyb3VuZCA9ICd9JywNCj4gIMKgIHdob2xlIGNvbnRl
+bnQgPcKgwqDCoMKgwqDCoMKgwqAgeyBOVUxMIH0NCj4gYmFkY291bnQ6IDMNCj4gYmFkOiB9DQo+
+IGJhZDoNCj4gYmFkOiAjZGVmaW5lIFFMSVNUX0hFQURfSU5JVElBTElaRVIoaGVhZCnCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIFwNCj4gQkFEOiEhISEhwqDCoMKgwqDCoMKgwqDCoCB7IE5VTEwgfQ0KPiBFUlJPUi1S
+RUNPVjogZm91bmQgc3luYyBlbmQgb2YgI2RlZmluZSwgbGluZSAxNTANCj4gcGFyc2luZyBwYXNz
+MjogdHJ5IGFnYWluDQo+IEVSUk9SLVJFQ09WOiBmb3VuZCBzeW5jIGVuZCBvZiAjZGVmaW5lLCBs
+aW5lIDE1MA0KPiBwYXJzZSBlcnJvcg0KPiAgwqA9IEZpbGUgImluY2x1ZGUvcWVtdS9xdWV1ZS5o
+IiwgbGluZSAxNTAsIGNvbHVtbiA0NywgY2hhcnBvcyA9IDc2MjgNCj4gIMKgIGFyb3VuZCA9ICcn
+LA0KPiAgwqAgd2hvbGUgY29udGVudCA9wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+KHZhcikgPSAoKHZhciktPmZpZWxkLmxlX25leHQpKQ0KPiBiYWRjb3VudDogNQ0KPiBiYWQ6IH0g
+d2hpbGUgKC8qQ09OU1RDT05EKi8wKQ0KPiBiYWQ6DQo+IGJhZDogI2RlZmluZSBRTElTVF9GT1JF
+QUNIKHZhciwgaGVhZCwgZmllbGQpwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBcDQo+IGJhZDrCoMKgwqDCoMKgwqDCoMKgIGZv
+ciAoKHZhcikgPSAoKGhlYWQpLT5saF9maXJzdCk7wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgXA0KPiBiYWQ6wqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgKHZhcik7wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgXA0KPiBCQUQ6ISEhISHCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCAodmFyKSA9ICgodmFyKS0+ZmllbGQubGVfbmV4dCkpDQo+IEVSUk9SLVJFQ09WOiBmb3VuZCBz
+eW5jIGVuZCBvZiAjZGVmaW5lLCBsaW5lIDE1NQ0KPiBwYXJzaW5nIHBhc3MyOiB0cnkgYWdhaW4N
+Cj4gDQo+IC4uLg0KPiANCj4gDQo+IFNvLCBpdCBzZWVtcyBsaWtlIGNvY2NpbmVsbGUganVzdCBk
+b24ndCB3b3JrLiBBdCBsZWFzdCBpdCBkb24ndCBhbGxvdyB0byBkZWZpbmUgaW5pdGlhbGl6ZXIg
+bWFjcm8uDQo+IA0KPiBBbnkgaWRlYXM/IFRoZSBzZXJpZXMgaXMgc3RpbGwgbWVhbmluZ2Z1bC4g
+Tm90IGFsbCBidWdzIGFyZSBmaXhlZCwgYnV0IGF0IGxlYXN0IHNvbWUgYnVncyBhcmUgZml4ZWQu
+DQo+IA0KPiBJJ20gYWZyYWlkIEkgY2FuJ3QgcHV0IG1vcmUgZWZmb3J0IG9uIHRoaXMgdG9waWMs
+IGl0IGFscmVhZHkgYXRlIGEgbG90IG9mIHRpbWUuDQo+IA0KPiBBcyBhbiBhbHRlcm5hdGl2ZSBJ
+IGNhbiBzdWdnZXN0IEdyZWcgdG8gcmViYXNlIGhpcyBzZXJpZXMgb24gbXkgcGF0Y2ggMDQgYW5k
+IGZvcmdldCBhYm91dCBlcnJvcl9hcHBlbmQNCj4gYW5kIHNvIG9uLg0KPiANCj4gSG1tIG9yIG1h
+eSBiZSB0cnkgc29tZSBzaW1wbGUgcmVnZXggaW5zdGVhZCBvZiBjb2NjaW5lbGxlPw0KPiANCj4g
+DQo+IFNvbWV0aGluZyBhcyBzaW1wbGUgYXMgc3Vic3RpdHV0ZQ0KPiAoXltee31dK1woW157fV0q
+RXJyb3IgXCpcKmVycnBbXnt9XSpcKVxzKl5ceykoKFtefV18KD88IV4pfSkqZXJyb3JfKHByZXBl
+bmR8YXBwZW5kX2hpbnQpXChlcnJwKQ0KPiANCj4gYnkNCj4gDQo+IFwxXG7CoMKgwqAgRVJSUF9B
+VVRPX1BST1BBR0FURSgpO1wyDQo+IA0KPiBzZWVtcyB3b3JrDQo+IA0KDQpIYWhhaGFoYS4NCg0K
+SSB0cmllZCwgaXQgd29ya3MuIEFuZCBpdCBnZW5lcmF0ZSBleGFjdGx5IHNhbWUgcGF0Y2hlcyBh
+cyBpbiB0aGVzZSBzZXJpZXMsIGV4Y2VwdCBvbmx5IHR3byBmdW5jdGlvbnMgaW4gbmJkDQphbmQg
+YmxvY2sgd2hpY2ggeW91J3ZlIGZvdW5kLiBJdCdzIGFtYXppbmcuIEknbGwgZHJvcCBjb2NjaW5l
+bGxlIHNjcmlwdCBhbmQgcmVzZW5kLiBNeSBjdXJyZW50IHNjcmlwdCBsb29rcyBhcw0KZm9sbG93
+cy4gSG1tIEknZCBiZXR0ZXIgcmV3cml0ZSByZWdleHAgaW4gYSBiaXQgbW9yZSByZWFkYWJsZSBt
+YW5uZXIuDQoNCiMhL3Vzci9iaW4vZW52IHB5dGhvbg0KaW1wb3J0IHJlDQppbXBvcnQgc3lzDQoN
+CnIgPSByZS5jb21waWxlKHIiKF5bXnt9XStcKFtee31dKkVycm9yIFwqXCplcnJwW157fV0qXClc
+cypeXHspKChbXn1dfCg/PCFeKX0pKmVycm9yXyhwcmVwZW5kfGFwcGVuZF9oaW50KVwoZXJycCki
+LCByZS5NKQ0KDQp3aXRoIG9wZW4oc3lzLmFyZ3ZbMV0pIGFzIGY6DQogICAgIHRleHQgPSBmLnJl
+YWQoKQ0KDQp0ZXh0ID0gci5zdWIocidcMVxuICAgIEVSUlBfQVVUT19QUk9QQUdBVEUoKTtcMics
+IHRleHQpDQoNCndpdGggb3BlbihzeXMuYXJndlsxXSwgJ3cnKSBhcyBmOg0KICAgICBmLndyaXRl
+KHRleHQpDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
