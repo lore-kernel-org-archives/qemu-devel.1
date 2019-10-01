@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52254C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21148C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2745920679
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:16:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2745920679
+	by mail.kernel.org (Postfix) with ESMTPS id EB4B221D71
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:20:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB4B221D71
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKow-0006ul-KB
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:16:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50120)
+	id 1iFKtI-0001Rq-Nz
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:20:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTG-0008LY-CJ
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:52 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTJ-0008Mq-0f
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTE-0006lH-Is
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTF-0006mY-2k
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:50 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38506)
+Received: from relay.sw.ru ([185.231.240.75]:38424)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKTD-0006bQ-S5
+ id 1iFKTE-0006YJ-1N
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:48 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKT2-0004xb-9a; Tue, 01 Oct 2019 18:53:36 +0300
+ id 1iFKSz-0004xb-SA; Tue, 01 Oct 2019 18:53:34 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 25/31] cmdline: Fix error_append_hint/error_prepend usage
-Date: Tue,  1 Oct 2019 18:53:13 +0300
-Message-Id: <20191001155319.8066-26-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 18/31] VFIO: Fix error_append_hint/error_prepend usage
+Date: Tue,  1 Oct 2019 18:53:06 +0300
+Message-Id: <20191001155319.8066-19-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
@@ -60,8 +60,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -94,29 +95,92 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- util/qemu-option.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/vfio/common.c     | 3 +++
+ hw/vfio/pci-quirks.c | 1 +
+ hw/vfio/pci.c        | 3 +++
+ hw/vfio/platform.c   | 1 +
+ 4 files changed, 8 insertions(+)
 
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 97172b5eaa..031c01eddc 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -145,6 +145,7 @@ static const QemuOptDesc *find_desc_by_name(const QemuOptDesc *desc,
- void parse_option_size(const char *name, const char *value,
-                        uint64_t *ret, Error **errp)
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 3e03c495d8..b0f3f64f5d 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -136,6 +136,7 @@ static const char *index_to_str(VFIODevice *vbasedev, int index)
+ int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex,
+                            int action, int fd, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     uint64_t size;
-     int err;
+     struct vfio_irq_set *irq_set;
+     int argsz, ret = 0;
+     const char *name;
+@@ -1437,6 +1438,7 @@ static void vfio_disconnect_container(VFIOGroup *group)
  
-@@ -660,6 +661,7 @@ QemuOpts *qemu_opts_find(QemuOptsList *list, const char *id)
- QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
-                            int fail_if_exists, Error **errp)
+ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     QemuOpts *opts = NULL;
+     VFIOGroup *group;
+     char path[32];
+     struct vfio_group_status status = { .argsz = sizeof(status) };
+@@ -1526,6 +1528,7 @@ void vfio_put_group(VFIOGroup *group)
+ int vfio_get_device(VFIOGroup *group, const char *name,
+                     VFIODevice *vbasedev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     struct vfio_device_info dev_info = { .argsz = sizeof(dev_info) };
+     int ret, fd;
  
-     if (id) {
+diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+index 136f3a9ad6..d8b6ef7021 100644
+--- a/hw/vfio/pci-quirks.c
++++ b/hw/vfio/pci-quirks.c
+@@ -2139,6 +2139,7 @@ const PropertyInfo qdev_prop_nv_gpudirect_clique = {
+ 
+ static int vfio_add_nv_gpudirect_cap(VFIOPCIDevice *vdev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PCIDevice *pdev = &vdev->pdev;
+     int ret, pos = 0xC8;
+ 
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index c5e6fe61cb..4b537bce2c 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1916,6 +1916,7 @@ static void vfio_check_af_flr(VFIOPCIDevice *vdev, uint8_t pos)
+ 
+ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PCIDevice *pdev = &vdev->pdev;
+     uint8_t cap_id, next, size;
+     int ret;
+@@ -2469,6 +2470,7 @@ int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
+ 
+ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VFIODevice *vbasedev = &vdev->vbasedev;
+     struct vfio_region_info *reg_info;
+     struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info) };
+@@ -2700,6 +2702,7 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+ 
+ static void vfio_realize(PCIDevice *pdev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VFIOPCIDevice *vdev = PCI_VFIO(pdev);
+     VFIODevice *vbasedev_iter;
+     VFIOGroup *group;
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index d7598c6152..236e5f8f57 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -617,6 +617,7 @@ static int vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
+  */
+ static void vfio_platform_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(dev);
+     SysBusDevice *sbdev = SYS_BUS_DEVICE(dev);
+     VFIODevice *vbasedev = &vdev->vbasedev;
 -- 
 2.21.0
 
