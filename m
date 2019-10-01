@@ -6,43 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17324C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:04:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F9EECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:07:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E527A2133F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:04:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E527A2133F
+	by mail.kernel.org (Postfix) with ESMTPS id D322B2168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:07:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D322B2168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKdN-0002R8-0o
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:04:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49955)
+	id 1iFKgK-0005fL-KZ
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:07:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50186)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT2-00084M-IF
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:37 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTJ-0008NK-6t
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKT0-0006XL-8u
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:36 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38370)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTG-0006oH-Ae
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:52 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38540)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKT0-0006WN-0f
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:34 -0400
+ id 1iFKTF-0006dP-36
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:50 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKSy-0004xb-AU; Tue, 01 Oct 2019 18:53:32 +0300
+ id 1iFKT3-0004xb-Cj; Tue, 01 Oct 2019 18:53:37 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 11/31] SmartFusion2: Fix error_append_hint/error_prepend
- usage
-Date: Tue,  1 Oct 2019 18:52:59 +0300
-Message-Id: <20191001155319.8066-12-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 30/31] PVRDMA: Fix error_append_hint/error_prepend usage
+Date: Tue,  1 Oct 2019 18:53:18 +0300
+Message-Id: <20191001155319.8066-31-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
@@ -61,9 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Greg Kurz <groug@kaod.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -96,21 +94,21 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/misc/msf2-sysreg.c | 1 +
+ hw/rdma/vmw/pvrdma_main.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
-index ddc5a30c80..343351480d 100644
---- a/hw/misc/msf2-sysreg.c
-+++ b/hw/misc/msf2-sysreg.c
-@@ -127,6 +127,7 @@ static Property msf2_sysreg_properties[] = {
+diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
+index 3e36e13013..fd1a6ef099 100644
+--- a/hw/rdma/vmw/pvrdma_main.c
++++ b/hw/rdma/vmw/pvrdma_main.c
+@@ -592,6 +592,7 @@ static void pvrdma_shutdown_notifier(Notifier *n, void *opaque)
  
- static void msf2_sysreg_realize(DeviceState *dev, Error **errp)
+ static void pvrdma_realize(PCIDevice *pdev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     MSF2SysregState *s = MSF2_SYSREG(dev);
- 
-     if ((s->apb0div > 32 || !is_power_of_2(s->apb0div))
+     int rc = 0;
+     PVRDMADev *dev = PVRDMA_DEV(pdev);
+     Object *memdev_root;
 -- 
 2.21.0
 
