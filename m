@@ -2,59 +2,89 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4C0ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E238C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:26:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62E3B21855
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:18:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62E3B21855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 62B32215EA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:26:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62B32215EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFMj3-0003eG-D6
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 14:18:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39714)
+	id 1iFMrQ-00063H-HF
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 14:26:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iFMhr-0002pb-SO
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:17:04 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iFMpM-0004rY-SN
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iFMho-0005jp-V2
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:17:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47340)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iFMho-0005jj-Q7; Tue, 01 Oct 2019 14:17:00 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DE82910C0929;
- Tue,  1 Oct 2019 18:16:59 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-78.ams2.redhat.com [10.36.116.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 539C36013A;
- Tue,  1 Oct 2019 18:16:55 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1] s390x/tcg: MVCL: Exit to main loop if there are pending
- interrupts
-Date: Tue,  1 Oct 2019 20:16:55 +0200
-Message-Id: <20191001181655.25948-1-david@redhat.com>
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iFMpK-00082m-LZ
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:24:48 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:47904
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1iFMpK-00082Q-FX; Tue, 01 Oct 2019 14:24:46 -0400
+Received: from host86-133-194-221.range86-133.btcentralplus.com
+ ([86.133.194.221] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1iFMpb-0007ex-Lx; Tue, 01 Oct 2019 19:25:04 +0100
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <bf30baf5-4d75-dc6f-c30a-57b80714999b@ilande.co.uk>
+ <CAL1e-=gcK2mdtrt9vibHGpbm4_FZgQWTA91+p=9ouuMYmZwPqQ@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <c9679b01-91c3-3d69-fb38-dfef1602dcf4@ilande.co.uk>
+Date: Tue, 1 Oct 2019 19:24:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 01 Oct 2019 18:17:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAL1e-=gcK2mdtrt9vibHGpbm4_FZgQWTA91+p=9ouuMYmZwPqQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.133.194.221
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: target/ppc: bug in optimised vsl/vsr implementation?
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 46.43.2.167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,88 +96,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: stefan.brankovic@rt-rk.com, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Paul Clarke <pc@us.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MVCL is interruptible and we should check for interrupts and process
-them after writing back the variables to the registers.
+On 28/09/2019 18:45, Aleksandar Markovic wrote:
 
-I can see both checks triggering. Most of them pass the first check,
-however, sometimes also the second check strikes and an interrupt gets
-delivered. (I assume pending interrupts that were not deliverable when
-injected but are now deliverable)
+Hi Aleksandar,
 
-When booting Fedora 30, I can see a handful of these exits and it seems
-to work reliable. (it never get's triggered via EXECUTE, though)
+Thanks for taking a look at this!
 
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/mem_helper.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+> Mark and Paul (and Stefan),
+> 
+> Thanks for spotting this and pinpointing the culprit commit. I guess Stefan is going
+> to respond soon, but, in the meantime, I took a look at the commit in question:
+> 
+> https://github.com/qemu/qemu/commit/4e6d0920e7547e6af4bbac5ffe9adfe6ea621822
+> 
+> I don't have at the moment any dev/test environment handy, but I did manual
+> inspection of the code, and here is what I found (in order of importance, perceived
+> by me):
+> 
+> 1. The code will not work correctly if the shift ammount (variable 'sh') is 0. This
+> is because, in that case, one of succeeding invocations of TCG shift functions will
+> be required to shift a 64-bit TCG variable by 64 bits, and the result of such TCG
+> operation is undefined (shift amount must be 63 or less) - see
+> https://github.com/qemu/qemu/blob/master/tcg/README.
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 4254548935..96f0728cb7 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1005,6 +1005,24 @@ static inline uint32_t do_mvcl(CPUS390XState *env,
-     return *destlen ? 3 : cc;
- }
-=20
-+static inline bool should_interrupt_instruction(CPUState *cs)
-+{
-+    /*
-+     * Something asked us to stop executing chained TBs, e.g.,
-+     * cpu_interrupt() or cpu_exit().
-+     */
-+    if ((int32_t)atomic_read(&cpu_neg(cs)->icount_decr.u32) < 0) {
-+        return true;
-+    }
-+
-+    /* We have a deliverable interrupt pending. */
-+    if ((atomic_read(&cs->interrupt_request) & CPU_INTERRUPT_HARD) &&
-+        s390_cpu_has_int(S390_CPU(cs))) {
-+        return true;
-+    }
-+    return false;
-+}
-+
- /* move long */
- uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- {
-@@ -1015,6 +1033,7 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t =
-r1, uint32_t r2)
-     uint64_t srclen =3D env->regs[r2 + 1] & 0xffffff;
-     uint64_t src =3D get_address(env, r2);
-     uint8_t pad =3D env->regs[r2 + 1] >> 24;
-+    CPUState *cs =3D env_cpu(env);
-     S390Access srca, desta;
-     uint32_t cc, cur_len;
-=20
-@@ -1065,7 +1084,14 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t=
- r1, uint32_t r2)
-         env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destle=
-n);
-         set_address_zero(env, r1, dest);
-=20
--        /* TODO: Deliver interrupts. */
-+        /*
-+         * MVCL is interruptible. Check if there is any irq, and if so,
-+         * return to the main loop where we can process it. In case we
-+         * don't deliver an interrupt, we'll end up back in this handler=
-.
-+         */
-+        if (unlikely(should_interrupt_instruction(cs))) {
-+            cpu_loop_exit_restore(cs, ra);
-+        }
-     }
-     return cc;
- }
---=20
-2.21.0
+Yes I think you're right here - the old helper got around this by doing an explicit
+copy from a to r if the shift value is zero. In fact the case that Paul reported is
+exactly this:
 
+   vsl VRT, VRA, VRB
+
+=> 0x100006e0 <vec_slq+132>: vsl v0,v0,v1
+(gdb) p $vr0.uint128
+$21 = 0x10111213141516172021222324252650
+(gdb) p $vr1.uint128
+$22 = 0x0
+(gdb) stepi
+0x00000000100006e4 in vec_slq ()
+1: x/i $pc
+=> 0x100006e4 <vec_slq+136>: xxlor vs0,vs32,vs32
+(gdb) p $vr0.uint128
+$23 = 0x10111213141516172021222324252650
+
+I guess the solution is check for sh == 0 and if this is the case, execute a copy
+instead.
+
+> 2. Variable naming is better in the old helper than in the new translator. In that
+> light, I would advise Stefan to change 'sh' to 'shift', and 'shifted' to 'carry'.
+
+It looks like the name "sh" comes from the ISA documentation, so whilst it's a little
+tricky to compare with the previous implementation it does make sense when comparing
+with the algorithm shown there. Note: this implementation also drops the check for
+each byte of VRB having the same shift value - should we care about this?
+
+> 3. Lines
+> 
+> tcg_gen_andi_i64(shifted, shifted, 0x7fULL);
+> 
+> and
+> 
+> tcg_gen_andi_i64(shifted, shifted, 0xfe00000000000000ULL);
+> 
+> appear to be spurious (albait in a harmless way). Therefore, they should be deleted,
+> or, alternatevely, a justification for them should be provided.
+
+I'm not sure why they are needed either - there's certainly no mention of it in the
+ISA documentation. Stefan?
+
+> 4. In the commit message, variable names were used without quotation mark, resulting
+> in puzzling and unclear wording.
+> 
+> 5. (a question for Mark) After all recent changes, does get_avr64(..., ..., true)
+> always (for any endian configuration) return the "high" half of an Altivec register,
+> and get_avr64(..., ..., false) the "low" one?
+
+Yes - the new functions always return the MSB (high) and LSB (low) correctly
+regardless of host endian.
+
+> Given all these circumstances, perhaps the most reasonable solution would be to
+> revert the commit in question, and allow Stefan enough dev and test time to hopefully
+> submit a new, better, version later on.
+
+Given that it has been broken for 3 months now, I don't think we're in any major rush
+to revert ASAP. I'd prefer to give Stefan a bit more time first since he does report
+some substantial speed improvements from these new implementations.
+
+
+ATB,
+
+Mark.
 
