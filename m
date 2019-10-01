@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B34ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52254C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:16:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 841E621906
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:15:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 841E621906
+	by mail.kernel.org (Postfix) with ESMTPS id 2745920679
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:16:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2745920679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKnj-0005z6-7b
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:14:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50270)
+	id 1iFKow-0006ul-KB
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:16:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTP-0008Vi-FR
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:00 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTG-0008LY-CJ
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTO-0006to-5g
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:59 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38426)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTE-0006lH-Is
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:50 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38506)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKTN-0006YK-UO; Tue, 01 Oct 2019 11:53:58 -0400
+ id 1iFKTD-0006bQ-S5
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:53:48 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKSx-0004xb-La; Tue, 01 Oct 2019 18:53:31 +0300
+ id 1iFKT2-0004xb-9a; Tue, 01 Oct 2019 18:53:36 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 07/31] s390: Fix error_append_hint/error_prepend usage
-Date: Tue,  1 Oct 2019 18:52:55 +0300
-Message-Id: <20191001155319.8066-8-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 25/31] cmdline: Fix error_append_hint/error_prepend usage
+Date: Tue,  1 Oct 2019 18:53:13 +0300
+Message-Id: <20191001155319.8066-26-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
@@ -59,12 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Farman <farman@linux.ibm.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Greg Kurz <groug@kaod.org>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Greg Kurz <groug@kaod.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -97,42 +94,29 @@ command and then do one huge commit.
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/s390x/s390-ccw.c       | 1 +
- target/s390x/cpu_models.c | 2 ++
- 2 files changed, 3 insertions(+)
+ util/qemu-option.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-index 0c5a5b60bd..c0a648a7e0 100644
---- a/hw/s390x/s390-ccw.c
-+++ b/hw/s390x/s390-ccw.c
-@@ -55,6 +55,7 @@ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
-                                   char *sysfsdev,
-                                   Error **errp)
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 97172b5eaa..031c01eddc 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -145,6 +145,7 @@ static const QemuOptDesc *find_desc_by_name(const QemuOptDesc *desc,
+ void parse_option_size(const char *name, const char *value,
+                        uint64_t *ret, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     unsigned int cssid, ssid, devid;
-     char dev_path[PATH_MAX] = {0}, *tmp;
+     uint64_t size;
+     int err;
  
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 009afc38b9..32f2e5e822 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -840,6 +840,7 @@ static void error_prepend_missing_feat(const char *name, void *opaque)
- static void check_compatibility(const S390CPUModel *max_model,
-                                 const S390CPUModel *model, Error **errp)
+@@ -660,6 +661,7 @@ QemuOpts *qemu_opts_find(QemuOptsList *list, const char *id)
+ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
+                            int fail_if_exists, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     S390FeatBitmap missing;
+     QemuOpts *opts = NULL;
  
-     if (model->def->gen > max_model->def->gen) {
-@@ -922,6 +923,7 @@ static inline void apply_cpu_model(const S390CPUModel *model, Error **errp)
- 
- void s390_realize_cpu_model(CPUState *cs, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     S390CPUClass *xcc = S390_CPU_GET_CLASS(cs);
-     S390CPU *cpu = S390_CPU(cs);
-     const S390CPUModel *max_model;
+     if (id) {
 -- 
 2.21.0
 
