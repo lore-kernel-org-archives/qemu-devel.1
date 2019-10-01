@@ -2,67 +2,57 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFC1C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6401EC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:32:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECE082086A
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:25:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE082086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 340C62133F
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:32:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 340C62133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gentoo.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFQah-0000xu-3e
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 18:25:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33533)
+	id 1iFQhT-0003u9-83
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 18:32:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iFP6H-0007nD-Fg
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 16:50:29 -0400
+ (envelope-from <chewi@gentoo.org>) id 1iFPZe-0000SG-Ua
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 17:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iFP6G-0008UF-8P
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 16:50:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52342)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iFP6B-0008RK-Fl; Tue, 01 Oct 2019 16:50:19 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A88FE10C0944;
- Tue,  1 Oct 2019 20:50:18 +0000 (UTC)
-Received: from [10.3.116.201] (ovpn-116-201.phx2.redhat.com [10.3.116.201])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B272E5C1D4;
- Tue,  1 Oct 2019 20:50:12 +0000 (UTC)
-Subject: Re: [PATCH 5/6] block-stream: add compress option
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <1569958040-697220-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1569958040-697220-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <b20bf05a-40b2-a300-5513-a7d225f7d3ba@redhat.com>
-Date: Tue, 1 Oct 2019 15:50:12 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <chewi@gentoo.org>) id 1iFPZX-0000xN-Dn
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 17:20:40 -0400
+Received: from smtp.gentoo.org ([140.211.166.183]:58258)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chewi@gentoo.org>) id 1iFPZX-0000vN-4I
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 17:20:39 -0400
+Received: from symphony.aura-online.co.uk (154.189.187.81.in-addr.arpa
+ [81.187.189.154])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested) (Authenticated sender: chewi)
+ by smtp.gentoo.org (Postfix) with ESMTPSA id 0A2B334B773
+ for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 21:20:35 +0000 (UTC)
+Date: Tue, 1 Oct 2019 22:20:26 +0100
+From: James Le Cuirot <chewi@gentoo.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH 3/3] win32: fix main-loop busy loop on socket/fd event
+Message-ID: <20191001222026.30a69801@symphony.aura-online.co.uk>
+In-Reply-To: <20191001132609.23184-4-marcandre.lureau@redhat.com>
+References: <20191001132609.23184-1-marcandre.lureau@redhat.com>
+ <20191001132609.23184-4-marcandre.lureau@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <1569958040-697220-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Tue, 01 Oct 2019 20:50:18 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: multipart/signed; boundary="Sig_/NYDNIGFhkhqUzAVhnVfyFWg";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 140.211.166.183
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,56 +64,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- armbru@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, den@openvz.org,
- mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/19 2:27 PM, Andrey Shinkevich wrote:
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+--Sig_/NYDNIGFhkhqUzAVhnVfyFWg
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+On Tue,  1 Oct 2019 17:26:09 +0400
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+
+> Commit 05e514b1d4d5bd4209e2c8bbc76ff05c85a235f3 introduced an AIO
+> context optimization to avoid calling event_notifier_test_and_clear() on
+> ctx->notifier. On Windows, the same notifier is being used to wakeup the
+> wait on socket events (see commit
+> d3385eb448e38f828c78f8f68ec5d79c66a58b5d).
+>=20
+> The ctx->notifier event is added to the gpoll sources in
+> aio_set_event_notifier(), aio_ctx_check() should clear the event
+> regardless of ctx->notified, since Windows sets the event by itself,
+> bypassing the aio->notified. This fixes qemu not clearing the event
+> resulting in a busy loop.
+>=20
+> Paolo suggested to me on irc to call event_notifier_test_and_clear()
+> after select() >0 from aio-win32.c's aio_prepare. Unfortunately, not all
+> fds associated with ctx->notifiers are in AIO fd handlers set.
+> (qemu_set_nonblock() in util/oslib-win32.c calls qemu_fd_register()).
+>=20
+> This is essentially a v2 of a patch that was sent earlier:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg00420.html
+>=20
+> that resurfaced when James investigated Spice performance issues on Windo=
+ws:
+> https://gitlab.freedesktop.org/spice/spice/issues/36
+>=20
+> In order to test that patch, I simply tried running test-char on
+> win32, and it hangs. Applying that patch solves it. QIO idle sources
+> are not dispatched. I haven't investigated much further, I suspect
+> source priorities and busy looping still come into play.
+>=20
+> This version keeps the "notified" field, so event_notifier_poll()
+> should still work as expected.
+>=20
+> Cc: James Le Cuirot <chewi@gentoo.org>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
+>  util/async.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/util/async.c b/util/async.c
+> index 4e4c7af51e..ca83e32c7f 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -354,7 +354,11 @@ void aio_notify(AioContext *ctx)
+> =20
+>  void aio_notify_accept(AioContext *ctx)
+>  {
+> -    if (atomic_xchg(&ctx->notified, false)) {
+> +    if (atomic_xchg(&ctx->notified, false)
+> +#ifdef WIN32
+> +        || true
+> +#endif
+> +    ) {
+>          event_notifier_test_and_clear(&ctx->notifier);
+>      }
+>  }
 
-The commit summary says 'what', but left out a body stating 'why'. 
-Reading the whole series makes it obvious, but landing on this commit in 
-isolation during a future 'git bisect' less so.  It's not necessarily a 
-show-stopper, but food for thought in writing future commit messages.
+I can confirm that this updated patch fixes my performance issue. The
+idle CPU usage drops from around 35% to around 2%. Moving the mouse now
+makes the usage go up, not down. :) Many thanks!
 
+Regards,
+--=20
+James Le Cuirot (chewi)
+Gentoo Linux Developer
 
-> +++ b/qapi/block-core.json
-> @@ -2544,6 +2544,9 @@
->   #
->   # @speed:  the maximum speed, in bytes per second
->   #
-> +# @compress: true to compress data, if the target format supports it.
+--Sig_/NYDNIGFhkhqUzAVhnVfyFWg
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Looking at neighbors, it would be more consistent to drop the trailing dot.
+-----BEGIN PGP SIGNATURE-----
 
-> +#            (default: false). Since 4.1.
-> +#
+iQIzBAEBCAAdFiEEPxcZ3tkwcedKm2a8EiZBXQDdMTcFAl2TwxoACgkQEiZBXQDd
+MTfQzQ/9ETD9cLC0GRVymoq3ngxQFIU5Qc7wx/+d1GJr5g6AYfJSQYo/Qi/aBx39
++fKAVlsy7wQxElJ+1WoNOTEvnwYYR95QDjh9VRGhMqHuPkYOQo+eC5XQp1hmHxpT
+U/XUzeXh+c4GkgErH0CEAS7BZi60c2uX03fSq5OUFt6dNoiDtyG+PzQumGuwHZvR
+9ypy7Olw/9Z5QB1AkmczdE3rZS2qRVuaZnOVwVaxEY+RTERqprGznenctrH44GKR
+cdZlAABeo4//6Fx1xcE1zEBtG2ueuaipeYbjYeop9t8fpetACXT4DMpcDCnozqL1
+UKYRLSdWXqyKt4eu5Xiy/dXEZuw05W6Azggz++OnaCrWy//lJoEt6svkeG6ROSb6
+ZdZEATVOlr75S8tLQjomvc0XM3a7N2PHwfeBom0HLD0oaZOI4jBx8PZ5xq76bY7w
+2fc6VrSk05CVFpm45IO9yxHZ2Q2yFTVIESKsutTy6QXkGSisdx9/5EZnOeCnieM5
+14Rw1IKZwvhTEa5Yft3TdZZT7T0ABxifmOZq8Cj0g+vU7vqbUonqzoVRn74ItR0x
+e29DXTA5AA2blFIbpy4RA3CUdilZ5RMI2lnApl3YsqM8B0c5M6pMaURmqi8AP4UQ
+uOv0EI/vhX6T0ir4mGTb9gJH7cuBf32CWugU67rXfyhuUWybp0s=
+=YhAO
+-----END PGP SIGNATURE-----
 
-4.2, now.
-
->   # @on-error: the action to take on an error (default report).
->   #            'stop' and 'enospc' can only be used if the block device
->   #            supports io-status (see BlockInfo).  Since 1.3.
-> @@ -2576,7 +2579,7 @@
->   { 'command': 'block-stream',
->     'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
->               '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
-> -            '*on-error': 'BlockdevOnError',
-> +            '*compress': 'bool', '*on-error': 'BlockdevOnError',
->               '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
->   
->   ##
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+--Sig_/NYDNIGFhkhqUzAVhnVfyFWg--
 
