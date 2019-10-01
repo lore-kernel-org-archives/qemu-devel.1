@@ -2,84 +2,92 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36144C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6242ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:46:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01D2F2133F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:38:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Kp/vdRSi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D2F2133F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C39920B7C
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:46:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C39920B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFN2P-000432-5W
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 14:38:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41607)
+	id 1iFNAG-0006yG-Bc
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 14:46:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43144)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@sifive.com>) id 1iFMyw-0000QL-0v
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:34:43 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFN8k-0006IZ-N5
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@sifive.com>) id 1iFMyt-00030n-Nw
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:34:41 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42922)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iFMyr-0002zK-RK
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:34:37 -0400
-Received: by mail-pg1-x543.google.com with SMTP id z12so10255820pgp.9
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 11:34:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
- :content-transfer-encoding;
- bh=OQi8CqLf3Tb5M+LSz1qzY7Pv1ZfhCTbNTGqS3rwVxX4=;
- b=Kp/vdRSiqArrA5SkRH8eV0CAzQp1ZegVPyzGK9YO/JiUom8yVMHS3zvJfwTQqbk7fg
- KTgMsdSIPvwo1s3/hTlUiXGojditaHxHhltRlx6AmmnvNqQ0uIrhusfknpJJT5iiSp8S
- 4wzvON3tORrseAf2fPF3VpWY62vLcBdQJoj+hx9z9PpHo7wqj5ugdJAM0HU62BNblZLe
- cBz3v6kvUDtBaoZKXqoCzO0ow8y7G1QjYt179ChJcokZLbiQf0w0HqTujJ+3xfEKOy/5
- RcExy65nEvWy5dKIG7FmWoigZacbq0UU8TasrDwTa8Se6ojsFpUSqB14xhalUxehHL+P
- K+Kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=OQi8CqLf3Tb5M+LSz1qzY7Pv1ZfhCTbNTGqS3rwVxX4=;
- b=h6R0DguR+WKSt2+8exIZPn0PQb5dnaljXYTTyshxb3Vv4FNe6Qbsr+cPAjXcJ8S4dP
- vqTuyb6nEEug97iV9TGwtyjUzZoGl9H4H60CTs9TW5a+RunzxFNP/K9lpjTiPry709PH
- AYrirTSgzuis2QPXf3IJCqrdoM+CKd1aaFfvC8/TOXFcrs+Dv0MS0vSMuvfcoj5KCg0M
- DcK770cv19p5SLGdDP1t0SF1OqlMMs7Wlbn3qahPuGRDWxv7IS/XA+kaNAqbwlqnIxoA
- IOV2PDIi3XCGeBrzg41YZ9w4daeD4LiDDCM4/5hzRfTe5WTx9w7g25MQK51+jerqeMaq
- oeZg==
-X-Gm-Message-State: APjAAAXHipRygy0KCSr320T8dfX0JvRs2qwcssP01MO+wq0/N+2ao63b
- ua0009bZLmfpYE/9Q68moiiO1oqOKZWbEg==
-X-Google-Smtp-Source: APXvYqxYvkk9MUEcdlMnSf2Nc4OHtWzpFc5Lct4D1ZB5TqSDApfpimxMUgCzWQ6EJc3Ao3bNmtVAsg==
-X-Received: by 2002:a65:4785:: with SMTP id e5mr30973147pgs.407.1569954875513; 
- Tue, 01 Oct 2019 11:34:35 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id f15sm16250203pfd.141.2019.10.01.11.34.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Oct 2019 11:34:34 -0700 (PDT)
-Date: Tue, 01 Oct 2019 11:34:34 -0700 (PDT)
-X-Google-Original-Date: Tue, 01 Oct 2019 11:34:23 PDT (-0700)
-Subject: Re: [PATCH v1 20/28] target/riscv: Mark both sstatus and vsstatus as
- dirty
-In-Reply-To: <035e50d6438660130233c472de56b883e369f6d4.1566603412.git.alistair.francis@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Message-ID: <mhng-de7a25b6-4610-45a6-9718-25ceeed0429f@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+ (envelope-from <mreitz@redhat.com>) id 1iFN8j-0000s4-Ep
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:44:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36516)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iFN8e-0000om-H3; Tue, 01 Oct 2019 14:44:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BD15E79705;
+ Tue,  1 Oct 2019 18:44:43 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.251])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 547403795;
+ Tue,  1 Oct 2019 18:44:42 +0000 (UTC)
+Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
+ platforms
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20190917234549.22910-1-jsnow@redhat.com>
+ <20190917234549.22910-2-jsnow@redhat.com>
+ <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+ <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
+Date: Tue, 1 Oct 2019 20:44:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+In-Reply-To: <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="0XZoN5poPQQpPhV96g1LJJfaGpIOC6Ng1"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Tue, 01 Oct 2019 18:44:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,58 +99,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Anup Patel <Anup.Patel@wdc.com>,
- qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 23 Aug 2019 16:38:42 PDT (-0700), Alistair Francis wrote:
-> Mark both sstatus and vsstatus as dirty (3).
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/translate.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 8ac72c6470..19771904f4 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -44,6 +44,7 @@ typedef struct DisasContext {
->      /* pc_succ_insn points to the instruction following base.pc_next */
->      target_ulong pc_succ_insn;
->      target_ulong priv_ver;
-> +    bool virt_enabled;
->      uint32_t opcode;
->      uint32_t mstatus_fs;
->      uint32_t misa;
-> @@ -398,6 +399,12 @@ static void mark_fs_dirty(DisasContext *ctx)
->      tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
->      tcg_gen_ori_tl(tmp, tmp, MSTATUS_FS);
->      tcg_gen_st_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
-> +
-> +    if (ctx->virt_enabled) {
-> +        tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPURISCVState, vsstatus));
-> +        tcg_gen_ori_tl(tmp, tmp, MSTATUS_FS);
-> +        tcg_gen_st_tl(tmp, cpu_env, offsetof(CPURISCVState, vsstatus));
-> +    }
->      tcg_temp_free(tmp);
->  }
->  #else
-> @@ -742,6 +749,11 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->      ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
->      ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
->      ctx->priv_ver = env->priv_ver;
-> +#if !defined(CONFIG_USER_ONLY)
-> +    ctx->virt_enabled = riscv_cpu_virt_enabled(env);
-> +#else
-> +    ctx->virt_enabled = false;
-> +#endif
->      ctx->misa = env->misa;
->      ctx->frm = -1;  /* unknown rounding mode */
->      ctx->ext_ifencei = cpu->cfg.ext_ifencei;
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0XZoN5poPQQpPhV96g1LJJfaGpIOC6Ng1
+Content-Type: multipart/mixed; boundary="aY2Z2ExwnvBjLI5hAk51RKIbg4oUGzbMk"
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+--aY2Z2ExwnvBjLI5hAk51RKIbg4oUGzbMk
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 28.09.19 01:35, John Snow wrote:
+>=20
+>=20
+> On 9/23/19 9:09 AM, Max Reitz wrote:
+>> On 18.09.19 01:45, John Snow wrote:
+>>> verify_platform will check an explicit whitelist and blacklist instea=
+d.
+>>> The default will now be assumed to be allowed to run anywhere.
+>>>
+>>> For tests that do not specify their platforms explicitly, this has th=
+e effect of
+>>> enabling these tests on non-linux platforms. For tests that always sp=
+ecified
+>>> linux explicitly, there is no change.
+>>>
+>>> For Python tests on FreeBSD at least; only seven python tests fail:
+>>> 045 147 149 169 194 199 211
+>>>
+>>> 045 and 149 appear to be misconfigurations,
+>>> 147 and 194 are the AF_UNIX path too long error,
+>>> 169 and 199 are bitmap migration bugs, and
+>>> 211 is a bug that shows up on Linux platforms, too.
+>>>
+>>> This is at least good evidence that these tests are not Linux-only. I=
+f
+>>> they aren't suitable for other platforms, they should be disabled on =
+a
+>>> per-platform basis as appropriate.
+>>>
+>>> Therefore, let's switch these on and deal with the failures.
+>>
+>> What exactly do you mean by =E2=80=9Cdeal with the failures=E2=80=9D? =
+ Do you have a
+>> reference to patches that deal with them, or are you or is someone els=
+e
+>> working on them...?
+>>
+>> Apart from that, I am rather hesitant to take a patch through my tree
+>> that not only may cause test failures on platforms that I will not or
+>> actually cannot run tests on (like MacOS or Windows), but that actuall=
+y
+>> does introduce new failures as you describe.
+>>
+>> Well, at least it doesn=E2=80=99t introduce build failures because it =
+appears
+>> there is no Python test that=E2=80=99s in the auto group, so I suppose=
+ =E2=80=9Crather
+>> hesitant=E2=80=9D is not an =E2=80=9CI won=E2=80=99t=E2=80=9D.
+>>
+>=20
+> Think of it more like this: The failures were always there, but we hid
+> them. I'm not "introducing new failures" as such O:-)
+
+That is incorrect.
+
+As I have said, the conceptual problem is that the iotests now run as
+part of make check.  As such, allowing auto tests to run on non-Linux
+platforms may introduce build failures that I cannot do anything about.
+
+And those are very much new failures.
+
+> I think that I have demonstrated sufficiently that it's not correct to
+> prohibit python tests from running on other platforms wholesale, so I'd=
+
+> prefer we don't do that anymore.
+
+You have not.
+
+The actual argument to convince me is =E2=80=9CThis does not affect any t=
+ests in
+the auto group, so it will not introduce build failures at this time=E2=80=
+=9D.
+
+> Further, iotests on FreeBSD already weren't 100% green, so I'm not
+> causing a regression in that sense, either.
+
+My problem is twofold:
+
+(1) You claim =E2=80=9CSure, there are failures, but let=E2=80=99s just d=
+eal with them=E2=80=9D
+and then you do not deal with them.  Seems wrong to me.
+
+I=E2=80=99m fine with the argument =E2=80=9CSorry, royal =E2=80=98we=E2=80=
+=99.  But it just doesn=E2=80=99t help
+anyone to hide the errors.  If someone=E2=80=99s on BSD and wants to run =
+the
+iotests, let them.=E2=80=9D
+
+That sounds good to me.
+
+(2) Maybe someone adds a Python test in the future that is in auto and
+that does not specify Linux as the only supported platform.  Then I send
+a pull request and it breaks on macOS.  Now what?  Remove it from auto?
+ Blindly put "macOS" in unsupported platforms?
+
+In any case, it=E2=80=99ll be a problem for no good reason.
+
+More on that in the next chunk.
+
+> I'm going to meekly push and ask that we stage this as-is, and when
+> something bad happens you can remind me that I wanted this and make me
+> do it.
+
+Make you do what?  Deal with the fact that a pull request is rejected
+because a test fails on macOS?
+
+This is precisely the kind of problem I already had with adding the
+iotests to make check, and I=E2=80=99m already very much not happy about =
+it.
+(In that case it was $DISPLAY not being set on Peter=E2=80=99s test syste=
+m.)
+
+
+I=E2=80=99ll let you make the deduction of =E2=80=9CThe problem isn=E2=80=
+=99t allowing the
+iotests to run on non-Linux platforms, but the fact that they run in
+make check=E2=80=9D yourself, so that I no longer feel like I=E2=80=99m t=
+he only one who
+considers that having been a mistake.
+
+Max
+
+
+--aY2Z2ExwnvBjLI5hAk51RKIbg4oUGzbMk--
+
+--0XZoN5poPQQpPhV96g1LJJfaGpIOC6Ng1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2TnpgACgkQ9AfbAGHV
+z0AYywf8CDVo6NhUJjbqptFlbVwl8wU7YIdHzG4oWUtNBF+9bFqCMRD7e99UqzFQ
+xl4MKywVd798KkkTdXltiD2DWCIPUy27/kKPg9mI2ps6AAiPIkkmj2AWGyhRCBXS
+alG/Htj54Nctw+FTc8RTMigJq28D/vIXQoJNmxuVKZIhNZRdtUbDpkhaMOhJ6FnD
+V8j5DqD0ncDMnN5etfuQutuWWgJrqbJesQuHT/MCA6j3P77e1U1IgVWAUSSCAHe/
+G7ObPwcxdiTqGTnc1b19BSg4zsPNX138AV+MmO7ohcnOJsWI8IEGc9MMSSLUT1jW
+oh0TlySG8HX/5n9fCMiAwtI31sxbFg==
+=xtvP
+-----END PGP SIGNATURE-----
+
+--0XZoN5poPQQpPhV96g1LJJfaGpIOC6Ng1--
 
