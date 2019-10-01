@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F49FC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DEFC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:17:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00F4A2086A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:15:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00F4A2086A
+	by mail.kernel.org (Postfix) with ESMTPS id 846C520842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:17:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 846C520842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50689 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFUAz-00044Y-Rf
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:15:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46358)
+	id 1iFUD4-0005jp-L7
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:17:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iFS08-0000t9-4l
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:17 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iFS0g-0001HI-TB
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iFS07-0002C9-1C
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47226)
+ (envelope-from <jsnow@redhat.com>) id 1iFS0f-0002l6-Ky
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60074)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iFS04-00026A-Is; Tue, 01 Oct 2019 19:56:12 -0400
+ id 1iFS0b-0002fX-H3; Tue, 01 Oct 2019 19:56:45 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BDE5E30832EA;
- Tue,  1 Oct 2019 23:56:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 552F2308FFB1;
+ Tue,  1 Oct 2019 23:56:44 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5509460BE0;
- Tue,  1 Oct 2019 23:56:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2E2AC60BE0;
+ Tue,  1 Oct 2019 23:56:31 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 2/8] block: Support providing LCHS from user
-Date: Tue,  1 Oct 2019 19:55:46 -0400
-Message-Id: <20191001235552.17790-3-jsnow@redhat.com>
+Subject: [PULL 6/8] bootdevice: Refactor get_boot_devices_list
+Date: Tue,  1 Oct 2019 19:55:50 -0400
+Message-Id: <20191001235552.17790-7-jsnow@redhat.com>
 In-Reply-To: <20191001235552.17790-1-jsnow@redhat.com>
 References: <20191001235552.17790-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 01 Oct 2019 23:56:11 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Tue, 01 Oct 2019 23:56:44 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -83,61 +83,106 @@ Sender: "Qemu-devel"
 
 From: Sam Eiderman <shmuel.eiderman@oracle.com>
 
-Add logical geometry variables to BlockConf.
+Move device name construction to a separate function.
 
-A user can now supply "lcyls", "lheads" & "lsecs" for any HD device
-that supports CHS ("cyls", "heads", "secs").
-
-These devices include:
-    * ide-hd
-    * scsi-hd
-    * virtio-blk-pci
-
-In future commits we will use the provided LCHS and pass it to the BIOS
-through fw_cfg to be supplied using INT13 routines.
+We will reuse this function in the following commit to pass logical CHS
+parameters through fw_cfg much like we currently pass bootindex.
 
 Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
 Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
 Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-id: 20190925110639.100699-3-sameid@google.com
+Message-id: 20190925110639.100699-7-sameid@google.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- include/hw/block/block.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ bootdevice.c | 61 +++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 34 insertions(+), 27 deletions(-)
 
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index fd55a30bca..d7246f3862 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -26,6 +26,7 @@ typedef struct BlockConf {
-     uint32_t discard_granularity;
-     /* geometry, not all devices use this */
-     uint32_t cyls, heads, secs;
-+    uint32_t lcyls, lheads, lsecs;
-     OnOffAuto wce;
-     bool share_rw;
-     BlockdevOnError rerror;
-@@ -65,7 +66,10 @@ static inline unsigned int get_physical_block_exp(Bloc=
-kConf *conf)
- #define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)                      =
-\
-     DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),                  =
-\
-     DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0),                =
-\
--    DEFINE_PROP_UINT32("secs", _state, _conf.secs, 0)
-+    DEFINE_PROP_UINT32("secs", _state, _conf.secs, 0),                  =
-\
-+    DEFINE_PROP_UINT32("lcyls", _state, _conf.lcyls, 0),                =
-\
-+    DEFINE_PROP_UINT32("lheads", _state, _conf.lheads, 0),              =
-\
-+    DEFINE_PROP_UINT32("lsecs", _state, _conf.lsecs, 0)
+diff --git a/bootdevice.c b/bootdevice.c
+index bc5e1c2de4..2b12fb85a4 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -202,6 +202,39 @@ DeviceState *get_boot_device(uint32_t position)
+     return res;
+ }
 =20
- #define DEFINE_BLOCK_ERROR_PROPERTIES(_state, _conf)                    =
-\
-     DEFINE_PROP_BLOCKDEV_ON_ERROR("rerror", _state, _conf.rerror,       =
-\
++static char *get_boot_device_path(DeviceState *dev, bool ignore_suffixes=
+,
++                                  char *suffix)
++{
++    char *devpath =3D NULL, *s =3D NULL, *d, *bootpath;
++
++    if (dev) {
++        devpath =3D qdev_get_fw_dev_path(dev);
++        assert(devpath);
++    }
++
++    if (!ignore_suffixes) {
++        if (dev) {
++            d =3D qdev_get_own_fw_dev_path_from_handler(dev->parent_bus,=
+ dev);
++            if (d) {
++                assert(!suffix);
++                s =3D d;
++            } else {
++                s =3D g_strdup(suffix);
++            }
++        } else {
++            s =3D g_strdup(suffix);
++        }
++    }
++
++    bootpath =3D g_strdup_printf("%s%s",
++                               devpath ? devpath : "",
++                               s ? s : "");
++    g_free(devpath);
++    g_free(s);
++
++    return bootpath;
++}
++
+ /*
+  * This function returns null terminated string that consist of new line
+  * separated device paths.
+@@ -218,36 +251,10 @@ char *get_boot_devices_list(size_t *size)
+     bool ignore_suffixes =3D mc->ignore_boot_device_suffixes;
+=20
+     QTAILQ_FOREACH(i, &fw_boot_order, link) {
+-        char *devpath =3D NULL,  *suffix =3D NULL;
+         char *bootpath;
+-        char *d;
+         size_t len;
+=20
+-        if (i->dev) {
+-            devpath =3D qdev_get_fw_dev_path(i->dev);
+-            assert(devpath);
+-        }
+-
+-        if (!ignore_suffixes) {
+-            if (i->dev) {
+-                d =3D qdev_get_own_fw_dev_path_from_handler(i->dev->pare=
+nt_bus,
+-                                                          i->dev);
+-                if (d) {
+-                    assert(!i->suffix);
+-                    suffix =3D d;
+-                } else {
+-                    suffix =3D g_strdup(i->suffix);
+-                }
+-            } else {
+-                suffix =3D g_strdup(i->suffix);
+-            }
+-        }
+-
+-        bootpath =3D g_strdup_printf("%s%s",
+-                                   devpath ? devpath : "",
+-                                   suffix ? suffix : "");
+-        g_free(devpath);
+-        g_free(suffix);
++        bootpath =3D get_boot_device_path(i->dev, ignore_suffixes, i->su=
+ffix);
+=20
+         if (total) {
+             list[total-1] =3D '\n';
 --=20
 2.21.0
 
