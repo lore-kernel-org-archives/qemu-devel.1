@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B869CC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66AE5C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C5CB20815
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:05:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C5CB20815
+	by mail.kernel.org (Postfix) with ESMTPS id E29F720815
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:07:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E29F720815
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFT4c-0008Nv-Pf
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:05:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40415)
+	id 1iFT74-0002aJ-CZ
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:07:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0001tO-B8
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:27 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsb-00020l-JF
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsK-0002Ms-2X
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23636)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0002a1-MO
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11282)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsJ-0001rg-6v; Tue, 01 Oct 2019 19:48:11 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ id 1iFRsS-00021H-Bb; Tue, 01 Oct 2019 19:48:24 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlO5S133877; Tue, 1 Oct 2019 19:47:41 -0400
+ x91NlQrm107943; Tue, 1 Oct 2019 19:47:58 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vccwbere1-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcgaurpcs-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:41 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91Nlf8X136416;
- Tue, 1 Oct 2019 19:47:41 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vccwberdh-1
+ Tue, 01 Oct 2019 19:47:57 -0400
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NlvqD108674;
+ Tue, 1 Oct 2019 19:47:57 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcgaurpcf-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:41 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjkEI027150;
- Tue, 1 Oct 2019 23:47:40 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma03dal.us.ibm.com with ESMTP id 2v9y587bh1-1
+ Tue, 01 Oct 2019 19:47:57 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjmNd029395;
+ Tue, 1 Oct 2019 23:47:56 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma01dal.us.ibm.com with ESMTP id 2v9y59fakb-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:40 +0000
+ Tue, 01 Oct 2019 23:47:56 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NldWT45285664
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91NltIV4129460
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:39 GMT
+ Tue, 1 Oct 2019 23:47:55 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 71F3D2805A;
- Tue,  1 Oct 2019 23:47:39 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 83EFB2805A;
+ Tue,  1 Oct 2019 23:47:55 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 55E2628059;
- Tue,  1 Oct 2019 23:47:39 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 6877228058;
+ Tue,  1 Oct 2019 23:47:55 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:39 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:55 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/97] megasas: fix mapped frame size
-Date: Tue,  1 Oct 2019 18:44:43 -0500
-Message-Id: <20191001234616.7825-5-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 80/97] iotests: Restrict nbd Python tests to nbd
+Date: Tue,  1 Oct 2019 18:45:59 -0500
+Message-Id: <20191001234616.7825-81-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -84,7 +84,7 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
  malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=937 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 148.163.156.1
@@ -99,42 +99,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>,
- qemu-stable@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Lieven <pl@kamp.de>
+From: Max Reitz <mreitz@redhat.com>
 
-the current value of 1024 bytes (16 * MFI_FRAME_SIZE) we map is not enough to hold
-the maximum number of scatter gather elements we advertise. We actually need a
-maximum of 2048 bytes. This is 128 max sg elements * 16 bytes (sizeof (union mfi_sgl)).
+We have two Python unittest-style tests that test NBD.  As such, they
+should specify supported_protocols=['nbd'] so they are skipped when the
+user wants to test some other protocol.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Lieven <pl@kamp.de>
-Message-Id: <20190404121015.28634-1-pl@kamp.de>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 2e56fbc87f6ec3cd56c37b01d313abd502b80d61)
+Furthermore, we should restrict their choice of formats to 'raw'.  The
+idea of a protocol/format combination is to use some format over some
+protocol; but we always use the raw format over NBD.  It does not really
+matter what the NBD server uses on its end, and it is not a useful test
+of the respective format driver anyway.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 7c932a1d69a6d6ac5c0b615c11d191da3bbe9aa8)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/scsi/megasas.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/147 | 5 ++---
+ tests/qemu-iotests/205 | 3 ++-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index a56317e026..5ad762de23 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -477,7 +477,7 @@ static MegasasCmd *megasas_enqueue_frame(MegasasState *s,
- {
-     PCIDevice *pcid = PCI_DEVICE(s);
-     MegasasCmd *cmd = NULL;
--    int frame_size = MFI_FRAME_SIZE * 16;
-+    int frame_size = MEGASAS_MAX_SGE * sizeof(union mfi_sgl);
-     hwaddr frame_size_p = frame_size;
-     unsigned long index;
+diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+index 82513279b0..ce1f5b459d 100755
+--- a/tests/qemu-iotests/147
++++ b/tests/qemu-iotests/147
+@@ -287,6 +287,5 @@ class BuiltinNBD(NBDBlockdevAddBase):
  
+ 
+ if __name__ == '__main__':
+-    # Need to support image creation
+-    iotests.main(supported_fmts=['vpc', 'parallels', 'qcow', 'vdi', 'qcow2',
+-                                 'vmdk', 'raw', 'vhdx', 'qed'])
++    iotests.main(supported_fmts=['raw'],
++                 supported_protocols=['nbd'])
+diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
+index 31b2f5707a..1cf2215730 100755
+--- a/tests/qemu-iotests/205
++++ b/tests/qemu-iotests/205
+@@ -153,4 +153,5 @@ class TestNbdServerRemove(iotests.QMPTestCase):
+ 
+ 
+ if __name__ == '__main__':
+-    iotests.main(supported_fmts=['generic'])
++    iotests.main(supported_fmts=['raw'],
++                 supported_protocols=['nbd'])
 -- 
 2.17.1
 
