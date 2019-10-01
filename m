@@ -2,107 +2,84 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F09A4C388F3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:10:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB27C388F3
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:12:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C274C21920
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:10:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C274C21920
+	by mail.kernel.org (Postfix) with ESMTPS id 6041F21920
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:12:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6041F21920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFEBN-000226-03
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 05:10:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60590)
+	id 1iFECl-0003KO-Hm
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 05:12:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iFE70-0005M9-Al
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:06:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1iFEBU-0002JV-Tb
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iFE6z-00088c-BW
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:06:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45474)
+ (envelope-from <philmd@redhat.com>) id 1iFEBS-0001iJ-Lo
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:11:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55602)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iFE6z-00087x-2p; Tue, 01 Oct 2019 05:06:25 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iFEBS-0001hM-DV
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:11:02 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5075E309BDA3;
- Tue,  1 Oct 2019 09:06:24 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 834C35C223;
- Tue,  1 Oct 2019 09:06:17 +0000 (UTC)
-Subject: Re: [PATCH v1 3/5] s390x/mmu: Implement
- Instruction-Execution-Protection Facility
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190926101627.23376-1-david@redhat.com>
- <20190926101627.23376-4-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <10a399fe-9933-c62c-8ac2-cc02ad5ec472@redhat.com>
-Date: Tue, 1 Oct 2019 11:06:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 572DF4E83E
+ for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 09:11:01 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id 124so660597wmz.1
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 02:11:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=cNX6CzKY6UI6bxi8es/quSNCTr9n0cikcVRKiLTZ/9s=;
+ b=KR6MxYC1br30erebH1Og3EOSv7/5w/+P1wU0hdW/NvaaCKEM1dTHxAJ9wWc+59GSDt
+ nzCOoS65PZaDdA9xLM/wIojb9wX2m9PnhYADcDYT3Wflxvj7gH4AD0wMwJ0PXNXrTQSR
+ n67NPgdN+Xkx6p5ODy/Z+016+YuUf7B58RvCA8AVHRpXksvtPyWk4gv1l639ozyK2uXk
+ qtdkN7rRcqUv4lCoubT2jL2eBnAYvctHk5gGk3sGmLBQYit8EEFVHS6se6Czy/XtB1YO
+ DGkrz3tGJxuUfGTvu/xrB5VN3lLH09ub8GQyUZehbPLveRAniZ3QKvjGuBwbRypsUvFg
+ UTUg==
+X-Gm-Message-State: APjAAAVTR7y/lX/a0VXwmSbRQ0qV59OfeW0ta65zKQm3lpb2Dxep/ERD
+ QZMLUYugDbdWkmN8KTudnD3+K1jyQJySrR1R1b35+bPeMfDP2bF0CwUjMkBaI23OQ5iaXpKQXfa
+ BimQdzmTvju0w/QI=
+X-Received: by 2002:a5d:52c8:: with SMTP id r8mr17797161wrv.256.1569921059871; 
+ Tue, 01 Oct 2019 02:10:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw24miDcosAukjkV7esurXFYlolpTSpLZx9q9776KzJiyyJbDYzZvqYHe56uU9Pu+An8mrMvw==
+X-Received: by 2002:a5d:52c8:: with SMTP id r8mr17797142wrv.256.1569921059691; 
+ Tue, 01 Oct 2019 02:10:59 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id u83sm3326270wme.0.2019.10.01.02.10.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 01 Oct 2019 02:10:59 -0700 (PDT)
+Subject: Re: [PATCH] hw/isa: Introduce a CONFIG_ISA_SUPERIO switch for
+ isa-superio.c
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
+References: <20190930150436.18162-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <cecc59f4-d2b9-7b3b-b750-b86ac202da2c@redhat.com>
+Date: Tue, 1 Oct 2019 11:10:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190926101627.23376-4-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190930150436.18162-1-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 01 Oct 2019 09:06:24 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -117,31 +94,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/09/2019 12.16, David Hildenbrand wrote:
-> IEP support in the mmu is fairly easy. Set the right permissions for TLB
-> entries and properly report an exception.
-> 
-> Make sure to handle EDAT-2 by setting bit 56/60/61 of the TEID (TEC) to
-> the right values.
-> 
-> Let's keep s390_cpu_get_phys_page_debug() working even if IEP is
-> active. Switch MMU_DATA_LOAD - this has no other effects any more as the
-> ASC to be used is now fully selected outside of mmu_translate().
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h        |  1 +
->  target/s390x/helper.c     |  6 +++++-
->  target/s390x/mmu_helper.c | 21 +++++++++++++++++++++
->  3 files changed, 27 insertions(+), 1 deletion(-)
+On 9/30/19 5:04 PM, Thomas Huth wrote:
+> Currently, isa-superio.c is always compiled as soon as CONFIG_ISA_BUS
+> is enabled. But there are also machines that have an ISA BUS without
+> any of the superio chips attached to it, so we should not compile
+> isa-superio.c in case we only compile a QEMU for such a machine.
+> Thus add a proper CONFIG_ISA_SUPERIO switch so that this file only gets
+> compiled when we really, really need it.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+> ---
+>   hw/isa/Kconfig       | 10 +++++++---
+>   hw/isa/Makefile.objs |  2 +-
+>   hw/mips/Kconfig      |  1 +
+>   3 files changed, 9 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
+> index 6db0d7970c..98a289957e 100644
+> --- a/hw/isa/Kconfig
+> +++ b/hw/isa/Kconfig
+> @@ -13,9 +13,13 @@ config I82378
+>       select MC146818RTC
+>       select PCSPK
+>  =20
+> -config PC87312
+> +config ISA_SUPERIO
+>       bool
+>       select ISA_BUS
+> +
+> +config PC87312
+> +    bool
+> +    select ISA_SUPERIO
+>       select I8259
+>       select I8254
+>       select I8257
+> @@ -34,14 +38,14 @@ config PIIX4
+>  =20
+>   config VT82C686
+>       bool
+> -    select ISA_BUS
+> +    select ISA_SUPERIO
+>       select ACPI_SMBUS
+>       select SERIAL_ISA
+>       select FDC
+>  =20
+>   config SMC37C669
+>       bool
+> -    select ISA_BUS
+> +    select ISA_SUPERIO
+>       select SERIAL_ISA
+>       select PARALLEL
+>       select FDC
+> diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
+> index 9e106df186..ff97485504 100644
+> --- a/hw/isa/Makefile.objs
+> +++ b/hw/isa/Makefile.objs
+> @@ -1,5 +1,5 @@
+>   common-obj-$(CONFIG_ISA_BUS) +=3D isa-bus.o
+> -common-obj-$(CONFIG_ISA_BUS) +=3D isa-superio.o
+> +common-obj-$(CONFIG_ISA_SUPERIO) +=3D isa-superio.o
+>   common-obj-$(CONFIG_APM) +=3D apm.o
+>   common-obj-$(CONFIG_I82378) +=3D i82378.o
+>   common-obj-$(CONFIG_PC87312) +=3D pc87312.o
+> diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
+> index 62aa01b29e..2c2adbc42a 100644
+> --- a/hw/mips/Kconfig
+> +++ b/hw/mips/Kconfig
+> @@ -13,6 +13,7 @@ config R4K
+>  =20
+>   config MALTA
+>       bool
+> +    select ISA_SUPERIO
+>  =20
+>   config MIPSSIM
+>       bool
+>=20
 
