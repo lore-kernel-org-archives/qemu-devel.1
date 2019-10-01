@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE46ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:24:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6168EC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E292133F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:24:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E292133F
+	by mail.kernel.org (Postfix) with ESMTPS id 10F552133F
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:27:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F552133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFOgp-0001y6-Ds
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 16:24:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54333)
+	id 1iFOja-00056x-CS
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 16:26:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54850)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFO7w-0004kY-5z
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:48:05 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFO8b-0005MW-J9
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:48:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFO7v-0007xS-4l
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:48:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35058)
+ (envelope-from <mreitz@redhat.com>) id 1iFO8a-0008JP-Gi
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:48:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53146)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFO7t-0007wJ-1V; Tue, 01 Oct 2019 15:48:01 -0400
+ id 1iFO8Y-0008ID-9I; Tue, 01 Oct 2019 15:48:42 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 34B8F81DE1;
- Tue,  1 Oct 2019 19:48:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 872683084025;
+ Tue,  1 Oct 2019 19:48:41 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C403B19C6A;
- Tue,  1 Oct 2019 19:47:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 24540261AA;
+ Tue,  1 Oct 2019 19:48:40 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 18/67] iotests/044: Honor $IMGOPTS
-Date: Tue,  1 Oct 2019 21:46:26 +0200
-Message-Id: <20191001194715.2796-19-mreitz@redhat.com>
+Subject: [PATCH 36/67] iotests/165: Honor $IMGOPTS
+Date: Tue,  1 Oct 2019 21:46:44 +0200
+Message-Id: <20191001194715.2796-37-mreitz@redhat.com>
 In-Reply-To: <20191001194715.2796-1-mreitz@redhat.com>
 References: <20191001194715.2796-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 01 Oct 2019 19:48:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 01 Oct 2019 19:48:41 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,41 +75,35 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/044 | 6 +++---
+ tests/qemu-iotests/165 | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-index 97ba98e628..a5e13751e1 100755
---- a/tests/qemu-iotests/044
-+++ b/tests/qemu-iotests/044
-@@ -23,7 +23,7 @@ import os
- import qcow2
- from qcow2 import QcowHeader
+diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+index 97dd7102c3..0c92947f72 100755
+--- a/tests/qemu-iotests/165
++++ b/tests/qemu-iotests/165
+@@ -22,7 +22,7 @@ from __future__ import print_function
+ import os
+ import re
  import iotests
--from iotests import qemu_img, qemu_img_verbose, qemu_io
-+from iotests import create_test_image, remove_test_image, qemu_img_verbo=
-se, qemu_io
- import struct
- import subprocess
- import sys
-@@ -100,13 +100,13 @@ class TestRefcountTableGrowth(iotests.QMPTestCase):
+-from iotests import qemu_img
++from iotests import create_test_image, remove_test_image
 =20
+ disk =3D os.path.join(iotests.test_dir, 'disk')
+ disk_size =3D 0x40000000 # 1G
+@@ -37,10 +37,10 @@ regions2 =3D ((0x10000000, 0x20000),
+ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
 =20
      def setUp(self):
--        qemu_img('create', '-f', iotests.imgfmt, '-o', 'cluster_size=3D5=
-12', test_img, '16G')
-+        create_test_image(test_img, '16G', opts=3D['cluster_size=3D512']=
-)
-         self.preallocate(test_img)
-         pass
-=20
+-        qemu_img('create', '-f', iotests.imgfmt, disk, str(disk_size))
++        create_test_image(disk, disk_size)
 =20
      def tearDown(self):
--        os.remove(test_img)
-+        remove_test_image(test_img)
-         pass
+-        os.remove(disk)
++        remove_test_image(disk)
 =20
-     def test_grow_refcount_table(self):
+     def mkVm(self):
+         return iotests.VM().add_drive(disk)
 --=20
 2.21.0
 
