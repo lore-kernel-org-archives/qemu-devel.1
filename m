@@ -6,68 +6,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A54C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF5CECE587
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:34:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AFA120842
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:34:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFA120842
+	by mail.kernel.org (Postfix) with ESMTPS id 68A0420842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:34:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68A0420842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFTXc-0004SV-KO
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:34:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41543)
+	id 1iFTXd-0004Sm-7n
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:34:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41553)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsw-0002Jd-V3
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:52 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsx-0002K0-4N
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRss-00037Y-R8
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53396
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsu-00039x-S1
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5134)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsg-0002E4-Jv; Tue, 01 Oct 2019 19:48:35 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlR3j146358; Tue, 1 Oct 2019 19:48:07 -0400
+ id 1iFRsg-0002Gz-8i; Tue, 01 Oct 2019 19:48:34 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x91NlO0j053445; Tue, 1 Oct 2019 19:48:05 -0400
 Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
  [169.63.214.131])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcfcp26qq-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcg1716gx-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:48:06 -0400
+ Tue, 01 Oct 2019 19:48:05 -0400
 Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlUN029385;
- Tue, 1 Oct 2019 23:48:06 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma01dal.us.ibm.com with ESMTP id 2v9y59fam9-1
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Njk6S029377;
+ Tue, 1 Oct 2019 23:48:04 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
+ [9.57.198.27]) by ppma01dal.us.ibm.com with ESMTP id 2v9y59fam2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:48:06 +0000
+ Tue, 01 Oct 2019 23:48:04 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91Nm4cT45089202
+ by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91Nm3ET38535672
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:48:04 GMT
+ Tue, 1 Oct 2019 23:48:03 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1881A28064;
- Tue,  1 Oct 2019 23:48:04 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 8CBAF2805A;
+ Tue,  1 Oct 2019 23:48:03 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EFE4D28059;
+ by IMSVA (Postfix) with ESMTP id 707DE28058;
  Tue,  1 Oct 2019 23:48:03 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
  Tue,  1 Oct 2019 23:48:03 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 95/97] s390: PCI: fix IOMMU region init
-Date: Tue,  1 Oct 2019 18:46:14 -0500
-Message-Id: <20191001234616.7825-96-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 94/97] slirp: ip_reass: Fix use after free
+Date: Tue,  1 Oct 2019 18:46:13 -0500
+Message-Id: <20191001234616.7825-95-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -81,7 +80,7 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,57 +92,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-stable@nongnu.org,
- Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Matthew Rosato <mjrosato@linux.ibm.com>
+Using ip_deq after m_free might read pointers from an allocation reuse.
 
-The fix in dbe9cf606c shrinks the IOMMU memory region to a size
-that seems reasonable on the surface, however is actually too
-small as it is based against a 0-mapped address space.  This
-causes breakage with small guests as they can overrun the IOMMU window.
+This would be difficult to exploit, but that is still related with
+CVE-2019-14378 which generates fragmented IP packets that would trigger this
+issue and at least produce a DoS.
 
-Let's go back to the prior method of initializing iommu for now.
-
-Fixes: dbe9cf606c ("s390x/pci: Set the iommu region size mpcifc request")
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-Reported-by: Boris Fiuczynski <fiuczy@linux.ibm.com>
-Tested-by: Boris Fiuczynski <fiuczy@linux.ibm.com>
-Reported-by: Stefan Zimmerman <stzi@linux.ibm.com>
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Message-Id: <1569507036-15314-1-git-send-email-mjrosato@linux.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-(cherry picked from commit 7df1dac5f1c85312474df9cb3a8fcae72303da62)
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+(from libslirp.git commit c59279437eda91841b9d26079c70b8a540d41204)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/s390x/s390-pci-bus.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ slirp/src/ip_input.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 2d0a28d544..a6be6305b8 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -694,10 +694,15 @@ static const MemoryRegionOps s390_msi_ctrl_ops = {
+diff --git a/slirp/src/ip_input.c b/slirp/src/ip_input.c
+index 68a99de5b5..89ae04e0c1 100644
+--- a/slirp/src/ip_input.c
++++ b/slirp/src/ip_input.c
+@@ -297,6 +297,7 @@ ip_reass(Slirp *slirp, struct ip *ip, struct ipq *fp)
+ 	 */
+ 	while (q != (struct ipasfrag*)&fp->frag_link &&
+             ip->ip_off + ip->ip_len > q->ipf_off) {
++        struct ipasfrag *prev;
+ 		i = (ip->ip_off + ip->ip_len) - q->ipf_off;
+ 		if (i < q->ipf_len) {
+ 			q->ipf_len -= i;
+@@ -304,9 +305,10 @@ ip_reass(Slirp *slirp, struct ip *ip, struct ipq *fp)
+ 			m_adj(dtom(slirp, q), i);
+ 			break;
+ 		}
++        prev = q;
+ 		q = q->ipf_next;
+-		m_free(dtom(slirp, q->ipf_prev));
+-		ip_deq(q->ipf_prev);
++		ip_deq(prev);
++		m_free(dtom(slirp, prev));
+ 	}
  
- void s390_pci_iommu_enable(S390PCIIOMMU *iommu)
- {
-+    /*
-+     * The iommu region is initialized against a 0-mapped address space,
-+     * so the smallest IOMMU region we can define runs from 0 to the end
-+     * of the PCI address space.
-+     */
-     char *name = g_strdup_printf("iommu-s390-%04x", iommu->pbdev->uid);
-     memory_region_init_iommu(&iommu->iommu_mr, sizeof(iommu->iommu_mr),
-                              TYPE_S390_IOMMU_MEMORY_REGION, OBJECT(&iommu->mr),
--                             name, iommu->pal - iommu->pba + 1);
-+                             name, iommu->pal + 1);
-     iommu->enabled = true;
-     memory_region_add_subregion(&iommu->mr, 0, MEMORY_REGION(&iommu->iommu_mr));
-     g_free(name);
+ insert:
 -- 
 2.17.1
 
