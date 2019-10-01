@@ -2,62 +2,64 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE48C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B18C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:13:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C37C621924
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:05:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C37C621924
+	by mail.kernel.org (Postfix) with ESMTPS id 63B4E21906
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:13:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63B4E21906
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFQHM-0004vq-Fe
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 18:05:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55878)
+	id 1iFQOf-0001JA-F4
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 18:13:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56869)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iFOBq-0000uM-Ox
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:52:07 -0400
+ (envelope-from <eblake@redhat.com>) id 1iFOL2-0000FR-BT
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 16:01:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iFOBo-0001SZ-NL
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:52:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45610)
+ (envelope-from <eblake@redhat.com>) id 1iFOL0-0006JF-5p
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 16:01:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42428)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iFOBm-0001Qz-In; Tue, 01 Oct 2019 15:52:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iFOKy-0006IW-S2
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 16:01:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C4DC52A09DA;
- Tue,  1 Oct 2019 19:52:01 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0BE163D955;
+ Tue,  1 Oct 2019 20:01:32 +0000 (UTC)
 Received: from [10.3.116.201] (ovpn-116-201.phx2.redhat.com [10.3.116.201])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DB6C5C219;
- Tue,  1 Oct 2019 19:51:58 +0000 (UTC)
-Subject: Re: [PATCH 0/2] block: Skip COR for inactive nodes
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20191001174827.11081-1-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ADE145D6D0;
+ Tue,  1 Oct 2019 20:01:29 +0000 (UTC)
+Subject: Re: [PATCH 2/7] qapi: Store pragma state in QAPISourceInfo, not
+ global state
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20191001191514.11208-1-armbru@redhat.com>
+ <20191001191514.11208-3-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <4638c5bf-b4fd-d9fb-bae4-e7cc6bbacb83@redhat.com>
-Date: Tue, 1 Oct 2019 14:51:58 -0500
+Message-ID: <f9972ef4-e128-19a6-b861-2faee991c71a@redhat.com>
+Date: Tue, 1 Oct 2019 15:01:28 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191001174827.11081-1-mreitz@redhat.com>
+In-Reply-To: <20191001191514.11208-3-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 01 Oct 2019 19:52:01 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.30]); Tue, 01 Oct 2019 20:01:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -72,34 +74,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/1/19 12:48 PM, Max Reitz wrote:
-> Hi,
->=20
-> While working on $IMGOPTS support for Python iotests, I noticed a minor
-> bug.  Let=E2=80=99s fix it, as you do with bugs.
->=20
->=20
-> Max Reitz (2):
->    block: Skip COR for inactive nodes
->    iotests/262: Switch source/dest VM launch order
-
+On 10/1/19 2:15 PM, Markus Armbruster wrote:
+> The frontend can't be run more than once due to its global state.
+> A future commit will want to do that.
+> 
+> Recent commit "qapi: Move context-sensitive checking to the proper
+> place" got rid of many global variables already, but pragma state is
+> still stored in global variables (that's why a pragma directive's
+> scope is the complete schema).
+> 
+> Move the pragma state to QAPISourceInfo.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   scripts/qapi/common.py | 36 +++++++++++++++++++-----------------
+>   1 file changed, 19 insertions(+), 17 deletions(-)
+> 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
->=20
->   block/io.c                 | 41 +++++++++++++++++++++++++------------=
--
->   tests/qemu-iotests/262     | 12 +++++------
->   tests/qemu-iotests/262.out |  6 +++---
->   3 files changed, 36 insertions(+), 23 deletions(-)
->=20
-
---=20
+-- 
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
