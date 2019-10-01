@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB3AECE587
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AADC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:54:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F24B2070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:53:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F24B2070B
+	by mail.kernel.org (Postfix) with ESMTPS id 26C4C2070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:54:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26C4C2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFStl-0006kv-6V
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:53:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40413)
+	id 1iFSum-0007k7-Ml
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:54:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0001tK-B8
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:30 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0001tX-Cw
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsK-0002Mz-2d
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsK-0002N5-3K
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33786
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18732
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsJ-0001pR-An; Tue, 01 Oct 2019 19:48:11 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ id 1iFRsJ-0001pm-CV; Tue, 01 Oct 2019 19:48:11 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlPqW122859; Tue, 1 Oct 2019 19:47:48 -0400
+ x91NlPS4037480; Tue, 1 Oct 2019 19:47:45 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcgk409bd-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcer2b36k-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:48 -0400
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NllFl123402;
- Tue, 1 Oct 2019 19:47:47 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcgk409b5-1
+ Tue, 01 Oct 2019 19:47:44 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91Nlio5038437;
+ Tue, 1 Oct 2019 19:47:44 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcer2b36a-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:47 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlZ1029380;
- Tue, 1 Oct 2019 23:47:46 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma01dal.us.ibm.com with ESMTP id 2v9y59fajv-1
+ Tue, 01 Oct 2019 19:47:44 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlJa006377;
+ Tue, 1 Oct 2019 23:47:43 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma04wdc.us.ibm.com with ESMTP id 2v9y57ye8n-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:46 +0000
+ Tue, 01 Oct 2019 23:47:43 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NlkbF41746912
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91Nlh6O47382828
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:46 GMT
+ Tue, 1 Oct 2019 23:47:43 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EC6512805A;
- Tue,  1 Oct 2019 23:47:45 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 67A0F2805C;
+ Tue,  1 Oct 2019 23:47:43 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D0F2928058;
- Tue,  1 Oct 2019 23:47:45 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4C13E28058;
+ Tue,  1 Oct 2019 23:47:43 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:45 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:43 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 62/97] block/backup: refactor: split out
- backup_calculate_cluster_size
-Date: Tue,  1 Oct 2019 18:45:41 -0500
-Message-Id: <20191001234616.7825-63-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 58/97] block/backup: simplify
+ backup_incremental_init_copy_bitmap
+Date: Tue,  1 Oct 2019 18:45:37 -0500
+Message-Id: <20191001234616.7825-59-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -109,146 +109,83 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Split out cluster_size calculation. Move copy-bitmap creation above
-block-job creation, as we are going to share it with upcoming
-backup-top filter, which also should be created before actual block job
-creation.
+Simplify backup_incremental_init_copy_bitmap using the function
+bdrv_dirty_bitmap_next_dirty_area.
+
+Note: move to job->len instead of bitmap size: it should not matter but
+less code.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190429090842.57910-6-vsementsov@virtuozzo.com
-[mreitz: Dropped a paragraph from the commit message that was left over
-         from a previous version]
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190429090842.57910-2-vsementsov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit ae6b12fa4cf7d54add35531c790aaf2bd6d833f3)
-*prereq for 110571be4e
+(cherry picked from commit c2da3413c021398152e98022261bb1643276a2fe)
+*prereq for 4a5b91ca
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/backup.c | 82 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 52 insertions(+), 30 deletions(-)
+ block/backup.c | 40 ++++++++++++----------------------------
+ 1 file changed, 12 insertions(+), 28 deletions(-)
 
 diff --git a/block/backup.c b/block/backup.c
-index b54386b699..d1b94a6dbe 100644
+index 9988753249..d9f5db18ac 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -507,6 +507,42 @@ static const BlockJobDriver backup_job_driver = {
-     .drain                  = backup_drain,
- };
- 
-+static int64_t backup_calculate_cluster_size(BlockDriverState *target,
-+                                             Error **errp)
-+{
-+    int ret;
-+    BlockDriverInfo bdi;
-+
-+    /*
-+     * If there is no backing file on the target, we cannot rely on COW if our
-+     * backup cluster size is smaller than the target cluster size. Even for
-+     * targets with a backing file, try to avoid COW if possible.
-+     */
-+    ret = bdrv_get_info(target, &bdi);
-+    if (ret == -ENOTSUP && !target->backing) {
-+        /* Cluster size is not defined */
-+        warn_report("The target block device doesn't provide "
-+                    "information about the block size and it doesn't have a "
-+                    "backing file. The default block size of %u bytes is "
-+                    "used. If the actual block size of the target exceeds "
-+                    "this default, the backup may be unusable",
-+                    BACKUP_CLUSTER_SIZE_DEFAULT);
-+        return BACKUP_CLUSTER_SIZE_DEFAULT;
-+    } else if (ret < 0 && !target->backing) {
-+        error_setg_errno(errp, -ret,
-+            "Couldn't determine the cluster size of the target image, "
-+            "which has no backing file");
-+        error_append_hint(errp,
-+            "Aborting, since this may create an unusable destination image\n");
-+        return ret;
-+    } else if (ret < 0 && target->backing) {
-+        /* Not fatal; just trudge on ahead. */
-+        return BACKUP_CLUSTER_SIZE_DEFAULT;
-+    }
-+
-+    return MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-+}
-+
- BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *target, int64_t speed,
-                   MirrorSyncMode sync_mode, BdrvDirtyBitmap *sync_bitmap,
-@@ -518,9 +554,10 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-                   JobTxn *txn, Error **errp)
+@@ -403,43 +403,27 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+ /* init copy_bitmap from sync_bitmap */
+ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
  {
-     int64_t len;
--    BlockDriverInfo bdi;
-     BackupBlockJob *job = NULL;
-     int ret;
-+    int64_t cluster_size;
-+    HBitmap *copy_bitmap = NULL;
+-    BdrvDirtyBitmapIter *dbi;
+-    int64_t offset;
+-    int64_t end = DIV_ROUND_UP(bdrv_dirty_bitmap_size(job->sync_bitmap),
+-                               job->cluster_size);
+-
+-    dbi = bdrv_dirty_iter_new(job->sync_bitmap);
+-    while ((offset = bdrv_dirty_iter_next(dbi)) != -1) {
+-        int64_t cluster = offset / job->cluster_size;
+-        int64_t next_cluster;
+-
+-        offset += bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+-        if (offset >= bdrv_dirty_bitmap_size(job->sync_bitmap)) {
+-            hbitmap_set(job->copy_bitmap, cluster, end - cluster);
+-            break;
+-        }
++    uint64_t offset = 0;
++    uint64_t bytes = job->len;
  
-     assert(bs);
-     assert(target);
-@@ -582,6 +619,13 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         goto error;
+-        offset = bdrv_dirty_bitmap_next_zero(job->sync_bitmap, offset,
+-                                             UINT64_MAX);
+-        if (offset == -1) {
+-            hbitmap_set(job->copy_bitmap, cluster, end - cluster);
+-            break;
+-        }
++    while (bdrv_dirty_bitmap_next_dirty_area(job->sync_bitmap,
++                                             &offset, &bytes))
++    {
++        uint64_t cluster = offset / job->cluster_size;
++        uint64_t end_cluster = DIV_ROUND_UP(offset + bytes, job->cluster_size);
+ 
+-        next_cluster = DIV_ROUND_UP(offset, job->cluster_size);
+-        hbitmap_set(job->copy_bitmap, cluster, next_cluster - cluster);
+-        if (next_cluster >= end) {
++        hbitmap_set(job->copy_bitmap, cluster, end_cluster - cluster);
++
++        offset = end_cluster * job->cluster_size;
++        if (offset >= job->len) {
+             break;
+         }
+-
+-        bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
++        bytes = job->len - offset;
      }
  
-+    cluster_size = backup_calculate_cluster_size(target, errp);
-+    if (cluster_size < 0) {
-+        goto error;
-+    }
-+
-+    copy_bitmap = hbitmap_alloc(len, ctz32(cluster_size));
-+
-     /* job->len is fixed, so we can't allow resize */
-     job = block_job_create(job_id, &backup_job_driver, txn, bs,
-                            BLK_PERM_CONSISTENT_READ,
-@@ -610,35 +654,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
- 
-     /* Detect image-fleecing (and similar) schemes */
-     job->serialize_target_writes = bdrv_chain_contains(target, bs);
+     /* TODO job_progress_set_remaining() would make more sense */
+     job_progress_update(&job->common.job,
+         job->len - hbitmap_count(job->copy_bitmap) * job->cluster_size);
 -
--    /* If there is no backing file on the target, we cannot rely on COW if our
--     * backup cluster size is smaller than the target cluster size. Even for
--     * targets with a backing file, try to avoid COW if possible. */
--    ret = bdrv_get_info(target, &bdi);
--    if (ret == -ENOTSUP && !target->backing) {
--        /* Cluster size is not defined */
--        warn_report("The target block device doesn't provide "
--                    "information about the block size and it doesn't have a "
--                    "backing file. The default block size of %u bytes is "
--                    "used. If the actual block size of the target exceeds "
--                    "this default, the backup may be unusable",
--                    BACKUP_CLUSTER_SIZE_DEFAULT);
--        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
--    } else if (ret < 0 && !target->backing) {
--        error_setg_errno(errp, -ret,
--            "Couldn't determine the cluster size of the target image, "
--            "which has no backing file");
--        error_append_hint(errp,
--            "Aborting, since this may create an unusable destination image\n");
--        goto error;
--    } else if (ret < 0 && target->backing) {
--        /* Not fatal; just trudge on ahead. */
--        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
--    } else {
--        job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
--    }
--
--    job->copy_bitmap = hbitmap_alloc(len, ctz32(job->cluster_size));
-+    job->cluster_size = cluster_size;
-+    job->copy_bitmap = copy_bitmap;
-+    copy_bitmap = NULL;
-     job->use_copy_range = true;
-     job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
-                                         blk_get_max_transfer(job->target));
-@@ -654,6 +672,10 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     return &job->common;
+-    bdrv_dirty_iter_free(dbi);
+ }
  
-  error:
-+    if (copy_bitmap) {
-+        assert(!job || !job->copy_bitmap);
-+        hbitmap_free(copy_bitmap);
-+    }
-     if (sync_bitmap) {
-         bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
-     }
+ static int coroutine_fn backup_run(Job *job, Error **errp)
 -- 
 2.17.1
 
