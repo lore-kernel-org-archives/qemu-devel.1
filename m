@@ -6,62 +6,104 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47262C388F3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A70F6C388F3
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:32:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C5D721924
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:22:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C5D721924
+	by mail.kernel.org (Postfix) with ESMTPS id 8034D215EA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:32:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8034D215EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFEMC-0002cZ-A8
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 05:22:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34315)
+	id 1iFEWB-0000DG-LU
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 05:32:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iFEKQ-0000VO-9Q
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:20:19 -0400
+ (envelope-from <thuth@redhat.com>) id 1iFEVI-00087K-VS
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:31:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iFEKP-0006JS-0s
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:20:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60884)
+ (envelope-from <thuth@redhat.com>) id 1iFEVF-00050w-Uk
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:31:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50504)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iFEKJ-0006CO-6D; Tue, 01 Oct 2019 05:20:11 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iFEVE-0004zr-EW
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:31:29 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3FBC081F07;
- Tue,  1 Oct 2019 09:20:09 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-215.ams2.redhat.com [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4AD343DE2;
- Tue,  1 Oct 2019 09:19:46 +0000 (UTC)
-Date: Tue, 1 Oct 2019 11:19:44 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v3 04/25] error: auto propagated local_err
-Message-ID: <20191001091944.GB4688@linux.fritz.box>
-References: <20190924200902.4703-1-vsementsov@virtuozzo.com>
- <20190924200902.4703-5-vsementsov@virtuozzo.com>
- <20190930151215.GB12777@linux.fritz.box>
- <ca629ae8-15c5-1685-1cbb-99283d37b0a1@virtuozzo.com>
- <20190930160039.GC12777@linux.fritz.box>
- <495102b2-5d1a-f659-4387-5733ae34b3e2@virtuozzo.com>
- <20190930163909.GD12777@linux.fritz.box>
- <8d55df7a-abe6-bebc-a6bd-a1a2db4b8946@virtuozzo.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id DEBD230842AF;
+ Tue,  1 Oct 2019 09:31:26 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B2C1219C7F;
+ Tue,  1 Oct 2019 09:31:20 +0000 (UTC)
+Subject: Re: [PATCH] slirp: Allow non-local DNS address when restrict is off
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org,
+ jasowang@redhat.com
+References: <20190929181303.19960-1-samuel.thibault@ens-lyon.org>
+ <b49bd2a3-5280-136a-cc35-3d7c14b0a19c@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <8ce50d6b-094a-5cef-58fc-56123d8f2e4f@redhat.com>
+Date: Tue, 1 Oct 2019 11:31:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8d55df7a-abe6-bebc-a6bd-a1a2db4b8946@virtuozzo.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <b49bd2a3-5280-136a-cc35-3d7c14b0a19c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 01 Oct 2019 09:20:09 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 01 Oct 2019 09:31:27 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -76,104 +118,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Paul Burton <pburton@wavecomp.com>, Jeff Cody <codyprime@gmail.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Eric Farman <farman@linux.ibm.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
- Yuval Shaia <yuval.shaia@oracle.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- David Hildenbrand <david@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- "integration@gluster.org" <integration@gluster.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 01.10.2019 um 10:39 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 30.09.2019 19:39, Kevin Wolf wrote:
-> > Am 30.09.2019 um 18:26 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >> 30.09.2019 19:00, Kevin Wolf wrote:
-> >>> Am 30.09.2019 um 17:19 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>> 30.09.2019 18:12, Kevin Wolf wrote:
-> >>>>> Am 24.09.2019 um 22:08 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>>>> Here is introduced ERRP_FUNCTION_BEGIN macro, to be used at start of
-> >>>>>> functions with errp parameter.
-> >>>>>
-> >>>>> A bit of bike shedding, but FOO_BEGIN suggests to me that a FOO_END will
-> >>>>> follow. Can we find a different name, especially now that we won't use
-> >>>>> this macro in every function that uses an errp, so even the "errp
-> >>>>> function" part isn't really correct any more?
-> >>>>>
-> >>>>> How about ERRP_AUTO_PROPAGATE?
-> >>>>
-> >>>> I have an idea that with this macro we can (optionally) get the whole call stack
-> >>>> of the error and print it to log, so it's good to give it more generic name, not
-> >>>> limited to propagation..
-> >>>
-> >>> Hm, what's the context for this feature?
-> >>>
-> >>> The obvious one where you want to have a stack trace is &error_abort,
-> >>> but that one crashes, so you get it automatically. If it's just a normal
-> >>> error (like a QAPI option contains an invalid value and some function
-> >>> down the call chain checks it), why would anyone want to know what the
-> >>> call chain in the QEMU code was?
-> >>>
-> >>
-> >> When I have bug from testers, call stack would be a lot more descriptive, than just
-> >> an error message.
-> >>
-> >> We may add trace point which will print this information, so with disabled trace point
-> >> - no extra output.
-> > 
-> > But wouldn't it make much more sense then to optionally add this
-> > functionality to any trace point? I really don't see how this is related
-> > specifically to user-visible error messages.
-> 
-> Interesting idea
-> 
-> > 
-> > However, even if we decide that we want to have this in Error objects,
-> > wouldn't it make much more sense to use the real C stack trace and save
-> > it from the innermost error_set() using backtrace() or compiler
-> > built-ins rather than relying on an error_propagate() chain?
-> > 
-> Hmm, I thought about this.. And in concatenation with the fact that
-> we'll have macro not everywhere, backtrace may be better..
-> 
-> On the other hand, backtrace will not show coroutine entries..
+On 01/10/2019 11.04, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Samuel,
+>=20
+> On 9/29/19 8:13 PM, Samuel Thibault wrote:
+>> This can be used to set a DNS server to be used by the guest which is
+>> different from the one configured on the host.
+>>
+>> This fixes LP 1010484.
+>=20
+> Wow, 7 years old...
+>=20
+> Can you use this format, easier to understand for newcomers:
+>=20
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1010484
 
-Hm, good point. I wonder if we can easily get a stack trace not starting
-at the current point, but from a jmp_buf. Then we could just switch to
-the coroutine caller whenever we reach coroutine_trampoline().
+That should be "Buglink:" instead. "Fixes:" is for referencing previous
+commits. See our submit-a-patch page for more information:
+https://wiki.qemu.org/Contribute/SubmitAPatch#Write_a_meaningful_commit_m=
+essage
 
-But glibc doesn't seem to support this case easily, so that might mean
-rewriting all of the stack unwinding inside QEMU... Maybe not then.
-
-> OK, anyway, if we will track some additional information in
-> trace-events or in macros or in error_* API functions, it's not bad to
-> track some additional information in macro named ERRP_AUTO_PROPAGATE.
-
-Yes, I think tracking the information where we use ERRP_AUTO_PROPAGATE
-anyway is okay. I just wouldn't add the macro everywhere just for the
-sake of the additional information.
-
-Kevin
+ Thomas
 
