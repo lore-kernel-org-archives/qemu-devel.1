@@ -2,67 +2,66 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F4AC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B2CECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 326EB2054F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:26:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326EB2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 839392054F
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:26:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="YI0UHfWq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 839392054F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFIAH-0007T4-A3
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:26:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56096)
+	id 1iFIAX-0007qF-JT
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:26:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1iFI96-00069K-Nd
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:24:53 -0400
+ (envelope-from <berto@igalia.com>) id 1iFHzw-0005bY-K5
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:15:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1iFI95-0007Ij-I4
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:24:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37404)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>)
- id 1iFI91-0007DR-7K; Tue, 01 Oct 2019 09:24:47 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 11A2B3084025;
- Tue,  1 Oct 2019 13:24:45 +0000 (UTC)
-Received: from angien.pipo.sk (unknown [10.43.2.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E439E6012C;
- Tue,  1 Oct 2019 13:24:43 +0000 (UTC)
-Date: Tue, 1 Oct 2019 15:24:41 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: bitmap migration bug with -drive while block mirror runs
-Message-ID: <20191001132441.GB9210@angien.pipo.sk>
-References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
- <f84745dc-68df-c10a-a91b-a28498e54870@virtuozzo.com>
- <20191001095416.GC4688@linux.fritz.box>
+ (envelope-from <berto@igalia.com>) id 1iFHzu-0007MN-Fx
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:15:24 -0400
+Received: from 6.130.60.178.static.reverse-mundo-r.com ([178.60.130.6]:44975
+ helo=fanzine.igalia.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>) id 1iFHzq-0006x0-KL
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:15:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=hZQkpikDxpS3+PDD1sN6F8XhMmVMK4kTAeA7WwXijJ8=; 
+ b=YI0UHfWq61P5ShbvW11xYYDTWQyeG3N5/7QQaL8zUcKqz04zZegFh03DwP+dIHlQ4ddydBNG+fmGn2so+8hJlfmgdpNwHD2pr1bG67/0yQcTYtgQa2T1VXSZWlEoyGWkXWDybgWazgL3lBUM924xt+lfi5Km+GWTgVhnhjBiL9Ts87xUjVUcCnGS4pvB4AcRLnWCkB+YGHsqtRsNYNMWLF35sq7tl3cjO8atvPVbO/OdoxQ+bzmJDIHZFm2lTRNBvvLWem8wjE6Nr2Dl/bVEvhF9fCJaka5bfC80qsI8LCGG5lMyf0NCfCieEg5I4Ss/OZaj9IlYpvmHkZ6/LcQG9w==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1iFHzX-0002CI-Np; Tue, 01 Oct 2019 15:14:59 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1iFHzX-0007me-La; Tue, 01 Oct 2019 15:14:59 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Tony Nguyen <tony.nguyen@bt.com>, qemu-devel@nongnu.org
+Subject: Re: [Qemu-devel] [PATCH 11/19] hw/ipack: Declare device little or big
+ endian
+In-Reply-To: <c715521dfd61c48283fd34794286fa1eb2ce9fe8.1566829168.git.tony.nguyen@bt.com>
+References: <cover.1566829168.git.tony.nguyen@bt.com>
+ <c715521dfd61c48283fd34794286fa1eb2ce9fe8.1566829168.git.tony.nguyen@bt.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Tue, 01 Oct 2019 15:14:59 +0200
+Message-ID: <w5136gcr4j0.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20191001095416.GC4688@linux.fritz.box>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 01 Oct 2019 13:24:45 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,66 +73,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 01, 2019 at 11:54:16 +0200, Kevin Wolf wrote:
-> Am 01.10.2019 um 10:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > 01.10.2019 3:09, John Snow wrote:
-> > > Hi folks, I identified a problem with the migration code that Red Hat=
- QE
-> > > found and thought you'd like to see it:
-> > >=20
-> > > https://bugzilla.redhat.com/show_bug.cgi?id=3D1652424#c20
-> > >=20
-> > > Very, very briefly: drive-mirror inserts a filter node that changes w=
-hat
-> > > bdrv_get_device_or_node_name() returns, which causes a migration prob=
-lem.
-> > >=20
-> > >=20
-> > > Ignorant question #1: Can we multi-parent the filter node and
-> > > source-node? It looks like at the moment both consider their only par=
-ent
-> > > to be the block-job and don't have a link back to their parents other=
-wise.
-> > >=20
-> > >=20
-> > > Otherwise: I have a lot of cloudy ideas on how to solve this, but
-> > > ultimately what we want is to be able to find the "addressable" name =
-for
-> > > the node the bitmap is attached to, which would be the name of the fi=
-rst
-> > > ancestor node that isn't a filter. (OR, the name of the block-backend
-> > > above that node.)
-> >=20
-> >=20
-> > Better would be to migrate by node-name only.. But am I right that
-> > node-names are different on source and destination? Or this situation
-> > changed?
->=20
-> Traditionally, I think migration assumes that frontends (guest devices)
-> must match exactly, but backends may and usually will differ.
->=20
-> Of course, dirty bitmaps are a backend feature that isn't really related
-> to guest devices, so this doesn't really work out any more in your case.
-> BlockBackend names are unusable for this purpose (especially as we're
-> moving towards anonymous BlockBackends everywhere), which I guess
-> essentially means node-name is the only option left.
->=20
-> Is bitmap migration something that must be enabled explicitly or does
-> it happen automatically? If it's explicit, then making an additional
-> requirement (matching node-names) shouldn't be a problem.
+On Mon 26 Aug 2019 04:21:37 PM CEST, Tony Nguyen wrote:
+> For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
+> targets from the set of target/hw/*/device.o.
+>
+> If the set of targets are all little or all big endian, re-declare
+> as DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN respectively.
+>
+> Then, on inspection:
+> - if ununsed, re-declare as DEVICE_HOST_ENDIAN.
+> - if max/min size=1, re-declare as DEVICE_HOST_ENDIAN.
+> - if just a bit bucket, re-delcare as DEVICE_HOST_ENDIAN
+> - if PCI, re-declare as DEVICE_LITTLE_ENDIAN.
+> - if for {ARM|unicore32} only, re-declare as DEVICE_LITTLE_ENDIAN.
+> - if for SPARC only, re-declare as DEVICE_BIG_ENDIAN.
+>
+> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 
-I think a far better and more reasonable solution is to provide a map on
-migration which would match the node names explicitly. If they have to
-be the same it moves node names together with the frontend options as
-guest ABI.
+Acked-by: Alberto Garcia <berto@igalia.com>
 
-This means that changing the disk backend on migration will become very
-painful.
+Berto
 
