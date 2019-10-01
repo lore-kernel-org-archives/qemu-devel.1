@@ -2,61 +2,53 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FFD2ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E03EECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:16:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2483C20640
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:12:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2483C20640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 476F021906
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 13:16:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 476F021906
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFHxI-0002eN-6q
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:12:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48254)
+	id 1iFI1G-0006V0-Ls
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 09:16:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53485)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iFHkU-0006sp-G8
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:59:28 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFHyy-0004cN-B5
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:14:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iFHkS-0005xx-SK
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 08:59:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51744)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFHyw-0006Nl-Q7
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 09:14:24 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60972)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1iFHkK-0005j8-AL; Tue, 01 Oct 2019 08:59:16 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 771CE1057867;
- Tue,  1 Oct 2019 12:59:15 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C33E46;
- Tue,  1 Oct 2019 12:59:13 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Subject: [PATCH v5 6/9] target/arm/kvm64: max cpu: Enable SVE when available
-Date: Tue,  1 Oct 2019 14:58:42 +0200
-Message-Id: <20191001125845.8793-7-drjones@redhat.com>
-In-Reply-To: <20191001125845.8793-1-drjones@redhat.com>
-References: <20191001125845.8793-1-drjones@redhat.com>
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iFHyr-0006D8-9i; Tue, 01 Oct 2019 09:14:19 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iFHyk-00040D-BI; Tue, 01 Oct 2019 16:14:10 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v15 1/5] block/backup: move in-flight requests handling from
+ backup to block-copy
+Date: Tue,  1 Oct 2019 16:14:05 +0300
+Message-Id: <20191001131409.14202-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191001131409.14202-1-vsementsov@virtuozzo.com>
+References: <20191001131409.14202-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Tue, 01 Oct 2019 12:59:15 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,222 +60,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
- eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
- Dave.Martin@arm.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, wencongyang2@huawei.com,
+ xiechanglong.d@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ den@openvz.org, mreitz@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enable SVE in the KVM guest when the 'max' cpu type is configured
-and KVM supports it. KVM SVE requires use of the new finalize
-vcpu ioctl, so we add that now too. For starters SVE can only be
-turned on or off, getting all vector lengths the host CPU supports
-when on. We'll add the other SVE CPU properties in later patches.
+Move synchronization mechanism to block-copy, to be able to use one
+block-copy instance from backup job and backup-top filter in parallel.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- target/arm/cpu64.c       | 17 ++++++++++++++---
- target/arm/kvm.c         |  5 +++++
- target/arm/kvm64.c       | 20 +++++++++++++++++++-
- target/arm/kvm_arm.h     | 27 +++++++++++++++++++++++++++
- tests/arm-cpu-features.c |  1 +
- 5 files changed, 66 insertions(+), 4 deletions(-)
+ include/block/block-copy.h |  8 ++++++
+ block/backup.c             | 52 --------------------------------------
+ block/block-copy.c         | 43 +++++++++++++++++++++++++++++++
+ 3 files changed, 51 insertions(+), 52 deletions(-)
 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 34b0ba2cf6f7..a771a28daa56 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -493,6 +493,11 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v,=
- const char *name,
-         return;
-     }
-=20
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+        error_setg(errp, "'sve' feature not supported by KVM on this hos=
-t");
-+        return;
-+    }
+diff --git a/include/block/block-copy.h b/include/block/block-copy.h
+index 54f90d0c9a..962f91056a 100644
+--- a/include/block/block-copy.h
++++ b/include/block/block-copy.h
+@@ -17,6 +17,13 @@
+ 
+ #include "block/block.h"
+ 
++typedef struct BlockCopyInFlightReq {
++    int64_t start_byte;
++    int64_t end_byte;
++    QLIST_ENTRY(BlockCopyInFlightReq) list;
++    CoQueue wait_queue; /* coroutines blocked on this request */
++} BlockCopyInFlightReq;
 +
-     t =3D cpu->isar.id_aa64pfr0;
-     t =3D FIELD_DP64(t, ID_AA64PFR0, SVE, value);
-     cpu->isar.id_aa64pfr0 =3D t;
-@@ -507,11 +512,16 @@ static void aarch64_max_initfn(Object *obj)
+ typedef void (*ProgressBytesCallbackFunc)(int64_t bytes, void *opaque);
+ typedef void (*ProgressResetCallbackFunc)(void *opaque);
+ typedef struct BlockCopyState {
+@@ -27,6 +34,7 @@ typedef struct BlockCopyState {
+     bool use_copy_range;
+     int64_t copy_range_size;
+     uint64_t len;
++    QLIST_HEAD(, BlockCopyInFlightReq) inflight_reqs;
+ 
+     BdrvRequestFlags write_flags;
+ 
+diff --git a/block/backup.c b/block/backup.c
+index 4613b8c88d..d918836f1d 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -29,13 +29,6 @@
+ 
+ #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
+ 
+-typedef struct CowRequest {
+-    int64_t start_byte;
+-    int64_t end_byte;
+-    QLIST_ENTRY(CowRequest) list;
+-    CoQueue wait_queue; /* coroutines blocked on this request */
+-} CowRequest;
+-
+ typedef struct BackupBlockJob {
+     BlockJob common;
+     BlockDriverState *source_bs;
+@@ -51,50 +44,12 @@ typedef struct BackupBlockJob {
+     uint64_t bytes_read;
+     int64_t cluster_size;
+     NotifierWithReturn before_write;
+-    QLIST_HEAD(, CowRequest) inflight_reqs;
+ 
+     BlockCopyState *bcs;
+ } BackupBlockJob;
+ 
+ static const BlockJobDriver backup_job_driver;
+ 
+-/* See if in-flight requests overlap and wait for them to complete */
+-static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
+-                                                       int64_t start,
+-                                                       int64_t end)
+-{
+-    CowRequest *req;
+-    bool retry;
+-
+-    do {
+-        retry = false;
+-        QLIST_FOREACH(req, &job->inflight_reqs, list) {
+-            if (end > req->start_byte && start < req->end_byte) {
+-                qemu_co_queue_wait(&req->wait_queue, NULL);
+-                retry = true;
+-                break;
+-            }
+-        }
+-    } while (retry);
+-}
+-
+-/* Keep track of an in-flight request */
+-static void cow_request_begin(CowRequest *req, BackupBlockJob *job,
+-                              int64_t start, int64_t end)
+-{
+-    req->start_byte = start;
+-    req->end_byte = end;
+-    qemu_co_queue_init(&req->wait_queue);
+-    QLIST_INSERT_HEAD(&job->inflight_reqs, req, list);
+-}
+-
+-/* Forget about a completed request */
+-static void cow_request_end(CowRequest *req)
+-{
+-    QLIST_REMOVE(req, list);
+-    qemu_co_queue_restart_all(&req->wait_queue);
+-}
+-
+ static void backup_progress_bytes_callback(int64_t bytes, void *opaque)
  {
-     ARMCPU *cpu =3D ARM_CPU(obj);
-     uint32_t vq;
-+    uint64_t t;
-=20
-     if (kvm_enabled()) {
-         kvm_arm_set_cpu_features_from_host(cpu);
-+        if (kvm_arm_sve_supported(CPU(cpu))) {
-+            t =3D cpu->isar.id_aa64pfr0;
-+            t =3D FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
-+            cpu->isar.id_aa64pfr0 =3D t;
-+        }
-     } else {
--        uint64_t t;
-         uint32_t u;
-         aarch64_a57_initfn(obj);
-=20
-@@ -612,8 +622,6 @@ static void aarch64_max_initfn(Object *obj)
-=20
-         object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve=
-_max_vq,
-                             cpu_max_set_sve_max_vq, NULL, NULL, &error_f=
-atal);
--        object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
--                            cpu_arm_set_sve, NULL, NULL, &error_fatal);
-=20
-         for (vq =3D 1; vq <=3D ARM_MAX_VQ; ++vq) {
-             char name[8];
-@@ -622,6 +630,9 @@ static void aarch64_max_initfn(Object *obj)
-                                 cpu_arm_set_sve_vq, NULL, NULL, &error_f=
-atal);
-         }
-     }
-+
-+    object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
-+                        cpu_arm_set_sve, NULL, NULL, &error_fatal);
- }
-=20
- struct ARMCPUInfo {
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index b2eaa50b8df9..72569f71236e 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -51,6 +51,11 @@ int kvm_arm_vcpu_init(CPUState *cs)
-     return kvm_vcpu_ioctl(cs, KVM_ARM_VCPU_INIT, &init);
- }
-=20
-+int kvm_arm_vcpu_finalize(CPUState *cs, int feature)
+     BackupBlockJob *s = opaque;
+@@ -116,7 +71,6 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+                                       bool *error_is_read,
+                                       bool is_write_notifier)
+ {
+-    CowRequest cow_request;
+     int ret = 0;
+     int64_t start, end; /* bytes */
+ 
+@@ -127,14 +81,9 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+ 
+     trace_backup_do_cow_enter(job, start, offset, bytes);
+ 
+-    wait_for_overlapping_requests(job, start, end);
+-    cow_request_begin(&cow_request, job, start, end);
+-
+     ret = block_copy(job->bcs, start, end - start, error_is_read,
+                      is_write_notifier);
+ 
+-    cow_request_end(&cow_request);
+-
+     trace_backup_do_cow_return(job, offset, bytes, ret);
+ 
+     qemu_co_rwlock_unlock(&job->flush_rwlock);
+@@ -316,7 +265,6 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
+     BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
+     int ret = 0;
+ 
+-    QLIST_INIT(&s->inflight_reqs);
+     qemu_co_rwlock_init(&s->flush_rwlock);
+ 
+     backup_init_copy_bitmap(s);
+diff --git a/block/block-copy.c b/block/block-copy.c
+index 3fc9152853..61e5ea5f46 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -19,6 +19,41 @@
+ #include "block/block-copy.h"
+ #include "sysemu/block-backend.h"
+ 
++static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState *s,
++                                                       int64_t start,
++                                                       int64_t end)
 +{
-+    return kvm_vcpu_ioctl(cs, KVM_ARM_VCPU_FINALIZE, &feature);
++    BlockCopyInFlightReq *req;
++    bool waited;
++
++    do {
++        waited = false;
++        QLIST_FOREACH(req, &s->inflight_reqs, list) {
++            if (end > req->start_byte && start < req->end_byte) {
++                qemu_co_queue_wait(&req->wait_queue, NULL);
++                waited = true;
++                break;
++            }
++        }
++    } while (waited);
 +}
 +
- void kvm_arm_init_serror_injection(CPUState *cs)
- {
-     cap_has_inject_serror_esr =3D kvm_check_extension(cs->kvm_state,
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 4c0b11d105a4..850da1b5e6aa 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -602,6 +602,13 @@ bool kvm_arm_aarch32_supported(CPUState *cpu)
-     return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
- }
-=20
-+bool kvm_arm_sve_supported(CPUState *cpu)
++static void block_copy_inflight_req_begin(BlockCopyState *s,
++                                          BlockCopyInFlightReq *req,
++                                          int64_t start, int64_t end)
 +{
-+    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-+
-+    return kvm_check_extension(s, KVM_CAP_ARM_SVE);
++    req->start_byte = start;
++    req->end_byte = end;
++    qemu_co_queue_init(&req->wait_queue);
++    QLIST_INSERT_HEAD(&s->inflight_reqs, req, list);
 +}
 +
- #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
-=20
- int kvm_arch_init_vcpu(CPUState *cs)
-@@ -630,13 +637,17 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_EL1_32BIT;
-     }
-     if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
--            cpu->has_pmu =3D false;
-+        cpu->has_pmu =3D false;
-     }
-     if (cpu->has_pmu) {
-         cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_PMU_V3;
-     } else {
-         unset_feature(&env->features, ARM_FEATURE_PMU);
-     }
-+    if (cpu_isar_feature(aa64_sve, cpu)) {
-+        assert(kvm_arm_sve_supported(cs));
-+        cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_SVE;
-+    }
-=20
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-     ret =3D kvm_arm_vcpu_init(cs);
-@@ -644,6 +655,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         return ret;
-     }
-=20
-+    if (cpu_isar_feature(aa64_sve, cpu)) {
-+        ret =3D kvm_arm_vcpu_finalize(cs, KVM_ARM_VCPU_SVE);
-+        if (ret) {
-+            return ret;
-+        }
-+    }
++static void coroutine_fn block_copy_inflight_req_end(BlockCopyInFlightReq *req)
++{
++    QLIST_REMOVE(req, list);
++    qemu_co_queue_restart_all(&req->wait_queue);
++}
++
+ void block_copy_state_free(BlockCopyState *s)
+ {
+     if (!s) {
+@@ -79,6 +114,8 @@ BlockCopyState *block_copy_state_new(
+     s->use_copy_range =
+         !(write_flags & BDRV_REQ_WRITE_COMPRESSED) && s->copy_range_size > 0;
+ 
++    QLIST_INIT(&s->inflight_reqs);
 +
      /*
-      * When KVM is in use, PSCI is emulated in-kernel and not by qemu.
-      * Currently KVM has its own idea about MPIDR assignment, so we
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index b3106c8600af..1151877f97ea 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -27,6 +27,20 @@
-  */
- int kvm_arm_vcpu_init(CPUState *cs);
-=20
-+/**
-+ * kvm_arm_vcpu_finalize
-+ * @cs: CPUState
-+ * @feature: int
-+ *
-+ * Finalizes the configuration of the specified VCPU feature by
-+ * invoking the KVM_ARM_VCPU_FINALIZE ioctl. Features requiring
-+ * this are documented in the "KVM_ARM_VCPU_FINALIZE" section of
-+ * KVM's API documentation.
-+ *
-+ * Returns: 0 if success else < 0 error code
-+ */
-+int kvm_arm_vcpu_finalize(CPUState *cs, int feature);
+      * We just allow aio context change on our block backends. block_copy() user
+      * (now it's only backup) is responsible for source and target being in same
+@@ -266,6 +303,7 @@ int coroutine_fn block_copy(BlockCopyState *s,
+     int64_t end = bytes + start; /* bytes */
+     void *bounce_buffer = NULL;
+     int64_t status_bytes;
++    BlockCopyInFlightReq req;
+ 
+     /*
+      * block_copy() user is responsible for keeping source and target in same
+@@ -276,6 +314,9 @@ int coroutine_fn block_copy(BlockCopyState *s,
+     assert(QEMU_IS_ALIGNED(start, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(end, s->cluster_size));
+ 
++    block_copy_wait_inflight_reqs(s, start, bytes);
++    block_copy_inflight_req_begin(s, &req, start, end);
 +
- /**
-  * kvm_arm_register_device:
-  * @mr: memory region for this device
-@@ -225,6 +239,14 @@ bool kvm_arm_aarch32_supported(CPUState *cs);
-  */
- bool kvm_arm_pmu_supported(CPUState *cs);
-=20
-+/**
-+ * bool kvm_arm_sve_supported:
-+ * @cs: CPUState
-+ *
-+ * Returns true if the KVM VCPU can enable SVE and false otherwise.
-+ */
-+bool kvm_arm_sve_supported(CPUState *cs);
+     while (start < end) {
+         int64_t dirty_end;
+ 
+@@ -329,5 +370,7 @@ int coroutine_fn block_copy(BlockCopyState *s,
+         qemu_vfree(bounce_buffer);
+     }
+ 
++    block_copy_inflight_req_end(&req);
 +
- /**
-  * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
-  * IPA address space supported by KVM
-@@ -275,6 +297,11 @@ static inline bool kvm_arm_pmu_supported(CPUState *c=
-s)
-     return false;
+     return ret;
  }
-=20
-+static inline bool kvm_arm_sve_supported(CPUState *cs)
-+{
-+    return false;
-+}
-+
- static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
- {
-     return -ENOENT;
-diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-index 0190148260dc..3c8ed85b5adb 100644
---- a/tests/arm-cpu-features.c
-+++ b/tests/arm-cpu-features.c
-@@ -391,6 +391,7 @@ static void test_query_cpu_model_expansion_kvm(const =
-void *data)
-=20
-     if (g_str_equal(qtest_get_arch(), "aarch64")) {
-         assert_has_feature(qts, "host", "aarch64");
-+        assert_has_feature(qts, "max", "sve");
-=20
-         assert_error(qts, "cortex-a15",
-             "We cannot guarantee the CPU type 'cortex-a15' works "
---=20
-2.20.1
+-- 
+2.21.0
 
 
