@@ -2,80 +2,78 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 001FAC352AA
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10502ECE58A
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 23:55:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C87BD20818
+	by mail.kernel.org (Postfix) with ESMTPS id DA97C21924
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 23:55:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C87BD20818
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA97C21924
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFRz8-0007qB-ES
+	id 1iFRz8-0007sk-BV
 	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 19:55:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38907)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRrd-00017O-OO
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRrd-00017N-Nx
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRrb-0001Kx-Vl
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRrb-0001Ka-Pu
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:47:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4656
- helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25066)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRrb-0001Iq-F5; Tue, 01 Oct 2019 19:47:27 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlQET078956; Tue, 1 Oct 2019 19:47:26 -0400
+ id 1iFRrb-0001Hf-60; Tue, 01 Oct 2019 19:47:27 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x91NlOJ2053133; Tue, 1 Oct 2019 19:47:25 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcc4f00rw-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcg171618-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:26 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NlQQP078950;
- Tue, 1 Oct 2019 19:47:26 -0400
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vcc4f00q4-1
+ Tue, 01 Oct 2019 19:47:25 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NlPFP053472;
+ Tue, 1 Oct 2019 19:47:25 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcg17160j-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:26 -0400
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Njk06006371;
- Tue, 1 Oct 2019 23:47:20 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma04wdc.us.ibm.com with ESMTP id 2v9y57ye73-1
+ Tue, 01 Oct 2019 19:47:25 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Njk67029377;
+ Tue, 1 Oct 2019 23:47:24 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
+ [9.57.198.28]) by ppma01dal.us.ibm.com with ESMTP id 2v9y59fage-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:20 +0000
+ Tue, 01 Oct 2019 23:47:23 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NlJqO44564964
+ by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91NlN7E43188586
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:19 GMT
+ Tue, 1 Oct 2019 23:47:23 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A9B902805A;
- Tue,  1 Oct 2019 23:47:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 31CD928058;
+ Tue,  1 Oct 2019 23:47:23 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8CE4A28058;
- Tue,  1 Oct 2019 23:47:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 158E82805A;
+ Tue,  1 Oct 2019 23:47:23 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:19 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:23 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 15/97] s390x/cpumodel: ignore csske for expansion
-Date: Tue,  1 Oct 2019 18:44:54 -0500
-Message-Id: <20191001234616.7825-16-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 21/97] iotests.py: Fix VM.run_job
+Date: Tue,  1 Oct 2019 18:45:00 -0500
+Message-Id: <20191001234616.7825-22-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -89,7 +87,7 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,41 +99,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-stable@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+From: Max Reitz <mreitz@redhat.com>
 
-csske will be removed in a future machine. Ignore it for expanding the
-cpu model. Otherwise qemu falls back to z9.
+log() is in the current module, there is no need to prefix it.  In fact,
+doing so may make VM.run_job() unusable in tests that never use
+iotests.log() themselves.
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-stable@nongnu.org
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190429090250.7648-3-borntraeger@de.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-(cherry picked from commit eaf6f642abf1d4d24791b70728d4068428fc4658)
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 86a4f599a67b9b709109c7a7c8b7eb91d21c21fd)
+*prereq for d6a79af0e6
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/s390x/cpu_models.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/qemu-iotests/iotests.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index eb125d4d0d..e154d53eda 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -1327,6 +1327,8 @@ static void init_ignored_base_feat(void)
-          S390_FEAT_KM_TDEA_192,
-          S390_FEAT_KIMD_SHA_1,
-          S390_FEAT_KLMD_SHA_1,
-+         /* CSSKE is deprecated on newer generations */
-+         S390_FEAT_CONDITIONAL_SSKE,
-     };
-     int i;
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 8061f01ade..fa00b61892 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -560,7 +560,7 @@ class VM(qtest.QEMUQtestMachine):
+                     elif status == 'null':
+                         return error
+                 else:
+-                    iotests.log(ev)
++                    log(ev)
  
+     def node_info(self, node_name):
+         nodes = self.qmp('query-named-block-nodes')
 -- 
 2.17.1
 
