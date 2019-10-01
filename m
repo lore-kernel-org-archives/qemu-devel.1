@@ -2,51 +2,69 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9132C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86098C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:55:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD67F20842
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:53:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD67F20842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BE9F20842
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 19:55:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE9F20842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFOCo-000197-1x
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 15:53:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48335)
+	id 1iFOFN-0003ca-Ne
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 15:55:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFNo9-0004j2-5E
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:27:38 -0400
+ (envelope-from <eblake@redhat.com>) id 1iFO54-0001uC-Sh
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFNo7-0001SS-6S
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:27:36 -0400
-Received: from relay.sw.ru ([185.231.240.75]:45312)
+ (envelope-from <eblake@redhat.com>) id 1iFO53-0005Pl-Dx
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:45:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43098)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iFNo6-0001Qp-UX; Tue, 01 Oct 2019 15:27:35 -0400
-Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iFNo3-00060a-UZ; Tue, 01 Oct 2019 22:27:32 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Subject: [PATCH 5/6] block-stream: add compress option
-Date: Tue,  1 Oct 2019 22:27:19 +0300
-Message-Id: <1569958040-697220-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1569958040-697220-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1569958040-697220-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iFO4t-0005Cc-GU; Tue, 01 Oct 2019 15:44:57 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 448C6300CB28;
+ Tue,  1 Oct 2019 19:44:54 +0000 (UTC)
+Received: from [10.3.116.201] (ovpn-116-201.phx2.redhat.com [10.3.116.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 21D765D9CC;
+ Tue,  1 Oct 2019 19:44:51 +0000 (UTC)
+Subject: Re: [PATCH v4 23/31] block: Fix error_append_hint/error_prepend usage
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-24-vsementsov@virtuozzo.com>
+ <f6456405-3128-a530-7039-45671d8f2508@redhat.com>
+ <e626f8ca-e0f6-ef0d-1d09-3b7fcbde8cb3@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b934b470-9858-7a33-991a-3d25ff8ecc30@redhat.com>
+Date: Tue, 1 Oct 2019 14:44:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+In-Reply-To: <e626f8ca-e0f6-ef0d-1d09-3b7fcbde8cb3@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Tue, 01 Oct 2019 19:44:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,207 +76,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- jsnow@redhat.com, armbru@redhat.com, dgilbert@redhat.com, stefanha@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ "integration@gluster.org" <integration@gluster.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- block/stream.c            | 19 +++++++++++++------
- blockdev.c                | 14 +++++++++++++-
- hmp-commands.hx           |  4 ++--
- include/block/block_int.h |  3 ++-
- monitor/hmp-cmds.c        |  5 +++--
- qapi/block-core.json      |  5 ++++-
- 6 files changed, 37 insertions(+), 13 deletions(-)
+On 10/1/19 1:55 PM, Vladimir Sementsov-Ogievskiy wrote:
 
-diff --git a/block/stream.c b/block/stream.c
-index 5562ccb..51cc49e 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -36,15 +36,21 @@ typedef struct StreamBlockJob {
-     char *backing_file_str;
-     bool bs_read_only;
-     bool chain_frozen;
-+    bool compress;
- } StreamBlockJob;
- 
--static int coroutine_fn stream_populate(BlockBackend *blk,
--                                        int64_t offset, uint64_t bytes)
-+static int coroutine_fn stream_populate(BlockBackend *blk, int64_t offset,
-+                                        uint64_t bytes, bool compress)
- {
-+    int flags = BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH;
-+
-+    if (compress) {
-+        flags |= BDRV_REQ_WRITE_COMPRESSED;
-+    }
-+
-     assert(bytes < SIZE_MAX);
- 
--    return blk_co_preadv(blk, offset, bytes, NULL,
--                         BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH);
-+    return blk_co_preadv(blk, offset, bytes, NULL, flags);
- }
- 
- static void stream_abort(Job *job)
-@@ -167,7 +173,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-         }
-         trace_stream_one_iteration(s, offset, n, ret);
-         if (copy) {
--            ret = stream_populate(blk, offset, n);
-+            ret = stream_populate(blk, offset, n, s->compress);
-         }
-         if (ret < 0) {
-             BlockErrorAction action =
-@@ -217,7 +223,7 @@ static const BlockJobDriver stream_job_driver = {
- 
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
--                  int creation_flags, int64_t speed,
-+                  int creation_flags, int64_t speed, bool compress,
-                   BlockdevOnError on_error, Error **errp)
- {
-     StreamBlockJob *s;
-@@ -267,6 +273,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     s->backing_file_str = g_strdup(backing_file_str);
-     s->bs_read_only = bs_read_only;
-     s->chain_frozen = true;
-+    s->compress = compress;
- 
-     s->on_error = on_error;
-     trace_stream_start(bs, base, s);
-diff --git a/blockdev.c b/blockdev.c
-index fbef684..290ee4b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3238,6 +3238,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-                       bool has_base_node, const char *base_node,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-+                      bool has_compress, bool compress,
-                       bool has_on_error, BlockdevOnError on_error,
-                       bool has_auto_finalize, bool auto_finalize,
-                       bool has_auto_dismiss, bool auto_dismiss,
-@@ -3254,6 +3255,10 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         on_error = BLOCKDEV_ON_ERROR_REPORT;
-     }
- 
-+    if (!has_compress) {
-+        compress = false;
-+    }
-+
-     bs = bdrv_lookup_bs(device, device, errp);
-     if (!bs) {
-         return;
-@@ -3308,6 +3313,12 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         goto out;
-     }
- 
-+    if (compress && bs->drv->bdrv_co_pwritev_compressed_part == NULL) {
-+        error_setg(errp, "Compression is not supported for this drive %s",
-+                   bdrv_get_device_name(bs));
-+        goto out;
-+    }
-+
-     /* backing_file string overrides base bs filename */
-     base_name = has_backing_file ? backing_file : base_name;
- 
-@@ -3319,7 +3330,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     }
- 
-     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
--                 job_flags, has_speed ? speed : 0, on_error, &local_err);
-+                 job_flags, has_speed ? speed : 0, compress, on_error,
-+                 &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto out;
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index cfcc044..3a347fd 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -95,8 +95,8 @@ ETEXI
- 
-     {
-         .name       = "block_stream",
--        .args_type  = "device:B,speed:o?,base:s?",
--        .params     = "device [speed [base]]",
-+        .args_type  = "device:B,speed:o?,base:s?,compress:o?",
-+        .params     = "device [speed [base]] [compress]",
-         .help       = "copy data from a backing file into a block device",
-         .cmd        = hmp_block_stream,
-     },
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 0422acd..5e7fce8 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1065,6 +1065,7 @@ int is_windows_drive(const char *filename);
-  * @creation_flags: Flags that control the behavior of the Job lifetime.
-  *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-+ * @compress: True to compress data.
-  * @on_error: The action to take upon error.
-  * @errp: Error object.
-  *
-@@ -1077,7 +1078,7 @@ int is_windows_drive(const char *filename);
-  */
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
--                  int creation_flags, int64_t speed,
-+                  int creation_flags, int64_t speed, bool compress,
-                   BlockdevOnError on_error, Error **errp);
- 
- /**
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index b2551c1..91201fe 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -2025,11 +2025,12 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
-     const char *device = qdict_get_str(qdict, "device");
-     const char *base = qdict_get_try_str(qdict, "base");
-     int64_t speed = qdict_get_try_int(qdict, "speed", 0);
-+    bool compress = qdict_get_try_bool(qdict, "compress", false);
- 
-     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
-                      false, NULL, qdict_haskey(qdict, "speed"), speed, true,
--                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
--                     &error);
-+                     compress, true, BLOCKDEV_ON_ERROR_REPORT,
-+                     false, false, false, false, &error);
- 
-     hmp_handle_error(mon, &error);
- }
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e6edd64..f41513f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2544,6 +2544,9 @@
- #
- # @speed:  the maximum speed, in bytes per second
- #
-+# @compress: true to compress data, if the target format supports it.
-+#            (default: false). Since 4.1.
-+#
- # @on-error: the action to take on an error (default report).
- #            'stop' and 'enospc' can only be used if the block device
- #            supports io-status (see BlockInfo).  Since 1.3.
-@@ -2576,7 +2579,7 @@
- { 'command': 'block-stream',
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
-             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
--            '*on-error': 'BlockdevOnError',
-+            '*compress': 'bool', '*on-error': 'BlockdevOnError',
-             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
--- 
-1.8.3.1
+>> Your patch is missing a patch to qcow2_store_persistent_dirty_bitmaps(=
+), which calls error_prepend(errp, ...).=C2=A0 However, when I manually r=
+an the same spatch command line, I also got the same failure to include a=
+ fix in that function.
+>>
+>> I'm not sure what's wrong with the .cocci script to miss that instance=
+; I've tried fiddling around with the .cocci file to see if I can spot an=
+y change to make (for example, using ... instead of <+...), but so far, w=
+ith no success at getting the second function patched.
+>>
+>=20
+>=20
+> Hmm, interesting. Actually I think that coccinelle is something that ju=
+st works bad from the beginning of these series. And here:
+>=20
 
+> but failes with:
+>=20
+> void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error *=
+*errp)
+> {
+>       QSIMPLEQ_HEAD(, Qcow2BitmapTable) drop_tables;
+>=20
+>       error_prepend(errp, "Bitmap '%s' doesn't satisfy the constraints:=
+ ",
+>                     name);
+> }
+>=20
+> So, it can't parse "QSIMPLEQ_HEAD(, Qcow2BitmapTable) drop_tables" thin=
+g..
+
+Generally, when running spatch, you want to include --macro-file=20
+scripts/cocci-macro-file.h to help coccinelle get past the worst of the=20
+preprocessor macros it can't otherwise handle.  But that is rather sad=20
+that it ignores the entire function body as soon as it encounters a=20
+parse problem, and also sad that scripts/cocci-macro-file.h isn't yet=20
+complete enough to help coccinelle past the QSIMPLEQ_HEAD() uses in our=20
+sources.  (I wonder how many other false negatives we have where we=20
+missed a code cleanup because Coccinelle silently gave up on parsing a=20
+function or file)
+
+
+> adding --recursive-includes parameter to spatch leads to error:
+>=20
+> [.. a lot of failures]
+> failed on sys/shm.h
+> failed on sys/uio.h
+> failed on qapi/qapi-types-error.h
+> failed on qapi/qapi-types-crypto.h
+> failed on sys/endian.h
+> failed on machine/bswap.h
+> failed on byteswap.h
+> failed on pthread.h
+> failed on semaphore.h
+> failed on qapi/qapi-builtin-types.h
+> failed on qapi/qapi-types-block-core.h
+> failed on qapi/qapi-types-job.h
+> failed on qcow2.h
+> Impossible: How can diff be null and have not Correct in compare_c? Tag=
+1 ("diff token: QEMU_PACKED VS QEMU_PACKED\nFile \"block/qcow2-bitmap.c\"=
+, line 59, column 15, charpos =3D 2334\n  around =3D 'QEMU_PACKED',\n  wh=
+ole content =3D typedef struct QEMU_PACKED Qcow2BitmapDirEntry {\nFile \"=
+/tmp/cocci-output-10311-cc4e45-qcow2-bitmap.c\", line 59, column 15, char=
+pos =3D 2334\n  around =3D 'QEMU_PACKED',\n  whole content =3D typedef st=
+ruct QEMU_PACKED Qcow2BitmapDirEntry {\n")
+
+Eww - that sounds like a Coccinelle bug that we should report to their=20
+upstream.
+
+>=20
+> Aha, we need -I option. Something like
+>=20
+> spatch --verbose-parsing --verbose-includes -I include -I '.' -I block =
+--recursive-includes --sp-file scripts/coccinelle/fix-error-add-info.cocc=
+i block/qcow2-bitmap.c 2>&1
+>=20
+>=20
+> And it just can't parse our includes, queue.h for example.. So many par=
+sing errors.
+
+We may not need to parse all our headers, if the --macro-file=20
+scripts/cocci-macro-file.h is sufficient.
+
+In fact, now that I found that (by reading through git log history of=20
+previous Coccinelle scripts we've run), and adding the proper=20
+--macro-file command line argument, I didn't have to add a=20
+--recursive-includes, but Coccinelle was finally able to fix that last=20
+spot in block/qcow2-bitmap.c.
+
+
+> So, it seems like coccinelle just don't work. At least it don't allow t=
+o define initializer macro.
+>=20
+> Any ideas? The series is still meaningful. Not all bugs are fixed, but =
+at least some bugs are fixed.
+>=20
+
+Using --macro-file sscripts/cocci-macro-file.h should get it a lot=20
+further.  The sad part is I don't have a quantitative way to tell how=20
+many functions/files are being silently skipped when Coccinelle runs up=20
+against something it doesn't know how to parse.
+
+> I'm afraid I can't put more effort on this topic, it already ate a lot =
+of time.
+>=20
+> As an alternative I can suggest Greg to rebase his series on my patch 0=
+4 and forget about error_append
+> and so on.
+>=20
+> Hmm or may be try some simple regex instead of coccinelle?
+>=20
+>=20
+> Something as simple as substitute
+> (^[^{}]+\([^{}]*Error \*\*errp[^{}]*\)\s*^\{)(([^}]|(?<!^)})*error_(pre=
+pend|append_hint)\(errp)
+>=20
+> by
+>=20
+> \1\n    ERRP_AUTO_PROPAGATE();\2
+>=20
+> seems work
+
+A little more blunt (and as written, not idempotent), but as long as we=20
+document whatever pattern we use (whether coccinelle or regex) and the=20
+patch is repeatable, that's less of a concern.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
