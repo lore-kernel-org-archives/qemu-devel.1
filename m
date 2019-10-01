@@ -2,109 +2,70 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA87C388F3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 04:55:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB0CC388F3
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 05:45:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16A062168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 04:55:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A062168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A45162168B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 05:45:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A45162168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFACM-0005BZ-6r
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 00:55:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36858)
+	id 1iFAyU-0003oC-Lw
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 01:45:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iFABN-0004eW-Ur
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 00:54:43 -0400
+ (envelope-from <clg@kaod.org>) id 1iFAxL-0003Hv-NL
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 01:44:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iFABL-0004CC-6P
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 00:54:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53000)
+ (envelope-from <clg@kaod.org>) id 1iFAxK-0003Kn-GU
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 01:44:15 -0400
+Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:50286)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iFABK-0004Bk-Up; Tue, 01 Oct 2019 00:54:39 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 83CAAC0568FA;
- Tue,  1 Oct 2019 04:54:37 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EB3CF10013D9;
- Tue,  1 Oct 2019 04:54:32 +0000 (UTC)
-Subject: Re: [PATCH v3 6/7] s390x/mmu: DAT table definition overhaul
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190927095831.23543-1-david@redhat.com>
- <20190927095831.23543-7-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <dccde1e6-f91f-2e65-bf04-220764d4fa2c@redhat.com>
-Date: Tue, 1 Oct 2019 06:54:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iFAxK-0003Hv-Au
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 01:44:14 -0400
+Received: from player772.ha.ovh.net (unknown [10.108.57.226])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 90BA124E8D9
+ for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 07:44:03 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id 200E9A640E55;
+ Tue,  1 Oct 2019 05:43:51 +0000 (UTC)
+Subject: Re: [PATCH v2 21/33] spapr, xics, xive: Move cpu_intc_create from
+ SpaprIrq to SpaprInterruptController
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
+ <20190927055028.11493-22-david@gibson.dropbear.id.au>
+ <20190927121649.5b9f3db7@bahia.lan> <20190930014904.GB11105@umbus.fritz.box>
+ <adb67721-5c4e-50ac-f459-a48570a45d6e@kaod.org>
+ <20190930061445.GG11105@umbus.fritz.box>
+ <75672a0f-6bae-406c-0f0c-d23cc58c9c9f@kaod.org>
+ <20191001023102.GN11105@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <9c6c7e17-0578-2313-4324-a5ca75149762@kaod.org>
+Date: Tue, 1 Oct 2019 07:43:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190927095831.23543-7-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191001023102.GN11105@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 01 Oct 2019 04:54:37 +0000 (UTC)
+X-Ovh-Tracer-Id: 16691184645595040537
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeefgdeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 178.33.111.247
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,171 +77,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/09/2019 11.58, David Hildenbrand wrote:
-> Let's use consitent names for the region/section/page table entries and
-> for the macros to extract relevant parts from virtual address. Make the=
-m
-> match the definitions in the PoP - e.g., how the relevant bits are actu=
-ally
-> called.
+On 01/10/2019 04:31, David Gibson wrote:
+> On Mon, Sep 30, 2019 at 12:13:14PM +0200, C=E9dric Le Goater wrote:
+>> On 30/09/2019 08:14, David Gibson wrote:
+>>> On Mon, Sep 30, 2019 at 07:28:45AM +0200, C=E9dric Le Goater wrote:
+>>>> On 30/09/2019 03:49, David Gibson wrote:
+>>>>> On Fri, Sep 27, 2019 at 12:16:49PM +0200, Greg Kurz wrote:
+>>>>>> On Fri, 27 Sep 2019 15:50:16 +1000
+>>>>>> David Gibson <david@gibson.dropbear.id.au> wrote:
+>>>>>>
+>>>>>>> This method essentially represents code which belongs to the inte=
+rrupt
+>>>>>>> controller, but needs to be called on all possible intcs, rather =
+than
+>>>>>>> just the currently active one.  The "dual" version therefore call=
+s
+>>>>>>> into the xics and xive versions confusingly.
+>>>>>>>
+>>>>>>> Handle this more directly, by making it instead a method on the i=
+ntc
+>>>>>>> backend, and always calling it on every backend that exists.
+>>>>>>>
+>>>>>>> While we're there, streamline the error reporting a bit.
+>>>>>>>
+>>>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>>> [snip]
+>>>>>>> @@ -525,6 +469,30 @@ static void spapr_irq_check(SpaprMachineStat=
+e *spapr, Error **errp)
+>>>>>>>  /*
+>>>>>>>   * sPAPR IRQ frontend routines for devices
+>>>>>>>   */
+>>>>>>> +int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+>>>>>>> +                              PowerPCCPU *cpu, Error **errp)
+>>>>>>> +{
+>>>>>>> +    if (spapr->xive) {
+>>>>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr->xiv=
+e);
+>>>>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_C=
+LASS(intc);
+>>>>>>> +
+>>>>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
+>>>>>>> +            return -1;
+>>>>>>> +        }
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>> +    if (spapr->ics) {
+>>>>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr->ics=
+);
+>>>>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_C=
+LASS(intc);
+>>>>>>> +
+>>>>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
+>>>>>>> +            return -1;
+>>>>>>> +        }
+>>>>>>> +    }
+>>>>>>> +
+>>>>>>
+>>>>>> Instead of these hooks, what about open-coding spapr_xive_cpu_intc=
+_create()
+>>>>>> and xics_spapr_cpu_intc_create() directly here, like you already d=
+id for the
+>>>>>> ICS and the XIVE objects in spapr_irq_init() ?
+>>>>>
+>>>>> I'd prefer not to.  The idea is I want to treat this as basically:
+>>>>>
+>>>>> 	foreach_possible_intc(intc)
+>>>>> 		intc::cpu_intc_create(...)
+>>>>>
+>>>>> If I find time I might indeed replace the explicit ics and xive
+>>>>> pointers with just an array of SpaprInterruptController *.
+>>>>
+>>>> Or you could use object_child_foreach() and check for the type. If w=
+e had
+>>>> a helper object_child_foreach_type(), we could use it elsewhere.
+>>>
+>>> I thought about that, but I don't think it quite works.  The
+>>> complication is that the xics device is made explicitly a child of th=
+e
+>>> machine, but the xive device has mmio, so it's a SusBusDevice sitting
+>>> on the root bus instead.
+>>
+>> PnvXscom works fine with Devices and SysBusDevices.
 >=20
-> Introduce defines for all bits declared in the PoP. This will come in
-> handy in follow-up patches.
->=20
-> Add a note where additional information about s390x and the used
-> definitions can be found.
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h        | 81 +++++++++++++++++++++++++++++----------
->  target/s390x/mem_helper.c | 12 +++---
->  target/s390x/mmu_helper.c | 37 ++++++++++--------
->  3 files changed, 87 insertions(+), 43 deletions(-)
->=20
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 163dae13d7..690b94c8ea 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -1,6 +1,10 @@
->  /*
->   * S/390 virtual CPU header
->   *
-> + * For details on the s390x architecture and used definitions (e.g.,
-> + * PSW, PER and DAT (Dynamic Address Translation)), please refer to
-> + * the "z/Architecture Principles of Operations" - a.k.a. PoP.
-> + *
->   *  Copyright (c) 2009 Ulrich Hecht
->   *  Copyright IBM Corp. 2012, 2018
->   *
-> @@ -558,26 +562,63 @@ QEMU_BUILD_BUG_ON(sizeof(SysIB) !=3D 4096);
->  #define ASCE_TYPE_SEGMENT     0x00        /* segment table type       =
-        */
->  #define ASCE_TABLE_LENGTH     0x03        /* region table length      =
-        */
-> =20
-> -#define REGION_ENTRY_ORIGIN   (~0xfffULL) /* region/segment table orig=
-in    */
-> -#define REGION_ENTRY_RO       0x200       /* region/segment protection=
- bit  */
-> -#define REGION_ENTRY_TF       0xc0        /* region/segment table offs=
-et    */
-> -#define REGION_ENTRY_INV      0x20        /* invalid region table entr=
-y     */
-> -#define REGION_ENTRY_TYPE_MASK 0x0c       /* region/segment table type=
- mask */
-> -#define REGION_ENTRY_TYPE_R1  0x0c        /* region first table type  =
-      */
-> -#define REGION_ENTRY_TYPE_R2  0x08        /* region second table type =
-      */
-> -#define REGION_ENTRY_TYPE_R3  0x04        /* region third table type  =
-      */
-> -#define REGION_ENTRY_LENGTH   0x03        /* region third length      =
-      */
-> -
-> -#define SEGMENT_ENTRY_ORIGIN  (~0x7ffULL) /* segment table origin     =
-   */
-> -#define SEGMENT_ENTRY_FC      0x400       /* format control           =
-   */
-> -#define SEGMENT_ENTRY_RO      0x200       /* page protection bit      =
-   */
-> -#define SEGMENT_ENTRY_INV     0x20        /* invalid segment table ent=
-ry */
-> -
-> -#define VADDR_PX              0xff000     /* page index bits   */
-> -
-> -#define PAGE_RO               0x200       /* HW read-only bit  */
-> -#define PAGE_INVALID          0x400       /* HW invalid bit    */
-> -#define PAGE_RES0             0x800       /* bit must be zero  */
-> +#define REGION_ENTRY_ORIGIN         0xfffffffffffff000ULL
-> +#define REGION_ENTRY_P              0x0000000000000200ULL
-> +#define REGION_ENTRY_TF             0x00000000000000c0ULL
-> +#define REGION_ENTRY_I              0x0000000000000020ULL
-> +#define REGION_ENTRY_TT             0x000000000000000cULL
-> +#define REGION_ENTRY_TL             0x0000000000000003ULL
-> +
-> +#define REGION_ENTRY_TT_REGION1     0x000000000000000cULL
-> +#define REGION_ENTRY_TT_REGION2     0x0000000000000008ULL
-> +#define REGION_ENTRY_TT_REGION3     0x0000000000000004ULL
-> +
-> +#define REGION3_ENTRY_RFAA          0xffffffff80000000ULL
-> +#define REGION3_ENTRY_AV            0x0000000000010000ULL
-> +#define REGION3_ENTRY_ACC           0x000000000000f000ULL
-> +#define REGION3_ENTRY_F             0x0000000000000800ULL
-> +#define REGION3_ENTRY_FC            0x0000000000000400ULL
-> +#define REGION3_ENTRY_IEP           0x0000000000000100ULL
-> +#define REGION3_ENTRY_CR            0x0000000000000010ULL
-> +
-> +#define SEGMENT_ENTRY_ORIGIN        0xfffffffffffff800ULL
-> +#define SEGMENT_ENTRY_SFAA          0xfffffffffff80000ULL
+> Uh... what's an example of it working with a SysBusDevice?  All the
+> implementors of PNV_XSCOM_INTERFACE I could find were instantiated
+> with object_initialize_child() making them explicitly children of the
+> chip.  The SPAPR_XIVE is instantiated with qdev_create(NULL,
+> TYPE_SPAPR_XIVE), making it a child of the root bus, not the machine,
+> I believe.
 
-I think SFAA should be 0xfffffffffff00000ULL instead?
+I see. We should reparent the interrupt controller then, Could we rework=20
+the code to instantiate and realize the XICS and XIVE model objects ?=20
+We have the handlers spapr_instance_init() and spapr_machine_init().=20
 
-> +#define SEGMENT_ENTRY_AV            0x0000000000010000ULL
-> +#define SEGMENT_ENTRY_ACC           0x000000000000f000ULL
-> +#define SEGMENT_ENTRY_F             0x0000000000000800ULL
-> +#define SEGMENT_ENTRY_FC            0x0000000000000400ULL
-> +#define SEGMENT_ENTRY_P             0x0000000000000200ULL
-> +#define SEGMENT_ENTRY_IEP           0x0000000000000100ULL
-> +#define SEGMENT_ENTRY_I             0x0000000000000020ULL
-> +#define SEGMENT_ENTRY_CS            0x0000000000000010ULL
-> +#define SEGMENT_ENTRY_TT            0x000000000000000cULL
-> +
-> +#define SEGMENT_ENTRY_TT_REGION1    0x000000000000000cULL
-> +#define SEGMENT_ENTRY_TT_REGION2    0x0000000000000008ULL
-> +#define SEGMENT_ENTRY_TT_REGION3    0x0000000000000004ULL
+That always has been a problem IMO.
 
-The above three definitions do not make much sense. TT should always be
-00 for segment table entries.
 
-> +#define SEGMENT_ENTRY_TT_SEGMENT    0x0000000000000000ULL
-> +
-> +#define PAGE_ENTRY_0                0x0000000000000800ULL
-> +#define PAGE_ENTRY_I                0x0000000000000400ULL
-> +#define PAGE_ENTRY_P                0x0000000000000200ULL
-> +#define PAGE_ENTRY_IEP              0x0000000000000100ULL
-> +
-> +#define VADDR_REGION1_TX_MASK       0xffe0000000000000ULL
-> +#define VADDR_REGION2_TX_MASK       0x001ffc0000000000ULL
-> +#define VADDR_REGION3_TX_MASK       0x000003ff80000000ULL
-> +#define VADDR_SEGMENT_TX_MASK       0x000000007ff00000ULL
-> +#define VADDR_PAGE_TX_MASK          0x00000000000ff000ULL
-> +
-> +#define VADDR_REGION1_TX(vaddr)     (((vaddr) & VADDR_REGION1_TX_MASK)=
- >> 53)
-> +#define VADDR_REGION2_TX(vaddr)     (((vaddr) & VADDR_REGION2_TX_MASK)=
- >> 42)
-> +#define VADDR_REGION3_TX(vaddr)     (((vaddr) & VADDR_REGION3_TX_MASK)=
- >> 31)
-> +#define VADDR_SEGMENT_TX(vaddr)     (((vaddr) & VADDR_SEGMENT_TX_MASK)=
- >> 20)
-> +#define VADDR_PAGE_TX(vaddr)        (((vaddr) & VADDR_PAGE_TX_MASK) >>=
- 12)
-> +
-> +#define VADDR_REGION1_TL(vaddr)     (((vaddr) & 0xc000000000000000ULL)=
- >> 62)
-> +#define VADDR_REGION2_TL(vaddr)     (((vaddr) & 0x0018000000000000ULL)=
- >> 51)
-> +#define VADDR_REGION3_TL(vaddr)     (((vaddr) & 0x0000030000000000ULL)=
- >> 40)
-> +#define VADDR_SEGMENT_TL(vaddr)     (((vaddr) & 0x0000000060000000ULL)=
- >> 29)
-> =20
->  #define SK_C                    (0x1 << 1)
->  #define SK_R                    (0x1 << 2)
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 44e535856d..08c5cc6a99 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
+C.=20
+=20
 
-The rest of the patch looks fine to me.
 
- Thomas
 
