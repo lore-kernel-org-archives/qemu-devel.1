@@ -2,111 +2,116 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAAFDECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 415BAC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70BF72070B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:49:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70BF72070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 145942070B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 15:51:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 145942070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKOl-0002Zk-IO
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 11:49:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46929)
+	id 1iFKQx-0004q9-4I
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 11:51:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47012)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iFK74-00027T-IQ
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:30:56 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iFK7Z-0002NV-QS
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:31:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iFK72-0008LK-R4
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:30:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43996)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iFK72-0008Jc-Iv; Tue, 01 Oct 2019 11:30:52 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 97926307D97F;
- Tue,  1 Oct 2019 15:30:51 +0000 (UTC)
-Received: from [10.36.116.54] (ovpn-116-54.ams2.redhat.com [10.36.116.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8FF9E60BE0;
- Tue,  1 Oct 2019 15:30:50 +0000 (UTC)
-Subject: Re: [PATCH v4 09/18] target/s390x: Return exception from mmu_translate
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190927193925.23567-1-richard.henderson@linaro.org>
- <20190927193925.23567-10-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <68d9b84b-7c89-46c3-a97d-2c67d75aeddf@redhat.com>
-Date: Tue, 1 Oct 2019 17:30:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <laurent@vivier.eu>) id 1iFK7X-0000sU-JC
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:31:25 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:39069)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iFK7V-0000mU-P8
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:31:23 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MCbZL-1iNGSe3yYF-009kJJ; Tue, 01 Oct 2019 17:31:08 +0200
+Subject: Re: [PATCH v2 1/3] tests/migration: mem leak fix
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+References: <cover.1568170994.git.maozhongyi@cmss.chinamobile.com>
+ <9b8662b94d89030b1f33193246c645baac2eedd7.1568170994.git.maozhongyi@cmss.chinamobile.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2731f5b5-f43d-cf97-0a1a-30f3cbd21ae0@vivier.eu>
+Date: Tue, 1 Oct 2019 17:31:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190927193925.23567-10-richard.henderson@linaro.org>
+In-Reply-To: <9b8662b94d89030b1f33193246c645baac2eedd7.1568170994.git.maozhongyi@cmss.chinamobile.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Tue, 01 Oct 2019 15:30:51 +0000 (UTC)
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:RmP/nbUz+5w8lFam1xOAX9weTGwLej1RIGftrzjurqTYt23lN7r
+ KVQC+mNhhgybNTQzo/G08YmQA4LZD0ojgrEBzi13ie7sv1aQO6VT4LW3H/4rVA3ZhmzXUgF
+ MI6/UHIPXvq/ZkJiNgHSEoQJI3edcTdcPJfXEJGVSzwkQSAZ31OUht8hA/XNnMlg0TvAdQm
+ e31JP56tMyapzP9i3WYnA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8Rg8QKNa5lw=:x7eaegzvua55BYO3iuCXbl
+ FU85fs9/5Li044yXJasmBewcQC5SaqRuH7XlJGXNB/qkUyGtjzPfPSlPOmdGYMwiv/wldQ8gI
+ ocxHDedOL9eSdsDBDEsTiJa8hMlUnWWH8145S5d0pKpicg5UsVgV1m1pK8KBlDopPo6u+Z8Lh
+ dyBc2Ubeli9VgFm2MUjPYwSEwyOuKCmlezCEJ4lmmC/3TQ/IS+RZlVbddgIorvhI6K9WJIoRh
+ 54LVdutYkko66tp0OZpwTlFcREiRyB8Ic8EIE4TV7w/3/OovrdU/TIyuqYdc0a/BJ6mEtDKJQ
+ Fixb4QvL5xETfX53I8geEFvgiV9Ezb4HbclmM7rxkASH+RBDgP5CNZjIc0omMp0kaUNr1wm6Y
+ uSJKP84cOw3oKgA4tYDHUJAeqqRCtjz07CC1JzNMQ1cuTp4Pp4z43qPAZNJmTHGMdM7Q3Skez
+ L+KSm0rtYtx6MCwE0YtYRl32OrbNKLXDwoOU7czjyKlo66AHZtbE4tQZBaCA64XWAgYCjXpLe
+ 0j90mKvPFYjOANypeZt4aSyhooJ4voMMqOg4+qJZEkyply4WWNDOlreQDFoW+UX9nGmRuZg0z
+ 6KgBgtpK3XV/513NNz5f6k5zWXG7HSTfd7HweekE+t0MPG9qXg5kRiQInx52SZekUWC6dyDXo
+ vj8iN3nfjBKWaQgesTP14IJxYzFkG8HVLA35UftqXZyV3SAjxM/dBgSxRMf8W3lOFT8tys+cj
+ lkuzKwJEbQUyLNHMRjD1yZPE4+xpSQvHDd4HqOCsSbN8tJL66fkSYaC3kDefzstV8E73+tV5j
+ iEEA4JUFuLNabnpff/Shnj+qmgvFs9ZnO/27qUHxi2cK1Jh7fHVhGdqXXuKNO4M/u2g9I1kYJ
+ E36a6246+C0285bb+2mfXdOzKtPMlph86jzQywxA4=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,218 +123,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org
+Cc: tony.nguyen@bt.com, alex.bennee@linaro.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.09.19 21:39, Richard Henderson wrote:
-> Do not raise the exception directly within mmu_translate,
-> but pass it back so that caller may do so.
+Le 11/09/2019 à 05:31, Mao Zhongyi a écrit :
+> ‘data’ has the possibility of memory leaks， so use the
+> glic macros g_autofree recommended by CODING_STYLE.rst
+> to automatically release the memory that returned from
+> g_malloc().
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Cc: armbru@redhat.com
+> Cc: laurent@vivier.eu
+> Cc: tony.nguyen@bt.com
+> Cc: alex.bennee@linaro.org
+> 
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
 > ---
->  target/s390x/internal.h    |  2 +-
->  target/s390x/excp_helper.c |  4 ++--
->  target/s390x/mem_helper.c  | 13 +++++++---
->  target/s390x/mmu_helper.c  | 49 +++++++++++++++-----------------------
->  4 files changed, 32 insertions(+), 36 deletions(-)
+>  tests/migration/stress.c | 10 ++--------
+>  1 file changed, 2 insertions(+), 8 deletions(-)
 > 
-> diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-> index c4388aaf23..c993c3ef40 100644
-> --- a/target/s390x/internal.h
-> +++ b/target/s390x/internal.h
-> @@ -360,7 +360,7 @@ void probe_write_access(CPUS390XState *env, uint64_t addr, uint64_t len,
->  
->  /* mmu_helper.c */
->  int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
-> -                  target_ulong *raddr, int *flags, bool exc);
-> +                  target_ulong *raddr, int *flags, uint64_t *tec);
->  int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
->                         target_ulong *addr, int *flags, uint64_t *tec);
->  
-> diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-> index 906b87c071..6a0728b65f 100644
-> --- a/target/s390x/excp_helper.c
-> +++ b/target/s390x/excp_helper.c
-> @@ -140,8 +140,8 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->          if (!(env->psw.mask & PSW_MASK_64)) {
->              vaddr &= 0x7fffffff;
->          }
-> -        fail = mmu_translate(env, vaddr, access_type, asc, &raddr, &prot, true);
-> -        excp = 0; /* exception already raised */
-> +        excp = mmu_translate(env, vaddr, access_type, asc, &raddr, &prot, &tec);
-> +        fail = excp;
->      } else if (mmu_idx == MMU_REAL_IDX) {
->          /* 31-Bit mode */
->          if (!(env->psw.mask & PSW_MASK_64)) {
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 7d2a652823..e15aa296dd 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -2364,8 +2364,8 @@ uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
->      CPUState *cs = env_cpu(env);
->      uint32_t cc = 0;
->      uint64_t asc = env->psw.mask & PSW_MASK_ASC;
-> -    uint64_t ret;
-> -    int old_exc, flags;
-> +    uint64_t ret, tec;
-> +    int old_exc, flags, exc;
->  
->      /* XXX incomplete - has more corner cases */
->      if (!(env->psw.mask & PSW_MASK_64) && (addr >> 32)) {
-> @@ -2373,7 +2373,14 @@ uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
->      }
->  
->      old_exc = cs->exception_index;
-> -    if (mmu_translate(env, addr, 0, asc, &ret, &flags, true)) {
-> +    exc = mmu_translate(env, addr, 0, asc, &ret, &flags, &tec);
-> +    if (exc) {
-> +        /*
-> +         * We don't care about ILEN or TEC, as we're not going to
-> +         * deliver the exception -- thus resetting exception_index below.
-> +         * TODO: clean this up.
-> +         */
-> +        trigger_pgm_exception(env, exc, ILEN_UNWIND);
->          cc = 3;
->      }
->      if (cs->exception_index == EXCP_PGM) {
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index aa8712221e..8ea1c95549 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -369,17 +369,15 @@ static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
->   * @return       0 if the translation was successful, -1 if a fault occurred
->   */
->  int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
-> -                  target_ulong *raddr, int *flags, bool exc)
-> +                  target_ulong *raddr, int *flags, uint64_t *tec)
+> diff --git a/tests/migration/stress.c b/tests/migration/stress.c
+> index d9aa4afe92..6cbb2d49d3 100644
+> --- a/tests/migration/stress.c
+> +++ b/tests/migration/stress.c
+> @@ -170,10 +170,10 @@ static unsigned long long now(void)
+>  static int stressone(unsigned long long ramsizeMB)
 >  {
-> -    /* Code accesses have an undefined ilc, let's use 2 bytes. */
-> -    const int ilen = (rw == MMU_INST_FETCH) ? 2 : ILEN_AUTO;
-> -    uint64_t tec = (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
-> -                   (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ);
->      uint64_t asce;
->      int r;
->  
-> -
-> +    *tec = (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
-> +            (rw == MMU_DATA_STORE ? FS_WRITE : FS_READ);
->      *flags = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-> +
->      if (is_low_address(vaddr & TARGET_PAGE_MASK) && lowprot_enabled(env, asc)) {
->          /*
->           * If any part of this page is currently protected, make sure the
-> @@ -391,12 +389,9 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->           */
->          *flags |= PAGE_WRITE_INV;
->          if (is_low_address(vaddr) && rw == MMU_DATA_STORE) {
-> -            if (exc) {
-> -                /* LAP sets bit 56 */
-> -                tec |= 0x80;
-> -                trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
-> -            }
-> -            return -EACCES;
-> +            /* LAP sets bit 56 */
-> +            *tec |= 0x80;
-> +            return PGM_PROTECTION;
->          }
->      }
->  
-> @@ -426,30 +421,21 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->      /* perform the DAT translation */
->      r = mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw);
->      if (unlikely(r)) {
-> -        if (exc) {
-> -            trigger_access_exception(env, r, ilen, tec);
-> -        }
-> -        return -1;
-> +        return r;
->      }
->  
->      /* check for DAT protection */
->      if (unlikely(rw == MMU_DATA_STORE && !(*flags & PAGE_WRITE))) {
-> -        if (exc) {
-> -            /* DAT sets bit 61 only */
-> -            tec |= 0x4;
-> -            trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
-> -        }
-> -        return -1;
-> +        /* DAT sets bit 61 only */
-> +        *tec |= 0x4;
-> +        return PGM_PROTECTION;
->      }
->  
->      /* check for Instruction-Execution-Protection */
->      if (unlikely(rw == MMU_INST_FETCH && !(*flags & PAGE_EXEC))) {
-> -        if (exc) {
-> -            /* IEP sets bit 56 and 61 */
-> -            tec |= 0x84;
-> -            trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
-> -        }
-> -        return -1;
-> +        /* IEP sets bit 56 and 61 */
-> +        *tec |= 0x84;
-> +        return PGM_PROTECTION;
->      }
->  
->  nodat:
-> @@ -473,9 +459,12 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
->      int ret, i, pflags;
->  
->      for (i = 0; i < nr_pages; i++) {
-> -        ret = mmu_translate(env, addr, is_write, asc, &pages[i], &pflags, true);
-> +        uint64_t tec;
-> +
-> +        ret = mmu_translate(env, addr, is_write, asc, &pages[i], &pflags, &tec);
->          if (ret) {
-> -            return ret;
-> +            trigger_access_exception(env, ret, ILEN_AUTO, tec);
-> +            return -EFAULT;
->          }
->          if (!address_space_access_valid(&address_space_memory, pages[i],
->                                          TARGET_PAGE_SIZE, is_write,
-> 
+>      size_t pagesPerMB = 1024 * 1024 / PAGE_SIZE;
+> -    char *ram = malloc(ramsizeMB * 1024 * 1024);
+> +    g_autofree char *ram = malloc(ramsizeMB * 1024 * 1024);
+>      char *ramptr;
+>      size_t i, j, k;
+> -    char *data = malloc(PAGE_SIZE);
+> +    g_autofree char *data = malloc(PAGE_SIZE);
 
-This patch breaks "tests/test-hmp"
-
-[dhildenb@desktop qemu]$ LANG=C make  check-qtest-s390x
-make[1]: Entering directory '/home/dhildenb/git/qemu/slirp'
-make[1]: Nothing to be done for 'all'.
-make[1]: Leaving directory '/home/dhildenb/git/qemu/slirp'
-        CHK version_gen.h
-  TEST    check-qtest-s390x: tests/boot-serial-test
-  TEST    check-qtest-s390x: tests/pxe-test
-  TEST    check-qtest-s390x: tests/test-netfilter
-  TEST    check-qtest-s390x: tests/test-filter-mirror
-  TEST    check-qtest-s390x: tests/test-filter-redirector
-  TEST    check-qtest-s390x: tests/drive_del-test
-  TEST    check-qtest-s390x: tests/device-plug-test
-  TEST    check-qtest-s390x: tests/virtio-ccw-test
-  TEST    check-qtest-s390x: tests/cpu-plug-test
-  TEST    check-qtest-s390x: tests/migration-test
-  TEST    check-qtest-s390x: tests/qmp-test
-  TEST    check-qtest-s390x: tests/qmp-cmd-test
-  TEST    check-qtest-s390x: tests/device-introspect-test
-  TEST    check-qtest-s390x: tests/cdrom-test
-  TEST    check-qtest-s390x: tests/machine-none-test
-  TEST    check-qtest-s390x: tests/qom-test
-  TEST    check-qtest-s390x: tests/test-hmp
-Broken pipe
-tests/libqtest.c:149: kill_qemu() detected QEMU death from signal 11
-(Segmentation fault) (core dumped)
-ERROR - too few tests run (expected 4, got 0)
-make: *** [/home/dhildenb/git/qemu/tests/Makefile.include:901:
-check-qtest-s390x] Error 1
-
-Haven't looked at the detail, but I could imagine some debug page access.
-
-The current combined tree resides at:
-https://github.com/davidhildenbrand/qemu/tree/mmu_plus_rewind
-
--- 
+So perhaps g_malloc() could be a better choice as it will exit on
+allocation failure?
 
 Thanks,
+Laurent
 
-David / dhildenb
 
