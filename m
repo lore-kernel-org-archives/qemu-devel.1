@@ -2,73 +2,55 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7029EECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97262ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:40:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 402F221855
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:39:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 402F221855
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6E8B621920
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:40:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E8B621920
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFLBe-00043E-4n
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:39:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52899)
+	id 1iFLCZ-00050m-TP
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:40:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50287)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iFKk3-0002JS-HM
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:11:12 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTQ-00005j-Gq
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iFKk2-0000w3-D1
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:11:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43952)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iFKk2-0000vP-7y
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 12:11:10 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iFKk1-0002TR-0J
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 16:11:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E11472E80CB
- for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 16:11:08 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Oct 2019 15:56:04 -0000
-From: Thomas Huth <1010484@bugs.launchpad.net>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTP-0006ue-9M
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:00 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38536)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iFKTP-0006cf-1i; Tue, 01 Oct 2019 11:53:59 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iFKT3-0004xb-5m; Tue, 01 Oct 2019 18:53:37 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jan-kiszka janitor marcandre-lureau th-huth zoup
-X-Launchpad-Bug-Reporter: Armin ranjbar (zoup)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20120608135400.14469.39467.malonedeb@gac.canonical.com>
-Message-Id: <156994536494.21544.16617017204419129423.malone@chaenomeles.canonical.com>
-Subject: [Bug 1010484] Re: slirp to accept non-local dns server
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19066";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 45ac22179e0f59fc748f508ddaa265f7a47b26e9
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Subject: [PATCH v4 29/31] nbd: Fix error_append_hint/error_prepend usage
+Date: Tue,  1 Oct 2019 18:53:17 +0300
+Message-Id: <20191001155319.8066-30-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,37 +59,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1010484 <1010484@bugs.launchpad.net>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Greg Kurz <groug@kaod.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A patch has been sent to the list now:
-https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00180.html
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
-** Changed in: qemu
-       Status: Expired =3D> In Progress
+This commit (together with its neighbors) was generated by
 
--- =
+git grep -l 'error_\(append_hint\|prepend\)(errp' | while read f; do \
+spatch --sp-file scripts/coccinelle/fix-error-add-info.cocci \
+--in-place $f; done
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1010484
+and then
 
-Title:
-  slirp to accept non-local dns server
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
 
-Status in QEMU:
-  In Progress
+(auto-msg was a file with this commit message)
 
-Bug description:
-  current version of slirp doesn't allow feeded dns address to be outside o=
-f given network.
-  in many scenarios you need to provide dns server that isn't local.
+and then by hand, for not maintained changed files:
 
-  this simple patch removes checking for if dns server isn't in local
-  subnet.
+git commit -m "<SUB-SYSTEM>: $(< auto-msg)" <FILES>
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1010484/+subscriptions
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ nbd/client.c | 5 +++++
+ nbd/server.c | 4 ++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/nbd/client.c b/nbd/client.c
+index f6733962b4..6e510f4a14 100644
+--- a/nbd/client.c
++++ b/nbd/client.c
+@@ -68,6 +68,7 @@ static int nbd_send_option_request(QIOChannel *ioc, uint32_t opt,
+                                    uint32_t len, const char *data,
+                                    Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NBDOption req;
+     QEMU_BUILD_BUG_ON(sizeof(req) != 16);
+ 
+@@ -153,6 +154,7 @@ static int nbd_receive_option_reply(QIOChannel *ioc, uint32_t opt,
+ static int nbd_handle_reply_err(QIOChannel *ioc, NBDOptionReply *reply,
+                                 bool strict, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     g_autofree char *msg = NULL;
+ 
+     if (!(reply->type & (1 << 31))) {
+@@ -331,6 +333,7 @@ static int nbd_receive_list(QIOChannel *ioc, char **name, char **description,
+ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_t opt,
+                               NBDExportInfo *info, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NBDOptionReply reply;
+     uint32_t len = strlen(info->name);
+     uint16_t type;
+@@ -870,6 +873,7 @@ static int nbd_start_negotiate(AioContext *aio_context, QIOChannel *ioc,
+                                bool structured_reply, bool *zeroes,
+                                Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     uint64_t magic;
+ 
+     trace_nbd_start_negotiate(tlscreds, hostname ? hostname : "<null>");
+@@ -1005,6 +1009,7 @@ int nbd_receive_negotiate(AioContext *aio_context, QIOChannel *ioc,
+                           const char *hostname, QIOChannel **outioc,
+                           NBDExportInfo *info, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int result;
+     bool zeroes;
+     bool base_allocation = info->base_allocation;
+diff --git a/nbd/server.c b/nbd/server.c
+index d8d1e62455..e7eb154f53 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -365,6 +365,7 @@ static int nbd_opt_read_name(NBDClient *client, char *name, uint32_t *length,
+ static int nbd_negotiate_send_rep_list(NBDClient *client, NBDExport *exp,
+                                        Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     size_t name_len, desc_len;
+     uint32_t len;
+     const char *name = exp->name ? exp->name : "";
+@@ -427,6 +428,7 @@ static void nbd_check_meta_export(NBDClient *client)
+ static int nbd_negotiate_handle_export_name(NBDClient *client, bool no_zeroes,
+                                             Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     char name[NBD_MAX_NAME_SIZE + 1];
+     char buf[NBD_REPLY_EXPORT_NAME_SIZE] = "";
+     size_t len;
+@@ -1260,6 +1262,7 @@ static int nbd_negotiate_options(NBDClient *client, Error **errp)
+  */
+ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     char buf[NBD_OLDSTYLE_NEGOTIATE_SIZE] = "";
+     int ret;
+ 
+@@ -1631,6 +1634,7 @@ void nbd_export_close(NBDExport *exp)
+ 
+ void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     if (mode == NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clients)) {
+         nbd_export_close(exp);
+         return;
+-- 
+2.21.0
+
 
