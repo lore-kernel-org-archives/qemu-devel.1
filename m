@@ -2,91 +2,109 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96187C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBFC6C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:26:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5995521855
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:21:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SghKJhyu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5995521855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDECF20673
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 14:26:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDECF20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFJ1i-0002iq-JE
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 10:21:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37654)
+	id 1iFJ6F-0004t0-W9
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 10:26:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38194)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jmattson@google.com>) id 1iFJ0u-0002Gm-JD
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:20:30 -0400
+ (envelope-from <thuth@redhat.com>) id 1iFJ5V-0004Dm-71
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:25:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jmattson@google.com>) id 1iFJ0t-0004bN-82
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:20:28 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:46995)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jmattson@google.com>) id 1iFJ0t-0004af-1q
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:20:27 -0400
-Received: by mail-io1-xd43.google.com with SMTP id c6so48211904ioo.13
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 07:20:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=D/xSwAO+ZHPX/90H8l9qiIZ/X2lvmU5qlfHvvHmawI8=;
- b=SghKJhyuubfUZGba9D/J3HbXP788J5my0wVH+70DG65wZCi0tD81arck0qSRRFOc5p
- ROa9DY+5OQiLSKDAWgz9ZxOOuqyecT5SZbjarSpZVJMrrdM2v5xstDXZM6r6LEQTSsy/
- JpL8w/eYqsOdhP5mA84yBexYXyNIQwHqIwjzkfoca8hTjwFuedCv0SB33LDnjB9km3Wu
- pgCtd4C6zReX7mKSHIBbt8fgv6+5j8aPfNLW+RRBBo3nndV+5oiGzjypuYfC3EIw9lb1
- sdQioFkHVeVershGm9BJ9HH37tou059WCQ7erjx2tv9vmrk0z2lCyIN2US01DrdWmPT5
- Ls2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=D/xSwAO+ZHPX/90H8l9qiIZ/X2lvmU5qlfHvvHmawI8=;
- b=loonE2og0fAPsbYAXAqbEId4DHtIcIOoDuc0geELJnRlhlEPcjnPCvNRPhszJ7Nl+z
- U79Ld+2TxPwk3tHJtfO7mIW1MGtQ4FwWVVoNtn87ZNfKIWRjBbMHoTNfelhuiylf1BGU
- 4RC3yMS0LS17dHN/sTqRMgFDEJPtzrMlL0e5wjHDwXR+jU8vT1EbUMAqKu8DZfpaZGa1
- GAZkEdq5pHS00hlfkCWngrrHPvCmhGxRh1x6bDUvr15fZKMTe0YCNaM3IFDphU7nWGKa
- DrGEIVZJVwAyqhHQZA5DCDfx0exBR3AGT5enG+RtKuIm/j9LoCwrJsK2gI0uaSuNF/SW
- vkWA==
-X-Gm-Message-State: APjAAAVih3RZfGdNIU0KcIqL69Y6g/H3PxG4RRpLNrCTlgxocGRoTYy/
- 4OHnYA43F04lWx0Ak31IGbDRtwNIjUqqEXVGtQBgSQ==
-X-Google-Smtp-Source: APXvYqxcvuQbyQ2lsmmk9D+terHcutbpXWHXy3e3XC8Gq2nJlGu4QIv5X/u+eSgAAB6aXCYaaTBZIAtbRCY3Lz4mxfI=
-X-Received: by 2002:a92:5ad1:: with SMTP id b78mr26611534ilg.118.1569939625754; 
- Tue, 01 Oct 2019 07:20:25 -0700 (PDT)
+ (envelope-from <thuth@redhat.com>) id 1iFJ5T-0002Wl-Nt
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:25:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57422)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iFJ5T-0002VA-Ff
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 10:25:11 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6D3583090FD2
+ for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 14:25:10 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 93BDE1001B11;
+ Tue,  1 Oct 2019 14:25:09 +0000 (UTC)
+Subject: Re: [PATCH 1/8] ide: fix leak from qemu_allocate_irqs
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1569936988-635-1-git-send-email-pbonzini@redhat.com>
+ <1569936988-635-2-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <e978cd0c-2ed3-2329-6b2e-51d87dc8841c@redhat.com>
+Date: Tue, 1 Oct 2019 16:25:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <1545227503-214403-1-git-send-email-robert.hu@linux.intel.com>
- <CALMp9eRZCoZbeyttZdvaCUpOFKygTNVF_x7+TWh6MktmF-ZK9A@mail.gmail.com>
- <263d31d9-b21e-ceb9-b47c-008e30bbd94f@redhat.com>
- <CALMp9eRFWq+F1Dwb8NcBd-Bo-YbT6KMOLo8DoinQQfK9hEi5Qg@mail.gmail.com>
- <20190930175449.GB4084@habkost.net>
- <CALMp9eR88jE7YV-TmZSSD2oJhEpbsgo-LCgsWHkyFtHcHTmnzw@mail.gmail.com>
- <9bbe864ab8fb16d9e64745b930c89b1db24ccc3a.camel@intel.com>
-In-Reply-To: <9bbe864ab8fb16d9e64745b930c89b1db24ccc3a.camel@intel.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Tue, 1 Oct 2019 07:20:17 -0700
-Message-ID: <CALMp9eSe_7on+F=ng05DkvvBpnWhSirEpSVz9Bua4Sy606xJnw@mail.gmail.com>
-Subject: Re: [PATCH] x86: Add CPUID KVM support for new instruction WBNOINVD
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, 
- "robert.hu@linux.intel.com" <robert.hu@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Hu, Robert" <robert.hu@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d43
+In-Reply-To: <1569936988-635-2-git-send-email-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Tue, 01 Oct 2019 14:25:10 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,131 +120,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 30, 2019 at 5:45 PM Huang, Kai <kai.huang@intel.com> wrote:
->
-> On Mon, 2019-09-30 at 12:23 -0700, Jim Mattson wrote:
-> > On Mon, Sep 30, 2019 at 10:54 AM Eduardo Habkost <ehabkost@redhat.com> =
-wrote:
-> > > CCing qemu-devel.
-> > >
-> > > On Tue, Sep 24, 2019 at 01:30:04PM -0700, Jim Mattson wrote:
-> > > > On Wed, Dec 19, 2018 at 1:02 PM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
-> > > > > On 19/12/18 18:39, Jim Mattson wrote:
-> > > > > > Is this an instruction that kvm has to be able to emulate befor=
-e it
-> > > > > > can enumerate its existence?
-> > > > >
-> > > > > It doesn't have any operands, so no.
-> > > > >
-> > > > > Paolo
-> > > > >
-> > > > > > On Wed, Dec 19, 2018 at 5:51 AM Robert Hoo <robert.hu@linux.int=
-el.com>
-> > > > > > wrote:
-> > > > > > > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> > > > > > > ---
-> > > > > > >  arch/x86/include/asm/cpufeatures.h | 1 +
-> > > > > > >  arch/x86/kvm/cpuid.c               | 2 +-
-> > > > > > >  2 files changed, 2 insertions(+), 1 deletion(-)
-> > > > > > >
-> > > > > > > diff --git a/arch/x86/include/asm/cpufeatures.h
-> > > > > > > b/arch/x86/include/asm/cpufeatures.h
-> > > > > > > index 28c4a50..932b19f 100644
-> > > > > > > --- a/arch/x86/include/asm/cpufeatures.h
-> > > > > > > +++ b/arch/x86/include/asm/cpufeatures.h
-> > > > > > > @@ -280,6 +280,7 @@
-> > > > > > >  /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), w=
-ord 13
-> > > > > > > */
-> > > > > > >  #define X86_FEATURE_CLZERO             (13*32+ 0) /* CLZERO
-> > > > > > > instruction */
-> > > > > > >  #define X86_FEATURE_IRPERF             (13*32+ 1) /* Instruc=
-tions
-> > > > > > > Retired Count */
-> > > > > > > +#define X86_FEATURE_WBNOINVD           (13*32+ 9) /* Writeba=
-ck and
-> > > > > > > Don't invalid cache */
-> > > > > > >  #define X86_FEATURE_XSAVEERPTR         (13*32+ 2) /* Always
-> > > > > > > save/restore FP error pointers */
-> > > > > > >  #define X86_FEATURE_AMD_IBPB           (13*32+12) /* "" Indi=
-rect
-> > > > > > > Branch Prediction Barrier */
-> > > > > > >  #define X86_FEATURE_AMD_IBRS           (13*32+14) /* "" Indi=
-rect
-> > > > > > > Branch Restricted Speculation */
-> > > > > > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > > > > > index cc6dd65..763e115 100644
-> > > > > > > --- a/arch/x86/kvm/cpuid.c
-> > > > > > > +++ b/arch/x86/kvm/cpuid.c
-> > > > > > > @@ -380,7 +380,7 @@ static inline int __do_cpuid_ent(struct
-> > > > > > > kvm_cpuid_entry2 *entry, u32 function,
-> > > > > > >
-> > > > > > >         /* cpuid 0x80000008.ebx */
-> > > > > > >         const u32 kvm_cpuid_8000_0008_ebx_x86_features =3D
-> > > > > > > -               F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) |
-> > > > > > > F(VIRT_SSBD) |
-> > > > > > > +               F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) |
-> > > > > > > F(AMD_SSBD) | F(VIRT_SSBD) |
-> > > > > > >                 F(AMD_SSB_NO) | F(AMD_STIBP);
-> > > > > > >
-> > > > > > >         /* cpuid 0xC0000001.edx */
-> > > > > > > --
-> > > > > > > 1.8.3.1
-> > > > > > >
-> > > >
-> > > > What is the point of enumerating support for WBNOINVD if kvm is goi=
-ng
-> > > > to implement it as WBINVD?
-> > >
-> > > I expect GET_SUPPORTED_CPUID to return WBNOINVD, because it
-> > > indicates to userspace what is supported by KVM.  Are there any
-> > > expectations that GET_SUPPORTED_CPUID will also dictate what is
-> > > enabled by default in some cases?
-> > >
-> > > In either case, your question applies to QEMU: why do we want
-> > > WBNOINVD to be enabled by "-cpu host" by default and be part of
-> > > QEMU's Icelake-* CPU model definitions?
-> >
-> > I had only looked at the SVM implementation of WBNOINVD, which is
-> > exactly the same as the SVM implementation of WBINVD. So, the question
-> > is, "why enumerate WBNOINVD if its implementation is exactly the same
-> > as WBINVD?"
-> >
-> > WBNOINVD appears to be only partially documented in Intel document
-> > 319433-037, "Intel=C2=AE Architecture Instruction Set Extensions and Fu=
-ture
-> > Features Programming Reference." In particular, there is no
-> > documentation regarding the instruction's behavior in VMX non-root
-> > mode. Does WBNOINVD cause a VM-exit when the VM-execution control,
-> > "WBINVD exiting," is set? If so, does it have the same VM-exit reason
-> > as WBINVD (54), or a different one? If it does have the same VM-exit
-> > reason (a la SVM), how does one distinguish a WBINVD VM-exit from a
-> > WBNOINVD VM-exit? If one can't distinguish (a la SVM), then it would
-> > seem that the VMX implementation also implements WBNOINVD as WBINVD.
-> > If that's the case, the question for VMX is the same as for SVM.
->
-> Unfortunately WBNOINVD interaction with VMX has not been made to public y=
-et. I
-> am reaching out internally to see when it can be done. I agree it may not=
- be
-> necessary to expose WBNOINVD if its implementation is exactly the same as
-> WBINVD, but it also doesn't have any harm, right?
+On 01/10/2019 15.36, Paolo Bonzini wrote:
+> The array returned by qemu_allocate_irqs is malloced, free it.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/ide/cmd646.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
+> index f3ccd11..19984d2 100644
+> --- a/hw/ide/cmd646.c
+> +++ b/hw/ide/cmd646.c
+> @@ -300,6 +300,7 @@ static void pci_cmd646_ide_realize(PCIDevice *dev, Error **errp)
+>          d->bmdma[i].bus = &d->bus[i];
+>          ide_register_restart_cb(&d->bus[i]);
+>      }
+> +    g_free(irq);
+>  
+>      vmstate_register(DEVICE(dev), 0, &vmstate_ide_pci, d);
+>      qemu_register_reset(cmd646_reset, d);
+> 
 
-If nested VMX changes are necessary to be consistent with hardware,
-then enumerating WBNOINVD support in the guest CPUID information at
-this time--without the attendant nested VMX changes--is premature. No
-changes to nested SVM are necessary, so it's fine for AMD systems.
+Maybe you could also update the description of qemu_allocate_irqs() to
+state that the returned pointer should be g_free'd later?
 
-If no changes to nested VMX are necessary, then it is true that
-WBNOINVD can be emulated by WBINVD. However, it provides no value to
-specifically enumerate the instruction.
-
-If there is some value that I'm missing, then why make guest support
-for the instruction contingent on host support for the instruction?
-KVM can implement WBNOINVD as WBINVD on any host with WBINVD,
-regardless of whether or not the host supports WBNOINVD.
-
-> Thanks,
-> -Kai
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
