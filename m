@@ -6,86 +6,84 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E65C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D10AECE587
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:39:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86C8920842
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:39:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86C8920842
+	by mail.kernel.org (Postfix) with ESMTPS id D3A6E20B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:39:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3A6E20B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFTcE-0001TI-0V
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:39:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40729)
+	id 1iFTcS-0001t8-Dx
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41958)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsd-00023g-Jw
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:36 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRtI-0002fE-2l
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0002b0-Sm
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20292)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRtG-0003cS-Gx
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:49:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13148)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsV-00023C-So; Tue, 01 Oct 2019 19:48:24 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ id 1iFRtD-00034r-FJ; Tue, 01 Oct 2019 19:49:07 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlP3r074782; Tue, 1 Oct 2019 19:48:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdv2vq5j-1
+ x91NmY9E144416; Tue, 1 Oct 2019 19:48:34 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vccr3f2e8-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:48:00 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91Nm0ae076040;
- Tue, 1 Oct 2019 19:48:00 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdv2vq53-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:48:00 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjqmL001450;
- Tue, 1 Oct 2019 23:47:59 GMT
+ Tue, 01 Oct 2019 19:48:33 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjkFE006374;
+ Tue, 1 Oct 2019 23:47:17 GMT
 Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
- [9.57.198.28]) by ppma03wdc.us.ibm.com with ESMTP id 2v9y56yf8y-1
+ [9.57.198.28]) by ppma04wdc.us.ibm.com with ESMTP id 2v9y57ye6x-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:59 +0000
+ Tue, 01 Oct 2019 23:47:17 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
  by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NlwnP53674338
+ x91NlGwA36897024
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:58 GMT
+ Tue, 1 Oct 2019 23:47:16 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8EBD928060;
- Tue,  1 Oct 2019 23:47:58 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 7E7C828066;
+ Tue,  1 Oct 2019 23:47:16 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 72FCA2805A;
- Tue,  1 Oct 2019 23:47:58 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 61C0328058;
+ Tue,  1 Oct 2019 23:47:16 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:58 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:16 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 85/97] blockjob: update nodes head while removing all bdrv
-Date: Tue,  1 Oct 2019 18:46:04 -0500
-Message-Id: <20191001234616.7825-86-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 10/97] spapr/xive: fix EQ page addresses above 64GB
+Date: Tue,  1 Oct 2019 18:44:49 -0500
+Message-Id: <20191001234616.7825-11-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-10-01_10:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x91NmY9E144416
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,69 +97,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Sergio Lopez <slp@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-stable@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sergio Lopez <slp@redhat.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-block_job_remove_all_bdrv() iterates through job->nodes, calling
-bdrv_root_unref_child() for each entry. The call to the latter may
-reach child_job_[can_]set_aio_ctx(), which will also attempt to
-traverse job->nodes, potentially finding entries that where freed
-on previous iterations.
+The high order bits of the address of the OS event queue is stored in
+bits [4-31] of word2 of the XIVE END internal structures and the low
+order bits in word3. This structure is using Big Endian ordering and
+computing the value requires some simple arithmetic which happens to
+be wrong. The mask removing bits [0-3] of word2 is applied to the
+wrong value and the resulting address is bogus when above 64GB.
 
-To avoid this situation, update job->nodes head on each iteration to
-ensure that already freed entries are no longer linked to the list.
+Guests with more than 64GB of RAM will allocate pages for the OS event
+queues which will reside above the 64GB limit. In this case, the XIVE
+device model will wake up the CPUs in case of a notification, such as
+IPIs, but the update of the event queue will be written at the wrong
+place in memory. The result is uncertain as the guest memory is
+trashed and IPI are not delivered.
 
-RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=1746631
-Signed-off-by: Sergio Lopez <slp@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190911100316.32282-1-mreitz@redhat.com
-Reviewed-by: Sergio Lopez <slp@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit d876bf676f5e7c6aa9ac64555e48cba8734ecb2f)
+Introduce a helper xive_end_qaddr() to compute this value correctly in
+all places where it is used.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190508171946.657-3-clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+(cherry picked from commit 13df93244efbd4bb8b4cf4e26104a26033178674)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- blockjob.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ hw/intc/spapr_xive.c       | 3 +--
+ hw/intc/xive.c             | 9 +++------
+ include/hw/ppc/xive_regs.h | 6 ++++++
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 730101d282..d770144fd6 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -193,14 +193,23 @@ static const BdrvChildRole child_job = {
- 
- void block_job_remove_all_bdrv(BlockJob *job)
- {
--    GSList *l;
--    for (l = job->nodes; l; l = l->next) {
-+    /*
-+     * bdrv_root_unref_child() may reach child_job_[can_]set_aio_ctx(),
-+     * which will also traverse job->nodes, so consume the list one by
-+     * one to make sure that such a concurrent access does not attempt
-+     * to process an already freed BdrvChild.
-+     */
-+    while (job->nodes) {
-+        GSList *l = job->nodes;
-         BdrvChild *c = l->data;
-+
-+        job->nodes = l->next;
-+
-         bdrv_op_unblock_all(c->bs, job->blocker);
-         bdrv_root_unref_child(c);
-+
-+        g_slist_free_1(l);
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 097f88d460..db75f5d608 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -1144,8 +1144,7 @@ static target_ulong h_int_get_queue_config(PowerPCC=
+PU *cpu,
      }
--    g_slist_free(job->nodes);
--    job->nodes = NULL;
- }
- 
- int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
--- 
+=20
+     if (xive_end_is_enqueue(end)) {
+-        args[1] =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff) << 32
+-            | be32_to_cpu(end->w3);
++        args[1] =3D xive_end_qaddr(end);
+         args[2] =3D xive_get_field32(END_W0_QSIZE, end->w0) + 12;
+     } else {
+         args[1] =3D 0;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index a0b87001da..dcf2fcd108 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1042,8 +1042,7 @@ static const TypeInfo xive_source_info =3D {
+=20
+ void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width, Monitor=
+ *mon)
+ {
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qentries =3D 1 << (qsize + 10);
+@@ -1072,8 +1071,7 @@ void xive_end_queue_pic_print_info(XiveEND *end, ui=
+nt32_t width, Monitor *mon)
+=20
+ void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
+n)
+ {
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+@@ -1101,8 +1099,7 @@ void xive_end_pic_print_info(XiveEND *end, uint32_t=
+ end_idx, Monitor *mon)
+=20
+ static void xive_end_enqueue(XiveEND *end, uint32_t data)
+ {
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
+diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+index bf36678a24..1a8c5b5e64 100644
+--- a/include/hw/ppc/xive_regs.h
++++ b/include/hw/ppc/xive_regs.h
+@@ -208,6 +208,12 @@ typedef struct XiveEND {
+ #define xive_end_is_backlog(end)  (be32_to_cpu((end)->w0) & END_W0_BACKL=
+OG)
+ #define xive_end_is_escalate(end) (be32_to_cpu((end)->w0) & END_W0_ESCAL=
+ATE_CTL)
+=20
++static inline uint64_t xive_end_qaddr(XiveEND *end)
++{
++    return ((uint64_t) be32_to_cpu(end->w2) & 0x0fffffff) << 32 |
++        be32_to_cpu(end->w3);
++}
++
+ /* Notification Virtual Target (NVT) */
+ typedef struct XiveNVT {
+         uint32_t        w0;
+--=20
 2.17.1
 
 
