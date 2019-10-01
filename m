@@ -2,89 +2,83 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E238C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:26:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3FDECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62B32215EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:26:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62B32215EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id B3BED2133F
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 18:36:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="EJonZtdK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3BED2133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFMrQ-00063H-HF
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 14:26:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40467)
+	id 1iFN0T-0001XG-H5
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 14:36:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41411)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iFMpM-0004rY-SN
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:24:50 -0400
+ (envelope-from <palmer@sifive.com>) id 1iFMyJ-0008Jr-Dd
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:34:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iFMpK-00082m-LZ
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:24:48 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:47904
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iFMpK-00082Q-FX; Tue, 01 Oct 2019 14:24:46 -0400
-Received: from host86-133-194-221.range86-133.btcentralplus.com
- ([86.133.194.221] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iFMpb-0007ex-Lx; Tue, 01 Oct 2019 19:25:04 +0100
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <bf30baf5-4d75-dc6f-c30a-57b80714999b@ilande.co.uk>
- <CAL1e-=gcK2mdtrt9vibHGpbm4_FZgQWTA91+p=9ouuMYmZwPqQ@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <c9679b01-91c3-3d69-fb38-dfef1602dcf4@ilande.co.uk>
-Date: Tue, 1 Oct 2019 19:24:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <CAL1e-=gcK2mdtrt9vibHGpbm4_FZgQWTA91+p=9ouuMYmZwPqQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+ (envelope-from <palmer@sifive.com>) id 1iFMyI-0002ha-3c
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:34:03 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43377)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iFMyH-0002h8-Uc
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 14:34:02 -0400
+Received: by mail-pg1-x542.google.com with SMTP id v27so10245613pgk.10
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 11:34:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=S6a5oA3Zj6JrzqQjT6/wQI3o70xoT4MbmOz5qrTzy84=;
+ b=EJonZtdKHP3xCRc9u71MMH/41QaBX1QO0p6JxCyjkcGgYS9Lc97bcQIkYfeipkSPe1
+ e2UEiOU7xgsGGX+jqK4vwn4Gc2V66JOcK3kKl+SgipTHr7dnpjh2+nwoVF12MKb8YF5M
+ z6kEC6bBx+YUfMiSkqmPc1yN50BaIqcISUIgMLgjKei+75JoIhd2CD69YIEFwNYM0CRs
+ BIVPzkUQTVdMBtwfL5qdshkzLTLCF9gRfSN2cF1xuMEMfQgoB6NuHy4a8MJhxz8Q6l/6
+ v8FMrlbcXcj7VCD6FY2pMQv5gpoyw4Sik0lOw7waneiqZHcQHFpiQ//MbqdwkydXoECH
+ cjkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=S6a5oA3Zj6JrzqQjT6/wQI3o70xoT4MbmOz5qrTzy84=;
+ b=r9x8WXGVH7cetlztPCCjGxp+7EKkT68ImhThFfPbs0dvsmlLBjUYYSAahig0IBX0FD
+ Us5HJhEF/BvZoJOSSaOxoJzsF7NuW6u0GsqUIF7mjyheurMCcGooUY4BEVK2TkUePzs9
+ gXLCOwYT26yVqQuLmwh+z8ZnIiC50NcoBEglwJbLaycm7FK9dJHMLhPMHBDQVP2M5Axm
+ j/jqQBDavFzNEkTCbKwssXh/lmnHL2g+yDv3oAKPx4jzJuOubYzsyJSVGWz76ibRk2k+
+ CA6lzHoWZq2DGOnK//yvsGAFaRPjqmlCEw72XYLpY4dQL2+N1yaDeDg2UKWmQJ5IEj1l
+ DBNg==
+X-Gm-Message-State: APjAAAVIC6ha1/vSPnIpBLTwSBkXaZSTDBaS5BIajs3kMlCDj0lbyVPU
+ H+kUCQwmBAQh+TylVQ0bnhokmsDiVSX0Og==
+X-Google-Smtp-Source: APXvYqwCHOF1mdeKfYaRJ25LqX8lifdSE5T1sA9JBgRGxl9uvtzQvLUedip/7XlfwSfVZhcPmJ7eAQ==
+X-Received: by 2002:a62:e106:: with SMTP id q6mr28730857pfh.14.1569954840139; 
+ Tue, 01 Oct 2019 11:34:00 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id c3sm3551608pgl.51.2019.10.01.11.33.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Oct 2019 11:33:59 -0700 (PDT)
+Date: Tue, 01 Oct 2019 11:33:59 -0700 (PDT)
+X-Google-Original-Date: Tue, 01 Oct 2019 11:27:13 PDT (-0700)
+Subject: Re: [PATCH v1 17/28] target/riscv: Add Hypervisor trap return support
+In-Reply-To: <6e2920dbef1ed86b8784827200525c5a112468b2.1566603412.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <mhng-5f63f9ba-daec-4cae-a1f8-23f2a59a244b@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.133.194.221
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: target/ppc: bug in optimised vsl/vsr implementation?
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.43.2.167
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,98 +90,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefan.brankovic@rt-rk.com, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Paul Clarke <pc@us.ibm.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-riscv@nongnu.org, Anup Patel <Anup.Patel@wdc.com>,
+ qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/09/2019 18:45, Aleksandar Markovic wrote:
+On Fri, 23 Aug 2019 16:38:34 PDT (-0700), Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/op_helper.c | 66 ++++++++++++++++++++++++++++++++--------
+>  1 file changed, 54 insertions(+), 12 deletions(-)
+>
+> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> index beb34e705b..5bcf5d2ff7 100644
+> --- a/target/riscv/op_helper.c
+> +++ b/target/riscv/op_helper.c
+> @@ -73,6 +73,8 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
+>
+>  target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
+>  {
+> +    target_ulong prev_priv, prev_virt, mstatus;
+> +
+>      if (!(env->priv >= PRV_S)) {
+>          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+>      }
+> @@ -87,16 +89,46 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
+>          riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+>      }
+>
+> -    target_ulong mstatus = *env->mstatus;
+> -    target_ulong prev_priv = get_field(mstatus, MSTATUS_SPP);
+> -    mstatus = set_field(mstatus,
+> -        env->priv_ver >= PRIV_VERSION_1_10_0 ?
+> -        MSTATUS_SIE : MSTATUS_UIE << prev_priv,
+> -        get_field(mstatus, MSTATUS_SPIE));
+> -    mstatus = set_field(mstatus, MSTATUS_SPIE, 0);
+> -    mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
+> +    mstatus = *env->mstatus;
+> +
+> +    if (riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
+> +        /* We support Hypervisor extensions and virtulisation is disabled */
+> +        target_ulong hstatus = env->hstatus;
+> +
+> +        prev_priv = get_field(mstatus, MSTATUS_SPP);
+> +        prev_virt = get_field(hstatus, HSTATUS_SPV);
+> +
+> +        hstatus = set_field(hstatus, HSTATUS_SPV,
+> +                                 get_field(hstatus, HSTATUS_SP2V));
+> +        mstatus = set_field(mstatus, MSTATUS_SPP,
+> +                            get_field(hstatus, HSTATUS_SP2P));
+> +        hstatus = set_field(hstatus, HSTATUS_SP2V, 0);
+> +        hstatus = set_field(hstatus, HSTATUS_SP2P, 0);
+> +        mstatus = set_field(mstatus, SSTATUS_SIE,
+> +                            get_field(mstatus, SSTATUS_SPIE));
+> +        mstatus = set_field(mstatus, SSTATUS_SPIE, 1);
+> +
+> +        *env->mstatus = mstatus;
+> +        env->hstatus = hstatus;
+> +
+> +        if (prev_virt == VIRT_ON) {
+> +            riscv_cpu_swap_hypervisor_regs(env);
+> +        }
+> +
+> +        riscv_cpu_set_virt_enabled(env, prev_virt);
+> +    } else {
+> +        prev_priv = get_field(mstatus, MSTATUS_SPP);
+> +
+> +        mstatus = set_field(mstatus,
+> +            env->priv_ver >= PRIV_VERSION_1_10_0 ?
+> +            MSTATUS_SIE : MSTATUS_UIE << prev_priv,
+> +            get_field(mstatus, MSTATUS_SPIE));
+> +        mstatus = set_field(mstatus, MSTATUS_SPIE, 0);
+> +        mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
+> +        *env->mstatus = mstatus;
+> +    }
+> +
+>      riscv_cpu_set_mode(env, prev_priv);
+> -    *env->mstatus = mstatus;
+>
+>      return retpc;
+>  }
+> @@ -114,14 +146,24 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
+>
+>      target_ulong mstatus = *env->mstatus;
+>      target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
+> +    target_ulong prev_virt = get_field(mstatus, MSTATUS_MPV);
+>      mstatus = set_field(mstatus,
+>          env->priv_ver >= PRIV_VERSION_1_10_0 ?
+>          MSTATUS_MIE : MSTATUS_UIE << prev_priv,
+>          get_field(mstatus, MSTATUS_MPIE));
+> -    mstatus = set_field(mstatus, MSTATUS_MPIE, 0);
+> -    mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
+> -    riscv_cpu_set_mode(env, prev_priv);
+> +    mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
+> +    mstatus = set_field(mstatus, MSTATUS_MPP, 0);
+> +    mstatus = set_field(mstatus, MSTATUS_MPV, 0);
+>      *env->mstatus = mstatus;
+> +    riscv_cpu_set_mode(env, prev_priv);
+> +
+> +    if (riscv_has_ext(env, RVH)) {
+> +        if (prev_virt == VIRT_ON) {
+> +            riscv_cpu_swap_hypervisor_regs(env);
+> +        }
+> +
+> +        riscv_cpu_set_virt_enabled(env, prev_virt);
+> +    }
+>
+>      return retpc;
+>  }
 
-Hi Aleksandar,
-
-Thanks for taking a look at this!
-
-> Mark and Paul (and Stefan),
-> 
-> Thanks for spotting this and pinpointing the culprit commit. I guess Stefan is going
-> to respond soon, but, in the meantime, I took a look at the commit in question:
-> 
-> https://github.com/qemu/qemu/commit/4e6d0920e7547e6af4bbac5ffe9adfe6ea621822
-> 
-> I don't have at the moment any dev/test environment handy, but I did manual
-> inspection of the code, and here is what I found (in order of importance, perceived
-> by me):
-> 
-> 1. The code will not work correctly if the shift ammount (variable 'sh') is 0. This
-> is because, in that case, one of succeeding invocations of TCG shift functions will
-> be required to shift a 64-bit TCG variable by 64 bits, and the result of such TCG
-> operation is undefined (shift amount must be 63 or less) - see
-> https://github.com/qemu/qemu/blob/master/tcg/README.
-
-Yes I think you're right here - the old helper got around this by doing an explicit
-copy from a to r if the shift value is zero. In fact the case that Paul reported is
-exactly this:
-
-   vsl VRT, VRA, VRB
-
-=> 0x100006e0 <vec_slq+132>: vsl v0,v0,v1
-(gdb) p $vr0.uint128
-$21 = 0x10111213141516172021222324252650
-(gdb) p $vr1.uint128
-$22 = 0x0
-(gdb) stepi
-0x00000000100006e4 in vec_slq ()
-1: x/i $pc
-=> 0x100006e4 <vec_slq+136>: xxlor vs0,vs32,vs32
-(gdb) p $vr0.uint128
-$23 = 0x10111213141516172021222324252650
-
-I guess the solution is check for sh == 0 and if this is the case, execute a copy
-instead.
-
-> 2. Variable naming is better in the old helper than in the new translator. In that
-> light, I would advise Stefan to change 'sh' to 'shift', and 'shifted' to 'carry'.
-
-It looks like the name "sh" comes from the ISA documentation, so whilst it's a little
-tricky to compare with the previous implementation it does make sense when comparing
-with the algorithm shown there. Note: this implementation also drops the check for
-each byte of VRB having the same shift value - should we care about this?
-
-> 3. Lines
-> 
-> tcg_gen_andi_i64(shifted, shifted, 0x7fULL);
-> 
-> and
-> 
-> tcg_gen_andi_i64(shifted, shifted, 0xfe00000000000000ULL);
-> 
-> appear to be spurious (albait in a harmless way). Therefore, they should be deleted,
-> or, alternatevely, a justification for them should be provided.
-
-I'm not sure why they are needed either - there's certainly no mention of it in the
-ISA documentation. Stefan?
-
-> 4. In the commit message, variable names were used without quotation mark, resulting
-> in puzzling and unclear wording.
-> 
-> 5. (a question for Mark) After all recent changes, does get_avr64(..., ..., true)
-> always (for any endian configuration) return the "high" half of an Altivec register,
-> and get_avr64(..., ..., false) the "low" one?
-
-Yes - the new functions always return the MSB (high) and LSB (low) correctly
-regardless of host endian.
-
-> Given all these circumstances, perhaps the most reasonable solution would be to
-> revert the commit in question, and allow Stefan enough dev and test time to hopefully
-> submit a new, better, version later on.
-
-Given that it has been broken for 3 months now, I don't think we're in any major rush
-to revert ASAP. I'd prefer to give Stefan a bit more time first since he does report
-some substantial speed improvements from these new implementations.
-
-
-ATB,
-
-Mark.
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
