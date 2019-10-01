@@ -2,63 +2,91 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78AC6C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B68C388F3
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:22:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D44920700
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:20:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D44920700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 419FD2133F
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 09:22:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 419FD2133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFEKQ-0008M4-Gu
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 05:20:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34068)
+	id 1iFEM5-0002UX-9z
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 05:22:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34387)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iFEIO-0006dw-RM
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:18:13 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iFEKu-0001CX-Pd
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iFEIN-00057b-Ii
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:18:12 -0400
-Received: from mga05.intel.com ([192.55.52.43]:3300)
+ (envelope-from <pbonzini@redhat.com>) id 1iFEKt-0006Tf-5W
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:20:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49125)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1iFEIN-00056L-Al
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:18:11 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 01 Oct 2019 02:18:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,570,1559545200"; d="scan'208";a="366272833"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga005.jf.intel.com with ESMTP; 01 Oct 2019 02:18:07 -0700
-Date: Tue, 1 Oct 2019 17:17:49 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Wei Yang <richard.weiyang@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: use migration_is_active to
- represent active state
-Message-ID: <20191001091749.GA14044@richard>
-References: <20190717005341.14140-1-richardw.yang@linux.intel.com>
- <20190913235433.u66jqdhx4afnqae5@master>
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iFEKs-0006T2-TK
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 05:20:47 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D7FBB2D1CE
+ for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 09:20:45 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id m16so645973wmg.8
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 02:20:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j6UXHfItFa0OAUgIF/55ko4z5qkmMhX0rgI7YKD4O5c=;
+ b=hbW+j7i/f+zsS0FW4T6q0k1U/+nVzYilLBl9nWsNDmNW01T2jCM/JPEkrGjlguYD+M
+ n66GSAES0GQZFjK+rqv9M4ujRyDBDuNRgLbETkRcwPx56W15McnZDM0aVUYMvCf50iYz
+ H05wIIdu3MCq/SHtDkeYTgAfDr6Vg8HSLAXB7YDMlSBI7aYmFK1xZAvF9mwCtufw9Bxd
+ MEqSB050qeqmTI2oE6KAnqY9Yv9A0X+3jgYny2h3FI0oVS+7EZWicJa5ib1Vl7cJMCAu
+ 1omrC1CQRgwmhfSzdHl88NnqMsT7OJKoHHnKmivfNuWAYZ4r4s3VhWX8TMxEtmM/NUmN
+ ADGw==
+X-Gm-Message-State: APjAAAU20ru3XgvrRGeas8Xdroh2n7rvoCQPNUNHmjKTzoIFaqkVliNc
+ 0uFU/DvmsuPC5nu8CA/oV0rYqIIOBUUs8OXhw3mByle9KpjZD9YUsX9uAksCvfa+l/o3erBrWcW
+ CKiOW/zpIFRWv0o8=
+X-Received: by 2002:a5d:52cd:: with SMTP id r13mr16088173wrv.376.1569921644497; 
+ Tue, 01 Oct 2019 02:20:44 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwuhm8/C+2/CwN1UYuf67MgQQeaByQ48XupRAFjkWA0NkNsIDfEF9rlS8XnS7iyCYp/+Xbc0A==
+X-Received: by 2002:a5d:52cd:: with SMTP id r13mr16088143wrv.376.1569921644213; 
+ Tue, 01 Oct 2019 02:20:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464?
+ ([2001:b07:6468:f312:b903:6d6f:a447:e464])
+ by smtp.gmail.com with ESMTPSA id d9sm18791001wrf.62.2019.10.01.02.20.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 01 Oct 2019 02:20:43 -0700 (PDT)
+Subject: Re: [RFC] cpu_map: Remove pconfig from Icelake-Server CPU model
+To: Jiri Denemark <jdenemar@redhat.com>
+References: <20190926214305.17690-1-ehabkost@redhat.com>
+ <20190930102453.GO4884@orkuz.int.mamuti.net>
+ <20190930141104.GA4084@habkost.net>
+ <9E79D1C9A97CFD4097BCE431828FDD31173BCF76@SHSMSX104.ccr.corp.intel.com>
+ <b9fbca16-9877-04b9-78fa-bf711c8f3053@redhat.com>
+ <20190930161611.GP4884@orkuz.int.mamuti.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4d94d1d1-746b-dbe4-f705-b33e347f9138@redhat.com>
+Date: Tue, 1 Oct 2019 11:20:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190913235433.u66jqdhx4afnqae5@master>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.43
+In-Reply-To: <20190930161611.GP4884@orkuz.int.mamuti.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,89 +98,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
- dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Kang,
+ Luwei" <luwei.kang@intel.com>, Robert Hoo <robert.hu@linux.intel.com>, "Huang,
+ Kai" <kai.huang@intel.com>, "Hu, Robert" <robert.hu@intel.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 13, 2019 at 11:54:33PM +0000, Wei Yang wrote:
->On Wed, Jul 17, 2019 at 08:53:41AM +0800, Wei Yang wrote:
->>Wrap the check into a function to make it easy to read.
+On 30/09/19 18:16, Jiri Denemark wrote:
+> On Mon, Sep 30, 2019 at 17:16:27 +0200, Paolo Bonzini wrote:
+>> On 30/09/19 16:31, Hu, Robert wrote:
+>>>> This might be a problem if there are plans to eventually make KVM support
+>>>> pconfig, though.  Paolo, Robert, are there plans to support pconfig in KVM in the
+>>>> future?
+>>> [Robert Hoo] 
+>>> Thanks Eduardo for efforts in resolving this issue, introduced from my Icelake CPU
+>>> model patch.
+>>> I've no idea about PCONFIG's detail and plan. Let me sync with Huang, Kai and answer
+>>> you soon.
 >>
->
->Hi, Dave & Juan
->
->Do you like this one :-) ?
->
+>> It's really, really unlikely.  It's possible that some future processor
+>> overloads PCONFIG in such a way that it will become virtualizable, but
+>> not IceLake.
+> 
+> I guess, the likelihood of this happening would be similar to
+> reintroducing other features, such as osxsave or ospke, right?
 
-Sorry for ping again.
+No, haveing osxsave and ospke was a mistake in the first place (they are
+not CPU features at all; they are more like a special way to let
+unprivileged programs read some bits of CR4).  For pconfig, it's just
+very unlikely.
 
->>Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>---
->> include/migration/misc.h |  1 +
->> migration/migration.c    | 12 ++++++++----
->> 2 files changed, 9 insertions(+), 4 deletions(-)
+>> Would it make sense for libvirt to treat absent CPU flags as "default
+>> off" during migration, so that it can leave out the flag in the command
+>> line if it's off?  If it's on, libvirt would pass pconfig=on as usual.
+>> This is a variant of [2], but more generally applicable:
 >>
->>diff --git a/include/migration/misc.h b/include/migration/misc.h
->>index 5cdbabd094..42d6abc920 100644
->>--- a/include/migration/misc.h
->>+++ b/include/migration/misc.h
->>@@ -61,6 +61,7 @@ void migration_object_init(void);
->> void migration_shutdown(void);
->> void qemu_start_incoming_migration(const char *uri, Error **errp);
->> bool migration_is_idle(void);
->>+bool migration_is_active(MigrationState *);
->> void add_migration_state_change_notifier(Notifier *notify);
->> void remove_migration_state_change_notifier(Notifier *notify);
->> bool migration_in_setup(MigrationState *);
->>diff --git a/migration/migration.c b/migration/migration.c
->>index 43fd8297ef..4c066fc85c 100644
->>--- a/migration/migration.c
->>+++ b/migration/migration.c
->>@@ -1529,8 +1529,7 @@ static void migrate_fd_cleanup(MigrationState *s)
->>         qemu_fclose(tmp);
->>     }
->> 
->>-    assert((s->state != MIGRATION_STATUS_ACTIVE) &&
->>-           (s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE));
->>+    assert(!migration_is_active(s));
->> 
->>     if (s->state == MIGRATION_STATUS_CANCELLING) {
->>         migrate_set_state(&s->state, MIGRATION_STATUS_CANCELLING,
->>@@ -1690,6 +1689,12 @@ bool migration_is_idle(void)
->>     return false;
->> }
->> 
->>+bool migration_is_active(MigrationState *s)
->>+{
->>+    return (s->state == MIGRATION_STATUS_ACTIVE ||
->>+            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
->>+}
->>+
->> void migrate_init(MigrationState *s)
->> {
->>     /*
->>@@ -3226,8 +3231,7 @@ static void *migration_thread(void *opaque)
->> 
->>     trace_migration_thread_setup_complete();
->> 
->>-    while (s->state == MIGRATION_STATUS_ACTIVE ||
->>-           s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
->>+    while (migration_is_active(s)) {
->>         int64_t current_time;
->> 
->>         if (urgent || !qemu_file_rate_limit(s->to_dst_file)) {
->>-- 
->>2.17.1
->>
->
->-- 
->Wei Yang
->Help you, Help me
+>>> [2] However starting a domain with Icelake-Server so that it can be
+>>> migrated or saved/restored on QEMU in 3.1.1 and 4.0.0 would be
+>>> impossible. This can be solved by a different hack, which would drop
+>>> pconfig=off from QEMU command line.
+> 
+> The domain XML does not contain a complete list of all CPU features.
+> Features which are implicitly included in a CPU model are not listed in
+> the XML. Count in the differences in libvirt's vs QEMU's definitions of
+> a particular CPU model and you can see feat=off cannot be mechanically
+> dropped from the command line as the CPU model itself could turn it on
+> by default and thus feat=off is not redundant.
 
--- 
-Wei Yang
-Help you, Help me
+I think I wasn't very clear, I meant "unsupported by QEMU" when I said
+"absent".  Libvirt on the destination knows that from
+query-cpu-model-expansion, so it can leave off pconfig if it is not
+supported by the destination QEMU.
+
+Paolo
 
