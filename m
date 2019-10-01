@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 131FDECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE888ECE587
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:54:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCB02215EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:53:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCB02215EA
+	by mail.kernel.org (Postfix) with ESMTPS id B4072215EA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 20:54:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4072215EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFP9d-00011Q-NV
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 16:53:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55178)
+	id 1iFPA4-0001HG-CC
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 16:54:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55414)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFO8u-0005jh-E6
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:49:05 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFO9G-0006FT-7q
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:49:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFO8t-0008VW-BD
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:49:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35312)
+ (envelope-from <mreitz@redhat.com>) id 1iFO9F-0000GQ-Av
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 15:49:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44004)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFO8q-0008TQ-MI; Tue, 01 Oct 2019 15:49:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1iFO9C-0000Dk-U3; Tue, 01 Oct 2019 15:49:23 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E319E81DE3;
- Tue,  1 Oct 2019 19:48:59 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AB2333090FC7;
+ Tue,  1 Oct 2019 19:49:20 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DE625C1D4;
- Tue,  1 Oct 2019 19:48:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44F0E60C5D;
+ Tue,  1 Oct 2019 19:49:20 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 44/67] iotests/208: Honor $IMGOPTS
-Date: Tue,  1 Oct 2019 21:46:52 +0200
-Message-Id: <20191001194715.2796-45-mreitz@redhat.com>
+Subject: [PATCH 53/67] iotests/235: Honor $IMGOPTS
+Date: Tue,  1 Oct 2019 21:47:01 +0200
+Message-Id: <20191001194715.2796-54-mreitz@redhat.com>
 In-Reply-To: <20191001194715.2796-1-mreitz@redhat.com>
 References: <20191001194715.2796-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 01 Oct 2019 19:48:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Tue, 01 Oct 2019 19:49:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,35 +75,38 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/208 | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/235 | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/208 b/tests/qemu-iotests/208
-index dfce6f9fe4..cd565eea43 100755
---- a/tests/qemu-iotests/208
-+++ b/tests/qemu-iotests/208
-@@ -21,16 +21,17 @@
- # blockdev-snapshot-sync.
-=20
+diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+index 9e88c65b93..3326d205b7 100755
+--- a/tests/qemu-iotests/235
++++ b/tests/qemu-iotests/235
+@@ -21,7 +21,7 @@
+ import sys
+ import os
  import iotests
-+from iotests import create_test_image
+-from iotests import qemu_img_create, qemu_io, file_path, log
++from iotests import create_test_image, qemu_io, image_path, log
 =20
- iotests.script_initialize(supported_fmts=3D['generic'])
+ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'pyt=
+hon'))
 =20
--with iotests.FilePath('disk.img') as disk_img_path, \
-+with iotests.ImagePath('disk.img') as disk_img_path, \
-      iotests.FilePath('disk-snapshot.img') as disk_snapshot_img_path, \
-      iotests.FilePath('nbd.sock') as nbd_sock_path, \
-      iotests.VM() as vm:
+@@ -42,11 +42,10 @@ iotests.script_initialize(supported_fmts=3D['qcow2'])
 =20
-     img_size =3D '10M'
--    iotests.qemu_img_create('-f', iotests.imgfmt, disk_img_path, img_siz=
-e)
-+    create_test_image(disk_img_path, img_size)
+ size =3D 1 * 1024 * 1024 * 1024
 =20
-     iotests.log('Launching VM...')
-     (vm.add_drive(disk_img_path, 'node-name=3Ddrive0-node', interface=3D=
-'none')
+-disk =3D file_path('disk')
++disk =3D image_path('disk')
+=20
+ # prepare source image
+-qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocation=3Dmetadata', =
+disk,
+-                str(size))
++create_test_image(disk, size, opts=3D['preallocation=3Dmetadata'])
+=20
+ vm =3D QEMUMachine(iotests.qemu_prog)
+ vm.add_args('-machine', 'accel=3Dkvm:tcg')
 --=20
 2.21.0
 
