@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4984C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E50FC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:24:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A791A21A4A
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:24:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A791A21A4A
+	by mail.kernel.org (Postfix) with ESMTPS id D62BD21A4A
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 16:24:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D62BD21A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFKwq-0005P9-3K
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:24:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50295)
+	id 1iFKx6-0005eI-7F
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 12:24:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50410)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTR-00006L-2e
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:02 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKU0-0000jN-C5
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTO-0006te-1q
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:00 -0400
-Received: from relay.sw.ru ([185.231.240.75]:38492)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFKTy-0007Ec-5G
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 11:54:36 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKTN-0006ae-Qw; Tue, 01 Oct 2019 11:53:58 -0400
+ id 1iFKTr-0006Zo-8W; Tue, 01 Oct 2019 11:54:33 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFKT1-0004xb-Lz; Tue, 01 Oct 2019 18:53:35 +0300
+ id 1iFKSw-0004xb-Of; Tue, 01 Oct 2019 18:53:30 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 23/31] block: Fix error_append_hint/error_prepend usage
-Date: Tue,  1 Oct 2019 18:53:11 +0300
-Message-Id: <20191001155319.8066-24-vsementsov@virtuozzo.com>
+Subject: [PATCH v4 04/31] error: auto propagated local_err
+Date: Tue,  1 Oct 2019 18:52:52 +0300
+Message-Id: <20191001155319.8066-5-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191001155319.8066-1-vsementsov@virtuozzo.com>
 References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
@@ -59,278 +59,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
- Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
- integration@gluster.org, John Snow <jsnow@redhat.com>
+Cc: fam@euphon.net, pburton@wavecomp.com, peter.maydell@linaro.org,
+ codyprime@gmail.com, jasowang@redhat.com, mark.cave-ayland@ilande.co.uk,
+ mdroth@linux.vnet.ibm.com, kraxel@redhat.com, sundeep.lkml@gmail.com,
+ qemu-block@nongnu.org, quintela@redhat.com, arikalo@wavecomp.com,
+ mst@redhat.com, armbru@redhat.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ joel@jms.id.au, marcandre.lureau@redhat.com, rth@twiddle.net,
+ farman@linux.ibm.com, ehabkost@redhat.com, sw@weilnetz.de, groug@kaod.org,
+ yuval.shaia@oracle.com, dgilbert@redhat.com, alex.williamson@redhat.com,
+ integration@gluster.org, clg@kaod.org, stefanha@redhat.com, david@redhat.com,
+ jsnow@redhat.com, david@gibson.dropbear.id.au, kwolf@redhat.com,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, berrange@redhat.com,
+ andrew@aj.id.au, cohuck@redhat.com, qemu-s390x@nongnu.org, mreitz@redhat.com,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
+functions with errp OUT parameter.
 
-This commit (together with its neighbors) was generated by
+It has three goals:
 
-git grep -l 'error_\(append_hint\|prepend\)(errp' | while read f; do \
-spatch --sp-file scripts/coccinelle/fix-error-add-info.cocci \
---in-place $f; done
+1. Fix issue with error_fatal & error_prepend/error_append_hint: user
+can't see this additional information, because exit() happens in
+error_setg earlier than information is added. [Reported by Greg Kurz]
 
-and then
+2. Fix issue with error_abort & error_propagate: when we wrap
+error_abort by local_err+error_propagate, resulting coredump will
+refer to error_propagate and not to the place where error happened.
+(the macro itself doesn't fix the issue, but it allows to [3.] drop all
+local_err+error_propagate pattern, which will definitely fix the issue)
+[Reported by Kevin Wolf]
 
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+3. Drop local_err+error_propagate pattern, which is used to workaround
+void functions with errp parameter, when caller wants to know resulting
+status. (Note: actually these functions could be merely updated to
+return int error code).
 
-(auto-msg was a file with this commit message)
-
-and then by hand, for not maintained changed files:
-
-git commit -m "<SUB-SYSTEM>: $(< auto-msg)" <FILES>
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/nbd.h  | 1 +
- block.c              | 3 +++
- block/backup.c       | 1 +
- block/dirty-bitmap.c | 1 +
- block/file-posix.c   | 4 ++++
- block/gluster.c      | 2 ++
- block/qcow.c         | 1 +
- block/qcow2-bitmap.c | 1 +
- block/qcow2.c        | 3 +++
- block/vdi.c          | 1 +
- block/vhdx-log.c     | 1 +
- block/vmdk.c         | 1 +
- block/vpc.c          | 1 +
- 13 files changed, 21 insertions(+)
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 316fd705a9..330f40142a 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -360,6 +360,7 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
- static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
-                            const char *desc, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret = qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
+CC: kwolf@redhat.com
+CC: mreitz@redhat.com
+CC: jsnow@redhat.com
+CC: fam@euphon.net
+CC: sw@weilnetz.de
+CC: codyprime@gmail.com
+CC: marcandre.lureau@redhat.com
+CC: pbonzini@redhat.com
+CC: groug@kaod.org
+CC: sundeep.lkml@gmail.com
+CC: peter.maydell@linaro.org
+CC: stefanha@redhat.com
+CC: pburton@wavecomp.com
+CC: arikalo@wavecomp.com
+CC: berrange@redhat.com
+CC: ehabkost@redhat.com
+CC: david@gibson.dropbear.id.au
+CC: clg@kaod.org
+CC: mst@redhat.com
+CC: marcel.apfelbaum@gmail.com
+CC: mark.cave-ayland@ilande.co.uk
+CC: yuval.shaia@oracle.com
+CC: cohuck@redhat.com
+CC: farman@linux.ibm.com
+CC: rth@twiddle.net
+CC: david@redhat.com
+CC: pasic@linux.ibm.com
+CC: borntraeger@de.ibm.com
+CC: kraxel@redhat.com
+CC: alex.williamson@redhat.com
+CC: andrew@aj.id.au
+CC: joel@jms.id.au
+CC: eblake@redhat.com
+CC: armbru@redhat.com
+CC: mdroth@linux.vnet.ibm.com
+CC: quintela@redhat.com
+CC: dgilbert@redhat.com
+CC: jasowang@redhat.com
+CC: qemu-block@nongnu.org
+CC: integration@gluster.org
+CC: qemu-arm@nongnu.org
+CC: qemu-ppc@nongnu.org
+CC: qemu-s390x@nongnu.org
+
+ include/qapi/error.h | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 9376f59c35..02f967ac1d 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -322,6 +322,43 @@ void error_set_internal(Error **errp,
+                         ErrorClass err_class, const char *fmt, ...)
+     GCC_FMT_ATTR(6, 7);
  
-     if (ret < 0) {
-diff --git a/block.c b/block.c
-index 5944124845..5dfcfc9b90 100644
---- a/block.c
-+++ b/block.c
-@@ -1565,6 +1565,7 @@ fail_opts:
- 
- static QDict *parse_json_filename(const char *filename, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     QObject *options_obj;
-     QDict *options;
-     int ret;
-@@ -2592,6 +2593,7 @@ out:
- int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
-                            const char *bdref_key, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     char *backing_filename = NULL;
-     char *bdref_key_dot;
-     const char *reference = NULL;
-@@ -2823,6 +2825,7 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
-                                                    QDict *snapshot_options,
-                                                    Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     /* TODO: extra byte is a hack to ensure MAX_PATH space on Windows. */
-     char *tmp_filename = g_malloc0(PATH_MAX + 1);
-     int64_t total_size;
-diff --git a/block/backup.c b/block/backup.c
-index 763f0d7ff6..58488a21fb 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -583,6 +583,7 @@ static const BlockJobDriver backup_job_driver = {
- static int64_t backup_calculate_cluster_size(BlockDriverState *target,
-                                              Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret;
-     BlockDriverInfo bdi;
- 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 134e0c9a0c..099ed74dfa 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -237,6 +237,7 @@ static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
- int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t flags,
-                             Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     if ((flags & BDRV_BITMAP_BUSY) && bdrv_dirty_bitmap_busy(bitmap)) {
-         error_setg(errp, "Bitmap '%s' is currently in use by another"
-                    " operation and cannot be used", bitmap->name);
-diff --git a/block/file-posix.c b/block/file-posix.c
-index f12c06de2d..db7a5b7e1a 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -320,6 +320,7 @@ static bool raw_is_io_aligned(int fd, void *buf, size_t len)
- 
- static void raw_probe_alignment(BlockDriverState *bs, int fd, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVRawState *s = bs->opaque;
-     char *buf;
-     size_t max_align = MAX(MAX_BLOCKSIZE, getpagesize());
-@@ -473,6 +474,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-                            int bdrv_flags, int open_flags,
-                            bool device, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVRawState *s = bs->opaque;
-     QemuOpts *opts;
-     Error *local_err = NULL;
-@@ -817,6 +819,7 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-                                 uint64_t new_perm, uint64_t new_shared,
-                                 Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVRawState *s = bs->opaque;
-     int ret = 0;
-     Error *local_err = NULL;
-@@ -2232,6 +2235,7 @@ static int64_t raw_get_allocated_file_size(BlockDriverState *bs)
- static int coroutine_fn
- raw_co_create(BlockdevCreateOptions *options, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptionsFile *file_opts;
-     Error *local_err = NULL;
-     int fd;
-diff --git a/block/gluster.c b/block/gluster.c
-index 64028b2cba..a69e89b42a 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -419,6 +419,7 @@ out:
- static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
-                                            Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     struct glfs *glfs;
-     int ret;
-     int old_errno;
-@@ -694,6 +695,7 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
-                               const char *filename,
-                               QDict *options, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret;
-     if (filename) {
-         ret = qemu_gluster_parse_uri(gconf, filename);
-diff --git a/block/qcow.c b/block/qcow.c
-index 5bdf72ba33..0caf94c8f8 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -117,6 +117,7 @@ static QemuOptsList qcow_runtime_opts = {
- static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-                      Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVQcowState *s = bs->opaque;
-     unsigned int len, i, shift;
-     int ret;
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index b2487101ed..90f2f010f2 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1618,6 +1618,7 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-                                       uint32_t granularity,
-                                       Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVQcow2State *s = bs->opaque;
-     bool found;
-     Qcow2BitmapList *bm_list;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 4d16393e61..a8f0bf3cae 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1207,6 +1207,7 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
- static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-                                       int flags, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVQcow2State *s = bs->opaque;
-     unsigned int len, i;
-     int ret = 0;
-@@ -3036,6 +3037,7 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
- static int coroutine_fn
- qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptionsQcow2 *qcow2_opts;
-     QDict *options;
- 
-@@ -3740,6 +3742,7 @@ fail:
- static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
-                                           PreallocMode prealloc, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t old_length;
-     int64_t new_l1_size;
-diff --git a/block/vdi.c b/block/vdi.c
-index 806ba7f53c..5259cce24b 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -735,6 +735,7 @@ nonallocating_write:
- static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
-                                          size_t block_size, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptionsVdi *vdi_opts;
-     int ret = 0;
-     uint64_t bytes = 0;
-diff --git a/block/vhdx-log.c b/block/vhdx-log.c
-index fdd3a7adc3..176e03327b 100644
---- a/block/vhdx-log.c
-+++ b/block/vhdx-log.c
-@@ -748,6 +748,7 @@ exit:
- int vhdx_parse_log(BlockDriverState *bs, BDRVVHDXState *s, bool *flushed,
-                    Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret = 0;
-     VHDXHeader *hdr;
-     VHDXLogSequence logs = { 0 };
-diff --git a/block/vmdk.c b/block/vmdk.c
-index fed3b50c8a..6b10830d94 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1078,6 +1078,7 @@ static const char *next_line(const char *s)
- static int vmdk_parse_extents(const char *desc, BlockDriverState *bs,
-                               QDict *options, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret;
-     int matches;
-     char access[11];
-diff --git a/block/vpc.c b/block/vpc.c
-index 5cd3890780..90d0cae862 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -971,6 +971,7 @@ static int calculate_rounded_image_size(BlockdevCreateOptionsVpc *vpc_opts,
- static int coroutine_fn vpc_co_create(BlockdevCreateOptions *opts,
-                                       Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptionsVpc *vpc_opts;
-     BlockBackend *blk = NULL;
-     BlockDriverState *bs = NULL;
++typedef struct ErrorPropagator {
++    Error *local_err;
++    Error **errp;
++} ErrorPropagator;
++
++static inline void error_propagator_cleanup(ErrorPropagator *prop)
++{
++    error_propagate(prop->errp, prop->local_err);
++}
++
++G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
++
++/*
++ * ERRP_AUTO_PROPAGATE
++ *
++ * This macro is created to be the first line of a function with Error **errp
++ * OUT parameter. It's needed only in cases where we want to use error_prepend,
++ * error_append_hint or dereference *errp. It's still safe (but useless) in
++ * other cases.
++ *
++ * If errp is NULL or points to error_fatal, it is rewritten to point to a
++ * local Error object, which will be automatically propagated to the original
++ * errp on function exit (see error_propagator_cleanup).
++ *
++ * After invocation of this macro it is always safe to dereference errp
++ * (as it's not NULL anymore) and to append hints (by error_append_hint)
++ * (as, if it was error_fatal, we swapped it with a local_error to be
++ * propagated on cleanup).
++ *
++ * Note: we don't wrap the error_abort case, as we want resulting coredump
++ * to point to the place where the error happened, not to error_propagate.
++ */
++#define ERRP_AUTO_PROPAGATE() \
++g_auto(ErrorPropagator) __auto_errp_prop = {.errp = errp}; \
++errp = ((errp == NULL || *errp == error_fatal) ? \
++    &__auto_errp_prop.local_err : errp)
++
+ /*
+  * Special error destination to abort on error.
+  * See error_setg() and error_propagate() for details.
 -- 
 2.21.0
 
