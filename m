@@ -2,70 +2,71 @@ Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB0CC388F3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 05:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E886DECDFB6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 06:24:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A45162168B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 05:45:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A45162168B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BD40F21783
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 06:24:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD40F21783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFAyU-0003oC-Lw
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 01:45:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41101)
+	id 1iFBaR-0002GK-Pa
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 02:24:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44160)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iFAxL-0003Hv-NL
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 01:44:16 -0400
+ (envelope-from <armbru@redhat.com>) id 1iFBZR-0001qW-5f
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 02:23:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iFAxK-0003Kn-GU
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 01:44:15 -0400
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:50286)
+ (envelope-from <armbru@redhat.com>) id 1iFBZL-0003Ir-AM
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 02:23:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41120)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iFAxK-0003Hv-Au
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 01:44:14 -0400
-Received: from player772.ha.ovh.net (unknown [10.108.57.226])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id 90BA124E8D9
- for <qemu-devel@nongnu.org>; Tue,  1 Oct 2019 07:44:03 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id 200E9A640E55;
- Tue,  1 Oct 2019 05:43:51 +0000 (UTC)
-Subject: Re: [PATCH v2 21/33] spapr, xics, xive: Move cpu_intc_create from
- SpaprIrq to SpaprInterruptController
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190927055028.11493-1-david@gibson.dropbear.id.au>
- <20190927055028.11493-22-david@gibson.dropbear.id.au>
- <20190927121649.5b9f3db7@bahia.lan> <20190930014904.GB11105@umbus.fritz.box>
- <adb67721-5c4e-50ac-f459-a48570a45d6e@kaod.org>
- <20190930061445.GG11105@umbus.fritz.box>
- <75672a0f-6bae-406c-0f0c-d23cc58c9c9f@kaod.org>
- <20191001023102.GN11105@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9c6c7e17-0578-2313-4324-a5ca75149762@kaod.org>
-Date: Tue, 1 Oct 2019 07:43:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iFBZL-0003HR-2W
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 02:23:31 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CE781301D671;
+ Tue,  1 Oct 2019 06:23:28 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9673B19C58;
+ Tue,  1 Oct 2019 06:23:25 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 27E1F1138648; Tue,  1 Oct 2019 08:23:24 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
+Subject: Re: [PATCH v4 15/24] audio: add mixing-engine option (documentation)
+References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <87sgonma7v.fsf@dusky.pond.sub.org>
+ <4d24c95c-0e98-2646-0b1a-6c7b3afe0e90@gmail.com>
+ <87wodwyabl.fsf@dusky.pond.sub.org>
+ <cacb71d0-494f-e05d-dece-637579b0c6d9@gmail.com>
+Date: Tue, 01 Oct 2019 08:23:24 +0200
+In-Reply-To: <cacb71d0-494f-e05d-dece-637579b0c6d9@gmail.com>
+ (=?utf-8?B?IlpvbHTDoW4JS8WRdsOhZ8OzIidz?= message of "Sun, 29 Sep 2019
+ 21:07:31 +0200")
+Message-ID: <87d0fh6l2b.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20191001023102.GN11105@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-X-Ovh-Tracer-Id: 16691184645595040537
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeefgdeliecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Tue, 01 Oct 2019 06:23:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.111.247
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,113 +78,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
- Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/10/2019 04:31, David Gibson wrote:
-> On Mon, Sep 30, 2019 at 12:13:14PM +0200, C=E9dric Le Goater wrote:
->> On 30/09/2019 08:14, David Gibson wrote:
->>> On Mon, Sep 30, 2019 at 07:28:45AM +0200, C=E9dric Le Goater wrote:
->>>> On 30/09/2019 03:49, David Gibson wrote:
->>>>> On Fri, Sep 27, 2019 at 12:16:49PM +0200, Greg Kurz wrote:
->>>>>> On Fri, 27 Sep 2019 15:50:16 +1000
->>>>>> David Gibson <david@gibson.dropbear.id.au> wrote:
->>>>>>
->>>>>>> This method essentially represents code which belongs to the inte=
-rrupt
->>>>>>> controller, but needs to be called on all possible intcs, rather =
-than
->>>>>>> just the currently active one.  The "dual" version therefore call=
-s
->>>>>>> into the xics and xive versions confusingly.
->>>>>>>
->>>>>>> Handle this more directly, by making it instead a method on the i=
-ntc
->>>>>>> backend, and always calling it on every backend that exists.
->>>>>>>
->>>>>>> While we're there, streamline the error reporting a bit.
->>>>>>>
->>>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>>>> [snip]
->>>>>>> @@ -525,6 +469,30 @@ static void spapr_irq_check(SpaprMachineStat=
-e *spapr, Error **errp)
->>>>>>>  /*
->>>>>>>   * sPAPR IRQ frontend routines for devices
->>>>>>>   */
->>>>>>> +int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
->>>>>>> +                              PowerPCCPU *cpu, Error **errp)
->>>>>>> +{
->>>>>>> +    if (spapr->xive) {
->>>>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr->xiv=
-e);
->>>>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_C=
-LASS(intc);
->>>>>>> +
->>>>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
->>>>>>> +            return -1;
->>>>>>> +        }
->>>>>>> +    }
->>>>>>> +
->>>>>>> +    if (spapr->ics) {
->>>>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr->ics=
-);
->>>>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_GET_C=
-LASS(intc);
->>>>>>> +
->>>>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
->>>>>>> +            return -1;
->>>>>>> +        }
->>>>>>> +    }
->>>>>>> +
->>>>>>
->>>>>> Instead of these hooks, what about open-coding spapr_xive_cpu_intc=
-_create()
->>>>>> and xics_spapr_cpu_intc_create() directly here, like you already d=
-id for the
->>>>>> ICS and the XIVE objects in spapr_irq_init() ?
->>>>>
->>>>> I'd prefer not to.  The idea is I want to treat this as basically:
->>>>>
->>>>> 	foreach_possible_intc(intc)
->>>>> 		intc::cpu_intc_create(...)
->>>>>
->>>>> If I find time I might indeed replace the explicit ics and xive
->>>>> pointers with just an array of SpaprInterruptController *.
->>>>
->>>> Or you could use object_child_foreach() and check for the type. If w=
-e had
->>>> a helper object_child_foreach_type(), we could use it elsewhere.
->>>
->>> I thought about that, but I don't think it quite works.  The
->>> complication is that the xics device is made explicitly a child of th=
-e
->>> machine, but the xive device has mmio, so it's a SusBusDevice sitting
->>> on the root bus instead.
+"Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
+
+> On 2019-09-25 11:49, Markus Armbruster wrote:
+>> "Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
 >>
->> PnvXscom works fine with Devices and SysBusDevices.
->=20
-> Uh... what's an example of it working with a SysBusDevice?  All the
-> implementors of PNV_XSCOM_INTERFACE I could find were instantiated
-> with object_initialize_child() making them explicitly children of the
-> chip.  The SPAPR_XIVE is instantiated with qdev_create(NULL,
-> TYPE_SPAPR_XIVE), making it a child of the root bus, not the machine,
-> I believe.
+>>> On 2019-09-23 15:08, Markus Armbruster wrote:
+>>>> "K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com> writes:
+>>>>
+>>>>> This will allow us to disable mixeng when we use a decent backend.
+>>>>>
+>>>>> Disabling mixeng have a few advantages:
+>>>>> * we no longer convert the audio output from one format to another, w=
+hen
+>>>>>     the underlying audio system would just convert it to a third form=
+at.
+>>>>>     We no longer convert, only the underlying system, when needed.
+>>>>> * the underlying system probably has better resampling and sample for=
+mat
+>>>>>     converting methods anyway...
+>>>>> * we may support formats that the mixeng currently does not support (=
+S24
+>>>>>     or float samples, more than two channels)
+>>>>> * when using an audio server (like pulseaudio) different sound card
+>>>>>     outputs will show up as separate streams, even if we use only one
+>>>>>     backend
+>>>>>
+>>>>> Disadvantages:
+>>>>> * audio capturing no longer works (wavcapture, and vnc audio extensio=
+n)
+>>>>> * some backends only support a single playback stream or very picky
+>>>>>     about the audio format.  In this case we can't disable mixeng.
+>>>>>
+>>>>> However mixeng is not removed, only made optional, so this shouldn't =
+be
+>>>>> a big concern.
+>>>>>
+>>>>> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail=
+.com>
+>>>>> ---
+>>>>>
+>>>>> Notes:
+>>>>>       Changes from v1:
+>>>>>            * renamed mixeng to mixing-engine
+>>>>>
+>>>>>    qapi/audio.json | 5 +++++
+>>>>>    qemu-options.hx | 6 ++++++
+>>>>>    2 files changed, 11 insertions(+)
+>>>>>
+>>>>> diff --git a/qapi/audio.json b/qapi/audio.json
+>>>>> index 9fefdf5186..0535eff794 100644
+>>>>> --- a/qapi/audio.json
+>>>>> +++ b/qapi/audio.json
+>>>>> @@ -11,6 +11,10 @@
+>>>>>    # General audio backend options that are used for both playback and
+>>>>>    # recording.
+>>>>>    #
+>>>>> +# @mixing-engine: use QEMU's mixing engine to mix all streams inside=
+ QEMU. When
+>>>>> +#                 set to off, fixed-settings must be also off. Not e=
+very backend
+>>>>> +#                 compatible with the off setting (default on, since=
+ 4.2)
+>>>>> +#
+>>>>
+>>>> Last sentence no verb.
+>>>>
+>>>> Which backends are compatible?
+>>>
+>>> Actually that's a simplification, it depends on a few things.  When
+>>> mixeng is off, qemu will try to use the same format as the emulated
+>>> sound card, and if the backend doesn't support that format, it won't
+>>> work (no audio).  Also attaching multiple sound cards to the same
+>>> audiodev might not work, if the backend doesn't support multiple
+>>> playback streams.  If you use pulseaudio, it'll work without problems,
+>>> if you use alsa, it depends on your device.  If you use a hw: device
+>>> directly, you'll likely only be able to use one emulated sound card
+>>> with a few selected audio formats.  If you use dmix: (and plug), alsa
+>>> will handle the conversion and mixing, so it will work no matter what
+>>> format the emulated sound card uses.  With OSS the situation is
+>>> probably similar, it depends on the kernel/hw what works and what not.
+>>> wav and spice certainly doesn't support multiple streams.  I'm not
+>>> completely sure about the other backends right now, but I think dsound
+>>> and coreaudio can handle the necessary sample format conversions and
+>>> mixing.
+>>>
+>>>> What happens when you try the off setting with incompatible backends?
+>>> See above.
+>>
+>> What happens *exactly*?
+>>
+>> I'm asking because I'm concerned about the user experience.  When a user
+>> asks for a combination of things QEMU can't provide, such as mixeng off
+>> with an incompatible backend, QEMU should fail with a suitable error
+>> message.  Does it?
+>
+> Error handling is not the best in the audio subsystem, if something
+> fails it generally just prints a warning to the console and continues,
+> and something will happen...  For example, this is what happens when I
+> try to open one hw device twice. I ran qemu with:
+>
+> -audiodev
+> alsa,id=3Dfoo,in.dev=3Dhw:1,,0,out.mixing-engine=3Doff,out.dev=3Dhw:1,,0
+> -device piix4-usb-uhci -device usb-audio,audiodev=3Dfoo -device
+> AC97,audiodev=3Dfoo
+>
+> When the guest tried to initialize the AC97 card, I got an error:
+>
+> alsa: Could not initialize DAC
+> alsa: Failed to open `hw:1,0':
+> alsa: Reason: Device or resource busy
+>
+> And it just continued. And the sound worked, but with wrong sample
+> rate (AC97 wants 44100 Hz, but USB audio previously opened the alsa
+> device with 48000 Hz).  I'll fix this bug in the next revision,
+> audio_pcm_hw_add_* shouldn't fall back to other HWs without mixeng.
+> But even with that, the result will be that one emulated sound card
+> will work and the other won't.
+>
+> It's not ideal, but fixing it would require a lot of effort.  Right
+> now, if you specify an invalid audiodev for alsa (even with mixeng),
+> it'll just print an error to the console and continue without audio.
 
-I see. We should reparent the interrupt controller then, Could we rework=20
-the code to instantiate and realize the XICS and XIVE model objects ?=20
-We have the handlers spapr_instance_init() and spapr_machine_init().=20
+Should we document this general error handling deficiency somehow?
 
-That always has been a problem IMO.
+>> Sometimes rejecting non-working configurations is impractical.  Is it
+>> here?
+>
+> I think it is.  It depends on the backend, its settings, the frontend
+> (emulated sound card), and how the guest uses it.  We currently don't
+> know what formats does a backend support, what formats can a frontend
+> produce, and even if we would know that, just because a frontend can
+> produce a format that the backend doesn't understand doesn't mean that
+> it will actually do it.  For example, right now with this patch series
+> applied, usb-audio can produce 7.1 audio.  If we want to be strict, it
+> means we can only use it with backends that support at least 8
+> channels, even if the user only wants to use stereo audio.
+>
+>> If yes, we should call out the problematic configurations in
+>> documentation.
+>
+> I think we should rather list known working configurations, and leave
+> the others as "try at your own risk" because there's too many things
+> that can go wrong.  (pulseaudio will work, alsa with dmix too.  Need
+> to check coreaudio, dsound and oss.  spice and wavcapture won't work.)
 
+Far from ideal, but better than nothing.
 
-C.=20
-=20
-
-
+Possibly naive idea: what about automatically falling back to mixeng on
+when mixeng off doesn't work?  Requires detecting "doesn't work", which
+I understand just isn't there.  Any other reasons why this couldn't be
+done?  Way out of scope for this series, of course.
 
