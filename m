@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83685C352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC77C352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:20:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52FF52054F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:20:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52FF52054F
+	by mail.kernel.org (Postfix) with ESMTPS id 7118421A4A
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 22:20:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7118421A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFQVT-00054Z-4k
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 18:20:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38023)
+	id 1iFQVb-0005DV-9u
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 18:20:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38273)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iFQRq-0003MQ-4r
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 18:16:47 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iFQS4-0003a2-MW
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 18:17:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iFQRp-0004kY-2W
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 18:16:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49618)
+ (envelope-from <jsnow@redhat.com>) id 1iFQS3-00052H-Kz
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 18:17:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38452)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iFQRj-0004by-M5; Tue, 01 Oct 2019 18:16:39 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iFQS1-0004yp-AW; Tue, 01 Oct 2019 18:16:57 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 91D473090FC4;
- Tue,  1 Oct 2019 22:16:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8817310275E2;
+ Tue,  1 Oct 2019 22:16:56 +0000 (UTC)
 Received: from [10.18.17.165] (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 129695D6D0;
- Tue,  1 Oct 2019 22:16:37 +0000 (UTC)
-Subject: Re: [PATCH 01/67] iotests.py: Read $IMGOPTS
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 059E760C80;
+ Tue,  1 Oct 2019 22:16:55 +0000 (UTC)
+Subject: Re: [PATCH 02/67] iotests.py: Add @skip_for_imgopts()
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20191001194715.2796-1-mreitz@redhat.com>
- <20191001194715.2796-2-mreitz@redhat.com>
+ <20191001194715.2796-3-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -120,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <c3feccfd-b967-3ee8-dc0c-9f48fc849741@redhat.com>
-Date: Tue, 1 Oct 2019 18:16:37 -0400
+Message-ID: <7274be9e-cea9-220a-1ab6-023ec8befab9@redhat.com>
+Date: Tue, 1 Oct 2019 18:16:55 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191001194715.2796-2-mreitz@redhat.com>
+In-Reply-To: <20191001194715.2796-3-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 01 Oct 2019 22:16:38 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Tue, 01 Oct 2019 22:16:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -154,40 +154,38 @@ Sender: "Qemu-devel"
 
 
 On 10/1/19 3:46 PM, Max Reitz wrote:
-> We do not do anything with yet, but this is the first step.
-> 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/iotests.py | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  tests/qemu-iotests/iotests.py | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 > 
 > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 1c5fce3e9e..7030900807 100644
+> index 7030900807..cdcb62c4ac 100644
 > --- a/tests/qemu-iotests/iotests.py
 > +++ b/tests/qemu-iotests/iotests.py
-> @@ -69,6 +69,12 @@ output_dir = os.environ.get('OUTPUT_DIR', '.')
->  cachemode = os.environ.get('CACHEMODE')
->  qemu_default_machine = os.environ.get('QEMU_DEFAULT_MACHINE')
+> @@ -950,6 +950,19 @@ def skip_if_unsupported(required_formats=[], read_only=False):
+>          return func_wrapper
+>      return skip_test_decorator
 >  
-> +imgopts = os.environ.get('IMGOPTS', '')
-> +if len(imgopts) == 0:
-> +    imgopts = []
-> +else:
-> +    imgopts = imgopts.split(',')
+> +def skip_for_imgopts(unsupported_opts=[]):
+> +    '''Skip Test Decorator
+> +       Skips the test if imgopts contains any of the given options'''
+> +    def skip_test_decorator(func):
+> +        def func_wrapper(test_case: QMPTestCase, *args, **kwargs):
+
+:D
+
+> +            for opt in imgopts:
+> +                if any(unsupported in opt for unsupported in unsupported_opts):
+> +                    test_case.case_skip('{}: Option {} is unsupported'.format(
+> +                                        test_case, opt))
+> +            return func(test_case, *args, **kwargs)
+> +        return func_wrapper
+> +    return skip_test_decorator
 > +
-
-Sometimes I think about the type of person I'd like to meet, and I ask
-myself if it's the type of person who would quote pep8, or say things
-like "idiomatic python" in a code review when the existing form has no
-technical problem whatsoever.
-
-I wonder what type of person I am.
-
-Well, questions for another day.
-
->  socket_scm_helper = os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_helper')
+>  def execute_unittest(debug=False):
+>      """Executes unittests within the calling module."""
 >  
->  luks_default_secret_object = 'secret,id=keysec0,data=' + \
 > 
 
 Reviewed-by: John Snow <jsnow@redhat.com>
