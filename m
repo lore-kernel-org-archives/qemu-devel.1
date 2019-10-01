@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72058ECE587
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:29:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3BFC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:30:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C77F215EA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:29:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDA5221A4A
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 17:30:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sfohzBHO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C77F215EA
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rv6rqUR2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDA5221A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45789 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFLyD-0005yy-03
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 13:29:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32868)
+	id 1iFLz2-000718-5H
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 13:30:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iFLlH-0001cm-RX
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:16:32 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iFLlR-0001kT-Pt
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:16:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iFLlG-0005YI-Mt
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:16:31 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34348)
+ (envelope-from <richard.henderson@linaro.org>) id 1iFLlQ-0005dg-F7
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:16:41 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:41350)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iFLlG-0005Xw-Hg
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:16:30 -0400
-Received: by mail-pg1-x542.google.com with SMTP id y35so10119373pgl.1
- for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 10:16:30 -0700 (PDT)
+ id 1iFLlQ-0005d5-9i
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 13:16:40 -0400
+Received: by mail-pg1-x543.google.com with SMTP id s1so10094319pgv.8
+ for <qemu-devel@nongnu.org>; Tue, 01 Oct 2019 10:16:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=qV5DRSUK9uxLr8VUlGB8IPLCjYhHZMF32okiY81/uHY=;
- b=sfohzBHOfz0OtcjcoVM3eEN2UWS/MQfxBDhy+XwtpM/X1TS4xXyM1fv8yfRp883mxA
- O57Xr9tC6hGZcqCm5uIK1ra4vG5VWcHRhNJjBb9S3vwGiJgwnhcQfBF/bAU0gMOpxyqy
- lhCaOgya7pBK+ew6ruys5zeuwSnhOQJKrLPtJaUQmrcn4UZTznUY3PqYUrdp2HLskmw2
- q7rngMc41RR1BN8orbuVr67Hy0HuQ/NJn/eBRB61Mfc8mn1JYEgyRKImkLa1uz8scdkw
- wSHDqpQmlDOBtaS07Wl0mWH6HgjAHXZSH0mFttQL2CzAqWEQhY9/NTiR8y67qr2FPCVz
- gjeA==
+ bh=zWndXgEDq38ZD9+tzMggT4V1IKonosDqt8xl6lDbLwc=;
+ b=Rv6rqUR2U5m+Q68C4U02FebkcUVqJvtdRBd3tY1NCPDSUBtvID3T7cs2mv4jwui7fF
+ mpee7zecLtAy6SHSlEVqgJmEzNQiJmgvQ7XYn7qyKY+ze+BJ5gC+M3GLdE2JGPkPgu4O
+ d4WNUAq/Ou7qj1gTZf8cnA9Gp6flf6wXM/XSAlFvjZfc/4G/LtEpsVfBp1xgUn9d044h
+ rQV2nU4TSK7bTEo/4Guwh+Ih9Jtz5aMqiOaN+bZJn+VMl2VjzUXa6n/BtF0wFf+gKZTh
+ UiwjqSd1fE0FKcuMPc87RaOiuG2fuSS/hAPioyXCmoaoWNoqjOBtqGtxbitovdIeqSFd
+ LL0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=qV5DRSUK9uxLr8VUlGB8IPLCjYhHZMF32okiY81/uHY=;
- b=Hh/IyGfKXoYJuWL31ohZwV3q3Rhe8d4Hy4IhqUG9JrYDOQ2hiFk6LQLWdC/rOhCGfQ
- THTL7MEHZX5NLbg6s79U8kNpX77L7xDd1Yzr0wVbXqXGKgTkr058bxHzOxnhoHYBu3sy
- PXYxQGZhSPeok8223XjEUbZbKyqIytTVHPSf8KbZJ73EOOz1pkQze3hJLkhWzRc/A5tc
- Q15DuP0tjG8fyhgtmnXjDQEnOEARqHRHQ488I9W9Uikie9MhPfgpyWXg8lgdN6lX7B99
- +VkQ4CTZ4BKQc5XZkf/d/lMjwmxWdZjcG/8I7ucLx/6dwZGiIkgrWoMhmjCsV+HQtQsR
- k1lw==
-X-Gm-Message-State: APjAAAXATKYJ9jLUjkqjZfAku2VLoiO6+ehL9GtqfiUVGmhi7/bMjm1G
- ncc5K+aV5WqG6103HRvLDZpvB0GnTXI=
-X-Google-Smtp-Source: APXvYqzb+fvvSKvBh0eMaLRqZm4jDgGkcgqpIdBLKXK//RY2rscoxI3ouw9J/gqrGiaLiEuUFWcnRQ==
-X-Received: by 2002:a17:90a:1b46:: with SMTP id
- q64mr6780639pjq.97.1569950188996; 
- Tue, 01 Oct 2019 10:16:28 -0700 (PDT)
+ bh=zWndXgEDq38ZD9+tzMggT4V1IKonosDqt8xl6lDbLwc=;
+ b=LVexExqHcVQuoAS7zpd+g8PtH9MrUHkmlbQYmZ5jk+ZaMd6FcEtwfqOjrmQ7AB14ci
+ QN0SB7zRKfGWRSlMzGnjoRSEGyB3onR+OqhBlHrFHH2RGQO+LdvrI2R09RLCvwEFOMVC
+ 7M3KpPnTW4UuqOTElZ7USGHsVDkcpaO3vS0BtWTwFkxgL1OzjOBkflz8Onsb6v/YIrRR
+ WRzWmsjhaVaNR45Fohb+E4KN5vQJrprN39cZOxjPlIoCQEhpWsEtIesV4V+mod03Wghl
+ F6OuaOJNToS/jB5mMeWRZFuZcsfgyTWrCir7I8ncmMTfjnYyKu1kr+TJ16NfnH+yhnYq
+ Tqtw==
+X-Gm-Message-State: APjAAAWCVqp1Blb3jiu8ODQ6fi3x3ASbHRGDQslJO4KC9rJRfwmNoJwn
+ yZYrLLwumzBuvoTXQHnX2SAs3g2cItE=
+X-Google-Smtp-Source: APXvYqx41FG48UQUibuw6rT8m/NNzDs22WvRfzOEJkfnd1Mv8WNToSMW5+emhnqcOqWLJDG/VmxqOw==
+X-Received: by 2002:a65:6786:: with SMTP id e6mr31821960pgr.257.1569950198473; 
+ Tue, 01 Oct 2019 10:16:38 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id w7sm2863568pjn.1.2019.10.01.10.16.27
+ by smtp.gmail.com with ESMTPSA id w7sm2863568pjn.1.2019.10.01.10.16.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Oct 2019 10:16:28 -0700 (PDT)
+ Tue, 01 Oct 2019 10:16:37 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 10/18] target/s390x: Return exception from translate_pages
-Date: Tue,  1 Oct 2019 10:16:06 -0700
-Message-Id: <20191001171614.8405-11-richard.henderson@linaro.org>
+Subject: [PATCH v5 17/18] target/s390x: Remove ilen argument from
+ trigger_pgm_exception
+Date: Tue,  1 Oct 2019 10:16:13 -0700
+Message-Id: <20191001171614.8405-18-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001171614.8405-1-richard.henderson@linaro.org>
 References: <20191001171614.8405-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,71 +96,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not raise the exception directly within translate_pages,
-but pass it back so that caller may do so.
+All but one caller passes ILEN_UNWIND, which is not stored.
+For the one use case in s390_cpu_tlb_fill, set int_pgm_ilen
+directly, simply to avoid the assert within do_program_interrupt.
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/s390x/mmu_helper.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ target/s390x/internal.h    | 2 +-
+ target/s390x/excp_helper.c | 7 ++++---
+ target/s390x/interrupt.c   | 7 ++-----
+ target/s390x/mmu_helper.c  | 2 +-
+ 4 files changed, 8 insertions(+), 10 deletions(-)
 
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index c993c3ef40..d37816104d 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -317,7 +317,7 @@ void cpu_unmap_lowcore(LowCore *lowcore);
+ 
+ 
+ /* interrupt.c */
+-void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen);
++void trigger_pgm_exception(CPUS390XState *env, uint32_t code);
+ void cpu_inject_clock_comparator(S390CPU *cpu);
+ void cpu_inject_cpu_timer(S390CPU *cpu);
+ void cpu_inject_emergency_signal(S390CPU *cpu, uint16_t src_cpu_addr);
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index c252e9a7d8..e70c20d363 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -42,7 +42,7 @@ void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env,
+     cpu_restore_state(cs, ra, true);
+     qemu_log_mask(CPU_LOG_INT, "program interrupt at %#" PRIx64 "\n",
+                   env->psw.addr);
+-    trigger_pgm_exception(env, code, ILEN_UNWIND);
++    trigger_pgm_exception(env, code);
+     cpu_loop_exit(cs);
+ }
+ 
+@@ -96,7 +96,7 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ {
+     S390CPU *cpu = S390_CPU(cs);
+ 
+-    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_UNWIND);
++    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING);
+     /* On real machines this value is dropped into LowMem.  Since this
+        is userland, simply put this someplace that cpu_loop can find it.  */
+     cpu->env.__excp_addr = address;
+@@ -186,7 +186,8 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+      * and so unwinding will not occur.  However, ILEN is also undefined
+      * for that case -- we choose to set ILEN = 2.
+      */
+-    trigger_pgm_exception(env, excp, 2);
++    env->int_pgm_ilen = 2;
++    trigger_pgm_exception(env, excp);
+     cpu_loop_exit_restore(cs, retaddr);
+ }
+ 
+diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
+index 2b71e03914..4cdbbc8849 100644
+--- a/target/s390x/interrupt.c
++++ b/target/s390x/interrupt.c
+@@ -22,16 +22,13 @@
+ #endif
+ 
+ /* Ensure to exit the TB after this call! */
+-void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
++void trigger_pgm_exception(CPUS390XState *env, uint32_t code)
+ {
+     CPUState *cs = env_cpu(env);
+ 
+     cs->exception_index = EXCP_PGM;
+     env->int_pgm_code = code;
+-    /* If ILEN_UNWIND, int_pgm_ilen already has the correct value.  */
+-    if (ilen != ILEN_UNWIND) {
+-        env->int_pgm_ilen = ilen;
+-    }
++    /* env->int_pgm_ilen is already set, or will be set during unwinding */
+ }
+ 
+ void s390_program_interrupt(CPUS390XState *env, uint32_t code, uintptr_t ra)
 diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 001d0a9c8a..869debd30a 100644
+index 09c74f17dd..90b81335f9 100644
 --- a/target/s390x/mmu_helper.c
 +++ b/target/s390x/mmu_helper.c
-@@ -451,25 +451,22 @@ nodat:
-  * the MEMOP interface.
-  */
- static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
--                           target_ulong *pages, bool is_write)
-+                           target_ulong *pages, bool is_write, uint64_t *tec)
- {
-     uint64_t asc = cpu->env.psw.mask & PSW_MASK_ASC;
-     CPUS390XState *env = &cpu->env;
-     int ret, i, pflags;
- 
-     for (i = 0; i < nr_pages; i++) {
--        uint64_t tec;
--
--        ret = mmu_translate(env, addr, is_write, asc, &pages[i], &pflags, &tec);
-+        ret = mmu_translate(env, addr, is_write, asc, &pages[i], &pflags, tec);
-         if (ret) {
--            trigger_access_exception(env, ret, ILEN_AUTO, tec);
--            return -EFAULT;
-+            return ret;
+@@ -44,7 +44,7 @@ static void trigger_access_exception(CPUS390XState *env, uint32_t type,
+         if (type != PGM_ADDRESSING) {
+             stq_phys(cs->as, env->psa + offsetof(LowCore, trans_exc_code), tec);
          }
-         if (!address_space_access_valid(&address_space_memory, pages[i],
-                                         TARGET_PAGE_SIZE, is_write,
-                                         MEMTXATTRS_UNSPECIFIED)) {
--            trigger_access_exception(env, PGM_ADDRESSING, ILEN_AUTO, 0);
--            return -EFAULT;
-+            *tec = 0; /* unused */
-+            return PGM_ADDRESSING;
-         }
-         addr += TARGET_PAGE_SIZE;
+-        trigger_pgm_exception(env, type, ILEN_UNWIND);
++        trigger_pgm_exception(env, type);
      }
-@@ -497,6 +494,7 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
- {
-     int currlen, nr_pages, i;
-     target_ulong *pages;
-+    uint64_t tec;
-     int ret;
+ }
  
-     if (kvm_enabled()) {
-@@ -510,8 +508,10 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
-                + 1;
-     pages = g_malloc(nr_pages * sizeof(*pages));
- 
--    ret = translate_pages(cpu, laddr, nr_pages, pages, is_write);
--    if (ret == 0 && hostbuf != NULL) {
-+    ret = translate_pages(cpu, laddr, nr_pages, pages, is_write, &tec);
-+    if (ret) {
-+        trigger_access_exception(&cpu->env, ret, ILEN_AUTO, tec);
-+    } else if (hostbuf != NULL) {
-         /* Copy data by stepping through the area page by page */
-         for (i = 0; i < nr_pages; i++) {
-             currlen = MIN(len, TARGET_PAGE_SIZE - (laddr % TARGET_PAGE_SIZE));
 -- 
 2.17.1
 
