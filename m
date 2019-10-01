@@ -1,4 +1,4 @@
-Return-Path: <SRS0=WBSu=X2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56057ECE58A
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 23:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 322D7C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:02:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D96120818
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 23:59:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D96120818
+	by mail.kernel.org (Postfix) with ESMTPS id 02BB021920
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:02:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02BB021920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49507 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFS3L-0003Lr-Pr
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 19:59:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38966)
+	id 1iFS5o-0004xC-7H
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:02:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39311)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRrj-00018C-0K
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:47:37 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRrs-0001HY-71
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:47:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRrb-0001Js-FW
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:47:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42112)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRrn-0001Yi-37
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:47:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9626
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRra-0001He-U6; Tue, 01 Oct 2019 19:47:27 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ id 1iFRrm-0001PA-Mp; Tue, 01 Oct 2019 19:47:38 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlOat053387; Tue, 1 Oct 2019 19:47:24 -0400
+ x91NlO5q122835; Tue, 1 Oct 2019 19:47:30 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcg17160g-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcgk4094s-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:24 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NlO5Q053078;
- Tue, 1 Oct 2019 19:47:24 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcg171600-1
+ Tue, 01 Oct 2019 19:47:30 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NlTop123007;
+ Tue, 1 Oct 2019 19:47:29 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcgk4094j-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:24 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Njlt0032690;
- Tue, 1 Oct 2019 23:47:22 GMT
+ Tue, 01 Oct 2019 19:47:29 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlX7001425;
+ Tue, 1 Oct 2019 23:47:29 GMT
 Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma02dal.us.ibm.com with ESMTP id 2v9y57qb69-1
+ [9.57.198.27]) by ppma03wdc.us.ibm.com with ESMTP id 2v9y56yf6s-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:22 +0000
+ Tue, 01 Oct 2019 23:47:29 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
  by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91NlLLu44302728
+ x91NlSm744302770
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:21 GMT
+ Tue, 1 Oct 2019 23:47:28 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 306A728059;
- Tue,  1 Oct 2019 23:47:21 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id BC89428058;
+ Tue,  1 Oct 2019 23:47:28 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 14D3828058;
- Tue,  1 Oct 2019 23:47:21 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 9F9C02805A;
+ Tue,  1 Oct 2019 23:47:28 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:21 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:28 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 18/97] iotests: Test commit job start with concurrent I/O
-Date: Tue,  1 Oct 2019 18:44:57 -0500
-Message-Id: <20191001234616.7825-19-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 31/97] q35: Revert to kernel irqchip
+Date: Tue,  1 Oct 2019 18:45:10 -0500
+Message-Id: <20191001234616.7825-32-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -82,12 +83,12 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-10-01_10:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,188 +100,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kevin Wolf <kwolf@redhat.com>
+From: Alex Williamson <alex.williamson@redhat.com>
 
-This tests that concurrent requests are correctly drained before making
-graph modifications instead of running into assertions in
-bdrv_replace_node().
+Backport of QEMU v4.1 commit for stable v4.0.1 release
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit ac6fb43eae1f5029b51e0a3d975fe2111cc8b976)
- Conflicts:
-	tests/qemu-iotests/group
-*prereq for d81e1efb tests
+commit c87759ce876a7a0b17c2bf4f0b964bd51f0ee871
+Author: Alex Williamson <alex.williamson@redhat.com>
+Date:   Tue May 14 14:14:41 2019 -0600
+
+    q35: Revert to kernel irqchip
+
+    Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
+    the default for the pc-q35-4.0 machine type to use split irqchip, which
+    turned out to have disasterous effects on vfio-pci INTx support.  KVM
+    resampling irqfds are registered for handling these interrupts, but
+    these are non-functional in split irqchip mode.  We can't simply test
+    for split irqchip in QEMU as userspace handling of this interrupt is a
+    significant performance regression versus KVM handling (GeForce GPUs
+    assigned to Windows VMs are non-functional without forcing MSI mode or
+    re-enabling kernel irqchip).
+
+    The resolution is to revert the change in default irqchip mode in the
+    pc-q35-4.1 machine and create a pc-q35-4.0.1 machine for the 4.0-stable
+    branch.  The qemu-q35-4.0 machine type should not be used in vfio-pci
+    configurations for devices requiring legacy INTx support without
+    explicitly modifying the VM configuration to use kernel irqchip.
+
+Link: https://bugs.launchpad.net/qemu/+bug/1826422
+Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+(upstream commit c87759ce876a7a0b17c2bf4f0b964bd51f0ee871)
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+*add comments regarding AML mismatch warnings from
+ tests/bios-tables-test.c
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/255        | 83 +++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/255.out    | 16 +++++++
- tests/qemu-iotests/group      |  1 +
- tests/qemu-iotests/iotests.py | 10 ++++-
- 4 files changed, 109 insertions(+), 1 deletion(-)
- create mode 100755 tests/qemu-iotests/255
- create mode 100644 tests/qemu-iotests/255.out
+ hw/core/machine.c        |  3 +++
+ hw/i386/pc.c             |  3 +++
+ hw/i386/pc_q35.c         | 16 ++++++++++++++--
+ include/hw/boards.h      |  3 +++
+ include/hw/i386/pc.h     |  3 +++
+ tests/bios-tables-test.c |  9 +++++++++
+ 6 files changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
-new file mode 100755
-index 0000000000..c0bb37a9b0
---- /dev/null
-+++ b/tests/qemu-iotests/255
-@@ -0,0 +1,83 @@
-+#!/usr/bin/env python
-+#
-+# Test commit job graph modifications while requests are active
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+from iotests import imgfmt
-+
-+iotests.verify_image_format(supported_fmts=['qcow2'])
-+
-+def blockdev_create(vm, options):
-+    result = vm.qmp_log('blockdev-create',
-+                        filters=[iotests.filter_qmp_testfiles],
-+                        job_id='job0', options=options)
-+
-+    if 'return' in result:
-+        assert result['return'] == {}
-+        vm.run_job('job0')
-+    iotests.log("")
-+
-+with iotests.FilePath('t.qcow2') as disk_path, \
-+     iotests.FilePath('t.qcow2.mid') as mid_path, \
-+     iotests.FilePath('t.qcow2.base') as base_path, \
-+     iotests.VM() as vm:
-+
-+    iotests.log("=== Create backing chain and start VM ===")
-+    iotests.log("")
-+
-+    size = 128 * 1024 * 1024
-+    size_str = str(size)
-+
-+    iotests.create_image(base_path, size)
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, mid_path, size_str)
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, disk_path, size_str)
-+
-+    # Create a backing chain like this:
-+    # base <- [throttled: bps-read=4096] <- mid <- overlay
-+
-+    vm.add_object('throttle-group,x-bps-read=4096,id=throttle0')
-+    vm.add_blockdev('file,filename=%s,node-name=base' % (base_path))
-+    vm.add_blockdev('throttle,throttle-group=throttle0,file=base,node-name=throttled')
-+    vm.add_blockdev('file,filename=%s,node-name=mid-file' % (mid_path))
-+    vm.add_blockdev('qcow2,file=mid-file,node-name=mid,backing=throttled')
-+    vm.add_drive_raw('if=none,id=overlay,driver=qcow2,file=%s,backing=mid' % (disk_path))
-+
-+    vm.launch()
-+
-+    iotests.log("=== Start background read requests ===")
-+    iotests.log("")
-+
-+    def start_requests():
-+        vm.hmp_qemu_io('overlay', 'aio_read 0 4k')
-+        vm.hmp_qemu_io('overlay', 'aio_read 0 4k')
-+
-+    start_requests()
-+
-+    iotests.log("=== Run a commit job ===")
-+    iotests.log("")
-+
-+    result = vm.qmp_log('block-commit', job_id='job0', auto_finalize=False,
-+                        device='overlay', top_node='mid')
-+
-+    vm.run_job('job0', auto_finalize=False, pre_finalize=start_requests,
-+                auto_dismiss=True)
-+
-+    vm.shutdown()
-diff --git a/tests/qemu-iotests/255.out b/tests/qemu-iotests/255.out
-new file mode 100644
-index 0000000000..9a2d7cbb77
---- /dev/null
-+++ b/tests/qemu-iotests/255.out
-@@ -0,0 +1,16 @@
-+=== Create backing chain and start VM ===
-+
-+Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+
-+Formatting 'TEST_DIR/PID-t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+
-+=== Start background read requests ===
-+
-+=== Run a commit job ===
-+
-+{"execute": "block-commit", "arguments": {"auto-finalize": false, "device": "overlay", "job-id": "job0", "top-node": "mid"}}
-+{"return": {}}
-+{"execute": "job-finalize", "arguments": {"id": "job0"}}
-+{"return": {}}
-+{"data": {"id": "job0", "type": "commit"}, "event": "BLOCK_JOB_PENDING", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"device": "job0", "len": 134217728, "offset": 134217728, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 4cd2fe80a6..19e2bb3aec 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -249,3 +249,4 @@
- 247 rw auto quick
- 248 rw auto quick
- 253 rw auto quick
-+255 rw auto quick
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 997dc910cb..8b209ea0ee 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -126,6 +126,11 @@ def qemu_img_pipe(*args):
-         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
-     return subp.communicate()[0]
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index b6766632d9..eb34f53a85 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -24,6 +24,9 @@
+ #include "hw/pci/pci.h"
+ #include "hw/mem/nvdimm.h"
  
-+def qemu_img_log(*args):
-+    result = qemu_img_pipe(*args)
-+    log(result, filters=[filter_testfiles])
-+    return result
++GlobalProperty hw_compat_4_0[] = {};
++const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
 +
- def img_info_log(filename, filter_path=None, imgopts=False, extra_args=[]):
-     args = [ 'info' ]
-     if imgopts:
-@@ -533,7 +538,8 @@ class VM(qtest.QEMUQtestMachine):
-         return result
+ GlobalProperty hw_compat_3_1[] = {
+     { "pcie-root-port", "x-speed", "2_5" },
+     { "pcie-root-port", "x-width", "1" },
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f2c15bf1f2..d98b737b8f 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -115,6 +115,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+ /* Physical Address of PVH entry point read from kernel ELF NOTE */
+ static size_t pvh_start_addr;
  
-     # Returns None on success, and an error string on failure
--    def run_job(self, job, auto_finalize=True, auto_dismiss=False):
-+    def run_job(self, job, auto_finalize=True, auto_dismiss=False,
-+                pre_finalize=None):
-         error = None
-         while True:
-             for ev in self.get_qmp_events_filtered(wait=True):
-@@ -546,6 +552,8 @@ class VM(qtest.QEMUQtestMachine):
-                                 error = j['error']
-                                 log('Job failed: %s' % (j['error']))
-                     elif status == 'pending' and not auto_finalize:
-+                        if pre_finalize:
-+                            pre_finalize()
-                         self.qmp_log('job-finalize', id=job)
-                     elif status == 'concluded' and not auto_dismiss:
-                         self.qmp_log('job-dismiss', id=job)
++GlobalProperty pc_compat_4_0[] = {};
++const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
++
+ GlobalProperty pc_compat_3_1[] = {
+     { "intel-iommu", "dma-drain", "off" },
+     { "Opteron_G3" "-" TYPE_X86_CPU, "rdtscp", "off" },
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 372c6b73be..45cc29d1ad 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -357,7 +357,7 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->units_per_default_bus = 1;
+     m->default_machine_opts = "firmware=bios-256k.bin";
+     m->default_display = "std";
+-    m->default_kernel_irqchip_split = true;
++    m->default_kernel_irqchip_split = false;
+     m->no_floppy = 1;
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
+     machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
+@@ -365,12 +365,24 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus = 288;
+ }
+ 
+-static void pc_q35_4_0_machine_options(MachineClass *m)
++static void pc_q35_4_0_1_machine_options(MachineClass *m)
+ {
+     pc_q35_machine_options(m);
+     m->alias = "q35";
+ }
+ 
++DEFINE_Q35_MACHINE(v4_0_1, "pc-q35-4.0.1", NULL,
++                   pc_q35_4_0_1_machine_options);
++
++static void pc_q35_4_0_machine_options(MachineClass *m)
++{
++    pc_q35_4_0_1_machine_options(m);
++    m->default_kernel_irqchip_split = true;
++    m->alias = NULL;
++    compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
++    compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
++}
++
+ DEFINE_Q35_MACHINE(v4_0, "pc-q35-4.0", NULL,
+                    pc_q35_4_0_machine_options);
+ 
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index e231860666..fe1885cbff 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -293,6 +293,9 @@ struct MachineState {
+     } \
+     type_init(machine_initfn##_register_types)
+ 
++extern GlobalProperty hw_compat_4_0[];
++extern const size_t hw_compat_4_0_len;
++
+ extern GlobalProperty hw_compat_3_1[];
+ extern const size_t hw_compat_3_1_len;
+ 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index ca65ef18af..43df7230a2 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -293,6 +293,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+ int e820_get_num_entries(void);
+ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ 
++extern GlobalProperty pc_compat_4_0[];
++extern const size_t pc_compat_4_0_len;
++
+ extern GlobalProperty pc_compat_3_1[];
+ extern const size_t pc_compat_3_1_len;
+ 
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index a506dcbb29..996599991e 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -354,6 +354,15 @@ static void test_acpi_asl(test_data *data)
+             } else {
+                 sdt->tmp_files_retain = true;
+                 exp_sdt->tmp_files_retain = true;
++                /* NOTE: In QEMU 4.0.1, q35 aliases "pc-q35-4.0.1" instead of
++                 * "pc-q35-4.0". This gets encoded into the smbios tables and
++                 * due to the extra characters changes the offset of ACPI
++                 * pointer values allocated by SeaBIOS, causing some tests to
++                 * report AML mismatches. Since ACPI expected file paths rely
++                 * on the "q35" alias being used we can't easily change the
++                 * tests to use pc-q35-4.0, so for now hopefully this friendly
++                 * note will suffice.
++                 */
+                 fprintf(stderr,
+                         "acpi-test: Warning! %.4s mismatch. "
+                         "Actual [asl:%s, aml:%s], Expected [asl:%s, aml:%s].\n",
 -- 
 2.17.1
 
