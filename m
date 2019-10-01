@@ -6,74 +6,76 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C16BFC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB3AECE587
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:53:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9580D2070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:52:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9580D2070B
+	by mail.kernel.org (Postfix) with ESMTPS id 8F24B2070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 00:53:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F24B2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFSsF-0005SL-1j
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:52:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39905)
+	id 1iFStl-0006kv-6V
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 20:53:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40413)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsE-0001dj-N4
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:10 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsW-0001tK-B8
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsB-00027A-Hc
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46892)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRsK-0002Mz-2d
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:48:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33786
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRsA-0001e9-Uc; Tue, 01 Oct 2019 19:48:03 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ id 1iFRsJ-0001pR-An; Tue, 01 Oct 2019 19:48:11 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NlPhN074797; Tue, 1 Oct 2019 19:47:42 -0400
+ x91NlPqW122859; Tue, 1 Oct 2019 19:47:48 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdv2vpy2-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcgk409bd-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:41 -0400
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91Nlfl1075660;
- Tue, 1 Oct 2019 19:47:41 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
- [169.55.91.170])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdv2vpxf-1
+ Tue, 01 Oct 2019 19:47:48 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NllFl123402;
+ Tue, 1 Oct 2019 19:47:47 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcgk409b5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:47:41 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
- by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91Njod0031648;
- Tue, 1 Oct 2019 23:47:40 GMT
+ Tue, 01 Oct 2019 19:47:47 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlZ1029380;
+ Tue, 1 Oct 2019 23:47:46 GMT
 Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma02wdc.us.ibm.com with ESMTP id 2v9y587fc0-1
+ [9.57.198.24]) by ppma01dal.us.ibm.com with ESMTP id 2v9y59fajv-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:40 +0000
+ Tue, 01 Oct 2019 23:47:46 +0000
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
  [9.57.199.106])
  by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91Nldob53477664
+ x91NlkbF41746912
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:40 GMT
+ Tue, 1 Oct 2019 23:47:46 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E063B28059;
- Tue,  1 Oct 2019 23:47:39 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id EC6512805A;
+ Tue,  1 Oct 2019 23:47:45 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C5BA52805A;
- Tue,  1 Oct 2019 23:47:39 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id D0F2928058;
+ Tue,  1 Oct 2019 23:47:45 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.213])
  by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:39 +0000 (GMT)
+ Tue,  1 Oct 2019 23:47:45 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 51/97] virtio-balloon: Rework pbp tracking data
-Date: Tue,  1 Oct 2019 18:45:30 -0500
-Message-Id: <20191001234616.7825-52-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 62/97] block/backup: refactor: split out
+ backup_calculate_cluster_size
+Date: Tue,  1 Oct 2019 18:45:41 -0500
+Message-Id: <20191001234616.7825-63-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
 References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
@@ -87,7 +89,7 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,151 +101,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
- David Hildenbrand <david@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Using the address of a RAMBlock to test for a matching pbp is not really
-safe. Instead, let's use the guest physical address of the base page
-along with the page size (via the number of subpages).
+Split out cluster_size calculation. Move copy-bitmap creation above
+block-job creation, as we are going to share it with upcoming
+backup-top filter, which also should be created before actual block job
+creation.
 
-Also, let's allocate the bitmap separately. This makes the code
-easier to read and maintain - we can reuse bitmap_new().
-
-Prepare the code to move the PBP out of the device.
-
-Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size")
-Fixes: b27b32391404 ("virtio-balloon: Fix possible guest memory corruption with inflates & deflates")
-Cc: qemu-stable@nongnu.org #v4.0.0
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20190722134108.22151-6-david@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 1c5cfc2b7153dd72bf4b8ddc456408eb2b9b66d8)
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190429090842.57910-6-vsementsov@virtuozzo.com
+[mreitz: Dropped a paragraph from the commit message that was left over
+         from a previous version]
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+(cherry picked from commit ae6b12fa4cf7d54add35531c790aaf2bd6d833f3)
+*prereq for 110571be4e
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio-balloon.c | 69 +++++++++++++++++++++++++-------------
- 1 file changed, 46 insertions(+), 23 deletions(-)
+ block/backup.c | 82 ++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 52 insertions(+), 30 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 76b4c58206..49999d0bbe 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -35,16 +35,44 @@
- #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
- 
- struct PartiallyBalloonedPage {
--    RAMBlock *rb;
--    ram_addr_t base;
--    unsigned long bitmap[];
-+    ram_addr_t base_gpa;
-+    long subpages;
-+    unsigned long *bitmap;
+diff --git a/block/backup.c b/block/backup.c
+index b54386b699..d1b94a6dbe 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -507,6 +507,42 @@ static const BlockJobDriver backup_job_driver = {
+     .drain                  = backup_drain,
  };
  
-+static void virtio_balloon_pbp_free(PartiallyBalloonedPage *pbp)
++static int64_t backup_calculate_cluster_size(BlockDriverState *target,
++                                             Error **errp)
 +{
-+    if (!pbp) {
-+        return;
++    int ret;
++    BlockDriverInfo bdi;
++
++    /*
++     * If there is no backing file on the target, we cannot rely on COW if our
++     * backup cluster size is smaller than the target cluster size. Even for
++     * targets with a backing file, try to avoid COW if possible.
++     */
++    ret = bdrv_get_info(target, &bdi);
++    if (ret == -ENOTSUP && !target->backing) {
++        /* Cluster size is not defined */
++        warn_report("The target block device doesn't provide "
++                    "information about the block size and it doesn't have a "
++                    "backing file. The default block size of %u bytes is "
++                    "used. If the actual block size of the target exceeds "
++                    "this default, the backup may be unusable",
++                    BACKUP_CLUSTER_SIZE_DEFAULT);
++        return BACKUP_CLUSTER_SIZE_DEFAULT;
++    } else if (ret < 0 && !target->backing) {
++        error_setg_errno(errp, -ret,
++            "Couldn't determine the cluster size of the target image, "
++            "which has no backing file");
++        error_append_hint(errp,
++            "Aborting, since this may create an unusable destination image\n");
++        return ret;
++    } else if (ret < 0 && target->backing) {
++        /* Not fatal; just trudge on ahead. */
++        return BACKUP_CLUSTER_SIZE_DEFAULT;
 +    }
-+    g_free(pbp->bitmap);
-+    g_free(pbp);
++
++    return MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
 +}
 +
-+static PartiallyBalloonedPage *virtio_balloon_pbp_alloc(ram_addr_t base_gpa,
-+                                                        long subpages)
-+{
-+    PartiallyBalloonedPage *pbp = g_new0(PartiallyBalloonedPage, 1);
-+
-+    pbp->base_gpa = base_gpa;
-+    pbp->subpages = subpages;
-+    pbp->bitmap = bitmap_new(subpages);
-+
-+    return pbp;
-+}
-+
-+static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
-+                                       ram_addr_t base_gpa, long subpages)
-+{
-+    return pbp->subpages == subpages && pbp->base_gpa == base_gpa;
-+}
-+
- static void balloon_inflate_page(VirtIOBalloon *balloon,
-                                  MemoryRegion *mr, hwaddr mr_offset)
+ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *target, int64_t speed,
+                   MirrorSyncMode sync_mode, BdrvDirtyBitmap *sync_bitmap,
+@@ -518,9 +554,10 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+                   JobTxn *txn, Error **errp)
  {
-     void *addr = memory_region_get_ram_ptr(mr) + mr_offset;
--    ram_addr_t rb_offset, rb_aligned_offset;
-+    ram_addr_t rb_offset, rb_aligned_offset, base_gpa;
-+    PartiallyBalloonedPage **pbp = &balloon->pbp;
-     RAMBlock *rb;
-     size_t rb_page_size;
-     int subpages;
-@@ -75,39 +103,34 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
+     int64_t len;
+-    BlockDriverInfo bdi;
+     BackupBlockJob *job = NULL;
+     int ret;
++    int64_t cluster_size;
++    HBitmap *copy_bitmap = NULL;
  
-     rb_aligned_offset = QEMU_ALIGN_DOWN(rb_offset, rb_page_size);
-     subpages = rb_page_size / BALLOON_PAGE_SIZE;
-+    base_gpa = memory_region_get_ram_addr(mr) + mr_offset -
-+               (rb_offset - rb_aligned_offset);
- 
--    if (balloon->pbp
--        && (rb != balloon->pbp->rb
--            || rb_aligned_offset != balloon->pbp->base)) {
-+    if (*pbp && !virtio_balloon_pbp_matches(*pbp, base_gpa, subpages)) {
-         /* We've partially ballooned part of a host page, but now
-          * we're trying to balloon part of a different one.  Too hard,
-          * give up on the old partial page */
--        g_free(balloon->pbp);
--        balloon->pbp = NULL;
-+        virtio_balloon_pbp_free(*pbp);
-+        *pbp = NULL;
+     assert(bs);
+     assert(target);
+@@ -582,6 +619,13 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+         goto error;
      }
  
--    if (!balloon->pbp) {
--        /* Starting on a new host page */
--        size_t bitlen = BITS_TO_LONGS(subpages) * sizeof(unsigned long);
--        balloon->pbp = g_malloc0(sizeof(PartiallyBalloonedPage) + bitlen);
--        balloon->pbp->rb = rb;
--        balloon->pbp->base = rb_aligned_offset;
-+    if (!*pbp) {
-+        *pbp = virtio_balloon_pbp_alloc(base_gpa, subpages);
-     }
++    cluster_size = backup_calculate_cluster_size(target, errp);
++    if (cluster_size < 0) {
++        goto error;
++    }
++
++    copy_bitmap = hbitmap_alloc(len, ctz32(cluster_size));
++
+     /* job->len is fixed, so we can't allow resize */
+     job = block_job_create(job_id, &backup_job_driver, txn, bs,
+                            BLK_PERM_CONSISTENT_READ,
+@@ -610,35 +654,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
  
--    set_bit((rb_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
--            balloon->pbp->bitmap);
-+    set_bit((rb_offset - rb_aligned_offset) / BALLOON_PAGE_SIZE,
-+            (*pbp)->bitmap);
- 
--    if (bitmap_full(balloon->pbp->bitmap, subpages)) {
-+    if (bitmap_full((*pbp)->bitmap, subpages)) {
-         /* We've accumulated a full host page, we can actually discard
-          * it now */
- 
--        ram_block_discard_range(rb, balloon->pbp->base, rb_page_size);
-+        ram_block_discard_range(rb, rb_aligned_offset, rb_page_size);
-         /* We ignore errors from ram_block_discard_range(), because it
-          * has already reported them, and failing to discard a balloon
-          * page is not fatal */
+     /* Detect image-fleecing (and similar) schemes */
+     job->serialize_target_writes = bdrv_chain_contains(target, bs);
 -
--        g_free(balloon->pbp);
--        balloon->pbp = NULL;
-+        virtio_balloon_pbp_free(*pbp);
-+        *pbp = NULL;
+-    /* If there is no backing file on the target, we cannot rely on COW if our
+-     * backup cluster size is smaller than the target cluster size. Even for
+-     * targets with a backing file, try to avoid COW if possible. */
+-    ret = bdrv_get_info(target, &bdi);
+-    if (ret == -ENOTSUP && !target->backing) {
+-        /* Cluster size is not defined */
+-        warn_report("The target block device doesn't provide "
+-                    "information about the block size and it doesn't have a "
+-                    "backing file. The default block size of %u bytes is "
+-                    "used. If the actual block size of the target exceeds "
+-                    "this default, the backup may be unusable",
+-                    BACKUP_CLUSTER_SIZE_DEFAULT);
+-        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
+-    } else if (ret < 0 && !target->backing) {
+-        error_setg_errno(errp, -ret,
+-            "Couldn't determine the cluster size of the target image, "
+-            "which has no backing file");
+-        error_append_hint(errp,
+-            "Aborting, since this may create an unusable destination image\n");
+-        goto error;
+-    } else if (ret < 0 && target->backing) {
+-        /* Not fatal; just trudge on ahead. */
+-        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
+-    } else {
+-        job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
+-    }
+-
+-    job->copy_bitmap = hbitmap_alloc(len, ctz32(job->cluster_size));
++    job->cluster_size = cluster_size;
++    job->copy_bitmap = copy_bitmap;
++    copy_bitmap = NULL;
+     job->use_copy_range = true;
+     job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
+                                         blk_get_max_transfer(job->target));
+@@ -654,6 +672,10 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+     return &job->common;
+ 
+  error:
++    if (copy_bitmap) {
++        assert(!job || !job->copy_bitmap);
++        hbitmap_free(copy_bitmap);
++    }
+     if (sync_bitmap) {
+         bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
      }
- }
- 
-@@ -128,7 +151,7 @@ static void balloon_deflate_page(VirtIOBalloon *balloon,
- 
-     if (balloon->pbp) {
-         /* Let's play safe and always reset the pbp on deflation requests. */
--        g_free(balloon->pbp);
-+        virtio_balloon_pbp_free(balloon->pbp);
-         balloon->pbp = NULL;
-     }
- 
 -- 
 2.17.1
 
