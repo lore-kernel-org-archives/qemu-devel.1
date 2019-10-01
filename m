@@ -2,61 +2,93 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 564AFECE587
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A08C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:53:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F63020815
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:53:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F63020815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE83B20815
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:53:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE83B20815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFTpT-0006h0-KF
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:53:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46623)
+	id 1iFTq0-0006z7-QB
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:53:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iFS0O-0001Az-SU
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:34 -0400
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRtL-0002lz-Br
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iFS0M-0002Vx-T3
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53564)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iFS0I-0002Qt-7y; Tue, 01 Oct 2019 19:56:26 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4A2513058E0A;
- Tue,  1 Oct 2019 23:56:25 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E0D0460BE0;
- Tue,  1 Oct 2019 23:56:11 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 3/8] bootdevice: Add interface to gather LCHS
-Date: Tue,  1 Oct 2019 19:55:47 -0400
-Message-Id: <20191001235552.17790-4-jsnow@redhat.com>
-In-Reply-To: <20191001235552.17790-1-jsnow@redhat.com>
-References: <20191001235552.17790-1-jsnow@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 01 Oct 2019 23:56:25 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRtJ-0003h8-3r
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:49:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57580)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+ id 1iFRtI-0003EN-Ou; Tue, 01 Oct 2019 19:49:12 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x91NmnCY005158; Tue, 1 Oct 2019 19:48:51 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdfxwett-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Oct 2019 19:48:49 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NmmJ1005008;
+ Tue, 1 Oct 2019 19:48:48 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdfxwec3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Oct 2019 19:48:48 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjlEk022439;
+ Tue, 1 Oct 2019 23:47:25 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma04dal.us.ibm.com with ESMTP id 2v9y57yd5d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Oct 2019 23:47:25 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x91NlOdR47513940
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 1 Oct 2019 23:47:24 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3FC8B2805A;
+ Tue,  1 Oct 2019 23:47:24 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 18D1E28058;
+ Tue,  1 Oct 2019 23:47:24 +0000 (GMT)
+Received: from localhost (unknown [9.53.179.213])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue,  1 Oct 2019 23:47:24 +0000 (GMT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 23/97] iotests: add iotest 256 for testing blockdev-backup
+ across iothread contexts
+Date: Tue,  1 Oct 2019 18:45:02 -0500
+Message-Id: <20191001234616.7825-24-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-01_10:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,117 +100,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Arbel Moshe <arbel.moshe@oracle.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Sam Eiderman <shmuel.eiderman@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Karl Heubaum <karl.heubaum@oracle.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-stable@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
+From: John Snow <jsnow@redhat.com>
 
-Add an interface to provide direct logical CHS values for boot devices.
-We will use this interface in the next commits.
-
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-id: 20190925110639.100699-4-sameid@google.com
 Signed-off-by: John Snow <jsnow@redhat.com>
+Message-id: 20190523170643.20794-6-jsnow@redhat.com
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+[mreitz: Moved from 250 to 256]
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+(cherry picked from commit ba7704f2228f16ed61b9903801e28e17666c7e38)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- include/sysemu/sysemu.h |  3 +++
- bootdevice.c            | 55 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
+ tests/qemu-iotests/256     | 122 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/256.out | 119 ++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 242 insertions(+)
+ create mode 100755 tests/qemu-iotests/256
+ create mode 100644 tests/qemu-iotests/256.out
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 44f18eb739..5bc5c79cbc 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -103,6 +103,9 @@ void device_add_bootindex_property(Object *obj, int32=
-_t *bootindex,
-                                    DeviceState *dev, Error **errp);
- void restore_boot_order(void *opaque);
- void validate_bootdevices(const char *devices, Error **errp);
-+void add_boot_device_lchs(DeviceState *dev, const char *suffix,
-+                          uint32_t lcyls, uint32_t lheads, uint32_t lsec=
-s);
-+void del_boot_device_lchs(DeviceState *dev, const char *suffix);
-=20
- /* handler to set the boot_device order for a specific type of MachineCl=
-ass */
- typedef void QEMUBootSetHandler(void *opaque, const char *boot_order,
-diff --git a/bootdevice.c b/bootdevice.c
-index 1d225202f9..bc5e1c2de4 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -343,3 +343,58 @@ void device_add_bootindex_property(Object *obj, int3=
-2_t *bootindex,
-     /* initialize devices' bootindex property to -1 */
-     object_property_set_int(obj, -1, name, NULL);
- }
+diff --git a/tests/qemu-iotests/256 b/tests/qemu-iotests/256
+new file mode 100755
+index 0000000000..c594a43205
+--- /dev/null
++++ b/tests/qemu-iotests/256
+@@ -0,0 +1,122 @@
++#!/usr/bin/env python
++#
++# Test incremental/backup across iothread contexts
++#
++# Copyright (c) 2019 John Snow for Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# owner=jsnow@redhat.com
 +
-+typedef struct FWLCHSEntry FWLCHSEntry;
++import os
++import iotests
++from iotests import log
 +
-+struct FWLCHSEntry {
-+    QTAILQ_ENTRY(FWLCHSEntry) link;
-+    DeviceState *dev;
-+    char *suffix;
-+    uint32_t lcyls;
-+    uint32_t lheads;
-+    uint32_t lsecs;
-+};
++iotests.verify_image_format(supported_fmts=['qcow2'])
++size = 64 * 1024 * 1024
 +
-+static QTAILQ_HEAD(, FWLCHSEntry) fw_lchs =3D
-+    QTAILQ_HEAD_INITIALIZER(fw_lchs);
++with iotests.FilePath('img0') as img0_path, \
++     iotests.FilePath('img1') as img1_path, \
++     iotests.FilePath('img0-full') as img0_full_path, \
++     iotests.FilePath('img1-full') as img1_full_path, \
++     iotests.FilePath('img0-incr') as img0_incr_path, \
++     iotests.FilePath('img1-incr') as img1_incr_path, \
++     iotests.VM() as vm:
 +
-+void add_boot_device_lchs(DeviceState *dev, const char *suffix,
-+                          uint32_t lcyls, uint32_t lheads, uint32_t lsec=
-s)
++    def create_target(filepath, name, size):
++        basename = os.path.basename(filepath)
++        nodename = "file_{}".format(basename)
++        log(vm.command('blockdev-create', job_id='job1',
++                       options={
++                           'driver': 'file',
++                           'filename': filepath,
++                           'size': 0,
++                       }))
++        vm.run_job('job1')
++        log(vm.command('blockdev-add', driver='file',
++                       node_name=nodename, filename=filepath))
++        log(vm.command('blockdev-create', job_id='job2',
++                       options={
++                           'driver': iotests.imgfmt,
++                           'file': nodename,
++                           'size': size,
++                       }))
++        vm.run_job('job2')
++        log(vm.command('blockdev-add', driver=iotests.imgfmt,
++                       node_name=name,
++                       file=nodename))
++
++    log('--- Preparing images & VM ---\n')
++    vm.add_object('iothread,id=iothread0')
++    vm.add_object('iothread,id=iothread1')
++    vm.add_device('virtio-scsi-pci,id=scsi0,iothread=iothread0')
++    vm.add_device('virtio-scsi-pci,id=scsi1,iothread=iothread1')
++    iotests.qemu_img_create('-f', iotests.imgfmt, img0_path, str(size))
++    iotests.qemu_img_create('-f', iotests.imgfmt, img1_path, str(size))
++    vm.add_drive(img0_path, interface='none')
++    vm.add_device('scsi-hd,id=device0,drive=drive0,bus=scsi0.0')
++    vm.add_drive(img1_path, interface='none')
++    vm.add_device('scsi-hd,id=device1,drive=drive1,bus=scsi1.0')
++
++    log('--- Starting VM ---\n')
++    vm.launch()
++
++    log('--- Create Targets & Full Backups ---\n')
++    create_target(img0_full_path, 'img0-full', size)
++    create_target(img1_full_path, 'img1-full', size)
++    ret = vm.qmp_log('transaction', indent=2, actions=[
++        { 'type': 'block-dirty-bitmap-add',
++          'data': { 'node': 'drive0', 'name': 'bitmap0' }},
++        { 'type': 'block-dirty-bitmap-add',
++          'data': { 'node': 'drive1', 'name': 'bitmap1' }},
++        { 'type': 'blockdev-backup',
++          'data': { 'device': 'drive0',
++                    'target': 'img0-full',
++                    'sync': 'full',
++                    'job-id': 'j0' }},
++        { 'type': 'blockdev-backup',
++          'data': { 'device': 'drive1',
++                    'target': 'img1-full',
++                    'sync': 'full',
++                    'job-id': 'j1' }}
++    ])
++    if "error" in ret:
++        raise Exception(ret['error']['desc'])
++    vm.run_job('j0', auto_dismiss=True)
++    vm.run_job('j1', auto_dismiss=True)
++
++    log('\n--- Create Targets & Incremental Backups ---\n')
++    create_target(img0_incr_path, 'img0-incr', size)
++    create_target(img1_incr_path, 'img1-incr', size)
++    ret = vm.qmp_log('transaction', indent=2, actions=[
++        { 'type': 'blockdev-backup',
++          'data': { 'device': 'drive0',
++                    'target': 'img0-incr',
++                    'sync': 'incremental',
++                    'bitmap': 'bitmap0',
++                    'job-id': 'j2' }},
++        { 'type': 'blockdev-backup',
++          'data': { 'device': 'drive1',
++                    'target': 'img1-incr',
++                    'sync': 'incremental',
++                    'bitmap': 'bitmap1',
++                    'job-id': 'j3' }}
++    ])
++    if "error" in ret:
++        raise Exception(ret['error']['desc'])
++    vm.run_job('j2', auto_dismiss=True)
++    vm.run_job('j3', auto_dismiss=True)
++
++    log('\n--- Done ---')
++    vm.shutdown()
+diff --git a/tests/qemu-iotests/256.out b/tests/qemu-iotests/256.out
+new file mode 100644
+index 0000000000..eec38614ec
+--- /dev/null
++++ b/tests/qemu-iotests/256.out
+@@ -0,0 +1,119 @@
++--- Preparing images & VM ---
++
++--- Starting VM ---
++
++--- Create Targets & Full Backups ---
++
++{}
++{"execute": "job-dismiss", "arguments": {"id": "job1"}}
++{"return": {}}
++{}
++{}
++{"execute": "job-dismiss", "arguments": {"id": "job2"}}
++{"return": {}}
++{}
++{}
++{"execute": "job-dismiss", "arguments": {"id": "job1"}}
++{"return": {}}
++{}
++{}
++{"execute": "job-dismiss", "arguments": {"id": "job2"}}
++{"return": {}}
++{}
 +{
-+    FWLCHSEntry *node;
-+
-+    if (!lcyls && !lheads && !lsecs) {
-+        return;
-+    }
-+
-+    assert(dev !=3D NULL || suffix !=3D NULL);
-+
-+    node =3D g_malloc0(sizeof(FWLCHSEntry));
-+    node->suffix =3D g_strdup(suffix);
-+    node->dev =3D dev;
-+    node->lcyls =3D lcyls;
-+    node->lheads =3D lheads;
-+    node->lsecs =3D lsecs;
-+
-+    QTAILQ_INSERT_TAIL(&fw_lchs, node, link);
++  "execute": "transaction",
++  "arguments": {
++    "actions": [
++      {
++        "data": {
++          "name": "bitmap0",
++          "node": "drive0"
++        },
++        "type": "block-dirty-bitmap-add"
++      },
++      {
++        "data": {
++          "name": "bitmap1",
++          "node": "drive1"
++        },
++        "type": "block-dirty-bitmap-add"
++      },
++      {
++        "data": {
++          "device": "drive0",
++          "job-id": "j0",
++          "sync": "full",
++          "target": "img0-full"
++        },
++        "type": "blockdev-backup"
++      },
++      {
++        "data": {
++          "device": "drive1",
++          "job-id": "j1",
++          "sync": "full",
++          "target": "img1-full"
++        },
++        "type": "blockdev-backup"
++      }
++    ]
++  }
 +}
-+
-+void del_boot_device_lchs(DeviceState *dev, const char *suffix)
 +{
-+    FWLCHSEntry *i;
-+
-+    if (dev =3D=3D NULL) {
-+        return;
-+    }
-+
-+    QTAILQ_FOREACH(i, &fw_lchs, link) {
-+        if ((!suffix || !g_strcmp0(i->suffix, suffix)) &&
-+             i->dev =3D=3D dev) {
-+            QTAILQ_REMOVE(&fw_lchs, i, link);
-+            g_free(i->suffix);
-+            g_free(i);
-+
-+            break;
-+        }
-+    }
++  "return": {}
 +}
---=20
-2.21.0
++{"data": {"device": "j0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "j1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++
++--- Create Targets & Incremental Backups ---
++
++{}
++{"execute": "job-dismiss", "arguments": {"id": "job1"}}
++{"return": {}}
++{}
++{}
++{"execute": "job-dismiss", "arguments": {"id": "job2"}}
++{"return": {}}
++{}
++{}
++{"execute": "job-dismiss", "arguments": {"id": "job1"}}
++{"return": {}}
++{}
++{}
++{"execute": "job-dismiss", "arguments": {"id": "job2"}}
++{"return": {}}
++{}
++{
++  "execute": "transaction",
++  "arguments": {
++    "actions": [
++      {
++        "data": {
++          "bitmap": "bitmap0",
++          "device": "drive0",
++          "job-id": "j2",
++          "sync": "incremental",
++          "target": "img0-incr"
++        },
++        "type": "blockdev-backup"
++      },
++      {
++        "data": {
++          "bitmap": "bitmap1",
++          "device": "drive1",
++          "job-id": "j3",
++          "sync": "incremental",
++          "target": "img1-incr"
++        },
++        "type": "blockdev-backup"
++      }
++    ]
++  }
++}
++{
++  "return": {}
++}
++{"data": {"device": "j2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"device": "j3", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++
++--- Done ---
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 19e2bb3aec..7aa6dc9875 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -250,3 +250,4 @@
+ 248 rw auto quick
+ 253 rw auto quick
+ 255 rw auto quick
++256 rw auto quick
+-- 
+2.17.1
 
 
