@@ -6,51 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7795BC352AA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 10:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0134AC352AA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 10:55:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BC912133F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 10:54:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC912133F
+	by mail.kernel.org (Postfix) with ESMTPS id C748D2133F
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Oct 2019 10:55:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C748D2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFFng-0006fm-9K
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 06:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51951)
+	id 1iFFo8-00075D-CG
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 06:55:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iFFkT-0003bG-NP
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 06:51:19 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iFFkO-0007RS-5b
+ (envelope-from <thuth@redhat.com>) id 1iFFkO-0003Xi-6y
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 06:51:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47096)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <thuth@redhat.com>) id 1iFFkM-0007Pl-6p
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 06:51:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33906)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iFFkM-0007OI-5w
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 06:51:11 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iFFkI-0007MA-DB
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 06:51:08 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 20E3E10CC201;
- Tue,  1 Oct 2019 10:51:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8FCDB10DCC94;
+ Tue,  1 Oct 2019 10:51:04 +0000 (UTC)
 Received: from thuth.com (ovpn-116-70.ams2.redhat.com [10.36.116.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3C56D26199;
- Tue,  1 Oct 2019 10:51:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AF71446;
+ Tue,  1 Oct 2019 10:51:03 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 4/5] hw/core/loader: Fix possible crash in rom_copy()
-Date: Tue,  1 Oct 2019 12:50:56 +0200
-Message-Id: <20191001105057.3949-5-thuth@redhat.com>
+Subject: [PULL 2/5] tests: fix echi/ehci typo
+Date: Tue,  1 Oct 2019 12:50:54 +0200
+Message-Id: <20191001105057.3949-3-thuth@redhat.com>
 In-Reply-To: <20191001105057.3949-1-thuth@redhat.com>
 References: <20191001105057.3949-1-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Tue, 01 Oct 2019 10:51:07 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Tue, 01 Oct 2019 10:51:04 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,43 +73,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Both, "rom->addr" and "addr" are derived from the binary image
-that can be loaded with the "-kernel" paramer. The code in
-rom_copy() then calculates:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-    d = dest + (rom->addr - addr);
+While at it, simplify using $(land).
 
-and uses "d" as destination in a memcpy() some lines later. Now with
-bad kernel images, it is possible that rom->addr is smaller than addr,
-thus "rom->addr - addr" gets negative and the memcpy() then tries to
-copy contents from the image to a bad memory location. This could
-maybe be used to inject code from a kernel image into the QEMU binary,
-so we better fix it with an additional sanity check here.
-
-Cc: qemu-stable@nongnu.org
-Reported-by: Guangming Liu
-Buglink: https://bugs.launchpad.net/qemu/+bug/1844635
-Message-Id: <20190925130331.27825-1-thuth@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20190926111955.17276-3-marcandre.lureau@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Fixes: dad5ddcea3b661 ("check: Only test usb-ehci when it is compiled in"=
+)
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/core/loader.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/Makefile.include | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 0d60219364..5099f27dc8 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1281,7 +1281,7 @@ int rom_copy(uint8_t *dest, hwaddr addr, size_t size)
-         if (rom->addr + rom->romsize < addr) {
-             continue;
-         }
--        if (rom->addr > end) {
-+        if (rom->addr > end || rom->addr < addr) {
-             break;
-         }
- 
--- 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 0595914526..3543451ed3 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -182,9 +182,7 @@ check-qtest-i386-$(CONFIG_PVPANIC) +=3D tests/pvpanic=
+-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_I82801B11) +=3D tests/i82801b11-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_IOH3420) +=3D tests/ioh3420-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_USB_UHCI) +=3D tests/usb-hcd-uhci-test$(EXESUF=
+)
+-ifeq ($(CONFIG_USB_ECHI)$(CONFIG_USB_UHCI),yy)
+-check-qtest-i386-y +=3D tests/usb-hcd-ehci-test$(EXESUF)
+-endif
++check-qtest-i386-$(call land,$(CONFIG_USB_EHCI),$(CONFIG_USB_UHCI)) +=3D=
+ tests/usb-hcd-ehci-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_USB_XHCI_NEC) +=3D tests/usb-hcd-xhci-test$(EX=
+ESUF)
+ check-qtest-i386-y +=3D tests/cpu-plug-test$(EXESUF)
+ check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
+--=20
 2.18.1
 
 
