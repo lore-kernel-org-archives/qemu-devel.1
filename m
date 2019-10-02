@@ -2,53 +2,51 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB22C35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 15:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B19EC35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AADEB21848
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 15:54:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AADEB21848
+	by mail.kernel.org (Postfix) with ESMTPS id 2B08321A4C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:02:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B08321A4C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFgxD-00016G-NJ
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 11:54:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54267)
+	id 1iFh5K-0003Nb-4g
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 12:02:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFgw8-0000J8-Gn
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 11:53:09 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFh26-0002Cy-0o
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 11:59:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFgw7-0005fA-Ec
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 11:53:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47708)
+ (envelope-from <mreitz@redhat.com>) id 1iFh24-00007J-18
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 11:59:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44406)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFgw4-0005Yp-MU; Wed, 02 Oct 2019 11:53:04 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iFh1y-000050-Uc; Wed, 02 Oct 2019 11:59:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 26ECC1DBC;
- Wed,  2 Oct 2019 15:53:03 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C80DF3084025;
+ Wed,  2 Oct 2019 15:59:09 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 20E856012C;
- Wed,  2 Oct 2019 15:52:58 +0000 (UTC)
-Subject: Re: [PATCH 3/4] block/mirror: support unaligned write in active mirror
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F0A1608C0;
+ Wed,  2 Oct 2019 15:58:58 +0000 (UTC)
+Subject: Re: [PATCH v2 0/6] qcow2: advanced compression options
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190912151338.21225-1-vsementsov@virtuozzo.com>
- <20190912151338.21225-4-vsementsov@virtuozzo.com>
- <7dec596f-0175-951e-ba3f-2eb8b2a3d8ed@redhat.com>
- <9a857f23-73b0-44c1-dde2-ac68d45dcf93@virtuozzo.com>
- <62e03b60-b9cb-9e59-f876-df40bba96ca0@virtuozzo.com>
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+References: <157002883347.27524.13510585852065141081@8230166b0665>
+ <75c7393b-5ad0-66d5-9592-388f0260a0de@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -74,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3dc81329-443a-288c-0ea1-4190dfc33f5e@redhat.com>
-Date: Wed, 2 Oct 2019 17:52:57 +0200
+Message-ID: <5106e252-43d4-0ed5-ee65-a71a5e569bf7@redhat.com>
+Date: Wed, 2 Oct 2019 17:58:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <62e03b60-b9cb-9e59-f876-df40bba96ca0@virtuozzo.com>
+In-Reply-To: <75c7393b-5ad0-66d5-9592-388f0260a0de@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Ssld2rgKjuWe8EJ5WLTAvzm6tbwAi3VkM"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Wed, 02 Oct 2019 15:53:03 +0000 (UTC)
+ boundary="0L7e6NzqG4BljDKMooIiS2s5cskAJVqAh"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Wed, 02 Oct 2019 15:59:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -100,107 +98,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "patchew-devel@redhat.com" <patchew-devel@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ssld2rgKjuWe8EJ5WLTAvzm6tbwAi3VkM
-Content-Type: multipart/mixed; boundary="QKhBpNNrYVG5xqy1k1an2Apw5cdJXa8nZ"
+--0L7e6NzqG4BljDKMooIiS2s5cskAJVqAh
+Content-Type: multipart/mixed; boundary="eVydxOMXw8MhByKTvqvP8WLLNaRhARhOw"
 
---QKhBpNNrYVG5xqy1k1an2Apw5cdJXa8nZ
+--eVydxOMXw8MhByKTvqvP8WLLNaRhARhOw
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 02.10.19 17:06, Vladimir Sementsov-Ogievskiy wrote:
-> 02.10.2019 18:03, Vladimir Sementsov-Ogievskiy wrote:
->> 02.10.2019 17:57, Max Reitz wrote:
->>> On 12.09.19 17:13, Vladimir Sementsov-Ogievskiy wrote:
->>>> Prior 9adc1cb49af8d do_sync_target_write had a bug: it reset aligned=
--up
->>>> region in the dirty bitmap, which means that we may not copy some by=
-tes
->>>> and assume them copied, which actually leads to producing corrupted
->>>> target.
->>>>
->>>> So 9adc1cb49af8d forced dirty bitmap granularity to be
->>>> request_alignment for mirror-top filter, so we are not working with
->>>> unaligned requests. However forcing large alignment obviously decrea=
-ses
->>>> performance of unaligned requests.
->>>>
->>>> This commit provides another solution for the problem: if unaligned
->>>> padding is already dirty, we can safely ignore it, as
->>>> 1. It's dirty, it will be copied by mirror_iteration anyway
->>>> 2. It's dirty, so skipping it now we don't increase dirtiness of the=
-
->>>> =C2=A0=C2=A0=C2=A0 bitmap and therefore don't damage "synchronicity"=
- of the
->>>> =C2=A0=C2=A0=C2=A0 write-blocking mirror.
->>>
->>> But that=E2=80=99s not what active mirror is for.=C2=A0 The point of =
-active mirror is
->>> that it must converge because every guest write will contribute towar=
-ds
->>> that goal.
->>>
->>> If you skip active mirroring for unaligned guest writes, they will no=
-t
->>> contribute towards converging, but in fact lead to the opposite.
->>>
+On 02.10.19 17:35, Vladimir Sementsov-Ogievskiy wrote:
+> Hi,
+>=20
+> 02.10.2019 18:07, no-reply@patchew.org wrote:
+>> Patchew URL: https://patchew.org/QEMU/1570026166-748566-1-git-send-ema=
+il-andrey.shinkevich@virtuozzo.com/
 >>
->> The will not contribute only if region is already dirty. Actually, aft=
-er
->> first iteration of mirroring (copying the whole disk), all following w=
-rites
->> will contribute, so the whole process must converge. It is a bit simil=
-ar with
->> running one mirror loop in normal mode, and then enable write-blocking=
-=2E
 >>
+>>
+>> Hi,
+>>
+>> This series failed the docker-quick@centos7 build test. Please find th=
+e testing commands and
+>> their output below. If you have Docker installed, you can probably rep=
+roduce it
+>> locally.
+>>
+>> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+>> #!/bin/bash
+>> make docker-image-centos7 V=3D1 NETWORK=3D1
+>> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
+>> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>>
+>>    CC      block/parallels.o
+>>    CC      block/blklogwrites.o
+>>    CC      block/block-backend.o
+>> /tmp/qemu-test/src/block/qcow2.c:4077:64: error: unknown type name 'Ai=
+oTask'
+>>   static coroutine_fn int qcow2_co_pwritev_compressed_task_entry(AioTa=
+sk *task)
+>>                                                                  ^
+>> /tmp/qemu-test/src/block/qcow2.c: In function 'qcow2_co_pwritev_compre=
+ssed_part':
+>> /tmp/qemu-test/src/block/qcow2.c:4098:5: error: unknown type name 'Aio=
+TaskPool'
+>>       AioTaskPool *aio =3D NULL;
+>>       ^
 >=20
 >=20
-> In other words, we don't need "all guest writes contribute" to converge=
-,
-> "all guest writes don't create new dirty bits" is enough, as we have pa=
-rallel
-> mirror iteration which contiguously handles dirty bits.
+> Who knows, what is wrong with it? Seems patchew ignores Based-on: tag i=
+n cover-letter,
+> which is written as "Based-on: https://github.com/XanClic/qemu.git bloc=
+k"...
+> These new types and functions are defined in Max's block branch.
 
-Hm, in a sense.  But it does mean that guest writes will not contribute
-to convergence.
+It would be news to me if Patchew supported such URLs.  I just put it
+into my cover letter for human reviewers...
 
-And that=E2=80=99s against the current definition of write-blocking, whic=
-h does
-state that =E2=80=9Cwhen data is written to the source, write it (synchro=
-nously)
-to the target as well=E2=80=9D.
+(Actually, it would be news to me if Patchew supported Based-on at all
+reliably...)
 
 Max
 
 
---QKhBpNNrYVG5xqy1k1an2Apw5cdJXa8nZ--
+--eVydxOMXw8MhByKTvqvP8WLLNaRhARhOw--
 
---Ssld2rgKjuWe8EJ5WLTAvzm6tbwAi3VkM
+--0L7e6NzqG4BljDKMooIiS2s5cskAJVqAh
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Ux9kACgkQ9AfbAGHV
-z0Alagf/Zt4lkXpa2CKU8rhM8yvoHphW6Qhc97/umwEH/xTJzsZleOoSr19n6G3R
-AMa6i5RnrksOzOJw3oxRnpJ2Nc4any2LP9G5nKxAhrK7ImC+Q/WVIw+6y8nvUH51
-Hp6vENt38olCNEBewDCE4QPuu39KjYJGvgYtiUp/ctq87RQTBFPr6N3Ru9d6hUsm
-oGjpi7mpGGiV+QjaMr4zNdNjrWX4ZefEuAvajwJjE9/Wm0zSMhhNln70eu+jZtKj
-siTxjAiBZCVyub0toHR51IMMuSZFw3W+eAyr00tKi5O8U649ysSPn5/Q553zusXX
-ZHz/6OBVf5Op50uFyDzvPqy1YQb3Hg==
-=/dnT
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2UyUEACgkQ9AfbAGHV
+z0C9yQf/aVAPJWUuJWcL0RhF29wd9SqfSFAWl4QdunhXBiFNaMrqINSZBFDOCBGG
+0U7D4ACmxIbrl9sbl8ibf35lG/6XyDdNC6kv+KmyHUxo8h4N4ET4st2siJZ2B7Bk
+KnelLYzLBHCyXXzXPCUiI5RGPSrP2X3MuOyLm0iX4+svJq1tO8LQQY+GrZ/HJi80
+0wpaF0xWJZXea1S5xuI/RmIjv3A/1Ha7R6VWc03MxNK9bEmmgwlgwTqfsPYnAIKI
+dVPqtYG8QsuNWIZBaavJ2qrUfzrugK27WaMYtjP/wlubseJJLKJaVcmVi1iJ2mtR
+99dlWN/O/f4cb6/plWYFt542KQ8UGw==
+=e5Io
 -----END PGP SIGNATURE-----
 
---Ssld2rgKjuWe8EJ5WLTAvzm6tbwAi3VkM--
+--0L7e6NzqG4BljDKMooIiS2s5cskAJVqAh--
 
