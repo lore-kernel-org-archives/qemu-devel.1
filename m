@@ -2,67 +2,66 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A61FCECE58B
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 06:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45910C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 06:18:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EE2E21783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 06:16:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EE2E21783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F1F7C205C9
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 06:18:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bqSDE/cq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F7C205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFXwV-0004JH-Hx
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 02:16:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47940)
+	id 1iFXxv-0005Mn-1o
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 02:18:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48085)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iFXv8-0003WL-Gr
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 02:15:32 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iFXwO-0004Ng-S6
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 02:16:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iFXv5-00073e-Cv
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 02:15:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54530)
+ (envelope-from <dgibson@ozlabs.org>) id 1iFXwN-0007cq-09
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 02:16:48 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:52807)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iFXv5-00072v-2D
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 02:15:27 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 85C55300CB25;
- Wed,  2 Oct 2019 06:15:25 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0984C60167;
- Wed,  2 Oct 2019 06:15:25 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 85981113864A; Wed,  2 Oct 2019 08:15:23 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Krempa <pkrempa@redhat.com>
-Subject: Re: [PATCH v2 1/2] qapi: Add feature flags to commands in qapi
- introspection
-References: <cover.1568989362.git.pkrempa@redhat.com>
- <96cc954e1cba111a4565123badb42c36e534a5d3.1568989362.git.pkrempa@redhat.com>
- <87blv02q1c.fsf@dusky.pond.sub.org>
-Date: Wed, 02 Oct 2019 08:15:23 +0200
-In-Reply-To: <87blv02q1c.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Tue, 01 Oct 2019 22:01:51 +0200")
-Message-ID: <87d0ffy8p0.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iFXwM-0007aK-K7; Wed, 02 Oct 2019 02:16:46 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46jmB16CsSz9sPl; Wed,  2 Oct 2019 16:16:41 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569997001;
+ bh=UvEvbvkdNMkfehWvigyyLcrNkorbE3OIBp8fGHyKvgY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=bqSDE/cqdQXsi3VjjBCtnTVnkrSGTA38boVgIvsFeQj4i1nV/zVag670P59/Wqt9C
+ d9fjA2NShZ1Fc7UEBothCjv1GYnTszwkdhdPPGDKn/M1q/4CuHY0ZJJ8rpD61qlMUt
+ 5vVOD2rxxNgNyU9hG7682kFP/YfmsTFu8tr8WBh0=
+Date: Wed, 2 Oct 2019 16:16:36 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v3 23/34] spapr, xics, xive: Move irq claim and free from
+ SpaprIrq to SpaprInterruptController
+Message-ID: <20191002061636.GX11105@umbus.fritz.box>
+References: <20191002025208.3487-1-david@gibson.dropbear.id.au>
+ <20191002025208.3487-24-david@gibson.dropbear.id.au>
+ <d4506422-a905-7e53-2daf-5b3bc4cb0470@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 02 Oct 2019 06:15:25 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="dZJOqldIUwtPuZvk"
+Content-Disposition: inline
+In-Reply-To: <d4506422-a905-7e53-2daf-5b3bc4cb0470@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,311 +73,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
 
-> Peter Krempa <pkrempa@redhat.com> writes:
->
->> Similarly to features for struct types introduce the feature flags also
->> for commands. This will allow notifying management layers of fixes and
->> compatible changes in the behaviour of a command which may not be
->> detectable any other way.
->>
->> The changes were heavily inspired by commit 6a8c0b51025.
->>
->> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
-[...]
->> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->> index d61bfdc526..1502820f46 100644
->> --- a/scripts/qapi/common.py
->> +++ b/scripts/qapi/common.py
->
-> Conflicts with my "[PATCH 6/7] qapi: Split up scripts/qapi/common.py"
-> and also with work that has already landed in master.  Untested rebase
-> appended for your convenience.
+--dZJOqldIUwtPuZvk
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I appended a stale version, sorry.  Have a fresh one.
+On Wed, Oct 02, 2019 at 08:10:33AM +0200, C=E9dric Le Goater wrote:
+> On 02/10/2019 04:51, David Gibson wrote:
+> > These methods, like cpu_intc_create, really belong to the interrupt
+> > controller, but need to be called on all possible intcs.
+> >=20
+> > Like cpu_intc_create, therefore, make them methods on the intc and
+> > always call it for all existing intcs.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/intc/spapr_xive.c        |  71 ++++++++++++-----------
+> >  hw/intc/xics_spapr.c        |  29 ++++++++++
+> >  hw/ppc/spapr_irq.c          | 110 +++++++++++-------------------------
+> >  include/hw/ppc/spapr_irq.h  |   5 +-
+> >  include/hw/ppc/spapr_xive.h |   2 -
+> >  5 files changed, 102 insertions(+), 115 deletions(-)
+> >=20
+> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> > index 9338daba3d..ff1a175b44 100644
+> > --- a/hw/intc/spapr_xive.c
+> > +++ b/hw/intc/spapr_xive.c
+> > @@ -487,6 +487,42 @@ static const VMStateDescription vmstate_spapr_xive=
+ =3D {
+> >      },
+> >  };
+> > =20
+> > +static int spapr_xive_claim_irq(SpaprInterruptController *intc, int li=
+sn,
+> > +                                bool lsi, Error **errp)
+> > +{
+> > +    SpaprXive *xive =3D SPAPR_XIVE(intc);
+> > +    XiveSource *xsrc =3D &xive->source;
+> > +
+> > +    assert(lisn < xive->nr_irqs);
+> > +
+> > +    if (xive_eas_is_valid(&xive->eat[lisn])) {
+> > +        error_setg(errp, "IRQ %d is not free", lisn);
+> > +        return -EBUSY;
+> > +    }
+> > +
+> > +    /*
+> > +     * Set default values when allocating an IRQ number
+> > +     */
+> > +    xive->eat[lisn].w |=3D cpu_to_be64(EAS_VALID | EAS_MASKED);
+> > +    if (lsi) {
+> > +        xive_source_irq_set_lsi(xsrc, lisn);
+> > +    }
+> > +
+> > +    if (kvm_irqchip_in_kernel()) {
+> > +        return kvmppc_xive_source_reset_one(xsrc, lisn, errp);
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static void spapr_xive_free_irq(SpaprInterruptController *intc, int li=
+sn)
+> > +{
+> > +    SpaprXive *xive =3D SPAPR_XIVE(intc);
+> > +    assert(lisn < xive->nr_irqs);
+> > +
+> > +    xive->eat[lisn].w &=3D cpu_to_be64(~EAS_VALID);
+> > +}
+> > +
+> >  static Property spapr_xive_properties[] =3D {
+> >      DEFINE_PROP_UINT32("nr-irqs", SpaprXive, nr_irqs, 0),
+> >      DEFINE_PROP_UINT32("nr-ends", SpaprXive, nr_ends, 0),
+> > @@ -536,6 +572,8 @@ static void spapr_xive_class_init(ObjectClass *klas=
+s, void *data)
+> >      xrc->get_tctx =3D spapr_xive_get_tctx;
+> > =20
+> >      sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
+> > +    sicc->claim_irq =3D spapr_xive_claim_irq;
+> > +    sicc->free_irq =3D spapr_xive_free_irq;
+> >  }
+> > =20
+> >  static const TypeInfo spapr_xive_info =3D {
+> > @@ -557,39 +595,6 @@ static void spapr_xive_register_types(void)
+> > =20
+> >  type_init(spapr_xive_register_types)
+> > =20
+> > -int spapr_xive_irq_claim(SpaprXive *xive, int lisn, bool lsi, Error **=
+errp)
+> > -{
+> > -    XiveSource *xsrc =3D &xive->source;
+> > -
+> > -    assert(lisn < xive->nr_irqs);
+> > -
+> > -    if (xive_eas_is_valid(&xive->eat[lisn])) {
+> > -        error_setg(errp, "IRQ %d is not free", lisn);
+> > -        return -EBUSY;
+> > -    }
+> > -
+> > -    /*
+> > -     * Set default values when allocating an IRQ number
+> > -     */
+> > -    xive->eat[lisn].w |=3D cpu_to_be64(EAS_VALID | EAS_MASKED);
+> > -    if (lsi) {
+> > -        xive_source_irq_set_lsi(xsrc, lisn);
+> > -    }
+> > -
+> > -    if (kvm_irqchip_in_kernel()) {
+> > -        return kvmppc_xive_source_reset_one(xsrc, lisn, errp);
+> > -    }
+> > -
+> > -    return 0;
+> > -}
+> > -
+> > -void spapr_xive_irq_free(SpaprXive *xive, int lisn)
+> > -{
+> > -    assert(lisn < xive->nr_irqs);
+> > -
+> > -    xive->eat[lisn].w &=3D cpu_to_be64(~EAS_VALID);
+> > -}
+> > -
+> >  /*
+> >   * XIVE hcalls
+> >   *
+> > diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+> > index 946311b858..224fe1efcd 100644
+> > --- a/hw/intc/xics_spapr.c
+> > +++ b/hw/intc/xics_spapr.c
+> > @@ -346,6 +346,33 @@ static int xics_spapr_cpu_intc_create(SpaprInterru=
+ptController *intc,
+> >      return 0;
+> >  }
+> > =20
+> > +static int xics_spapr_claim_irq(SpaprInterruptController *intc, int ir=
+q,
+> > +                                bool lsi, Error **errp)
+> > +{
+> > +    ICSState *ics =3D ICS_SPAPR(intc);
+> > +
+> > +    assert(ics);
+> > +    assert(ics_valid_irq(ics, irq));
+> > +
+> > +    if (!ics_irq_free(ics, irq - ics->offset)) {
+> > +        error_setg(errp, "IRQ %d is not free", irq);
+> > +        return -EBUSY;
+> > +    }
+> > +
+> > +    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> > +    return 0;
+> > +}
+> > +
+> > +static void xics_spapr_free_irq(SpaprInterruptController *intc, int ir=
+q)
+> > +{
+> > +    ICSState *ics =3D ICS_SPAPR(intc);
+> > +    uint32_t srcno =3D irq - ics->offset;
+> > +
+> > +    assert(ics_valid_irq(ics, irq));
+> > +
+> > +    memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
+> > +}
+> > +
+> >  static void ics_spapr_class_init(ObjectClass *klass, void *data)
+> >  {
+> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > @@ -355,6 +382,8 @@ static void ics_spapr_class_init(ObjectClass *klass=
+, void *data)
+> >      device_class_set_parent_realize(dc, ics_spapr_realize,
+> >                                      &isc->parent_realize);
+> >      sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
+> > +    sicc->claim_irq =3D xics_spapr_claim_irq;
+> > +    sicc->free_irq =3D xics_spapr_free_irq;
+> >  }
+> > =20
+> >  static const TypeInfo ics_spapr_info =3D {
+> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > index 9cb2fc71ca..83882cfad3 100644
+> > --- a/hw/ppc/spapr_irq.c
+> > +++ b/hw/ppc/spapr_irq.c
+> > @@ -98,33 +98,6 @@ static void spapr_irq_init_kvm(SpaprMachineState *sp=
+apr,
+> >   * XICS IRQ backend.
+> >   */
+> > =20
+> > -static int spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, boo=
+l lsi,
+> > -                                Error **errp)
+> > -{
+> > -    ICSState *ics =3D spapr->ics;
+> > -
+> > -    assert(ics);
+> > -    assert(ics_valid_irq(ics, irq));
+> > -
+> > -    if (!ics_irq_free(ics, irq - ics->offset)) {
+> > -        error_setg(errp, "IRQ %d is not free", irq);
+> > -        return -1;
+> > -    }
+> > -
+> > -    ics_set_irq_type(ics, irq - ics->offset, lsi);
+> > -    return 0;
+> > -}
+> > -
+> > -static void spapr_irq_free_xics(SpaprMachineState *spapr, int irq)
+> > -{
+> > -    ICSState *ics =3D spapr->ics;
+> > -    uint32_t srcno =3D irq - ics->offset;
+> > -
+> > -    assert(ics_valid_irq(ics, irq));
+> > -
+> > -    memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
+> > -}
+> > -
+> >  static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monito=
+r *mon)
+> >  {
+> >      CPUState *cs;
+> > @@ -182,8 +155,6 @@ SpaprIrq spapr_irq_xics =3D {
+> >      .xics        =3D true,
+> >      .xive        =3D false,
+> > =20
+> > -    .claim       =3D spapr_irq_claim_xics,
+> > -    .free        =3D spapr_irq_free_xics,
+> >      .print_info  =3D spapr_irq_print_info_xics,
+> >      .dt_populate =3D spapr_dt_xics,
+> >      .post_load   =3D spapr_irq_post_load_xics,
+> > @@ -196,17 +167,6 @@ SpaprIrq spapr_irq_xics =3D {
+> >   * XIVE IRQ backend.
+> >   */
+> > =20
+> > -static int spapr_irq_claim_xive(SpaprMachineState *spapr, int irq, boo=
+l lsi,
+> > -                                Error **errp)
+> > -{
+> > -    return spapr_xive_irq_claim(spapr->xive, irq, lsi, errp);
+> > -}
+> > -
+> > -static void spapr_irq_free_xive(SpaprMachineState *spapr, int irq)
+> > -{
+> > -    spapr_xive_irq_free(spapr->xive, irq);
+> > -}
+> > -
+> >  static void spapr_irq_print_info_xive(SpaprMachineState *spapr,
+> >                                        Monitor *mon)
+> >  {
+> > @@ -272,8 +232,6 @@ SpaprIrq spapr_irq_xive =3D {
+> >      .xics        =3D false,
+> >      .xive        =3D true,
+> > =20
+> > -    .claim       =3D spapr_irq_claim_xive,
+> > -    .free        =3D spapr_irq_free_xive,
+> >      .print_info  =3D spapr_irq_print_info_xive,
+> >      .dt_populate =3D spapr_dt_xive,
+> >      .post_load   =3D spapr_irq_post_load_xive,
+> > @@ -301,33 +259,6 @@ static SpaprIrq *spapr_irq_current(SpaprMachineSta=
+te *spapr)
+> >          &spapr_irq_xive : &spapr_irq_xics;
+> >  }
+> > =20
+> > -static int spapr_irq_claim_dual(SpaprMachineState *spapr, int irq, boo=
+l lsi,
+> > -                                Error **errp)
+> > -{
+> > -    Error *local_err =3D NULL;
+> > -    int ret;
+> > -
+> > -    ret =3D spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
+> > -    if (local_err) {
+> > -        error_propagate(errp, local_err);
+> > -        return ret;
+> > -    }
+> > -
+> > -    ret =3D spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
+> > -    if (local_err) {
+> > -        error_propagate(errp, local_err);
+> > -        return ret;
+> > -    }
+> > -
+> > -    return ret;
+> > -}
+> > -
+> > -static void spapr_irq_free_dual(SpaprMachineState *spapr, int irq)
+> > -{
+> > -    spapr_irq_xics.free(spapr, irq);
+> > -    spapr_irq_xive.free(spapr, irq);
+> > -}
+> > -
+> >  static void spapr_irq_print_info_dual(SpaprMachineState *spapr, Monito=
+r *mon)
+> >  {
+> >      spapr_irq_current(spapr)->print_info(spapr, mon);
+> > @@ -401,8 +332,6 @@ SpaprIrq spapr_irq_dual =3D {
+> >      .xics        =3D true,
+> >      .xive        =3D true,
+> > =20
+> > -    .claim       =3D spapr_irq_claim_dual,
+> > -    .free        =3D spapr_irq_free_dual,
+> >      .print_info  =3D spapr_irq_print_info_dual,
+> >      .dt_populate =3D spapr_irq_dt_populate_dual,
+> >      .post_load   =3D spapr_irq_post_load_dual,
+> > @@ -572,8 +501,11 @@ void spapr_irq_init(SpaprMachineState *spapr, Erro=
+r **errp)
+> > =20
+> >          /* Enable the CPU IPIs */
+> >          for (i =3D 0; i < nr_servers; ++i) {
+> > -            if (spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i,
+> > -                                     false, errp) < 0) {
+> > +            SpaprInterruptControllerClass *sicc
+> > +                =3D SPAPR_INTC_GET_CLASS(spapr->xive);
+> > +
+> > +            if (sicc->claim_irq(SPAPR_INTC(spapr->xive), SPAPR_IRQ_IPI=
+ + i,
+> > +                                false, errp) < 0) {
+>=20
+>=20
+> This should be called for Xive only. Why is this using the class
+> handler ?
 
-[...]
-> No tests.  Please add at least a positive test case to
-> qapi-schema-test.json.
+Only to avoid adding another exported function to the headers, when
+it's already indirectly exposed via the hook.
 
-Adding a feature to some existing command should suffice.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--dZJOqldIUwtPuZvk
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-From 4c216a45764be91b660f26c866352e5cab7b20ee Mon Sep 17 00:00:00 2001
-From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 1 Oct 2019 20:47:04 +0200
-Subject: [PATCH 1/2] qapi: Add feature flags to commands in qapi
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2UQMQACgkQbDjKyiDZ
+s5KKahAAiAjhgWggk4abgllFuoHVX2UhO4a0JFL3f426U5CfPyWi1EtKUNqNtQh+
+WcCzzhLZyDSIt9nmozVuMuzCJQ4tjVqPsVGtnANTR67bT2BpL+cj36E2oS6+SrCl
+fhSzBsayLYK+aHQ0LVfcSMSlo92IJ8gUAIe3YNr1kRLX+eMPQwguj6Lzqxhbtvbz
+44E827s/xqFr/FUcgKTErPoKshIyQLDhj0DlNSOVxGLfKvfIv64W0ZVs+rrjh6F3
+XGMaBp6h69dqUeUVuCyVilKP8nMzTUWjyddo1HvlOvzxXwtOuDGuTBlPNuhF7iva
+ilISkgfRgnzrcse5shbNyTz88GJNX5MxzG3oMSqPmG1tB1rnIHHw9Rwy/qSoG0HS
+lRxQunCyztCe8ob052Hpu+YuHig6qBN9bbaJN12+rWRaO1hfSef2DHs9m0P/CROc
+/tRo/jghazAtBLF/CLC2Uwq8ZH9KVNH6A3DEBJVbk1WDffad96oKO9n9Vzw8C9Ev
+wGvGFmp77WQUL7Z1S8T1s24FzfJuAEwxGPuQWhQJIx3sCliwHhe1DJUmnLc1FjUU
+tuWph28oS36EU/F7yizJ+CXoHl0xBRSrNHWgN27BSfqL/+C0t6DmKUh/YiLATvh/
+TqcUlXMtadw3H1XPDHQHIkpQYUdQAU5Y8P0Ma1oC3+uRo4a2/3c=
+=NVfD
+-----END PGP SIGNATURE-----
 
-Similarly to features for struct types introduce the feature flags also
-for commands. This will allow notifying management layers of fixes and
-compatible changes in the behaviour of a command which may not be
-detectable any other way.
-
-The changes were heavily inspired by commit 6a8c0b51025.
-
-Signed-off-by: Peter Krempa <pkrempa@redhat.com>
----
- docs/devel/qapi-code-gen.txt   |  7 ++++---
- qapi/introspect.json           |  6 +++++-
- scripts/qapi/commands.py       |  3 ++-
- scripts/qapi/doc.py            |  3 ++-
- scripts/qapi/expr.py           | 17 ++++++++++++++++-
- scripts/qapi/introspect.py     |  7 ++++++-
- scripts/qapi/schema.py         | 22 ++++++++++++++++++----
- tests/qapi-schema/test-qapi.py |  7 ++++++-
- 8 files changed, 59 insertions(+), 13 deletions(-)
-
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 64d9e4c6a9..637fa49977 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -640,9 +640,10 @@ change in the QMP syntax (usually by allowing values or operations
- that previously resulted in an error).  QMP clients may still need to
- know whether the extension is available.
- 
--For this purpose, a list of features can be specified for a struct type.
--This is exposed to the client as a list of string, where each string
--signals that this build of QEMU shows a certain behaviour.
-+For this purpose, a list of features can be specified for a command or
-+struct type.  This is exposed to the client as a list of strings,
-+where each string signals that this build of QEMU shows a certain
-+behaviour.
- 
- Each member of the 'features' array defines a feature.  It can either
- be { 'name': STRING, '*if': COND }, or STRING, which is shorthand for
-diff --git a/qapi/introspect.json b/qapi/introspect.json
-index 1843c1cb17..031a954fa9 100644
---- a/qapi/introspect.json
-+++ b/qapi/introspect.json
-@@ -266,13 +266,17 @@
- # @allow-oob: whether the command allows out-of-band execution,
- #             defaults to false (Since: 2.12)
- #
-+# @features: names of features associated with the command, in no particular
-+#            order. (since 4.2)
-+#
- # TODO: @success-response (currently irrelevant, because it's QGA, not QMP)
- #
- # Since: 2.5
- ##
- { 'struct': 'SchemaInfoCommand',
-   'data': { 'arg-type': 'str', 'ret-type': 'str',
--            '*allow-oob': 'bool' } }
-+            '*allow-oob': 'bool',
-+            '*features': [ 'str' ] } }
- 
- ##
- # @SchemaInfoEvent:
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index 898516b086..ab98e504f3 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -277,7 +277,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
-         genc.add(gen_registry(self._regy.get_content(), self._prefix))
- 
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfig):
-+                      success_response, boxed, allow_oob, allow_preconfig,
-+                      features):
-         if not gen:
-             return
-         # FIXME: If T is a user-defined type, the user is responsible
-diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-index dc8919bab7..8278ccbc43 100644
---- a/scripts/qapi/doc.py
-+++ b/scripts/qapi/doc.py
-@@ -249,7 +249,8 @@ class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
-                                body=texi_entity(doc, 'Members', ifcond)))
- 
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfig):
-+                      success_response, boxed, allow_oob, allow_preconfig,
-+                      features):
-         doc = self.cur_doc
-         if boxed:
-             body = texi_body(doc)
-diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index da23063f57..3e1a49e9af 100644
---- a/scripts/qapi/expr.py
-+++ b/scripts/qapi/expr.py
-@@ -277,12 +277,26 @@ def check_command(expr, info):
-     args = expr.get('data')
-     rets = expr.get('returns')
-     boxed = expr.get('boxed', False)
-+    features = expr.get('features')
- 
-     if boxed and args is None:
-         raise QAPISemError(info, "'boxed': true requires 'data'")
-     check_type(args, info, "'data'", allow_dict=not boxed)
-     check_type(rets, info, "'returns'", allow_array=True)
- 
-+    if features:
-+        if not isinstance(features, list):
-+            raise QAPISemError(info, "'features' must be an array")
-+        for f in features:
-+            source = "'features' member"
-+            assert isinstance(f, dict)
-+            check_keys(f, info, source, ['name'], ['if'])
-+            check_name_is_str(f['name'], info, source)
-+            source = "%s '%s'" % (source, f['name'])
-+            check_name_str(f['name'], info, source)
-+            check_if(f, info, source)
-+            normalize_if(f)
-+
- 
- def check_event(expr, info):
-     args = expr.get('data')
-@@ -357,7 +371,7 @@ def check_exprs(exprs):
-         elif meta == 'command':
-             check_keys(expr, info, meta,
-                        ['command'],
--                       ['data', 'returns', 'boxed', 'if',
-+                       ['data', 'returns', 'boxed', 'if', 'features',
-                         'gen', 'success-response', 'allow-oob',
-                         'allow-preconfig'])
-             normalize_members(expr.get('data'))
-@@ -366,6 +380,7 @@ def check_exprs(exprs):
-             check_keys(expr, info, meta,
-                        ['event'], ['data', 'boxed', 'if'])
-             normalize_members(expr.get('data'))
-+            normalize_features(expr.get('features'))
-             check_event(expr, info)
-         else:
-             assert False, 'unexpected meta type'
-diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-index d1c1ad346d..739b35ae8f 100644
---- a/scripts/qapi/introspect.py
-+++ b/scripts/qapi/introspect.py
-@@ -209,13 +209,18 @@ const QLitObject %(c_name)s = %(c_string)s;
-                            for m in variants.variants]}, ifcond)
- 
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfig):
-+                      success_response, boxed, allow_oob, allow_preconfig,
-+                      features):
-         arg_type = arg_type or self._schema.the_empty_object_type
-         ret_type = ret_type or self._schema.the_empty_object_type
-         obj = {'arg-type': self._use_type(arg_type),
-                'ret-type': self._use_type(ret_type)}
-         if allow_oob:
-             obj['allow-oob'] = allow_oob
-+
-+        if features:
-+            obj['features'] = [(f.name, {'if': f.ifcond}) for f in features]
-+
-         self._gen_qlit(name, 'command', obj, ifcond)
- 
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 38041098bd..8a48231766 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -109,7 +109,8 @@ class QAPISchemaVisitor(object):
-         pass
- 
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfig):
-+                      success_response, boxed, allow_oob, allow_preconfig,
-+                      features):
-         pass
- 
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-@@ -658,10 +659,14 @@ class QAPISchemaCommand(QAPISchemaEntity):
-     meta = 'command'
- 
-     def __init__(self, name, info, doc, ifcond, arg_type, ret_type,
--                 gen, success_response, boxed, allow_oob, allow_preconfig):
-+                 gen, success_response, boxed, allow_oob, allow_preconfig,
-+                 features):
-         QAPISchemaEntity.__init__(self, name, info, doc, ifcond)
-         assert not arg_type or isinstance(arg_type, str)
-         assert not ret_type or isinstance(ret_type, str)
-+        for f in features:
-+            assert isinstance(f, QAPISchemaFeature)
-+            f.set_defined_in(name)
-         self._arg_type_name = arg_type
-         self.arg_type = None
-         self._ret_type_name = ret_type
-@@ -671,6 +676,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
-         self.boxed = boxed
-         self.allow_oob = allow_oob
-         self.allow_preconfig = allow_preconfig
-+        self.features = features
- 
-     def check(self, schema):
-         QAPISchemaEntity.check(self, schema)
-@@ -700,13 +706,19 @@ class QAPISchemaCommand(QAPISchemaEntity):
-                         "command's 'returns' cannot take %s"
-                         % self.ret_type.describe())
- 
-+        # Features are in a name space separate from members
-+        seen = {}
-+        for f in self.features:
-+            f.check_clash(self.info, seen)
-+
-     def visit(self, visitor):
-         QAPISchemaEntity.visit(self, visitor)
-         visitor.visit_command(self.name, self.info, self.ifcond,
-                               self.arg_type, self.ret_type,
-                               self.gen, self.success_response,
-                               self.boxed, self.allow_oob,
--                              self.allow_preconfig)
-+                              self.allow_preconfig,
-+                              self.features)
- 
- 
- class QAPISchemaEvent(QAPISchemaEntity):
-@@ -983,6 +995,7 @@ class QAPISchema(object):
-         allow_oob = expr.get('allow-oob', False)
-         allow_preconfig = expr.get('allow-preconfig', False)
-         ifcond = expr.get('if')
-+        features = expr.get('features', [])
-         if isinstance(data, OrderedDict):
-             data = self._make_implicit_object_type(
-                 name, info, doc, ifcond, 'arg', self._make_members(data, info))
-@@ -991,7 +1004,8 @@ class QAPISchema(object):
-             rets = self._make_array_type(rets[0], info)
-         self._def_entity(QAPISchemaCommand(name, info, doc, ifcond, data, rets,
-                                            gen, success_response,
--                                           boxed, allow_oob, allow_preconfig))
-+                                           boxed, allow_oob, allow_preconfig,
-+                                           self._make_features(features, info)))
- 
-     def _def_event(self, expr, info, doc):
-         name = expr['event']
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.py
-index 664254618a..fc41d24bb9 100755
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -72,13 +72,18 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-         self._print_if(ifcond)
- 
-     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
--                      success_response, boxed, allow_oob, allow_preconfig):
-+                      success_response, boxed, allow_oob, allow_preconfig,
-+                      features):
-         print('command %s %s -> %s'
-               % (name, arg_type and arg_type.name,
-                  ret_type and ret_type.name))
-         print('   gen=%s success_response=%s boxed=%s oob=%s preconfig=%s'
-               % (gen, success_response, boxed, allow_oob, allow_preconfig))
-         self._print_if(ifcond)
-+        if features:
-+            for f in features:
-+                print('    feature %s' % f.name)
-+                self._print_if(f.ifcond, 8)
- 
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-         print('event %s %s' % (name, arg_type and arg_type.name))
--- 
-2.21.0
-
+--dZJOqldIUwtPuZvk--
 
