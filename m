@@ -2,64 +2,109 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C41BC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 03:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C10DFC35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 04:41:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53AF62086A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 03:36:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DCp9qzST"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53AF62086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 8E26920842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 04:41:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E26920842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFVRU-0004kE-HQ
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 23:36:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60700)
+	id 1iFWSa-0005vH-PA
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 00:41:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFUlF-00028I-8K
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:53:08 -0400
+ (envelope-from <thuth@redhat.com>) id 1iFWRh-0005M8-JC
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 00:41:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFUlB-0003Wu-SS
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:53:03 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:59571)
+ (envelope-from <thuth@redhat.com>) id 1iFWRe-0004yV-J3
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 00:40:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32940)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFUlB-00031l-DT; Tue, 01 Oct 2019 22:53:01 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46jgfB6w4Nz9sSC; Wed,  2 Oct 2019 12:52:18 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569984738;
- bh=8NIoM3HEHPwMWuOVyT8iaiM/yLh6LSJbwRRlZVX2WHs=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=DCp9qzSTJeuu7dFtJvkIFdoehU5x1v48U7a43SI97zxzSbbbagSpWmze+HQjLxqX8
- 9WjqMh6oXsngBuL+EaJQTAI56wdkbCJP8IqsfRjPKg8q1BI9i0hv3FhUVL/9NSUOgw
- ZFzGpdcXE0aJevXJQLgEuY+3Yuqzhth5aAmwqhaw=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-ppc@nongnu.org,
-	clg@kaod.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v3 30/34] spapr, xics,
- xive: Move SpaprIrq::reset hook logic into activate/deactivate
-Date: Wed,  2 Oct 2019 12:52:04 +1000
-Message-Id: <20191002025208.3487-31-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191002025208.3487-1-david@gibson.dropbear.id.au>
-References: <20191002025208.3487-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iFWRe-0004xp-B8; Wed, 02 Oct 2019 00:40:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 024253082B5F;
+ Wed,  2 Oct 2019 04:40:57 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-20.ams2.redhat.com [10.36.116.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D8F560605;
+ Wed,  2 Oct 2019 04:40:49 +0000 (UTC)
+Subject: Re: [PATCH 00/97] Patch Round-up for stable 4.0.1, freeze on
+ 2019-10-10
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <a9231694-e38b-8bf8-6d97-68c4593bbbfb@redhat.com>
+Date: Wed, 2 Oct 2019 06:40:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 02 Oct 2019 04:40:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,297 +116,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>, groug@kaod.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: Michal Privoznik <mprivozn@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-stable@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It turns out that all the logic in the SpaprIrq::reset hooks (and some in
-the SpaprIrq::post_load hooks) isn't really related to resetting the irq
-backend (that's handled by the backends' own reset routines).  Rather its
-about getting the backend ready to be the active interrupt controller or
-stopping being the active interrupt controller - reset (and post_load) is
-just the only time that changes at present.
+On 02/10/2019 01.44, Michael Roth wrote:
+> Hi everyone,                                                           =
+                                  =20
+>=20
+> The following new patches are queued for QEMU stable v4.0.1:
+>=20
+>   https://github.com/mdroth/qemu/commits/stable-4.0-staging
+>=20
+> The release is planned for 2019-10-17:
+>=20
+>   https://wiki.qemu.org/Planning/4.0
+>=20
+> Please respond here or CC qemu-stable@nongnu.org on any patches you
+> think should be included in the release.
+>
+Would it make sense to include the slirp update:
 
-To make this flow clearer, move the logic into the explicit backend
-activate and deactivate hooks.
+ e1a4a24d262ba5ac74ea1795adb3ab1cd574c7fb
+ "slirp: update with CVE-2019-14378 fix"
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/intc/spapr_xive.c       | 35 ++++++++++++++++++++
- hw/intc/xics_spapr.c       | 16 +++++++++
- hw/ppc/spapr_irq.c         | 67 ++------------------------------------
- include/hw/ppc/spapr_irq.h |  4 ++-
- 4 files changed, 57 insertions(+), 65 deletions(-)
+?
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 37ffb74ca5..e8b946982c 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -640,6 +640,39 @@ static void spapr_xive_dt(SpaprInterruptController *=
-intc, uint32_t nr_servers,
-                      plat_res_int_priorities, sizeof(plat_res_int_priori=
-ties)));
- }
-=20
-+static void spapr_xive_activate(SpaprInterruptController *intc, Error **=
-errp)
-+{
-+    SpaprXive *xive =3D SPAPR_XIVE(intc);
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+
-+        /* (TCG) Set the OS CAM line of the thread interrupt context. */
-+        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
-+    }
-+
-+    if (kvm_enabled()) {
-+        if (spapr_irq_init_kvm(kvmppc_xive_connect, intc, errp) < 0) {
-+            return;
-+        }
-+    }
-+
-+    /* Activate the XIVE MMIOs */
-+    spapr_xive_mmio_set_enabled(xive, true);
-+}
-+
-+static void spapr_xive_deactivate(SpaprInterruptController *intc)
-+{
-+    SpaprXive *xive =3D SPAPR_XIVE(intc);
-+
-+    spapr_xive_mmio_set_enabled(xive, false);
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        kvmppc_xive_disconnect(intc);
-+    }
-+}
-+
- static void spapr_xive_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -658,6 +691,8 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->write_nvt =3D spapr_xive_write_nvt;
-     xrc->get_tctx =3D spapr_xive_get_tctx;
-=20
-+    sicc->activate =3D spapr_xive_activate;
-+    sicc->deactivate =3D spapr_xive_deactivate;
-     sicc->cpu_intc_create =3D spapr_xive_cpu_intc_create;
-     sicc->claim_irq =3D spapr_xive_claim_irq;
-     sicc->free_irq =3D spapr_xive_free_irq;
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 4eabafc7e1..8abbc799ba 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -395,6 +395,20 @@ static void xics_spapr_print_info(SpaprInterruptCont=
-roller *intc, Monitor *mon)
-     ics_pic_print_info(ics, mon);
- }
-=20
-+static void xics_spapr_activate(SpaprInterruptController *intc, Error **=
-errp)
-+{
-+    if (kvm_enabled()) {
-+        spapr_irq_init_kvm(xics_kvm_connect, intc, errp);
-+    }
-+}
-+
-+static void xics_spapr_deactivate(SpaprInterruptController *intc)
-+{
-+    if (kvm_irqchip_in_kernel()) {
-+        xics_kvm_disconnect(intc);
-+    }
-+}
-+
- static void ics_spapr_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -403,6 +417,8 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
-=20
-     device_class_set_parent_realize(dc, ics_spapr_realize,
-                                     &isc->parent_realize);
-+    sicc->activate =3D xics_spapr_activate;
-+    sicc->deactivate =3D xics_spapr_deactivate;
-     sicc->cpu_intc_create =3D xics_spapr_cpu_intc_create;
-     sicc->claim_irq =3D xics_spapr_claim_irq;
-     sicc->free_irq =3D xics_spapr_free_irq;
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 7cd18e5b15..f70b331f44 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -65,9 +65,9 @@ void spapr_irq_msi_free(SpaprMachineState *spapr, int i=
-rq, uint32_t num)
-     bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
- }
-=20
--static int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Erro=
-r **),
--                              SpaprInterruptController *intc,
--                              Error **errp)
-+int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Error **),
-+                       SpaprInterruptController *intc,
-+                       Error **errp)
- {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-     Error *local_err =3D NULL;
-@@ -112,11 +112,6 @@ static int spapr_irq_post_load_xics(SpaprMachineStat=
-e *spapr, int version_id)
-     return 0;
- }
-=20
--static void spapr_irq_reset_xics(SpaprMachineState *spapr, Error **errp)
--{
--    spapr_irq_init_kvm(xics_kvm_connect, SPAPR_INTC(spapr->ics), errp);
--}
--
- SpaprIrq spapr_irq_xics =3D {
-     .nr_xirqs    =3D SPAPR_NR_XIRQS,
-     .nr_msis     =3D SPAPR_NR_MSIS,
-@@ -124,7 +119,6 @@ SpaprIrq spapr_irq_xics =3D {
-     .xive        =3D false,
-=20
-     .post_load   =3D spapr_irq_post_load_xics,
--    .reset       =3D spapr_irq_reset_xics,
- };
-=20
- /*
-@@ -136,26 +130,6 @@ static int spapr_irq_post_load_xive(SpaprMachineStat=
-e *spapr, int version_id)
-     return spapr_xive_post_load(spapr->xive, version_id);
- }
-=20
--static void spapr_irq_reset_xive(SpaprMachineState *spapr, Error **errp)
--{
--    CPUState *cs;
--
--    CPU_FOREACH(cs) {
--        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--
--        /* (TCG) Set the OS CAM line of the thread interrupt context. */
--        spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
--    }
--
--    if (spapr_irq_init_kvm(kvmppc_xive_connect,
--                           SPAPR_INTC(spapr->xive), errp) < 0) {
--        return;
--    }
--
--    /* Activate the XIVE MMIOs */
--    spapr_xive_mmio_set_enabled(spapr->xive, true);
--}
--
- SpaprIrq spapr_irq_xive =3D {
-     .nr_xirqs    =3D SPAPR_NR_XIRQS,
-     .nr_msis     =3D SPAPR_NR_MSIS,
-@@ -163,7 +137,6 @@ SpaprIrq spapr_irq_xive =3D {
-     .xive        =3D true,
-=20
-     .post_load   =3D spapr_irq_post_load_xive,
--    .reset       =3D spapr_irq_reset_xive,
- };
-=20
- /*
-@@ -187,37 +160,9 @@ static SpaprIrq *spapr_irq_current(SpaprMachineState=
- *spapr)
-=20
- static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int versio=
-n_id)
- {
--    /*
--     * Force a reset of the XIVE backend after migration. The machine
--     * defaults to XICS at startup.
--     */
--    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
--        if (kvm_irqchip_in_kernel()) {
--            xics_kvm_disconnect(SPAPR_INTC(spapr->ics));
--        }
--        spapr_irq_xive.reset(spapr, &error_fatal);
--    }
--
-     return spapr_irq_current(spapr)->post_load(spapr, version_id);
- }
-=20
--static void spapr_irq_reset_dual(SpaprMachineState *spapr, Error **errp)
--{
--    /*
--     * Deactivate the XIVE MMIOs. The XIVE backend will reenable them
--     * if selected.
--     */
--    spapr_xive_mmio_set_enabled(spapr->xive, false);
--
--    /* Destroy all KVM devices */
--    if (kvm_irqchip_in_kernel()) {
--        xics_kvm_disconnect(SPAPR_INTC(spapr->ics));
--        kvmppc_xive_disconnect(SPAPR_INTC(spapr->xive));
--    }
--
--    spapr_irq_current(spapr)->reset(spapr, errp);
--}
--
- /*
-  * Define values in sync with the XIVE and XICS backend
-  */
-@@ -228,7 +173,6 @@ SpaprIrq spapr_irq_dual =3D {
-     .xive        =3D true,
-=20
-     .post_load   =3D spapr_irq_post_load_dual,
--    .reset       =3D spapr_irq_reset_dual,
- };
-=20
-=20
-@@ -512,10 +456,6 @@ void spapr_irq_reset(SpaprMachineState *spapr, Error=
- **errp)
-     assert(!spapr->irq_map || bitmap_empty(spapr->irq_map, spapr->irq_ma=
-p_nr));
-=20
-     spapr_irq_update_active_intc(spapr);
--
--    if (spapr->irq->reset) {
--        spapr->irq->reset(spapr, errp);
--    }
- }
-=20
- int spapr_irq_get_phandle(SpaprMachineState *spapr, void *fdt, Error **e=
-rrp)
-@@ -651,7 +591,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
-     .xive        =3D false,
-=20
-     .post_load   =3D spapr_irq_post_load_xics,
--    .reset       =3D spapr_irq_reset_xics,
- };
-=20
- static void spapr_irq_register_types(void)
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index a5fdb963a8..1aff1c2eb7 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -84,7 +84,6 @@ typedef struct SpaprIrq {
-     bool        xive;
-=20
-     int (*post_load)(SpaprMachineState *spapr, int version_id);
--    void (*reset)(SpaprMachineState *spapr, Error **errp);
- } SpaprIrq;
-=20
- extern SpaprIrq spapr_irq_xics;
-@@ -99,6 +98,9 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq);
- int spapr_irq_post_load(SpaprMachineState *spapr, int version_id);
- void spapr_irq_reset(SpaprMachineState *spapr, Error **errp);
- int spapr_irq_get_phandle(SpaprMachineState *spapr, void *fdt, Error **e=
-rrp);
-+int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Error **),
-+                       SpaprInterruptController *intc,
-+                       Error **errp);
-=20
- /*
-  * XICS legacy routines
---=20
-2.21.0
+And maybe these commits:
 
+ 22235bb609c18547cf6b215bad1f9d2ec56ad371
+ "pc-dimm: fix crash when invalid slot number is used"
+
+ 95667c3be0c9f5fc62f58fe845879250f63f7d32
+ "nvme: Set number of queues later in nvme_init()"
+
+ c0bccee9b40ec58c9d165b406ae3d4f63652ce53
+ "hw/ssi/mss-spi: Avoid crash when reading empty RX FIFO"
+
+ a09ef5040477643a7026703199d8781fe048d3a8
+ "hw/display/xlnx_dp: Avoid crash when reading empty RX FIFO"
+
+Thomas
 
