@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D9AC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACBA1C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:48:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1528F2133F
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:45:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1528F2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 764AA20842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:48:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 764AA20842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFe0K-0003fk-4Z
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:45:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48006)
+	id 1iFe36-0005WG-Eq
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:48:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFdyj-0002v3-FE
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:43:39 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFe1c-0004sH-RE
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:46:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFdyi-0002ug-4x
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:43:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38376)
+ (envelope-from <mreitz@redhat.com>) id 1iFe1a-0004T6-90
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:46:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43888)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFdye-0002rZ-5f; Wed, 02 Oct 2019 08:43:32 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iFe1V-0004QH-SH; Wed, 02 Oct 2019 08:46:30 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 650D3300D1CA;
- Wed,  2 Oct 2019 12:43:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2594710C0516;
+ Wed,  2 Oct 2019 12:46:28 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 04E9060BC6;
- Wed,  2 Oct 2019 12:43:29 +0000 (UTC)
-Subject: Re: [PATCH 20/22] iotests: Add tests for invalid Quorum @replaces
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9509810018F8;
+ Wed,  2 Oct 2019 12:46:26 +0000 (UTC)
+Subject: Re: [PATCH 22/22] iotests: Mirror must not attempt to create loops
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190920152804.12875-1-mreitz@redhat.com>
- <20190920152804.12875-21-mreitz@redhat.com>
- <0851cb70-6c1c-13f6-43f1-05eca75e64e6@virtuozzo.com>
+ <20190920152804.12875-23-mreitz@redhat.com>
+ <8ad7e1db-271b-9456-96b1-3ce448423e9f@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3f4e2675-4069-fb7e-ce1d-df211a4ad1f7@redhat.com>
-Date: Wed, 2 Oct 2019 14:43:28 +0200
+Message-ID: <21a76051-0d08-2142-ef56-df083874b303@redhat.com>
+Date: Wed, 2 Oct 2019 14:46:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <0851cb70-6c1c-13f6-43f1-05eca75e64e6@virtuozzo.com>
+In-Reply-To: <8ad7e1db-271b-9456-96b1-3ce448423e9f@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="9OBOweHUJkmhBzOz3Vssqib3O2UGcQJC2"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 02 Oct 2019 12:43:31 +0000 (UTC)
+ boundary="Wqo2PxJDOyyOiR8N9kUmImYwJqXHW6yBi"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Wed, 02 Oct 2019 12:46:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -105,194 +105,286 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9OBOweHUJkmhBzOz3Vssqib3O2UGcQJC2
-Content-Type: multipart/mixed; boundary="e609cZBMl6OcoDkydU8xGk9noq0Bd9NlT"
+--Wqo2PxJDOyyOiR8N9kUmImYwJqXHW6yBi
+Content-Type: multipart/mixed; boundary="KiRVAuQuYdayVFb1SorgJx9t4DisL3ynS"
 
---e609cZBMl6OcoDkydU8xGk9noq0Bd9NlT
+--KiRVAuQuYdayVFb1SorgJx9t4DisL3ynS
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 26.09.19 16:30, Vladimir Sementsov-Ogievskiy wrote:
+On 26.09.19 17:03, Vladimir Sementsov-Ogievskiy wrote:
 > 20.09.2019 18:28, Max Reitz wrote:
->> Add two tests to see that you cannot replace a Quorum child with the
->> mirror job while the child is in use by a different parent.
->>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>   tests/qemu-iotests/041     | 57 ++++++++++++++++++++++++++++++++++++=
-+-
->>   tests/qemu-iotests/041.out |  4 +--
->>   2 files changed, 58 insertions(+), 3 deletions(-)
+>>   tests/qemu-iotests/041     | 152 +++++++++++++++++++++++++++++++++++=
+++
+>>   tests/qemu-iotests/041.out |   4 +-
+>>   2 files changed, 154 insertions(+), 2 deletions(-)
 >>
 >> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
->> index 20ae9750b7..148dc47ce4 100755
+>> index e4cc829fe2..6ea4764ae8 100755
 >> --- a/tests/qemu-iotests/041
 >> +++ b/tests/qemu-iotests/041
->> @@ -34,6 +34,8 @@ quorum_img3 =3D os.path.join(iotests.test_dir, 'quor=
-um3.img')
->>   quorum_repair_img =3D os.path.join(iotests.test_dir, 'quorum_repair.=
-img')
->>   quorum_snapshot_file =3D os.path.join(iotests.test_dir, 'quorum_snap=
-shot.img')
+>> @@ -1265,6 +1265,158 @@ class TestReplaces(iotests.QMPTestCase):
 >>  =20
->> +nbd_sock_path =3D os.path.join(iotests.test_dir, 'nbd.sock')
+>>           self.vm.assert_block_path('filter0/file', 'target')
+>>  =20
+>> +    '''
+>> +    See what happens when the @sync/@replaces configuration dictates
+>> +    creating a loop.
+>> +    '''
+>> +    def test_loop(self):
+>> +        qemu_img('create', '-f', iotests.imgfmt, test_img, str(1 * 10=
+24 * 1024))
 >> +
->>   class TestSingleDrive(iotests.QMPTestCase):
->>       image_len =3D 1 * 1024 * 1024 # MB
->>       qmp_cmd =3D 'drive-mirror'
->> @@ -901,7 +903,8 @@ class TestRepairQuorum(iotests.QMPTestCase):
->>  =20
->>       def tearDown(self):
->>           self.vm.shutdown()
->> -        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_f=
-ile ]:
->> +        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_f=
-ile,
->> +                                 nbd_sock_path ]:
->>               # Do a try/except because the test may have deleted some=
- images
->>               try:
->>                   os.remove(i)
->> @@ -1075,6 +1078,58 @@ class TestRepairQuorum(iotests.QMPTestCase):
->>           self.assert_has_block_node("repair0", quorum_repair_img)
->>           self.vm.assert_block_path('quorum0/children.1', 'repair0')
->>  =20
->> +    '''
->> +    Check that we cannot replace a Quorum child when it has other
->> +    parents.
->> +    '''
->=20
-> you constantly use ''', when PEP8 recommends """ for doc-strings. I can=
-'t
-> complain, as our python code is something not related to PEP8 unfortuna=
-tely..
-
-I just use what I see in existing code.
-
-(And additionally, in scripting languages I tend to just use what works.)=
-
-
->> +    def test_with_other_parent(self):
->=20
-> don't we need
->          if not iotests.supports_quorum():
->              return
-> like in neighbors?
-
-Good point.  Or a decorator, probably.
-
->> +        result =3D self.vm.qmp('nbd-server-start',
->> +                             addr=3D{
->> +                                 'type': 'unix',
->> +                                 'data': {'path': nbd_sock_path}
+>> +        # Dummy group so we can create a NOP filter
+>> +        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-gro=
+up', id=3D'tg0')
+>> +        self.assert_qmp(result, 'return', {})
+>> +
+>> +        result =3D self.vm.qmp('blockdev-add', **{
+>> +                                 'driver': 'throttle',
+>> +                                 'node-name': 'source',
+>> +                                 'throttle-group': 'tg0',
+>> +                                 'file': {
+>> +                                     'driver': iotests.imgfmt,
+>> +                                     'node-name': 'filtered',
+>> +                                     'file': {
+>> +                                         'driver': 'file',
+>> +                                         'filename': test_img
+>> +                                     }
+>> +                                 }
 >> +                             })
 >> +        self.assert_qmp(result, 'return', {})
 >> +
->> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
->> +        self.assert_qmp(result, 'return', {})
+>> +        # Block graph is now:
+>> +        #   source[throttle] --file--> filtered[qcow2] --file--> ...
+>=20
+> or qed, actually
+
+Yep.
+
 >> +
 >> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
-ice=3D'quorum0',
->> +                             sync=3D'full', node_name=3D'repair0', re=
-places=3D'img1',
->> +                             target=3Dquorum_repair_img, format=3Diot=
-ests.imgfmt)
+ice=3D'source',
+>> +                             target=3Dtarget_img, format=3Diotests.im=
+gfmt,
+>> +                             node_name=3D'target', sync=3D'none',
+>> +                             replaces=3D'filtered')
+>> +
+>> +        '''
+>> +        Block graph before mirror exits would be (ignoring mirror_top=
+):
+>> +          source[throttle] --file--> filtered[qcow2] --file--> ...
+>> +          target[qcow2] --file--> ...
+>> +
+>> +        Then, because of sync=3Dnone and drive-mirror in absolute-pat=
+hs mode,
+>> +        the source is attached to the target:
+>> +          source[throttle] --file--> filtered[qcow2] --file--> ...
+>> +                 ^
+>                      |
+>> +              backing
+>> +                 |
+>> +            target[qcow2] --file--> ...
+>> +
+>> +        Replacing filtered by target would yield:
+>> +          source[throttle] --file--> target[qcow2] --file--> ...
+>> +                 ^                        |
+>> +                 +------- backing --------+
+>> +
+>> +        I.e., a loop.  bdrv_replace_node() detects this and simply
+>> +        does not let source's file link point to target.  However,
+>> +        that means that target cannot really replace source.
+>> +
+>> +        drive-mirror should detect this and not allow this case.
+>> +        '''
+>> +
 >> +        self.assert_qmp(result, 'error/desc',
->> +                        "Cannot replace 'img1' by a node mirrored fro=
-m "
->> +                        "'quorum0', because it cannot be guaranteed t=
-hat doing "
->> +                        "so would not lead to an abrupt change of vis=
-ible data")
+>> +                        "Replacing 'filtered' by 'target' with this s=
+ync " + \
+>> +                        "mode would result in a loop, because the for=
+mer " + \
+>> +                        "would be a child of the latter's backing fil=
+e " + \
+>> +                        "('source') after the mirror job")
 >> +
 >> +    '''
->> +    The same as test_with_other_parent(), but add the NBD server only=
+>> +    Test what happens when there would be no loop with the pre-mirror=
 
->> +    when the mirror job is already running.
+>> +    configuration, but something changes during the mirror job that a=
+sks
+>> +    for a loop to be created during completion.
 >> +    '''
->> +    def test_with_other_parents_after_mirror_start(self):
->> +        result =3D self.vm.qmp('nbd-server-start',
->> +                             addr=3D{
->> +                                 'type': 'unix',
->> +                                 'data': {'path': nbd_sock_path}
+>> +    def test_loop_during_mirror(self):
+>> +        qemu_img('create', '-f', iotests.imgfmt, test_img, str(1 * 10=
+24 * 1024))
+>> +
+>> +        result =3D self.vm.qmp('blockdev-add', **{
+>> +                                 'driver': 'null-co',
+>> +                                 'node-name': 'common-base',
+>> +                                 'read-zeroes': True,
+>=20
+> why do you need read-zeroes?
+
+It=E2=80=99s my understanding that we=E2=80=99d better always set it to t=
+rue.
+
+>> +                                 'size': 1 * 1024 * 1024
 >> +                             })
 >> +        self.assert_qmp(result, 'return', {})
 >> +
->> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
-ice=3D'quorum0',
->> +                             sync=3D'full', node_name=3D'repair0', re=
-places=3D'img1',
->> +                             target=3Dquorum_repair_img, format=3Diot=
-ests.imgfmt)
+>> +        result =3D self.vm.qmp('blockdev-add', **{
+>> +                                 'driver': 'copy-on-read',
+>> +                                 'node-name': 'source',
+>> +                                 'file': 'common-base'
+>> +                             })
 >> +        self.assert_qmp(result, 'return', {})
->> +
->> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        # The full error message goes to stderr, so we unfortunately
->> +        # cannot check it here
 >=20
-> We can, iotests 169 and 245 do it with help of vm.get_log()
+> Hmm, why don't you create them both in one query?
 
-Uh, thanks, I=E2=80=99ll look into it.
+No good reason, I think.
 
-Max
+>> +
+>> +        '''
+>=20
+> the following is hard to read without some hint like, "We are going to =
+=2E.."
 
+I=E2=80=99ll see what I can come up with.
+
+>> +        x-blockdev-change can only add children to a quorum node that=
+
+>> +        have no parent yet, so we need an intermediate node between
+>> +        target and common-base that has no parents other than target.=
+
+>> +        We cannot use any parent that would forward the RESIZE
+>> +        permission (because the job takes it, but unshares it on the
+>> +        source), so we make it a backing child of a qcow2 node.
+>> +        Unfortunately, we cannot add backing files to Quorum nodes
+>> +        (because of an op blocker), so we put another raw node betwee=
+n
+>> +        the qcow2 node and common-base.
+>> +        '''
+>> +        result =3D self.vm.qmp('blockdev-add', **{
+>> +                                 'driver': 'qcow2',
+>> +                                 'node-name': 'base-parent',
+>> +                                 'file': {
+>> +                                     'driver': 'file',
+>> +                                     'filename': test_img
+>> +                                 },
+>> +                                 'backing': {
+>> +                                     'driver': 'raw',
+>> +                                     'file': 'common-base'
+>> +                                 }
+>> +                             })
+>> +
+>> +        # Add a quorum node with a single child, we will add
+>> +        # base-parent to prepare a loop later
+>> +        result =3D self.vm.qmp('blockdev-add', **{
+>> +                                 'driver': 'quorum',
+>=20
+> It would be good to skip test-cases if quorum unsupported, like other t=
+est-cases
+> with quorum.
+
+Will do.
+
+>> +                                 'node-name': 'target',
+>> +                                 'vote-threshold': 1,
+>> +                                 'children': [
+>> +                                     {
+>> +                                         'driver': 'null-co',
+>> +                                         'read-zeroes': True
+>> +                                     }
+>> +                                 ]
+>> +                             })
+>> +        self.assert_qmp(result, 'return', {})
+>=20
+> It would be nice to comment out current block graph here...
+
+OK.
+
+>> +
+>> +        result =3D self.vm.qmp('blockdev-mirror', job_id=3D'mirror',
+>> +                             device=3D'source', target=3D'target', sy=
+nc=3D'full',
+>> +                             replaces=3D'common-base')
+>> +        self.assert_qmp(result, 'return', {})
+>> +
+>> +        result =3D self.vm.qmp('x-blockdev-change',
+>> +                             parent=3D'target', node=3D'base-parent')=
+
+>> +        self.assert_qmp(result, 'return', {})
+>> +
+>> +        '''
+>=20
+> and here, like you do in previous test-case. And here it even nicer, as=
+ this test-case
+> is more complex.
+
+OK.
+
+>> +        This asks for this configuration post-mirror:
+>> +
+>> +        source -> target (replaced common-base) -> base-parent
+>> +                                  ^                    |
+>> +                                  |                    v
+>> +                                  +----------------- [raw]
+>> +
+>> +        bdrv_replace_node() would not allow such a configuration, but=
+
+>> +        we should not pretend we can create it, so the mirror job
+>> +        should fail during completion.
+>> +        '''
+>> +
 >> +        self.complete_and_wait('mirror',
 >> +                               completion_error=3D'Operation not perm=
 itted')
 >> +
->> +        # Should not have been replaced
->> +        self.vm.assert_block_path('quorum0/children.1', 'img1')
->> +
->> +
->>   # Test mirroring with a source that does not have any parents (not e=
-ven a
->>   # BlockBackend)
->>   class TestOrphanedSource(iotests.QMPTestCase):
+>>   if __name__ =3D=3D '__main__':
+>>       iotests.main(supported_fmts=3D['qcow2', 'qed'],
+>>                    supported_protocols=3D['file'])
 >> diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
->> index f496be9197..ffc779b4d1 100644
+>> index 877b76fd31..20a8158b99 100644
 >> --- a/tests/qemu-iotests/041.out
 >> +++ b/tests/qemu-iotests/041.out
 >> @@ -1,5 +1,5 @@
 >> -.....................................................................=
-=2E.....................
+=2E........................
 >> +.....................................................................=
-=2E.......................
+=2E..........................
 >>   --------------------------------------------------------------------=
 --
->> -Ran 91 tests
->> +Ran 93 tests
+>> -Ran 94 tests
+>> +Ran 96 tests
 >>  =20
 >>   OK
 >>
 >=20
-> With supports_quorum checked like in neighbor test-cases (or use @iotes=
-ts.skip_if_unsupported):
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >=20
 
 
 
---e609cZBMl6OcoDkydU8xGk9noq0Bd9NlT--
+--KiRVAuQuYdayVFb1SorgJx9t4DisL3ynS--
 
---9OBOweHUJkmhBzOz3Vssqib3O2UGcQJC2
+--Wqo2PxJDOyyOiR8N9kUmImYwJqXHW6yBi
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Um3AACgkQ9AfbAGHV
-z0DpuAf9GCd4y88k25UyM4qDiViim+ar/gAe3wKuImwbF47YomyPm3g6wwiWqpVb
-bMVZ1c79+HD+FKq09sqZMleRc3pLDZny2dPL76gHbRRGno+fAndWzmEYKexdQ8pc
-AEDUOdnMHuRQFw2JLmn8qxpZldnbe4bBc0OFLzy2G2JSr7TfwMfiHrCtmg0dhLs7
-6ZeRi+gLoXCEdMi62z+h+qN+U6syiWeXRu5fqRiIAXl0bofIY+z/fhID5Dx7StYI
-QknH3M4mhkDAb5pyAkaLmDIVf3YwOCnvE8SdVmPk6LhDADd457X80emEeA5jBr2S
-jV6t8lZ5PL3EGfxuHX74TCous8yOOw==
-=7N0m
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2UnCEACgkQ9AfbAGHV
+z0CZmwf/WMpNY0KnM390u5LGl5vxjtYPMTIScupjJLMq/vFQjYnneMavbz3dIjCR
+xihwmDlwKu+5Uu7ujfiTjYsNgibU03vr3C8wP86CNbnQAdxGbhfFe9/wOfPKgVKz
+riG2w86Amzw6RnUDm7vUBBcH5nGXHpSDu1XFOU0NPzj5SUS5/dgcTBVPe2xRZpaJ
+dfxzH3CbkXQ4/kRj07YFG4lM1yLt+FICTHhUL51CiEq3kpKkakfGZOVtRNWlq1el
+PVH3zQ7tV6zhCUddFJGcK5Pf77dr9R6kP8J1IWbSMSYNj+oKSheu+KXCJz5h3AtG
+OTtetda6gr1ucSo/hK68hZXy96+alw==
+=O4sn
 -----END PGP SIGNATURE-----
 
---9OBOweHUJkmhBzOz3Vssqib3O2UGcQJC2--
+--Wqo2PxJDOyyOiR8N9kUmImYwJqXHW6yBi--
 
