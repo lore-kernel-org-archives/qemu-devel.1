@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F729C10F14
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B528C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:05:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FF8321D81
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:04:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 043BF2086A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:05:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sU/rQPoJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FF8321D81
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVSdebq9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043BF2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFi2s-0001iw-MP
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:04:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35428)
+	id 1iFi3w-0002hc-4B
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:05:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35341)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrL-0005QY-Rs
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:16 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrE-0005Gw-LT
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrK-0003PR-Rn
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:15 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:39577)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrD-0003GI-JK
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:08 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50889)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iFhrK-0003Oa-M2
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:14 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id v17so7696397wml.4
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:14 -0700 (PDT)
+ id 1iFhrD-0003FS-D0
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:07 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 5so7993482wmg.0
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=KnkKCuPSW2iymXOv36vMmluvofqorOTBfFwhuGseNQc=;
- b=sU/rQPoJ9FZlR9FrU59GsYPr7XzFiQVdV6XM3cmhW7+wA95OVH9+/R1DF2KzKIV8zx
- fzAz1Qtho0XSR0josAIV5Lz0gOkXm5WJn2KASBh4aGJ3KiURewWUaI/lERQLFj85Soci
- JY04metUAvTT7EqRoPODdcIokOxFgI3ZDfOo8kYDw6+fPSK4u2kPXqLS74E770hUomGx
- lDs1uvxemvkdL7cEJQGsoMHg/gmEJJ+V2GdWVTDH1k27QgutodF8zyAkKEW1Nogtf1UA
- ifBlcX0fCtDnGkPIZjiwu1HQ6vbQClupPel1BVajtcIBCJPSaRKiXp2JnN3BfVKCvDqc
- X46w==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=ouS0dB8g9W/9/ob84vsKA1eSX6rKfJNGsZsisdoDFcw=;
+ b=YVSdebq9N+VVNwzMRuujIk64rU+jbNcFM+zQO9E94CTzXFjGJw2ni4cb6BKk5WFJxB
+ hV1h3UJOg0n/0Deix9IKGq2eKPlRF2RCYu23qC4nYuYY9GizZeCUQyMohqkhI2W4JjJJ
+ EZcXoKOA0KFPRbFH7D84LBUYgxuhrpIPdI2gb6LmPLAdD9lxxsjrrI/xfF1E/1wBlRXT
+ 1cVggENFn0XcoNh7qhWkOdZCoB1/iuxhTCUIC7VjiPh0wXIG7qWjdG/YzLWAAG3Xfh9u
+ mxAfX2mtQjrS4EcsTBiIKdVTDtaybXBTQvNN7CwDLv8PevW0WOgkk4Sgrdq8gK4bVmKb
+ DuKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=KnkKCuPSW2iymXOv36vMmluvofqorOTBfFwhuGseNQc=;
- b=pOogfOkw/Uhfy7zeGxTrtMNBiXlfvDVDyeAMGAIWoTsLuUC8I14Wv7Oo0S8srlZOZ4
- 8AXCnj6ALy59VGsb+BsvVZLEa/nvdq9wRGEAgGp4ucxWkPiduEB+1TTzG2yuXilvRWx5
- WRJ/6DSA9vKURFZijdrA6foDdcxbeiqFWsYhWm+Oh8M+ON1pdZAW7rUhtiMiN4cjlxWz
- ezBTNSjxdElv471TI9qZvwuBQs/U+N27Nu9135SwwfS7MUHs4ZbUMmgj5lZeWJ5a27JM
- zjP34+NE1bHcxh4IT1TwBZtsjfwIt3FaPWgeibm+tJR32Iyy5jZGWXAdZbJ/mZGPO1bW
- XbvQ==
-X-Gm-Message-State: APjAAAVcIVAaMD1Ep/Wk3H4r5HALcP2h1J02//1/QFJAcanog9uN+LWZ
- b/Bu6IELtubtDfaXNCpzE4zGTlV+
-X-Google-Smtp-Source: APXvYqwy52RdFLfQqNYihsSXfmEgFC7fdVKgPuaomz37rj1TecaITXv78orqv2oYFfr4RpQpWbKv0A==
-X-Received: by 2002:a1c:80ca:: with SMTP id b193mr3356516wmd.171.1570035133429; 
- Wed, 02 Oct 2019 09:52:13 -0700 (PDT)
+ bh=ouS0dB8g9W/9/ob84vsKA1eSX6rKfJNGsZsisdoDFcw=;
+ b=ckgHTl1sMH6gBHW/0ClqxIECkOvj0U1o6Vb4iRALBvyLT7ehzGCtxu1ALHvTfNI1tn
+ 922JJN250ck9Lyh/X0N/9USB6hM7vwe7DLdzWhXGO1BX3KJsG6mIvwIrWd6S3KgJfeLP
+ fT3VLEkzHp2oC6flJpNIuBaznC/I9p1vSh6vDBeMLFLuBxp7H5dJlP5S60oeqjen2mma
+ xOt4MlCOAxAguGbUTbQICEIlSzB+nYbFr/iOXQI79Iecmn/Mt7li2HUAdAEeJXVoaXoL
+ VdhnBNR6UzxefNRqqU5eganUmzdy6fpJb8CGH1NK6l/Rb6UL2rU13Y/XCDDlp+DXUJlm
+ WRnQ==
+X-Gm-Message-State: APjAAAVE4Aborg+7AQdfiux51PhFh10QsFJCP/jyfljbSL9hx4PEeP2k
+ PHLYpYqwjfko6Nj7IexQwi++LV1G
+X-Google-Smtp-Source: APXvYqxP0f5RPNxZaxPFgXrXHZCUj6EEUEHThXWyQWYA0eZAYxwmJq4FLR8OybW6GZgyp8yG/5oiOA==
+X-Received: by 2002:a1c:1b14:: with SMTP id b20mr3407087wmb.122.1570035126229; 
+ Wed, 02 Oct 2019 09:52:06 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.12
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.05
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 02 Oct 2019 09:52:12 -0700 (PDT)
+ Wed, 02 Oct 2019 09:52:05 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/30] mips: fix memory leaks in board initialization
-Date: Wed,  2 Oct 2019 18:51:41 +0200
-Message-Id: <1570035113-56848-19-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 11/30] replay: don't synchronize memory operations in replay
+ mode
+Date: Wed,  2 Oct 2019 18:51:34 +0200
+Message-Id: <1570035113-56848-12-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
 References: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,44 +90,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>,
+ Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-They are not a big deal, but they upset asan.
+From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 
+Commit 9458a9a1df1a4c719e24512394d548c1fc7abd22 added synchronization
+of vCPU and migration operations through calling run_on_cpu operation.
+However, in replay mode this synchronization is unneeded, because
+I/O and vCPU threads are already synchronized.
+This patch disables such synchronization for record/replay mode.
+
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 ---
- hw/mips/mips_int.c  | 1 +
- hw/mips/mips_jazz.c | 2 ++
- 2 files changed, 3 insertions(+)
+ exec.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-index 5ebc961..863ed45 100644
---- a/hw/mips/mips_int.c
-+++ b/hw/mips/mips_int.c
-@@ -81,6 +81,7 @@ void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
-     for (i = 0; i < 8; i++) {
-         env->irq[i] = qi[i];
-     }
-+    g_free(qi);
+diff --git a/exec.c b/exec.c
+index 8a0a661..1d6e4d8 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2959,8 +2959,17 @@ static void tcg_log_global_after_sync(MemoryListener *listener)
+      * by pushing the migration thread's memory read after the vCPU thread has
+      * written the memory.
+      */
+-    cpuas = container_of(listener, CPUAddressSpace, tcg_as_listener);
+-    run_on_cpu(cpuas->cpu, do_nothing, RUN_ON_CPU_NULL);
++    if (replay_mode == REPLAY_MODE_NONE) {
++        /*
++         * VGA can make calls to this function while updating the screen.
++         * In record/replay mode this causes a deadlock, because
++         * run_on_cpu waits for rr mutex. Therefore no races are possible
++         * in this case and no need for making run_on_cpu when
++         * record/replay is not enabled.
++         */
++        cpuas = container_of(listener, CPUAddressSpace, tcg_as_listener);
++        run_on_cpu(cpuas->cpu, do_nothing, RUN_ON_CPU_NULL);
++    }
  }
  
- void cpu_mips_soft_irq(CPUMIPSState *env, int irq, int level)
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index c967b97..8d010a0 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -362,6 +362,8 @@ static void mips_jazz_init(MachineState *machine,
- 
-     /* LED indicator */
-     sysbus_create_simple("jazz-led", 0x8000f000, NULL);
-+
-+    g_free(dmas);
- }
- 
- static
+ static void tcg_commit(MemoryListener *listener)
 -- 
 1.8.3.1
 
