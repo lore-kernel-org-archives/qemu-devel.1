@@ -6,53 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4705C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49261C35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8550821920
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:23:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8550821920
+	by mail.kernel.org (Postfix) with ESMTPS id CFCEA21920
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:24:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFCEA21920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFhPR-0002En-OX
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 12:23:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58827)
+	id 1iFhQQ-0003FE-Tm
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 12:24:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58833)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iFhLH-0005m2-RD
+ (envelope-from <kwolf@redhat.com>) id 1iFhLI-0005mS-6U
  for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iFhLG-00020l-84
+ (envelope-from <kwolf@redhat.com>) id 1iFhLG-00021Z-W2
  for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:19:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52770)
+Received: from mx1.redhat.com ([209.132.183.28]:53348)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iFhLA-0001re-Is; Wed, 02 Oct 2019 12:19:02 -0400
+ id 1iFhLE-0001vt-E2; Wed, 02 Oct 2019 12:19:04 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 901075D66B;
- Wed,  2 Oct 2019 16:18:59 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B2AE316D8D1;
+ Wed,  2 Oct 2019 16:19:02 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-117-198.ams2.redhat.com
  [10.36.117.198])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8B0C75D713;
- Wed,  2 Oct 2019 16:18:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6432B5D713;
+ Wed,  2 Oct 2019 16:19:01 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL v2 1/4] block/snapshot: Restrict set of snapshot nodes
-Date: Wed,  2 Oct 2019 18:18:48 +0200
-Message-Id: <20191002161851.1016-2-kwolf@redhat.com>
+Subject: [PULL v2 3/4] iotests: Require Python 3.6 or later
+Date: Wed,  2 Oct 2019 18:18:50 +0200
+Message-Id: <20191002161851.1016-4-kwolf@redhat.com>
 In-Reply-To: <20191002161851.1016-1-kwolf@redhat.com>
 References: <20191002161851.1016-1-kwolf@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 02 Oct 2019 16:18:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Wed, 02 Oct 2019 16:19:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,129 +74,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Nodes involved in internal snapshots were those that were returned by
-bdrv_next(), inserted and not read-only. bdrv_next() in turn returns all
-nodes that are either the root node of a BlockBackend or monitor-owned
-nodes.
+Running iotests is not required to build QEMU, so we can have stricter
+version requirements for Python here and can make use of new features
+and drop compatibility code earlier.
 
-With the typical -drive use, this worked well enough. However, in the
-typical -blockdev case, the user defines one node per option, making all
-nodes monitor-owned nodes. This includes protocol nodes etc. which often
-are not snapshottable, so "savevm" only returns an error.
+This makes qemu-iotests skip all Python tests if a Python version before
+3.6 is used for the build.
 
-Change the conditions so that internal snapshot still include all nodes
-that have a BlockBackend attached (we definitely want to snapshot
-anything attached to a guest device and probably also the built-in NBD
-server; snapshotting block job BlockBackends is more of an accident, but
-a preexisting one), but other monitor-owned nodes are only included if
-they have no parents.
-
-This makes internal snapshots usable again with typical -blockdev
-configurations.
-
-Cc: qemu-stable@nongnu.org
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Peter Krempa <pkrempa@redhat.com>
-Tested-by: Peter Krempa <pkrempa@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/snapshot.c | 26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/check | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/block/snapshot.c b/block/snapshot.c
-index f2f48f926a..8081616ae9 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -31,6 +31,7 @@
- #include "qapi/qmp/qerror.h"
- #include "qapi/qmp/qstring.h"
- #include "qemu/option.h"
-+#include "sysemu/block-backend.h"
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 875399d79f..588c453a94 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -633,6 +633,12 @@ then
+     export SOCKET_SCM_HELPER=3D"$build_iotests/socket_scm_helper"
+ fi
 =20
- QemuOptsList internal_snapshot_opts =3D {
-     .name =3D "snapshot",
-@@ -384,6 +385,16 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriver=
-State *bs,
-     return ret;
- }
-=20
-+static bool bdrv_all_snapshots_includes_bs(BlockDriverState *bs)
-+{
-+    if (!bdrv_is_inserted(bs) || bdrv_is_read_only(bs)) {
-+        return false;
-+    }
++python_usable=3Dfalse
++if $PYTHON -c 'import sys; sys.exit(0 if sys.version_info >=3D (3,6) els=
+e 1)'
++then
++    python_usable=3Dtrue
++fi
 +
-+    /* Include all nodes that are either in use by a BlockBackend, or th=
-at
-+     * aren't attached to any node, but owned by the monitor. */
-+    return bdrv_has_blk(bs) || QLIST_EMPTY(&bs->parents);
-+}
+ default_machine=3D$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*=
+//p')
+ default_alias_machine=3D$($QEMU_PROG -machine help | \
+    sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
+@@ -809,7 +815,12 @@ do
+         start=3D$(_wallclock)
 =20
- /* Group operations. All block drivers are involved.
-  * These functions will properly handle dataplane (take aio_context_acqu=
-ire
-@@ -399,7 +410,7 @@ bool bdrv_all_can_snapshot(BlockDriverState **first_b=
-ad_bs)
-         AioContext *ctx =3D bdrv_get_aio_context(bs);
-=20
-         aio_context_acquire(ctx);
--        if (bdrv_is_inserted(bs) && !bdrv_is_read_only(bs)) {
-+        if (bdrv_all_snapshots_includes_bs(bs)) {
-             ok =3D bdrv_can_snapshot(bs);
-         }
-         aio_context_release(ctx);
-@@ -426,8 +437,9 @@ int bdrv_all_delete_snapshot(const char *name, BlockD=
-riverState **first_bad_bs,
-         AioContext *ctx =3D bdrv_get_aio_context(bs);
-=20
-         aio_context_acquire(ctx);
--        if (bdrv_can_snapshot(bs) &&
--                bdrv_snapshot_find(bs, snapshot, name) >=3D 0) {
-+        if (bdrv_all_snapshots_includes_bs(bs) &&
-+            bdrv_snapshot_find(bs, snapshot, name) >=3D 0)
-+        {
-             ret =3D bdrv_snapshot_delete(bs, snapshot->id_str,
-                                        snapshot->name, err);
-         }
-@@ -455,7 +467,7 @@ int bdrv_all_goto_snapshot(const char *name, BlockDri=
-verState **first_bad_bs,
-         AioContext *ctx =3D bdrv_get_aio_context(bs);
-=20
-         aio_context_acquire(ctx);
--        if (bdrv_can_snapshot(bs)) {
-+        if (bdrv_all_snapshots_includes_bs(bs)) {
-             ret =3D bdrv_snapshot_goto(bs, name, errp);
-         }
-         aio_context_release(ctx);
-@@ -481,7 +493,7 @@ int bdrv_all_find_snapshot(const char *name, BlockDri=
-verState **first_bad_bs)
-         AioContext *ctx =3D bdrv_get_aio_context(bs);
-=20
-         aio_context_acquire(ctx);
--        if (bdrv_can_snapshot(bs)) {
-+        if (bdrv_all_snapshots_includes_bs(bs)) {
-             err =3D bdrv_snapshot_find(bs, &sn, name);
-         }
-         aio_context_release(ctx);
-@@ -512,7 +524,7 @@ int bdrv_all_create_snapshot(QEMUSnapshotInfo *sn,
-         if (bs =3D=3D vm_state_bs) {
-             sn->vm_state_size =3D vm_state_size;
-             err =3D bdrv_snapshot_create(bs, sn);
--        } else if (bdrv_can_snapshot(bs)) {
-+        } else if (bdrv_all_snapshots_includes_bs(bs)) {
-             sn->vm_state_size =3D 0;
-             err =3D bdrv_snapshot_create(bs, sn);
-         }
-@@ -538,7 +550,7 @@ BlockDriverState *bdrv_all_find_vmstate_bs(void)
-         bool found;
-=20
-         aio_context_acquire(ctx);
--        found =3D bdrv_can_snapshot(bs);
-+        found =3D bdrv_all_snapshots_includes_bs(bs) && bdrv_can_snapsho=
-t(bs);
-         aio_context_release(ctx);
-=20
-         if (found) {
+         if [ "$(head -n 1 "$source_iotests/$seq")" =3D=3D "#!/usr/bin/en=
+v python" ]; then
+-            run_command=3D"$PYTHON $seq"
++            if $python_usable; then
++                run_command=3D"$PYTHON $seq"
++            else
++                run_command=3D"false"
++                echo "Unsupported Python version" > $seq.notrun
++            fi
+         else
+             run_command=3D"./$seq"
+         fi
 --=20
 2.20.1
 
