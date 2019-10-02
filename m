@@ -2,87 +2,68 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6324C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 07:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A8AC35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 07:32:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F72B22469
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 07:22:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="S/mJf//t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F72B22469
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cloud.ionos.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F827206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 07:32:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F827206BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFYxT-0003Pf-KI
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 03:21:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56686)
+	id 1iFZ7c-0005qJ-OK
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 03:32:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
- id 1iFYva-0001xX-Gv
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 03:20:03 -0400
+ (envelope-from <clg@kaod.org>) id 1iFZ6d-0005Gs-5r
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 03:31:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
- id 1iFYvZ-0006DL-1R
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 03:20:02 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:45725)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
- id 1iFYvY-0006Bw-PQ
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 03:20:00 -0400
-Received: by mail-ed1-x542.google.com with SMTP id h33so14209569edh.12
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 00:20:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=cloud.ionos.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=19W0eOoTuraQeZeHO2eZBSMYlX1E0zDD99C78StSA/I=;
- b=S/mJf//tO1OqMZiMWNRLlMwiWPVJVFtpDBGPuYi44ApGysKV5TiU5hFdMOOpN+H6+m
- PxsSVKic6oUoX1xr9KzBRqdM8mmGxgko2v+tDvaIgiLITgbesH3SJfrVFxY4S7xMtJp5
- +vnfpEL8hR3Oll7v7ot26Q5PdYDQMTRWhiGfKZxBVMPGIgusFCHzsvh/3fyn7WaegQFf
- pYb8R5KnT9ZVwVXb5xPqTEB9hqKwX59E0iyQB+1oE+rVwP/pm6pOVYQcGMIh0ITlYVJa
- gvfSRUNrS+eIkcdIMOKjWx0twMcdxFcfDH+rrtYwGcvznGAVb6W2Jn9oGxwnJk4Y/jsV
- rgWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=19W0eOoTuraQeZeHO2eZBSMYlX1E0zDD99C78StSA/I=;
- b=etu2NOxsPH27pSWylWt2OYyTzAIhb/CT0cDfYS8pu0Ti2Hcr2NEhYRF+50Jg1gkbVM
- DkyOWwCG9Nac8KvJs4UEWx+C7SqVnyYcrCj9w73B5W+tlP997ll0ck+6AYbPoHfWq9Ut
- b87dzXSgOi0H9a+W7HrHq/Dw08PwEZrnUUQ5UoThVabZUfrq+VhuRE9869BwQ87U7pu0
- uDjzuiSjj8DTxu/DePMdvVHrgO/4U78CxFzYahT91sD5o0j75CYgamvSl8Olb0cdr7By
- 2JqpIRd18vnZnPUdMicb6ac0YJUUAm/cq6CmTwJ1vV0+saa517u8Ijqc/+O2WIMqArXm
- Ataw==
-X-Gm-Message-State: APjAAAW7iisn1mFGSM70LofPaQSX0o4lzIeu3PYdbbR5bYY3aeZPD27V
- NNpW5f2UPmUvkcH6zKQc2zlCB9rzsXc=
-X-Google-Smtp-Source: APXvYqwrs68l9tn7G7xqxYuJQRhyf6YM1OUP/BT74oSB8fdXPiqIxq0H5twVux4zU9POMEAtE2x1pg==
-X-Received: by 2002:a17:907:441d:: with SMTP id
- om21mr1845482ejb.188.1570000799263; 
- Wed, 02 Oct 2019 00:19:59 -0700 (PDT)
-Received: from msennikovskii2.pb.local
- ([2001:1438:4010:2558:d098:3701:97c4:7b4e])
- by smtp.googlemail.com with ESMTPSA id y22sm2147648eje.42.2019.10.02.00.19.58
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Wed, 02 Oct 2019 00:19:58 -0700 (PDT)
-From: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] virtio-net: prevent offloads reset on migration
-Date: Wed,  2 Oct 2019 09:19:45 +0200
-Message-Id: <1570000785-9257-2-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1570000785-9257-1-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
-References: <1570000785-9257-1-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::542
+ (envelope-from <clg@kaod.org>) id 1iFZ6b-0006vf-R0
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 03:31:26 -0400
+Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:45992)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iFZ6b-0006up-H2
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 03:31:25 -0400
+Received: from player738.ha.ovh.net (unknown [10.109.143.189])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 5582710CB3F
+ for <qemu-devel@nongnu.org>; Wed,  2 Oct 2019 09:31:22 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player738.ha.ovh.net (Postfix) with ESMTPSA id 57F88A963622;
+ Wed,  2 Oct 2019 07:31:09 +0000 (UTC)
+Subject: Re: [PATCH v3 22/34] spapr, xics, xive: Move cpu_intc_create from
+ SpaprIrq to SpaprInterruptController
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20191002025208.3487-1-david@gibson.dropbear.id.au>
+ <20191002025208.3487-23-david@gibson.dropbear.id.au>
+ <360fd118-81c2-7ba1-2faf-d735d887d955@kaod.org>
+ <3118503c-10a2-507a-46e5-da0847d7135e@kaod.org>
+ <20191002064015.GY11105@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a6058ebc-9d52-ecf2-9b6f-2329bcbec550@kaod.org>
+Date: Wed, 2 Oct 2019 09:31:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+In-Reply-To: <20191002064015.GY11105@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 5929270385812999065
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeehgdduvddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.37.72
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,159 +75,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently offloads disabled by guest via the VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET
-command are not preserved on VM migration.
-Instead all offloads reported by guest features (via VIRTIO_PCI_GUEST_FEATURES)
-get enabled.
-What happens is: first the VirtIONet::curr_guest_offloads gets restored and offloads
-are getting set correctly:
+On 02/10/2019 08:40, David Gibson wrote:
+> On Wed, Oct 02, 2019 at 08:13:55AM +0200, C=E9dric Le Goater wrote:
+>>>> @@ -527,6 +471,30 @@ static int spapr_irq_check(SpaprMachineState *s=
+papr, Error **errp)
+>>>>  /*
+>>>>   * sPAPR IRQ frontend routines for devices
+>>>>   */
+>>>> +#define ALL_INTCS(spapr_) \
+>>>> +    { SPAPR_INTC((spapr_)->ics), SPAPR_INTC((spapr_)->xive), }
+>>>
+>>> I would have expected this array to be under the machine.
+>>>
+>>>> +int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+>>>> +                              PowerPCCPU *cpu, Error **errp)
+>>>> +{
+>>>> +    SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
+>>>> +    int i;
+>>>> +    int rc;
+>>>> +
+>>>> +    for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
+>>>
+>>> but it would have been difficult to use ARRAY_SIZE. OK then.
+>>>
+>>>> +        SpaprInterruptController *intc =3D intcs[i];
+>>>> +        if (intc) {
+>>>
+>>> Is that test needed ?=20
+>>
+>> I understand now : spapr->ics and spapr->xive can be NULL.=20
+>>
+>> I think using a list would be better.
+>=20
+> Uh.. a list in what sense?
 
- #0  qemu_set_offload (nc=0x555556a11400, csum=1, tso4=0, tso6=0, ecn=0, ufo=0) at net/net.c:474
- #1  virtio_net_apply_guest_offloads (n=0x555557701ca0) at hw/net/virtio-net.c:720
- #2  virtio_net_post_load_device (opaque=0x555557701ca0, version_id=11) at hw/net/virtio-net.c:2334
- #3  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577c80 <vmstate_virtio_net_device>, opaque=0x555557701ca0, version_id=11)
-     at migration/vmstate.c:168
- #4  virtio_load (vdev=0x555557701ca0, f=0x5555569dc010, version_id=11) at hw/virtio/virtio.c:2197
- #5  virtio_device_get (f=0x5555569dc010, opaque=0x555557701ca0, size=0, field=0x55555668cd00 <__compound_literal.5>) at hw/virtio/virtio.c:2036
- #6  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577ce0 <vmstate_virtio_net>, opaque=0x555557701ca0, version_id=11) at migration/vmstate.c:143
- #7  vmstate_load (f=0x5555569dc010, se=0x5555578189e0) at migration/savevm.c:829
- #8  qemu_loadvm_section_start_full (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2211
- #9  qemu_loadvm_state_main (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2395
- #10 qemu_loadvm_state (f=0x5555569dc010) at migration/savevm.c:2467
- #11 process_incoming_migration_co (opaque=0x0) at migration/migration.c:449
+an interrupt controller list under the machine.=20
 
-However later on the features are getting restored, and offloads get reset to
-everything supported by features:
+when created, an interrupt controller would self register in that list.
 
- #0  qemu_set_offload (nc=0x555556a11400, csum=1, tso4=1, tso6=1, ecn=0, ufo=0) at net/net.c:474
- #1  virtio_net_apply_guest_offloads (n=0x555557701ca0) at hw/net/virtio-net.c:720
- #2  virtio_net_set_features (vdev=0x555557701ca0, features=5104441767) at hw/net/virtio-net.c:773
- #3  virtio_set_features_nocheck (vdev=0x555557701ca0, val=5104441767) at hw/virtio/virtio.c:2052
- #4  virtio_load (vdev=0x555557701ca0, f=0x5555569dc010, version_id=11) at hw/virtio/virtio.c:2220
- #5  virtio_device_get (f=0x5555569dc010, opaque=0x555557701ca0, size=0, field=0x55555668cd00 <__compound_literal.5>) at hw/virtio/virtio.c:2036
- #6  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577ce0 <vmstate_virtio_net>, opaque=0x555557701ca0, version_id=11) at migration/vmstate.c:143
- #7  vmstate_load (f=0x5555569dc010, se=0x5555578189e0) at migration/savevm.c:829
- #8  qemu_loadvm_section_start_full (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2211
- #9  qemu_loadvm_state_main (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2395
- #10 qemu_loadvm_state (f=0x5555569dc010) at migration/savevm.c:2467
- #11 process_incoming_migration_co (opaque=0x0) at migration/migration.c:449
-
-This patch fixes this by adding an extra argument to the set_features callback,
-specifying whether the offloads are to be reset, and setting it to false
-for the migration case.
-
-Signed-off-by: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
----
- hw/display/virtio-gpu-base.c |  3 ++-
- hw/net/virtio-net.c          |  5 +++--
- hw/virtio/virtio.c           | 11 ++++++-----
- include/hw/virtio/virtio.h   |  2 +-
- 4 files changed, 12 insertions(+), 9 deletions(-)
-
-diff --git a/hw/display/virtio-gpu-base.c b/hw/display/virtio-gpu-base.c
-index 55e0799..04d8a23 100644
---- a/hw/display/virtio-gpu-base.c
-+++ b/hw/display/virtio-gpu-base.c
-@@ -193,7 +193,8 @@ virtio_gpu_base_get_features(VirtIODevice *vdev, uint64_t features,
- }
- 
- static void
--virtio_gpu_base_set_features(VirtIODevice *vdev, uint64_t features)
-+virtio_gpu_base_set_features(VirtIODevice *vdev, uint64_t features,
-+                               bool reset_offloads)
- {
-     static const uint32_t virgl = (1 << VIRTIO_GPU_F_VIRGL);
-     VirtIOGPUBase *g = VIRTIO_GPU_BASE(vdev);
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index b9e1cd7..5d108e5 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -743,7 +743,8 @@ static inline uint64_t virtio_net_supported_guest_offloads(VirtIONet *n)
-     return virtio_net_guest_offloads_by_features(vdev->guest_features);
- }
- 
--static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
-+static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features,
-+                                        bool reset_offloads)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-     int i;
-@@ -767,7 +768,7 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
-     n->rsc6_enabled = virtio_has_feature(features, VIRTIO_NET_F_RSC_EXT) &&
-         virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO6);
- 
--    if (n->has_vnet_hdr) {
-+    if (reset_offloads && n->has_vnet_hdr) {
-         n->curr_guest_offloads =
-             virtio_net_guest_offloads_by_features(features);
-         virtio_net_apply_guest_offloads(n);
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index a94ea18..70759f2 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2042,14 +2042,15 @@ const VMStateInfo  virtio_vmstate_info = {
-     .put = virtio_device_put,
- };
- 
--static int virtio_set_features_nocheck(VirtIODevice *vdev, uint64_t val)
-+static int virtio_set_features_nocheck(VirtIODevice *vdev, uint64_t val,
-+                              bool reset_offloads)
- {
-     VirtioDeviceClass *k = VIRTIO_DEVICE_GET_CLASS(vdev);
-     bool bad = (val & ~(vdev->host_features)) != 0;
- 
-     val &= vdev->host_features;
-     if (k->set_features) {
--        k->set_features(vdev, val);
-+        k->set_features(vdev, val, reset_offloads);
-     }
-     vdev->guest_features = val;
-     return bad ? -1 : 0;
-@@ -2065,7 +2066,7 @@ int virtio_set_features(VirtIODevice *vdev, uint64_t val)
-     if (vdev->status & VIRTIO_CONFIG_S_FEATURES_OK) {
-         return -EINVAL;
-     }
--    ret = virtio_set_features_nocheck(vdev, val);
-+    ret = virtio_set_features_nocheck(vdev, val, true);
-     if (!ret) {
-         if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
-             /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
-@@ -2217,14 +2218,14 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-          * host_features.
-          */
-         uint64_t features64 = vdev->guest_features;
--        if (virtio_set_features_nocheck(vdev, features64) < 0) {
-+        if (virtio_set_features_nocheck(vdev, features64, false) < 0) {
-             error_report("Features 0x%" PRIx64 " unsupported. "
-                          "Allowed features: 0x%" PRIx64,
-                          features64, vdev->host_features);
-             return -1;
-         }
-     } else {
--        if (virtio_set_features_nocheck(vdev, features) < 0) {
-+        if (virtio_set_features_nocheck(vdev, features, false) < 0) {
-             error_report("Features 0x%x unsupported. "
-                          "Allowed features: 0x%" PRIx64,
-                          features, vdev->host_features);
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index b189788..fd8cac5 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -128,7 +128,7 @@ typedef struct VirtioDeviceClass {
-                              uint64_t requested_features,
-                              Error **errp);
-     uint64_t (*bad_features)(VirtIODevice *vdev);
--    void (*set_features)(VirtIODevice *vdev, uint64_t val);
-+    void (*set_features)(VirtIODevice *vdev, uint64_t val, bool reset_offloads);
-     int (*validate_features)(VirtIODevice *vdev);
-     void (*get_config)(VirtIODevice *vdev, uint8_t *config);
-     void (*set_config)(VirtIODevice *vdev, const uint8_t *config);
--- 
-2.7.4
-
+C.
 
