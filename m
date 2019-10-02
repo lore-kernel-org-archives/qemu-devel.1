@@ -2,71 +2,92 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E88FCC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:45:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A716C35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:49:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1C3C21D81
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:45:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C3C21D81
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4E47521920
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:49:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pZU2ijE+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E47521920
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFhkz-0002ct-PR
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 12:45:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34089)
+	id 1iFhoU-0003wC-Fq
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 12:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iFhk6-000211-ST
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:44:48 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iFhnJ-0003TN-F3
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iFhk5-00075t-I8
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:44:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60654)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iFhk1-000747-VS; Wed, 02 Oct 2019 12:44:42 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2AB8C10A8137;
- Wed,  2 Oct 2019 16:44:41 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-198.ams2.redhat.com
- [10.36.117.198])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BB7F45B69A;
- Wed,  2 Oct 2019 16:44:39 +0000 (UTC)
-Date: Wed, 2 Oct 2019 18:44:38 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
- platforms
-Message-ID: <20191002164438.GD5819@localhost.localdomain>
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-2-jsnow@redhat.com>
- <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
- <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
- <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
- <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
- <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iFhnG-0000Tj-RG
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:48:04 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33201)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iFhnF-0000Rv-TD
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:48:02 -0400
+Received: by mail-pg1-x541.google.com with SMTP id q1so4134769pgb.0
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:48:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=aFh0KZ8ZuSk6TleyDGx/pvDXFGqFdjXOgnQi5+o+DcU=;
+ b=pZU2ijE+Zt5ndvwmZvnpbO5CbRzUEff0zO/PB/jeku07xnLYcJPtq8pimG20XGsmbA
+ sEA40ZyvtDcGtU1XD6vAkj6bpFCTi9+uqNekavpUBXB5D/ybmXMIBZn9f7phtQ76vwm2
+ MuUy/A+vu2x4yO/YTZXhWrMJSynSMIej4sjO82mB+2S6yUoD6EGIfHSbZw2YmgKzfyk1
+ v2ozKGE0OOAkbprCoSQ9CAHlUu7DkMHFlUZLfE3f57gIYN/D7rlhhZKmPHaelU6n+gYs
+ Y65sXmHy6asWTATsAaHZ2bMVOQkF6HywcgqrsY9LSkJDzBX8nb+VSREuo5zGjx/jLRlT
+ UetA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aFh0KZ8ZuSk6TleyDGx/pvDXFGqFdjXOgnQi5+o+DcU=;
+ b=beFej5uBdi4kE4nsWnsX6kC88Utmqe1OP6QBRVees+kSmHS2OYgoNRaqOWgOGu+vlP
+ tsrrHpA8SxDL9rzXou3g+Y151WkJWM/ulMzFLIIil9+FPujls3luRRvhWxfpkgEFoyAB
+ JgiZHb4y6uF8wHzn+WiyqoKqOnkrJTPjIJKCgQhbAFmCuuR8A/2cnhoYfiZMoDwGEE1n
+ iSgmWt8Q7NwrOs4BXoFMiCJGxsDKpWIE/kYqfDrWmZJPh5biH8rGnjdRkQugCqSiCQEf
+ OX4MhdBJ1QjbuA2ItnTgfOMbBYdxlknng70AjmQ3GzZrdv7ciLQV9rpz9ifxpSrevRWV
+ Wvaw==
+X-Gm-Message-State: APjAAAXGpfLPJytfJ7WfoeiPaWZMr41P1r2bsq+tzPW1zcUT8xvGQ48A
+ HUf62SJBjUkS9ZrVzpbz9TQuSg==
+X-Google-Smtp-Source: APXvYqwtDOC9EZHIjU9PUakntyrYlOfkUoZOgNIj/RqzgmsHaC6fR/SGNu0nxg4dbPctbLNzw+zXKA==
+X-Received: by 2002:aa7:9d8d:: with SMTP id f13mr5789100pfq.196.1570034880013; 
+ Wed, 02 Oct 2019 09:48:00 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d22sm23947989pfq.168.2019.10.02.09.47.58
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 02 Oct 2019 09:47:59 -0700 (PDT)
+Subject: Re: [PATCH v2] s390x/tcg: MVCL: Exit to main loop if requested
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20191002082636.7739-1-david@redhat.com>
+ <87zhijjwph.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <0479ad1f-348e-ed40-c2c6-aef168afdb7e@linaro.org>
+Date: Wed, 2 Oct 2019 09:47:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="3V7upXqbjpZ4EhLz"
-Content-Disposition: inline
-In-Reply-To: <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Wed, 02 Oct 2019 16:44:41 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <87zhijjwph.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,138 +99,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/2/19 2:58 AM, Alex Bennée wrote:
+> 
+> David Hildenbrand <david@redhat.com> writes:
+> 
+>> MVCL is interruptible and we should check for interrupts and process
+>> them after writing back the variables to the registers. Let's check
+>> for any exit requests and exit to the main loop.
+>>
+>> When booting Fedora 30, I can see a handful of these exits and it seems
+>> to work reliable. (it never get's triggered via EXECUTE, though)
+>>
+>> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>
+>> v1 -> v2:
+>> - Check only if icount_decr.u32 < 0
+>> - Drop should_interrupt_instruction() and perform the check inline
+>> - Rephrase comment, subject, and description
+>>
+>> ---
+>>  target/s390x/mem_helper.c | 10 +++++++++-
+>>  1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+>> index 4254548935..87e4ebd169 100644
+>> --- a/target/s390x/mem_helper.c
+>> +++ b/target/s390x/mem_helper.c
+>> @@ -1015,6 +1015,7 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+>>      uint64_t srclen = env->regs[r2 + 1] & 0xffffff;
+>>      uint64_t src = get_address(env, r2);
+>>      uint8_t pad = env->regs[r2 + 1] >> 24;
+>> +    CPUState *cs = env_cpu(env);
+>>      S390Access srca, desta;
+>>      uint32_t cc, cur_len;
+>>
+>> @@ -1065,7 +1066,14 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+>>          env->regs[r1 + 1] = deposit64(env->regs[r1 + 1], 0, 24, destlen);
+>>          set_address_zero(env, r1, dest);
+>>
+>> -        /* TODO: Deliver interrupts. */
+>> +        /*
+>> +         * MVCL is interruptible. Check if somebody (e.g., cpu_interrupt() or
+>> +         * cpu_exit()) asked us to return to the main loop. In case there is
+>> +         * no deliverable interrupt, we'll end up back in this handler.
+>> +         */
+>> +        if
+>> (unlikely((int32_t)atomic_read(&cpu_neg(cs)->icount_decr.u32) < 0)) {
+> 
+> I'm not sure about directly checking the icount_decr here. It really is
+> an internal implementation detail for the generated code.
 
---3V7upXqbjpZ4EhLz
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+But it's also the exact right thing to test.
 
-Not sure where in this thread to reply, but since my name is mentioned
-in this mail, it might at least be not the worst one.
 
-Am 02.10.2019 um 13:57 hat Max Reitz geschrieben:
-> On 02.10.19 06:46, Thomas Huth wrote:
-> > On 01/10/2019 20.44, Max Reitz wrote:
-> > [...]
-> >> As I have said, the conceptual problem is that the iotests now run as
-> >> part of make check.  As such, allowing auto tests to run on non-Linux
-> >> platforms may introduce build failures that I cannot do anything about.
-> >=20
-> > Well, simply run "make vm-build-openbsd", "make vm-build-freebsd", ...
-> > if something fails there, it likely should not be in the auto group.
->=20
-> Then we come to Windows and macOS.
->=20
-> What I=E2=80=99ve proposed to John on IRC was to simply skip the iotests =
-in make
-> check for non-Linux systems.
+> Having said
+> that is seems cpu_interrupt() is messing with this directly rather than
+> calling cpu_exit() which sets the more easily checked &cpu->exit_request.
+> 
+> This is potentially problematic as in other points in the cpu loop code
+> you see checks like this:
+> 
+>     /* Finally, check if we need to exit to the main loop.  */
+>     if (unlikely(atomic_read(&cpu->exit_request))
+>         || (use_icount
+>             && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0)) {
+>         atomic_set(&cpu->exit_request, 0);
+>         if (cpu->exception_index == -1) {
+>             cpu->exception_index = EXCP_INTERRUPT;
+>         }
+>         return true;
+>     }
+> 
+> although I guess this is because interrupts and "exits" take subtly
+> different paths through the outer loop. Given that exits and interrupts
+> are slightly different is what you want to check
+> atomic_read(&cpu->interrupt_request))?
 
-I think this really makes sense. Or at least have a blacklist of OSes
-that we can't support iotests on, which would contain at least Windows
-and OS X. Windows because I'm pretty sure that it doesn't work anyway,
-and OS X because if something fails there, we have no way to reproduce.
-The occasional build failures on OS X that must be fixed by blindly
-guessing what could work without any way to test the fix are already bad
-enough.
+No, this is not about interrupts per se.
 
-> > Max, I can understand that you are a little bit annoyed that this "make
-> > check with iotests" caused some extra hurdles for you. But honestly,
-> > removing that again would be quite egoistic by you. Try to put yourself
-> > into the position of a "normal", non-blocklayer-maintainer QEMU
-> > developer. For me, iotests were a *constant* source of frustration.
-> > Often, when I ran them on top of my latest and greatest patches, to
-> > check whether I caused a regression, the iotests simply failed. Then I
-> > had to start debugging - did my patches cause the break, or is "master"
-> > broken, too? In almost all cases, there was an issue in the master
-> > branch already, either because they were failing on s390x, or because I
-> > was using ext4 instead of xfs, or because I was using an older distro
-> > than you, etc... . So while the iotests likely worked fine for the
-> > limited set of systems that you, Kevin and the other hard-core block
-> > layer developers are using, it's constantly broken for everybody else
-> > who is not using the very same setup as you. The only way of *not*
-> > getting upset about the iotests was to simply completely *ignore* them.
-> > Is it that what you want?
->=20
-> It usually worked fine for me because it=E2=80=99s rather rare that non-b=
-lock
-> patches broke the iotests.
+The thing we're trying to solve here is MVCL running for a long time.  The
+length operand is 24 bits, so max 16MB can be copied with one instruction.  We
+want to exit back to the main loop early when told to do so, as the insn is
+officially restartable.
 
-I disagree. It happened all the time that someone else broke the iotests
-in master and we needed to fix it up.
+Ordinarily, I would say move the loop out to the tcg level, but that creates
+further complications and I'd rather not open up that can of worms.
 
-> Maybe my main problem is that I feel like now I have to deal with all of
-> the fallout, even though adding the iotests to make check wasn=E2=80=99t =
-my idea
-> and neither me nor Kevin ever consented.  (I don=E2=80=99t know whether K=
-evin
-> consented implicitly, but I don=E2=80=99t see his name in bdd95e47844f2d8=
-b.)
->=20
-> You can=E2=80=99t just give me more responsibility without my consent and=
- then
-> call me egoistic for not liking it.
+There is still the special case of EXECUTE of MVCL, which I suspect must have
+some failure mode that we're not considering -- the setting and clearing of
+ex_value can't help.  I have a suspicion that we need to special case that
+within helper_ex, just so that ex_value doesn't enter into it.
 
-I think I may have implicitly consented by helping Alex with the changes
-to 'check' that made its output fit better in 'make check'.
 
-Basically, my stance is that I share your dislike for the effects on me
-personally (also, I can't run 'make check' any more before a pull
-request without testing half of the iotests twice because I still need a
-full iotests run), but I also think that having iotests in 'make check'
-is really the right thing for the project despite the inconvenience it
-means for me.
-
-> I know you=E2=80=99ll say that we just need to ensure we can add more tes=
-ts,
-> then.  But for one thing, the most important tests are the ones that
-> take the longest, like 041.  And the other of course is that adding any
-> more tests to make check just brings me more pain, so I won=E2=80=99t do =
-it.
-
-That's something that can be fixed by tweaking the auto group.
-
-Can we run tests in 'auto' that require the system emulator? If so,
-let's add 030 040 041 to the default set. They take long, but they are
-among the most valuable tests we have. If this makes the tests take too
-much time, let's remove some less important ones instead.
-
-> [1] There is the recent case of Kevin=E2=80=99s pull request having been
-> rejected because his test failed on anything but x64.  I=E2=80=99m torn h=
-ere,
-> because I would have seen that failure on my -m32 build.  So it isn=E2=80=
-=99t
-> like it would have evaded our view for long.
-
-I messed up, so this pull request was rightly stopped. I consider this
-one a feature, not a bug.
-
-Kevin
-
---3V7upXqbjpZ4EhLz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdlNP2AAoJEH8JsnLIjy/WlJYQAILgLHnt80aigacuBaYMPIof
-e7Ll/3YVaHaub3KZV+SgNxsVrvxKG2uW+9GnRQ+m87e+QvHrzNHxwyIEnm0Rffpw
-RThGs0DSgfTyeQzCBGE/TNQoD9JJ3TQrVXgKKvoAPX8nngz4zFxYhyWwukn8uQId
-errhX8whpacC6Cy9V0hSiGxkk0KLjQFK8CVcb/13LJSj3KDMU8+fCJU6NF0jv6IA
-siRcqCKi3WwFbZXuniGF5jP1NAIdTb3sWJj0xGIWGsUnmb7T06pbD7BZxAQC8zHO
-GLJH9yi5lcTdzjlGs0oJxCZ52D776YyhlQRdB7Jxz40s0yA1GYr9lKDnK69eP4uF
-k9NJd8f5aXklZ9Uwu8QJCDUjOcPz1OdHKRczx/4/SDfIq8aPWXDfdV+6D7hEvoOB
-Sje9OvR8p10i6acwmfYopM6Hic2UM4qLcJJLxrhnltTWpPHnShpsUR9/s5wDv8q/
-XFs7zxYzApyxbH2wONg7u0f1Ti2anEG1prEJ+q6s8sNfcSYKXwyqzAhsFcqNIbwR
-me31FehUBtpa2ps2AnPuAjWMghfDa9vm6HJ1f1ynksiCU5uD7H5WkuswGSfB9PiL
-xdsmzlTQXSr+5PYy4bpG3yH+1mCjUdWFqJt/fwyC9e+4QhjO3gPZrK66WLvplFlX
-FBy4r3LPw6BBOx56iYWV
-=fYQT
------END PGP SIGNATURE-----
-
---3V7upXqbjpZ4EhLz--
+r~
 
