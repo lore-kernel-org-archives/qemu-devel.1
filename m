@@ -2,67 +2,109 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AB6C35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60AD9C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1125321929
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:04:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1125321929
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3A822218DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:07:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A822218DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFdN0-000791-6U
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:04:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42444)
+	id 1iFdPJ-0008UE-EN
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:07:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iFdLs-0006hJ-0T
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:03:29 -0400
+ (envelope-from <thuth@redhat.com>) id 1iFdOJ-00080y-TJ
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iFdLq-0005vt-3k
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:03:27 -0400
-Resent-Date: Wed, 02 Oct 2019 08:03:27 -0400
-Resent-Message-Id: <E1iFdLq-0005vt-3k@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21513)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iFdLp-0005vO-SZ
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:03:26 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1570017794; cv=none; d=zoho.com; s=zohoarc; 
- b=JaBAB3O53eXI+twe7UwLTV2681fdV5bjq4A1coWFxBkUwN0GClScfP2XryCSlX6FSjKzxphAXYNtdo0KSkFveK8/0xjjAufSeopNKfmaMfSMG+BtpFGbul08ALyHfnt0P/8WI7xnwjggJUmK1VwGHMSoQKtiuyfilsujtPROMk4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1570017794;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=Gw6oCDtv90IH7R1TD3x06UdXZLuRdvFcowFXNQANXk4=; 
- b=E9RLkMkOm73s6tYpKNgNwKnRTrfHTPv4lNQGtwaoKkr+luWbcxEr435n5qJTHKOvqBrz8pRRZQjt5yCKxSnG0qB//VFhl6cjZCbqIdlhropWrUliFbl1MwcN0vamkWVy6wOPFB5NWnDY+ZzrMfz3MFGOEHlAuc962tU9UjEFzDM=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1570017793937704.2965819788811;
- Wed, 2 Oct 2019 05:03:13 -0700 (PDT)
-Subject: Re: [PATCH v5 00/10] Introduce the microvm machine type
-In-Reply-To: <20191002113103.45023-1-slp@redhat.com>
-Message-ID: <157001779203.27524.4468384410902390930@8230166b0665>
+ (envelope-from <thuth@redhat.com>) id 1iFdOI-0006zQ-75
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:05:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54196)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iFdOH-0006yg-Uz
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:05:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 755E010C0951;
+ Wed,  2 Oct 2019 12:05:56 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-20.ams2.redhat.com [10.36.116.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 679715D9DC;
+ Wed,  2 Oct 2019 12:05:42 +0000 (UTC)
+Subject: Re: [PATCH v5 10/10] hw/i386: Introduce the microvm machine type
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20191002113103.45023-1-slp@redhat.com>
+ <20191002113103.45023-11-slp@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <07749cf1-d60f-0485-253d-718d3322046b@redhat.com>
+Date: Wed, 2 Oct 2019 14:05:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: slp@redhat.com
-Date: Wed, 2 Oct 2019 05:03:13 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20191002113103.45023-11-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Wed, 02 Oct 2019 12:05:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.55
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,90 +116,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, slp@redhat.com, mst@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, imammedo@redhat.com,
- pbonzini@redhat.com, rth@twiddle.net, lersek@redhat.com, sgarzare@redhat.com
+Cc: ehabkost@redhat.com, mst@redhat.com, philmd@redhat.com, kraxel@redhat.com,
+ imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, lersek@redhat.com,
+ sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAwMjExMzEwMy40NTAy
-My0xLXNscEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2Vy
-LXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFu
-ZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwg
-eW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVUV09S
-Sz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0xNCBO
-RVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
-bXUvaHcvYXJtL3ZpcnQubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS92aXJ0LWFj
-cGktYnVpbGQubwovdG1wL3FlbXUtdGVzdC9zcmMvaHcvaTM4Ni94ZW4veGVuLWh2bS5jOiBJbiBm
-dW5jdGlvbiAneGVuX3JhbV9pbml0JzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2kzODYveGVuL3hl
-bi1odm0uYzoyMDM6NTM6IGVycm9yOiAnUENfTUFDSElORV9NQVhfUkFNX0JFTE9XXzRHJyB1bmRl
-Y2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBQQ19NQUNISU5FX01BWF9SQU1fQkVMT1df
-NEcsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvaTM4Ni94ZW4veGVuLWh2bS5jOjIwMzo1Mzogbm90ZTog
-ZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQgb25seSBvbmNlIGZvciBlYWNo
-IGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2kzODYveGVuL3hl
-bi1odm0uYzoyMTc6MTM6IGVycm9yOiAnUENNYWNoaW5lU3RhdGUnIGhhcyBubyBtZW1iZXIgbmFt
-ZWQgJ2Fib3ZlXzRnX21lbV9zaXplJwogICAgICAgICBwY21zLT5hYm92ZV80Z19tZW1fc2l6ZSA9
-IHJhbV9zaXplIC0gdXNlcl9sb3dtZW07CiAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3Ny
-Yy9ody9pMzg2L3hlbi94ZW4taHZtLmM6MjE4OjEzOiBlcnJvcjogJ1BDTWFjaGluZVN0YXRlJyBo
-YXMgbm8gbWVtYmVyIG5hbWVkICdiZWxvd180Z19tZW1fc2l6ZScKICAgICAgICAgcGNtcy0+YmVs
-b3dfNGdfbWVtX3NpemUgPSB1c2VyX2xvd21lbTsKICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRl
-c3Qvc3JjL2h3L2kzODYveGVuL3hlbi1odm0uYzoyMjA6MTM6IGVycm9yOiAnUENNYWNoaW5lU3Rh
-dGUnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2Fib3ZlXzRnX21lbV9zaXplJwogICAgICAgICBwY21z
-LT5hYm92ZV80Z19tZW1fc2l6ZSA9IDA7CiAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3Ny
-Yy9ody9pMzg2L3hlbi94ZW4taHZtLmM6MjIxOjEzOiBlcnJvcjogJ1BDTWFjaGluZVN0YXRlJyBo
-YXMgbm8gbWVtYmVyIG5hbWVkICdiZWxvd180Z19tZW1fc2l6ZScKICAgICAgICAgcGNtcy0+YmVs
-b3dfNGdfbWVtX3NpemUgPSByYW1fc2l6ZTsKICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qv
-c3JjL2h3L2kzODYveGVuL3hlbi1odm0uYzoyMjM6MTQ6IGVycm9yOiAnUENNYWNoaW5lU3RhdGUn
-IGhhcyBubyBtZW1iZXIgbmFtZWQgJ2Fib3ZlXzRnX21lbV9zaXplJwogICAgIGlmICghcGNtcy0+
-YWJvdmVfNGdfbWVtX3NpemUpIHsKICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9o
-dy9pMzg2L3hlbi94ZW4taHZtLmM6MjMwOjQwOiBlcnJvcjogJ1BDTWFjaGluZVN0YXRlJyBoYXMg
-bm8gbWVtYmVyIG5hbWVkICdhYm92ZV80Z19tZW1fc2l6ZScKICAgICAgICAgYmxvY2tfbGVuID0g
-KDFVTEwgPDwgMzIpICsgcGNtcy0+YWJvdmVfNGdfbWVtX3NpemU7CiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ody9pMzg2L3hlbi94
-ZW4taHZtLmM6MjQ3OjM0OiBlcnJvcjogJ1BDTWFjaGluZVN0YXRlJyBoYXMgbm8gbWVtYmVyIG5h
-bWVkICdiZWxvd180Z19tZW1fc2l6ZScKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcGNt
-cy0+YmVsb3dfNGdfbWVtX3NpemUgLSAweGMwMDAwKTsKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2kzODYveGVuL3hlbi1odm0uYzoyNDk6
-MTM6IGVycm9yOiAnUENNYWNoaW5lU3RhdGUnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2Fib3ZlXzRn
-X21lbV9zaXplJwogICAgIGlmIChwY21zLT5hYm92ZV80Z19tZW1fc2l6ZSA+IDApIHsKICAgICAg
-ICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L2kzODYveGVuL3hlbi1odm0uYzoyNTI6Mzg6
-IGVycm9yOiAnUENNYWNoaW5lU3RhdGUnIGhhcyBubyBtZW1iZXIgbmFtZWQgJ2Fib3ZlXzRnX21l
-bV9zaXplJwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcGNtcy0+YWJvdmVfNGdf
-bWVtX3NpemUpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KbWFrZVsx
-XTogKioqIFtody9pMzg2L3hlbi94ZW4taHZtLm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRp
-bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L3Rhcmdl
-dC9pMzg2L3RyYW5zbGF0ZS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2RpZ2lj
-X2JvYXJkcy5vCi0tLQogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9yZWFsdmlldy5v
-CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3Nic2EtcmVmLm8KICBDQyAgICAgIGFh
-cmNoNjQtc29mdG1tdS9ody9hcm0vc3RlbGxhcmlzLm8KbWFrZTogKioqIFt4ODZfNjQtc29mdG1t
-dS9hbGxdIEVycm9yIDIKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
-ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vY29sbGllLm8KICBDQyAgICAgIGFhcmNo
-NjQtc29mdG1tdS9ody9hcm0vdmVyc2F0aWxlcGIubwotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nl
-c3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21t
-YW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11
-Lmluc3RhbmNlLnV1aWQ9ZjFjMmY3YzRjYzFiNGQzNjg1NjZmMDkzODZkYzM4ZWYnLCAnLXUnLCAn
-MTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICct
-ZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywg
-J1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAn
-LWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIv
-LmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFy
-L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAteW9lNzc2bncvc3JjL2RvY2tlci1zcmMuMjAxOS0xMC0w
-Mi0wOC4wMC40Ny4xOTAzNzovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92
-YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBz
-dGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZjFj
-MmY3YzRjYzFiNGQzNjg1NjZmMDkzODZkYzM4ZWYKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBF
-cnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
-ci10bXAteW9lNzc2bncvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50
-b3M3XSBFcnJvciAyCgpyZWFsICAgIDJtMjUuMzY1cwp1c2VyICAgIDBtNy44NjNzCgoKVGhlIGZ1
-bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTAwMjEx
-MzEwMy40NTAyMy0xLXNscEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 02/10/2019 13.31, Sergio Lopez wrote:
+> Microvm is a machine type inspired by Firecracker and constructed
+> after the its machine model.
+> 
+> It's a minimalist machine type without PCI nor ACPI support, designed
+> for short-lived guests. Microvm also establishes a baseline for
+> benchmarking and optimizing both QEMU and guest operating systems,
+> since it is optimized for both boot time and footprint.
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  default-configs/i386-softmmu.mak |   1 +
+>  hw/i386/Kconfig                  |   4 +
+>  hw/i386/Makefile.objs            |   1 +
+>  hw/i386/microvm.c                | 574 +++++++++++++++++++++++++++++++
+>  include/hw/i386/microvm.h        |  83 +++++
+>  5 files changed, 663 insertions(+)
+>  create mode 100644 hw/i386/microvm.c
+>  create mode 100644 include/hw/i386/microvm.h
+> 
+> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+> index 4229900f57..4cc64dafa2 100644
+> --- a/default-configs/i386-softmmu.mak
+> +++ b/default-configs/i386-softmmu.mak
+> @@ -28,3 +28,4 @@
+>  CONFIG_ISAPC=y
+>  CONFIG_I440FX=y
+>  CONFIG_Q35=y
+> +CONFIG_MICROVM=y
+> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+> index c5c9d4900e..d399dcba52 100644
+> --- a/hw/i386/Kconfig
+> +++ b/hw/i386/Kconfig
+> @@ -92,6 +92,10 @@ config Q35
+>      select SMBIOS
+>      select FW_CFG_DMA
+>  
+> +config MICROVM
+> +    bool
+> +    select VIRTIO_MMIO
 
+You also need these switches, I think:
+
+    select I8259
+    select ISA_BUS
+    select SERIAL_ISA
+    select MC146818RTC
+
+(ideally, it should be possible to disable all the other machines in
+default-configs/i386-softmmu.mak and only compile with CONFIG_MICROVM=y
+... but seems like there are also some other indirect dependencies left)
+
+ Thomas
 
