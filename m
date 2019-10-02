@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FCC9C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B80C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:00:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCF4F21920
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:00:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F86A21920
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:00:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sp55rzD4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF4F21920
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fa4o45vj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F86A21920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFhz3-0005wE-4T
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35366)
+	id 1iFhzG-00067x-Ng
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:00:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrH-0005Jw-1T
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:11 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrK-0005Oy-Qr
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrF-0003IX-NS
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:10 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:52612)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrJ-0003OF-QR
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:14 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:33792)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iFhrF-0003Hm-HN
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:09 -0400
-Received: by mail-wm1-x335.google.com with SMTP id r19so7971682wmh.2
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:09 -0700 (PDT)
+ id 1iFhrJ-0003MW-Jx
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:13 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id y135so5358831wmc.1
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=OfES0nT3k6Z9LTQ7lYjY3cIAvS5cOEPfvSwDFax1+oI=;
- b=sp55rzD4mHywNngoU3mlFw0WfGRnvEfa6IoPKvHFS3fMPXXVDk5BTEcfcZfzoa82mX
- +h85Q5XKmok0hiDnfgx+sqscYk3qA1XKS5v5/874qBjHwm/yWLy51E4FGzWkxTKzvZNM
- boiNhWIkuMTNY9AXxK6TPZmdsPpQwwE3gotq3lRf5KEjIn5tSsWd/ckboLRJIAuGmeM3
- HOwy8KyGZUrBjFgas48zKeNUOwoQxWWnYBIF3yH1WGWDOkk63aulI5tIGvCYfJl/xqdc
- gLEDAdcmG7zl8br7k1zhi0Ub2sGKN+WCBk7zGEurGne2CBqb9gpbBW70YEcm8nFEe1Ox
- 454Q==
+ bh=Gwkm7BIFv5Gq9pCfaTUHfWzPGvgH4PsTi5+em8nFU0M=;
+ b=fa4o45vjhLkC08Qa54nmAY9BTjZkdWS9WoeavtDyiAVR9pWHSDqqxFUAaDGkkzd6MF
+ o/Db/MSf6/FbO6DBLKK7fbzfAygckuTTvhh0N2Wi6BE1UM3KIipCcYcI0R/Ga9W9QTki
+ ZoQ1Nrj0LBfa4C57qS3VDhS64Kr0cQE/7NgVtzpnvIlDLR92X9Ze8TWup6d/P/NeYsFV
+ 6mIV9J9pirfasWT0BsJpDGWwHnv28NegO1L1ovC9X2dC1z1BevEGDO/D9b98CW/vwN8P
+ idX9Eq5PHkLrIXZXnWUcWrmkxPme6jPT5bklY2/QPXwZK8xZc6wIliFqk34O+QGP2zRx
+ n6OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=OfES0nT3k6Z9LTQ7lYjY3cIAvS5cOEPfvSwDFax1+oI=;
- b=oKN6gSDWDBnQH3aqUIwW6DJVjdxxaiAkz/HOUE35RZN9xgEp1oXblaLHqmeLNbk2yF
- xbY5ksvkT5KJpBlZvRb40kfu3qzLhC3w43UjrtVfw8urtciMDeo5Uj9SCGq6f0eAV/4b
- Qj89nsD1O3ZrWR9yOkaBV4JvZOJrPop3n8Xy42+R57htk6f1/XZ0osBbBT9Mknc05E+e
- mlidmsSETmthi1pAe7gmOkM2T6/U9kgkrC15YR7xlyEEKUoazGVq393IMAnQlrDUGpp7
- utB0T5p0fzfkU+Y5gkI/pgy84GBGw6B3XhjUrHHKORp1vW3zzq5zRGvJnvqWciEQFLpJ
- LhXQ==
-X-Gm-Message-State: APjAAAWDcDfFCWLM39xbWo71T6gEOMnab+pw9qj65I1FYiIAqZ2/cjnT
- A5TvHc6o8b6gh5QR0qIr5GM1lluY
-X-Google-Smtp-Source: APXvYqzktRvSs54ozypdhBgAjRyW34oohMdJDQlTbQk6il5ofaTuTr9DVedQMASJVA5HOW7FQXYFmg==
-X-Received: by 2002:a1c:1f89:: with SMTP id f131mr3486276wmf.72.1570035128153; 
- Wed, 02 Oct 2019 09:52:08 -0700 (PDT)
+ bh=Gwkm7BIFv5Gq9pCfaTUHfWzPGvgH4PsTi5+em8nFU0M=;
+ b=qI0nmQH242TeYwgsUb2OeDVhWAnDW6yBM4SBfhWDNCHhNtykrHguCgKwBi8yxWlB6k
+ rCP6QwEw6drdYOUln1Qx3fBnqRZUKUtVRZVlli0R1pdGrX6qCtqFU9fDi21TU+Hc2pJK
+ 55Sf4ByW5d2vwCMfbh6+KghIi0t5gzgK3qh9aWgDSWYg1MeaOLhxxJF3Ey8HlzroWrbU
+ G/qDmRmggONJqHi+fiApliQXwW/SqwQWOxW6nvbhnrL1yVjM3LbEAJBqxX0PioHgGqYC
+ oN8u+K/oa2T/6viKV7KkJ//wBe2vkUlfvJSupuXdulhiSYPA9HDW6NOpBMT8UrGB/8/D
+ f8aQ==
+X-Gm-Message-State: APjAAAXr7YrAu3kqMdoWF4u2/rYNS+bX535Be+7Q4NpMRhBUb+du2h+d
+ SRQuoad0W4s3QgEcMLTYfAZ0uWRb
+X-Google-Smtp-Source: APXvYqwewTrRnzms8LNKk1xv0R958YgLVK+AnWrOfifhvJyGI4yllqhI9ouvdRWmpobgPO0yZjjJoA==
+X-Received: by 2002:a1c:7c15:: with SMTP id x21mr3384082wmc.36.1570035132386; 
+ Wed, 02 Oct 2019 09:52:12 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.07
+ by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.11
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 02 Oct 2019 09:52:07 -0700 (PDT)
+ Wed, 02 Oct 2019 09:52:11 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 13/30] hw/isa: Introduce a CONFIG_ISA_SUPERIO switch for
- isa-superio.c
-Date: Wed,  2 Oct 2019 18:51:36 +0200
-Message-Id: <1570035113-56848-14-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 17/30] hppa: fix leak from g_strdup_printf
+Date: Wed,  2 Oct 2019 18:51:40 +0200
+Message-Id: <1570035113-56848-18-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
 References: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::335
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,88 +94,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+memory_region_init_* takes care of copying the name into memory it owns.
+Free it in the caller.
 
-Currently, isa-superio.c is always compiled as soon as CONFIG_ISA_BUS
-is enabled. But there are also machines that have an ISA BUS without
-any of the superio chips attached to it, so we should not compile
-isa-superio.c in case we only compile a QEMU for such a machine.
-Thus add a proper CONFIG_ISA_SUPERIO switch so that this file only gets
-compiled when we really, really need it.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/isa/Kconfig       | 10 +++++++---
- hw/isa/Makefile.objs |  2 +-
- hw/mips/Kconfig      |  1 +
- 3 files changed, 9 insertions(+), 4 deletions(-)
+ hw/hppa/dino.c    | 1 +
+ hw/hppa/machine.c | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/isa/Kconfig b/hw/isa/Kconfig
-index 6db0d79..98a2899 100644
---- a/hw/isa/Kconfig
-+++ b/hw/isa/Kconfig
-@@ -13,9 +13,13 @@ config I82378
-     select MC146818RTC
-     select PCSPK
+diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
+index e0466ee..ab6969b 100644
+--- a/hw/hppa/dino.c
++++ b/hw/hppa/dino.c
+@@ -485,6 +485,7 @@ PCIBus *dino_init(MemoryRegion *addr_space,
+         memory_region_init_alias(&s->pci_mem_alias[i], OBJECT(s),
+                                  name, &s->pci_mem, addr,
+                                  DINO_MEM_CHUNK_SIZE);
++        g_free(name);
+     }
  
--config PC87312
-+config ISA_SUPERIO
-     bool
-     select ISA_BUS
-+
-+config PC87312
-+    bool
-+    select ISA_SUPERIO
-     select I8259
-     select I8254
-     select I8257
-@@ -34,14 +38,14 @@ config PIIX4
+     /* Set up PCI view of memory: Bus master address space.  */
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index 2736ce8..7e23675 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -78,13 +78,15 @@ static void machine_hppa_init(MachineState *machine)
  
- config VT82C686
-     bool
--    select ISA_BUS
-+    select ISA_SUPERIO
-     select ACPI_SMBUS
-     select SERIAL_ISA
-     select FDC
+     /* Create CPUs.  */
+     for (i = 0; i < smp_cpus; i++) {
++        char *name = g_strdup_printf("cpu%ld-io-eir", i);
+         cpu[i] = HPPA_CPU(cpu_create(machine->cpu_type));
  
- config SMC37C669
-     bool
--    select ISA_BUS
-+    select ISA_SUPERIO
-     select SERIAL_ISA
-     select PARALLEL
-     select FDC
-diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
-index 9e106df..ff97485 100644
---- a/hw/isa/Makefile.objs
-+++ b/hw/isa/Makefile.objs
-@@ -1,5 +1,5 @@
- common-obj-$(CONFIG_ISA_BUS) += isa-bus.o
--common-obj-$(CONFIG_ISA_BUS) += isa-superio.o
-+common-obj-$(CONFIG_ISA_SUPERIO) += isa-superio.o
- common-obj-$(CONFIG_APM) += apm.o
- common-obj-$(CONFIG_I82378) += i82378.o
- common-obj-$(CONFIG_PC87312) += pc87312.o
-diff --git a/hw/mips/Kconfig b/hw/mips/Kconfig
-index 62aa01b..2c2adbc 100644
---- a/hw/mips/Kconfig
-+++ b/hw/mips/Kconfig
-@@ -13,6 +13,7 @@ config R4K
+         cpu_region = g_new(MemoryRegion, 1);
+         memory_region_init_io(cpu_region, OBJECT(cpu[i]), &hppa_io_eir_ops,
+-                              cpu[i], g_strdup_printf("cpu%ld-io-eir", i), 4);
++                              cpu[i], name, 4);
+         memory_region_add_subregion(addr_space, CPU_HPA + i * 0x1000,
+                                     cpu_region);
++        g_free(name);
+     }
  
- config MALTA
-     bool
-+    select ISA_SUPERIO
- 
- config MIPSSIM
-     bool
+     /* Limit main memory. */
 -- 
 1.8.3.1
 
