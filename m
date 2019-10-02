@@ -6,56 +6,60 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE790C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 08:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FB0C35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 08:13:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7B82215EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 08:07:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7B82215EA
+	by mail.kernel.org (Postfix) with ESMTPS id BD111215EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 08:13:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD111215EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFZfl-0006LQ-UB
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 04:07:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34579)
+	id 1iFZl4-0007dm-MV
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 04:13:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35353)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iFZf5-0005tq-0B
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:07:04 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iFZkP-0007B7-CM
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:12:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iFZf2-0005mU-98
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:07:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46264)
+ (envelope-from <kwolf@redhat.com>) id 1iFZkO-00072J-FM
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:12:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54992)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iFZf2-0005lx-32
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:07:00 -0400
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iFZkL-000717-Ea; Wed, 02 Oct 2019 04:12:29 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4EDBA3090FCE;
- Wed,  2 Oct 2019 08:06:58 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C5C45D71C;
- Wed,  2 Oct 2019 08:06:54 +0000 (UTC)
-Date: Wed, 2 Oct 2019 09:06:52 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: Arch info lost in "info cpus"
-Message-ID: <20191002080652.GA2710@work-vm>
-References: <87blv2i5ha.fsf@redhat.com> <20190930084551.GB2759@work-vm>
- <20191001194301.GK4084@habkost.net>
+ by mx1.redhat.com (Postfix) with ESMTPS id 8716B34CC;
+ Wed,  2 Oct 2019 08:12:28 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-198.ams2.redhat.com
+ [10.36.117.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4229A5D6A3;
+ Wed,  2 Oct 2019 08:12:24 +0000 (UTC)
+Date: Wed, 2 Oct 2019 10:12:23 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: bitmap migration bug with -drive while block mirror runs
+Message-ID: <20191002081223.GA5819@localhost.localdomain>
+References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
+ <d897c755-40e7-6392-23e3-c06b1a371f28@virtuozzo.com>
+ <4bc910ef-0bec-cfd6-89f6-a93d35367218@redhat.com>
+ <9431d242-bfe1-b9db-17d0-6c1a280a05da@virtuozzo.com>
+ <e112c85a-684f-5721-2da7-d23312c9e487@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191001194301.GK4084@habkost.net>
+In-Reply-To: <e112c85a-684f-5721-2da7-d23312c9e487@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Wed, 02 Oct 2019 08:06:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Wed, 02 Oct 2019 08:12:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,48 +74,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, tao3.xu@intel.com, qemu-devel@nongnu.org,
- Sergio Lopez <slp@redhat.com>, mihajlov@linux.vnet.ibm.com
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Eduardo Habkost (ehabkost@redhat.com) wrote:
-> On Mon, Sep 30, 2019 at 09:45:51AM +0100, Dr. David Alan Gilbert wrote:
-> > * Sergio Lopez (slp@redhat.com) wrote:
-> > > Hi,
-> > > 
-> > > Commit 137b5cb6ab565cb3781d5337591e155932b4230e (hmp: change
-> > > hmp_info_cpus to use query-cpus-fast) updated the "info cpus" commit to
-> > > make it more lightweight, but also removed the ability to get the
-> > > architecture specific status of each vCPU.
-> > > 
-> > > This information was really useful to diagnose certain Guest issues,
-> > > without the need of using GDB, which is more intrusive and requires
-> > > enabling it in advance.
-> > > 
-> > > Is there an alternative way of getting something equivalent to what
-> > > "info cpus" provided previously (in 2.10)?
-> > 
-> > Even the qemp equivalent, query-cpus is deprecated.
-> > (Although we do call the underlying query-cpus in 'info numa' as well)
+Am 01.10.2019 um 18:07 hat John Snow geschrieben:
+> >> So the real back-resolution mechanism is:
 > 
-> Why exactly it has to be deprecated?  We have use cases that
-> require `query-cpus-fast` to exist, but I don't see why the
-> existence of a command that returns extended information is a bad
-> thing.
+> Amendment:
+>    - If our local node-name N is well-formed, use this.
+>    - Otherwise:
+> >> - Find the first non-filter ancestor, A
+> >> - if A is not a block-backend, we must use our node-local name.
+>      Amendment: If it's not a BB, we have no addressable name
+>                 for the bitmap and this is an error.
+> >> - if A's name is empty, we must use our node-local name.
+>      Amendment: If it's empty, we have no addressable name
+>                 for the bitmap and this is an error.
+> >> - If the name we have chosen is not id_wellformed, we have no
+> >> migration-stable addressable name for this bitmap and the migration must
+> >> fail!
+>      (Handled by above amendments.)
 > 
-> Having a command that synchronizes CPU state is even a
-> requirement if we want to eventually implement "info registers"
-> using QMP.
+> The reason for the change is to prefer user-defined node names whenever
+> possible; only trying to find a "device" or "backend" name whenever we
+> fail to find one.
 
-Yes, agreed; it was useful to have the non-syncing version
-but I don't see a reason to remove the full-fat version.
+I think we also need to clarify what "find the first non-filter" means:
+"first" means not skipping over non-filters, but there can still be
+multiple parents, and we can take the name of any of them.
 
-Dave
- 
-> -- 
-> Eduardo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+In legacy setups, we can expect that there is only one BB that has a
+defined name (i.e. nodes aren't reused in multiple subtrees) whereas the
+other BBs may come from things like block jobs. We must not give up and
+error out when the job BB is returned first.
+
+Kevin
 
