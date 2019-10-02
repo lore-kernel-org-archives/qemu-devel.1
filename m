@@ -2,50 +2,50 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D503C35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6203CC35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:59:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F26021783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:58:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F26021783
+	by mail.kernel.org (Postfix) with ESMTPS id 3AE3F21783
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:59:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE3F21783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFg4w-0008FK-4W
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44000)
+	id 1iFg6K-00010o-7I
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:59:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFg4D-0007bd-Tw
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:57:26 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFg4V-0007xk-MN
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFg4C-0003YG-TC
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:57:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37430)
+ (envelope-from <mreitz@redhat.com>) id 1iFg4U-0003fg-QQ
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:57:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35786)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFg49-0003Wt-02; Wed, 02 Oct 2019 10:57:21 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iFg4S-0003eT-E6; Wed, 02 Oct 2019 10:57:40 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E80012A09B5;
- Wed,  2 Oct 2019 14:57:19 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A097F61D25;
+ Wed,  2 Oct 2019 14:57:39 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 07649196AE;
- Wed,  2 Oct 2019 14:57:15 +0000 (UTC)
-Subject: Re: [PATCH 3/4] block/mirror: support unaligned write in active mirror
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EAAA360BF4;
+ Wed,  2 Oct 2019 14:57:35 +0000 (UTC)
+Subject: Re: [PATCH 1/4] block/mirror: simplify do_sync_target_write
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190912151338.21225-1-vsementsov@virtuozzo.com>
- <20190912151338.21225-4-vsementsov@virtuozzo.com>
+ <20190912151338.21225-2-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -71,18 +71,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7dec596f-0175-951e-ba3f-2eb8b2a3d8ed@redhat.com>
-Date: Wed, 2 Oct 2019 16:57:14 +0200
+Message-ID: <086776af-e43c-eecc-7e7b-103e3d53d44b@redhat.com>
+Date: Wed, 2 Oct 2019 16:57:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190912151338.21225-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190912151338.21225-2-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="igQjL0QlrxY924E6uJTBFdbekmDStLRVc"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ boundary="IVqRmSEuV1IS4yb4O2ryfqdootMuv1m8X"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 02 Oct 2019 14:57:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Wed, 02 Oct 2019 14:57:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -103,64 +103,47 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---igQjL0QlrxY924E6uJTBFdbekmDStLRVc
-Content-Type: multipart/mixed; boundary="7HsGHspyrKqV44HSPdCs11WPgtJzDoUYn"
+--IVqRmSEuV1IS4yb4O2ryfqdootMuv1m8X
+Content-Type: multipart/mixed; boundary="5csfPHLeBgwAev8RAeuFOOZsR3cscj7Iy"
 
---7HsGHspyrKqV44HSPdCs11WPgtJzDoUYn
+--5csfPHLeBgwAev8RAeuFOOZsR3cscj7Iy
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 12.09.19 17:13, Vladimir Sementsov-Ogievskiy wrote:
-> Prior 9adc1cb49af8d do_sync_target_write had a bug: it reset aligned-up=
-
-> region in the dirty bitmap, which means that we may not copy some bytes=
-
-> and assume them copied, which actually leads to producing corrupted
-> target.
+> do_sync_target_write is called from bdrv_mirror_top_do_write after
+> write/discard operation, all inside active_write/active_write_settle
+> protecting us from mirror iteration. So the whole area is dirty for
+> sure, no reason to examine dirty bitmap.
 >=20
-> So 9adc1cb49af8d forced dirty bitmap granularity to be
-> request_alignment for mirror-top filter, so we are not working with
-> unaligned requests. However forcing large alignment obviously decreases=
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/mirror.c | 95 +++++++++++++++-----------------------------------=
 
-> performance of unaligned requests.
->=20
-> This commit provides another solution for the problem: if unaligned
-> padding is already dirty, we can safely ignore it, as
-> 1. It's dirty, it will be copied by mirror_iteration anyway
-> 2. It's dirty, so skipping it now we don't increase dirtiness of the
->    bitmap and therefore don't damage "synchronicity" of the
->    write-blocking mirror.
+>  1 file changed, 28 insertions(+), 67 deletions(-)
 
-But that=E2=80=99s not what active mirror is for.  The point of active mi=
-rror is
-that it must converge because every guest write will contribute towards
-that goal.
-
-If you skip active mirroring for unaligned guest writes, they will not
-contribute towards converging, but in fact lead to the opposite.
-
-Max
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---7HsGHspyrKqV44HSPdCs11WPgtJzDoUYn--
+--5csfPHLeBgwAev8RAeuFOOZsR3cscj7Iy--
 
---igQjL0QlrxY924E6uJTBFdbekmDStLRVc
+--IVqRmSEuV1IS4yb4O2ryfqdootMuv1m8X
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2UusoACgkQ9AfbAGHV
-z0BynggApMIMojOGzJ2sHuO8/NITdYY9LOnPcJbpunUq3o+RXhg6RRFnr4bHPBFo
-S3UrEe9MShkI/JYZwODs6BYwx+hfmvOV/V3moAitasGVAzcWSNkLD/OQ+qTSaRyP
-4eEVIXW39Ew73YQGtqGdby/jm1O5AJO/ZHrybQgHOEqx04nhkAAlCTyoCAjbYmVK
-b2kkc1NWMGxx6C/7SNDiMZSmxs7mIx/OocHPLdfPv9Rq2IztXgKOHB+5LKpkjxdk
-luRHy/H6cEHTI90qlR8McqCs4FNj4kkU5QatENT0qafr/4RfL1c+wfDtwV9Xfnyg
-VVOexImPG1o28N6JgVZVoXFBFRA51Q==
-=Gl0y
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Uut4ACgkQ9AfbAGHV
+z0DhwAf/e2FI3qQMjliWHeImjJtk1U7cHDeE9bOQQ2QDXS5rNANsNLTjCezD3dKv
+ENPV0/cD+wREFBsoUfHlGvyJoxJfqfy1dVEXxm0p/xf8tpjDdKGL1zizhcn+3my7
+C6BR35LM1eYldbxHzopm1ZNfELBLaJvjqASesSJsKG1C/Jc6dfShUqJpDhxHZBts
+j8PNCPfq0/T/NL8IzHt77iW0qAPg6283xz8SaqsU7RNMTilG3LWDvYEI2umRNL06
+C1Qc63RSzbsxazEHenobNfa/nCpeGBXdbyIlMyFLtIW4OJwnuf204UuoBGBCVuOE
+EIlww50tvBxANGKF/oFjP0nUkWEq5g==
+=/9+Y
 -----END PGP SIGNATURE-----
 
---igQjL0QlrxY924E6uJTBFdbekmDStLRVc--
+--IVqRmSEuV1IS4yb4O2ryfqdootMuv1m8X--
 
