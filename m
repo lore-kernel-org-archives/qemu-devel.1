@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E0AC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA5FEC35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:43:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D0C720659
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:41:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D0C720659
+	by mail.kernel.org (Postfix) with ESMTPS id 7F2F62133F
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:43:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2F62133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFdwQ-0001HQ-B1
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:41:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47477)
+	id 1iFdy7-0002Lt-N1
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:42:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47816)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFdvd-0000nQ-Ot
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:40:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFdxQ-0001pu-GL
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFdvc-0000eU-EZ
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:40:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38316)
+ (envelope-from <mreitz@redhat.com>) id 1iFdxP-00021z-Gg
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:42:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51490)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFdvZ-0000ap-DD; Wed, 02 Oct 2019 08:40:21 -0400
+ id 1iFdxJ-0001xb-BH; Wed, 02 Oct 2019 08:42:09 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4A90D307C826;
- Wed,  2 Oct 2019 12:40:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8EB8064467;
+ Wed,  2 Oct 2019 12:42:08 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DC627196B2;
- Wed,  2 Oct 2019 12:40:18 +0000 (UTC)
-Subject: Re: [PATCH 17/22] iotests: Add VM.assert_block_path()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3325F19C6A;
+ Wed,  2 Oct 2019 12:42:07 +0000 (UTC)
+Subject: Re: [PATCH 19/22] iotests: Use self.image_len in TestRepairQuorum
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190920152804.12875-1-mreitz@redhat.com>
- <20190920152804.12875-18-mreitz@redhat.com>
- <de0a9fe2-ea84-7be9-6911-b806f032cfff@virtuozzo.com>
+ <20190920152804.12875-20-mreitz@redhat.com>
+ <18a0f40d-7253-58a1-21e6-fb5a466f7e11@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b977e9f8-53f0-290e-5eb5-73c02469779b@redhat.com>
-Date: Wed, 2 Oct 2019 14:40:17 +0200
+Message-ID: <83183924-8022-6b93-2865-ac63b911b301@redhat.com>
+Date: Wed, 2 Oct 2019 14:42:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <de0a9fe2-ea84-7be9-6911-b806f032cfff@virtuozzo.com>
+In-Reply-To: <18a0f40d-7253-58a1-21e6-fb5a466f7e11@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="RdFQ80n6QeHWfvZXZVdfHBbDJzYuPu36o"
+ boundary="mFMnmPHMUKy51r9DtCvdRAcHPH6dLDvMO"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 02 Oct 2019 12:40:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Wed, 02 Oct 2019 12:42:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -105,173 +105,84 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RdFQ80n6QeHWfvZXZVdfHBbDJzYuPu36o
-Content-Type: multipart/mixed; boundary="2oYAA26s1UPMNEsnP29t6yJIdQPM3j8XK"
+--mFMnmPHMUKy51r9DtCvdRAcHPH6dLDvMO
+Content-Type: multipart/mixed; boundary="ByMoQ7sNs8udboFrvZtNPdLfcLcnwIjtE"
 
---2oYAA26s1UPMNEsnP29t6yJIdQPM3j8XK
+--ByMoQ7sNs8udboFrvZtNPdLfcLcnwIjtE
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 26.09.19 16:07, Vladimir Sementsov-Ogievskiy wrote:
-> 20.09.2019 18:27, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   tests/qemu-iotests/iotests.py | 48 +++++++++++++++++++++++++++++++++=
-++
->>   1 file changed, 48 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
-s.py
->> index daed4ee013..e6fb46287d 100644
->> --- a/tests/qemu-iotests/iotests.py
->> +++ b/tests/qemu-iotests/iotests.py
->> @@ -670,6 +670,54 @@ class VM(qtest.QEMUQtestMachine):
->>  =20
->>           return fields.items() <=3D ret.items()
->>  =20
->> +    '''
->> +    @path is a string whose components are separated by slashes.
->> +    The first component is a node name, the rest are child names.
->> +    Examples:
->> +      - "qcow2-node/backing/file"
->> +      - "quorum-node/children.2/file"
+On 26.09.19 16:13, Vladimir Sementsov-Ogievskiy wrote:
+> 20.09.2019 18:28, Max Reitz wrote:
+>> 041's TestRepairQuorum has its own image_len, no need to refer to
+>> TestSingleDrive.  (This patch allows uncommenting TestSingleDrive to
 >=20
-> Possibly, separting node-name to first parameter and keeping child-path=
- as
-> a second will simplify code a bit, and be more useful for cases when on=
- caller
-> part node-name is in variable.
+> you mean commenting
 
-Sounds good.
+Ah, yes, I mean commenting out. :-)
 
->> +
->> +    @expected_node may be None.
->> +
->> +    @graph may be None or the result of an x-debug-query-block-graph
->> +    call that has already been performed.
->> +    '''
->> +    def assert_block_path(self, path, expected_node, graph=3DNone):
->> +        if graph is None:
->> +            graph =3D self.qmp('x-debug-query-block-graph')['return']=
-
+>> speed up 041 during test testing.)
 >=20
-> Yay! I'm happy to see that it's useful.
-
-:-)
-
-It=E2=80=99s probably the best query function we have.
-
->> +
->> +        iter_path =3D iter(path.split('/'))
->> +        root =3D next(iter_path)
->> +        try:
->> +            node =3D next(node for node in graph['nodes'] if node['na=
-me'] =3D=3D root)
->> +        except StopIteration:
->> +            node =3D None
+> we definitely want a way to run a subset of test cases.
 >=20
-> for such usage next has second optional argument: next(iterator[, defau=
-lt])
+> I usually do s/def test/def ntest/, and then set needed test-case back =
+to
+> 'def test'
 
-Great!
-
-> (don't think I teach you Python, actually you teach me, as before I did=
-n't know
-> correct way to search first element with condition)
-
-We learn from one another, which is the best case.
-
->> +
->> +        for path_node in iter_path:
->> +            assert node is not None, 'Cannot follow path %s' % path
->> +
->> +            try:
->> +                node_id =3D next(edge['child'] for edge in graph['edg=
-es'] \
->> +                                             if edge['parent'] =3D=3D=
- node['id'] and
->> +                                                edge['name'] =3D=3D p=
-ath_node)
->=20
-> Hmm here you allow default StopIteration exception [1]
->=20
->=20
->> +
->> +                node =3D next(node for node in graph['nodes'] \
->> +                                 if node['id'] =3D=3D node_id)
->> +            except StopIteration:
->> +                node =3D None
->=20
-> actually, I think this will never happen, so we may simplify code and a=
-llow it to
-> throw StopIteration exception in this impossible case..
-
-This is for a use case where the next child simply doesn=E2=80=99t exist,=
- so you
-can do:
-
-assert_block_path('qcow2-node/backing', None)
-
-To verify that the qcow2 node has no backing file.
-
->> +
->> +        assert node is not None or expected_node is None, \
->> +               'No node found under %s (but expected %s)' % \
->> +               (path, expected_node)
->=20
-> node may be None here only from last iteration, but it can't happen: if=
- we have edge
-> with child, we'll for sure have node with such node-name in graph
-
-node will always be set by the try-except block, won=E2=80=99t it?
-
->> +
->> +        assert expected_node is not None or node is None, \
->> +               'Found node %s under %s (but expected none)' % \
->> +               (node['name'], path)
->=20
-> hmm, so expected_node=3DNone means we want to prove that there is no su=
-ch node? It should
-> be mentioned in comment above the function. But this don't work due to =
-[1]
-
-Hm, I seem to remember I tested all cases locally and they all worked.
+Thanks for that tip.
 
 Max
 
->> +
->> +        if node is not None and expected_node is not None:
->> +            assert node['name'] =3D=3D expected_node, \
->> +                   'Found node %s under %s (but expected %s)' % \
->> +                   (node['name'], path, expected_node)
->>  =20
->>   index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
->>  =20
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   tests/qemu-iotests/041 | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+>> index ca126de3ff..20ae9750b7 100755
+>> --- a/tests/qemu-iotests/041
+>> +++ b/tests/qemu-iotests/041
+>> @@ -880,7 +880,7 @@ class TestRepairQuorum(iotests.QMPTestCase):
+>>           # Add each individual quorum images
+>>           for i in self.IMAGES:
+>>               qemu_img('create', '-f', iotests.imgfmt, i,
+>> -                     str(TestSingleDrive.image_len))
+>> +                     str(self.image_len))
+>=20
+> yes, seems TestSingleDrive.image_len is a copy-pasting mistake here..
+>=20
+>>               # Assign a node name to each quorum image in order to ma=
+nipulate
+>>               # them
+>>               opts =3D "node-name=3Dimg%i" % self.IMAGES.index(i)
 >>
 >=20
 >=20
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
 
 
 
---2oYAA26s1UPMNEsnP29t6yJIdQPM3j8XK--
+--ByMoQ7sNs8udboFrvZtNPdLfcLcnwIjtE--
 
---RdFQ80n6QeHWfvZXZVdfHBbDJzYuPu36o
+--mFMnmPHMUKy51r9DtCvdRAcHPH6dLDvMO
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2UmrEACgkQ9AfbAGHV
-z0BniAgAtDr3hLIeR3XjAlaelmoSZv90Oo3d1R9tQmm2WattY0y1mELPWNFMbnZe
-kFDfo7a8AL+6N3fsBQP+NXOFcDdc4MD7QVONa6DecFJ+fQTXOrjtxgi2b16qBGtt
-JGSXs0B5c5FOLesnOndKNo2XbO342TG9IN0TTll23vds0zXeDAAKn+W37rZho0qQ
-KlKReXxeQVE4TT9/FUjFnVEN/kHFCanL1j9KHe/5hkeEO5qompbA/kwkMFzaHSVx
-Srvt2FnPOgZNc0Z6/bCvtapMAD3cdA7Qk7ig2RfHecznCPfpROmlgS/nasOtBtET
-6TRjE8Qouq5VgX2Jmxho+Zz7E1VX5A==
-=7RB5
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Umx0ACgkQ9AfbAGHV
+z0CrZAgAo9KObT3UCBdIeBzcRhtkyGHM34C83XtxNnmX27LYVhtdRaJNdQVIgo6N
+qN2JVPC/k+mvkNGKjmG7Uuz8v5x9m2XLRoORI/wFAO+ma0wBYG5VjkPf3DPIxOV3
+gpDpue16UsDoUv3oyj5HDGJfNfntXJ8GATunN259AnJsOumAk9idC8qBlIabBmT+
+IHYp4WJE1ME+FdfpmCIwTF7+BZjDsjmMIXvbBTt272d5b+JWKe4jaffdV/tTdMbr
+Tr0N6GEsxpMDQjv+sCZ89bkDpkgjI9omZhs+6E2Odoom8Rnc5fXyt4n61u8vQWv5
+gVhsKGYTuAEOB/o0VFsRFF/RDsZhjg==
+=oEnp
 -----END PGP SIGNATURE-----
 
---RdFQ80n6QeHWfvZXZVdfHBbDJzYuPu36o--
+--mFMnmPHMUKy51r9DtCvdRAcHPH6dLDvMO--
 
