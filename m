@@ -2,49 +2,47 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A0DECE58A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B305AC35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:31:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C8CD21783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:30:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C8CD21783
+	by mail.kernel.org (Postfix) with ESMTPS id 88CBB21783
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:31:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88CBB21783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFfeV-0004Zz-2e
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:30:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38118)
+	id 1iFfep-0004lx-HL
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:31:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWx-0005hj-7G
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWx-0005hw-8H
  for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:23:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWv-0005bb-MA
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:23:02 -0400
-Received: from relay.sw.ru ([185.231.240.75]:53306)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWv-0005bm-NN
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:23:03 -0400
+Received: from relay.sw.ru ([185.231.240.75]:53316)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iFfWv-0005Zi-Bw; Wed, 02 Oct 2019 10:23:01 -0400
+ id 1iFfWv-0005Zh-D0; Wed, 02 Oct 2019 10:23:01 -0400
 Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iFfWs-0003C3-0y; Wed, 02 Oct 2019 17:22:58 +0300
+ id 1iFfWr-0003C3-2H; Wed, 02 Oct 2019 17:22:57 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Subject: [PATCH v2 6/6] tests/qemu-iotests: add case for block-stream compress
-Date: Wed,  2 Oct 2019 17:22:46 +0300
-Message-Id: <1570026166-748566-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v2 0/6] qcow2: advanced compression options
+Date: Wed,  2 Oct 2019 17:22:40 +0300
+Message-Id: <1570026166-748566-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1570026166-748566-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1570026166-748566-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
@@ -65,94 +63,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a test case to the iotest #030 that checks 'compress' option for a
-block-stream job.
+New enhancements for writing compressed data to QCOW2 image.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/030     | 49 +++++++++++++++++++++++++++++++++++++++++++++-
- tests/qemu-iotests/030.out |  4 ++--
- 2 files changed, 50 insertions(+), 3 deletions(-)
+The preceding patches have been queued in the Max's block branch:
 
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index f3766f2..13fe5a2 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -21,7 +21,8 @@
- import time
- import os
- import iotests
--from iotests import qemu_img, qemu_io
-+from iotests import qemu_img, qemu_io, qemu_img_pipe
-+import json
- 
- backing_img = os.path.join(iotests.test_dir, 'backing.img')
- mid_img = os.path.join(iotests.test_dir, 'mid.img')
-@@ -956,6 +957,52 @@ class TestSetSpeed(iotests.QMPTestCase):
- 
-         self.cancel_and_wait(resume=True)
- 
-+class TestCompressed(iotests.QMPTestCase):
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, backing_img, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, '-o',
-+                 'backing_file=%s' % backing_img, mid_img)
-+        qemu_img('create', '-f', iotests.imgfmt, '-o',
-+                 'backing_file=%s' % mid_img, test_img)
-+        qemu_io('-c', 'write -P 0x1 0 512k', backing_img)
-+        self.vm = iotests.VM().add_drive(test_img, "backing.node-name=mid," +
-+                                         "backing.backing.node-name=base")
-+        self.vm.launch()
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        os.remove(test_img)
-+        os.remove(mid_img)
-+        os.remove(backing_img)
-+
-+    def test_stream_compress(self):
-+        self.assert_no_active_block_jobs()
-+
-+        result = self.vm.qmp('block-stream', device='mid', job_id='stream-mid')
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.wait_until_completed(drive='stream-mid')
-+        for event in self.vm.get_qmp_events(wait=True):
-+            if event['event'] == 'BLOCK_JOB_COMPLETED':
-+                self.dictpath(event, 'data/device')
-+                self.assert_qmp_absent(event, 'data/error')
-+
-+        result = self.vm.qmp('block-stream', device='drive0', base=mid_img,
-+                             job_id='stream-top', compress=True)
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.wait_until_completed(drive='stream-top')
-+        self.assert_no_active_block_jobs()
-+        self.vm.shutdown()
-+
-+        top = json.loads(qemu_img_pipe('info', '--output=json', test_img))
-+        mid = json.loads(qemu_img_pipe('info', '--output=json', mid_img))
-+        base = json.loads(qemu_img_pipe('info', '--output=json', backing_img))
-+
-+        self.assertEqual(mid['actual-size'], base['actual-size'])
-+        self.assertLess(top['actual-size'], mid['actual-size'])
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'],
-                  supported_protocols=['file'])
-diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
-index 6d9bee1..af8dac1 100644
---- a/tests/qemu-iotests/030.out
-+++ b/tests/qemu-iotests/030.out
-@@ -1,5 +1,5 @@
--...........................
-+............................
- ----------------------------------------------------------------------
--Ran 27 tests
-+Ran 28 tests
- 
- OK
+Based-on: https://github.com/XanClic/qemu.git block
+
+v2:
+    The number of parameters in nbd_export_new() has been reduced by
+    the introduced flags for all the boolean ones (suggested by Eric).
+
+Andrey Shinkevich (6):
+  qcow2: Allow writing compressed data to multiple clusters
+  tests/qemu-iotests: add case of writing compressed data to multiple
+    clusters
+  qemu-nbd: add compression flag support
+  block: support compressed write for copy-on-read
+  block-stream: add compress option
+  tests/qemu-iotests: add case for block-stream compress
+
+ block/io.c                 |  21 +++++++--
+ block/qcow2.c              | 113 ++++++++++++++++++++++++++++++++++-----------
+ block/stream.c             |  19 +++++---
+ block/trace-events         |   2 +-
+ blockdev-nbd.c             |   8 +++-
+ blockdev.c                 |  14 +++++-
+ hmp-commands.hx            |   4 +-
+ include/block/block_int.h  |   3 +-
+ include/block/nbd.h        |  11 ++++-
+ monitor/hmp-cmds.c         |   5 +-
+ nbd/server.c               |  14 ++++--
+ qapi/block-core.json       |   5 +-
+ qemu-nbd.c                 |  30 ++++++++++--
+ qemu-nbd.texi              |   2 +
+ tests/qemu-iotests/030     |  49 +++++++++++++++++++-
+ tests/qemu-iotests/030.out |   4 +-
+ tests/qemu-iotests/214     |   9 ++++
+ tests/qemu-iotests/214.out |   6 +++
+ 18 files changed, 257 insertions(+), 62 deletions(-)
+
 -- 
 1.8.3.1
 
