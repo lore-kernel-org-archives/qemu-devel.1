@@ -2,57 +2,51 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A99BC35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A778C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43A03215EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:23:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A03215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 32D46215EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:24:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32D46215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFfWx-0005Qs-AT
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:23:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37939)
+	id 1iFfYL-000767-70
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:24:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iFfVv-0004O6-7H
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:22:00 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWx-0005ho-7D
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iFfVt-00057i-6f
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:21:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49724)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWv-0005bI-KX
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:23:03 -0400
+Received: from relay.sw.ru ([185.231.240.75]:53302)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iFfVp-00054m-Kn; Wed, 02 Oct 2019 10:21:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3182E4E924;
- Wed,  2 Oct 2019 14:21:52 +0000 (UTC)
-Received: from thuth.com (ovpn-116-20.ams2.redhat.com [10.36.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9EBF608A5;
- Wed,  2 Oct 2019 14:21:50 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Max Reitz <mreitz@redhat.com>,
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iFfWv-0005Zf-Bb; Wed, 02 Oct 2019 10:23:01 -0400
+Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iFfWr-0003C3-O3; Wed, 02 Oct 2019 17:22:57 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Subject: [PATCH] iotests: Do not run the iotests during "make check" anymore
-Date: Wed,  2 Oct 2019 16:21:46 +0200
-Message-Id: <20191002142146.6124-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 02 Oct 2019 14:21:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Subject: [PATCH v2 4/6] block: support compressed write for copy-on-read
+Date: Wed,  2 Oct 2019 17:22:44 +0300
+Message-Id: <1570026166-748566-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1570026166-748566-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1570026166-748566-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,48 +58,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ jsnow@redhat.com, armbru@redhat.com, dgilbert@redhat.com, stefanha@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Running the iotests during "make check" is causing more headaches than
-benefits for the block layer maintainers, so let's disable the iotests
-during "make check" again.
+Support the data compression during block-stream job over a backup
+backing chain implemented in the following patch 'block-stream:
+add compress option'.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Signed-off-by: Denis V. Lunev <den@openvz.org>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/Makefile.include   | 2 +-
- tests/qemu-iotests/group | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ block/io.c         | 21 ++++++++++++++++-----
+ block/trace-events |  2 +-
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3543451ed3..5d19f39ee7 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -1172,7 +1172,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
- check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
- check-block: $(patsubst %,check-%, $(check-block-y))
--check: check-block check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
-+check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
- check-clean:
- 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5d3da937e4..246cf9aa65 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -10,7 +10,7 @@
- #
- # - img : Tests in this group can be used to excercise the qemu-img tool.
- #
--# - auto : Tests in this group are used during "make check" and should be
-+# - auto : Tests in this group are usable in all environments and should be
- #   runnable in any case. That means they should run with every QEMU binary
- #   (also non-x86), with every QEMU configuration (i.e. must not fail if
- #   an optional feature is not compiled in - but reporting a "skip" is ok),
+diff --git a/block/io.c b/block/io.c
+index f8c3596..a7cd24f 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1264,12 +1264,13 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+      * allocating cluster in the image file.  Note that this value may exceed
+      * BDRV_REQUEST_MAX_BYTES (even when the original read did not), which
+      * is one reason we loop rather than doing it all at once.
++     * Also, this is crucial for compressed copy-on-read.
+      */
+     bdrv_round_to_clusters(bs, offset, bytes, &cluster_offset, &cluster_bytes);
+     skip_bytes = offset - cluster_offset;
+ 
+     trace_bdrv_co_do_copy_on_readv(bs, offset, bytes,
+-                                   cluster_offset, cluster_bytes);
++                                   cluster_offset, cluster_bytes, flags);
+ 
+     while (cluster_bytes) {
+         int64_t pnum;
+@@ -1328,9 +1329,15 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+                 /* This does not change the data on the disk, it is not
+                  * necessary to flush even in cache=writethrough mode.
+                  */
+-                ret = bdrv_driver_pwritev(bs, cluster_offset, pnum,
+-                                          &local_qiov, 0,
+-                                          BDRV_REQ_WRITE_UNCHANGED);
++                if (flags & BDRV_REQ_WRITE_COMPRESSED) {
++                    ret = bdrv_driver_pwritev_compressed(bs, cluster_offset,
++                                                         pnum, &local_qiov,
++                                                         qiov_offset);
++                } else {
++                    ret = bdrv_driver_pwritev(bs, cluster_offset, pnum,
++                                              &local_qiov, 0,
++                                              BDRV_REQ_WRITE_UNCHANGED);
++                }
+             }
+ 
+             if (ret < 0) {
+@@ -1396,7 +1403,11 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+      * to pass through to drivers.  For now, there aren't any
+      * passthrough flags.  */
+     assert(!(flags & ~(BDRV_REQ_NO_SERIALISING | BDRV_REQ_COPY_ON_READ |
+-                       BDRV_REQ_PREFETCH)));
++                       BDRV_REQ_PREFETCH | BDRV_REQ_WRITE_COMPRESSED)));
++
++    /* write compressed only makes sense with copy on read */
++    assert(!(flags & BDRV_REQ_WRITE_COMPRESSED) ||
++           (flags & BDRV_REQ_COPY_ON_READ));
+ 
+     /* Handle Copy on Read and associated serialisation */
+     if (flags & BDRV_REQ_COPY_ON_READ) {
+diff --git a/block/trace-events b/block/trace-events
+index 3aa27e6..f444548 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -14,7 +14,7 @@ blk_root_detach(void *child, void *blk, void *bs) "child %p blk %p bs %p"
+ bdrv_co_preadv(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+ bdrv_co_pwritev(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+ bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p offset %"PRId64" count %d flags 0x%x"
+-bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes, int64_t cluster_offset, int64_t cluster_bytes) "bs %p offset %"PRId64" bytes %u cluster_offset %"PRId64" cluster_bytes %"PRId64
++bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes, int64_t cluster_offset, int64_t cluster_bytes, int flags) "bs %p offset %"PRId64" bytes %u cluster_offset %"PRId64" cluster_bytes %"PRId64" flags 0x%x"
+ bdrv_co_copy_range_from(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
+ bdrv_co_copy_range_to(void *src, uint64_t src_offset, void *dst, uint64_t dst_offset, uint64_t bytes, int read_flags, int write_flags) "src %p offset %"PRIu64" dst %p offset %"PRIu64" bytes %"PRIu64" rw flags 0x%x 0x%x"
+ 
 -- 
-2.18.1
+1.8.3.1
 
 
