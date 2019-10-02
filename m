@@ -2,55 +2,56 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C27C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 11:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B115C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 11:33:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 077132133F
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 11:33:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077132133F
+	by mail.kernel.org (Postfix) with ESMTPS id E430E2133F
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 11:33:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E430E2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFct9-0002dN-Gj
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 07:33:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36882)
+	id 1iFctE-0002jj-IG
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 07:33:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iFcqw-0000yZ-0K
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:31 -0400
+ (envelope-from <slp@redhat.com>) id 1iFcqx-000109-SV
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iFcqu-0008NA-I5
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43736)
+ (envelope-from <slp@redhat.com>) id 1iFcqw-0008P6-F5
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43746)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iFcqu-0008Lp-5W
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:28 -0400
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iFcqw-0008O4-7Z
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:30 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 403923084032;
- Wed,  2 Oct 2019 11:31:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6B8133084242;
+ Wed,  2 Oct 2019 11:31:29 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.103])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 32A10608C0;
- Wed,  2 Oct 2019 11:31:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99A8C608C0;
+ Wed,  2 Oct 2019 11:31:26 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 00/10] Introduce the microvm machine type
-Date: Wed,  2 Oct 2019 13:30:53 +0200
-Message-Id: <20191002113103.45023-1-slp@redhat.com>
+Subject: [PATCH v5 01/10] hw/virtio: Factorize virtio-mmio headers
+Date: Wed,  2 Oct 2019 13:30:54 +0200
+Message-Id: <20191002113103.45023-2-slp@redhat.com>
+In-Reply-To: <20191002113103.45023-1-slp@redhat.com>
+References: <20191002113103.45023-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 02 Oct 2019 11:31:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 02 Oct 2019 11:31:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,102 +74,163 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Microvm is a machine type inspired by Firecracker and constructed
-after the its machine model.
+Put QOM and main struct definition in a separate header file, so it
+can be accessed from other components.
 
-It's a minimalist machine type without PCI nor ACPI support, designed
-for short-lived guests. Microvm also establishes a baseline for
-benchmarking and optimizing both QEMU and guest operating systems,
-since it is optimized for both boot time and footprint.
-
+Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
-
-Changelog
-v5:
- - Drop unneeded "[PATCH v4 2/8] hw/i386: Factorize e820 related
-   functions" (Philippe Mathieu-Daud=C3=A9)
- - Drop unneeded "[PATCH v4 1/8] hw/i386: Factorize PVH related
-   functions" (Stefano Garzarella)
- - Split X86MachineState introduction into smaller patches (Philippe
-   Mathieu-Daud=C3=A9)
- - Change option-roms to x-option-roms and kernel-cmdline to
-   auto-kernel-cmdline (Paolo Bonzini)
- - Make i8259 PIT and i8254 PIC optional (Paolo Bonzini)
- - Some fixes to the documentation (Paolo Bonzini)
- - Switch documentation format from txt to rst (Peter Maydell)
- - Move NMI interface to X86_MACHINE (Philippe Mathieu-Daud=C3=A9, Paolo
-   Bonzini)
-
-v4:
- - This is a complete rewrite of the whole patchset, with a focus on
-   reusing as much existing code as possible to ease the maintenance burd=
-en
-   and making the machine type as compatible as possible by default. As
-   a result, the number of lines dedicated specifically to microvm is
-   383 (code lines measured by "cloc") and, with the default
-   configuration, it's now able to boot both PVH ELF images and
-   bzImages with either SeaBIOS or qboot.
-
-v3:
-  - Add initrd support (thanks Stefano).
-
-v2:
-  - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
-  - Simplify machine definition (thanks Eduardo).
-  - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
-  - Add a patch to factorize PVH-related functions.
-  - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
-
----
-Sergio Lopez (10):
-  hw/virtio: Factorize virtio-mmio headers
-  hw/i386/pc: rename functions shared with non-PC machines
-  hw/i386/pc: move shared x86 functions to x86.c and export them
-  hw/i386: split PCMachineState deriving X86MachineState from it
-  hw/i386: make x86.c independent from PCMachineState
-  fw_cfg: add "modify" functions for all types
-  hw/intc/apic: reject pic ints if isa_pic =3D=3D NULL
-  roms: add microvm-bios (qboot) as binary and git submodule
-  docs/microvm.rst: document the new microvm machine type
-  hw/i386: Introduce the microvm machine type
-
- .gitmodules                      |   3 +
- default-configs/i386-softmmu.mak |   1 +
- docs/microvm.rst                 |  98 ++++
- hw/acpi/cpu_hotplug.c            |  10 +-
- hw/i386/Kconfig                  |   4 +
- hw/i386/Makefile.objs            |   2 +
- hw/i386/acpi-build.c             |  29 +-
- hw/i386/amd_iommu.c              |   3 +-
- hw/i386/intel_iommu.c            |   3 +-
- hw/i386/microvm.c                | 574 ++++++++++++++++++++++
- hw/i386/pc.c                     | 779 +++---------------------------
- hw/i386/pc_piix.c                |  46 +-
- hw/i386/pc_q35.c                 |  38 +-
- hw/i386/pc_sysfw.c               |  58 +--
- hw/i386/x86.c                    | 789 +++++++++++++++++++++++++++++++
- hw/intc/apic.c                   |   2 +-
- hw/intc/ioapic.c                 |   2 +-
- hw/nvram/fw_cfg.c                |  29 ++
- hw/virtio/virtio-mmio.c          |  48 +-
- include/hw/i386/microvm.h        |  83 ++++
- include/hw/i386/pc.h             |  28 +-
- include/hw/i386/x86.h            |  93 ++++
- include/hw/nvram/fw_cfg.h        |  42 ++
- include/hw/virtio/virtio-mmio.h  |  73 +++
- pc-bios/bios-microvm.bin         | Bin 0 -> 65536 bytes
- roms/Makefile                    |   6 +
- roms/qboot                       |   1 +
- 27 files changed, 1948 insertions(+), 896 deletions(-)
- create mode 100644 docs/microvm.rst
- create mode 100644 hw/i386/microvm.c
- create mode 100644 hw/i386/x86.c
- create mode 100644 include/hw/i386/microvm.h
- create mode 100644 include/hw/i386/x86.h
+ hw/virtio/virtio-mmio.c         | 48 +---------------------
+ include/hw/virtio/virtio-mmio.h | 73 +++++++++++++++++++++++++++++++++
+ 2 files changed, 74 insertions(+), 47 deletions(-)
  create mode 100644 include/hw/virtio/virtio-mmio.h
- create mode 100755 pc-bios/bios-microvm.bin
- create mode 160000 roms/qboot
 
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 3d5ca0f667..94d934c44b 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -29,57 +29,11 @@
+ #include "qemu/host-utils.h"
+ #include "qemu/module.h"
+ #include "sysemu/kvm.h"
+-#include "hw/virtio/virtio-bus.h"
++#include "hw/virtio/virtio-mmio.h"
+ #include "qemu/error-report.h"
+ #include "qemu/log.h"
+ #include "trace.h"
+=20
+-/* QOM macros */
+-/* virtio-mmio-bus */
+-#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+-#define VIRTIO_MMIO_BUS(obj) \
+-        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+-#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+-#define VIRTIO_MMIO_BUS_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BUS=
+)
+-
+-/* virtio-mmio */
+-#define TYPE_VIRTIO_MMIO "virtio-mmio"
+-#define VIRTIO_MMIO(obj) \
+-        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+-
+-#define VIRT_MAGIC 0x74726976 /* 'virt' */
+-#define VIRT_VERSION 2
+-#define VIRT_VERSION_LEGACY 1
+-#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+-
+-typedef struct VirtIOMMIOQueue {
+-    uint16_t num;
+-    bool enabled;
+-    uint32_t desc[2];
+-    uint32_t avail[2];
+-    uint32_t used[2];
+-} VirtIOMMIOQueue;
+-
+-typedef struct {
+-    /* Generic */
+-    SysBusDevice parent_obj;
+-    MemoryRegion iomem;
+-    qemu_irq irq;
+-    bool legacy;
+-    /* Guest accessible state needing migration and reset */
+-    uint32_t host_features_sel;
+-    uint32_t guest_features_sel;
+-    uint32_t guest_page_shift;
+-    /* virtio-bus */
+-    VirtioBusState bus;
+-    bool format_transport_address;
+-    /* Fields only used for non-legacy (v2) devices */
+-    uint32_t guest_features[2];
+-    VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
+-} VirtIOMMIOProxy;
+-
+ static bool virtio_mmio_ioeventfd_enabled(DeviceState *d)
+ {
+     return kvm_eventfds_enabled();
+diff --git a/include/hw/virtio/virtio-mmio.h b/include/hw/virtio/virtio-m=
+mio.h
+new file mode 100644
+index 0000000000..c8a6ef20de
+--- /dev/null
++++ b/include/hw/virtio/virtio-mmio.h
+@@ -0,0 +1,73 @@
++/*
++ * Virtio MMIO bindings
++ *
++ * Copyright (c) 2011 Linaro Limited
++ *
++ * Author:
++ *  Peter Maydell <peter.maydell@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License; either version =
+2
++ * of the License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License alo=
+ng
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef QEMU_VIRTIO_MMIO_H
++#define QEMU_VIRTIO_MMIO_H
++
++#include "hw/virtio/virtio-bus.h"
++
++/* QOM macros */
++/* virtio-mmio-bus */
++#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
++#define VIRTIO_MMIO_BUS(obj) \
++        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
++#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
++        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
++#define VIRTIO_MMIO_BUS_CLASS(klass) \
++        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BUS=
+)
++
++/* virtio-mmio */
++#define TYPE_VIRTIO_MMIO "virtio-mmio"
++#define VIRTIO_MMIO(obj) \
++        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
++
++#define VIRT_MAGIC 0x74726976 /* 'virt' */
++#define VIRT_VERSION 2
++#define VIRT_VERSION_LEGACY 1
++#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
++
++typedef struct VirtIOMMIOQueue {
++    uint16_t num;
++    bool enabled;
++    uint32_t desc[2];
++    uint32_t avail[2];
++    uint32_t used[2];
++} VirtIOMMIOQueue;
++
++typedef struct {
++    /* Generic */
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++    qemu_irq irq;
++    bool legacy;
++    /* Guest accessible state needing migration and reset */
++    uint32_t host_features_sel;
++    uint32_t guest_features_sel;
++    uint32_t guest_page_shift;
++    /* virtio-bus */
++    VirtioBusState bus;
++    bool format_transport_address;
++    /* Fields only used for non-legacy (v2) devices */
++    uint32_t guest_features[2];
++    VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
++} VirtIOMMIOProxy;
++
++#endif
 --=20
 2.21.0
 
