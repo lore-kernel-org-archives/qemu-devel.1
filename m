@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1135C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E0AC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:41:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9003421A4C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:37:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9003421A4C
+	by mail.kernel.org (Postfix) with ESMTPS id 2D0C720659
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:41:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D0C720659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFdtA-00082A-NF
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:37:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46887)
+	id 1iFdwQ-0001HQ-B1
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:41:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47477)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFdrm-00070M-T5
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:36:28 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFdvd-0000nQ-Ot
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:40:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFdrl-0006fh-F5
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:36:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18482)
+ (envelope-from <mreitz@redhat.com>) id 1iFdvc-0000eU-EZ
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:40:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38316)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFdrh-0006dR-Lv; Wed, 02 Oct 2019 08:36:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1iFdvZ-0000ap-DD; Wed, 02 Oct 2019 08:40:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 92894305AB7A;
- Wed,  2 Oct 2019 12:36:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4A90D307C826;
+ Wed,  2 Oct 2019 12:40:20 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08F135C226;
- Wed,  2 Oct 2019 12:36:18 +0000 (UTC)
-Subject: Re: [PATCH 15/22] mirror: Prevent loops
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DC627196B2;
+ Wed,  2 Oct 2019 12:40:18 +0000 (UTC)
+Subject: Re: [PATCH 17/22] iotests: Add VM.assert_block_path()
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190920152804.12875-1-mreitz@redhat.com>
- <20190920152804.12875-16-mreitz@redhat.com>
- <99247c12-cb75-7a22-69c8-7eeed019ad61@virtuozzo.com>
+ <20190920152804.12875-18-mreitz@redhat.com>
+ <de0a9fe2-ea84-7be9-6911-b806f032cfff@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <abf63160-3766-de27-bc05-72f695d05bae@redhat.com>
-Date: Wed, 2 Oct 2019 14:36:17 +0200
+Message-ID: <b977e9f8-53f0-290e-5eb5-73c02469779b@redhat.com>
+Date: Wed, 2 Oct 2019 14:40:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <99247c12-cb75-7a22-69c8-7eeed019ad61@virtuozzo.com>
+In-Reply-To: <de0a9fe2-ea84-7be9-6911-b806f032cfff@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="w1FEhHJYl8fCndJDAteFS6sbi6oRtm7Zm"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="RdFQ80n6QeHWfvZXZVdfHBbDJzYuPu36o"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 02 Oct 2019 12:36:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 02 Oct 2019 12:40:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -105,276 +105,173 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---w1FEhHJYl8fCndJDAteFS6sbi6oRtm7Zm
-Content-Type: multipart/mixed; boundary="SaZUPJ92E5YRYaR0fupv7jE2QuxyPn95Q"
+--RdFQ80n6QeHWfvZXZVdfHBbDJzYuPu36o
+Content-Type: multipart/mixed; boundary="2oYAA26s1UPMNEsnP29t6yJIdQPM3j8XK"
 
---SaZUPJ92E5YRYaR0fupv7jE2QuxyPn95Q
+--2oYAA26s1UPMNEsnP29t6yJIdQPM3j8XK
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 26.09.19 15:08, Vladimir Sementsov-Ogievskiy wrote:
+On 26.09.19 16:07, Vladimir Sementsov-Ogievskiy wrote:
 > 20.09.2019 18:27, Max Reitz wrote:
->> While bdrv_replace_node() will not follow through with it, a specific
->> @replaces asks the mirror job to create a loop.
->>
->> For example, say both the source and the target share a child where th=
-e
->> source is a filter; by letting @replaces point to the common child, yo=
-u
->> ask for a loop.
->=20
->=20
-> source[filter]
->    |
->    v
-> child  <----- target
->=20
-> and we want target to be a child if itself. OK, it's a loop.
->=20
->>
->> Or if you use @replaces in drive-mirror with sync=3Dnone and
->> mode=3Dabsolute-paths, you generally ask for a loop (@replaces must po=
-int
->> to a child of the source, and sync=3Dnone makes the source the backing=
-
->> file of the target after the job).
->>
->> bdrv_replace_node() will not create those loops, but it by doing so, i=
-t
->=20
-> s/but it/but ?
-
-Yep.
-
->> ignores the user-requested configuration, which is not ideally either.=
-
->> (In the first example above, the target's child will remain what it wa=
-s,
->> which may still be reasonable.  But in the second example, the target
->> will just not become a child of the source, which is precisely what wa=
-s
->> requested with @replaces.)
->=20
-> so you say that second example is bad [1]
->=20
->>
->> So prevent such configurations, both before the job, and before it
->> actually completes.
->>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>   include/block/block_int.h |  3 +++
->>   block.c                   | 30 ++++++++++++++++++++++++
->>   block/mirror.c            | 19 +++++++++++++++-
->>   blockdev.c                | 48 +++++++++++++++++++++++++++++++++++++=
-+-
->>   4 files changed, 98 insertions(+), 2 deletions(-)
+>>   tests/qemu-iotests/iotests.py | 48 +++++++++++++++++++++++++++++++++=
+++
+>>   1 file changed, 48 insertions(+)
 >>
->> diff --git a/include/block/block_int.h b/include/block/block_int.h
->> index 70f26530c9..8a26a0d88a 100644
->> --- a/include/block/block_int.h
->> +++ b/include/block/block_int.h
->> @@ -1256,6 +1256,9 @@ void bdrv_format_default_perms(BlockDriverState =
-*bs, BdrvChild *c,
->>   bool bdrv_recurse_can_replace(BlockDriverState *bs,
->>                                 BlockDriverState *to_replace);
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+>> index daed4ee013..e6fb46287d 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -670,6 +670,54 @@ class VM(qtest.QEMUQtestMachine):
 >>  =20
->> +bool bdrv_is_child_of(BlockDriverState *child, BlockDriverState *pare=
-nt,
->> +                      int min_level);
->> +
->>   /*
->>    * Default implementation for drivers to pass bdrv_co_block_status()=
- to
->>    * their file.
->> diff --git a/block.c b/block.c
->> index 0d9b3de98f..332191fb47 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -6260,6 +6260,36 @@ out:
->>       return to_replace_bs;
->>   }
+>>           return fields.items() <=3D ret.items()
 >>  =20
->> +/*
->> + * Return true iff @child is a (recursive) child of @parent, with at
->> + * least @min_level edges between them.
->> + *
->> + * (If @min_level =3D=3D 0, return true if @child =3D=3D @parent.  Fo=
-r
->> + * @min_level =3D=3D 1, @child needs to be at least a real child; for=
-
->> + * @min_level =3D=3D 2, it needs to be at least a grand-child; and so=
- on.)
->> + */
->> +bool bdrv_is_child_of(BlockDriverState *child, BlockDriverState *pare=
-nt,
->> +                      int min_level)
->> +{
->> +    BdrvChild *c;
->> +
->> +    if (child =3D=3D parent && min_level <=3D 0) {
->> +        return true;
->> +    }
->> +
->> +    if (!parent) {
->> +        return false;
->> +    }
->> +
->> +    QLIST_FOREACH(c, &parent->children, next) {
->> +        if (bdrv_is_child_of(child, c->bs, min_level - 1)) {
->> +            return true;
->> +        }
->> +    }
->> +
->> +    return false;
->> +}
->> +
->>   /**
->>    * Iterates through the list of runtime option keys that are said to=
-
->>    * be "strong" for a BDS.  An option is called "strong" if it change=
-s
->> diff --git a/block/mirror.c b/block/mirror.c
->> index d877637e1e..f30a6933d8 100644
->> --- a/block/mirror.c
->> +++ b/block/mirror.c
->> @@ -701,7 +701,24 @@ static int mirror_exit_common(Job *job)
->>            * there.
->>            */
->>           if (bdrv_recurse_can_replace(src, to_replace)) {
->> -            bdrv_replace_node(to_replace, target_bs, &local_err);
->> +            /*
->> +             * It is OK for @to_replace to be an immediate child of
->> +             * @target_bs, because that is what happens with
->> +             * drive-mirror sync=3Dnone mode=3Dabsolute-paths: target=
-_bs's
->> +             * backing file will be the source node, which is also
->> +             * to_replace (by default).
->> +             * bdrv_replace_node() handles this case by not letting
->> +             * target_bs->backing point to itself, but to the source
->> +             * still.
+>> +    '''
+>> +    @path is a string whose components are separated by slashes.
+>> +    The first component is a node name, the rest are child names.
+>> +    Examples:
+>> +      - "qcow2-node/backing/file"
+>> +      - "quorum-node/children.2/file"
 >=20
-> but here you said [1] is good
+> Possibly, separting node-name to first parameter and keeping child-path=
+ as
+> a second will simplify code a bit, and be more useful for cases when on=
+ caller
+> part node-name is in variable.
 
-Well.  Not quite.
+Sounds good.
 
-In [1] I say that sync=3Dnone mode=3Dabsolute-paths replaces=3Dsome-node =
-will
-not work as intended, because the target will not replace some-node.
-(bdrv_replace_node() prevents that.)
+>> +
+>> +    @expected_node may be None.
+>> +
+>> +    @graph may be None or the result of an x-debug-query-block-graph
+>> +    call that has already been performed.
+>> +    '''
+>> +    def assert_block_path(self, path, expected_node, graph=3DNone):
+>> +        if graph is None:
+>> +            graph =3D self.qmp('x-debug-query-block-graph')['return']=
 
-Here, it=E2=80=99s about when there is no @replaces option.  Then, the ta=
-rget
-will absolutely replace the source, and target->backing will point to
-the source.
+>=20
+> Yay! I'm happy to see that it's useful.
 
-Here=E2=80=99s what happens (as far as I understand):
+:-)
 
-Without @replaces:
+It=E2=80=99s probably the best query function we have.
 
-target->backing is first set to the source.
+>> +
+>> +        iter_path =3D iter(path.split('/'))
+>> +        root =3D next(iter_path)
+>> +        try:
+>> +            node =3D next(node for node in graph['nodes'] if node['na=
+me'] =3D=3D root)
+>> +        except StopIteration:
+>> +            node =3D None
+>=20
+> for such usage next has second optional argument: next(iterator[, defau=
+lt])
 
-Then, target replaces the source node.  bdrv_replace_node() will not
-create loops, so it keeps the target->backing link as it is.
+Great!
 
-With replaces=3Dsome-node (must be a (recursive) child of the source):
+> (don't think I teach you Python, actually you teach me, as before I did=
+n't know
+> correct way to search first element with condition)
 
-target->backing is first set to the source.
+We learn from one another, which is the best case.
 
-Then target replaces some-node.  bdrv_replace_node() will not create
-loops, so it keeps all links that would connect the source and the
-target as they are.  Thus, the target will actually not really replace
-some-node.
-
-Example:
-
-quorum --children.0--> to-replace
-
-Now we mirror from quorum to some target (target-node) with sync=3Dnone,
-mode=3Dabsolute-paths, and replaces=3Dto-replace.
-
-What we=E2=80=99re effectively asking for is this:
-
-quorum --children.0--> target-node
-  ^                         |
-  +---------backing---------+
-
-Which of course doesn=E2=80=99t work.  It makes sense if you break up the=
- loop
-by imagining that quorum simply won=E2=80=99t read from children.0, but i=
-n
-reality it is a loop, so it can=E2=80=99t work.
-
-What happens though is this:
-
-  quorum --children.0--> to-replace
-     ^
-  backing
-     |
-target-node
-
-The target node does not replace to-replace, because changing the
-children.0 link to point to target-node would create a loop.  Thus, the
-user doesn=E2=80=99t get what they want.
-
-(Note that if to-replace has other parents, target-node would absolutely
-replace it for them.)
-
->> +             */
->> +            if (!bdrv_is_child_of(to_replace, target_bs, 2)) {
->> +                bdrv_replace_node(to_replace, target_bs, &local_err);=
-
->> +            } else {
+>> +
+>> +        for path_node in iter_path:
+>> +            assert node is not None, 'Cannot follow path %s' % path
+>> +
+>> +            try:
+>> +                node_id =3D next(edge['child'] for edge in graph['edg=
+es'] \
+>> +                                             if edge['parent'] =3D=3D=
+ node['id'] and
+>> +                                                edge['name'] =3D=3D p=
+ath_node)
+>=20
+> Hmm here you allow default StopIteration exception [1]
 >=20
 >=20
-> So, we allow bdrv_replace_node automatically handle case whith immediat=
-e child of target is
-> replaces.. But if consider several additional filters above target (so =
-target is a filter),
-> we not allow it. Why filtered case is worse?
+>> +
+>> +                node =3D next(node for node in graph['nodes'] \
+>> +                                 if node['id'] =3D=3D node_id)
+>> +            except StopIteration:
+>> +                node =3D None
+>=20
+> actually, I think this will never happen, so we may simplify code and a=
+llow it to
+> throw StopIteration exception in this impossible case..
 
-Because if it=E2=80=99s an immediate child, there are no other nodes invo=
-lved.
-Just one link stays as it is (e.g. target->backing simply still points
-to the source node).
+This is for a use case where the next child simply doesn=E2=80=99t exist,=
+ so you
+can do:
 
-If it=E2=80=99s an indirect child, then there are other nodes involved an=
-d it=E2=80=99s
-likely the user won=E2=80=99t get what they want (as in the example above=
-, where
-the replacement just won=E2=80=99t happen).
+assert_block_path('qcow2-node/backing', None)
 
+To verify that the qcow2 node has no backing file.
 
-The pragmatic explanation is =E2=80=9CWe need to allow immediate children=
-,
-because that=E2=80=99s the no-@replaces sync=3Dnone mode=3Dabsolute-paths=
- case.  We
-need to forbid everything else because it=E2=80=99d probably lead to unex=
-pected
-results.=E2=80=9D
+>> +
+>> +        assert node is not None or expected_node is None, \
+>> +               'No node found under %s (but expected %s)' % \
+>> +               (path, expected_node)
+>=20
+> node may be None here only from last iteration, but it can't happen: if=
+ we have edge
+> with child, we'll for sure have node with such node-name in graph
+
+node will always be set by the try-except block, won=E2=80=99t it?
+
+>> +
+>> +        assert expected_node is not None or node is None, \
+>> +               'Found node %s under %s (but expected none)' % \
+>> +               (node['name'], path)
+>=20
+> hmm, so expected_node=3DNone means we want to prove that there is no su=
+ch node? It should
+> be mentioned in comment above the function. But this don't work due to =
+[1]
+
+Hm, I seem to remember I tested all cases locally and they all worked.
 
 Max
 
+>> +
+>> +        if node is not None and expected_node is not None:
+>> +            assert node['name'] =3D=3D expected_node, \
+>> +                   'Found node %s under %s (but expected %s)' % \
+>> +                   (node['name'], path, expected_node)
+>>  =20
+>>   index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
+>>  =20
+>>
+>=20
+>=20
 
---SaZUPJ92E5YRYaR0fupv7jE2QuxyPn95Q--
 
---w1FEhHJYl8fCndJDAteFS6sbi6oRtm7Zm
+
+--2oYAA26s1UPMNEsnP29t6yJIdQPM3j8XK--
+
+--RdFQ80n6QeHWfvZXZVdfHBbDJzYuPu36o
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2UmcEACgkQ9AfbAGHV
-z0AfPQgAs2vO5ou3gOOLZNZKtEzDbGlCp8fMnsLveeIe5nzb1UpwRCqMMPV+DC8V
-ga1B9/GthezwSsKNnea7/DfGEqbGEKie1g91jl3ufE3nWGsxhxDgSvfGl4aYSiv3
-UVP4/f6TkVkHkxdumwctepcphAKqo0wMnLIF1Uu179Y9etKJ5gdU5xtQ7zWbhGsL
-622NklQfOpXSVn8TVqNDuHYvAAa/cVoR8W6IEWR2xDMZdEcgVGUDlLPMpHKAtEdw
-y8KRzKED1JohMOZJ0hdjKSTvLdhNj4ZRJ6vxAcYMPv98a4MIMI71EU9WVmrEWfSb
-MWMFz4wpCGbXmAhJ8HUiGA8Tkz8S8g==
-=NuXT
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2UmrEACgkQ9AfbAGHV
+z0BniAgAtDr3hLIeR3XjAlaelmoSZv90Oo3d1R9tQmm2WattY0y1mELPWNFMbnZe
+kFDfo7a8AL+6N3fsBQP+NXOFcDdc4MD7QVONa6DecFJ+fQTXOrjtxgi2b16qBGtt
+JGSXs0B5c5FOLesnOndKNo2XbO342TG9IN0TTll23vds0zXeDAAKn+W37rZho0qQ
+KlKReXxeQVE4TT9/FUjFnVEN/kHFCanL1j9KHe/5hkeEO5qompbA/kwkMFzaHSVx
+Srvt2FnPOgZNc0Z6/bCvtapMAD3cdA7Qk7ig2RfHecznCPfpROmlgS/nasOtBtET
+6TRjE8Qouq5VgX2Jmxho+Zz7E1VX5A==
+=7RB5
 -----END PGP SIGNATURE-----
 
---w1FEhHJYl8fCndJDAteFS6sbi6oRtm7Zm--
+--RdFQ80n6QeHWfvZXZVdfHBbDJzYuPu36o--
 
