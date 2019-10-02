@@ -2,92 +2,149 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A582C35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF894C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:29:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41DF621A4A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:29:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41DF621A4A
+	by mail.kernel.org (Postfix) with ESMTPS id B988321920
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:29:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="XgWodsgG";
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="iknwAG2G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B988321920
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54833 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFdki-0000rZ-4A
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:29:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46558)
+	id 1iFdku-0000zA-L6
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:29:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33756)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iFb2y-0000Nk-2l
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 05:35:49 -0400
+ (envelope-from <prvs=71787d9211=jglauber@marvell.com>)
+ id 1iFcSZ-0001Zp-H6
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iFb2w-0006jl-B3
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 05:35:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40492)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iFb2w-0006j0-56
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 05:35:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iFb2t-0005jU-FD
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:35:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 70F972E80D0
- for <qemu-devel@nongnu.org>; Wed,  2 Oct 2019 09:35:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 02 Oct 2019 09:23:00 -0000
+ (envelope-from <prvs=71787d9211=jglauber@marvell.com>)
+ id 1iFcSY-00086U-4u
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:06:19 -0400
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:23934)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=71787d9211=jglauber@marvell.com>)
+ id 1iFcSX-00084J-OW; Wed, 02 Oct 2019 07:06:18 -0400
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+ by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ x92B56hO016689; Wed, 2 Oct 2019 04:06:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=pfpt0818;
+ bh=EFDxkDF/0G/gyAHFdLEbXHCcL5I84rZ0elughXsauuY=;
+ b=XgWodsgGm1W39e/LDV3T4rIh6k5MGrHU0xBNnRexvagpEfIPPJO9ay2c1wMk9iSuWavl
+ We+ae5rlDG28zN3iL9V9zYU0xEEU0ROAO35t2ujkr4Fjn8/b1tMeZjFmGZeNECEyf/41
+ K8wwXmvSpVEaLDM2Vs2HXZR5tQiVzOo6vW6hqU3lqc2z/yKJFLPLvukAafd5+K1y/0im
+ 3gEslFjhlfU1NHbUPYyk8dBdR+iZWQwumLtlu+y/Mvtp1VarZnvvFmq8WzRTaskdbk61
+ +sZVzbVM2W/ZMCX9o1dFAJDA12thfslZLpiWNbuEYkvP8fJM7CIN0frTd3TVXqO8tUO3 Bw== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+ by mx0b-0016f401.pphosted.com with ESMTP id 2va71mpse0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Wed, 02 Oct 2019 04:06:02 -0700
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Wed, 2 Oct
+ 2019 04:06:00 -0700
+Received: from NAM01-BN3-obe.outbound.protection.outlook.com (104.47.33.56) by
+ SC-EXCH03.marvell.com (10.93.176.83) with Microsoft SMTP Server
+ (TLS) id
+ 15.0.1367.3 via Frontend Transport; Wed, 2 Oct 2019 04:06:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S+3/VP5TgRYHm7WEO54gDuuS/usRQzQv2JNa6d/CS/K96UonPqN3p2NGbJmuxf83weIwLJ+zvBZ09cXECLqyIYyst24C/QSMr6QMqTM1qPXsOa19DEwypoMIxyDW/8QtPWuxmS2sZ9JcC00THJf+5nTKxqyIh17sT+gaNSAmgAOiZukl1KQl9J8YOo+fAV8TAGSzyn64dzsQYm2B0m9rYlXzHwkYjQ7Q6OtpCD68ScijXW2nSf8l3oP/c8NHO9OFXMP85o5XQ+Y74cL3TSD8hgMWz6PN21mMzI3Qc6HnXFWNOWhkWkLu0nRcZtCaN+UAKv9QDCBYsQZ6FszEseQUcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EFDxkDF/0G/gyAHFdLEbXHCcL5I84rZ0elughXsauuY=;
+ b=PQMrkQcTfduoHD5JPPomNUQ7FYYh9Jfh1fFy+3yBSveiwWrl249HGFyArN2Tgaoz0fyLO7bQS38n0lTOt+GacAB22sKFUwHmwEpjLWJaZmpXh17wSb1F/xJo748rbKKqhvNge22szRoboGzhNHE7MGLdkNRcEcLWMB1T9Z3OxPsqBnxTBJ12mzwqzfvT5fDn8WIihIIOt7mCfmRlZdwtQs+835IDhkl19vyYGyVOxPjyrJ7ZjgIo0yihAhL29oOEToV+jxf5+H2CQOrTO6v+XIv1mGN/6ylBJW6tBWnNjXTLP4SPws5L3iMKGtQCxQZQCNaubBjZ1OyCscd+4Nr3Og==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector2-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EFDxkDF/0G/gyAHFdLEbXHCcL5I84rZ0elughXsauuY=;
+ b=iknwAG2G3geAYmCJk0QRAsKrhFfWAhhsd8oGZtqot+Y5YKYMc9z47/bCt27yROpH4ZcEt3GTBfU/kf5CuF77lbB/RWBcbtIg+1ZVCd43nPTXkmmKIUqYO1hjHfKStDxcdfxlj9C/pgLGMq8gbb3eqIS2yTbpYkvovl4XdIPZU84=
+Received: from DM6PR18MB3001.namprd18.prod.outlook.com (20.179.104.143) by
+ DM6PR18MB2362.namprd18.prod.outlook.com (20.179.71.27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.18; Wed, 2 Oct 2019 11:05:59 +0000
+Received: from DM6PR18MB3001.namprd18.prod.outlook.com
+ ([fe80::11c2:98e0:b9d9:5dba]) by DM6PR18MB3001.namprd18.prod.outlook.com
+ ([fe80::11c2:98e0:b9d9:5dba%5]) with mapi id 15.20.2305.023; Wed, 2 Oct 2019
+ 11:05:59 +0000
 From: Jan Glauber <jglauber@marvell.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=In Progress; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=New; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
- component=main; status=New; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=In Progress; importance=Medium;
- assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=ff-series;
- sourcepackage=qemu; component=None; status=New; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dannf jan-glauber-i jnsnow lizhengui rafaeldtinoco
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Jan Glauber (jan-glauber-i)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] qemu_futex_wait() lockups in ARM64: 2 possible issues
+Thread-Topic: [Qemu-devel] qemu_futex_wait() lockups in ARM64: 2 possible
+ issues
+Thread-Index: AQHVeRFen3KZ7K8mD02pkgA8c1cuvA==
+Date: Wed, 2 Oct 2019 11:05:59 +0000
+Message-ID: <20191002110550.GA3482@hc>
+References: <cbe46ad6-ef6c-d155-e79a-672182c725ad@ubuntu.com>
+ <d94f18f1-986f-ec19-02c0-e83e5e7af3d0@redhat.com>
  <1864070a-2f84-1d98-341e-f01ddf74ec4b@ubuntu.com>
- <20190924202517.GA21422@xps13.dannf>
-Message-Id: <20191002092253.GA3857@hc>
-Subject: [Bug 1805256] Re: [Qemu-devel] qemu_futex_wait() lockups in ARM64: 2
- possible issues
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19066";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 2e3ae6c15255563c05797f29c21e59ec758a4d2e
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+ <20190924202517.GA21422@xps13.dannf> <20191002092253.GA3857@hc>
+ <ed5c4522-9250-e403-c55d-d3dbcda82540@redhat.com>
+In-Reply-To: <ed5c4522-9250-e403-c55d-d3dbcda82540@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: AM0PR10CA0056.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:150::36) To DM6PR18MB3001.namprd18.prod.outlook.com
+ (2603:10b6:5:182::15)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [109.42.2.12]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e7d98316-6b95-4f2c-992c-08d74728814a
+x-ms-traffictypediagnostic: DM6PR18MB2362:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <DM6PR18MB2362690DAEE656B51202DB52D89C0@DM6PR18MB2362.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 0178184651
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(7916004)(376002)(346002)(366004)(396003)(39860400002)(136003)(189003)(199004)(6306002)(316002)(7736002)(81166006)(1076003)(52116002)(6436002)(66066001)(8936002)(99286004)(2906002)(33656002)(4326008)(9686003)(5660300002)(305945005)(8676002)(14444005)(26005)(81156014)(966005)(6486002)(3846002)(478600001)(76176011)(6116002)(256004)(6246003)(6916009)(229853002)(14454004)(53546011)(6506007)(6512007)(5024004)(102836004)(25786009)(386003)(86362001)(11346002)(476003)(486006)(64756008)(71200400001)(66556008)(66476007)(66946007)(33716001)(71190400001)(446003)(66446008)(186003)(54906003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR18MB2362;
+ H:DM6PR18MB3001.namprd18.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 7/p9KFAwpMC/KNFOS3sW1jO+wWfr79FyHxaRIPKUbVt1su826VmXfXMBtyZ1PZlCpCEuuVU9hS4BXbzvQCFMie7EeLjivlGWPtrKhNXNwPdZf2lhzNv3V097hxW1d3k4ZLqX+53htrJzsA8fL8J2dcw3KIhS7ONOc3SqTO/aR01dEQEk8uExvc2EyhOhFcr7gOWekY0JaRc5bkYMu5GyC0/eqcOUbwdbVUZoBOV5p2A4mlD6rbGJoi5fjHFdY/6eTOc9htcqR58UuapdkrbcLUL3kEqa5u1FqWfLHMuBg1eGSPTKj3Oex7ZU7Adi9CPXzdiJhcDtGEnuBvO2fUa72nBqkIwk2gc+WE/NCxKb8yL3gd44CUDUg/XQ1dtQWw1HQNphFZBhbHCWF8uZsaFYs/chG6dRTLeNlGTsa6+4LlEw7Dn0f7gdf7lqxYRuUGDPds4O7iWsC/Tx4zo9q2ncrA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A4E5701BF442ED4899E88E94649B8589@namprd18.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7d98316-6b95-4f2c-992c-08d74728814a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Oct 2019 11:05:59.2576 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xK+wbFx59S6OXXyUO0Pz1HoEOiUrGg8SCeeVjz1l1q+0JdgYw78OrnL7fvczoe3DD/QhrocgCJczSakk0ij8hA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR18MB2362
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,1.0.8
+ definitions=2019-10-02_06:2019-10-01,2019-10-02 signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 67.231.156.173
 X-Mailman-Approved-At: Wed, 02 Oct 2019 08:27:28 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,229 +153,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: Rafael David Tinoco <rafaeldtinoco@ubuntu.com>,
+ lizhengui <lizhengui@huawei.com>, dann frazier <dann.frazier@canonical.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Bug 1805256 <1805256@bugs.launchpad.net>, QEMU
+ Developers - ARM <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I've looked into this on ThunderX2. The arm64 code generated for the
-atomic_[add|sub] accesses of ctx->notify_me doesn't contain any
-memory barriers. It is just plain ldaxr/stlxr.
+On Wed, Oct 02, 2019 at 11:45:19AM +0200, Paolo Bonzini wrote:
+> On 02/10/19 11:23, Jan Glauber wrote:
+> > I've tried to verify me theory with this patch and didn't run into the
+> > issue for ~500 iterations (usually I would trigger the issue ~20 iterat=
+ions).
+>=20
+> Awesome!  That would be a compiler bug though, as atomic_add and atomic_s=
+ub
+> are defined as sequentially consistent:
+>=20
+> #define atomic_add(ptr, n) ((void) __atomic_fetch_add(ptr, n, __ATOMIC_SE=
+Q_CST))
+> #define atomic_sub(ptr, n) ((void) __atomic_fetch_sub(ptr, n, __ATOMIC_SE=
+Q_CST))
 
->From my understanding this is not sufficient for SMP sync.
+Compiler bug sounds kind of unlikely...
 
-If I read this comment correct:
+> What compiler are you using and what distro?  Can you compile util/aio-po=
+six.c
+> with "-fdump-rtl-all -fdump-tree-all", zip the boatload of debugging file=
+s and
+> send them my way?
 
-    void aio_notify(AioContext *ctx)
-    {
-        /* Write e.g. bh->scheduled before reading ctx->notify_me.  Pairs
-         * with atomic_or in aio_ctx_prepare or atomic_add in aio_poll.
-         */
-        smp_mb();
-        if (ctx->notify_me) {
+This is on Ubuntu 18.04.3,
+gcc version 7.4.0 (Ubuntu/Linaro 7.4.0-1ubuntu1~18.04.1)
 
-it points out that the smp_mb() should be paired. But as
-I said the used atomics don't generate any barriers at all.
+I've uploaded the debug files to:
+https://bugs.launchpad.net/qemu/+bug/1805256/+attachment/5293619/+files/aio=
+-posix.tar.xz
 
-I've tried to verify me theory with this patch and didn't run into the
-issue for ~500 iterations (usually I would trigger the issue ~20 iterations=
-).
+Thanks,
+Jan
 
---Jan
-
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index d8f0cb4af8dd..d07dcd4e9993 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -591,6 +591,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
-      */
-     if (blocking) {
-         atomic_add(&ctx->notify_me, 2);
-+        smp_mb();
-     }
- =
-
-     qemu_lockcnt_inc(&ctx->list_lock);
-@@ -632,6 +633,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
- =
-
-     if (blocking) {
-         atomic_sub(&ctx->notify_me, 2);
-+        smp_mb();
-     }
- =
-
-     /* Adjust polling time */
-diff --git a/util/async.c b/util/async.c
-index 4dd9d95a9e73..92ac209c4615 100644
---- a/util/async.c
-+++ b/util/async.c
-@@ -222,6 +222,7 @@ aio_ctx_prepare(GSource *source, gint    *timeout)
-     AioContext *ctx =3D (AioContext *) source;
- =
-
-     atomic_or(&ctx->notify_me, 1);
-+    smp_mb();
- =
-
-     /* We assume there is no timeout already supplied */
-     *timeout =3D qemu_timeout_ns_to_ms(aio_compute_timeout(ctx));
-@@ -240,6 +241,7 @@ aio_ctx_check(GSource *source)
-     QEMUBH *bh;
- =
-
-     atomic_and(&ctx->notify_me, ~1);
-+    smp_mb();
-     aio_notify_accept(ctx);
- =
-
-     for (bh =3D ctx->first_bh; bh; bh =3D bh->next) {
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
-
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
-
-Status in QEMU:
-  In Progress
-Status in qemu package in Ubuntu:
-  In Progress
-Status in qemu source package in Bionic:
-  New
-Status in qemu source package in Disco:
-  New
-Status in qemu source package in Eoan:
-  In Progress
-Status in qemu source package in FF-Series:
-  New
-
-Bug description:
-  Command:
-
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs.
-
-  ----
-
-  Workaround:
-
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
-
-  ----
-
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
-
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
-
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
-
-  ----
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  [ Original Description ]
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
+> Thanks,
+>=20
+> Paolo
 
