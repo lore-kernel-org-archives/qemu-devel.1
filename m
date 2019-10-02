@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B15DC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A0DECE58A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:30:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EC7C2133F
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:28:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EC7C2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 7C8CD21783
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:30:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C8CD21783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFfcd-00029Z-2L
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:28:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38129)
+	id 1iFfeV-0004Zz-2e
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:30:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38118)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWx-0005iH-Ek
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWx-0005hj-7G
  for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:23:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWv-0005bS-L1
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:23:03 -0400
-Received: from relay.sw.ru ([185.231.240.75]:53298)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iFfWv-0005bb-MA
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:23:02 -0400
+Received: from relay.sw.ru ([185.231.240.75]:53306)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iFfWv-0005Ze-CF; Wed, 02 Oct 2019 10:23:01 -0400
+ id 1iFfWv-0005Zi-Bw; Wed, 02 Oct 2019 10:23:01 -0400
 Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iFfWr-0003C3-Sl; Wed, 02 Oct 2019 17:22:57 +0300
+ id 1iFfWs-0003C3-0y; Wed, 02 Oct 2019 17:22:58 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Subject: [PATCH v2 5/6] block-stream: add compress option
-Date: Wed,  2 Oct 2019 17:22:45 +0300
-Message-Id: <1570026166-748566-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v2 6/6] tests/qemu-iotests: add case for block-stream compress
+Date: Wed,  2 Oct 2019 17:22:46 +0300
+Message-Id: <1570026166-748566-7-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1570026166-748566-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1570026166-748566-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -65,201 +65,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow data compression during block-stream job for backup backing chain.
+Add a test case to the iotest #030 that checks 'compress' option for a
+block-stream job.
 
-Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/stream.c            | 19 +++++++++++++------
- blockdev.c                | 14 +++++++++++++-
- hmp-commands.hx           |  4 ++--
- include/block/block_int.h |  3 ++-
- monitor/hmp-cmds.c        |  5 +++--
- qapi/block-core.json      |  5 ++++-
- 6 files changed, 37 insertions(+), 13 deletions(-)
+ tests/qemu-iotests/030     | 49 +++++++++++++++++++++++++++++++++++++++++++++-
+ tests/qemu-iotests/030.out |  4 ++--
+ 2 files changed, 50 insertions(+), 3 deletions(-)
 
-diff --git a/block/stream.c b/block/stream.c
-index 5562ccb..51cc49e 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -36,15 +36,21 @@ typedef struct StreamBlockJob {
-     char *backing_file_str;
-     bool bs_read_only;
-     bool chain_frozen;
-+    bool compress;
- } StreamBlockJob;
+diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+index f3766f2..13fe5a2 100755
+--- a/tests/qemu-iotests/030
++++ b/tests/qemu-iotests/030
+@@ -21,7 +21,8 @@
+ import time
+ import os
+ import iotests
+-from iotests import qemu_img, qemu_io
++from iotests import qemu_img, qemu_io, qemu_img_pipe
++import json
  
--static int coroutine_fn stream_populate(BlockBackend *blk,
--                                        int64_t offset, uint64_t bytes)
-+static int coroutine_fn stream_populate(BlockBackend *blk, int64_t offset,
-+                                        uint64_t bytes, bool compress)
- {
-+    int flags = BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH;
+ backing_img = os.path.join(iotests.test_dir, 'backing.img')
+ mid_img = os.path.join(iotests.test_dir, 'mid.img')
+@@ -956,6 +957,52 @@ class TestSetSpeed(iotests.QMPTestCase):
+ 
+         self.cancel_and_wait(resume=True)
+ 
++class TestCompressed(iotests.QMPTestCase):
 +
-+    if (compress) {
-+        flags |= BDRV_REQ_WRITE_COMPRESSED;
-+    }
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, backing_img, '1M')
++        qemu_img('create', '-f', iotests.imgfmt, '-o',
++                 'backing_file=%s' % backing_img, mid_img)
++        qemu_img('create', '-f', iotests.imgfmt, '-o',
++                 'backing_file=%s' % mid_img, test_img)
++        qemu_io('-c', 'write -P 0x1 0 512k', backing_img)
++        self.vm = iotests.VM().add_drive(test_img, "backing.node-name=mid," +
++                                         "backing.backing.node-name=base")
++        self.vm.launch()
 +
-     assert(bytes < SIZE_MAX);
- 
--    return blk_co_preadv(blk, offset, bytes, NULL,
--                         BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH);
-+    return blk_co_preadv(blk, offset, bytes, NULL, flags);
- }
- 
- static void stream_abort(Job *job)
-@@ -167,7 +173,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-         }
-         trace_stream_one_iteration(s, offset, n, ret);
-         if (copy) {
--            ret = stream_populate(blk, offset, n);
-+            ret = stream_populate(blk, offset, n, s->compress);
-         }
-         if (ret < 0) {
-             BlockErrorAction action =
-@@ -217,7 +223,7 @@ static const BlockJobDriver stream_job_driver = {
- 
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
--                  int creation_flags, int64_t speed,
-+                  int creation_flags, int64_t speed, bool compress,
-                   BlockdevOnError on_error, Error **errp)
- {
-     StreamBlockJob *s;
-@@ -267,6 +273,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     s->backing_file_str = g_strdup(backing_file_str);
-     s->bs_read_only = bs_read_only;
-     s->chain_frozen = true;
-+    s->compress = compress;
- 
-     s->on_error = on_error;
-     trace_stream_start(bs, base, s);
-diff --git a/blockdev.c b/blockdev.c
-index fbef684..290ee4b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3238,6 +3238,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-                       bool has_base_node, const char *base_node,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-+                      bool has_compress, bool compress,
-                       bool has_on_error, BlockdevOnError on_error,
-                       bool has_auto_finalize, bool auto_finalize,
-                       bool has_auto_dismiss, bool auto_dismiss,
-@@ -3254,6 +3255,10 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         on_error = BLOCKDEV_ON_ERROR_REPORT;
-     }
- 
-+    if (!has_compress) {
-+        compress = false;
-+    }
++    def tearDown(self):
++        self.vm.shutdown()
++        os.remove(test_img)
++        os.remove(mid_img)
++        os.remove(backing_img)
 +
-     bs = bdrv_lookup_bs(device, device, errp);
-     if (!bs) {
-         return;
-@@ -3308,6 +3313,12 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         goto out;
-     }
- 
-+    if (compress && bs->drv->bdrv_co_pwritev_compressed_part == NULL) {
-+        error_setg(errp, "Compression is not supported for this drive %s",
-+                   bdrv_get_device_name(bs));
-+        goto out;
-+    }
++    def test_stream_compress(self):
++        self.assert_no_active_block_jobs()
 +
-     /* backing_file string overrides base bs filename */
-     base_name = has_backing_file ? backing_file : base_name;
++        result = self.vm.qmp('block-stream', device='mid', job_id='stream-mid')
++        self.assert_qmp(result, 'return', {})
++
++        self.wait_until_completed(drive='stream-mid')
++        for event in self.vm.get_qmp_events(wait=True):
++            if event['event'] == 'BLOCK_JOB_COMPLETED':
++                self.dictpath(event, 'data/device')
++                self.assert_qmp_absent(event, 'data/error')
++
++        result = self.vm.qmp('block-stream', device='drive0', base=mid_img,
++                             job_id='stream-top', compress=True)
++        self.assert_qmp(result, 'return', {})
++
++        self.wait_until_completed(drive='stream-top')
++        self.assert_no_active_block_jobs()
++        self.vm.shutdown()
++
++        top = json.loads(qemu_img_pipe('info', '--output=json', test_img))
++        mid = json.loads(qemu_img_pipe('info', '--output=json', mid_img))
++        base = json.loads(qemu_img_pipe('info', '--output=json', backing_img))
++
++        self.assertEqual(mid['actual-size'], base['actual-size'])
++        self.assertLess(top['actual-size'], mid['actual-size'])
++
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'],
+                  supported_protocols=['file'])
+diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
+index 6d9bee1..af8dac1 100644
+--- a/tests/qemu-iotests/030.out
++++ b/tests/qemu-iotests/030.out
+@@ -1,5 +1,5 @@
+-...........................
++............................
+ ----------------------------------------------------------------------
+-Ran 27 tests
++Ran 28 tests
  
-@@ -3319,7 +3330,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     }
- 
-     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
--                 job_flags, has_speed ? speed : 0, on_error, &local_err);
-+                 job_flags, has_speed ? speed : 0, compress, on_error,
-+                 &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto out;
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index cfcc044..3a347fd 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -95,8 +95,8 @@ ETEXI
- 
-     {
-         .name       = "block_stream",
--        .args_type  = "device:B,speed:o?,base:s?",
--        .params     = "device [speed [base]]",
-+        .args_type  = "device:B,speed:o?,base:s?,compress:o?",
-+        .params     = "device [speed [base]] [compress]",
-         .help       = "copy data from a backing file into a block device",
-         .cmd        = hmp_block_stream,
-     },
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 0422acd..5e7fce8 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1065,6 +1065,7 @@ int is_windows_drive(const char *filename);
-  * @creation_flags: Flags that control the behavior of the Job lifetime.
-  *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-+ * @compress: True to compress data.
-  * @on_error: The action to take upon error.
-  * @errp: Error object.
-  *
-@@ -1077,7 +1078,7 @@ int is_windows_drive(const char *filename);
-  */
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
--                  int creation_flags, int64_t speed,
-+                  int creation_flags, int64_t speed, bool compress,
-                   BlockdevOnError on_error, Error **errp);
- 
- /**
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index b2551c1..91201fe 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -2025,11 +2025,12 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
-     const char *device = qdict_get_str(qdict, "device");
-     const char *base = qdict_get_try_str(qdict, "base");
-     int64_t speed = qdict_get_try_int(qdict, "speed", 0);
-+    bool compress = qdict_get_try_bool(qdict, "compress", false);
- 
-     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
-                      false, NULL, qdict_haskey(qdict, "speed"), speed, true,
--                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
--                     &error);
-+                     compress, true, BLOCKDEV_ON_ERROR_REPORT,
-+                     false, false, false, false, &error);
- 
-     hmp_handle_error(mon, &error);
- }
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e6edd64..9c2093e 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2544,6 +2544,9 @@
- #
- # @speed:  the maximum speed, in bytes per second
- #
-+# @compress: true to compress data, if the target format supports it
-+#            (default: false). Since 4.2.
-+#
- # @on-error: the action to take on an error (default report).
- #            'stop' and 'enospc' can only be used if the block device
- #            supports io-status (see BlockInfo).  Since 1.3.
-@@ -2576,7 +2579,7 @@
- { 'command': 'block-stream',
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
-             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
--            '*on-error': 'BlockdevOnError',
-+            '*compress': 'bool', '*on-error': 'BlockdevOnError',
-             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
+ OK
 -- 
 1.8.3.1
 
