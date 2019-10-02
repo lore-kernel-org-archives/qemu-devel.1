@@ -2,61 +2,66 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B14FC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2128EECE587
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:58:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D567320815
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:58:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D567320815
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E026420815
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 01:58:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MyvJTkpY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E026420815
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFTu2-0002yi-9i
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:58:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46278)
+	id 1iFTua-0003iL-61
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 21:58:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59791)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iFS05-0000mk-6H
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:14 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iFT2t-0007mu-Vt
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iFS03-00025s-TR
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53524)
+ (envelope-from <dgibson@ozlabs.org>) id 1iFT2q-0007PG-KN
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:03:11 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:50443 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iFS01-00020p-1z; Tue, 01 Oct 2019 19:56:09 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 325253058E0A;
- Tue,  1 Oct 2019 23:56:08 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 642C460C80;
- Tue,  1 Oct 2019 23:56:06 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 1/8] block: Refactor macros - fix tabbing
-Date: Tue,  1 Oct 2019 19:55:45 -0400
-Message-Id: <20191001235552.17790-2-jsnow@redhat.com>
-In-Reply-To: <20191001235552.17790-1-jsnow@redhat.com>
-References: <20191001235552.17790-1-jsnow@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iFT2l-0007J1-Va; Tue, 01 Oct 2019 21:03:06 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46jdD327dcz9sPk; Wed,  2 Oct 2019 11:02:59 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569978179;
+ bh=ToJkGaiWKKb4yJHLkhlNi2eQqGgd7t2rBI4ENm/jlOA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=MyvJTkpYjtRBImIW6p8qwLZra8fTrbOoEdnN6OfISKhA8CjfDgzLy/7Y5tCT2Kdv/
+ jZ8JuIiJa6JtyZnE43Jl2vezruErZmepDhPJXMQdaLaTD38VUOXBawFFXB7VOdoM48
+ jSUHcpWYLZSr0uQE1zdRyxG5TyijttzZ8w69gRLo=
+Date: Wed, 2 Oct 2019 11:02:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] spapr/xive: skip partially initialized vCPUs in presenter
+Message-ID: <20191002010245.GT11105@umbus.fritz.box>
+References: <20191001085722.32755-1-clg@kaod.org>
+ <20191001130614.226ef6a2@bahia.w3ibm.bluemix.net>
+ <fad6aae9-8722-498c-730d-fa204f07e3c5@kaod.org>
+ <20191001185629.0b284ba1@bahia.lan>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 01 Oct 2019 23:56:08 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="2wYUONsACSj9OMJp"
+Content-Disposition: inline
+In-Reply-To: <20191001185629.0b284ba1@bahia.lan>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,98 +73,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Arbel Moshe <arbel.moshe@oracle.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Sam Eiderman <shmuel.eiderman@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Karl Heubaum <karl.heubaum@oracle.com>
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
 
-Fixing tabbing in block related macros.
+--2wYUONsACSj9OMJp
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-id: 20190925110639.100699-2-sameid@google.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- include/hw/block/block.h | 16 ++++++++--------
- hw/ide/qdev.c            |  2 +-
- 2 files changed, 9 insertions(+), 9 deletions(-)
+On Tue, Oct 01, 2019 at 06:56:28PM +0200, Greg Kurz wrote:
+> On Tue, 1 Oct 2019 13:56:10 +0200
+> C=E9dric Le Goater <clg@kaod.org> wrote:
+>=20
+> > On 01/10/2019 13:06, Greg Kurz wrote:
+> > > On Tue,  1 Oct 2019 10:57:22 +0200
+> > > C=E9dric Le Goater <clg@kaod.org> wrote:
+> > >=20
+> > >> When vCPUs are hotplugged, they are added to the QEMU CPU list before
+> > >> being fully realized. This can crash the XIVE presenter because the
+> > >> 'tctx' pointer is not necessarily initialized when looking for a
+> > >> matching target.
+> > >>
+> > >=20
+> > > Ouch... :-\
+> > >=20
+> > >> These vCPUs are not valid targets for the presenter. Skip them.
+> > >>
+> > >=20
+> > > This likely fixes this specific issue, but more generally, this
+> > > seems to indicate that using CPU_FOREACH() is rather fragile.
+> > >=20
+> > > What about tracking XIVE TM contexts with a QLIST in xive.c ?
+> >=20
+> > This is a good idea. =20
+> >=20
+> > On HW, the thread interrupt contexts belong to the XIVE presenter=20
+> > subengine. This is the logic doing the CAM line matching to find
+> > a target for an event notification. So we should model the context=20
+> > list below the XiveRouter in QEMU which models both router and=20
+> > presenter subengines. We have done without a presenter model for=20
+> > the moment and I don't think we will need to introduce one. =20
+> >=20
+> > This would be a nice improvements of my patchset adding support
+> > for xive escalations and better support of multi chip systems.=20
+> > I have introduced a PNV_CHIP_CPU_FOREACH in this patchset which=20
+> > would become useless with a list of tctx under the XIVE interrupt
+> > controller, XiveRouter, SpaprXive, PnvXive.
+> >=20
+>=20
+> I agree. It makes more sense to have the list below the XiveRouter,
+> rather than relying on CPU_FOREACH(), which looks a bit weird from
+> a device emulation code perspective.
 
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index 607539057a..fd55a30bca 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -50,21 +50,21 @@ static inline unsigned int get_physical_block_exp(Blo=
-ckConf *conf)
-                           _conf.logical_block_size),                    =
-\
-     DEFINE_PROP_BLOCKSIZE("physical_block_size", _state,                =
-\
-                           _conf.physical_block_size),                   =
-\
--    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),  \
-+    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    =
-\
-     DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    =
-\
--    DEFINE_PROP_UINT32("discard_granularity", _state, \
--                       _conf.discard_granularity, -1), \
--    DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce, \
--                            ON_OFF_AUTO_AUTO), \
-+    DEFINE_PROP_UINT32("discard_granularity", _state,                   =
-\
-+                       _conf.discard_granularity, -1),                  =
-\
-+    DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce,           =
-\
-+                            ON_OFF_AUTO_AUTO),                          =
-\
-     DEFINE_PROP_BOOL("share-rw", _state, _conf.share_rw, false)
-=20
- #define DEFINE_BLOCK_PROPERTIES(_state, _conf)                          =
-\
-     DEFINE_PROP_DRIVE("drive", _state, _conf.blk),                      =
-\
-     DEFINE_BLOCK_PROPERTIES_BASE(_state, _conf)
-=20
--#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)      \
--    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),  \
--    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0), \
-+#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)                      =
-\
-+    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),                  =
-\
-+    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0),                =
-\
-     DEFINE_PROP_UINT32("secs", _state, _conf.secs, 0)
-=20
- #define DEFINE_BLOCK_ERROR_PROPERTIES(_state, _conf)                    =
-\
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 6fba6b62b8..6dd219944f 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -290,7 +290,7 @@ static void ide_drive_realize(IDEDevice *dev, Error *=
-*errp)
-     DEFINE_BLOCK_PROPERTIES(IDEDrive, dev.conf),        \
-     DEFINE_BLOCK_ERROR_PROPERTIES(IDEDrive, dev.conf),  \
-     DEFINE_PROP_STRING("ver",  IDEDrive, dev.version),  \
--    DEFINE_PROP_UINT64("wwn",  IDEDrive, dev.wwn, 0),    \
-+    DEFINE_PROP_UINT64("wwn",  IDEDrive, dev.wwn, 0),   \
-     DEFINE_PROP_STRING("serial",  IDEDrive, dev.serial),\
-     DEFINE_PROP_STRING("model", IDEDrive, dev.model)
-=20
+That does sound like a better idea long term.  However, for now, I
+think the NULL check is a reasonable way of fixing the real error
+we're hitting, so I've applied the patch here.
+
+Future cleanups to a different approach remain welcome, of course.
+
+> > Next step would be to get rid of the tctx->cs pointer. In my latest
+> > patches, it is only used to calculate the HW CAM line.=20
+> >=20
+> > There might be some consequences on the object hierarchy and it will
+> > break migration.
+> >=20
+>=20
+> This could break if the contexts were devices sitting in a bus, which
+> isn't the case here. I'll try to come up with a proposal for spapr,
+> and we can work out the changes on your recent XIVE series for pnv.
+>=20
+> > Thanks,
+> >=20
+> > C.
+> >=20
+> > >=20
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+> > > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> > > index 6d38755f8459..89b9ef7f20b1 100644
+> > > --- a/include/hw/ppc/xive.h
+> > > +++ b/include/hw/ppc/xive.h
+> > > @@ -319,6 +319,8 @@ typedef struct XiveTCTX {
+> > >      qemu_irq    os_output;
+> > > =20
+> > >      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
+> > > +
+> > > +    QTAILQ_ENTRY(XiveTCTX) next;
+> > >  } XiveTCTX;
+> > > =20
+> > >  /*
+> > > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> > > index b7417210d817..f7721c711041 100644
+> > > --- a/hw/intc/xive.c
+> > > +++ b/hw/intc/xive.c
+> > > @@ -568,6 +568,8 @@ static void xive_tctx_reset(void *dev)
+> > >          ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
+> > >  }
+> > > =20
+> > > +static QTAILQ_HEAD(, XiveTCTX) xive_tctx_list =3D QTAILQ_HEAD_INITIA=
+LIZER(xive_tctx_list);
+> > > +
+> > >  static void xive_tctx_realize(DeviceState *dev, Error **errp)
+> > >  {
+> > >      XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> > > @@ -609,10 +611,14 @@ static void xive_tctx_realize(DeviceState *dev,=
+ Error **errp)
+> > >      }
+> > > =20
+> > >      qemu_register_reset(xive_tctx_reset, dev);
+> > > +    QTAILQ_INSERT_HEAD(&xive_tctx_list, tctx, next);
+> > >  }
+> > > =20
+> > >  static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
+> > >  {
+> > > +    XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> > > +
+> > > +    QTAILQ_REMOVE(&xive_tctx_list, tctx, next);
+> > >      qemu_unregister_reset(xive_tctx_reset, dev);
+> > >  }
+> > > =20
+> > > @@ -1385,15 +1391,14 @@ static bool xive_presenter_match(XiveRouter *=
+xrtr, uint8_t format,
+> > >                                   bool cam_ignore, uint8_t priority,
+> > >                                   uint32_t logic_serv, XiveTCTXMatch =
+*match)
+> > >  {
+> > > -    CPUState *cs;
+> > > +    XiveTCTX *tctx;
+> > > =20
+> > >      /*
+> > >       * TODO (PowerNV): handle chip_id overwrite of block field for
+> > >       * hardwired CAM compares
+> > >       */
+> > > =20
+> > > -    CPU_FOREACH(cs) {
+> > > -        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
+> > > +    QTAILQ_FOREACH(tctx, &xive_tctx_list, next) {
+> > >          int ring;
+> > > =20
+> > >          /*
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+> > >=20
+> > >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > >> ---
+> > >>  hw/intc/xive.c | 8 ++++++++
+> > >>  1 file changed, 8 insertions(+)
+> > >>
+> > >> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> > >> index b7417210d817..29df06df1136 100644
+> > >> --- a/hw/intc/xive.c
+> > >> +++ b/hw/intc/xive.c
+> > >> @@ -1396,6 +1396,14 @@ static bool xive_presenter_match(XiveRouter *=
+xrtr, uint8_t format,
+> > >>          XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
+> > >>          int ring;
+> > >> =20
+> > >> +        /*
+> > >> +         * Skip partially initialized vCPUs. This can happen when
+> > >> +         * vCPUs are hotplugged.
+> > >> +         */
+> > >> +        if (!tctx) {
+> > >> +            continue;
+> > >> +        }
+> > >> +
+> > >>          /*
+> > >>           * HW checks that the CPU is enabled in the Physical Thread
+> > >>           * Enable Register (PTER).
+> > >=20
+> >=20
+>=20
+
 --=20
-2.21.0
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--2wYUONsACSj9OMJp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2T9zMACgkQbDjKyiDZ
+s5KY+g/+IAlHnz7hpfvnxWK+HBcWhakc0Zdt8nlaeAl7ZnpVwy36DmvWUvXLvpZs
+PeIEp2C9ANwfkcleRV80avQttiDn3/XvzuXvBKTnNcz2gIh3RknAiQjDJGleyj0d
+xjbVT3SXaJOfsudvR+OWYQ+sAn5JsYOpfaCziY3Xl/9hP/DJiG5GkEYyy78mMPXO
+Bjj/Yng8uo9CHz1en8ZJCIr4SV0VHJHuC7SQ1qr+YPleh20koh/XtjbgYDIM0rtL
+ei55T7C76bUfHgrjs7d76zKPA9+bp/UuKgHkVZWKiNzfKTYpGvtNzWCsR+lfATHe
+MIIkt4XEFxnc2bN+Bt3DgD1Y6gzBf4HRQlIZJkxls6ckuF1303owZQZrDZPfzsYz
+wk588VEn9sJgEXd95B4u3JEKj8sAWNB3pgh1u5zH8HyWcnADUWxIQDXO9RCd0nqf
+2nbUCHrsM+sziDonsgeiyy7ojiQUPR+4XiJD9OW97HLjA/OBc+Mf8fxeX/aolKhQ
+eCK7Yebj0gSw0CkaFCWHd/HvmNnH/hGn6IdzQ+hEUx9Cb9yBDSqooP+Nz+chjKj9
+Ll2enaJedCf8hQv+ClmVWn44SK6Rqos2y2LlYxIBgj8VwvBKncUI6e1R6r331CWJ
+CS9/bJt0GLd3GtCufArTB+TpDxnpFrCfr8Axn5CQ3Mvp1I6YFQ8=
+=ThYT
+-----END PGP SIGNATURE-----
+
+--2wYUONsACSj9OMJp--
 
