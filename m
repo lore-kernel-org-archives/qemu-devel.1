@@ -2,91 +2,120 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACBA1C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 548B9C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 764AA20842
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:48:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 764AA20842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 087DF20842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:59:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rqrDDarQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087DF20842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFe36-0005WG-Eq
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:48:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48540)
+	id 1iFeDd-0008SE-6B
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:59:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50737)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFe1c-0004sH-RE
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:46:40 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFeCs-000812-Fw
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:58:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFe1a-0004T6-90
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:46:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43888)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFe1V-0004QH-SH; Wed, 02 Oct 2019 08:46:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2594710C0516;
- Wed,  2 Oct 2019 12:46:28 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9509810018F8;
- Wed,  2 Oct 2019 12:46:26 +0000 (UTC)
-Subject: Re: [PATCH 22/22] iotests: Mirror must not attempt to create loops
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190920152804.12875-1-mreitz@redhat.com>
- <20190920152804.12875-23-mreitz@redhat.com>
- <8ad7e1db-271b-9456-96b1-3ce448423e9f@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <21a76051-0d08-2142-ef56-df083874b303@redhat.com>
-Date: Wed, 2 Oct 2019 14:46:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFeCq-00060S-TA
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:58:14 -0400
+Received: from mail-eopbgr140132.outbound.protection.outlook.com
+ ([40.107.14.132]:24352 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iFeCq-0005zY-6q
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:58:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gQpSJK0cAfTScyVhc9OW3bUQQCO0QTuVChYJMmcAjFBhqIj9s6e3OuCqWQrK4cuQ8XFRL0oHgDt49Rkw8xHafC8mlIpKZaCJDzgrNp70MhUR6B89mdX/A8zKhj9WxRgtyG2ISDv30R07X8Y8zPlhwZ/1bfIq4cAtvVfYrJx/MGa1lUgB+rl68F7pHtwuOulWm1mnVD8SmHj+1BA/eFqP12AlnqZ6Ll1IviDODf1I/lowkJlIGuk1KbDbTUFrzpoTwvFhFYksOB7HK+QomJM+cGEhvXU1EOVJse4paUmjuhBUAq1HpurYSCD7kk/Q6Cy65BdmE3SXD53xi4NGszCxyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S6SXV4MFD9GTTtykN8FgwQcz3X/vq+8082+HycpuGRQ=;
+ b=f5YisHAJKch1sdq7tHM6ZGKYSYcnJFeMg9HfTRmMIcQcTN62YaRQ1HF+cwL5fCpByOeQaPBympUGbUHrz1Tu2fYluTgFyxGuaEzm9Iu6eIvVZfvR63f8vCOHBnKFR0HIZ6VMktpEkNhUecj4iAu66UX8dlNeZ0wgHNHXlkez+YEStRD8CGWSWxH5iEFhaMs4/hZRVRHqnBrACZSeh0hTjQZ4w6G1CPLfqcYx+jrzWb3XJ6Dzo27PcNadldTiWAIhWMDDpyamzovrEBMt5puL+N13tPnRYMXGvNNCaoSRA8DAe9oPWfqJaMmDcGER2a2kVGJYgc1uWPGLlJGz4xnFTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S6SXV4MFD9GTTtykN8FgwQcz3X/vq+8082+HycpuGRQ=;
+ b=rqrDDarQ6eIEpKs5qrW6NxZbOE2fRV/m/IcrTS8PA1xUCCihbtbBwGtWNrdT3XMta5LQh7vIkQlHObo9t8GAFxtB0CT/Xu80u93jG28EDbzAJboStvjbgBN92oQ17TWH9TUBNe3+FYTZyEJzPfLPSyuknFDeAzNXcFCp1sKMuO0=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5402.eurprd08.prod.outlook.com (52.133.241.74) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Wed, 2 Oct 2019 12:58:09 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.023; Wed, 2 Oct 2019
+ 12:58:09 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v4 21/31] virtio-9p: Fix error_append_hint/error_prepend
+ usage
+Thread-Topic: [PATCH v4 21/31] virtio-9p: Fix error_append_hint/error_prepend
+ usage
+Thread-Index: AQHVeHBjsJBaOkT9y0K+qBVLhCi+pKdHFAcAgAA9KQA=
+Date: Wed, 2 Oct 2019 12:58:08 +0000
+Message-ID: <6413b323-2b2b-b5b5-3a19-46330bca0140@virtuozzo.com>
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-22-vsementsov@virtuozzo.com>
+ <20191002111912.647a4470@bahia.lan>
+In-Reply-To: <20191002111912.647a4470@bahia.lan>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0902CA0043.eurprd09.prod.outlook.com
+ (2603:10a6:7:15::32) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191002155806695
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 200b84f4-6b81-4fc7-c33c-08d747382c9e
+x-ms-traffictypediagnostic: DB8PR08MB5402:
+x-microsoft-antispam-prvs: <DB8PR08MB5402A131662DB59A90CB00EFC19C0@DB8PR08MB5402.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0178184651
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(346002)(39850400004)(376002)(366004)(136003)(52314003)(199004)(189003)(186003)(316002)(446003)(6506007)(52116002)(99286004)(102836004)(26005)(386003)(6436002)(14454004)(36756003)(66556008)(6512007)(76176011)(31686004)(86362001)(31696002)(229853002)(25786009)(478600001)(5660300002)(6246003)(476003)(4326008)(11346002)(486006)(2616005)(66446008)(66476007)(6916009)(3846002)(7736002)(8936002)(6116002)(64756008)(305945005)(71200400001)(71190400001)(66066001)(66946007)(6486002)(81156014)(8676002)(81166006)(2906002)(14444005)(256004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5402;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: OqKe8lqsTvRVvjyAJXcKXC7ZdAF3iVqfq2yeYmnBvWSP6EoVBgoO7wjBoGGaq2bjzP89IDUyQQAF7gf9xxsCEVUE/ORWmkOmKcQxi6MlHfLtbk4sGeCaFW0qbR+YEPzDW5r1kA24LWDU8QNGqFHt6mh8axG+RQfkvdc4xyUpMK1hA0xILHGDEQBND/v0nLPk5DZfI/m8GltkoX7BkIg1eydqPuDp/iNUTOzLgHRdbyLe5A7+ITvLDMpGe9psDF4+/zrhmrcpGB4Av7AFzWa5dsb/Q6iOCiGra/Z4VibAdmhMRE5HHaFVFMpXtPc0V9V3I8WBT/98fpNwmLgYVWqvUIWq3H07NBe5Ur8N5j8W9ZsCudmaKplNXnbNLVbHhiryBpGqiT8bdDQpaC49px/Tie8i/OZ29BOZ9Pt2gIBf3VY=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7B680E163C06D644BE75D6F1C381577F@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <8ad7e1db-271b-9456-96b1-3ce448423e9f@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Wqo2PxJDOyyOiR8N9kUmImYwJqXHW6yBi"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Wed, 02 Oct 2019 12:46:28 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 200b84f4-6b81-4fc7-c33c-08d747382c9e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Oct 2019 12:58:08.9718 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: B3uY3IzwaBI9khQRjKLRDPFEtXV9rXNHUeUVusuyTMG53gdmKTPceij4eAB8aBtEEV6peVzqB8Ue9SFP7rFd8BuIydZygGvza+Cv2hTZQ6k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5402
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.14.132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,293 +127,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Wqo2PxJDOyyOiR8N9kUmImYwJqXHW6yBi
-Content-Type: multipart/mixed; boundary="KiRVAuQuYdayVFb1SorgJx9t4DisL3ynS"
-
---KiRVAuQuYdayVFb1SorgJx9t4DisL3ynS
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 26.09.19 17:03, Vladimir Sementsov-Ogievskiy wrote:
-> 20.09.2019 18:28, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   tests/qemu-iotests/041     | 152 +++++++++++++++++++++++++++++++++++=
-++
->>   tests/qemu-iotests/041.out |   4 +-
->>   2 files changed, 154 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
->> index e4cc829fe2..6ea4764ae8 100755
->> --- a/tests/qemu-iotests/041
->> +++ b/tests/qemu-iotests/041
->> @@ -1265,6 +1265,158 @@ class TestReplaces(iotests.QMPTestCase):
->>  =20
->>           self.vm.assert_block_path('filter0/file', 'target')
->>  =20
->> +    '''
->> +    See what happens when the @sync/@replaces configuration dictates
->> +    creating a loop.
->> +    '''
->> +    def test_loop(self):
->> +        qemu_img('create', '-f', iotests.imgfmt, test_img, str(1 * 10=
-24 * 1024))
->> +
->> +        # Dummy group so we can create a NOP filter
->> +        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-gro=
-up', id=3D'tg0')
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        result =3D self.vm.qmp('blockdev-add', **{
->> +                                 'driver': 'throttle',
->> +                                 'node-name': 'source',
->> +                                 'throttle-group': 'tg0',
->> +                                 'file': {
->> +                                     'driver': iotests.imgfmt,
->> +                                     'node-name': 'filtered',
->> +                                     'file': {
->> +                                         'driver': 'file',
->> +                                         'filename': test_img
->> +                                     }
->> +                                 }
->> +                             })
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        # Block graph is now:
->> +        #   source[throttle] --file--> filtered[qcow2] --file--> ...
->=20
-> or qed, actually
-
-Yep.
-
->> +
->> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
-ice=3D'source',
->> +                             target=3Dtarget_img, format=3Diotests.im=
-gfmt,
->> +                             node_name=3D'target', sync=3D'none',
->> +                             replaces=3D'filtered')
->> +
->> +        '''
->> +        Block graph before mirror exits would be (ignoring mirror_top=
-):
->> +          source[throttle] --file--> filtered[qcow2] --file--> ...
->> +          target[qcow2] --file--> ...
->> +
->> +        Then, because of sync=3Dnone and drive-mirror in absolute-pat=
-hs mode,
->> +        the source is attached to the target:
->> +          source[throttle] --file--> filtered[qcow2] --file--> ...
->> +                 ^
->                      |
->> +              backing
->> +                 |
->> +            target[qcow2] --file--> ...
->> +
->> +        Replacing filtered by target would yield:
->> +          source[throttle] --file--> target[qcow2] --file--> ...
->> +                 ^                        |
->> +                 +------- backing --------+
->> +
->> +        I.e., a loop.  bdrv_replace_node() detects this and simply
->> +        does not let source's file link point to target.  However,
->> +        that means that target cannot really replace source.
->> +
->> +        drive-mirror should detect this and not allow this case.
->> +        '''
->> +
->> +        self.assert_qmp(result, 'error/desc',
->> +                        "Replacing 'filtered' by 'target' with this s=
-ync " + \
->> +                        "mode would result in a loop, because the for=
-mer " + \
->> +                        "would be a child of the latter's backing fil=
-e " + \
->> +                        "('source') after the mirror job")
->> +
->> +    '''
->> +    Test what happens when there would be no loop with the pre-mirror=
-
->> +    configuration, but something changes during the mirror job that a=
-sks
->> +    for a loop to be created during completion.
->> +    '''
->> +    def test_loop_during_mirror(self):
->> +        qemu_img('create', '-f', iotests.imgfmt, test_img, str(1 * 10=
-24 * 1024))
->> +
->> +        result =3D self.vm.qmp('blockdev-add', **{
->> +                                 'driver': 'null-co',
->> +                                 'node-name': 'common-base',
->> +                                 'read-zeroes': True,
->=20
-> why do you need read-zeroes?
-
-It=E2=80=99s my understanding that we=E2=80=99d better always set it to t=
-rue.
-
->> +                                 'size': 1 * 1024 * 1024
->> +                             })
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        result =3D self.vm.qmp('blockdev-add', **{
->> +                                 'driver': 'copy-on-read',
->> +                                 'node-name': 'source',
->> +                                 'file': 'common-base'
->> +                             })
->> +        self.assert_qmp(result, 'return', {})
->=20
-> Hmm, why don't you create them both in one query?
-
-No good reason, I think.
-
->> +
->> +        '''
->=20
-> the following is hard to read without some hint like, "We are going to =
-=2E.."
-
-I=E2=80=99ll see what I can come up with.
-
->> +        x-blockdev-change can only add children to a quorum node that=
-
->> +        have no parent yet, so we need an intermediate node between
->> +        target and common-base that has no parents other than target.=
-
->> +        We cannot use any parent that would forward the RESIZE
->> +        permission (because the job takes it, but unshares it on the
->> +        source), so we make it a backing child of a qcow2 node.
->> +        Unfortunately, we cannot add backing files to Quorum nodes
->> +        (because of an op blocker), so we put another raw node betwee=
-n
->> +        the qcow2 node and common-base.
->> +        '''
->> +        result =3D self.vm.qmp('blockdev-add', **{
->> +                                 'driver': 'qcow2',
->> +                                 'node-name': 'base-parent',
->> +                                 'file': {
->> +                                     'driver': 'file',
->> +                                     'filename': test_img
->> +                                 },
->> +                                 'backing': {
->> +                                     'driver': 'raw',
->> +                                     'file': 'common-base'
->> +                                 }
->> +                             })
->> +
->> +        # Add a quorum node with a single child, we will add
->> +        # base-parent to prepare a loop later
->> +        result =3D self.vm.qmp('blockdev-add', **{
->> +                                 'driver': 'quorum',
->=20
-> It would be good to skip test-cases if quorum unsupported, like other t=
-est-cases
-> with quorum.
-
-Will do.
-
->> +                                 'node-name': 'target',
->> +                                 'vote-threshold': 1,
->> +                                 'children': [
->> +                                     {
->> +                                         'driver': 'null-co',
->> +                                         'read-zeroes': True
->> +                                     }
->> +                                 ]
->> +                             })
->> +        self.assert_qmp(result, 'return', {})
->=20
-> It would be nice to comment out current block graph here...
-
-OK.
-
->> +
->> +        result =3D self.vm.qmp('blockdev-mirror', job_id=3D'mirror',
->> +                             device=3D'source', target=3D'target', sy=
-nc=3D'full',
->> +                             replaces=3D'common-base')
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        result =3D self.vm.qmp('x-blockdev-change',
->> +                             parent=3D'target', node=3D'base-parent')=
-
->> +        self.assert_qmp(result, 'return', {})
->> +
->> +        '''
->=20
-> and here, like you do in previous test-case. And here it even nicer, as=
- this test-case
-> is more complex.
-
-OK.
-
->> +        This asks for this configuration post-mirror:
->> +
->> +        source -> target (replaced common-base) -> base-parent
->> +                                  ^                    |
->> +                                  |                    v
->> +                                  +----------------- [raw]
->> +
->> +        bdrv_replace_node() would not allow such a configuration, but=
-
->> +        we should not pretend we can create it, so the mirror job
->> +        should fail during completion.
->> +        '''
->> +
->> +        self.complete_and_wait('mirror',
->> +                               completion_error=3D'Operation not perm=
-itted')
->> +
->>   if __name__ =3D=3D '__main__':
->>       iotests.main(supported_fmts=3D['qcow2', 'qed'],
->>                    supported_protocols=3D['file'])
->> diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
->> index 877b76fd31..20a8158b99 100644
->> --- a/tests/qemu-iotests/041.out
->> +++ b/tests/qemu-iotests/041.out
->> @@ -1,5 +1,5 @@
->> -.....................................................................=
-=2E........................
->> +.....................................................................=
-=2E..........................
->>   --------------------------------------------------------------------=
---
->> -Ran 94 tests
->> +Ran 96 tests
->>  =20
->>   OK
->>
->=20
->=20
-
-
-
---KiRVAuQuYdayVFb1SorgJx9t4DisL3ynS--
-
---Wqo2PxJDOyyOiR8N9kUmImYwJqXHW6yBi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2UnCEACgkQ9AfbAGHV
-z0CZmwf/WMpNY0KnM390u5LGl5vxjtYPMTIScupjJLMq/vFQjYnneMavbz3dIjCR
-xihwmDlwKu+5Uu7ujfiTjYsNgibU03vr3C8wP86CNbnQAdxGbhfFe9/wOfPKgVKz
-riG2w86Amzw6RnUDm7vUBBcH5nGXHpSDu1XFOU0NPzj5SUS5/dgcTBVPe2xRZpaJ
-dfxzH3CbkXQ4/kRj07YFG4lM1yLt+FICTHhUL51CiEq3kpKkakfGZOVtRNWlq1el
-PVH3zQ7tV6zhCUddFJGcK5Pf77dr9R6kP8J1IWbSMSYNj+oKSheu+KXCJz5h3AtG
-OTtetda6gr1ucSo/hK68hZXy96+alw==
-=O4sn
------END PGP SIGNATURE-----
-
---Wqo2PxJDOyyOiR8N9kUmImYwJqXHW6yBi--
+MDIuMTAuMjAxOSAxMjoxOSwgR3JlZyBLdXJ6IHdyb3RlOg0KPiBPbiBUdWUsICAxIE9jdCAyMDE5
+IDE4OjUzOjA5ICswMzAwDQo+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRz
+b3ZAdmlydHVvenpvLmNvbT4gd3JvdGU6DQo+IA0KPj4gSWYgd2Ugd2FudCB0byBhZGQgc29tZSBp
+bmZvIHRvIGVycnAgKGJ5IGVycm9yX3ByZXBlbmQoKSBvcg0KPj4gZXJyb3JfYXBwZW5kX2hpbnQo
+KSksIHdlIG11c3QgdXNlIHRoZSBFUlJQX0FVVE9fUFJPUEFHQVRFIG1hY3JvLg0KPj4gT3RoZXJ3
+aXNlLCB0aGlzIGluZm8gd2lsbCBub3QgYmUgYWRkZWQgd2hlbiBlcnJwID09ICZmYXRhbF9lcnIN
+Cj4+ICh0aGUgcHJvZ3JhbSB3aWxsIGV4aXQgcHJpb3IgdG8gdGhlIGVycm9yX2FwcGVuZF9oaW50
+KCkgb3INCj4+IGVycm9yX3ByZXBlbmQoKSBjYWxsKS4gIEZpeCBzdWNoIGNhc2VzLg0KPj4NCj4g
+DQo+IFdlbGwuLi4gdGhpcyBwYXRjaCBkb2Vzbid0IHJlYWxseSBmaXggYW55dGhpbmcgYmVjYXVz
+ZS4uLg0KDQpJJ20gc3VyZSBpdCBmaXhlcy4gQnV0IGl0IGFsc28gYnJlYWtzIHNvbWUgdGhpbmdz
+IHlvdSBtZW50aW9uIGJlbG93Li4NCg0KPiANCj4+IFRoaXMgY29tbWl0ICh0b2dldGhlciB3aXRo
+IGl0cyBuZWlnaGJvcnMpIHdhcyBnZW5lcmF0ZWQgYnkNCj4+DQo+PiBnaXQgZ3JlcCAtbCAnZXJy
+b3JfXChhcHBlbmRfaGludFx8cHJlcGVuZFwpKGVycnAnIHwgd2hpbGUgcmVhZCBmOyBkbyBcDQo+
+PiBzcGF0Y2ggLS1zcC1maWxlIHNjcmlwdHMvY29jY2luZWxsZS9maXgtZXJyb3ItYWRkLWluZm8u
+Y29jY2kgXA0KPj4gLS1pbi1wbGFjZSAkZjsgZG9uZQ0KPj4NCj4+IGFuZCB0aGVuDQo+Pg0KPj4g
+Li9weXRob24vY29tbWl0LXBlci1zdWJzeXN0ZW0ucHkgTUFJTlRBSU5FUlMgIiQoPCBhdXRvLW1z
+ZykiDQo+Pg0KPj4gKGF1dG8tbXNnIHdhcyBhIGZpbGUgd2l0aCB0aGlzIGNvbW1pdCBtZXNzYWdl
+KQ0KPj4NCj4+IGFuZCB0aGVuIGJ5IGhhbmQsIGZvciBub3QgbWFpbnRhaW5lZCBjaGFuZ2VkIGZp
+bGVzOg0KPj4NCj4+IGdpdCBjb21taXQgLW0gIjxTVUItU1lTVEVNPjogJCg8IGF1dG8tbXNnKSIg
+PEZJTEVTPg0KPj4NCj4+IFN0aWxsLCBmb3IgYmFja3BvcnRpbmcgaXQgbWF5IGJlIG1vcmUgY29t
+Zm9ydGFibGUgdG8gdXNlIG9ubHkgdGhlIGZpcnN0DQo+PiBjb21tYW5kIGFuZCB0aGVuIGRvIG9u
+ZSBodWdlIGNvbW1pdC4NCj4+DQo+PiBSZXBvcnRlZC1ieTogR3JlZyBLdXJ6IDxncm91Z0BrYW9k
+Lm9yZz4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZz
+ZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0tLQ0KPj4gICBody85cGZzLzlwLWxvY2FsLmMg
+fCAxICsNCj4+ICAgaHcvOXBmcy85cC1wcm94eS5jIHwgMSArDQo+PiAgIGh3LzlwZnMvOXAuYyAg
+ICAgICB8IDEgKw0KPj4gICAzIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQ0KPj4NCj4+
+IGRpZmYgLS1naXQgYS9ody85cGZzLzlwLWxvY2FsLmMgYi9ody85cGZzLzlwLWxvY2FsLmMNCj4+
+IGluZGV4IDA4ZTY3M2E3OWMuLmZjY2JmNzU4YmQgMTAwNjQ0DQo+PiAtLS0gYS9ody85cGZzLzlw
+LWxvY2FsLmMNCj4+ICsrKyBiL2h3LzlwZnMvOXAtbG9jYWwuYw0KPj4gQEAgLTE0NzEsNiArMTQ3
+MSw3IEBAIHN0YXRpYyB2b2lkIGxvY2FsX2NsZWFudXAoRnNDb250ZXh0ICpjdHgpDQo+PiAgIA0K
+Pj4gICBzdGF0aWMgdm9pZCBlcnJvcl9hcHBlbmRfc2VjdXJpdHlfbW9kZWxfaGludChFcnJvciAq
+KmVycnApDQo+PiAgIHsNCj4+ICsgICAgRVJSUF9BVVRPX1BST1BBR0FURSgpOw0KPj4gICAgICAg
+ZXJyb3JfYXBwZW5kX2hpbnQoZXJycCwgIlZhbGlkIG9wdGlvbnMgYXJlOiBzZWN1cml0eV9tb2Rl
+bD0iDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAiW3Bhc3N0aHJvdWdofG1hcHBlZC14YXR0
+cnxtYXBwZWQtZmlsZXxub25lXVxuIik7DQo+PiAgIH0NCj4gDQo+IFRoaXMgZnVuY3Rpb24gZG9l
+c24ndCBuZWVkIGF1dG8gcHJvcGFnYXRpb24gaW4gdGhlIGZpcnN0IHBsYWNlLiBJdCBpcw0KPiBz
+aW1wbHkgYSB3cmFwcGVyIGFyb3VuZCBlcnJvcl9hcHBlbmRfaGludCgpLiBFUlJQX0FVVE9fUFJP
+UEFHQVRFKCkNCj4gc2hvdWxkIGdvIHRvIHRoZSBjYWxsZXIgbG9jYWxfcGFyc2Vfb3B0cygpLg0K
+DQpIbW0sIHRoYXQncyBiYWQuIFNvLCBhY3R1YWxseSBpdCdzIG9uZSBtb3JlIGVycnAgSU4gcGFy
+YW1ldGVyLg0KDQo+IA0KPiBBbHNvIHNvbWUgZXh0cmEgY2FyZSBpcyBuZWVkZWQgdGhlcmUgdG8g
+aGFuZGxlIHBhcnQgWzMuXSBvZiB0aGUNCj4gY2xlYW51cC4gSSB1bmRlcnN0YW5kIHRoaXMgaXMg
+b3V0IG9mIHRoZSBzY29wZSBvZiB0aGF0IHNlcmllcywNCj4gYnV0IEknZCByYXRoZXIgc2VlIGFs
+bCBvZiB0aGlzIGZpeGVkIGluIHRoZSBzYW1lIHBhdGNoLg0KPiANCj4+IGRpZmYgLS1naXQgYS9o
+dy85cGZzLzlwLXByb3h5LmMgYi9ody85cGZzLzlwLXByb3h5LmMNCj4+IGluZGV4IDU3YThjMWM4
+MDguLjkyOTFjOGVmYTIgMTAwNjQ0DQo+PiAtLS0gYS9ody85cGZzLzlwLXByb3h5LmMNCj4+ICsr
+KyBiL2h3LzlwZnMvOXAtcHJveHkuYw0KPj4gQEAgLTExMTYsNiArMTExNiw3IEBAIHN0YXRpYyBp
+bnQgY29ubmVjdF9uYW1lZHNvY2tldChjb25zdCBjaGFyICpwYXRoLCBFcnJvciAqKmVycnApDQo+
+PiAgIA0KPj4gICBzdGF0aWMgdm9pZCBlcnJvcl9hcHBlbmRfc29ja2V0X3NvY2tmZF9oaW50KEVy
+cm9yICoqZXJycCkNCj4+ICAgew0KPj4gKyAgICBFUlJQX0FVVE9fUFJPUEFHQVRFKCk7DQo+PiAg
+ICAgICBlcnJvcl9hcHBlbmRfaGludChlcnJwLCAiRWl0aGVyIHNwZWNpZnkgc29ja2V0PS9zb21l
+L3BhdGggd2hlcmUgL3NvbWUvcGF0aCINCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICIgcG9p
+bnRzIHRvIGEgbGlzdGVuaW5nIEFGX1VOSVggc29ja2V0IG9yIHNvY2tfZmQ9ZmQiDQo+PiAgICAg
+ICAgICAgICAgICAgICAgICAgICAiIHdoZXJlIGZkIGlzIGEgZmlsZSBkZXNjcmlwdG9yIHRvIGEg
+Y29ubmVjdGVkIEFGX1VOSVgiDQo+IA0KPiBTYW1lIGhlcmUuIEVSUlBfQVVUT19QUk9QQUdBVEUo
+KSBzaG91bGQgZ28gdG8gcHJveHlfcGFyc2Vfb3B0cygpLg0KDQphbmQgdGhpcyBvbmUuDQoNCj4g
+DQo+PiBkaWZmIC0tZ2l0IGEvaHcvOXBmcy85cC5jIGIvaHcvOXBmcy85cC5jDQo+PiBpbmRleCBj
+Y2UyMzY2MjE5Li4xZGYyNzQ5ZTAzIDEwMDY0NA0KPj4gLS0tIGEvaHcvOXBmcy85cC5jDQo+PiAr
+KysgYi9ody85cGZzLzlwLmMNCj4+IEBAIC0zNTUyLDYgKzM1NTIsNyBAQCB2b2lkIHBkdV9zdWJt
+aXQoVjlmc1BEVSAqcGR1LCBQOU1zZ0hlYWRlciAqaGRyKQ0KPj4gICBpbnQgdjlmc19kZXZpY2Vf
+cmVhbGl6ZV9jb21tb24oVjlmc1N0YXRlICpzLCBjb25zdCBWOWZzVHJhbnNwb3J0ICp0LA0KPj4g
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQ0KPj4gICB7DQo+
+PiArICAgIEVSUlBfQVVUT19QUk9QQUdBVEUoKTsNCj4gDQo+IFRoaXMgaXMgY29ycmVjdCBzaW5j
+ZSB0aGlzIGZ1bmN0aW9uIGNhbGxzIGVycm9yX3ByZXBlbmQoKSBidXQgSSB0aGluaw0KPiBlcnJw
+IGlzIG5ldmVyICZlcnJvcl9mYXRhbCBvciAmZXJyb3JfYWJvcnQgb24gdGhlIHJlYWxpemUgcGF0
+aC4gQW55d2F5LA0KPiBiZXR0ZXIgc2FmZSB0aGFuIHNvcnJ5Lg0KPiANCj4+ICAgICAgIGludCBp
+LCBsZW47DQo+PiAgICAgICBzdHJ1Y3Qgc3RhdCBzdGF0Ow0KPj4gICAgICAgRnNEcml2ZXJFbnRy
+eSAqZnNlOw0KPiANCj4gUGxlYXNlIGRyb3AgdGhpcyBwYXRjaCBmcm9tIHlvdXIgc2VyaWVzIGFu
+ZCBJJ2xsIGRvIHRoZSBjaGFuZ2Ugb25jZQ0KPiBFUlJQX0FVVE9fUFJPUEFHQVRFKCkgZ2V0cyBt
+ZXJnZWQuDQo+IA0KPiBHcmVhdCB0aGFua3MgZm9yIHlvdXIgdGltZSBpbiBmaW5kaW5nIGEgY2xl
+dmVyIHdheSB0byBkZWFsIHdpdGggZXJyb3INCj4gcHJvcGFnYXRpb24uIDopDQo+IA0KDQpIbW0s
+IGFjdHVhbCBxdWVzdGlvbiBpczogaG93IG1hbnkgb3RoZXIgZXJycCBJTiBwYXJhbWV0ZXJzIEkn
+dmUgYnJva2VuIGluDQp0aGVzZSBzZXJpZXM/DQoNCkkgY2FuJ3Qgc2ltcGx5IGRyb3Agb25lIHBh
+dGNoIGZyb20gYXRvbWF0aWNhbGx5IGdlbmVyZWF0ZWQgc2VyaWVzOiBob3cgcGVvcGxlDQp3aWxs
+IGJhY2twb3J0IGl0IHRoYW4sIG9yIHVuZGVyc3RhbmQgaG93IHRvIGJhY2twb3J0IG90aGVyIGNy
+b3NzaW5nIHRoaW5ncz8NCg0KQWN0dWFsbHksIGZvciB0aGUgY2FzZXMgeW91IG1lYW4sIEVSUlBf
+QVVUT19QUk9QQUdBVEUgaXMgbm8tb3AsIGFzIGl0IHVzZXMgb3JpZ2luYWwNCmVycnAgaWYgaXQn
+cyBub3QgTlVMTCBhbmQgZG9uJ3QgcG9pbnQgdG8gZXJyb3JfZmF0YWwuDQoNClNvLCBub3RoaW5n
+IGlzIGJyb2tlbiBoZXJlLCBtYXkgYmUgd2UgY2FuIHByb2NlZWQgYXMgaXM/IEJ1dCBJIGFncmVl
+LCBpdCBsb29rcyBzdHJhbmdlLg0KDQpFcmljLCB3aGF0IGRvIHlvdSB0aGluaz8NCg0KSSB0cmll
+ZCB0byBjaGFuZ2UgY29jY2kgc2NyaXB0IHRvDQoNCiAgIEBydWxlMEANCiAgIC8vIEFkZCBpbnZv
+Y2F0aW9uIHRvIGVycnAtZnVuY3Rpb25zDQp+IGlkZW50aWZpZXIgZm4sIGZuMjsNCiAgIEBADQoN
+CiAgICBmbiguLi4sIEVycm9yICoqZXJycCwgLi4uKQ0KICAgIHsNCiAgICsgICBFUlJQX0FVVE9f
+UFJPUEFHQVRFKCk7DQogICAgICAgPCsuLi4NCisgICAgIGZuMiguLi4sIGVycnAsIC4uLikNCisg
+ICAgIC4uLg0KICAgKA0KICAgICAgIGVycm9yX2FwcGVuZF9oaW50KGVycnAsIC4uLik7DQogICB8
+DQogICAgICAgZXJyb3JfcHJlcGVuZChlcnJwLCAuLi4pOw0KICAgKQ0KICAgICAgIC4uLis+DQog
+ICAgfQ0KDQoNCmJ1dCBpdCBzdHVicyBvbiBody92ZmlvL3BjaS5jLi4uIGFuZCBpdCBza2lwcyBh
+IGxvdCBvZiB2YWxpZCBjYXNlcywgc28gaXQncyB3cm9uZy4NCg0KDQoNCi0tIA0KQmVzdCByZWdh
+cmRzLA0KVmxhZGltaXINCg==
 
