@@ -2,63 +2,86 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD2F1C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:35:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A8DC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:40:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EB3D21783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:35:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EB3D21783
+	by mail.kernel.org (Postfix) with ESMTPS id EF2DE21783
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:40:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF2DE21783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFfiq-00082i-Pc
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:35:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39453)
+	id 1iFfnp-00019r-2x
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:40:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iFfeq-00054o-Iy
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:31:14 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFfn2-0000gS-U7
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:39:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iFfek-0003II-Vv
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:31:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36714)
+ (envelope-from <mreitz@redhat.com>) id 1iFfn0-0000C6-Tm
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:39:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35900)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iFfek-0003H9-NU
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:31:06 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iFfmx-000089-Vh; Wed, 02 Oct 2019 10:39:36 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 650DE307D978;
- Wed,  2 Oct 2019 14:31:05 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E599510018FF;
- Wed,  2 Oct 2019 14:31:03 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6FE8A113864A; Wed,  2 Oct 2019 16:31:02 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 4/7] qapi: Speed up frontend tests
-References: <20191001191514.11208-1-armbru@redhat.com>
- <20191001191514.11208-5-armbru@redhat.com>
- <9049db38-9698-a4f9-78af-c7b8f5a8a263@redhat.com>
-Date: Wed, 02 Oct 2019 16:31:02 +0200
-In-Reply-To: <9049db38-9698-a4f9-78af-c7b8f5a8a263@redhat.com> (Eric Blake's
- message of "Tue, 1 Oct 2019 15:23:22 -0500")
-Message-ID: <874l0rte1l.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5414130860D5;
+ Wed,  2 Oct 2019 14:39:34 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B3CB1001B22;
+ Wed,  2 Oct 2019 14:39:32 +0000 (UTC)
+Subject: Re: [PATCH] iotests: Do not run the iotests during "make check"
+ anymore
+To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
+References: <20191002142146.6124-1-thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <725c14db-2ab7-5ac5-d47d-42d0104b7d93@redhat.com>
+Date: Wed, 2 Oct 2019 16:39:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20191002142146.6124-1-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="l4N6glCTgdllF8BYSxwuE3wP1PFdYjtH6"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 02 Oct 2019 14:31:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Wed, 02 Oct 2019 14:39:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,182 +96,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com, marcandre.lureau@redhat.com,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--l4N6glCTgdllF8BYSxwuE3wP1PFdYjtH6
+Content-Type: multipart/mixed; boundary="Xv17nQ5i9ZLNt2lMKQBCo3U8X7bzDeJaQ"
 
-> On 10/1/19 2:15 PM, Markus Armbruster wrote:
->> "make check-qapi-schema" takes around 10s user + system time for me.
->> With -j, it takes a bit over 3s real time.  We have worse tests.  It's
->> still annoying when you work on the QAPI generator.
->
-> All true :)
->
->
->> test-qapi.py is designed to be the simplest possible building block
->> for a shell script to do the complete job (it's actually a Makefile,
->> not a shell script; no real difference).  Python is just not meant for
->> that.  It's for bigger blocks.
->>
->> Move the post-processing and diffing into test-qapi.py, and make it
->> capable of testing multiple schema files.
->
-> Sounds reasonable.
->
->>
->> Running it once per test case now takes slightly longer than 8s.  But
->> running it once for all of them takes under 0.2s.
->>
->> Messing with the Makefile to run it only on the tests that need
->> retesting is clearly not worth the bother.
->>
->> Expected error output changes because the new normalization strips off
->> $(SRCDIR)/tests/qapi-schema/ instead of just $(SRCDIR)/.
->>
->> The .exit files go away, because there is no exit status to test
->> anymore.
->
-> So the bulk of the patch is the mechanical fallout.
->
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>   tests/Makefile.include                        |  16 +--
->
->>   tests/qapi-schema/test-qapi.py                | 119 +++++++++++++++---
->
-> while these are the interesting parts.  (Using git diff -O
-> path/to/file with a listing that floats those two files to the top of
-> the diff would ease review slightly)
->
->>   364 files changed, 413 insertions(+), 515 deletions(-)
->
->>   delete mode 100644 tests/qapi-schema/struct-member-invalid.exit
->>   mode change 100644 => 100755 tests/qapi-schema/test-qapi.py
->
-> I'm guessing this one is intentional.
+--Xv17nQ5i9ZLNt2lMKQBCo3U8X7bzDeJaQ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Yes.  It's a program.  Our make recipe
+On 02.10.19 16:21, Thomas Huth wrote:
+> Running the iotests during "make check" is causing more headaches than
+> benefits for the block layer maintainers, so let's disable the iotests
+> during "make check" again.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tests/Makefile.include   | 2 +-
+>  tests/qemu-iotests/group | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-    PYTHONIOENCODING=utf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py $^
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-happens work without the executable bit.
+I=E2=80=99ll leave this patch on the list for a while so that others can =
+speak
+up if they disagree.
 
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index 214fbd941c..1b24b8ba10 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -1102,17 +1102,11 @@ check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) \
->>   		$(patsubst %,%/all,$(filter %-softmmu,$(TARGET_DIRS)))
->>   	@$<
->>   -.PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
->> -$(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
->> +.PHONY: check-tests/qapi-schema/frontend
->> +check-tests/qapi-schema/frontend: $(addprefix $(SRC_PATH)/, $(check-qapi-schema-y))
->>   	$(call quiet-command, PYTHONPATH=$(SRC_PATH)/scripts \
->> -		PYTHONIOENCODING=utf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
->> -		$^ >$*.test.out 2>$*.test.err; \
->> -		echo $$? >$*.test.exit, \
->> -		"TEST","$*.out")
->> -	@# Sanitize error messages (make them independent of build directory)
->> -	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -u $(SRC_PATH)/$*.err -
->> -	@diff -u $(SRC_PATH)/$*.out $*.test.out
->> -	@diff -u $(SRC_PATH)/$*.exit $*.test.exit
->> +	  PYTHONIOENCODING=utf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py $^, \
->> +	  TEST, check-qapi-schema)
->>   
->
-> So instead of one $(call $(PYTHON)) per test, it is now one call for
-> all files at once.
+The problem is that this causes headaches of rather high importance
+(make check), and I have to deal with them.  I=E2=80=99ll gladly accept h=
+elp in
+dealing with them, but without such help, I don=E2=80=99t feel like it=E2=
+=80=99s worth it.
 
-Correct.
+As far as I=E2=80=99m aware, the plan is to still the iotests in e.g. Tra=
+vis,
+and maybe even more thoroughly then (because we won=E2=80=99t be as const=
+rained
+by the test duration), just not in make check.
 
->> +++ b/tests/qapi-schema/allow-preconfig-test.err
->> @@ -1,2 +1,2 @@
->> -tests/qapi-schema/allow-preconfig-test.json: In command 'allow-preconfig-test':
->> -tests/qapi-schema/allow-preconfig-test.json:2: flag 'allow-preconfig' may only use true value
->> +allow-preconfig-test.json: In command 'allow-preconfig-test':
->> +allow-preconfig-test.json:2: flag 'allow-preconfig' may only use true value
->
-> Normalization to strip off a longer prefix could have been done in a
-> separate patch, but it doesn't matter.
->
->> +++ b/tests/qapi-schema/test-qapi.py
->> @@ -1,3 +1,4 @@
->> +#!/usr/bin/env python
->>   #
->>   # QAPI parser test harness
->>   #
->> @@ -11,7 +12,14 @@
->>   #
->>     from __future__ import print_function
->> +import argparse
->> +import difflib
->> +import os
->>   import sys
->> +if sys.version_info[0] < 3:
->> +    from cStringIO import StringIO
->> +else:
->> +    from io import StringIO
->
-> I guess we can't get rid of Python 2 during 'make check' just yet?
+Max
 
-I'd prefer to keep the tests working with Python 2 as long as we use
-Python 2 with qapi-gen.py.  2 months, 29 days, 6 hours and chump change.
 
->> +
->> +    print("%s %s" % (test_name, 'UPDATE' if update else 'FAIL'),
->> +          file=sys.stderr)
->> +    out_diff = difflib.unified_diff(expected_out, actual_out, outfp.name)
->> +    err_diff = difflib.unified_diff(expected_err, actual_err, errfp.name)
->> +    sys.stdout.writelines(out_diff)
->> +    sys.stdout.writelines(err_diff)
->> +
->> +    if not update:
->> +        return 1
->> +
->> +    try:
->> +        outfp.truncate(0)
->> +        outfp.seek(0)
->> +        outfp.writelines(actual_out)
->
-> Handy for mass-rebuilding of the directory after an error message tweak.
+--Xv17nQ5i9ZLNt2lMKQBCo3U8X7bzDeJaQ--
 
-I could've used this so many times...
+--l4N6glCTgdllF8BYSxwuE3wP1PFdYjtH6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->> +def main(argv):
->> +    parser = argparse.ArgumentParser(
->> +        description='QAPI schema tester')
->> +    parser.add_argument('-d', '--dir', action='store', default='',
->> +                        help="directory containing tests")
->> +    parser.add_argument('-u', '--update', action='store_true',
->> +                        help="update expected test results")
->> +    parser.add_argument('tests', nargs='*', metavar='TEST', action='store')
->> +    args = parser.parse_args()
->> +
->
-> No --help mode? Not strictly necessary, but can be useful.
+-----BEGIN PGP SIGNATURE-----
 
-We get that for free with argparse:
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2UtqMACgkQ9AfbAGHV
+z0DNeAgAmJjGRuhJt1wjLD4d3gqAG1X8408Qa5F2zwlCI4KiI5UyL9jyv1iZUoZX
++hlt9w9ymm75NgqrR8JI2pGiBNub8E9PpZDtrxzbnxJJlXDLW1s+tQvzsUcN3Kjv
+ThtSNVzpfkSeS0W1u40mZaDVY2Cqdy0+qHcbfMyVhnIGvR66zGK4PKHJhP3Pz2rN
+a7HZcDZWGcUDSxZ7pZE0Nr9aX7AfVoi0LUu9hhxy0Moe96DjXifREPFwkFYIaMnd
+FOGUeLJCYgWQDo9KQTri/aMdIhPYvpA7SQ8s0RacWamVBGO1txFk0D8LJjhlrhJ8
+Uj7e5TZfwPVvU09Qq8Fw0YCjcdiTGA==
+=z+Bt
+-----END PGP SIGNATURE-----
 
-$ tests/qapi-schema/test-qapi.py -h
-usage: test-qapi.py [-h] [-d DIR] [-u] [TEST [TEST ...]]
-
-QAPI schema tester
-
-positional arguments:
-  TEST
-
-optional arguments:
-  -h, --help         show this help message and exit
-  -d DIR, --dir DIR  directory containing tests
-  -u, --update       update expected test results
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+--l4N6glCTgdllF8BYSxwuE3wP1PFdYjtH6--
 
