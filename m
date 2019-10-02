@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC04EC10F14
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3DD1C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:11:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78C2F2086A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:10:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EC002054F
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:11:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dyVXZ6kd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C2F2086A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfxRh8HG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC002054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFi8y-0000ee-Q3
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:10:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35486)
+	id 1iFi9g-0001kT-Cs
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:11:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35440)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrR-0005aR-NX
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:23 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrN-0005SI-7J
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrQ-0003XS-Ej
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:21 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39350)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrL-0003Qn-Sd
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:16 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54805)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iFhrQ-0003Wc-6w
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:20 -0400
-Received: by mail-wm1-x341.google.com with SMTP id v17so7696719wml.4
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:20 -0700 (PDT)
+ id 1iFhrL-0003Pk-Jx
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:15 -0400
+Received: by mail-wm1-x342.google.com with SMTP id p7so7968694wmp.4
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=i9c6AFc6vOgw/CCh7etmxchVWi89c6GZaBeygIRrOxc=;
- b=dyVXZ6kd2FLmBsK0kElBVkW9xEW8f7ZebXRO+L05ZiA4qwNrun2jojlNmXRVY3wzZn
- lZMylbdUluFe4PIHJ4dlbVQClWyae0yokITMKS6UTzK1y1CvBCyBZ0x2BQQingnaehvG
- sWNSOON3ju1PRydHpzX63vLUPM/htirqktPVErYXPDUDN/xlDVl3keSx7MXowhuRxeq+
- 3R0ndJ+9a1lCimTw2G4cASsG4NfuuriNECIzwGhVLXajOhZnetfjjoI4mMcKlRBBGVmq
- kbMI4MdAx2AlJVtub5ljGCiEPQWj61tVABOMxGEsfIe+qk1x517rN5lfTdZnzqQIf1IE
- JRVA==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=XQJk1DHPtMxR5rn6iJkZ4+R9JTJIU95kBBNqy6kS5R0=;
+ b=mfxRh8HG/WR9akh1+9ibjC5P6cgNZVkmRH+D0d6GRBWPN/dCvg24vEzxpiUCmhurvV
+ /YQN4UMa6vXquqdcu7eAl3kuES/O1pHiu8RsRIOC5+DkK3zZU7PcNVlg+N03nGmFCy3U
+ wuSrYX4S9Tin09MTm8XZrtCIti+EoZBCVFjzrqiXwX0PPFBwqF6a4LULwJ8h5u+lbhor
+ 3TX1zFvitlflnQzRSCt7Yw5VrsYy4heUNPSgLHL7Rpmkm/jFYNQuHmnUSyXhcmPQ0UwW
+ KKTzZQClPMhbNqg93EJCkrfUDv0H7MP4S5Pjnu2tUJ4tLHc8orkjs71a708nYl+JJkwT
+ tSHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=i9c6AFc6vOgw/CCh7etmxchVWi89c6GZaBeygIRrOxc=;
- b=VYTPRDn0jPrLjmcKxqBsGNYM7BHQIAGXRlseF+jkYv6bJ9fagZDMBjBpju7Jgec9GS
- CK2NXlGcbIL7i2xpq7+YqIP6e+cAljDf7nkjl4fUxZCieZJxYQtsJNe/fmv2n+cG/Rba
- mhHAISEl8et7N4sWDjfHQkGv01b7U2/tPSTZXLkdj6buLSIHRMd198nW2u2W6sVjd5nQ
- MWyrQpY9QMzgvfgJuVp2vimxcWUqViyg3K71aMdW6LmuNbGHSjXkH28cLFO1lGgOuelV
- 3bI1Tz1DYrkF+1RPuL3mm+NwXqWlHO3N+WimxNJbYObI8pivsXRVqRqI3uorFAB8k5lp
- vgkw==
-X-Gm-Message-State: APjAAAWmSG3KmNySc0MS7F+2MaujRzW8CuqPO88Yu86wKoWF26FSWaIx
- NMFVL3zylzaa2TKlbqEds/stmCwA
-X-Google-Smtp-Source: APXvYqw66NKewjZoS03fTw5xubrUIwdweWFkbdHtjV2artDwblzplZPcnSSh0zCiFBJEvAPraMLxUg==
-X-Received: by 2002:a1c:2089:: with SMTP id g131mr3520602wmg.33.1570035138662; 
- Wed, 02 Oct 2019 09:52:18 -0700 (PDT)
+ bh=XQJk1DHPtMxR5rn6iJkZ4+R9JTJIU95kBBNqy6kS5R0=;
+ b=YkOz5fP1Yh0MnHNdjvlqPlT+4b37GB5xGa0BSR2TAVkT0BZHT7j5f9dOr7Q6szbfUW
+ zC4tIKxySDwBJk8deqEHe1sTWi72beOhBUjVcXKQwa8kTOcQB04hD3BT/IjwM0VIkVAk
+ 9Mf1+7z1Gqe4OEhMJnz7/EY5WSaR5hHe6hzw+3D6c72cvmnlBkLW+fOBZbxLA4vT6rCB
+ ndwfQHMgq35FMUeexwX8qWUH1Q3CLhGHitFu1rSZ+HvqZW+acnkOUyXr0bIwvgPIoxpO
+ 7cp7QyPM/4Qbq/5Kl20K9QzrBgxp7fVlGO/B/hixSnEGd384niL36CMEwrVGqhEQfBq6
+ aJeQ==
+X-Gm-Message-State: APjAAAV3FnvsryyvfTXbW4rZK37xKp/VTjEb4HdbQYUg6A/WWFgp6Tge
+ NZIpTuEHZg+2/+doodbux4yptBSg
+X-Google-Smtp-Source: APXvYqytYYi13XucODbggEKUqldvBriEYTyy6rL8afO2BACKWUADoTPQc5eHofRNVHZMA4atHpE5Tg==
+X-Received: by 2002:a1c:a851:: with SMTP id r78mr3574856wme.166.1570035134368; 
+ Wed, 02 Oct 2019 09:52:14 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.17
+ by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.13
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 02 Oct 2019 09:52:17 -0700 (PDT)
+ Wed, 02 Oct 2019 09:52:13 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/30] vfio: Turn the container error into an Error handle
-Date: Wed,  2 Oct 2019 18:51:46 +0200
-Message-Id: <1570035113-56848-24-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 19/30] cris: do not leak struct cris_disasm_data
+Date: Wed,  2 Oct 2019 18:51:42 +0200
+Message-Id: <1570035113-56848-20-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
 References: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,177 +90,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+Use a stack-allocated struct to avoid a memory leak.
 
-The container error integer field is currently used to store
-the first error potentially encountered during any
-vfio_listener_region_add() call. However this fails to propagate
-detailed error messages up to the vfio_connect_container caller.
-Instead of using an integer, let's use an Error handle.
-
-Messages are slightly reworded to accomodate the propagation.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/vfio/common.c              | 43 ++++++++++++++++++++++++++++---------------
- hw/vfio/spapr.c               |  4 +++-
- include/hw/vfio/vfio-common.h |  2 +-
- 3 files changed, 32 insertions(+), 17 deletions(-)
+ disas/cris.c | 59 +++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 29 insertions(+), 30 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 3e03c49..cebbb1c 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -509,6 +509,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
-     int ret;
-     VFIOHostDMAWindow *hostwin;
-     bool hostwin_found;
-+    Error *err = NULL;
+diff --git a/disas/cris.c b/disas/cris.c
+index 2f43c9b..0b0a3fb 100644
+--- a/disas/cris.c
++++ b/disas/cris.c
+@@ -1294,24 +1294,17 @@ static int cris_constraint
+ /* Parse disassembler options and store state in info.  FIXME: For the
+    time being, we abuse static variables.  */
  
-     if (vfio_listener_skipped_section(section)) {
-         trace_vfio_listener_region_add_skip(
-@@ -543,13 +544,20 @@ static void vfio_listener_region_add(MemoryListener *listener,
-                                hostwin->max_iova - hostwin->min_iova + 1,
-                                section->offset_within_address_space,
-                                int128_get64(section->size))) {
--                ret = -1;
-+                error_setg(&err,
-+                    "region [0x%"PRIx64",0x%"PRIx64"] overlaps with existing"
-+                    "host DMA window [0x%"PRIx64",0x%"PRIx64"]",
-+                    section->offset_within_address_space,
-+                    section->offset_within_address_space +
-+                        int128_get64(section->size) - 1,
-+                    hostwin->min_iova, hostwin->max_iova);
-                 goto fail;
-             }
-         }
+-static bfd_boolean
+-cris_parse_disassembler_options (disassemble_info *info,
++static void
++cris_parse_disassembler_options (struct cris_disasm_data *disdata,
++				 char *disassembler_options,
+ 				 enum cris_disass_family distype)
+ {
+-  struct cris_disasm_data *disdata;
+-
+-  info->private_data = calloc (1, sizeof (struct cris_disasm_data));
+-  disdata = (struct cris_disasm_data *) info->private_data;
+-  if (disdata == NULL)
+-    return false;
+-
+   /* Default true.  */
+   disdata->trace_case
+-    = (info->disassembler_options == NULL
+-       || (strcmp (info->disassembler_options, "nocase") != 0));
++    = (disassembler_options == NULL
++       || (strcmp (disassembler_options, "nocase") != 0));
  
-         ret = vfio_spapr_create_window(container, section, &pgsize);
-         if (ret) {
-+            error_setg_errno(&err, -ret, "Failed to create SPAPR window");
-             goto fail;
-         }
- 
-@@ -594,10 +602,8 @@ static void vfio_listener_region_add(MemoryListener *listener,
-     }
- 
-     if (!hostwin_found) {
--        error_report("vfio: IOMMU container %p can't map guest IOVA region"
--                     " 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx,
--                     container, iova, end);
--        ret = -EFAULT;
-+        error_setg(&err, "Container %p can't map guest IOVA region"
-+                   " 0x%"HWADDR_PRIx"..0x%"HWADDR_PRIx, container, iova, end);
-         goto fail;
-     }
- 
-@@ -664,11 +670,12 @@ static void vfio_listener_region_add(MemoryListener *listener,
-     ret = vfio_dma_map(container, iova, int128_get64(llsize),
-                        vaddr, section->readonly);
-     if (ret) {
--        error_report("vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
--                     "0x%"HWADDR_PRIx", %p) = %d (%m)",
--                     container, iova, int128_get64(llsize), vaddr, ret);
-+        error_setg(&err, "vfio_dma_map(%p, 0x%"HWADDR_PRIx", "
-+                   "0x%"HWADDR_PRIx", %p) = %d (%m)",
-+                   container, iova, int128_get64(llsize), vaddr, ret);
-         if (memory_region_is_ram_device(section->mr)) {
-             /* Allow unexpected mappings not to be fatal for RAM devices */
-+            error_report_err(err);
-             return;
-         }
-         goto fail;
-@@ -688,9 +695,14 @@ fail:
-      */
-     if (!container->initialized) {
-         if (!container->error) {
--            container->error = ret;
-+            error_propagate_prepend(&container->error, err,
-+                                    "Region %s: ",
-+                                    memory_region_name(section->mr));
-+        } else {
-+            error_free(err);
-         }
-     } else {
-+        error_report_err(err);
-         hw_error("vfio: DMA mapping failed, unable to continue");
-     }
+   disdata->distype = distype;
+-  return true;
  }
-@@ -1251,6 +1263,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     container = g_malloc0(sizeof(*container));
-     container->space = space;
-     container->fd = fd;
-+    container->error = NULL;
-     QLIST_INIT(&container->giommu_list);
-     QLIST_INIT(&container->hostwin_list);
  
-@@ -1308,9 +1321,9 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-                                      &address_space_memory);
-             if (container->error) {
-                 memory_listener_unregister(&container->prereg_listener);
--                ret = container->error;
--                error_setg(errp,
--                    "RAM memory listener initialization failed for container");
-+                ret = -1;
-+                error_propagate_prepend(errp, container->error,
-+                    "RAM memory listener initialization failed: ");
-                 goto free_container_exit;
-             }
-         }
-@@ -1365,9 +1378,9 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-     memory_listener_register(&container->listener, container->space->as);
+ static const struct cris_spec_reg *
+@@ -2736,9 +2729,10 @@ static int
+ print_insn_cris_with_register_prefix (bfd_vma vma,
+ 				      disassemble_info *info)
+ {
+-  if (info->private_data == NULL
+-      && !cris_parse_disassembler_options (info, cris_dis_v0_v10))
+-    return -1;
++  struct cris_disasm_data disdata;
++  info->private_data = &disdata;
++  cris_parse_disassembler_options (&disdata, info->disassembler_options,
++				   cris_dis_v0_v10);
+   return print_insn_cris_generic (vma, info, true);
+ }
+ /* Disassemble, prefixing register names with `$'.  CRIS v32.  */
+@@ -2747,9 +2741,10 @@ static int
+ print_insn_crisv32_with_register_prefix (bfd_vma vma,
+ 					 disassemble_info *info)
+ {
+-  if (info->private_data == NULL
+-      && !cris_parse_disassembler_options (info, cris_dis_v32))
+-    return -1;
++  struct cris_disasm_data disdata;
++  info->private_data = &disdata;
++  cris_parse_disassembler_options (&disdata, info->disassembler_options,
++				   cris_dis_v32);
+   return print_insn_cris_generic (vma, info, true);
+ }
  
-     if (container->error) {
--        ret = container->error;
--        error_setg_errno(errp, -ret,
--                         "memory listener initialization failed for container");
-+        ret = -1;
-+        error_propagate_prepend(errp, container->error,
-+            "memory listener initialization failed: ");
-         goto listener_release_exit;
-     }
+@@ -2761,9 +2756,10 @@ static int
+ print_insn_crisv10_v32_with_register_prefix (bfd_vma vma,
+ 					     disassemble_info *info)
+ {
+-  if (info->private_data == NULL
+-      && !cris_parse_disassembler_options (info, cris_dis_common_v10_v32))
+-    return -1;
++  struct cris_disasm_data disdata;
++  info->private_data = &disdata;
++  cris_parse_disassembler_options (&disdata, info->disassembler_options,
++				   cris_dis_common_v10_v32);
+   return print_insn_cris_generic (vma, info, true);
+ }
  
-diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-index 96c0ad9..e853eeb 100644
---- a/hw/vfio/spapr.c
-+++ b/hw/vfio/spapr.c
-@@ -17,6 +17,7 @@
- #include "hw/hw.h"
- #include "exec/ram_addr.h"
- #include "qemu/error-report.h"
-+#include "qapi/error.h"
- #include "trace.h"
+@@ -2773,9 +2769,10 @@ static int
+ print_insn_cris_without_register_prefix (bfd_vma vma,
+ 					 disassemble_info *info)
+ {
+-  if (info->private_data == NULL
+-      && !cris_parse_disassembler_options (info, cris_dis_v0_v10))
+-    return -1;
++  struct cris_disasm_data disdata;
++  info->private_data = &disdata;
++  cris_parse_disassembler_options (&disdata, info->disassembler_options,
++				   cris_dis_v0_v10);
+   return print_insn_cris_generic (vma, info, false);
+ }
  
- static bool vfio_prereg_listener_skipped_section(MemoryRegionSection *section)
-@@ -85,7 +86,8 @@ static void vfio_prereg_listener_region_add(MemoryListener *listener,
-          */
-         if (!container->initialized) {
-             if (!container->error) {
--                container->error = ret;
-+                error_setg_errno(&container->error, -ret,
-+                                 "Memory registering failed");
-             }
-         } else {
-             hw_error("vfio: Memory registering failed, unable to continue");
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 9107bd4..fd56420 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -71,7 +71,7 @@ typedef struct VFIOContainer {
-     MemoryListener listener;
-     MemoryListener prereg_listener;
-     unsigned iommu_type;
--    int error;
-+    Error *error;
-     bool initialized;
-     unsigned long pgsizes;
-     QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
+@@ -2785,9 +2782,10 @@ static int
+ print_insn_crisv32_without_register_prefix (bfd_vma vma,
+ 					    disassemble_info *info)
+ {
+-  if (info->private_data == NULL
+-      && !cris_parse_disassembler_options (info, cris_dis_v32))
+-    return -1;
++  struct cris_disasm_data disdata;
++  info->private_data = &disdata;
++  cris_parse_disassembler_options (&disdata, info->disassembler_options,
++				   cris_dis_v32);
+   return print_insn_cris_generic (vma, info, false);
+ }
+ 
+@@ -2798,9 +2796,10 @@ static int
+ print_insn_crisv10_v32_without_register_prefix (bfd_vma vma,
+ 						disassemble_info *info)
+ {
+-  if (info->private_data == NULL
+-      && !cris_parse_disassembler_options (info, cris_dis_common_v10_v32))
+-    return -1;
++  struct cris_disasm_data disdata;
++  info->private_data = &disdata;
++  cris_parse_disassembler_options (&disdata, info->disassembler_options,
++				   cris_dis_common_v10_v32);
+   return print_insn_cris_generic (vma, info, false);
+ }
+ #endif
 -- 
 1.8.3.1
 
