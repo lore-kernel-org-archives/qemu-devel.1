@@ -2,130 +2,62 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BDCC35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 10:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F15FEC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 10:21:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB21920700
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 10:16:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="VxS7ZCvR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB21920700
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id A6DD520700
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 10:21:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6DD520700
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFbgj-0002n1-TI
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 06:16:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53537)
+	id 1iFble-0004xn-LI
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 06:21:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54130)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rkagan@virtuozzo.com>) id 1iFbfl-0002EN-85
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:15:55 -0400
+ (envelope-from <groug@kaod.org>) id 1iFbkd-0004FP-6t
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:20:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rkagan@virtuozzo.com>) id 1iFbfj-0005nn-6s
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:15:52 -0400
-Received: from mail-bgr052101135032.outbound.protection.outlook.com
- ([52.101.135.32]:20936 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
- id 1iFbfi-0005mz-I5; Wed, 02 Oct 2019 06:15:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E9nrttVFb5i0InhnY+hEpTLMDA4Q0xv6IfZN6QKUldyvaEXKeNilXyK18g8hK/NuIyX9fDaefTEiFTG13M64qvKLbOi25/8N1aptHka3PoIik5wbsHqbRXTw1MOq6eWy/4djPi8sWDsyvebQqAxLWa/WNbReICItsHt7vNoMbwxoiZnF59XQ+p3jAag+1weppdYX3DE89sxorTGVNRg2D+VX/pi1r4YX0gvRmQO3nE0ZVnWX2zbRxwnpMnc/ItIbd6jcgPDQVlveB0pxxbE92xsdRd1llPkraIP2Db0ZZXYx4AQjQlJHNtmvDmbQq11c2T8DcVdjPXkj4Ov+hVhMEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mQ2yvun1xhyL9SM51/wIh4yatjeXyuIGXn7tzbeeWq8=;
- b=LDfj6dlIvW5I4gzAdIE/zLuo+q1+HgjjFSeZFU4bJWXP5affI/KkAX8+Jd58vWSw+266eqXZ7cpTJ5f5c8cblJC7Qwe8TlDCg816dYwyfzLMDK4HCBu5txVMmaM3J0e++N6HSmSocrrGQ1NS6gIyBDogXXRs8mR46ytJYUsp82IlsOJWFRAQhC+vw4b2vLzLMGSk07b6nZCKkA1Pvvicpesr12PMQ6r4KxEI37PntCVtxkvHVG6djjQq7E10ZrjCy8z+tsKhOEKQsKPB/TVa5EDITDJr6kcOcGNJ/lUlhB+26P/DxWlnE0zRonj1Hnhspvi85nyV2Ym68t+6ZelJmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mQ2yvun1xhyL9SM51/wIh4yatjeXyuIGXn7tzbeeWq8=;
- b=VxS7ZCvR2bi17KW00MF5JAxxz/uYxPjraTGxdkNoPHw9nEZmMlPU7brn/KamsGYXdTBxS7GZiyGViIZa/RQN8s5waws7K4LaC/paZFYxUCL2CGi2rC7at0hwQoG02kxo9XRqzYEljLUijPKnNyDiwD7cb0VGBtzf5Az3zccU/lQ=
-Received: from AM0PR08MB5537.eurprd08.prod.outlook.com (20.179.36.87) by
- AM0PR08MB3844.eurprd08.prod.outlook.com (20.178.22.156) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2305.20; Wed, 2 Oct 2019 10:15:40 +0000
-Received: from AM0PR08MB5537.eurprd08.prod.outlook.com
- ([fe80::a8ea:5223:db78:dd3]) by AM0PR08MB5537.eurprd08.prod.outlook.com
- ([fe80::a8ea:5223:db78:dd3%7]) with mapi id 15.20.2305.022; Wed, 2 Oct 2019
- 10:15:40 +0000
-From: Roman Kagan <rkagan@virtuozzo.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v4 04/31] error: auto propagated local_err
-Thread-Topic: [PATCH v4 04/31] error: auto propagated local_err
-Thread-Index: AQHVeHShdnUXp1vh8EWixe39zoJi5KdHI7+A
-Date: Wed, 2 Oct 2019 10:15:40 +0000
-Message-ID: <20191002101535.GA30896@rkaganb.sw.ru>
-References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
- <20191001155319.8066-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20191001155319.8066-5-vsementsov@virtuozzo.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mutt/1.12.1 (2019-06-15)
-mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,	Vladimir
- Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,	qemu-devel@nongnu.org,
- fam@euphon.net, pburton@wavecomp.com,	peter.maydell@linaro.org,
- codyprime@gmail.com, jasowang@redhat.com,	mark.cave-ayland@ilande.co.uk,
- mdroth@linux.vnet.ibm.com,	kraxel@redhat.com, sundeep.lkml@gmail.com,
- qemu-block@nongnu.org,	quintela@redhat.com, arikalo@wavecomp.com,
- mst@redhat.com,	armbru@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com,	joel@jms.id.au, marcandre.lureau@redhat.com,
- rth@twiddle.net,	farman@linux.ibm.com, ehabkost@redhat.com, sw@weilnetz.de,
- groug@kaod.org, yuval.shaia@oracle.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, integration@gluster.org, clg@kaod.org,
- stefanha@redhat.com, david@redhat.com, jsnow@redhat.com,
- david@gibson.dropbear.id.au, kwolf@redhat.com, berrange@redhat.com,
- andrew@aj.id.au, cohuck@redhat.com, qemu-s390x@nongnu.org, mreitz@redhat.com, 
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,	pbonzini@redhat.com
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1PR0202CA0004.eurprd02.prod.outlook.com
- (2603:10a6:3:8c::14) To AM0PR08MB5537.eurprd08.prod.outlook.com
- (2603:10a6:208:148::23)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0b503372-c645-4768-d303-08d7472179ee
-x-ms-traffictypediagnostic: AM0PR08MB3844:|AM0PR08MB3844:|AM0PR08MB3844:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB3844534E1B8765592D253B9BC99C0@AM0PR08MB3844.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0178184651
-x-forefront-antispam-report: SFV:SPM;
- SFS:(10019020)(136003)(366004)(346002)(396003)(376002)(39840400004)(199004)(189003)(486006)(86362001)(81156014)(229853002)(8676002)(81166006)(4326008)(6862004)(25786009)(99286004)(8936002)(1076003)(71190400001)(6486002)(66476007)(66556008)(64756008)(66446008)(71200400001)(6436002)(476003)(6246003)(58126008)(54906003)(102836004)(5660300002)(186003)(478600001)(11346002)(52116002)(7736002)(6116002)(3846002)(316002)(2906002)(305945005)(76176011)(446003)(14454004)(7416002)(7406005)(256004)(6512007)(9686003)(33656002)(66946007)(26005)(386003)(6506007)(66066001)(36756003)(6636002)(30126002);
- DIR:OUT; SFP:1501; SCL:5; SRVR:AM0PR08MB3844;
- H:AM0PR08MB5537.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: T1NolrBZD3NJQiXmFyutJUNL0JjrAdwNqamp7ClnOzzXkXvxzDx8ihfGj+UNx0ovJKBy4lhpO+FakMTGGRXZ11bTC0BJaukLBEvmxpoqIAmJGCrHxML9rNsTkzBpMe7oMmX4QPi+4/mDsrxQXY75nJh4PtNR2Sd+oYy5BrBI4Q2Uq8bkHZF0kNZOxN1hBOnBHy9uRaVtXKanzN/h3J+s9HXpZ/BkoPbsE5gY15EpW01cJinJSzaP0tW9I3lv7z0H3Ctaxcr8xPolbdOw3p2UfOZ7/6FCgc80PPVhjoA+r8c0OdmmhnLhYD+Jfqbxy0rQMii+bcqgaM6tFOpwjybyFT6CIJX8EP6pIE1A6JqqIz69wSU5XB1PA2YaTMyzpYGuiBBVMKTEGLOMSPcvJUjzaPuE1CueEe6j6zHY0EKlSP4FVvWRjPOWg/PKM33lQgUik3Jc/VyCVI96PqCpKXD7SR34IecmUadAcp4jQJrtpaPkMrCYaEtKAgX78dsjXXOz
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E2DD77A9F7BE654D90D9BB55DB58ABFF@eurprd08.prod.outlook.com>
+ (envelope-from <groug@kaod.org>) id 1iFbka-0007wR-MB
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:20:54 -0400
+Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:45971)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iFbka-0007vV-BW
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:20:52 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.146.106])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id AD5FB229BBC
+ for <qemu-devel@nongnu.org>; Wed,  2 Oct 2019 12:20:49 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player759.ha.ovh.net (Postfix) with ESMTPSA id 4D8CCA82F03F;
+ Wed,  2 Oct 2019 10:20:38 +0000 (UTC)
+Date: Wed, 2 Oct 2019 12:20:35 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v3 34/34] spapr: Remove last pieces of SpaprIrq
+Message-ID: <20191002122035.6f667938@bahia.lan>
+In-Reply-To: <20191002025208.3487-35-david@gibson.dropbear.id.au>
+References: <20191002025208.3487-1-david@gibson.dropbear.id.au>
+ <20191002025208.3487-35-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b503372-c645-4768-d303-08d7472179ee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Oct 2019 10:15:40.4330 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zipra8lJQEMAZq5oVeCTEods+Pmk5IrQGqp2MkOavuv6XtFMGR6JfdpLwYoaUJQL2nZ+8kmRgKxzn235So4+Bg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3844
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 52.101.135.32
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 8791307948054845926
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeeigddvkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 178.33.47.94
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,169 +69,464 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "pburton@wavecomp.com" <pburton@wavecomp.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "codyprime@gmail.com" <codyprime@gmail.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "arikalo@wavecomp.com" <arikalo@wavecomp.com>,
- "mst@redhat.com" <mst@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "joel@jms.id.au" <joel@jms.id.au>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "sw@weilnetz.de" <sw@weilnetz.de>,
- "groug@kaod.org" <groug@kaod.org>,
- "yuval.shaia@oracle.com" <yuval.shaia@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "clg@kaod.org" <clg@kaod.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "david@redhat.com" <david@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "integration@gluster.org" <integration@gluster.org>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "andrew@aj.id.au" <andrew@aj.id.au>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ clg@kaod.org, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 01, 2019 at 06:52:52PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
-> functions with errp OUT parameter.
+On Wed,  2 Oct 2019 12:52:08 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> The only thing remaining in this structure are the flags to allow either
+> XICS or XIVE to be present.  These actually make more sense as spapr
+> capabilities - that way they can take advantage of the existing
+> infrastructure to sanity check capability states across migration and so
+> forth.
 > 
-> It has three goals:
-> 
-> 1. Fix issue with error_fatal & error_prepend/error_append_hint: user
-> can't see this additional information, because exit() happens in
-> error_setg earlier than information is added. [Reported by Greg Kurz]
-> 
-> 2. Fix issue with error_abort & error_propagate: when we wrap
-> error_abort by local_err+error_propagate, resulting coredump will
-> refer to error_propagate and not to the place where error happened.
-> (the macro itself doesn't fix the issue, but it allows to [3.] drop all
-> local_err+error_propagate pattern, which will definitely fix the issue)
-> [Reported by Kevin Wolf]
-> 
-> 3. Drop local_err+error_propagate pattern, which is used to workaround
-> void functions with errp parameter, when caller wants to know resulting
-> status. (Note: actually these functions could be merely updated to
-> return int error code).
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
+
+This needs some more care. Incoming migration of older existing machine
+types breaks:
+
+qemu-system-ppc64: cap-xics higher level (1) in incoming stream than on destination (0)
+qemu-system-ppc64: error while loading state for instance 0x0 of device 'spapr'
+qemu-system-ppc64: load of migration failed: Invalid argument
+
+>  hw/ppc/spapr.c             | 38 +++++++++--------
+>  hw/ppc/spapr_caps.c        | 64 +++++++++++++++++++++++++++++
+>  hw/ppc/spapr_hcall.c       |  7 ++--
+>  hw/ppc/spapr_irq.c         | 84 ++------------------------------------
+>  include/hw/ppc/spapr.h     |  8 ++--
+>  include/hw/ppc/spapr_irq.h | 10 -----
+>  6 files changed, 99 insertions(+), 112 deletions(-)
 > 
-> CC: kwolf@redhat.com
-> CC: mreitz@redhat.com
-> CC: jsnow@redhat.com
-> CC: fam@euphon.net
-> CC: sw@weilnetz.de
-> CC: codyprime@gmail.com
-> CC: marcandre.lureau@redhat.com
-> CC: pbonzini@redhat.com
-> CC: groug@kaod.org
-> CC: sundeep.lkml@gmail.com
-> CC: peter.maydell@linaro.org
-> CC: stefanha@redhat.com
-> CC: pburton@wavecomp.com
-> CC: arikalo@wavecomp.com
-> CC: berrange@redhat.com
-> CC: ehabkost@redhat.com
-> CC: david@gibson.dropbear.id.au
-> CC: clg@kaod.org
-> CC: mst@redhat.com
-> CC: marcel.apfelbaum@gmail.com
-> CC: mark.cave-ayland@ilande.co.uk
-> CC: yuval.shaia@oracle.com
-> CC: cohuck@redhat.com
-> CC: farman@linux.ibm.com
-> CC: rth@twiddle.net
-> CC: david@redhat.com
-> CC: pasic@linux.ibm.com
-> CC: borntraeger@de.ibm.com
-> CC: kraxel@redhat.com
-> CC: alex.williamson@redhat.com
-> CC: andrew@aj.id.au
-> CC: joel@jms.id.au
-> CC: eblake@redhat.com
-> CC: armbru@redhat.com
-> CC: mdroth@linux.vnet.ibm.com
-> CC: quintela@redhat.com
-> CC: dgilbert@redhat.com
-> CC: jasowang@redhat.com
-> CC: qemu-block@nongnu.org
-> CC: integration@gluster.org
-> CC: qemu-arm@nongnu.org
-> CC: qemu-ppc@nongnu.org
-> CC: qemu-s390x@nongnu.org
-> 
->  include/qapi/error.h | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
-> 
-> diff --git a/include/qapi/error.h b/include/qapi/error.h
-> index 9376f59c35..02f967ac1d 100644
-> --- a/include/qapi/error.h
-> +++ b/include/qapi/error.h
-> @@ -322,6 +322,43 @@ void error_set_internal(Error **errp,
->                          ErrorClass err_class, const char *fmt, ...)
->      GCC_FMT_ATTR(6, 7);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e1ff03152e..b9ac01d90c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1072,12 +1072,13 @@ static void spapr_dt_ov5_platform_support(SpaprMachineState *spapr, void *fdt,
+>          26, 0x40, /* Radix options: GTSE == yes. */
+>      };
 >  
-> +typedef struct ErrorPropagator {
-> +    Error *local_err;
-> +    Error **errp;
-> +} ErrorPropagator;
-> +
-> +static inline void error_propagator_cleanup(ErrorPropagator *prop)
+> -    if (spapr->irq->xics && spapr->irq->xive) {
+> +    if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
+> +        && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+>          val[1] = SPAPR_OV5_XIVE_BOTH;
+> -    } else if (spapr->irq->xive) {
+> +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+>          val[1] = SPAPR_OV5_XIVE_EXPLOIT;
+>      } else {
+> -        assert(spapr->irq->xics);
+> +        assert(spapr_get_cap(spapr, SPAPR_CAP_XICS));
+>          val[1] = SPAPR_OV5_XIVE_LEGACY;
+>      }
+>  
+> @@ -2775,7 +2776,7 @@ static void spapr_machine_init(MachineState *machine)
+>      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
+>  
+>      /* advertise XIVE on POWER9 machines */
+> -    if (spapr->irq->xive) {
+> +    if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+>          spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
+>      }
+>  
+> @@ -3242,14 +3243,18 @@ static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
+>  static char *spapr_get_ic_mode(Object *obj, Error **errp)
+>  {
+>      SpaprMachineState *spapr = SPAPR_MACHINE(obj);
+> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+>  
+> -    if (spapr->irq == &spapr_irq_xics_legacy) {
+> +    if (smc->legacy_irq_allocation) {
+>          return g_strdup("legacy");
+> -    } else if (spapr->irq == &spapr_irq_xics) {
+> +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
+> +               && !spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+>          return g_strdup("xics");
+> -    } else if (spapr->irq == &spapr_irq_xive) {
+> +    } else if (!spapr_get_cap(spapr, SPAPR_CAP_XICS)
+> +               && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+>          return g_strdup("xive");
+> -    } else if (spapr->irq == &spapr_irq_dual) {
+> +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
+> +               && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+>          return g_strdup("dual");
+>      }
+>      g_assert_not_reached();
+> @@ -3266,11 +3271,14 @@ static void spapr_set_ic_mode(Object *obj, const char *value, Error **errp)
+>  
+>      /* The legacy IRQ backend can not be set */
+>      if (strcmp(value, "xics") == 0) {
+> -        spapr->irq = &spapr_irq_xics;
+> +        object_property_set_bool(obj, true, "cap-xics", errp);
+> +        object_property_set_bool(obj, false, "cap-xive", errp);
+>      } else if (strcmp(value, "xive") == 0) {
+> -        spapr->irq = &spapr_irq_xive;
+> +        object_property_set_bool(obj, false, "cap-xics", errp);
+> +        object_property_set_bool(obj, true, "cap-xive", errp);
+>      } else if (strcmp(value, "dual") == 0) {
+> -        spapr->irq = &spapr_irq_dual;
+> +        object_property_set_bool(obj, true, "cap-xics", errp);
+> +        object_property_set_bool(obj, true, "cap-xive", errp);
+>      } else {
+>          error_setg(errp, "Bad value for \"ic-mode\" property");
+>      }
+> @@ -3309,7 +3317,6 @@ static void spapr_set_host_serial(Object *obj, const char *value, Error **errp)
+>  static void spapr_instance_init(Object *obj)
+>  {
+>      SpaprMachineState *spapr = SPAPR_MACHINE(obj);
+> -    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+>  
+>      spapr->htab_fd = -1;
+>      spapr->use_hotplug_event_source = true;
+> @@ -3345,7 +3352,6 @@ static void spapr_instance_init(Object *obj)
+>                               spapr_get_msix_emulation, NULL, NULL);
+>  
+>      /* The machine class defines the default interrupt controller mode */
+> -    spapr->irq = smc->irq;
+>      object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
+>                              spapr_set_ic_mode, NULL);
+>      object_property_set_description(obj, "ic-mode",
+> @@ -4439,8 +4445,9 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
+>      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
+> +    smc->default_caps.caps[SPAPR_CAP_XICS] = SPAPR_CAP_ON;
+> +    smc->default_caps.caps[SPAPR_CAP_XIVE] = SPAPR_CAP_ON;
+>      spapr_caps_add_properties(smc, &error_abort);
+> -    smc->irq = &spapr_irq_dual;
+>      smc->dr_phb_enabled = true;
+>      smc->linux_pci_probe = true;
+>      smc->nr_xirqs = SPAPR_NR_XIRQS;
+> @@ -4539,7 +4546,7 @@ static void spapr_machine_4_0_class_options(MachineClass *mc)
+>      spapr_machine_4_1_class_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+>      smc->phb_placement = phb_placement_4_0;
+> -    smc->irq = &spapr_irq_xics;
+> +    smc->default_caps.caps[SPAPR_CAP_XIVE] = SPAPR_CAP_OFF;
+>      smc->pre_4_1_migration = true;
+>  }
+>  
+> @@ -4580,7 +4587,6 @@ static void spapr_machine_3_0_class_options(MachineClass *mc)
+>  
+>      smc->legacy_irq_allocation = true;
+>      smc->nr_xirqs = 0x400;
+> -    smc->irq = &spapr_irq_xics_legacy;
+>  }
+>  
+>  DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 481dfd2a27..e06fd386f6 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -496,6 +496,42 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+>      }
+>  }
+>  
+> +static void cap_xics_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
 > +{
-> +    error_propagate(prop->errp, prop->local_err);
+> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+> +
+> +    if (!val) {
+> +        if (!spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+> +            error_setg(errp,
+> +"No interrupt controllers enabled, try cap-xics=on or cap-xive=on");
+> +            return;
+> +        }
+> +
+> +        if (smc->legacy_irq_allocation) {
+> +            error_setg(errp, "This machine version requires XICS support");
+> +            return;
+> +        }
+> +    }
 > +}
 > +
-> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
+> +static void cap_xive_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+> +{
+> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+> +    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
 > +
-> +/*
-> + * ERRP_AUTO_PROPAGATE
-> + *
-> + * This macro is created to be the first line of a function with Error **errp
-> + * OUT parameter. It's needed only in cases where we want to use error_prepend,
-> + * error_append_hint or dereference *errp. It's still safe (but useless) in
-> + * other cases.
-> + *
-> + * If errp is NULL or points to error_fatal, it is rewritten to point to a
-> + * local Error object, which will be automatically propagated to the original
-> + * errp on function exit (see error_propagator_cleanup).
-> + *
-> + * After invocation of this macro it is always safe to dereference errp
-> + * (as it's not NULL anymore) and to append hints (by error_append_hint)
-> + * (as, if it was error_fatal, we swapped it with a local_error to be
-> + * propagated on cleanup).
-> + *
-> + * Note: we don't wrap the error_abort case, as we want resulting coredump
-> + * to point to the place where the error happened, not to error_propagate.
-> + */
-> +#define ERRP_AUTO_PROPAGATE() \
-> +g_auto(ErrorPropagator) __auto_errp_prop = {.errp = errp}; \
-> +errp = ((errp == NULL || *errp == error_fatal) ? \
-> +    &__auto_errp_prop.local_err : errp)
+> +    if (val) {
+> +        if (smc->legacy_irq_allocation) {
+> +            error_setg(errp, "This machine version cannot support XIVE");
+> +            return;
+> +        }
+> +        if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
+> +                              spapr->max_compat_pvr)) {
+> +            error_setg(errp, "XIVE requires POWER9 CPU");
+> +            return;
+> +        }
+> +    }
+> +}
 > +
+>  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>      [SPAPR_CAP_HTM] = {
+>          .name = "htm",
+> @@ -595,6 +631,24 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>          .type = "bool",
+>          .apply = cap_ccf_assist_apply,
+>      },
+> +    [SPAPR_CAP_XICS] = {
+> +        .name = "xics",
+> +        .description = "Allow XICS interrupt controller",
+> +        .index = SPAPR_CAP_XICS,
+> +        .get = spapr_cap_get_bool,
+> +        .set = spapr_cap_set_bool,
+> +        .type = "bool",
+> +        .apply = cap_xics_apply,
+> +    },
+> +    [SPAPR_CAP_XIVE] = {
+> +        .name = "xive",
+> +        .description = "Allow XIVE interrupt controller",
+> +        .index = SPAPR_CAP_XIVE,
+> +        .get = spapr_cap_get_bool,
+> +        .set = spapr_cap_set_bool,
+> +        .type = "bool",
+> +        .apply = cap_xive_apply,
+> +    },
+>  };
+>  
+>  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+> @@ -641,6 +695,14 @@ static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
+>          caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
+>      }
+>  
+> +    /*
+> +     * POWER8 machines don't have XIVE
+> +     */
+> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_3_00,
+> +                               0, spapr->max_compat_pvr)) {
+> +        caps.caps[SPAPR_CAP_XIVE] = SPAPR_CAP_OFF;
+> +    }
+> +
+>      return caps;
+>  }
+>  
+> @@ -734,6 +796,8 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MAXPAGESIZE);
+>  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
+>  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
+>  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
+> +SPAPR_CAP_MIG_STATE(xics, SPAPR_CAP_XICS);
+> +SPAPR_CAP_MIG_STATE(xive, SPAPR_CAP_XIVE);
+>  
+>  void spapr_caps_init(SpaprMachineState *spapr)
+>  {
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 140f05c1c6..cb4c6edf63 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1784,13 +1784,13 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>       * terminate the boot.
+>       */
+>      if (guest_xive) {
+> -        if (!spapr->irq->xive) {
+> +        if (!spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+>              error_report(
+>  "Guest requested unavailable interrupt mode (XIVE), try the ic-mode=xive or ic-mode=dual machine property");
+>              exit(EXIT_FAILURE);
+>          }
+>      } else {
+> -        if (!spapr->irq->xics) {
+> +        if (!spapr_get_cap(spapr, SPAPR_CAP_XICS)) {
+>              error_report(
+>  "Guest requested unavailable interrupt mode (XICS), either don't set the ic-mode machine property or try ic-mode=xics or ic-mode=dual");
+>              exit(EXIT_FAILURE);
+> @@ -1804,7 +1804,8 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>       */
+>      if (!spapr->cas_reboot) {
+>          spapr->cas_reboot = spapr_ovec_test(ov5_updates, OV5_XIVE_EXPLOIT)
+> -            && spapr->irq->xics && spapr->irq->xive;
+> +            && spapr_get_cap(spapr, SPAPR_CAP_XICS)
+> +            && spapr_get_cap(spapr, SPAPR_CAP_XIVE);
+>      }
+>  
+>      spapr_ovec_cleanup(ov5_updates);
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 2768f9a765..473fc8780a 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -101,90 +101,19 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Error **),
+>      return 0;
+>  }
+>  
+> -/*
+> - * XICS IRQ backend.
+> - */
+> -
+> -SpaprIrq spapr_irq_xics = {
+> -    .xics        = true,
+> -    .xive        = false,
+> -};
+> -
+> -/*
+> - * XIVE IRQ backend.
+> - */
+> -
+> -SpaprIrq spapr_irq_xive = {
+> -    .xics        = false,
+> -    .xive        = true,
+> -};
+> -
+> -/*
+> - * Dual XIVE and XICS IRQ backend.
+> - *
+> - * Both interrupt mode, XIVE and XICS, objects are created but the
+> - * machine starts in legacy interrupt mode (XICS). It can be changed
+> - * by the CAS negotiation process and, in that case, the new mode is
+> - * activated after an extra machine reset.
+> - */
+> -
+> -/*
+> - * Define values in sync with the XIVE and XICS backend
+> - */
+> -SpaprIrq spapr_irq_dual = {
+> -    .xics        = true,
+> -    .xive        = true,
+> -};
+> -
+> -
+>  static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
+>  {
+>      MachineState *machine = MACHINE(spapr);
+>  
+> -    /*
+> -     * Sanity checks on non-P9 machines. On these, XIVE is not
+> -     * advertised, see spapr_dt_ov5_platform_support()
+> -     */
+> -    if (!ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_00,
+> -                               0, spapr->max_compat_pvr)) {
+> -        /*
+> -         * If the 'dual' interrupt mode is selected, force XICS as CAS
+> -         * negotiation is useless.
+> -         */
+> -        if (spapr->irq == &spapr_irq_dual) {
+> -            spapr->irq = &spapr_irq_xics;
+> -            return 0;
+> -        }
+> -
+> -        /*
+> -         * Non-P9 machines using only XIVE is a bogus setup. We have two
+> -         * scenarios to take into account because of the compat mode:
+> -         *
+> -         * 1. POWER7/8 machines should fail to init later on when creating
+> -         *    the XIVE interrupt presenters because a POWER9 exception
+> -         *    model is required.
+> -
+> -         * 2. POWER9 machines using the POWER8 compat mode won't fail and
+> -         *    will let the OS boot with a partial XIVE setup : DT
+> -         *    properties but no hcalls.
+> -         *
+> -         * To cover both and not confuse the OS, add an early failure in
+> -         * QEMU.
+> -         */
+> -        if (spapr->irq == &spapr_irq_xive) {
+> -            error_setg(errp, "XIVE-only machines require a POWER9 CPU");
+> -            return -1;
+> -        }
+> -    }
+> -
+>      /*
+>       * On a POWER9 host, some older KVM XICS devices cannot be destroyed and
+>       * re-created. Detect that early to avoid QEMU to exit later when the
+>       * guest reboots.
+>       */
+>      if (kvm_enabled() &&
+> -        spapr->irq == &spapr_irq_dual &&
+>          machine_kernel_irqchip_required(machine) &&
+> +        spapr_get_cap(spapr, SPAPR_CAP_XICS) &&
+> +        spapr_get_cap(spapr, SPAPR_CAP_XIVE) &&
+>          xics_kvm_has_broken_disconnect(spapr)) {
+>          error_setg(errp, "KVM is too old to support ic-mode=dual,kernel-irqchip=on");
+>          return -1;
+> @@ -280,7 +209,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>      /* Initialize the MSI IRQ allocator. */
+>      spapr_irq_msi_init(spapr);
+>  
+> -    if (spapr->irq->xics) {
+> +    if (spapr_get_cap(spapr, SPAPR_CAP_XICS)) {
+>          Error *local_err = NULL;
+>          Object *obj;
+>  
+> @@ -313,7 +242,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>          spapr->ics = ICS_SPAPR(obj);
+>      }
+>  
+> -    if (spapr->irq->xive) {
+> +    if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
+>          uint32_t nr_servers = spapr_max_server_number(spapr);
+>          DeviceState *dev;
+>          int i;
+> @@ -558,11 +487,6 @@ int spapr_irq_find(SpaprMachineState *spapr, int num, bool align, Error **errp)
+>      return first + ics->offset;
+>  }
+>  
+> -SpaprIrq spapr_irq_xics_legacy = {
+> -    .xics        = true,
+> -    .xive        = false,
+> -};
+> -
+>  static void spapr_irq_register_types(void)
+>  {
+>      type_register_static(&spapr_intc_info);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 623e8e3f93..bae5d1ccb3 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -79,8 +79,12 @@ typedef enum {
+>  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
+>  /* Count Cache Flush Assist HW Instruction */
+>  #define SPAPR_CAP_CCF_ASSIST            0x09
+> +/* XICS interrupt controller */
+> +#define SPAPR_CAP_XICS                  0x0a
+> +/* XIVE interrupt controller */
+> +#define SPAPR_CAP_XIVE                  0x0b
+>  /* Num Caps */
+> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
+> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_XIVE + 1)
+>  
+>  /*
+>   * Capability Values
+> @@ -131,7 +135,6 @@ struct SpaprMachineClass {
+>                            hwaddr *nv2atsd, Error **errp);
+>      SpaprResizeHpt resize_hpt_default;
+>      SpaprCapabilities default_caps;
+> -    SpaprIrq *irq;
+>  };
+>  
+>  /**
+> @@ -195,7 +198,6 @@ struct SpaprMachineState {
+>  
+>      int32_t irq_map_nr;
+>      unsigned long *irq_map;
+> -    SpaprIrq *irq;
+>      qemu_irq *qirqs;
+>      SpaprInterruptController *active_intc;
+>      ICSState *ics;
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index 50491cea4f..4b58134701 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -77,16 +77,6 @@ int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool align,
+>                          Error **errp);
+>  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t num);
+>  
+> -typedef struct SpaprIrq {
+> -    bool        xics;
+> -    bool        xive;
+> -} SpaprIrq;
+> -
+> -extern SpaprIrq spapr_irq_xics;
+> -extern SpaprIrq spapr_irq_xics_legacy;
+> -extern SpaprIrq spapr_irq_xive;
+> -extern SpaprIrq spapr_irq_dual;
+> -
+>  void spapr_irq_init(SpaprMachineState *spapr, Error **errp);
+>  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error **errp);
+>  void spapr_irq_free(SpaprMachineState *spapr, int irq, int num);
 
-I guess it has been discussed but I couldn't find it, so: what's the
-reason for casting in stone the name of the function parameter, which
-isn't quite so obvious when you see this macro used in the code?  IMO
-if the macro took errp as a parameter that would be easier to follow.
-
-Thanks,
-Roman.
 
