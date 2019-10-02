@@ -2,61 +2,61 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 893A0C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2131C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:07:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44D2E2086A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:04:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44D2E2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B39D2086A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:07:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B39D2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFU0X-0001qk-BB
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:04:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46681)
+	id 1iFU2g-0004Az-50
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:07:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52668)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iFS0Y-0001DU-0w
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:43 -0400
+ (envelope-from <nramas@linux.microsoft.com>) id 1iFTVH-000250-Hc
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:32:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iFS0W-0002cn-1L
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35790)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iFS0O-0002WZ-Qs; Tue, 01 Oct 2019 19:56:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0B1CA2A09CC;
- Tue,  1 Oct 2019 23:56:31 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7324360BE0;
- Tue,  1 Oct 2019 23:56:27 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 5/8] bootdevice: Gather LCHS from all relevant devices
-Date: Tue,  1 Oct 2019 19:55:49 -0400
-Message-Id: <20191001235552.17790-6-jsnow@redhat.com>
-In-Reply-To: <20191001235552.17790-1-jsnow@redhat.com>
-References: <20191001235552.17790-1-jsnow@redhat.com>
+ (envelope-from <nramas@linux.microsoft.com>) id 1iFTVG-0005kC-4G
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:32:31 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:35386)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <nramas@linux.microsoft.com>)
+ id 1iFTVC-0005eU-KQ; Tue, 01 Oct 2019 21:32:26 -0400
+Received: from [10.200.157.26] (unknown [131.107.147.154])
+ by linux.microsoft.com (Postfix) with ESMTPSA id 075762007698;
+ Tue,  1 Oct 2019 18:32:25 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 075762007698
+Subject: Re: Is kexec supported in QEMU for ARM64 (qemu-system-aarch64) with
+ arm-trusted-firmware, optee, and u-boot.
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+References: <21633062-b021-a8e7-0cc8-062f4c29dde5@linux.microsoft.com>
+ <ca5c74db-cf5d-0c3f-eb6f-27d1092420ae@linux.microsoft.com>
+ <65b49cb0-c9fb-d966-8dec-1e39d09ab8c7@redhat.com>
+ <88878b22-803f-41fc-9df2-2c6eb551b98d@linux.microsoft.com>
+ <CAKv+Gu8kwg_tsrH7qne3H11hUPyA6zw-J_jpUmiyJMvXo3-SNQ@mail.gmail.com>
+From: Lakshmi Ramasubramanian <nramas@linux.microsoft.com>
+Message-ID: <5938a592-1494-ca0c-8a34-7df38dbbea0c@linux.microsoft.com>
+Date: Tue, 1 Oct 2019 18:32:24 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 01 Oct 2019 23:56:31 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAKv+Gu8kwg_tsrH7qne3H11hUPyA6zw-J_jpUmiyJMvXo3-SNQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 13.77.154.182
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,126 +68,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Arbel Moshe <arbel.moshe@oracle.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Sam Eiderman <shmuel.eiderman@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sam Eiderman <sameid@google.com>, Laszlo Ersek <lersek@redhat.com>,
- Karl Heubaum <karl.heubaum@oracle.com>
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
+On 10/1/19 9:30 AM, Ard Biesheuvel wrote:
 
-Relevant devices are:
-    * ide-hd (and ide-cd, ide-drive)
-    * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
-    * virtio-blk-pci
+> 
+> kexec is a linux concept, so whether it is supported should not depend
+> on the secure world firmware or the underlying host.
 
-We do not call del_boot_device_lchs() for ide-* since we don't need to -
-IDE block devices do not support unplugging.
+I agree Ard.
+When I don't use ATF I am able to do kexec in QEMU and successfully boot 
+into the new kernel.
+Is the following expected?
 
-Signed-off-by: Sam Eiderman <sameid@google.com>
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-id: 20190925110639.100699-6-sameid@google.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/block/virtio-blk.c |  6 ++++++
- hw/ide/qdev.c         |  5 +++++
- hw/scsi/scsi-disk.c   | 12 ++++++++++++
- 3 files changed, 23 insertions(+)
+When I execute kexec ("kexec -l <kernel>", followed by "kexec -e") I hit 
+the following assert in ATF (in the file
+arm-trusted-firmware/plat/qemu/qemu_pm.c)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 18851601cb..6d8ff34a16 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -1186,6 +1186,11 @@ static void virtio_blk_device_realize(DeviceState =
-*dev, Error **errp)
-     blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);
-=20
-     blk_iostatus_enable(s->blk);
-+
-+    add_boot_device_lchs(dev, "/disk@0,0",
-+                         conf->conf.lcyls,
-+                         conf->conf.lheads,
-+                         conf->conf.lsecs);
- }
-=20
- static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
-@@ -1193,6 +1198,7 @@ static void virtio_blk_device_unrealize(DeviceState=
- *dev, Error **errp)
-     VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
-     VirtIOBlock *s =3D VIRTIO_BLK(dev);
-=20
-+    del_boot_device_lchs(dev, "/disk@0,0");
-     virtio_blk_data_plane_destroy(s->dataplane);
-     s->dataplane =3D NULL;
-     qemu_del_vm_change_state_handler(s->change);
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 6dd219944f..2ffd387a73 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -220,6 +220,11 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveK=
-ind kind, Error **errp)
-=20
-     add_boot_device_path(dev->conf.bootindex, &dev->qdev,
-                          dev->unit ? "/disk@1" : "/disk@0");
-+
-+    add_boot_device_lchs(&dev->qdev, dev->unit ? "/disk@1" : "/disk@0",
-+                         dev->conf.lcyls,
-+                         dev->conf.lheads,
-+                         dev->conf.lsecs);
- }
-=20
- static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *n=
-ame,
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 915641a0f1..d19896fe4d 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -35,6 +35,7 @@
- #include "hw/block/block.h"
- #include "hw/qdev-properties.h"
- #include "sysemu/dma.h"
-+#include "sysemu/sysemu.h"
- #include "qemu/cutils.h"
- #include "trace.h"
-=20
-@@ -2402,6 +2403,16 @@ static void scsi_realize(SCSIDevice *dev, Error **=
-errp)
-     blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
-=20
-     blk_iostatus_enable(s->qdev.conf.blk);
-+
-+    add_boot_device_lchs(&dev->qdev, NULL,
-+                         dev->conf.lcyls,
-+                         dev->conf.lheads,
-+                         dev->conf.lsecs);
-+}
-+
-+static void scsi_unrealize(SCSIDevice *dev, Error **errp)
-+{
-+    del_boot_device_lchs(&dev->qdev, NULL);
- }
-=20
- static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
-@@ -3006,6 +3017,7 @@ static void scsi_hd_class_initfn(ObjectClass *klass=
-, void *data)
-     SCSIDeviceClass *sc =3D SCSI_DEVICE_CLASS(klass);
-=20
-     sc->realize      =3D scsi_hd_realize;
-+    sc->unrealize    =3D scsi_unrealize;
-     sc->alloc_req    =3D scsi_new_request;
-     sc->unit_attention_reported =3D scsi_disk_unit_attention_reported;
-     dc->desc =3D "virtual SCSI disk";
---=20
-2.21.0
+/*******************************************************************************
+   * Platform handler called when a power domain is about to be turned
+   * off. The target_state encodes the power state that each level should
+   * transition to.
+******************************************************************************/
+void qemu_pwr_domain_off(const psci_power_state_t *target_state)
+{
+      assert(0);
+}
+
+Thanks,
+  -lakshmi
+
 
 
