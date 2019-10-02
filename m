@@ -2,92 +2,85 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A716C35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3C0C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:53:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E47521920
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:49:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAE9821920
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 16:53:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pZU2ijE+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E47521920
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="phI6wvFG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAE9821920
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFhoU-0003wC-Fq
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 12:49:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34526)
+	id 1iFhsx-0006ng-FU
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 12:53:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35206)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iFhnJ-0003TN-F3
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:48:06 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhr4-000570-Hf
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iFhnG-0000Tj-RG
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:48:04 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33201)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhr3-00033x-7b
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:51:58 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51951)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iFhnF-0000Rv-TD
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:48:02 -0400
-Received: by mail-pg1-x541.google.com with SMTP id q1so4134769pgb.0
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=aFh0KZ8ZuSk6TleyDGx/pvDXFGqFdjXOgnQi5+o+DcU=;
- b=pZU2ijE+Zt5ndvwmZvnpbO5CbRzUEff0zO/PB/jeku07xnLYcJPtq8pimG20XGsmbA
- sEA40ZyvtDcGtU1XD6vAkj6bpFCTi9+uqNekavpUBXB5D/ybmXMIBZn9f7phtQ76vwm2
- MuUy/A+vu2x4yO/YTZXhWrMJSynSMIej4sjO82mB+2S6yUoD6EGIfHSbZw2YmgKzfyk1
- v2ozKGE0OOAkbprCoSQ9CAHlUu7DkMHFlUZLfE3f57gIYN/D7rlhhZKmPHaelU6n+gYs
- Y65sXmHy6asWTATsAaHZ2bMVOQkF6HywcgqrsY9LSkJDzBX8nb+VSREuo5zGjx/jLRlT
- UetA==
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iFhr2-00032S-VW
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:51:57 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 7so7979681wme.1
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:51:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=RlGVGBCtzPQHiyhlqLIjunehNFoE63BJ9stQ7pnTfeY=;
+ b=phI6wvFGa8EQydfPi38xegiWea9Db6PykbR638HkAm0mht25LN0ijCFmpFEor7TAa1
+ QpKL98jydGxRpw18ck97nfb84he+rSj6NiEzPUXqAYiH8f16JM3YIsNiYqa5Xs1CwsC/
+ 6zPs7NmCQwMv1CWCsAGYODZU638+avRBQjS0AznrJanC19rqE5RZZ6+PySKNai5JAt8b
+ sTnDx2P6ik9SUG/josWpX7V46qMaY4utPzShKOtb9Vt7rj7Lh7xqpIuGF9hbod5pWPl7
+ uon9ZTbodupQTM7tDyz8H0ROBcy0EA0ES5IIF7y/BT+hrlfFmfvaPFXEYFzrSXUCj262
+ 4uuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aFh0KZ8ZuSk6TleyDGx/pvDXFGqFdjXOgnQi5+o+DcU=;
- b=beFej5uBdi4kE4nsWnsX6kC88Utmqe1OP6QBRVees+kSmHS2OYgoNRaqOWgOGu+vlP
- tsrrHpA8SxDL9rzXou3g+Y151WkJWM/ulMzFLIIil9+FPujls3luRRvhWxfpkgEFoyAB
- JgiZHb4y6uF8wHzn+WiyqoKqOnkrJTPjIJKCgQhbAFmCuuR8A/2cnhoYfiZMoDwGEE1n
- iSgmWt8Q7NwrOs4BXoFMiCJGxsDKpWIE/kYqfDrWmZJPh5biH8rGnjdRkQugCqSiCQEf
- OX4MhdBJ1QjbuA2ItnTgfOMbBYdxlknng70AjmQ3GzZrdv7ciLQV9rpz9ifxpSrevRWV
- Wvaw==
-X-Gm-Message-State: APjAAAXGpfLPJytfJ7WfoeiPaWZMr41P1r2bsq+tzPW1zcUT8xvGQ48A
- HUf62SJBjUkS9ZrVzpbz9TQuSg==
-X-Google-Smtp-Source: APXvYqwtDOC9EZHIjU9PUakntyrYlOfkUoZOgNIj/RqzgmsHaC6fR/SGNu0nxg4dbPctbLNzw+zXKA==
-X-Received: by 2002:aa7:9d8d:: with SMTP id f13mr5789100pfq.196.1570034880013; 
- Wed, 02 Oct 2019 09:48:00 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d22sm23947989pfq.168.2019.10.02.09.47.58
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=RlGVGBCtzPQHiyhlqLIjunehNFoE63BJ9stQ7pnTfeY=;
+ b=cOBHliL/y3Vsnj++QcTvMJjywb0O/KE14xRKTSdqysq1okaHqJzmL+yTBYZIgm4tVT
+ wbjJ3DwZIcM7Vr7ZbECrcx9yjXdxV57oiHHjpbJ9GG1HHsWOWbKKCVTpGDHu3kb3ryGw
+ aX0Nh8syUFC2VFdIDF/cek2M8PdxGaD3JzolvdD9vbF/HMEYBR/y894CF6TOt3cdYxq4
+ hvzmZb5X2XR366M/GhQK9P2lXMVioHUTaQhJUboKe19SlYyBtcvXGIHJcd7LdLP0x+oq
+ 8+IHYvli+wobLlk9hdRUVQfibxDRWWGZZpcEkCmxtfoIW5mHU6KLor3sYSpjFR7JeZ6d
+ 3GzQ==
+X-Gm-Message-State: APjAAAWHzJlx/kW8XeSzL2M9i/FMPtP5yQTlJur1SmSzQs6/74FCQMgw
+ cP7an9szd/M+GUaEXaP57Rqj/LnV
+X-Google-Smtp-Source: APXvYqwhaNaXBY7JscFOI3MRTFXfSg9P/xwuUkGSEQt2fWkyH7vwRfDfswDV1r31XcrNNI7Ke8Lw+g==
+X-Received: by 2002:a1c:1981:: with SMTP id 123mr3567013wmz.88.1570035115142; 
+ Wed, 02 Oct 2019 09:51:55 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.51.54
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 02 Oct 2019 09:47:59 -0700 (PDT)
-Subject: Re: [PATCH v2] s390x/tcg: MVCL: Exit to main loop if requested
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191002082636.7739-1-david@redhat.com>
- <87zhijjwph.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <0479ad1f-348e-ed40-c2c6-aef168afdb7e@linaro.org>
-Date: Wed, 2 Oct 2019 09:47:57 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Wed, 02 Oct 2019 09:51:54 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/30] Misc patches for 2010-10-02
+Date: Wed,  2 Oct 2019 18:51:23 +0200
+Message-Id: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <87zhijjwph.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,105 +92,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/2/19 2:58 AM, Alex Bennée wrote:
-> 
-> David Hildenbrand <david@redhat.com> writes:
-> 
->> MVCL is interruptible and we should check for interrupts and process
->> them after writing back the variables to the registers. Let's check
->> for any exit requests and exit to the main loop.
->>
->> When booting Fedora 30, I can see a handful of these exits and it seems
->> to work reliable. (it never get's triggered via EXECUTE, though)
->>
->> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>
->> v1 -> v2:
->> - Check only if icount_decr.u32 < 0
->> - Drop should_interrupt_instruction() and perform the check inline
->> - Rephrase comment, subject, and description
->>
->> ---
->>  target/s390x/mem_helper.c | 10 +++++++++-
->>  1 file changed, 9 insertions(+), 1 deletion(-)
->>
->> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
->> index 4254548935..87e4ebd169 100644
->> --- a/target/s390x/mem_helper.c
->> +++ b/target/s390x/mem_helper.c
->> @@ -1015,6 +1015,7 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
->>      uint64_t srclen = env->regs[r2 + 1] & 0xffffff;
->>      uint64_t src = get_address(env, r2);
->>      uint8_t pad = env->regs[r2 + 1] >> 24;
->> +    CPUState *cs = env_cpu(env);
->>      S390Access srca, desta;
->>      uint32_t cc, cur_len;
->>
->> @@ -1065,7 +1066,14 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t r1, uint32_t r2)
->>          env->regs[r1 + 1] = deposit64(env->regs[r1 + 1], 0, 24, destlen);
->>          set_address_zero(env, r1, dest);
->>
->> -        /* TODO: Deliver interrupts. */
->> +        /*
->> +         * MVCL is interruptible. Check if somebody (e.g., cpu_interrupt() or
->> +         * cpu_exit()) asked us to return to the main loop. In case there is
->> +         * no deliverable interrupt, we'll end up back in this handler.
->> +         */
->> +        if
->> (unlikely((int32_t)atomic_read(&cpu_neg(cs)->icount_decr.u32) < 0)) {
-> 
-> I'm not sure about directly checking the icount_decr here. It really is
-> an internal implementation detail for the generated code.
+The following changes since commit 7f21573c822805a8e6be379d9bcf3ad9effef3dc:
 
-But it's also the exact right thing to test.
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-10-01' into staging (2019-10-01 13:13:38 +0100)
+
+are available in the git repository at:
 
 
-> Having said
-> that is seems cpu_interrupt() is messing with this directly rather than
-> calling cpu_exit() which sets the more easily checked &cpu->exit_request.
-> 
-> This is potentially problematic as in other points in the cpu loop code
-> you see checks like this:
-> 
->     /* Finally, check if we need to exit to the main loop.  */
->     if (unlikely(atomic_read(&cpu->exit_request))
->         || (use_icount
->             && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0)) {
->         atomic_set(&cpu->exit_request, 0);
->         if (cpu->exception_index == -1) {
->             cpu->exception_index = EXCP_INTERRUPT;
->         }
->         return true;
->     }
-> 
-> although I guess this is because interrupts and "exits" take subtly
-> different paths through the outer loop. Given that exits and interrupts
-> are slightly different is what you want to check
-> atomic_read(&cpu->interrupt_request))?
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-No, this is not about interrupts per se.
+for you to fetch changes up to 52c8850d80c5bf34afd3b203b912217f45327a9e:
 
-The thing we're trying to solve here is MVCL running for a long time.  The
-length operand is 24 bits, so max 16MB can be copied with one instruction.  We
-want to exit back to the main loop early when told to do so, as the insn is
-officially restartable.
+  accel/kvm: ensure ret always set (2019-10-02 18:37:27 +0200)
 
-Ordinarily, I would say move the loop out to the tcg level, but that creates
-further complications and I'd rather not open up that can of worms.
+----------------------------------------------------------------
+* Compilation fix for KVM (Alex)
+* SMM fix (Dmitry)
+* VFIO error reporting (Eric)
+* win32 fixes and workarounds (Marc-André)
+* qemu-pr-helper crash bugfix (Maxim)
+* VMX feature flags (myself)
+* Memory leak fixes (myself)
+* Record-replay deadlock (Pavel)
+* i386 CPUID bits (Sebastian)
+* kconfig tweak (Thomas)
+* Valgrind fix (Thomas)
+* distclean improvement (Thomas)
+* Autoconverge test (Yury)
 
-There is still the special case of EXECUTE of MVCL, which I suspect must have
-some failure mode that we're not considering -- the setting and clearing of
-ex_value can't help.  I have a suspicion that we need to special case that
-within helper_ex, just so that ex_value doesn't enter into it.
+----------------------------------------------------------------
+Alex Bennée (1):
+      accel/kvm: ensure ret always set
 
+Dmitry Poletaev (1):
+      Fix wrong behavior of cpu_memory_rw_debug() function in SMM
 
-r~
+Eric Auger (2):
+      vfio: Turn the container error into an Error handle
+      memory: allow memory_region_register_iommu_notifier() to fail
+
+Marc-André Lureau (3):
+      util: WSAEWOULDBLOCK on connect should map to EINPROGRESS
+      tests: skip serial test on windows
+      win32: work around main-loop busy loop on socket/fd event
+
+Maxim Levitsky (1):
+      qemu-pr-helper: fix crash in mpath_reconstruct_sense
+
+Paolo Bonzini (16):
+      target/i386: handle filtered_features in a new function mark_unavailable_features
+      target/i386: introduce generic feature dependency mechanism
+      target/i386: expand feature words to 64 bits
+      target/i386: add VMX definitions
+      vmxcap: correct the name of the variables
+      target/i386: add VMX features
+      target/i386: work around KVM_GET_MSRS bug for secondary execution controls
+      ide: fix leak from qemu_allocate_irqs
+      microblaze: fix leak of fdevice tree blob
+      mcf5208: fix leak from qemu_allocate_irqs
+      hppa: fix leak from g_strdup_printf
+      mips: fix memory leaks in board initialization
+      cris: do not leak struct cris_disasm_data
+      lm32: do not leak memory on object_new/object_unref
+      docker: test-debug: disable LeakSanitizer
+      tests/docker: only enable ubsan for test-clang
+
+Pavel Dovgaluk (1):
+      replay: don't synchronize memory operations in replay mode
+
+Sebastian Andrzej Siewior (1):
+      i386: Add CPUID bit for CLZERO and XSAVEERPTR
+
+Thomas Huth (3):
+      target/i386/kvm: Silence warning from Valgrind about uninitialized bytes
+      Makefile: Remove generated files when doing 'distclean'
+      hw/isa: Introduce a CONFIG_ISA_SUPERIO switch for isa-superio.c
+
+Yury Kotov (1):
+      tests/migration: Add a test for auto converge
+
+ Makefile                      |   6 +-
+ accel/kvm/kvm-all.c           |   6 +-
+ disas/cris.c                  |  59 +++---
+ exec.c                        |  23 ++-
+ hw/arm/smmuv3.c               |  18 +-
+ hw/hppa/dino.c                |   1 +
+ hw/hppa/machine.c             |   4 +-
+ hw/i386/amd_iommu.c           |  17 +-
+ hw/i386/intel_iommu.c         |   8 +-
+ hw/ide/cmd646.c               |   1 +
+ hw/isa/Kconfig                |  10 +-
+ hw/isa/Makefile.objs          |   2 +-
+ hw/m68k/mcf5208.c             |   2 +
+ hw/microblaze/boot.c          |   1 +
+ hw/mips/Kconfig               |   1 +
+ hw/mips/mips_int.c            |   1 +
+ hw/mips/mips_jazz.c           |   2 +
+ hw/ppc/spapr_iommu.c          |   8 +-
+ hw/timer/lm32_timer.c         |   6 +-
+ hw/timer/milkymist-sysctl.c   |  10 +-
+ hw/vfio/common.c              |  52 +++--
+ hw/vfio/spapr.c               |   4 +-
+ hw/virtio/vhost.c             |   9 +-
+ include/exec/memory.h         |  21 +-
+ include/hw/vfio/vfio-common.h |   2 +-
+ include/sysemu/kvm.h          |   2 +-
+ memory.c                      |  31 +--
+ scripts/kvm/vmxcap            |  14 +-
+ scsi/qemu-pr-helper.c         |   6 +-
+ target/i386/cpu.c             | 447 +++++++++++++++++++++++++++++++++---------
+ target/i386/cpu.h             | 146 +++++++++++++-
+ target/i386/helper.c          |   5 +-
+ target/i386/kvm.c             | 183 ++++++++++++++++-
+ tests/Makefile.include        |  12 +-
+ tests/docker/test-clang       |   4 +-
+ tests/docker/test-debug       |   1 +
+ tests/migration-test.c        | 157 +++++++++++++--
+ tests/test-char.c             |   4 +-
+ util/async.c                  |   6 +-
+ util/oslib-win32.c            |   6 +-
+ 40 files changed, 1050 insertions(+), 248 deletions(-)
+-- 
+1.8.3.1
+
 
