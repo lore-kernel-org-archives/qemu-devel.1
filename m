@@ -2,58 +2,51 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D722C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 08:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EBBAC35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 08:38:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6120D21783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 08:27:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6120D21783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4320B206C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 08:38:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4320B206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFZyt-0003O7-J9
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 04:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37028)
+	id 1iFa9p-00060A-AR
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 04:38:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38389)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iFZy8-0002vs-4K
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:26:45 -0400
+ (envelope-from <w.bumiller@proxmox.com>) id 1iFa8q-0005MH-EF
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:37:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iFZy7-0002zx-48
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:26:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33816)
+ (envelope-from <w.bumiller@proxmox.com>) id 1iFa8p-0005u6-5H
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 04:37:48 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:41519)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iFZy6-0002zg-VV; Wed, 02 Oct 2019 04:26:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2B0B230860B5;
- Wed,  2 Oct 2019 08:26:42 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-58.ams2.redhat.com [10.36.117.58])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A089C5D9D6;
- Wed,  2 Oct 2019 08:26:37 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
+ (Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
+ id 1iFa8o-0005tj-Ue; Wed, 02 Oct 2019 04:37:47 -0400
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 4187C468A7;
+ Wed,  2 Oct 2019 10:30:04 +0200 (CEST)
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2] s390x/tcg: MVCL: Exit to main loop if requested
-Date: Wed,  2 Oct 2019 10:26:36 +0200
-Message-Id: <20191002082636.7739-1-david@redhat.com>
+Subject: [PATCH] monitor/qmp: resume monitor when clearing its queue
+Date: Wed,  2 Oct 2019 10:30:03 +0200
+Message-Id: <20191002083003.21556-1-w.bumiller@proxmox.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 02 Oct 2019 08:26:42 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 212.186.127.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,68 +58,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MVCL is interruptible and we should check for interrupts and process
-them after writing back the variables to the registers. Let's check
-for any exit requests and exit to the main loop.
+When a monitor's queue is filled up in handle_qmp_command()
+it gets suspended. It's the dispatcher bh's job currently to
+resume the monitor, which it does after processing an event
+from the queue. However, it is possible for a
+CHR_EVENT_CLOSED event to be processed before before the bh
+is scheduled, which will clear the queue without resuming
+the monitor, thereby preventing the dispatcher from reaching
+the resume() call.
+Fix this by resuming the monitor when clearing a queue which
+was filled up.
 
-When booting Fedora 30, I can see a handful of these exits and it seems
-to work reliable. (it never get's triggered via EXECUTE, though)
-
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
 ---
+@Michael, we ran into this with qemu 4.0, so if the logic in this patch
+is correct it may make sense to include it in the 4.0.1 roundup.
+A backport is at [1] as 4.0 was before the monitor/ dir split.
 
-v1 -> v2:
-- Check only if icount_decr.u32 < 0
-- Drop should_interrupt_instruction() and perform the check inline
-- Rephrase comment, subject, and description
+[1] https://gitlab.com/wbumiller/qemu/commit/9d8bbb5294ed084f282174b0c91e=
+1a614e0a0714
 
----
- target/s390x/mem_helper.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ monitor/qmp.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 4254548935..87e4ebd169 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1015,6 +1015,7 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t =
-r1, uint32_t r2)
-     uint64_t srclen =3D env->regs[r2 + 1] & 0xffffff;
-     uint64_t src =3D get_address(env, r2);
-     uint8_t pad =3D env->regs[r2 + 1] >> 24;
-+    CPUState *cs =3D env_cpu(env);
-     S390Access srca, desta;
-     uint32_t cc, cur_len;
-=20
-@@ -1065,7 +1066,14 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t=
- r1, uint32_t r2)
-         env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destle=
-n);
-         set_address_zero(env, r1, dest);
-=20
--        /* TODO: Deliver interrupts. */
-+        /*
-+         * MVCL is interruptible. Check if somebody (e.g., cpu_interrupt=
-() or
-+         * cpu_exit()) asked us to return to the main loop. In case ther=
-e is
-+         * no deliverable interrupt, we'll end up back in this handler.
-+         */
-+        if (unlikely((int32_t)atomic_read(&cpu_neg(cs)->icount_decr.u32)=
- < 0)) {
-+            cpu_loop_exit_restore(cs, ra);
-+        }
+diff --git a/monitor/qmp.c b/monitor/qmp.c
+index 9d9e5d8b27..c1db5bf940 100644
+--- a/monitor/qmp.c
++++ b/monitor/qmp.c
+@@ -70,9 +70,19 @@ static void qmp_request_free(QMPRequest *req)
+ /* Caller must hold mon->qmp.qmp_queue_lock */
+ static void monitor_qmp_cleanup_req_queue_locked(MonitorQMP *mon)
+ {
++    bool need_resume =3D (!qmp_oob_enabled(mon) && mon->qmp_requests->le=
+ngth > 0)
++        || mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX;
+     while (!g_queue_is_empty(mon->qmp_requests)) {
+         qmp_request_free(g_queue_pop_head(mon->qmp_requests));
      }
-     return cc;
++    if (need_resume) {
++        /*
++         * Pairs with the monitor_suspend() in handle_qmp_command() in c=
+ase the
++         * queue gets cleared from a CH_EVENT_CLOSED event before the di=
+spatch
++         * bh got scheduled.
++         */
++        monitor_resume(&mon->common);
++    }
  }
+=20
+ static void monitor_qmp_cleanup_queues(MonitorQMP *mon)
 --=20
-2.21.0
+2.20.1
+
 
 
