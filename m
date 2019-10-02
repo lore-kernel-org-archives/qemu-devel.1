@@ -2,82 +2,68 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2809C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB42C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:44:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C84A621783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:39:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C84A621783
+	by mail.kernel.org (Postfix) with ESMTPS id 00C9C21783
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:44:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00C9C21783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFeqf-0002hP-Oe
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 09:39:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58269)
+	id 1iFevY-0005nd-2p
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 09:44:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iFepR-0001Yr-NH
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:38:06 -0400
+ (envelope-from <pkrempa@redhat.com>) id 1iFeuo-0005B6-U7
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iFepQ-0005FW-QW
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:38:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41938)
+ (envelope-from <pkrempa@redhat.com>) id 1iFeun-0007Xg-Ix
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:43:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46216)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iFepQ-0005F3-I0
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:38:04 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>)
+ id 1iFeui-0007Vj-Vp; Wed, 02 Oct 2019 09:43:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9786C85543
- for <qemu-devel@nongnu.org>; Wed,  2 Oct 2019 13:38:03 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id f63so2102150wma.7
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 06:38:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=upaONc1tg8FH/B+Hq5snypMNaYk/YaDs6TBwQMCMyJQ=;
- b=b4lvdrSCxc6TtqpnfLwXfS21bbnVqzdYCm1fgEMkLV+HB/KleZM9uQLrLNAYcIlNSJ
- B1oRzkSzD05gl/oe8s/od9rZ+Pt59BWjE3/KhtkO2UOexqWypfs/T/An1drOC0VfJeZK
- u4VmojbcZg4vtvnVlS1DQHufIkZL/qEm5nojl1DxoWCY6N9n2+3td/BzLfHIqTJ2DCcO
- OxV+ggcTrdtztKCR6cyq/MsNBkiH4MUF5Njvc16LRqZgzdr38LktAj/VRQXfw9KR3PPi
- hDPktctZIAZw9Ho6kobEF4u822cDzGYup8/zF2ei/Vo9l8vNhElrhuV0CpgWntbSRsI3
- vb2g==
-X-Gm-Message-State: APjAAAXGixTHyRdaP2K504hhpmaHxWU/9gkakw8cXh0FIU4Jjq5eTwtj
- hz96neE1C23JftMHtGiZmhZ1RZi5a+MOyM1X2wpTbIdRo08mvVO6eBvF8ExJkLgjQ15Aa+0BbmY
- kE6BR1wAXm8Ios/Q=
-X-Received: by 2002:a5d:4f11:: with SMTP id c17mr2941743wru.227.1570023482266; 
- Wed, 02 Oct 2019 06:38:02 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwAMLFio/Oh6G3FlBWgyZ+7aPkwl2MZYgpfZ1sLvv8d3IZsr83SEPGTdRuaZckyqL5K3rzBXA==
-X-Received: by 2002:a5d:4f11:: with SMTP id c17mr2941708wru.227.1570023482039; 
- Wed, 02 Oct 2019 06:38:02 -0700 (PDT)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id c8sm15966321wrr.49.2019.10.02.06.38.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Oct 2019 06:38:01 -0700 (PDT)
-References: <20191002113103.45023-1-slp@redhat.com>
- <20191002113103.45023-10-slp@redhat.com>
- <f604f346-b799-4465-d5ed-0a0f6ff719cd@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v5 09/10] docs/microvm.rst: document the new microvm
- machine type
-In-reply-to: <f604f346-b799-4465-d5ed-0a0f6ff719cd@redhat.com>
-Date: Wed, 02 Oct 2019 15:37:59 +0200
-Message-ID: <87zhijfetk.fsf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 31B70307D989;
+ Wed,  2 Oct 2019 13:43:31 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.43.2.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 333045D721;
+ Wed,  2 Oct 2019 13:43:25 +0000 (UTC)
+Date: Wed, 2 Oct 2019 15:43:23 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: bitmap migration bug with -drive while block mirror runs
+Message-ID: <20191002134323.GE6129@angien.pipo.sk>
+References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
+ <d897c755-40e7-6392-23e3-c06b1a371f28@virtuozzo.com>
+ <4bc910ef-0bec-cfd6-89f6-a93d35367218@redhat.com>
+ <9431d242-bfe1-b9db-17d0-6c1a280a05da@virtuozzo.com>
+ <e112c85a-684f-5721-2da7-d23312c9e487@redhat.com>
+ <20191002104600.GC6129@angien.pipo.sk>
+ <20191002111147.GB5819@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191002111147.GB5819@localhost.localdomain>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 02 Oct 2019 13:43:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -92,54 +78,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, lersek@redhat.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, imammedo@redhat.com,
- sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
+On Wed, Oct 02, 2019 at 13:11:47 +0200, Kevin Wolf wrote:
+> Am 02.10.2019 um 12:46 hat Peter Krempa geschrieben:
+
+[...]
+
+> > I'd like to re-iterate that the necessity to keep node names same on
+> > both sides of migration is unexpected, undocumented and in some cases
+> > impossible.
+>=20
+> I think the (implicitly made) requirement is not that all node-names are
+> kept the same, but only the node-names of those nodes for which
+> migration transfers some state.
+
+[1] This also implies that node names of the nodes where migration should
+not transfer state must be unique on the both sides since you can't
+control it otherwise.
+
+> It seems to me that bitmap migration is the first case of putting
+> something in the migration stream that isn't related to a frontend, but
+> to the backend, so the usual device hierarchy to address information
+> doesn't work here. And it seems the implications of this weren't really
+> considered sufficiently, resulting in the design problem we're
+> discussing now.
+
+This should then also be a moment to carefully think about the
+semantics of migrating data for backends which don't need to be
+identical on both sides of the migration for the VM to work correctly.
+
+I think that any feature which touches backends should ideally be an
+opt-in. This would call for a explicit action to use it which would also
+allow management apps to consider expectations and implications of
+enabling it rather than doing it automatically. One possibility would be
+also to make it introspectable in such a way that it can be made opt-in
+by disabling all unknown features programatically in the mgmt app.
+
+In case of migration of bitmaps if node-names are going to be used for
+the matching, it can have interresting consequences (such as matching
+wrong ones if they don't match) and thus the feature should be used
+knowingly.
+
+> What we need to transfer is dirty bitmaps, which can be attached to any
+> node in the block graph. If we accept that the way to transfer this is
+> the migration stream, we need a way to tell which bitmap belongs to
+> which node. Matching node-name is the obvious answer, just like a
+> matching device tree hierarchy is used for frontends.
 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> On 02/10/19 13:31, Sergio Lopez wrote:
->> +- LAPIC (in userspace by default)
->
-> Note that LAPIC should be in kernel by default.  The userspace LAPIC is
-> slow (cannot use APIC virtualization in recent Intel and AMD processors)
-> and probably somewhat buggy.
+> If we don't want to use the migration stream for backends, we would need
+> to find another way to transfer the bitmaps. I would welcome removing
+> backend data from the migration stream, but if this includes
+> non-persistent bitmaps, I don't see what the alternative could be.
+>=20
+> > If you want to mandate that they must be kept the same please document
+> > it and also note the following:
+> >=20
+> > - during migrations the storage layout may change e.g. a backing chain
+> >   may become flattened, thus keeping node names stable beyond the top
+> >   layer is impossible
+>=20
+> You don't want to transfer bitmaps of nodes that you're going to drop.
+> I'm not an expert for these bitmaps, but I think this just means you
+> would have to disable any bitmaps on the backing files to be dropped on
+> the source host before you migrate.
 
-Thanks for catching this. It's a copy/paste bug in the doc. The default
-mode is irqchip_split = true, so the LAPIC is in the kernel and the
-IOAPIC in userspace. I'll fix it.
+Well it depends actually on what's happening. In some cases we use a
+drive/blockdev-mirror to transfer the image if it's non-shared which
+also by default flattens the backing chain. In such case you still might
+want to transfer the bitmaps over and merge them during migration so
+that backups can be taken despite the chain being flattened. In this
+case we still want to use the bitmap on the destination with all new
+changes merged in, but it must also allow the NBD server.
 
-Cheers,
-Sergio.
+> > - in some cases (readonly image in a cdrom not present on destination,
+> >   thus not relevant here probably) it may even become impossible to
+> >   create any node thus keeping the top node may be impossible
+>=20
+> Same thing, you don't want to transfer a bitmap for a node that
+> disappears.
 
->> +- IOAPIC (in userspace by default)
+[1]
 
+> > - it should be documented when and why this happens and how management
+> >   tools are supposed to do it
+> >=20
+> > - please let me know what's actually expected, since libvirt
+> >   didn't enable blockdev yet we can fix any unexpected expectations
+> >=20
+> > - Document it so that the expectations don't change after this.
+>=20
+> Yes, we need a good and ideally future-proof rule of which node-names
+> need to stay the same. Currently it's only bitmaps, but might we get
+> another feature later where we want to transfer more backend data?
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+As I've said above, ideally anything like that will be an explicit
+opt-in so that we can actually make sure that it's doing the right thing
+if the user reconfigures the storage backends at the destination of
+migration.
 
------BEGIN PGP SIGNATURE-----
+> > - Ideally node names will not be bound to anything and freely
+> >   changeable. If necessary we can provide a map to qemu during migration
+> >   which is probably less painful and more straightforward than keeping
+> >   them in sync somehow ...
+>=20
+> A map feels painful for the average user (and for the QEMU
+> implementation), even if it looks convenient for libvirt. If anything,
+> I'd make it optional and default to 1:1 mappings for anything that isn't
+> explicitly mapped.
 
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2UqDcACgkQ9GknjS8M
-AjWGfhAAnl4q088wKEq4zZ4Apxr9anmxNI6QnLBhH0QmzIHlC4CaeiB4aT2+7gD5
-YWbDKPeQR/+xndqmYueWmHgxDETS0ho0J7IEWj7xZgcx8h/+RCo9w509Onx4dtkx
-HhdQsDmaMLfJ6rFKHDaTm8Uw8dVrGtUiaDvGKuGwPoj5wdIx/iFVhQSvsV2fhacW
-bzEWLcSOovB6IZ2LSHJn/m4JYQ4I4MI9EYHhvW+pND85iVsQ2EauKC8of+3GXlef
-p/dk9olMDwPahge4CVaYzM2P9fyZYTZ5MX1YbMTV7U3x7X0HGICrzXNm1552qGnp
-0ZF7FeBN+MNLonCj+JIXdL/m0qsyECwFxA8AgtKLps4V1zjnPRNgiJZgzX5i8Q8D
-vISXtXbp7hBKUiqCrPLoSwO6SSaG7NjJBYMG/MNExY1gl5ZxyLamvaxoyB9b/KXk
-RLna/ZtR8oSP89zUXhQEpWTM3jahFNmZRZ3nkGxpJ88qC1BTWvfu4V1Ou5D/Rm73
-kcco0HIQS1mOQSDfMUN2kHbE5crGwENuMVYYUuVu4Mc7w6xrDz+Jxg321kyKcdN8
-CoetqgKWGhplVT50nXDqW7eFuW7V7l4JmPy6+1nYcY+nAXoJCI+lsS/ElZCU5ZXj
-1IGBl8gL+oHB8tYFYp7gg0nBiZXJzMeNxRNOHVQRhB2m84HXydk=
-=MEZr
------END PGP SIGNATURE-----
---=-=-=--
+Well, without an explicit map the above cases (drop the bitmaps if the
+destination does not have the corresponding image) become hard to tell
+apart from failures. That will mean that any missing mapping will be
+ignored and on any wrong configuration bitmaps just vanish rather than
+reporting error.
 
