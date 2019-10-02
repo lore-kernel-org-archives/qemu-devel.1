@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8051C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 03:14:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A32C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 03:14:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 771CB20842
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 03:14:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42A9B20842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 03:14:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hY4sO15w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 771CB20842
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k+PiJ7Qq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42A9B20842
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFV5f-0005m0-V3
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 23:14:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59875)
+	id 1iFV5l-0005zp-Ua
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 23:14:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFUko-0001fY-PG
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:52:42 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFUkl-0002ux-93
+ (envelope-from <dgibson@ozlabs.org>) id 1iFUkk-0001ah-Te
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:52:38 -0400
-Received: from ozlabs.org ([203.11.71.1]:59505)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1iFUki-0002ov-8N
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:52:34 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:41973)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFUkk-0002pE-HN; Tue, 01 Oct 2019 22:52:34 -0400
+ id 1iFUkh-0002md-NJ; Tue, 01 Oct 2019 22:52:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46jgf76vRfz9sRH; Wed,  2 Oct 2019 12:52:15 +1000 (AEST)
+ id 46jgf74Wczz9sR7; Wed,  2 Oct 2019 12:52:15 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1569984735;
- bh=DQmngEMiivkphtE6NW57+oUk3GSNufbe24fbel5QQ2E=;
+ bh=AJiJdvQQRtY3xCC+8NIaQB+q5QY2SYMofAFjSwQ8Fag=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=hY4sO15wgm9UmiXo6hbGZsTEG381n4/4Mz/VDt4uHgV+n+3DWGcS/MyypjvTN1/hI
- TgZLSrh+Vr3pLd56jP61Y4kY8iSb+PDJSeccf876k4IiL/vIwz/md6DUlrF3VQlRZv
- yxDrW5amWpjoy/w2wkuqaypLijKrFpxdM5WHVjw8=
+ b=k+PiJ7QqWIpuLV0ecI8O9nDDllFYIvSovVE3ofotHRQXFxHFW2MlNTR0YclCmCT8L
+ LvQ8XiifIbMXnBCsKwNqK9BEcpsMcZsLAaTEgXjiH+FFwBTZUNExHY2BONJJTIIV6G
+ BKFwFpYv/PpQFPUwS9kjQPVq0bftUAlfqOjSW8X8=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org,
 	clg@kaod.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v3 14/34] spapr: Remove unhelpful tracepoints from
- spapr_irq_free_xics()
-Date: Wed,  2 Oct 2019 12:51:48 +1000
-Message-Id: <20191002025208.3487-15-david@gibson.dropbear.id.au>
+Subject: [PATCH v3 10/34] spapr: Eliminate nr_irqs parameter to SpaprIrq::init
+Date: Wed,  2 Oct 2019 12:51:44 +1000
+Message-Id: <20191002025208.3487-11-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191002025208.3487-1-david@gibson.dropbear.id.au>
 References: <20191002025208.3487-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,58 +80,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These traces contain some useless information (the always-0 source#) and
-have no equivalents for XIVE mode.  For now just remove them, and we can
-put back something more sensible if and when we need it.
+The only reason this parameter was needed was to work around the
+inconsistent meaning of nr_irqs between xics and xive.  Now that we've
+fixed that, we can consistently use the number directly in the SpaprIrq
+configuration.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/ppc/spapr_irq.c  | 4 ----
- hw/ppc/trace-events | 4 ----
- 2 files changed, 8 deletions(-)
+ hw/ppc/spapr_irq.c         | 21 ++++++++++-----------
+ include/hw/ppc/spapr_irq.h |  2 +-
+ 2 files changed, 11 insertions(+), 12 deletions(-)
 
 diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index ec2229d2d1..9919910a86 100644
+index 3207b6bd01..cded3a0154 100644
 --- a/hw/ppc/spapr_irq.c
 +++ b/hw/ppc/spapr_irq.c
-@@ -140,11 +140,7 @@ static void spapr_irq_free_xics(SpaprMachineState *s=
-papr, int irq, int num)
+@@ -92,8 +92,7 @@ static void spapr_irq_init_kvm(SpaprMachineState *spapr=
+,
+  * XICS IRQ backend.
+  */
+=20
+-static void spapr_irq_init_xics(SpaprMachineState *spapr, int nr_xirqs,
+-                                Error **errp)
++static void spapr_irq_init_xics(SpaprMachineState *spapr, Error **errp)
+ {
+     Object *obj;
+     Error *local_err =3D NULL;
+@@ -102,7 +101,8 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
+apr, int nr_xirqs,
+     object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
+     object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+                                    &error_fatal);
+-    object_property_set_int(obj, nr_xirqs, "nr-irqs",  &error_fatal);
++    object_property_set_int(obj, spapr->irq->nr_xirqs,
++                            "nr-irqs",  &error_fatal);
+     object_property_set_bool(obj, true, "realized", &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+@@ -256,15 +256,15 @@ SpaprIrq spapr_irq_xics =3D {
+ /*
+  * XIVE IRQ backend.
+  */
+-static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_xirqs,
+-                                Error **errp)
++static void spapr_irq_init_xive(SpaprMachineState *spapr, Error **errp)
+ {
+     uint32_t nr_servers =3D spapr_max_server_number(spapr);
+     DeviceState *dev;
      int i;
 =20
-     if (ics_valid_irq(ics, irq)) {
--        trace_spapr_irq_free(0, irq, num);
-         for (i =3D srcno; i < srcno + num; ++i) {
--            if (ics_irq_free(ics, i)) {
--                trace_spapr_irq_free_warn(0, i);
--            }
-             memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
-         }
-     }
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 96dad767a1..9ea620f23c 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -13,10 +13,6 @@ spapr_pci_msi_retry(unsigned config_addr, unsigned req=
-_num, unsigned max_irqs) "
- spapr_cas_failed(unsigned long n) "DT diff buffer is too small: %ld byte=
-s"
- spapr_cas_continue(unsigned long n) "Copy changes to the guest: %ld byte=
-s"
+     dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+-    qdev_prop_set_uint32(dev, "nr-irqs", nr_xirqs + SPAPR_XIRQ_BASE);
++    qdev_prop_set_uint32(dev, "nr-irqs",
++                         spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
+     /*
+      * 8 XIVE END structures per CPU. One for each available priority
+      */
+@@ -438,18 +438,17 @@ static SpaprIrq *spapr_irq_current(SpaprMachineStat=
+e *spapr)
+         &spapr_irq_xive : &spapr_irq_xics;
+ }
 =20
--# spapr_irq.c
--spapr_irq_free(int src, int irq, int num) "Source#%d, first irq %d, %d i=
-rqs"
--spapr_irq_free_warn(int src, int irq) "Source#%d, irq %d is already free=
-"
--
- # spapr_hcall.c
- spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "=
-current=3D0x%x, explicit_match=3D%u, new=3D0x%x"
- spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=3D0x%"=
-PRIx64", shift=3D%"PRIu64
+-static void spapr_irq_init_dual(SpaprMachineState *spapr, int nr_xirqs,
+-                                Error **errp)
++static void spapr_irq_init_dual(SpaprMachineState *spapr, Error **errp)
+ {
+     Error *local_err =3D NULL;
+=20
+-    spapr_irq_xics.init(spapr, spapr_irq_xics.nr_xirqs, &local_err);
++    spapr_irq_xics.init(spapr, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+     }
+=20
+-    spapr_irq_xive.init(spapr, spapr_irq_xive.nr_xirqs, &local_err);
++    spapr_irq_xive.init(spapr, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -678,7 +677,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error *=
+*errp)
+         spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
+     }
+=20
+-    spapr->irq->init(spapr, spapr->irq->nr_xirqs, errp);
++    spapr->irq->init(spapr, errp);
+=20
+     spapr->qirqs =3D qemu_allocate_irqs(spapr->irq->set_irq, spapr,
+                                       spapr->irq->nr_xirqs + SPAPR_XIRQ_=
+BASE);
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index a8f9a2ab11..7e26288fcd 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -41,7 +41,7 @@ typedef struct SpaprIrq {
+     uint32_t    nr_msis;
+     uint8_t     ov5;
+=20
+-    void (*init)(SpaprMachineState *spapr, int nr_irqs, Error **errp);
++    void (*init)(SpaprMachineState *spapr, Error **errp);
+     int (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error **er=
+rp);
+     void (*free)(SpaprMachineState *spapr, int irq, int num);
+     qemu_irq (*qirq)(SpaprMachineState *spapr, int irq);
 --=20
 2.21.0
 
