@@ -2,61 +2,66 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2478CC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1DFC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:25:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D687220842
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:20:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D687220842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F6C920842
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:25:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F6C920842
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFUFO-0007VI-3A
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:20:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46929)
+	id 1iFUKM-00020f-5x
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:25:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iFS0o-0001RZ-6L
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:57:00 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iFUJQ-0001XD-4D
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:24:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iFS0l-0002vJ-Gt
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:56:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40988)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iFS0f-0002kD-Jg; Tue, 01 Oct 2019 19:56:49 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 35E1F18CB8E6;
- Tue,  1 Oct 2019 23:56:48 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6170760BE0;
- Tue,  1 Oct 2019 23:56:46 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 8/8] hd-geo-test: Add tests for lchs override
-Date: Tue,  1 Oct 2019 19:55:52 -0400
-Message-Id: <20191001235552.17790-9-jsnow@redhat.com>
-In-Reply-To: <20191001235552.17790-1-jsnow@redhat.com>
-References: <20191001235552.17790-1-jsnow@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iFUJO-0005QF-77
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:24:19 -0400
+Resent-Date: Tue, 01 Oct 2019 22:24:19 -0400
+Resent-Message-Id: <E1iFUJO-0005QF-77@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21414)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iFUJN-0005Mi-Gk; Tue, 01 Oct 2019 22:24:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1569983032; cv=none; d=zoho.com; s=zohoarc; 
+ b=FCSMc46v2jQd3j+cRht12HUt7MP0hpNSv9hoObnh+swL6UedRBQfJKYgNlBdGkdf++wh2NupYzLLlcwvrX2Vlh3imMIqbnfcWv+iI4izBpO4XGbrAy8JwL3RitoYnPoAO4JntiIsiWcYdFRs0mIM75GXodWTlsrNYY4BGA4tfm8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1569983032;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=EBOLe3v2tu4uWMg9XpFPgGT2B5A8ftfgqPSKkG7HiEs=; 
+ b=HrvLY1biwvMwrN0tzNtjTfQO1pqy02YcUsi2vhy1mnoCGezUxFMaybndpC8XykBK6Rnn8n2NafCQo0YjVsvkDqmZuDZJyt+vXfV/jjWsHyAe1XpncY0/lTPuWWmHWzyUkZLjh4rqHRnvprbX6kzUoqFkq97L6OaP3L1L2gjeeYM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1569983029937772.810819090622;
+ Tue, 1 Oct 2019 19:23:49 -0700 (PDT)
+Subject: Re: [PATCH 0/6] qcow2: advanced compression options
+In-Reply-To: <1569958040-697220-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Message-ID: <156998302778.27524.10178584773785001083@8230166b0665>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Tue, 01 Oct 2019 23:56:48 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: andrey.shinkevich@virtuozzo.com
+Date: Tue, 1 Oct 2019 19:23:49 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,696 +73,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Arbel Moshe <arbel.moshe@oracle.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>, "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Sam Eiderman <shmuel.eiderman@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Karl Heubaum <karl.heubaum@oracle.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, andrey.shinkevich@virtuozzo.com,
+ mreitz@redhat.com, jsnow@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-
-Add QTest tests to check the logical geometry override option.
-
-The tests in hd-geo-test are out of date - they only test IDE and do not
-test interesting MBRs.
-
-I added a few helper functions which will make adding more tests easier.
-
-QTest's fw_cfg helper functions support only legacy fw_cfg, so I had to
-read the new fw_cfg layout on my own.
-
-Creating qcow2 disks with specific size and MBR layout is currently
-unused - we only use a default empty MBR.
-
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-id: 20190925110639.100699-9-sameid@google.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/hd-geo-test.c    | 589 +++++++++++++++++++++++++++++++++++++++++
- tests/Makefile.include |   2 +-
- 2 files changed, 590 insertions(+), 1 deletion(-)
-
-diff --git a/tests/hd-geo-test.c b/tests/hd-geo-test.c
-index 62eb624726..458de99c31 100644
---- a/tests/hd-geo-test.c
-+++ b/tests/hd-geo-test.c
-@@ -17,7 +17,12 @@
-=20
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-+#include "qemu/bswap.h"
-+#include "qapi/qmp/qlist.h"
- #include "libqtest.h"
-+#include "libqos/fw_cfg.h"
-+#include "libqos/libqos.h"
-+#include "standard-headers/linux/qemu_fw_cfg.h"
-=20
- #define ARGV_SIZE 256
-=20
-@@ -388,6 +393,575 @@ static void test_ide_drive_cd_0(void)
-     qtest_quit(qts);
- }
-=20
-+typedef struct {
-+    bool active;
-+    uint32_t head;
-+    uint32_t sector;
-+    uint32_t cyl;
-+    uint32_t end_head;
-+    uint32_t end_sector;
-+    uint32_t end_cyl;
-+    uint32_t start_sect;
-+    uint32_t nr_sects;
-+} MBRpartitions[4];
-+
-+static MBRpartitions empty_mbr =3D { {false, 0, 0, 0, 0, 0, 0, 0, 0},
-+                                   {false, 0, 0, 0, 0, 0, 0, 0, 0},
-+                                   {false, 0, 0, 0, 0, 0, 0, 0, 0},
-+                                   {false, 0, 0, 0, 0, 0, 0, 0, 0} };
-+
-+static char *create_qcow2_with_mbr(MBRpartitions mbr, uint64_t sectors)
-+{
-+    const char *template =3D "/tmp/qtest.XXXXXX";
-+    char *raw_path =3D strdup(template);
-+    char *qcow2_path =3D strdup(template);
-+    char cmd[100 + 2 * PATH_MAX];
-+    uint8_t buf[512];
-+    int i, ret, fd, offset;
-+    uint64_t qcow2_size =3D sectors * 512;
-+    uint8_t status, parttype, head, sector, cyl;
-+    char *qemu_img_path;
-+    char *qemu_img_abs_path;
-+
-+    offset =3D 0xbe;
-+
-+    for (i =3D 0; i < 4; i++) {
-+        status =3D mbr[i].active ? 0x80 : 0x00;
-+        g_assert(mbr[i].head < 256);
-+        g_assert(mbr[i].sector < 64);
-+        g_assert(mbr[i].cyl < 1024);
-+        head =3D mbr[i].head;
-+        sector =3D mbr[i].sector + ((mbr[i].cyl & 0x300) >> 2);
-+        cyl =3D mbr[i].cyl & 0xff;
-+
-+        buf[offset + 0x0] =3D status;
-+        buf[offset + 0x1] =3D head;
-+        buf[offset + 0x2] =3D sector;
-+        buf[offset + 0x3] =3D cyl;
-+
-+        parttype =3D 0;
-+        g_assert(mbr[i].end_head < 256);
-+        g_assert(mbr[i].end_sector < 64);
-+        g_assert(mbr[i].end_cyl < 1024);
-+        head =3D mbr[i].end_head;
-+        sector =3D mbr[i].end_sector + ((mbr[i].end_cyl & 0x300) >> 2);
-+        cyl =3D mbr[i].end_cyl & 0xff;
-+
-+        buf[offset + 0x4] =3D parttype;
-+        buf[offset + 0x5] =3D head;
-+        buf[offset + 0x6] =3D sector;
-+        buf[offset + 0x7] =3D cyl;
-+
-+        (*(uint32_t *)&buf[offset + 0x8]) =3D cpu_to_le32(mbr[i].start_s=
-ect);
-+        (*(uint32_t *)&buf[offset + 0xc]) =3D cpu_to_le32(mbr[i].nr_sect=
-s);
-+
-+        offset +=3D 0x10;
-+    }
-+
-+    fd =3D mkstemp(raw_path);
-+    g_assert(fd);
-+    close(fd);
-+
-+    fd =3D open(raw_path, O_WRONLY);
-+    g_assert(fd >=3D 0);
-+    ret =3D write(fd, buf, sizeof(buf));
-+    g_assert(ret =3D=3D sizeof(buf));
-+    close(fd);
-+
-+    fd =3D mkstemp(qcow2_path);
-+    g_assert(fd);
-+    close(fd);
-+
-+    qemu_img_path =3D getenv("QTEST_QEMU_IMG");
-+    g_assert(qemu_img_path);
-+    qemu_img_abs_path =3D realpath(qemu_img_path, NULL);
-+    g_assert(qemu_img_abs_path);
-+
-+    ret =3D snprintf(cmd, sizeof(cmd),
-+                   "%s convert -f raw -O qcow2 %s %s > /dev/null",
-+                   qemu_img_abs_path,
-+                   raw_path, qcow2_path);
-+    g_assert((0 < ret) && (ret <=3D sizeof(cmd)));
-+    ret =3D system(cmd);
-+    g_assert(ret =3D=3D 0);
-+
-+    ret =3D snprintf(cmd, sizeof(cmd),
-+                   "%s resize %s %" PRIu64 " > /dev/null",
-+                   qemu_img_abs_path,
-+                   qcow2_path, qcow2_size);
-+    g_assert((0 < ret) && (ret <=3D sizeof(cmd)));
-+    ret =3D system(cmd);
-+    g_assert(ret =3D=3D 0);
-+
-+    free(qemu_img_abs_path);
-+
-+    unlink(raw_path);
-+    free(raw_path);
-+
-+    return qcow2_path;
-+}
-+
-+struct QemuCfgFile {
-+    uint32_t  size;        /* file size */
-+    uint16_t  select;      /* write this to 0x510 to read it */
-+    uint16_t  reserved;
-+    char name[56];
-+};
-+
-+static uint16_t find_fw_cfg_file(QFWCFG *fw_cfg,
-+                                 const char *filename)
-+{
-+    struct QemuCfgFile qfile;
-+    uint32_t count, e;
-+    uint16_t select;
-+
-+    count =3D qfw_cfg_get_u32(fw_cfg, FW_CFG_FILE_DIR);
-+    count =3D be32_to_cpu(count);
-+    for (select =3D 0, e =3D 0; e < count; e++) {
-+        qfw_cfg_read_data(fw_cfg, &qfile, sizeof(qfile));
-+        if (!strcmp(filename, qfile.name)) {
-+            select =3D be16_to_cpu(qfile.select);
-+        }
-+    }
-+
-+    return select;
-+}
-+
-+static void read_fw_cfg_file(QFWCFG *fw_cfg,
-+                             const char *filename,
-+                             void *data,
-+                             size_t len)
-+{
-+    uint16_t select =3D find_fw_cfg_file(fw_cfg, filename);
-+
-+    g_assert(select);
-+
-+    qfw_cfg_get(fw_cfg, select, data, len);
-+}
-+
-+#define BIOS_GEOMETRY_MAX_SIZE 10000
-+
-+typedef struct {
-+    uint32_t c;
-+    uint32_t h;
-+    uint32_t s;
-+} CHS;
-+
-+typedef struct {
-+    const char *dev_path;
-+    CHS chs;
-+} CHSResult;
-+
-+static void read_bootdevices(QFWCFG *fw_cfg, CHSResult expected[])
-+{
-+    char *buf =3D g_malloc0(BIOS_GEOMETRY_MAX_SIZE);
-+    char *cur;
-+    GList *results =3D NULL, *cur_result;
-+    CHSResult *r;
-+    int i;
-+    int res;
-+    bool found;
-+
-+    read_fw_cfg_file(fw_cfg, "bios-geometry", buf, BIOS_GEOMETRY_MAX_SIZ=
-E);
-+
-+    for (cur =3D buf; *cur; cur++) {
-+        if (*cur =3D=3D '\n') {
-+            *cur =3D '\0';
-+        }
-+    }
-+    cur =3D buf;
-+
-+    while (strlen(cur)) {
-+
-+        r =3D g_malloc0(sizeof(*r));
-+        r->dev_path =3D g_malloc0(strlen(cur) + 1);
-+        res =3D sscanf(cur, "%s %" PRIu32 " %" PRIu32 " %" PRIu32,
-+                     (char *)r->dev_path,
-+                     &(r->chs.c), &(r->chs.h), &(r->chs.s));
-+
-+        g_assert(res =3D=3D 4);
-+
-+        results =3D g_list_prepend(results, r);
-+
-+        cur +=3D strlen(cur) + 1;
-+    }
-+
-+    i =3D 0;
-+
-+    while (expected[i].dev_path) {
-+        found =3D false;
-+        cur_result =3D results;
-+        while (cur_result) {
-+            r =3D cur_result->data;
-+            if (!strcmp(r->dev_path, expected[i].dev_path) &&
-+                !memcmp(&(r->chs), &(expected[i].chs), sizeof(r->chs))) =
-{
-+                found =3D true;
-+                break;
-+            }
-+            cur_result =3D g_list_next(cur_result);
-+        }
-+        g_assert(found);
-+        g_free((char *)((CHSResult *)cur_result->data)->dev_path);
-+        g_free(cur_result->data);
-+        results =3D g_list_delete_link(results, cur_result);
-+        i++;
-+    }
-+
-+    g_assert(results =3D=3D NULL);
-+
-+    g_free(buf);
-+}
-+
-+#define MAX_DRIVES 30
-+
-+typedef struct {
-+    char **argv;
-+    int argc;
-+    char **drives;
-+    int n_drives;
-+    int n_scsi_disks;
-+    int n_scsi_controllers;
-+    int n_virtio_disks;
-+} TestArgs;
-+
-+static TestArgs *create_args(void)
-+{
-+    TestArgs *args =3D g_malloc0(sizeof(*args));
-+    args->argv =3D g_new0(char *, ARGV_SIZE);
-+    args->argc =3D append_arg(args->argc, args->argv,
-+                            ARGV_SIZE, g_strdup("-nodefaults"));
-+    args->drives =3D g_new0(char *, MAX_DRIVES);
-+    return args;
-+}
-+
-+static void add_drive_with_mbr(TestArgs *args,
-+                               MBRpartitions mbr, uint64_t sectors)
-+{
-+    char *img_file_name;
-+    char part[300];
-+    int ret;
-+
-+    g_assert(args->n_drives < MAX_DRIVES);
-+
-+    img_file_name =3D create_qcow2_with_mbr(mbr, sectors);
-+
-+    args->drives[args->n_drives] =3D img_file_name;
-+    ret =3D snprintf(part, sizeof(part),
-+                   "-drive file=3D%s,if=3Dnone,format=3Dqcow2,id=3Ddisk%=
-d",
-+                   img_file_name, args->n_drives);
-+    g_assert((0 < ret) && (ret <=3D sizeof(part)));
-+    args->argc =3D append_arg(args->argc, args->argv, ARGV_SIZE, g_strdu=
-p(part));
-+    args->n_drives++;
-+}
-+
-+static void add_ide_disk(TestArgs *args,
-+                         int drive_idx, int bus, int unit, int c, int h,=
- int s)
-+{
-+    char part[300];
-+    int ret;
-+
-+    ret =3D snprintf(part, sizeof(part),
-+                   "-device ide-hd,drive=3Ddisk%d,bus=3Dide.%d,unit=3D%d=
-,"
-+                   "lcyls=3D%d,lheads=3D%d,lsecs=3D%d",
-+                   drive_idx, bus, unit, c, h, s);
-+    g_assert((0 < ret) && (ret <=3D sizeof(part)));
-+    args->argc =3D append_arg(args->argc, args->argv, ARGV_SIZE, g_strdu=
-p(part));
-+}
-+
-+static void add_scsi_controller(TestArgs *args,
-+                                const char *type,
-+                                const char *bus,
-+                                int addr)
-+{
-+    char part[300];
-+    int ret;
-+
-+    ret =3D snprintf(part, sizeof(part),
-+                   "-device %s,id=3Dscsi%d,bus=3D%s,addr=3D%d",
-+                   type, args->n_scsi_controllers, bus, addr);
-+    g_assert((0 < ret) && (ret <=3D sizeof(part)));
-+    args->argc =3D append_arg(args->argc, args->argv, ARGV_SIZE, g_strdu=
-p(part));
-+    args->n_scsi_controllers++;
-+}
-+
-+static void add_scsi_disk(TestArgs *args,
-+                          int drive_idx, int bus,
-+                          int channel, int scsi_id, int lun,
-+                          int c, int h, int s)
-+{
-+    char part[300];
-+    int ret;
-+
-+    ret =3D snprintf(part, sizeof(part),
-+                   "-device scsi-hd,id=3Dscsi-disk%d,drive=3Ddisk%d,"
-+                   "bus=3Dscsi%d.0,"
-+                   "channel=3D%d,scsi-id=3D%d,lun=3D%d,"
-+                   "lcyls=3D%d,lheads=3D%d,lsecs=3D%d",
-+                   args->n_scsi_disks, drive_idx, bus, channel, scsi_id,=
- lun,
-+                   c, h, s);
-+    g_assert((0 < ret) && (ret <=3D sizeof(part)));
-+    args->argc =3D append_arg(args->argc, args->argv, ARGV_SIZE, g_strdu=
-p(part));
-+    args->n_scsi_disks++;
-+}
-+
-+static void add_virtio_disk(TestArgs *args,
-+                            int drive_idx, const char *bus, int addr,
-+                            int c, int h, int s)
-+{
-+    char part[300];
-+    int ret;
-+
-+    ret =3D snprintf(part, sizeof(part),
-+                   "-device virtio-blk-pci,id=3Dvirtio-disk%d,"
-+                   "drive=3Ddisk%d,bus=3D%s,addr=3D%d,"
-+                   "lcyls=3D%d,lheads=3D%d,lsecs=3D%d",
-+                   args->n_virtio_disks, drive_idx, bus, addr, c, h, s);
-+    g_assert((0 < ret) && (ret <=3D sizeof(part)));
-+    args->argc =3D append_arg(args->argc, args->argv, ARGV_SIZE, g_strdu=
-p(part));
-+    args->n_virtio_disks++;
-+}
-+
-+static void test_override(TestArgs *args, CHSResult expected[])
-+{
-+    QTestState *qts;
-+    char *joined_args;
-+    QFWCFG *fw_cfg;
-+    int i;
-+
-+    joined_args =3D g_strjoinv(" ", args->argv);
-+
-+    qts =3D qtest_init(joined_args);
-+    fw_cfg =3D pc_fw_cfg_init(qts);
-+
-+    read_bootdevices(fw_cfg, expected);
-+
-+    g_free(joined_args);
-+    qtest_quit(qts);
-+
-+    g_free(fw_cfg);
-+
-+    for (i =3D 0; i < args->n_drives; i++) {
-+        unlink(args->drives[i]);
-+        free(args->drives[i]);
-+    }
-+    g_free(args->drives);
-+    g_strfreev(args->argv);
-+    g_free(args);
-+}
-+
-+static void test_override_ide(void)
-+{
-+    TestArgs *args =3D create_args();
-+    CHSResult expected[] =3D {
-+        {"/pci@i0cf8/ide@1,1/drive@0/disk@0", {10000, 120, 30} },
-+        {"/pci@i0cf8/ide@1,1/drive@0/disk@1", {9000, 120, 30} },
-+        {"/pci@i0cf8/ide@1,1/drive@1/disk@0", {0, 1, 1} },
-+        {"/pci@i0cf8/ide@1,1/drive@1/disk@1", {1, 0, 0} },
-+        {NULL, {0, 0, 0} }
-+    };
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_ide_disk(args, 0, 0, 0, 10000, 120, 30);
-+    add_ide_disk(args, 1, 0, 1, 9000, 120, 30);
-+    add_ide_disk(args, 2, 1, 0, 0, 1, 1);
-+    add_ide_disk(args, 3, 1, 1, 1, 0, 0);
-+    test_override(args, expected);
-+}
-+
-+static void test_override_scsi(void)
-+{
-+    TestArgs *args =3D create_args();
-+    CHSResult expected[] =3D {
-+        {"/pci@i0cf8/scsi@3/channel@0/disk@0,0", {10000, 120, 30} },
-+        {"/pci@i0cf8/scsi@3/channel@0/disk@1,0", {9000, 120, 30} },
-+        {"/pci@i0cf8/scsi@3/channel@0/disk@2,0", {1, 0, 0} },
-+        {"/pci@i0cf8/scsi@3/channel@0/disk@3,0", {0, 1, 0} },
-+        {NULL, {0, 0, 0} }
-+    };
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_scsi_controller(args, "lsi53c895a", "pci.0", 3);
-+    add_scsi_disk(args, 0, 0, 0, 0, 0, 10000, 120, 30);
-+    add_scsi_disk(args, 1, 0, 0, 1, 0, 9000, 120, 30);
-+    add_scsi_disk(args, 2, 0, 0, 2, 0, 1, 0, 0);
-+    add_scsi_disk(args, 3, 0, 0, 3, 0, 0, 1, 0);
-+    test_override(args, expected);
-+}
-+
-+static void test_override_scsi_2_controllers(void)
-+{
-+    TestArgs *args =3D create_args();
-+    CHSResult expected[] =3D {
-+        {"/pci@i0cf8/scsi@3/channel@0/disk@0,0", {10000, 120, 30} },
-+        {"/pci@i0cf8/scsi@3/channel@0/disk@1,0", {9000, 120, 30} },
-+        {"/pci@i0cf8/scsi@4/channel@0/disk@0,1", {1, 0, 0} },
-+        {"/pci@i0cf8/scsi@4/channel@0/disk@1,2", {0, 1, 0} },
-+        {NULL, {0, 0, 0} }
-+    };
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_scsi_controller(args, "lsi53c895a", "pci.0", 3);
-+    add_scsi_controller(args, "virtio-scsi-pci", "pci.0", 4);
-+    add_scsi_disk(args, 0, 0, 0, 0, 0, 10000, 120, 30);
-+    add_scsi_disk(args, 1, 0, 0, 1, 0, 9000, 120, 30);
-+    add_scsi_disk(args, 2, 1, 0, 0, 1, 1, 0, 0);
-+    add_scsi_disk(args, 3, 1, 0, 1, 2, 0, 1, 0);
-+    test_override(args, expected);
-+}
-+
-+static void test_override_virtio_blk(void)
-+{
-+    TestArgs *args =3D create_args();
-+    CHSResult expected[] =3D {
-+        {"/pci@i0cf8/scsi@3/disk@0,0", {10000, 120, 30} },
-+        {"/pci@i0cf8/scsi@4/disk@0,0", {9000, 120, 30} },
-+        {NULL, {0, 0, 0} }
-+    };
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_virtio_disk(args, 0, "pci.0", 3, 10000, 120, 30);
-+    add_virtio_disk(args, 1, "pci.0", 4, 9000, 120, 30);
-+    test_override(args, expected);
-+}
-+
-+static void test_override_zero_chs(void)
-+{
-+    TestArgs *args =3D create_args();
-+    CHSResult expected[] =3D {
-+        {NULL, {0, 0, 0} }
-+    };
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_ide_disk(args, 0, 1, 1, 0, 0, 0);
-+    test_override(args, expected);
-+}
-+
-+static void test_override_scsi_hot_unplug(void)
-+{
-+    QTestState *qts;
-+    char *joined_args;
-+    QFWCFG *fw_cfg;
-+    QDict *response;
-+    int i;
-+    TestArgs *args =3D create_args();
-+    CHSResult expected[] =3D {
-+        {"/pci@i0cf8/scsi@2/channel@0/disk@0,0", {10000, 120, 30} },
-+        {"/pci@i0cf8/scsi@2/channel@0/disk@1,0", {20, 20, 20} },
-+        {NULL, {0, 0, 0} }
-+    };
-+    CHSResult expected2[] =3D {
-+        {"/pci@i0cf8/scsi@2/channel@0/disk@1,0", {20, 20, 20} },
-+        {NULL, {0, 0, 0} }
-+    };
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_scsi_controller(args, "virtio-scsi-pci", "pci.0", 2);
-+    add_scsi_disk(args, 0, 0, 0, 0, 0, 10000, 120, 30);
-+    add_scsi_disk(args, 1, 0, 0, 1, 0, 20, 20, 20);
-+
-+    joined_args =3D g_strjoinv(" ", args->argv);
-+
-+    qts =3D qtest_init(joined_args);
-+    fw_cfg =3D pc_fw_cfg_init(qts);
-+
-+    read_bootdevices(fw_cfg, expected);
-+
-+    /* unplug device an restart */
-+    response =3D qtest_qmp(qts,
-+                         "{ 'execute': 'device_del',"
-+                         "  'arguments': {'id': 'scsi-disk0' }}");
-+    g_assert(response);
-+    g_assert(!qdict_haskey(response, "error"));
-+    qobject_unref(response);
-+    response =3D qtest_qmp(qts,
-+                         "{ 'execute': 'system_reset', 'arguments': { }}=
-");
-+    g_assert(response);
-+    g_assert(!qdict_haskey(response, "error"));
-+    qobject_unref(response);
-+
-+    qtest_qmp_eventwait(qts, "RESET");
-+
-+    read_bootdevices(fw_cfg, expected2);
-+
-+    g_free(joined_args);
-+    qtest_quit(qts);
-+
-+    g_free(fw_cfg);
-+
-+    for (i =3D 0; i < args->n_drives; i++) {
-+        unlink(args->drives[i]);
-+        free(args->drives[i]);
-+    }
-+    g_free(args->drives);
-+    g_strfreev(args->argv);
-+    g_free(args);
-+}
-+
-+static void test_override_virtio_hot_unplug(void)
-+{
-+    QTestState *qts;
-+    char *joined_args;
-+    QFWCFG *fw_cfg;
-+    QDict *response;
-+    int i;
-+    TestArgs *args =3D create_args();
-+    CHSResult expected[] =3D {
-+        {"/pci@i0cf8/scsi@2/disk@0,0", {10000, 120, 30} },
-+        {"/pci@i0cf8/scsi@3/disk@0,0", {20, 20, 20} },
-+        {NULL, {0, 0, 0} }
-+    };
-+    CHSResult expected2[] =3D {
-+        {"/pci@i0cf8/scsi@3/disk@0,0", {20, 20, 20} },
-+        {NULL, {0, 0, 0} }
-+    };
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_drive_with_mbr(args, empty_mbr, 1);
-+    add_virtio_disk(args, 0, "pci.0", 2, 10000, 120, 30);
-+    add_virtio_disk(args, 1, "pci.0", 3, 20, 20, 20);
-+
-+    joined_args =3D g_strjoinv(" ", args->argv);
-+
-+    qts =3D qtest_init(joined_args);
-+    fw_cfg =3D pc_fw_cfg_init(qts);
-+
-+    read_bootdevices(fw_cfg, expected);
-+
-+    /* unplug device an restart */
-+    response =3D qtest_qmp(qts,
-+                         "{ 'execute': 'device_del',"
-+                         "  'arguments': {'id': 'virtio-disk0' }}");
-+    g_assert(response);
-+    g_assert(!qdict_haskey(response, "error"));
-+    qobject_unref(response);
-+    response =3D qtest_qmp(qts,
-+                         "{ 'execute': 'system_reset', 'arguments': { }}=
-");
-+    g_assert(response);
-+    g_assert(!qdict_haskey(response, "error"));
-+    qobject_unref(response);
-+
-+    qtest_qmp_eventwait(qts, "RESET");
-+
-+    read_bootdevices(fw_cfg, expected2);
-+
-+    g_free(joined_args);
-+    qtest_quit(qts);
-+
-+    g_free(fw_cfg);
-+
-+    for (i =3D 0; i < args->n_drives; i++) {
-+        unlink(args->drives[i]);
-+        free(args->drives[i]);
-+    }
-+    g_free(args->drives);
-+    g_strfreev(args->argv);
-+    g_free(args);
-+}
-+
- int main(int argc, char **argv)
- {
-     Backend i;
-@@ -413,6 +987,21 @@ int main(int argc, char **argv)
-     qtest_add_func("hd-geo/ide/device/mbr/chs", test_ide_device_mbr_chs)=
-;
-     qtest_add_func("hd-geo/ide/device/user/chs", test_ide_device_user_ch=
-s);
-     qtest_add_func("hd-geo/ide/device/user/chst", test_ide_device_user_c=
-hst);
-+    if (have_qemu_img()) {
-+        qtest_add_func("hd-geo/override/ide", test_override_ide);
-+        qtest_add_func("hd-geo/override/scsi", test_override_scsi);
-+        qtest_add_func("hd-geo/override/scsi_2_controllers",
-+                       test_override_scsi_2_controllers);
-+        qtest_add_func("hd-geo/override/virtio_blk", test_override_virti=
-o_blk);
-+        qtest_add_func("hd-geo/override/zero_chs", test_override_zero_ch=
-s);
-+        qtest_add_func("hd-geo/override/scsi_hot_unplug",
-+                       test_override_scsi_hot_unplug);
-+        qtest_add_func("hd-geo/override/virtio_hot_unplug",
-+                       test_override_virtio_hot_unplug);
-+    } else {
-+        g_test_message("QTEST_QEMU_IMG not set or qemu-img missing; "
-+                       "skipping hd-geo/override/* tests");
-+    }
-=20
-     ret =3D g_test_run();
-=20
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3543451ed3..6941ae7c77 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -780,7 +780,7 @@ tests/ide-test$(EXESUF): tests/ide-test.o $(libqos-pc=
--obj-y)
- tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y) qemu-img$=
-(EXESUF)
- tests/ipmi-kcs-test$(EXESUF): tests/ipmi-kcs-test.o
- tests/ipmi-bt-test$(EXESUF): tests/ipmi-bt-test.o
--tests/hd-geo-test$(EXESUF): tests/hd-geo-test.o
-+tests/hd-geo-test$(EXESUF): tests/hd-geo-test.o $(libqos-obj-y)
- tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
- tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y=
-)
- tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
---=20
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY5OTU4MDQwLTY5NzIyMC0x
+LWdpdC1zZW5kLWVtYWlsLWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20vCgoKCkhpLAoK
+VGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQ
+bGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJ
+ZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBp
+dApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRv
+Y2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1
+aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKICBDQyAgICAgIGJsb2NrL3FlZC1sMi1jYWNoZS5vCiAgQ0MgICAgICBibG9jay9xZWQt
+dGFibGUubwogIENDICAgICAgYmxvY2svcWVkLWNsdXN0ZXIubwovdG1wL3FlbXUtdGVzdC9zcmMv
+YmxvY2svcWNvdzIuYzo0MDc3OjY0OiBlcnJvcjogdW5rbm93biB0eXBlIG5hbWUgJ0Fpb1Rhc2sn
+CiBzdGF0aWMgY29yb3V0aW5lX2ZuIGludCBxY293Ml9jb19wd3JpdGV2X2NvbXByZXNzZWRfdGFz
+a19lbnRyeShBaW9UYXNrICp0YXNrKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2sv
+cWNvdzIuYzogSW4gZnVuY3Rpb24gJ3Fjb3cyX2NvX3B3cml0ZXZfY29tcHJlc3NlZF9wYXJ0JzoK
+L3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fjb3cyLmM6NDA5ODo1OiBlcnJvcjogdW5rbm93biB0
+eXBlIG5hbWUgJ0Fpb1Rhc2tQb29sJwogICAgIEFpb1Rhc2tQb29sICphaW8gPSBOVUxMOwogICAg
+IF4KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fjb3cyLmM6NDEyMzo1OiBlcnJvcjogaW1wbGlj
+aXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ2Fpb190YXNrX3Bvb2xfc3RhdHVzJyBbLVdlcnJv
+cj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAgICB3aGlsZSAoYnl0ZXMgJiYgYWlv
+X3Rhc2tfcG9vbF9zdGF0dXMoYWlvKSA9PSAwKSB7CiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMv
+YmxvY2svcWNvdzIuYzo0MTIzOjU6IGVycm9yOiBuZXN0ZWQgZXh0ZXJuIGRlY2xhcmF0aW9uIG9m
+ICdhaW9fdGFza19wb29sX3N0YXR1cycgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVt
+dS10ZXN0L3NyYy9ibG9jay9xY293Mi5jOjQxMzA6MTM6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJh
+dGlvbiBvZiBmdW5jdGlvbiAnYWlvX3Rhc2tfcG9vbF9uZXcnIFstV2Vycm9yPWltcGxpY2l0LWZ1
+bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgICAgICAgICAgYWlvID0gYWlvX3Rhc2tfcG9vbF9uZXco
+UUNPVzJfTUFYX1dPUktFUlMpOwogICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvYmxv
+Y2svcWNvdzIuYzo0MTMwOjEzOiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAn
+YWlvX3Rhc2tfcG9vbF9uZXcnIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVz
+dC9zcmMvYmxvY2svcWNvdzIuYzo0MTMwOjM3OiBlcnJvcjogJ1FDT1cyX01BWF9XT1JLRVJTJyB1
+bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikKICAgICAgICAgICAgIGFpbyA9
+IGFpb190YXNrX3Bvb2xfbmV3KFFDT1cyX01BWF9XT1JLRVJTKTsKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fjb3cyLmM6NDEz
+MDozNzogbm90ZTogZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQgb25seSBv
+bmNlIGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4KL3RtcC9xZW11LXRlc3Qvc3JjL2Js
+b2NrL3Fjb3cyLmM6NDEzMzo5OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rp
+b24gJ3Fjb3cyX2FkZF90YXNrJyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlv
+bl0KICAgICAgICAgcmV0ID0gcWNvdzJfYWRkX3Rhc2soYnMsIGFpbywgcWNvdzJfY29fcHdyaXRl
+dl9jb21wcmVzc2VkX3Rhc2tfZW50cnksCiAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2Js
+b2NrL3Fjb3cyLmM6NDEzMzo5OiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAn
+cWNvdzJfYWRkX3Rhc2snIFstV2Vycm9yPW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVzdC9z
+cmMvYmxvY2svcWNvdzIuYzo0MTMzOjM5OiBlcnJvcjogJ3Fjb3cyX2NvX3B3cml0ZXZfY29tcHJl
+c3NlZF90YXNrX2VudHJ5JyB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbikK
+ICAgICAgICAgcmV0ID0gcWNvdzJfYWRkX3Rhc2soYnMsIGFpbywgcWNvdzJfY29fcHdyaXRldl9j
+b21wcmVzc2VkX3Rhc2tfZW50cnksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fjb3cyLmM6NDE0NTo5OiBlcnJvcjogaW1w
+bGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ2Fpb190YXNrX3Bvb2xfd2FpdF9hbGwnIFst
+V2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgICAgICBhaW9fdGFza19w
+b29sX3dhaXRfYWxsKGFpbyk7CiAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2Jsb2NrL3Fj
+b3cyLmM6NDE0NTo5OiBlcnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAnYWlvX3Rh
+c2tfcG9vbF93YWl0X2FsbCcgWy1XZXJyb3I9bmVzdGVkLWV4dGVybnNdCi90bXAvcWVtdS10ZXN0
+L3NyYy9ibG9jay9xY293Mi5jOiBBdCB0b3AgbGV2ZWw6Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9j
+ay9xY293Mi5jOjQwMTI6MTogZXJyb3I6ICdxY293Ml9jb19wd3JpdGV2X2NvbXByZXNzZWRfdGFz
+aycgZGVmaW5lZCBidXQgbm90IHVzZWQgWy1XZXJyb3I9dW51c2VkLWZ1bmN0aW9uXQogcWNvdzJf
+Y29fcHdyaXRldl9jb21wcmVzc2VkX3Rhc2soQmxvY2tEcml2ZXJTdGF0ZSAqYnMsCiBeCmNjMTog
+YWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2U6ICoqKiBbYmxvY2svcWNv
+dzIub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIv
+ZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
+Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
+bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
+bXUuaW5zdGFuY2UudXVpZD1jMGZmNmRkNmZiM2Y0NmQxYjljMDdhMTA2YzlkZDI2YScsICctdScs
+ICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
+Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
+LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScs
+ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
+Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zh
+ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLThtX25lYmFiL3NyYy9kb2NrZXItc3JjLjIwMTktMTAt
+MDEtMjIuMjIuMDguNjQ1NTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92
+YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBz
+dGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YzBm
+ZjZkZDZmYjNmNDZkMWI5YzA3YTEwNmM5ZGQyNmEKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBF
+cnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rl
+ci10bXAtOG1fbmViYWIvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50
+b3M3XSBFcnJvciAyCgpyZWFsICAgIDFtNDAuMzkwcwp1c2VyICAgIDBtOC45NjZzCgoKVGhlIGZ1
+bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTY5OTU4MDQw
+LTY5NzIyMC0xLWdpdC1zZW5kLWVtYWlsLWFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20v
+dGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
