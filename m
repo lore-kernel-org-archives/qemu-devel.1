@@ -2,116 +2,121 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5D2C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D89C35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:13:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBE2221920
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:12:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE2221920
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C350621920
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:13:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="MS8IuSnn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C350621920
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFeQD-0004Wf-ST
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 09:12:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53469)
+	id 1iFeRl-0005oH-NF
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 09:13:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53534)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iFePW-000439-Ln
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:11:20 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFeQM-0004nB-7Q
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iFePV-0006gf-6T
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:11:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52760)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iFePQ-0006aN-H1; Wed, 02 Oct 2019 09:11:12 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1186210C094F;
- Wed,  2 Oct 2019 13:11:11 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-20.ams2.redhat.com [10.36.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A172C60C18;
- Wed,  2 Oct 2019 13:11:02 +0000 (UTC)
-Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
- platforms
-To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-2-jsnow@redhat.com>
- <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
- <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
- <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
- <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
- <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABtB5UaG9tYXMgSHV0
- aCA8dGh1dGhAcmVkaGF0LmNvbT6JAjgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
- QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
- EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
- 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
- eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
- ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
- zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
- tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
- WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
- UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDuQIN
- BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
- 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
- +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
- 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
- gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
- WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
- VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
- knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
- cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
- X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABiQIfBBgBAgAJBQJR+3lM
- AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
- ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
- fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
- 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
- cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
- ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
- Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
- oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
- IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
- yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-Organization: Red Hat
-Message-ID: <30b22415-a46a-6810-4f9f-d108084cd7bb@redhat.com>
-Date: Wed, 2 Oct 2019 15:11:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFeQK-00079C-H6
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:12:09 -0400
+Received: from mail-eopbgr40118.outbound.protection.outlook.com
+ ([40.107.4.118]:10465 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iFeQJ-00077k-Qc
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:12:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TmCcLaQqEFrjSPxYkX6JU+6ZqNApXbOAZ/ZyUteWeYa4c9ohk58/ZQajzwHZ5uPUWqzf6Hgll8xNpLFyfbz9MOHmwa3yiTQIGhM5LYH2+9eA9X1j2TB1mDO/R3IWJ1D8Fji7t6LqMHgCkpPUPJ9DXu/1OoN/SUFSDbtM7bJsMObvL4UuHba9wv0s3ZdDEevtmq9Cqeom70IblQY9gXrWDimLrB1ML9A2tFvob7o0dqbwAM2423rWppecaxP/32yoUZ9aFSKdbZOWdgrQTscIp3Z07JcqpwvDbdwsgkT4b1N748vKPwZ6jqKGFXzxD/TTl4CX95QP15iF6/SafdK8SA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JOrnst0z4t+QA+fL59llLjBBbaPOcKPysBAvLstfEaQ=;
+ b=R1EwBboeFXhhGIlManCxuWbWo6AJII2pX0NPNCt1bWfkCDcOE9NTNNCDuWfFd7xHGFzmUeLyIZoposktyKmmRL4LMSG4G2H+hZrOesv2VlRsxr7ya1zrfzJCy6bZ4EZuZyjVk1ViQEPelOTgrD425uRUgp5KR6TUjbbYcWzBtO73VLBqpTfvpuyJTeYvmRIlqwXVmLZ5eeRJoocMq4K42BemDTcDW/FYl4R2DTwFPY45jD7Pytr2Ldht8pXk0XKeeBYFMFr9FstKqWJkBZDxKZe6vaOO8U8TICxTdmXBhL2MHLHZAcJ1QWaNTO1ua+O8l6UnYKXTIveD/csdqYCfKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JOrnst0z4t+QA+fL59llLjBBbaPOcKPysBAvLstfEaQ=;
+ b=MS8IuSnnWR+0EEphHRL4jzLeBtgwsxqNLop8idQ5whf2suhZvz0MUHyWQOWJIDiQg5hqmHL5krnYq8H5APOKMnvX/h869a0UwJQIMF54uJ95U/SX7BayiKq6OvXI6B0UqxERwsM3gcpvpjm0NoY238trY9MPMXRicK7PuaOstIc=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5132.eurprd08.prod.outlook.com (10.255.18.154) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Wed, 2 Oct 2019 13:11:58 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.023; Wed, 2 Oct 2019
+ 13:11:58 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v4 21/31] virtio-9p: Fix error_append_hint/error_prepend
+ usage
+Thread-Topic: [PATCH v4 21/31] virtio-9p: Fix error_append_hint/error_prepend
+ usage
+Thread-Index: AQHVeHBjsJBaOkT9y0K+qBVLhCi+pKdHFAcAgAA9KQCAAAPcgA==
+Date: Wed, 2 Oct 2019 13:11:58 +0000
+Message-ID: <7e6ff8eb-ecf8-1e5f-0bfc-2fc1986857ad@virtuozzo.com>
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-22-vsementsov@virtuozzo.com>
+ <20191002111912.647a4470@bahia.lan>
+ <6413b323-2b2b-b5b5-3a19-46330bca0140@virtuozzo.com>
+In-Reply-To: <6413b323-2b2b-b5b5-3a19-46330bca0140@virtuozzo.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Wed, 02 Oct 2019 13:11:11 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0902CA0033.eurprd09.prod.outlook.com
+ (2603:10a6:7:15::22) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191002161155933
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8f604852-db91-431b-373b-08d7473a1ad6
+x-ms-traffictypediagnostic: DB8PR08MB5132:
+x-microsoft-antispam-prvs: <DB8PR08MB5132D09C881533000729C639C19C0@DB8PR08MB5132.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0178184651
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(39850400004)(136003)(346002)(396003)(366004)(189003)(52314003)(199004)(81166006)(66446008)(476003)(36756003)(64756008)(66066001)(25786009)(66476007)(66946007)(478600001)(486006)(6916009)(5660300002)(66556008)(76176011)(7736002)(305945005)(31686004)(54906003)(52116002)(99286004)(316002)(4326008)(6436002)(14444005)(81156014)(31696002)(14454004)(6506007)(102836004)(8936002)(386003)(256004)(8676002)(6116002)(71200400001)(26005)(71190400001)(2906002)(86362001)(6486002)(229853002)(6512007)(3846002)(11346002)(6246003)(446003)(186003)(2616005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5132;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: rKyhs+XOofHbtv/55JZ7a3wUrsRGy9llLZkZDCuGIpeHWPEIrMgJZou/iYZjryszcj7aA5zXdGt5q4WOOAkjdwK9P0FVVVLEt3fxy9hlR8l4oGnQnt3pbHPSeKt1RDu2Pqyp167y6IeUlqWe57p+bBdcJMpRs7XM8/9wevcFKTd8wxbkVKd93oFBo85Nkg38hP2N6QaehYvIB2sxKRA1p1w5RPVAhZEHZkTKPv9g5ft+gzlulkdy5eMczDbb+T9MpafjElPxu75XlVZCCFthJ1WRn2bmUBnOizhs6XvoBzJdtNW9fAoQqTDkz1MIFFBWo2/R26GEYNV2iIdTRD6LWzqIasvZ+huX8R66UhyW+nyIaYi1vkW38bPRjiOLVQxCvhvHZ5qE3uEG9AUt77W852Dc8rTl8e94a/rqybFqrP0=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F273E993B79D2E4CACA9A606D314BCEE@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f604852-db91-431b-373b-08d7473a1ad6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Oct 2019 13:11:58.1797 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zIbzukaUEMUq2kqFJGY4f9P/wJMYE/Hzc9KjlnM012p8RYpRBEqBEZmwwJQyMLi2UWoWZ8IzcTT8MkvizACdRimPImqdHPECWaerXZl0+6s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5132
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.4.118
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,140 +128,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/2019 13.57, Max Reitz wrote:
-> On 02.10.19 06:46, Thomas Huth wrote:
->> [...]
->> Max, I can understand that you are a little bit annoyed that this "mak=
-e
->> check with iotests" caused some extra hurdles for you. But honestly,
->> removing that again would be quite egoistic by you. Try to put yoursel=
-f
->> into the position of a "normal", non-blocklayer-maintainer QEMU
->> developer. For me, iotests were a *constant* source of frustration.
->> Often, when I ran them on top of my latest and greatest patches, to
->> check whether I caused a regression, the iotests simply failed. Then I
->> had to start debugging - did my patches cause the break, or is "master=
-"
->> broken, too? In almost all cases, there was an issue in the master
->> branch already, either because they were failing on s390x, or because =
-I
->> was using ext4 instead of xfs, or because I was using an older distro
->> than you, etc... . So while the iotests likely worked fine for the
->> limited set of systems that you, Kevin and the other hard-core block
->> layer developers are using, it's constantly broken for everybody else
->> who is not using the very same setup as you. The only way of *not*
->> getting upset about the iotests was to simply completely *ignore* them=
-.
->> Is it that what you want?
->=20
-> It usually worked fine for me because it=E2=80=99s rather rare that non=
--block
-> patches broke the iotests.
->=20
-> I have to admit I actually didn=E2=80=99t think of other people wanting=
- to run
-> the iotests; but to be honest, your mail doesn=E2=80=99t sound like you=
- want to
-> run the iotests either.
-
-I *want* to run them. Occasionally - when I have new patches that might
-affect anything related to the block layer. But then I don't want to be
-in the situation where I first have to debug multiple other problems
-with the iotests first that are not related to my new patches.
-
-> (The reason I didn=E2=80=99t think of it is because non-block patches r=
-arely
-> break them, so I wouldn=E2=80=99t run the iotests if I were a non-block
-> maintainer.  Sorry.)
-
-Well, "rarely" is relative. They've been broken *completely* two times
-in the 4.1 development time frame, and IIRC at least once in the 4.0
-time frame.
-
-[...]
-> Maybe my main problem is that I feel like now I have to deal with all o=
-f
-> the fallout, even though adding the iotests to make check wasn=E2=80=99=
-t my idea
-> and neither me nor Kevin ever consented.  (I don=E2=80=99t know whether=
- Kevin
-> consented implicitly, but I don=E2=80=99t see his name in bdd95e47844f2=
-d8b.)
->=20
-> You can=E2=80=99t just give me more responsibility without my consent a=
-nd then
-> call me egoistic for not liking it.
-
-Ok, sorry for that. I guess one part of my frustration was also that the
-patches to enable the iotests during "make check" have been on the list
-for weeks - or rather months - and I never ever got much feedback from
-you or Kevin on them. If you told me right in the beginning about your
-concerns, we would not be at this point now. Also partly my bad, I
-guess, since I could have reached out to you on IRC to discuss it, but
-at that point in time, I rather thought that you just don't really care.
-Thus it's good to have some conversation now, helps a lot to understand
-the different expectations. Maybe we can also have a discussion about
-this at KVM forum, I think it's easier to clarify some points of view
-verbally there instead of using mails.
-
->> Or maybe let me phrase it differently: Do you consider the iotests as
->> something that is more or less "private" to the hard-core block layer
->> developers, and it's ok if others completely ignore them and break the=
-m
->> by accident (and you also don't expect the normal developers to fix th=
-e
->> iotests afterwards)?
->=20
-> Well, that=E2=80=99s how it=E2=80=99s always worked, and that didn=E2=80=
-=99t frustrate me.
-
-Ok ... you're the maintainer, so if that's really the way you prefer, I
-can send a patch to remove the iotests from "make check" again.
-
-> Honestly, it looks to me like you don=E2=80=99t even want to run the io=
-tests.  I
-> interpret most of what you=E2=80=99ve written as:
->=20
-> - I don=E2=80=99t want to not run the iotests, because then people will=
- hit me
->   for making them fail.
->=20
-> - But they fail all the time, so I always need a baseline for what is
->   expected to sometimes fail and what isn=E2=80=99t.  That=E2=80=99s ve=
-ry annoying.
->   Let=E2=80=99s introduce a baseline in the form of auto/qcow2, and the=
-n let
->   everyone verify that it works.
->=20
-> So to me it looks like we=E2=80=99ve just added all tests that never fa=
-il to
-> auto.  But if they never fail, then it=E2=80=99s like we haven=E2=80=99=
-t run the tests
-> at all.
-
-I disagree. First, the complete iotest failures that have been merged
-during the 4.1 development time frame to the master branch would have
-been prevented, I think, so it's certainly not that "they never fail".
-
-Second, yes, the basic idea was to start with a small set of tests in
-the auto group which was already working, and then to increase that set
-over time, once other tests run more stable, too. But you know the
-iotests better than me, if you think that most of them can hardly
-brought into the right shape, then this was likely just wishful thinking
-by me.
-
-> You have to decide: Either let me deal with the problems, but then I
-> have every right to be egoistic about it =E2=80=93 or you help me deal =
-with them.
-
-Since I'm not assigned to the block layer, I could only help
-occasionally, so that's likely not enough for solving your frustration.
-Thus I'll send a patch to remove the iotests from "make check" again.
-
- Thomas
+MDIuMTAuMjAxOSAxNTo1OCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+MDIuMTAuMjAxOSAxMjoxOSwgR3JlZyBLdXJ6IHdyb3RlOg0KPj4gT24gVHVlLMKgIDEgT2N0IDIw
+MTkgMTg6NTM6MDkgKzAzMDANCj4+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1l
+bnRzb3ZAdmlydHVvenpvLmNvbT4gd3JvdGU6DQo+Pg0KPj4+IElmIHdlIHdhbnQgdG8gYWRkIHNv
+bWUgaW5mbyB0byBlcnJwIChieSBlcnJvcl9wcmVwZW5kKCkgb3INCj4+PiBlcnJvcl9hcHBlbmRf
+aGludCgpKSwgd2UgbXVzdCB1c2UgdGhlIEVSUlBfQVVUT19QUk9QQUdBVEUgbWFjcm8uDQo+Pj4g
+T3RoZXJ3aXNlLCB0aGlzIGluZm8gd2lsbCBub3QgYmUgYWRkZWQgd2hlbiBlcnJwID09ICZmYXRh
+bF9lcnINCj4+PiAodGhlIHByb2dyYW0gd2lsbCBleGl0IHByaW9yIHRvIHRoZSBlcnJvcl9hcHBl
+bmRfaGludCgpIG9yDQo+Pj4gZXJyb3JfcHJlcGVuZCgpIGNhbGwpLsKgIEZpeCBzdWNoIGNhc2Vz
+Lg0KPj4+DQo+Pg0KPj4gV2VsbC4uLiB0aGlzIHBhdGNoIGRvZXNuJ3QgcmVhbGx5IGZpeCBhbnl0
+aGluZyBiZWNhdXNlLi4uDQo+IA0KPiBJJ20gc3VyZSBpdCBmaXhlcy4gQnV0IGl0IGFsc28gYnJl
+YWtzIHNvbWUgdGhpbmdzIHlvdSBtZW50aW9uIGJlbG93Li4NCj4gDQo+Pg0KPj4+IFRoaXMgY29t
+bWl0ICh0b2dldGhlciB3aXRoIGl0cyBuZWlnaGJvcnMpIHdhcyBnZW5lcmF0ZWQgYnkNCj4+Pg0K
+Pj4+IGdpdCBncmVwIC1sICdlcnJvcl9cKGFwcGVuZF9oaW50XHxwcmVwZW5kXCkoZXJycCcgfCB3
+aGlsZSByZWFkIGY7IGRvIFwNCj4+PiBzcGF0Y2ggLS1zcC1maWxlIHNjcmlwdHMvY29jY2luZWxs
+ZS9maXgtZXJyb3ItYWRkLWluZm8uY29jY2kgXA0KPj4+IC0taW4tcGxhY2UgJGY7IGRvbmUNCj4+
+Pg0KPj4+IGFuZCB0aGVuDQo+Pj4NCj4+PiAuL3B5dGhvbi9jb21taXQtcGVyLXN1YnN5c3RlbS5w
+eSBNQUlOVEFJTkVSUyAiJCg8IGF1dG8tbXNnKSINCj4+Pg0KPj4+IChhdXRvLW1zZyB3YXMgYSBm
+aWxlIHdpdGggdGhpcyBjb21taXQgbWVzc2FnZSkNCj4+Pg0KPj4+IGFuZCB0aGVuIGJ5IGhhbmQs
+IGZvciBub3QgbWFpbnRhaW5lZCBjaGFuZ2VkIGZpbGVzOg0KPj4+DQo+Pj4gZ2l0IGNvbW1pdCAt
+bSAiPFNVQi1TWVNURU0+OiAkKDwgYXV0by1tc2cpIiA8RklMRVM+DQo+Pj4NCj4+PiBTdGlsbCwg
+Zm9yIGJhY2twb3J0aW5nIGl0IG1heSBiZSBtb3JlIGNvbWZvcnRhYmxlIHRvIHVzZSBvbmx5IHRo
+ZSBmaXJzdA0KPj4+IGNvbW1hbmQgYW5kIHRoZW4gZG8gb25lIGh1Z2UgY29tbWl0Lg0KPj4+DQo+
+Pj4gUmVwb3J0ZWQtYnk6IEdyZWcgS3VyeiA8Z3JvdWdAa2FvZC5vcmc+DQo+Pj4gU2lnbmVkLW9m
+Zi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
+Y29tPg0KPj4+IC0tLQ0KPj4+IMKgIGh3LzlwZnMvOXAtbG9jYWwuYyB8IDEgKw0KPj4+IMKgIGh3
+LzlwZnMvOXAtcHJveHkuYyB8IDEgKw0KPj4+IMKgIGh3LzlwZnMvOXAuY8KgwqDCoMKgwqDCoCB8
+IDEgKw0KPj4+IMKgIDMgZmlsZXMgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspDQo+Pj4NCj4+PiBk
+aWZmIC0tZ2l0IGEvaHcvOXBmcy85cC1sb2NhbC5jIGIvaHcvOXBmcy85cC1sb2NhbC5jDQo+Pj4g
+aW5kZXggMDhlNjczYTc5Yy4uZmNjYmY3NThiZCAxMDA2NDQNCj4+PiAtLS0gYS9ody85cGZzLzlw
+LWxvY2FsLmMNCj4+PiArKysgYi9ody85cGZzLzlwLWxvY2FsLmMNCj4+PiBAQCAtMTQ3MSw2ICsx
+NDcxLDcgQEAgc3RhdGljIHZvaWQgbG9jYWxfY2xlYW51cChGc0NvbnRleHQgKmN0eCkNCj4+PiDC
+oCBzdGF0aWMgdm9pZCBlcnJvcl9hcHBlbmRfc2VjdXJpdHlfbW9kZWxfaGludChFcnJvciAqKmVy
+cnApDQo+Pj4gwqAgew0KPj4+ICvCoMKgwqAgRVJSUF9BVVRPX1BST1BBR0FURSgpOw0KPj4+IMKg
+wqDCoMKgwqAgZXJyb3JfYXBwZW5kX2hpbnQoZXJycCwgIlZhbGlkIG9wdGlvbnMgYXJlOiBzZWN1
+cml0eV9tb2RlbD0iDQo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCAiW3Bhc3N0aHJvdWdofG1hcHBlZC14YXR0cnxtYXBwZWQtZmlsZXxub25lXVxuIik7
+DQo+Pj4gwqAgfQ0KPj4NCj4+IFRoaXMgZnVuY3Rpb24gZG9lc24ndCBuZWVkIGF1dG8gcHJvcGFn
+YXRpb24gaW4gdGhlIGZpcnN0IHBsYWNlLiBJdCBpcw0KPj4gc2ltcGx5IGEgd3JhcHBlciBhcm91
+bmQgZXJyb3JfYXBwZW5kX2hpbnQoKS4gRVJSUF9BVVRPX1BST1BBR0FURSgpDQo+PiBzaG91bGQg
+Z28gdG8gdGhlIGNhbGxlciBsb2NhbF9wYXJzZV9vcHRzKCkuDQo+IA0KPiBIbW0sIHRoYXQncyBi
+YWQuIFNvLCBhY3R1YWxseSBpdCdzIG9uZSBtb3JlIGVycnAgSU4gcGFyYW1ldGVyLg0KPiANCj4+
+DQo+PiBBbHNvIHNvbWUgZXh0cmEgY2FyZSBpcyBuZWVkZWQgdGhlcmUgdG8gaGFuZGxlIHBhcnQg
+WzMuXSBvZiB0aGUNCj4+IGNsZWFudXAuIEkgdW5kZXJzdGFuZCB0aGlzIGlzIG91dCBvZiB0aGUg
+c2NvcGUgb2YgdGhhdCBzZXJpZXMsDQo+PiBidXQgSSdkIHJhdGhlciBzZWUgYWxsIG9mIHRoaXMg
+Zml4ZWQgaW4gdGhlIHNhbWUgcGF0Y2guDQo+Pg0KPj4+IGRpZmYgLS1naXQgYS9ody85cGZzLzlw
+LXByb3h5LmMgYi9ody85cGZzLzlwLXByb3h5LmMNCj4+PiBpbmRleCA1N2E4YzFjODA4Li45Mjkx
+YzhlZmEyIDEwMDY0NA0KPj4+IC0tLSBhL2h3LzlwZnMvOXAtcHJveHkuYw0KPj4+ICsrKyBiL2h3
+LzlwZnMvOXAtcHJveHkuYw0KPj4+IEBAIC0xMTE2LDYgKzExMTYsNyBAQCBzdGF0aWMgaW50IGNv
+bm5lY3RfbmFtZWRzb2NrZXQoY29uc3QgY2hhciAqcGF0aCwgRXJyb3IgKiplcnJwKQ0KPj4+IMKg
+IHN0YXRpYyB2b2lkIGVycm9yX2FwcGVuZF9zb2NrZXRfc29ja2ZkX2hpbnQoRXJyb3IgKiplcnJw
+KQ0KPj4+IMKgIHsNCj4+PiArwqDCoMKgIEVSUlBfQVVUT19QUk9QQUdBVEUoKTsNCj4+PiDCoMKg
+wqDCoMKgIGVycm9yX2FwcGVuZF9oaW50KGVycnAsICJFaXRoZXIgc3BlY2lmeSBzb2NrZXQ9L3Nv
+bWUvcGF0aCB3aGVyZSAvc29tZS9wYXRoIg0KPj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgIiBwb2ludHMgdG8gYSBsaXN0ZW5pbmcgQUZfVU5JWCBzb2Nr
+ZXQgb3Igc29ja19mZD1mZCINCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgICIgd2hlcmUgZmQgaXMgYSBmaWxlIGRlc2NyaXB0b3IgdG8gYSBjb25uZWN0
+ZWQgQUZfVU5JWCINCj4+DQo+PiBTYW1lIGhlcmUuIEVSUlBfQVVUT19QUk9QQUdBVEUoKSBzaG91
+bGQgZ28gdG8gcHJveHlfcGFyc2Vfb3B0cygpLg0KPiANCj4gYW5kIHRoaXMgb25lLg0KPiANCj4+
+DQo+Pj4gZGlmZiAtLWdpdCBhL2h3LzlwZnMvOXAuYyBiL2h3LzlwZnMvOXAuYw0KPj4+IGluZGV4
+IGNjZTIzNjYyMTkuLjFkZjI3NDllMDMgMTAwNjQ0DQo+Pj4gLS0tIGEvaHcvOXBmcy85cC5jDQo+
+Pj4gKysrIGIvaHcvOXBmcy85cC5jDQo+Pj4gQEAgLTM1NTIsNiArMzU1Miw3IEBAIHZvaWQgcGR1
+X3N1Ym1pdChWOWZzUERVICpwZHUsIFA5TXNnSGVhZGVyICpoZHIpDQo+Pj4gwqAgaW50IHY5ZnNf
+ZGV2aWNlX3JlYWxpemVfY29tbW9uKFY5ZnNTdGF0ZSAqcywgY29uc3QgVjlmc1RyYW5zcG9ydCAq
+dCwNCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIEVycm9yICoqZXJycCkNCj4+PiDCoCB7DQo+Pj4gK8KgwqDCoCBFUlJQ
+X0FVVE9fUFJPUEFHQVRFKCk7DQo+Pg0KPj4gVGhpcyBpcyBjb3JyZWN0IHNpbmNlIHRoaXMgZnVu
+Y3Rpb24gY2FsbHMgZXJyb3JfcHJlcGVuZCgpIGJ1dCBJIHRoaW5rDQo+PiBlcnJwIGlzIG5ldmVy
+ICZlcnJvcl9mYXRhbCBvciAmZXJyb3JfYWJvcnQgb24gdGhlIHJlYWxpemUgcGF0aC4gQW55d2F5
+LA0KPj4gYmV0dGVyIHNhZmUgdGhhbiBzb3JyeS4NCj4+DQo+Pj4gwqDCoMKgwqDCoCBpbnQgaSwg
+bGVuOw0KPj4+IMKgwqDCoMKgwqAgc3RydWN0IHN0YXQgc3RhdDsNCj4+PiDCoMKgwqDCoMKgIEZz
+RHJpdmVyRW50cnkgKmZzZTsNCj4+DQo+PiBQbGVhc2UgZHJvcCB0aGlzIHBhdGNoIGZyb20geW91
+ciBzZXJpZXMgYW5kIEknbGwgZG8gdGhlIGNoYW5nZSBvbmNlDQo+PiBFUlJQX0FVVE9fUFJPUEFH
+QVRFKCkgZ2V0cyBtZXJnZWQuDQo+Pg0KPj4gR3JlYXQgdGhhbmtzIGZvciB5b3VyIHRpbWUgaW4g
+ZmluZGluZyBhIGNsZXZlciB3YXkgdG8gZGVhbCB3aXRoIGVycm9yDQo+PiBwcm9wYWdhdGlvbi4g
+OikNCj4+DQo+IA0KPiBIbW0sIGFjdHVhbCBxdWVzdGlvbiBpczogaG93IG1hbnkgb3RoZXIgZXJy
+cCBJTiBwYXJhbWV0ZXJzIEkndmUgYnJva2VuIGluDQo+IHRoZXNlIHNlcmllcz8NCj4gDQo+IEkg
+Y2FuJ3Qgc2ltcGx5IGRyb3Agb25lIHBhdGNoIGZyb20gYXRvbWF0aWNhbGx5IGdlbmVyZWF0ZWQg
+c2VyaWVzOiBob3cgcGVvcGxlDQo+IHdpbGwgYmFja3BvcnQgaXQgdGhhbiwgb3IgdW5kZXJzdGFu
+ZCBob3cgdG8gYmFja3BvcnQgb3RoZXIgY3Jvc3NpbmcgdGhpbmdzPw0KPiANCj4gQWN0dWFsbHks
+IGZvciB0aGUgY2FzZXMgeW91IG1lYW4sIEVSUlBfQVVUT19QUk9QQUdBVEUgaXMgbm8tb3AsIGFz
+IGl0IHVzZXMgb3JpZ2luYWwNCj4gZXJycCBpZiBpdCdzIG5vdCBOVUxMIGFuZCBkb24ndCBwb2lu
+dCB0byBlcnJvcl9mYXRhbC4NCj4gDQo+IFNvLCBub3RoaW5nIGlzIGJyb2tlbiBoZXJlLCBtYXkg
+YmUgd2UgY2FuIHByb2NlZWQgYXMgaXM/IEJ1dCBJIGFncmVlLCBpdCBsb29rcyBzdHJhbmdlLg0K
+PiANCj4gRXJpYywgd2hhdCBkbyB5b3UgdGhpbms/DQo+IA0KPiBJIHRyaWVkIHRvIGNoYW5nZSBj
+b2NjaSBzY3JpcHQgdG8NCj4gDQo+ICDCoCBAcnVsZTBADQo+ICDCoCAvLyBBZGQgaW52b2NhdGlv
+biB0byBlcnJwLWZ1bmN0aW9ucw0KPiB+IGlkZW50aWZpZXIgZm4sIGZuMjsNCj4gIMKgIEBADQo+
+IA0KPiAgwqDCoCBmbiguLi4sIEVycm9yICoqZXJycCwgLi4uKQ0KPiAgwqDCoCB7DQo+ICDCoCAr
+wqDCoCBFUlJQX0FVVE9fUFJPUEFHQVRFKCk7DQo+ICDCoMKgwqDCoMKgIDwrLi4uDQo+ICvCoMKg
+wqDCoCBmbjIoLi4uLCBlcnJwLCAuLi4pDQo+ICvCoMKgwqDCoCAuLi4NCj4gIMKgICgNCj4gIMKg
+wqDCoMKgwqAgZXJyb3JfYXBwZW5kX2hpbnQoZXJycCwgLi4uKTsNCj4gIMKgIHwNCj4gIMKgwqDC
+oMKgwqAgZXJyb3JfcHJlcGVuZChlcnJwLCAuLi4pOw0KPiAgwqAgKQ0KPiAgwqDCoMKgwqDCoCAu
+Li4rPg0KPiAgwqDCoCB9DQo+IA0KPiANCj4gYnV0IGl0IHN0dWJzIG9uIGh3L3ZmaW8vcGNpLmMu
+Li4gYW5kIGl0IHNraXBzIGEgbG90IG9mIHZhbGlkIGNhc2VzLCBzbyBpdCdzIHdyb25nLg0KPiAN
+Cj4gDQo+IA0KDQpFcmljLCB5b3UgYXJlIHRoZSBtb3N0IGludGVyZXN0ZWQgbWFpbnRhaW5lciwg
+bWF5IGJlLCBJJ2xsIG1ha2UgYSB2NSB3aXRoIG9ubHkgbmJkIHVwZGF0ZWQ/DQpUaGVuIEdyZWcg
+d2lsbCB1cGRhdGUgaGlzIHN1YnN5c3RlbSwgdGhlbiBtYXkgYmUgSSBvciBzb21lb25lIGVsc2Ug
+d2lsbCB1cGRhdGUgYmxvY2suLiBJJ20NCmFmcmFpZCwgbm9ib2R5IHdpbGwgcmV2aWV3IHRoZSB3
+aG9sZSBzZXJpZXMsIGFuZCBHcmVnIHNob3dzLCB0aGF0IHRoZXJlIG1heWJlIHNvbWUgdW5wcmVk
+aWN0ZWQNCmVmZmVjdHMuDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
