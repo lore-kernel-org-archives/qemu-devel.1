@@ -2,92 +2,72 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC529C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0177C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:14:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A92092086A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:12:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A92092086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id A51AC2086A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:14:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MCRwIX5o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51AC2086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFU7d-0000rp-Oe
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42029)
+	id 1iFU9X-0002J4-Kt
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:14:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRtL-0002mE-Cf
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:49:16 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iFTBM-0007iW-TP
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:11:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iFRtJ-0003hk-Dw
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 19:49:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61154)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iFRtJ-0003Eh-4X; Tue, 01 Oct 2019 19:49:13 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x91NmmVE005032; Tue, 1 Oct 2019 19:48:52 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdfxweuf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:48:51 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x91NmpuQ005573;
- Tue, 1 Oct 2019 19:48:51 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vcdfxweh2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 19:48:51 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x91NjmR2032160;
- Tue, 1 Oct 2019 23:47:52 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma01wdc.us.ibm.com with ESMTP id 2v9y57fgc8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Oct 2019 23:47:52 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x91Nlo9449742282
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Oct 2019 23:47:50 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8B38E28058;
- Tue,  1 Oct 2019 23:47:50 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6F45A2805C;
- Tue,  1 Oct 2019 23:47:50 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.213])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  1 Oct 2019 23:47:50 +0000 (GMT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 06/97] block: Fix AioContext switch for bs->drv == NULL
-Date: Tue,  1 Oct 2019 18:44:45 -0500
-Message-Id: <20191001234616.7825-7-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
-References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-01_10:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910010203
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <dgibson@ozlabs.org>) id 1iFTBK-0006qd-BB
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 21:11:56 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:34115 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iFTBG-0006kZ-Cj; Tue, 01 Oct 2019 21:11:53 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46jdQ84ZJCz9sPh; Wed,  2 Oct 2019 11:11:44 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1569978704;
+ bh=OLVxyQW5762cwwR5FN/pK92drJvOD7ZLqtT83C4l6nQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=MCRwIX5oNVXztdC8J9dB8XH0WFFlzsDnyJa4onwwhbZTqfvn1tqlRWuoF4G5gAHv7
+ Tc0aUCnbVipiVuKc9zIsecSEoWEkyR9775doh8su/xhbgpdQ+1j85ZNAbM/tHe+qnb
+ N6WHWrNwr74i569WUGfhcRFP130whO8T//ZRXltI=
+Date: Wed, 2 Oct 2019 11:11:26 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 21/33] spapr, xics, xive: Move cpu_intc_create from
+ SpaprIrq to SpaprInterruptController
+Message-ID: <20191002011126.GU11105@umbus.fritz.box>
+References: <20190930014904.GB11105@umbus.fritz.box>
+ <adb67721-5c4e-50ac-f459-a48570a45d6e@kaod.org>
+ <20190930061445.GG11105@umbus.fritz.box>
+ <75672a0f-6bae-406c-0f0c-d23cc58c9c9f@kaod.org>
+ <20191001023102.GN11105@umbus.fritz.box>
+ <9c6c7e17-0578-2313-4324-a5ca75149762@kaod.org>
+ <20191001064726.GP11105@umbus.fritz.box>
+ <5d1910be-7bb7-19d9-73c3-269f2d0c2ee7@kaod.org>
+ <20191001081135.GQ11105@umbus.fritz.box>
+ <2273d09c-1379-cdbe-0aa9-76f3f4ece349@kaod.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="FfX2iGK5t5ehHnsE"
+Content-Disposition: inline
+In-Reply-To: <2273d09c-1379-cdbe-0aa9-76f3f4ece349@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,114 +79,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kevin Wolf <kwolf@redhat.com>
 
-Even for block nodes with bs->drv == NULL, we can't just ignore a
-bdrv_set_aio_context() call. Leaving the node in its old context can
-mean that it's still in an iothread context in bdrv_close_all() during
-shutdown, resulting in an attempted unlock of the AioContext lock which
-we don't hold.
+--FfX2iGK5t5ehHnsE
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This is an example stack trace of a related crash:
+On Tue, Oct 01, 2019 at 01:43:12PM +0200, C=E9dric Le Goater wrote:
+> On 01/10/2019 10:11, David Gibson wrote:
+> > On Tue, Oct 01, 2019 at 09:41:27AM +0200, C=E9dric Le Goater wrote:
+> >> On 01/10/2019 08:47, David Gibson wrote:
+> >>> On Tue, Oct 01, 2019 at 07:43:51AM +0200, C=E9dric Le Goater wrote:
+> >>>> On 01/10/2019 04:31, David Gibson wrote:
+> >>>>> On Mon, Sep 30, 2019 at 12:13:14PM +0200, C=E9dric Le Goater wrote:
+> >>>>>> On 30/09/2019 08:14, David Gibson wrote:
+> >>>>>>> On Mon, Sep 30, 2019 at 07:28:45AM +0200, C=E9dric Le Goater wrot=
+e:
+> >>>>>>>> On 30/09/2019 03:49, David Gibson wrote:
+> >>>>>>>>> On Fri, Sep 27, 2019 at 12:16:49PM +0200, Greg Kurz wrote:
+> >>>>>>>>>> On Fri, 27 Sep 2019 15:50:16 +1000
+> >>>>>>>>>> David Gibson <david@gibson.dropbear.id.au> wrote:
+> >>>>>>>>>>
+> >>>>>>>>>>> This method essentially represents code which belongs to the =
+interrupt
+> >>>>>>>>>>> controller, but needs to be called on all possible intcs, rat=
+her than
+> >>>>>>>>>>> just the currently active one.  The "dual" version therefore =
+calls
+> >>>>>>>>>>> into the xics and xive versions confusingly.
+> >>>>>>>>>>>
+> >>>>>>>>>>> Handle this more directly, by making it instead a method on t=
+he intc
+> >>>>>>>>>>> backend, and always calling it on every backend that exists.
+> >>>>>>>>>>>
+> >>>>>>>>>>> While we're there, streamline the error reporting a bit.
+> >>>>>>>>>>>
+> >>>>>>>>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>>>>>>> [snip]
+> >>>>>>>>>>> @@ -525,6 +469,30 @@ static void spapr_irq_check(SpaprMachine=
+State *spapr, Error **errp)
+> >>>>>>>>>>>  /*
+> >>>>>>>>>>>   * sPAPR IRQ frontend routines for devices
+> >>>>>>>>>>>   */
+> >>>>>>>>>>> +int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+> >>>>>>>>>>> +                              PowerPCCPU *cpu, Error **errp)
+> >>>>>>>>>>> +{
+> >>>>>>>>>>> +    if (spapr->xive) {
+> >>>>>>>>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr-=
+>xive);
+> >>>>>>>>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_G=
+ET_CLASS(intc);
+> >>>>>>>>>>> +
+> >>>>>>>>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
+> >>>>>>>>>>> +            return -1;
+> >>>>>>>>>>> +        }
+> >>>>>>>>>>> +    }
+> >>>>>>>>>>> +
+> >>>>>>>>>>> +    if (spapr->ics) {
+> >>>>>>>>>>> +        SpaprInterruptController *intc =3D SPAPR_INTC(spapr-=
+>ics);
+> >>>>>>>>>>> +        SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_G=
+ET_CLASS(intc);
+> >>>>>>>>>>> +
+> >>>>>>>>>>> +        if (sicc->cpu_intc_create(intc, cpu, errp) < 0) {
+> >>>>>>>>>>> +            return -1;
+> >>>>>>>>>>> +        }
+> >>>>>>>>>>> +    }
+> >>>>>>>>>>> +
+> >>>>>>>>>>
+> >>>>>>>>>> Instead of these hooks, what about open-coding spapr_xive_cpu_=
+intc_create()
+> >>>>>>>>>> and xics_spapr_cpu_intc_create() directly here, like you alrea=
+dy did for the
+> >>>>>>>>>> ICS and the XIVE objects in spapr_irq_init() ?
+> >>>>>>>>>
+> >>>>>>>>> I'd prefer not to.  The idea is I want to treat this as basical=
+ly:
+> >>>>>>>>>
+> >>>>>>>>> 	foreach_possible_intc(intc)
+> >>>>>>>>> 		intc::cpu_intc_create(...)
+> >>>>>>>>>
+> >>>>>>>>> If I find time I might indeed replace the explicit ics and xive
+> >>>>>>>>> pointers with just an array of SpaprInterruptController *.
+> >>>>>>>>
+> >>>>>>>> Or you could use object_child_foreach() and check for the type. =
+If we had
+> >>>>>>>> a helper object_child_foreach_type(), we could use it elsewhere.
+> >>>>>>>
+> >>>>>>> I thought about that, but I don't think it quite works.  The
+> >>>>>>> complication is that the xics device is made explicitly a child o=
+f the
+> >>>>>>> machine, but the xive device has mmio, so it's a SusBusDevice sit=
+ting
+> >>>>>>> on the root bus instead.
+> >>>>>>
+> >>>>>> PnvXscom works fine with Devices and SysBusDevices.
+> >>>>>
+> >>>>> Uh... what's an example of it working with a SysBusDevice?  All the
+> >>>>> implementors of PNV_XSCOM_INTERFACE I could find were instantiated
+> >>>>> with object_initialize_child() making them explicitly children of t=
+he
+> >>>>> chip.  The SPAPR_XIVE is instantiated with qdev_create(NULL,
+> >>>>> TYPE_SPAPR_XIVE), making it a child of the root bus, not the machin=
+e,
+> >>>>> I believe.
+> >>>>
+> >>>> I see. We should reparent the interrupt controller then.
+> >>>
+> >>> Well, maybe.  It's not obvious to me that that's the right approach
+> >>> just because of this.
+> >>>
+> >>>
+> >>>> Could we rework=20
+> >>>> the code to instantiate and realize the XICS and XIVE model objects =
+?=20
+> >>>> We have the handlers spapr_instance_init() and spapr_machine_init().=
+=20
+> >>>
+> >>> I'm not really sure what you're suggesting here.
+> >>
+> >> Define the device model objects under the machine and not pointers :
+> >>
+> >> 	struct SpaprMachineState {
+> >> 		...
+> >> 		ICSState ics;
+> >> 		SpaprXive  xive;
+> >> 		...
+> >> 	};
+> >>
+> >> in spapr_instance_init() :
+> >>
+> >> 	object_initialize_child(obj, "ics",  &spapr->ics, sizeof(spapr->ics),
+> >>                             TYPE_ICS, &error_abort, NULL);
+> >> 	object_property_add_const_link(OBJECT(&spapr->ics), "xics", obj,
+> >>                                    &error_abort);
+> >>
+> >> 	object_initialize_child(obj, "xive",  &spapr->xive, sizeof(spapr->xiv=
+e),
+> >>                             TYPE_SPAPR_XIVE, &error_abort, NULL);
+> >>
+> >>
+> >> in spapr_machine_init(), call the realize handler depending on the cho=
+sen=20
+> >> 'ic-mode'.
+> >=20
+> > Hm, yeah, maybe.  I don't love having a whole structure in there
+> > that's unused when ic-mode !=3D dual.
+> >=20
+>=20
+> This is the pattern followed in the ARM SoC models. Enough room is=20
+> provisioned for the maximum controllers and depending on the SoC
+> configuration only some are realized.
 
- #0  0x00007ffff59da57f in raise () at /lib64/libc.so.6
- #1  0x00007ffff59c4895 in abort () at /lib64/libc.so.6
- #2  0x0000555555b97b1e in error_exit (err=<optimized out>, msg=msg@entry=0x555555d386d0 <__func__.19059> "qemu_mutex_unlock_impl") at util/qemu-thread-posix.c:36
- #3  0x0000555555b97f7f in qemu_mutex_unlock_impl (mutex=mutex@entry=0x5555568002f0, file=file@entry=0x555555d378df "util/async.c", line=line@entry=507) at util/qemu-thread-posix.c:97
- #4  0x0000555555b92f55 in aio_context_release (ctx=ctx@entry=0x555556800290) at util/async.c:507
- #5  0x0000555555b05cf8 in bdrv_prwv_co (child=child@entry=0x7fffc80012f0, offset=offset@entry=131072, qiov=qiov@entry=0x7fffffffd4f0, is_write=is_write@entry=true, flags=flags@entry=0)
-         at block/io.c:833
- #6  0x0000555555b060a9 in bdrv_pwritev (qiov=0x7fffffffd4f0, offset=131072, child=0x7fffc80012f0) at block/io.c:990
- #7  0x0000555555b060a9 in bdrv_pwrite (child=0x7fffc80012f0, offset=131072, buf=<optimized out>, bytes=<optimized out>) at block/io.c:990
- #8  0x0000555555ae172b in qcow2_cache_entry_flush (bs=bs@entry=0x555556810680, c=c@entry=0x5555568cc740, i=i@entry=0) at block/qcow2-cache.c:51
- #9  0x0000555555ae18dd in qcow2_cache_write (bs=bs@entry=0x555556810680, c=0x5555568cc740) at block/qcow2-cache.c:248
- #10 0x0000555555ae15de in qcow2_cache_flush (bs=0x555556810680, c=<optimized out>) at block/qcow2-cache.c:259
- #11 0x0000555555ae16b1 in qcow2_cache_flush_dependency (c=0x5555568a1700, c=0x5555568a1700, bs=0x555556810680) at block/qcow2-cache.c:194
- #12 0x0000555555ae16b1 in qcow2_cache_entry_flush (bs=bs@entry=0x555556810680, c=c@entry=0x5555568a1700, i=i@entry=0) at block/qcow2-cache.c:194
- #13 0x0000555555ae18dd in qcow2_cache_write (bs=bs@entry=0x555556810680, c=0x5555568a1700) at block/qcow2-cache.c:248
- #14 0x0000555555ae15de in qcow2_cache_flush (bs=bs@entry=0x555556810680, c=<optimized out>) at block/qcow2-cache.c:259
- #15 0x0000555555ad242c in qcow2_inactivate (bs=bs@entry=0x555556810680) at block/qcow2.c:2124
- #16 0x0000555555ad2590 in qcow2_close (bs=0x555556810680) at block/qcow2.c:2153
- #17 0x0000555555ab0c62 in bdrv_close (bs=0x555556810680) at block.c:3358
- #18 0x0000555555ab0c62 in bdrv_delete (bs=0x555556810680) at block.c:3542
- #19 0x0000555555ab0c62 in bdrv_unref (bs=0x555556810680) at block.c:4598
- #20 0x0000555555af4d72 in blk_remove_bs (blk=blk@entry=0x5555568103d0) at block/block-backend.c:785
- #21 0x0000555555af4dbb in blk_remove_all_bs () at block/block-backend.c:483
- #22 0x0000555555aae02f in bdrv_close_all () at block.c:3412
- #23 0x00005555557f9796 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4776
+Hm, ok, I guess that makes it a pretty promising approach.  Maybe for
+another day though.  In the meantime I've come up with an approach
+that's not totally elegant, but it does remove the duplication of the
+paths for xics vs. xive, keep the individual pointers in the structure
+for now, and isn't *too* verbose.
 
-The reproducer I used is a qcow2 image on gluster volume, where the
-virtual disk size (4 GB) is larger than the gluster volume size (64M),
-so we can easily trigger an ENOSPC. This backend is assigned to a
-virtio-blk device using an iothread, and then from the guest a
-'dd if=/dev/zero of=/dev/vda bs=1G count=1' causes the VM to stop
-because of an I/O error. qemu_gluster_co_flush_to_disk() sets
-bs->drv = NULL on error, so when virtio-blk stops the dataplane, the
-block nodes stay in the iothread AioContext. A 'quit' monitor command
-issued from this paused state crashes the process.
+I've stripped your R-b due to the change, so please have a look in the
+next spin.
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1631227
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-(cherry picked from commit 1bffe1ae7a7b707c3a14ea2ccd00d3609d3ce4d8)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- block.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-diff --git a/block.c b/block.c
-index 16615bc876..9ae5c0ed2f 100644
---- a/block.c
-+++ b/block.c
-@@ -5672,10 +5672,6 @@ void bdrv_detach_aio_context(BlockDriverState *bs)
-     BdrvAioNotifier *baf, *baf_tmp;
-     BdrvChild *child;
- 
--    if (!bs->drv) {
--        return;
--    }
--
-     assert(!bs->walking_aio_notifiers);
-     bs->walking_aio_notifiers = true;
-     QLIST_FOREACH_SAFE(baf, &bs->aio_notifiers, list, baf_tmp) {
-@@ -5690,7 +5686,7 @@ void bdrv_detach_aio_context(BlockDriverState *bs)
-      */
-     bs->walking_aio_notifiers = false;
- 
--    if (bs->drv->bdrv_detach_aio_context) {
-+    if (bs->drv && bs->drv->bdrv_detach_aio_context) {
-         bs->drv->bdrv_detach_aio_context(bs);
-     }
-     QLIST_FOREACH(child, &bs->children, next) {
-@@ -5709,10 +5705,6 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
-     BdrvAioNotifier *ban, *ban_tmp;
-     BdrvChild *child;
- 
--    if (!bs->drv) {
--        return;
--    }
--
-     if (bs->quiesce_counter) {
-         aio_disable_external(new_context);
-     }
-@@ -5722,7 +5714,7 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
-     QLIST_FOREACH(child, &bs->children, next) {
-         bdrv_attach_aio_context(child->bs, new_context);
-     }
--    if (bs->drv->bdrv_attach_aio_context) {
-+    if (bs->drv && bs->drv->bdrv_attach_aio_context) {
-         bs->drv->bdrv_attach_aio_context(bs, new_context);
-     }
- 
--- 
-2.17.1
+--FfX2iGK5t5ehHnsE
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2T+T4ACgkQbDjKyiDZ
+s5IVPg/+KphXcYbARR1HecpOADQ96JTcCS5ODic7tEiutH4SpO9Cs7+sHATwGo6M
+Kn9XShKJOGehlqe/iMKu7+S9spgoxunXzhltyiMKunk8PJeTViFjpCN5kYTbfWOJ
+va8xT6n1ZOt5J3R5E9oAlgd/PdmfKVmEMPQDOF+BWkVHb5zVfxzfrssRzYaB+pob
+rBI9b+GcuGuwefHOCDxcSaJjeSnUVwkZKo18Davo8ft2wAQiaBmXRN3ptyglVq1u
+L8VPXi2CPcqtUaJ1/jEA6glLyRKiXC3/DKRXRuywsW5lGVZu//7Wt4OqSjIaPLio
+jBU1+PBIiPtFWk7zYID/r4VyTmIbhkaX+WU7w+5Ge/H+1eWOBjegP+RUW/v0dSoG
+dtji5kU8tNfoAWXfd2U4NZUt/D96JNh+giQYCmr9UarvhliVaiBzIzfeu6kiND8k
+7ObAHGGjJwHgB9Uwsrn023snTyzoGIPIgbh7xCbGdfswXx5k5SPoi+mILytXT2lq
+YCm54JO5zDDrPVPvILjQGCZffh1SaaGXByE/Pv3RAmXUaJ/K3iRy8gf1581hG0SZ
+1Te2ddE3gpnGX26duTBMavsiHoDzXTS82XIEfuziXOIUEI4s/Utt5osrFELv1Kdc
+X6EGSZLYomDZU0Tfz2xi3fRYWGeaD9iHnwOZpXg6FZ/pQYkwwZo=
+=YSPw
+-----END PGP SIGNATURE-----
+
+--FfX2iGK5t5ehHnsE--
 
