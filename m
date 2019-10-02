@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5363C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 18:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E09C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 18:45:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F1DA21783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 18:36:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F1DA21783
+	by mail.kernel.org (Postfix) with ESMTPS id D64A521783
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 18:45:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D64A521783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFjUJ-0007nX-KC
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 14:36:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49125)
+	id 1iFjcx-0001Xz-R1
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 14:45:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50289)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFjTT-0007Hy-VC
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 14:35:44 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFjbW-0000od-FY
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 14:44:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFjTS-0006mq-U3
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 14:35:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46204)
+ (envelope-from <mreitz@redhat.com>) id 1iFjbV-0003yt-I3
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 14:44:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:24656)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFjTP-0006lq-33; Wed, 02 Oct 2019 14:35:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1iFjbS-0003rR-Dy; Wed, 02 Oct 2019 14:43:59 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4315E8A1C8D;
- Wed,  2 Oct 2019 18:35:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5649F300C72B;
+ Wed,  2 Oct 2019 18:43:56 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08AF65D9D3;
- Wed,  2 Oct 2019 18:35:31 +0000 (UTC)
-Subject: Re: [PATCH v15 2/5] block/backup: move write_flags calculation inside
- backup_job_create
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 62BE2608A5;
+ Wed,  2 Oct 2019 18:43:51 +0000 (UTC)
+Subject: Re: [PATCH v15 3/5] block/block-copy: split block_copy_set_callbacks
+ function
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20191001131409.14202-1-vsementsov@virtuozzo.com>
- <20191001131409.14202-3-vsementsov@virtuozzo.com>
+ <20191001131409.14202-4-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ea3fbc25-d639-2bc3-4c81-19ee6d68f3b0@redhat.com>
-Date: Wed, 2 Oct 2019 20:35:30 +0200
+Message-ID: <ac1b02bc-d4d0-38e3-c16e-e3cfe6035400@redhat.com>
+Date: Wed, 2 Oct 2019 20:43:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191001131409.14202-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20191001131409.14202-4-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="tbp2dHuCMRLq2C38DbNIRyHdETu2l4sPz"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Wed, 02 Oct 2019 18:35:37 +0000 (UTC)
+ boundary="w3bRPWZnK9zELMhATxHbwT3jWL7u3S9JM"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Wed, 02 Oct 2019 18:43:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -105,45 +105,51 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tbp2dHuCMRLq2C38DbNIRyHdETu2l4sPz
-Content-Type: multipart/mixed; boundary="XHwPbicC1pPEFNV9gCbnB5MNxNUjZ16ll"
+--w3bRPWZnK9zELMhATxHbwT3jWL7u3S9JM
+Content-Type: multipart/mixed; boundary="rPoSTrFbRXHLlr3nkS1gkmHeaf3TEZVm6"
 
---XHwPbicC1pPEFNV9gCbnB5MNxNUjZ16ll
+--rPoSTrFbRXHLlr3nkS1gkmHeaf3TEZVm6
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 01.10.19 15:14, Vladimir Sementsov-Ogievskiy wrote:
-> This is logic-less refactoring, which simplifies further patch, as
-> we'll need write_flags for backup-top filter creation and backup-top
-> should be created before block job creation.
+> Split block_copy_set_callbacks out of block_copy_state_new. It's needed=
+
+> for further commit: block-copy will use BdrvChildren of backup-top
+> filter, so it will be created from backup-top filter creation function.=
+
+> But callbacks will still belong to backup job and will be set in
+> separate.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/backup.c | 30 +++++++++++++++---------------
->  1 file changed, 15 insertions(+), 15 deletions(-)
+>  include/block/block-copy.h | 13 +++++++++----
+>  block/backup.c             |  6 ++++--
+>  block/block-copy.c         | 24 +++++++++++++++---------
+>  3 files changed, 28 insertions(+), 15 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---XHwPbicC1pPEFNV9gCbnB5MNxNUjZ16ll--
+--rPoSTrFbRXHLlr3nkS1gkmHeaf3TEZVm6--
 
---tbp2dHuCMRLq2C38DbNIRyHdETu2l4sPz
+--w3bRPWZnK9zELMhATxHbwT3jWL7u3S9JM
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2U7fIACgkQ9AfbAGHV
-z0DuyQgAnGyvG+b+UL3muSZmCL4GmKrCswfhlJxjhuTeVobPSJzreNbdTQ5d909D
-15WQpzBBKKPDCuZ3Ty2fCYl3lw5m+rUefYEqAIu3YH2iYcAhTcaNuMPhhmVgKPaw
-500rXG6Q6AcgRdKX4bDhvCjblzkZB0NgxUreO/3EML1cU25/X6ic2N4try6zMGdY
-KvOnHpeCF8aZ89/YUqbAaEdYKIUFFLoLAtFqpZJqcSooGxoQIB7WAXOhn+ykaYkD
-McM2HUUwGb1HDzjpvh+XjVALuHZYziq/mSG/6Bxoe9hHVnaXDkVoAoxUsWoHCuTw
-bC8+C1nEp+mFwhy644BBcA/yzx0RRw==
-=ebEM
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2U7+UACgkQ9AfbAGHV
+z0BZ4Qf9Hzc3PThOp/ED9OY+pfaRcAndGdJUF0BJU1sChosMXFnet+jwlLHJ6NHn
+fGBnm5QDfpjqyfU0ciFzh/ycCnHjYt2Td/atuvH1S08LddNX5Zq+8dJjyLl8ejhD
+JFzuXaalhmiZbIl7mwSFFBTTtPZflNnVDhf45+RBZSzL4SHffM78XZ7oxfjA/45z
+//7ovqd2PeSak3kN+zSSDc6AmEVboEIOuUXQZSpe5bybFgjh5BFft/q4ke/7wEBK
+nIlB0lT8Un6VR70M4S1gL0aiVm2nU4cL89hIYIs9JYkgt7a5vPAsg0Lts0Un/iBa
+FgJBsIWODY7y/pDfAwVCp4i/fuPVSg==
+=Iv4F
 -----END PGP SIGNATURE-----
 
---tbp2dHuCMRLq2C38DbNIRyHdETu2l4sPz--
+--w3bRPWZnK9zELMhATxHbwT3jWL7u3S9JM--
 
