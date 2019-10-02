@@ -7,82 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B80C10F14
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F87BC10F14
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:01:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F86A21920
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:00:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C1242086A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:01:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fa4o45vj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F86A21920
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E3JjPbvX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1242086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFhzG-00067x-Ng
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:00:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35416)
+	id 1iFi0F-00077X-9j
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:01:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrK-0005Oy-Qr
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:15 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrC-0005E9-Lj
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrJ-0003OF-QR
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:14 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:33792)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrB-0003Dw-J4
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:06 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42466)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iFhrJ-0003MW-Jx
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:13 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id y135so5358831wmc.1
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:13 -0700 (PDT)
+ id 1iFhrB-0003Cz-C7
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:05 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n14so20460588wrw.9
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Gwkm7BIFv5Gq9pCfaTUHfWzPGvgH4PsTi5+em8nFU0M=;
- b=fa4o45vjhLkC08Qa54nmAY9BTjZkdWS9WoeavtDyiAVR9pWHSDqqxFUAaDGkkzd6MF
- o/Db/MSf6/FbO6DBLKK7fbzfAygckuTTvhh0N2Wi6BE1UM3KIipCcYcI0R/Ga9W9QTki
- ZoQ1Nrj0LBfa4C57qS3VDhS64Kr0cQE/7NgVtzpnvIlDLR92X9Ze8TWup6d/P/NeYsFV
- 6mIV9J9pirfasWT0BsJpDGWwHnv28NegO1L1ovC9X2dC1z1BevEGDO/D9b98CW/vwN8P
- idX9Eq5PHkLrIXZXnWUcWrmkxPme6jPT5bklY2/QPXwZK8xZc6wIliFqk34O+QGP2zRx
- n6OA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=7wcBLal9cVFkgaCtfQxJxYKhmsjCSuFD9FIEO060xXw=;
+ b=E3JjPbvXTVE2hldjOBDhjC7atG3mYxKBtXCZPmFUTwd6fcJHdWHU4cb9asK/dieV9R
+ 2p+iqFTDfYLDeWGhoFF/H+Hqf78jhhgC/X4kTehNTJwclDt/BhVRcwCRSB7USVYQk9b0
+ rc5DJmiJAOp/eYJM7FrswQnRyo3Pd6ob5coCk0zJIEGcKk1gHUpOxSSYfbTArU/uSCQ0
+ GX7yWYcLPGkY+rQHGp6lA+bvYBPbjx7HBUI/bklJkJroBA+7yrPu3FTVpPNJMMt0IyJ3
+ CGzImDWLTGb45E+423LBfWSlUkNboZk7urPqAUR/f75CDh0JsRlmSehcUhSA7gv0zOLS
+ PuFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Gwkm7BIFv5Gq9pCfaTUHfWzPGvgH4PsTi5+em8nFU0M=;
- b=qI0nmQH242TeYwgsUb2OeDVhWAnDW6yBM4SBfhWDNCHhNtykrHguCgKwBi8yxWlB6k
- rCP6QwEw6drdYOUln1Qx3fBnqRZUKUtVRZVlli0R1pdGrX6qCtqFU9fDi21TU+Hc2pJK
- 55Sf4ByW5d2vwCMfbh6+KghIi0t5gzgK3qh9aWgDSWYg1MeaOLhxxJF3Ey8HlzroWrbU
- G/qDmRmggONJqHi+fiApliQXwW/SqwQWOxW6nvbhnrL1yVjM3LbEAJBqxX0PioHgGqYC
- oN8u+K/oa2T/6viKV7KkJ//wBe2vkUlfvJSupuXdulhiSYPA9HDW6NOpBMT8UrGB/8/D
- f8aQ==
-X-Gm-Message-State: APjAAAXr7YrAu3kqMdoWF4u2/rYNS+bX535Be+7Q4NpMRhBUb+du2h+d
- SRQuoad0W4s3QgEcMLTYfAZ0uWRb
-X-Google-Smtp-Source: APXvYqwewTrRnzms8LNKk1xv0R958YgLVK+AnWrOfifhvJyGI4yllqhI9ouvdRWmpobgPO0yZjjJoA==
-X-Received: by 2002:a1c:7c15:: with SMTP id x21mr3384082wmc.36.1570035132386; 
- Wed, 02 Oct 2019 09:52:12 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=7wcBLal9cVFkgaCtfQxJxYKhmsjCSuFD9FIEO060xXw=;
+ b=osoD9QV9AahzG9oVDQFAUarhguYD+t4Y9DrNQAg7NWV2bxbEyPdgdIm98mzwaOnu8T
+ IKPwmHpNw02WClfhShYQ5uAWxVk9kozsOBRX+SkjqXVU+/lXchE6YLtwhuczYWxKEycg
+ D9N5iYnET7mOHOjV0rz5SKiC9X8bquBr7qn9RQKbgaTwRUv1Vu0yI3R3H8gvuESo78V7
+ /JIae7keOCKrOj4xvR17+kYWCykU/dx5FTEjjOps2A+XFyGEhf9st71NWIbXS2RTnkHd
+ jofN6aS1JzvT/BxdTUNGz06z5RkFhbVKyf01+vPVt79lE5HYVn5uNQAWsz90lvGZlxMN
+ rGOw==
+X-Gm-Message-State: APjAAAWsXgqcS9yTw+wfylNwnU/VXLV+qIsUf+da/JPGrwbaHVurN2eN
+ mY/BjNlKRrQCzsqoURm/iaEhpXy3
+X-Google-Smtp-Source: APXvYqy0KlRLgifrLEwjYcOTemNjwZ6QTZcg1rWR0jwRMj/SQPvtBjcFeWzZviuWkFguOhQJAMivww==
+X-Received: by 2002:a05:6000:108c:: with SMTP id
+ y12mr3383528wrw.238.1570035124117; 
+ Wed, 02 Oct 2019 09:52:04 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.11
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.03
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 02 Oct 2019 09:52:11 -0700 (PDT)
+ Wed, 02 Oct 2019 09:52:03 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/30] hppa: fix leak from g_strdup_printf
-Date: Wed,  2 Oct 2019 18:51:40 +0200
-Message-Id: <1570035113-56848-18-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 09/30] target/i386/kvm: Silence warning from Valgrind about
+ uninitialized bytes
+Date: Wed,  2 Oct 2019 18:51:32 +0200
+Message-Id: <1570035113-56848-10-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
 References: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,53 +91,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_init_* takes care of copying the name into memory it owns.
-Free it in the caller.
+From: Thomas Huth <thuth@redhat.com>
 
+When I run QEMU with KVM under Valgrind, I currently get this warning:
+
+ Syscall param ioctl(generic) points to uninitialised byte(s)
+    at 0x95BA45B: ioctl (in /usr/lib64/libc-2.28.so)
+    by 0x429DC3: kvm_ioctl (kvm-all.c:2365)
+    by 0x51B249: kvm_arch_get_supported_msr_feature (kvm.c:469)
+    by 0x4C2A49: x86_cpu_get_supported_feature_word (cpu.c:3765)
+    by 0x4C4116: x86_cpu_expand_features (cpu.c:5065)
+    by 0x4C7F8D: x86_cpu_realizefn (cpu.c:5242)
+    by 0x5961F3: device_set_realized (qdev.c:835)
+    by 0x7038F6: property_set_bool (object.c:2080)
+    by 0x707EFE: object_property_set_qobject (qom-qobject.c:26)
+    by 0x705814: object_property_set_bool (object.c:1338)
+    by 0x498435: pc_new_cpu (pc.c:1549)
+    by 0x49C67D: pc_cpus_init (pc.c:1681)
+  Address 0x1ffeffee74 is on thread 1's stack
+  in frame #2, created by kvm_arch_get_supported_msr_feature (kvm.c:445)
+
+It's harmless, but a little bit annoying, so silence it by properly
+initializing the whole structure with zeroes.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/hppa/dino.c    | 1 +
- hw/hppa/machine.c | 4 +++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ target/i386/kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index e0466ee..ab6969b 100644
---- a/hw/hppa/dino.c
-+++ b/hw/hppa/dino.c
-@@ -485,6 +485,7 @@ PCIBus *dino_init(MemoryRegion *addr_space,
-         memory_region_init_alias(&s->pci_mem_alias[i], OBJECT(s),
-                                  name, &s->pci_mem, addr,
-                                  DINO_MEM_CHUNK_SIZE);
-+        g_free(name);
-     }
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 91d0bf6..522d9fd 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -188,7 +188,7 @@ static int kvm_get_tsc(CPUState *cs)
+     struct {
+         struct kvm_msrs info;
+         struct kvm_msr_entry entries[1];
+-    } msr_data;
++    } msr_data = {};
+     int ret;
  
-     /* Set up PCI view of memory: Bus master address space.  */
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 2736ce8..7e23675 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -78,13 +78,15 @@ static void machine_hppa_init(MachineState *machine)
+     if (env->tsc_valid) {
+@@ -448,7 +448,7 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+     struct {
+         struct kvm_msrs info;
+         struct kvm_msr_entry entries[1];
+-    } msr_data;
++    } msr_data = {};
+     uint64_t value;
+     uint32_t ret, can_be_one, must_be_one;
  
-     /* Create CPUs.  */
-     for (i = 0; i < smp_cpus; i++) {
-+        char *name = g_strdup_printf("cpu%ld-io-eir", i);
-         cpu[i] = HPPA_CPU(cpu_create(machine->cpu_type));
- 
-         cpu_region = g_new(MemoryRegion, 1);
-         memory_region_init_io(cpu_region, OBJECT(cpu[i]), &hppa_io_eir_ops,
--                              cpu[i], g_strdup_printf("cpu%ld-io-eir", i), 4);
-+                              cpu[i], name, 4);
-         memory_region_add_subregion(addr_space, CPU_HPA + i * 0x1000,
-                                     cpu_region);
-+        g_free(name);
-     }
- 
-     /* Limit main memory. */
 -- 
 1.8.3.1
 
