@@ -2,71 +2,119 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F40C352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36B6CC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:51:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 889DF21783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:49:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 889DF21783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DEE2A21783
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 13:51:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="cpo58WnD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEE2A21783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFf0i-00084c-Mg
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 09:49:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60051)
+	id 1iFf2q-0001Ts-Us
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 09:51:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60616)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1iFezH-0007UG-MA
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:48:19 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFf25-0000xY-0d
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:51:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1iFezF-0001gN-LQ
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:48:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56346)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>)
- id 1iFezA-0001cf-Uk; Wed, 02 Oct 2019 09:48:09 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 020325945B;
- Wed,  2 Oct 2019 13:48:08 +0000 (UTC)
-Received: from angien.pipo.sk (unknown [10.43.2.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 53F8B100197A;
- Wed,  2 Oct 2019 13:48:03 +0000 (UTC)
-Date: Wed, 2 Oct 2019 15:48:00 +0200
-From: Peter Krempa <pkrempa@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: bitmap migration bug with -drive while block mirror runs
-Message-ID: <20191002134800.GF6129@angien.pipo.sk>
-References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
- <d897c755-40e7-6392-23e3-c06b1a371f28@virtuozzo.com>
- <4bc910ef-0bec-cfd6-89f6-a93d35367218@redhat.com>
- <9431d242-bfe1-b9db-17d0-6c1a280a05da@virtuozzo.com>
- <e112c85a-684f-5721-2da7-d23312c9e487@redhat.com>
- <20191002104600.GC6129@angien.pipo.sk>
- <20191002111147.GB5819@localhost.localdomain>
- <b102c656-0d17-16d7-3414-6828e569b90f@virtuozzo.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iFf23-0003BK-BC
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 09:51:08 -0400
+Received: from mail-eopbgr20123.outbound.protection.outlook.com
+ ([40.107.2.123]:2531 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iFf22-00038j-Jl; Wed, 02 Oct 2019 09:51:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ghIfwgSfllL8koaO9TdspMHiJ9Td4pbeZyJsqrNM/ooiyzXuODwfG1axFJoCZW90SdsdfRhnjz3K2Q3yy2Ih6lgfO7ekXV+LPPZR9ZzZ8GZvChewQ36G2kT/RyX0pZT4Z6LBdhufC+imeKMWAzUb1Aqzu1zqTlFUJaVtPJmQlWN2c+Z2QU46ZlgXuIZ0n+CIm/FsVxJ/eXmztqIj2sq45f7PhvnTgLlAQecUk0CWVRjK6tZ0LsLPANI++DAm0xEmnh9jK7Ps1RYRdULAKSPuDTd1agrEKIIBxC5vUn2nl4ML9vVubW9noLscHJmQ1ISTQNHuVNsHloHE5bsPlfI+wA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vMPQnyZD1yNIhgMhsJdK/jHqH3ufrITizV3i7dV/gqU=;
+ b=BMbxYTTuh7BOLIgQvztYgEoxqtRvRjJRgOr7PQ6H2NDdCzu8E60fzxnUw556TXEk9mEuGaeHO/FWDupurnqeJP/1EZsi9ll1jIDUp4cu1uD9D10F0zV0poR4Y1YI9dL0I4HZAohYwvU+IIORQIbWoFG5AFjuL5qKgCCfSbAB+1X71Nkbh7Aqjv+8MadqTQVfMkM/Bb4hVrwzK4OZRQgHaWuHdDp1+BXlAB5CfSAKp/ZROrfwgA7qrc45HFprMIIdqrJEwHYgIzcscJEKrEUzyGErNgCGFDXfIoho8TAVuOyTsPIcKzxmA7dK9iYfFD0ElVjPTZHA7382gjHyAQihXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vMPQnyZD1yNIhgMhsJdK/jHqH3ufrITizV3i7dV/gqU=;
+ b=cpo58WnDoJPwXaw19d3HodXvidpjvBKUcBvxlNzdQrP8QNedZ6TnNNIHO3gIQlFbY/X1JcfprOqyz65w4x6hhD7ZBcL8y9ZfCqRMZFtHUYqZHGIv7dPm09IsWlFdiLA6GHDQbDaxpqkEkETAM6SyudNbYfFOWq4/MkZhFEa0MS4=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB3996.eurprd08.prod.outlook.com (20.179.9.90) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.20; Wed, 2 Oct 2019 13:51:01 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.023; Wed, 2 Oct 2019
+ 13:51:01 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH 17/22] iotests: Add VM.assert_block_path()
+Thread-Topic: [PATCH 17/22] iotests: Add VM.assert_block_path()
+Thread-Index: AQHVb8qng16jD1DLk0mMEq10srCWrqc+B8EAgAlVwICAABO/AA==
+Date: Wed, 2 Oct 2019 13:51:00 +0000
+Message-ID: <b564a2f1-e0cf-7e10-ec84-665f5b246643@virtuozzo.com>
+References: <20190920152804.12875-1-mreitz@redhat.com>
+ <20190920152804.12875-18-mreitz@redhat.com>
+ <de0a9fe2-ea84-7be9-6911-b806f032cfff@virtuozzo.com>
+ <b977e9f8-53f0-290e-5eb5-73c02469779b@redhat.com>
+In-Reply-To: <b977e9f8-53f0-290e-5eb5-73c02469779b@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0402CA0024.eurprd04.prod.outlook.com
+ (2603:10a6:3:d0::34) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191002165058313
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b5177c3a-9006-4cf9-9841-08d7473f8f3c
+x-ms-traffictypediagnostic: DB8PR08MB3996:
+x-microsoft-antispam-prvs: <DB8PR08MB39969C42364B31C15A8FAC69C19C0@DB8PR08MB3996.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 0178184651
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(366004)(396003)(136003)(39850400004)(376002)(199004)(189003)(54906003)(102836004)(2501003)(6246003)(6512007)(66946007)(486006)(66446008)(229853002)(26005)(36756003)(71190400001)(71200400001)(66066001)(25786009)(446003)(476003)(2616005)(478600001)(4326008)(11346002)(86362001)(3846002)(52116002)(186003)(76176011)(6116002)(305945005)(31696002)(8676002)(316002)(14454004)(7736002)(2906002)(110136005)(81166006)(81156014)(386003)(6486002)(66556008)(66476007)(64756008)(6436002)(6506007)(53546011)(256004)(14444005)(31686004)(99286004)(5660300002)(8936002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB3996;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dOacOzRRgJ7UcKX+l5Ywx3iWJ5JNBcZrQU8DLzgA34I1BgWvAGKxWnqnBQN615I80xZ8zrDiAw4qIsgFRVAE51DL/f/Ovrdwv5pEPBk9oUVICWHFZs+mGdApKvqMbfHk/11rPjPH1N5QorCWdFldGtEmo6FK9TJ/ZGQU6seyY9zjCYTtLyL3dI+DFwdAahLxHYfPvZVnkvnJOO1R0I7vIcbrAZFb90G2FxeqF0SjwHQ9puv8RZFmUi0bl6hG4j1z5+U+L3EA46fS/UTRyHcCu0qVj/m3qdy/mGKslootK+ib93FVWhWGfMusfGTgcp9Us234xTm+CSpCydsCW3kpy1U17A1dFvIHwpstjYtA6BmgmWjARe2jAGv57lbzZLyU5/jTErQ+12TUb1WYggLfmwK0zYBz1eGbLgQB64NLDVg=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <162BDACF0A7E694F93EB12EEF2388F8B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b102c656-0d17-16d7-3414-6828e569b90f@virtuozzo.com>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 02 Oct 2019 13:48:08 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5177c3a-9006-4cf9-9841-08d7473f8f3c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Oct 2019 13:51:00.9600 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ltm3bToHMeX8XgbZsy1+T5+M8rjfIVMFxs+xUX5ICHQ5pHTegqQDEmoSN97fjSeaTpKKIXwpYlAs5S2VFkEwbS8I37yYzEvXSKuWlOdnn94=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB3996
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.2.123
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,163 +126,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 02, 2019 at 12:22:01 +0000, Vladimir Sementsov-Ogievskiy wrote:
-> 02.10.2019 14:11, Kevin Wolf wrote:
-> > Am 02.10.2019 um 12:46 hat Peter Krempa geschrieben:
-> >> On Tue, Oct 01, 2019 at 12:07:54 -0400, John Snow wrote:
-> >>>
-> >>>
-> >>> On 10/1/19 11:57 AM, Vladimir Sementsov-Ogievskiy wrote:
-> >>>> 01.10.2019 17:10, John Snow wrote:
-> >>>>>
-> >>>>>
-> >>>>> On 10/1/19 10:00 AM, Vladimir Sementsov-Ogievskiy wrote:
-> >>>>>>> Otherwise: I have a lot of cloudy ideas on how to solve this, but
-> >>>>>>> ultimately what we want is to be able to find the "addressable" name for
-> >>>>>>> the node the bitmap is attached to, which would be the name of the first
-> >>>>>>> ancestor node that isn't a filter. (OR, the name of the block-backend
-> >>>>>>> above that node.)
-> >>>>>> Not the name of ancestor node, it will break mapping: it must be name of the
-> >>>>>> node itself or name of parent (may be through several filters) block-backend
-> >>>>>>
-> >>>>>
-> >>>>> Ah, you are right of course -- because block-backends are the only
-> >>>>> "nodes" for which we actually descend the graph and add the bitmap to
-> >>>>> its child.
-> >>>>>
-> >>>>> So the real back-resolution mechanism is:
-> >>>>>
-> >>>
-> >>> Amendment:
-> >>>     - If our local node-name N is well-formed, use this.
-> >>
-> >> I'd like to re-iterate that the necessity to keep node names same on
-> >> both sides of migration is unexpected, undocumented and in some cases
-> >> impossible.
-> > 
-> > I think the (implicitly made) requirement is not that all node-names are
-> > kept the same, but only the node-names of those nodes for which
-> > migration transfers some state.
-> > 
-> > It seems to me that bitmap migration is the first case of putting
-> > something in the migration stream that isn't related to a frontend, but
-> > to the backend, so the usual device hierarchy to address information
-> > doesn't work here. And it seems the implications of this weren't really
-> > considered sufficiently, resulting in the design problem we're
-> > discussing now.
-> > 
-> > What we need to transfer is dirty bitmaps, which can be attached to any
-> > node in the block graph. If we accept that the way to transfer this is
-> > the migration stream, we need a way to tell which bitmap belongs to
-> > which node. Matching node-name is the obvious answer, just like a
-> > matching device tree hierarchy is used for frontends.
-> > 
-> > If we don't want to use the migration stream for backends, we would need
-> > to find another way to transfer the bitmaps. I would welcome removing
-> > backend data from the migration stream, but if this includes
-> > non-persistent bitmaps, I don't see what the alternative could be.
-> 
-> But how to migrate persistent bitmaps if storage is not shared?
-
-In that case we are exporting new fresh images from destination qemu
-using NBD and mapping them into the source and using
-blockdev/drive-mirror to copy the data.
-
-At that point (since it's mapped) we could theoretically copy them over.
-
-We certainly do want to copy over bitmaps using blockdev-mirror when
-doing a standar virDomainBlockCopy operation in libvirt, so this could
-share the code path.
-
-> 
-> And even with only persistent bitmaps and shared storage: bitmaps data may
-> be large, and storing/loading it during migration downtime will increase
-> it.
-
-Note that for non-shared storage migration the downtime is bigger
-anyways due to us setting up the NBD and having to terminate the jobs
-etc.
-
-> 
-> > 
-> >> If you want to mandate that they must be kept the same please document
-> >> it and also note the following:
-> >>
-> >> - during migrations the storage layout may change e.g. a backing chain
-> >>    may become flattened, thus keeping node names stable beyond the top
-> >>    layer is impossible
-> > 
-> > You don't want to transfer bitmaps of nodes that you're going to drop.
-> > I'm not an expert for these bitmaps, but I think this just means you
-> > would have to disable any bitmaps on the backing files to be dropped on
-> > the source host before you migrate.
-> 
-> You mean remove them.. But yes, any way it's not a problem. If corresponding
-> node isn't exist on target, we don't need any bitmaps for it.
-> 
-> > 
-> >> - in some cases (readonly image in a cdrom not present on destination,
-> >>    thus not relevant here probably) it may even become impossible to
-> >>    create any node thus keeping the top node may be impossible
-> > 
-> > Same thing, you don't want to transfer a bitmap for a node that
-> > disappears.
-> > 
-> >> - it should be documented when and why this happens and how management
-> >>    tools are supposed to do it
-> >>
-> >> - please let me know what's actually expected, since libvirt
-> >>    didn't enable blockdev yet we can fix any unexpected expectations
-> >>
-> >> - Document it so that the expectations don't change after this.
-> > 
-> > Yes, we need a good and ideally future-proof rule of which node-names
-> > need to stay the same. Currently it's only bitmaps, but might we get
-> > another feature later where we want to transfer more backend data?
-> > 
-> >> - Ideally node names will not be bound to anything and freely
-> >>    changeable. If necessary we can provide a map to qemu during migration
-> >>    which is probably less painful and more straightforward than keeping
-> >>    them in sync somehow ...
-> > 
-> > A map feels painful for the average user (and for the QEMU
-> > implementation), even if it looks convenient for libvirt. If anything,
-> > I'd make it optional and default to 1:1 mappings for anything that isn't
-> > explicitly mapped.
-> > 
-> 
-> Hmm, I don't think that optional map is painful.
-> 
-> What about the following:
-> 
-> 1. If map is provided:
-> - migrate only bitmaps in nodes, specified by map
-> - bitmaps migrated only accordingly to the map, block device names are not involved at all
-> 
-> 2. If map not provided:
-> - For nodes directly bound to named block backends, or through several filters, use name of this
-> block backend.
-> - For other nodes use node-name
-
-As I've pointed out in a different response, it feels wrong to me to
-enable such a feature by default if it can mis-map the targets for the
-bitmap migration unknowingly. Especially since users weren't expecting
-that the implications of naming nodes in conjunction with migration.
-
-> 
-> ===
-> 
-> And I think [2.] should be done now to fix current bug, and [1.] may be postponed until we
-> really need it.
-> 
-> -- 
-> Best regards,
-> Vladimir
+MDIuMTAuMjAxOSAxNTo0MCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyNi4wOS4xOSAxNjowNywg
+VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDIwLjA5LjIwMTkgMTg6Mjcs
+IE1heCBSZWl0eiB3cm90ZToNCj4+PiBTaWduZWQtb2ZmLWJ5OiBNYXggUmVpdHogPG1yZWl0ekBy
+ZWRoYXQuY29tPg0KPj4+IC0tLQ0KPj4+ICAgIHRlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5
+IHwgNDggKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4+PiAgICAxIGZpbGUg
+Y2hhbmdlZCwgNDggaW5zZXJ0aW9ucygrKQ0KPj4+DQo+Pj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3Fl
+bXUtaW90ZXN0cy9pb3Rlc3RzLnB5IGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkNCj4+
+PiBpbmRleCBkYWVkNGVlMDEzLi5lNmZiNDYyODdkIDEwMDY0NA0KPj4+IC0tLSBhL3Rlc3RzL3Fl
+bXUtaW90ZXN0cy9pb3Rlc3RzLnB5DQo+Pj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVz
+dHMucHkNCj4+PiBAQCAtNjcwLDYgKzY3MCw1NCBAQCBjbGFzcyBWTShxdGVzdC5RRU1VUXRlc3RN
+YWNoaW5lKToNCj4+PiAgICANCj4+PiAgICAgICAgICAgIHJldHVybiBmaWVsZHMuaXRlbXMoKSA8
+PSByZXQuaXRlbXMoKQ0KPj4+ICAgIA0KPj4+ICsgICAgJycnDQo+Pj4gKyAgICBAcGF0aCBpcyBh
+IHN0cmluZyB3aG9zZSBjb21wb25lbnRzIGFyZSBzZXBhcmF0ZWQgYnkgc2xhc2hlcy4NCj4+PiAr
+ICAgIFRoZSBmaXJzdCBjb21wb25lbnQgaXMgYSBub2RlIG5hbWUsIHRoZSByZXN0IGFyZSBjaGls
+ZCBuYW1lcy4NCj4+PiArICAgIEV4YW1wbGVzOg0KPj4+ICsgICAgICAtICJxY293Mi1ub2RlL2Jh
+Y2tpbmcvZmlsZSINCj4+PiArICAgICAgLSAicXVvcnVtLW5vZGUvY2hpbGRyZW4uMi9maWxlIg0K
+Pj4NCj4+IFBvc3NpYmx5LCBzZXBhcnRpbmcgbm9kZS1uYW1lIHRvIGZpcnN0IHBhcmFtZXRlciBh
+bmQga2VlcGluZyBjaGlsZC1wYXRoIGFzDQo+PiBhIHNlY29uZCB3aWxsIHNpbXBsaWZ5IGNvZGUg
+YSBiaXQsIGFuZCBiZSBtb3JlIHVzZWZ1bCBmb3IgY2FzZXMgd2hlbiBvbiBjYWxsZXINCj4+IHBh
+cnQgbm9kZS1uYW1lIGlzIGluIHZhcmlhYmxlLg0KPiANCj4gU291bmRzIGdvb2QuDQo+IA0KPj4+
+ICsNCj4+PiArICAgIEBleHBlY3RlZF9ub2RlIG1heSBiZSBOb25lLg0KPj4+ICsNCj4+PiArICAg
+IEBncmFwaCBtYXkgYmUgTm9uZSBvciB0aGUgcmVzdWx0IG9mIGFuIHgtZGVidWctcXVlcnktYmxv
+Y2stZ3JhcGgNCj4+PiArICAgIGNhbGwgdGhhdCBoYXMgYWxyZWFkeSBiZWVuIHBlcmZvcm1lZC4N
+Cj4+PiArICAgICcnJw0KPj4+ICsgICAgZGVmIGFzc2VydF9ibG9ja19wYXRoKHNlbGYsIHBhdGgs
+IGV4cGVjdGVkX25vZGUsIGdyYXBoPU5vbmUpOg0KPj4+ICsgICAgICAgIGlmIGdyYXBoIGlzIE5v
+bmU6DQo+Pj4gKyAgICAgICAgICAgIGdyYXBoID0gc2VsZi5xbXAoJ3gtZGVidWctcXVlcnktYmxv
+Y2stZ3JhcGgnKVsncmV0dXJuJ10NCj4+DQo+PiBZYXkhIEknbSBoYXBweSB0byBzZWUgdGhhdCBp
+dCdzIHVzZWZ1bC4NCj4gDQo+IDotKQ0KPiANCj4gSXTigJlzIHByb2JhYmx5IHRoZSBiZXN0IHF1
+ZXJ5IGZ1bmN0aW9uIHdlIGhhdmUuDQo+IA0KPj4+ICsNCj4+PiArICAgICAgICBpdGVyX3BhdGgg
+PSBpdGVyKHBhdGguc3BsaXQoJy8nKSkNCj4+PiArICAgICAgICByb290ID0gbmV4dChpdGVyX3Bh
+dGgpDQo+Pj4gKyAgICAgICAgdHJ5Og0KPj4+ICsgICAgICAgICAgICBub2RlID0gbmV4dChub2Rl
+IGZvciBub2RlIGluIGdyYXBoWydub2RlcyddIGlmIG5vZGVbJ25hbWUnXSA9PSByb290KQ0KPj4+
+ICsgICAgICAgIGV4Y2VwdCBTdG9wSXRlcmF0aW9uOg0KPj4+ICsgICAgICAgICAgICBub2RlID0g
+Tm9uZQ0KPj4NCj4+IGZvciBzdWNoIHVzYWdlIG5leHQgaGFzIHNlY29uZCBvcHRpb25hbCBhcmd1
+bWVudDogbmV4dChpdGVyYXRvclssIGRlZmF1bHRdKQ0KPiANCj4gR3JlYXQhDQo+IA0KPj4gKGRv
+bid0IHRoaW5rIEkgdGVhY2ggeW91IFB5dGhvbiwgYWN0dWFsbHkgeW91IHRlYWNoIG1lLCBhcyBi
+ZWZvcmUgSSBkaWRuJ3Qga25vdw0KPj4gY29ycmVjdCB3YXkgdG8gc2VhcmNoIGZpcnN0IGVsZW1l
+bnQgd2l0aCBjb25kaXRpb24pDQo+IA0KPiBXZSBsZWFybiBmcm9tIG9uZSBhbm90aGVyLCB3aGlj
+aCBpcyB0aGUgYmVzdCBjYXNlLg0KPiANCj4+PiArDQo+Pj4gKyAgICAgICAgZm9yIHBhdGhfbm9k
+ZSBpbiBpdGVyX3BhdGg6DQo+Pj4gKyAgICAgICAgICAgIGFzc2VydCBub2RlIGlzIG5vdCBOb25l
+LCAnQ2Fubm90IGZvbGxvdyBwYXRoICVzJyAlIHBhdGgNCj4+PiArDQo+Pj4gKyAgICAgICAgICAg
+IHRyeToNCj4+PiArICAgICAgICAgICAgICAgIG5vZGVfaWQgPSBuZXh0KGVkZ2VbJ2NoaWxkJ10g
+Zm9yIGVkZ2UgaW4gZ3JhcGhbJ2VkZ2VzJ10gXA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBpZiBlZGdlWydwYXJlbnQnXSA9PSBub2RlWydpZCddIGFu
+ZA0KPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBl
+ZGdlWyduYW1lJ10gPT0gcGF0aF9ub2RlKQ0KPj4NCj4+IEhtbSBoZXJlIHlvdSBhbGxvdyBkZWZh
+dWx0IFN0b3BJdGVyYXRpb24gZXhjZXB0aW9uIFsxXQ0KDQpicnIsIEkganVzdCBtaXN0YWtlbiBo
+ZXJlOiB3ZSBhcmUgaW4gc2FtZSB0cnktZXhjZXB0IGFzIHRoZSBmb2xsb3dpbmcgbGluZSwgYW5k
+IHdlJ2xsDQpjYXRjaCBpdCBvZiBjb3Vyc2UNCg0KPj4NCj4+DQo+Pj4gKw0KPj4+ICsgICAgICAg
+ICAgICAgICAgbm9kZSA9IG5leHQobm9kZSBmb3Igbm9kZSBpbiBncmFwaFsnbm9kZXMnXSBcDQo+
+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlmIG5vZGVbJ2lkJ10gPT0gbm9k
+ZV9pZCkNCj4+PiArICAgICAgICAgICAgZXhjZXB0IFN0b3BJdGVyYXRpb246DQo+Pj4gKyAgICAg
+ICAgICAgICAgICBub2RlID0gTm9uZQ0KPj4NCj4+IGFjdHVhbGx5LCBJIHRoaW5rIHRoaXMgd2ls
+bCBuZXZlciBoYXBwZW4sIHNvIHdlIG1heSBzaW1wbGlmeSBjb2RlIGFuZCBhbGxvdyBpdCB0bw0K
+Pj4gdGhyb3cgU3RvcEl0ZXJhdGlvbiBleGNlcHRpb24gaW4gdGhpcyBpbXBvc3NpYmxlIGNhc2Uu
+Lg0KPiANCj4gVGhpcyBpcyBmb3IgYSB1c2UgY2FzZSB3aGVyZSB0aGUgbmV4dCBjaGlsZCBzaW1w
+bHkgZG9lc27igJl0IGV4aXN0LCBzbyB5b3UNCj4gY2FuIGRvOg0KPiANCj4gYXNzZXJ0X2Jsb2Nr
+X3BhdGgoJ3Fjb3cyLW5vZGUvYmFja2luZycsIE5vbmUpDQo+IA0KPiBUbyB2ZXJpZnkgdGhhdCB0
+aGUgcWNvdzIgbm9kZSBoYXMgbm8gYmFja2luZyBmaWxlLg0KPiANCj4+PiArDQo+Pj4gKyAgICAg
+ICAgYXNzZXJ0IG5vZGUgaXMgbm90IE5vbmUgb3IgZXhwZWN0ZWRfbm9kZSBpcyBOb25lLCBcDQo+
+Pj4gKyAgICAgICAgICAgICAgICdObyBub2RlIGZvdW5kIHVuZGVyICVzIChidXQgZXhwZWN0ZWQg
+JXMpJyAlIFwNCj4+PiArICAgICAgICAgICAgICAgKHBhdGgsIGV4cGVjdGVkX25vZGUpDQo+Pg0K
+Pj4gbm9kZSBtYXkgYmUgTm9uZSBoZXJlIG9ubHkgZnJvbSBsYXN0IGl0ZXJhdGlvbiwgYnV0IGl0
+IGNhbid0IGhhcHBlbjogaWYgd2UgaGF2ZSBlZGdlDQo+PiB3aXRoIGNoaWxkLCB3ZSdsbCBmb3Ig
+c3VyZSBoYXZlIG5vZGUgd2l0aCBzdWNoIG5vZGUtbmFtZSBpbiBncmFwaA0KPiANCj4gbm9kZSB3
+aWxsIGFsd2F5cyBiZSBzZXQgYnkgdGhlIHRyeS1leGNlcHQgYmxvY2ssIHdvbuKAmXQgaXQ/DQo+
+IA0KPj4+ICsNCj4+PiArICAgICAgICBhc3NlcnQgZXhwZWN0ZWRfbm9kZSBpcyBub3QgTm9uZSBv
+ciBub2RlIGlzIE5vbmUsIFwNCj4+PiArICAgICAgICAgICAgICAgJ0ZvdW5kIG5vZGUgJXMgdW5k
+ZXIgJXMgKGJ1dCBleHBlY3RlZCBub25lKScgJSBcDQo+Pj4gKyAgICAgICAgICAgICAgIChub2Rl
+WyduYW1lJ10sIHBhdGgpDQo+Pg0KPj4gaG1tLCBzbyBleHBlY3RlZF9ub2RlPU5vbmUgbWVhbnMg
+d2Ugd2FudCB0byBwcm92ZSB0aGF0IHRoZXJlIGlzIG5vIHN1Y2ggbm9kZT8gSXQgc2hvdWxkDQo+
+PiBiZSBtZW50aW9uZWQgaW4gY29tbWVudCBhYm92ZSB0aGUgZnVuY3Rpb24uIEJ1dCB0aGlzIGRv
+bid0IHdvcmsgZHVlIHRvIFsxXQ0KPiANCj4gSG0sIEkgc2VlbSB0byByZW1lbWJlciBJIHRlc3Rl
+ZCBhbGwgY2FzZXMgbG9jYWxseSBhbmQgdGhleSBhbGwgd29ya2VkLg0KPiANCj4gTWF4DQo+IA0K
+Pj4+ICsNCj4+PiArICAgICAgICBpZiBub2RlIGlzIG5vdCBOb25lIGFuZCBleHBlY3RlZF9ub2Rl
+IGlzIG5vdCBOb25lOg0KPj4+ICsgICAgICAgICAgICBhc3NlcnQgbm9kZVsnbmFtZSddID09IGV4
+cGVjdGVkX25vZGUsIFwNCj4+PiArICAgICAgICAgICAgICAgICAgICdGb3VuZCBub2RlICVzIHVu
+ZGVyICVzIChidXQgZXhwZWN0ZWQgJXMpJyAlIFwNCj4+PiArICAgICAgICAgICAgICAgICAgIChu
+b2RlWyduYW1lJ10sIHBhdGgsIGV4cGVjdGVkX25vZGUpDQo+Pj4gICAgDQo+Pj4gICAgaW5kZXhf
+cmUgPSByZS5jb21waWxlKHInKFteXFtdKylcWyhbXlxdXSspXF0nKQ0KPj4+ICAgIA0KPj4+DQo+
+Pg0KPj4NCj4gDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
