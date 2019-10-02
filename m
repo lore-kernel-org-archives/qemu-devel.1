@@ -6,87 +6,90 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56270C4360C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 19:35:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAAB2C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 19:41:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2007A21783
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 19:35:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC13620659
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 19:41:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZAg9r+UF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2007A21783
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fUraRKch"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC13620659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFkP5-0007I8-0c
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 15:35:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55364)
+	id 1iFkUw-0000sA-QE
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 15:41:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56143)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iFkNz-0006om-Bv
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 15:34:08 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iFkUB-0000Sw-JP
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 15:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iFkNx-0006Tq-EQ
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 15:34:07 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34362)
+ (envelope-from <richard.henderson@linaro.org>) id 1iFkUA-0000wo-DE
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 15:40:31 -0400
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:36843)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iFkNx-0006TW-70
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 15:34:05 -0400
-Received: by mail-pg1-x543.google.com with SMTP id y35so129056pgl.1
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 12:34:05 -0700 (PDT)
+ id 1iFkUA-0000wJ-7c
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 15:40:30 -0400
+Received: by mail-pf1-x42e.google.com with SMTP id y22so21571pfr.3
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 12:40:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=/emTy/X2u8H2Kx2MK4ciGkdwVLEO2QNY9Tghq7PxAq0=;
- b=ZAg9r+UFp5Wge4k3c+/xZqHwrBfkwkit3UYOp4lHRHk7vYWqVjToS4Up6gDP86SAKW
- gJwF+/EMU/sZdsmk4LNN4RI0Yu5R8zfN39v/HtFwR0L9Zjoly6Cd0H+gHin6jtt1eLRZ
- C6WzNZWkBgJfFOy5Lz0X44VREnQCT+JjCmSu2qOTm+yVRMVnMpPDDgh3UWvJkAK5iX/w
- 6C3QT/sTPLAP3ioKQHFsuHEN4+cq/1idMnR7Lw2k+caRNMpP6excGbMST3mQcf80QKT4
- ICHlR29miGybfHa7UtoBqcpJAf9u5S2+9pn9F/q+z+U+i2II2SdcGbNJnoLJTJUnHV+H
- WPpQ==
+ bh=U+fDm4+ZXs6BauH4LvJxLjn54MCtsuR5xloJjjtTW6I=;
+ b=fUraRKchd7/5pGGMHElQG0e6y+tT5w4WhVfkPnhIjt+oTiH6viDbkG26iGJUqn509h
+ nsMRrOAJoFPpD2wKYEajwPrN6YBHJE/nPLpY38vgFbrS+JZSJQFJ3gBRpuXcLxICGv95
+ 5R30bh1+KqQU58DB43FGA33eUJ9pSU8geqkgOgMOjy1rTjgJV/hlmVEO3oK5p8edQQ4q
+ +UXPaTQAncHnTN+OpXeq3k/q22Ywyx7za5rUT+H34P+PwqDrXo0u4bAroIQYwwFBL2eD
+ XNlejBZIqIFVYZ9ZJ9wbsT8TrIFQIYZxAc0Mu1ZGbOKm8XG7xucw1Ot/Yia7STSVzV/E
+ gmdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=/emTy/X2u8H2Kx2MK4ciGkdwVLEO2QNY9Tghq7PxAq0=;
- b=d2AJMhVy4Bf8DJZ5vbSvYRZIBMVbCfVZJbw983Iui0xKevm1fp/rNzRpmH7hk1OSnx
- 9n2Oxjf0v1KSA4CedsPcBM3CjZ+8iSfx11spbqUY5TXyUZ88Lvzyw/GBB8fCuK/Ms1y5
- GiytnLLg+2tLJgBWDC9BTqwluEDeOJul1kZLWj5mqGrv0c6CYwIvF/1k40BZZjgS3HkX
- q6vU0PeXT9H669c0f3g/JpHTcsrRAz7Wx4SI6xm5ke23J2xH3qce2Ycv3r4jDHNTM/RP
- 76bQdr6Pxst41qNcoWf/UpsdRAD9XTJOXWEGz/1S0IBeRzsIc2KZAkJ9zx9z4j++eYbZ
- SpTg==
-X-Gm-Message-State: APjAAAVOe3rQo5cVNdq35aRA2zfcCFtJskQ4IhzvNZIIMGejGM3cMywj
- A4kE6yyIHbVHegvo3UOiB0GkIw==
-X-Google-Smtp-Source: APXvYqz9CTIwPlZaXVnCeOj3cIdDzZlPXPrNN0T4V3rA3epDqZChGJsQFvxOPQpoEP0+mGg9ghrxSw==
-X-Received: by 2002:a63:ca06:: with SMTP id n6mr5361495pgi.17.1570044843849;
- Wed, 02 Oct 2019 12:34:03 -0700 (PDT)
+ bh=U+fDm4+ZXs6BauH4LvJxLjn54MCtsuR5xloJjjtTW6I=;
+ b=N22yHv/HfqGNUB6tVKUTwppahgzkaBaLcRXJ4fHsTC1ZA26RcodB39QPEJucEc2t+a
+ J4kb8o9+/r3at9aLtEQTftZWveFP/8M9kBp/qJ7ncl9t1MrrsoggLZHVaf7aR/XRBVKw
+ Bp0VLhVwoT+dotyEaQO5IEMYwuM3z+FxhToWFdfmdchfqNg3CPOHajhXhYtpQFjs1K0L
+ Nyp+dCpIic0lpYWiLadeFZoYdKKx3WHlwpebgpGnbxP2C1FmuNzdu/u6GtcMy5s2tN5z
+ 1upRG7Bi+UE44cxYjAucl6pDPjnOOhvJU+6hDqclX4tn+saOnK3y5bzKQ1UnBsbEEA4u
+ +e9g==
+X-Gm-Message-State: APjAAAUOXyskUSi3JT083kQUXMVY3Mcxq4HNVVXiyEW9PxFIT9iGz0D1
+ 5Cj+rNwWUk+spbzgtsLHBn5m6w==
+X-Google-Smtp-Source: APXvYqwiyycx7gXXi9wK92qK8oNzq4FH1YyR0tcFRP/kVL6u/xPmhJTlmaQskYmm21VssaEZehxwwQ==
+X-Received: by 2002:a17:90a:b012:: with SMTP id
+ x18mr6348889pjq.116.1570045228755; 
+ Wed, 02 Oct 2019 12:40:28 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id fa24sm63791pjb.13.2019.10.02.12.34.02
+ by smtp.gmail.com with ESMTPSA id w188sm180279pgw.26.2019.10.02.12.40.27
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 02 Oct 2019 12:34:03 -0700 (PDT)
-Subject: Re: [PATCH v2] s390x/tcg: MVCL: Exit to main loop if requested
-From: Richard Henderson <richard.henderson@linaro.org>
+ Wed, 02 Oct 2019 12:40:27 -0700 (PDT)
+Subject: Re: target/ppc: bug in optimised vsl/vsr implementation?
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
-References: <20191002082636.7739-1-david@redhat.com>
- <87zhijjwph.fsf@linaro.org> <0479ad1f-348e-ed40-c2c6-aef168afdb7e@linaro.org>
+References: <bf30baf5-4d75-dc6f-c30a-57b80714999b@ilande.co.uk>
+ <CAL1e-=gcK2mdtrt9vibHGpbm4_FZgQWTA91+p=9ouuMYmZwPqQ@mail.gmail.com>
+ <c9679b01-91c3-3d69-fb38-dfef1602dcf4@ilande.co.uk>
+ <87v9t7jbep.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <379c2065-adfe-0847-46f3-7f25c7650df9@linaro.org>
-Date: Wed, 2 Oct 2019 12:34:01 -0700
+Message-ID: <5f80d547-3027-2315-bb98-221283b9df2f@linaro.org>
+Date: Wed, 2 Oct 2019 12:40:25 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <0479ad1f-348e-ed40-c2c6-aef168afdb7e@linaro.org>
+In-Reply-To: <87v9t7jbep.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,46 +101,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: stefan.brankovic@rt-rk.com, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Paul Clarke <pc@us.ibm.com>, Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/2/19 9:47 AM, Richard Henderson wrote:
-> There is still the special case of EXECUTE of MVCL, which I suspect must have
-> some failure mode that we're not considering -- the setting and clearing of
-> ex_value can't help.  I have a suspicion that we need to special case that
-> within helper_ex, just so that ex_value doesn't enter into it.
+On 10/2/19 10:38 AM, Alex Bennée wrote:
+> Is the denbcdq instruction exposed in any standard float operations?
+> Once this is fixed it would be worth adding a testcase (either ppc64
+> specific or multiarch) so protect it from regression in the future.
 
-I had a walk and a think.  I now believe that we're ok:
-
-(1) TB with EXECUTE runs, at address Ae
-
-    - env->psw_addr stored with Ae.
-    - helper_ex() runs, memory address Am computed
-      from D2a(X2a,B2a) or from psw.addr+RI2.
-    - env->ex_value stored with memory value modified by R1a
-
-(2) TB of executee runs,
-
-    - env->ex_value stored with 0.
-    - helper_mvcl() runs, using and updating R1b, R1b+1, R2b, R2b+1.
-
-(3a) helper_mvcl() completes,
-
-     - TB of executee continues, psw.addr += ilen.
-     - Next instruction is the one following EXECUTE.
-
-(3b) helper_mvcl() exits to main loop,
-
-     - cpu_loop_exit_restore() unwinds psw.addr = Ae.
-     - Next instruction is the EXECUTE itself...
-     - goto 1.
-
-If we can agree that the result is undefined if registers R1a, X2a, B2a overlap
-R1b, R1b+1, R2b, R2b+1, or if the memory address Am is modified by the
-interrupted MVCL, then we're ok.
+Not standard float operations -- this is binary coded decimal stuff.
+It would certainly be possible to write a ppc specific test case.
 
 
 r~
