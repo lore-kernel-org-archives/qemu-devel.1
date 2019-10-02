@@ -2,61 +2,65 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54CDDC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15ACCC35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:23:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27F3A21A4C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:10:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27F3A21A4C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF6F3215EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 14:23:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6F3215EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFfKV-0000h1-Bk
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:10:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35557)
+	id 1iFfWu-0005LV-0S
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 10:23:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37916)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1iFfJm-00006R-Jx
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:09:27 -0400
+ (envelope-from <groug@kaod.org>) id 1iFfVr-0004Mi-3R
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:21:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefan.brankovic@rt-rk.com>) id 1iFfJk-0005tE-O1
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:09:26 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:60801 helo=mail.rt-rk.com)
+ (envelope-from <groug@kaod.org>) id 1iFfVp-00055T-Ao
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:21:54 -0400
+Received: from 5.mo177.mail-out.ovh.net ([46.105.39.154]:46101)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefan.brankovic@rt-rk.com>)
- id 1iFfJk-0005Hw-Ct; Wed, 02 Oct 2019 10:09:24 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 87DCA1A20B1;
- Wed,  2 Oct 2019 16:08:18 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from [10.10.13.132] (rtrkw870-lin.domain.local [10.10.13.132])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 6D7071A204B;
- Wed,  2 Oct 2019 16:08:18 +0200 (CEST)
-Subject: Re: target/ppc: bug in optimised vsl/vsr implementation?
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <bf30baf5-4d75-dc6f-c30a-57b80714999b@ilande.co.uk>
- <CAL1e-=gcK2mdtrt9vibHGpbm4_FZgQWTA91+p=9ouuMYmZwPqQ@mail.gmail.com>
- <c9679b01-91c3-3d69-fb38-dfef1602dcf4@ilande.co.uk>
-From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-Message-ID: <16069cfc-66c6-0629-51de-6dfe39214e11@rt-rk.com>
-Date: Wed, 2 Oct 2019 16:08:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iFfVp-00053F-3f
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 10:21:53 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.160.23])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 23EED10CCC9
+ for <qemu-devel@nongnu.org>; Wed,  2 Oct 2019 16:21:48 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player759.ha.ovh.net (Postfix) with ESMTPSA id 15BC1A867E10;
+ Wed,  2 Oct 2019 14:21:44 +0000 (UTC)
+Date: Wed, 2 Oct 2019 16:21:42 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH] spapr/xive: skip partially initialized vCPUs in presenter
+Message-ID: <20191002162142.7ce18dcb@bahia.lan>
+In-Reply-To: <20191002010245.GT11105@umbus.fritz.box>
+References: <20191001085722.32755-1-clg@kaod.org>
+ <20191001130614.226ef6a2@bahia.w3ibm.bluemix.net>
+ <fad6aae9-8722-498c-730d-fa204f07e3c5@kaod.org>
+ <20191001185629.0b284ba1@bahia.lan>
+ <20191002010245.GT11105@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <c9679b01-91c3-3d69-fb38-dfef1602dcf4@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+Content-Type: multipart/signed; boundary="Sig_/j2.Mqap+/iKgTsK6KMCJWew";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 12861154639510804966
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeeigdejiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.39.154
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,116 +72,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Paul Clarke <pc@us.ibm.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Mark,
+--Sig_/j2.Mqap+/iKgTsK6KMCJWew
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for reporting this bug. I was away from office for couple of 
-days, so that's why I am answering you a bit late, sorry about that. I 
-will start working on a solution and try to fix this problem in next 
-couple of days.
+On Wed, 2 Oct 2019 11:02:45 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-On 1.10.19. 20:24, Mark Cave-Ayland wrote:
-> On 28/09/2019 18:45, Aleksandar Markovic wrote:
->
-> Hi Aleksandar,
->
-> Thanks for taking a look at this!
->
->> Mark and Paul (and Stefan),
->>
->> Thanks for spotting this and pinpointing the culprit commit. I guess Stefan is going
->> to respond soon, but, in the meantime, I took a look at the commit in question:
->>
->> https://github.com/qemu/qemu/commit/4e6d0920e7547e6af4bbac5ffe9adfe6ea621822
->>
->> I don't have at the moment any dev/test environment handy, but I did manual
->> inspection of the code, and here is what I found (in order of importance, perceived
->> by me):
->>
->> 1. The code will not work correctly if the shift ammount (variable 'sh') is 0. This
->> is because, in that case, one of succeeding invocations of TCG shift functions will
->> be required to shift a 64-bit TCG variable by 64 bits, and the result of such TCG
->> operation is undefined (shift amount must be 63 or less) - see
->> https://github.com/qemu/qemu/blob/master/tcg/README.
-> Yes I think you're right here - the old helper got around this by doing an explicit
-> copy from a to r if the shift value is zero. In fact the case that Paul reported is
-> exactly this:
->
->     vsl VRT, VRA, VRB
->
-> => 0x100006e0 <vec_slq+132>: vsl v0,v0,v1
-> (gdb) p $vr0.uint128
-> $21 = 0x10111213141516172021222324252650
-> (gdb) p $vr1.uint128
-> $22 = 0x0
-> (gdb) stepi
-> 0x00000000100006e4 in vec_slq ()
-> 1: x/i $pc
-> => 0x100006e4 <vec_slq+136>: xxlor vs0,vs32,vs32
-> (gdb) p $vr0.uint128
-> $23 = 0x10111213141516172021222324252650
->
-> I guess the solution is check for sh == 0 and if this is the case, execute a copy
-> instead.
-I agree with you. This will be changed in upcoming patch.
->
->> 2. Variable naming is better in the old helper than in the new translator. In that
->> light, I would advise Stefan to change 'sh' to 'shift', and 'shifted' to 'carry'.
-> It looks like the name "sh" comes from the ISA documentation, so whilst it's a little
-> tricky to compare with the previous implementation it does make sense when comparing
-> with the algorithm shown there. Note: this implementation also drops the check for
-> each byte of VRB having the same shift value - should we care about this?
+> On Tue, Oct 01, 2019 at 06:56:28PM +0200, Greg Kurz wrote:
+> > On Tue, 1 Oct 2019 13:56:10 +0200
+> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> >=20
+> > > On 01/10/2019 13:06, Greg Kurz wrote:
+> > > > On Tue,  1 Oct 2019 10:57:22 +0200
+> > > > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> > > >=20
+> > > >> When vCPUs are hotplugged, they are added to the QEMU CPU list bef=
+ore
+> > > >> being fully realized. This can crash the XIVE presenter because the
+> > > >> 'tctx' pointer is not necessarily initialized when looking for a
+> > > >> matching target.
+> > > >>
+> > > >=20
+> > > > Ouch... :-\
+> > > >=20
+> > > >> These vCPUs are not valid targets for the presenter. Skip them.
+> > > >>
+> > > >=20
+> > > > This likely fixes this specific issue, but more generally, this
+> > > > seems to indicate that using CPU_FOREACH() is rather fragile.
+> > > >=20
+> > > > What about tracking XIVE TM contexts with a QLIST in xive.c ?
+> > >=20
+> > > This is a good idea. =20
+> > >=20
+> > > On HW, the thread interrupt contexts belong to the XIVE presenter=20
+> > > subengine. This is the logic doing the CAM line matching to find
+> > > a target for an event notification. So we should model the context=20
+> > > list below the XiveRouter in QEMU which models both router and=20
+> > > presenter subengines. We have done without a presenter model for=20
+> > > the moment and I don't think we will need to introduce one. =20
+> > >=20
+> > > This would be a nice improvements of my patchset adding support
+> > > for xive escalations and better support of multi chip systems.=20
+> > > I have introduced a PNV_CHIP_CPU_FOREACH in this patchset which=20
+> > > would become useless with a list of tctx under the XIVE interrupt
+> > > controller, XiveRouter, SpaprXive, PnvXive.
+> > >=20
+> >=20
+> > I agree. It makes more sense to have the list below the XiveRouter,
+> > rather than relying on CPU_FOREACH(), which looks a bit weird from
+> > a device emulation code perspective.
+>=20
+> That does sound like a better idea long term.  However, for now, I
+> think the NULL check is a reasonable way of fixing the real error
+> we're hitting, so I've applied the patch here.
+>=20
 
-"sh" is taken from the ISA documentation, so I would leave that as it is 
-now, but I can change some other variable names to be consistent with 
-previous implementation (e.g. "shifted" -> "carry").
+Fair enough.
 
-I don't think that we should check each byte of VRB, because we care 
-only about "defined" behavior. If shift values doesn't match, result is 
-"undefined" so it doesn't matter what is inside resulting register.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
->> 3. Lines
->>
->> tcg_gen_andi_i64(shifted, shifted, 0x7fULL);
->>
->> and
->>
->> tcg_gen_andi_i64(shifted, shifted, 0xfe00000000000000ULL);
->>
->> appear to be spurious (albait in a harmless way). Therefore, they should be deleted,
->> or, alternatevely, a justification for them should be provided.
-> I'm not sure why they are needed either - there's certainly no mention of it in the
-> ISA documentation. Stefan?
-This will be removed in upcoming patch.
->
->> 4. In the commit message, variable names were used without quotation mark, resulting
->> in puzzling and unclear wording.
->>
->> 5. (a question for Mark) After all recent changes, does get_avr64(..., ..., true)
->> always (for any endian configuration) return the "high" half of an Altivec register,
->> and get_avr64(..., ..., false) the "low" one?
-> Yes - the new functions always return the MSB (high) and LSB (low) correctly
-> regardless of host endian.
->
->> Given all these circumstances, perhaps the most reasonable solution would be to
->> revert the commit in question, and allow Stefan enough dev and test time to hopefully
->> submit a new, better, version later on.
-> Given that it has been broken for 3 months now, I don't think we're in any major rush
-> to revert ASAP. I'd prefer to give Stefan a bit more time first since he does report
-> some substantial speed improvements from these new implementations.
->
->
-> ATB,
->
-> Mark.
+> Future cleanups to a different approach remain welcome, of course.
+>=20
 
-Best Regards,
+I've started to look. This should simplify Cedric's "add XIVE support
+for KVM guests" series, but I'll wait for your massive cleanup series
+to get merged first.
 
-Stefan
+> > > Next step would be to get rid of the tctx->cs pointer. In my latest
+> > > patches, it is only used to calculate the HW CAM line.=20
+> > >=20
+> > > There might be some consequences on the object hierarchy and it will
+> > > break migration.
+> > >=20
+> >=20
+> > This could break if the contexts were devices sitting in a bus, which
+> > isn't the case here. I'll try to come up with a proposal for spapr,
+> > and we can work out the changes on your recent XIVE series for pnv.
+> >=20
+> > > Thanks,
+> > >=20
+> > > C.
+> > >=20
+> > > >=20
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+> > > > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> > > > index 6d38755f8459..89b9ef7f20b1 100644
+> > > > --- a/include/hw/ppc/xive.h
+> > > > +++ b/include/hw/ppc/xive.h
+> > > > @@ -319,6 +319,8 @@ typedef struct XiveTCTX {
+> > > >      qemu_irq    os_output;
+> > > > =20
+> > > >      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
+> > > > +
+> > > > +    QTAILQ_ENTRY(XiveTCTX) next;
+> > > >  } XiveTCTX;
+> > > > =20
+> > > >  /*
+> > > > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> > > > index b7417210d817..f7721c711041 100644
+> > > > --- a/hw/intc/xive.c
+> > > > +++ b/hw/intc/xive.c
+> > > > @@ -568,6 +568,8 @@ static void xive_tctx_reset(void *dev)
+> > > >          ipb_to_pipr(tctx->regs[TM_QW3_HV_PHYS + TM_IPB]);
+> > > >  }
+> > > > =20
+> > > > +static QTAILQ_HEAD(, XiveTCTX) xive_tctx_list =3D QTAILQ_HEAD_INIT=
+IALIZER(xive_tctx_list);
+> > > > +
+> > > >  static void xive_tctx_realize(DeviceState *dev, Error **errp)
+> > > >  {
+> > > >      XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> > > > @@ -609,10 +611,14 @@ static void xive_tctx_realize(DeviceState *de=
+v, Error **errp)
+> > > >      }
+> > > > =20
+> > > >      qemu_register_reset(xive_tctx_reset, dev);
+> > > > +    QTAILQ_INSERT_HEAD(&xive_tctx_list, tctx, next);
+> > > >  }
+> > > > =20
+> > > >  static void xive_tctx_unrealize(DeviceState *dev, Error **errp)
+> > > >  {
+> > > > +    XiveTCTX *tctx =3D XIVE_TCTX(dev);
+> > > > +
+> > > > +    QTAILQ_REMOVE(&xive_tctx_list, tctx, next);
+> > > >      qemu_unregister_reset(xive_tctx_reset, dev);
+> > > >  }
+> > > > =20
+> > > > @@ -1385,15 +1391,14 @@ static bool xive_presenter_match(XiveRouter=
+ *xrtr, uint8_t format,
+> > > >                                   bool cam_ignore, uint8_t priority,
+> > > >                                   uint32_t logic_serv, XiveTCTXMatc=
+h *match)
+> > > >  {
+> > > > -    CPUState *cs;
+> > > > +    XiveTCTX *tctx;
+> > > > =20
+> > > >      /*
+> > > >       * TODO (PowerNV): handle chip_id overwrite of block field for
+> > > >       * hardwired CAM compares
+> > > >       */
+> > > > =20
+> > > > -    CPU_FOREACH(cs) {
+> > > > -        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
+> > > > +    QTAILQ_FOREACH(tctx, &xive_tctx_list, next) {
+> > > >          int ring;
+> > > > =20
+> > > >          /*
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+> > > >=20
+> > > >> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> > > >> ---
+> > > >>  hw/intc/xive.c | 8 ++++++++
+> > > >>  1 file changed, 8 insertions(+)
+> > > >>
+> > > >> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> > > >> index b7417210d817..29df06df1136 100644
+> > > >> --- a/hw/intc/xive.c
+> > > >> +++ b/hw/intc/xive.c
+> > > >> @@ -1396,6 +1396,14 @@ static bool xive_presenter_match(XiveRouter=
+ *xrtr, uint8_t format,
+> > > >>          XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
+> > > >>          int ring;
+> > > >> =20
+> > > >> +        /*
+> > > >> +         * Skip partially initialized vCPUs. This can happen when
+> > > >> +         * vCPUs are hotplugged.
+> > > >> +         */
+> > > >> +        if (!tctx) {
+> > > >> +            continue;
+> > > >> +        }
+> > > >> +
+> > > >>          /*
+> > > >>           * HW checks that the CPU is enabled in the Physical Thre=
+ad
+> > > >>           * Enable Register (PTER).
+> > > >=20
+> > >=20
+> >=20
+>=20
 
+
+--Sig_/j2.Mqap+/iKgTsK6KMCJWew
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2UsnYACgkQcdTV5YIv
+c9ZF3A//aSfvAdnhmwPXsXpL6psgK3Z1NMLTPaYOSP/raX1mY0hIJDJ1fnQQUyLk
+LHabTDSa1zUBe9aefeKYSdxb0VHVH091XGoWCPMl0F1jVu9LPvkjFY4TcFEGjhbV
+qpIwgtTev8684kanKhEOOp2BSEiOSTzFEa/OuBd26UL7QZE/Ppvb2rMP8syCmpN9
+/kx9WZGmN9ifHqxb42cWXg6UYZyOnYguLYEPmxnrs828DmRlkNCCDenOy9JUMPYG
+HZ8rfhEI74u4B6/rHS23GaFbgiVfb7d+9cMbXLZZf+ANYvYIhxLTQFTzOZmm6878
+YuNGunWCOG6lLRVDm2sq0mIiILEM+F2/3TuBx2YJ51wGaOxC1vCFPfrwcBz4Kqkq
+y2RMSCLF/zNewE6wwNyNQCpWejMRl7wKIGKrMBNjDPywhLFvpRu2VBI7yP01yF5m
+kZP9HAXapKa2qidhk8Wh220TTMHBj+04bCREuoy0sDSbHtMSbqYRnGraWb1ldJis
+wDpTnGT7sI70pB2ojYMcvGwa43xRySCiIBU/sVcsEG5sH59crwSV/pFhtHLWGogL
+VF958nZ5XuhIleyBnun/cnGYpIOpCOLxUlD0fzyi6KereVX/VTyZ+zpsGBwAJI1J
+9/2h7Oe6261Ir6i31Rql9ly9LLzlEzIzcgiWiw2wdPplbw/MNxY=
+=LYji
+-----END PGP SIGNATURE-----
+
+--Sig_/j2.Mqap+/iKgTsK6KMCJWew--
 
