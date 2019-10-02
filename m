@@ -2,62 +2,87 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F15FEC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 10:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AC9C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 10:23:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6DD520700
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 10:21:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6DD520700
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2158020700
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 10:23:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K5gVLW+/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2158020700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFble-0004xn-LI
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 06:21:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54130)
+	id 1iFbmx-0005sF-5n
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 06:23:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54311)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iFbkd-0004FP-6t
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:20:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iFbmD-0005S7-Ce
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iFbka-0007wR-MB
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:20:54 -0400
-Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:45971)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iFbka-0007vV-BW
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:20:52 -0400
-Received: from player759.ha.ovh.net (unknown [10.109.146.106])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id AD5FB229BBC
- for <qemu-devel@nongnu.org>; Wed,  2 Oct 2019 12:20:49 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player759.ha.ovh.net (Postfix) with ESMTPSA id 4D8CCA82F03F;
- Wed,  2 Oct 2019 10:20:38 +0000 (UTC)
-Date: Wed, 2 Oct 2019 12:20:35 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v3 34/34] spapr: Remove last pieces of SpaprIrq
-Message-ID: <20191002122035.6f667938@bahia.lan>
-In-Reply-To: <20191002025208.3487-35-david@gibson.dropbear.id.au>
-References: <20191002025208.3487-1-david@gibson.dropbear.id.au>
- <20191002025208.3487-35-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <alex.bennee@linaro.org>) id 1iFbmB-000093-Hr
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:22:33 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35110)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iFbmB-00007z-9w
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 06:22:31 -0400
+Received: by mail-wr1-x441.google.com with SMTP id v8so19020430wrt.2
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 03:22:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=IYA27I4k+X20iMhTgUDiQt+Kq5nsLRsXVXPBklSSwWM=;
+ b=K5gVLW+/19CuDqiUfAEqgTBp/wCUKyTN5LGJLQuQEV0ROhN/YiKVvzv+uC39cqKd1V
+ hXrbf+0jiyIRoEzMGw5Jf77iBQLv883VS/43ka06txWzjYI4lDoVqB1v53Qog3TwJvdW
+ PdKs61iUxcxfEFzgkeqGhDOf77tlV6FRIMm+DrwTUonYA5nAAh2QRjUA29vquUWnk1K+
+ W+d5nrP398aE8LKZMDDubIm30ooGPm3kVdAx+1V8G3XxDEWSglkQFpTuI4ihZJHgbbun
+ tewpIxjnqOozbwtNIQT+5xRbjcjAsm3bJ/YDaElpPjGpMG+z7wbBmJtmrgveBlf8Auz7
+ QLOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=IYA27I4k+X20iMhTgUDiQt+Kq5nsLRsXVXPBklSSwWM=;
+ b=OdktzX5Ar651VWTxtN7EmheTwro9Kb9omNXJsAC/NMLJfJkQOFe17sA2jb32mrLBFC
+ Tetp7V0dRWZ+MFYxXHZSeMYzu7JM1YviSBpZDpV+6L99cVSQfXHM1KWCDc0lMFid0yYE
+ G4TGUqegIEC2FlHVFNy/0OrUREhhwiVoP/6+tJsSBtINU/NkrNDj1DM2g08CBfkyYJho
+ wFwXTx4zYIJMPygnD2QLyRXGevKCZdgW6lfzpgF9XwcSE643akBo7MRnrTuEYqPL45DS
+ DKZODriH21dRFomCQsNIdZSD7iGuR07vlUvPkU1OxzWnTt6J8VW5ih/pB0ElmWBwrLlm
+ NdEg==
+X-Gm-Message-State: APjAAAUg8UhVjUkOciJBuipiF1x2Vg/MejbOTKGEKCR/mSYHxTP4hDtp
+ ibI7elKbyF0i6/oYwHH4ii8zmQ==
+X-Google-Smtp-Source: APXvYqxgRqSiSoPjrsprBlIeWNOCrME4vyWqfcmoAgUJonf+cuG6+6hd0A+XGFvc82HBKSLBvZpRYw==
+X-Received: by 2002:a5d:63ca:: with SMTP id c10mr2195782wrw.314.1570011748341; 
+ Wed, 02 Oct 2019 03:22:28 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a13sm48250121wrf.73.2019.10.02.03.22.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 02 Oct 2019 03:22:27 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DC71E1FF87;
+ Wed,  2 Oct 2019 11:22:26 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] accel/kvm: ensure ret always set
+Date: Wed,  2 Oct 2019 11:22:12 +0100
+Message-Id: <20191002102212.6100-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 8791307948054845926
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeeigddvkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 178.33.47.94
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,464 +94,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- clg@kaod.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed,  2 Oct 2019 12:52:08 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Some of the cross compilers rightly complain there are cases where ret
+may not be set. 0 seems to be the reasonable default unless particular
+slot explicitly returns -1.
 
-> The only thing remaining in this structure are the flags to allow either
-> XICS or XIVE to be present.  These actually make more sense as spapr
-> capabilities - that way they can take advantage of the existing
-> infrastructure to sanity check capability states across migration and so
-> forth.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ accel/kvm/kvm-all.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-This needs some more care. Incoming migration of older existing machine
-types breaks:
-
-qemu-system-ppc64: cap-xics higher level (1) in incoming stream than on destination (0)
-qemu-system-ppc64: error while loading state for instance 0x0 of device 'spapr'
-qemu-system-ppc64: load of migration failed: Invalid argument
-
->  hw/ppc/spapr.c             | 38 +++++++++--------
->  hw/ppc/spapr_caps.c        | 64 +++++++++++++++++++++++++++++
->  hw/ppc/spapr_hcall.c       |  7 ++--
->  hw/ppc/spapr_irq.c         | 84 ++------------------------------------
->  include/hw/ppc/spapr.h     |  8 ++--
->  include/hw/ppc/spapr_irq.h | 10 -----
->  6 files changed, 99 insertions(+), 112 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e1ff03152e..b9ac01d90c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1072,12 +1072,13 @@ static void spapr_dt_ov5_platform_support(SpaprMachineState *spapr, void *fdt,
->          26, 0x40, /* Radix options: GTSE == yes. */
->      };
->  
-> -    if (spapr->irq->xics && spapr->irq->xive) {
-> +    if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> +        && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
->          val[1] = SPAPR_OV5_XIVE_BOTH;
-> -    } else if (spapr->irq->xive) {
-> +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
->          val[1] = SPAPR_OV5_XIVE_EXPLOIT;
->      } else {
-> -        assert(spapr->irq->xics);
-> +        assert(spapr_get_cap(spapr, SPAPR_CAP_XICS));
->          val[1] = SPAPR_OV5_XIVE_LEGACY;
->      }
->  
-> @@ -2775,7 +2776,7 @@ static void spapr_machine_init(MachineState *machine)
->      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
->  
->      /* advertise XIVE on POWER9 machines */
-> -    if (spapr->irq->xive) {
-> +    if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
->          spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
->      }
->  
-> @@ -3242,14 +3243,18 @@ static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
->  static char *spapr_get_ic_mode(Object *obj, Error **errp)
->  {
->      SpaprMachineState *spapr = SPAPR_MACHINE(obj);
-> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
->  
-> -    if (spapr->irq == &spapr_irq_xics_legacy) {
-> +    if (smc->legacy_irq_allocation) {
->          return g_strdup("legacy");
-> -    } else if (spapr->irq == &spapr_irq_xics) {
-> +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> +               && !spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
->          return g_strdup("xics");
-> -    } else if (spapr->irq == &spapr_irq_xive) {
-> +    } else if (!spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> +               && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
->          return g_strdup("xive");
-> -    } else if (spapr->irq == &spapr_irq_dual) {
-> +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> +               && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
->          return g_strdup("dual");
->      }
->      g_assert_not_reached();
-> @@ -3266,11 +3271,14 @@ static void spapr_set_ic_mode(Object *obj, const char *value, Error **errp)
->  
->      /* The legacy IRQ backend can not be set */
->      if (strcmp(value, "xics") == 0) {
-> -        spapr->irq = &spapr_irq_xics;
-> +        object_property_set_bool(obj, true, "cap-xics", errp);
-> +        object_property_set_bool(obj, false, "cap-xive", errp);
->      } else if (strcmp(value, "xive") == 0) {
-> -        spapr->irq = &spapr_irq_xive;
-> +        object_property_set_bool(obj, false, "cap-xics", errp);
-> +        object_property_set_bool(obj, true, "cap-xive", errp);
->      } else if (strcmp(value, "dual") == 0) {
-> -        spapr->irq = &spapr_irq_dual;
-> +        object_property_set_bool(obj, true, "cap-xics", errp);
-> +        object_property_set_bool(obj, true, "cap-xive", errp);
->      } else {
->          error_setg(errp, "Bad value for \"ic-mode\" property");
->      }
-> @@ -3309,7 +3317,6 @@ static void spapr_set_host_serial(Object *obj, const char *value, Error **errp)
->  static void spapr_instance_init(Object *obj)
->  {
->      SpaprMachineState *spapr = SPAPR_MACHINE(obj);
-> -    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
->  
->      spapr->htab_fd = -1;
->      spapr->use_hotplug_event_source = true;
-> @@ -3345,7 +3352,6 @@ static void spapr_instance_init(Object *obj)
->                               spapr_get_msix_emulation, NULL, NULL);
->  
->      /* The machine class defines the default interrupt controller mode */
-> -    spapr->irq = smc->irq;
->      object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
->                              spapr_set_ic_mode, NULL);
->      object_property_set_description(obj, "ic-mode",
-> @@ -4439,8 +4445,9 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
->      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
->      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
->      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
-> +    smc->default_caps.caps[SPAPR_CAP_XICS] = SPAPR_CAP_ON;
-> +    smc->default_caps.caps[SPAPR_CAP_XIVE] = SPAPR_CAP_ON;
->      spapr_caps_add_properties(smc, &error_abort);
-> -    smc->irq = &spapr_irq_dual;
->      smc->dr_phb_enabled = true;
->      smc->linux_pci_probe = true;
->      smc->nr_xirqs = SPAPR_NR_XIRQS;
-> @@ -4539,7 +4546,7 @@ static void spapr_machine_4_0_class_options(MachineClass *mc)
->      spapr_machine_4_1_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
->      smc->phb_placement = phb_placement_4_0;
-> -    smc->irq = &spapr_irq_xics;
-> +    smc->default_caps.caps[SPAPR_CAP_XIVE] = SPAPR_CAP_OFF;
->      smc->pre_4_1_migration = true;
->  }
->  
-> @@ -4580,7 +4587,6 @@ static void spapr_machine_3_0_class_options(MachineClass *mc)
->  
->      smc->legacy_irq_allocation = true;
->      smc->nr_xirqs = 0x400;
-> -    smc->irq = &spapr_irq_xics_legacy;
->  }
->  
->  DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 481dfd2a27..e06fd386f6 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -496,6 +496,42 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
->      }
->  }
->  
-> +static void cap_xics_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
-> +{
-> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-> +
-> +    if (!val) {
-> +        if (!spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> +            error_setg(errp,
-> +"No interrupt controllers enabled, try cap-xics=on or cap-xive=on");
-> +            return;
-> +        }
-> +
-> +        if (smc->legacy_irq_allocation) {
-> +            error_setg(errp, "This machine version requires XICS support");
-> +            return;
-> +        }
-> +    }
-> +}
-> +
-> +static void cap_xive_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
-> +{
-> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-> +    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-> +
-> +    if (val) {
-> +        if (smc->legacy_irq_allocation) {
-> +            error_setg(errp, "This machine version cannot support XIVE");
-> +            return;
-> +        }
-> +        if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> +                              spapr->max_compat_pvr)) {
-> +            error_setg(errp, "XIVE requires POWER9 CPU");
-> +            return;
-> +        }
-> +    }
-> +}
-> +
->  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->      [SPAPR_CAP_HTM] = {
->          .name = "htm",
-> @@ -595,6 +631,24 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->          .type = "bool",
->          .apply = cap_ccf_assist_apply,
->      },
-> +    [SPAPR_CAP_XICS] = {
-> +        .name = "xics",
-> +        .description = "Allow XICS interrupt controller",
-> +        .index = SPAPR_CAP_XICS,
-> +        .get = spapr_cap_get_bool,
-> +        .set = spapr_cap_set_bool,
-> +        .type = "bool",
-> +        .apply = cap_xics_apply,
-> +    },
-> +    [SPAPR_CAP_XIVE] = {
-> +        .name = "xive",
-> +        .description = "Allow XIVE interrupt controller",
-> +        .index = SPAPR_CAP_XIVE,
-> +        .get = spapr_cap_get_bool,
-> +        .set = spapr_cap_set_bool,
-> +        .type = "bool",
-> +        .apply = cap_xive_apply,
-> +    },
->  };
->  
->  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
-> @@ -641,6 +695,14 @@ static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
->          caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] = mps;
->      }
->  
-> +    /*
-> +     * POWER8 machines don't have XIVE
-> +     */
-> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_3_00,
-> +                               0, spapr->max_compat_pvr)) {
-> +        caps.caps[SPAPR_CAP_XIVE] = SPAPR_CAP_OFF;
-> +    }
-> +
->      return caps;
->  }
->  
-> @@ -734,6 +796,8 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MAXPAGESIZE);
->  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
->  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
->  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-> +SPAPR_CAP_MIG_STATE(xics, SPAPR_CAP_XICS);
-> +SPAPR_CAP_MIG_STATE(xive, SPAPR_CAP_XIVE);
->  
->  void spapr_caps_init(SpaprMachineState *spapr)
->  {
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 140f05c1c6..cb4c6edf63 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1784,13 +1784,13 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->       * terminate the boot.
->       */
->      if (guest_xive) {
-> -        if (!spapr->irq->xive) {
-> +        if (!spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
->              error_report(
->  "Guest requested unavailable interrupt mode (XIVE), try the ic-mode=xive or ic-mode=dual machine property");
->              exit(EXIT_FAILURE);
->          }
->      } else {
-> -        if (!spapr->irq->xics) {
-> +        if (!spapr_get_cap(spapr, SPAPR_CAP_XICS)) {
->              error_report(
->  "Guest requested unavailable interrupt mode (XICS), either don't set the ic-mode machine property or try ic-mode=xics or ic-mode=dual");
->              exit(EXIT_FAILURE);
-> @@ -1804,7 +1804,8 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->       */
->      if (!spapr->cas_reboot) {
->          spapr->cas_reboot = spapr_ovec_test(ov5_updates, OV5_XIVE_EXPLOIT)
-> -            && spapr->irq->xics && spapr->irq->xive;
-> +            && spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> +            && spapr_get_cap(spapr, SPAPR_CAP_XIVE);
->      }
->  
->      spapr_ovec_cleanup(ov5_updates);
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 2768f9a765..473fc8780a 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -101,90 +101,19 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Error **),
->      return 0;
->  }
->  
-> -/*
-> - * XICS IRQ backend.
-> - */
-> -
-> -SpaprIrq spapr_irq_xics = {
-> -    .xics        = true,
-> -    .xive        = false,
-> -};
-> -
-> -/*
-> - * XIVE IRQ backend.
-> - */
-> -
-> -SpaprIrq spapr_irq_xive = {
-> -    .xics        = false,
-> -    .xive        = true,
-> -};
-> -
-> -/*
-> - * Dual XIVE and XICS IRQ backend.
-> - *
-> - * Both interrupt mode, XIVE and XICS, objects are created but the
-> - * machine starts in legacy interrupt mode (XICS). It can be changed
-> - * by the CAS negotiation process and, in that case, the new mode is
-> - * activated after an extra machine reset.
-> - */
-> -
-> -/*
-> - * Define values in sync with the XIVE and XICS backend
-> - */
-> -SpaprIrq spapr_irq_dual = {
-> -    .xics        = true,
-> -    .xive        = true,
-> -};
-> -
-> -
->  static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
->  {
->      MachineState *machine = MACHINE(spapr);
->  
-> -    /*
-> -     * Sanity checks on non-P9 machines. On these, XIVE is not
-> -     * advertised, see spapr_dt_ov5_platform_support()
-> -     */
-> -    if (!ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_00,
-> -                               0, spapr->max_compat_pvr)) {
-> -        /*
-> -         * If the 'dual' interrupt mode is selected, force XICS as CAS
-> -         * negotiation is useless.
-> -         */
-> -        if (spapr->irq == &spapr_irq_dual) {
-> -            spapr->irq = &spapr_irq_xics;
-> -            return 0;
-> -        }
-> -
-> -        /*
-> -         * Non-P9 machines using only XIVE is a bogus setup. We have two
-> -         * scenarios to take into account because of the compat mode:
-> -         *
-> -         * 1. POWER7/8 machines should fail to init later on when creating
-> -         *    the XIVE interrupt presenters because a POWER9 exception
-> -         *    model is required.
-> -
-> -         * 2. POWER9 machines using the POWER8 compat mode won't fail and
-> -         *    will let the OS boot with a partial XIVE setup : DT
-> -         *    properties but no hcalls.
-> -         *
-> -         * To cover both and not confuse the OS, add an early failure in
-> -         * QEMU.
-> -         */
-> -        if (spapr->irq == &spapr_irq_xive) {
-> -            error_setg(errp, "XIVE-only machines require a POWER9 CPU");
-> -            return -1;
-> -        }
-> -    }
-> -
->      /*
->       * On a POWER9 host, some older KVM XICS devices cannot be destroyed and
->       * re-created. Detect that early to avoid QEMU to exit later when the
->       * guest reboots.
->       */
->      if (kvm_enabled() &&
-> -        spapr->irq == &spapr_irq_dual &&
->          machine_kernel_irqchip_required(machine) &&
-> +        spapr_get_cap(spapr, SPAPR_CAP_XICS) &&
-> +        spapr_get_cap(spapr, SPAPR_CAP_XIVE) &&
->          xics_kvm_has_broken_disconnect(spapr)) {
->          error_setg(errp, "KVM is too old to support ic-mode=dual,kernel-irqchip=on");
->          return -1;
-> @@ -280,7 +209,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->      /* Initialize the MSI IRQ allocator. */
->      spapr_irq_msi_init(spapr);
->  
-> -    if (spapr->irq->xics) {
-> +    if (spapr_get_cap(spapr, SPAPR_CAP_XICS)) {
->          Error *local_err = NULL;
->          Object *obj;
->  
-> @@ -313,7 +242,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->          spapr->ics = ICS_SPAPR(obj);
->      }
->  
-> -    if (spapr->irq->xive) {
-> +    if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
->          uint32_t nr_servers = spapr_max_server_number(spapr);
->          DeviceState *dev;
->          int i;
-> @@ -558,11 +487,6 @@ int spapr_irq_find(SpaprMachineState *spapr, int num, bool align, Error **errp)
->      return first + ics->offset;
->  }
->  
-> -SpaprIrq spapr_irq_xics_legacy = {
-> -    .xics        = true,
-> -    .xive        = false,
-> -};
-> -
->  static void spapr_irq_register_types(void)
->  {
->      type_register_static(&spapr_intc_info);
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 623e8e3f93..bae5d1ccb3 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -79,8 +79,12 @@ typedef enum {
->  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
->  /* Count Cache Flush Assist HW Instruction */
->  #define SPAPR_CAP_CCF_ASSIST            0x09
-> +/* XICS interrupt controller */
-> +#define SPAPR_CAP_XICS                  0x0a
-> +/* XIVE interrupt controller */
-> +#define SPAPR_CAP_XIVE                  0x0b
->  /* Num Caps */
-> -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
-> +#define SPAPR_CAP_NUM                   (SPAPR_CAP_XIVE + 1)
->  
->  /*
->   * Capability Values
-> @@ -131,7 +135,6 @@ struct SpaprMachineClass {
->                            hwaddr *nv2atsd, Error **errp);
->      SpaprResizeHpt resize_hpt_default;
->      SpaprCapabilities default_caps;
-> -    SpaprIrq *irq;
->  };
->  
->  /**
-> @@ -195,7 +198,6 @@ struct SpaprMachineState {
->  
->      int32_t irq_map_nr;
->      unsigned long *irq_map;
-> -    SpaprIrq *irq;
->      qemu_irq *qirqs;
->      SpaprInterruptController *active_intc;
->      ICSState *ics;
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 50491cea4f..4b58134701 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -77,16 +77,6 @@ int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool align,
->                          Error **errp);
->  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t num);
->  
-> -typedef struct SpaprIrq {
-> -    bool        xics;
-> -    bool        xive;
-> -} SpaprIrq;
-> -
-> -extern SpaprIrq spapr_irq_xics;
-> -extern SpaprIrq spapr_irq_xics_legacy;
-> -extern SpaprIrq spapr_irq_xive;
-> -extern SpaprIrq spapr_irq_dual;
-> -
->  void spapr_irq_init(SpaprMachineState *spapr, Error **errp);
->  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error **errp);
->  void spapr_irq_free(SpaprMachineState *spapr, int irq, int num);
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index aabe097c41..d2d96d73e8 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -712,11 +712,11 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
+     KVMState *s = kvm_state;
+     uint64_t start, size, offset, count;
+     KVMSlot *mem;
+-    int ret, i;
++    int ret = 0, i;
+ 
+     if (!s->manual_dirty_log_protect) {
+         /* No need to do explicit clear */
+-        return 0;
++        return ret;
+     }
+ 
+     start = section->offset_within_address_space;
+@@ -724,7 +724,7 @@ static int kvm_physical_log_clear(KVMMemoryListener *kml,
+ 
+     if (!size) {
+         /* Nothing more we can do... */
+-        return 0;
++        return ret;
+     }
+ 
+     kvm_slots_lock(kml);
+-- 
+2.20.1
 
 
