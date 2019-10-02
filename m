@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA5FEC35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D9AC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:45:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F2F62133F
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:43:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2F62133F
+	by mail.kernel.org (Postfix) with ESMTPS id 1528F2133F
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:45:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1528F2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFdy7-0002Lt-N1
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:42:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47816)
+	id 1iFe0K-0003fk-4Z
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:45:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFdxQ-0001pu-GL
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:42:17 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iFdyj-0002v3-FE
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFdxP-00021z-Gg
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:42:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51490)
+ (envelope-from <mreitz@redhat.com>) id 1iFdyi-0002ug-4x
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:43:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38376)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFdxJ-0001xb-BH; Wed, 02 Oct 2019 08:42:09 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iFdye-0002rZ-5f; Wed, 02 Oct 2019 08:43:32 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8EB8064467;
- Wed,  2 Oct 2019 12:42:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 650D3300D1CA;
+ Wed,  2 Oct 2019 12:43:31 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3325F19C6A;
- Wed,  2 Oct 2019 12:42:07 +0000 (UTC)
-Subject: Re: [PATCH 19/22] iotests: Use self.image_len in TestRepairQuorum
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 04E9060BC6;
+ Wed,  2 Oct 2019 12:43:29 +0000 (UTC)
+Subject: Re: [PATCH 20/22] iotests: Add tests for invalid Quorum @replaces
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190920152804.12875-1-mreitz@redhat.com>
- <20190920152804.12875-20-mreitz@redhat.com>
- <18a0f40d-7253-58a1-21e6-fb5a466f7e11@virtuozzo.com>
+ <20190920152804.12875-21-mreitz@redhat.com>
+ <0851cb70-6c1c-13f6-43f1-05eca75e64e6@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <83183924-8022-6b93-2865-ac63b911b301@redhat.com>
-Date: Wed, 2 Oct 2019 14:42:05 +0200
+Message-ID: <3f4e2675-4069-fb7e-ce1d-df211a4ad1f7@redhat.com>
+Date: Wed, 2 Oct 2019 14:43:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <18a0f40d-7253-58a1-21e6-fb5a466f7e11@virtuozzo.com>
+In-Reply-To: <0851cb70-6c1c-13f6-43f1-05eca75e64e6@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="mFMnmPHMUKy51r9DtCvdRAcHPH6dLDvMO"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ boundary="9OBOweHUJkmhBzOz3Vssqib3O2UGcQJC2"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 02 Oct 2019 12:42:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Wed, 02 Oct 2019 12:43:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -105,84 +105,194 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mFMnmPHMUKy51r9DtCvdRAcHPH6dLDvMO
-Content-Type: multipart/mixed; boundary="ByMoQ7sNs8udboFrvZtNPdLfcLcnwIjtE"
+--9OBOweHUJkmhBzOz3Vssqib3O2UGcQJC2
+Content-Type: multipart/mixed; boundary="e609cZBMl6OcoDkydU8xGk9noq0Bd9NlT"
 
---ByMoQ7sNs8udboFrvZtNPdLfcLcnwIjtE
+--e609cZBMl6OcoDkydU8xGk9noq0Bd9NlT
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 26.09.19 16:13, Vladimir Sementsov-Ogievskiy wrote:
+On 26.09.19 16:30, Vladimir Sementsov-Ogievskiy wrote:
 > 20.09.2019 18:28, Max Reitz wrote:
->> 041's TestRepairQuorum has its own image_len, no need to refer to
->> TestSingleDrive.  (This patch allows uncommenting TestSingleDrive to
->=20
-> you mean commenting
-
-Ah, yes, I mean commenting out. :-)
-
->> speed up 041 during test testing.)
->=20
-> we definitely want a way to run a subset of test cases.
->=20
-> I usually do s/def test/def ntest/, and then set needed test-case back =
-to
-> 'def test'
-
-Thanks for that tip.
-
-Max
-
+>> Add two tests to see that you cannot replace a Quorum child with the
+>> mirror job while the child is in use by a different parent.
 >>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>   tests/qemu-iotests/041 | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>   tests/qemu-iotests/041     | 57 ++++++++++++++++++++++++++++++++++++=
++-
+>>   tests/qemu-iotests/041.out |  4 +--
+>>   2 files changed, 58 insertions(+), 3 deletions(-)
 >>
 >> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
->> index ca126de3ff..20ae9750b7 100755
+>> index 20ae9750b7..148dc47ce4 100755
 >> --- a/tests/qemu-iotests/041
 >> +++ b/tests/qemu-iotests/041
->> @@ -880,7 +880,7 @@ class TestRepairQuorum(iotests.QMPTestCase):
->>           # Add each individual quorum images
->>           for i in self.IMAGES:
->>               qemu_img('create', '-f', iotests.imgfmt, i,
->> -                     str(TestSingleDrive.image_len))
->> +                     str(self.image_len))
+>> @@ -34,6 +34,8 @@ quorum_img3 =3D os.path.join(iotests.test_dir, 'quor=
+um3.img')
+>>   quorum_repair_img =3D os.path.join(iotests.test_dir, 'quorum_repair.=
+img')
+>>   quorum_snapshot_file =3D os.path.join(iotests.test_dir, 'quorum_snap=
+shot.img')
+>>  =20
+>> +nbd_sock_path =3D os.path.join(iotests.test_dir, 'nbd.sock')
+>> +
+>>   class TestSingleDrive(iotests.QMPTestCase):
+>>       image_len =3D 1 * 1024 * 1024 # MB
+>>       qmp_cmd =3D 'drive-mirror'
+>> @@ -901,7 +903,8 @@ class TestRepairQuorum(iotests.QMPTestCase):
+>>  =20
+>>       def tearDown(self):
+>>           self.vm.shutdown()
+>> -        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_f=
+ile ]:
+>> +        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_f=
+ile,
+>> +                                 nbd_sock_path ]:
+>>               # Do a try/except because the test may have deleted some=
+ images
+>>               try:
+>>                   os.remove(i)
+>> @@ -1075,6 +1078,58 @@ class TestRepairQuorum(iotests.QMPTestCase):
+>>           self.assert_has_block_node("repair0", quorum_repair_img)
+>>           self.vm.assert_block_path('quorum0/children.1', 'repair0')
+>>  =20
+>> +    '''
+>> +    Check that we cannot replace a Quorum child when it has other
+>> +    parents.
+>> +    '''
 >=20
-> yes, seems TestSingleDrive.image_len is a copy-pasting mistake here..
+> you constantly use ''', when PEP8 recommends """ for doc-strings. I can=
+'t
+> complain, as our python code is something not related to PEP8 unfortuna=
+tely..
+
+I just use what I see in existing code.
+
+(And additionally, in scripting languages I tend to just use what works.)=
+
+
+>> +    def test_with_other_parent(self):
 >=20
->>               # Assign a node name to each quorum image in order to ma=
-nipulate
->>               # them
->>               opts =3D "node-name=3Dimg%i" % self.IMAGES.index(i)
+> don't we need
+>          if not iotests.supports_quorum():
+>              return
+> like in neighbors?
+
+Good point.  Or a decorator, probably.
+
+>> +        result =3D self.vm.qmp('nbd-server-start',
+>> +                             addr=3D{
+>> +                                 'type': 'unix',
+>> +                                 'data': {'path': nbd_sock_path}
+>> +                             })
+>> +        self.assert_qmp(result, 'return', {})
+>> +
+>> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
+>> +        self.assert_qmp(result, 'return', {})
+>> +
+>> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
+ice=3D'quorum0',
+>> +                             sync=3D'full', node_name=3D'repair0', re=
+places=3D'img1',
+>> +                             target=3Dquorum_repair_img, format=3Diot=
+ests.imgfmt)
+>> +        self.assert_qmp(result, 'error/desc',
+>> +                        "Cannot replace 'img1' by a node mirrored fro=
+m "
+>> +                        "'quorum0', because it cannot be guaranteed t=
+hat doing "
+>> +                        "so would not lead to an abrupt change of vis=
+ible data")
+>> +
+>> +    '''
+>> +    The same as test_with_other_parent(), but add the NBD server only=
+
+>> +    when the mirror job is already running.
+>> +    '''
+>> +    def test_with_other_parents_after_mirror_start(self):
+>> +        result =3D self.vm.qmp('nbd-server-start',
+>> +                             addr=3D{
+>> +                                 'type': 'unix',
+>> +                                 'data': {'path': nbd_sock_path}
+>> +                             })
+>> +        self.assert_qmp(result, 'return', {})
+>> +
+>> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
+ice=3D'quorum0',
+>> +                             sync=3D'full', node_name=3D'repair0', re=
+places=3D'img1',
+>> +                             target=3Dquorum_repair_img, format=3Diot=
+ests.imgfmt)
+>> +        self.assert_qmp(result, 'return', {})
+>> +
+>> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
+>> +        self.assert_qmp(result, 'return', {})
+>> +
+>> +        # The full error message goes to stderr, so we unfortunately
+>> +        # cannot check it here
+>=20
+> We can, iotests 169 and 245 do it with help of vm.get_log()
+
+Uh, thanks, I=E2=80=99ll look into it.
+
+Max
+
+>> +        self.complete_and_wait('mirror',
+>> +                               completion_error=3D'Operation not perm=
+itted')
+>> +
+>> +        # Should not have been replaced
+>> +        self.vm.assert_block_path('quorum0/children.1', 'img1')
+>> +
+>> +
+>>   # Test mirroring with a source that does not have any parents (not e=
+ven a
+>>   # BlockBackend)
+>>   class TestOrphanedSource(iotests.QMPTestCase):
+>> diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
+>> index f496be9197..ffc779b4d1 100644
+>> --- a/tests/qemu-iotests/041.out
+>> +++ b/tests/qemu-iotests/041.out
+>> @@ -1,5 +1,5 @@
+>> -.....................................................................=
+=2E.....................
+>> +.....................................................................=
+=2E.......................
+>>   --------------------------------------------------------------------=
+--
+>> -Ran 91 tests
+>> +Ran 93 tests
+>>  =20
+>>   OK
 >>
 >=20
->=20
+> With supports_quorum checked like in neighbor test-cases (or use @iotes=
+ts.skip_if_unsupported):
 > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >=20
 
 
 
---ByMoQ7sNs8udboFrvZtNPdLfcLcnwIjtE--
+--e609cZBMl6OcoDkydU8xGk9noq0Bd9NlT--
 
---mFMnmPHMUKy51r9DtCvdRAcHPH6dLDvMO
+--9OBOweHUJkmhBzOz3Vssqib3O2UGcQJC2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Umx0ACgkQ9AfbAGHV
-z0CrZAgAo9KObT3UCBdIeBzcRhtkyGHM34C83XtxNnmX27LYVhtdRaJNdQVIgo6N
-qN2JVPC/k+mvkNGKjmG7Uuz8v5x9m2XLRoORI/wFAO+ma0wBYG5VjkPf3DPIxOV3
-gpDpue16UsDoUv3oyj5HDGJfNfntXJ8GATunN259AnJsOumAk9idC8qBlIabBmT+
-IHYp4WJE1ME+FdfpmCIwTF7+BZjDsjmMIXvbBTt272d5b+JWKe4jaffdV/tTdMbr
-Tr0N6GEsxpMDQjv+sCZ89bkDpkgjI9omZhs+6E2Odoom8Rnc5fXyt4n61u8vQWv5
-gVhsKGYTuAEOB/o0VFsRFF/RDsZhjg==
-=oEnp
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2Um3AACgkQ9AfbAGHV
+z0DpuAf9GCd4y88k25UyM4qDiViim+ar/gAe3wKuImwbF47YomyPm3g6wwiWqpVb
+bMVZ1c79+HD+FKq09sqZMleRc3pLDZny2dPL76gHbRRGno+fAndWzmEYKexdQ8pc
+AEDUOdnMHuRQFw2JLmn8qxpZldnbe4bBc0OFLzy2G2JSr7TfwMfiHrCtmg0dhLs7
+6ZeRi+gLoXCEdMi62z+h+qN+U6syiWeXRu5fqRiIAXl0bofIY+z/fhID5Dx7StYI
+QknH3M4mhkDAb5pyAkaLmDIVf3YwOCnvE8SdVmPk6LhDADd457X80emEeA5jBr2S
+jV6t8lZ5PL3EGfxuHX74TCous8yOOw==
+=7N0m
 -----END PGP SIGNATURE-----
 
---mFMnmPHMUKy51r9DtCvdRAcHPH6dLDvMO--
+--9OBOweHUJkmhBzOz3Vssqib3O2UGcQJC2--
 
