@@ -2,123 +2,92 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F07FAC35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A582C35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:29:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A90F621920
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:23:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ciBie/3v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A90F621920
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 41DF621A4A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 12:29:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41DF621A4A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54833 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFdfK-00054s-Rt
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:23:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44837)
+	id 1iFdki-0000rZ-4A
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 08:29:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46558)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFde1-0004Km-QW
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:22:15 -0400
+ (envelope-from <bounces@canonical.com>) id 1iFb2y-0000Nk-2l
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 05:35:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iFde0-00070F-EW
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 08:22:13 -0400
-Received: from mail-eopbgr50126.outbound.protection.outlook.com
- ([40.107.5.126]:35515 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iFddv-0006uI-Lj; Wed, 02 Oct 2019 08:22:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DdMzMIKoFW01lofEk6E39K/AcAdJoyXtaKbKPfDGVKJKlyL+7ZyRHxKm1kLoD7+tlt9cFU9fuXWToaxLbPMpsu2Ojn8mVUJbDfg4bMxGgeHa0nJD/SJ2Ii+hiLt+fqNIOL1wBopTdXC5xQjatUyixI5p0t900bxY4qOKQmatpdCgblrKR+Mu9WQfM5ZsrBQWCKW3HG+P3H/O2hJw9nX1loWTGmtEPkPihD0wemj88mSWpJSnCE4hhfjDErFSZUIeofUkmmCcS9WYlvA3zPVn0Tuxez31pWhguikTZC3XLLurNMos6eXJJhQznG4jOA1r9r38TIekYMoSv5l3H5hyAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ds0ypAe2y7m/yZyXoIi+eRJerqNk6+g7I9Gitw0/Ogs=;
- b=SRfzhAVkv2Qx5R0rofGsyCkkbZVQeWbAK0xL8bRtqdXktJoC7+aX0VQOzQrdlRFq66hwx07mBN89PDOvwRTz38Pus9eKTGqvL3zuiKpiUrxomX844AyaER9cb4w3h+DRu3iUby6/Ctt+KIUfJMWIcxn2ED60HcGC1l8VE2q0bp5+JHPt1Og83MTMJY2T6YF5UwXQYgErTeUZX32iAZp7/gvgiv9xT2FJRoUxdJP28ttZxvcQTtJ+oPmMR6q919UAVFBJFm0Ou7gN0Zp2OklJTTvfm+QymaLQlk2KpUeWl8ZlCOCC8EteyxL54K7SYwR2wYxQYGhBmjIKIxkEJD/Zbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ds0ypAe2y7m/yZyXoIi+eRJerqNk6+g7I9Gitw0/Ogs=;
- b=ciBie/3vdMBeUxwHx+K5mhY54T1IMeEWIRU6g059lzs4Pb1pdfRO3Mk/Kh8MP3IzCGNCuAFn6KLIxoxWy0F0XByR2Cs9wADGT/a/0JDLT3pB1USV/lfSZVHrjIB0IdHTwWgW7glacHrg9h99uHv0HgepAkc3/tr2XUxAk9jSbk8=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB4058.eurprd08.prod.outlook.com (20.179.10.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2305.20; Wed, 2 Oct 2019 12:22:02 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.023; Wed, 2 Oct 2019
- 12:22:02 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>
-Subject: Re: bitmap migration bug with -drive while block mirror runs
-Thread-Topic: bitmap migration bug with -drive while block mirror runs
-Thread-Index: AQHVd+yDiWNDoVbdB0u/++2NVEJq8qdF0TUAgAAC+ICAAB3ngIAAAtYAgAE4ZQCAAAc0gIAAE54A
-Date: Wed, 2 Oct 2019 12:22:01 +0000
-Message-ID: <b102c656-0d17-16d7-3414-6828e569b90f@virtuozzo.com>
-References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
- <d897c755-40e7-6392-23e3-c06b1a371f28@virtuozzo.com>
- <4bc910ef-0bec-cfd6-89f6-a93d35367218@redhat.com>
- <9431d242-bfe1-b9db-17d0-6c1a280a05da@virtuozzo.com>
- <e112c85a-684f-5721-2da7-d23312c9e487@redhat.com>
- <20191002104600.GC6129@angien.pipo.sk>
- <20191002111147.GB5819@localhost.localdomain>
-In-Reply-To: <20191002111147.GB5819@localhost.localdomain>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR09CA0059.eurprd09.prod.outlook.com
- (2603:10a6:7:3c::27) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191002152159991
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d164bace-f74f-40aa-9f46-08d747332103
-x-ms-traffictypediagnostic: DB8PR08MB4058:
-x-microsoft-antispam-prvs: <DB8PR08MB40580BB5BCE78EFB4CC0F69EC19C0@DB8PR08MB4058.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
-x-forefront-prvs: 0178184651
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(979002)(346002)(376002)(136003)(396003)(39850400004)(366004)(199004)(189003)(305945005)(8936002)(7736002)(66946007)(64756008)(81166006)(66066001)(66556008)(81156014)(66476007)(66446008)(8676002)(31686004)(6512007)(6246003)(5024004)(14454004)(256004)(4326008)(5660300002)(14444005)(6116002)(3846002)(229853002)(99286004)(36756003)(6436002)(53546011)(102836004)(52116002)(386003)(6506007)(76176011)(26005)(316002)(478600001)(86362001)(31696002)(71200400001)(110136005)(54906003)(71190400001)(486006)(476003)(2616005)(11346002)(446003)(2906002)(25786009)(6486002)(186003)(969003)(989001)(999001)(1009001)(1019001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4058;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: W4Gx2Q6bkqYG29RuZ+zoT//mOYJzNATABuYULJ4lGJXtA3QO3b0ER1LUb1TE5mr+8/9eaOrJEM6eZpRcyHfP/ZQxVv8JXyu4b/zlsqNjoYWL6qS3fNCqF5np6arhf3nydEhRqw2JiYojrB9sflvbkkFCkPiNFXQ2cH6AuOuNJHviG7/WgV9fs6GcSxg8w48Fn8GU/TxBrFvKg1+7Gvta4+Omd4kw8hFtFGY1/VsbQTb4SV2CmYhoeXBM/1OaNKM2Vbi4gfDhPji/gWzNpzuGL/9d+ABImznIyWlBKF+CrFQHBuUympJwAtoMLqNSHaft7pirpTo+h7+FwJ6SirOwzN405gj/mI1jMHtPcQsaIdwQCq5vu4r/FsvJHcagAkd/5XdnX4i+1b0KccY94bNqGCyPT5Tfus2mpX+FInZP+p8=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F99AE584DE149347B2F32D9205E8D067@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <bounces@canonical.com>) id 1iFb2w-0006jl-B3
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 05:35:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40492)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iFb2w-0006j0-56
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 05:35:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iFb2t-0005jU-FD
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:35:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 70F972E80D0
+ for <qemu-devel@nongnu.org>; Wed,  2 Oct 2019 09:35:43 +0000 (UTC)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d164bace-f74f-40aa-9f46-08d747332103
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Oct 2019 12:22:02.0035 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6onNUfqYw7uGbxxBiYf1Gqg5x9KHqk0snjAmcZOrQmU8yJTG/6Izm5p9+2gy3FwtIBZKvL5TJi3e3qS5/e0ZtaopTMbNlrqVbEDbrYA2POU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4058
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.126
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 02 Oct 2019 09:23:00 -0000
+From: Jan Glauber <jglauber@marvell.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=In Progress; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
+ component=main; status=New; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
+ component=main; status=New; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=In Progress; importance=Medium;
+ assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=ff-series;
+ sourcepackage=qemu; component=None; status=New; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: qemu-img
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dannf jan-glauber-i jnsnow lizhengui rafaeldtinoco
+X-Launchpad-Bug-Reporter: dann frazier (dannf)
+X-Launchpad-Bug-Modifier: Jan Glauber (jan-glauber-i)
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+ <1864070a-2f84-1d98-341e-f01ddf74ec4b@ubuntu.com>
+ <20190924202517.GA21422@xps13.dannf>
+Message-Id: <20191002092253.GA3857@hc>
+Subject: [Bug 1805256] Re: [Qemu-devel] qemu_futex_wait() lockups in ARM64: 2
+ possible issues
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19066";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 2e3ae6c15255563c05797f29c21e59ec758a4d2e
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Wed, 02 Oct 2019 08:27:28 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -127,105 +96,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDIuMTAuMjAxOSAxNDoxMSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDIuMTAuMjAxOSB1bSAx
-Mjo0NiBoYXQgUGV0ZXIgS3JlbXBhIGdlc2NocmllYmVuOg0KPj4gT24gVHVlLCBPY3QgMDEsIDIw
-MTkgYXQgMTI6MDc6NTQgLTA0MDAsIEpvaG4gU25vdyB3cm90ZToNCj4+Pg0KPj4+DQo+Pj4gT24g
-MTAvMS8xOSAxMTo1NyBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+
-Pj4gMDEuMTAuMjAxOSAxNzoxMCwgSm9obiBTbm93IHdyb3RlOg0KPj4+Pj4NCj4+Pj4+DQo+Pj4+
-PiBPbiAxMC8xLzE5IDEwOjAwIEFNLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
-Og0KPj4+Pj4+PiBPdGhlcndpc2U6IEkgaGF2ZSBhIGxvdCBvZiBjbG91ZHkgaWRlYXMgb24gaG93
-IHRvIHNvbHZlIHRoaXMsIGJ1dA0KPj4+Pj4+PiB1bHRpbWF0ZWx5IHdoYXQgd2Ugd2FudCBpcyB0
-byBiZSBhYmxlIHRvIGZpbmQgdGhlICJhZGRyZXNzYWJsZSIgbmFtZSBmb3INCj4+Pj4+Pj4gdGhl
-IG5vZGUgdGhlIGJpdG1hcCBpcyBhdHRhY2hlZCB0bywgd2hpY2ggd291bGQgYmUgdGhlIG5hbWUg
-b2YgdGhlIGZpcnN0DQo+Pj4+Pj4+IGFuY2VzdG9yIG5vZGUgdGhhdCBpc24ndCBhIGZpbHRlci4g
-KE9SLCB0aGUgbmFtZSBvZiB0aGUgYmxvY2stYmFja2VuZA0KPj4+Pj4+PiBhYm92ZSB0aGF0IG5v
-ZGUuKQ0KPj4+Pj4+IE5vdCB0aGUgbmFtZSBvZiBhbmNlc3RvciBub2RlLCBpdCB3aWxsIGJyZWFr
-IG1hcHBpbmc6IGl0IG11c3QgYmUgbmFtZSBvZiB0aGUNCj4+Pj4+PiBub2RlIGl0c2VsZiBvciBu
-YW1lIG9mIHBhcmVudCAobWF5IGJlIHRocm91Z2ggc2V2ZXJhbCBmaWx0ZXJzKSBibG9jay1iYWNr
-ZW5kDQo+Pj4+Pj4NCj4+Pj4+DQo+Pj4+PiBBaCwgeW91IGFyZSByaWdodCBvZiBjb3Vyc2UgLS0g
-YmVjYXVzZSBibG9jay1iYWNrZW5kcyBhcmUgdGhlIG9ubHkNCj4+Pj4+ICJub2RlcyIgZm9yIHdo
-aWNoIHdlIGFjdHVhbGx5IGRlc2NlbmQgdGhlIGdyYXBoIGFuZCBhZGQgdGhlIGJpdG1hcCB0bw0K
-Pj4+Pj4gaXRzIGNoaWxkLg0KPj4+Pj4NCj4+Pj4+IFNvIHRoZSByZWFsIGJhY2stcmVzb2x1dGlv
-biBtZWNoYW5pc20gaXM6DQo+Pj4+Pg0KPj4+DQo+Pj4gQW1lbmRtZW50Og0KPj4+ICAgICAtIElm
-IG91ciBsb2NhbCBub2RlLW5hbWUgTiBpcyB3ZWxsLWZvcm1lZCwgdXNlIHRoaXMuDQo+Pg0KPj4g
-SSdkIGxpa2UgdG8gcmUtaXRlcmF0ZSB0aGF0IHRoZSBuZWNlc3NpdHkgdG8ga2VlcCBub2RlIG5h
-bWVzIHNhbWUgb24NCj4+IGJvdGggc2lkZXMgb2YgbWlncmF0aW9uIGlzIHVuZXhwZWN0ZWQsIHVu
-ZG9jdW1lbnRlZCBhbmQgaW4gc29tZSBjYXNlcw0KPj4gaW1wb3NzaWJsZS4NCj4gDQo+IEkgdGhp
-bmsgdGhlIChpbXBsaWNpdGx5IG1hZGUpIHJlcXVpcmVtZW50IGlzIG5vdCB0aGF0IGFsbCBub2Rl
-LW5hbWVzIGFyZQ0KPiBrZXB0IHRoZSBzYW1lLCBidXQgb25seSB0aGUgbm9kZS1uYW1lcyBvZiB0
-aG9zZSBub2RlcyBmb3Igd2hpY2gNCj4gbWlncmF0aW9uIHRyYW5zZmVycyBzb21lIHN0YXRlLg0K
-PiANCj4gSXQgc2VlbXMgdG8gbWUgdGhhdCBiaXRtYXAgbWlncmF0aW9uIGlzIHRoZSBmaXJzdCBj
-YXNlIG9mIHB1dHRpbmcNCj4gc29tZXRoaW5nIGluIHRoZSBtaWdyYXRpb24gc3RyZWFtIHRoYXQg
-aXNuJ3QgcmVsYXRlZCB0byBhIGZyb250ZW5kLCBidXQNCj4gdG8gdGhlIGJhY2tlbmQsIHNvIHRo
-ZSB1c3VhbCBkZXZpY2UgaGllcmFyY2h5IHRvIGFkZHJlc3MgaW5mb3JtYXRpb24NCj4gZG9lc24n
-dCB3b3JrIGhlcmUuIEFuZCBpdCBzZWVtcyB0aGUgaW1wbGljYXRpb25zIG9mIHRoaXMgd2VyZW4n
-dCByZWFsbHkNCj4gY29uc2lkZXJlZCBzdWZmaWNpZW50bHksIHJlc3VsdGluZyBpbiB0aGUgZGVz
-aWduIHByb2JsZW0gd2UncmUNCj4gZGlzY3Vzc2luZyBub3cuDQo+IA0KPiBXaGF0IHdlIG5lZWQg
-dG8gdHJhbnNmZXIgaXMgZGlydHkgYml0bWFwcywgd2hpY2ggY2FuIGJlIGF0dGFjaGVkIHRvIGFu
-eQ0KPiBub2RlIGluIHRoZSBibG9jayBncmFwaC4gSWYgd2UgYWNjZXB0IHRoYXQgdGhlIHdheSB0
-byB0cmFuc2ZlciB0aGlzIGlzDQo+IHRoZSBtaWdyYXRpb24gc3RyZWFtLCB3ZSBuZWVkIGEgd2F5
-IHRvIHRlbGwgd2hpY2ggYml0bWFwIGJlbG9uZ3MgdG8NCj4gd2hpY2ggbm9kZS4gTWF0Y2hpbmcg
-bm9kZS1uYW1lIGlzIHRoZSBvYnZpb3VzIGFuc3dlciwganVzdCBsaWtlIGENCj4gbWF0Y2hpbmcg
-ZGV2aWNlIHRyZWUgaGllcmFyY2h5IGlzIHVzZWQgZm9yIGZyb250ZW5kcy4NCj4gDQo+IElmIHdl
-IGRvbid0IHdhbnQgdG8gdXNlIHRoZSBtaWdyYXRpb24gc3RyZWFtIGZvciBiYWNrZW5kcywgd2Ug
-d291bGQgbmVlZA0KPiB0byBmaW5kIGFub3RoZXIgd2F5IHRvIHRyYW5zZmVyIHRoZSBiaXRtYXBz
-LiBJIHdvdWxkIHdlbGNvbWUgcmVtb3ZpbmcNCj4gYmFja2VuZCBkYXRhIGZyb20gdGhlIG1pZ3Jh
-dGlvbiBzdHJlYW0sIGJ1dCBpZiB0aGlzIGluY2x1ZGVzDQo+IG5vbi1wZXJzaXN0ZW50IGJpdG1h
-cHMsIEkgZG9uJ3Qgc2VlIHdoYXQgdGhlIGFsdGVybmF0aXZlIGNvdWxkIGJlLg0KDQpCdXQgaG93
-IHRvIG1pZ3JhdGUgcGVyc2lzdGVudCBiaXRtYXBzIGlmIHN0b3JhZ2UgaXMgbm90IHNoYXJlZD8N
-Cg0KQW5kIGV2ZW4gd2l0aCBvbmx5IHBlcnNpc3RlbnQgYml0bWFwcyBhbmQgc2hhcmVkIHN0b3Jh
-Z2U6IGJpdG1hcHMgZGF0YSBtYXkNCmJlIGxhcmdlLCBhbmQgc3RvcmluZy9sb2FkaW5nIGl0IGR1
-cmluZyBtaWdyYXRpb24gZG93bnRpbWUgd2lsbCBpbmNyZWFzZQ0KaXQuDQoNCj4gDQo+PiBJZiB5
-b3Ugd2FudCB0byBtYW5kYXRlIHRoYXQgdGhleSBtdXN0IGJlIGtlcHQgdGhlIHNhbWUgcGxlYXNl
-IGRvY3VtZW50DQo+PiBpdCBhbmQgYWxzbyBub3RlIHRoZSBmb2xsb3dpbmc6DQo+Pg0KPj4gLSBk
-dXJpbmcgbWlncmF0aW9ucyB0aGUgc3RvcmFnZSBsYXlvdXQgbWF5IGNoYW5nZSBlLmcuIGEgYmFj
-a2luZyBjaGFpbg0KPj4gICAgbWF5IGJlY29tZSBmbGF0dGVuZWQsIHRodXMga2VlcGluZyBub2Rl
-IG5hbWVzIHN0YWJsZSBiZXlvbmQgdGhlIHRvcA0KPj4gICAgbGF5ZXIgaXMgaW1wb3NzaWJsZQ0K
-PiANCj4gWW91IGRvbid0IHdhbnQgdG8gdHJhbnNmZXIgYml0bWFwcyBvZiBub2RlcyB0aGF0IHlv
-dSdyZSBnb2luZyB0byBkcm9wLg0KPiBJJ20gbm90IGFuIGV4cGVydCBmb3IgdGhlc2UgYml0bWFw
-cywgYnV0IEkgdGhpbmsgdGhpcyBqdXN0IG1lYW5zIHlvdQ0KPiB3b3VsZCBoYXZlIHRvIGRpc2Fi
-bGUgYW55IGJpdG1hcHMgb24gdGhlIGJhY2tpbmcgZmlsZXMgdG8gYmUgZHJvcHBlZCBvbg0KPiB0
-aGUgc291cmNlIGhvc3QgYmVmb3JlIHlvdSBtaWdyYXRlLg0KDQpZb3UgbWVhbiByZW1vdmUgdGhl
-bS4uIEJ1dCB5ZXMsIGFueSB3YXkgaXQncyBub3QgYSBwcm9ibGVtLiBJZiBjb3JyZXNwb25kaW5n
-DQpub2RlIGlzbid0IGV4aXN0IG9uIHRhcmdldCwgd2UgZG9uJ3QgbmVlZCBhbnkgYml0bWFwcyBm
-b3IgaXQuDQoNCj4gDQo+PiAtIGluIHNvbWUgY2FzZXMgKHJlYWRvbmx5IGltYWdlIGluIGEgY2Ry
-b20gbm90IHByZXNlbnQgb24gZGVzdGluYXRpb24sDQo+PiAgICB0aHVzIG5vdCByZWxldmFudCBo
-ZXJlIHByb2JhYmx5KSBpdCBtYXkgZXZlbiBiZWNvbWUgaW1wb3NzaWJsZSB0bw0KPj4gICAgY3Jl
-YXRlIGFueSBub2RlIHRodXMga2VlcGluZyB0aGUgdG9wIG5vZGUgbWF5IGJlIGltcG9zc2libGUN
-Cj4gDQo+IFNhbWUgdGhpbmcsIHlvdSBkb24ndCB3YW50IHRvIHRyYW5zZmVyIGEgYml0bWFwIGZv
-ciBhIG5vZGUgdGhhdA0KPiBkaXNhcHBlYXJzLg0KPiANCj4+IC0gaXQgc2hvdWxkIGJlIGRvY3Vt
-ZW50ZWQgd2hlbiBhbmQgd2h5IHRoaXMgaGFwcGVucyBhbmQgaG93IG1hbmFnZW1lbnQNCj4+ICAg
-IHRvb2xzIGFyZSBzdXBwb3NlZCB0byBkbyBpdA0KPj4NCj4+IC0gcGxlYXNlIGxldCBtZSBrbm93
-IHdoYXQncyBhY3R1YWxseSBleHBlY3RlZCwgc2luY2UgbGlidmlydA0KPj4gICAgZGlkbid0IGVu
-YWJsZSBibG9ja2RldiB5ZXQgd2UgY2FuIGZpeCBhbnkgdW5leHBlY3RlZCBleHBlY3RhdGlvbnMN
-Cj4+DQo+PiAtIERvY3VtZW50IGl0IHNvIHRoYXQgdGhlIGV4cGVjdGF0aW9ucyBkb24ndCBjaGFu
-Z2UgYWZ0ZXIgdGhpcy4NCj4gDQo+IFllcywgd2UgbmVlZCBhIGdvb2QgYW5kIGlkZWFsbHkgZnV0
-dXJlLXByb29mIHJ1bGUgb2Ygd2hpY2ggbm9kZS1uYW1lcw0KPiBuZWVkIHRvIHN0YXkgdGhlIHNh
-bWUuIEN1cnJlbnRseSBpdCdzIG9ubHkgYml0bWFwcywgYnV0IG1pZ2h0IHdlIGdldA0KPiBhbm90
-aGVyIGZlYXR1cmUgbGF0ZXIgd2hlcmUgd2Ugd2FudCB0byB0cmFuc2ZlciBtb3JlIGJhY2tlbmQg
-ZGF0YT8NCj4gDQo+PiAtIElkZWFsbHkgbm9kZSBuYW1lcyB3aWxsIG5vdCBiZSBib3VuZCB0byBh
-bnl0aGluZyBhbmQgZnJlZWx5DQo+PiAgICBjaGFuZ2VhYmxlLiBJZiBuZWNlc3Nhcnkgd2UgY2Fu
-IHByb3ZpZGUgYSBtYXAgdG8gcWVtdSBkdXJpbmcgbWlncmF0aW9uDQo+PiAgICB3aGljaCBpcyBw
-cm9iYWJseSBsZXNzIHBhaW5mdWwgYW5kIG1vcmUgc3RyYWlnaHRmb3J3YXJkIHRoYW4ga2VlcGlu
-Zw0KPj4gICAgdGhlbSBpbiBzeW5jIHNvbWVob3cgLi4uDQo+IA0KPiBBIG1hcCBmZWVscyBwYWlu
-ZnVsIGZvciB0aGUgYXZlcmFnZSB1c2VyIChhbmQgZm9yIHRoZSBRRU1VDQo+IGltcGxlbWVudGF0
-aW9uKSwgZXZlbiBpZiBpdCBsb29rcyBjb252ZW5pZW50IGZvciBsaWJ2aXJ0LiBJZiBhbnl0aGlu
-ZywNCj4gSSdkIG1ha2UgaXQgb3B0aW9uYWwgYW5kIGRlZmF1bHQgdG8gMToxIG1hcHBpbmdzIGZv
-ciBhbnl0aGluZyB0aGF0IGlzbid0DQo+IGV4cGxpY2l0bHkgbWFwcGVkLg0KPiANCg0KSG1tLCBJ
-IGRvbid0IHRoaW5rIHRoYXQgb3B0aW9uYWwgbWFwIGlzIHBhaW5mdWwuDQoNCldoYXQgYWJvdXQg
-dGhlIGZvbGxvd2luZzoNCg0KMS4gSWYgbWFwIGlzIHByb3ZpZGVkOg0KLSBtaWdyYXRlIG9ubHkg
-Yml0bWFwcyBpbiBub2Rlcywgc3BlY2lmaWVkIGJ5IG1hcA0KLSBiaXRtYXBzIG1pZ3JhdGVkIG9u
-bHkgYWNjb3JkaW5nbHkgdG8gdGhlIG1hcCwgYmxvY2sgZGV2aWNlIG5hbWVzIGFyZSBub3QgaW52
-b2x2ZWQgYXQgYWxsDQoNCjIuIElmIG1hcCBub3QgcHJvdmlkZWQ6DQotIEZvciBub2RlcyBkaXJl
-Y3RseSBib3VuZCB0byBuYW1lZCBibG9jayBiYWNrZW5kcywgb3IgdGhyb3VnaCBzZXZlcmFsIGZp
-bHRlcnMsIHVzZSBuYW1lIG9mIHRoaXMNCmJsb2NrIGJhY2tlbmQuDQotIEZvciBvdGhlciBub2Rl
-cyB1c2Ugbm9kZS1uYW1lDQoNCj09PQ0KDQpBbmQgSSB0aGluayBbMi5dIHNob3VsZCBiZSBkb25l
-IG5vdyB0byBmaXggY3VycmVudCBidWcsIGFuZCBbMS5dIG1heSBiZSBwb3N0cG9uZWQgdW50aWwg
-d2UNCnJlYWxseSBuZWVkIGl0Lg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+I've looked into this on ThunderX2. The arm64 code generated for the
+atomic_[add|sub] accesses of ctx->notify_me doesn't contain any
+memory barriers. It is just plain ldaxr/stlxr.
+
+>From my understanding this is not sufficient for SMP sync.
+
+If I read this comment correct:
+
+    void aio_notify(AioContext *ctx)
+    {
+        /* Write e.g. bh->scheduled before reading ctx->notify_me.  Pairs
+         * with atomic_or in aio_ctx_prepare or atomic_add in aio_poll.
+         */
+        smp_mb();
+        if (ctx->notify_me) {
+
+it points out that the smp_mb() should be paired. But as
+I said the used atomics don't generate any barriers at all.
+
+I've tried to verify me theory with this patch and didn't run into the
+issue for ~500 iterations (usually I would trigger the issue ~20 iterations=
+).
+
+--Jan
+
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index d8f0cb4af8dd..d07dcd4e9993 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -591,6 +591,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
+      */
+     if (blocking) {
+         atomic_add(&ctx->notify_me, 2);
++        smp_mb();
+     }
+ =
+
+     qemu_lockcnt_inc(&ctx->list_lock);
+@@ -632,6 +633,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
+ =
+
+     if (blocking) {
+         atomic_sub(&ctx->notify_me, 2);
++        smp_mb();
+     }
+ =
+
+     /* Adjust polling time */
+diff --git a/util/async.c b/util/async.c
+index 4dd9d95a9e73..92ac209c4615 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -222,6 +222,7 @@ aio_ctx_prepare(GSource *source, gint    *timeout)
+     AioContext *ctx =3D (AioContext *) source;
+ =
+
+     atomic_or(&ctx->notify_me, 1);
++    smp_mb();
+ =
+
+     /* We assume there is no timeout already supplied */
+     *timeout =3D qemu_timeout_ns_to_ms(aio_compute_timeout(ctx));
+@@ -240,6 +241,7 @@ aio_ctx_check(GSource *source)
+     QEMUBH *bh;
+ =
+
+     atomic_and(&ctx->notify_me, ~1);
++    smp_mb();
+     aio_notify_accept(ctx);
+ =
+
+     for (bh =3D ctx->first_bh; bh; bh =3D bh->next) {
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805256
+
+Title:
+  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
+  converting images
+
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  In Progress
+Status in qemu source package in Bionic:
+  New
+Status in qemu source package in Disco:
+  New
+Status in qemu source package in Eoan:
+  In Progress
+Status in qemu source package in FF-Series:
+  New
+
+Bug description:
+  Command:
+
+  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+
+  Hangs indefinitely approximately 30% of the runs.
+
+  ----
+
+  Workaround:
+
+  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+
+  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
+
+  ----
+
+  (gdb) thread 1
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf1ad81c in __GI_ppoll
+  #1 0x0000aaaaaabcf73c in ppoll
+  #2 qemu_poll_ns
+  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
+  #4 main_loop_wait
+  ...
+
+  (gdb) thread 2
+  ...
+  (gdb) bt
+  #0 syscall ()
+  #1 0x0000aaaaaabd41cc in qemu_futex_wait
+  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
+  #3 0x0000aaaaaabed05c in call_rcu_thread
+  #4 0x0000aaaaaabd34c8 in qemu_thread_start
+  #5 0x0000ffffbf25c880 in start_thread
+  #6 0x0000ffffbf1b6b9c in thread_start ()
+
+  (gdb) thread 3
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
+  #1 0x0000ffffbf2671b4 in __sigwait
+  #2 0x0000aaaaaabd1ddc in sigwait_compat
+  #3 0x0000aaaaaabd34c8 in qemu_thread_start
+  #4 0x0000ffffbf25c880 in start_thread
+  #5 0x0000ffffbf1b6b9c in thread_start
+
+  ----
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
+  ./disk01.ext4.qcow2 ./output.qcow2
+
+  [New Thread 0xffffbec5ad90 (LWP 72839)]
+  [New Thread 0xffffbe459d90 (LWP 72840)]
+  [New Thread 0xffffbdb57d90 (LWP 72841)]
+  [New Thread 0xffffacac9d90 (LWP 72859)]
+  [New Thread 0xffffa7ffed90 (LWP 72860)]
+  [New Thread 0xffffa77fdd90 (LWP 72861)]
+  [New Thread 0xffffa6ffcd90 (LWP 72862)]
+  [New Thread 0xffffa67fbd90 (LWP 72863)]
+  [New Thread 0xffffa5ffad90 (LWP 72864)]
+
+  [Thread 0xffffa5ffad90 (LWP 72864) exited]
+  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
+  [Thread 0xffffa77fdd90 (LWP 72861) exited]
+  [Thread 0xffffbdb57d90 (LWP 72841) exited]
+  [Thread 0xffffa67fbd90 (LWP 72863) exited]
+  [Thread 0xffffacac9d90 (LWP 72859) exited]
+  [Thread 0xffffa7ffed90 (LWP 72860) exited]
+
+  <HUNG w/ 3 threads in the stack trace showed before>
+  """
+
+  All the tasks left are blocked in a system call, so no task left to call
+  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
+  thread #1 (doing poll() in a pipe with thread #2).
+
+  Those 7 threads exit before disk conversion is complete (sometimes in
+  the beginning, sometimes at the end).
+
+  ----
+
+  [ Original Description ]
+
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+
+  Once hung, attaching gdb gives the following backtrace:
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
+igmask=3D0xffffc123b950)
+  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
+linux-gnu/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
+c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805256/+subscriptions
 
