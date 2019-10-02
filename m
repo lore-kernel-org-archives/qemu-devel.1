@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3DD1C10F14
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE0AC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:13:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EC002054F
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:11:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DB182054F
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:13:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfxRh8HG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC002054F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OaeSiMzq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB182054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFi9g-0001kT-Cs
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:11:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35440)
+	id 1iFiBp-0003y0-LW
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:13:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrN-0005SI-7J
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:18 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrJ-0005NX-Mc
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrL-0003Qn-Sd
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:16 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54805)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFhrI-0003MC-RA
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:13 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51956)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iFhrL-0003Pk-Jx
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:15 -0400
-Received: by mail-wm1-x342.google.com with SMTP id p7so7968694wmp.4
- for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:15 -0700 (PDT)
+ id 1iFhrI-0003LS-LJ
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 12:52:12 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 7so7980621wme.1
+ for <qemu-devel@nongnu.org>; Wed, 02 Oct 2019 09:52:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=XQJk1DHPtMxR5rn6iJkZ4+R9JTJIU95kBBNqy6kS5R0=;
- b=mfxRh8HG/WR9akh1+9ibjC5P6cgNZVkmRH+D0d6GRBWPN/dCvg24vEzxpiUCmhurvV
- /YQN4UMa6vXquqdcu7eAl3kuES/O1pHiu8RsRIOC5+DkK3zZU7PcNVlg+N03nGmFCy3U
- wuSrYX4S9Tin09MTm8XZrtCIti+EoZBCVFjzrqiXwX0PPFBwqF6a4LULwJ8h5u+lbhor
- 3TX1zFvitlflnQzRSCt7Yw5VrsYy4heUNPSgLHL7Rpmkm/jFYNQuHmnUSyXhcmPQ0UwW
- KKTzZQClPMhbNqg93EJCkrfUDv0H7MP4S5Pjnu2tUJ4tLHc8orkjs71a708nYl+JJkwT
- tSHw==
+ bh=ctHqzmF5TD8AB7smZxOhtvuEQnZ1yozHJ+9MqxlkUs0=;
+ b=OaeSiMzqglA9jbgYLidNul4LVSa+ezpPObr8nrH34VlW53Diilqgig/XNy6vcsgDA6
+ oGJf20POMjWhJVe4uAb5+B9b8p7Vy63jxgiugiRjcjtUIBm/9fItTAU4azemxY9J+mGo
+ 5iCP4aeA/XpbnLlIZpohBnX3dxH7TsO6lKxHhnPwQU1u8uVsh/Bh2JmorttXlaOXDaox
+ d8Oha6ipz545+cRUukq/KwaiAqzflI0BqjIdn//5KU+yGScQ7aLHIF4jeDEHO9rdHvoC
+ 3AN0kgPn41lSUUGr03A1FgIgvbQZvGHiKcDXHJ9TK/KKhxotkgNUYKmTMFL29bsKbeRb
+ kjEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=XQJk1DHPtMxR5rn6iJkZ4+R9JTJIU95kBBNqy6kS5R0=;
- b=YkOz5fP1Yh0MnHNdjvlqPlT+4b37GB5xGa0BSR2TAVkT0BZHT7j5f9dOr7Q6szbfUW
- zC4tIKxySDwBJk8deqEHe1sTWi72beOhBUjVcXKQwa8kTOcQB04hD3BT/IjwM0VIkVAk
- 9Mf1+7z1Gqe4OEhMJnz7/EY5WSaR5hHe6hzw+3D6c72cvmnlBkLW+fOBZbxLA4vT6rCB
- ndwfQHMgq35FMUeexwX8qWUH1Q3CLhGHitFu1rSZ+HvqZW+acnkOUyXr0bIwvgPIoxpO
- 7cp7QyPM/4Qbq/5Kl20K9QzrBgxp7fVlGO/B/hixSnEGd384niL36CMEwrVGqhEQfBq6
- aJeQ==
-X-Gm-Message-State: APjAAAV3FnvsryyvfTXbW4rZK37xKp/VTjEb4HdbQYUg6A/WWFgp6Tge
- NZIpTuEHZg+2/+doodbux4yptBSg
-X-Google-Smtp-Source: APXvYqytYYi13XucODbggEKUqldvBriEYTyy6rL8afO2BACKWUADoTPQc5eHofRNVHZMA4atHpE5Tg==
-X-Received: by 2002:a1c:a851:: with SMTP id r78mr3574856wme.166.1570035134368; 
- Wed, 02 Oct 2019 09:52:14 -0700 (PDT)
+ bh=ctHqzmF5TD8AB7smZxOhtvuEQnZ1yozHJ+9MqxlkUs0=;
+ b=lB4IKQBppHEQd5pq2QL8gnlnRJ0ey55WXzpCKbiQbl8dnd4H0RrL7hKLtq7PoQ9MMr
+ /LhL7A/6ygmHLWgjTd5lpWm23EWraDlbJBUYTcN/yb2YBUvNF/wCpWDKJSC1N6jKqUPu
+ nN2mK5nOWlTKhjD8tVUvZ+8sJVPFkZymVoRQlDkTIaBXqqYjva2TUnMjf0gakioe8X/6
+ yF2UjqHQYXgfDacy5WsmVud0GhaWe015IAP54uCimYS1YcdsNrV/Y7svSrWLSZRN/2lt
+ LwtNnZNKWlGmIw3g4sNVY6Mf6h9gzaMWmFZURthz712mQDB1zkDbxRZAZ9sZNRPp54FE
+ 19JQ==
+X-Gm-Message-State: APjAAAUHYPqViwzzsuYD1MKfHYMO7eNSuIvuztbrIrn/eIHJmKBGvE1F
+ uEBSSos8FOYgGirU9Eq2U90xzk6i
+X-Google-Smtp-Source: APXvYqxRaGm2dI0X4OgyKUrl9NdufBR2pkadAxmrTrHFFn1gWKsTHjrDLxjd+UjCS3PiosMexeaYmw==
+X-Received: by 2002:a05:600c:2057:: with SMTP id
+ p23mr3558370wmg.17.1570035131366; 
+ Wed, 02 Oct 2019 09:52:11 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.13
+ by smtp.gmail.com with ESMTPSA id g4sm27303990wrw.9.2019.10.02.09.52.10
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 02 Oct 2019 09:52:13 -0700 (PDT)
+ Wed, 02 Oct 2019 09:52:10 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 19/30] cris: do not leak struct cris_disasm_data
-Date: Wed,  2 Oct 2019 18:51:42 +0200
-Message-Id: <1570035113-56848-20-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 16/30] mcf5208: fix leak from qemu_allocate_irqs
+Date: Wed,  2 Oct 2019 18:51:39 +0200
+Message-Id: <1570035113-56848-17-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
 References: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
@@ -94,131 +95,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use a stack-allocated struct to avoid a memory leak.
+The array returned by qemu_allocate_irqs is malloced, free it.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- disas/cris.c | 59 +++++++++++++++++++++++++++++------------------------------
- 1 file changed, 29 insertions(+), 30 deletions(-)
+ hw/m68k/mcf5208.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/disas/cris.c b/disas/cris.c
-index 2f43c9b..0b0a3fb 100644
---- a/disas/cris.c
-+++ b/disas/cris.c
-@@ -1294,24 +1294,17 @@ static int cris_constraint
- /* Parse disassembler options and store state in info.  FIXME: For the
-    time being, we abuse static variables.  */
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index 012710d..60c5802 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -273,6 +273,8 @@ static void mcf5208evb_init(MachineState *machine)
+                      0xfc030000, pic + 36);
+     }
  
--static bfd_boolean
--cris_parse_disassembler_options (disassemble_info *info,
-+static void
-+cris_parse_disassembler_options (struct cris_disasm_data *disdata,
-+				 char *disassembler_options,
- 				 enum cris_disass_family distype)
- {
--  struct cris_disasm_data *disdata;
--
--  info->private_data = calloc (1, sizeof (struct cris_disasm_data));
--  disdata = (struct cris_disasm_data *) info->private_data;
--  if (disdata == NULL)
--    return false;
--
-   /* Default true.  */
-   disdata->trace_case
--    = (info->disassembler_options == NULL
--       || (strcmp (info->disassembler_options, "nocase") != 0));
-+    = (disassembler_options == NULL
-+       || (strcmp (disassembler_options, "nocase") != 0));
- 
-   disdata->distype = distype;
--  return true;
- }
- 
- static const struct cris_spec_reg *
-@@ -2736,9 +2729,10 @@ static int
- print_insn_cris_with_register_prefix (bfd_vma vma,
- 				      disassemble_info *info)
- {
--  if (info->private_data == NULL
--      && !cris_parse_disassembler_options (info, cris_dis_v0_v10))
--    return -1;
-+  struct cris_disasm_data disdata;
-+  info->private_data = &disdata;
-+  cris_parse_disassembler_options (&disdata, info->disassembler_options,
-+				   cris_dis_v0_v10);
-   return print_insn_cris_generic (vma, info, true);
- }
- /* Disassemble, prefixing register names with `$'.  CRIS v32.  */
-@@ -2747,9 +2741,10 @@ static int
- print_insn_crisv32_with_register_prefix (bfd_vma vma,
- 					 disassemble_info *info)
- {
--  if (info->private_data == NULL
--      && !cris_parse_disassembler_options (info, cris_dis_v32))
--    return -1;
-+  struct cris_disasm_data disdata;
-+  info->private_data = &disdata;
-+  cris_parse_disassembler_options (&disdata, info->disassembler_options,
-+				   cris_dis_v32);
-   return print_insn_cris_generic (vma, info, true);
- }
- 
-@@ -2761,9 +2756,10 @@ static int
- print_insn_crisv10_v32_with_register_prefix (bfd_vma vma,
- 					     disassemble_info *info)
- {
--  if (info->private_data == NULL
--      && !cris_parse_disassembler_options (info, cris_dis_common_v10_v32))
--    return -1;
-+  struct cris_disasm_data disdata;
-+  info->private_data = &disdata;
-+  cris_parse_disassembler_options (&disdata, info->disassembler_options,
-+				   cris_dis_common_v10_v32);
-   return print_insn_cris_generic (vma, info, true);
- }
- 
-@@ -2773,9 +2769,10 @@ static int
- print_insn_cris_without_register_prefix (bfd_vma vma,
- 					 disassemble_info *info)
- {
--  if (info->private_data == NULL
--      && !cris_parse_disassembler_options (info, cris_dis_v0_v10))
--    return -1;
-+  struct cris_disasm_data disdata;
-+  info->private_data = &disdata;
-+  cris_parse_disassembler_options (&disdata, info->disassembler_options,
-+				   cris_dis_v0_v10);
-   return print_insn_cris_generic (vma, info, false);
- }
- 
-@@ -2785,9 +2782,10 @@ static int
- print_insn_crisv32_without_register_prefix (bfd_vma vma,
- 					    disassemble_info *info)
- {
--  if (info->private_data == NULL
--      && !cris_parse_disassembler_options (info, cris_dis_v32))
--    return -1;
-+  struct cris_disasm_data disdata;
-+  info->private_data = &disdata;
-+  cris_parse_disassembler_options (&disdata, info->disassembler_options,
-+				   cris_dis_v32);
-   return print_insn_cris_generic (vma, info, false);
- }
- 
-@@ -2798,9 +2796,10 @@ static int
- print_insn_crisv10_v32_without_register_prefix (bfd_vma vma,
- 						disassemble_info *info)
- {
--  if (info->private_data == NULL
--      && !cris_parse_disassembler_options (info, cris_dis_common_v10_v32))
--    return -1;
-+  struct cris_disasm_data disdata;
-+  info->private_data = &disdata;
-+  cris_parse_disassembler_options (&disdata, info->disassembler_options,
-+				   cris_dis_common_v10_v32);
-   return print_insn_cris_generic (vma, info, false);
- }
- #endif
++    g_free(pic);
++
+     /*  0xfc000000 SCM.  */
+     /*  0xfc004000 XBS.  */
+     /*  0xfc008000 FlexBus CS.  */
 -- 
 1.8.3.1
 
