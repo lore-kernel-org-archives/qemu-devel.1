@@ -2,49 +2,54 @@ Return-Path: <SRS0=R1m8=X3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C10DFC35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 04:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656D3C35280
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 04:47:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E26920842
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 04:41:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E26920842
+	by mail.kernel.org (Postfix) with ESMTPS id 3B2772133F
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 04:47:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B2772133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFWSa-0005vH-PA
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 00:41:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59942)
+	id 1iFWYE-0000nK-ES
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 00:47:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iFWRh-0005M8-JC
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 00:41:02 -0400
+ (envelope-from <thuth@redhat.com>) id 1iFWXS-0000Hh-QL
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 00:47:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iFWRe-0004yV-J3
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 00:40:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32940)
+ (envelope-from <thuth@redhat.com>) id 1iFWXR-0008Lv-9M
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 00:46:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33808)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iFWRe-0004xp-B8; Wed, 02 Oct 2019 00:40:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iFWXL-0008IF-EL; Wed, 02 Oct 2019 00:46:51 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 024253082B5F;
- Wed,  2 Oct 2019 04:40:57 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4E7B481F10;
+ Wed,  2 Oct 2019 04:46:50 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-20.ams2.redhat.com [10.36.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D8F560605;
- Wed,  2 Oct 2019 04:40:49 +0000 (UTC)
-Subject: Re: [PATCH 00/97] Patch Round-up for stable 4.0.1, freeze on
- 2019-10-10
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8BFA75D6A3;
+ Wed,  2 Oct 2019 04:46:46 +0000 (UTC)
+Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
+ platforms
+To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190917234549.22910-1-jsnow@redhat.com>
+ <20190917234549.22910-2-jsnow@redhat.com>
+ <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+ <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
+ <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,17 +95,17 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <a9231694-e38b-8bf8-6d97-68c4593bbbfb@redhat.com>
-Date: Wed, 2 Oct 2019 06:40:49 +0200
+Message-ID: <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
+Date: Wed, 2 Oct 2019 06:46:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+In-Reply-To: <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Wed, 02 Oct 2019 04:40:57 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Wed, 02 Oct 2019 04:46:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -116,49 +121,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michal Privoznik <mprivozn@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-stable@nongnu.org, Igor Mammedov <imammedo@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/10/2019 01.44, Michael Roth wrote:
-> Hi everyone,                                                           =
-                                  =20
+On 01/10/2019 20.44, Max Reitz wrote:
+[...]
+> As I have said, the conceptual problem is that the iotests now run as
+> part of make check.  As such, allowing auto tests to run on non-Linux
+> platforms may introduce build failures that I cannot do anything about.
+
+Well, simply run "make vm-build-openbsd", "make vm-build-freebsd", ...
+if something fails there, it likely should not be in the auto group.
+
+> And those are very much new failures.
 >=20
-> The following new patches are queued for QEMU stable v4.0.1:
+>> I think that I have demonstrated sufficiently that it's not correct to
+>> prohibit python tests from running on other platforms wholesale, so I'=
+d
+>> prefer we don't do that anymore.
 >=20
->   https://github.com/mdroth/qemu/commits/stable-4.0-staging
+> You have not.
 >=20
-> The release is planned for 2019-10-17:
+> The actual argument to convince me is =E2=80=9CThis does not affect any=
+ tests in
+> the auto group, so it will not introduce build failures at this time=E2=
+=80=9D.
+
+I've applied the patch here and it works fine with FreeBSD and macOS:
+
+ https://cirrus-ci.com/build/5169384718336000
+ https://travis-ci.com/huth/qemu/builds/129968676
+
+It also works fine with "make vm-build-openbsd BUILD_TARGET=3Dcheck-block=
+"
+... so I think you don't have to worry here.
+
+>> Further, iotests on FreeBSD already weren't 100% green, so I'm not
+>> causing a regression in that sense, either.
 >=20
->   https://wiki.qemu.org/Planning/4.0
+> My problem is twofold:
 >=20
-> Please respond here or CC qemu-stable@nongnu.org on any patches you
-> think should be included in the release.
->
-Would it make sense to include the slirp update:
+> (1) You claim =E2=80=9CSure, there are failures, but let=E2=80=99s just=
+ deal with them=E2=80=9D
+> and then you do not deal with them.  Seems wrong to me.
+>=20
+> I=E2=80=99m fine with the argument =E2=80=9CSorry, royal =E2=80=98we=E2=
+=80=99.  But it just doesn=E2=80=99t help
+> anyone to hide the errors.  If someone=E2=80=99s on BSD and wants to ru=
+n the
+> iotests, let them.=E2=80=9D
+>=20
+> That sounds good to me.
+>=20
+> (2) Maybe someone adds a Python test in the future that is in auto and
+> that does not specify Linux as the only supported platform.  Then I sen=
+d
+> a pull request and it breaks on macOS.  Now what?  Remove it from auto?
+>  Blindly put "macOS" in unsupported platforms?
 
- e1a4a24d262ba5ac74ea1795adb3ab1cd574c7fb
- "slirp: update with CVE-2019-14378 fix"
+I think both solutions are good. If a test does not work on all systems,
+it either should not be in the "auto" group, or it needs to be modified
+to skip testing when running in an unsupported environment.
 
-?
+> In any case, it=E2=80=99ll be a problem for no good reason.
 
-And maybe these commits:
+Really? Is "more test coverage" not a good reason?
 
- 22235bb609c18547cf6b215bad1f9d2ec56ad371
- "pc-dimm: fix crash when invalid slot number is used"
+> More on that in the next chunk.
+>=20
+>> I'm going to meekly push and ask that we stage this as-is, and when
+>> something bad happens you can remind me that I wanted this and make me
+>> do it.
+>=20
+> Make you do what?  Deal with the fact that a pull request is rejected
+> because a test fails on macOS?
+>=20
+> This is precisely the kind of problem I already had with adding the
+> iotests to make check, and I=E2=80=99m already very much not happy abou=
+t it.
+> (In that case it was $DISPLAY not being set on Peter=E2=80=99s test sys=
+tem.)
+>=20
+> I=E2=80=99ll let you make the deduction of =E2=80=9CThe problem isn=E2=80=
+=99t allowing the
+> iotests to run on non-Linux platforms, but the fact that they run in
+> make check=E2=80=9D yourself, so that I no longer feel like I=E2=80=99m=
+ the only one who
+> considers that having been a mistake.
 
- 95667c3be0c9f5fc62f58fe845879250f63f7d32
- "nvme: Set number of queues later in nvme_init()"
+Max, I can understand that you are a little bit annoyed that this "make
+check with iotests" caused some extra hurdles for you. But honestly,
+removing that again would be quite egoistic by you. Try to put yourself
+into the position of a "normal", non-blocklayer-maintainer QEMU
+developer. For me, iotests were a *constant* source of frustration.
+Often, when I ran them on top of my latest and greatest patches, to
+check whether I caused a regression, the iotests simply failed. Then I
+had to start debugging - did my patches cause the break, or is "master"
+broken, too? In almost all cases, there was an issue in the master
+branch already, either because they were failing on s390x, or because I
+was using ext4 instead of xfs, or because I was using an older distro
+than you, etc... . So while the iotests likely worked fine for the
+limited set of systems that you, Kevin and the other hard-core block
+layer developers are using, it's constantly broken for everybody else
+who is not using the very same setup as you. The only way of *not*
+getting upset about the iotests was to simply completely *ignore* them.
+Is it that what you want?
 
- c0bccee9b40ec58c9d165b406ae3d4f63652ce53
- "hw/ssi/mss-spi: Avoid crash when reading empty RX FIFO"
+Or maybe let me phrase it differently: Do you consider the iotests as
+something that is more or less "private" to the hard-core block layer
+developers, and it's ok if others completely ignore them and break them
+by accident (and you also don't expect the normal developers to fix the
+iotests afterwards)? Then sure, please go ahead and remove the iotests
+from "make check" again. Maybe I just understood the idea of having
+common tests in the repository wrong (or maybe the iotests should be
+moved to a separate repository instead, so that the normal QEMU
+developers do not get in touch with them anymore?) ... Otherwise, I
+think it was the right step to add them "make check" so that everybody
+now *has* to run at least a basic set of the iotests now before they can
+their patches merged.
 
- a09ef5040477643a7026703199d8781fe048d3a8
- "hw/display/xlnx_dp: Avoid crash when reading empty RX FIFO"
+ Thomas
 
-Thomas
+
+PS: Sorry, if my mail sounded a little bit harsh... but I really had
+quite some frustration with the iotests in the past already.
 
