@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC7DC352AA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C313CC10F14
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:55:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB72C20815
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:49:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB72C20815
+	by mail.kernel.org (Postfix) with ESMTPS id 9EE3820815
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 17:55:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE3820815
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFikI-0007mB-14
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:49:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42738)
+	id 1iFiqg-0002CL-Sq
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 13:55:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43598)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iFiiz-0006fX-G1
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 13:47:42 -0400
+ (envelope-from <thuth@redhat.com>) id 1iFipn-0001Qp-SP
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 13:54:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iFiiy-000698-4k
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 13:47:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38280)
+ (envelope-from <thuth@redhat.com>) id 1iFipm-0008TW-Ri
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 13:54:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58626)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iFiiu-00066r-6u; Wed, 02 Oct 2019 13:47:36 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iFipj-0008Q4-BQ; Wed, 02 Oct 2019 13:54:39 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 48CE78980EA;
- Wed,  2 Oct 2019 17:47:34 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.69])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9634B5D9D6;
- Wed,  2 Oct 2019 17:47:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7E7A9105787C;
+ Wed,  2 Oct 2019 17:54:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-111.ams2.redhat.com [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D0775D9D3;
+ Wed,  2 Oct 2019 17:54:32 +0000 (UTC)
 Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
  platforms
-To: Kevin Wolf <kwolf@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 References: <20190917234549.22910-1-jsnow@redhat.com>
  <20190917234549.22910-2-jsnow@redhat.com>
  <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
@@ -52,43 +52,63 @@ References: <20190917234549.22910-1-jsnow@redhat.com>
  <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
  <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
  <20191002164438.GD5819@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a7f532cc-68cb-175e-6c8f-930401221ef9@redhat.com>
-Date: Wed, 2 Oct 2019 19:47:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <6491a70e-c574-5ccf-1d2e-f9b49632fec2@redhat.com>
+Date: Wed, 2 Oct 2019 19:54:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
 In-Reply-To: <20191002164438.GD5819@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="4SAkzyN5kCnJiNEZZXSN0fWhmqMXROIRM"
+ boundary="wkXLiGuoJjtDIsbnBxyvCnbj4gLyQ0MWP"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Wed, 02 Oct 2019 17:47:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Wed, 02 Oct 2019 17:54:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -103,22 +123,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4SAkzyN5kCnJiNEZZXSN0fWhmqMXROIRM
-Content-Type: multipart/mixed; boundary="XdGbjSEXcOHJfYIJZlShwBvfxzaq7rPcP"
+--wkXLiGuoJjtDIsbnBxyvCnbj4gLyQ0MWP
+Content-Type: multipart/mixed; boundary="3yCjSysSIMzfYkjaDHX3VZeUYrblWmD6L";
+ protected-headers="v1"
+From: Thomas Huth <thuth@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Message-ID: <6491a70e-c574-5ccf-1d2e-f9b49632fec2@redhat.com>
+Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
+ platforms
+References: <20190917234549.22910-1-jsnow@redhat.com>
+ <20190917234549.22910-2-jsnow@redhat.com>
+ <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+ <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
+ <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
+ <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
+ <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
+ <20191002164438.GD5819@localhost.localdomain>
+In-Reply-To: <20191002164438.GD5819@localhost.localdomain>
 
---XdGbjSEXcOHJfYIJZlShwBvfxzaq7rPcP
+--3yCjSysSIMzfYkjaDHX3VZeUYrblWmD6L
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 02.10.19 18:44, Kevin Wolf wrote:
+On 02/10/2019 18.44, Kevin Wolf wrote:
 > Not sure where in this thread to reply, but since my name is mentioned
 > in this mail, it might at least be not the worst one.
 >=20
@@ -148,136 +183,46 @@ ts in make
 > and OS X. Windows because I'm pretty sure that it doesn't work anyway,
 > and OS X because if something fails there, we have no way to reproduce.=
 
-> The occasional build failures on OS X that must be fixed by blindly
-> guessing what could work without any way to test the fix are already ba=
-d
-> enough.
->=20
->>> Max, I can understand that you are a little bit annoyed that this "ma=
-ke
->>> check with iotests" caused some extra hurdles for you. But honestly,
->>> removing that again would be quite egoistic by you. Try to put yourse=
-lf
->>> into the position of a "normal", non-blocklayer-maintainer QEMU
->>> developer. For me, iotests were a *constant* source of frustration.
->>> Often, when I ran them on top of my latest and greatest patches, to
->>> check whether I caused a regression, the iotests simply failed. Then =
-I
->>> had to start debugging - did my patches cause the break, or is "maste=
-r"
->>> broken, too? In almost all cases, there was an issue in the master
->>> branch already, either because they were failing on s390x, or because=
- I
->>> was using ext4 instead of xfs, or because I was using an older distro=
 
->>> than you, etc... . So while the iotests likely worked fine for the
->>> limited set of systems that you, Kevin and the other hard-core block
->>> layer developers are using, it's constantly broken for everybody else=
+Both, .travis.yml and .cirrus-ci.yml have a macOS test, so you can
+reproduce bugs there. It's just a PITA that you cannot do any
+interactive debugging there.
 
->>> who is not using the very same setup as you. The only way of *not*
->>> getting upset about the iotests was to simply completely *ignore* the=
-m.
->>> Is it that what you want?
->>
->> It usually worked fine for me because it=E2=80=99s rather rare that no=
-n-block
->> patches broke the iotests.
->=20
-> I disagree. It happened all the time that someone else broke the iotest=
-s
-> in master and we needed to fix it up.
+[...]
+> Can we run tests in 'auto' that require the system emulator?
 
-OK.
+Yes. In fact, tests/check-block.sh explicitly checks for the
+availability of a system emulator before running the iotests.
 
-(In my experience, it=E2=80=99s still mostly block patches, only that the=
-y tend
-to go through non-block trees.)
+> If so, let's add 030 040 041 to the default set.
+Sure, but let's check whether they work in Travis first.
 
->> Maybe my main problem is that I feel like now I have to deal with all =
-of
->> the fallout, even though adding the iotests to make check wasn=E2=80=99=
-t my idea
->> and neither me nor Kevin ever consented.  (I don=E2=80=99t know whethe=
-r Kevin
->> consented implicitly, but I don=E2=80=99t see his name in bdd95e47844f=
-2d8b.)
->>
->> You can=E2=80=99t just give me more responsibility without my consent =
-and then
->> call me egoistic for not liking it.
->=20
-> I think I may have implicitly consented by helping Alex with the change=
-s
-> to 'check' that made its output fit better in 'make check'.
->=20
-> Basically, my stance is that I share your dislike for the effects on me=
-
-> personally (also, I can't run 'make check' any more before a pull
-> request without testing half of the iotests twice because I still need =
-a
-> full iotests run), but I also think that having iotests in 'make check'=
-
-> is really the right thing for the project despite the inconvenience it
-> means for me.
-
-Then I expect you to NACK Thomas=E2=80=99s patch, and I take it to mean t=
-hat I
-can rely on you to handle basically all make check iotests failures that
-are not caused by my own pull requests.
-
-Works for me.
-
->> I know you=E2=80=99ll say that we just need to ensure we can add more =
-tests,
->> then.  But for one thing, the most important tests are the ones that
->> take the longest, like 041.  And the other of course is that adding an=
-y
->> more tests to make check just brings me more pain, so I won=E2=80=99t =
-do it.
->=20
-> That's something that can be fixed by tweaking the auto group.
->=20
-> Can we run tests in 'auto' that require the system emulator? If so,
-> let's add 030 040 041 to the default set. They take long, but they are
-> among the most valuable tests we have. If this makes the tests take too=
-
-> much time, let's remove some less important ones instead.
->=20
->> [1] There is the recent case of Kevin=E2=80=99s pull request having be=
-en
->> rejected because his test failed on anything but x64.  I=E2=80=99m tor=
-n here,
->> because I would have seen that failure on my -m32 build.  So it isn=E2=
-=80=99t
->> like it would have evaded our view for long.
->=20
-> I messed up, so this pull request was rightly stopped. I consider this
-> one a feature, not a bug.
-
-Sure, that was a good thing.  I just wonder whether that instance is
-enough to justify the pain.
-
-Max
+ Thomas
 
 
---XdGbjSEXcOHJfYIJZlShwBvfxzaq7rPcP--
+--3yCjSysSIMzfYkjaDHX3VZeUYrblWmD6L--
 
---4SAkzyN5kCnJiNEZZXSN0fWhmqMXROIRM
+--wkXLiGuoJjtDIsbnBxyvCnbj4gLyQ0MWP
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2U4rEACgkQ9AfbAGHV
-z0A/fgf8DHaS7k+KP8B8jjI9JcroFZOadkXJ8rl/ROIlHtuPuflBRll5jKwvjcoO
-pAyJeLcgzLbGuFbIDyr/GMsX38eHJFanfHigXJLVjAN6dGQ2KxQgaY21/0nsutEp
-C/sLHRL6pKGwLKtZRu9p0xDgCZs3onquaqMhockdFvWO6N1I+Lp0RDAvx2zTJ72f
-ufim1/HnmCZCtTWAj64qUYmASO4P9pRdN8znnNtw+a4Vcvvi2fz0O6hoq2ALtwWh
-33iD6IFTQPCdXnVxuk0jGmv7TaJqfi4rDu2oLvEq07PLZ2BdTisU07vEUXdCGmna
-iiY0vRl7wMa3Jca5HYuyLm58EsGQ0A==
-=m2gV
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl2U5FcACgkQLtnXdP5w
+LbUlgg//XKUuErT/x9OAl/wYarWt44tDnWFsdX8PW/mXSPq6tjdW/OvnodfjL4fq
+c+JY+lXyr83qcxxzkkwVWflwmCa5uwgTh9a33cvPN9ZxsldPexo5SzIBffF8IXz+
+2kqQIknQOZ0nw9/6yAfIm4G7lpG1LFB+H6roof2hcJ41xuTRQzv9emH/wU9wnaP/
+cq35gHXzRANxGJ9+9xmEcfRw69myJRMyj8cXLWrlXpXg2O7JYpLP0KhC/keZN5El
+X4jdEnwFgEHJqSK70pHW007ksXW7SbrpT19u6RhZbZF8MBcuHLKVBo8vTgbKo/Bt
+XRus7hYlqgU1R/IqtG/hw3DjpYjHMQXWfMCbbg3VQvR5sNJDZXhK29lNAOzuM1Eh
+Nr0SsRFMKX1L2VinQXIYZ3xXwGGTCE3SpIR4l3NYrwOwj89SLBJh3aRvRBMVwlwR
+33TxS7t/4/dZGehEv+opE4FNEFkYhpOGvm5KzncO5NKdC9Ck7f8QAUiENuOnUa5u
+AaT/nfO2J+1IBtBLaMSA375K05sZIlIxiEEIku3rT4hIbQfWgdd36coQZI1ELcpJ
+tCLFf6bqNM522aHPxJym+Bbu/TCX0ZzVLjT2PUUIjgtqI3cOO74WjEsh6KLtai9n
+tZBvTduBxjQ24/60fNONSzAb7lTOD+LH89E9SuAso4mBOAd9DXU=
+=qiv8
 -----END PGP SIGNATURE-----
 
---4SAkzyN5kCnJiNEZZXSN0fWhmqMXROIRM--
+--wkXLiGuoJjtDIsbnBxyvCnbj4gLyQ0MWP--
 
