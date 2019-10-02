@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4021C35280
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 11:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3D6C352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 11:36:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A8E42133F
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 11:34:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A8E42133F
+	by mail.kernel.org (Postfix) with ESMTPS id F0F9720679
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 11:36:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F9720679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFctc-0003Au-Lj
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 07:34:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36970)
+	id 1iFcvO-0005WN-Ug
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 07:36:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iFcrN-0001Dm-3A
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:32:01 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iFcrI-0000BW-60
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43914)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iFcrH-0000AL-3B
+ (envelope-from <slp@redhat.com>) id 1iFcrG-00018H-KZ
  for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:52 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <slp@redhat.com>) id 1iFcrE-00009A-70
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39278)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iFcrD-000086-VW
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 07:31:48 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 57B7718C892B;
- Wed,  2 Oct 2019 11:31:50 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.103])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2798E608C0;
+ by mx1.redhat.com (Postfix) with ESMTPS id C12138AC6F5;
  Wed,  2 Oct 2019 11:31:46 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C449360605;
+ Wed,  2 Oct 2019 11:31:29 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 03/10] hw/i386/pc: move shared x86 functions to x86.c and
- export them
-Date: Wed,  2 Oct 2019 13:30:56 +0200
-Message-Id: <20191002113103.45023-4-slp@redhat.com>
+Subject: [PATCH v5 02/10] hw/i386/pc: rename functions shared with non-PC
+ machines
+Date: Wed,  2 Oct 2019 13:30:55 +0200
+Message-Id: <20191002113103.45023-3-slp@redhat.com>
 In-Reply-To: <20191002113103.45023-1-slp@redhat.com>
 References: <20191002113103.45023-1-slp@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Wed, 02 Oct 2019 11:31:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.69]); Wed, 02 Oct 2019 11:31:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,1609 +75,216 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move x86 functions that will be shared between PC and non-PC machine
-types to x86.c, along with their helpers.
+load_linux                 -> x86_load_linux
+pc_new_cpu                 -> x86_new_cpu
+pc_cpus_init               -> x86_cpus_init
+pc_cpu_index_to_props      -> x86_cpu_index_to_props
+pc_get_default_cpu_node_id -> x86_get_default_cpu_node_id
+pc_possible_cpu_arch_ids   -> x86_possible_cpu_arch_ids
+old_pc_system_rom_init     -> x86_system_rom_init
 
 Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
- hw/i386/Makefile.objs |   1 +
- hw/i386/pc.c          | 582 +----------------------------------
- hw/i386/pc_piix.c     |   1 +
- hw/i386/pc_q35.c      |   1 +
- hw/i386/pc_sysfw.c    |  54 +---
- hw/i386/x86.c         | 684 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/i386/pc.h  |   1 -
- include/hw/i386/x86.h |  35 +++
- 8 files changed, 724 insertions(+), 635 deletions(-)
- create mode 100644 hw/i386/x86.c
- create mode 100644 include/hw/i386/x86.h
+ hw/i386/pc.c         | 28 ++++++++++++++--------------
+ hw/i386/pc_piix.c    |  2 +-
+ hw/i386/pc_q35.c     |  2 +-
+ hw/i386/pc_sysfw.c   |  6 +++---
+ include/hw/i386/pc.h |  2 +-
+ 5 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-index d3374e0831..7ed80a4853 100644
---- a/hw/i386/Makefile.objs
-+++ b/hw/i386/Makefile.objs
-@@ -1,5 +1,6 @@
- obj-$(CONFIG_KVM) +=3D kvm/
- obj-y +=3D e820_memory_layout.o multiboot.o
-+obj-y +=3D x86.o
- obj-y +=3D pc.o
- obj-$(CONFIG_I440FX) +=3D pc_piix.o
- obj-$(CONFIG_Q35) +=3D pc_q35.o
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 029bc23e7c..b9ca831164 100644
+index bcda50efcc..029bc23e7c 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "hw/i386/pc.h"
-+#include "hw/i386/x86.h"
- #include "hw/char/serial.h"
- #include "hw/char/parallel.h"
- #include "hw/i386/apic.h"
-@@ -102,9 +103,6 @@
-=20
- struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
-=20
--/* Physical Address of PVH entry point read from kernel ELF NOTE */
--static size_t pvh_start_addr;
--
- GlobalProperty pc_compat_4_1[] =3D {};
- const size_t pc_compat_4_1_len =3D G_N_ELEMENTS(pc_compat_4_1);
-=20
-@@ -866,478 +864,6 @@ static void handle_a20_line_change(void *opaque, in=
-t irq, int level)
-     x86_cpu_set_a20(cpu, level);
+@@ -1019,8 +1019,8 @@ static bool load_elfboot(const char *kernel_filenam=
+e,
+     return true;
  }
 =20
--/* Calculates initial APIC ID for a specific CPU index
-- *
-- * Currently we need to be able to calculate the APIC ID from the CPU in=
-dex
-- * alone (without requiring a CPU object), as the QEMU<->Seabios interfa=
-ces have
-- * no concept of "CPU index", and the NUMA tables on fw_cfg need the API=
-C ID of
-- * all CPUs up to max_cpus.
-- */
--static uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
--                                           unsigned int cpu_index)
--{
--    MachineState *ms =3D MACHINE(pcms);
--    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
--    uint32_t correct_id;
--    static bool warned;
--
--    correct_id =3D x86_apicid_from_cpu_idx(pcms->smp_dies, ms->smp.cores=
-,
--                                         ms->smp.threads, cpu_index);
--    if (pcmc->compat_apic_id_mode) {
--        if (cpu_index !=3D correct_id && !warned && !qtest_enabled()) {
--            error_report("APIC IDs set in compatibility mode, "
--                         "CPU topology won't match the configuration");
--            warned =3D true;
--        }
--        return cpu_index;
--    } else {
--        return correct_id;
--    }
--}
--
--static long get_file_size(FILE *f)
--{
--    long where, size;
--
--    /* XXX: on Unix systems, using fstat() probably makes more sense */
--
--    where =3D ftell(f);
--    fseek(f, 0, SEEK_END);
--    size =3D ftell(f);
--    fseek(f, where, SEEK_SET);
--
--    return size;
--}
--
--struct setup_data {
--    uint64_t next;
--    uint32_t type;
--    uint32_t len;
--    uint8_t data[0];
--} __attribute__((packed));
--
--
--/*
-- * The entry point into the kernel for PVH boot is different from
-- * the native entry point.  The PVH entry is defined by the x86/HVM
-- * direct boot ABI and is available in an ELFNOTE in the kernel binary.
-- *
-- * This function is passed to load_elf() when it is called from
-- * load_elfboot() which then additionally checks for an ELF Note of
-- * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
-- * parse the PVH entry address from the ELF Note.
-- *
-- * Due to trickery in elf_opts.h, load_elf() is actually available as
-- * load_elf32() or load_elf64() and this routine needs to be able
-- * to deal with being called as 32 or 64 bit.
-- *
-- * The address of the PVH entry point is saved to the 'pvh_start_addr'
-- * global variable.  (although the entry point is 32-bit, the kernel
-- * binary can be either 32-bit or 64-bit).
-- */
--static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
--{
--    size_t *elf_note_data_addr;
--
--    /* Check if ELF Note header passed in is valid */
--    if (arg1 =3D=3D NULL) {
--        return 0;
--    }
--
--    if (is64) {
--        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
--        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
--        uint64_t phdr_align =3D *(uint64_t *)arg2;
--        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
--
--        elf_note_data_addr =3D
--            ((void *)nhdr64) + nhdr_size64 +
--            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
--    } else {
--        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
--        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
--        uint32_t phdr_align =3D *(uint32_t *)arg2;
--        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
--
--        elf_note_data_addr =3D
--            ((void *)nhdr32) + nhdr_size32 +
--            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
--    }
--
--    pvh_start_addr =3D *elf_note_data_addr;
--
--    return pvh_start_addr;
--}
--
--static bool load_elfboot(const char *kernel_filename,
--                   int kernel_file_size,
--                   uint8_t *header,
--                   size_t pvh_xen_start_addr,
--                   FWCfgState *fw_cfg)
--{
--    uint32_t flags =3D 0;
--    uint32_t mh_load_addr =3D 0;
--    uint32_t elf_kernel_size =3D 0;
--    uint64_t elf_entry;
--    uint64_t elf_low, elf_high;
--    int kernel_size;
--
--    if (ldl_p(header) !=3D 0x464c457f) {
--        return false; /* no elfboot */
--    }
--
--    bool elf_is64 =3D header[EI_CLASS] =3D=3D ELFCLASS64;
--    flags =3D elf_is64 ?
--        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flag=
-s;
--
--    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
--        error_report("elfboot unsupported flags =3D %x", flags);
--        exit(1);
--    }
--
--    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
--    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
--                           NULL, &elf_note_type, &elf_entry,
--                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
--                           0, 0);
--
--    if (kernel_size < 0) {
--        error_report("Error while loading elf kernel");
--        exit(1);
--    }
--    mh_load_addr =3D elf_low;
--    elf_kernel_size =3D elf_high - elf_low;
--
--    if (pvh_start_addr =3D=3D 0) {
--        error_report("Error loading uncompressed kernel without PVH ELF =
-Note");
--        exit(1);
--    }
--    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
--    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
--    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
--
--    return true;
--}
--
--static void x86_load_linux(PCMachineState *pcms,
--                           FWCfgState *fw_cfg)
--{
--    uint16_t protocol;
--    int setup_size, kernel_size, cmdline_size;
--    int dtb_size, setup_data_offset;
--    uint32_t initrd_max;
--    uint8_t header[8192], *setup, *kernel;
--    hwaddr real_addr, prot_addr, cmdline_addr, initrd_addr =3D 0;
--    FILE *f;
--    char *vmode;
--    MachineState *machine =3D MACHINE(pcms);
--    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
--    struct setup_data *setup_data;
--    const char *kernel_filename =3D machine->kernel_filename;
--    const char *initrd_filename =3D machine->initrd_filename;
--    const char *dtb_filename =3D machine->dtb;
--    const char *kernel_cmdline =3D machine->kernel_cmdline;
--
--    /* Align to 16 bytes as a paranoia measure */
--    cmdline_size =3D (strlen(kernel_cmdline)+16) & ~15;
--
--    /* load the kernel header */
--    f =3D fopen(kernel_filename, "rb");
--    if (!f || !(kernel_size =3D get_file_size(f)) ||
--        fread(header, 1, MIN(ARRAY_SIZE(header), kernel_size), f) !=3D
--        MIN(ARRAY_SIZE(header), kernel_size)) {
--        fprintf(stderr, "qemu: could not load kernel '%s': %s\n",
--                kernel_filename, strerror(errno));
--        exit(1);
--    }
--
--    /* kernel protocol version */
--#if 0
--    fprintf(stderr, "header magic: %#x\n", ldl_p(header+0x202));
--#endif
--    if (ldl_p(header+0x202) =3D=3D 0x53726448) {
--        protocol =3D lduw_p(header+0x206);
--    } else {
--        /*
--         * This could be a multiboot kernel. If it is, let's stop treati=
-ng it
--         * like a Linux kernel.
--         * Note: some multiboot images could be in the ELF format (the s=
-ame of
--         * PVH), so we try multiboot first since we check the multiboot =
-magic
--         * header before to load it.
--         */
--        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
--                           kernel_cmdline, kernel_size, header)) {
--            return;
--        }
--        /*
--         * Check if the file is an uncompressed kernel file (ELF) and lo=
-ad it,
--         * saving the PVH entry point used by the x86/HVM direct boot AB=
-I.
--         * If load_elfboot() is successful, populate the fw_cfg info.
--         */
--        if (pcmc->pvh_enabled &&
--            load_elfboot(kernel_filename, kernel_size,
--                         header, pvh_start_addr, fw_cfg)) {
--            fclose(f);
--
--            fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
--                strlen(kernel_cmdline) + 1);
--            fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdlin=
-e);
--
--            fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
--            fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
--                             header, sizeof(header));
--
--            /* load initrd */
--            if (initrd_filename) {
--                GMappedFile *mapped_file;
--                gsize initrd_size;
--                gchar *initrd_data;
--                GError *gerr =3D NULL;
--
--                mapped_file =3D g_mapped_file_new(initrd_filename, false=
-, &gerr);
--                if (!mapped_file) {
--                    fprintf(stderr, "qemu: error reading initrd %s: %s\n=
-",
--                            initrd_filename, gerr->message);
--                    exit(1);
--                }
--                pcms->initrd_mapped_file =3D mapped_file;
--
--                initrd_data =3D g_mapped_file_get_contents(mapped_file);
--                initrd_size =3D g_mapped_file_get_length(mapped_file);
--                initrd_max =3D pcms->below_4g_mem_size - pcmc->acpi_data=
-_size - 1;
--                if (initrd_size >=3D initrd_max) {
--                    fprintf(stderr, "qemu: initrd is too large, cannot s=
-upport."
--                            "(max: %"PRIu32", need %"PRId64")\n",
--                            initrd_max, (uint64_t)initrd_size);
--                    exit(1);
--                }
--
--                initrd_addr =3D (initrd_max - initrd_size) & ~4095;
--
--                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
--                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
--                fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data=
-,
--                                 initrd_size);
--            }
--
--            option_rom[nb_option_roms].bootindex =3D 0;
--            option_rom[nb_option_roms].name =3D "pvh.bin";
--            nb_option_roms++;
--
--            return;
--        }
--        protocol =3D 0;
--    }
--
--    if (protocol < 0x200 || !(header[0x211] & 0x01)) {
--        /* Low kernel */
--        real_addr    =3D 0x90000;
--        cmdline_addr =3D 0x9a000 - cmdline_size;
--        prot_addr    =3D 0x10000;
--    } else if (protocol < 0x202) {
--        /* High but ancient kernel */
--        real_addr    =3D 0x90000;
--        cmdline_addr =3D 0x9a000 - cmdline_size;
--        prot_addr    =3D 0x100000;
--    } else {
--        /* High and recent kernel */
--        real_addr    =3D 0x10000;
--        cmdline_addr =3D 0x20000;
--        prot_addr    =3D 0x100000;
--    }
--
--#if 0
--    fprintf(stderr,
--            "qemu: real_addr     =3D 0x" TARGET_FMT_plx "\n"
--            "qemu: cmdline_addr  =3D 0x" TARGET_FMT_plx "\n"
--            "qemu: prot_addr     =3D 0x" TARGET_FMT_plx "\n",
--            real_addr,
--            cmdline_addr,
--            prot_addr);
--#endif
--
--    /* highest address for loading the initrd */
--    if (protocol >=3D 0x20c &&
--        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
--        /*
--         * Linux has supported initrd up to 4 GB for a very long time (2=
-007,
--         * long before XLF_CAN_BE_LOADED_ABOVE_4G which was added in 201=
-3),
--         * though it only sets initrd_max to 2 GB to "work around bootlo=
-ader
--         * bugs". Luckily, QEMU firmware(which does something like bootl=
-oader)
--         * has supported this.
--         *
--         * It's believed that if XLF_CAN_BE_LOADED_ABOVE_4G is set, init=
-rd can
--         * be loaded into any address.
--         *
--         * In addition, initrd_max is uint32_t simply because QEMU doesn=
-'t
--         * support the 64-bit boot protocol (specifically the ext_ramdis=
-k_image
--         * field).
--         *
--         * Therefore here just limit initrd_max to UINT32_MAX simply as =
-well.
--         */
--        initrd_max =3D UINT32_MAX;
--    } else if (protocol >=3D 0x203) {
--        initrd_max =3D ldl_p(header+0x22c);
--    } else {
--        initrd_max =3D 0x37ffffff;
--    }
--
--    if (initrd_max >=3D pcms->below_4g_mem_size - pcmc->acpi_data_size) =
-{
--        initrd_max =3D pcms->below_4g_mem_size - pcmc->acpi_data_size - =
-1;
--    }
--
--    fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_ADDR, cmdline_addr);
--    fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE, strlen(kernel_cmdline)+1=
-);
--    fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
--
--    if (protocol >=3D 0x202) {
--        stl_p(header+0x228, cmdline_addr);
--    } else {
--        stw_p(header+0x20, 0xA33F);
--        stw_p(header+0x22, cmdline_addr-real_addr);
--    }
--
--    /* handle vga=3D parameter */
--    vmode =3D strstr(kernel_cmdline, "vga=3D");
--    if (vmode) {
--        unsigned int video_mode;
--        /* skip "vga=3D" */
--        vmode +=3D 4;
--        if (!strncmp(vmode, "normal", 6)) {
--            video_mode =3D 0xffff;
--        } else if (!strncmp(vmode, "ext", 3)) {
--            video_mode =3D 0xfffe;
--        } else if (!strncmp(vmode, "ask", 3)) {
--            video_mode =3D 0xfffd;
--        } else {
--            video_mode =3D strtol(vmode, NULL, 0);
--        }
--        stw_p(header+0x1fa, video_mode);
--    }
--
--    /* loader type */
--    /* High nybble =3D B reserved for QEMU; low nybble is revision numbe=
-r.
--       If this code is substantially changed, you may want to consider
--       incrementing the revision. */
--    if (protocol >=3D 0x200) {
--        header[0x210] =3D 0xB0;
--    }
--    /* heap */
--    if (protocol >=3D 0x201) {
--        header[0x211] |=3D 0x80;	/* CAN_USE_HEAP */
--        stw_p(header+0x224, cmdline_addr-real_addr-0x200);
--    }
--
--    /* load initrd */
--    if (initrd_filename) {
--        GMappedFile *mapped_file;
--        gsize initrd_size;
--        gchar *initrd_data;
--        GError *gerr =3D NULL;
--
--        if (protocol < 0x200) {
--            fprintf(stderr, "qemu: linux kernel too old to load a ram di=
-sk\n");
--            exit(1);
--        }
--
--        mapped_file =3D g_mapped_file_new(initrd_filename, false, &gerr)=
-;
--        if (!mapped_file) {
--            fprintf(stderr, "qemu: error reading initrd %s: %s\n",
--                    initrd_filename, gerr->message);
--            exit(1);
--        }
--        pcms->initrd_mapped_file =3D mapped_file;
--
--        initrd_data =3D g_mapped_file_get_contents(mapped_file);
--        initrd_size =3D g_mapped_file_get_length(mapped_file);
--        if (initrd_size >=3D initrd_max) {
--            fprintf(stderr, "qemu: initrd is too large, cannot support."
--                    "(max: %"PRIu32", need %"PRId64")\n",
--                    initrd_max, (uint64_t)initrd_size);
--            exit(1);
--        }
--
--        initrd_addr =3D (initrd_max-initrd_size) & ~4095;
--
--        fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
--        fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
--        fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data, initrd=
-_size);
--
--        stl_p(header+0x218, initrd_addr);
--        stl_p(header+0x21c, initrd_size);
--    }
--
--    /* load kernel and setup */
--    setup_size =3D header[0x1f1];
--    if (setup_size =3D=3D 0) {
--        setup_size =3D 4;
--    }
--    setup_size =3D (setup_size+1)*512;
--    if (setup_size > kernel_size) {
--        fprintf(stderr, "qemu: invalid kernel header\n");
--        exit(1);
--    }
--    kernel_size -=3D setup_size;
--
--    setup  =3D g_malloc(setup_size);
--    kernel =3D g_malloc(kernel_size);
--    fseek(f, 0, SEEK_SET);
--    if (fread(setup, 1, setup_size, f) !=3D setup_size) {
--        fprintf(stderr, "fread() failed\n");
--        exit(1);
--    }
--    if (fread(kernel, 1, kernel_size, f) !=3D kernel_size) {
--        fprintf(stderr, "fread() failed\n");
--        exit(1);
--    }
--    fclose(f);
--
--    /* append dtb to kernel */
--    if (dtb_filename) {
--        if (protocol < 0x209) {
--            fprintf(stderr, "qemu: Linux kernel too old to load a dtb\n"=
-);
--            exit(1);
--        }
--
--        dtb_size =3D get_image_size(dtb_filename);
--        if (dtb_size <=3D 0) {
--            fprintf(stderr, "qemu: error reading dtb %s: %s\n",
--                    dtb_filename, strerror(errno));
--            exit(1);
--        }
--
--        setup_data_offset =3D QEMU_ALIGN_UP(kernel_size, 16);
--        kernel_size =3D setup_data_offset + sizeof(struct setup_data) + =
-dtb_size;
--        kernel =3D g_realloc(kernel, kernel_size);
--
--        stq_p(header+0x250, prot_addr + setup_data_offset);
--
--        setup_data =3D (struct setup_data *)(kernel + setup_data_offset)=
-;
--        setup_data->next =3D 0;
--        setup_data->type =3D cpu_to_le32(SETUP_DTB);
--        setup_data->len =3D cpu_to_le32(dtb_size);
--
--        load_image_size(dtb_filename, setup_data->data, dtb_size);
--    }
--
--    memcpy(setup, header, MIN(sizeof(header), setup_size));
--
--    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, prot_addr);
--    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
--    fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, kernel, kernel_size);
--
--    fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_ADDR, real_addr);
--    fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
--    fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
--
--    option_rom[nb_option_roms].bootindex =3D 0;
--    option_rom[nb_option_roms].name =3D "linuxboot.bin";
--    if (pcmc->linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
--        option_rom[nb_option_roms].name =3D "linuxboot_dma.bin";
--    }
--    nb_option_roms++;
--}
--
- #define NE2000_NB_MAX 6
-=20
- static const int ne2000_io[NE2000_NB_MAX] =3D { 0x300, 0x320, 0x340, 0x3=
-60,
-@@ -1374,24 +900,6 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, i=
+-static void load_linux(PCMachineState *pcms,
+-                       FWCfgState *fw_cfg)
++static void x86_load_linux(PCMachineState *pcms,
++                           FWCfgState *fw_cfg)
+ {
+     uint16_t protocol;
+     int setup_size, kernel_size, cmdline_size;
+@@ -1374,7 +1374,7 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, i=
 nt level)
      }
  }
 =20
--static void x86_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **e=
+-static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **er=
+rp)
++static void x86_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **e=
 rrp)
--{
--    Object *cpu =3D NULL;
--    Error *local_err =3D NULL;
--    CPUX86State *env =3D NULL;
--
--    cpu =3D object_new(MACHINE(pcms)->cpu_type);
--
--    env =3D &X86_CPU(cpu)->env;
--    env->nr_dies =3D pcms->smp_dies;
--
--    object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
--    object_property_set_bool(cpu, true, "realized", &local_err);
--
--    object_unref(cpu);
--    error_propagate(errp, local_err);
--}
--
- /*
-  * This function is very similar to smp_parse()
-  * in hw/core/machine.c but includes CPU die support.
-@@ -1497,31 +1005,6 @@ void pc_hot_add_cpu(MachineState *ms, const int64_=
-t id, Error **errp)
+ {
+     Object *cpu =3D NULL;
+     Error *local_err =3D NULL;
+@@ -1490,14 +1490,14 @@ void pc_hot_add_cpu(MachineState *ms, const int64=
+_t id, Error **errp)
+         return;
+     }
+=20
+-    pc_new_cpu(PC_MACHINE(ms), apic_id, &local_err);
++    x86_new_cpu(PC_MACHINE(ms), apic_id, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
      }
  }
 =20
--void x86_cpus_init(PCMachineState *pcms)
--{
--    int i;
--    const CPUArchIdList *possible_cpus;
--    MachineState *ms =3D MACHINE(pcms);
--    MachineClass *mc =3D MACHINE_GET_CLASS(pcms);
--    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(mc);
--
--    x86_cpu_set_default_version(pcmc->default_cpu_version);
--
--    /* Calculates the limit to CPU APIC ID values
--     *
--     * Limit for the APIC ID value, so that all
--     * CPU APIC IDs are < pcms->apic_id_limit.
--     *
--     * This is used for FW_CFG_MAX_CPUS. See comments on fw_cfg_arch_cre=
-ate().
--     */
--    pcms->apic_id_limit =3D x86_cpu_apic_id_from_index(pcms,
--                                                     ms->smp.max_cpus - =
-1) + 1;
--    possible_cpus =3D mc->possible_cpu_arch_ids(ms);
--    for (i =3D 0; i < ms->smp.cpus; i++) {
--        x86_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
--    }
--}
--
- static void rtc_set_cpus_count(ISADevice *rtc, uint16_t cpus_count)
+-void pc_cpus_init(PCMachineState *pcms)
++void x86_cpus_init(PCMachineState *pcms)
  {
-     if (cpus_count > 0xff) {
-@@ -2677,69 +2160,6 @@ static void pc_machine_wakeup(MachineState *machin=
-e)
-     cpu_synchronize_all_post_reset();
+     int i;
+     const CPUArchIdList *possible_cpus;
+@@ -1518,7 +1518,7 @@ void pc_cpus_init(PCMachineState *pcms)
+                                                      ms->smp.max_cpus - =
+1) + 1;
+     possible_cpus =3D mc->possible_cpu_arch_ids(ms);
+     for (i =3D 0; i < ms->smp.cpus; i++) {
+-        pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
++        x86_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
+     }
  }
 =20
--static CpuInstanceProperties
--x86_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
--{
--    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
--    const CPUArchIdList *possible_cpus =3D mc->possible_cpu_arch_ids(ms)=
-;
--
--    assert(cpu_index < possible_cpus->len);
--    return possible_cpus->cpus[cpu_index].props;
--}
--
--static int64_t x86_get_default_cpu_node_id(const MachineState *ms, int i=
-dx)
--{
--   X86CPUTopoInfo topo;
--   PCMachineState *pcms =3D PC_MACHINE(ms);
--
--   assert(idx < ms->possible_cpus->len);
--   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
--                            pcms->smp_dies, ms->smp.cores,
--                            ms->smp.threads, &topo);
--   return topo.pkg_id % ms->numa_state->num_nodes;
--}
--
--static const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
--{
--    PCMachineState *pcms =3D PC_MACHINE(ms);
--    int i;
--    unsigned int max_cpus =3D ms->smp.max_cpus;
--
--    if (ms->possible_cpus) {
--        /*
--         * make sure that max_cpus hasn't changed since the first use, i=
-.e.
--         * -smp hasn't been parsed after it
--        */
--        assert(ms->possible_cpus->len =3D=3D max_cpus);
--        return ms->possible_cpus;
--    }
--
--    ms->possible_cpus =3D g_malloc0(sizeof(CPUArchIdList) +
--                                  sizeof(CPUArchId) * max_cpus);
--    ms->possible_cpus->len =3D max_cpus;
--    for (i =3D 0; i < ms->possible_cpus->len; i++) {
--        X86CPUTopoInfo topo;
--
--        ms->possible_cpus->cpus[i].type =3D ms->cpu_type;
--        ms->possible_cpus->cpus[i].vcpus_count =3D 1;
--        ms->possible_cpus->cpus[i].arch_id =3D x86_cpu_apic_id_from_inde=
-x(pcms, i);
--        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
--                                 pcms->smp_dies, ms->smp.cores,
--                                 ms->smp.threads, &topo);
--        ms->possible_cpus->cpus[i].props.has_socket_id =3D true;
--        ms->possible_cpus->cpus[i].props.socket_id =3D topo.pkg_id;
--        if (pcms->smp_dies > 1) {
--            ms->possible_cpus->cpus[i].props.has_die_id =3D true;
--            ms->possible_cpus->cpus[i].props.die_id =3D topo.die_id;
--        }
--        ms->possible_cpus->cpus[i].props.has_core_id =3D true;
--        ms->possible_cpus->cpus[i].props.core_id =3D topo.core_id;
--        ms->possible_cpus->cpus[i].props.has_thread_id =3D true;
--        ms->possible_cpus->cpus[i].props.thread_id =3D topo.smt_id;
--    }
--    return ms->possible_cpus;
--}
--
- static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+@@ -1621,7 +1621,7 @@ void xen_load_linux(PCMachineState *pcms)
+     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
+     rom_set_fw(fw_cfg);
+=20
+-    load_linux(pcms, fw_cfg);
++    x86_load_linux(pcms, fw_cfg);
+     for (i =3D 0; i < nb_option_roms; i++) {
+         assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
+                !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
+@@ -1756,7 +1756,7 @@ void pc_memory_init(PCMachineState *pcms,
+     }
+=20
+     if (linux_boot) {
+-        load_linux(pcms, fw_cfg);
++        x86_load_linux(pcms, fw_cfg);
+     }
+=20
+     for (i =3D 0; i < nb_option_roms; i++) {
+@@ -2678,7 +2678,7 @@ static void pc_machine_wakeup(MachineState *machine=
+)
+ }
+=20
+ static CpuInstanceProperties
+-pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
++x86_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
  {
-     /* cpu index isn't used */
+     MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+     const CPUArchIdList *possible_cpus =3D mc->possible_cpu_arch_ids(ms)=
+;
+@@ -2687,7 +2687,7 @@ pc_cpu_index_to_props(MachineState *ms, unsigned cp=
+u_index)
+     return possible_cpus->cpus[cpu_index].props;
+ }
+=20
+-static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int id=
+x)
++static int64_t x86_get_default_cpu_node_id(const MachineState *ms, int i=
+dx)
+ {
+    X86CPUTopoInfo topo;
+    PCMachineState *pcms =3D PC_MACHINE(ms);
+@@ -2699,7 +2699,7 @@ static int64_t pc_get_default_cpu_node_id(const Mac=
+hineState *ms, int idx)
+    return topo.pkg_id % ms->numa_state->num_nodes;
+ }
+=20
+-static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
++static const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+ {
+     PCMachineState *pcms =3D PC_MACHINE(ms);
+     int i;
+@@ -2801,9 +2801,9 @@ static void pc_machine_class_init(ObjectClass *oc, =
+void *data)
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler =3D pc_get_hotplug_handler;
+     mc->hotplug_allowed =3D pc_hotplug_allowed;
+-    mc->cpu_index_to_instance_props =3D pc_cpu_index_to_props;
+-    mc->get_default_cpu_node_id =3D pc_get_default_cpu_node_id;
+-    mc->possible_cpu_arch_ids =3D pc_possible_cpu_arch_ids;
++    mc->cpu_index_to_instance_props =3D x86_cpu_index_to_props;
++    mc->get_default_cpu_node_id =3D x86_get_default_cpu_node_id;
++    mc->possible_cpu_arch_ids =3D x86_possible_cpu_arch_ids;
+     mc->auto_enable_numa_with_memhp =3D true;
+     mc->has_hotpluggable_cpus =3D true;
+     mc->default_boot_order =3D "cad";
 diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index de09e076cd..c8afe46e37 100644
+index 6824b72124..de09e076cd 100644
 --- a/hw/i386/pc_piix.c
 +++ b/hw/i386/pc_piix.c
-@@ -28,6 +28,7 @@
- #include "qemu/units.h"
- #include "hw/loader.h"
- #include "hw/i386/pc.h"
-+#include "hw/i386/x86.h"
- #include "hw/i386/apic.h"
- #include "hw/display/ramfb.h"
- #include "hw/firmware/smbios.h"
+@@ -152,7 +152,7 @@ static void pc_init1(MachineState *machine,
+         }
+     }
+=20
+-    pc_cpus_init(pcms);
++    x86_cpus_init(pcms);
+=20
+     if (kvm_enabled() && pcmc->kvmclock_enabled) {
+         kvmclock_create();
 diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 894989b64e..c87653eb6a 100644
+index 8fad20f314..894989b64e 100644
 --- a/hw/i386/pc_q35.c
 +++ b/hw/i386/pc_q35.c
-@@ -42,6 +42,7 @@
- #include "hw/qdev-properties.h"
- #include "exec/address-spaces.h"
- #include "hw/i386/pc.h"
-+#include "hw/i386/x86.h"
- #include "hw/i386/ich9.h"
- #include "hw/i386/amd_iommu.h"
- #include "hw/i386/intel_iommu.h"
+@@ -179,7 +179,7 @@ static void pc_q35_init(MachineState *machine)
+         xen_hvm_init(pcms, &ram_memory);
+     }
+=20
+-    pc_cpus_init(pcms);
++    x86_cpus_init(pcms);
+=20
+     kvmclock_create();
+=20
 diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 1ee254b15e..6d2e693179 100644
+index a9983f0bfb..1ee254b15e 100644
 --- a/hw/i386/pc_sysfw.c
 +++ b/hw/i386/pc_sysfw.c
-@@ -32,6 +32,7 @@
- #include "qemu/units.h"
- #include "hw/sysbus.h"
- #include "hw/i386/pc.h"
-+#include "hw/i386/x86.h"
- #include "hw/loader.h"
- #include "hw/qdev-properties.h"
- #include "sysemu/sysemu.h"
-@@ -211,59 +212,6 @@ static void pc_system_flash_map(PCMachineState *pcms=
-,
+@@ -211,7 +211,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
      }
  }
 =20
--static void x86_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram=
+-static void old_pc_system_rom_init(MemoryRegion *rom_memory, bool isapc_=
+ram_fw)
++static void x86_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram=
 _fw)
--{
--    char *filename;
--    MemoryRegion *bios, *isa_bios;
--    int bios_size, isa_bios_size;
--    int ret;
--
--    /* BIOS load */
--    if (bios_name =3D=3D NULL) {
--        bios_name =3D BIOS_FILENAME;
--    }
--    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
--    if (filename) {
--        bios_size =3D get_image_size(filename);
--    } else {
--        bios_size =3D -1;
--    }
--    if (bios_size <=3D 0 ||
--        (bios_size % 65536) !=3D 0) {
--        goto bios_error;
--    }
--    bios =3D g_malloc(sizeof(*bios));
--    memory_region_init_ram(bios, NULL, "pc.bios", bios_size, &error_fata=
-l);
--    if (!isapc_ram_fw) {
--        memory_region_set_readonly(bios, true);
--    }
--    ret =3D rom_add_file_fixed(bios_name, (uint32_t)(-bios_size), -1);
--    if (ret !=3D 0) {
--    bios_error:
--        fprintf(stderr, "qemu: could not load PC BIOS '%s'\n", bios_name=
-);
--        exit(1);
--    }
--    g_free(filename);
--
--    /* map the last 128KB of the BIOS in ISA space */
--    isa_bios_size =3D MIN(bios_size, 128 * KiB);
--    isa_bios =3D g_malloc(sizeof(*isa_bios));
--    memory_region_init_alias(isa_bios, NULL, "isa-bios", bios,
--                             bios_size - isa_bios_size, isa_bios_size);
--    memory_region_add_subregion_overlap(rom_memory,
--                                        0x100000 - isa_bios_size,
--                                        isa_bios,
--                                        1);
--    if (!isapc_ram_fw) {
--        memory_region_set_readonly(isa_bios, true);
--    }
--
--    /* map all the bios at the top of memory */
--    memory_region_add_subregion(rom_memory,
--                                (uint32_t)(-bios_size),
--                                bios);
--}
--
- void pc_system_firmware_init(PCMachineState *pcms,
-                              MemoryRegion *rom_memory)
  {
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-new file mode 100644
-index 0000000000..a9dee67890
---- /dev/null
-+++ b/hw/i386/x86.c
-@@ -0,0 +1,684 @@
-+/*
-+ * Copyright (c) 2003-2004 Fabrice Bellard
-+ * Copyright (c) 2019 Red Hat, Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-+ * of this software and associated documentation files (the "Software"),=
- to deal
-+ * in the Software without restriction, including without limitation the=
- rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be includ=
-ed in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qemu/option.h"
-+#include "qemu/cutils.h"
-+#include "qemu/units.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qapi/qapi-visit-common.h"
-+#include "qapi/visitor.h"
-+#include "sysemu/qtest.h"
-+#include "sysemu/numa.h"
-+#include "sysemu/replay.h"
-+#include "sysemu/sysemu.h"
-+
-+#include "hw/i386/x86.h"
-+#include "hw/i386/pc.h"
-+#include "target/i386/cpu.h"
-+#include "hw/i386/topology.h"
-+#include "hw/i386/fw_cfg.h"
-+
-+#include "hw/acpi/cpu_hotplug.h"
-+#include "hw/nmi.h"
-+#include "hw/loader.h"
-+#include "multiboot.h"
-+#include "elf.h"
-+#include "standard-headers/asm-x86/bootparam.h"
-+
-+#define BIOS_FILENAME "bios.bin"
-+
-+/* Physical Address of PVH entry point read from kernel ELF NOTE */
-+static size_t pvh_start_addr;
-+
-+/* Calculates initial APIC ID for a specific CPU index
-+ *
-+ * Currently we need to be able to calculate the APIC ID from the CPU in=
-dex
-+ * alone (without requiring a CPU object), as the QEMU<->Seabios interfa=
-ces have
-+ * no concept of "CPU index", and the NUMA tables on fw_cfg need the API=
-C ID of
-+ * all CPUs up to max_cpus.
-+ */
-+uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
-+                                    unsigned int cpu_index)
-+{
-+    MachineState *ms =3D MACHINE(pcms);
-+    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
-+    uint32_t correct_id;
-+    static bool warned;
-+
-+    correct_id =3D x86_apicid_from_cpu_idx(pcms->smp_dies, ms->smp.cores=
-,
-+                                         ms->smp.threads, cpu_index);
-+    if (pcmc->compat_apic_id_mode) {
-+        if (cpu_index !=3D correct_id && !warned && !qtest_enabled()) {
-+            error_report("APIC IDs set in compatibility mode, "
-+                         "CPU topology won't match the configuration");
-+            warned =3D true;
-+        }
-+        return cpu_index;
-+    } else {
-+        return correct_id;
-+    }
-+}
-+
-+void x86_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
-+{
-+    Object *cpu =3D NULL;
-+    Error *local_err =3D NULL;
-+    CPUX86State *env =3D NULL;
-+
-+    cpu =3D object_new(MACHINE(pcms)->cpu_type);
-+
-+    env =3D &X86_CPU(cpu)->env;
-+    env->nr_dies =3D pcms->smp_dies;
-+
-+    object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
-+    object_property_set_bool(cpu, true, "realized", &local_err);
-+
-+    object_unref(cpu);
-+    error_propagate(errp, local_err);
-+}
-+
-+void x86_cpus_init(PCMachineState *pcms)
-+{
-+    int i;
-+    const CPUArchIdList *possible_cpus;
-+    MachineState *ms =3D MACHINE(pcms);
-+    MachineClass *mc =3D MACHINE_GET_CLASS(pcms);
-+    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(mc);
-+
-+    x86_cpu_set_default_version(pcmc->default_cpu_version);
-+
-+    /* Calculates the limit to CPU APIC ID values
-+     *
-+     * Limit for the APIC ID value, so that all
-+     * CPU APIC IDs are < pcms->apic_id_limit.
-+     *
-+     * This is used for FW_CFG_MAX_CPUS. See comments on fw_cfg_arch_cre=
-ate().
-+     */
-+    pcms->apic_id_limit =3D x86_cpu_apic_id_from_index(pcms,
-+                                                     ms->smp.max_cpus - =
-1) + 1;
-+    possible_cpus =3D mc->possible_cpu_arch_ids(ms);
-+    for (i =3D 0; i < ms->smp.cpus; i++) {
-+        x86_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
-+    }
-+}
-+
-+CpuInstanceProperties
-+x86_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-+{
-+    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
-+    const CPUArchIdList *possible_cpus =3D mc->possible_cpu_arch_ids(ms)=
-;
-+
-+    assert(cpu_index < possible_cpus->len);
-+    return possible_cpus->cpus[cpu_index].props;
-+}
-+
-+int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
-+{
-+   X86CPUTopoInfo topo;
-+   PCMachineState *pcms =3D PC_MACHINE(ms);
-+
-+   assert(idx < ms->possible_cpus->len);
-+   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
-+                            pcms->smp_dies, ms->smp.cores,
-+                            ms->smp.threads, &topo);
-+   return topo.pkg_id % ms->numa_state->num_nodes;
-+}
-+
-+const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
-+{
-+    PCMachineState *pcms =3D PC_MACHINE(ms);
-+    int i;
-+    unsigned int max_cpus =3D ms->smp.max_cpus;
-+
-+    if (ms->possible_cpus) {
-+        /*
-+         * make sure that max_cpus hasn't changed since the first use, i=
-.e.
-+         * -smp hasn't been parsed after it
-+        */
-+        assert(ms->possible_cpus->len =3D=3D max_cpus);
-+        return ms->possible_cpus;
-+    }
-+
-+    ms->possible_cpus =3D g_malloc0(sizeof(CPUArchIdList) +
-+                                  sizeof(CPUArchId) * max_cpus);
-+    ms->possible_cpus->len =3D max_cpus;
-+    for (i =3D 0; i < ms->possible_cpus->len; i++) {
-+        X86CPUTopoInfo topo;
-+
-+        ms->possible_cpus->cpus[i].type =3D ms->cpu_type;
-+        ms->possible_cpus->cpus[i].vcpus_count =3D 1;
-+        ms->possible_cpus->cpus[i].arch_id =3D x86_cpu_apic_id_from_inde=
-x(pcms, i);
-+        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
-+                                 pcms->smp_dies, ms->smp.cores,
-+                                 ms->smp.threads, &topo);
-+        ms->possible_cpus->cpus[i].props.has_socket_id =3D true;
-+        ms->possible_cpus->cpus[i].props.socket_id =3D topo.pkg_id;
-+        if (pcms->smp_dies > 1) {
-+            ms->possible_cpus->cpus[i].props.has_die_id =3D true;
-+            ms->possible_cpus->cpus[i].props.die_id =3D topo.die_id;
-+        }
-+        ms->possible_cpus->cpus[i].props.has_core_id =3D true;
-+        ms->possible_cpus->cpus[i].props.core_id =3D topo.core_id;
-+        ms->possible_cpus->cpus[i].props.has_thread_id =3D true;
-+        ms->possible_cpus->cpus[i].props.thread_id =3D topo.smt_id;
-+    }
-+    return ms->possible_cpus;
-+}
-+
-+static long get_file_size(FILE *f)
-+{
-+    long where, size;
-+
-+    /* XXX: on Unix systems, using fstat() probably makes more sense */
-+
-+    where =3D ftell(f);
-+    fseek(f, 0, SEEK_END);
-+    size =3D ftell(f);
-+    fseek(f, where, SEEK_SET);
-+
-+    return size;
-+}
-+
-+struct setup_data {
-+    uint64_t next;
-+    uint32_t type;
-+    uint32_t len;
-+    uint8_t data[0];
-+} __attribute__((packed));
-+
-+/*
-+ * The entry point into the kernel for PVH boot is different from
-+ * the native entry point.  The PVH entry is defined by the x86/HVM
-+ * direct boot ABI and is available in an ELFNOTE in the kernel binary.
-+ *
-+ * This function is passed to load_elf() when it is called from
-+ * load_elfboot() which then additionally checks for an ELF Note of
-+ * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
-+ * parse the PVH entry address from the ELF Note.
-+ *
-+ * Due to trickery in elf_opts.h, load_elf() is actually available as
-+ * load_elf32() or load_elf64() and this routine needs to be able
-+ * to deal with being called as 32 or 64 bit.
-+ *
-+ * The address of the PVH entry point is saved to the 'pvh_start_addr'
-+ * global variable.  (although the entry point is 32-bit, the kernel
-+ * binary can be either 32-bit or 64-bit).
-+ */
-+static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
-+{
-+    size_t *elf_note_data_addr;
-+
-+    /* Check if ELF Note header passed in is valid */
-+    if (arg1 =3D=3D NULL) {
-+        return 0;
-+    }
-+
-+    if (is64) {
-+        struct elf64_note *nhdr64 =3D (struct elf64_note *)arg1;
-+        uint64_t nhdr_size64 =3D sizeof(struct elf64_note);
-+        uint64_t phdr_align =3D *(uint64_t *)arg2;
-+        uint64_t nhdr_namesz =3D nhdr64->n_namesz;
-+
-+        elf_note_data_addr =3D
-+            ((void *)nhdr64) + nhdr_size64 +
-+            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-+    } else {
-+        struct elf32_note *nhdr32 =3D (struct elf32_note *)arg1;
-+        uint32_t nhdr_size32 =3D sizeof(struct elf32_note);
-+        uint32_t phdr_align =3D *(uint32_t *)arg2;
-+        uint32_t nhdr_namesz =3D nhdr32->n_namesz;
-+
-+        elf_note_data_addr =3D
-+            ((void *)nhdr32) + nhdr_size32 +
-+            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
-+    }
-+
-+    pvh_start_addr =3D *elf_note_data_addr;
-+
-+    return pvh_start_addr;
-+}
-+
-+static bool load_elfboot(const char *kernel_filename,
-+                   int kernel_file_size,
-+                   uint8_t *header,
-+                   size_t pvh_xen_start_addr,
-+                   FWCfgState *fw_cfg)
-+{
-+    uint32_t flags =3D 0;
-+    uint32_t mh_load_addr =3D 0;
-+    uint32_t elf_kernel_size =3D 0;
-+    uint64_t elf_entry;
-+    uint64_t elf_low, elf_high;
-+    int kernel_size;
-+
-+    if (ldl_p(header) !=3D 0x464c457f) {
-+        return false; /* no elfboot */
-+    }
-+
-+    bool elf_is64 =3D header[EI_CLASS] =3D=3D ELFCLASS64;
-+    flags =3D elf_is64 ?
-+        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flag=
-s;
-+
-+    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
-+        error_report("elfboot unsupported flags =3D %x", flags);
-+        exit(1);
-+    }
-+
-+    uint64_t elf_note_type =3D XEN_ELFNOTE_PHYS32_ENTRY;
-+    kernel_size =3D load_elf(kernel_filename, read_pvh_start_addr,
-+                           NULL, &elf_note_type, &elf_entry,
-+                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
-+                           0, 0);
-+
-+    if (kernel_size < 0) {
-+        error_report("Error while loading elf kernel");
-+        exit(1);
-+    }
-+    mh_load_addr =3D elf_low;
-+    elf_kernel_size =3D elf_high - elf_low;
-+
-+    if (pvh_start_addr =3D=3D 0) {
-+        error_report("Error loading uncompressed kernel without PVH ELF =
-Note");
-+        exit(1);
-+    }
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
-+
-+    return true;
-+}
-+
-+void x86_load_linux(PCMachineState *pcms,
-+                    FWCfgState *fw_cfg)
-+{
-+    uint16_t protocol;
-+    int setup_size, kernel_size, cmdline_size;
-+    int dtb_size, setup_data_offset;
-+    uint32_t initrd_max;
-+    uint8_t header[8192], *setup, *kernel;
-+    hwaddr real_addr, prot_addr, cmdline_addr, initrd_addr =3D 0;
-+    FILE *f;
-+    char *vmode;
-+    MachineState *machine =3D MACHINE(pcms);
-+    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
-+    struct setup_data *setup_data;
-+    const char *kernel_filename =3D machine->kernel_filename;
-+    const char *initrd_filename =3D machine->initrd_filename;
-+    const char *dtb_filename =3D machine->dtb;
-+    const char *kernel_cmdline =3D machine->kernel_cmdline;
-+
-+    /* Align to 16 bytes as a paranoia measure */
-+    cmdline_size =3D (strlen(kernel_cmdline)+16) & ~15;
-+
-+    /* load the kernel header */
-+    f =3D fopen(kernel_filename, "rb");
-+    if (!f || !(kernel_size =3D get_file_size(f)) ||
-+        fread(header, 1, MIN(ARRAY_SIZE(header), kernel_size), f) !=3D
-+        MIN(ARRAY_SIZE(header), kernel_size)) {
-+        fprintf(stderr, "qemu: could not load kernel '%s': %s\n",
-+                kernel_filename, strerror(errno));
-+        exit(1);
-+    }
-+
-+    /* kernel protocol version */
-+#if 0
-+    fprintf(stderr, "header magic: %#x\n", ldl_p(header+0x202));
-+#endif
-+    if (ldl_p(header+0x202) =3D=3D 0x53726448) {
-+        protocol =3D lduw_p(header+0x206);
-+    } else {
-+        /*
-+         * This could be a multiboot kernel. If it is, let's stop treati=
-ng it
-+         * like a Linux kernel.
-+         * Note: some multiboot images could be in the ELF format (the s=
-ame of
-+         * PVH), so we try multiboot first since we check the multiboot =
-magic
-+         * header before to load it.
-+         */
-+        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
-+                           kernel_cmdline, kernel_size, header)) {
-+            return;
-+        }
-+        /*
-+         * Check if the file is an uncompressed kernel file (ELF) and lo=
-ad it,
-+         * saving the PVH entry point used by the x86/HVM direct boot AB=
-I.
-+         * If load_elfboot() is successful, populate the fw_cfg info.
-+         */
-+        if (pcmc->pvh_enabled &&
-+            load_elfboot(kernel_filename, kernel_size,
-+                         header, pvh_start_addr, fw_cfg)) {
-+            fclose(f);
-+
-+            fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
-+                strlen(kernel_cmdline) + 1);
-+            fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdlin=
-e);
-+
-+            fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
-+            fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
-+                             header, sizeof(header));
-+
-+            /* load initrd */
-+            if (initrd_filename) {
-+                GMappedFile *mapped_file;
-+                gsize initrd_size;
-+                gchar *initrd_data;
-+                GError *gerr =3D NULL;
-+
-+                mapped_file =3D g_mapped_file_new(initrd_filename, false=
-, &gerr);
-+                if (!mapped_file) {
-+                    fprintf(stderr, "qemu: error reading initrd %s: %s\n=
-",
-+                            initrd_filename, gerr->message);
-+                    exit(1);
-+                }
-+                pcms->initrd_mapped_file =3D mapped_file;
-+
-+                initrd_data =3D g_mapped_file_get_contents(mapped_file);
-+                initrd_size =3D g_mapped_file_get_length(mapped_file);
-+                initrd_max =3D pcms->below_4g_mem_size - pcmc->acpi_data=
-_size - 1;
-+                if (initrd_size >=3D initrd_max) {
-+                    fprintf(stderr, "qemu: initrd is too large, cannot s=
-upport."
-+                            "(max: %"PRIu32", need %"PRId64")\n",
-+                            initrd_max, (uint64_t)initrd_size);
-+                    exit(1);
-+                }
-+
-+                initrd_addr =3D (initrd_max - initrd_size) & ~4095;
-+
-+                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
-+                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
-+                fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data=
-,
-+                                 initrd_size);
-+            }
-+
-+            option_rom[nb_option_roms].bootindex =3D 0;
-+            option_rom[nb_option_roms].name =3D "pvh.bin";
-+            nb_option_roms++;
-+
-+            return;
-+        }
-+        protocol =3D 0;
-+    }
-+
-+    if (protocol < 0x200 || !(header[0x211] & 0x01)) {
-+        /* Low kernel */
-+        real_addr    =3D 0x90000;
-+        cmdline_addr =3D 0x9a000 - cmdline_size;
-+        prot_addr    =3D 0x10000;
-+    } else if (protocol < 0x202) {
-+        /* High but ancient kernel */
-+        real_addr    =3D 0x90000;
-+        cmdline_addr =3D 0x9a000 - cmdline_size;
-+        prot_addr    =3D 0x100000;
-+    } else {
-+        /* High and recent kernel */
-+        real_addr    =3D 0x10000;
-+        cmdline_addr =3D 0x20000;
-+        prot_addr    =3D 0x100000;
-+    }
-+
-+#if 0
-+    fprintf(stderr,
-+            "qemu: real_addr     =3D 0x" TARGET_FMT_plx "\n"
-+            "qemu: cmdline_addr  =3D 0x" TARGET_FMT_plx "\n"
-+            "qemu: prot_addr     =3D 0x" TARGET_FMT_plx "\n",
-+            real_addr,
-+            cmdline_addr,
-+            prot_addr);
-+#endif
-+
-+    /* highest address for loading the initrd */
-+    if (protocol >=3D 0x20c &&
-+        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
-+        /*
-+         * Linux has supported initrd up to 4 GB for a very long time (2=
-007,
-+         * long before XLF_CAN_BE_LOADED_ABOVE_4G which was added in 201=
-3),
-+         * though it only sets initrd_max to 2 GB to "work around bootlo=
-ader
-+         * bugs". Luckily, QEMU firmware(which does something like bootl=
-oader)
-+         * has supported this.
-+         *
-+         * It's believed that if XLF_CAN_BE_LOADED_ABOVE_4G is set, init=
-rd can
-+         * be loaded into any address.
-+         *
-+         * In addition, initrd_max is uint32_t simply because QEMU doesn=
-'t
-+         * support the 64-bit boot protocol (specifically the ext_ramdis=
-k_image
-+         * field).
-+         *
-+         * Therefore here just limit initrd_max to UINT32_MAX simply as =
-well.
-+         */
-+        initrd_max =3D UINT32_MAX;
-+    } else if (protocol >=3D 0x203) {
-+        initrd_max =3D ldl_p(header+0x22c);
-+    } else {
-+        initrd_max =3D 0x37ffffff;
-+    }
-+
-+    if (initrd_max >=3D pcms->below_4g_mem_size - pcmc->acpi_data_size) =
-{
-+        initrd_max =3D pcms->below_4g_mem_size - pcmc->acpi_data_size - =
-1;
-+    }
-+
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_ADDR, cmdline_addr);
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE, strlen(kernel_cmdline)+1=
-);
-+    fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
-+
-+    if (protocol >=3D 0x202) {
-+        stl_p(header+0x228, cmdline_addr);
-+    } else {
-+        stw_p(header+0x20, 0xA33F);
-+        stw_p(header+0x22, cmdline_addr-real_addr);
-+    }
-+
-+    /* handle vga=3D parameter */
-+    vmode =3D strstr(kernel_cmdline, "vga=3D");
-+    if (vmode) {
-+        unsigned int video_mode;
-+        /* skip "vga=3D" */
-+        vmode +=3D 4;
-+        if (!strncmp(vmode, "normal", 6)) {
-+            video_mode =3D 0xffff;
-+        } else if (!strncmp(vmode, "ext", 3)) {
-+            video_mode =3D 0xfffe;
-+        } else if (!strncmp(vmode, "ask", 3)) {
-+            video_mode =3D 0xfffd;
-+        } else {
-+            video_mode =3D strtol(vmode, NULL, 0);
-+        }
-+        stw_p(header+0x1fa, video_mode);
-+    }
-+
-+    /* loader type */
-+    /* High nybble =3D B reserved for QEMU; low nybble is revision numbe=
-r.
-+       If this code is substantially changed, you may want to consider
-+       incrementing the revision. */
-+    if (protocol >=3D 0x200) {
-+        header[0x210] =3D 0xB0;
-+    }
-+    /* heap */
-+    if (protocol >=3D 0x201) {
-+        header[0x211] |=3D 0x80;	/* CAN_USE_HEAP */
-+        stw_p(header+0x224, cmdline_addr-real_addr-0x200);
-+    }
-+
-+    /* load initrd */
-+    if (initrd_filename) {
-+        GMappedFile *mapped_file;
-+        gsize initrd_size;
-+        gchar *initrd_data;
-+        GError *gerr =3D NULL;
-+
-+        if (protocol < 0x200) {
-+            fprintf(stderr, "qemu: linux kernel too old to load a ram di=
-sk\n");
-+            exit(1);
-+        }
-+
-+        mapped_file =3D g_mapped_file_new(initrd_filename, false, &gerr)=
-;
-+        if (!mapped_file) {
-+            fprintf(stderr, "qemu: error reading initrd %s: %s\n",
-+                    initrd_filename, gerr->message);
-+            exit(1);
-+        }
-+        pcms->initrd_mapped_file =3D mapped_file;
-+
-+        initrd_data =3D g_mapped_file_get_contents(mapped_file);
-+        initrd_size =3D g_mapped_file_get_length(mapped_file);
-+        if (initrd_size >=3D initrd_max) {
-+            fprintf(stderr, "qemu: initrd is too large, cannot support."
-+                    "(max: %"PRIu32", need %"PRId64")\n",
-+                    initrd_max, (uint64_t)initrd_size);
-+            exit(1);
-+        }
-+
-+        initrd_addr =3D (initrd_max-initrd_size) & ~4095;
-+
-+        fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
-+        fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
-+        fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data, initrd=
-_size);
-+
-+        stl_p(header+0x218, initrd_addr);
-+        stl_p(header+0x21c, initrd_size);
-+    }
-+
-+    /* load kernel and setup */
-+    setup_size =3D header[0x1f1];
-+    if (setup_size =3D=3D 0) {
-+        setup_size =3D 4;
-+    }
-+    setup_size =3D (setup_size+1)*512;
-+    if (setup_size > kernel_size) {
-+        fprintf(stderr, "qemu: invalid kernel header\n");
-+        exit(1);
-+    }
-+    kernel_size -=3D setup_size;
-+
-+    setup  =3D g_malloc(setup_size);
-+    kernel =3D g_malloc(kernel_size);
-+    fseek(f, 0, SEEK_SET);
-+    if (fread(setup, 1, setup_size, f) !=3D setup_size) {
-+        fprintf(stderr, "fread() failed\n");
-+        exit(1);
-+    }
-+    if (fread(kernel, 1, kernel_size, f) !=3D kernel_size) {
-+        fprintf(stderr, "fread() failed\n");
-+        exit(1);
-+    }
-+    fclose(f);
-+
-+    /* append dtb to kernel */
-+    if (dtb_filename) {
-+        if (protocol < 0x209) {
-+            fprintf(stderr, "qemu: Linux kernel too old to load a dtb\n"=
-);
-+            exit(1);
-+        }
-+
-+        dtb_size =3D get_image_size(dtb_filename);
-+        if (dtb_size <=3D 0) {
-+            fprintf(stderr, "qemu: error reading dtb %s: %s\n",
-+                    dtb_filename, strerror(errno));
-+            exit(1);
-+        }
-+
-+        setup_data_offset =3D QEMU_ALIGN_UP(kernel_size, 16);
-+        kernel_size =3D setup_data_offset + sizeof(struct setup_data) + =
-dtb_size;
-+        kernel =3D g_realloc(kernel, kernel_size);
-+
-+        stq_p(header+0x250, prot_addr + setup_data_offset);
-+
-+        setup_data =3D (struct setup_data *)(kernel + setup_data_offset)=
-;
-+        setup_data->next =3D 0;
-+        setup_data->type =3D cpu_to_le32(SETUP_DTB);
-+        setup_data->len =3D cpu_to_le32(dtb_size);
-+
-+        load_image_size(dtb_filename, setup_data->data, dtb_size);
-+    }
-+
-+    memcpy(setup, header, MIN(sizeof(header), setup_size));
-+
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, prot_addr);
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
-+    fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, kernel, kernel_size);
-+
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_ADDR, real_addr);
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
-+    fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
-+
-+    option_rom[nb_option_roms].bootindex =3D 0;
-+    option_rom[nb_option_roms].name =3D "linuxboot.bin";
-+    if (pcmc->linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
-+        option_rom[nb_option_roms].name =3D "linuxboot_dma.bin";
-+    }
-+    nb_option_roms++;
-+}
-+
-+void x86_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
-+{
-+    char *filename;
-+    MemoryRegion *bios, *isa_bios;
-+    int bios_size, isa_bios_size;
-+    int ret;
-+
-+    /* BIOS load */
-+    if (bios_name =3D=3D NULL) {
-+        bios_name =3D BIOS_FILENAME;
-+    }
-+    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-+    if (filename) {
-+        bios_size =3D get_image_size(filename);
-+    } else {
-+        bios_size =3D -1;
-+    }
-+    if (bios_size <=3D 0 ||
-+        (bios_size % 65536) !=3D 0) {
-+        goto bios_error;
-+    }
-+    bios =3D g_malloc(sizeof(*bios));
-+    memory_region_init_ram(bios, NULL, "pc.bios", bios_size, &error_fata=
-l);
-+    if (!isapc_ram_fw) {
-+        memory_region_set_readonly(bios, true);
-+    }
-+    ret =3D rom_add_file_fixed(bios_name, (uint32_t)(-bios_size), -1);
-+    if (ret !=3D 0) {
-+    bios_error:
-+        fprintf(stderr, "qemu: could not load PC BIOS '%s'\n", bios_name=
-);
-+        exit(1);
-+    }
-+    g_free(filename);
-+
-+    /* map the last 128KB of the BIOS in ISA space */
-+    isa_bios_size =3D MIN(bios_size, 128 * KiB);
-+    isa_bios =3D g_malloc(sizeof(*isa_bios));
-+    memory_region_init_alias(isa_bios, NULL, "isa-bios", bios,
-+                             bios_size - isa_bios_size, isa_bios_size);
-+    memory_region_add_subregion_overlap(rom_memory,
-+                                        0x100000 - isa_bios_size,
-+                                        isa_bios,
-+                                        1);
-+    if (!isapc_ram_fw) {
-+        memory_region_set_readonly(isa_bios, true);
-+    }
-+
-+    /* map all the bios at the top of memory */
-+    memory_region_add_subregion(rom_memory,
-+                                (uint32_t)(-bios_size),
-+                                bios);
-+}
+     char *filename;
+     MemoryRegion *bios, *isa_bios;
+@@ -272,7 +272,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
+     BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
+=20
+     if (!pcmc->pci_enabled) {
+-        old_pc_system_rom_init(rom_memory, true);
++        x86_system_rom_init(rom_memory, true);
+         return;
+     }
+=20
+@@ -293,7 +293,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
+=20
+     if (!pflash_blk[0]) {
+         /* Machine property pflash0 not set, use ROM mode */
+-        old_pc_system_rom_init(rom_memory, false);
++        x86_system_rom_init(rom_memory, false);
+     } else {
+         if (kvm_enabled() && !kvm_readonly_mem_enabled()) {
+             /*
 diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index d12f42e9e5..73e2847e87 100644
+index 6df4f4b6fb..d12f42e9e5 100644
 --- a/include/hw/i386/pc.h
 +++ b/include/hw/i386/pc.h
-@@ -195,7 +195,6 @@ bool pc_machine_is_smm_enabled(PCMachineState *pcms);
+@@ -195,7 +195,7 @@ bool pc_machine_is_smm_enabled(PCMachineState *pcms);
  void pc_register_ferr_irq(qemu_irq irq);
  void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
 =20
--void x86_cpus_init(PCMachineState *pcms);
+-void pc_cpus_init(PCMachineState *pcms);
++void x86_cpus_init(PCMachineState *pcms);
  void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
  void pc_smp_parse(MachineState *ms, QemuOpts *opts);
 =20
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-new file mode 100644
-index 0000000000..bc1b594a93
---- /dev/null
-+++ b/include/hw/i386/x86.h
-@@ -0,0 +1,35 @@
-+/*
-+ * Copyright (c) 2019 Red Hat, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_I386_X86_H
-+#define HW_I386_X86_H
-+
-+#include "hw/boards.h"
-+
-+uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
-+                                    unsigned int cpu_index);
-+void x86_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp);
-+void x86_cpus_init(PCMachineState *pcms);
-+CpuInstanceProperties x86_cpu_index_to_props(MachineState *ms,
-+                                             unsigned cpu_index);
-+int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx);
-+const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms);
-+
-+void x86_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw);
-+
-+void x86_load_linux(PCMachineState *x86ms, FWCfgState *fw_cfg);
-+
-+#endif
 --=20
 2.21.0
 
