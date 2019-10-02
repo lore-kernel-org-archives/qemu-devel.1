@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0FABECE587
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4BEC352AA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:59:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBAB12086A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:59:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 770C12086A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Oct 2019 02:59:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="kQaLrslp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBAB12086A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aVw6HapX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 770C12086A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFUrX-0000NN-LA
-	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:59:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59726)
+	id 1iFUrf-0000Zw-1K
+	for qemu-devel@archiver.kernel.org; Tue, 01 Oct 2019 22:59:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59710)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFUkk-0001ag-TM
- for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:52:39 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iFUkk-0001ae-JY
+ for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:52:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFUkh-0002oR-Ri
+ (envelope-from <dgibson@ozlabs.org>) id 1iFUkh-0002oM-S8
  for qemu-devel@nongnu.org; Tue, 01 Oct 2019 22:52:34 -0400
-Received: from ozlabs.org ([203.11.71.1]:41969)
+Received: from ozlabs.org ([203.11.71.1]:40399)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFUkh-0002mT-Ay; Tue, 01 Oct 2019 22:52:31 -0400
+ id 1iFUkh-0002mW-BT; Tue, 01 Oct 2019 22:52:31 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46jgf66hDzz9sPx; Wed,  2 Oct 2019 12:52:14 +1000 (AEST)
+ id 46jgf75bGZz9sRD; Wed,  2 Oct 2019 12:52:15 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1569984734;
- bh=uJH95fv8zdCK834D504Ee3NB5qBHe2oNm3GGUw9V7Ao=;
+ d=gibson.dropbear.id.au; s=201602; t=1569984735;
+ bh=nIuSmMjmRIP2JxH6+XRAiVaVtFEjEQi4rUDk6u8g8NA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=kQaLrslpHnREZNHogoMxBUTHlw/HCWoCtcL+72FPuPFfRYKL1+JvioMxg837OGpQC
- CUal2BfSAIyo4PosQQXVoOag/O4VrxYszj3EpgK7wTxHxIjh9ufgnseWg5CSwhAa5f
- Jzn86pv50QYiqU5GEelxansWFscMOdQby0/pVLQQ=
+ b=aVw6HapXVQYUka+6kWCW91DwOWqibX5vgA9H05x3JOIDZ/1vCyaYhVzT/2aqjCI33
+ stnljoReR8HpPmglG2yn8K1bnhduN8a+oRlwICQfkPAoS7oGEr8m7xdwQuTxmY8GNT
+ 1ULl4hroCPZCKx7yC6cgbcQV/8MCkdPTkBe+XbgE=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org,
 	clg@kaod.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v3 05/34] xics: Merge TYPE_ICS_BASE and TYPE_ICS_SIMPLE classes
-Date: Wed,  2 Oct 2019 12:51:39 +1000
-Message-Id: <20191002025208.3487-6-david@gibson.dropbear.id.au>
+Subject: [PATCH v3 12/34] spapr: Simplify spapr_qirq() handling
+Date: Wed,  2 Oct 2019 12:51:46 +1000
+Message-Id: <20191002025208.3487-13-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191002025208.3487-1-david@gibson.dropbear.id.au>
 References: <20191002025208.3487-1-david@gibson.dropbear.id.au>
@@ -80,283 +80,159 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TYPE_ICS_SIMPLE is the only subtype of TYPE_ICS_BASE that's ever
-instantiated.  The existence of different classes is mostly a hang
-over from when we (misguidedly) had separate subtypes for the KVM and
-non-KVM version of the device.
+Currently spapr_qirq(), whic is used to find the qemu_irq for an spapr
+global irq number, redirects through the SpaprIrq::qirq method.  But
+the array of qemu_irqs is allocated in the PAPR layer, not the
+backends, and so the method implementations all return the same thing,
+just differing in the preliminary checks they make.
 
-There could be some call for an abstract base type for ICS variants
-that use a different representation of their state (PowerNV PHB3 might
-want this).  The current split isn't really in the right place for
-that though.  If we need this in future, we can re-implement it more
-in line with what we actually need.
-
-So, collapse the two classes together into just TYPE_ICS.
+So, we can remove the method, and just implement spapr_qirq() directly,
+including all the relevant checks in one place.  We change all those
+checks into assert()s as well, since a failure here indicates an error in
+the calling code.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/intc/xics.c        | 86 ++++++++++++++-----------------------------
- hw/ppc/pnv_psi.c      |  2 +-
- hw/ppc/spapr_irq.c    |  4 +-
- include/hw/ppc/xics.h | 16 +++-----
- 4 files changed, 36 insertions(+), 72 deletions(-)
+ hw/ppc/spapr_irq.c         | 54 ++++++++++++++------------------------
+ include/hw/ppc/spapr_irq.h |  1 -
+ 2 files changed, 19 insertions(+), 36 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 82e6f09259..dfe7dbd254 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -555,7 +555,7 @@ static void ics_reset_irq(ICSIRQState *irq)
-=20
- static void ics_reset(DeviceState *dev)
- {
--    ICSState *ics =3D ICS_BASE(dev);
-+    ICSState *ics =3D ICS(dev);
-     int i;
-     uint8_t flags[ics->nr_irqs];
-=20
-@@ -573,7 +573,7 @@ static void ics_reset(DeviceState *dev)
-     if (kvm_irqchip_in_kernel()) {
-         Error *local_err =3D NULL;
-=20
--        ics_set_kvm_state(ICS_BASE(dev), &local_err);
-+        ics_set_kvm_state(ICS(dev), &local_err);
-         if (local_err) {
-             error_report_err(local_err);
-         }
-@@ -585,47 +585,15 @@ static void ics_reset_handler(void *dev)
-     ics_reset(dev);
- }
-=20
--static void ics_simple_realize(DeviceState *dev, Error **errp)
-+static void ics_realize(DeviceState *dev, Error **errp)
- {
--    ICSState *ics =3D ICS_SIMPLE(dev);
--    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
-+    ICSState *ics =3D ICS(dev);
-     Error *local_err =3D NULL;
--
--    icsc->parent_realize(dev, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
--    qemu_register_reset(ics_reset_handler, ics);
--}
--
--static void ics_simple_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc =3D DEVICE_CLASS(klass);
--    ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
--
--    device_class_set_parent_realize(dc, ics_simple_realize,
--                                    &isc->parent_realize);
--}
--
--static const TypeInfo ics_simple_info =3D {
--    .name =3D TYPE_ICS_SIMPLE,
--    .parent =3D TYPE_ICS_BASE,
--    .instance_size =3D sizeof(ICSState),
--    .class_init =3D ics_simple_class_init,
--    .class_size =3D sizeof(ICSStateClass),
--};
--
--static void ics_base_realize(DeviceState *dev, Error **errp)
--{
--    ICSState *ics =3D ICS_BASE(dev);
-     Object *obj;
--    Error *err =3D NULL;
-=20
--    obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
-+    obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &local_=
-err);
-     if (!obj) {
--        error_propagate_prepend(errp, err,
-+        error_propagate_prepend(errp, local_err,
-                                 "required link '" ICS_PROP_XICS
-                                 "' not found: ");
-         return;
-@@ -637,16 +605,18 @@ static void ics_base_realize(DeviceState *dev, Erro=
-r **errp)
-         return;
-     }
-     ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
-+
-+    qemu_register_reset(ics_reset_handler, ics);
- }
-=20
--static void ics_base_instance_init(Object *obj)
-+static void ics_instance_init(Object *obj)
- {
--    ICSState *ics =3D ICS_BASE(obj);
-+    ICSState *ics =3D ICS(obj);
-=20
-     ics->offset =3D XICS_IRQ_BASE;
- }
-=20
--static int ics_base_pre_save(void *opaque)
-+static int ics_pre_save(void *opaque)
- {
-     ICSState *ics =3D opaque;
-=20
-@@ -657,7 +627,7 @@ static int ics_base_pre_save(void *opaque)
-     return 0;
- }
-=20
--static int ics_base_post_load(void *opaque, int version_id)
-+static int ics_post_load(void *opaque, int version_id)
- {
-     ICSState *ics =3D opaque;
-=20
-@@ -675,7 +645,7 @@ static int ics_base_post_load(void *opaque, int versi=
-on_id)
-     return 0;
- }
-=20
--static const VMStateDescription vmstate_ics_base_irq =3D {
-+static const VMStateDescription vmstate_ics_irq =3D {
-     .name =3D "ics/irq",
-     .version_id =3D 2,
-     .minimum_version_id =3D 1,
-@@ -689,45 +659,44 @@ static const VMStateDescription vmstate_ics_base_ir=
-q =3D {
-     },
- };
-=20
--static const VMStateDescription vmstate_ics_base =3D {
-+static const VMStateDescription vmstate_ics =3D {
-     .name =3D "ics",
-     .version_id =3D 1,
-     .minimum_version_id =3D 1,
--    .pre_save =3D ics_base_pre_save,
--    .post_load =3D ics_base_post_load,
-+    .pre_save =3D ics_pre_save,
-+    .post_load =3D ics_post_load,
-     .fields =3D (VMStateField[]) {
-         /* Sanity check */
-         VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
-=20
-         VMSTATE_STRUCT_VARRAY_POINTER_UINT32(irqs, ICSState, nr_irqs,
--                                             vmstate_ics_base_irq,
-+                                             vmstate_ics_irq,
-                                              ICSIRQState),
-         VMSTATE_END_OF_LIST()
-     },
- };
-=20
--static Property ics_base_properties[] =3D {
-+static Property ics_properties[] =3D {
-     DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
--static void ics_base_class_init(ObjectClass *klass, void *data)
-+static void ics_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
--    dc->realize =3D ics_base_realize;
--    dc->props =3D ics_base_properties;
-+    dc->realize =3D ics_realize;
-+    dc->props =3D ics_properties;
-     dc->reset =3D ics_reset;
--    dc->vmsd =3D &vmstate_ics_base;
-+    dc->vmsd =3D &vmstate_ics;
- }
-=20
--static const TypeInfo ics_base_info =3D {
--    .name =3D TYPE_ICS_BASE,
-+static const TypeInfo ics_info =3D {
-+    .name =3D TYPE_ICS,
-     .parent =3D TYPE_DEVICE,
--    .abstract =3D true,
-     .instance_size =3D sizeof(ICSState),
--    .instance_init =3D ics_base_instance_init,
--    .class_init =3D ics_base_class_init,
-+    .instance_init =3D ics_instance_init,
-+    .class_init =3D ics_class_init,
-     .class_size =3D sizeof(ICSStateClass),
- };
-=20
-@@ -767,8 +736,7 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool =
-lsi)
-=20
- static void xics_register_types(void)
- {
--    type_register_static(&ics_simple_info);
--    type_register_static(&ics_base_info);
-+    type_register_static(&ics_info);
-     type_register_static(&icp_info);
-     type_register_static(&xics_fabric_info);
- }
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 8ea81e9d8e..a997f16bb4 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -469,7 +469,7 @@ static void pnv_psi_power8_instance_init(Object *obj)
-     Pnv8Psi *psi8 =3D PNV8_PSI(obj);
-=20
-     object_initialize_child(obj, "ics-psi",  &psi8->ics, sizeof(psi8->ic=
-s),
--                            TYPE_ICS_SIMPLE, &error_abort, NULL);
-+                            TYPE_ICS, &error_abort, NULL);
- }
-=20
- static const uint8_t irq_to_xivr[] =3D {
 diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index ac189c5796..6c45d2a3c0 100644
+index 8f79aa829f..8f179076c6 100644
 --- a/hw/ppc/spapr_irq.c
 +++ b/hw/ppc/spapr_irq.c
-@@ -98,7 +98,7 @@ static void spapr_irq_init_xics(SpaprMachineState *spap=
-r, int nr_irqs,
-     Object *obj;
-     Error *local_err =3D NULL;
-=20
--    obj =3D object_new(TYPE_ICS_SIMPLE);
-+    obj =3D object_new(TYPE_ICS);
-     object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
-     object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
-                                    &error_fatal);
-@@ -109,7 +109,7 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
-apr, int nr_irqs,
-         return;
+@@ -150,17 +150,6 @@ static void spapr_irq_free_xics(SpaprMachineState *s=
+papr, int irq, int num)
      }
-=20
--    spapr->ics =3D ICS_BASE(obj);
-+    spapr->ics =3D ICS(obj);
-=20
-     xics_spapr_init(spapr);
  }
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 7efd49c02c..1e6a9300eb 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -89,17 +89,13 @@ struct PnvICPState {
-     uint32_t links[3];
- };
 =20
--#define TYPE_ICS_BASE "ics-base"
--#define ICS_BASE(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_BASE)
-+#define TYPE_ICS "ics"
-+#define ICS(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS)
-=20
--/* Retain ics for sPAPR for migration from existing sPAPR guests */
--#define TYPE_ICS_SIMPLE "ics"
--#define ICS_SIMPLE(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SIMPLE)
+-static qemu_irq spapr_qirq_xics(SpaprMachineState *spapr, int irq)
+-{
+-    ICSState *ics =3D spapr->ics;
 -
--#define ICS_BASE_CLASS(klass) \
--     OBJECT_CLASS_CHECK(ICSStateClass, (klass), TYPE_ICS_BASE)
--#define ICS_BASE_GET_CLASS(obj) \
--     OBJECT_GET_CLASS(ICSStateClass, (obj), TYPE_ICS_BASE)
-+#define ICS_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(ICSStateClass, (klass), TYPE_ICS)
-+#define ICS_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(ICSStateClass, (obj), TYPE_ICS)
+-    if (ics_valid_irq(ics, irq)) {
+-        return spapr->qirqs[irq];
+-    }
+-
+-    return NULL;
+-}
+-
+ static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monitor =
+*mon)
+ {
+     CPUState *cs;
+@@ -242,7 +231,6 @@ SpaprIrq spapr_irq_xics =3D {
+     .init        =3D spapr_irq_init_xics,
+     .claim       =3D spapr_irq_claim_xics,
+     .free        =3D spapr_irq_free_xics,
+-    .qirq        =3D spapr_qirq_xics,
+     .print_info  =3D spapr_irq_print_info_xics,
+     .dt_populate =3D spapr_dt_xics,
+     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+@@ -300,20 +288,6 @@ static void spapr_irq_free_xive(SpaprMachineState *s=
+papr, int irq, int num)
+     }
+ }
 =20
- struct ICSStateClass {
-     DeviceClass parent_class;
+-static qemu_irq spapr_qirq_xive(SpaprMachineState *spapr, int irq)
+-{
+-    SpaprXive *xive =3D spapr->xive;
+-
+-    if ((irq < SPAPR_XIRQ_BASE) || (irq >=3D xive->nr_irqs)) {
+-        return NULL;
+-    }
+-
+-    /* The sPAPR machine/device should have claimed the IRQ before */
+-    assert(xive_eas_is_valid(&xive->eat[irq]));
+-
+-    return spapr->qirqs[irq];
+-}
+-
+ static void spapr_irq_print_info_xive(SpaprMachineState *spapr,
+                                       Monitor *mon)
+ {
+@@ -408,7 +382,6 @@ SpaprIrq spapr_irq_xive =3D {
+     .init        =3D spapr_irq_init_xive,
+     .claim       =3D spapr_irq_claim_xive,
+     .free        =3D spapr_irq_free_xive,
+-    .qirq        =3D spapr_qirq_xive,
+     .print_info  =3D spapr_irq_print_info_xive,
+     .dt_populate =3D spapr_dt_xive,
+     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
+@@ -482,11 +455,6 @@ static void spapr_irq_free_dual(SpaprMachineState *s=
+papr, int irq, int num)
+     spapr_irq_xive.free(spapr, irq, num);
+ }
+=20
+-static qemu_irq spapr_qirq_dual(SpaprMachineState *spapr, int irq)
+-{
+-    return spapr_irq_current(spapr)->qirq(spapr, irq);
+-}
+-
+ static void spapr_irq_print_info_dual(SpaprMachineState *spapr, Monitor =
+*mon)
+ {
+     spapr_irq_current(spapr)->print_info(spapr, mon);
+@@ -581,7 +549,6 @@ SpaprIrq spapr_irq_dual =3D {
+     .init        =3D spapr_irq_init_dual,
+     .claim       =3D spapr_irq_claim_dual,
+     .free        =3D spapr_irq_free_dual,
+-    .qirq        =3D spapr_qirq_dual,
+     .print_info  =3D spapr_irq_print_info_dual,
+     .dt_populate =3D spapr_irq_dt_populate_dual,
+     .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
+@@ -695,7 +662,25 @@ void spapr_irq_free(SpaprMachineState *spapr, int ir=
+q, int num)
+=20
+ qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
+ {
+-    return spapr->irq->qirq(spapr, irq);
++    /*
++     * This interface is basically for VIO and PHB devices to find the
++     * right qemu_irq to manipulate, so we only allow access to the
++     * external irqs for now.  Currently anything which needs to
++     * access the IPIs most naturally gets there via the guest side
++     * interfaces, we can change this if we need to in future.
++     */
++    assert(irq >=3D SPAPR_XIRQ_BASE);
++    assert(irq < (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
++
++    if (spapr->ics) {
++        assert(ics_valid_irq(spapr->ics, irq));
++    }
++    if (spapr->xive) {
++        assert(irq < spapr->xive->nr_irqs);
++        assert(xive_eas_is_valid(&spapr->xive->eat[irq]));
++    }
++
++    return spapr->qirqs[irq];
+ }
+=20
+ int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
+@@ -798,7 +783,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+     .init        =3D spapr_irq_init_xics,
+     .claim       =3D spapr_irq_claim_xics,
+     .free        =3D spapr_irq_free_xics,
+-    .qirq        =3D spapr_qirq_xics,
+     .print_info  =3D spapr_irq_print_info_xics,
+     .dt_populate =3D spapr_dt_xics,
+     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index 7e26288fcd..a4e790ef60 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -44,7 +44,6 @@ typedef struct SpaprIrq {
+     void (*init)(SpaprMachineState *spapr, Error **errp);
+     int (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error **er=
+rp);
+     void (*free)(SpaprMachineState *spapr, int irq, int num);
+-    qemu_irq (*qirq)(SpaprMachineState *spapr, int irq);
+     void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
+     void (*dt_populate)(SpaprMachineState *spapr, uint32_t nr_servers,
+                         void *fdt, uint32_t phandle);
 --=20
 2.21.0
 
