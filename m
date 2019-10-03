@@ -2,84 +2,86 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 698B5C32792
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 10:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DAA0C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 10:26:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F174218DE
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 10:21:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F174218DE
+	by mail.kernel.org (Postfix) with ESMTPS id 14230218DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 10:26:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14230218DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFyF7-0008Kz-CS
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 06:21:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55212)
+	id 1iFyJ9-0001fy-3r
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 06:26:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55884)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iFyD9-0006h4-Mb
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:19:52 -0400
+ (envelope-from <philmd@redhat.com>) id 1iFyI7-00017o-FH
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:25:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iFyD8-0007ao-Py
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:19:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55996)
+ (envelope-from <philmd@redhat.com>) id 1iFyI5-0001gf-Ry
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:24:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36930)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iFyD8-0007aa-HQ
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:19:50 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iFyI5-0001gB-GY
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:24:57 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 88AE12DD3B
- for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 10:19:49 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id m16so497866wmg.8
- for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 03:19:49 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id BA3B7C049D7C
+ for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 10:24:55 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id 32so907556wrk.15
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 03:24:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to;
- bh=GDRq+Y9wrO/qw4EoU2FcteS8Wu/uIkZRuZRNRF5nhhs=;
- b=biuNOuG90VmEpeWGnUiosloiOayhl7zvOc6UmQyd4yZ2Fb9wkfDEeU82Bgf2GUHYbL
- KGUiY1ON7DOE10TJRwt+BIlMIWOsAHUfG5qbdEK3tAn3Bm6UEQ6OGx1JlYm8B37+5QG8
- LQBycM9t8ZNYF0Bk07gXiMaKfU8lhcugKVqjdiKx0eN+cQfhv3b1bznwx1dWDWhZhYC3
- i9SCjtXOY75pvILBWPVQIUTLcTpQZAYR57OC0CADDyc6iSYZpD8HhMQ68CixS7tzxh+3
- q1Al8vFBIO3CwSKMhDIwqyUbPetTCsfGe0Qpe0G/4LP8W1HMbnJ04zhIWkgOfGZ7gCvM
- EwBQ==
-X-Gm-Message-State: APjAAAVej1ZT4ZUHE01sZzIxyNBO0/pcuHWr36WEa0Ifz30/MDPktfsd
- H7HKLk6RU/CPeaFO14LMcRVqaAw5rUqZYO8THGPhp4pZr9oR6pGa34nmnIsdVXuDJzOEzIHvQM4
- 899IBBbTIUxH1Pp4=
-X-Received: by 2002:a1c:e0d6:: with SMTP id x205mr1569241wmg.1.1570097988069; 
- Thu, 03 Oct 2019 03:19:48 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqy7/HNdWcqfii2tZKF8qEoxVFdHpp5WO3PePQ/mJWeQ8CWGx8FtrZwYEjn0Mun2VKqq+xQWeQ==
-X-Received: by 2002:a1c:e0d6:: with SMTP id x205mr1569232wmg.1.1570097987689; 
- Thu, 03 Oct 2019 03:19:47 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b903:6d6f:a447:e464?
- ([2001:b07:6468:f312:b903:6d6f:a447:e464])
- by smtp.gmail.com with ESMTPSA id u7sm2262829wrp.19.2019.10.03.03.19.46
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7bHv14b2mRKZle8ci5oxB3hp8T1rZYI5YInGSdK1RVY=;
+ b=RV/bU2MZj4Lkr2U3NMQiAeRtjHAXx2lxndJGOdnY8yM6UiEW78AEHHWnXKwJscpq5g
+ wMiD47WadMKARxQFLj/w4HpLYzJq2DOM0UGfZVQUSiaeA1oVyH5+yGcqy3JVnrAIpDT2
+ GrJ4H4Axk2dvTOY70hX14Lqlc/6gYpDBw/Rf/d+s8rJhm2xmE9pI8Ss4etcdFZdG5N75
+ Ac2ey1vttCpU9pPNQbdKSaVK0RBO9GPb6ssw7Mn7XBEnDWb0NhHUoK3U4W7c6nfB/JEt
+ +yfNBnNJgtyA/TR7U9HBR/pNkwr+NJV96CqTTyRr34N+LtrArFdQIE2ov0AF1T7FVbaK
+ EAtg==
+X-Gm-Message-State: APjAAAVpn9XLs9fSkv2RXjanvo4s/4TYqTaW9vG99vmFbPtYorw8PQ2J
+ DsVYTM2M1kFAH0gLOUnoScLxtCmZE94bQ1ETwvXgzcPHyZwD54k5zyu8fNYiVnqZiLvCBD2QLbG
+ d6gI5CK5sgr+Oagw=
+X-Received: by 2002:a05:600c:28d:: with SMTP id
+ 13mr6610601wmk.84.1570098294469; 
+ Thu, 03 Oct 2019 03:24:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxaGtgN1fIfFXrskicSvyXaxT6WuU7NCwPK7gRKFA+R7FGz5EelBuS6YYqzn+iOX+ShENTZyg==
+X-Received: by 2002:a05:600c:28d:: with SMTP id
+ 13mr6610589wmk.84.1570098294211; 
+ Thu, 03 Oct 2019 03:24:54 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id f9sm1180156wre.74.2019.10.03.03.24.52
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Oct 2019 03:19:46 -0700 (PDT)
-Subject: Re: [PATCH v5 08/10] roms: add microvm-bios (qboot) as binary and git
- submodule
-To: Sergio Lopez <slp@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+ Thu, 03 Oct 2019 03:24:53 -0700 (PDT)
+Subject: Re: [PATCH v5 04/10] hw/i386: split PCMachineState deriving
+ X86MachineState from it
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
 References: <20191002113103.45023-1-slp@redhat.com>
- <20191002113103.45023-9-slp@redhat.com> <87lfu2i1mh.fsf@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <59b1b371-f0f3-de63-6cac-dbb86e17c1d1@redhat.com>
-Date: Thu, 3 Oct 2019 12:19:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ <20191002113103.45023-5-slp@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <11c49099-7911-2f3b-3c8c-b3d1659fad6e@redhat.com>
+Date: Thu, 3 Oct 2019 12:24:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <87lfu2i1mh.fsf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="F78VcbdjmBdVdGjEtKV0SlgStRy5HYv38"
+In-Reply-To: <20191002113103.45023-5-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -94,69 +96,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, lersek@redhat.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, imammedo@redhat.com,
- sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: Stefano Stabellini <sstabellini@kernel.org>, ehabkost@redhat.com,
+ mst@redhat.com, Paul Durrant <paul@xen.org>, kraxel@redhat.com,
+ pbonzini@redhat.com, Anthony Perard <anthony.perard@citrix.com>,
+ imammedo@redhat.com, sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---F78VcbdjmBdVdGjEtKV0SlgStRy5HYv38
-Content-Type: multipart/mixed; boundary="STtjLXKDeA8DKQRlIXDsuCUVoEvGDLJrQ";
- protected-headers="v1"
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Sergio Lopez <slp@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, imammedo@redhat.com,
- marcel.apfelbaum@gmail.com, rth@twiddle.net, ehabkost@redhat.com,
- philmd@redhat.com, lersek@redhat.com, kraxel@redhat.com, sgarzare@redhat.com
-Message-ID: <59b1b371-f0f3-de63-6cac-dbb86e17c1d1@redhat.com>
-Subject: Re: [PATCH v5 08/10] roms: add microvm-bios (qboot) as binary and git
- submodule
-References: <20191002113103.45023-1-slp@redhat.com>
- <20191002113103.45023-9-slp@redhat.com> <87lfu2i1mh.fsf@redhat.com>
-In-Reply-To: <87lfu2i1mh.fsf@redhat.com>
+Hi Sergio,
 
---STtjLXKDeA8DKQRlIXDsuCUVoEvGDLJrQ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 03/10/19 12:07, Sergio Lopez wrote:
+On 10/2/19 1:30 PM, Sergio Lopez wrote:
+> Split up PCMachineState and PCMachineClass and derive X86MachineState
+> and X86MachineClass from them. This allows sharing code with non-PC
+> x86 machine types.
 >=20
->> qboot is a minimalist x86 firmware for booting Linux kernels. It does
->> the mininum amount of work required for the task, and it's able to
->> boot both PVH images and bzImages without relying on option roms.
-> I've just noticed all other submodules refer to mirrors hosted in
-> git.qemu.org. What's our policy regarding this submodules? Can we add a=
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>   hw/acpi/cpu_hotplug.c |  10 +--
+>   hw/i386/acpi-build.c  |  29 ++++---
+>   hw/i386/amd_iommu.c   |   3 +-
+>   hw/i386/intel_iommu.c |   3 +-
+>   hw/i386/pc.c          | 178 ++++++++++++++---------------------------=
+-
+>   hw/i386/pc_piix.c     |  43 +++++-----
+>   hw/i386/pc_q35.c      |  35 +++++----
+>   hw/i386/x86.c         | 139 +++++++++++++++++++++++++++++----
+>   hw/intc/ioapic.c      |   2 +-
+>   include/hw/i386/pc.h  |  27 +------
+>   include/hw/i386/x86.h |  56 ++++++++++++-
+>   11 files changed, 308 insertions(+), 217 deletions(-)
+>=20
+[...]
+> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+> index bc1b594a93..5de2f91845 100644
+> --- a/include/hw/i386/x86.h
+> +++ b/include/hw/i386/x86.h
+> @@ -17,7 +17,61 @@
+>   #ifndef HW_I386_X86_H
+>   #define HW_I386_X86_H
+>  =20
+> +#include "qemu-common.h"
+> +#include "exec/hwaddr.h"
+> +#include "qemu/notify.h"
+> +
+>   #include "hw/boards.h"
+> +#include "hw/nmi.h"
+> +
+> +typedef struct {
+> +    /*< private >*/
+> +    MachineClass parent;
+> +
+> +    /*< public >*/
+> +
+> +    /* Enables contiguous-apic-ID mode */
+> +    bool compat_apic_id_mode;
+> +} X86MachineClass;
+> +
+> +typedef struct {
+> +    /*< private >*/
+> +    MachineState parent;
+> +
+> +    /*< public >*/
+> +
+> +    /* Pointers to devices and objects: */
+> +    ISADevice *rtc;
+> +    FWCfgState *fw_cfg;
+> +    qemu_irq *gsi;
+> +    GMappedFile *initrd_mapped_file;
+> +
+> +    /* Configuration options: */
+> +    uint64_t max_ram_below_4g;
+> +
+> +    /* RAM information (sizes, addresses, configuration): */
+> +    ram_addr_t below_4g_mem_size, above_4g_mem_size;
+> +
+> +    /* CPU and apic information: */
+> +    bool apic_xrupt_override;
+> +    unsigned apic_id_limit;
+> +    uint16_t boot_cpus;
+> +    unsigned smp_dies;
+> +
+> +    /* Address space used by IOAPIC device. All IOAPIC interrupts
+> +     * will be translated to MSI messages in the address space. */
+> +    AddressSpace *ioapic_as;
+> +} X86MachineState;
+> +
+> +#define X86_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
+> +
+> +#define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
+> +#define X86_MACHINE(obj) \
+> +    OBJECT_CHECK(X86MachineState, (obj), TYPE_X86_MACHINE)
+> +#define X86_MACHINE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(X86MachineClass, obj, TYPE_X86_MACHINE)
+> +#define X86_MACHINE_CLASS(class) \
+> +    OBJECT_CLASS_CHECK(X86MachineClass, class, TYPE_X86_MACHINE)
+>  =20
+>   uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
+>                                       unsigned int cpu_index);
+> @@ -30,6 +84,6 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(Machin=
+eState *ms);
+>  =20
+>   void x86_system_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)=
+;
+>  =20
+> -void x86_load_linux(PCMachineState *x86ms, FWCfgState *fw_cfg);
+> +void x86_load_linux(PCMachineState *pcms, FWCfgState *fw_cfg);
+>  =20
+>   #endif
+>=20
 
-> reference to an external repo or should I somehow request a mirror in
-> the aforementioned repo?
+You forgot to update Xen:
 
-We usually start with an external repo and then sooner or later change
-it to a mirror on qemu.org.
-
-Paolo
-
-
---STtjLXKDeA8DKQRlIXDsuCUVoEvGDLJrQ--
-
---F78VcbdjmBdVdGjEtKV0SlgStRy5HYv38
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl2Vyz4ACgkQv/vSX3jH
-roMJ2Af+K7Z5HNPVoen28tcg0DbhGx3n+IQElA6ZAAA9z0nIAR8XEoMiCE01goC+
-8bCr3/Fwk6X0X8zpD3FtSKFYFpAcxY/efCv3OeEplX4oziNf0JKxEOBjFwRrrJpM
-CdDqE0xS+deFowzw2FSBH3z7dLU+AgYtcmLkAH4SZxgJWzx2bqFd0GrrDGXt+3B/
-1SWynvBSqh9gpH0BTE+6h+aAF4MK3tH1rSm2iRJSbgsD/BZqEW+sU7J4y/CAKrd2
-3ycYfORGhSohMltSvt8ZcJ3Ch/rsLw4XXJVGjUE17sSQ0hKMhEBTwn8j1EhvO0Cb
-Dv+zHSFtPhvfosywzZWKrF0myYdB6A==
-=gePN
------END PGP SIGNATURE-----
-
---F78VcbdjmBdVdGjEtKV0SlgStRy5HYv38--
+hw/i386/xen/xen-hvm.c: In function =E2=80=98xen_ram_init=E2=80=99:
+hw/i386/xen/xen-hvm.c:203:53: error: =E2=80=98PC_MACHINE_MAX_RAM_BELOW_4G=
+=E2=80=99=20
+undeclared (first use in this function); did you mean=20
+=E2=80=98X86_MACHINE_MAX_RAM_BELOW_4G=E2=80=99?
+=20
+PC_MACHINE_MAX_RAM_BELOW_4G,
+=20
+^~~~~~~~~~~~~~~~~~~~~~~~~~~
+=20
+X86_MACHINE_MAX_RAM_BELOW_4G
+hw/i386/xen/xen-hvm.c:203:53: note: each undeclared identifier is=20
+reported only once for each function it appears in
+hw/i386/xen/xen-hvm.c:217:13: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98above_4g_mem_size=E2=
+=80=99
+          pcms->above_4g_mem_size =3D ram_size - user_lowmem;
+              ^~
+hw/i386/xen/xen-hvm.c:218:13: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98below_4g_mem_size=E2=
+=80=99
+          pcms->below_4g_mem_size =3D user_lowmem;
+              ^~
+hw/i386/xen/xen-hvm.c:220:13: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98above_4g_mem_size=E2=
+=80=99
+          pcms->above_4g_mem_size =3D 0;
+              ^~
+hw/i386/xen/xen-hvm.c:221:13: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98below_4g_mem_size=E2=
+=80=99
+          pcms->below_4g_mem_size =3D ram_size;
+              ^~
+hw/i386/xen/xen-hvm.c:223:14: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98above_4g_mem_size=E2=
+=80=99
+      if (!pcms->above_4g_mem_size) {
+               ^~
+hw/i386/xen/xen-hvm.c:230:40: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98above_4g_mem_size=E2=
+=80=99
+          block_len =3D (1ULL << 32) + pcms->above_4g_mem_size;
+                                         ^~
+hw/i386/xen/xen-hvm.c:247:34: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98below_4g_mem_size=E2=
+=80=99
+                               pcms->below_4g_mem_size - 0xc0000);
+                                   ^~
+hw/i386/xen/xen-hvm.c:249:13: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98above_4g_mem_size=E2=
+=80=99
+      if (pcms->above_4g_mem_size > 0) {
+              ^~
+hw/i386/xen/xen-hvm.c:252:38: error: =E2=80=98PCMachineState=E2=80=99 {ak=
+a =E2=80=98struct=20
+PCMachineState=E2=80=99} has no member named =E2=80=98above_4g_mem_size=E2=
+=80=99
+                                   pcms->above_4g_mem_size);
+                                       ^~
+make[1]: *** [rules.mak:69: hw/i386/xen/xen-hvm.o] Error 1
 
