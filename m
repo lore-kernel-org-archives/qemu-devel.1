@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19520C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ACE6C32792
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:54:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E25B8207FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:53:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E25B8207FF
+	by mail.kernel.org (Postfix) with ESMTPS id 2FD87207FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:54:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FD87207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG79q-0000uG-TG
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 15:53:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51785)
+	id 1iG7Ba-0002WH-76
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 15:54:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iG6qs-0005Q2-7r
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:33:28 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iG6qu-0005Ri-F0
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:33:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iG6qp-0004rF-K6
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:33:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50244)
+ (envelope-from <jsnow@redhat.com>) id 1iG6qs-0004t6-8N
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:33:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60254)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iG6qm-0004lR-E7; Thu, 03 Oct 2019 15:33:20 -0400
+ id 1iG6qo-0004n4-Dm; Thu, 03 Oct 2019 15:33:22 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9897C83F40;
- Thu,  3 Oct 2019 19:33:19 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9A13F18CB8E0;
+ Thu,  3 Oct 2019 19:33:21 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4955410018F8;
- Thu,  3 Oct 2019 19:33:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B43F31001B09;
+ Thu,  3 Oct 2019 19:33:19 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 4/8] scsi: Propagate unrealize() callback to scsi-hd
-Date: Thu,  3 Oct 2019 15:32:41 -0400
-Message-Id: <20191003193245.8993-5-jsnow@redhat.com>
+Subject: [PULL v2 5/8] bootdevice: Gather LCHS from all relevant devices
+Date: Thu,  3 Oct 2019 15:32:42 -0400
+Message-Id: <20191003193245.8993-6-jsnow@redhat.com>
 In-Reply-To: <20191003193245.8993-1-jsnow@redhat.com>
 References: <20191003193245.8993-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 03 Oct 2019 19:33:19 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Thu, 03 Oct 2019 19:33:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -84,74 +84,109 @@ Sender: "Qemu-devel"
 
 From: Sam Eiderman <shmuel.eiderman@oracle.com>
 
-We will need to add LCHS removal logic to scsi-hd's unrealize() in the
-next commit.
+Relevant devices are:
+    * ide-hd (and ide-cd, ide-drive)
+    * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
+    * virtio-blk-pci
+
+We do not call del_boot_device_lchs() for ide-* since we don't need to -
+IDE block devices do not support unplugging.
 
 Signed-off-by: Sam Eiderman <sameid@google.com>
 Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
 Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
 Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-id: 20190925110639.100699-5-sameid@google.com
+Message-id: 20190925110639.100699-6-sameid@google.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- include/hw/scsi/scsi.h |  1 +
- hw/scsi/scsi-bus.c     | 16 ++++++++++++++++
- 2 files changed, 17 insertions(+)
+ hw/block/virtio-blk.c |  6 ++++++
+ hw/ide/qdev.c         |  5 +++++
+ hw/scsi/scsi-disk.c   | 12 ++++++++++++
+ 3 files changed, 23 insertions(+)
 
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index d77a92361b..332ef602f4 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -59,6 +59,7 @@ struct SCSIRequest {
- typedef struct SCSIDeviceClass {
-     DeviceClass parent_class;
-     void (*realize)(SCSIDevice *dev, Error **errp);
-+    void (*unrealize)(SCSIDevice *dev, Error **errp);
-     int (*parse_cdb)(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
-                      void *hba_private);
-     SCSIRequest *(*alloc_req)(SCSIDevice *s, uint32_t tag, uint32_t lun,
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index bccb7cc4c6..359d50d6d0 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -59,6 +59,14 @@ static void scsi_device_realize(SCSIDevice *s, Error *=
-*errp)
-     }
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 18851601cb..6d8ff34a16 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -1186,6 +1186,11 @@ static void virtio_blk_device_realize(DeviceState =
+*dev, Error **errp)
+     blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);
+=20
+     blk_iostatus_enable(s->blk);
++
++    add_boot_device_lchs(dev, "/disk@0,0",
++                         conf->conf.lcyls,
++                         conf->conf.lheads,
++                         conf->conf.lsecs);
  }
 =20
-+static void scsi_device_unrealize(SCSIDevice *s, Error **errp)
-+{
-+    SCSIDeviceClass *sc =3D SCSI_DEVICE_GET_CLASS(s);
-+    if (sc->unrealize) {
-+        sc->unrealize(s, errp);
-+    }
+ static void virtio_blk_device_unrealize(DeviceState *dev, Error **errp)
+@@ -1193,6 +1198,7 @@ static void virtio_blk_device_unrealize(DeviceState=
+ *dev, Error **errp)
+     VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+     VirtIOBlock *s =3D VIRTIO_BLK(dev);
+=20
++    del_boot_device_lchs(dev, "/disk@0,0");
+     virtio_blk_data_plane_destroy(s->dataplane);
+     s->dataplane =3D NULL;
+     qemu_del_vm_change_state_handler(s->change);
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 6dd219944f..2ffd387a73 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -220,6 +220,11 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveK=
+ind kind, Error **errp)
+=20
+     add_boot_device_path(dev->conf.bootindex, &dev->qdev,
+                          dev->unit ? "/disk@1" : "/disk@0");
++
++    add_boot_device_lchs(&dev->qdev, dev->unit ? "/disk@1" : "/disk@0",
++                         dev->conf.lcyls,
++                         dev->conf.lheads,
++                         dev->conf.lsecs);
+ }
+=20
+ static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *n=
+ame,
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 915641a0f1..d19896fe4d 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -35,6 +35,7 @@
+ #include "hw/block/block.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/dma.h"
++#include "sysemu/sysemu.h"
+ #include "qemu/cutils.h"
+ #include "trace.h"
+=20
+@@ -2402,6 +2403,16 @@ static void scsi_realize(SCSIDevice *dev, Error **=
+errp)
+     blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
+=20
+     blk_iostatus_enable(s->qdev.conf.blk);
++
++    add_boot_device_lchs(&dev->qdev, NULL,
++                         dev->conf.lcyls,
++                         dev->conf.lheads,
++                         dev->conf.lsecs);
 +}
 +
- int scsi_bus_parse_cdb(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
-                        void *hba_private)
- {
-@@ -217,12 +225,20 @@ static void scsi_qdev_realize(DeviceState *qdev, Er=
-ror **errp)
- static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
- {
-     SCSIDevice *dev =3D SCSI_DEVICE(qdev);
-+    Error *local_err =3D NULL;
-=20
-     if (dev->vmsentry) {
-         qemu_del_vm_change_state_handler(dev->vmsentry);
-     }
-=20
-     scsi_device_purge_requests(dev, SENSE_CODE(NO_SENSE));
-+
-+    scsi_device_unrealize(dev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     blockdev_mark_auto_del(dev->conf.blk);
++static void scsi_unrealize(SCSIDevice *dev, Error **errp)
++{
++    del_boot_device_lchs(&dev->qdev, NULL);
  }
 =20
+ static void scsi_hd_realize(SCSIDevice *dev, Error **errp)
+@@ -3006,6 +3017,7 @@ static void scsi_hd_class_initfn(ObjectClass *klass=
+, void *data)
+     SCSIDeviceClass *sc =3D SCSI_DEVICE_CLASS(klass);
+=20
+     sc->realize      =3D scsi_hd_realize;
++    sc->unrealize    =3D scsi_unrealize;
+     sc->alloc_req    =3D scsi_new_request;
+     sc->unit_attention_reported =3D scsi_disk_unit_attention_reported;
+     dc->desc =3D "virtual SCSI disk";
 --=20
 2.21.0
 
