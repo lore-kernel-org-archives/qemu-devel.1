@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3ADDC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E675C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:55:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6455621D81
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:53:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D36121D81
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:55:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RpvDNni7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6455621D81
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jfembrSg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D36121D81
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFrF7-000096-8t
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:53:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40647)
+	id 1iFrGy-0002UD-3T
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:55:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5M-00007f-Bk
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:22 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5P-0000AK-G1
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5K-0000xT-9L
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:20 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:59441)
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5N-00010d-6L
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:23 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58509 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFr5I-0000wE-9I; Wed, 02 Oct 2019 22:43:17 -0400
+ id 1iFr5M-0000xq-Io; Wed, 02 Oct 2019 22:43:21 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46kHP95nvyz9sPL; Thu,  3 Oct 2019 12:43:09 +1000 (AEST)
+ id 46kHPC0Nvsz9sQv; Thu,  3 Oct 2019 12:43:11 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570070589;
- bh=mTN9VjpZMT1HLOs/HSsbjzc7k9UfSwliXhrPLdqw+5g=;
+ d=gibson.dropbear.id.au; s=201602; t=1570070591;
+ bh=D83nMpK3B9GzE0sRrNbZuOBzfObm9XI3qmffYjMJbUs=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=RpvDNni7IFRCIR4sGrawsKXX+74ANsfgrBd98rM7wxlp/dC7pPriICKHKwmukEktP
- eGXaGh0n1kSHtHxPU6lzwv0DBNqcAELlx3bnC4+efF683xIGkKQH/eetgzFYYpA/4c
- Fhy4qV0OGjzL6ZGXS1fslGd64YERy33QqNjTy1NY=
-Date: Thu, 3 Oct 2019 12:08:59 +1000
+ b=jfembrSgwSHMJ+HBuIILOmlTggdLAUoaqcDW6tIWeLV0CG8FymB0ILbtbcg7L86eV
+ zdgndoDr9jZeOlZuvCCJTQBSYVtwabD8yWlukFL03aP//XY3nPjaw21tCZ9nAGXSPO
+ dSWFMNDmnwD2SG1Ym7xy4CdyBT1NlFMcXBv2AZU8=
+Date: Thu, 3 Oct 2019 12:41:56 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v4 11/25] ppc/xive: Move the TIMA operations to the
- controller model
-Message-ID: <20191003020859.GJ11105@umbus.fritz.box>
+Subject: Re: [PATCH v4 24/25] ppc/pnv: Improve trigger data definition
+Message-ID: <20191003024156.GQ11105@umbus.fritz.box>
 References: <20190918160645.25126-1-clg@kaod.org>
- <20190918160645.25126-12-clg@kaod.org>
+ <20190918160645.25126-25-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="dYuLH7fbMjVsPkFl"
+ protocol="application/pgp-signature"; boundary="fTD7sGci972winw4"
 Content-Disposition: inline
-In-Reply-To: <20190918160645.25126-12-clg@kaod.org>
+In-Reply-To: <20190918160645.25126-25-clg@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,210 +77,158 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---dYuLH7fbMjVsPkFl
-Content-Type: text/plain; charset=iso-8859-1
+--fTD7sGci972winw4
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2019 at 06:06:31PM +0200, C=E9dric Le Goater wrote:
-> This also removes the need of the get_tctx() XiveRouter handler in the
-> core XIVE framework.
-
-In general these commit messages could really do with more context.
-What exactly is the "controller model"?  Where were the TIMA
-operations before now.  Why is having them in the controller model
-better?
-
-I could probably answer those with some investigation, but the point
-is that the commit message is supposed to make it easy to find that
-information.
-
+On Wed, Sep 18, 2019 at 06:06:44PM +0200, C=C3=A9dric Le Goater wrote:
+> The trigger definition is used for triggers both for HW source
+> interrupts, PHB, PSI, as well as for rerouting interrupts between
+> Interrupt Controller.
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> HW source controllers set bit0 of word0 to =E2=80=980=E2=80=99 as they pr=
+ovide EAS
+> information (EAS block + EAS index) in the 8 byte data and not END
+> information, and bit1 of word0 to =E2=80=981=E2=80=99 to signal that the =
+state bit
+> check has been performed.
+>=20
+> Introduce these new trigger bits and rename the XIVE_SRCNO macros in
+> XIVE_EAS to reflect better the nature of the data. This is breaking
+> the notification for the PSI model which will be fixed in the next
+> patch.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 > ---
->  include/hw/ppc/xive.h |  1 -
->  hw/intc/pnv_xive.c    | 35 ++++++++++++++++++++++++++++++++++-
->  hw/intc/spapr_xive.c  | 33 +++++++++++++++++++++++++++++++--
->  hw/intc/xive.c        | 29 -----------------------------
->  4 files changed, 65 insertions(+), 33 deletions(-)
+>  include/hw/ppc/xive_regs.h | 24 +++++++++++++++++++++---
+>  hw/intc/pnv_xive.c         | 16 ++++++++++++----
+>  hw/intc/xive.c             |  4 ++--
+>  3 files changed, 35 insertions(+), 9 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index 536deea8c622..9d9cd88dd17e 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -462,7 +462,6 @@ typedef struct XiveENDSource {
->  #define XIVE_TM_OS_PAGE         0x2
->  #define XIVE_TM_USER_PAGE       0x3
+> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+> index dd42c33cef35..83a2f2cc1318 100644
+> --- a/include/hw/ppc/xive_regs.h
+> +++ b/include/hw/ppc/xive_regs.h
+> @@ -22,9 +22,27 @@
+>  /*
+>   * Interrupt source number encoding on PowerBUS
+>   */
+> -#define XIVE_SRCNO_BLOCK(srcno) (((srcno) >> 28) & 0xf)
+> -#define XIVE_SRCNO_INDEX(srcno) ((srcno) & 0x0fffffff)
+> -#define XIVE_SRCNO(blk, idx)    ((uint32_t)(blk) << 28 | (idx))
+> +/*
+> + * Trigger data definition
+> + *
+> + * The trigger definition is used for triggers both for HW source
+> + * interrupts (PHB, PSI), as well as for rerouting interrupts between
+> + * Interrupt Controller.
+> + *
+> + * HW source controllers set bit0 of word0 to =E2=80=980=E2=80=99 as the=
+y provide EAS
+> + * information (EAS block + EAS index) in the 8 byte data and not END
+> + * information, and bit1 of word0 to =E2=80=981=E2=80=99 to signal that =
+the state bit
+> + * check has been performed.
+> + */
+> +#define XIVE_TRIGGER_END        PPC_BIT(0)
+> +#define XIVE_TRIGGER_EAS        PPC_BIT(1)
+
+These names seem really confusing in light of the comment above.  HW
+source controllers set the XIVE_TRIGGER_END bit in order to indicate
+that they're providing EAS info, not END info??  And also set the
+XIVE_TRIGGER_EAS bit to indicate something different?
+
+Also, the comment implies that HW source controllers set both bits,
+but I'm not really sure if that's what you meant.  Expanding on what
+non-HW source controllers might set could be helpful, too..
+
+> +
+> +/*
+> + * QEMU macros to manipulate the trigger payload in native endian
+> + */
+> +#define XIVE_EAS_BLOCK(n)       (((n) >> 28) & 0xf)
+> +#define XIVE_EAS_INDEX(n)       ((n) & 0x0fffffff)
+> +#define XIVE_EAS(blk, idx)      ((uint32_t)(blk) << 28 | (idx))
 > =20
-> -extern const MemoryRegionOps xive_tm_ops;
->  void xive_tctx_tm_write(XivePresenter *xptr, XiveTCTX *tctx, hwaddr offs=
-et,
->                          uint64_t value, unsigned size);
->  uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveTCTX *tctx, hwaddr o=
-ffset,
+>  #define TM_SHIFT                16
+> =20
 > diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-> index 3d6fcf9ac139..40e18fb44811 100644
+> index 4c1fa024cdf5..61af3f23000f 100644
 > --- a/hw/intc/pnv_xive.c
 > +++ b/hw/intc/pnv_xive.c
-> @@ -1475,6 +1475,39 @@ static const MemoryRegionOps xive_tm_indirect_ops =
-=3D {
->      },
->  };
+> @@ -385,7 +385,7 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_t=
+ blk, uint32_t idx,
+>       * EAT lookups should be local to the IC
+>       */
+>      if (pnv_xive_block_id(xive) !=3D blk) {
+> -        xive_error(xive, "VST: EAS %x is remote !?", XIVE_SRCNO(blk, idx=
+));
+> +        xive_error(xive, "VST: EAS %x is remote !?", XIVE_EAS(blk, idx));
+>          return -1;
+>      }
 > =20
-> +static void pnv_xive_tm_write(void *opaque, hwaddr offset,
-> +                              uint64_t value, unsigned size)
-> +{
-> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-> +    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-> +    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-> +
-> +    xive_tctx_tm_write(XIVE_PRESENTER(xive), tctx, offset, value, size);
-> +}
-> +
-> +static uint64_t pnv_xive_tm_read(void *opaque, hwaddr offset, unsigned s=
-ize)
-> +{
-> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-> +    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-> +    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-> +
-> +    return xive_tctx_tm_read(XIVE_PRESENTER(xive), tctx, offset, size);
-
-You're not using the opaque pointer in either of these cases.  So
-couldn't you make it point to the presenter for pnv as well, then...
-
-> +}
-> +
-> +const MemoryRegionOps pnv_xive_tm_ops =3D {
-> +    .read =3D pnv_xive_tm_read,
-> +    .write =3D pnv_xive_tm_write,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 8,
-> +    },
-> +    .impl =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 8,
-> +    },
-> +};
-> +
->  /*
->   * Interrupt controller XSCOM region.
->   */
-> @@ -1832,7 +1865,7 @@ static void pnv_xive_realize(DeviceState *dev, Erro=
-r **errp)
->                            "xive-pc", PNV9_XIVE_PC_SIZE);
+> @@ -502,7 +502,7 @@ static void pnv_xive_notify(XiveNotifier *xn, uint32_=
+t srcno)
+>      PnvXive *xive =3D PNV_XIVE(xn);
+>      uint8_t blk =3D pnv_xive_block_id(xive);
 > =20
->      /* Thread Interrupt Management Area (Direct) */
-> -    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,
-> +    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &pnv_xive_tm_ops,
->                            xive, "xive-tima", PNV9_XIVE_TM_SIZE);
-> =20
->      qemu_register_reset(pnv_xive_reset, dev);
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index eefc0d4c36b9..e00a9bdd901b 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -222,6 +222,35 @@ void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
->      memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
+> -    xive_router_notify(xn, XIVE_SRCNO(blk, srcno));
+> +    xive_router_notify(xn, XIVE_EAS(blk, srcno));
 >  }
 > =20
-> +static void spapr_xive_tm_write(void *opaque, hwaddr offset,
-> +                          uint64_t value, unsigned size)
-> +{
-> +    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
-> +
-> +    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value,
-> size);
-
-=2E.. there would be no difference from the spapr versions, AFAICT.
-
-> +}
-> +
-> +static uint64_t spapr_xive_tm_read(void *opaque, hwaddr offset, unsigned=
- size)
-> +{
-> +    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
-> +
-> +    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size);
-> +}
-> +
-> +const MemoryRegionOps spapr_xive_tm_ops =3D {
-> +    .read =3D spapr_xive_tm_read,
-> +    .write =3D spapr_xive_tm_write,
-> +    .endianness =3D DEVICE_BIG_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 8,
-> +    },
-> +    .impl =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 8,
-> +    },
-> +};
-> +
->  static void spapr_xive_end_reset(XiveEND *end)
+>  /*
+> @@ -1287,12 +1287,20 @@ static const MemoryRegionOps pnv_xive_ic_reg_ops =
+=3D {
+> =20
+>  static void pnv_xive_ic_hw_trigger(PnvXive *xive, hwaddr addr, uint64_t =
+val)
 >  {
->      memset(end, 0, sizeof(*end));
-> @@ -331,8 +360,8 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
-r **errp)
->      qemu_register_reset(spapr_xive_reset, dev);
-> =20
->      /* TIMA initialization */
-> -    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
-ve,
-> -                          "xive.tima", 4ull << TM_SHIFT);
-> +    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &spapr_xive_tm_o=
-ps,
-> +                          xive, "xive.tima", 4ull << TM_SHIFT);
->      sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
-> =20
+> +    uint8_t blk =3D XIVE_EAS_BLOCK(val);
+> +    uint32_t idx =3D XIVE_EAS_INDEX(val);
+> +
 >      /*
+>       * Forward the source event notification directly to the Router.
+>       * The source interrupt number should already be correctly encoded
+>       * with the chip block id by the sending device (PHB, PSI).
+>       */
+> -    xive_router_notify(XIVE_NOTIFIER(xive), val);
+> +    if (val & XIVE_TRIGGER_EAS) {
+> +        xive_router_notify(XIVE_NOTIFIER(xive), XIVE_EAS(blk, idx));
+> +    } else {
+> +        xive_error(xive, "IC: END trigger at @0x%"HWADDR_PRIx" data 0x%"=
+PRIx64,
+> +                   addr, val);
+> +    }
+>  }
+> =20
+>  static void pnv_xive_ic_notify_write(void *opaque, hwaddr addr, uint64_t=
+ val,
+> @@ -1683,7 +1691,7 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monitor=
+ *mon)
+>      XiveRouter *xrtr =3D XIVE_ROUTER(xive);
+>      uint8_t blk =3D pnv_xive_block_id(xive);
+>      uint8_t chip_id =3D xive->chip->chip_id;
+> -    uint32_t srcno0 =3D XIVE_SRCNO(blk, 0);
+> +    uint32_t srcno0 =3D XIVE_EAS(blk, 0);
+>      uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive, blk);
+>      XiveEAS eas;
+>      XiveEND end;
 > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 9bb09ed6ee7b..11432f04f5c3 100644
+> index 07b7c3586c12..6702f32be601 100644
 > --- a/hw/intc/xive.c
 > +++ b/hw/intc/xive.c
-> @@ -483,35 +483,6 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, Xive=
-TCTX *tctx, hwaddr offset,
->      return xive_tm_raw_read(tctx, offset, size);
->  }
-> =20
-> -static void xive_tm_write(void *opaque, hwaddr offset,
-> -                          uint64_t value, unsigned size)
-> -{
-> -    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
-_cpu);
-> -
-> -    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
-);
-> -}
-> -
-> -static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
-> -{
-> -    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
-_cpu);
-> -
-> -    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size);
-> -}
-> -
-> -const MemoryRegionOps xive_tm_ops =3D {
-> -    .read =3D xive_tm_read,
-> -    .write =3D xive_tm_write,
-> -    .endianness =3D DEVICE_BIG_ENDIAN,
-> -    .valid =3D {
-> -        .min_access_size =3D 1,
-> -        .max_access_size =3D 8,
-> -    },
-> -    .impl =3D {
-> -        .min_access_size =3D 1,
-> -        .max_access_size =3D 8,
-> -    },
-> -};
-> -
->  static char *xive_tctx_ring_print(uint8_t *ring)
+> @@ -1652,8 +1652,8 @@ do_escalation:
+>  void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
 >  {
->      uint32_t w2 =3D xive_tctx_word2(ring);
+>      XiveRouter *xrtr =3D XIVE_ROUTER(xn);
+> -    uint8_t eas_blk =3D XIVE_SRCNO_BLOCK(lisn);
+> -    uint32_t eas_idx =3D XIVE_SRCNO_INDEX(lisn);
+> +    uint8_t eas_blk =3D XIVE_EAS_BLOCK(lisn);
+> +    uint32_t eas_idx =3D XIVE_EAS_INDEX(lisn);
+>      XiveEAS eas;
+> =20
+>      /* EAS cache lookup */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -289,25 +236,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---dYuLH7fbMjVsPkFl
+--fTD7sGci972winw4
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VWDgACgkQbDjKyiDZ
-s5Jrdw/+Lb1jwCGIY3sJoTMQdUtELEGbpSXYdcPx4hhVL1qsZKuCVCgdxnuoOApt
-hfl10A/DwvoFxaOkUUbV/ZnT4Twjr8uMJUrL+VGRMfpRjmJgXMaahccmxD1eq7/6
-dbkUN+UZcGOtBcDDIhX0S7HIN3/K7dq9HOut2X8d0h5X1JEdhGKN0IctJPAxkCuO
-EOGHfVRFDpDnM190mpfHhqOkkqM6VXvUGkqarZwT4JWSe7hXyl6BSnYMlc/KHAjh
-NKzFOcKNLpTXAfICrgGvNH0khG6xu81+GlK5NfK9oLivw8F9Z1X9TliC3IbBYX4E
-uO6IrNB+RdBLGwNkFmxNEVGtLcApGXej3GWmF28xORRJ6ZSuVE1irxVq2arp+asg
-Ammsbqft4SJ52IkedEsUdl1GwLszUV8A/HKyTHlk3OR/Jqc44Sh4Stgo3TDjBPuu
-xW/E5SEx94tusw6QDVQImgr9ct1MrTCFA7IItGAay3f0Xt85pqrl3XafVfPKycjc
-azqycOT7h2gJAfDHNj0R86vn3573BtvIAsnuWV2cTVOR3Zwsmip3UFgJmdxeE9i/
-OUJff9svPv7Hml9tE+jKOxZcwA8sF07uo/pLrTvJY+5iH4yxc5toAIhUv3BpVEyl
-4VWw7/5/NbA4LHBNcUkvsFa74SApB/Qs0qgTNPl029urkjlkofg=
-=V8tV
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VX/QACgkQbDjKyiDZ
+s5KGxhAAqudJeJXRkJKk+12i6ZUVf/zfJXy5QtZYiQxYe1v4zA0DP9e+RUFuQ8vW
+7gUvbHELmN+bdL3I408ClWEwn4L54rhXewv8NgiUFrePk2qinuiXwZPRJN69Zkfg
+r7POEFQxPS8yRkSp1LO7igYigeIZIZDZMklpiDDvzs0P8ScnUdpJm3HOhZAAqYm+
+TVWVq7PDng5PhpZssALzudzWzMGjlmNY0d6QyrXDHpsHPXGPTi9Qku3LpZ9pLMGh
+5yqMUy+ms8GyCRRo9qM29e4fmEtX/GJP+XH51xU9MxAm5hYFGgEEu8edXS6lJLRz
+MLH1eAAePTtPr4ea6QDU/S5L5AGHnwLe7b3F+lWViYRG3mEawVCv267VaMy/kzg1
+uDxarb4uRD9a1enL+s8fwEU++gxdj9J3majqRgxrebkubAs9ZOzHo7dC8RXpxcIu
+rDN+LsQMN13mFtbS3FKZYiITy2AeFiMZluMV3vGQNtUNl2iZnbb/+PLjIg5lsRkD
+YxX+zBx2xrqcw4ANPFc4SSGUQpq8o9lrYnUXGpaClaU+Bb8awxBD8hSiTG/M2BPW
+JGbNSEFBJG18MoUw1iJ/l0iLNXnvDR+B9V4x8rdlgbf4O9JpfZGb221sVn4PV5uU
+zSQtHfxKJOnLigPHpiYefa7TdSS3A+3yHMTc4jzdz4DvkvmURkk=
+=pDIr
 -----END PGP SIGNATURE-----
 
---dYuLH7fbMjVsPkFl--
+--fTD7sGci972winw4--
 
