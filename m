@@ -2,62 +2,101 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D679CC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C57C32792
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:49:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6E4A20842
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:46:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6E4A20842
+	by mail.kernel.org (Postfix) with ESMTPS id B0F242133F
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:49:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOcjLYgr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0F242133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGAoC-0002JK-3J
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 19:46:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46909)
+	id 1iGAqf-0003og-ME
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 19:49:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56323)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iGABf-0002SY-AF
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:07:08 -0400
+ (envelope-from <philmd@redhat.com>) id 1iGASj-0006Qz-Sh
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:24:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iGABe-00079E-5b
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:07:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37032)
+ (envelope-from <philmd@redhat.com>) id 1iGASg-0004AC-AX
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:24:44 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26352
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iGABb-00074y-Id; Thu, 03 Oct 2019 19:07:03 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7CE455117D;
- Thu,  3 Oct 2019 23:07:02 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-21.brq.redhat.com [10.40.204.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 541BC10018F8;
- Thu,  3 Oct 2019 23:06:48 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/14] hw/rtc/mc146818: Include mc146818rtc_regs.h a bit
- less
-Date: Fri,  4 Oct 2019 01:04:02 +0200
-Message-Id: <20191003230404.19384-13-philmd@redhat.com>
-In-Reply-To: <20191003230404.19384-1-philmd@redhat.com>
-References: <20191003230404.19384-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iGASg-00048U-2A
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:24:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1570145081;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Wki6/h0rYHJ1VluFFFgwSUQEH1GEWfy/N8CY+kJiJCU=;
+ b=QOcjLYgrJtDNDOgPkfx1zfse2P1xbWKYZWCGEVNl+xe0bZANoVZBSAntlPu6ATm12nFg0x
+ xj/JomzSr+nOxD6BI2I9YSV12C2Wr6FSpDaeUKs2loHLXfx/yl7MFNVYLV4JYosAfHJkbD
+ /k1CP1WrVm5x5dQqfeROwdNohPeKRek=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-RXPDFZEtOFifTie4g2-08Q-1; Thu, 03 Oct 2019 19:24:39 -0400
+Received: by mail-wr1-f72.google.com with SMTP id k4so1673298wru.1
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 16:24:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xnT5eQjNQBARaF6UDq3kKyCElJIjEQvAj4d/TAmzogM=;
+ b=CgUKs6E+Nzo/1psll+4/qnD00tCBolx1HL6ts9ewmNkynv+Zml/HuSFwXfnFIxr2O1
+ FV5bklXAczcz7IMrD7LDrDkdGJOqyFe4PwUqw1HKS9m0WVSBbhBqFVSDnn76ijIcwv+J
+ Sid1n1aLuM/KlxwCWQErdjmbB9rszxT7juXIKOTnA+MKzu1PvXLEWusKK6hZObw68sVe
+ tbZshEmTbO5RgKXhACYQ+dB6AIzk+I8BES8YtzmzaO4lyOnpQ0wBJ7eLgMDpOgWascik
+ zLRH15e2v/g8BCwG6e64ku5DwzTI6Nz1YKjH+6hvMN837BCjIn7eK9CbeU7/s4aiaM1H
+ wfFg==
+X-Gm-Message-State: APjAAAUZaCVqVWAzxKVM2byszZlTQrgayCaq2oBj39gBC/Nz4H+ev6yd
+ nU6lSU9Xy/uuMLCXMF5KoubkgYCIRTW4J1X8hfxUKXdcz4MZiaK6zCqrI7PpODoqO3JB+ZIP5qV
+ FEy1GXQFIuYY5DGc=
+X-Received: by 2002:adf:8b13:: with SMTP id n19mr9547887wra.203.1570145078422; 
+ Thu, 03 Oct 2019 16:24:38 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqytqQfonwi9TyRypBVBtTOHAKUeH9u3olvVwiF+onGSKJs8xrcnjgrJBKUgF9tWtJyxSHX7mg==
+X-Received: by 2002:adf:8b13:: with SMTP id n19mr9547869wra.203.1570145078220; 
+ Thu, 03 Oct 2019 16:24:38 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id o22sm9901551wra.96.2019.10.03.16.24.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Oct 2019 16:24:37 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 01/15] target/arm/arm-semi: Capture errno
+ in softmmu version of set_swi_errno()
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190916141544.17540-1-peter.maydell@linaro.org>
+ <20190916141544.17540-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a10f43ac-82e8-7600-94d3-513feafaf325@redhat.com>
+Date: Fri, 4 Oct 2019 01:24:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 03 Oct 2019 23:07:02 +0000 (UTC)
+In-Reply-To: <20190916141544.17540-2-peter.maydell@linaro.org>
+Content-Language: en-US
+X-MC-Unique: RXPDFZEtOFifTie4g2-08Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,76 +108,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Alistair Francis <alistair.francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Andrew Jeffery <andrew@aj.id.au>, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Only 2 source files require the "mc146818rtc_regs.h" header.
-Instead of having it processed 12 times, by all objects
-using "mc146818rtc.h", include it directly where used.
+On 9/16/19 4:15 PM, Peter Maydell wrote:
+> The set_swi_errno() function is called to capture the errno
+> from a host system call, so that we can return -1 from the
+> semihosting function and later allow the guest to get a more
+> specific error code with the SYS_ERRNO function. It comes in
+> two versions, one for user-only and one for softmmu. We forgot
+> to capture the errno in the softmmu version; fix the error.
+>=20
+> (Semihosting calls directed to gdb are unaffected because
+> they go through a different code path that captures the
+> error return from the gdbstub call in arm_semi_cb() or
+> arm_semi_flen_cb().)
+>=20
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/rtc/mc146818rtc.c         | 1 +
- hw/timer/hpet.c              | 1 +
- include/hw/rtc/mc146818rtc.h | 1 -
- 3 files changed, 2 insertions(+), 1 deletion(-)
+Fixes: 8e71621f784
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-index ced15f764f..9d4ed54f65 100644
---- a/hw/rtc/mc146818rtc.c
-+++ b/hw/rtc/mc146818rtc.c
-@@ -35,6 +35,7 @@
- #include "sysemu/reset.h"
- #include "sysemu/runstate.h"
- #include "hw/rtc/mc146818rtc.h"
-+#include "hw/rtc/mc146818rtc_regs.h"
- #include "migration/vmstate.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-misc-target.h"
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index 02bf8a8ce8..9f17aaa278 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -34,6 +34,7 @@
- #include "hw/timer/hpet.h"
- #include "hw/sysbus.h"
- #include "hw/rtc/mc146818rtc.h"
-+#include "hw/rtc/mc146818rtc_regs.h"
- #include "migration/vmstate.h"
- #include "hw/timer/i8254.h"
-=20
-diff --git a/include/hw/rtc/mc146818rtc.h b/include/hw/rtc/mc146818rtc.h
-index 2e9331637a..7fa59d4279 100644
---- a/include/hw/rtc/mc146818rtc.h
-+++ b/include/hw/rtc/mc146818rtc.h
-@@ -10,7 +10,6 @@
- #define HW_RTC_MC146818RTC_H
-=20
- #include "hw/isa/isa.h"
--#include "hw/rtc/mc146818rtc_regs.h"
-=20
- #define TYPE_MC146818_RTC "mc146818rtc"
-=20
---=20
-2.20.1
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> NB that a later commit will put in some cleanup of TaskState
+> that will let us reduce the duplication between the two
+> implementations of this function.
+> ---
+>   target/arm/arm-semi.c | 9 +++++----
+>   1 file changed, 5 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+> index 90423a35deb..03e60105c05 100644
+> --- a/target/arm/arm-semi.c
+> +++ b/target/arm/arm-semi.c
+> @@ -114,8 +114,13 @@ static inline uint32_t set_swi_errno(TaskState *ts, =
+uint32_t code)
+>       return code;
+>   }
+>   #else
+> +static target_ulong syscall_err;
+> +
+>   static inline uint32_t set_swi_errno(CPUARMState *env, uint32_t code)
+>   {
+> +    if (code =3D=3D (uint32_t)-1) {
+> +        syscall_err =3D errno;
+> +    }
+>       return code;
+>   }
+>  =20
+> @@ -124,10 +129,6 @@ static inline uint32_t set_swi_errno(CPUARMState *en=
+v, uint32_t code)
+>  =20
+>   static target_ulong arm_semi_syscall_len;
+>  =20
+> -#if !defined(CONFIG_USER_ONLY)
+> -static target_ulong syscall_err;
+> -#endif
+> -
+>   static void arm_semi_cb(CPUState *cs, target_ulong ret, target_ulong er=
+r)
+>   {
+>       ARMCPU *cpu =3D ARM_CPU(cs);
+>=20
 
 
