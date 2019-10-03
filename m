@@ -2,66 +2,80 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B02F1C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 13:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F82EC32792
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 13:05:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C2DA2133F
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 13:04:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C2DA2133F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 391EB2133F
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 13:05:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nMDrk/Au"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391EB2133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG0mg-0004Yd-IZ
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 09:04:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49383)
+	id 1iG0nC-00054S-BN
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 09:05:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iG0kn-0003Ye-4v
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 09:02:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iG0ly-00046k-F3
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 09:03:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iG0kh-0008FR-Vd
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 09:02:45 -0400
-Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:45224)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iG0kh-0008DI-Pm
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 09:02:39 -0400
-Received: from player732.ha.ovh.net (unknown [10.109.143.3])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id D690F209F7F
- for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 15:02:36 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player732.ha.ovh.net (Postfix) with ESMTPSA id B80ADA6D3C1C;
- Thu,  3 Oct 2019 13:02:32 +0000 (UTC)
-Date: Thu, 3 Oct 2019 15:02:31 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 1/7] spapr, xics: Get number of servers with a
- XICSFabricClass method
-Message-ID: <20191003150231.44bf1046@bahia.lan>
-In-Reply-To: <7e0d1ddd-61eb-4adf-193a-9bb197b3033c@kaod.org>
-References: <157010404888.246126.9768030542733152637.stgit@bahia.lan>
- <157010405465.246126.7760334967989385566.stgit@bahia.lan>
- <a00c6fee-42b8-c923-386f-5fa909f6f99b@kaod.org>
- <20191003144952.181da0e2@bahia.lan>
- <7e0d1ddd-61eb-4adf-193a-9bb197b3033c@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <peter.maydell@linaro.org>) id 1iG0lw-0000uR-E6
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 09:03:58 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43550)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iG0lr-0000pV-RZ
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 09:03:53 -0400
+Received: by mail-ot1-x343.google.com with SMTP id o44so2156281ota.10
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 06:03:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ipghaSDRH3YnZXK1nkRDDiCycPJ/rQxJ3f4sjT7herY=;
+ b=nMDrk/AuwiorZpFQW/VJN4lPDP3F8E04MZlm4T3Tipjf8H4p8r8U1HdnVbFxjSxPFB
+ DHHUKHVM70tMzNywW1W7hO5URlWvqWu25rxPmtPW25QgSwxBaSIi3pUJj2cMdtX8vhcp
+ /OfgrMGADawAX3ztzna35maOtiawZTbNggTfEvWyzky6RuzudZCnpwME23AV2qwD9zX4
+ aHcqr/yXIjkZPES8PUsvt9I7c/IStMKfiiMXL/jz7ofMJSCTeIwoSyzRfPgYU9CquZGX
+ od3n6Waj8EFj0JspcTmDOgfN+Y1H344H28fZyAT2nORsh2SqH6n2pLz9XPTkGKJeGuMs
+ /uwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ipghaSDRH3YnZXK1nkRDDiCycPJ/rQxJ3f4sjT7herY=;
+ b=UpvD946uhJ6/gZN7pQSPlcMjyOcfYGYOGYub38k6g7INqbxe9xxiKMClFIF88WWKno
+ yHY5lKVDmnurxuWLbznnAuPRASWgwf+XFAXRGYDmJZibAwzfxWQ9skbcuv2rpL3lc0kH
+ +B2BmfocIM0TSTG8HY2wPgvRfdb4bME/pTcOA21xqYx2yUk7UHaSmQ3LjTQjYAdZ55RN
+ Cw9SS9FHcZZjA1gEgOYm6kQ7mgLrH9PkS9f5ceLkfZ9yLAKLroVsUIXa7i64iCZekMsK
+ 4Scx1K8Nz6DAUSxLc+3FB6FtOWX+dvsGArYEH65WkqLTNYCIrYNuYq175tvv3C+FFq5K
+ 5FSw==
+X-Gm-Message-State: APjAAAVz9SQ58udiEvZ4pV3U0bSdckIMtg+CFoXRaz0oodIeI7YSU5FY
+ +JJ+82TlY4JUHRG2OeJAev56aja5vF7769+Fh6EyEXkd0/s=
+X-Google-Smtp-Source: APXvYqxO5Wzft4nIjec+vUoP6tXA/o5iAru/G7hppGwN2pbYBDVpe7ybD7FKZ2HJ8jUODWDTrgXgbSFaRKwucqEz0+g=
+X-Received: by 2002:a05:6830:1357:: with SMTP id
+ r23mr6670747otq.91.1570107830223; 
+ Thu, 03 Oct 2019 06:03:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 17396279464803932555
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeekgdeiudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 178.33.253.54
+References: <20190916141544.17540-1-peter.maydell@linaro.org>
+In-Reply-To: <20190916141544.17540-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Oct 2019 14:03:38 +0100
+Message-ID: <CAFEAcA_deKRqVfn+P5HBQrTcHFjdSnHdcuzvFJsQC3jUP=dFww@mail.gmail.com>
+Subject: Re: [PATCH v2 00/15] target/arm: Implement semihosting v2.0
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,144 +87,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 3 Oct 2019 14:58:45 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+Ping for code review, please?
 
-> On 03/10/2019 14:49, Greg Kurz wrote:
-> > On Thu, 3 Oct 2019 14:24:06 +0200
-> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >=20
-> >> On 03/10/2019 14:00, Greg Kurz wrote:
-> >>> The number of servers, ie. upper bound of the highest VCPU id, is
-> >>> currently only needed to generate the "interrupt-controller" node
-> >>> in the DT. Soon it will be needed to inform the XICS-on-XIVE KVM
-> >>> device that it can allocates less resources in the XIVE HW.
-> >>>
-> >>> Add a method to XICSFabricClass for this purpose.=20
-> >>
-> >> This is sPAPR code and PowerNV does not care.
-> >>
-> >=20
-> > Then PowerNV doesn't need to implement the method.
-> >=20
-> >> why can not we simply call spapr_max_server_number(spapr) ?
-> >>
-> >=20
-> > Because the backend shouldn't reach out to sPAPR machine
-> > internals. XICSFabric is the natural interface for ICS/ICP
-> > if they need something from the machine.
->=20
-> From what I can see, xics_nr_servers() is only called by :=20
->=20
->   spapr_dt_xics(SpaprMachineState *spapr ...)
->   xics_kvm_connect(SpaprMachineState *spapr ...)
->=20
+thanks
+-- PMM
 
-Yes... and ?
-
-> C.=20
->=20
-> >>
-> >>> Implement it
-> >>> for sPAPR and use it to generate the "interrupt-controller" node.
-> >>>
-> >>> Signed-off-by: Greg Kurz <groug@kaod.org>
-> >>> ---
-> >>>  hw/intc/xics.c        |    7 +++++++
-> >>>  hw/intc/xics_spapr.c  |    3 ++-
-> >>>  hw/ppc/spapr.c        |    8 ++++++++
-> >>>  include/hw/ppc/xics.h |    2 ++
-> >>>  4 files changed, 19 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> >>> index dfe7dbd254ab..f82072935266 100644
-> >>> --- a/hw/intc/xics.c
-> >>> +++ b/hw/intc/xics.c
-> >>> @@ -716,6 +716,13 @@ ICPState *xics_icp_get(XICSFabric *xi, int serve=
-r)
-> >>>      return xic->icp_get(xi, server);
-> >>>  }
-> >>> =20
-> >>> +uint32_t xics_nr_servers(XICSFabric *xi)
-> >>> +{
-> >>> +    XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
-> >>> +
-> >>> +    return xic->nr_servers(xi);
-> >>> +}
-> >>> +
-> >>>  void ics_set_irq_type(ICSState *ics, int srcno, bool lsi)
-> >>>  {
-> >>>      assert(!(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK));
-> >>> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> >>> index 6e5eb24b3cca..aa568ed0dc0d 100644
-> >>> --- a/hw/intc/xics_spapr.c
-> >>> +++ b/hw/intc/xics_spapr.c
-> >>> @@ -311,8 +311,9 @@ static void ics_spapr_realize(DeviceState *dev, E=
-rror **errp)
-> >>>  void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, vo=
-id *fdt,
-> >>>                     uint32_t phandle)
-> >>>  {
-> >>> +    ICSState *ics =3D spapr->ics;
-> >>>      uint32_t interrupt_server_ranges_prop[] =3D {
-> >>> -        0, cpu_to_be32(nr_servers),
-> >>> +        0, cpu_to_be32(xics_nr_servers(ics->xics)),
-> >>>      };
-> >>>      int node;
-> >>> =20
-> >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>> index 514a17ae74d6..b8b9796c88e4 100644
-> >>> --- a/hw/ppc/spapr.c
-> >>> +++ b/hw/ppc/spapr.c
-> >>> @@ -4266,6 +4266,13 @@ static ICPState *spapr_icp_get(XICSFabric *xi,=
- int vcpu_id)
-> >>>      return cpu ? spapr_cpu_state(cpu)->icp : NULL;
-> >>>  }
-> >>> =20
-> >>> +static uint32_t spapr_nr_servers(XICSFabric *xi)
-> >>> +{
-> >>> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(xi);
-> >>> +
-> >>> +    return spapr_max_server_number(spapr);
-> >>> +}
-> >>> +
-> >>>  static void spapr_pic_print_info(InterruptStatsProvider *obj,
-> >>>                                   Monitor *mon)
-> >>>  {
-> >>> @@ -4423,6 +4430,7 @@ static void spapr_machine_class_init(ObjectClas=
-s *oc, void *data)
-> >>>      xic->ics_get =3D spapr_ics_get;
-> >>>      xic->ics_resend =3D spapr_ics_resend;
-> >>>      xic->icp_get =3D spapr_icp_get;
-> >>> +    xic->nr_servers =3D spapr_nr_servers;
-> >>>      ispc->print_info =3D spapr_pic_print_info;
-> >>>      /* Force NUMA node memory size to be a multiple of
-> >>>       * SPAPR_MEMORY_BLOCK_SIZE (256M) since that's the granularity
-> >>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> >>> index 1e6a9300eb2b..e6bb1239e8f8 100644
-> >>> --- a/include/hw/ppc/xics.h
-> >>> +++ b/include/hw/ppc/xics.h
-> >>> @@ -151,9 +151,11 @@ typedef struct XICSFabricClass {
-> >>>      ICSState *(*ics_get)(XICSFabric *xi, int irq);
-> >>>      void (*ics_resend)(XICSFabric *xi);
-> >>>      ICPState *(*icp_get)(XICSFabric *xi, int server);
-> >>> +    uint32_t (*nr_servers)(XICSFabric *xi);
-> >>>  } XICSFabricClass;
-> >>> =20
-> >>>  ICPState *xics_icp_get(XICSFabric *xi, int server);
-> >>> +uint32_t xics_nr_servers(XICSFabric *xi);
-> >>> =20
-> >>>  /* Internal XICS interfaces */
-> >>>  void icp_set_cppr(ICPState *icp, uint8_t cppr);
-> >>>
-> >>
-> >=20
->=20
-
+On Mon, 16 Sep 2019 at 15:15, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> This patchset implements support in QEMU for v2.0 of the
+> Arm semihosting specification:
+>  https://developer.arm.com/docs/100863/latest/preface
+>
+> Specifically, v2.0 has:
+>  * a mechanism for detection of optional extra features,
+>    which works by allowing the guest to open a magic file
+>    named ":semihosting-features" and read some feature
+>    flags from it
+>  * two defined extensions:
+>   - STDOUT_STDERR lets the guest separately open stdout and
+>     stderr via the ":tt" magic filename (v1.0 only allowed
+>     access to stdout)
+>   - EXIT_EXTENDED lets A32/T32 guests exit with a specified
+>     exit status (otherwise only available to A64 guests).
+>     This is something that people have been complaining
+>     about for a long time.
+>
+> (Technically some of the things we already support, like
+> having an A64 semihosting interface at all, are also part of
+> the v2.0 spec.)
+>
+> This patchset:
+>  * fixes some bugs relating to errnos in some cases
+>  * makes semihosting hand out its own filedescriptors rather
+>    than just passing out host fd numbers
+>  * abstracts out the fd-related semihosting calls so they
+>    indirect via a function table based on the type of the fd
+>  * adds a new type of fd representing the magic file
+>    ":semihosting-features" which is used for feature-detection
+>  * implements both of the extensions defined by the v2.0 spec
+>
+> I've tested this by improving my semihosting test suite:
+>  https://git.linaro.org/people/peter.maydell/semihosting-tests.git/
+> (if people have other guest binaries that make much use of
+> semihosting then testing would certainly be welcome.)
+>
+> Changes v1->v2:
+>  * Added a patch which corrects misunderstanding in a FIXME
+>    comment about the when the callback function is called
+>    for arm_gdb_syscall()
+>  * in patch 4, if the SYS_open is going via the gdbstub, we
+>    must do the associate_guestfd() work in the gdbstub callback
+>    function. This is because in softmmu mode the callback will
+>    not be called until after do_arm_semihosting() returns.
+>    (The v1 series effectively broke SYS_open in the gdbstub
+>    + softmmu config)
+>  * Pass CPUARMState* to set_swi_errno(), rather than creating
+>    an odd local-to-this-file typedef of TaskState for the
+>    softmmu compilation
+>  * New patch: avoid ifdeffery in gdb callback fns by
+>    using set_swi_errno() rather than doing it by-hand
+>  * The various 'factor out SYS_foo' patches are basically
+>    unchanged, but all the functions no longer need to take
+>    a TaskState*. This seemed kind of borderline as to whether
+>    to retain Alex's reviewed-by tags, so I dropped them.
+>  * Since we need 'env' for set_swi_errno(), we don't need
+>    to put the variable declaration inside ifdefs any more
+>    in the host_readfn() etc.
+>
+> I do plan to have a go at fixing the odd FIXME surrounding
+> arm_gdb_syscall() which patch 3 clarifies/states in a comment.
+> But I thought it better to not tangle that up with this
+> patchset, which is already pretty long.
+>
+> thanks
+> -- PMM
+>
+>
+> Peter Maydell (15):
+>   target/arm/arm-semi: Capture errno in softmmu version of
+>     set_swi_errno()
+>   target/arm/arm-semi: Always set some kind of errno for failed calls
+>   target/arm/arm-semi: Correct comment about gdb syscall races
+>   target/arm/arm-semi: Make semihosting code hand out its own file
+>     descriptors
+>   target/arm/arm-semi: Restrict use of TaskState*
+>   target/arm/arm-semi: Use set_swi_errno() in gdbstub callback functions
+>   target/arm/arm-semi: Factor out implementation of SYS_CLOSE
+>   target/arm/arm-semi: Factor out implementation of SYS_WRITE
+>   target/arm/arm-semi: Factor out implementation of SYS_READ
+>   target/arm/arm-semi: Factor out implementation of SYS_ISTTY
+>   target/arm/arm-semi: Factor out implementation of SYS_SEEK
+>   target/arm/arm-semi: Factor out implementation of SYS_FLEN
+>   target/arm/arm-semi: Implement support for semihosting feature
+>     detection
+>   target/arm/arm-semi: Implement SH_EXT_EXIT_EXTENDED extension
+>   target/arm/arm-semi: Implement SH_EXT_STDOUT_STDERR extension
+>
+>  target/arm/arm-semi.c | 707 ++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 577 insertions(+), 130 deletions(-)
+>
+> --
+> 2.20.1
 
