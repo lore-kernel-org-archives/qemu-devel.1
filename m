@@ -2,64 +2,67 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB06C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 12:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A843C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 12:49:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E54120700
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 12:46:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E54120700
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 42C3420700
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 12:49:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C3420700
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG0VP-0003bz-4b
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 08:46:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46764)
+	id 1iG0XT-0004oE-DO
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 08:48:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iG0Th-0002Zi-7Y
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:45:06 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iG0W0-0004Bn-Pt
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:47:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iG0Tf-0000uN-MM
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:45:04 -0400
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:48503)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iG0Tf-0000sc-Fw
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:45:03 -0400
-Received: from player168.ha.ovh.net (unknown [10.109.160.93])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id EE072144939
- for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 14:45:00 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player168.ha.ovh.net (Postfix) with ESMTPSA id 52568A6F3C4C;
- Thu,  3 Oct 2019 12:44:55 +0000 (UTC)
-Date: Thu, 3 Oct 2019 14:44:54 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 2/7] spapr, xive: Turn "nr-ends" property into
- "nr-servers" property
-Message-ID: <20191003144454.2768bd33@bahia.lan>
-In-Reply-To: <c6d66c57-fd1d-4f69-98b3-8325bcf4db24@kaod.org>
-References: <157010404888.246126.9768030542733152637.stgit@bahia.lan>
- <157010406203.246126.13381271918474281392.stgit@bahia.lan>
- <c6d66c57-fd1d-4f69-98b3-8325bcf4db24@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <no-reply@patchew.org>) id 1iG0Vy-0001aE-SF
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:47:28 -0400
+Resent-Date: Thu, 03 Oct 2019 08:47:28 -0400
+Resent-Message-Id: <E1iG0Vy-0001aE-SF@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21590)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iG0Vy-0001Zz-N3
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:47:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1570106838; cv=none; d=zoho.com; s=zohoarc; 
+ b=jatSnQ5eKJvEZaijAlgi1ZJs0GwtPWhGjwuwpjn37jzNTMO5HuCgMegxE2aMPJlL56iqTDNag5Q4qeXRGvFQ8CelXYzg3gCjgXokQKvzzoMmDFWtcP/RtqA7uXvp8ovXcBjmIUuFT4nfH4xelBi5+4b+drsRS0Mdv3yfAcOzNEE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1570106838;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=dv3Q7qWvFZfEhZMhS2wz3ELo51HLDqGvOdY1kpoN210=; 
+ b=Gy15hqAZ34HMYwUKau/BtkB6rMXhz7+s3cegma9+5Sj6f9i2j8ero6FkSO8vAJ5V4GGNkdm1NRSvbzARsyFJed8zW0PiiMw8BqC9NZomUlLkYMWE8akAaJTQ6g2RaD8/fPbePQvvrHmDXeHvvBVq/3ZM/Smz5ziTfzkXmZLkWB4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1570106837097902.530478922125;
+ Thu, 3 Oct 2019 05:47:17 -0700 (PDT)
+Subject: Re: [PATCH] migration: Support gtree migration
+In-Reply-To: <20191003114144.30129-1-eric.auger@redhat.com>
+Message-ID: <157010683582.27524.3420696216247339122@8230166b0665>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 17099041888086956427
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeekgdehjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: eric.auger@redhat.com
+Date: Thu, 3 Oct 2019 05:47:17 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.63.230
+X-Received-From: 136.143.188.55
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,165 +74,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: qemu-devel@nongnu.org
+Cc: eric.auger@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 3 Oct 2019 14:21:59 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-
-> On 03/10/2019 14:01, Greg Kurz wrote:
-> > The sPAPR XIVE object has an nr_ends field which happens to be a
-> > multiple of spapr_max_server_number(). It is currently set with
-> > the help of "nr-ends" property. This is a bit unfortunate since
-> > it exposes to the sPAPR irq frontend what should remain an
-> > implemantation detail within the XIVE backend.
->=20
-> implementation
->=20
-
-oops
-
-> > It will be possible soon to inform the XIVE KVM device about the
-> > range of VCPU ids that may be used in the VM, as returned by the
-> > spapr_max_server_number() function. This will allow the device
-> > to substantially reduce the consumption of scarce resources
-> > in the XIVE HW.
-> >=20
-> > For both reasons, replace the "nr-ends" property with an "nr-servers"
-> > one. The existing nr_ends field must be kept though since it tells how
-> > many ENDs are migrated, it is derived from "nr-servers" at realize time
-> > for simplicity. Convert spapr_dt_xive() to use it as well.
->=20
-> Looks good. one question below.
->=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >  hw/intc/spapr_xive.c        |   21 ++++++++++++++++-----
-> >  hw/ppc/spapr_irq.c          |    2 +-
-> >  include/hw/ppc/spapr_xive.h |    1 +
-> >  3 files changed, 18 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> > index 04879abf2e7a..62888ddc68db 100644
-> > --- a/hw/intc/spapr_xive.c
-> > +++ b/hw/intc/spapr_xive.c
-> > @@ -99,6 +99,15 @@ int spapr_xive_end_to_target(uint8_t end_blk, uint32=
-_t end_idx,
-> >      return 0;
-> >  }
-> > =20
-> > +static uint32_t spapr_xive_vcpu_id_to_end_idx(uint32_t vcpu_id)
->=20
->=20
-> may be use a simpler macro :
->=20
-> #define spapr_xive_cpu_end_idx(vcpu, prio) (((vcpu) << 3) + prio)=20
->=20
-
-Will do but I'll keep the comment.
-
-> > +{
-> > +    /*
-> > +     * 8 XIVE END structures per CPU. One for each available
-> > +     * priority
-> > +     */
-> > +    return vcpu_id << 3;
-> > +}
-> > +
-> >  static void spapr_xive_cpu_to_end(PowerPCCPU *cpu, uint8_t prio,
-> >                                    uint8_t *out_end_blk, uint32_t *out_=
-end_idx)
-> >  {
-> > @@ -109,7 +118,7 @@ static void spapr_xive_cpu_to_end(PowerPCCPU *cpu, =
-uint8_t prio,
-> >      }
-> > =20
-> >      if (out_end_idx) {
-> > -        *out_end_idx =3D (cpu->vcpu_id << 3) + prio;
-> > +        *out_end_idx =3D spapr_xive_vcpu_id_to_end_idx(cpu->vcpu_id) +=
- prio;
-> >      }
-> >  }
-> > =20
-> > @@ -283,11 +292,13 @@ static void spapr_xive_realize(DeviceState *dev, =
-Error **errp)
-> >          return;
-> >      }
-> > =20
-> > -    if (!xive->nr_ends) {
-> > -        error_setg(errp, "Number of interrupt needs to be greater 0");
-> > +    if (!xive->nr_servers) {
-> > +        error_setg(errp, "Number of interrupt servers must be greater =
-than 0");
-> >          return;
-> >      }
-> > =20
-> > +    xive->nr_ends =3D spapr_xive_vcpu_id_to_end_idx(xive->nr_servers);
-> > +
-> >      /*
-> >       * Initialize the internal sources, for IPIs and virtual devices.
-> >       */
-> > @@ -489,7 +500,7 @@ static const VMStateDescription vmstate_spapr_xive =
-=3D {
-> > =20
-> >  static Property spapr_xive_properties[] =3D {
-> >      DEFINE_PROP_UINT32("nr-irqs", SpaprXive, nr_irqs, 0),
-> > -    DEFINE_PROP_UINT32("nr-ends", SpaprXive, nr_ends, 0),
-> > +    DEFINE_PROP_UINT32("nr-servers", SpaprXive, nr_servers, 0),
-> >      DEFINE_PROP_UINT64("vc-base", SpaprXive, vc_base, SPAPR_XIVE_VC_BA=
-SE),
-> >      DEFINE_PROP_UINT64("tm-base", SpaprXive, tm_base, SPAPR_XIVE_TM_BA=
-SE),
-> >      DEFINE_PROP_END_OF_LIST(),
-> > @@ -1550,7 +1561,7 @@ void spapr_dt_xive(SpaprMachineState *spapr, uint=
-32_t nr_servers, void *fdt,
->=20
-> we should remove the 'uint32_t nr_servers' parameter from spapr_dt_xive()=
-=20
-> then ?
->=20
-
-Yes but this would also affect XICS since this function is a backend
-method. It is hence done in the next patch.
-
-> >      /* Interrupt number ranges for the IPIs */
-> >      uint32_t lisn_ranges[] =3D {
-> >          cpu_to_be32(0),
-> > -        cpu_to_be32(nr_servers),
-> > +        cpu_to_be32(xive->nr_servers),
-> >      };
-> >      /*
-> >       * EQ size - the sizes of pages supported by the system 4K, 64K,
-> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> > index 457eabe24cda..025fd00143a2 100644
-> > --- a/hw/ppc/spapr_irq.c
-> > +++ b/hw/ppc/spapr_irq.c
-> > @@ -591,7 +591,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
- **errp)
-> >           * 8 XIVE END structures per CPU. One for each available
-> >           * priority
-> >           */
-> > -        qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
-> > +        qdev_prop_set_uint32(dev, "nr-servers", nr_servers);
-> >          qdev_init_nofail(dev);
-> > =20
-> >          spapr->xive =3D SPAPR_XIVE(dev);
-> > diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> > index 0df20a6590a5..4a4a6fc6be7f 100644
-> > --- a/include/hw/ppc/spapr_xive.h
-> > +++ b/include/hw/ppc/spapr_xive.h
-> > @@ -22,6 +22,7 @@ typedef struct SpaprXive {
-> >      /* Internal interrupt source for IPIs and virtual devices */
-> >      XiveSource    source;
-> >      hwaddr        vc_base;
-> > +    uint32_t      nr_servers;
-> > =20
-> >      /* END ESB MMIOs */
-> >      XiveENDSource end_source;
-> >=20
->=20
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAwMzExNDE0NC4zMDEy
+OS0xLWVyaWMuYXVnZXJAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tl
+ci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dA
+ZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAg
+bmV0L25ldC5vCiAgQ0MgICAgICBuZXQvcXVldWUubwovdG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0
+aW9uL3Ztc3RhdGUtdHlwZXMuYzogSW4gZnVuY3Rpb24gJ3B1dF9ndHJlZV9lbGVtJzoKL3RtcC9x
+ZW11LXRlc3Qvc3JjL21pZ3JhdGlvbi92bXN0YXRlLXR5cGVzLmM6NzE0OjI2OiBlcnJvcjogY2Fz
+dCBmcm9tIHBvaW50ZXIgdG8gaW50ZWdlciBvZiBkaWZmZXJlbnQgc2l6ZSBbLVdlcnJvcj1wb2lu
+dGVyLXRvLWludC1jYXN0XQogICAgICAgICBxZW11X3B1dF9iZTY0KGYsICh1aW50NjRfdClrZXkp
+OwogICAgICAgICAgICAgICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL21pZ3JhdGlv
+bi92bXN0YXRlLXR5cGVzLmM6IEluIGZ1bmN0aW9uICdwdXRfZ3RyZWUnOgovdG1wL3FlbXUtdGVz
+dC9zcmMvbWlncmF0aW9uL3Ztc3RhdGUtdHlwZXMuYzo3MzU6MTk6IGVycm9yOiBjYXN0IHRvIHBv
+aW50ZXIgZnJvbSBpbnRlZ2VyIG9mIGRpZmZlcmVudCBzaXplIFstV2Vycm9yPWludC10by1wb2lu
+dGVyLWNhc3RdCiAgICAgR1RyZWUgKnRyZWUgPSAoR1RyZWUgKikoKnB2YWwpOwogICAgICAgICAg
+ICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvbWlncmF0aW9uL3Ztc3RhdGUtdHlwZXMuYzog
+SW4gZnVuY3Rpb24gJ2dldF9ndHJlZSc6Ci90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24vdm1z
+dGF0ZS10eXBlcy5jOjc4OToxNzogZXJyb3I6IGNhc3QgZnJvbSBwb2ludGVyIHRvIGludGVnZXIg
+b2YgZGlmZmVyZW50IHNpemUgWy1XZXJyb3I9cG9pbnRlci10by1pbnQtY2FzdF0KICAgICAgICAg
+KnB2YWwgPSAodWludDY0X3QpdHJlZTsKICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0
+L3NyYy9taWdyYXRpb24vdm1zdGF0ZS10eXBlcy5jOjc5MjoxNjogZXJyb3I6IGNhc3QgdG8gcG9p
+bnRlciBmcm9tIGludGVnZXIgb2YgZGlmZmVyZW50IHNpemUgWy1XZXJyb3I9aW50LXRvLXBvaW50
+ZXItY2FzdF0KICAgICAgICAgdHJlZSA9IChHVHJlZSAqKSgqcHZhbCk7CiAgICAgICAgICAgICAg
+ICBeCi90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24vdm1zdGF0ZS10eXBlcy5jOjc5NzoxOTog
+ZXJyb3I6IGNhc3QgdG8gcG9pbnRlciBmcm9tIGludGVnZXIgb2YgZGlmZmVyZW50IHNpemUgWy1X
+ZXJyb3I9aW50LXRvLXBvaW50ZXItY2FzdF0KICAgICAgICAgICAgIGtleSA9IChncG9pbnRlcilx
+ZW11X2dldF9iZTY0KGYpOwogICAgICAgICAgICAgICAgICAgXgpjYzE6IGFsbCB3YXJuaW5ncyBi
+ZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxl
+cy5tYWs6Njk6IG1pZ3JhdGlvbi92bXN0YXRlLXR5cGVzLm9dIEVycm9yIDEKbWFrZTogKioqIFdh
+aXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxs
+IGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjYyLCBpbiA8
+bW9kdWxlPgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1
+YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9j
+a2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YzBlNzg0MDBl
+ZjU4NDY4NmI1NDcxNzRhMWRlMjc2MWYnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcs
+ICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUn
+LCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUn
+LCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1w
+L2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hl
+Oi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1k
+OXd2bWQ2dS9zcmMvZG9ja2VyLXNyYy4yMDE5LTEwLTAzLTA4LjM2LjE2LjE0ODQyOi92YXIvdG1w
+L3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1p
+bmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1s
+YWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWMwZTc4NDAwZWY1ODQ2ODZiNTQ3MTc0YTFkZTI3
+NjFmCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRp
+cmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWQ5d3ZtZDZ1L3NyYycKbWFrZTog
+KioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDEwbTU5
+LjgzNHMKdXNlciAgICAwbTguMDYycwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMDMxMTQxNDQuMzAxMjktMS1lcmljLmF1Z2VyQHJl
+ZGhhdC5jb20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
+Y29t
 
 
