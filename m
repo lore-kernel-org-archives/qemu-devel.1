@@ -2,98 +2,66 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5742C32792
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 18:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 166ABC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:32:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE26F20862
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 18:58:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE26F20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E069620862
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:32:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E069620862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG6Ir-0005EN-RH
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 14:58:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46521)
+	id 1iG6ow-0004By-Tp
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 15:31:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iG6Hk-0004Sl-7k
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 14:57:09 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1iG6o7-0003l8-Oh
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:30:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iG6Hi-0002sG-Tp
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 14:57:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6648
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iG6Hh-0002rS-Pt; Thu, 03 Oct 2019 14:57:06 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x93IqU5m058539; Thu, 3 Oct 2019 14:56:55 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vdmgqvwq7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 03 Oct 2019 14:56:55 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x93IqXjM059011;
- Thu, 3 Oct 2019 14:56:55 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vdmgqvwpt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 03 Oct 2019 14:56:55 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x93ItuSG024822;
- Thu, 3 Oct 2019 18:56:54 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma02dal.us.ibm.com with ESMTP id 2v9y58a5hc-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 03 Oct 2019 18:56:54 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x93IurNU26673454
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 3 Oct 2019 18:56:53 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A2D002805C;
- Thu,  3 Oct 2019 18:56:53 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 84CAC28059;
- Thu,  3 Oct 2019 18:56:53 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.213])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu,  3 Oct 2019 18:56:53 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <eric.auger@redhat.com>) id 1iG6o3-0003jg-2Y
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:30:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58746)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iG6nv-0003ez-R9
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:30:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F172309DEE3;
+ Thu,  3 Oct 2019 19:30:21 +0000 (UTC)
+Received: from [10.36.117.64] (ovpn-117-64.ams2.redhat.com [10.36.117.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AC805D6A9;
+ Thu,  3 Oct 2019 19:30:18 +0000 (UTC)
+Subject: Re: [PATCH v2] migration: Support gtree migration
+To: quintela@redhat.com
+References: <20191003145431.21154-1-eric.auger@redhat.com>
+ <87muehhklm.fsf@trasno.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <98f28661-1595-69c1-2430-fefc2869b0a3@redhat.com>
+Date: Thu, 3 Oct 2019 21:30:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <a9231694-e38b-8bf8-6d97-68c4593bbbfb@redhat.com>
-References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
- <a9231694-e38b-8bf8-6d97-68c4593bbbfb@redhat.com>
-Message-ID: <157012900887.11473.13354215633405542907@sif>
-User-Agent: alot/0.7
-Subject: Re: [PATCH 00/97] Patch Round-up for stable 4.0.1,
- freeze on 2019-10-10
-Date: Thu, 03 Oct 2019 13:56:48 -0500
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-03_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=997 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910030155
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+In-Reply-To: <87muehhklm.fsf@trasno.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Thu, 03 Oct 2019 19:30:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,75 +73,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michal Privoznik <mprivozn@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-stable@nongnu.org,
- =?utf-8?q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Quoting Thomas Huth (2019-10-01 23:40:49)
-> On 02/10/2019 01.44, Michael Roth wrote:
-> > Hi everyone,                                                           =
-                                   =
+Hi Juan,
 
-> > =
+On 10/3/19 6:14 PM, Juan Quintela wrote:
+> Eric Auger <eric.auger@redhat.com> wrote:
+>> Introduce support for GTree migration. A custom save/restore
+>> is implemented. Each item is made of a key and a data. For that
+>> reason, 2 VMSD objects are passed into the GTree VMStateField.
+>>
+>> When putting the items, the tree is traversed in sorted order by
+>> g_tree_foreach.
+>>
+>> On the get() path, gtrees must be allocated using the proper
+>> key compare, key destroy and value destroy. This can be done
+>> externally of automatically. If done automatically, the set of
+>              ^^
+> 
+> or.
+> 
+>> functions must be stored within the VMStateField in a new opaque
+>> pointer.
+> 
+> I am not fully convinced that the automatic mode is needed.  Especially
+> the ->data field.  I *fear* it being abused for other cases.
+OK. I implemented your suggestion, ie. using preload and it does the
+job. So I don't need that field anymore.
+> 
+>> Automatic allocation is needed for complex state save/restore.
+>> For instance the virtio-iommu uses a gtree of domain and each
+>> domain has a gtree of mappings.
+> 
+> There is a pre_load() function for the VMState that creates this.  it
+> can be used to initualize the field value, no?  That way the data part
+> is not needed.  I think this will make the code less complex, what do
+> you think?
+agreed
+> 
+>> Special care was taken about direct key (ie. when the key is not
+>> a pointer to an object but is directly a value).
+> 
+> I am wondering if for this, it is better to add two VMSTATE (at least at
+> the macro level).  SIMPLE_TREE, and TREE, or whataver oyou want to call
+> it.  But I haven't fully looked into it.
+I don't have a strong opinion here. At the moment I test the
+key_vmsd->field and if it is NULL this means the key is a direct one.
 
-> > The following new patches are queued for QEMU stable v4.0.1:
-> > =
+Otherwise we could have 2 macros, a single info, but 2 different field
+names. the name would allow to know the nature of the key.
+> 
+> The other general "consideration" that I have is that there is neither
+> of:
+> - marker between elements
+so we have one
+> - number of elements
+you don't have it
+> - total size/size of elements.
+you just have the size of the key and the size of the value at the
+moment. I could easily add the number of nodes.
+> 
+> That makes completelly impractical to "walk" the migration stream
+> without understanding exactyl what is there.  (Now, to be fair, there
+> are other parts of qemu that are like that.  PCI cames to mind.)
+> 
+>> Tests are added to test save/dump of structs containing gtrees
+>> including the virtio-iommu domain/mappings scenario.
+> 
+> Really nice to have the tests.  Thanks.
 
-> >   https://github.com/mdroth/qemu/commits/stable-4.0-staging
-> > =
 
-> > The release is planned for 2019-10-17:
-> > =
+> 
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> 
+>> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+>> index 1fbfd099dd..4d9698eaab 100644
+>> --- a/include/migration/vmstate.h
+>> +++ b/include/migration/vmstate.h
+>> @@ -171,6 +171,7 @@ struct VMStateField {
+>>      int version_id;
+>>      int struct_version_id;
+>>      bool (*field_exists)(void *opaque, int version_id);
+>> +    void *data;
+>>  };
+> 
+> This is the bit that I don't really like :p
+> 
+>>  
+>> +typedef struct GTreeInitData {
+>> +    GCompareDataFunc key_compare_func;
+>> +    gpointer key_compare_data;
+>> +    GDestroyNotify key_destroy_func;
+>> +    GDestroyNotify value_destroy_func;
+>> +} GTreeInitData;
+> 
+> My understanding is that if you do this on the pre_load() function, you
+> don't need this at all.
+yep
+> 
+>> diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+>> index bee658a1b2..06c4663de6 100644
+>> --- a/migration/vmstate-types.c
+>> +++ b/migration/vmstate-types.c
+>> @@ -17,6 +17,7 @@
+>>  #include "qemu/error-report.h"
+>>  #include "qemu/queue.h"
+>>  #include "trace.h"
+>> +#include <glib.h>
+>>  
+>>  /* bool */
+>>  
+>> @@ -691,3 +692,135 @@ const VMStateInfo vmstate_info_qtailq = {
+>>      .get  = get_qtailq,
+>>      .put  = put_qtailq,
+>>  };
+>> +
+>> +struct put_gtree_data {
+>> +    QEMUFile *f;
+>> +    const VMStateField *field;
+>> +    QJSON *vmdesc;
+>> +};
+>> +
+>> +static gboolean put_gtree_elem(gpointer key, gpointer value, gpointer data)
+>> +{
+>> +    struct put_gtree_data *capsule = (struct put_gtree_data *)data;
+>> +    const VMStateField *field = capsule->field;
+>> +    QEMUFile *f = capsule->f;
+>> +    const VMStateDescription *key_vmsd = &field->vmsd[0];
+>> +    const VMStateDescription *data_vmsd = &field->vmsd[1];
+>> +
+>> +    qemu_put_byte(f, true);
+> 
+> Ok.  there is a marker O:-)
+yep
+> 
+>> +
+>> +    /* put the key */
+>> +    if (!key_vmsd->fields) {
+>> +        qemu_put_be32(f, GPOINTER_TO_UINT(key));
+>> +    } else {
+>> +        if (vmstate_save_state(f, key_vmsd, key, capsule->vmdesc)) {
+>> +            return true;
+>> +        }
+>> +    }
+> 
+> But it is magic to know if it is a simple or complex key.
+key_vmsd->fields is used
+this means you set
 
-> >   https://wiki.qemu.org/Planning/4.0
-> > =
+static const VMStateDescription vmstate_id_domain[2] = {
+    {}, VMSTATE_DOMAIN /* direct key, value */
+};
 
-> > Please respond here or CC qemu-stable@nongnu.org on any patches you
-> > think should be included in the release.
-> >
-> Would it make sense to include the slirp update:
-> =
 
->  e1a4a24d262ba5ac74ea1795adb3ab1cd574c7fb
->  "slirp: update with CVE-2019-14378 fix"
+> 
+> 
+>> +    if (field->data) {
+>> +        init_data = (GTreeInitData *)field->data;
+>> +        tree = g_tree_new_full(init_data->key_compare_func,
+>> +                               init_data->key_compare_data,
+>> +                               init_data->key_destroy_func,
+>> +                               init_data->value_destroy_func);
+>> +        *pval = tree;
+>> +    } else {
+>> +        /* tree is externally allocated */
+>> +        tree = *pval;
+>> +    }
+> 
+> This can be simplified while we are at it.
+yep, only the else block remains
+> 
+>> +    while (qemu_get_byte(f)) {
+> 
+> If we get out of sync, for any reason, we have no way to recover.  The
+> only way to recover is that we don't get a "false" in this position.
+adding the number of nodes should do the job
+> 
+> 
+> Later, Juan.
+> 
 
-4.0 hadn't yet moved to using slirp submodule, but the following
-patches are included here and should provide the equivalent fixes:
+So I think I will respin with the following modifications:
+- use preload
+- introduce 2 different macros
+- encode/decode & test the number of nodes
 
-  slirp: ip_reass: Fix use after free
-  slirp: Fix heap overflow in ip_reass on big packet input
+Thank you for the quick feedbacks!
 
-> =
-
-> ?
-> =
-
-> And maybe these commits:
-> =
-
->  22235bb609c18547cf6b215bad1f9d2ec56ad371
->  "pc-dimm: fix crash when invalid slot number is used"
-> =
-
->  95667c3be0c9f5fc62f58fe845879250f63f7d32
->  "nvme: Set number of queues later in nvme_init()"
-> =
-
->  c0bccee9b40ec58c9d165b406ae3d4f63652ce53
->  "hw/ssi/mss-spi: Avoid crash when reading empty RX FIFO"
-> =
-
->  a09ef5040477643a7026703199d8781fe048d3a8
->  "hw/display/xlnx_dp: Avoid crash when reading empty RX FIFO"
-
-Applied, thanks!
-
-> =
-
-> Thomas
->=20
+Eric
 
