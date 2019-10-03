@@ -6,56 +6,77 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FFAEC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 11:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D4FC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 11:27:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84ED12133F
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 11:20:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84ED12133F
+	by mail.kernel.org (Postfix) with ESMTPS id 9D6BE206BB
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 11:27:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6BE206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFz9Z-00055v-Gf
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 07:20:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34388)
+	id 1iFzGs-0008U9-QY
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 07:27:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iFz8c-0004et-IH
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 07:19:16 -0400
+ (envelope-from <slp@redhat.com>) id 1iFzFP-0007cs-N7
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 07:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iFz8a-0008Ua-4T
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 07:19:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46792)
+ (envelope-from <slp@redhat.com>) id 1iFzFN-0006j3-IH
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 07:26:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54922)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iFz8Z-0008Tu-Qy
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 07:19:12 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iFzFN-0006hk-9h
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 07:26:13 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C3ADF3084025;
- Thu,  3 Oct 2019 11:19:10 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF2ED5D9E1;
- Thu,  3 Oct 2019 11:19:03 +0000 (UTC)
-Date: Thu, 3 Oct 2019 13:19:01 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v12 07/11] numa: Extend CLI to provide memory side cache
- information
-Message-ID: <20191003131901.630b1e0e@redhat.com>
-In-Reply-To: <20190920074349.2616-8-tao3.xu@intel.com>
-References: <20190920074349.2616-1-tao3.xu@intel.com>
- <20190920074349.2616-8-tao3.xu@intel.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 15982C05E740
+ for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 11:26:12 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id s19so552001wmj.0
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 04:26:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=d93WqDjHA92NUrrFWYCKTzaN8bdm35VX9nXUmV1YNoY=;
+ b=KjUyqcsq0vvMO7rJMQO3Rc+1ljq/GC+yMUJk6UBuyb1L+92XJ4KHcGjnlmm/f6scGS
+ 7P+t0FHSexdL77ecXzHt/P/1PY6ot9l8zVNT21y+3iGuhpCOm4c8j2Lw/EPqimYejMeV
+ hBBSa+OMM7UpSYG1DMuk7Bn+g80Ey/PyaLfupZQG2QgEQB7Fm9zFmxZf/zPE2KbmYSpt
+ cvaTPJE1lA2Z4hd1I+OIIIoSfjTUmPSV5zIvD0HUiplQTkIdxcpgTYLfUFzqsT4xpXfn
+ hQxJPAW43et52J03wKjuOCbYLekUCIkPYsUZOZMGwjBnbmXWP8mlkr46oJvRxA9xPesu
+ UzmQ==
+X-Gm-Message-State: APjAAAW99X76cTweqsAM28TYnkB6kA0tJxJUuYFoeff/hx/rgb7xRqyV
+ D+sPb5cMF30UVQGv7DIpLasrtKPiGTZfRmjgB/1I6fFzLy/wEQlcdhy9WL0cgeeO0W5+HqaajOZ
+ D56N1YTnkR/4nulA=
+X-Received: by 2002:a5d:4b46:: with SMTP id w6mr7113882wrs.223.1570101970782; 
+ Thu, 03 Oct 2019 04:26:10 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyTFI5UGcYTON50bRWlx6Jy0lUhFHBw1YeptSOOMXE7n7394znz443L/fDTftItATRXq9MJAw==
+X-Received: by 2002:a5d:4b46:: with SMTP id w6mr7113858wrs.223.1570101970512; 
+ Thu, 03 Oct 2019 04:26:10 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id c8sm2567537wrr.49.2019.10.03.04.26.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Oct 2019 04:26:09 -0700 (PDT)
+References: <20191002113103.45023-1-slp@redhat.com>
+ <20191002113103.45023-2-slp@redhat.com>
+ <96ff1ae1-fc3f-af56-08bd-a8b821385572@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v5 01/10] hw/virtio: Factorize virtio-mmio headers
+In-reply-to: <96ff1ae1-fc3f-af56-08bd-a8b821385572@redhat.com>
+Date: Thu, 03 Oct 2019 13:26:07 +0200
+Message-ID: <87ftkahxyo.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 03 Oct 2019 11:19:10 +0000 (UTC)
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,365 +91,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
- jonathan.cameron@huawei.com, dan.j.williams@intel.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 20 Sep 2019 15:43:45 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
-
-> From: Liu Jingqi <jingqi.liu@intel.com>
-> 
-> Add -numa hmat-cache option to provide Memory Side Cache Information.
-> These memory attributes help to build Memory Side Cache Information
-> Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
-> 
-> Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
-> 
-> No changes in v12.
-> 
-> Changes in v11:
->     - Move numa option patches forward.
-> ---
->  hw/core/numa.c        | 74 +++++++++++++++++++++++++++++++++++++++
->  include/sysemu/numa.h | 31 +++++++++++++++++
->  qapi/machine.json     | 81 +++++++++++++++++++++++++++++++++++++++++--
->  qemu-options.hx       | 16 +++++++--
->  4 files changed, 198 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> index f5a1c9e909..182e4d9d62 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -293,6 +293,67 @@ void parse_numa_hmat_lb(NumaState *nstat, NumaHmatLBOptions *node,
->      }
->  }
->  
-> +void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-> +                           Error **errp)
-> +{
-> +    int nb_numa_nodes = ms->numa_state->num_nodes;
-> +    HMAT_Cache_Info *hmat_cache = NULL;
-> +
-> +    if (node->node_id >= nb_numa_nodes) {
-> +        error_setg(errp, "Invalid node-id=%" PRIu32
-> +                   ", it should be less than %d.",
-> +                   node->node_id, nb_numa_nodes);
-> +        return;
-> +    }
-> +
-> +    if (node->total > MAX_HMAT_CACHE_LEVEL) {
-> +        error_setg(errp, "Invalid total=%" PRIu8
-> +                   ", it should be less than or equal to %d.",
-> +                   node->total, MAX_HMAT_CACHE_LEVEL);
-> +        return;
-> +    }
-> +    if (node->level > node->total) {
-> +        error_setg(errp, "Invalid level=%" PRIu8
-> +                   ", it should be less than or equal to"
-> +                   " total=%" PRIu8 ".",
-> +                   node->level, node->total);
-> +        return;
-> +    }
-> +    if (ms->numa_state->hmat_cache[node->node_id][node->level]) {
-> +        error_setg(errp, "Duplicate configuration of the side cache for "
-> +                   "node-id=%" PRIu32 " and level=%" PRIu8 ".",
-> +                   node->node_id, node->level);
-> +        return;
-> +    }
-> +
-> +    if ((node->level > 1) &&
-> +        ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
-> +        (node->size >=
-> +            ms->numa_state->hmat_cache[node->node_id][node->level - 1]->size)) {
-> +        error_setg(errp, "Invalid size=0x%" PRIx64
-> +                   ", the size of level=%" PRIu8
-> +                   " should be less than the size(0x%" PRIx64
-> +                   ") of level=%" PRIu8 ".",
-> +                   node->size, node->level,
-> +                   ms->numa_state->hmat_cache[node->node_id]
-> +                                             [node->level - 1]->size,
-> +                   node->level - 1);
-> +        return;
-> +    }
-> +
-> +    hmat_cache = g_malloc0(sizeof(*hmat_cache));
-> +
-> +    hmat_cache->mem_proximity = node->node_id;
-> +    hmat_cache->size = node->size;
-> +    hmat_cache->total_levels = node->total;
-> +    hmat_cache->level = node->level;
-> +    hmat_cache->associativity = node->assoc;
-> +    hmat_cache->write_policy = node->policy;
-> +    hmat_cache->line_size = node->line;
-> +
-> +    ms->numa_state->hmat_cache[node->node_id][node->level] = hmat_cache;
-> +}
-> +
->  void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
->  {
->      Error *err = NULL;
-> @@ -344,6 +405,19 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
->              goto end;
->          }
->          break;
-> +    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
-> +        if (!ms->numa_state->hmat_enabled) {
-> +            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table "
-> +                       "(HMAT) is disabled, use -machine hmat=on before "
-> +                       "set initiator of NUMA");
-> +            return;
-the same as in 6/11 at similar place
-
-> +        }
-> +
-> +        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
-> +        if (err) {
-> +            goto end;
-> +        }
-> +        break;
->      default:
->          abort();
->      }
-> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index 876beaee22..39312eefd4 100644
-> --- a/include/sysemu/numa.h
-> +++ b/include/sysemu/numa.h
-> @@ -35,6 +35,8 @@ enum {
->  #define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
->  #define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
->  
-> +#define MAX_HMAT_CACHE_LEVEL        3
-
-s/3/HMAT_LB_MEM_CACHE_3RD_LEVEL/
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
->  struct NodeInfo {
->      uint64_t node_mem;
->      struct HostMemoryBackend *node_memdev;
-> @@ -65,6 +67,30 @@ struct HMAT_LB_Info {
->  };
->  typedef struct HMAT_LB_Info HMAT_LB_Info;
->  
-> +struct HMAT_Cache_Info {
-> +    /* The memory proximity domain to which the memory belongs. */
-> +    uint32_t    mem_proximity;
-mem prefix here is redundant
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> +    /* Size of memory side cache in bytes. */
-> +    uint64_t    size;
-> +
-> +    /* Total cache levels for this memory proximity domain. */
-> +    uint8_t     total_levels;
-> +
-> +    /* Cache level described in this structure. */
-> +    uint8_t     level;
-> +
-> +    /* Cache Associativity: None/Direct Mapped/Comple Cache Indexing */
-> +    uint8_t     associativity;
-> +
-> +    /* Write Policy: None/Write Back(WB)/Write Through(WT) */
-> +    uint8_t     write_policy;
-> +
-> +    /* Cache Line size in bytes. */
-> +    uint16_t    line_size;
-> +};
-> +typedef struct HMAT_Cache_Info HMAT_Cache_Info;
-> +
->  struct NumaState {
->      /* Number of NUMA nodes */
->      int num_nodes;
-> @@ -83,6 +109,9 @@ struct NumaState {
->  
->      /* NUMA nodes HMAT Locality Latency and Bandwidth Information */
->      HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
-> +
-> +    /* Memory Side Cache Information Structure */
-> +    HMAT_Cache_Info *hmat_cache[MAX_NODES][MAX_HMAT_CACHE_LEVEL + 1];
->  };
->  typedef struct NumaState NumaState;
->  
-> @@ -90,6 +119,8 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp);
->  void parse_numa_opts(MachineState *ms);
->  void parse_numa_hmat_lb(NumaState *nstat, NumaHmatLBOptions *node,
->                          Error **errp);
-> +void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-> +                           Error **errp);
->  void numa_complete_configuration(MachineState *ms);
->  void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
->  extern QemuOptsList qemu_numa_opts;
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index b6019335e8..088be81920 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -428,10 +428,12 @@
->  #
->  # @hmat-lb: memory latency and bandwidth information (Since: 4.2)
->  #
-> +# @hmat-cache: memory side cache information (Since: 4.2)
-> +#
->  # Since: 2.1
->  ##
->  { 'enum': 'NumaOptionsType',
-> -  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
-> +  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
->  
->  ##
->  # @NumaOptions:
-> @@ -447,7 +449,8 @@
->      'node': 'NumaNodeOptions',
->      'dist': 'NumaDistOptions',
->      'cpu': 'NumaCpuOptions',
-> -    'hmat-lb': 'NumaHmatLBOptions' }}
-> +    'hmat-lb': 'NumaHmatLBOptions',
-> +    'hmat-cache': 'NumaHmatCacheOptions' }}
->  
->  ##
->  # @NumaNodeOptions:
-> @@ -648,6 +651,80 @@
->      '*latency': 'time',
->      '*bandwidth': 'size' }}
->  
-> +##
-> +# @HmatCacheAssociativity:
-> +#
-> +# Cache associativity in the Memory Side Cache
-> +# Information Structure of HMAT
-> +#
-> +# For more information of @HmatCacheAssociativity see
-> +# the chapter 5.2.27.5: Table 5-143 of ACPI 6.3 spec.
-> +#
-> +# @none: None
-> +#
-> +# @direct: Direct Mapped
-> +#
-> +# @complex: Complex Cache Indexing (implementation specific)
-> +#
-> +# Since: 4.2
-> +##
-> +{ 'enum': 'HmatCacheAssociativity',
-> +  'data': [ 'none', 'direct', 'complex' ] }
-> +
-> +##
-> +# @HmatCacheWritePolicy:
-> +#
-> +# Cache write policy in the Memory Side Cache
-> +# Information Structure of HMAT
-> +#
-> +# For more information of @HmatCacheWritePolicy see
-> +# the chapter 5.2.27.5: Table 5-143: Field "Cache Attributes" of ACPI 6.3 spec.
-> +#
-> +# @none: None
-> +#
-> +# @write-back: Write Back (WB)
-> +#
-> +# @write-through: Write Through (WT)
-> +#
-> +# Since: 4.2
-> +##
-> +{ 'enum': 'HmatCacheWritePolicy',
-> +  'data': [ 'none', 'write-back', 'write-through' ] }
-> +
-> +##
-> +# @NumaHmatCacheOptions:
-> +#
-> +# Set the memory side cache information for a given memory domain.
-> +#
-> +# For more information of @NumaHmatCacheOptions see
-> +# the chapter 5.2.27.5: Table 5-143: Field "Cache Attributes" of ACPI 6.3 spec.
-> +#
-> +# @node-id: the memory proximity domain to which the memory belongs.
-> +#
-> +# @size: the size of memory side cache in bytes.
-> +#
-> +# @total: the total cache levels for this memory proximity domain.
+> On 10/2/19 1:30 PM, Sergio Lopez wrote:
+>> Put QOM and main struct definition in a separate header file, so it
+>> can be accessed from other components.
+>>
+>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>> ---
+>>   hw/virtio/virtio-mmio.c         | 48 +---------------------
+>>   include/hw/virtio/virtio-mmio.h | 73 +++++++++++++++++++++++++++++++++
+>>   2 files changed, 74 insertions(+), 47 deletions(-)
+>>   create mode 100644 include/hw/virtio/virtio-mmio.h
+>>
+>> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+>> index 3d5ca0f667..94d934c44b 100644
+>> --- a/hw/virtio/virtio-mmio.c
+>> +++ b/hw/virtio/virtio-mmio.c
+>> @@ -29,57 +29,11 @@
+>>   #include "qemu/host-utils.h"
+>>   #include "qemu/module.h"
+>>   #include "sysemu/kvm.h"
+>> -#include "hw/virtio/virtio-bus.h"
+>> +#include "hw/virtio/virtio-mmio.h"
+>>   #include "qemu/error-report.h"
+>>   #include "qemu/log.h"
+>>   #include "trace.h"
+>>   -/* QOM macros */
+>> -/* virtio-mmio-bus */
+>> -#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+>> -#define VIRTIO_MMIO_BUS(obj) \
+>> -        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+>> -#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+>> -        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+>> -#define VIRTIO_MMIO_BUS_CLASS(klass) \
+>> -        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BU=
+S)
+>> -
+>> -/* virtio-mmio */
+>> -#define TYPE_VIRTIO_MMIO "virtio-mmio"
+>> -#define VIRTIO_MMIO(obj) \
+>> -        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+>> -
+>> -#define VIRT_MAGIC 0x74726976 /* 'virt' */
+>> -#define VIRT_VERSION 2
+>> -#define VIRT_VERSION_LEGACY 1
+>> -#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+>> -
+>> -typedef struct VirtIOMMIOQueue {
+>> -    uint16_t num;
+>> -    bool enabled;
+>> -    uint32_t desc[2];
+>> -    uint32_t avail[2];
+>> -    uint32_t used[2];
+>> -} VirtIOMMIOQueue;
+>> -
+>> -typedef struct {
+>> -    /* Generic */
+>> -    SysBusDevice parent_obj;
+>> -    MemoryRegion iomem;
+>> -    qemu_irq irq;
+>> -    bool legacy;
+>> -    /* Guest accessible state needing migration and reset */
+>> -    uint32_t host_features_sel;
+>> -    uint32_t guest_features_sel;
+>> -    uint32_t guest_page_shift;
+>> -    /* virtio-bus */
+>> -    VirtioBusState bus;
+>> -    bool format_transport_address;
+>> -    /* Fields only used for non-legacy (v2) devices */
+>> -    uint32_t guest_features[2];
+>> -    VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
+>> -} VirtIOMMIOProxy;
+>> -
+>>   static bool virtio_mmio_ioeventfd_enabled(DeviceState *d)
+>>   {
+>>       return kvm_eventfds_enabled();
+>> diff --git a/include/hw/virtio/virtio-mmio.h b/include/hw/virtio/virtio-=
+mmio.h
+>> new file mode 100644
+>> index 0000000000..c8a6ef20de
+>> --- /dev/null
+>> +++ b/include/hw/virtio/virtio-mmio.h
+>> @@ -0,0 +1,73 @@
+>> +/*
+>> + * Virtio MMIO bindings
+>> + *
+>> + * Copyright (c) 2011 Linaro Limited
+>> + *
+>> + * Author:
+>> + *  Peter Maydell <peter.maydell@linaro.org>
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License; either version=
+ 2
+>> + * of the License, or (at your option) any later version.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License al=
+ong
+>> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#ifndef QEMU_VIRTIO_MMIO_H
+>> +#define QEMU_VIRTIO_MMIO_H
+>
+> I'd rather use HW_VIRTIO_MMIO_H
 
-Can we calculate this without making user to do it?
+Looks like there isn't a consensus in this regard:
 
-> +# @level: the cache level described in this structure.
-> +#
-> +# @assoc: the cache associativity, none/direct-mapped/complex(complex cache indexing).
-> +#
-> +# @policy: the write policy, none/write-back/write-through.
-> +#
-> +# @line: the cache Line size in bytes.
-> +#
-> +# Since: 4.2
-> +##
-> +{ 'struct': 'NumaHmatCacheOptions',
-> +  'data': {
-> +   'node-id': 'uint32',
-> +   'size': 'size',
-> +   'total': 'uint8',
-> +   'level': 'uint8',
-> +   'assoc': 'HmatCacheAssociativity',
-> +   'policy': 'HmatCacheWritePolicy',
-> +   'line': 'uint16' }}
-> +
->  ##
->  # @HostMemPolicy:
->  #
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 129da0cdc3..7cf214a653 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -169,7 +169,8 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
->      "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
->      "-numa dist,src=source,dst=destination,val=distance\n"
->      "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
-> -    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,latency=lat][,bandwidth=bw]\n",
-> +    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,latency=lat][,bandwidth=bw]\n"
-> +    "-numa hmat-cache,node-id=node,size=size,total=total,level=level[,assoc=none|direct|complex][,policy=none|write-back|write-through][,line=size]\n",
->      QEMU_ARCH_ALL)
->  STEXI
->  @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
-> @@ -177,6 +178,7 @@ STEXI
->  @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
->  @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
->  @itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,latency=@var{lat}][,bandwidth=@var{bw}]
-> +@itemx -numa hmat-cache,node-id=@var{node},size=@var{size},total=@var{total},level=@var{level}[,assoc=@var{str}][,policy=@var{str}][,line=@var{size}]
->  @findex -numa
->  Define a NUMA node and assign RAM and VCPUs to it.
->  Set the NUMA distance from a source node to a destination node.
-> @@ -282,11 +284,19 @@ if NUM is 0, means the corresponding latency or bandwidth information is not pro
->  And if input numbers without any unit, the latency unit will be 'ps' and the bandwidth
->  will be MB/s.
->  
-> +In @samp{hmat-cache} option, @var{node-id} is the NUMA-id of the memory belongs.
-> +@var{size} is the size of memory side cache in bytes. @var{total} is the total cache levels.
-> +@var{level} is the cache level described in this structure. @var{assoc} is the cache associativity,
-> +the possible value is 'none/direct(direct-mapped)/complex(complex cache indexing)'.
-> +@var{policy} is the write policy. @var{line} is the cache Line size in bytes.
-> +
->  For example, the following option assigns NUMA node 0 and 1. Node 0 has 2 cpus and
->  a ram, node 1 has only a ram. The processors in node 0 access memory in node
->  0 with access-latency 5 nanoseconds, access-bandwidth is 200 MB/s;
->  The processors in NUMA node 0 access memory in NUMA node 1 with access-latency 10
->  nanoseconds, access-bandwidth is 100 MB/s.
-> +And for memory side cache information, NUMA node 0 and 1 both have 1 level memory
-> +cache, size is 0x20000 bytes, policy is write-back, the cache Line size is 8 bytes:
-hex is not particularly user readable format, use decimal here and size suffixes
-here and in the example below.
+$ grep "ifndef" *
+vhost-backend.h:#ifndef VHOST_BACKEND_H
+vhost.h:#ifndef VHOST_H
+vhost-scsi-common.h:#ifndef VHOST_SCSI_COMMON_H
+vhost-scsi.h:#ifndef VHOST_SCSI_H
+vhost-user-blk.h:#ifndef VHOST_USER_BLK_H
+vhost-user.h:#ifndef HW_VIRTIO_VHOST_USER_H
+vhost-user-scsi.h:#ifndef VHOST_USER_SCSI_H
+vhost-vsock.h:#ifndef QEMU_VHOST_VSOCK_H
+virtio-access.h:#ifndef QEMU_VIRTIO_ACCESS_H
+virtio-balloon.h:#ifndef QEMU_VIRTIO_BALLOON_H
+virtio-balloon.h.orig:#ifndef QEMU_VIRTIO_BALLOON_H
+virtio-blk.h:#ifndef QEMU_VIRTIO_BLK_H
+virtio-bus.h:#ifndef VIRTIO_BUS_H
+virtio-crypto.h:#ifndef QEMU_VIRTIO_CRYPTO_H
+virtio-gpu-bswap.h:#ifndef HW_VIRTIO_GPU_BSWAP_H
+virtio-gpu.h:#ifndef HW_VIRTIO_GPU_H
+virtio-gpu-pci.h:#ifndef HW_VIRTIO_GPU_PCI_H
+virtio-gpu-pixman.h:#ifndef HW_VIRTIO_GPU_PIXMAN_H
+virtio.h:#ifndef QEMU_VIRTIO_H
+virtio-input.h:#ifndef QEMU_VIRTIO_INPUT_H
+virtio-mmio.h:#ifndef QEMU_VIRTIO_MMIO_H
+virtio-net.h:#ifndef QEMU_VIRTIO_NET_H
+virtio-pmem.h:#ifndef HW_VIRTIO_PMEM_H
+virtio-rng.h:#ifndef QEMU_VIRTIO_RNG_H
+virtio-scsi.h:#ifndef QEMU_VIRTIO_SCSI_H
+virtio-serial.h:#ifndef QEMU_VIRTIO_SERIAL_H
 
->  @example
->  -machine hmat=on \
->  -m 2G \
-> @@ -300,7 +310,9 @@ nanoseconds, access-bandwidth is 100 MB/s.
->  -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,latency=5ns \
->  -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,bandwidth=200M \
->  -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,latency=10ns \
-> --numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=100M
-> +-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=100M \
-> +-numa hmat-cache,node-id=0,size=0x20000,total=1,level=1,assoc=direct,policy=write-back,line=8 \
-> +-numa hmat-cache,node-id=1,size=0x20000,total=1,level=1,assoc=direct,policy=write-back,line=8
->  @end example
->  
->  ETEXI
+Do we have an actual policy written somewhere?
 
+> Regardless:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+>> +
+>> +#include "hw/virtio/virtio-bus.h"
+>> +
+>> +/* QOM macros */
+>> +/* virtio-mmio-bus */
+>> +#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+>> +#define VIRTIO_MMIO_BUS(obj) \
+>> +        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+>> +#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+>> +        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+>> +#define VIRTIO_MMIO_BUS_CLASS(klass) \
+>> +        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BU=
+S)
+>> +
+>> +/* virtio-mmio */
+>> +#define TYPE_VIRTIO_MMIO "virtio-mmio"
+>> +#define VIRTIO_MMIO(obj) \
+>> +        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+>> +
+>> +#define VIRT_MAGIC 0x74726976 /* 'virt' */
+>> +#define VIRT_VERSION 2
+>> +#define VIRT_VERSION_LEGACY 1
+>> +#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+>> +
+>> +typedef struct VirtIOMMIOQueue {
+>> +    uint16_t num;
+>> +    bool enabled;
+>> +    uint32_t desc[2];
+>> +    uint32_t avail[2];
+>> +    uint32_t used[2];
+>> +} VirtIOMMIOQueue;
+>> +
+>> +typedef struct {
+>> +    /* Generic */
+>> +    SysBusDevice parent_obj;
+>> +    MemoryRegion iomem;
+>> +    qemu_irq irq;
+>> +    bool legacy;
+>> +    /* Guest accessible state needing migration and reset */
+>> +    uint32_t host_features_sel;
+>> +    uint32_t guest_features_sel;
+>> +    uint32_t guest_page_shift;
+>> +    /* virtio-bus */
+>> +    VirtioBusState bus;
+>> +    bool format_transport_address;
+>> +    /* Fields only used for non-legacy (v2) devices */
+>> +    uint32_t guest_features[2];
+>> +    VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
+>> +} VirtIOMMIOProxy;
+>> +
+>> +#endif
+>>
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2V2s8ACgkQ9GknjS8M
+AjUOxg/7BF2O23GVyAmhX2lDHKQjB+h9bqtJ0apVuVjAN4cZkT4w47c01Ar+gsYI
+x4c8UbjweVzUg4XD0QeiNpFl8ValI99MmLj8H3MpFRzjWVrOi4SmCeqvlkYBJD0o
+U27kxVgFPRDylV1j+AErR44CjhYwU5UfwB8KU4cmflgiSxXIoQYeJgpl8ymSoIWf
+cSoYCc7GoIOE3ATK7CfaCxT7EtXifuydQD9L+BUuTyUWsRY3gARhbz+JcVly28QE
+LegzUJ5/FFXOzsWicauJDlOyJ02T8tYD6tElAP8vA4g16W7ACb4EwdGcCgsfI7jy
+BfIbHkLIacg2jgblOq8/tt+/rf/+jV9VNWERc+oB9OUWfdR+mL0afjsYEiKb8AbF
+68R7VdQAq4VW7eE6dkJ0/mPs8jft+nYz9WCHKncjVL+Vgys2vEMmMwqxKQXE2Fnu
++FdCMnPZPnSPrhrgVm1P8fGvRUk+FZv4H0xaHKp8xNnbMlyzcEuoVu/B2w/kYuzz
+NYCZ3BT94+OxoBOQ0PaOPwD6FekGviRe89xxaRTtHfxkMmLVY8xRn3/f2+RlwFnN
+hB24Qu0AWzbXBzsqaap3ocMfVBUMQsobjAJZdI7lJH7H5JeJMj7b8JlYkYly/pJd
+8TR2Qop00yM7KLmiYtGaKFvf1VL3ErALL33/bU9Zht+ekjrZWCw=
+=Gv+n
+-----END PGP SIGNATURE-----
+--=-=-=--
 
