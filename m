@@ -7,55 +7,56 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B46C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D09AEC47404
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09BAF21D81
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A038021D81
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="A4DqPz1c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09BAF21D81
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Mq6Mu3DU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A038021D81
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFrBp-0005a0-NL
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:50:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40655)
+	id 1iFrBr-0005aj-2y
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:50:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5M-00007l-ID
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:22 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5M-00007Y-15
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5K-0000xj-NQ
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:20 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:37291)
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5K-0000xQ-8X
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:19 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:38617)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFr5K-0000wu-6I; Wed, 02 Oct 2019 22:43:18 -0400
+ id 1iFr5I-0000wB-8j; Wed, 02 Oct 2019 22:43:17 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46kHPB4DKWz9sPk; Thu,  3 Oct 2019 12:43:10 +1000 (AEST)
+ id 46kHP92jTMz9sN1; Thu,  3 Oct 2019 12:43:09 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570070590;
- bh=GTYXh1L5k2UqdQaiMEgA0uDG+ovgdPLDLCqEA5+Bei4=;
+ d=gibson.dropbear.id.au; s=201602; t=1570070589;
+ bh=kuQo7v3meGGppIl4DcmZDigutTgIl6ckR6zxEjCHaPM=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=A4DqPz1chwYmGkVVdNm4TjUVf3J+avWNpWMCOwgP2UByWWLBnqut1EllLygjP/EE4
- MF23pyfTfi4X94VIl9L9FSZ1x5quEnwHDq1rmfuuOUNSLJMFCcpBKPFV2MnlTZ26de
- 8nki+reVUjaYuAGzmmXxwU6gTkNBP1MpzMLTNQAk=
-Date: Thu, 3 Oct 2019 12:12:58 +1000
+ b=Mq6Mu3DUpqWQmpFxCOUhhTUIULocRZxwN19hlepiFfgqQsgb5kuxAmfWLrFUISm4z
+ pkQDoku8z2r3pUHdnxTvz7gz99EfDo8Zuyt1Kd/G1z09LhlC1LC4na94/5cnIShlQL
+ G8XfqvudpvilR9Z4x6rl+iE53UV0Tz5p4hrM1I28=
+Date: Thu, 3 Oct 2019 11:50:17 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v4 14/25] ppc/xive: Introduce helpers for the NVT id
-Message-ID: <20191003021258.GL11105@umbus.fritz.box>
+Subject: Re: [PATCH v4 03/25] ppc/pnv: Introduce a PNV_CHIP_CPU_FOREACH()
+ helper
+Message-ID: <20191003015017.GE11105@umbus.fritz.box>
 References: <20190918160645.25126-1-clg@kaod.org>
- <20190918160645.25126-15-clg@kaod.org>
+ <20190918160645.25126-4-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ibe32dcbQs37CEZO"
+ protocol="application/pgp-signature"; boundary="Zljh9u/ceMLi+8mf"
 Content-Disposition: inline
-In-Reply-To: <20190918160645.25126-15-clg@kaod.org>
+In-Reply-To: <20190918160645.25126-4-clg@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -77,75 +78,69 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---ibe32dcbQs37CEZO
+--Zljh9u/ceMLi+8mf
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2019 at 06:06:34PM +0200, C=E9dric Le Goater wrote:
-> The NVT space is 19 bits wide, giving a maximum of 512K per chip. When
-> dispatched on a HW thread, the NVT identifier of a vCPU is pushed/stored
-> in the CAM line (word2) of the thread interrupt context.
+On Wed, Sep 18, 2019 at 06:06:23PM +0200, C=E9dric Le Goater wrote:
+> As there is now easy way to loop on the CPUs belonging to a chip, add
+> a helper to filter out external CPUs.
 
-Ok, that's interesting, but how does it lead to this patch?  Connect
-the dots, please.
+This seems a somewhat odd way to go about it, given that the chip does
+have a cores array and the cores then have a threads array.  What's
+the difficulty with using that rather than looping through all vcpus
+and filtering?
 
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  include/hw/ppc/xive.h      |  5 -----
->  include/hw/ppc/xive_regs.h | 21 +++++++++++++++++++++
->  2 files changed, 21 insertions(+), 5 deletions(-)
+>  hw/intc/pnv_xive.c | 23 ++++++++++++++++++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index a461753f5da5..794dfcaae0f8 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -469,11 +469,6 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Monito=
-r *mon);
->  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
->  void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb);
+> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+> index ae449aa1119b..e1c15b6b5b71 100644
+> --- a/hw/intc/pnv_xive.c
+> +++ b/hw/intc/pnv_xive.c
+> @@ -392,15 +392,36 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8=
+_t blk, uint32_t idx,
+>      return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
+>  }
 > =20
-> -static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
-> -{
-> -    return (nvt_blk << 19) | nvt_idx;
-> -}
-> -
->  /*
->   * KVM XIVE device helpers
->   */
-> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-> index 08c8bf7172e2..3d7b6fd09664 100644
-> --- a/include/hw/ppc/xive_regs.h
-> +++ b/include/hw/ppc/xive_regs.h
-> @@ -251,4 +251,25 @@ typedef struct XiveNVT {
-> =20
->  #define xive_nvt_is_valid(nvt)    (be32_to_cpu((nvt)->w0) & NVT_W0_VALID)
-> =20
-> +/*
-> + * The VP number space in a block is defined by the END_W6_NVT_INDEX
-> + * field of the XIVE END
-> + */
-> +#define XIVE_NVT_SHIFT                19
-> +
-> +static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
+> +static int cpu_pir(PowerPCCPU *cpu)
 > +{
-> +    return (nvt_blk << XIVE_NVT_SHIFT) | nvt_idx;
+> +    CPUPPCState *env =3D &cpu->env;
+> +    return env->spr_cb[SPR_PIR].default_value;
 > +}
 > +
-> +static inline uint32_t xive_nvt_idx(uint32_t cam_line)
+> +static int cpu_chip_id(PowerPCCPU *cpu)
 > +{
-> +    return cam_line & ((1 << XIVE_NVT_SHIFT) - 1);
+> +    int pir =3D cpu_pir(cpu);
+> +    return (pir >> 8) & 0x7f;
 > +}
 > +
-> +static inline uint32_t xive_nvt_blk(uint32_t cam_line)
-> +{
-> +    return (cam_line >> XIVE_NVT_SHIFT) & 0xf;
-> +}
+> +#define PNV_CHIP_CPU_FOREACH(chip, cs)                                  \
+> +    CPU_FOREACH(cs)                                                     \
+> +        if (chip->chip_id !=3D cpu_chip_id(POWERPC_CPU(cs))) {} else
 > +
->  #endif /* PPC_XIVE_REGS_H */
+>  static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
+>                                uint8_t nvt_blk, uint32_t nvt_idx,
+>                                bool cam_ignore, uint8_t priority,
+>                                uint32_t logic_serv, XiveTCTXMatch *match)
+>  {
+> +    PnvXive *xive =3D PNV_XIVE(xptr);
+>      CPUState *cs;
+>      int count =3D 0;
+> =20
+> -    CPU_FOREACH(cs) {
+> +    /*
+> +     * Loop on all CPUs of the machine and filter out the CPUs
+> +     * belonging to another chip.
+> +     */
+> +    PNV_CHIP_CPU_FOREACH(xive->chip, cs) {
+>          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>          XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+>          int ring;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -153,25 +148,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ibe32dcbQs37CEZO
+--Zljh9u/ceMLi+8mf
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VWSoACgkQbDjKyiDZ
-s5JYcA//Uf2R68G++EtHjUHOmB7i1sjdKzalJD+byNiFzYEZuryiiBM70nqm63Lu
-CF+0UTwv3lZ8CibKLqrYMd+l+31nUwN1HNjqwHi/ohgfMDoyACE36Rg4ovuVD/AD
-Mqkrct32/SQlKCPoaazM7bQkyipVOLf9HGPrhzvtJVYn3kPoKGVQKOWzbb7efcXF
-8/hX5NWW8bPBaUGpZ8x8QW44sKOuB9VNVCPBBQnv+EyJKTGv0/cgJeHbd2QKMsW8
-mnapf9KZPfvEvXuZ69T1GRzXjBlousCDUqiEVPs3mBMF/blx0WJNjL9An6fDa4hY
-ao2p6tM6JmwVbgLvxyTJGBhbU7F4sKQH056SKwo7Gb1Av8YYHLxsFgVSDKlG/Tfp
-efqGTrre0sDZtRekriHCpsuuTHtQ0yyFm/NTCLyus+is9DnBzMKDAK0FjQuGjISG
-HCPmvvhP6IhNbv3GPBXDKrLsMm/P0Wa4kvauPfT4jBbyzmZx2cGOb0zZKEgJfYxI
-g/oQxMLN+buXjt0+Plv+BRLuLhvvwx69I/6WLDeuSyQ5gRYxOd4ON3+tHZW2D0Mj
-09zoQuIjuIROqdYP+0xcPdNx07jh1cj59k7xGYZFDU45QWHg7zWVzT+VaBPUD8UU
-e61vtwNOjUrN9PQYZ4d7MfQ5Bg93hdxXdDOUbg7i2Teg8wQonUw=
-=r9RE
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VU9cACgkQbDjKyiDZ
+s5KCJhAArH5y2NwFIj7D0wYGjIdkFW9LKjVg6AiKIjQwP4Dchjt0sSbuKBC1kd2k
+oC7FyvpkUwBtr+lM58kvaAutPLIPGinmR9HbT5N1gPnQyURhPlbl8ug01pKlBUQN
+Np5pecCGXVHkTveiPgW/rWrpLvoRKaNKCub8q4dWA02KkEwHJ00NY9hUyV0OJvvI
+YdZO4v3j1U/2r07dLLCZp7JqmRwgnoWPCWQKlevuKUL8H74vdDXAiIVy+wHAThjX
+IOq5wvBtjLWkpwQYhOad+sGkr9cmB0+M843W+c9LK8QXuf6vBn2SGdyAIlZDcdSD
+odko1PA3SNnYAnXASSIodZDHta2ZeLrl8OBkCii668oUADU/YaIsAZhLEYRv+db0
+JFIVTlsJGDQEg0VGPlrvSAWB1VIW19iN1ZjjgxtCHP7G0K2oS3vOVL4/d3PtVJCE
+nMj9n5x75yw4RmNqvo239FfXqgWcUHAIXS9Z8Twa+EhViK5VXAAf8Bx6ZALoLNva
+3cqGmIrTED/Ce+hbTIpRwpgE2mEXkzjyzZ+NuKOoaB/RMb20+09B3ZTuYSCqK7zF
+W6/7tk0x/IVKBU5bkWOeOwRTXlecwQTeHl/mtTdDkTfFDiceNnjuDtOGOtvEviFk
+1O9CDu2P9U1YJWPW581cBDPzhQhVmQlLL1KE0yzKxoyFHUsw/jE=
+=IMPZ
 -----END PGP SIGNATURE-----
 
---ibe32dcbQs37CEZO--
+--Zljh9u/ceMLi+8mf--
 
