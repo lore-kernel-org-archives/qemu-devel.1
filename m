@@ -2,143 +2,72 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A64C4CED1
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 904A6C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:28:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D660520830
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:27:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D660520830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6A83820830
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:28:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A83820830
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG4tM-0001T7-SB
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 13:27:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34076)
+	id 1iG4ts-0001vJ-L8
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 13:28:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34140)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iG4s6-0000IR-Tb
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:26:36 -0400
+ (envelope-from <bounces@canonical.com>) id 1iG4sH-0000VF-O8
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:26:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iG4s5-0003qx-Lg
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:26:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59853)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iG4s2-0003qA-Ht; Thu, 03 Oct 2019 13:26:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B436C308620B;
- Thu,  3 Oct 2019 17:26:29 +0000 (UTC)
-Received: from [10.18.17.165] (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF4D35D9E1;
- Thu,  3 Oct 2019 17:26:16 +0000 (UTC)
-Subject: Re: [PULL 0/8] Ide patches
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191001235552.17790-1-jsnow@redhat.com>
- <CAFEAcA8q2UgQNxO41CGyAS=c7sb9V-v8kvcBFRZ9wW67Q7eo-w@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <bf8fe3f9-5d38-7c77-81a0-6382ce1bdbee@redhat.com>
-Date: Thu, 3 Oct 2019 13:26:15 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <bounces@canonical.com>) id 1iG4sF-0003uf-SQ
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:26:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33144)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iG4sF-0003uL-M8
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:26:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iG4sC-0001v7-Ki
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 17:26:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AF9CA2E80DC
+ for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 17:26:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8q2UgQNxO41CGyAS=c7sb9V-v8kvcBFRZ9wW67Q7eo-w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 03 Oct 2019 17:26:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Oct 2019 17:17:35 -0000
+From: Rhodus <1846392@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: rhodus ubuntu-weilnetz
+X-Launchpad-Bug-Reporter: Rhodus (rhodus)
+X-Launchpad-Bug-Modifier: Rhodus (rhodus)
+References: <157004264359.16779.14522562243536509301.malonedeb@gac.canonical.com>
+Message-Id: <157012305578.21167.2254033178410008284.malone@chaenomeles.canonical.com>
+Subject: [Bug 1846392] Re: VCPU shutdown request with HAX
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19066";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: adb84e776272d59649057a02beff16da5a46ba82
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -147,65 +76,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Reply-To: Bug 1846392 <1846392@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Ahh, yeah, the FAQ ...! :D A lot of work testing stuff and then I forgot
+about that. (I _did_ have a look into it when I wondered about the
+binaries whose name ends with a W.)
+
+Anyways, WHPX is not available for Win8.1, but only starting with Win10 _18=
+03_, they say:
+https://docs.microsoft.com/en-us/xamarin/android/get-started/installation/a=
+ndroid-emulator/hardware-acceleration?pivots=3Dwindows#accelerating-with-hy=
+per-v
+
+And indeed, '.\qemu-system-x86_64.exe -accel whpx' will return
+...\qemu-system-x86_64.exe: Could not load library WinHvPlatform.dll.
+...\qemu-system-x86_64.exe: failed to initialize WHPX: Function not impleme=
+nted
+
+Fortunately enough I do have Win10 1803 in dual-boot on this machine.
+Let's see how it goes!*
+
+*[At this point, I could have saved this message, switched OS and tried
+it, such that I could write about the outcome here, but that wouldn't
+really belong to this bug, so instead, I'll send this first and then
+I'll maybe file a fresh bug if WHPX doesn't work either. ;) ]
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1846392
+
+Title:
+  VCPU shutdown request with HAX
+
+Status in QEMU:
+  New
+
+Bug description:
+  In most scenarios when turning on HAX, QEMU will exit, printing "VCPU
+  shutdown request" to the console.
+
+  This is on Windows 8.1 with Intel HAXM 7.5.2.
+  QEMU's -version prints v4.1.0-11789-g013a2ecf4f-dirty .
+  I've used an installer from qemu.weilnetz.de.
+  The host CPU is an IvyBridge i5 (mobile).
+
+  Some miscellaneous notes (you can skip them first):
+  Win10-1709-PE_Custom.iso is a custom WinPE image I had meant to test usin=
+g QEMU. It is likely broken and doesn't boot at all.
+  [Stuck, etc.]: I had given that image almost 2h during which the circle o=
+f dots continued to spin. I don't know if it or QEMU did anything of intere=
+st at all during that period, but this might indicate long-term stability, =
+sort of.
+  Win10_1709_German_x32.iso: Stock Win10 1709 32bit ISO I got off a German =
+tech website. I've waited for the install screen to appear.
+  TinyCore_10-1.iso: TinyCore by Core Project. A 18MB graphical Linux distr=
+ibution, pretty barren by default. I've generally opened Apps there, the pa=
+ckage manager, then shut it down again.
+  On the one marked [Fx stable], I've gotten Firefox 60.8.0 ESR and visited=
+ a couple of websites. (I don't know of any available program that would tr=
+y to execute exotic CPU instructions in weird combinations to do a proper t=
+est.)
+  Q64 is .\qemu-system-x86_64.exe , substituted for readability (shorter li=
+nes).
+
+  =
+
+  Invocations that QEMU seemed to handle well (without the headline error):
+  Q64 -machine q35 -accel hax
+  Q64 -machine q35 -cdrom \!S\Win10-1709-PE_Custom.iso
+  Q64 -machine q35 -cdrom \!S\Win10-1709-PE_Custom.iso -m 4096 [Stuck, etc.]
+  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -m 1920
+  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -cpu max -m 256 [1]
+  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -cpu max -m 512
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -cpu max -serial file:\!S\QEMU_TC=
+L_BUG.log [2]
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax [Fx stable, s.a.]
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu Skylake-Client-IB=
+RS
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu Icelake-Client-v1
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu Cascadelake-Serve=
+r-v2
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu Broadwell-v4
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu IvyBridge-IBRS
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu coreduo
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu pentium
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu base [3]
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -cpu base [4]
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -cpu pentium
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu Icelake-Client-v1 [5]
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu Broadwell-v4 [5]
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu IvyBridge-v1 [5]
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu coreduo
+
+  =
+
+  Then, those that made it print "VCPU shutdown request" repeatedly and qui=
+t, immediately or after a couple of seconds at most, except where noted. I =
+put an indication of the number of messages into curly braces.
+  Q64 -machine q35,accel=3Dhax -cpu max  {many}
+  Q64 -machine q35,accel=3Dhax -cdrom \!S\Win10-1709-PE_Custom.iso
+  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -accel hax  =
+{very many}
+  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -accel hax -=
+cpu max  {very many}
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -accel hax  {just two}
+  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu max  {a couple}
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu Icelake-Client-v1 -a=
+ccel hax  {two}
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu IvyBridge-v1 -accel =
+hax  {two}
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu pentium -accel hax  =
+{three}
+  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu coreduo -accel hax  =
+{a few}
 
 
-On 10/3/19 11:35 AM, Peter Maydell wrote:
-> On Wed, 2 Oct 2019 at 00:56, John Snow <jsnow@redhat.com> wrote:
->>
->> The following changes since commit 7f21573c822805a8e6be379d9bcf3ad9effef3dc:
->>
->>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-10-01' into staging (2019-10-01 13:13:38 +0100)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->>
->> for you to fetch changes up to d5eedf4633376d22a34a17a061d3ed47ddb6fee0:
->>
->>   hd-geo-test: Add tests for lchs override (2019-10-01 17:50:16 -0400)
->>
->> ----------------------------------------------------------------
->> "IDE" Pull request. (CHS changes for SeaBios)
->>
->> ----------------------------------------------------------------
->>
->> Sam Eiderman (8):
->>   block: Refactor macros - fix tabbing
->>   block: Support providing LCHS from user
->>   bootdevice: Add interface to gather LCHS
->>   scsi: Propagate unrealize() callback to scsi-hd
->>   bootdevice: Gather LCHS from all relevant devices
->>   bootdevice: Refactor get_boot_devices_list
->>   bootdevice: FW_CFG interface for LCHS values
->>   hd-geo-test: Add tests for lchs override
-> 
-> Hi John -- it looks like you forgot to put your signed-off-by
-> as the maintainer on the commits in this pullreq. Could you
-> fix that and resend, please?
-> 
+  (I have rewritten a couple of commandlines to make them more uniform
+  (changing the placement of parameters and using '-accel hax' instead
+  of '-machine ...,accel=3Dhax').)
 
-... I see what happened now, actually.
+  [1]: WinPE boot error, not enough RAM.
+  [2]: Will cause a kernel BUG: "... \ login[892]: root login on 'tty1' \ B=
+UG: unable to handle kernel paging request at 00010ffa \ ...". See attached=
+ file.
+  [3]: Stuck after "Booting the kernel.", cursor blinks.
+  [4]: Stuck at blinking console prompt, no input possible.
+  [5]: According to the printout, TCG doesn't support a bunch of those proc=
+essor's features that have been requested.
 
-The emails got signed but the commits didn't.
+  PS: There should be some note highlighting that there is a strict limit o=
+n line length (or at least that's what it looks like).  I can shorten the f=
+ile names further to enhance skimmability ... :/
+  Also, let me know if you need anything else.
 
-I didn't sign them when I applied the patches, but I signed them when
-using git-publish --pull-request --signoff, and it applies the signature
-before send, but after mirroring.
-
-I'll try to fix that when I have the time to make sure it doesn't happen
-again.
-
---js
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1846392/+subscriptions
 
