@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09AEC47404
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D58C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A038021D81
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D965421D81
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Mq6Mu3DU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A038021D81
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oZS3Cib2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D965421D81
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFrBr-0005aj-2y
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:50:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40638)
+	id 1iFrBs-0005bW-IK
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:50:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40658)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5M-00007Y-15
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:21 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5M-00007n-LA
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5K-0000xQ-8X
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:19 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:38617)
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5K-0000yA-Ve
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:20 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:45761 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFr5I-0000wB-8j; Wed, 02 Oct 2019 22:43:17 -0400
+ id 1iFr5K-0000wp-9X; Wed, 02 Oct 2019 22:43:18 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46kHP92jTMz9sN1; Thu,  3 Oct 2019 12:43:09 +1000 (AEST)
+ id 46kHPB2k0Yz9sPh; Thu,  3 Oct 2019 12:43:10 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570070589;
- bh=kuQo7v3meGGppIl4DcmZDigutTgIl6ckR6zxEjCHaPM=;
+ d=gibson.dropbear.id.au; s=201602; t=1570070590;
+ bh=h2MMpDmBrgbXfzhn6sRqy3nLm/+RksZ/9+FnSJihtm4=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Mq6Mu3DUpqWQmpFxCOUhhTUIULocRZxwN19hlepiFfgqQsgb5kuxAmfWLrFUISm4z
- pkQDoku8z2r3pUHdnxTvz7gz99EfDo8Zuyt1Kd/G1z09LhlC1LC4na94/5cnIShlQL
- G8XfqvudpvilR9Z4x6rl+iE53UV0Tz5p4hrM1I28=
-Date: Thu, 3 Oct 2019 11:50:17 +1000
+ b=oZS3Cib2Hrs15pP+sFFG3c449zros4BkLbSzfP0g7Vv7O6LWmHl+WlnHr0qIMavE2
+ 9Rk9k1cZVeaoLNqEgmggWkj7aaljmHjxHiMv4wweRvFNVZXYxFtH3NiqiLOG0DuApC
+ 37fOZyQ8M+r2FD1C/P69V2MAAp0DaD0C2reUW3nU=
+Date: Thu, 3 Oct 2019 12:11:37 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v4 03/25] ppc/pnv: Introduce a PNV_CHIP_CPU_FOREACH()
+Subject: Re: [PATCH v4 13/25] ppc/xive: Introduce a xive_tctx_ipb_update()
  helper
-Message-ID: <20191003015017.GE11105@umbus.fritz.box>
+Message-ID: <20191003021137.GK11105@umbus.fritz.box>
 References: <20190918160645.25126-1-clg@kaod.org>
- <20190918160645.25126-4-clg@kaod.org>
+ <20190918160645.25126-14-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Zljh9u/ceMLi+8mf"
+ protocol="application/pgp-signature"; boundary="NrP+m7YXMSGlHqXH"
 Content-Disposition: inline
-In-Reply-To: <20190918160645.25126-4-clg@kaod.org>
+In-Reply-To: <20190918160645.25126-14-clg@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,69 +78,83 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Zljh9u/ceMLi+8mf
+--NrP+m7YXMSGlHqXH
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2019 at 06:06:23PM +0200, C=E9dric Le Goater wrote:
-> As there is now easy way to loop on the CPUs belonging to a chip, add
-> a helper to filter out external CPUs.
-
-This seems a somewhat odd way to go about it, given that the chip does
-have a cores array and the cores then have a threads array.  What's
-the difficulty with using that rather than looping through all vcpus
-and filtering?
-
+On Wed, Sep 18, 2019 at 06:06:33PM +0200, C=E9dric Le Goater wrote:
+> We will use it to resend missed interrupts when a vCPU context is
+> pushed a HW thread.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  hw/intc/pnv_xive.c | 23 ++++++++++++++++++++++-
->  1 file changed, 22 insertions(+), 1 deletion(-)
+>  include/hw/ppc/xive.h |  1 +
+>  hw/intc/xive.c        | 15 +++++++++++----
+>  2 files changed, 12 insertions(+), 4 deletions(-)
 >=20
-> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-> index ae449aa1119b..e1c15b6b5b71 100644
-> --- a/hw/intc/pnv_xive.c
-> +++ b/hw/intc/pnv_xive.c
-> @@ -392,15 +392,36 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8=
-_t blk, uint32_t idx,
->      return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index f35ff3b64791..a461753f5da5 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -467,6 +467,7 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveT=
+CTX *tctx, hwaddr offset,
+> =20
+>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
+>  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
+> +void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb);
+> =20
+>  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
+dx)
+>  {
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 68d3361d1c3f..5f7c37b091a7 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -135,6 +135,15 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8=
+_t ring, uint8_t cppr)
+>      xive_tctx_notify(tctx, ring);
 >  }
 > =20
-> +static int cpu_pir(PowerPCCPU *cpu)
+> +void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb)
 > +{
-> +    CPUPPCState *env =3D &cpu->env;
-> +    return env->spr_cb[SPR_PIR].default_value;
+> +    uint8_t *regs =3D &tctx->regs[ring];
+> +
+> +    regs[TM_IPB] |=3D ipb;
+> +    regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
+
+You're opencoding the existing ipb_update() here, but not eliminating
+it.  That doesn't seem like a good idea.
+
+> +    xive_tctx_notify(tctx, ring);
 > +}
 > +
-> +static int cpu_chip_id(PowerPCCPU *cpu)
-> +{
-> +    int pir =3D cpu_pir(cpu);
-> +    return (pir >> 8) & 0x7f;
-> +}
-> +
-> +#define PNV_CHIP_CPU_FOREACH(chip, cs)                                  \
-> +    CPU_FOREACH(cs)                                                     \
-> +        if (chip->chip_id !=3D cpu_chip_id(POWERPC_CPU(cs))) {} else
-> +
->  static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
->                                uint8_t nvt_blk, uint32_t nvt_idx,
->                                bool cam_ignore, uint8_t priority,
->                                uint32_t logic_serv, XiveTCTXMatch *match)
+>  static inline uint32_t xive_tctx_word2(uint8_t *ring)
 >  {
-> +    PnvXive *xive =3D PNV_XIVE(xptr);
->      CPUState *cs;
->      int count =3D 0;
+>      return *((uint32_t *) &ring[TM_WORD2]);
+> @@ -336,8 +345,7 @@ static void xive_tm_set_os_cppr(XivePresenter *xptr, =
+XiveTCTX *tctx,
+>  static void xive_tm_set_os_pending(XivePresenter *xptr, XiveTCTX *tctx,
+>                                     hwaddr offset, uint64_t value, unsign=
+ed size)
+>  {
+> -    ipb_update(&tctx->regs[TM_QW1_OS], value & 0xff);
+> -    xive_tctx_notify(tctx, TM_QW1_OS);
+> +    xive_tctx_ipb_update(tctx, TM_QW1_OS, priority_to_ipb(value & 0xff));
+>  }
 > =20
-> -    CPU_FOREACH(cs) {
-> +    /*
-> +     * Loop on all CPUs of the machine and filter out the CPUs
-> +     * belonging to another chip.
-> +     */
-> +    PNV_CHIP_CPU_FOREACH(xive->chip, cs) {
->          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->          XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
->          int ring;
+>  static uint64_t xive_tm_pull_os_ctx(XivePresenter *xptr, XiveTCTX *tctx,
+> @@ -1382,8 +1390,7 @@ static bool xive_presenter_notify(uint8_t format,
+> =20
+>      /* handle CPU exception delivery */
+>      if (count) {
+> -        ipb_update(&match.tctx->regs[match.ring], priority);
+> -        xive_tctx_notify(match.tctx, match.ring);
+> +        xive_tctx_ipb_update(match.tctx, match.ring, priority_to_ipb(pri=
+ority));
+>      }
+> =20
+>      return count;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -148,25 +162,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Zljh9u/ceMLi+8mf
+--NrP+m7YXMSGlHqXH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VU9cACgkQbDjKyiDZ
-s5KCJhAArH5y2NwFIj7D0wYGjIdkFW9LKjVg6AiKIjQwP4Dchjt0sSbuKBC1kd2k
-oC7FyvpkUwBtr+lM58kvaAutPLIPGinmR9HbT5N1gPnQyURhPlbl8ug01pKlBUQN
-Np5pecCGXVHkTveiPgW/rWrpLvoRKaNKCub8q4dWA02KkEwHJ00NY9hUyV0OJvvI
-YdZO4v3j1U/2r07dLLCZp7JqmRwgnoWPCWQKlevuKUL8H74vdDXAiIVy+wHAThjX
-IOq5wvBtjLWkpwQYhOad+sGkr9cmB0+M843W+c9LK8QXuf6vBn2SGdyAIlZDcdSD
-odko1PA3SNnYAnXASSIodZDHta2ZeLrl8OBkCii668oUADU/YaIsAZhLEYRv+db0
-JFIVTlsJGDQEg0VGPlrvSAWB1VIW19iN1ZjjgxtCHP7G0K2oS3vOVL4/d3PtVJCE
-nMj9n5x75yw4RmNqvo239FfXqgWcUHAIXS9Z8Twa+EhViK5VXAAf8Bx6ZALoLNva
-3cqGmIrTED/Ce+hbTIpRwpgE2mEXkzjyzZ+NuKOoaB/RMb20+09B3ZTuYSCqK7zF
-W6/7tk0x/IVKBU5bkWOeOwRTXlecwQTeHl/mtTdDkTfFDiceNnjuDtOGOtvEviFk
-1O9CDu2P9U1YJWPW581cBDPzhQhVmQlLL1KE0yzKxoyFHUsw/jE=
-=IMPZ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VWNkACgkQbDjKyiDZ
+s5JCEg//fMlQGIN48kUga9cXSyiPj3jGDmGYMDTBOKBj0/1zja06iBdW+gD8txjk
+6XUgMZdeEKW1NL6NQU24uR8dHlm0igsfrW/424ZWiC+2BzCbe6eBtb7rQxYdgyoS
+/dweR1mCBxFy1qa7DPvkwSkLR025Zbule8DRKZD6uqCtEY7OlvoPuZHROQbIAnY/
+SkzyCZRsA3ot2smtLQR95FWaH7KxrYMn0s0mlV2RberwOWw6H1X4yIGewQo+4jAr
+4AvD9Zgl1YqFa+ulTwxg842e4/blCerITjkoZnZtwfBPxC9m4IQGQBTxjtRceMMj
+BhlNf9dlDJ4aR36LMNp14egXhQknA8jM83iKeYDrxZBqCjbR/DhZgHi/rJ+zAblY
+vldDCexFZWrUe/bttHivRxVWesmJ9I7QYueSuUJFxbVlC/x5xm/0wgK5bYJ9Bxoe
+PuYR01Mp1yMJlW1CLPSoffV+pJNOW/dIc+LbjCnT0Taj1uax0my+oYRLsyU+BiH8
+PynfwvYC17O+YeSEGeJT4JunG++s3Z1VS6CsYGSoLD36H38MplJFoYrPKZKsXFre
+7xKYlQYJBnSQCcM/BPTw7dWGV7dFkkRMptIosEytOz8ZXTsTruFHT0Fcwor5btCR
+5fqAnoERVyTFytA3HqTmRbogJeyL6XMEahxZg/RhupRVWyuWNjA=
+=Ssys
 -----END PGP SIGNATURE-----
 
---Zljh9u/ceMLi+8mf--
+--NrP+m7YXMSGlHqXH--
 
