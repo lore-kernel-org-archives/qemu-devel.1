@@ -2,79 +2,91 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42139C4CED1
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 16:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE993C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:05:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0960920865
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 16:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D1DC2086A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:05:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hl9zqnoE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0960920865
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Lv7ERghf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1DC2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG3qN-0006mB-7J
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 12:20:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52863)
+	id 1iG4Y0-0003wC-PH
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 13:05:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59144)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iG3or-0005kq-2p
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 12:19:12 -0400
+ (envelope-from <prvs=172cfdf36=alistair.francis@wdc.com>)
+ id 1iG4WY-0003FV-B6
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:04:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iG3oo-0003a4-Nk
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 12:19:08 -0400
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:43718)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iG3ol-0003XS-0M
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 12:19:04 -0400
-Received: by mail-oi1-x231.google.com with SMTP id t84so3112169oih.10
- for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 09:19:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=g6tzVyOz1bXGvqsFVPdb1+uS9wO1zc6lCSuAxbwa6vk=;
- b=Hl9zqnoE6XzBNbBOpHBZMupZ9CXjiboxXUrVyDlfAYVSCStCD3t4gODHOPtLOXK9Nr
- iiKGmn2oRT234YLntpWDDCpgD3AE3Ok0bEKYqnIy732+sTX7MQuePQ9XoRi/jxRdLZK8
- oquiL6KPzgl8HTHC7O8km8bRV8m/cKKXUq0Xztph5prXPVooSOi3w7CyMD7EZVPKCea8
- AAJ9/P3Ki5VfNRfwgQHjmQULdXArHTxo5z3stgSfI0+0xwbHIsfzxwVY4dm5V+tyScMK
- +lu/nrvmzlHwfiGz/QwXPjNhMbdke/mCYqlUbEJgh/Kwjy1fBnWFqKAHZmwMMgsYUjfs
- cuPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=g6tzVyOz1bXGvqsFVPdb1+uS9wO1zc6lCSuAxbwa6vk=;
- b=pOyROdLv+Djuzv+zMnymAgeXRnci2i9Qypli28kiGtOPwVsquMDm6yuDdWy+0ZKYbO
- 6L4Y2LjS1lEvQEmvY8X+uchmwVRqrcu50QFtu9/OFNAkEwFlvX5vtN8j8EKCDwDGkxDf
- L8hX1WNN8QjILu9LUPN9w8p4K3PTdyz6j1IHLyT8OrDI/YBaN1z8IwtQWQf5jQisJ/cN
- S/WM/A708BYaCMuorerZnF/0robi9ZA2FvLpTjWZN4FO8e8MBgRnyu0GYvGnDlG7e8q3
- GfKT4gJqGFZQEVy1KVyARliF6yVu/XZIBolWFCQrT3J+/x1Csb8gsvC/01mpbNaQEs7u
- JLZg==
-X-Gm-Message-State: APjAAAVzFOvaIYYKMKdOSQ4oirWUZlM3Ez8gR6Oruu2sZE7lzebiYzyC
- P9Aj5ZXrsieL9QlzKS+odySd0JAyNhEi0TU0KhelCA==
-X-Google-Smtp-Source: APXvYqzm0qcLW52KF7jfMODpzRWN5L/TDxR68R2YgjvWrj5eTOyO1UwHF/QmkVcDMDohaj7NJZ35OblWyMgsSgkFT10=
-X-Received: by 2002:aca:b48a:: with SMTP id d132mr3564787oif.98.1570119540912; 
- Thu, 03 Oct 2019 09:19:00 -0700 (PDT)
+ (envelope-from <prvs=172cfdf36=alistair.francis@wdc.com>)
+ id 1iG4WW-0001JW-Rk
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:04:17 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:54355)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=172cfdf36=alistair.francis@wdc.com>)
+ id 1iG4WW-0001Hd-7I; Thu, 03 Oct 2019 13:04:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1570122271; x=1601658271;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=8TMbnmR/zLiQJyylzxvf42J8aj+45HyIeTyvX3zhMaY=;
+ b=Lv7ERghfwm4oPYnM06B18EWq9MNF0BBjNFQclxtl5hH6L78b0HuRHAE2
+ 2SuU7JISzuj40lkwva6mLIttzWWN35bqYeUkF7HEUjo0vR4leHiI1l07F
+ xu4oenTqsBNze1qjzE/BDoLbUGBbwD5D/qW/sooplKPkgQDVQiy7xRLzG
+ HyIHWzmmhQ+pbAGbVfai+wEiW22kOqi+6iIxilzO9wde3V1nBDomU4Lnv
+ J3Vj1JkXpIHKNVs7phMDElwU64kbxp/0RhcdCv7GmhA9H6y//DUwWJ4LU
+ ukcC3DSjPOm1/r6PK8i2GuCLOqubf0S4tTodo8hiTvAVmWT1uMzu9LnCu A==;
+IronPort-SDR: EeZKZbVKB7GFDzOHY3J5aHelu6J19JX+romRKj5TvT4kPHYwjQBCWo/FOyrylW6jToOoKClK0r
+ 8/gJj858rQRICuMJEj2NXVnRVEg1KI/W09dsxJmXJtlreYZDKekf05ikXZa2n3fIgBXmWFuyRs
+ 36KFzAWOVw8JBk/pyPSKdrkYtDYyPDFCpuB70WmwNJ+erQsRECDAIZM4adFqJnxOhN2R3MtUyC
+ asWKaT2acrOH2IDiIjLJ9MmZX6RPqNbofIj1tk+a7oZN2yxGb2ch/pnrwgdl4Cc+i9WXEzBPBC
+ Gb0=
+X-IronPort-AV: E=Sophos;i="5.67,253,1566835200"; d="scan'208";a="220670339"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 04 Oct 2019 01:04:05 +0800
+IronPort-SDR: ZC598ZwiGSSOH+FCkT5bpzzlvj5ALyKJ7B2TBOlAY1HRwCLZZurIgYiEWcq7HwvSC/6ivxo7mU
+ dxeulfZDVjBfWC3PwWseyuu6xeieFf7Qky25P9MLRZ9OyFEeHZT+o1/QQY0iHR6b8ZVOZgvdOV
+ XPb6oXhE/Z1FHi+LaC9MXVVImOq82FDKeC5NDLDPGzo3Xf+cfC22Cpk5NFRY9OnjRBRFwHgBM9
+ fURrS4jATTvXYcizFMEikdntKGrLtJ/DTxv82iAnPVLfTMJOfhwIjSKJdOHUJwo7fsmYMSUeF4
+ NB8cV0Rha/wftq12Prmg4mdT
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Oct 2019 10:00:02 -0700
+IronPort-SDR: spj2QAvGgbCPMhCKbKp41+q0vxM9Ev6v7eIDS4sFcaE9CFmLETfVoBQ5FAlTDib5cYeFoklp6u
+ E7mK9iNUbEfyNnwRPKHueckNu4i0nlH+kV2yejmrG9ztniuPb2+2C5gSs09lTNrB+KRu0/YnkF
+ 551pkB38bCYBdJ3zLUzG/8LdnPTQVxTe/r0Rr+KLU9ckQCOuDqRtPI60P99as5Y1aKo/Eu7NEh
+ msGn8x2F2NEPkEHRgZODkTRW5PilZipLjMd05HxUcXoJ+DHzQDz5oTSMyCjSrNhH8/hmADPmk0
+ dbM=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.157.58])
+ by uls-op-cesaip01.wdc.com with ESMTP; 03 Oct 2019 10:03:58 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v2 1/1] riscv/boot: Fix possible memory leak
+Date: Thu,  3 Oct 2019 09:59:29 -0700
+Message-Id: <07ef5d368b4bbada15eaae0d23378a323969026b.1570121723.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-References: <20191002161851.1016-1-kwolf@redhat.com>
-In-Reply-To: <20191002161851.1016-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Oct 2019 17:18:49 +0100
-Message-ID: <CAFEAcA9xQQ7cXdzFc1WL9x_aYj=dCcirDUifmb8aSs72Rqs+hQ@mail.gmail.com>
-Subject: Re: [PULL v2 0/4] Block layer patches
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::231
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 68.232.143.124
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,77 +98,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2 Oct 2019 at 17:18, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit 7f21573c822805a8e6be379d9bcf3ad9effef3dc:
->
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-10-01' into staging (2019-10-01 13:13:38 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 352492e5541e293ea8117412ffd171ce1c7ac15d:
->
->   iotests: Remove Python 2 compatibility code (2019-10-02 16:47:23 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - Fix internal snapshots with typical -blockdev setups
-> - iotests: Require Python 3.6 or later
->
-> ----------------------------------------------------------------
-> Kevin Wolf (4):
->       block/snapshot: Restrict set of snapshot nodes
->       iotests: Test internal snapshots with -blockdev
->       iotests: Require Python 3.6 or later
->       iotests: Remove Python 2 compatibility code
+Coverity (CID 1405786) thinks that there is a possible memory leak as
+we don't guarantee that the memory allocated from riscv_find_firmware()
+is freed. This is a false positive, but let's tidy up the code to fix
+the warning.
 
-Hi. This failed on iotest 267 on the ppc build machine I test on,
-in the same way that the patchew report for centos7 failed:
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+v2:
+ - Fix commit typos
 
---- /home/pm215/qemu/tests/qemu-iotests/267.out 2019-10-03
-15:35:50.099974113 +0000
-+++ /home/pm215/qemu/build/all/tests/qemu-iotests/267.out.bad
-2019-10-03 15:41:46.190579461 +0000
-@@ -3,180 +3,770 @@
- === No block devices at all ===
+ hw/riscv/boot.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
--Testing:
--QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) savevm snap0
--Error: No block device can accept snapshots
--(qemu) info snapshots
--No available block device supports snapshots
--(qemu) loadvm snap0
--Error: No block device supports snapshots
--(qemu) quit
-+Usage: sed [OPTION]... {script-only-if-no-other-script} [input-file]...
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index 2e92fb0680..7fee98d2f8 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -38,7 +38,7 @@ void riscv_find_and_load_firmware(MachineState *machine,
+                                   const char *default_machine_firmware,
+                                   hwaddr firmware_load_addr)
+ {
+-    char *firmware_filename;
++    char *firmware_filename = NULL;
+ 
+     if (!machine->firmware) {
+         /*
+@@ -70,14 +70,11 @@ void riscv_find_and_load_firmware(MachineState *machine,
+          * if no -bios option is set without breaking anything.
+          */
+         firmware_filename = riscv_find_firmware(default_machine_firmware);
+-    } else {
+-        firmware_filename = machine->firmware;
+-        if (strcmp(firmware_filename, "none")) {
+-            firmware_filename = riscv_find_firmware(firmware_filename);
+-        }
++    } else if (strcmp(machine->firmware, "none")) {
++        firmware_filename = riscv_find_firmware(machine->firmware);
+     }
+ 
+-    if (strcmp(firmware_filename, "none")) {
++    if (firmware_filename) {
+         /* If not "none" load the firmware */
+         riscv_load_firmware(firmware_filename, firmware_load_addr);
+         g_free(firmware_filename);
+-- 
+2.23.0
 
-+  -n, --quiet, --silent
-+                 suppress automatic printing of pattern space
-+  -e script, --expression=script
-+                 add the script to the commands to be executed
-[etc]
-
-The machine is running 'sed (GNU sed) 4.2.2'.
-
-It looks like this version of sed doesn't like it if you
-specify '-r' twice, as you have done in the _filter_vmstate_size()
-function in common.filter in the "iotests: Test internal snapshots
-with -blockdev" patch. I think '-r' is supposed to apply to all
-scripts in the sed invocation; if that's correct then a command
-line like '-re thing1 -re thing2' is confusing and would be better
-written '-r -e thing1 -e thing2' even if this older sed didn't
-complain about it.
-
-thanks
--- PMM
 
