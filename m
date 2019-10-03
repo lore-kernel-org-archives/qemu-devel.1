@@ -2,118 +2,60 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C80DC32792
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 14:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FF0C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 14:56:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E98F520865
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 14:51:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="j3+4GTSj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E98F520865
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 68E3621783
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 14:56:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68E3621783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG2S6-0004Gi-Ol
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 10:51:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38028)
+	id 1iG2X6-0007bF-DX
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 10:56:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iG2Pf-00031U-QO
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 10:49:05 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1iG2VE-0006Lk-CR
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 10:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iG2Pd-0000uU-Tu
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 10:49:03 -0400
-Received: from mail-eopbgr150115.outbound.protection.outlook.com
- ([40.107.15.115]:12335 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iG2PZ-0000sZ-3D; Thu, 03 Oct 2019 10:48:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KrVh6l890Kfbx7EeCJ70uDGQ6INhyf714gGVVYd69oQfP7SYCK8U+MG7Rh4uXA9Ixm1/aKipHLXkoSCziyAGO21O2v+7i9nSVC66ZgafCAw0mKNhIMivy/xpIbVrcUAd1WpJqzYGRJ5A+V8p8eHaIt9yBHNxEGmjApZlhlTksuYq+4NWhdkgiIqnC2x8kSN1KauRr0MwZEOUQcHWlWAdyKan8XEas+9ppqxQdlqwBA0aQInDJI4cWc/6j9CBiM8FM65yn4ArgGUxYqppBIIkEYEX9OjqpgdPEju5Yvuq+7tYQIP7sNjOVVHB4SS/SGawmGDztlpB1H88W/rSXou9rw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o+9Ll20bK3YDqiIWk9OhVRRZjEFkAjhwp2oByi33olA=;
- b=VAEAWVLgQiWhD0ZhZOCc8cYkH0G73vuzhZAp8mLKE/GkWWpUbG3+M/7OO/hmIYFzIJLqzgpgeor/TOD8VaozK6PGP0cPcT/5ACeT0YETzyz3I1bvz11fXtSUk37c87wk4i9/syNW5RuXxNtyAs5WXZqOrw0b0jQjd3Q+T+j989p23SSLTLcBvYGgQMve7EcZV09WUEO7QK6eQ7lm+XHvH7L7XQRsfvgXs1s+rA0ms0hdLR/iWF7kDyMFPm8KwvqAzTCgOCXajSihd7UJF7K2QH07ZtJ0wAyZkKgKYY8qzl/DyvOGRPy+AiZV6QqB4hNlv/knaQyZkOAp6bcQDM0T7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o+9Ll20bK3YDqiIWk9OhVRRZjEFkAjhwp2oByi33olA=;
- b=j3+4GTSjyzh0bitEPfe4Np2RLVNaRyX5KkBJWYgNYPnhjNmGyXOnezUIbhnHgyjq8tgVN36Fw5BaWnt1sa94eJjnpPPfW1e6SDjth+czQl5G+v4AlhOD1vhoEOMHsTOPxw3kh+cBT6gN6uF531KXs2/22TtwtytGBHNVhoAB/cU=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8SPR01MB0010.eurprd08.prod.outlook.com (20.179.13.143) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2305.15; Thu, 3 Oct 2019 14:48:53 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2305.023; Thu, 3 Oct 2019
- 14:48:53 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v2 5/6] block-stream: add compress option
-Thread-Topic: [PATCH v2 5/6] block-stream: add compress option
-Thread-Index: AQHVeSzoyCePuWb7cUSzDVPP3HeHYKdJAP2A
-Date: Thu, 3 Oct 2019 14:48:53 +0000
-Message-ID: <b37bfb4f-287d-66e0-1f98-7afeb962b530@virtuozzo.com>
-References: <1570026166-748566-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1570026166-748566-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-In-Reply-To: <1570026166-748566-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0502CA0008.eurprd05.prod.outlook.com
- (2603:10a6:3:e3::18) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191003174851071
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b4f6eb99-3277-4df0-e74b-08d74810cf90
-x-ms-traffictypediagnostic: DB8SPR01MB0010:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB8SPR01MB0010F8156F5D358F313A9696C19F0@DB8SPR01MB0010.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3044;
-x-forefront-prvs: 01792087B6
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(376002)(346002)(136003)(39840400004)(396003)(199004)(189003)(11346002)(102836004)(4326008)(7736002)(26005)(2616005)(5660300002)(446003)(6246003)(478600001)(25786009)(14454004)(107886003)(305945005)(386003)(7416002)(71200400001)(71190400001)(3846002)(6116002)(186003)(66066001)(486006)(2906002)(110136005)(66946007)(31696002)(66556008)(66476007)(64756008)(66446008)(31686004)(2201001)(229853002)(2501003)(6486002)(76176011)(256004)(316002)(86362001)(99286004)(476003)(36756003)(81166006)(81156014)(6512007)(54906003)(6506007)(8676002)(6436002)(52116002)(8936002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8SPR01MB0010;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5/orNJUIvUMxlQdM8QPwtGU9usY+GXUr4aebxPn75ScoxXXdGy4q5quKlnXI7/28rtnbuV7sq1S+EsV9B41RiCboqzPdyPbsSop9Y9wZRu+KpkMWnIFt7Q/6Q3hkSTub3g9LObvlpRQdwoEaZC/VzvxnAB84SmV1/QoNOV77QWVUD7jn7pgErYcM6otoYBxspHL+Mn0ZrgYBov1zdE3IfY6xgGEN/3gcMxB8dPju1N1C5NtOFemQCtpQwyaL3w8v8hkyWc7pO3CYGCMmaOPyEpau20iGIvqNQdRtL9HARY/2JnpoVwFW3jEFK5MxumJk7cCmTaCdQae4spN3UoIlCPMZVUrmoQRWfT9AJuIR8wtEDpK0WnVqX7vj4LlJC5J187Y2KNriKmfw/IEFrAXgfpShpu4BEmchlL2O0A966eo=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7508C1C23A97224EA3E7A51D2D73D4EA@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <eric.auger@redhat.com>) id 1iG2VA-0003N0-9I
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 10:54:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35994)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iG2VA-0003MV-0l
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 10:54:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 84F2F89810D;
+ Thu,  3 Oct 2019 14:54:42 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-117-64.ams2.redhat.com [10.36.117.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 62E145D9E1;
+ Thu,  3 Oct 2019 14:54:35 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, quintela@redhat.com
+Subject: [PATCH v2] migration: Support gtree migration
+Date: Thu,  3 Oct 2019 16:54:31 +0200
+Message-Id: <20191003145431.21154-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4f6eb99-3277-4df0-e74b-08d74810cf90
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2019 14:48:53.7132 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Lak4zGtvYFjNNzlTRJ59FxEP83D156e/sYvaWQrolTcQUcW3SgGfy9UJb4g3fKuTNUZ6TlOncE7o+EOm3GONY465g9lqLYeblQiWqX+Mu3Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8SPR01MB0010
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.115
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Thu, 03 Oct 2019 14:54:42 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,171 +67,758 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- Denis Lunev <den@virtuozzo.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDIuMTAuMjAxOSAxNzoyMiwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IEFsbG93IGRhdGEg
-Y29tcHJlc3Npb24gZHVyaW5nIGJsb2NrLXN0cmVhbSBqb2IgZm9yIGJhY2t1cCBiYWNraW5nIGNo
-YWluLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQW50b24gTmVmZWRvdiA8YW50b24ubmVmZWRvdkB2
-aXJ0dW96em8uY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZz
-a2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IERlbmlzIFYu
-IEx1bmV2IDxkZW5Ab3BlbnZ6Lm9yZz4NCj4gU2lnbmVkLW9mZi1ieTogQW5kcmV5IFNoaW5rZXZp
-Y2ggPGFuZHJleS5zaGlua2V2aWNoQHZpcnR1b3p6by5jb20+DQo+IC0tLQ0KPiAgIGJsb2NrL3N0
-cmVhbS5jICAgICAgICAgICAgfCAxOSArKysrKysrKysrKysrLS0tLS0tDQo+ICAgYmxvY2tkZXYu
-YyAgICAgICAgICAgICAgICB8IDE0ICsrKysrKysrKysrKystDQo+ICAgaG1wLWNvbW1hbmRzLmh4
-ICAgICAgICAgICB8ICA0ICsrLS0NCj4gICBpbmNsdWRlL2Jsb2NrL2Jsb2NrX2ludC5oIHwgIDMg
-KystDQo+ICAgbW9uaXRvci9obXAtY21kcy5jICAgICAgICB8ICA1ICsrKy0tDQo+ICAgcWFwaS9i
-bG9jay1jb3JlLmpzb24gICAgICB8ICA1ICsrKystDQo+ICAgNiBmaWxlcyBjaGFuZ2VkLCAzNyBp
-bnNlcnRpb25zKCspLCAxMyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ibG9jay9z
-dHJlYW0uYyBiL2Jsb2NrL3N0cmVhbS5jDQo+IGluZGV4IDU1NjJjY2IuLjUxY2M0OWUgMTAwNjQ0
-DQo+IC0tLSBhL2Jsb2NrL3N0cmVhbS5jDQo+ICsrKyBiL2Jsb2NrL3N0cmVhbS5jDQo+IEBAIC0z
-NiwxNSArMzYsMjEgQEAgdHlwZWRlZiBzdHJ1Y3QgU3RyZWFtQmxvY2tKb2Igew0KPiAgICAgICBj
-aGFyICpiYWNraW5nX2ZpbGVfc3RyOw0KPiAgICAgICBib29sIGJzX3JlYWRfb25seTsNCj4gICAg
-ICAgYm9vbCBjaGFpbl9mcm96ZW47DQo+ICsgICAgYm9vbCBjb21wcmVzczsNCj4gICB9IFN0cmVh
-bUJsb2NrSm9iOw0KPiAgIA0KPiAtc3RhdGljIGludCBjb3JvdXRpbmVfZm4gc3RyZWFtX3BvcHVs
-YXRlKEJsb2NrQmFja2VuZCAqYmxrLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIGludDY0X3Qgb2Zmc2V0LCB1aW50NjRfdCBieXRlcykNCj4gK3N0YXRpYyBpbnQg
-Y29yb3V0aW5lX2ZuIHN0cmVhbV9wb3B1bGF0ZShCbG9ja0JhY2tlbmQgKmJsaywgaW50NjRfdCBv
-ZmZzZXQsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDY0
-X3QgYnl0ZXMsIGJvb2wgY29tcHJlc3MpDQo+ICAgew0KPiArICAgIGludCBmbGFncyA9IEJEUlZf
-UkVRX0NPUFlfT05fUkVBRCB8IEJEUlZfUkVRX1BSRUZFVENIOw0KDQpiZXR0ZXI6IEJkcnZSZXF1
-ZXN0RmxhZ3MgZmxhZ3MgPSAuLi4NCg0KPiArDQo+ICsgICAgaWYgKGNvbXByZXNzKSB7DQo+ICsg
-ICAgICAgIGZsYWdzIHw9IEJEUlZfUkVRX1dSSVRFX0NPTVBSRVNTRUQ7DQo+ICsgICAgfQ0KPiAr
-DQo+ICAgICAgIGFzc2VydChieXRlcyA8IFNJWkVfTUFYKTsNCj4gICANCj4gLSAgICByZXR1cm4g
-YmxrX2NvX3ByZWFkdihibGssIG9mZnNldCwgYnl0ZXMsIE5VTEwsDQo+IC0gICAgICAgICAgICAg
-ICAgICAgICAgICAgQkRSVl9SRVFfQ09QWV9PTl9SRUFEIHwgQkRSVl9SRVFfUFJFRkVUQ0gpOw0K
-PiArICAgIHJldHVybiBibGtfY29fcHJlYWR2KGJsaywgb2Zmc2V0LCBieXRlcywgTlVMTCwgZmxh
-Z3MpOw0KPiAgIH0NCj4gICANCj4gICBzdGF0aWMgdm9pZCBzdHJlYW1fYWJvcnQoSm9iICpqb2Ip
-DQo+IEBAIC0xNjcsNyArMTczLDcgQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gc3RyZWFtX3J1
-bihKb2IgKmpvYiwgRXJyb3IgKiplcnJwKQ0KPiAgICAgICAgICAgfQ0KPiAgICAgICAgICAgdHJh
-Y2Vfc3RyZWFtX29uZV9pdGVyYXRpb24ocywgb2Zmc2V0LCBuLCByZXQpOw0KPiAgICAgICAgICAg
-aWYgKGNvcHkpIHsNCj4gLSAgICAgICAgICAgIHJldCA9IHN0cmVhbV9wb3B1bGF0ZShibGssIG9m
-ZnNldCwgbik7DQo+ICsgICAgICAgICAgICByZXQgPSBzdHJlYW1fcG9wdWxhdGUoYmxrLCBvZmZz
-ZXQsIG4sIHMtPmNvbXByZXNzKTsNCj4gICAgICAgICAgIH0NCj4gICAgICAgICAgIGlmIChyZXQg
-PCAwKSB7DQo+ICAgICAgICAgICAgICAgQmxvY2tFcnJvckFjdGlvbiBhY3Rpb24gPQ0KPiBAQCAt
-MjE3LDcgKzIyMyw3IEBAIHN0YXRpYyBjb25zdCBCbG9ja0pvYkRyaXZlciBzdHJlYW1fam9iX2Ry
-aXZlciA9IHsNCj4gICANCj4gICB2b2lkIHN0cmVhbV9zdGFydChjb25zdCBjaGFyICpqb2JfaWQs
-IEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICAgICAgICAgICAgICAgIEJsb2NrRHJpdmVy
-U3RhdGUgKmJhc2UsIGNvbnN0IGNoYXIgKmJhY2tpbmdfZmlsZV9zdHIsDQo+IC0gICAgICAgICAg
-ICAgICAgICBpbnQgY3JlYXRpb25fZmxhZ3MsIGludDY0X3Qgc3BlZWQsDQo+ICsgICAgICAgICAg
-ICAgICAgICBpbnQgY3JlYXRpb25fZmxhZ3MsIGludDY0X3Qgc3BlZWQsIGJvb2wgY29tcHJlc3Ms
-DQo+ICAgICAgICAgICAgICAgICAgICAgQmxvY2tkZXZPbkVycm9yIG9uX2Vycm9yLCBFcnJvciAq
-KmVycnApDQo+ICAgew0KPiAgICAgICBTdHJlYW1CbG9ja0pvYiAqczsNCj4gQEAgLTI2Nyw2ICsy
-NzMsNyBAQCB2b2lkIHN0cmVhbV9zdGFydChjb25zdCBjaGFyICpqb2JfaWQsIEJsb2NrRHJpdmVy
-U3RhdGUgKmJzLA0KPiAgICAgICBzLT5iYWNraW5nX2ZpbGVfc3RyID0gZ19zdHJkdXAoYmFja2lu
-Z19maWxlX3N0cik7DQo+ICAgICAgIHMtPmJzX3JlYWRfb25seSA9IGJzX3JlYWRfb25seTsNCj4g
-ICAgICAgcy0+Y2hhaW5fZnJvemVuID0gdHJ1ZTsNCj4gKyAgICBzLT5jb21wcmVzcyA9IGNvbXBy
-ZXNzOw0KDQpJJ2QgcHJlZmVyIGNoZWNrIGZvciBjb21wcmVzcyBzdXBwb3J0IHRvIGJlIGluIHRo
-aXMgZnVuY3Rpb24sIG5vdCBpbiB0aGUgY2FsbGVyLg0KDQo+ICAgDQo+ICAgICAgIHMtPm9uX2Vy
-cm9yID0gb25fZXJyb3I7DQo+ICAgICAgIHRyYWNlX3N0cmVhbV9zdGFydChicywgYmFzZSwgcyk7
-DQo+IGRpZmYgLS1naXQgYS9ibG9ja2Rldi5jIGIvYmxvY2tkZXYuYw0KPiBpbmRleCBmYmVmNjg0
-Li4yOTBlZTRiIDEwMDY0NA0KPiAtLS0gYS9ibG9ja2Rldi5jDQo+ICsrKyBiL2Jsb2NrZGV2LmMN
-Cj4gQEAgLTMyMzgsNiArMzIzOCw3IEBAIHZvaWQgcW1wX2Jsb2NrX3N0cmVhbShib29sIGhhc19q
-b2JfaWQsIGNvbnN0IGNoYXIgKmpvYl9pZCwgY29uc3QgY2hhciAqZGV2aWNlLA0KPiAgICAgICAg
-ICAgICAgICAgICAgICAgICBib29sIGhhc19iYXNlX25vZGUsIGNvbnN0IGNoYXIgKmJhc2Vfbm9k
-ZSwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgYm9vbCBoYXNfYmFja2luZ19maWxlLCBjb25z
-dCBjaGFyICpiYWNraW5nX2ZpbGUsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2wgaGFz
-X3NwZWVkLCBpbnQ2NF90IHNwZWVkLA0KPiArICAgICAgICAgICAgICAgICAgICAgIGJvb2wgaGFz
-X2NvbXByZXNzLCBib29sIGNvbXByZXNzLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICBib29s
-IGhhc19vbl9lcnJvciwgQmxvY2tkZXZPbkVycm9yIG9uX2Vycm9yLA0KPiAgICAgICAgICAgICAg
-ICAgICAgICAgICBib29sIGhhc19hdXRvX2ZpbmFsaXplLCBib29sIGF1dG9fZmluYWxpemUsDQo+
-ICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2wgaGFzX2F1dG9fZGlzbWlzcywgYm9vbCBhdXRv
-X2Rpc21pc3MsDQo+IEBAIC0zMjU0LDYgKzMyNTUsMTAgQEAgdm9pZCBxbXBfYmxvY2tfc3RyZWFt
-KGJvb2wgaGFzX2pvYl9pZCwgY29uc3QgY2hhciAqam9iX2lkLCBjb25zdCBjaGFyICpkZXZpY2Us
-DQo+ICAgICAgICAgICBvbl9lcnJvciA9IEJMT0NLREVWX09OX0VSUk9SX1JFUE9SVDsNCj4gICAg
-ICAgfQ0KPiAgIA0KPiArICAgIGlmICghaGFzX2NvbXByZXNzKSB7DQo+ICsgICAgICAgIGNvbXBy
-ZXNzID0gZmFsc2U7DQo+ICsgICAgfQ0KDQpUaGlzIGlzIGV4dHJhIHRoaW5nOiBpdCdzIGd1YXJh
-bnRlZWQgZm9yIGl0IHRvIGJlIGZhbHNlLCBpZiBpdCBpcyBhYnNlbnQuDQoNCj4gKw0KPiAgICAg
-ICBicyA9IGJkcnZfbG9va3VwX2JzKGRldmljZSwgZGV2aWNlLCBlcnJwKTsNCj4gICAgICAgaWYg
-KCFicykgew0KPiAgICAgICAgICAgcmV0dXJuOw0KPiBAQCAtMzMwOCw2ICszMzEzLDEyIEBAIHZv
-aWQgcW1wX2Jsb2NrX3N0cmVhbShib29sIGhhc19qb2JfaWQsIGNvbnN0IGNoYXIgKmpvYl9pZCwg
-Y29uc3QgY2hhciAqZGV2aWNlLA0KPiAgICAgICAgICAgZ290byBvdXQ7DQo+ICAgICAgIH0NCj4g
-ICANCj4gKyAgICBpZiAoY29tcHJlc3MgJiYgYnMtPmRydi0+YmRydl9jb19wd3JpdGV2X2NvbXBy
-ZXNzZWRfcGFydCA9PSBOVUxMKSB7DQo+ICsgICAgICAgIGVycm9yX3NldGcoZXJycCwgIkNvbXBy
-ZXNzaW9uIGlzIG5vdCBzdXBwb3J0ZWQgZm9yIHRoaXMgZHJpdmUgJXMiLA0KPiArICAgICAgICAg
-ICAgICAgICAgIGJkcnZfZ2V0X2RldmljZV9uYW1lKGJzKSk7DQo+ICsgICAgICAgIGdvdG8gb3V0
-Ow0KPiArICAgIH0NCj4gKw0KPiAgICAgICAvKiBiYWNraW5nX2ZpbGUgc3RyaW5nIG92ZXJyaWRl
-cyBiYXNlIGJzIGZpbGVuYW1lICovDQo+ICAgICAgIGJhc2VfbmFtZSA9IGhhc19iYWNraW5nX2Zp
-bGUgPyBiYWNraW5nX2ZpbGUgOiBiYXNlX25hbWU7DQo+ICAgDQo+IEBAIC0zMzE5LDcgKzMzMzAs
-OCBAQCB2b2lkIHFtcF9ibG9ja19zdHJlYW0oYm9vbCBoYXNfam9iX2lkLCBjb25zdCBjaGFyICpq
-b2JfaWQsIGNvbnN0IGNoYXIgKmRldmljZSwNCj4gICAgICAgfQ0KPiAgIA0KPiAgICAgICBzdHJl
-YW1fc3RhcnQoaGFzX2pvYl9pZCA/IGpvYl9pZCA6IE5VTEwsIGJzLCBiYXNlX2JzLCBiYXNlX25h
-bWUsDQo+IC0gICAgICAgICAgICAgICAgIGpvYl9mbGFncywgaGFzX3NwZWVkID8gc3BlZWQgOiAw
-LCBvbl9lcnJvciwgJmxvY2FsX2Vycik7DQo+ICsgICAgICAgICAgICAgICAgIGpvYl9mbGFncywg
-aGFzX3NwZWVkID8gc3BlZWQgOiAwLCBjb21wcmVzcywgb25fZXJyb3IsDQo+ICsgICAgICAgICAg
-ICAgICAgICZsb2NhbF9lcnIpOw0KPiAgICAgICBpZiAobG9jYWxfZXJyKSB7DQo+ICAgICAgICAg
-ICBlcnJvcl9wcm9wYWdhdGUoZXJycCwgbG9jYWxfZXJyKTsNCj4gICAgICAgICAgIGdvdG8gb3V0
-Ow0KPiBkaWZmIC0tZ2l0IGEvaG1wLWNvbW1hbmRzLmh4IGIvaG1wLWNvbW1hbmRzLmh4DQo+IGlu
-ZGV4IGNmY2MwNDQuLjNhMzQ3ZmQgMTAwNjQ0DQo+IC0tLSBhL2htcC1jb21tYW5kcy5oeA0KPiAr
-KysgYi9obXAtY29tbWFuZHMuaHgNCj4gQEAgLTk1LDggKzk1LDggQEAgRVRFWEkNCj4gICANCj4g
-ICAgICAgew0KPiAgICAgICAgICAgLm5hbWUgICAgICAgPSAiYmxvY2tfc3RyZWFtIiwNCj4gLSAg
-ICAgICAgLmFyZ3NfdHlwZSAgPSAiZGV2aWNlOkIsc3BlZWQ6bz8sYmFzZTpzPyIsDQo+IC0gICAg
-ICAgIC5wYXJhbXMgICAgID0gImRldmljZSBbc3BlZWQgW2Jhc2VdXSIsDQo+ICsgICAgICAgIC5h
-cmdzX3R5cGUgID0gImRldmljZTpCLHNwZWVkOm8/LGJhc2U6cz8sY29tcHJlc3M6bz8iLA0KPiAr
-ICAgICAgICAucGFyYW1zICAgICA9ICJkZXZpY2UgW3NwZWVkIFtiYXNlXV0gW2NvbXByZXNzXSIs
-DQo+ICAgICAgICAgICAuaGVscCAgICAgICA9ICJjb3B5IGRhdGEgZnJvbSBhIGJhY2tpbmcgZmls
-ZSBpbnRvIGEgYmxvY2sgZGV2aWNlIiwNCj4gICAgICAgICAgIC5jbWQgICAgICAgID0gaG1wX2Js
-b2NrX3N0cmVhbSwNCj4gICAgICAgfSwNCg0KSSdtIG5vdCBhIGZhbiBvZiBjb250cmlidXRpbmcg
-aW50byBobXAsIGFuZCBJIGRvbid0IHJlbWVtYmVyIHRoZSBzeW50YXggb2YgdGhpcyBmaWxlLA0K
-YnV0IEkgdGhpbmsgaXQncyB3cm9uZyB0byBkZWZpbmUgYm9vbGVhbiBmaWVsZCBsaWtlIGludGVy
-Z2VyIHNwZWVkLi4uDQoNCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvYmxvY2svYmxvY2tfaW50Lmgg
-Yi9pbmNsdWRlL2Jsb2NrL2Jsb2NrX2ludC5oDQo+IGluZGV4IDA0MjJhY2QuLjVlN2ZjZTggMTAw
-NjQ0DQo+IC0tLSBhL2luY2x1ZGUvYmxvY2svYmxvY2tfaW50LmgNCj4gKysrIGIvaW5jbHVkZS9i
-bG9jay9ibG9ja19pbnQuaA0KPiBAQCAtMTA2NSw2ICsxMDY1LDcgQEAgaW50IGlzX3dpbmRvd3Nf
-ZHJpdmUoY29uc3QgY2hhciAqZmlsZW5hbWUpOw0KPiAgICAqIEBjcmVhdGlvbl9mbGFnczogRmxh
-Z3MgdGhhdCBjb250cm9sIHRoZSBiZWhhdmlvciBvZiB0aGUgSm9iIGxpZmV0aW1lLg0KPiAgICAq
-ICAgICAgICAgICAgICAgICAgU2VlIEBCbG9ja0pvYkNyZWF0ZUZsYWdzDQo+ICAgICogQHNwZWVk
-OiBUaGUgbWF4aW11bSBzcGVlZCwgaW4gYnl0ZXMgcGVyIHNlY29uZCwgb3IgMCBmb3IgdW5saW1p
-dGVkLg0KPiArICogQGNvbXByZXNzOiBUcnVlIHRvIGNvbXByZXNzIGRhdGEuDQo+ICAgICogQG9u
-X2Vycm9yOiBUaGUgYWN0aW9uIHRvIHRha2UgdXBvbiBlcnJvci4NCj4gICAgKiBAZXJycDogRXJy
-b3Igb2JqZWN0Lg0KPiAgICAqDQo+IEBAIC0xMDc3LDcgKzEwNzgsNyBAQCBpbnQgaXNfd2luZG93
-c19kcml2ZShjb25zdCBjaGFyICpmaWxlbmFtZSk7DQo+ICAgICovDQo+ICAgdm9pZCBzdHJlYW1f
-c3RhcnQoY29uc3QgY2hhciAqam9iX2lkLCBCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAg
-ICAgICAgICAgICAgICBCbG9ja0RyaXZlclN0YXRlICpiYXNlLCBjb25zdCBjaGFyICpiYWNraW5n
-X2ZpbGVfc3RyLA0KPiAtICAgICAgICAgICAgICAgICAgaW50IGNyZWF0aW9uX2ZsYWdzLCBpbnQ2
-NF90IHNwZWVkLA0KPiArICAgICAgICAgICAgICAgICAgaW50IGNyZWF0aW9uX2ZsYWdzLCBpbnQ2
-NF90IHNwZWVkLCBib29sIGNvbXByZXNzLA0KPiAgICAgICAgICAgICAgICAgICAgIEJsb2NrZGV2
-T25FcnJvciBvbl9lcnJvciwgRXJyb3IgKiplcnJwKTsNCj4gICANCj4gICAvKioNCj4gZGlmZiAt
-LWdpdCBhL21vbml0b3IvaG1wLWNtZHMuYyBiL21vbml0b3IvaG1wLWNtZHMuYw0KPiBpbmRleCBi
-MjU1MWMxLi45MTIwMWZlIDEwMDY0NA0KPiAtLS0gYS9tb25pdG9yL2htcC1jbWRzLmMNCj4gKysr
-IGIvbW9uaXRvci9obXAtY21kcy5jDQo+IEBAIC0yMDI1LDExICsyMDI1LDEyIEBAIHZvaWQgaG1w
-X2Jsb2NrX3N0cmVhbShNb25pdG9yICptb24sIGNvbnN0IFFEaWN0ICpxZGljdCkNCj4gICAgICAg
-Y29uc3QgY2hhciAqZGV2aWNlID0gcWRpY3RfZ2V0X3N0cihxZGljdCwgImRldmljZSIpOw0KPiAg
-ICAgICBjb25zdCBjaGFyICpiYXNlID0gcWRpY3RfZ2V0X3RyeV9zdHIocWRpY3QsICJiYXNlIik7
-DQo+ICAgICAgIGludDY0X3Qgc3BlZWQgPSBxZGljdF9nZXRfdHJ5X2ludChxZGljdCwgInNwZWVk
-IiwgMCk7DQo+ICsgICAgYm9vbCBjb21wcmVzcyA9IHFkaWN0X2dldF90cnlfYm9vbChxZGljdCwg
-ImNvbXByZXNzIiwgZmFsc2UpOw0KPiAgIA0KPiAgICAgICBxbXBfYmxvY2tfc3RyZWFtKHRydWUs
-IGRldmljZSwgZGV2aWNlLCBiYXNlICE9IE5VTEwsIGJhc2UsIGZhbHNlLCBOVUxMLA0KPiAgICAg
-ICAgICAgICAgICAgICAgICAgIGZhbHNlLCBOVUxMLCBxZGljdF9oYXNrZXkocWRpY3QsICJzcGVl
-ZCIpLCBzcGVlZCwgdHJ1ZSwNCj4gLSAgICAgICAgICAgICAgICAgICAgIEJMT0NLREVWX09OX0VS
-Uk9SX1JFUE9SVCwgZmFsc2UsIGZhbHNlLCBmYWxzZSwgZmFsc2UsDQo+IC0gICAgICAgICAgICAg
-ICAgICAgICAmZXJyb3IpOw0KPiArICAgICAgICAgICAgICAgICAgICAgY29tcHJlc3MsIHRydWUs
-IEJMT0NLREVWX09OX0VSUk9SX1JFUE9SVCwNCj4gKyAgICAgICAgICAgICAgICAgICAgIGZhbHNl
-LCBmYWxzZSwgZmFsc2UsIGZhbHNlLCAmZXJyb3IpOw0KPiAgIA0KPiAgICAgICBobXBfaGFuZGxl
-X2Vycm9yKG1vbiwgJmVycm9yKTsNCj4gICB9DQo+IGRpZmYgLS1naXQgYS9xYXBpL2Jsb2NrLWNv
-cmUuanNvbiBiL3FhcGkvYmxvY2stY29yZS5qc29uDQo+IGluZGV4IGU2ZWRkNjQuLjljMjA5M2Ug
-MTAwNjQ0DQo+IC0tLSBhL3FhcGkvYmxvY2stY29yZS5qc29uDQo+ICsrKyBiL3FhcGkvYmxvY2st
-Y29yZS5qc29uDQo+IEBAIC0yNTQ0LDYgKzI1NDQsOSBAQA0KPiAgICMNCj4gICAjIEBzcGVlZDog
-IHRoZSBtYXhpbXVtIHNwZWVkLCBpbiBieXRlcyBwZXIgc2Vjb25kDQo+ICAgIw0KPiArIyBAY29t
-cHJlc3M6IHRydWUgdG8gY29tcHJlc3MgZGF0YSwgaWYgdGhlIHRhcmdldCBmb3JtYXQgc3VwcG9y
-dHMgaXQNCj4gKyMgICAgICAgICAgICAoZGVmYXVsdDogZmFsc2UpLiBTaW5jZSA0LjIuDQo+ICsj
-DQo+ICAgIyBAb24tZXJyb3I6IHRoZSBhY3Rpb24gdG8gdGFrZSBvbiBhbiBlcnJvciAoZGVmYXVs
-dCByZXBvcnQpLg0KPiAgICMgICAgICAgICAgICAnc3RvcCcgYW5kICdlbm9zcGMnIGNhbiBvbmx5
-IGJlIHVzZWQgaWYgdGhlIGJsb2NrIGRldmljZQ0KPiAgICMgICAgICAgICAgICBzdXBwb3J0cyBp
-by1zdGF0dXMgKHNlZSBCbG9ja0luZm8pLiAgU2luY2UgMS4zLg0KPiBAQCAtMjU3Niw3ICsyNTc5
-LDcgQEANCj4gICB7ICdjb21tYW5kJzogJ2Jsb2NrLXN0cmVhbScsDQo+ICAgICAnZGF0YSc6IHsg
-Jypqb2ItaWQnOiAnc3RyJywgJ2RldmljZSc6ICdzdHInLCAnKmJhc2UnOiAnc3RyJywNCj4gICAg
-ICAgICAgICAgICAnKmJhc2Utbm9kZSc6ICdzdHInLCAnKmJhY2tpbmctZmlsZSc6ICdzdHInLCAn
-KnNwZWVkJzogJ2ludCcsDQo+IC0gICAgICAgICAgICAnKm9uLWVycm9yJzogJ0Jsb2NrZGV2T25F
-cnJvcicsDQo+ICsgICAgICAgICAgICAnKmNvbXByZXNzJzogJ2Jvb2wnLCAnKm9uLWVycm9yJzog
-J0Jsb2NrZGV2T25FcnJvcicsDQo+ICAgICAgICAgICAgICAgJyphdXRvLWZpbmFsaXplJzogJ2Jv
-b2wnLCAnKmF1dG8tZGlzbWlzcyc6ICdib29sJyB9IH0NCj4gICANCj4gICAjIw0KPiANCg0KDQot
-LSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+Introduce support for GTree migration. A custom save/restore
+is implemented. Each item is made of a key and a data. For that
+reason, 2 VMSD objects are passed into the GTree VMStateField.
+
+When putting the items, the tree is traversed in sorted order by
+g_tree_foreach.
+
+On the get() path, gtrees must be allocated using the proper
+key compare, key destroy and value destroy. This can be done
+externally of automatically. If done automatically, the set of
+functions must be stored within the VMStateField in a new opaque
+pointer.
+
+Automatic allocation is needed for complex state save/restore.
+For instance the virtio-iommu uses a gtree of domain and each
+domain has a gtree of mappings.
+
+Special care was taken about direct key (ie. when the key is not
+a pointer to an object but is directly a value).
+
+Tests are added to test save/dump of structs containing gtrees
+including the virtio-iommu domain/mappings scenario.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+
+---
+
+v1 -> v2:
+- fix compilation issues reported by robots
+- fixed init of VMSD array
+- direct key now dumped as a 32b
+- removed useless cast from/to pointer
+---
+ include/migration/vmstate.h |  31 +++
+ migration/trace-events      |   6 +
+ migration/vmstate-types.c   | 133 +++++++++++
+ tests/test-vmstate.c        | 427 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 597 insertions(+)
+
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 1fbfd099dd..4d9698eaab 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -171,6 +171,7 @@ struct VMStateField {
+     int version_id;
+     int struct_version_id;
+     bool (*field_exists)(void *opaque, int version_id);
++    void *data;
+ };
+=20
+ struct VMStateDescription {
+@@ -224,6 +225,7 @@ extern const VMStateInfo vmstate_info_unused_buffer;
+ extern const VMStateInfo vmstate_info_tmp;
+ extern const VMStateInfo vmstate_info_bitmap;
+ extern const VMStateInfo vmstate_info_qtailq;
++extern const VMStateInfo vmstate_info_gtree;
+=20
+ #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
+ /*
+@@ -754,6 +756,35 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .start        =3D offsetof(_type, _next),                           =
+   \
+ }
+=20
++typedef struct GTreeInitData {
++    GCompareDataFunc key_compare_func;
++    gpointer key_compare_data;
++    GDestroyNotify key_destroy_func;
++    GDestroyNotify value_destroy_func;
++} GTreeInitData;
++
++/*
++ * For migrating a GTree.
++ * _vmsd: Start address of the 2 element array containing the key vmsd
++ *        and the data vmsd
++ * _key_type: type of the key
++ * _val_type: type of the value
++ * _data: pointer to a GTreeInitData struct
++ * if _data is NULL, the target tree must have been properly initialized
++ */
++#define VMSTATE_GTREE_V(_field, _state, _version, _vmsd,                =
+       \
++                        _key_type, _val_type, _data)                    =
+       \
++{                                                                       =
+       \
++    .name         =3D (stringify(_field)),                              =
+         \
++    .version_id   =3D (_version),                                       =
+         \
++    .vmsd         =3D (_vmsd),                                          =
+         \
++    .info         =3D &vmstate_info_gtree,                              =
+         \
++    .start        =3D sizeof(_key_type),                                =
+         \
++    .size         =3D sizeof(_val_type),                                =
+         \
++    .offset       =3D offsetof(_state, _field),                         =
+         \
++    .data         =3D (_data)                                           =
+         \
++}
++
+ /* _f : field name
+    _f_n : num of elements field_name
+    _n : num of elements
+diff --git a/migration/trace-events b/migration/trace-events
+index 858d415d56..3e2775bd3b 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -71,6 +71,12 @@ get_qtailq_end(const char *name, const char *reason, i=
+nt val) "%s %s/%d"
+ put_qtailq(const char *name, int version_id) "%s v%d"
+ put_qtailq_end(const char *name, const char *reason) "%s %s"
+=20
++get_gtree(const char *key_name, const char *val_name, int version) "%s/%=
+s %d"
++get_gtree_fail(const char *key_name, const char *reason, int val) "%s %s=
+/%d"
++get_gtree_succeed(const char *key_name, const char *val_name, const char=
+ *reason, int val) "%s/%s %s/%d"
++put_gtree(const char *key_name, int key_version, const char *val_name, i=
+nt val_version) "%s(%d)/%s(%d)"
++put_gtree_end(const char *key_name, const char *val_name, const char *re=
+ason) "%s/%s %s"
++
+ # qemu-file.c
+ qemu_file_fclose(void) ""
+=20
+diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+index bee658a1b2..06c4663de6 100644
+--- a/migration/vmstate-types.c
++++ b/migration/vmstate-types.c
+@@ -17,6 +17,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/queue.h"
+ #include "trace.h"
++#include <glib.h>
+=20
+ /* bool */
+=20
+@@ -691,3 +692,135 @@ const VMStateInfo vmstate_info_qtailq =3D {
+     .get  =3D get_qtailq,
+     .put  =3D put_qtailq,
+ };
++
++struct put_gtree_data {
++    QEMUFile *f;
++    const VMStateField *field;
++    QJSON *vmdesc;
++};
++
++static gboolean put_gtree_elem(gpointer key, gpointer value, gpointer da=
+ta)
++{
++    struct put_gtree_data *capsule =3D (struct put_gtree_data *)data;
++    const VMStateField *field =3D capsule->field;
++    QEMUFile *f =3D capsule->f;
++    const VMStateDescription *key_vmsd =3D &field->vmsd[0];
++    const VMStateDescription *data_vmsd =3D &field->vmsd[1];
++
++    qemu_put_byte(f, true);
++
++    /* put the key */
++    if (!key_vmsd->fields) {
++        qemu_put_be32(f, GPOINTER_TO_UINT(key));
++    } else {
++        if (vmstate_save_state(f, key_vmsd, key, capsule->vmdesc)) {
++            return true;
++        }
++    }
++
++    /* put the data */
++    if (vmstate_save_state(f, data_vmsd, value, capsule->vmdesc)) {
++        return true;
++    }
++    return false;
++}
++
++static int put_gtree(QEMUFile *f, void *pv, size_t unused_size,
++                     const VMStateField *field, QJSON *vmdesc)
++{
++    const VMStateDescription *key_vmsd =3D &field->vmsd[0];
++    const VMStateDescription *val_vmsd =3D &field->vmsd[1];
++    struct put_gtree_data capsule =3D {f, field, vmdesc};
++    GTree **pval =3D pv;
++    GTree *tree =3D *pval;
++
++    trace_put_gtree(key_vmsd->name, key_vmsd->version_id,
++                    val_vmsd->name, val_vmsd->version_id);
++    g_tree_foreach(tree, put_gtree_elem, (gpointer)&capsule);
++    qemu_put_byte(f, false);
++
++    trace_put_gtree_end(key_vmsd->name, val_vmsd->name, "end");
++    return 0;
++}
++
++static int get_gtree(QEMUFile *f, void *pv, size_t unused_size,
++                     const VMStateField *field)
++{
++    const VMStateDescription *key_vmsd =3D &field->vmsd[0];
++    const VMStateDescription *val_vmsd =3D &field->vmsd[1];
++    int version_id =3D field->version_id;
++    size_t key_size =3D field->start;
++    size_t val_size =3D field->size;
++    GTreeInitData *init_data;
++    GTree **pval =3D pv;
++    void *key, *val;
++    GTree *tree;
++    int ret;
++
++    /* in case of direct key, the key vmsd can be {}, ie. check fields *=
+/
++    trace_get_gtree(key_vmsd->name, val_vmsd->name, version_id);
++    if (key_vmsd->fields && version_id > key_vmsd->version_id) {
++        error_report("%s %s",  key_vmsd->name, "too new");
++        trace_get_gtree_fail(key_vmsd->name, "too new", -EINVAL);
++        return -EINVAL;
++    }
++    if (key_vmsd->fields && version_id < key_vmsd->minimum_version_id) {
++        error_report("%s %s",  key_vmsd->name, "too old");
++        trace_get_gtree_fail(key_vmsd->name, "too old", -EINVAL);
++        return -EINVAL;
++    }
++    if (version_id > val_vmsd->version_id) {
++        error_report("%s %s",  val_vmsd->name, "too new");
++        trace_get_gtree_fail(val_vmsd->name, "too new", -EINVAL);
++        return -EINVAL;
++    }
++    if (version_id < val_vmsd->minimum_version_id) {
++        error_report("%s %s",  val_vmsd->name, "too old");
++        trace_get_gtree_fail(val_vmsd->name, "too old", -EINVAL);
++        return -EINVAL;
++    }
++
++    if (field->data) {
++        init_data =3D (GTreeInitData *)field->data;
++        tree =3D g_tree_new_full(init_data->key_compare_func,
++                               init_data->key_compare_data,
++                               init_data->key_destroy_func,
++                               init_data->value_destroy_func);
++        *pval =3D tree;
++    } else {
++        /* tree is externally allocated */
++        tree =3D *pval;
++    }
++
++    while (qemu_get_byte(f)) {
++        if (!key_vmsd->fields) {
++            key =3D GUINT_TO_POINTER(qemu_get_be32(f));
++        } else {
++            key =3D g_malloc0(key_size);
++            ret =3D vmstate_load_state(f, key_vmsd, key, version_id);
++        }
++        if (ret) {
++            g_free(key);
++            trace_get_gtree_fail(key_vmsd->name, "saving state", ret);
++            return ret;
++        }
++        val =3D g_malloc0(val_size);
++        ret =3D vmstate_load_state(f, val_vmsd, val, version_id);
++        if (ret) {
++            g_free(key);
++            g_free(val);
++            trace_get_gtree_fail(val_vmsd->name, "saving state", ret);
++            return ret;
++        }
++        g_tree_insert(tree, key, val);
++    }
++    trace_get_gtree_succeed(key_vmsd->name, val_vmsd->name, "end", 0);
++    return 0;
++}
++
++
++const VMStateInfo vmstate_info_gtree =3D {
++    .name =3D "gtree",
++    .get  =3D get_gtree,
++    .put  =3D put_gtree,
++};
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index e80c4c6143..ee8d9132a4 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -33,6 +33,7 @@
+ #include "qemu/coroutine.h"
+ #include "qemu/module.h"
+ #include "io/channel-file.h"
++#include <glib.h>
+=20
+ static char temp_file[] =3D "/tmp/vmst.test.XXXXXX";
+ static int temp_fd;
+@@ -812,6 +813,428 @@ static void test_load_q(void)
+     qemu_fclose(fload);
+ }
+=20
++/* interval (key) */
++typedef struct TestGTreeInterval {
++    uint64_t low;
++    uint64_t high;
++} TestGTreeInterval;
++
++#define VMSTATE_INTERVAL                               \
++{                                                      \
++    .name =3D "interval",                                \
++    .version_id =3D 1,                                   \
++    .minimum_version_id =3D 1,                           \
++    .fields =3D (VMStateField[]) {                       \
++        VMSTATE_UINT64(low, TestGTreeInterval),        \
++        VMSTATE_UINT64(high, TestGTreeInterval),       \
++        VMSTATE_END_OF_LIST()                          \
++    }                                                  \
++}
++
++/* mapping (value) */
++typedef struct TestGTreeMapping {
++    uint64_t phys_addr;
++    uint32_t flags;
++} TestGTreeMapping;
++
++#define VMSTATE_MAPPING                               \
++{                                                     \
++    .name =3D "mapping",                                \
++    .version_id =3D 1,                                  \
++    .minimum_version_id =3D 1,                          \
++    .fields =3D (VMStateField[]) {                      \
++        VMSTATE_UINT64(phys_addr, TestGTreeMapping),  \
++        VMSTATE_UINT32(flags, TestGTreeMapping),      \
++        VMSTATE_END_OF_LIST()                         \
++    },                                                \
++}
++
++static const VMStateDescription vmstate_interval_mapping[2] =3D {
++    VMSTATE_INTERVAL, /* key   */
++    VMSTATE_MAPPING   /* value */
++};
++
++typedef struct TestGTreeDomain {
++    int32_t  id;
++    GTree    *mappings;
++} TestGTreeDomain;
++
++typedef struct TestGTreeIOMMU {
++    int32_t  id;
++    GTree    *domains;
++} TestGTreeIOMMU;
++
++/* Interval comparison function */
++static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user=
+_data)
++{
++    TestGTreeInterval *inta =3D (TestGTreeInterval *)a;
++    TestGTreeInterval *intb =3D (TestGTreeInterval *)b;
++
++    if (inta->high < intb->low) {
++        return -1;
++    } else if (intb->high < inta->low) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++
++/* ID comparison function */
++static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data=
+)
++{
++    uint ua =3D GPOINTER_TO_UINT(a);
++    uint ub =3D GPOINTER_TO_UINT(b);
++    return (ua > ub) - (ua < ub);
++}
++
++/* init data for interval/mapping binary tree */
++GTreeInitData gtree_interval_mapping_init =3D {
++    .key_compare_func =3D interval_cmp,
++    .key_compare_data =3D NULL,
++    .key_destroy_func =3D g_free,
++    .value_destroy_func =3D g_free
++};
++
++static void destroy_domain(gpointer data)
++{
++    TestGTreeDomain *domain =3D (TestGTreeDomain *)data;
++
++    g_tree_destroy(domain->mappings);
++    g_free(domain);
++}
++
++/* init data for id (direct key)/domain binary tree */
++GTreeInitData gtree_id_domain_init =3D {
++    .key_compare_func =3D int_cmp,
++    .key_compare_data =3D NULL,
++    .key_destroy_func =3D NULL,
++    .value_destroy_func =3D destroy_domain
++};
++
++#define VMSTATE_DOMAIN                                       \
++{                                                            \
++    .name =3D "domain",                                        \
++    .version_id =3D 1,                                         \
++    .minimum_version_id =3D 1,                                 \
++    .fields =3D (VMStateField[]) {                             \
++        VMSTATE_INT32(id, TestGTreeDomain),                  \
++        VMSTATE_GTREE_V(mappings, TestGTreeDomain, 1,        \
++                        vmstate_interval_mapping,            \
++                        TestGTreeInterval, TestGTreeMapping, \
++                        &gtree_interval_mapping_init),       \
++        VMSTATE_END_OF_LIST()                                \
++    }                                                        \
++}
++static const VMStateDescription vmstate_domain =3D VMSTATE_DOMAIN;
++
++static const VMStateDescription vmstate_id_domain[2] =3D {
++    {}, VMSTATE_DOMAIN /* direct key, value */
++};
++
++static const VMStateDescription vmstate_iommu =3D {
++    .name =3D "iommu",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_INT32(id, TestGTreeIOMMU),
++        VMSTATE_GTREE_V(domains, TestGTreeIOMMU, 1,
++                        vmstate_id_domain,
++                        NULL, TestGTreeDomain,
++                        &gtree_id_domain_init),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++uint8_t first_domain_dump[] =3D {
++    /* id */
++    0x00, 0x0, 0x0, 0x6,
++    0x1, /* start of a */
++    /* a */
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0xFF,
++    /* map_a */
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xa0, 0x00,
++    0x00, 0x00, 0x00, 0x01,
++    0x1, /* start of b */
++    /* b */
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00,
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF,
++    /* map_b */
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00,
++    0x00, 0x00, 0x00, 0x02,
++    0x0, /* end of gtree */
++    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely=
+ */
++};
++
++static TestGTreeDomain *create_first_domain(void)
++{
++    TestGTreeDomain *domain;
++    TestGTreeMapping *map_a, *map_b;
++    TestGTreeInterval *a, *b;
++
++    domain =3D g_malloc0(sizeof(TestGTreeDomain));
++    domain->id =3D 6;
++
++    a =3D g_malloc0(sizeof(TestGTreeInterval));
++    a->low =3D 0x1000;
++    a->high =3D 0x1FFF;
++
++    b =3D g_malloc0(sizeof(TestGTreeInterval));
++    b->low =3D 0x4000;
++    b->high =3D 0x4FFF;
++
++    map_a =3D g_malloc0(sizeof(TestGTreeMapping));
++    map_a->phys_addr =3D 0xa000;
++    map_a->flags =3D 1;
++
++    map_b =3D g_malloc0(sizeof(TestGTreeMapping));
++    map_b->phys_addr =3D 0xe0000;
++    map_b->flags =3D 2;
++
++    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,=
+ NULL,
++                                        (GDestroyNotify)g_free,
++                                        (GDestroyNotify)g_free);
++    g_tree_insert(domain->mappings, a, map_a);
++    g_tree_insert(domain->mappings, b, map_b);
++    return domain;
++}
++
++static void test_gtree_save_domain(void)
++{
++    TestGTreeDomain *first_domain =3D create_first_domain();
++
++    save_vmstate(&vmstate_domain, first_domain);
++    compare_vmstate(first_domain_dump, sizeof(first_domain_dump));
++    destroy_domain(first_domain);
++}
++
++struct match_node_data {
++    GTree *tree;
++    gpointer key;
++    gpointer value;
++};
++
++struct tree_cmp_data {
++    GTree *tree1;
++    GTree *tree2;
++    GTraverseFunc match_node;
++};
++
++static gboolean match_interval_mapping_node(gpointer key,
++                                            gpointer value, gpointer dat=
+a)
++{
++    TestGTreeMapping *map_a, *map_b;
++    TestGTreeInterval *a, *b;
++    struct match_node_data *d =3D (struct match_node_data *)data;
++    char *str =3D g_strdup_printf("dest");
++
++    g_free(str);
++    a =3D (TestGTreeInterval *)key;
++    b =3D (TestGTreeInterval *)d->key;
++
++    map_a =3D (TestGTreeMapping *)value;
++    map_b =3D (TestGTreeMapping *)d->value;
++
++    assert(a->low =3D=3D b->low);
++    assert(a->high =3D=3D b->high);
++    assert(map_a->phys_addr =3D=3D map_b->phys_addr);
++    assert(map_a->flags =3D=3D map_b->flags);
++    g_tree_remove(d->tree, key);
++    return true;
++}
++
++static gboolean diff_tree(gpointer key, gpointer value, gpointer data)
++{
++    struct tree_cmp_data *tp =3D (struct tree_cmp_data *)data;
++    struct match_node_data d =3D {tp->tree2, key, value};
++
++    g_tree_foreach(tp->tree2, tp->match_node, &d);
++    g_tree_remove(tp->tree1, key);
++    return false;
++}
++
++static void compare_trees(GTree *tree1, GTree *tree2,
++                          GTraverseFunc function)
++{
++    struct tree_cmp_data tp =3D {tree1, tree2, function};
++
++    g_tree_foreach(tree1, diff_tree, &tp);
++    assert(g_tree_nnodes(tree1) =3D=3D 0);
++    assert(g_tree_nnodes(tree2) =3D=3D 0);
++}
++
++static void diff_domain(TestGTreeDomain *d1, TestGTreeDomain *d2)
++{
++    assert(d1->id =3D=3D d2->id);
++    compare_trees(d1->mappings, d2->mappings, match_interval_mapping_nod=
+e);
++}
++
++static gboolean match_domain_node(gpointer key, gpointer value, gpointer=
+ data)
++{
++    uint64_t id1, id2;
++    TestGTreeDomain *d1, *d2;
++    struct match_node_data *d =3D (struct match_node_data *)data;
++
++    id1 =3D (uint64_t)key;
++    id2 =3D (uint64_t)d->key;
++    d1 =3D (TestGTreeDomain *)value;
++    d2 =3D (TestGTreeDomain *)d->value;
++    assert(id1 =3D=3D id2);
++    diff_domain(d1, d2);
++    g_tree_remove(d->tree, key);
++    return true;
++}
++
++static void diff_iommu(TestGTreeIOMMU *iommu1, TestGTreeIOMMU *iommu2)
++{
++    assert(iommu1->id =3D=3D iommu2->id);
++    compare_trees(iommu1->domains, iommu2->domains, match_domain_node);
++}
++
++static void test_gtree_load_domain(void)
++{
++    TestGTreeDomain *dest_domain =3D g_malloc0(sizeof(TestGTreeDomain));
++    TestGTreeDomain *orig_domain =3D create_first_domain();
++    QEMUFile *fload, *fsave;
++    char eof;
++
++    fsave =3D open_test_file(true);
++    qemu_put_buffer(fsave, first_domain_dump, sizeof(first_domain_dump))=
+;
++    g_assert(!qemu_file_get_error(fsave));
++    qemu_fclose(fsave);
++
++    fload =3D open_test_file(false);
++    dest_domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval=
+_cmp,
++                                            NULL,
++                                            (GDestroyNotify)g_free,
++                                            (GDestroyNotify)g_free);
++
++    vmstate_load_state(fload, &vmstate_domain, dest_domain, 1);
++    eof =3D qemu_get_byte(fload);
++    g_assert(!qemu_file_get_error(fload));
++    g_assert_cmpint(orig_domain->id, =3D=3D, dest_domain->id);
++    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
++
++    diff_domain(orig_domain, dest_domain);
++    destroy_domain(orig_domain);
++    destroy_domain(dest_domain);
++    qemu_fclose(fload);
++}
++
++uint8_t iommu_dump[] =3D {
++    /* iommu id */
++    0x00, 0x0, 0x0, 0x7,
++    0x1,/* start of domain 5 */
++        0x00, 0x0, 0x0, 0x5, /* key =3D 5 */
++        0x00, 0x0, 0x0, 0x5, /* domain1 id */
++        0x1, /* start of mappings */
++            /* c */
++            0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
++            0x00, 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF,
++            /* map_c */
++            0x00, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00,
++            0x00, 0x0, 0x0, 0x3,
++            0x0, /* end of domain1 mappings*/
++    0x1,/* start of domain 6 */
++        0x00, 0x0, 0x0, 0x6, /* key =3D 6 */
++        0x00, 0x0, 0x0, 0x6, /* domain6 id */
++            0x1, /* start of a */
++            /* a */
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0xFF,
++            /* map_a */
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xa0, 0x00,
++            0x00, 0x00, 0x00, 0x01,
++            0x1, /* start of b */
++            /* b */
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00,
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF,
++            /* map_b */
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00,
++            0x00, 0x00, 0x00, 0x02,
++            0x0, /* end of domain6 mappings*/
++    0x0, /* end of domains */
++    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely=
+ */
++};
++
++static TestGTreeIOMMU *create_iommu(void)
++{
++    TestGTreeIOMMU *iommu =3D g_malloc0(sizeof(TestGTreeIOMMU));
++    TestGTreeDomain *first_domain =3D create_first_domain();
++    TestGTreeDomain *second_domain;
++    TestGTreeMapping *map_c;
++    TestGTreeInterval *c;
++
++    iommu->id =3D 7;
++    iommu->domains =3D g_tree_new_full((GCompareDataFunc)int_cmp, NULL,
++                                     NULL,
++                                     destroy_domain);
++
++    second_domain =3D g_malloc0(sizeof(TestGTreeDomain));
++    second_domain->id =3D 5;
++    second_domain->mappings =3D g_tree_new_full((GCompareDataFunc)interv=
+al_cmp,
++                                              NULL,
++                                              (GDestroyNotify)g_free,
++                                              (GDestroyNotify)g_free);
++
++    g_tree_insert(iommu->domains, GUINT_TO_POINTER(6), first_domain);
++    g_tree_insert(iommu->domains, GUINT_TO_POINTER(5), second_domain);
++
++    c =3D g_malloc0(sizeof(TestGTreeInterval));
++    c->low =3D 0x1000000;
++    c->high =3D 0x1FFFFFF;
++
++    map_c =3D g_malloc0(sizeof(TestGTreeMapping));
++    map_c->phys_addr =3D 0xF000000;
++    map_c->flags =3D 0x3;
++
++    g_tree_insert(second_domain->mappings, c, map_c);
++    return iommu;
++}
++
++static void destroy_iommu(TestGTreeIOMMU *iommu)
++{
++    g_tree_destroy(iommu->domains);
++    g_free(iommu);
++}
++
++static void test_gtree_save_iommu(void)
++{
++    TestGTreeIOMMU *iommu =3D create_iommu();
++
++    save_vmstate(&vmstate_iommu, iommu);
++    compare_vmstate(iommu_dump, sizeof(iommu_dump));
++    destroy_iommu(iommu);
++}
++
++static void test_gtree_load_iommu(void)
++{
++    TestGTreeIOMMU *dest_iommu =3D g_malloc0(sizeof(TestGTreeIOMMU));
++    TestGTreeIOMMU *orig_iommu =3D create_iommu();
++    QEMUFile *fsave, *fload;
++    char eof;
++    int ret;
++
++    fsave =3D open_test_file(true);
++    qemu_put_buffer(fsave, iommu_dump, sizeof(iommu_dump));
++    g_assert(!qemu_file_get_error(fsave));
++    qemu_fclose(fsave);
++
++    fload =3D open_test_file(false);
++    vmstate_load_state(fload, &vmstate_iommu, dest_iommu, 1);
++    ret =3D qemu_file_get_error(fload);
++    eof =3D qemu_get_byte(fload);
++    ret =3D qemu_file_get_error(fload);
++    g_assert(!ret);
++    g_assert_cmpint(orig_iommu->id, =3D=3D, dest_iommu->id);
++    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
++
++    diff_iommu(orig_iommu, dest_iommu);
++    destroy_iommu(orig_iommu);
++    destroy_iommu(dest_iommu);
++    qemu_fclose(fload);
++}
++
+ typedef struct TmpTestStruct {
+     TestStruct *parent;
+     int64_t diff;
+@@ -932,6 +1355,10 @@ int main(int argc, char **argv)
+                     test_arr_ptr_prim_0_load);
+     g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
+     g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
++    g_test_add_func("/vmstate/gtree/save/savedomain", test_gtree_save_do=
+main);
++    g_test_add_func("/vmstate/gtree/load/loaddomain", test_gtree_load_do=
+main);
++    g_test_add_func("/vmstate/gtree/save/saveiommu", test_gtree_save_iom=
+mu);
++    g_test_add_func("/vmstate/gtree/load/loadiommu", test_gtree_load_iom=
+mu);
+     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
+     g_test_run();
+=20
+--=20
+2.20.1
+
 
