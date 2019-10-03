@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E675C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AA1C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:55:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D36121D81
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:55:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7DCA21D81
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:55:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jfembrSg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D36121D81
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cs2wJT4h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7DCA21D81
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFrGy-0002UD-3T
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:55:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40752)
+	id 1iFrH2-0002bd-VC
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:55:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5P-0000AK-G1
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:25 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5N-00010d-6L
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5M-00007o-TF
  for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:23 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58509 helo=ozlabs.org)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5K-0000xd-BN
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:20 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:46397 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFr5M-0000xq-Io; Wed, 02 Oct 2019 22:43:21 -0400
+ id 1iFr5J-0000wq-QL; Wed, 02 Oct 2019 22:43:18 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46kHPC0Nvsz9sQv; Thu,  3 Oct 2019 12:43:11 +1000 (AEST)
+ id 46kHPB3gY4z9sPc; Thu,  3 Oct 2019 12:43:10 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570070591;
- bh=D83nMpK3B9GzE0sRrNbZuOBzfObm9XI3qmffYjMJbUs=;
+ d=gibson.dropbear.id.au; s=201602; t=1570070590;
+ bh=PdftzuUomStjJ4KNS6bJYl992Svkq3oiO/3cVEJjHOw=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=jfembrSgwSHMJ+HBuIILOmlTggdLAUoaqcDW6tIWeLV0CG8FymB0ILbtbcg7L86eV
- zdgndoDr9jZeOlZuvCCJTQBSYVtwabD8yWlukFL03aP//XY3nPjaw21tCZ9nAGXSPO
- dSWFMNDmnwD2SG1Ym7xy4CdyBT1NlFMcXBv2AZU8=
-Date: Thu, 3 Oct 2019 12:41:56 +1000
+ b=cs2wJT4hXJalcCEW++lTnESzC4NEzIc9BfmaatydXY9RsU90eqLmeuQseU/1xW50M
+ JU/hziPS35JqDdWJx/Vo4yRAOWB4UyzswK7Ije67Jfs5YKcsZdzW3cdNcN7czwbyEX
+ ClHCG/s17RC0JAk0uvUWktmMTHWND+kn/TnYXpHc=
+Date: Thu, 3 Oct 2019 12:20:53 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v4 24/25] ppc/pnv: Improve trigger data definition
-Message-ID: <20191003024156.GQ11105@umbus.fritz.box>
+Subject: Re: [PATCH v4 16/25] ppc/pnv: Remove pnv_xive_vst_size() routine
+Message-ID: <20191003022053.GM11105@umbus.fritz.box>
 References: <20190918160645.25126-1-clg@kaod.org>
- <20190918160645.25126-25-clg@kaod.org>
+ <20190918160645.25126-17-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="fTD7sGci972winw4"
+ protocol="application/pgp-signature"; boundary="DMotDPdpQlD4ewOK"
 Content-Disposition: inline
-In-Reply-To: <20190918160645.25126-25-clg@kaod.org>
+In-Reply-To: <20190918160645.25126-17-clg@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -77,158 +77,245 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---fTD7sGci972winw4
-Content-Type: text/plain; charset=utf-8
+--DMotDPdpQlD4ewOK
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2019 at 06:06:44PM +0200, C=C3=A9dric Le Goater wrote:
-> The trigger definition is used for triggers both for HW source
-> interrupts, PHB, PSI, as well as for rerouting interrupts between
-> Interrupt Controller.
+On Wed, Sep 18, 2019 at 06:06:36PM +0200, C=E9dric Le Goater wrote:
+> pnv_xive_vst_size() tries to compute the size of a VSD table from the
+> information given by FW. The number of entries of the table are
+> deduced from the result and the MMIO regions of the ESBs and the ENDS
+> are also resized with the computed value.
 >=20
-> HW source controllers set bit0 of word0 to =E2=80=980=E2=80=99 as they pr=
-ovide EAS
-> information (EAS block + EAS index) in the 8 byte data and not END
-> information, and bit1 of word0 to =E2=80=981=E2=80=99 to signal that the =
-state bit
-> check has been performed.
+> But for indirect tables, the result is incorrect. An indirect table is
+> a one page array of VSDs pointing to subpages containing XIVE virtual
+> structures. The number of first level VSD entries is page aligned and
+> the overall computed size of the table is too large. It can also be
+> completely wrong when the first VSD entry is not yet initialized.
 >=20
-> Introduce these new trigger bits and rename the XIVE_SRCNO macros in
-> XIVE_EAS to reflect better the nature of the data. This is breaking
-> the notification for the PSI model which will be fixed in the next
-> patch.
+> Remove pnv_xive_vst_size() and use a simpler form for direct tables.
+> This is only useful when outputting the XIVE sources on the monitor
+> and to resize the ESB MMIO window.
 >=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Do.. does this actually correct the value for indirect tables?  Or
+just remove the calculation on the grounds that it was already broken
+and we'll fix later?  If it's the latter, we should surely have some
+error_report()s or something if the guest does attempt to use an
+indirect table.
+
 > ---
->  include/hw/ppc/xive_regs.h | 24 +++++++++++++++++++++---
->  hw/intc/pnv_xive.c         | 16 ++++++++++++----
->  hw/intc/xive.c             |  4 ++--
->  3 files changed, 35 insertions(+), 9 deletions(-)
+>  hw/intc/pnv_xive.c | 112 +++++++++++++++++----------------------------
+>  1 file changed, 43 insertions(+), 69 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-> index dd42c33cef35..83a2f2cc1318 100644
-> --- a/include/hw/ppc/xive_regs.h
-> +++ b/include/hw/ppc/xive_regs.h
-> @@ -22,9 +22,27 @@
->  /*
->   * Interrupt source number encoding on PowerBUS
->   */
-> -#define XIVE_SRCNO_BLOCK(srcno) (((srcno) >> 28) & 0xf)
-> -#define XIVE_SRCNO_INDEX(srcno) ((srcno) & 0x0fffffff)
-> -#define XIVE_SRCNO(blk, idx)    ((uint32_t)(blk) << 28 | (idx))
-> +/*
-> + * Trigger data definition
-> + *
-> + * The trigger definition is used for triggers both for HW source
-> + * interrupts (PHB, PSI), as well as for rerouting interrupts between
-> + * Interrupt Controller.
-> + *
-> + * HW source controllers set bit0 of word0 to =E2=80=980=E2=80=99 as the=
-y provide EAS
-> + * information (EAS block + EAS index) in the 8 byte data and not END
-> + * information, and bit1 of word0 to =E2=80=981=E2=80=99 to signal that =
-the state bit
-> + * check has been performed.
-> + */
-> +#define XIVE_TRIGGER_END        PPC_BIT(0)
-> +#define XIVE_TRIGGER_EAS        PPC_BIT(1)
-
-These names seem really confusing in light of the comment above.  HW
-source controllers set the XIVE_TRIGGER_END bit in order to indicate
-that they're providing EAS info, not END info??  And also set the
-XIVE_TRIGGER_EAS bit to indicate something different?
-
-Also, the comment implies that HW source controllers set both bits,
-but I'm not really sure if that's what you meant.  Expanding on what
-non-HW source controllers might set could be helpful, too..
-
-> +
-> +/*
-> + * QEMU macros to manipulate the trigger payload in native endian
-> + */
-> +#define XIVE_EAS_BLOCK(n)       (((n) >> 28) & 0xf)
-> +#define XIVE_EAS_INDEX(n)       ((n) & 0x0fffffff)
-> +#define XIVE_EAS(blk, idx)      ((uint32_t)(blk) << 28 | (idx))
-> =20
->  #define TM_SHIFT                16
-> =20
 > diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-> index 4c1fa024cdf5..61af3f23000f 100644
+> index 74d6ccbea3d6..b7d505839e68 100644
 > --- a/hw/intc/pnv_xive.c
 > +++ b/hw/intc/pnv_xive.c
-> @@ -385,7 +385,7 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_t=
- blk, uint32_t idx,
->       * EAT lookups should be local to the IC
->       */
->      if (pnv_xive_block_id(xive) !=3D blk) {
-> -        xive_error(xive, "VST: EAS %x is remote !?", XIVE_SRCNO(blk, idx=
-));
-> +        xive_error(xive, "VST: EAS %x is remote !?", XIVE_EAS(blk, idx));
->          return -1;
+> @@ -123,36 +123,22 @@ static uint64_t pnv_xive_vst_page_size_allowed(uint=
+32_t page_shift)
+>           page_shift =3D=3D 21 || page_shift =3D=3D 24;
+>  }
+> =20
+> -static uint64_t pnv_xive_vst_size(uint64_t vsd)
+> -{
+> -    uint64_t vst_tsize =3D 1ull << (GETFIELD(VSD_TSIZE, vsd) + 12);
+> -
+> -    /*
+> -     * Read the first descriptor to get the page size of the indirect
+> -     * table.
+> -     */
+> -    if (VSD_INDIRECT & vsd) {
+> -        uint32_t nr_pages =3D vst_tsize / XIVE_VSD_SIZE;
+> -        uint32_t page_shift;
+> -
+> -        vsd =3D ldq_be_dma(&address_space_memory, vsd & VSD_ADDRESS_MASK=
+);
+> -        page_shift =3D GETFIELD(VSD_TSIZE, vsd) + 12;
+> -
+> -        if (!pnv_xive_vst_page_size_allowed(page_shift)) {
+> -            return 0;
+> -        }
+> -
+> -        return nr_pages * (1ull << page_shift);
+> -    }
+> -
+> -    return vst_tsize;
+> -}
+> -
+>  static uint64_t pnv_xive_vst_addr_direct(PnvXive *xive, uint32_t type,
+>                                           uint64_t vsd, uint32_t idx)
+>  {
+>      const XiveVstInfo *info =3D &vst_infos[type];
+>      uint64_t vst_addr =3D vsd & VSD_ADDRESS_MASK;
+> +    uint64_t vst_tsize =3D 1ull << (GETFIELD(VSD_TSIZE, vsd) + 12);
+> +    uint32_t idx_max;
+> +
+> +    idx_max =3D vst_tsize / info->size - 1;
+> +    if (idx > idx_max) {
+> +#ifdef XIVE_DEBUG
+> +        xive_error(xive, "VST: %s entry %x out of range [ 0 .. %x ] !?",
+> +                   info->name, idx, idx_max);
+> +#endif
+> +        return 0;
+> +    }
+> =20
+>      return vst_addr + idx * info->size;
+>  }
+> @@ -215,7 +201,6 @@ static uint64_t pnv_xive_vst_addr(PnvXive *xive, uint=
+32_t type, uint8_t blk,
+>  {
+>      const XiveVstInfo *info =3D &vst_infos[type];
+>      uint64_t vsd;
+> -    uint32_t idx_max;
+> =20
+>      if (blk >=3D info->max_blocks) {
+>          xive_error(xive, "VST: invalid block id %d for VST %s %d !?",
+> @@ -232,15 +217,6 @@ static uint64_t pnv_xive_vst_addr(PnvXive *xive, uin=
+t32_t type, uint8_t blk,
+>          return xive ? pnv_xive_vst_addr(xive, type, blk, idx) : 0;
 >      }
 > =20
-> @@ -502,7 +502,7 @@ static void pnv_xive_notify(XiveNotifier *xn, uint32_=
-t srcno)
->      PnvXive *xive =3D PNV_XIVE(xn);
->      uint8_t blk =3D pnv_xive_block_id(xive);
+> -    idx_max =3D pnv_xive_vst_size(vsd) / info->size - 1;
+> -    if (idx > idx_max) {
+> -#ifdef XIVE_DEBUG
+> -        xive_error(xive, "VST: %s entry %x/%x out of range [ 0 .. %x ] !=
+?",
+> -                   info->name, blk, idx, idx_max);
+> -#endif
+> -        return 0;
+> -    }
+> -
+>      if (VSD_INDIRECT & vsd) {
+>          return pnv_xive_vst_addr_indirect(xive, type, vsd, idx);
+>      }
+> @@ -519,19 +495,12 @@ static uint64_t pnv_xive_pc_size(PnvXive *xive)
+>      return (~xive->regs[CQ_PC_BARM >> 3] + 1) & CQ_PC_BARM_MASK;
+>  }
 > =20
-> -    xive_router_notify(xn, XIVE_SRCNO(blk, srcno));
-> +    xive_router_notify(xn, XIVE_EAS(blk, srcno));
+> -static uint32_t pnv_xive_nr_ipis(PnvXive *xive)
+> +static uint32_t pnv_xive_nr_ipis(PnvXive *xive, uint8_t blk)
+>  {
+> -    uint8_t blk =3D xive->chip->chip_id;
+> -
+> -    return pnv_xive_vst_size(xive->vsds[VST_TSEL_SBE][blk]) * SBE_PER_BY=
+TE;
+> -}
+> -
+> -static uint32_t pnv_xive_nr_ends(PnvXive *xive)
+> -{
+> -    uint8_t blk =3D xive->chip->chip_id;
+> +    uint64_t vsd =3D xive->vsds[VST_TSEL_SBE][blk];
+> +    uint64_t vst_tsize =3D 1ull << (GETFIELD(VSD_TSIZE, vsd) + 12);
+> =20
+> -    return pnv_xive_vst_size(xive->vsds[VST_TSEL_EQDT][blk])
+> -        / vst_infos[VST_TSEL_EQDT].size;
+> +    return VSD_INDIRECT & vsd ? 0 : vst_tsize * SBE_PER_BYTE;
 >  }
 > =20
 >  /*
-> @@ -1287,12 +1287,20 @@ static const MemoryRegionOps pnv_xive_ic_reg_ops =
-=3D {
+> @@ -664,6 +633,7 @@ static void pnv_xive_vst_set_exclusive(PnvXive *xive,=
+ uint8_t type,
+>      XiveSource *xsrc =3D &xive->ipi_source;
+>      const XiveVstInfo *info =3D &vst_infos[type];
+>      uint32_t page_shift =3D GETFIELD(VSD_TSIZE, vsd) + 12;
+> +    uint64_t vst_tsize =3D 1ull << page_shift;
+>      uint64_t vst_addr =3D vsd & VSD_ADDRESS_MASK;
 > =20
->  static void pnv_xive_ic_hw_trigger(PnvXive *xive, hwaddr addr, uint64_t =
-val)
->  {
-> +    uint8_t blk =3D XIVE_EAS_BLOCK(val);
-> +    uint32_t idx =3D XIVE_EAS_INDEX(val);
-> +
->      /*
->       * Forward the source event notification directly to the Router.
->       * The source interrupt number should already be correctly encoded
->       * with the chip block id by the sending device (PHB, PSI).
->       */
-> -    xive_router_notify(XIVE_NOTIFIER(xive), val);
-> +    if (val & XIVE_TRIGGER_EAS) {
-> +        xive_router_notify(XIVE_NOTIFIER(xive), XIVE_EAS(blk, idx));
-> +    } else {
-> +        xive_error(xive, "IC: END trigger at @0x%"HWADDR_PRIx" data 0x%"=
-PRIx64,
-> +                   addr, val);
-> +    }
->  }
+>      /* Basic checks */
+> @@ -699,11 +669,16 @@ static void pnv_xive_vst_set_exclusive(PnvXive *xiv=
+e, uint8_t type,
 > =20
->  static void pnv_xive_ic_notify_write(void *opaque, hwaddr addr, uint64_t=
- val,
-> @@ -1683,7 +1691,7 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monitor=
+>      case VST_TSEL_EQDT:
+>          /*
+> -         * Backing store pages for the END. Compute the number of ENDs
+> -         * provisioned by FW and resize the END ESB window accordingly.
+> +         * Backing store pages for the END.
+> +         *
+> +         * If the table is direct, we can compute the number of PQ
+> +         * entries provisioned by FW (such as skiboot) and resize the
+> +         * END ESB window accordingly.
+>           */
+> -        memory_region_set_size(&end_xsrc->esb_mmio, pnv_xive_nr_ends(xiv=
+e) *
+> -                               (1ull << (end_xsrc->esb_shift + 1)));
+> +        if (!(VSD_INDIRECT & vsd)) {
+> +            memory_region_set_size(&end_xsrc->esb_mmio, (vst_tsize / inf=
+o->size)
+> +                                   * (1ull << xsrc->esb_shift));
+> +        }
+>          memory_region_add_subregion(&xive->end_edt_mmio, 0,
+>                                      &end_xsrc->esb_mmio);
+>          break;
+> @@ -712,11 +687,16 @@ static void pnv_xive_vst_set_exclusive(PnvXive *xiv=
+e, uint8_t type,
+>          /*
+>           * Backing store pages for the source PQ bits. The model does
+>           * not use these PQ bits backed in RAM because the XiveSource
+> -         * model has its own. Compute the number of IRQs provisioned
+> -         * by FW and resize the IPI ESB window accordingly.
+> +         * model has its own.
+> +         *
+> +         * If the table is direct, we can compute the number of PQ
+> +         * entries provisioned by FW (such as skiboot) and resize the
+> +         * ESB window accordingly.
+>           */
+> -        memory_region_set_size(&xsrc->esb_mmio, pnv_xive_nr_ipis(xive) *
+> -                               (1ull << xsrc->esb_shift));
+> +        if (!(VSD_INDIRECT & vsd)) {
+> +            memory_region_set_size(&xsrc->esb_mmio, vst_tsize * SBE_PER_=
+BYTE
+> +                                   * (1ull << xsrc->esb_shift));
+> +        }
+>          memory_region_add_subregion(&xive->ipi_edt_mmio, 0, &xsrc->esb_m=
+mio);
+>          break;
+> =20
+> @@ -1666,8 +1646,7 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monitor=
  *mon)
 >      XiveRouter *xrtr =3D XIVE_ROUTER(xive);
->      uint8_t blk =3D pnv_xive_block_id(xive);
->      uint8_t chip_id =3D xive->chip->chip_id;
-> -    uint32_t srcno0 =3D XIVE_SRCNO(blk, 0);
-> +    uint32_t srcno0 =3D XIVE_EAS(blk, 0);
->      uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive, blk);
+>      uint8_t blk =3D xive->chip->chip_id;
+>      uint32_t srcno0 =3D XIVE_SRCNO(blk, 0);
+> -    uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive);
+> -    uint32_t nr_ends =3D pnv_xive_nr_ends(xive);
+> +    uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive, blk);
 >      XiveEAS eas;
 >      XiveEND end;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 07b7c3586c12..6702f32be601 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1652,8 +1652,8 @@ do_escalation:
->  void xive_router_notify(XiveNotifier *xn, uint32_t lisn)
->  {
->      XiveRouter *xrtr =3D XIVE_ROUTER(xn);
-> -    uint8_t eas_blk =3D XIVE_SRCNO_BLOCK(lisn);
-> -    uint32_t eas_idx =3D XIVE_SRCNO_INDEX(lisn);
-> +    uint8_t eas_blk =3D XIVE_EAS_BLOCK(lisn);
-> +    uint32_t eas_idx =3D XIVE_EAS_INDEX(lisn);
->      XiveEAS eas;
+>      int i;
+> @@ -1687,21 +1666,16 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monit=
+or *mon)
+>          }
+>      }
 > =20
->      /* EAS cache lookup */
+> -    monitor_printf(mon, "XIVE[%x] ENDT %08x .. %08x\n", blk, 0, nr_ends =
+- 1);
+> -    for (i =3D 0; i < nr_ends; i++) {
+> -        if (xive_router_get_end(xrtr, blk, i, &end)) {
+> -            break;
+> -        }
+> -        xive_end_pic_print_info(&end, i, mon);
+> +    monitor_printf(mon, "XIVE[%x] ENDT\n", blk);
+> +    i =3D 0;
+> +    while (!xive_router_get_end(xrtr, blk, i, &end)) {
+> +        xive_end_pic_print_info(&end, i++, mon);
+>      }
+> =20
+> -    monitor_printf(mon, "XIVE[%x] END Escalation %08x .. %08x\n", blk, 0,
+> -                   nr_ends - 1);
+> -    for (i =3D 0; i < nr_ends; i++) {
+> -        if (xive_router_get_end(xrtr, blk, i, &end)) {
+> -            break;
+> -        }
+> -        xive_end_eas_pic_print_info(&end, i, mon);
+> +    monitor_printf(mon, "XIVE[%x] END Escalation EAT\n", blk);
+> +    i =3D 0;
+> +    while (!xive_router_get_end(xrtr, blk, i, &end)) {
+> +        xive_end_eas_pic_print_info(&end, i++, mon);
+>      }
+>  }
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -236,25 +323,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---fTD7sGci972winw4
+--DMotDPdpQlD4ewOK
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VX/QACgkQbDjKyiDZ
-s5KGxhAAqudJeJXRkJKk+12i6ZUVf/zfJXy5QtZYiQxYe1v4zA0DP9e+RUFuQ8vW
-7gUvbHELmN+bdL3I408ClWEwn4L54rhXewv8NgiUFrePk2qinuiXwZPRJN69Zkfg
-r7POEFQxPS8yRkSp1LO7igYigeIZIZDZMklpiDDvzs0P8ScnUdpJm3HOhZAAqYm+
-TVWVq7PDng5PhpZssALzudzWzMGjlmNY0d6QyrXDHpsHPXGPTi9Qku3LpZ9pLMGh
-5yqMUy+ms8GyCRRo9qM29e4fmEtX/GJP+XH51xU9MxAm5hYFGgEEu8edXS6lJLRz
-MLH1eAAePTtPr4ea6QDU/S5L5AGHnwLe7b3F+lWViYRG3mEawVCv267VaMy/kzg1
-uDxarb4uRD9a1enL+s8fwEU++gxdj9J3majqRgxrebkubAs9ZOzHo7dC8RXpxcIu
-rDN+LsQMN13mFtbS3FKZYiITy2AeFiMZluMV3vGQNtUNl2iZnbb/+PLjIg5lsRkD
-YxX+zBx2xrqcw4ANPFc4SSGUQpq8o9lrYnUXGpaClaU+Bb8awxBD8hSiTG/M2BPW
-JGbNSEFBJG18MoUw1iJ/l0iLNXnvDR+B9V4x8rdlgbf4O9JpfZGb221sVn4PV5uU
-zSQtHfxKJOnLigPHpiYefa7TdSS3A+3yHMTc4jzdz4DvkvmURkk=
-=pDIr
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VWwUACgkQbDjKyiDZ
+s5Jm1g/9G4fHhvFjNdYTjjf41lNIbFsMx6obVPS7dDW4u8ZFPuXhPqQVONh662vY
+WR2Phnavp37duxhKP28HoUr/g5kZeVBndhyS/Z5rYBj96LOyBNa2g4ux0Io0p/PM
+q/mGtUev2Yo7QJOqUCmtraI9VjBe/1iwmXps6x5Y9ErSX3GSZiuoUXgEVwo+GEvP
+thtAImOqgVu70EhpRSJUXEVJV3tCZROp1n2WkfsmbTV4BY7VBdaIHP9pcmV5z36/
+NuhDx/uElkMEXDkQCBBpawk6w9puq9AWlhbxf65GRS1AR7SUaHDTTdwuNCHiNAuQ
+Xc6GpqPv9r90S+1UKg+ypmI8AlvauN9tquLsLqbCvishddx2q+lnsbMRmm78hWFd
+iU4wWIUHq41rAa/4F1FEoSbt+9Mm3eE+dTv23Rs87TJCOdNk80NYJEdFt9kjT6gZ
++iNmcJ/J9H1Vb0mxVlz9hiWbtqBq602dlsErPpWlkVArgqBx1ZYM09Boe/tdwQTC
+Y/x2Ra1q3MYsUgXtzdQYtH0HTg9CzA7rUJHMmE2Y/AVeJO0RI5pdJgdPMaGWzkbM
+XnY01fr/Znp5Q4Ma8dW4zn7eGRVZpcGX5O4pOgtXI1hpjKj2kAR0UZ+jKZ5+/3y9
+DU6BJxjysKhA754urgMbBXCJKwOQBWdnxzS4MaIuSUIhOI/o58k=
+=l8Np
 -----END PGP SIGNATURE-----
 
---fTD7sGci972winw4--
+--DMotDPdpQlD4ewOK--
 
