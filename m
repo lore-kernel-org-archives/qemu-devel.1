@@ -6,82 +6,61 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ADFDC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 09:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D773BC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 09:24:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF2D82133F
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 09:23:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF2D82133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AECAB2133F
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 09:24:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AECAB2133F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFxKb-00044C-2p
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 05:23:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47650)
+	id 1iFxLr-0005FG-U6
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 05:24:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iFxJY-0003cq-0t
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:22:25 -0400
+ (envelope-from <clg@kaod.org>) id 1iFxKh-0004Qx-Cs
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iFxJU-0007kX-Hw
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:22:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40888)
+ (envelope-from <clg@kaod.org>) id 1iFxKf-00086m-Hs
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:23:35 -0400
+Received: from 5.mo1.mail-out.ovh.net ([178.33.45.107]:36304)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iFxJU-0007jq-69
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:22:20 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CE50C2A09A8
- for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 09:22:17 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id w10so848503wrl.5
- for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 02:22:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=HAKXNqxlu9hZBy+XRHRcb7TZaV3lei632APcndVyxUk=;
- b=LLEP0udk3S0/XlQp4XP72ryNz9xKIB5e0hBVDygJRgGDXv6KkfM8X7TbxR5htp8eNM
- aVl4TVPJuBbSSCtVoh2fgRc5Iaj1zoa2KP4ADEb7LRoDqp+uyJcy+Dg2VZSX+xur705t
- IrzS55zW/2pdxMwos4pMUxXVBG0lIesbrWLjKAvcau3DpjzPXLD/JvRXV1jA6v+pQYsd
- wt1xQN3vuWxCH+C3ZjWlXpce48hHcxbatfHlK43XJ9dnudadk1oHOqXx8Abgk2digWjS
- Dry0XUrqDSQv8ZIVA6iSNP9RSrrcBf4E58iKfduRcE6ZT1PvPLbLosepmuIcLlf2ahrY
- z9QA==
-X-Gm-Message-State: APjAAAUwTwuq2UE9WV1wbBoDPvD7pbsESgver3AnKp1jzN4FPEVfygyi
- 5LsoIyCY8JDDiePshXMB37yAarzDCT8xfPood+JQUDMkhq4LFHCdpPvneXjeVpUF8q0NDXypGzM
- +7ds9nYz5S87wfBo=
-X-Received: by 2002:adf:e701:: with SMTP id c1mr6393787wrm.296.1570094536555; 
- Thu, 03 Oct 2019 02:22:16 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyKdm7DfRH9ongAz9t7tr/3VrJ7SkrtbeY99qjcjiPSRnYpusQl2V4khxoImjgoyGDORVpe6Q==
-X-Received: by 2002:adf:e701:: with SMTP id c1mr6393773wrm.296.1570094536306; 
- Thu, 03 Oct 2019 02:22:16 -0700 (PDT)
-Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.200.174])
- by smtp.gmail.com with ESMTPSA id l11sm2106255wmh.34.2019.10.03.02.22.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Oct 2019 02:22:15 -0700 (PDT)
-Date: Thu, 3 Oct 2019 11:22:13 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH] accel/kvm: ensure ret always set
-Message-ID: <20191003092213.etjzlwgd7nlnzqay@steredhat>
-References: <20191002102212.6100-1-alex.bennee@linaro.org>
- <05d59eb3-1693-d5f4-0f6d-9642fd46c32a@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iFxKf-00085Z-6R
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:23:33 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.143.72])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id BBF381921E1
+ for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 11:23:30 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player759.ha.ovh.net (Postfix) with ESMTPSA id 4EEFAA8E23F6;
+ Thu,  3 Oct 2019 09:23:26 +0000 (UTC)
+Subject: Re: [PATCH v4 14/25] ppc/xive: Introduce helpers for the NVT id
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190918160645.25126-1-clg@kaod.org>
+ <20190918160645.25126-15-clg@kaod.org>
+ <20191003021258.GL11105@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <65827861-df95-93f0-85cf-e0bae0816cdb@kaod.org>
+Date: Thu, 3 Oct 2019 11:23:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <05d59eb3-1693-d5f4-0f6d-9642fd46c32a@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20191003021258.GL11105@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 13696009420371168153
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeekgdduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 178.33.45.107
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,62 +72,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 02, 2019 at 01:08:40PM +0200, Paolo Bonzini wrote:
-> On 02/10/19 12:22, Alex Benn=E9e wrote:
-> > Some of the cross compilers rightly complain there are cases where re=
-t
-> > may not be set. 0 seems to be the reasonable default unless particula=
-r
-> > slot explicitly returns -1.
-> >=20
-
-Even Coverity reported it (CID 1405857).
-
-> > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> > ---
-> >  accel/kvm/kvm-all.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > index aabe097c41..d2d96d73e8 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -712,11 +712,11 @@ static int kvm_physical_log_clear(KVMMemoryList=
-ener *kml,
-> >      KVMState *s =3D kvm_state;
-> >      uint64_t start, size, offset, count;
-> >      KVMSlot *mem;
-> > -    int ret, i;
-> > +    int ret =3D 0, i;
-> > =20
-> >      if (!s->manual_dirty_log_protect) {
-> >          /* No need to do explicit clear */
-> > -        return 0;
-> > +        return ret;
-> >      }
-> > =20
-> >      start =3D section->offset_within_address_space;
-> > @@ -724,7 +724,7 @@ static int kvm_physical_log_clear(KVMMemoryListen=
-er *kml,
-> > =20
-> >      if (!size) {
-> >          /* Nothing more we can do... */
-> > -        return 0;
-> > +        return ret;
-> >      }
-> > =20
-> >      kvm_slots_lock(kml);
-> >=20
+On 03/10/2019 04:12, David Gibson wrote:
+> On Wed, Sep 18, 2019 at 06:06:34PM +0200, C=E9dric Le Goater wrote:
+>> The NVT space is 19 bits wide, giving a maximum of 512K per chip. When
+>> dispatched on a HW thread, the NVT identifier of a vCPU is pushed/stor=
+ed
+>> in the CAM line (word2) of the thread interrupt context.
 >=20
-> Queued, thanks.
+> Ok, that's interesting, but how does it lead to this patch?  Connect
+> the dots, please.
+
+ok. These are helpers for the next patch. It's a clarification of the
+values also.
+
+
+When a vPCU is dispatched on a HW thread, the NVT identifier is pushed
+in the CAM line (QW1W2). This identifier is used to fetch a NVT structure=
+,
+in the presenter subengine, which might contain pending interrupts that=20
+need a resend. So we will use these helpers to do :=20
+
+ xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)
+ xive_router_write_nvt(xrtr, nvt_blk, nvt_idx, &nvt, 4)
+
+and notify a cpu.
+
+C.
+
+
 >=20
-> Paolo
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/xive.h      |  5 -----
+>>  include/hw/ppc/xive_regs.h | 21 +++++++++++++++++++++
+>>  2 files changed, 21 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index a461753f5da5..794dfcaae0f8 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -469,11 +469,6 @@ void xive_tctx_pic_print_info(XiveTCTX *tctx, Mon=
+itor *mon);
+>>  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)=
+;
+>>  void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb);
+>> =20
+>> -static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nv=
+t_idx)
+>> -{
+>> -    return (nvt_blk << 19) | nvt_idx;
+>> -}
+>> -
+>>  /*
+>>   * KVM XIVE device helpers
+>>   */
+>> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+>> index 08c8bf7172e2..3d7b6fd09664 100644
+>> --- a/include/hw/ppc/xive_regs.h
+>> +++ b/include/hw/ppc/xive_regs.h
+>> @@ -251,4 +251,25 @@ typedef struct XiveNVT {
+>> =20
+>>  #define xive_nvt_is_valid(nvt)    (be32_to_cpu((nvt)->w0) & NVT_W0_VA=
+LID)
+>> =20
+>> +/*
+>> + * The VP number space in a block is defined by the END_W6_NVT_INDEX
+>> + * field of the XIVE END
+>> + */
+>> +#define XIVE_NVT_SHIFT                19
+>> +
+>> +static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nv=
+t_idx)
+>> +{
+>> +    return (nvt_blk << XIVE_NVT_SHIFT) | nvt_idx;
+>> +}
+>> +
+>> +static inline uint32_t xive_nvt_idx(uint32_t cam_line)
+>> +{
+>> +    return cam_line & ((1 << XIVE_NVT_SHIFT) - 1);
+>> +}
+>> +
+>> +static inline uint32_t xive_nvt_blk(uint32_t cam_line)
+>> +{
+>> +    return (cam_line >> XIVE_NVT_SHIFT) & 0xf;
+>> +}
+>> +
+>>  #endif /* PPC_XIVE_REGS_H */
 >=20
 
---=20
 
