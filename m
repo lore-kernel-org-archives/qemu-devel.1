@@ -2,66 +2,87 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FF9C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 10:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D013C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 11:02:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BC712086A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 10:58:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BC712086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 584DF218DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 11:02:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrdbP2cK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 584DF218DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFyoR-0001lI-C4
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 06:58:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59025)
+	id 1iFysA-0003aD-1W
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 07:02:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59329)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iFynW-0001GM-1i
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:57:27 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFypU-0002O5-VD
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iFynU-0001pB-A2
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:57:25 -0400
-Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:36054)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iFynU-0001ma-2W
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:57:24 -0400
-Received: from player158.ha.ovh.net (unknown [10.109.146.106])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 7CF1A6B617
- for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 12:57:21 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player158.ha.ovh.net (Postfix) with ESMTPSA id ED6C1A6D48B1;
- Thu,  3 Oct 2019 10:57:16 +0000 (UTC)
-Subject: Re: [PATCH v4 11/25] ppc/xive: Move the TIMA operations to the
- controller model
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190918160645.25126-1-clg@kaod.org>
- <20190918160645.25126-12-clg@kaod.org>
- <20191003020859.GJ11105@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e98e9ebf-3cd7-2af0-8e58-1db08da5a23d@kaod.org>
-Date: Thu, 3 Oct 2019 12:57:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iFypP-0003uS-LU
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:59:28 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33077)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iFypP-0003rD-7l
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 06:59:23 -0400
+Received: by mail-wr1-x444.google.com with SMTP id b9so2484432wrs.0
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 03:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=mj08ruo+mSzrmNeE9C3Au4yHvuIS25YuGCkEgbFLHmU=;
+ b=lrdbP2cKnQGLRL4tF0JFoPKEYNL8BOCFButZ41O1sU5JUnLLrbgIXJmgDDsf9n/8ie
+ 9OtbCbV8r+Rm1CCJ/gqufzepsS9j/T1m/W+gfdWfCnRKu9ZYpJO2jxVUXRC6B0vhKnGS
+ IZb1DfKnZsf43JMU11fEgFv5NFdr4rkqaKBX3qDLVTmv+lsSQ58WRxIkHgh0J8tsjz/r
+ ML2h5m54r1Thi1aoYY9/JOdVhNECCPyTb1DTb7rfDG9ikeTN9sqdyYTjAJFwaaC7VMcE
+ R1xa4HtNxXqrg4kZDzBfjv/YaKoZPnky6z336P9eVUBxUH/IzHVnQzbAxc78rHZJsHHo
+ hq9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=mj08ruo+mSzrmNeE9C3Au4yHvuIS25YuGCkEgbFLHmU=;
+ b=PNJ+lsWxtwxJinmqjAW9tgMxMl3h2HsxTSzXmU4vGjnMGKHaIYDRNw6YXM0aPHJ8AJ
+ ar+kuOFoM41eZa0+64yCI5Qq2T1bqPbNyD5vptxlZRXpfvBW1x8L6Z9RzLL4UA+bWaRm
+ Ot1xBz594bksWiXcOPB6IBPoOfCjflBEWTSWzHMzJILVGh5LMMKmp9w7mFAcm7CCCV9u
+ skSEoiEyESOp1x0EoIhdzZLqRu8aoXAZzTbLle0QLx0GucQ6ejeJ55YNv8fANsr37sTq
+ RnHz/55nqcwjHtjb3LYGCa9vo7BgfqOX7NUTH6v0SLbL8uOOh4+oeUs4s1OtUNMkpFU0
+ JpSg==
+X-Gm-Message-State: APjAAAUtZ732FVVapp2N4HJLIj7prWZbezd106+AzOUks4GJF3j8O15i
+ TQGIHXPAtI9Iy0M36QG4djjswsR9
+X-Google-Smtp-Source: APXvYqzs2+CZaVI5ph10mibUGkFXNUNKn79nRqu2kPPJrUCfwOVgm9CMMpFQsBawt3EXufnqZL0BFw==
+X-Received: by 2002:a5d:6701:: with SMTP id o1mr7097273wru.6.1570100361201;
+ Thu, 03 Oct 2019 03:59:21 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id l10sm3391485wrh.20.2019.10.03.03.59.20
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 03 Oct 2019 03:59:20 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 00/22] Misc patches for 2010-10-02
+Date: Thu,  3 Oct 2019 12:59:18 +0200
+Message-Id: <1570100358-22344-2-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1570100358-22344-1-git-send-email-pbonzini@redhat.com>
+References: <1570100358-22344-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191003020859.GJ11105@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-X-Ovh-Tracer-Id: 15280995013449124761
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeekgdefiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 178.33.251.173
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,230 +94,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/10/2019 04:08, David Gibson wrote:
-> On Wed, Sep 18, 2019 at 06:06:31PM +0200, C=E9dric Le Goater wrote:
->> This also removes the need of the get_tctx() XiveRouter handler in the
->> core XIVE framework.
->=20
-> In general these commit messages could really do with more context.
-> What exactly is the "controller model"?  Where were the TIMA
-> operations before now.  Why is having them in the controller model
-> better?
->=20
-> I could probably answer those with some investigation, but the point
-> is that the commit message is supposed to make it easy to find that
-> information.
->=20
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/xive.h |  1 -
->>  hw/intc/pnv_xive.c    | 35 ++++++++++++++++++++++++++++++++++-
->>  hw/intc/spapr_xive.c  | 33 +++++++++++++++++++++++++++++++--
->>  hw/intc/xive.c        | 29 -----------------------------
->>  4 files changed, 65 insertions(+), 33 deletions(-)
->>
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index 536deea8c622..9d9cd88dd17e 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -462,7 +462,6 @@ typedef struct XiveENDSource {
->>  #define XIVE_TM_OS_PAGE         0x2
->>  #define XIVE_TM_USER_PAGE       0x3
->> =20
->> -extern const MemoryRegionOps xive_tm_ops;
->>  void xive_tctx_tm_write(XivePresenter *xptr, XiveTCTX *tctx, hwaddr o=
-ffset,
->>                          uint64_t value, unsigned size);
->>  uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveTCTX *tctx, hwadd=
-r offset,
->> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
->> index 3d6fcf9ac139..40e18fb44811 100644
->> --- a/hw/intc/pnv_xive.c
->> +++ b/hw/intc/pnv_xive.c
->> @@ -1475,6 +1475,39 @@ static const MemoryRegionOps xive_tm_indirect_o=
-ps =3D {
->>      },
->>  };
->> =20
->> +static void pnv_xive_tm_write(void *opaque, hwaddr offset,
->> +                              uint64_t value, unsigned size)
->> +{
->> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
->> +    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
->> +    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
->> +
->> +    xive_tctx_tm_write(XIVE_PRESENTER(xive), tctx, offset, value, siz=
-e);
->> +}
->> +
->> +static uint64_t pnv_xive_tm_read(void *opaque, hwaddr offset, unsigne=
-d size)
->> +{
->> +    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
->> +    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
->> +    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
->> +
->> +    return xive_tctx_tm_read(XIVE_PRESENTER(xive), tctx, offset, size=
-);
->=20
-> You're not using the opaque pointer in either of these cases.  So
-> couldn't you make it point to the presenter for pnv as well, then...
+The following changes since commit 7f21573c822805a8e6be379d9bcf3ad9effef3dc:
 
-On PowerNV, it's the cpu doing the TIMA load/store which determines=20
-the chip and the XiveTCTX is deduced from the pnv_cpu_state().
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-10-01' into staging (2019-10-01 13:13:38 +0100)
 
-The TIMA is only mapped on chip0 in our model. See CQ_TM1_BAR reg.
-=20
->=20
->> +}
->> +
->> +const MemoryRegionOps pnv_xive_tm_ops =3D {
->> +    .read =3D pnv_xive_tm_read,
->> +    .write =3D pnv_xive_tm_write,
->> +    .endianness =3D DEVICE_BIG_ENDIAN,
->> +    .valid =3D {
->> +        .min_access_size =3D 1,
->> +        .max_access_size =3D 8,
->> +    },
->> +    .impl =3D {
->> +        .min_access_size =3D 1,
->> +        .max_access_size =3D 8,
->> +    },
->> +};
->> +
->>  /*
->>   * Interrupt controller XSCOM region.
->>   */
->> @@ -1832,7 +1865,7 @@ static void pnv_xive_realize(DeviceState *dev, E=
-rror **errp)
->>                            "xive-pc", PNV9_XIVE_PC_SIZE);
->> =20
->>      /* Thread Interrupt Management Area (Direct) */
->> -    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,
->> +    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &pnv_xive_tm_=
-ops,
->>                            xive, "xive-tima", PNV9_XIVE_TM_SIZE);
->> =20
->>      qemu_register_reset(pnv_xive_reset, dev);
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index eefc0d4c36b9..e00a9bdd901b 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -222,6 +222,35 @@ void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx)
->>      memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &nvt_cam, 4);
->>  }
->> =20
->> +static void spapr_xive_tm_write(void *opaque, hwaddr offset,
->> +                          uint64_t value, unsigned size)
->> +{
->> +    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tct=
-x;
->> +
->> +    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value,
->> size);
->=20
-> ... there would be no difference from the spapr versions, AFAICT.
+are available in the git repository at:
 
-the XiveTCTX is deduced from the spapr_cpu_state().
 
-C.
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
->=20
->> +}
->> +
->> +static uint64_t spapr_xive_tm_read(void *opaque, hwaddr offset, unsig=
-ned size)
->> +{
->> +    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tct=
-x;
->> +
->> +    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, si=
-ze);
->> +}
->> +
->> +const MemoryRegionOps spapr_xive_tm_ops =3D {
->> +    .read =3D spapr_xive_tm_read,
->> +    .write =3D spapr_xive_tm_write,
->> +    .endianness =3D DEVICE_BIG_ENDIAN,
->> +    .valid =3D {
->> +        .min_access_size =3D 1,
->> +        .max_access_size =3D 8,
->> +    },
->> +    .impl =3D {
->> +        .min_access_size =3D 1,
->> +        .max_access_size =3D 8,
->> +    },
->> +};
->> +
->>  static void spapr_xive_end_reset(XiveEND *end)
->>  {
->>      memset(end, 0, sizeof(*end));
->> @@ -331,8 +360,8 @@ static void spapr_xive_realize(DeviceState *dev, E=
-rror **errp)
->>      qemu_register_reset(spapr_xive_reset, dev);
->> =20
->>      /* TIMA initialization */
->> -    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,=
- xive,
->> -                          "xive.tima", 4ull << TM_SHIFT);
->> +    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &spapr_xive_t=
-m_ops,
->> +                          xive, "xive.tima", 4ull << TM_SHIFT);
->>      sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
->> =20
->>      /*
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index 9bb09ed6ee7b..11432f04f5c3 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -483,35 +483,6 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, X=
-iveTCTX *tctx, hwaddr offset,
->>      return xive_tm_raw_read(tctx, offset, size);
->>  }
->> =20
->> -static void xive_tm_write(void *opaque, hwaddr offset,
->> -                          uint64_t value, unsigned size)
->> -{
->> -    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
-ent_cpu);
->> -
->> -    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, s=
-ize);
->> -}
->> -
->> -static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned si=
-ze)
->> -{
->> -    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), curr=
-ent_cpu);
->> -
->> -    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, si=
-ze);
->> -}
->> -
->> -const MemoryRegionOps xive_tm_ops =3D {
->> -    .read =3D xive_tm_read,
->> -    .write =3D xive_tm_write,
->> -    .endianness =3D DEVICE_BIG_ENDIAN,
->> -    .valid =3D {
->> -        .min_access_size =3D 1,
->> -        .max_access_size =3D 8,
->> -    },
->> -    .impl =3D {
->> -        .min_access_size =3D 1,
->> -        .max_access_size =3D 8,
->> -    },
->> -};
->> -
->>  static char *xive_tctx_ring_print(uint8_t *ring)
->>  {
->>      uint32_t w2 =3D xive_tctx_word2(ring);
->=20
+for you to fetch changes up to 8cd5aa6899689e6f9f3e72bf43474a436148a341:
 
+  tests/docker: only enable ubsan for test-clang (2019-10-03 12:58:05 +0200)
+
+----------------------------------------------------------------
+* Compilation fix for KVM (Alex)
+* SMM fix (Dmitry)
+* VFIO error reporting (Eric)
+* win32 fixes and workarounds (Marc-André)
+* qemu-pr-helper crash bugfix (Maxim)
+* Memory leak fixes (myself)
+* Record-replay deadlock (Pavel)
+* i386 CPUID bits (Sebastian)
+* kconfig tweak (Thomas)
+* Valgrind fix (Thomas)
+* distclean improvement (Thomas)
+* Autoconverge test (Yury)
+
+----------------------------------------------------------------
+
+v1->v2: dropped the VMX patches
+
+Alex Bennée (1):
+      accel/kvm: ensure ret always set
+
+Dmitry Poletaev (1):
+      Fix wrong behavior of cpu_memory_rw_debug() function in SMM
+
+Eric Auger (2):
+      vfio: Turn the container error into an Error handle
+      memory: allow memory_region_register_iommu_notifier() to fail
+
+Marc-André Lureau (3):
+      util: WSAEWOULDBLOCK on connect should map to EINPROGRESS
+      tests: skip serial test on windows
+      win32: work around main-loop busy loop on socket/fd event
+
+Maxim Levitsky (1):
+      qemu-pr-helper: fix crash in mpath_reconstruct_sense
+
+Paolo Bonzini (9):
+      ide: fix leak from qemu_allocate_irqs
+      microblaze: fix leak of fdevice tree blob
+      mcf5208: fix leak from qemu_allocate_irqs
+      hppa: fix leak from g_strdup_printf
+      mips: fix memory leaks in board initialization
+      cris: do not leak struct cris_disasm_data
+      lm32: do not leak memory on object_new/object_unref
+      docker: test-debug: disable LeakSanitizer
+      tests/docker: only enable ubsan for test-clang
+
+Pavel Dovgaluk (1):
+      replay: don't synchronize memory operations in replay mode
+
+Sebastian Andrzej Siewior (1):
+      i386: Add CPUID bit for CLZERO and XSAVEERPTR
+
+Thomas Huth (2):
+      Makefile: Remove generated files when doing 'distclean'
+      hw/isa: Introduce a CONFIG_ISA_SUPERIO switch for isa-superio.c
+
+Yury Kotov (1):
+      tests/migration: Add a test for auto converge
+
+ Makefile                      |   6 +-
+ accel/kvm/kvm-all.c           |   6 +-
+ disas/cris.c                  |  59 ++++++++--------
+ exec.c                        |  23 +++++--
+ hw/arm/smmuv3.c               |  18 ++---
+ hw/hppa/dino.c                |   1 +
+ hw/hppa/machine.c             |   4 +-
+ hw/i386/amd_iommu.c           |  17 +++--
+ hw/i386/intel_iommu.c         |   8 ++-
+ hw/ide/cmd646.c               |   1 +
+ hw/isa/Kconfig                |  10 ++-
+ hw/isa/Makefile.objs          |   2 +-
+ hw/m68k/mcf5208.c             |   2 +
+ hw/microblaze/boot.c          |   1 +
+ hw/mips/Kconfig               |   1 +
+ hw/mips/mips_int.c            |   1 +
+ hw/mips/mips_jazz.c           |   2 +
+ hw/ppc/spapr_iommu.c          |   8 ++-
+ hw/timer/lm32_timer.c         |   6 +-
+ hw/timer/milkymist-sysctl.c   |  10 +--
+ hw/vfio/common.c              |  52 +++++++++-----
+ hw/vfio/spapr.c               |   4 +-
+ hw/virtio/vhost.c             |   9 ++-
+ include/exec/memory.h         |  21 ++++--
+ include/hw/vfio/vfio-common.h |   2 +-
+ memory.c                      |  31 ++++++---
+ scsi/qemu-pr-helper.c         |   6 +-
+ target/i386/cpu.c             |   4 +-
+ target/i386/cpu.h             |   5 +-
+ target/i386/helper.c          |   5 +-
+ tests/Makefile.include        |  12 +++-
+ tests/docker/test-clang       |   4 +-
+ tests/docker/test-debug       |   1 +
+ tests/migration-test.c        | 157 +++++++++++++++++++++++++++++++++++++-----
+ tests/test-char.c             |   4 +-
+ util/async.c                  |   6 +-
+ util/oslib-win32.c            |   6 +-
+ 37 files changed, 372 insertions(+), 143 deletions(-)
+-- 
+1.8.3.1
 
