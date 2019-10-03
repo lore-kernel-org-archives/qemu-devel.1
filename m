@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C20C32792
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF38AC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:44:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1AA120862
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:39:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1AA120862
+	by mail.kernel.org (Postfix) with ESMTPS id C352C20862
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 19:44:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C352C20862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG6wJ-0008Fm-E3
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 15:39:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51849)
+	id 1iG71H-00035o-CW
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 15:44:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iG6qy-0005X4-7V
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:33:33 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iG6qY-00054W-4p
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:33:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iG6qw-0004vr-TP
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:33:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38630)
+ (envelope-from <jsnow@redhat.com>) id 1iG6qX-0004fG-1c
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 15:33:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56228)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iG6qt-0004t0-L7; Thu, 03 Oct 2019 15:33:28 -0400
+ id 1iG6qU-0004du-KN; Thu, 03 Oct 2019 15:33:02 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E080A3024558;
- Thu,  3 Oct 2019 19:33:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B633D3078A23;
+ Thu,  3 Oct 2019 19:33:01 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BD38F10018F8;
- Thu,  3 Oct 2019 19:33:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E59891001B13;
+ Thu,  3 Oct 2019 19:32:59 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL v2 6/8] bootdevice: Refactor get_boot_devices_list
-Date: Thu,  3 Oct 2019 15:32:43 -0400
-Message-Id: <20191003193245.8993-7-jsnow@redhat.com>
+Subject: [PULL v2 1/8] block: Refactor macros - fix tabbing
+Date: Thu,  3 Oct 2019 15:32:38 -0400
+Message-Id: <20191003193245.8993-2-jsnow@redhat.com>
 In-Reply-To: <20191003193245.8993-1-jsnow@redhat.com>
 References: <20191003193245.8993-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 03 Oct 2019 19:33:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Thu, 03 Oct 2019 19:33:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -83,106 +83,82 @@ Sender: "Qemu-devel"
 
 From: Sam Eiderman <shmuel.eiderman@oracle.com>
 
-Move device name construction to a separate function.
-
-We will reuse this function in the following commit to pass logical CHS
-parameters through fw_cfg much like we currently pass bootindex.
+Fixing tabbing in block related macros.
 
 Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
 Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
 Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-id: 20190925110639.100699-7-sameid@google.com
+Message-id: 20190925110639.100699-2-sameid@google.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- bootdevice.c | 61 +++++++++++++++++++++++++++++-----------------------
- 1 file changed, 34 insertions(+), 27 deletions(-)
+ include/hw/block/block.h | 16 ++++++++--------
+ hw/ide/qdev.c            |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/bootdevice.c b/bootdevice.c
-index bc5e1c2de4..2b12fb85a4 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -202,6 +202,39 @@ DeviceState *get_boot_device(uint32_t position)
-     return res;
- }
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index 607539057a..fd55a30bca 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -50,21 +50,21 @@ static inline unsigned int get_physical_block_exp(Blo=
+ckConf *conf)
+                           _conf.logical_block_size),                    =
+\
+     DEFINE_PROP_BLOCKSIZE("physical_block_size", _state,                =
+\
+                           _conf.physical_block_size),                   =
+\
+-    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),  \
++    DEFINE_PROP_UINT16("min_io_size", _state, _conf.min_io_size, 0),    =
+\
+     DEFINE_PROP_UINT32("opt_io_size", _state, _conf.opt_io_size, 0),    =
+\
+-    DEFINE_PROP_UINT32("discard_granularity", _state, \
+-                       _conf.discard_granularity, -1), \
+-    DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce, \
+-                            ON_OFF_AUTO_AUTO), \
++    DEFINE_PROP_UINT32("discard_granularity", _state,                   =
+\
++                       _conf.discard_granularity, -1),                  =
+\
++    DEFINE_PROP_ON_OFF_AUTO("write-cache", _state, _conf.wce,           =
+\
++                            ON_OFF_AUTO_AUTO),                          =
+\
+     DEFINE_PROP_BOOL("share-rw", _state, _conf.share_rw, false)
 =20
-+static char *get_boot_device_path(DeviceState *dev, bool ignore_suffixes=
-,
-+                                  char *suffix)
-+{
-+    char *devpath =3D NULL, *s =3D NULL, *d, *bootpath;
-+
-+    if (dev) {
-+        devpath =3D qdev_get_fw_dev_path(dev);
-+        assert(devpath);
-+    }
-+
-+    if (!ignore_suffixes) {
-+        if (dev) {
-+            d =3D qdev_get_own_fw_dev_path_from_handler(dev->parent_bus,=
- dev);
-+            if (d) {
-+                assert(!suffix);
-+                s =3D d;
-+            } else {
-+                s =3D g_strdup(suffix);
-+            }
-+        } else {
-+            s =3D g_strdup(suffix);
-+        }
-+    }
-+
-+    bootpath =3D g_strdup_printf("%s%s",
-+                               devpath ? devpath : "",
-+                               s ? s : "");
-+    g_free(devpath);
-+    g_free(s);
-+
-+    return bootpath;
-+}
-+
- /*
-  * This function returns null terminated string that consist of new line
-  * separated device paths.
-@@ -218,36 +251,10 @@ char *get_boot_devices_list(size_t *size)
-     bool ignore_suffixes =3D mc->ignore_boot_device_suffixes;
+ #define DEFINE_BLOCK_PROPERTIES(_state, _conf)                          =
+\
+     DEFINE_PROP_DRIVE("drive", _state, _conf.blk),                      =
+\
+     DEFINE_BLOCK_PROPERTIES_BASE(_state, _conf)
 =20
-     QTAILQ_FOREACH(i, &fw_boot_order, link) {
--        char *devpath =3D NULL,  *suffix =3D NULL;
-         char *bootpath;
--        char *d;
-         size_t len;
+-#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)      \
+-    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),  \
+-    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0), \
++#define DEFINE_BLOCK_CHS_PROPERTIES(_state, _conf)                      =
+\
++    DEFINE_PROP_UINT32("cyls", _state, _conf.cyls, 0),                  =
+\
++    DEFINE_PROP_UINT32("heads", _state, _conf.heads, 0),                =
+\
+     DEFINE_PROP_UINT32("secs", _state, _conf.secs, 0)
 =20
--        if (i->dev) {
--            devpath =3D qdev_get_fw_dev_path(i->dev);
--            assert(devpath);
--        }
--
--        if (!ignore_suffixes) {
--            if (i->dev) {
--                d =3D qdev_get_own_fw_dev_path_from_handler(i->dev->pare=
-nt_bus,
--                                                          i->dev);
--                if (d) {
--                    assert(!i->suffix);
--                    suffix =3D d;
--                } else {
--                    suffix =3D g_strdup(i->suffix);
--                }
--            } else {
--                suffix =3D g_strdup(i->suffix);
--            }
--        }
--
--        bootpath =3D g_strdup_printf("%s%s",
--                                   devpath ? devpath : "",
--                                   suffix ? suffix : "");
--        g_free(devpath);
--        g_free(suffix);
-+        bootpath =3D get_boot_device_path(i->dev, ignore_suffixes, i->su=
-ffix);
+ #define DEFINE_BLOCK_ERROR_PROPERTIES(_state, _conf)                    =
+\
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 6fba6b62b8..6dd219944f 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -290,7 +290,7 @@ static void ide_drive_realize(IDEDevice *dev, Error *=
+*errp)
+     DEFINE_BLOCK_PROPERTIES(IDEDrive, dev.conf),        \
+     DEFINE_BLOCK_ERROR_PROPERTIES(IDEDrive, dev.conf),  \
+     DEFINE_PROP_STRING("ver",  IDEDrive, dev.version),  \
+-    DEFINE_PROP_UINT64("wwn",  IDEDrive, dev.wwn, 0),    \
++    DEFINE_PROP_UINT64("wwn",  IDEDrive, dev.wwn, 0),   \
+     DEFINE_PROP_STRING("serial",  IDEDrive, dev.serial),\
+     DEFINE_PROP_STRING("model", IDEDrive, dev.model)
 =20
-         if (total) {
-             list[total-1] =3D '\n';
 --=20
 2.21.0
 
