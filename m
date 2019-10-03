@@ -2,91 +2,65 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0202FC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 12:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFD1C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 12:23:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE3CB20830
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 12:17:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oJeYotOZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE3CB20830
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 953D9218DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 12:23:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953D9218DE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG02z-0001wx-UQ
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 08:17:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42662)
+	id 1iG08V-0005k3-NC
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 08:23:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43829)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iG01X-0001Ub-FH
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:16:01 -0400
+ (envelope-from <clg@kaod.org>) id 1iG07X-0005AN-0h
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iG01U-0008F5-3i
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:15:58 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36783)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iG01T-0008ES-AA
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:15:56 -0400
-Received: by mail-wr1-x442.google.com with SMTP id y19so2686626wrd.3
- for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 05:15:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=FzacPTlNUKnQ43tm7EzyKmuGlJNT1pooGj2dsuQ39pw=;
- b=oJeYotOZ1UzvleQWhszkAyIkJPhKs5qAMr6JOyrtGbygYrJcdlKsGsyAzt9rJz/FfD
- e7vf50UlsZ6N3ch1fT3EN+Rfsop0TwQO67KwiMMFG8JazsjZbtYs1v5zIQ2Rcs1RL8Ms
- kvEfUQSj5tdD1EcdKK5QJ9qAzT5hJif+Zxt8T+4OgCGVGW2rYfR0XBa7hXF2R0V50LnK
- i2ewCGySu1TDtYCRnAjoa5aNsy4oDAR6/Cs3r+Q6NinbMx/IQUmt6WQkuXiTwKuS73Mu
- mDmKwDYkY99FlX7nNY1ydo/P5N2ldp7DVfeO6Dbh8wiI8V3Dx3rdQ53vD+Kzvp+MlZfJ
- Z2rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=FzacPTlNUKnQ43tm7EzyKmuGlJNT1pooGj2dsuQ39pw=;
- b=OcBhOYcSOZS31KfEgMuR/xRBDpASmMlyXK+h61psm3I4TMXzbTYiy5Gjm71brOAb7h
- eeZlYuvba3DjJ7Zt85Wzy1TvLZeSrEekGIkkocjdHJwgIvlVkGrhNbLHFrK1wD9CU7Pk
- mn7stfggzLmROk6YPrEcbpDOHidDntfIXA00ZHUjQ6qg+Gb19IUtVjdZQZBoF8vX1Jns
- f1xH5LXJNePdKEsxP8+V/CPTUWAqxKq/Pe5bLKNfctzTGrcNQqcd4sGq9OmAMQjf+E1+
- vhu0v5wSjL8+WwgCr8Z0ZzrmEgkgRHDJurOIXk3orAdp28Y0cwYKB00fQQ58pZgbOHfj
- nshg==
-X-Gm-Message-State: APjAAAWpnrswGZfoQuPw61bDX6X0XWi223K9rGDp8i8IwMIVbVrKePV1
- V1HoK80cD8zBC8t+tXrom4g0rEuE+o0=
-X-Google-Smtp-Source: APXvYqz6rb7lG0LDt/54GH/jok0jKcNhwWSfXupI21g4plWQlcz86hc0mG1FRlSJMcAkobpAhb0FMQ==
-X-Received: by 2002:a5d:61c4:: with SMTP id q4mr6565642wrv.327.1570104952445; 
- Thu, 03 Oct 2019 05:15:52 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id h14sm2337574wro.44.2019.10.03.05.15.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Oct 2019 05:15:51 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 39E881FF87;
- Thu,  3 Oct 2019 13:15:50 +0100 (BST)
-References: <20191002102212.6100-1-alex.bennee@linaro.org>
- <05d59eb3-1693-d5f4-0f6d-9642fd46c32a@redhat.com>
- <20191003092213.etjzlwgd7nlnzqay@steredhat>
- <e85b2eaa-1190-c372-5875-6a024ae3a9cd@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] accel/kvm: ensure ret always set
-In-reply-to: <e85b2eaa-1190-c372-5875-6a024ae3a9cd@redhat.com>
-Date: Thu, 03 Oct 2019 13:15:50 +0100
-Message-ID: <87sgoaja89.fsf@linaro.org>
+ (envelope-from <clg@kaod.org>) id 1iG07V-0002wz-EW
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:22:10 -0400
+Received: from 8.mo177.mail-out.ovh.net ([46.105.61.98]:39039)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iG07V-0002ve-6i
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 08:22:09 -0400
+Received: from player776.ha.ovh.net (unknown [10.108.35.159])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 6EC1E10CE4C
+ for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 14:22:06 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player776.ha.ovh.net (Postfix) with ESMTPSA id 9F0C2A820B90;
+ Thu,  3 Oct 2019 12:22:00 +0000 (UTC)
+Subject: Re: [PATCH 2/7] spapr, xive: Turn "nr-ends" property into
+ "nr-servers" property
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <157010404888.246126.9768030542733152637.stgit@bahia.lan>
+ <157010406203.246126.13381271918474281392.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c6d66c57-fd1d-4f69-98b3-8325bcf4db24@kaod.org>
+Date: Thu, 3 Oct 2019 14:21:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
+In-Reply-To: <157010406203.246126.13381271918474281392.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 16712013793413663552
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeekgdehfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.61.98
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,83 +72,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 03/10/2019 14:01, Greg Kurz wrote:
+> The sPAPR XIVE object has an nr_ends field which happens to be a
+> multiple of spapr_max_server_number(). It is currently set with
+> the help of "nr-ends" property. This is a bit unfortunate since
+> it exposes to the sPAPR irq frontend what should remain an
+> implemantation detail within the XIVE backend.
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+implementation
 
-> On 10/3/19 11:22 AM, Stefano Garzarella wrote:
->> On Wed, Oct 02, 2019 at 01:08:40PM +0200, Paolo Bonzini wrote:
->>> On 02/10/19 12:22, Alex Benn=C3=A9e wrote:
->>>> Some of the cross compilers rightly complain there are cases where ret
->>>> may not be set. 0 seems to be the reasonable default unless particular
->>>> slot explicitly returns -1.
->>>>
->> Even Coverity reported it (CID 1405857).
->
-> And GCC ;)
+> It will be possible soon to inform the XIVE KVM device about the
+> range of VCPU ids that may be used in the VM, as returned by the
+> spapr_max_server_number() function. This will allow the device
+> to substantially reduce the consumption of scarce resources
+> in the XIVE HW.
+> 
+> For both reasons, replace the "nr-ends" property with an "nr-servers"
+> one. The existing nr_ends field must be kept though since it tells how
+> many ENDs are migrated, it is derived from "nr-servers" at realize time
+> for simplicity. Convert spapr_dt_xive() to use it as well.
 
-So my normal gcc didn't catch that - which is odd as I didn't expect the
-shippable gcc's to be ahead of my local buster install.
+Looks good. one question below.
 
->
-> /home/phil/source/qemu/accel/kvm/kvm-all.c: In function =E2=80=98kvm_log_=
-clear=E2=80=99:
-> /home/phil/source/qemu/accel/kvm/kvm-all.c:1121:8: error: =E2=80=98ret=E2=
-=80=99 may be
-> used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
->      if (r < 0) {
->         ^
-> cc1: all warnings being treated as errors
-> make[1]: *** [/home/phil/source/qemu/rules.mak:69:
-> accel/kvm/kvm-all.o] Error 1
->
-> Fixes: 4222147dfb7
->
->>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>> ---
->>>>   accel/kvm/kvm-all.c | 6 +++---
->>>>   1 file changed, 3 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>>> index aabe097c41..d2d96d73e8 100644
->>>> --- a/accel/kvm/kvm-all.c
->>>> +++ b/accel/kvm/kvm-all.c
->>>> @@ -712,11 +712,11 @@ static int kvm_physical_log_clear(KVMMemoryListe=
-ner *kml,
->>>>       KVMState *s =3D kvm_state;
->>>>       uint64_t start, size, offset, count;
->>>>       KVMSlot *mem;
->>>> -    int ret, i;
->>>> +    int ret =3D 0, i;
->>>>         if (!s->manual_dirty_log_protect) {
->>>>           /* No need to do explicit clear */
->>>> -        return 0;
->>>> +        return ret;
->>>>       }
->>>>         start =3D section->offset_within_address_space;
->>>> @@ -724,7 +724,7 @@ static int kvm_physical_log_clear(KVMMemoryListene=
-r *kml,
->>>>         if (!size) {
->>>>           /* Nothing more we can do... */
->>>> -        return 0;
->>>> +        return ret;
->>>>       }
->>>>         kvm_slots_lock(kml);
->>>>
->>>
->>> Queued, thanks.
->>>
->>> Paolo
->>>
->>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/intc/spapr_xive.c        |   21 ++++++++++++++++-----
+>  hw/ppc/spapr_irq.c          |    2 +-
+>  include/hw/ppc/spapr_xive.h |    1 +
+>  3 files changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 04879abf2e7a..62888ddc68db 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -99,6 +99,15 @@ int spapr_xive_end_to_target(uint8_t end_blk, uint32_t end_idx,
+>      return 0;
+>  }
+>  
+> +static uint32_t spapr_xive_vcpu_id_to_end_idx(uint32_t vcpu_id)
 
 
---
-Alex Benn=C3=A9e
+may be use a simpler macro :
+
+#define spapr_xive_cpu_end_idx(vcpu, prio) (((vcpu) << 3) + prio) 
+
+> +{
+> +    /*
+> +     * 8 XIVE END structures per CPU. One for each available
+> +     * priority
+> +     */
+> +    return vcpu_id << 3;
+> +}
+> +
+>  static void spapr_xive_cpu_to_end(PowerPCCPU *cpu, uint8_t prio,
+>                                    uint8_t *out_end_blk, uint32_t *out_end_idx)
+>  {
+> @@ -109,7 +118,7 @@ static void spapr_xive_cpu_to_end(PowerPCCPU *cpu, uint8_t prio,
+>      }
+>  
+>      if (out_end_idx) {
+> -        *out_end_idx = (cpu->vcpu_id << 3) + prio;
+> +        *out_end_idx = spapr_xive_vcpu_id_to_end_idx(cpu->vcpu_id) + prio;
+>      }
+>  }
+>  
+> @@ -283,11 +292,13 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    if (!xive->nr_ends) {
+> -        error_setg(errp, "Number of interrupt needs to be greater 0");
+> +    if (!xive->nr_servers) {
+> +        error_setg(errp, "Number of interrupt servers must be greater than 0");
+>          return;
+>      }
+>  
+> +    xive->nr_ends = spapr_xive_vcpu_id_to_end_idx(xive->nr_servers);
+> +
+>      /*
+>       * Initialize the internal sources, for IPIs and virtual devices.
+>       */
+> @@ -489,7 +500,7 @@ static const VMStateDescription vmstate_spapr_xive = {
+>  
+>  static Property spapr_xive_properties[] = {
+>      DEFINE_PROP_UINT32("nr-irqs", SpaprXive, nr_irqs, 0),
+> -    DEFINE_PROP_UINT32("nr-ends", SpaprXive, nr_ends, 0),
+> +    DEFINE_PROP_UINT32("nr-servers", SpaprXive, nr_servers, 0),
+>      DEFINE_PROP_UINT64("vc-base", SpaprXive, vc_base, SPAPR_XIVE_VC_BASE),
+>      DEFINE_PROP_UINT64("tm-base", SpaprXive, tm_base, SPAPR_XIVE_TM_BASE),
+>      DEFINE_PROP_END_OF_LIST(),
+> @@ -1550,7 +1561,7 @@ void spapr_dt_xive(SpaprMachineState *spapr, uint32_t nr_servers, void *fdt,
+
+we should remove the 'uint32_t nr_servers' parameter from spapr_dt_xive() 
+then ?
+
+>      /* Interrupt number ranges for the IPIs */
+>      uint32_t lisn_ranges[] = {
+>          cpu_to_be32(0),
+> -        cpu_to_be32(nr_servers),
+> +        cpu_to_be32(xive->nr_servers),
+>      };
+>      /*
+>       * EQ size - the sizes of pages supported by the system 4K, 64K,
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 457eabe24cda..025fd00143a2 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -591,7 +591,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>           * 8 XIVE END structures per CPU. One for each available
+>           * priority
+>           */
+> -        qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
+> +        qdev_prop_set_uint32(dev, "nr-servers", nr_servers);
+>          qdev_init_nofail(dev);
+>  
+>          spapr->xive = SPAPR_XIVE(dev);
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 0df20a6590a5..4a4a6fc6be7f 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -22,6 +22,7 @@ typedef struct SpaprXive {
+>      /* Internal interrupt source for IPIs and virtual devices */
+>      XiveSource    source;
+>      hwaddr        vc_base;
+> +    uint32_t      nr_servers;
+>  
+>      /* END ESB MMIOs */
+>      XiveENDSource end_source;
+> 
+
 
