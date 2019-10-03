@@ -2,72 +2,80 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 904A6C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2827C4CED1
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:40:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A83820830
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:28:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A83820830
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C31132133F
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 17:40:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8VRYRPR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C31132133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iG4ts-0001vJ-L8
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 13:28:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34140)
+	id 1iG55o-0006mW-Vr
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 13:40:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iG4sH-0000VF-O8
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:26:47 -0400
+ (envelope-from <up.mauricio.g@gmail.com>) id 1iG3iu-0002lx-Hp
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 12:13:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iG4sF-0003uf-SQ
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:26:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33144)
+ (envelope-from <up.mauricio.g@gmail.com>) id 1iG3it-0001kg-Je
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 12:13:00 -0400
+Received: from mail-qt1-x82d.google.com ([2607:f8b0:4864:20::82d]:33897)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iG4sF-0003uL-M8
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 13:26:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iG4sC-0001v7-Ki
- for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 17:26:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AF9CA2E80DC
- for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 17:26:37 +0000 (UTC)
+ (Exim 4.71) (envelope-from <up.mauricio.g@gmail.com>)
+ id 1iG3it-0001js-Fe
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 12:12:59 -0400
+Received: by mail-qt1-x82d.google.com with SMTP id 3so4405956qta.1
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 09:12:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=IgGSZKO63xj4PNMuM1wH2xGvi8mQxy2LKwgbGBGvM/c=;
+ b=Z8VRYRPRYksqHB0ADstLpH/guseZ2vWn+2mtTUO4XCnfH2HVu+JuTFZeIxFXn8Pfgn
+ aRPbNoCCiA9/wjhPah/v+uJudckWzwFHBfZJpR+v5mWCngg/SXFhCAmsZDDINNgz0FmG
+ B6pqAbedSG7K6LA3zZUP+Wy61VtsVq27O9h2GREYmxqjK7fMxOgpUX1U56rMxS5OpqL1
+ +D9uDNqUiLU9YSIVOrrUd3EDuRX+JRFZkyBN/gdQ0oOzC5MIzxsp8GmrI4XcagUvFmnH
+ 8yQ6d2O5QTf62J9p6Z0/VP/ef5kFaH30WEwg77NRG0YrL83rA+dfCg/3zng+aSpytwRn
+ fBew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=IgGSZKO63xj4PNMuM1wH2xGvi8mQxy2LKwgbGBGvM/c=;
+ b=QWr2odYBybdDHaLK970pJUGJO8ousVjBG5OyG40XnlzUHqX1tYBCaTFcdrz5k9p78M
+ CKXWESOpkr/2yQyz+tMpuvaNJLnkFDiaKACOUx81jMQT1nG+5MZDShh8YuyImIDo+1SQ
+ 6Xcoo6dMrjVsDptOF5HTKm/7fThaURUpPcYrCsgB7tN3qK5FQdtRx7Kpcbvt/ZOEevvQ
+ BR5E4Wm5/rRvEw8MfJWcQnJ7olSBr359HN07navD2wFhtEorvEEfSsmSUNFx+AKx0tqd
+ oIroqcEsoshI5HfGTMZP5NJUciETDuOdB6TvrNASVFxaa6PdDD1zl/i8GoYZmxpqsUsw
+ V0Mw==
+X-Gm-Message-State: APjAAAWJI32GnayxXLg7BRecw3IlwfJVaN6lBGRWauW+e5A0f6Pb/apu
+ eyrZrq/rfibBKs2bWdomV8MPYCUc6/k8PALN4Wy6vg==
+X-Google-Smtp-Source: APXvYqyjbbyj2OUfg/o72Nm8pxSyMbTkHqcc0QE9l/QFzYsPT37QiPMHb7YiS1PCG8WeIwXkUe/rlLZ0z5lbP6uO/hA=
+X-Received: by 2002:a0c:e7cc:: with SMTP id c12mr6039966qvo.251.1570119177559; 
+ Thu, 03 Oct 2019 09:12:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 Oct 2019 17:17:35 -0000
-From: Rhodus <1846392@bugs.launchpad.net>
+From: Mauricio Galindo <up.mauricio.g@gmail.com>
+Date: Thu, 3 Oct 2019 09:12:46 -0700
+Message-ID: <CAOx2=+fECU91FE5wZY_ee02YHhM=OWW9O0d_RNw+0khoL9snLQ@mail.gmail.com>
+Subject: QEMU user mode execve
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: rhodus ubuntu-weilnetz
-X-Launchpad-Bug-Reporter: Rhodus (rhodus)
-X-Launchpad-Bug-Modifier: Rhodus (rhodus)
-References: <157004264359.16779.14522562243536509301.malonedeb@gac.canonical.com>
-Message-Id: <157012305578.21167.2254033178410008284.malone@chaenomeles.canonical.com>
-Subject: [Bug 1846392] Re: VCPU shutdown request with HAX
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19066";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: adb84e776272d59649057a02beff16da5a46ba82
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Content-Type: multipart/alternative; boundary="000000000000d563db059403dbd9"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::82d
+X-Mailman-Approved-At: Thu, 03 Oct 2019 13:39:56 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,145 +84,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1846392 <1846392@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ahh, yeah, the FAQ ...! :D A lot of work testing stuff and then I forgot
-about that. (I _did_ have a look into it when I wondered about the
-binaries whose name ends with a W.)
+--000000000000d563db059403dbd9
+Content-Type: text/plain; charset="UTF-8"
 
-Anyways, WHPX is not available for Win8.1, but only starting with Win10 _18=
-03_, they say:
-https://docs.microsoft.com/en-us/xamarin/android/get-started/installation/a=
-ndroid-emulator/hardware-acceleration?pivots=3Dwindows#accelerating-with-hy=
-per-v
+Hi,
 
-And indeed, '.\qemu-system-x86_64.exe -accel whpx' will return
-...\qemu-system-x86_64.exe: Could not load library WinHvPlatform.dll.
-...\qemu-system-x86_64.exe: failed to initialize WHPX: Function not impleme=
-nted
+I'm running QEMU in user mode and I'm running into issues when trying to
+exec binaries within the emulated process given that binaries are
+expected to run in the native architecture. Would it be useful to have an
+option to rewrite execve(/bin/some_binary, ...) to
+execve(qemu-$arch-static, [/bin/some_binary, ...], ...)?
 
-Fortunately enough I do have Win10 1803 in dual-boot on this machine.
-Let's see how it goes!*
+--000000000000d563db059403dbd9
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-*[At this point, I could have saved this message, switched OS and tried
-it, such that I could write about the outcome here, but that wouldn't
-really belong to this bug, so instead, I'll send this first and then
-I'll maybe file a fresh bug if WHPX doesn't work either. ;) ]
+<div dir=3D"ltr">Hi,<div><br></div><div>I&#39;m running QEMU in user mode a=
+nd I&#39;m running into issues when trying to exec binaries within the emul=
+ated process given that binaries are expected=C2=A0to run in the native arc=
+hitecture. Would it be useful to have an option to rewrite execve(/bin/some=
+_binary, ...) to execve(qemu-$arch-static, [/bin/some_binary, ...], ...)?</=
+div></div>
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1846392
-
-Title:
-  VCPU shutdown request with HAX
-
-Status in QEMU:
-  New
-
-Bug description:
-  In most scenarios when turning on HAX, QEMU will exit, printing "VCPU
-  shutdown request" to the console.
-
-  This is on Windows 8.1 with Intel HAXM 7.5.2.
-  QEMU's -version prints v4.1.0-11789-g013a2ecf4f-dirty .
-  I've used an installer from qemu.weilnetz.de.
-  The host CPU is an IvyBridge i5 (mobile).
-
-  Some miscellaneous notes (you can skip them first):
-  Win10-1709-PE_Custom.iso is a custom WinPE image I had meant to test usin=
-g QEMU. It is likely broken and doesn't boot at all.
-  [Stuck, etc.]: I had given that image almost 2h during which the circle o=
-f dots continued to spin. I don't know if it or QEMU did anything of intere=
-st at all during that period, but this might indicate long-term stability, =
-sort of.
-  Win10_1709_German_x32.iso: Stock Win10 1709 32bit ISO I got off a German =
-tech website. I've waited for the install screen to appear.
-  TinyCore_10-1.iso: TinyCore by Core Project. A 18MB graphical Linux distr=
-ibution, pretty barren by default. I've generally opened Apps there, the pa=
-ckage manager, then shut it down again.
-  On the one marked [Fx stable], I've gotten Firefox 60.8.0 ESR and visited=
- a couple of websites. (I don't know of any available program that would tr=
-y to execute exotic CPU instructions in weird combinations to do a proper t=
-est.)
-  Q64 is .\qemu-system-x86_64.exe , substituted for readability (shorter li=
-nes).
-
-  =
-
-  Invocations that QEMU seemed to handle well (without the headline error):
-  Q64 -machine q35 -accel hax
-  Q64 -machine q35 -cdrom \!S\Win10-1709-PE_Custom.iso
-  Q64 -machine q35 -cdrom \!S\Win10-1709-PE_Custom.iso -m 4096 [Stuck, etc.]
-  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -m 1920
-  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -cpu max -m 256 [1]
-  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -cpu max -m 512
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -cpu max -serial file:\!S\QEMU_TC=
-L_BUG.log [2]
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax [Fx stable, s.a.]
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu Skylake-Client-IB=
-RS
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu Icelake-Client-v1
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu Cascadelake-Serve=
-r-v2
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu Broadwell-v4
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu IvyBridge-IBRS
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu coreduo
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu pentium
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu base [3]
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -cpu base [4]
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -cpu pentium
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu Icelake-Client-v1 [5]
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu Broadwell-v4 [5]
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu IvyBridge-v1 [5]
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu coreduo
-
-  =
-
-  Then, those that made it print "VCPU shutdown request" repeatedly and qui=
-t, immediately or after a couple of seconds at most, except where noted. I =
-put an indication of the number of messages into curly braces.
-  Q64 -machine q35,accel=3Dhax -cpu max  {many}
-  Q64 -machine q35,accel=3Dhax -cdrom \!S\Win10-1709-PE_Custom.iso
-  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -accel hax  =
-{very many}
-  Q64 -machine q35 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -accel hax -=
-cpu max  {very many}
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -accel hax  {just two}
-  Q64 -cdrom \!S\TinyCore_10-1.iso -m 512 -accel hax -cpu max  {a couple}
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu Icelake-Client-v1 -a=
-ccel hax  {two}
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu IvyBridge-v1 -accel =
-hax  {two}
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu pentium -accel hax  =
-{three}
-  Q64 -cdrom \!S\Win10_1709_German_x32.iso -m 512 -cpu coreduo -accel hax  =
-{a few}
-
-
-  (I have rewritten a couple of commandlines to make them more uniform
-  (changing the placement of parameters and using '-accel hax' instead
-  of '-machine ...,accel=3Dhax').)
-
-  [1]: WinPE boot error, not enough RAM.
-  [2]: Will cause a kernel BUG: "... \ login[892]: root login on 'tty1' \ B=
-UG: unable to handle kernel paging request at 00010ffa \ ...". See attached=
- file.
-  [3]: Stuck after "Booting the kernel.", cursor blinks.
-  [4]: Stuck at blinking console prompt, no input possible.
-  [5]: According to the printout, TCG doesn't support a bunch of those proc=
-essor's features that have been requested.
-
-  PS: There should be some note highlighting that there is a strict limit o=
-n line length (or at least that's what it looks like).  I can shorten the f=
-ile names further to enhance skimmability ... :/
-  Also, let me know if you need anything else.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1846392/+subscriptions
+--000000000000d563db059403dbd9--
 
