@@ -2,66 +2,86 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E65C32792
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 09:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FE9C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 09:35:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F123218DE
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 09:32:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F123218DE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AEE80218DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 09:35:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEE80218DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFxT8-0008Ic-B9
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 05:32:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49062)
+	id 1iFxW2-0001d9-RD
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 05:35:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49241)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iFxRj-0007NN-7z
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:30:52 -0400
+ (envelope-from <slp@redhat.com>) id 1iFxUh-0000dt-SB
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iFxRh-0002N0-7Y
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:30:51 -0400
-Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:33252)
+ (envelope-from <slp@redhat.com>) id 1iFxUg-0003Ak-8w
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:33:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36422)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iFxRf-0002LZ-M0
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:30:49 -0400
-Received: from player732.ha.ovh.net (unknown [10.109.146.173])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id A1E4D6B692
- for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 11:30:43 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player732.ha.ovh.net (Postfix) with ESMTPSA id 89AF2A6A156B;
- Thu,  3 Oct 2019 09:30:38 +0000 (UTC)
-Subject: Re: [PATCH v4 13/25] ppc/xive: Introduce a xive_tctx_ipb_update()
- helper
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190918160645.25126-1-clg@kaod.org>
- <20190918160645.25126-14-clg@kaod.org>
- <20191003021137.GK11105@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5580c25b-dc6e-3303-8e85-9d25ad8b92e7@kaod.org>
-Date: Thu, 3 Oct 2019 11:30:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iFxUg-00039q-04
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 05:33:54 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BBB08368FF
+ for <qemu-devel@nongnu.org>; Thu,  3 Oct 2019 09:33:52 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id k67so459155wmf.3
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 02:33:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=gf+Qbxksk3B9oIq95/inNVVvY3Do4jSQ6YPSwb50D20=;
+ b=fZzg0rjBb/1YBfZjcNDzZCGShIeoMfRx+0YkOkoiic6v+g02tl12tKUkEzJf6Hn/RB
+ gPGU+PKqA/zzSD984NIyO/GVy1ZpG9iV4p+obZ9ACXBpUnG1wRH2bXLVddBFCUGatoVX
+ oPLvpO+Vsv0RpfmZfp+e8gZyNXg3zLibuicbv/AxgkSNLWTIVZr1fSPlaEpvyDBncEqF
+ LUpR+i5OkSrHYb4m4mm0N9mEwb78PMvuCxIFBWEHVR3fYov3mwG0JuSnSOgKgJoyjoKD
+ gHcBJgTT59ZTt0ws52Y/WvTCbhqTA2mxFJbt45hu+3y6JoBmvoBwU2lO0hJXiinjVqbP
+ lpUg==
+X-Gm-Message-State: APjAAAXkK0O0GVVImiy8dbv9V1vBC+znF6R9sptJTey/tEMYM1aIdscA
+ J3U79mc2ZDbhqSzpqznkq00dPIFolvJ00xWcunkfq6lFfgjwNjC+fl3zsot5nzlH5G2G1szBwiq
+ RFLpLMZXcptjiu04=
+X-Received: by 2002:a1c:a404:: with SMTP id n4mr6121235wme.41.1570095231522;
+ Thu, 03 Oct 2019 02:33:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxwdlT5rTYJzyEgYxGs3p8S+fz24KRQvE+R5uuvy1ojHsU/QR13qr+vWKAmtU/W4hofTwSa0w==
+X-Received: by 2002:a1c:a404:: with SMTP id n4mr6121213wme.41.1570095231290;
+ Thu, 03 Oct 2019 02:33:51 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id t6sm3726046wmf.8.2019.10.03.02.33.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Oct 2019 02:33:50 -0700 (PDT)
+References: <20190913152507.56197-1-slp@redhat.com>
+ <20190913152507.56197-2-slp@redhat.com>
+ <f10c8f6d-5ad2-b37c-16b7-659a3f02661c@redhat.com>
+ <20190916075303.GA10930@localhost.localdomain> <87d0g0h4mo.fsf@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v2 1/2] blockdev: release the AioContext at
+ drive_backup_prepare
+In-reply-to: <87d0g0h4mo.fsf@redhat.com>
+Date: Thu, 03 Oct 2019 11:33:46 +0200
+Message-ID: <87o8yyi35x.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191003021137.GK11105@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-X-Ovh-Tracer-Id: 13817888084286475161
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrgeekgddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.43.105
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,95 +93,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: mreitz@redhat.com, John Snow <jsnow@redhat.com>, armbru@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/10/2019 04:11, David Gibson wrote:
-> On Wed, Sep 18, 2019 at 06:06:33PM +0200, C=E9dric Le Goater wrote:
->> We will use it to resend missed interrupts when a vCPU context is
->> pushed a HW thread.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+
+Sergio Lopez <slp@redhat.com> writes:
+
+> Kevin Wolf <kwolf@redhat.com> writes:
+>
+>> Am 13.09.2019 um 21:54 hat John Snow geschrieben:
+>>>=20
+>>>=20
+>>> On 9/13/19 11:25 AM, Sergio Lopez wrote:
+>>> > do_drive_backup() already acquires the AioContext, so release it
+>>> > before the call.
+>>> >=20
+>>> > Signed-off-by: Sergio Lopez <slp@redhat.com>
+>>> > ---
+>>> >  blockdev.c | 6 +-----
+>>> >  1 file changed, 1 insertion(+), 5 deletions(-)
+>>> >=20
+>>> > diff --git a/blockdev.c b/blockdev.c
+>>> > index fbef6845c8..3927fdab80 100644
+>>> > --- a/blockdev.c
+>>> > +++ b/blockdev.c
+>>> > @@ -1783,20 +1783,16 @@ static void drive_backup_prepare(BlkActionSta=
+te *common, Error **errp)
+>>> >=20=20
+>>> >      aio_context =3D bdrv_get_aio_context(bs);
+>>> >      aio_context_acquire(aio_context);
+>>> > -
 >>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  include/hw/ppc/xive.h |  1 +
->>  hw/intc/xive.c        | 15 +++++++++++----
->>  2 files changed, 12 insertions(+), 4 deletions(-)
+>> Are you removing this unrelated empty line intentionally?
+>
+> Yes. In the sense of that whole set of lines being a "open drained
+> section" block.
+>
+>>> >      /* Paired with .clean() */
+>>> >      bdrv_drained_begin(bs);
+>>>=20
+>>> Do we need to make this change to blockdev_backup_prepare as well?
 >>
->> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
->> index f35ff3b64791..a461753f5da5 100644
->> --- a/include/hw/ppc/xive.h
->> +++ b/include/hw/ppc/xive.h
->> @@ -467,6 +467,7 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, Xi=
-veTCTX *tctx, hwaddr offset,
->> =20
->>  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
->>  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)=
-;
->> +void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb);
->> =20
->>  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nv=
-t_idx)
->>  {
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index 68d3361d1c3f..5f7c37b091a7 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -135,6 +135,15 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, ui=
-nt8_t ring, uint8_t cppr)
->>      xive_tctx_notify(tctx, ring);
->>  }
->> =20
->> +void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb)
->> +{
->> +    uint8_t *regs =3D &tctx->regs[ring];
->> +
->> +    regs[TM_IPB] |=3D ipb;
->> +    regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
->=20
-> You're opencoding the existing ipb_update() here, but not eliminating
-> it.  That doesn't seem like a good idea.
- It is in patch 15 when the IPB is correctly recorded in the NVT.=20
+>> Actually, the whole structure feels a bit wrong. We get the bs here and
+>> take its lock, then release the lock again and forget the reference,
+>> only to do both things again inside do_drive_backup().
+>>
+>> The way snapshots work is that the "normal" snapshot commands are
+>> wrappers that turn it into a single-entry transaction. Then you have
+>> only one code path where you can resolve the ID and take the lock just
+>> once. So maybe backup should work like this, too?
+>
+> I'm neither opposed nor in favor, but I think this is outside the scope
+> of this patch series.
 
-I can move that part before patch 13 to make things clearer.
+Kevin, do you think we should attempt to just fix this issue (which
+would make a possible backport easier) or try to move all blockdev
+actions to be transaction-based?
 
+Cheers,
+Sergio.
 
-C.=20
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
->> +    xive_tctx_notify(tctx, ring);
->> +}
->> +
->>  static inline uint32_t xive_tctx_word2(uint8_t *ring)
->>  {
->>      return *((uint32_t *) &ring[TM_WORD2]);
->> @@ -336,8 +345,7 @@ static void xive_tm_set_os_cppr(XivePresenter *xpt=
-r, XiveTCTX *tctx,
->>  static void xive_tm_set_os_pending(XivePresenter *xptr, XiveTCTX *tct=
-x,
->>                                     hwaddr offset, uint64_t value, uns=
-igned size)
->>  {
->> -    ipb_update(&tctx->regs[TM_QW1_OS], value & 0xff);
->> -    xive_tctx_notify(tctx, TM_QW1_OS);
->> +    xive_tctx_ipb_update(tctx, TM_QW1_OS, priority_to_ipb(value & 0xf=
-f));
->>  }
->> =20
->>  static uint64_t xive_tm_pull_os_ctx(XivePresenter *xptr, XiveTCTX *tc=
-tx,
->> @@ -1382,8 +1390,7 @@ static bool xive_presenter_notify(uint8_t format=
-,
->> =20
->>      /* handle CPU exception delivery */
->>      if (count) {
->> -        ipb_update(&match.tctx->regs[match.ring], priority);
->> -        xive_tctx_notify(match.tctx, match.ring);
->> +        xive_tctx_ipb_update(match.tctx, match.ring, priority_to_ipb(=
-priority));
->>      }
->> =20
->>      return count;
->=20
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2VwHoACgkQ9GknjS8M
+AjWNPQ//UWMQdMVZKHM4xXu0qrRngPi/paChzw67mLVXTbUxQaM2CBRgjU2e/uKB
+G7JcizbXSfyYrfNhci76eMteLTrWn5805AaUpuFBw+/M4Eo/3ULIuQ4Wsvs+LsT9
+R5rpA3lX0/Xfid+vjXAPMJ5tNoJYZryelD6XsDM3Q2KDie6mENZQOS1X4NK8JinT
+5f+I/HQygOTdWm5W7ekmoy+GHlY3JXr6e6vNZjr8fMJQyTeGT9y2zsvo8SIpYGc/
+QIMPV2fmhlkZVUT1luSvin+9nQplQ8HIeY2SqB5AKU4eA/tYTD8DicqNDY8lriSg
+zHOQrqTVqfDbJwXR1rspZrakwjGlkf/UqYEDCtQkjgS8iNniYcZSXx/Kwn/V4Oav
+LHbnt3dqmfjCtp76Kuy8o0zwnurwiCl/RIp1eNgkQwMW4mIDA4N7wtNoigs1KWCb
+uCFZZtCHN5DT0IHhCHW5TfkFgXRJrUGHAdqL9xbEjfqkq+MFkaGCYC6QyAg4FTeX
+gjGTbRxFRT7k8DcrblsZ6XkGNp6afg4FaJbcZOmpOjwm0ORXPgIZkLMWaHhhLcMG
+1EuSxzcBpcboAhHFd38MZDo6A+jAzgp4NCjG089+Y/j7aPyqDMyIK/NGJI3vXgMs
+OmcY0W/qDDaqE9LYWCd0IxgJWbDddY+M13AAoNxNWfUk4n0H8YY=
+=fjjj
+-----END PGP SIGNATURE-----
+--=-=-=--
 
