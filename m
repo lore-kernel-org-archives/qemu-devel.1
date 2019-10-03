@@ -2,62 +2,99 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD52C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 06:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCA0C32792
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 07:05:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8A9F222BE
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 06:19:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C5BD222C7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 07:05:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YVw1KNze"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8A9F222BE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HmnvQikA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C5BD222C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFuSx-0002bc-Rw
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 02:19:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56976)
+	id 1iFvBP-0001DI-Kn
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 03:05:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFuS8-00021U-8O
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 02:19:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1iFvAa-0000b7-2e
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 03:05:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFuS6-0003yk-HT
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 02:19:03 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:57207 helo=ozlabs.org)
+ (envelope-from <philmd@redhat.com>) id 1iFvAX-00048g-EZ
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 03:04:58 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34522
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFuS4-0003ua-5f; Thu, 03 Oct 2019 02:19:02 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46kNB65Frbz9sN1; Thu,  3 Oct 2019 16:18:54 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570083534;
- bh=VCPNx624BGXwrTJ+rV2QY28E02rG4/Q8QIddsfG6n4g=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=YVw1KNzeWuDRvlHVdSn7QrdD6TNi15fjLK8NlqHKck5+3HLXyWP3kZ8WKFtm31MMQ
- 7mNEpegHdPFW1dyM6HaMQUK0KmbbR+1OsiMKjSOxri2EBz/3VdKzJ96P5zxsSH7agE
- oF6AgDDAtpMZHiGFoBoiptLKGmfO2xQVpF/0kao8=
-Date: Thu, 3 Oct 2019 16:18:45 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v3 00/34] spapr: IRQ subsystem cleanup
-Message-ID: <20191003061845.GS11105@umbus.fritz.box>
-References: <20191002025208.3487-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iFvAX-00048S-2M
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 03:04:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1570086295;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=C6ltcGQLZfldS8yXWHTgjtks/bc5B9SoVXaYQ5Gcnwo=;
+ b=HmnvQikAolI9hBz6tu/bCa0pyqKVF5ZyEo6SC49n38Fg8Y9QRyBPHkmIT4BRNXmIMST1oi
+ DxBgoLEkMaRyIWte1B4scQgJnz+O2pWKDpPIaAVxg+UFxSxUX1gX4huZFe+pM9pulPgdcu
+ obl2okkDx/wNO8SKxc8PXSv95zJXHxs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-MJ7J5hozOPODRkbOnvDUDA-1; Thu, 03 Oct 2019 03:04:54 -0400
+Received: by mail-wm1-f71.google.com with SMTP id k184so732594wmk.1
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 00:04:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ehvHZDO8kG+zG/2KzYQqnzm1x88Z2sej/c5l+4eo2l4=;
+ b=iOcuFKy5X3a7DnivbxGeklkZD2I57qN/sIFr9Q+PSurvjKy/s71jQieS4sZ5NUuVbn
+ /5hKcy5vM5GfCqNA8iwTLZy5Qc6GquaY0xrF8Sc7zo7RLYcHEX6su6phujXmLxdKWOnc
+ nKMMqmQj7tnLpEr/kQN0up5jwioiP8KVZn62Kya4KPvCmTz4uMF+ylHkxnY9VKTlHeji
+ CenKx+/5Ot//9KGnFmQtMq+8fyQ6B5aOay27MvVSi9n8QeRluZSN+lB7fFHbkOhtdBxY
+ nkBaSwrzWwf/QMrsz7PdfK2MsMTJEkEq5BNcT7cF/k+U/nkevCN5AV7A5NV/IECdV5u3
+ +MuQ==
+X-Gm-Message-State: APjAAAWREOkKihVvrpbF0TUiUwt5fO2SVNlfa71sM35nbu1gbO/G/lct
+ s88Gl+wpnCn0eMrCWCc1MChC5NyRhl+QeQON0hZIIAy5puVUUV+k/mFphwgMdL6Vd62z/rP60DU
+ hoLIFK4X+2XYSOr4=
+X-Received: by 2002:adf:eec5:: with SMTP id a5mr1720122wrp.191.1570086293035; 
+ Thu, 03 Oct 2019 00:04:53 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxyMkMIF21P9FdlT28VM+54ZAxwp7xiHRhi4Ff1yPBYYGOniGnwlSAlf6AmRK47Sf1TfmWPkA==
+X-Received: by 2002:adf:eec5:: with SMTP id a5mr1720094wrp.191.1570086292716; 
+ Thu, 03 Oct 2019 00:04:52 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id b15sm1557775wmb.28.2019.10.03.00.04.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Oct 2019 00:04:52 -0700 (PDT)
+Subject: Re: [PATCH v1 1/1] riscv/boot: Fix possible memory leak
+To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+References: <4cba4d80e570372183b6685a26c72fa3e907bb51.1570051975.git.alistair.francis@wdc.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b26817c1-c2ae-6637-1cb2-81187b6682bc@redhat.com>
+Date: Thu, 3 Oct 2019 09:04:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="sCshgy9RPHTe3gCr"
-Content-Disposition: inline
-In-Reply-To: <20191002025208.3487-1-david@gibson.dropbear.id.au>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <4cba4d80e570372183b6685a26c72fa3e907bb51.1570051975.git.alistair.francis@wdc.com>
+Content-Language: en-US
+X-MC-Unique: MJ7J5hozOPODRkbOnvDUDA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,146 +106,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>, groug@kaod.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Cc: peter.maydell@linaro.org, alistair23@gmail.com, palmer@sifive.com,
+ bmeng.cn@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/2/19 11:34 PM, Alistair Francis wrote:
+> Coverity (CID 1405786) thinks that there is a possible memory leak as
+> we don't guarentee that the memory allocatd from riscv_find_firmware()
 
---sCshgy9RPHTe3gCr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+typos: 'guarantee', 'allocated'
 
-On Wed, Oct 02, 2019 at 12:51:34PM +1000, David Gibson wrote:
-> This is a substantial rework to clean up the handling of IRQs in
-> spapr.  It includes some cleanups to both the XICS and XIVE interrupt
-> controller backends, as well as more to the common spapr irq handling
-> infrastructure.
-
-Since there seems to be general agreement on that part, I've now
-merged the first 20 patches of this series into ppc-for-4.2, which I
-intend to send a PR for tomorroow.
-
+> is freed. This is a false positive, but let's tidy up the code to fix
+> the warning.
 >=20
-> Changes since v2:
->  * Fixed a bug where the "move handling multiple irq frees" to
->    frontend patch was actually freeing one irq over and over, rather
->    than freeing multiple irqs
->  * Fixed some places I missed still using only-Error * style, and flow
->    on adjustments
->  * New idiom to iterate across all constructed backends for the things
->    that need that (cpu_intc_create, claim & freem), rather than
->    open-coding a call on the xics, then xive versions.
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>   hw/riscv/boot.c | 11 ++++-------
+>   1 file changed, 4 insertions(+), 7 deletions(-)
 >=20
-> Changes since v1:
->  * Lots of extra patches
->  * Many minor adjustments based on feedback
->  * Moved towards return value + Error * style, instead of just Error *
->    style
->=20
-> David Gibson (34):
->   xics: Minor fixes for XICSFabric interface
->   xics: Eliminate 'reject', 'resend' and 'eoi' class hooks
->   xics: Rename misleading ics_simple_*() functions
->   xics: Eliminate reset hook
->   xics: Merge TYPE_ICS_BASE and TYPE_ICS_SIMPLE classes
->   xics: Create sPAPR specific ICS subtype
->   spapr: Fold spapr_phb_lsi_qirq() into its single caller
->   spapr: Replace spapr_vio_qirq() helper with spapr_vio_irq_pulse()
->     helper
->   spapr: Clarify and fix handling of nr_irqs
->   spapr: Eliminate nr_irqs parameter to SpaprIrq::init
->   spapr: Fix indexing of XICS irqs
->   spapr: Simplify spapr_qirq() handling
->   spapr: Eliminate SpaprIrq:get_nodename method
->   spapr: Remove unhelpful tracepoints from spapr_irq_free_xics()
->   spapr: Handle freeing of multiple irqs in frontend only
->   spapr, xics, xive: Better use of assert()s on irq claim/free paths
->   xive: Improve irq claim/free path
->   spapr: Use less cryptic representation of which irq backends are
->     supported
->   spapr: Add return value to spapr_irq_check()
->   spapr: Eliminate SpaprIrq::init hook
->   spapr, xics, xive: Introduce SpaprInterruptController QOM interface
->   spapr, xics, xive: Move cpu_intc_create from SpaprIrq to
->     SpaprInterruptController
->   spapr, xics, xive: Move irq claim and free from SpaprIrq to
->     SpaprInterruptController
->   spapr: Formalize notion of active interrupt controller
->   spapr, xics, xive: Move set_irq from SpaprIrq to
->     SpaprInterruptController
->   spapr, xics, xive: Move print_info from SpaprIrq to
->     SpaprInterruptController
->   spapr, xics, xive: Move dt_populate from SpaprIrq to
->     SpaprInterruptController
->   spapr, xics, xive: Match signatures for XICS and XIVE KVM connect
->     routines
->   spapr: Remove SpaprIrq::init_kvm hook
->   spapr, xics, xive: Move SpaprIrq::reset hook logic into
->     activate/deactivate
->   spapr, xics, xive: Move SpaprIrq::post_load hook to backends
->   spapr: Remove SpaprIrq::nr_msis
->   spapr: Move SpaprIrq::nr_xirqs to SpaprMachineClass
->   spapr: Remove last pieces of SpaprIrq
->=20
->  hw/char/spapr_vty.c         |   3 +-
->  hw/intc/spapr_xive.c        | 298 ++++++++-----
->  hw/intc/spapr_xive_kvm.c    |  30 +-
->  hw/intc/trace-events        |  10 +-
->  hw/intc/xics.c              | 210 +++------
->  hw/intc/xics_kvm.c          |   9 +-
->  hw/intc/xics_spapr.c        | 157 ++++++-
->  hw/net/spapr_llan.c         |   3 +-
->  hw/ppc/pnv_psi.c            |   6 +-
->  hw/ppc/spapr.c              |  57 ++-
->  hw/ppc/spapr_caps.c         |  64 +++
->  hw/ppc/spapr_cpu_core.c     |   3 +-
->  hw/ppc/spapr_hcall.c        |   7 +-
->  hw/ppc/spapr_irq.c          | 847 +++++++++++-------------------------
->  hw/ppc/spapr_pci.c          |  10 +-
->  hw/ppc/spapr_vio.c          |   3 +-
->  hw/ppc/trace-events         |   4 -
->  include/hw/pci-host/spapr.h |  11 +-
->  include/hw/ppc/spapr.h      |  14 +-
->  include/hw/ppc/spapr_irq.h  |  89 ++--
->  include/hw/ppc/spapr_vio.h  |   5 +-
->  include/hw/ppc/spapr_xive.h |   9 +-
->  include/hw/ppc/xics.h       |  33 +-
->  include/hw/ppc/xics_spapr.h |  10 +-
->  include/hw/ppc/xive.h       |   2 +-
->  25 files changed, 897 insertions(+), 997 deletions(-)
+> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> index 2e92fb0680..7fee98d2f8 100644
+> --- a/hw/riscv/boot.c
+> +++ b/hw/riscv/boot.c
+> @@ -38,7 +38,7 @@ void riscv_find_and_load_firmware(MachineState *machine=
+,
+>                                     const char *default_machine_firmware,
+>                                     hwaddr firmware_load_addr)
+>   {
+> -    char *firmware_filename;
+> +    char *firmware_filename =3D NULL;
+>  =20
+>       if (!machine->firmware) {
+>           /*
+> @@ -70,14 +70,11 @@ void riscv_find_and_load_firmware(MachineState *machi=
+ne,
+>            * if no -bios option is set without breaking anything.
+>            */
+>           firmware_filename =3D riscv_find_firmware(default_machine_firmw=
+are);
+> -    } else {
+> -        firmware_filename =3D machine->firmware;
+> -        if (strcmp(firmware_filename, "none")) {
+> -            firmware_filename =3D riscv_find_firmware(firmware_filename)=
+;
+> -        }
+> +    } else if (strcmp(machine->firmware, "none")) {
+> +        firmware_filename =3D riscv_find_firmware(machine->firmware);
+>       }
+>  =20
+> -    if (strcmp(firmware_filename, "none")) {
+> +    if (firmware_filename) {
+>           /* If not "none" load the firmware */
+>           riscv_load_firmware(firmware_filename, firmware_load_addr);
+>           g_free(firmware_filename);
 >=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
---sCshgy9RPHTe3gCr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VksMACgkQbDjKyiDZ
-s5LH+BAAoclB5E46FZU4rDYM0FADmdFTJ4SEZk1kHwN0kv0RQwVqih9lvpXk8Y0p
-7hD894DcmM5ETygnNCg4IZ0+JPf0jPPYFcTT1TEogzfRxTDv48iCzxTBlIxcy8Am
-RxBLP72Y2OH3WEDWYh8TNWnjqItyopIzYpKqVvlzMcRIkIZz017EadrDizk8oaxk
-DX9uDhN2oNwL67PvqI/iQPujMSL8pFOMv+wu2v4Lek656mbEIzzXIGeDGnrpGZMy
-NkAfFPRPNmbOICloiVBN/bXYis8G5Q+ggiFU9ABHzebc4JfkoSl4TkH3yW3zH/5J
-kdeB7y9SbY9Paf1NaUKgZeY69abQJNvOXn020g8XkTdG+oaxg92oYohocI1G13k+
-TXT+l+KvQ6wavk5EGjgnBKasyVi/jT48ckeL7xfQhjeYTov9xCVugs/OOz3SvwjQ
-A05LuSNeZR2jHklpv+wpCXpR7rmQeRrFMFrvhD00/UQLPO7UpNRzDRYjd9C4GnF5
-p2cOWFF1SOvMCPTVOI3YFAwEylQVWnNNZMQHJAnCJ0RJ7dZ10spcRkH2/0Avrfgj
-uuCXOJ0l1S1DSO665SKwL1VWfUvcD4JDkfbBV6c8dVtk/i3mckuzlUMNT+N1YtTY
-2V6h3+xFZpbWb4XcYNKZvv545vRjnB0nisWqHdLwRE7Uc0Mpbo4=
-=WhXT
------END PGP SIGNATURE-----
-
---sCshgy9RPHTe3gCr--
 
