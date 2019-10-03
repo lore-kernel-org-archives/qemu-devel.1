@@ -2,100 +2,101 @@ Return-Path: <SRS0=VLgg=X4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E33C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:54:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A26C32792
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:59:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C541E2077B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:54:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2494520842
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:59:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GhYGRE60"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C541E2077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GrNC553h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2494520842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGAvX-0007vX-Tg
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 19:54:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57915)
+	id 1iGB0g-0003au-Ff
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 19:59:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iGAVz-00008P-Ke
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:28:10 -0400
+ (envelope-from <philmd@redhat.com>) id 1iGAc5-00048N-Px
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iGAVq-00076z-MT
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:28:00 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38940)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iGAVq-00074z-AI
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:27:58 -0400
-Received: by mail-wr1-x443.google.com with SMTP id r3so4723987wrj.6
- for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 16:27:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=GKRmMcfTAOzszSXfqMzG5lMRL9Qv8Y95aFzcCLLs1oA=;
- b=GhYGRE608NUaS2rDu68jcpkjdSdRmynoP+Ra8ZJWQJiJOVbD//ZISC5mQtf9bF6wMk
- h/YkEEECrwBRIWYERZeutsNkxKU4WS5kWOvn7RZpX/3bsqiS+Hee+JH+TuBx/PSTjHKb
- I6okjBQvKGNpN2qA5hwEmpXA82G7Ks2LDFKRnPf5wUIiLCfj01JRkzJ/2R3cBXjIP3An
- IsQMQAo3Nrb0uSrSO4NwX+c9SaAiBPmb3COYy3VdnpM3k+LhC8E9siG4R3GrE4mOWgRF
- i+CEKuJXadjC66m5Rdt9HPmPAZS4CiTQLS1Oa3YnVpk0cvxHTsEogulD7vGhbCEGatrx
- A7AQ==
+ (envelope-from <philmd@redhat.com>) id 1iGAby-0004KV-4g
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:34:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40036
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iGAbP-0003vj-Uf
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:34:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1570145622;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ncD+GIq+W9TQMVOQtOXuiMziZEZ6DuqaNnsravIvYNs=;
+ b=GrNC553hlEv8QWR2bnLyCEGDXNciw0JGbm0ID/PvpCQiQ0fPNIH3/WGoUfCCJDAyfIRMrd
+ cfm+q4EhrvBL6qolMuQX4r+ce4hHr87kBnMzbM1ITSVKPmHCrKNtlouX5sgBroyCkQHzMk
+ 9uOnt//mcHvUGp0beCAb4ioEesu2Mus=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-634MWuf5PR6yXpCUYe51Zg-1; Thu, 03 Oct 2019 19:33:36 -0400
+Received: by mail-wr1-f72.google.com with SMTP id m14so1814448wru.17
+ for <qemu-devel@nongnu.org>; Thu, 03 Oct 2019 16:33:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=GKRmMcfTAOzszSXfqMzG5lMRL9Qv8Y95aFzcCLLs1oA=;
- b=X2s6j1cTU1Y0XeOB1HBb7ifgihyUCcGliigEPY4BlO1FRNgqGzXY/HBOJiqa06cxD9
- UOT4d2CibaXWTXOfFN3v6fSwyGxdOobcaH3KORlm1uc9efdLnbp4FJ/3WRfYXlUV8vWR
- 98/qcyVmjgiI4bYeI7EmflTky8Mt63yY+q0Roi53AVwEROVXEO3KyQ3NKJVUQPEVlA6A
- 3IQO9+k5vOnDchNuGhor9TyV9fZgYMbKTnEailtVu3qZDGdg5f3E5XJPl3N0HJApgKHA
- /hkiaa6gtz67rpSPwmbO+kVY+U7XpA/O5npjAsv/pbwG8hBtcmc6508YmN6aAPfMG5d7
- 72PQ==
-X-Gm-Message-State: APjAAAVMgJoqmcP+jvaYwY0CvIYX0leLS9qtdl5ox3i83OBuZMQ3/0Pi
- 4LYdnd/uQ/vF9Ra+Vj045AI=
-X-Google-Smtp-Source: APXvYqxwbjx1Bv+167IQxAmMPYt5l+BXOoEamb7LxewCIQvlCxP668vCzY+gDAy2EhiMJZlUaAXjNQ==
-X-Received: by 2002:adf:f801:: with SMTP id s1mr9208696wrp.293.1570145276667; 
- Thu, 03 Oct 2019 16:27:56 -0700 (PDT)
-Received: from ?IPv6:fd00:835b:d940:d4fc:1::d3?
- (2a01-036c-0113-e8f4-0001-0000-0000-00d3.pool6.digikabel.hu.
- [2a01:36c:113:e8f4:1::d3])
- by smtp.gmail.com with ESMTPSA id j1sm9085598wrg.24.2019.10.03.16.27.55
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 03 Oct 2019 16:27:56 -0700 (PDT)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
- <DirtY.iCE.hu@gmail.com>
-Subject: Re: [PATCH v4 15/24] audio: add mixing-engine option (documentation)
-To: Markus Armbruster <armbru@redhat.com>
-References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
- <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
- <87sgonma7v.fsf@dusky.pond.sub.org>
- <4d24c95c-0e98-2646-0b1a-6c7b3afe0e90@gmail.com>
- <87wodwyabl.fsf@dusky.pond.sub.org>
- <cacb71d0-494f-e05d-dece-637579b0c6d9@gmail.com>
- <87d0fh6l2b.fsf@dusky.pond.sub.org>
-Message-ID: <1a31eb0a-2f07-ae33-e272-bec46d4593a5@gmail.com>
-Date: Fri, 4 Oct 2019 01:27:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ bh=2OXZied8K+dE+da8q1xBCh960/6kRu+OEosH48qhxHc=;
+ b=fNuQ2LTAGSCsPJ4Hdf1OjL2IFPq+fJRsBfA6DCCcESogPpvf3w8Wm3I3TrvslwVza3
+ C7phNkyKSrPVnQDs3ARtQHWhEgdlHLMoQsg3DkHDtxOAJHXAcMl88FGtd/Y0icX2XetY
+ fhlb7At1ZFPF2zOhnLb+VSCJQMwJ34oB02FiYZ7vEDzXrLE37/9WBwF/aB3aC2BiNg0w
+ EmkmcF8XrRVFmXMsWsPi4V1cMcHUUk/U2zMhPmUAhypfPbdtK61SrJesdLL56FpG4YfZ
+ IdXUyp1AATmeHBWT3fuNC9sNE03Y+yLxeK44r0XOcFyG8Y5NZcpySAawEaMB/tc1ErBC
+ X51A==
+X-Gm-Message-State: APjAAAUE76IEHe7/YTXeTlfiYyPwkhzHklRf7RjeYt2ZGilWeFVbX5/p
+ SRC9WN6Y2VbebtoeZmhFdYrAHVYWFlYAUcdXoknZD2ZoyjuIc036NuYj/JwXQBpk/NcgjWjNelm
+ XpJQAln9oqUtixr0=
+X-Received: by 2002:a7b:c35a:: with SMTP id l26mr8864688wmj.81.1570145615650; 
+ Thu, 03 Oct 2019 16:33:35 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwhyvZnn3Y4sK991iS9YYd4ha8RYjss5QkQYeGxsCWL2f6dzYKf20uwwMuJ2mKUyQZ50whu2A==
+X-Received: by 2002:a7b:c35a:: with SMTP id l26mr8864680wmj.81.1570145615407; 
+ Thu, 03 Oct 2019 16:33:35 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id a3sm6652758wmc.3.2019.10.03.16.33.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Oct 2019 16:33:34 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 08/15] target/arm/arm-semi: Factor out
+ implementation of SYS_WRITE
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190916141544.17540-1-peter.maydell@linaro.org>
+ <20190916141544.17540-9-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <674d0aff-71c7-f613-2a62-3fbaffda1da1@redhat.com>
+Date: Fri, 4 Oct 2019 01:33:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <87d0fh6l2b.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190916141544.17540-9-peter.maydell@linaro.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-MC-Unique: 634MWuf5PR6yXpCUYe51Zg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,172 +108,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-10-01 08:23, Markus Armbruster wrote:
-> "Zoltán Kővágó" <dirty.ice.hu@gmail.com> writes:
-> 
->> On 2019-09-25 11:49, Markus Armbruster wrote:
->>> "Zoltán Kővágó" <dirty.ice.hu@gmail.com> writes:
->>>
->>>> On 2019-09-23 15:08, Markus Armbruster wrote:
->>>>> "Kővágó, Zoltán" <dirty.ice.hu@gmail.com> writes:
->>>>>
->>>>>> This will allow us to disable mixeng when we use a decent backend.
->>>>>>
->>>>>> Disabling mixeng have a few advantages:
->>>>>> * we no longer convert the audio output from one format to another, when
->>>>>>      the underlying audio system would just convert it to a third format.
->>>>>>      We no longer convert, only the underlying system, when needed.
->>>>>> * the underlying system probably has better resampling and sample format
->>>>>>      converting methods anyway...
->>>>>> * we may support formats that the mixeng currently does not support (S24
->>>>>>      or float samples, more than two channels)
->>>>>> * when using an audio server (like pulseaudio) different sound card
->>>>>>      outputs will show up as separate streams, even if we use only one
->>>>>>      backend
->>>>>>
->>>>>> Disadvantages:
->>>>>> * audio capturing no longer works (wavcapture, and vnc audio extension)
->>>>>> * some backends only support a single playback stream or very picky
->>>>>>      about the audio format.  In this case we can't disable mixeng.
->>>>>>
->>>>>> However mixeng is not removed, only made optional, so this shouldn't be
->>>>>> a big concern.
->>>>>>
->>>>>> Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
->>>>>> ---
->>>>>>
->>>>>> Notes:
->>>>>>        Changes from v1:
->>>>>>             * renamed mixeng to mixing-engine
->>>>>>
->>>>>>     qapi/audio.json | 5 +++++
->>>>>>     qemu-options.hx | 6 ++++++
->>>>>>     2 files changed, 11 insertions(+)
->>>>>>
->>>>>> diff --git a/qapi/audio.json b/qapi/audio.json
->>>>>> index 9fefdf5186..0535eff794 100644
->>>>>> --- a/qapi/audio.json
->>>>>> +++ b/qapi/audio.json
->>>>>> @@ -11,6 +11,10 @@
->>>>>>     # General audio backend options that are used for both playback and
->>>>>>     # recording.
->>>>>>     #
->>>>>> +# @mixing-engine: use QEMU's mixing engine to mix all streams inside QEMU. When
->>>>>> +#                 set to off, fixed-settings must be also off. Not every backend
->>>>>> +#                 compatible with the off setting (default on, since 4.2)
->>>>>> +#
->>>>>
->>>>> Last sentence no verb.
->>>>>
->>>>> Which backends are compatible?
->>>>
->>>> Actually that's a simplification, it depends on a few things.  When
->>>> mixeng is off, qemu will try to use the same format as the emulated
->>>> sound card, and if the backend doesn't support that format, it won't
->>>> work (no audio).  Also attaching multiple sound cards to the same
->>>> audiodev might not work, if the backend doesn't support multiple
->>>> playback streams.  If you use pulseaudio, it'll work without problems,
->>>> if you use alsa, it depends on your device.  If you use a hw: device
->>>> directly, you'll likely only be able to use one emulated sound card
->>>> with a few selected audio formats.  If you use dmix: (and plug), alsa
->>>> will handle the conversion and mixing, so it will work no matter what
->>>> format the emulated sound card uses.  With OSS the situation is
->>>> probably similar, it depends on the kernel/hw what works and what not.
->>>> wav and spice certainly doesn't support multiple streams.  I'm not
->>>> completely sure about the other backends right now, but I think dsound
->>>> and coreaudio can handle the necessary sample format conversions and
->>>> mixing.
->>>>
->>>>> What happens when you try the off setting with incompatible backends?
->>>> See above.
->>>
->>> What happens *exactly*?
->>>
->>> I'm asking because I'm concerned about the user experience.  When a user
->>> asks for a combination of things QEMU can't provide, such as mixeng off
->>> with an incompatible backend, QEMU should fail with a suitable error
->>> message.  Does it?
->>
->> Error handling is not the best in the audio subsystem, if something
->> fails it generally just prints a warning to the console and continues,
->> and something will happen...  For example, this is what happens when I
->> try to open one hw device twice. I ran qemu with:
->>
->> -audiodev
->> alsa,id=foo,in.dev=hw:1,,0,out.mixing-engine=off,out.dev=hw:1,,0
->> -device piix4-usb-uhci -device usb-audio,audiodev=foo -device
->> AC97,audiodev=foo
->>
->> When the guest tried to initialize the AC97 card, I got an error:
->>
->> alsa: Could not initialize DAC
->> alsa: Failed to open `hw:1,0':
->> alsa: Reason: Device or resource busy
->>
->> And it just continued. And the sound worked, but with wrong sample
->> rate (AC97 wants 44100 Hz, but USB audio previously opened the alsa
->> device with 48000 Hz).  I'll fix this bug in the next revision,
->> audio_pcm_hw_add_* shouldn't fall back to other HWs without mixeng.
->> But even with that, the result will be that one emulated sound card
->> will work and the other won't.
->>
->> It's not ideal, but fixing it would require a lot of effort.  Right
->> now, if you specify an invalid audiodev for alsa (even with mixeng),
->> it'll just print an error to the console and continue without audio.
-> 
-> Should we document this general error handling deficiency somehow?
+On 9/16/19 4:15 PM, Peter Maydell wrote:
+> Factor out the implementation of SYS_WRITE via the
+> new function tables.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-It could be useful to mention it, especially for people who write script 
-and expect qemu to fail if they specify an invalid parameter.  I'm not 
-sure how in-depth this explanation should be however.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
->>> Sometimes rejecting non-working configurations is impractical.  Is it
->>> here?
->>
->> I think it is.  It depends on the backend, its settings, the frontend
->> (emulated sound card), and how the guest uses it.  We currently don't
->> know what formats does a backend support, what formats can a frontend
->> produce, and even if we would know that, just because a frontend can
->> produce a format that the backend doesn't understand doesn't mean that
->> it will actually do it.  For example, right now with this patch series
->> applied, usb-audio can produce 7.1 audio.  If we want to be strict, it
->> means we can only use it with backends that support at least 8
->> channels, even if the user only wants to use stereo audio.
->>
->>> If yes, we should call out the problematic configurations in
->>> documentation.
->>
->> I think we should rather list known working configurations, and leave
->> the others as "try at your own risk" because there's too many things
->> that can go wrong.  (pulseaudio will work, alsa with dmix too.  Need
->> to check coreaudio, dsound and oss.  spice and wavcapture won't work.)
-> 
-> Far from ideal, but better than nothing.
-> 
-> Possibly naive idea: what about automatically falling back to mixeng on
-> when mixeng off doesn't work?  Requires detecting "doesn't work", which
-> I understand just isn't there.  Any other reasons why this couldn't be
-> done?  Way out of scope for this series, of course.
+> ---
+>   target/arm/arm-semi.c | 51 ++++++++++++++++++++++++++++---------------
+>   1 file changed, 33 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+> index e5f1e2aaaf2..c21cbb97bc1 100644
+> --- a/target/arm/arm-semi.c
+> +++ b/target/arm/arm-semi.c
+> @@ -384,6 +384,8 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_=
+syscall_complete_cb cb,
+>    * setting the guest errno if appropriate.
+>    */
+>   typedef uint32_t sys_closefn(ARMCPU *cpu, GuestFD *gf);
+> +typedef uint32_t sys_writefn(ARMCPU *cpu, GuestFD *gf,
+> +                             target_ulong buf, uint32_t len);
+>  =20
+>   static uint32_t host_closefn(ARMCPU *cpu, GuestFD *gf)
+>   {
+> @@ -392,21 +394,51 @@ static uint32_t host_closefn(ARMCPU *cpu, GuestFD *=
+gf)
+>       return set_swi_errno(env, close(gf->hostfd));
+>   }
+>  =20
+> +static uint32_t host_writefn(ARMCPU *cpu, GuestFD *gf,
+> +                             target_ulong buf, uint32_t len)
+> +{
+> +    uint32_t ret;
+> +    CPUARMState *env =3D &cpu->env;
+> +    char *s =3D lock_user(VERIFY_READ, buf, len, 1);
+> +    if (!s) {
+> +        /* Return bytes not written on error */
+> +        return len;
+> +    }
+> +    ret =3D set_swi_errno(env, write(gf->hostfd, s, len));
+> +    unlock_user(s, buf, 0);
+> +    if (ret =3D=3D (uint32_t)-1) {
+> +        ret =3D 0;
+> +    }
+> +    /* Return bytes not written */
+> +    return len - ret;
+> +}
+> +
+>   static uint32_t gdb_closefn(ARMCPU *cpu, GuestFD *gf)
+>   {
+>       return arm_gdb_syscall(cpu, arm_semi_cb, "close,%x", gf->hostfd);
+>   }
+>  =20
+> +static uint32_t gdb_writefn(ARMCPU *cpu, GuestFD *gf,
+> +                            target_ulong buf, uint32_t len)
+> +{
+> +    arm_semi_syscall_len =3D len;
+> +    return arm_gdb_syscall(cpu, arm_semi_cb, "write,%x,%x,%x",
+> +                           gf->hostfd, buf, len);
+> +}
+> +
+>   typedef struct GuestFDFunctions {
+>       sys_closefn *closefn;
+> +    sys_writefn *writefn;
+>   } GuestFDFunctions;
+>  =20
+>   static const GuestFDFunctions guestfd_fns[] =3D {
+>       [GuestFDHost] =3D {
+>           .closefn =3D host_closefn,
+> +        .writefn =3D host_writefn,
+>       },
+>       [GuestFDGDB] =3D {
+>           .closefn =3D gdb_closefn,
+> +        .writefn =3D gdb_writefn,
+>       },
+>   };
+>  =20
+> @@ -539,24 +571,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>               return set_swi_errno(env, -1);
+>           }
+>  =20
+> -        if (use_gdb_syscalls()) {
+> -            arm_semi_syscall_len =3D len;
+> -            return arm_gdb_syscall(cpu, arm_semi_cb, "write,%x,%x,%x",
+> -                                   gf->hostfd, arg1, len);
+> -        } else {
+> -            s =3D lock_user(VERIFY_READ, arg1, len, 1);
+> -            if (!s) {
+> -                /* Return bytes not written on error */
+> -                return len;
+> -            }
+> -            ret =3D set_swi_errno(env, write(gf->hostfd, s, len));
+> -            unlock_user(s, arg1, 0);
+> -            if (ret =3D=3D (uint32_t)-1) {
+> -                ret =3D 0;
+> -            }
+> -            /* Return bytes not written */
+> -            return len - ret;
+> -        }
+> +        return guestfd_fns[gf->type].writefn(cpu, gf, arg1, len);
+>       case TARGET_SYS_READ:
+>           GET_ARG(0);
+>           GET_ARG(1);
+>=20
 
-There are two cases when mixeng can help: a) when the frontend requires 
-a format not supported by the backend, and b) when multiple frontends 
-wants to use the same backend, but the backend doesn't support multiple 
-channels.  This fallback logic would help with a) but it would be much 
-harder to solve b) (I'm not saying it's impossible, but it would require 
-us to convert the already running stream back to mixeng).  However, 
-since the goal of this setting is to get rid of limitations of mixeng, 
-currently you only want to turn it off if when you want to use 5.1 or 
-7.1 audio, where falling back to mixeng is not an option.  (The other 
-use case was when using pulseaudio, you wanted different pa streams per 
-emulated sound card, but since you can have multiple -audiodevs now, 
-it's no longer necessary to disable mixeng.)
-
-The ideal solution is probably porting as much as possible to gstreamer, 
-but this is even more out of scope:
-https://wiki.qemu.org/Internships/ProjectIdeas/AudioGStreamer
 
