@@ -7,56 +7,55 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D58C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE838C47404
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:53:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D965421D81
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:50:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CB02222C2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 02:53:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oZS3Cib2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D965421D81
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lOUpiybl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB02222C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iFrBs-0005bW-IK
-	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:50:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40658)
+	id 1iFrF7-0000AZ-J3
+	for qemu-devel@archiver.kernel.org; Wed, 02 Oct 2019 22:53:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40735)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5M-00007n-LA
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:22 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5P-00009k-4g
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iFr5K-0000yA-Ve
- for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:20 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:45761 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iFr5N-00010i-7O
+ for qemu-devel@nongnu.org; Wed, 02 Oct 2019 22:43:22 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:47103 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iFr5K-0000wp-9X; Wed, 02 Oct 2019 22:43:18 -0400
+ id 1iFr5M-0000xr-Kk; Wed, 02 Oct 2019 22:43:21 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46kHPB2k0Yz9sPh; Thu,  3 Oct 2019 12:43:10 +1000 (AEST)
+ id 46kHPB5ypqz9sPj; Thu,  3 Oct 2019 12:43:10 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1570070590;
- bh=h2MMpDmBrgbXfzhn6sRqy3nLm/+RksZ/9+FnSJihtm4=;
+ bh=gKfD0N75QStGIGd9tY1bg28lPN5C8s83GDqk/VptEkE=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=oZS3Cib2Hrs15pP+sFFG3c449zros4BkLbSzfP0g7Vv7O6LWmHl+WlnHr0qIMavE2
- 9Rk9k1cZVeaoLNqEgmggWkj7aaljmHjxHiMv4wweRvFNVZXYxFtH3NiqiLOG0DuApC
- 37fOZyQ8M+r2FD1C/P69V2MAAp0DaD0C2reUW3nU=
-Date: Thu, 3 Oct 2019 12:11:37 +1000
+ b=lOUpiybleYC1yxAiV8Wmc39FSjm87jAX+p1mWDWVVAdm3Wysq5AnszDWJOMVp2OKv
+ JfyibVU8e/H9BnpHCQLLXQo4wSHSSTbLrU/e/7JD4pCAGgui0U8oPpELKaYotN/9uQ
+ t6TJeQ0CHutqu2Vy5Shf8kLvDZqBNc2BAkGezLlQ=
+Date: Thu, 3 Oct 2019 12:34:51 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v4 13/25] ppc/xive: Introduce a xive_tctx_ipb_update()
- helper
-Message-ID: <20191003021137.GK11105@umbus.fritz.box>
+Subject: Re: [PATCH v4 22/25] ppc/xive: Introduce a xive_os_cam_decode() helper
+Message-ID: <20191003023451.GP11105@umbus.fritz.box>
 References: <20190918160645.25126-1-clg@kaod.org>
- <20190918160645.25126-14-clg@kaod.org>
+ <20190918160645.25126-23-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NrP+m7YXMSGlHqXH"
+ protocol="application/pgp-signature"; boundary="OxpYUbrsx40GOZXC"
 Content-Disposition: inline
-In-Reply-To: <20190918160645.25126-14-clg@kaod.org>
+In-Reply-To: <20190918160645.25126-23-clg@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -78,83 +77,88 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---NrP+m7YXMSGlHqXH
+--OxpYUbrsx40GOZXC
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2019 at 06:06:33PM +0200, C=E9dric Le Goater wrote:
-> We will use it to resend missed interrupts when a vCPU context is
-> pushed a HW thread.
+On Wed, Sep 18, 2019 at 06:06:42PM +0200, C=E9dric Le Goater wrote:
+> The OS CAM line has a special encoding exploited by the HW. Provide a
+> helper routine to hide the details to the TIMA command handlers. This
+> also clarifies the endian ness of different variables : 'qw1w2' is
+> big-endian and 'cam' is native.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  include/hw/ppc/xive.h |  1 +
->  hw/intc/xive.c        | 15 +++++++++++----
->  2 files changed, 12 insertions(+), 4 deletions(-)
+>  hw/intc/xive.c | 35 ++++++++++++++++++++++++++---------
+>  1 file changed, 26 insertions(+), 9 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index f35ff3b64791..a461753f5da5 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -467,6 +467,7 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveT=
-CTX *tctx, hwaddr offset,
-> =20
->  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
->  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-> +void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb);
-> =20
->  static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
->  {
 > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 68d3361d1c3f..5f7c37b091a7 100644
+> index dfae584a319f..cdc4ea8b0e51 100644
 > --- a/hw/intc/xive.c
 > +++ b/hw/intc/xive.c
-> @@ -135,6 +135,15 @@ static void xive_tctx_set_cppr(XiveTCTX *tctx, uint8=
-_t ring, uint8_t cppr)
->      xive_tctx_notify(tctx, ring);
+> @@ -342,14 +342,29 @@ static void xive_tm_set_os_pending(XivePresenter *x=
+ptr, XiveTCTX *tctx,
+>      xive_tctx_ipb_update(tctx, TM_QW1_OS, priority_to_ipb(value & 0xff));
 >  }
 > =20
-> +void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb)
+> +static void xive_os_cam_decode(uint32_t cam, uint8_t *nvt_blk,
+> +                               uint32_t *nvt_idx, bool *vo)
 > +{
-> +    uint8_t *regs =3D &tctx->regs[ring];
-> +
-> +    regs[TM_IPB] |=3D ipb;
-> +    regs[TM_PIPR] =3D ipb_to_pipr(regs[TM_IPB]);
-
-You're opencoding the existing ipb_update() here, but not eliminating
-it.  That doesn't seem like a good idea.
-
-> +    xive_tctx_notify(tctx, ring);
+> +    *nvt_blk =3D xive_nvt_blk(cam);
+> +    *nvt_idx =3D xive_nvt_idx(cam);
+> +    *vo =3D !!(cam & TM_QW1W2_VO);
 > +}
 > +
->  static inline uint32_t xive_tctx_word2(uint8_t *ring)
+>  static uint64_t xive_tm_pull_os_ctx(XivePresenter *xptr, XiveTCTX *tctx,
+>                                      hwaddr offset, unsigned size)
 >  {
->      return *((uint32_t *) &ring[TM_WORD2]);
-> @@ -336,8 +345,7 @@ static void xive_tm_set_os_cppr(XivePresenter *xptr, =
-XiveTCTX *tctx,
->  static void xive_tm_set_os_pending(XivePresenter *xptr, XiveTCTX *tctx,
->                                     hwaddr offset, uint64_t value, unsign=
-ed size)
->  {
-> -    ipb_update(&tctx->regs[TM_QW1_OS], value & 0xff);
-> -    xive_tctx_notify(tctx, TM_QW1_OS);
-> +    xive_tctx_ipb_update(tctx, TM_QW1_OS, priority_to_ipb(value & 0xff));
+> -    uint32_t qw1w2_prev =3D xive_tctx_word2(&tctx->regs[TM_QW1_OS]);
+> -    uint32_t qw1w2;
+> +    uint32_t qw1w2 =3D xive_tctx_word2(&tctx->regs[TM_QW1_OS]);
+> +    uint32_t qw1w2_new;
+> +    uint32_t cam =3D be32_to_cpu(qw1w2);
+> +    uint8_t nvt_blk;
+> +    uint32_t nvt_idx;
+> +    bool vo;
+> =20
+> -    qw1w2 =3D xive_set_field32(TM_QW1W2_VO, qw1w2_prev, 0);
+> -    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
+
+I'd kind of prefer to fold both the memcpy and the endian swizzle into
+a read/write_register_word helper of some sort.
+
+> +    xive_os_cam_decode(cam, &nvt_blk, &nvt_idx, &vo);
+> +
+> +    /* Invalidate CAM line */
+> +    qw1w2_new =3D xive_set_field32(TM_QW1W2_VO, qw1w2, 0);
+> +    memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2_new, 4);
+>      return qw1w2;
 >  }
 > =20
->  static uint64_t xive_tm_pull_os_ctx(XivePresenter *xptr, XiveTCTX *tctx,
-> @@ -1382,8 +1390,7 @@ static bool xive_presenter_notify(uint8_t format,
+> @@ -387,13 +402,15 @@ static void xive_tctx_need_resend(XiveRouter *xrtr,=
+ XiveTCTX *tctx,
+>  static void xive_tm_push_os_ctx(XivePresenter *xptr, XiveTCTX *tctx,
+>                                  hwaddr offset, uint64_t value, unsigned =
+size)
+>  {
+> -    uint32_t qw1w2 =3D value;
+> -    uint8_t nvt_blk =3D xive_nvt_blk(qw1w2);
+> -    uint32_t nvt_idx =3D xive_nvt_idx(qw1w2);
+> -    bool vo =3D !!(qw1w2 & TM_QW1W2_VO);
+> +    uint32_t cam =3D value;
+> +    uint32_t qw1w2 =3D cpu_to_be32(cam);
+> +    uint8_t nvt_blk;
+> +    uint32_t nvt_idx;
+> +    bool vo;
+> +
+> +    xive_os_cam_decode(cam, &nvt_blk, &nvt_idx, &vo);
 > =20
->      /* handle CPU exception delivery */
->      if (count) {
-> -        ipb_update(&match.tctx->regs[match.ring], priority);
-> -        xive_tctx_notify(match.tctx, match.ring);
-> +        xive_tctx_ipb_update(match.tctx, match.ring, priority_to_ipb(pri=
-ority));
->      }
+>      /* First update the registers */
+> -    qw1w2 =3D cpu_to_be32(qw1w2);
+>      memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
 > =20
->      return count;
+>      /* Check the interrupt pending bits */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -162,25 +166,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NrP+m7YXMSGlHqXH
+--OxpYUbrsx40GOZXC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VWNkACgkQbDjKyiDZ
-s5JCEg//fMlQGIN48kUga9cXSyiPj3jGDmGYMDTBOKBj0/1zja06iBdW+gD8txjk
-6XUgMZdeEKW1NL6NQU24uR8dHlm0igsfrW/424ZWiC+2BzCbe6eBtb7rQxYdgyoS
-/dweR1mCBxFy1qa7DPvkwSkLR025Zbule8DRKZD6uqCtEY7OlvoPuZHROQbIAnY/
-SkzyCZRsA3ot2smtLQR95FWaH7KxrYMn0s0mlV2RberwOWw6H1X4yIGewQo+4jAr
-4AvD9Zgl1YqFa+ulTwxg842e4/blCerITjkoZnZtwfBPxC9m4IQGQBTxjtRceMMj
-BhlNf9dlDJ4aR36LMNp14egXhQknA8jM83iKeYDrxZBqCjbR/DhZgHi/rJ+zAblY
-vldDCexFZWrUe/bttHivRxVWesmJ9I7QYueSuUJFxbVlC/x5xm/0wgK5bYJ9Bxoe
-PuYR01Mp1yMJlW1CLPSoffV+pJNOW/dIc+LbjCnT0Taj1uax0my+oYRLsyU+BiH8
-PynfwvYC17O+YeSEGeJT4JunG++s3Z1VS6CsYGSoLD36H38MplJFoYrPKZKsXFre
-7xKYlQYJBnSQCcM/BPTw7dWGV7dFkkRMptIosEytOz8ZXTsTruFHT0Fcwor5btCR
-5fqAnoERVyTFytA3HqTmRbogJeyL6XMEahxZg/RhupRVWyuWNjA=
-=Ssys
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2VXksACgkQbDjKyiDZ
+s5LKUA//Qjdv467c0mQfMkAk60LwcxIT18DnnNd28k8davoYPcn3m7Lf5w6G/aYI
+VKQJwMFOwLWwzfFO3Izjx+sIfMst7tqimMG0GRU6tOl1YiSEjM0SnjUUJdNHC7WY
+TfoCVSoc6FeTADOfTjF2EhEvxDJV65QjA2v7sZW9YdY+UiOZ+Vti/hHCXItZgjZ8
+mUVXVX/ROqSnGQpflHUfuA4xtDdXVzmkNITOLvjVDrxnIo63gVoBGdrET5pvXdDy
+1U61XEK98kNT9JNcjqKlAiisHT5GXy8UMPVfYqSRK3LVE6dOuGQv9aUOn58zGSuF
+b+NakTxD67VEw/9qtWYWDQ3wTByMDKkkWT6mL4pvbkIKPvj4TJKyOjYeVxUAbFp/
+KhXcJBmjyLWlWuym/Vh0HO7VJEy5VFhQJfFh6Njyo+1LrieTsyJUVwlSWWjjz51t
+kM81eOCZuRNw0nVDUsZFlt7CPiicD04HbdyYQjAiF24Qa7I9mfgWiwdoYNpwDtZh
+zmQgW1UgLgj00agtcrSKwfkXrVMqIlHfcjaFbRpsDT28SdWLZBwasN4uUHCsuOXT
+XjmhDrw/Wp6h7KteZ5W9eOFoksaxDq22T0KGLKWhot9hGk/TiI9L8o9I2POp+QCx
+7zPHafZApA7j1itH54uRMkgrJVeVK0WoIQRLViTqwSSGxElqMwU=
+=r7+N
 -----END PGP SIGNATURE-----
 
---NrP+m7YXMSGlHqXH--
+--OxpYUbrsx40GOZXC--
 
