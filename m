@@ -6,53 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B401C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A60AC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:14:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C62720842
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:11:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C62720842
+	by mail.kernel.org (Postfix) with ESMTPS id D175620842
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Oct 2019 23:14:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D175620842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGAFT-0004aS-Jo
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 19:11:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41139)
+	id 1iGAIS-0006u6-4N
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 19:14:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45747)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iGA0U-000435-2x
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 18:55:36 -0400
+ (envelope-from <philmd@redhat.com>) id 1iGA9l-0000ux-R7
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iGA0R-0008KI-AF
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 18:55:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34190)
+ (envelope-from <philmd@redhat.com>) id 1iGA9k-00060Y-3e
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 19:05:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42768)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iGA0R-0008J5-1M
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 18:55:31 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1iGA9W-0005ug-Gv; Thu, 03 Oct 2019 19:04:54 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 440254E926;
- Thu,  3 Oct 2019 22:55:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3DA22368FF;
+ Thu,  3 Oct 2019 23:04:52 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-21.brq.redhat.com [10.40.204.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C5BC600C4;
- Thu,  3 Oct 2019 22:55:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EC8B10013A7;
+ Thu,  3 Oct 2019 23:04:33 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 5/7] tests/libqos/fw_cfg: Pass QTestState as argument
-Date: Fri,  4 Oct 2019 00:54:35 +0200
-Message-Id: <20191003225437.16651-6-philmd@redhat.com>
-In-Reply-To: <20191003225437.16651-1-philmd@redhat.com>
-References: <20191003225437.16651-1-philmd@redhat.com>
+Subject: [PATCH v2 02/14] hw: Move PL031 device from hw/timer/ to hw/rtc/
+ subdirectory
+Date: Fri,  4 Oct 2019 01:03:52 +0200
+Message-Id: <20191003230404.19384-3-philmd@redhat.com>
+In-Reply-To: <20191003230404.19384-1-philmd@redhat.com>
+References: <20191003230404.19384-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 03 Oct 2019 22:55:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Thu, 03 Oct 2019 23:04:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -68,495 +69,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>
+ Artyom Tarasenko <atar4qemu@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Andrew Jeffery <andrew@aj.id.au>, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since a QFWCFG object is not tied to a particular test, we can
-call *_fw_cfg_init() once before creating QTests and use the same
-for all the tests, then release the object with g_free() once all
-the tests are run.
+The PL031 is a Real Time Clock, not a timer.
+Move it under the hw/rtc/ subdirectory.
 
-Refactor the qfw_cfg* API to take QTestState as argument.
-
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/boot-order-test.c  | 12 ++++----
- tests/fw_cfg-test.c      | 49 ++++++++++++++++----------------
- tests/libqos/fw_cfg.c    | 61 ++++++++++++++++++++--------------------
- tests/libqos/fw_cfg.h    | 30 +++++++++-----------
- tests/libqos/malloc-pc.c |  4 +--
- 5 files changed, 77 insertions(+), 79 deletions(-)
+ MAINTAINERS                       | 4 ++--
+ Makefile.objs                     | 1 +
+ hw/Kconfig                        | 1 +
+ hw/Makefile.objs                  | 1 +
+ hw/arm/musca.c                    | 2 +-
+ hw/rtc/Kconfig                    | 2 ++
+ hw/rtc/Makefile.objs              | 1 +
+ hw/{timer =3D> rtc}/pl031.c         | 2 +-
+ hw/rtc/trace-events               | 8 ++++++++
+ hw/timer/Kconfig                  | 3 ---
+ hw/timer/Makefile.objs            | 1 -
+ hw/timer/trace-events             | 7 -------
+ include/hw/{timer =3D> rtc}/pl031.h | 5 +++--
+ 13 files changed, 21 insertions(+), 17 deletions(-)
+ create mode 100644 hw/rtc/Kconfig
+ create mode 100644 hw/rtc/Makefile.objs
+ rename hw/{timer =3D> rtc}/pl031.c (99%)
+ create mode 100644 hw/rtc/trace-events
+ rename include/hw/{timer =3D> rtc}/pl031.h (93%)
 
-diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
-index a725bce729..e2d1b7940f 100644
---- a/tests/boot-order-test.c
-+++ b/tests/boot-order-test.c
-@@ -134,9 +134,9 @@ static void test_prep_boot_order(void)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 21264eae9c..92d27f1206 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -495,8 +495,8 @@ F: hw/intc/pl190.c
+ F: hw/sd/pl181.c
+ F: hw/ssi/pl022.c
+ F: include/hw/ssi/pl022.h
+-F: hw/timer/pl031.c
+-F: include/hw/timer/pl031.h
++F: hw/rtc/pl031.c
++F: include/hw/rtc/pl031.h
+ F: include/hw/arm/primecell.h
+ F: hw/timer/cmsdk-apb-timer.c
+ F: include/hw/timer/cmsdk-apb-timer.h
+diff --git a/Makefile.objs b/Makefile.objs
+index abcbd89654..11ba1a36bd 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -173,6 +173,7 @@ trace-events-subdirs +=3D hw/pci-host
+ trace-events-subdirs +=3D hw/ppc
+ trace-events-subdirs +=3D hw/rdma
+ trace-events-subdirs +=3D hw/rdma/vmw
++trace-events-subdirs +=3D hw/rtc
+ trace-events-subdirs +=3D hw/s390x
+ trace-events-subdirs +=3D hw/scsi
+ trace-events-subdirs +=3D hw/sd
+diff --git a/hw/Kconfig b/hw/Kconfig
+index b45db3c813..4b53fee4d0 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -27,6 +27,7 @@ source pci-host/Kconfig
+ source pcmcia/Kconfig
+ source pci/Kconfig
+ source rdma/Kconfig
++source rtc/Kconfig
+ source scsi/Kconfig
+ source sd/Kconfig
+ source semihosting/Kconfig
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index ece6cc3755..fd9750e5f2 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -26,6 +26,7 @@ devices-dirs-y +=3D nvram/
+ devices-dirs-y +=3D pci/
+ devices-dirs-$(CONFIG_PCI) +=3D pci-bridge/ pci-host/
+ devices-dirs-y +=3D pcmcia/
++devices-dirs-y +=3D rtc/
+ devices-dirs-$(CONFIG_SCSI) +=3D scsi/
+ devices-dirs-y +=3D sd/
+ devices-dirs-y +=3D ssi/
+diff --git a/hw/arm/musca.c b/hw/arm/musca.c
+index 68db4b5b38..ba99dd1941 100644
+--- a/hw/arm/musca.c
++++ b/hw/arm/musca.c
+@@ -32,7 +32,7 @@
+ #include "hw/misc/tz-mpc.h"
+ #include "hw/misc/tz-ppc.h"
+ #include "hw/misc/unimp.h"
+-#include "hw/timer/pl031.h"
++#include "hw/rtc/pl031.h"
 =20
- static uint64_t read_boot_order_pmac(QTestState *qts)
- {
--    QFWCFG *fw_cfg =3D mm_fw_cfg_init(qts, 0xf0000510);
-+    QFWCFG *fw_cfg =3D mm_fw_cfg_init(0xf0000510);
+ #define MUSCA_NUMIRQ_MAX 96
+ #define MUSCA_PPC_MAX 3
+diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
+new file mode 100644
+index 0000000000..8a4383bca9
+--- /dev/null
++++ b/hw/rtc/Kconfig
+@@ -0,0 +1,2 @@
++config PL031
++    bool
+diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
+new file mode 100644
+index 0000000000..3e1eb42563
+--- /dev/null
++++ b/hw/rtc/Makefile.objs
+@@ -0,0 +1 @@
++common-obj-$(CONFIG_PL031) +=3D pl031.o
+diff --git a/hw/timer/pl031.c b/hw/rtc/pl031.c
+similarity index 99%
+rename from hw/timer/pl031.c
+rename to hw/rtc/pl031.c
+index 2b3e261006..3a982752a2 100644
+--- a/hw/timer/pl031.c
++++ b/hw/rtc/pl031.c
+@@ -13,7 +13,7 @@
 =20
--    return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
-+    return qfw_cfg_get_u16(qts, fw_cfg, FW_CFG_BOOT_DEVICE);
- }
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+-#include "hw/timer/pl031.h"
++#include "hw/rtc/pl031.h"
+ #include "migration/vmstate.h"
+ #include "hw/irq.h"
+ #include "hw/qdev-properties.h"
+diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
+new file mode 100644
+index 0000000000..54c94ac557
+--- /dev/null
++++ b/hw/rtc/trace-events
+@@ -0,0 +1,8 @@
++# See docs/devel/tracing.txt for syntax documentation.
++
++# pl031.c
++pl031_irq_state(int level) "irq state %d"
++pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
++pl031_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
++pl031_alarm_raised(void) "alarm raised"
++pl031_set_alarm(uint32_t ticks) "alarm set for %u ticks"
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index eefc95f35e..27c5dce09e 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -27,9 +27,6 @@ config M41T80
+ config M48T59
+     bool
 =20
- static const boot_order_test test_cases_fw_cfg[] =3D {
-@@ -159,9 +159,9 @@ static void test_pmac_newworld_boot_order(void)
-=20
- static uint64_t read_boot_order_sun4m(QTestState *qts)
- {
--    QFWCFG *fw_cfg =3D mm_fw_cfg_init(qts, 0xd00000510ULL);
-+    QFWCFG *fw_cfg =3D mm_fw_cfg_init(0xd00000510ULL);
-=20
--    return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
-+    return qfw_cfg_get_u16(qts, fw_cfg, FW_CFG_BOOT_DEVICE);
- }
-=20
- static void test_sun4m_boot_order(void)
-@@ -171,9 +171,9 @@ static void test_sun4m_boot_order(void)
-=20
- static uint64_t read_boot_order_sun4u(QTestState *qts)
- {
--    QFWCFG *fw_cfg =3D io_fw_cfg_init(qts, 0x510);
-+    QFWCFG *fw_cfg =3D io_fw_cfg_init(0x510);
-=20
--    return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
-+    return qfw_cfg_get_u16(qts, fw_cfg, FW_CFG_BOOT_DEVICE);
- }
-=20
- static void test_sun4u_boot_order(void)
-diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index 77a833d50e..6fb52a4d08 100644
---- a/tests/fw_cfg-test.c
-+++ b/tests/fw_cfg-test.c
-@@ -35,9 +35,9 @@ static void test_fw_cfg_signature(const void *opaque)
-     char buf[5];
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    qfw_cfg_get(fw_cfg, FW_CFG_SIGNATURE, buf, 4);
-+    qfw_cfg_get(s, fw_cfg, FW_CFG_SIGNATURE, buf, 4);
-     buf[4] =3D 0;
-=20
-     g_assert_cmpstr(buf, =3D=3D, "QEMU");
-@@ -53,9 +53,9 @@ static void test_fw_cfg_id(const void *opaque)
-     uint32_t id;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    id =3D qfw_cfg_get_u32(fw_cfg, FW_CFG_ID);
-+    id =3D qfw_cfg_get_u32(s, fw_cfg, FW_CFG_ID);
-     g_assert((id =3D=3D 1) ||
-              (id =3D=3D 3));
-     g_free(fw_cfg);
-@@ -75,9 +75,9 @@ static void test_fw_cfg_uuid(const void *opaque)
-     };
-=20
-     s =3D qtest_initf("-M %s -uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8"=
-, ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    qfw_cfg_get(fw_cfg, FW_CFG_UUID, buf, 16);
-+    qfw_cfg_get(s, fw_cfg, FW_CFG_UUID, buf, 16);
-     g_assert(memcmp(buf, uuid, sizeof(buf)) =3D=3D 0);
-=20
-     g_free(fw_cfg);
-@@ -92,9 +92,9 @@ static void test_fw_cfg_ram_size(const void *opaque)
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE), =3D=3D, ra=
-m_size);
-+    g_assert_cmpint(qfw_cfg_get_u64(s, fw_cfg, FW_CFG_RAM_SIZE), =3D=3D,=
- ram_size);
-=20
-     g_free(fw_cfg);
-     qtest_quit(s);
-@@ -107,9 +107,9 @@ static void test_fw_cfg_nographic(const void *opaque)
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_NOGRAPHIC), =3D=3D, 0=
-);
-+    g_assert_cmpint(qfw_cfg_get_u16(s, fw_cfg, FW_CFG_NOGRAPHIC), =3D=3D=
-, 0);
-=20
-     g_free(fw_cfg);
-     qtest_quit(s);
-@@ -122,9 +122,9 @@ static void test_fw_cfg_nb_cpus(const void *opaque)
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_NB_CPUS), =3D=3D, nb_=
-cpus);
-+    g_assert_cmpint(qfw_cfg_get_u16(s, fw_cfg, FW_CFG_NB_CPUS), =3D=3D, =
-nb_cpus);
-=20
-     g_free(fw_cfg);
-     qtest_quit(s);
-@@ -137,9 +137,9 @@ static void test_fw_cfg_max_cpus(const void *opaque)
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_MAX_CPUS), =3D=3D, ma=
-x_cpus);
-+    g_assert_cmpint(qfw_cfg_get_u16(s, fw_cfg, FW_CFG_MAX_CPUS), =3D=3D,=
- max_cpus);
-     g_free(fw_cfg);
-     qtest_quit(s);
- }
-@@ -153,15 +153,15 @@ static void test_fw_cfg_numa(const void *opaque)
-     uint64_t *node_mask;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u64(fw_cfg, FW_CFG_NUMA), =3D=3D, nb_nod=
-es);
-+    g_assert_cmpint(qfw_cfg_get_u64(s, fw_cfg, FW_CFG_NUMA), =3D=3D, nb_=
-nodes);
-=20
-     cpu_mask =3D g_new0(uint64_t, max_cpus);
-     node_mask =3D g_new0(uint64_t, nb_nodes);
-=20
--    qfw_cfg_read_data(fw_cfg, cpu_mask, sizeof(uint64_t) * max_cpus);
--    qfw_cfg_read_data(fw_cfg, node_mask, sizeof(uint64_t) * nb_nodes);
-+    qfw_cfg_read_data(s, fw_cfg, cpu_mask, sizeof(uint64_t) * max_cpus);
-+    qfw_cfg_read_data(s, fw_cfg, node_mask, sizeof(uint64_t) * nb_nodes)=
-;
-=20
-     if (nb_nodes) {
-         g_assert(cpu_mask[0] & 0x01);
-@@ -181,9 +181,10 @@ static void test_fw_cfg_boot_menu(const void *opaque=
-)
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_MENU), =3D=3D, b=
-oot_menu);
-+    g_assert_cmpint(qfw_cfg_get_u16(s, fw_cfg, FW_CFG_BOOT_MENU),
-+                    =3D=3D, boot_menu);
-     g_free(fw_cfg);
-     qtest_quit(s);
- }
-@@ -197,9 +198,9 @@ static void test_fw_cfg_reboot_timeout(const void *op=
-aque)
-     size_t filesize;
-=20
-     s =3D qtest_initf("-M %s -boot reboot-timeout=3D15", ctx->machine_na=
-me);
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-fail-wait",
-+    filesize =3D qfw_cfg_get_file(s, fw_cfg, "etc/boot-fail-wait",
-                                 &reboot_timeout, sizeof(reboot_timeout))=
-;
-     g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_timeout));
-     reboot_timeout =3D le32_to_cpu(reboot_timeout);
-@@ -217,9 +218,9 @@ static void test_fw_cfg_splash_time(const void *opaqu=
-e)
-     size_t filesize;
-=20
-     s =3D qtest_initf("-M %s -boot splash-time=3D12", ctx->machine_name)=
-;
--    fw_cfg =3D pc_fw_cfg_init(s);
-+    fw_cfg =3D pc_fw_cfg_init();
-=20
--    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-menu-wait",
-+    filesize =3D qfw_cfg_get_file(s, fw_cfg, "etc/boot-menu-wait",
-                                 &splash_time, sizeof(splash_time));
-     g_assert_cmpint(filesize, =3D=3D, sizeof(splash_time));
-     splash_time =3D le16_to_cpu(splash_time);
-diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-index ddeec821db..d25a367194 100644
---- a/tests/libqos/fw_cfg.c
-+++ b/tests/libqos/fw_cfg.c
-@@ -18,46 +18,47 @@
- #include "qemu/bswap.h"
- #include "hw/nvram/fw_cfg.h"
-=20
--void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
-+void qfw_cfg_select(QTestState *qts, QFWCFG *fw_cfg, uint16_t key)
- {
--    fw_cfg->select(fw_cfg, key);
-+    fw_cfg->select(qts, fw_cfg, key);
- }
-=20
--void qfw_cfg_read_data(QFWCFG *fw_cfg, void *data, size_t len)
-+void qfw_cfg_read_data(QTestState *qts, QFWCFG *fw_cfg, void *data, size=
-_t len)
- {
--    fw_cfg->read(fw_cfg, data, len);
-+    fw_cfg->read(qts, fw_cfg, data, len);
- }
-=20
--void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len)
-+void qfw_cfg_get(QTestState *qts, QFWCFG *fw_cfg, uint16_t key,
-+                 void *data, size_t len)
- {
--    qfw_cfg_select(fw_cfg, key);
--    qfw_cfg_read_data(fw_cfg, data, len);
-+    qfw_cfg_select(qts, fw_cfg, key);
-+    qfw_cfg_read_data(qts, fw_cfg, data, len);
- }
-=20
--uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key)
-+uint16_t qfw_cfg_get_u16(QTestState *qts, QFWCFG *fw_cfg, uint16_t key)
- {
-     uint16_t value;
--    qfw_cfg_get(fw_cfg, key, &value, sizeof(value));
-+    qfw_cfg_get(qts, fw_cfg, key, &value, sizeof(value));
-     return le16_to_cpu(value);
- }
-=20
--uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key)
-+uint32_t qfw_cfg_get_u32(QTestState *qts, QFWCFG *fw_cfg, uint16_t key)
- {
-     uint32_t value;
--    qfw_cfg_get(fw_cfg, key, &value, sizeof(value));
-+    qfw_cfg_get(qts, fw_cfg, key, &value, sizeof(value));
-     return le32_to_cpu(value);
- }
-=20
--uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key)
-+uint64_t qfw_cfg_get_u64(QTestState *qts, QFWCFG *fw_cfg, uint16_t key)
- {
-     uint64_t value;
--    qfw_cfg_get(fw_cfg, key, &value, sizeof(value));
-+    qfw_cfg_get(qts, fw_cfg, key, &value, sizeof(value));
-     return le64_to_cpu(value);
- }
-=20
--static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
-+static void mm_fw_cfg_select(QTestState *qts, QFWCFG *fw_cfg, uint16_t k=
-ey)
- {
--    qtest_writew(fw_cfg->qts, fw_cfg->base, key);
-+    qtest_writew(qts, fw_cfg->base, key);
- }
-=20
- /*
-@@ -72,8 +73,8 @@ static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t k=
-ey)
-  * necessary in total. And, while the caller's buffer has been fully
-  * populated, it has received only a starting slice of the fw_cfg file.
+-config PL031
+-    bool
+-
+ config TWL92230
+     bool
+     depends on I2C
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index f407523aa4..9f64f6e11e 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -11,7 +11,6 @@ common-obj-$(CONFIG_M48T59) +=3D m48t59.o
+ ifeq ($(CONFIG_ISA_BUS),y)
+ common-obj-$(CONFIG_M48T59) +=3D m48t59-isa.o
+ endif
+-common-obj-$(CONFIG_PL031) +=3D pl031.o
+ common-obj-$(CONFIG_PUV3) +=3D puv3_ost.o
+ common-obj-$(CONFIG_TWL92230) +=3D twl92230.o
+ common-obj-$(CONFIG_XILINX) +=3D xilinx_timer.o
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index db02a9142c..6936fe8573 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -80,10 +80,3 @@ xlnx_zynqmp_rtc_gettime(int year, int month, int day, =
+int hour, int min, int sec
+ # nrf51_timer.c
+ nrf51_timer_read(uint64_t addr, uint32_t value, unsigned size) "read add=
+r 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+ nrf51_timer_write(uint64_t addr, uint32_t value, unsigned size) "write a=
+ddr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+-
+-# pl031.c
+-pl031_irq_state(int level) "irq state %d"
+-pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+-pl031_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
+-pl031_alarm_raised(void) "alarm raised"
+-pl031_set_alarm(uint32_t ticks) "alarm set for %u ticks"
+diff --git a/include/hw/timer/pl031.h b/include/hw/rtc/pl031.h
+similarity index 93%
+rename from include/hw/timer/pl031.h
+rename to include/hw/rtc/pl031.h
+index 8c3f555ee2..e3cb1d646f 100644
+--- a/include/hw/timer/pl031.h
++++ b/include/hw/rtc/pl031.h
+@@ -11,10 +11,11 @@
+  * GNU GPL, version 2 or (at your option) any later version.
   */
--size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
--                      void *data, size_t buflen)
-+size_t qfw_cfg_get_file(QTestState *qts, QFWCFG *fw_cfg, const char *fil=
-ename,
-+                        void *data, size_t buflen)
- {
-     uint32_t count;
-     uint32_t i;
-@@ -82,11 +83,11 @@ size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *f=
-ilename,
-     FWCfgFile *pdir_entry;
-     size_t filesize =3D 0;
 =20
--    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
-+    qfw_cfg_get(qts, fw_cfg, FW_CFG_FILE_DIR, &count, sizeof(count));
-     count =3D be32_to_cpu(count);
-     dsize =3D sizeof(uint32_t) + count * sizeof(struct fw_cfg_file);
-     filesbuf =3D g_malloc(dsize);
--    qfw_cfg_get(fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
-+    qfw_cfg_get(qts, fw_cfg, FW_CFG_FILE_DIR, filesbuf, dsize);
-     pdir_entry =3D (FWCfgFile *)(filesbuf + sizeof(uint32_t));
-     for (i =3D 0; i < count; ++i, ++pdir_entry) {
-         if (!strcmp(pdir_entry->name, filename)) {
-@@ -96,7 +97,7 @@ size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *fil=
-ename,
-             if (len > buflen) {
-                 len =3D buflen;
-             }
--            qfw_cfg_get(fw_cfg, sel, data, len);
-+            qfw_cfg_get(qts, fw_cfg, sel, data, len);
-             break;
-         }
-     }
-@@ -104,49 +105,49 @@ size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char =
-*filename,
-     return filesize;
- }
+-#ifndef HW_TIMER_PL031_H
+-#define HW_TIMER_PL031_H
++#ifndef HW_RTC_PL031_H
++#define HW_RTC_PL031_H
 =20
--static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-+static void mm_fw_cfg_read(QTestState *qts, QFWCFG *fw_cfg,
-+                           void *data, size_t len)
- {
-     uint8_t *ptr =3D data;
-     int i;
+ #include "hw/sysbus.h"
++#include "qemu/timer.h"
 =20
-     for (i =3D 0; i < len; i++) {
--        ptr[i] =3D qtest_readb(fw_cfg->qts, fw_cfg->base + 2);
-+        ptr[i] =3D qtest_readb(qts, fw_cfg->base + 2);
-     }
- }
-=20
--QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base)
-+QFWCFG *mm_fw_cfg_init(uint64_t base)
- {
-     QFWCFG *fw_cfg =3D g_malloc0(sizeof(*fw_cfg));
-=20
-     fw_cfg->base =3D base;
--    fw_cfg->qts =3D qts;
-     fw_cfg->select =3D mm_fw_cfg_select;
-     fw_cfg->read =3D mm_fw_cfg_read;
-=20
-     return fw_cfg;
- }
-=20
--static void io_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
-+static void io_fw_cfg_select(QTestState *qts, QFWCFG *fw_cfg, uint16_t k=
-ey)
- {
--    qtest_outw(fw_cfg->qts, fw_cfg->base, key);
-+    qtest_outw(qts, fw_cfg->base, key);
- }
-=20
--static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-+static void io_fw_cfg_read(QTestState *qts, QFWCFG *fw_cfg,
-+                           void *data, size_t len)
- {
-     uint8_t *ptr =3D data;
-     int i;
-=20
-     for (i =3D 0; i < len; i++) {
--        ptr[i] =3D qtest_inb(fw_cfg->qts, fw_cfg->base + 1);
-+        ptr[i] =3D qtest_inb(qts, fw_cfg->base + 1);
-     }
- }
-=20
--QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base)
-+QFWCFG *io_fw_cfg_init(uint16_t base)
- {
-     QFWCFG *fw_cfg =3D g_malloc0(sizeof(*fw_cfg));
-=20
-     fw_cfg->base =3D base;
--    fw_cfg->qts =3D qts;
-     fw_cfg->select =3D io_fw_cfg_select;
-     fw_cfg->read =3D io_fw_cfg_read;
-=20
-diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-index 6316f4c354..e560cd02ac 100644
---- a/tests/libqos/fw_cfg.h
-+++ b/tests/libqos/fw_cfg.h
-@@ -20,52 +20,48 @@ typedef struct QFWCFG QFWCFG;
- struct QFWCFG
- {
-     uint64_t base;
--    QTestState *qts;
--    void (*select)(QFWCFG *fw_cfg, uint16_t key);
--    void (*read)(QFWCFG *fw_cfg, void *data, size_t len);
-+    void (*select)(QTestState *qts, QFWCFG *fw_cfg, uint16_t key);
-+    void (*read)(QTestState *qts, QFWCFG *fw_cfg, void *data, size_t len=
-);
- };
-=20
--void qfw_cfg_select(QFWCFG *fw_cfg, uint16_t key);
--void qfw_cfg_read_data(QFWCFG *fw_cfg, void *data, size_t len);
--void qfw_cfg_get(QFWCFG *fw_cfg, uint16_t key, void *data, size_t len);
--uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
--uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
--uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
--size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
-+void qfw_cfg_select(QTestState *qts, QFWCFG *fw_cfg, uint16_t key);
-+void qfw_cfg_read_data(QTestState *qts, QFWCFG *fw_cfg, void *data, size=
-_t len);
-+void qfw_cfg_get(QTestState *qts, QFWCFG *fw_cfg, uint16_t key, void *da=
-ta, size_t len);
-+uint16_t qfw_cfg_get_u16(QTestState *qts, QFWCFG *fw_cfg, uint16_t key);
-+uint32_t qfw_cfg_get_u32(QTestState *qts, QFWCFG *fw_cfg, uint16_t key);
-+uint64_t qfw_cfg_get_u64(QTestState *qts, QFWCFG *fw_cfg, uint16_t key);
-+size_t qfw_cfg_get_file(QTestState *qts, QFWCFG *fw_cfg, const char *fil=
-ename,
-                         void *data, size_t buflen);
-=20
- /**
-  * mm_fw_cfg_init():
-- * @qts: The #QTestState that will be referred to by the QFWCFG object.
-  * @base: The MMIO base address of the fw_cfg device in the guest.
-  *
-  * Returns a newly allocated QFWCFG object which must be released
-  * with a call to g_free() when no longer required.
-  */
--QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
-+QFWCFG *mm_fw_cfg_init(uint64_t base);
-=20
- /**
-  * io_fw_cfg_init():
-- * @qts: The #QTestState that will be referred to by the QFWCFG object.
-  * @base: The I/O address of the fw_cfg device in the guest.
-  *
-  * Returns a newly allocated QFWCFG object which must be released
-  * with a call to g_free() when no longer required.
-  */
--QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
-+QFWCFG *io_fw_cfg_init(uint16_t base);
-=20
- /**
-  * pc_fw_cfg_init():
-- * @qts: The #QTestState that will be referred to by the QFWCFG object.
-  *
-  * This function is specific to the PC machine (X86).
-  *
-  * Returns a newly allocated QFWCFG object which must be released
-  * with a call to g_free() when no longer required.
-  */
--static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
-+static inline QFWCFG *pc_fw_cfg_init(void)
- {
--    return io_fw_cfg_init(qts, 0x510);
-+    return io_fw_cfg_init(0x510);
- }
-=20
- #endif
-diff --git a/tests/libqos/malloc-pc.c b/tests/libqos/malloc-pc.c
-index 949a99361d..4932ae092d 100644
---- a/tests/libqos/malloc-pc.c
-+++ b/tests/libqos/malloc-pc.c
-@@ -23,9 +23,9 @@
- void pc_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags=
-)
- {
-     uint64_t ram_size;
--    QFWCFG *fw_cfg =3D pc_fw_cfg_init(qts);
-+    QFWCFG *fw_cfg =3D pc_fw_cfg_init();
-=20
--    ram_size =3D qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE);
-+    ram_size =3D qfw_cfg_get_u64(qts, fw_cfg, FW_CFG_RAM_SIZE);
-     alloc_init(s, flags, 1 << 20, MIN(ram_size, 0xE0000000), PAGE_SIZE);
-=20
-     /* clean-up */
+ #define TYPE_PL031 "pl031"
+ #define PL031(obj) OBJECT_CHECK(PL031State, (obj), TYPE_PL031)
 --=20
 2.20.1
 
