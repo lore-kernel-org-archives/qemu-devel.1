@@ -2,79 +2,86 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5DAC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1439FC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B662720867
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:54:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLuH5SR+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B662720867
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id DC9E720867
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:55:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC9E720867
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGLEP-0008V6-5D
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:54:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54560)
+	id 1iGLEl-0000Xg-LF
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:55:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54662)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hsp.cat7@gmail.com>) id 1iGK7Y-0002lN-4y
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:43:33 -0400
+ (envelope-from <philmd@redhat.com>) id 1iGK81-0003Ca-Ac
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:44:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1iGK7W-0001GF-Nm
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:43:32 -0400
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:44650)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1iGK7W-0001Bg-GJ
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:43:30 -0400
-Received: by mail-oi1-x231.google.com with SMTP id w6so5197292oie.11
- for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 02:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WFSJAYRpaoyLsENzTQ+K8D+e8lIzy7q2m2Khfcg/0Bo=;
- b=nLuH5SR+miQm3V/AOXaRm7FieAaXGJNISlk+4sUtdFHjERVZ2NOWMFyzD10Sq8zyrX
- 32ELk0Pwb2KWsnxaPDhOlzzNAAJL4KMUfLRZIkI9hFNvB9uw70xxA4qMo6893POOCXD8
- GMM3SStaZJFvky7s8kjnl4XRz2EyZXGji/Awzcv+/BCUw41W2MiutfMFaluWRovBfFyK
- Nk9xytN7iX5AGf0akmAXVy6TKI2S1nAuuDoELsut/4VyOARpwq+nFi33EMtWjtEI8Bi5
- nmdghGcjsD5cdM/vjheytnNTZkOWbT1REhCbFQzdIdWNqoC3/FarXPVbcI0wGy2afVSJ
- L3IA==
+ (envelope-from <philmd@redhat.com>) id 1iGK7z-0001cu-EB
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:44:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42820)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iGK7x-0001aw-If
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:43:59 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 667005117D
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 09:43:56 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id g67so1394952wmg.4
+ for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 02:43:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WFSJAYRpaoyLsENzTQ+K8D+e8lIzy7q2m2Khfcg/0Bo=;
- b=IRriEvBj230WddkDocDvEvZtHXKsCFIwfpsokuIcMbDrdGGctWYhS6h2VHladcd2m/
- ZPWae2HUmaekupwqMj0qbmGf9Q2GrJKuF3P0b2PP8S/+XtMDgXiW+OCj6xFfUO2ShO61
- rXeW2aU3c6s2Ndd2AP2Eb41sxmCliWJgVMqbNp/WrvHXxayVhZ3mgAm7ZBt1qOgTMyvl
- ZYW34fpJak8LCmm3Yk6LMgb8m1SsGQw26BCVNOjKHqNEgNP7pNGzYEGrGhpz4Bm0W3ZE
- NhEPWQZ2AdcIaM3/q2EMsPbb+GiSQDoIEoXUofrLpa9vUzZm9PJBHP1AYLT8PrWNzO8y
- CMSw==
-X-Gm-Message-State: APjAAAWZJZRZMLDbAEFq1c15/lYS6Xvl7qPWPbbHt6aoX8XsC2LFXQeg
- XACPGNzQtM7kf6ye31F8/VAPUrT8RqKTwkR9ZNk=
-X-Google-Smtp-Source: APXvYqySg9k5SbI9QleX7Taou1tfR1E4E7y0IkmOYLDlh4V8/t/3wFUnOgH/ZgXcSexzXO+z9fK//43ueh5vZs3csBQ=
-X-Received: by 2002:aca:5ad7:: with SMTP id o206mr6473406oib.59.1570182207393; 
- Fri, 04 Oct 2019 02:43:27 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=so92RmyzpSBPlQMlFqQ9gQn20WQcsSKTXy/qkSJ9eI4=;
+ b=Bcvcpv3+RGPGWuP7oj8TFKuyoDJOyEPX31/lrTOCnvNPmRoH/Tp37b9/7P9VsLrSBu
+ CpfxsfMHmSBe06YGBAjkX7R3MX3S9h/fOulzwV/fJluwg6hXwqmTdef4Na87ByolGmxL
+ K5ANoItWU1T62va2mtv2E3Hn3bY/teutvwQ12OVTsOyHrZ9TiAFqNnSaloQjfdRIWyOq
+ Ey4s3sR7cYeDW6NBJBR0Uh36TTC8lz7vGw/4Og+QEVq1qyCRIDFG8giA8RixzrQ81c85
+ HZ8vPk16Nw3xb0eZLVeb6G9nOReZ+ZgR0DdU59Y6AnoUnFty/j1ldhyVhD0ZGRKN+map
+ 7Rdg==
+X-Gm-Message-State: APjAAAVfm41ac/ylabQ34O9Z1Gm/sIxOgp/1SDUc8cxGgX42V4bXQqYZ
+ Y1u2YMMIjPnX0dFtckbZBGd4b7+go9zsEM1QaSA6LE/xBChKU1fGVioacEbVANbsWmiqIh6XpCO
+ hrdWUZFtEj0GoqoQ=
+X-Received: by 2002:a1c:9a46:: with SMTP id c67mr10201924wme.115.1570182235068; 
+ Fri, 04 Oct 2019 02:43:55 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxrp0sUP254DdZZXWAIPrx0+ZAQoyzu3ak9BPav/Os4yetuNaOGf8d0EGSTFvydny/B8nQ/Bw==
+X-Received: by 2002:a1c:9a46:: with SMTP id c67mr10201903wme.115.1570182234796; 
+ Fri, 04 Oct 2019 02:43:54 -0700 (PDT)
+Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
+ [88.21.68.240])
+ by smtp.gmail.com with ESMTPSA id a10sm6165747wrm.52.2019.10.04.02.43.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 04 Oct 2019 02:43:54 -0700 (PDT)
+Subject: Re: [PATCH v6 01/10] hw/virtio: Factorize virtio-mmio headers
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20191004093752.16564-1-slp@redhat.com>
+ <20191004093752.16564-2-slp@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <c197783a-a845-9448-ae39-960fb7dc305b@redhat.com>
+Date: Fri, 4 Oct 2019 11:43:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20160915151441.12160.56338.malonedeb@gac.canonical.com>
- <156990182871.21256.13331111233039136696.malone@chaenomeles.canonical.com>
-In-Reply-To: <156990182871.21256.13331111233039136696.malone@chaenomeles.canonical.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Fri, 4 Oct 2019 11:43:16 +0200
-Message-ID: <CABLmASFaiFgKTBhS3CYX0p5eH4uMDpmcaz5d+xAyBUqZxZVOfw@mail.gmail.com>
-Subject: Re: [Bug 1623998] Re: pulseaudio Invalid argument error
-To: Bug 1623998 <1623998@bugs.launchpad.net>
-Content-Type: multipart/alternative; boundary="000000000000b452c10594128886"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::231
+In-Reply-To: <20191004093752.16564-2-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,122 +93,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Cc: ehabkost@redhat.com, mst@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b452c10594128886
-Content-Type: text/plain; charset="UTF-8"
+Hi Sergio,
 
-On Tue, Oct 1, 2019 at 6:06 AM Thomas Huth <1623998@bugs.launchpad.net>
-wrote:
+On 10/4/19 11:37 AM, Sergio Lopez wrote:
+> Put QOM and main struct definition in a separate header file, so it
+> can be accessed from other components.
+>=20
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
 
-> Triaging old bug tickets ... Can you still reproduce this issue with the
-> latest version of QEMU (currently 4.1)? Or could we close this ticket
-> nowadays?
->
-> ** Changed in: qemu
->        Status: New => Incomplete
->
-> --
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1623998
->
-> Title:
->   pulseaudio Invalid argument error
->
-> Status in QEMU:
->   Incomplete
->
-> Bug description:
->   When using qemu-system-ppc on Ubuntu Mate 15 with the usb audio card,
->   I see these error messages:
->
->   pulseaudio: set_sink_input_volume() failed
->   pulseaudio: Reason: Invalid argument
->   pulseaudio: set_sink_input_mute() failed
->   pulseaudio: Reason: Invalid argument
->
->   No audio plays. When an attempt is made, QEMU seems to freeze for a
->   moment.
->
->   I use "-device usb-audio" to add the usb sound card. This issue is
->   present in both emulation and KVM mode.
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1623998/+subscriptions
+Please collect/keep reviewer tags between iterations, this will save=20
+them time. Only reset (remove) them if you want the reviewer to review=20
+your patch carefully again.
 
+Only cosmetic change since v5 which had:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Hi
-
-This is still visible with both current master and Gerd's queue/audio
-branch compiled on Fedora 30.
-Additionally, running qemu-system-ppc with Mac OS 9.2 guest and -device
-usb-audio results in the icons on the guest desktop to disappear after a
-few seconds. Before that happens, audio is playable OK.
-
-Best,
-Howard
-
---000000000000b452c10594128886
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Oct 1, 2019 at 6:06 AM Thomas=
- Huth &lt;<a href=3D"mailto:1623998@bugs.launchpad.net">1623998@bugs.launch=
-pad.net</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"=
-margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
-t:1ex">Triaging old bug tickets ... Can you still reproduce this issue with=
- the<br>
-latest version of QEMU (currently 4.1)? Or could we close this ticket<br>
-nowadays?<br>
-<br>
-** Changed in: qemu<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0Status: New =3D&gt; Incomplete<br>
-<br>
--- <br>
-You received this bug notification because you are a member of qemu-<br>
-devel-ml, which is subscribed to QEMU.<br>
-<a href=3D"https://bugs.launchpad.net/bugs/1623998" rel=3D"noreferrer" targ=
-et=3D"_blank">https://bugs.launchpad.net/bugs/1623998</a><br>
-<br>
-Title:<br>
-=C2=A0 pulseaudio Invalid argument error<br>
-<br>
-Status in QEMU:<br>
-=C2=A0 Incomplete<br>
-<br>
-Bug description:<br>
-=C2=A0 When using qemu-system-ppc on Ubuntu Mate 15 with the usb audio card=
-,<br>
-=C2=A0 I see these error messages:<br>
-<br>
-=C2=A0 pulseaudio: set_sink_input_volume() failed<br>
-=C2=A0 pulseaudio: Reason: Invalid argument<br>
-=C2=A0 pulseaudio: set_sink_input_mute() failed<br>
-=C2=A0 pulseaudio: Reason: Invalid argument<br>
-<br>
-=C2=A0 No audio plays. When an attempt is made, QEMU seems to freeze for a<=
-br>
-=C2=A0 moment.<br>
-<br>
-=C2=A0 I use &quot;-device usb-audio&quot; to add the usb sound card. This =
-issue is<br>
-=C2=A0 present in both emulation and KVM mode.<br>
-<br>
-To manage notifications about this bug go to:<br>
-<a href=3D"https://bugs.launchpad.net/qemu/+bug/1623998/+subscriptions" rel=
-=3D"noreferrer" target=3D"_blank">https://bugs.launchpad.net/qemu/+bug/1623=
-998/+subscriptions</a></blockquote><div><br></div><div>Hi</div><div><br></d=
-iv><div>This is still visible with both current master and Gerd&#39;s queue=
-/audio branch compiled on Fedora 30.<br></div><div>Additionally, running qe=
-mu-system-ppc with Mac OS 9.2 guest and -device usb-audio results in the ic=
-ons on the guest desktop to disappear after a few seconds. Before that happ=
-ens, audio is playable OK. <br></div><div><br></div><div>Best,</div><div>Ho=
-ward<br></div><div><br></div><div>=C2=A0</div></div></div>
-
---000000000000b452c10594128886--
+> ---
+>   include/hw/virtio/virtio-mmio.h | 73 ++++++++++++++++++++++++++++++++=
++
+>   hw/virtio/virtio-mmio.c         | 48 +---------------------
+>   2 files changed, 74 insertions(+), 47 deletions(-)
+>   create mode 100644 include/hw/virtio/virtio-mmio.h
+>=20
+> diff --git a/include/hw/virtio/virtio-mmio.h b/include/hw/virtio/virtio=
+-mmio.h
+> new file mode 100644
+> index 0000000000..7dbfd03dcf
+> --- /dev/null
+> +++ b/include/hw/virtio/virtio-mmio.h
+> @@ -0,0 +1,73 @@
+> +/*
+> + * Virtio MMIO bindings
+> + *
+> + * Copyright (c) 2011 Linaro Limited
+> + *
+> + * Author:
+> + *  Peter Maydell <peter.maydell@linaro.org>
+> + *
+> + * This program is free software; you can redistribute it and/or modif=
+y
+> + * it under the terms of the GNU General Public License; either versio=
+n 2
+> + * of the License, or (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License a=
+long
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef HW_VIRTIO_MMIO_H
+> +#define HW_VIRTIO_MMIO_H
+> +
+> +#include "hw/virtio/virtio-bus.h"
+> +
+> +/* QOM macros */
+> +/* virtio-mmio-bus */
+> +#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+> +#define VIRTIO_MMIO_BUS(obj) \
+> +        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+> +#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+> +        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+> +#define VIRTIO_MMIO_BUS_CLASS(klass) \
+> +        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_B=
+US)
+> +
+> +/* virtio-mmio */
+> +#define TYPE_VIRTIO_MMIO "virtio-mmio"
+> +#define VIRTIO_MMIO(obj) \
+> +        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+> +
+> +#define VIRT_MAGIC 0x74726976 /* 'virt' */
+> +#define VIRT_VERSION 2
+> +#define VIRT_VERSION_LEGACY 1
+> +#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+> +
+> +typedef struct VirtIOMMIOQueue {
+> +    uint16_t num;
+> +    bool enabled;
+> +    uint32_t desc[2];
+> +    uint32_t avail[2];
+> +    uint32_t used[2];
+> +} VirtIOMMIOQueue;
+> +
+> +typedef struct {
+> +    /* Generic */
+> +    SysBusDevice parent_obj;
+> +    MemoryRegion iomem;
+> +    qemu_irq irq;
+> +    bool legacy;
+> +    /* Guest accessible state needing migration and reset */
+> +    uint32_t host_features_sel;
+> +    uint32_t guest_features_sel;
+> +    uint32_t guest_page_shift;
+> +    /* virtio-bus */
+> +    VirtioBusState bus;
+> +    bool format_transport_address;
+> +    /* Fields only used for non-legacy (v2) devices */
+> +    uint32_t guest_features[2];
+> +    VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
+> +} VirtIOMMIOProxy;
+> +
+> +#endif
+> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+> index 3d5ca0f667..94d934c44b 100644
+> --- a/hw/virtio/virtio-mmio.c
+> +++ b/hw/virtio/virtio-mmio.c
+> @@ -29,57 +29,11 @@
+>   #include "qemu/host-utils.h"
+>   #include "qemu/module.h"
+>   #include "sysemu/kvm.h"
+> -#include "hw/virtio/virtio-bus.h"
+> +#include "hw/virtio/virtio-mmio.h"
+>   #include "qemu/error-report.h"
+>   #include "qemu/log.h"
+>   #include "trace.h"
+>  =20
+> -/* QOM macros */
+> -/* virtio-mmio-bus */
+> -#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+> -#define VIRTIO_MMIO_BUS(obj) \
+> -        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+> -#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+> -        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+> -#define VIRTIO_MMIO_BUS_CLASS(klass) \
+> -        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_B=
+US)
+> -
+> -/* virtio-mmio */
+> -#define TYPE_VIRTIO_MMIO "virtio-mmio"
+> -#define VIRTIO_MMIO(obj) \
+> -        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+> -
+> -#define VIRT_MAGIC 0x74726976 /* 'virt' */
+> -#define VIRT_VERSION 2
+> -#define VIRT_VERSION_LEGACY 1
+> -#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+> -
+> -typedef struct VirtIOMMIOQueue {
+> -    uint16_t num;
+> -    bool enabled;
+> -    uint32_t desc[2];
+> -    uint32_t avail[2];
+> -    uint32_t used[2];
+> -} VirtIOMMIOQueue;
+> -
+> -typedef struct {
+> -    /* Generic */
+> -    SysBusDevice parent_obj;
+> -    MemoryRegion iomem;
+> -    qemu_irq irq;
+> -    bool legacy;
+> -    /* Guest accessible state needing migration and reset */
+> -    uint32_t host_features_sel;
+> -    uint32_t guest_features_sel;
+> -    uint32_t guest_page_shift;
+> -    /* virtio-bus */
+> -    VirtioBusState bus;
+> -    bool format_transport_address;
+> -    /* Fields only used for non-legacy (v2) devices */
+> -    uint32_t guest_features[2];
+> -    VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
+> -} VirtIOMMIOProxy;
+> -
+>   static bool virtio_mmio_ioeventfd_enabled(DeviceState *d)
+>   {
+>       return kvm_eventfds_enabled();
+>=20
 
