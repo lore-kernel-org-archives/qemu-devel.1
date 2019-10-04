@@ -6,95 +6,143 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2DCC47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E856FC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:51:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDCB720862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:45:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDCB720862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8AD5215EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:51:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8AD5215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGMxe-0008QR-TT
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 08:45:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37024)
+	id 1iGN31-0002Jk-Ee
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 08:51:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37533)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iGMwS-0007qh-OX
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 08:44:18 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1iGN09-0000rp-TH
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 08:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iGMwQ-0004hO-Kp
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 08:44:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48926)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iGMwM-0004Yz-J7; Fri, 04 Oct 2019 08:44:10 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E5CB92D1CE;
- Fri,  4 Oct 2019 12:44:08 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-31.brq.redhat.com
- [10.40.204.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B05E919C5B;
- Fri,  4 Oct 2019 12:44:04 +0000 (UTC)
-Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
- platforms
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-2-jsnow@redhat.com>
- <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
- <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
- <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
- <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
- <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
- <20191002164438.GD5819@localhost.localdomain>
- <a7f532cc-68cb-175e-6c8f-930401221ef9@redhat.com>
- <20191004101952.GC5491@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d194e22c-7125-e558-0a80-131a28a87419@redhat.com>
-Date: Fri, 4 Oct 2019 14:44:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <borntraeger@de.ibm.com>) id 1iGN06-0007Zt-Jb
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 08:48:05 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54360)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1iGN02-0007UQ-7m
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 08:47:59 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x94Clqiu130641
+ for <qemu-devel@nongnu.org>; Fri, 4 Oct 2019 08:47:55 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ve3uepv8f-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 08:47:54 -0400
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 4 Oct 2019 13:47:45 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 4 Oct 2019 13:47:41 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x94CleBj55115844
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 4 Oct 2019 12:47:40 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 274B9A4040;
+ Fri,  4 Oct 2019 12:47:40 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E1C13A404D;
+ Fri,  4 Oct 2019 12:47:39 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.146])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri,  4 Oct 2019 12:47:39 +0000 (GMT)
+Subject: Re: libvirt? qemu change that mmaps ELF files breaks libvirt svirt
+ handling for os.kernel
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <d450afbe-06ae-f6f7-3bc0-f1a54c31907c@de.ibm.com>
+ <1dc0a320-b771-072d-d1f4-4eda2ab51a1f@redhat.com>
+ <a12ee0e1-44cc-e197-68e3-4a7137c8b972@de.ibm.com>
+ <20191004123613.GF25716@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Fri, 4 Oct 2019 14:47:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191004101952.GC5491@linux.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="4HniRnEymN8DNuz24afMHX6kkS6iNIz9U"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 04 Oct 2019 12:44:08 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <20191004123613.GF25716@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19100412-0012-0000-0000-0000035405E1
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19100412-0013-0000-0000-0000218F10D5
+Message-Id: <b44c70b1-71b6-2249-d50a-9a9e02f79259@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-04_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910040118
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x94Clqiu130641
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,275 +154,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Libvirt <libvir-list@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Marc Hartmayer <mhartmay@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4HniRnEymN8DNuz24afMHX6kkS6iNIz9U
-Content-Type: multipart/mixed; boundary="VhgnGrFRQ9QJgclaJyUN354vKWLpWi6Au"
 
---VhgnGrFRQ9QJgclaJyUN354vKWLpWi6Au
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
-On 04.10.19 12:19, Kevin Wolf wrote:
-> Am 02.10.2019 um 19:47 hat Max Reitz geschrieben:
->> On 02.10.19 18:44, Kevin Wolf wrote:
->>> Am 02.10.2019 um 13:57 hat Max Reitz geschrieben:
->>>> It usually worked fine for me because it=E2=80=99s rather rare that =
-non-block
->>>> patches broke the iotests.
->>>
->>> I disagree. It happened all the time that someone else broke the iote=
-sts
->>> in master and we needed to fix it up.
+On 04.10.19 14:36, Daniel P. Berrang=C3=A9 wrote:
+> On Fri, Oct 04, 2019 at 02:18:49PM +0200, Christian Borntraeger wrote:
 >>
->> OK.
 >>
->> (In my experience, it=E2=80=99s still mostly block patches, only that =
-they tend
->> to go through non-block trees.)
->=20
-> Fair enough, it's usually code that touches block code. I assumed "bloc=
-k
-> patches" to mean patches that go through one of the block trees and for=
-
-> which iotests are run before sending a pull request.
->=20
-> In the end, I don't care what code these patches touched. I do an
-> innocent git pull, and when I finally see that it's master that breaks
-> iotests and not my patches on top of it, I'm annoyed.
-
-Hm.  Part of my point was that this still happens all the time.
-
-Which is why I=E2=80=99d prefer more tests to run in CI than a handful of=
- not
-very useful ones in make check.
-
-(Of course, running it in a CI won=E2=80=99t prevent iotest failures on y=
-our
-machine, but in practice neither does the current model.)
-
->>>> Maybe my main problem is that I feel like now I have to deal with al=
-l of
->>>> the fallout, even though adding the iotests to make check wasn=E2=80=
-=99t my idea
->>>> and neither me nor Kevin ever consented.  (I don=E2=80=99t know whet=
-her Kevin
->>>> consented implicitly, but I don=E2=80=99t see his name in bdd95e4784=
-4f2d8b.)
+>> On 04.10.19 14:13, Paolo Bonzini wrote:
+>>> On 04/10/19 14:03, Christian Borntraeger wrote:
+>>>> Stefano, Paolo,
 >>>>
->>>> You can=E2=80=99t just give me more responsibility without my consen=
-t and then
->>>> call me egoistic for not liking it.
+>>>> I have an interesting fail in QEMU=20
+>>>>
+>>>> 2019-10-04T12:00:32.675188Z qemu-system-s390x: GLib: g_mapped_file_u=
+nref: assertion 'file !=3D NULL' failed
+>>>> that bisected to=20
+>>>> commit 816b9fe450220e19acb91a0ce4a8ade7000648d1 (refs/bisect/bad)
+>>>>     elf-ops.h: Map into memory the ELF to load
+>>>>
+>>>> strace tells that I can read the ELF file, but not mmap
+>>>> strace:
+>>>> 214365 openat(AT_FDCWD, "/var/lib/libvirt/images/test_cpu_timer.elf"=
+, O_RDONLY) =3D 36
+>>>> 214365 read(46, "\177ELF\2\2\1\0\0\0\0\0\0\0\0\0", 16) =3D 16
+>>>> 214365 lseek(46, 0, SEEK_SET)           =3D 0
+>>>> [...]
+>>>> 214365 fstat(46, {st_mode=3DS_IFREG|0755, st_size=3D168176, ...}) =3D=
+ 0
+>>>> 214365 mmap(NULL, 168176, PROT_READ|PROT_WRITE, MAP_PRIVATE, 46, 0) =
+=3D -1 EACCES (Permission denied)
+>>>>
+>>>> So reading from /var/lib/libvirt/images/test_cpu_timer.elf does work=
+, mmaping does not.
+>>>> setenforce 0 makes the problem go away.=20
+>>>>
+>>>> This might be more of an issue in libvirt, setting the svirt context=
+ too
+>>>> restrictive, but I am not too deep into the svirt part of libvirt.
+>>>> Reverting the qemu commit makes the problem go away.
 >>>
->>> I think I may have implicitly consented by helping Alex with the chan=
-ges
->>> to 'check' that made its output fit better in 'make check'.
+>>> Yes, the policy is too restrictive in my opinion.
 >>>
->>> Basically, my stance is that I share your dislike for the effects on =
-me
->>> personally (also, I can't run 'make check' any more before a pull
->>> request without testing half of the iotests twice because I still nee=
-d a
->>> full iotests run),
-
--x auto for the qcow2 pass, by the way.
-
->>> but I also think that having iotests in 'make check'
->>> is really the right thing for the project despite the inconvenience i=
-t
->>> means for me.
+>>> Can you include the output of "audit2allow" and/or "audit2allow -R"?
+>>>
+>>> Thanks,
+>>>
+>>> Paolo
+>>>
 >>
->> Then I expect you to NACK Thomas=E2=80=99s patch, and I take it to mea=
-n that I
->> can rely on you to handle basically all make check iotests failures th=
-at
->> are not caused by my own pull requests.
+>> require {
+>> 	type unconfined_t;
+>> 	type virt_content_t;
+>> 	type svirt_t;
+>> 	type systemd_tmpfiles_t;
+>> 	type user_home_t;
+>> 	type NetworkManager_t;
+>> 	class file { entrypoint execute ioctl lock map open read write };
+>> 	class bpf prog_run;
+>> }
 >>
->> Works for me.
->=20
-> Ah, we can also play this game the other way round.
->=20
-> So if you merge that revert, when iotests break in master, I take it I
-> can rely on you to fix it up before it impacts my working branch?
-
-This is not a game, I=E2=80=99m talking purely from my standpoint:
-(I talked wrongly, but more on that below)
-
-Whenever make check fails, it=E2=80=99s urgent.  Without iotests running =
-in make
-check, we had some time to sort the situation out.  That=E2=80=99s no lon=
-ger the
-case.
-
-That means we need to take care of everything immediately.  And I purely
-want help with that.  I just did not have the impression that such help
-was there in the past months.
-(This impression may or may not have a correlation to reality.)
-
-I thought that was just because nobody really cared about the iotests in
-make check.  Now you say you do, so that=E2=80=99s why I said you should =
-NACK
-the revert and then I know that I can count on your help.
-
-
-Now where I was wrong: I didn=E2=80=99t say =E2=80=9Cyour help=E2=80=9D b=
-ut =E2=80=9Cyou handle it=E2=80=9D.
-That was wrong.  I=E2=80=99m sorry.  That would mean I reap all the benef=
-its and
-you have to pay the price.
-
-
-What I=E2=80=99m not so sure of is why you didn=E2=80=99t just say that=E2=
-=80=99s unfair and
-instead reply with an impossible suggestion.  That makes it a bit
-difficult for me to find out exactly what you plan to do.
-
-I take your point as =E2=80=9CExactly, this suggestion would be impossibl=
-e.
-With the tests in make check, the worst that happens is CI breakage and
-rejected pull requests, and dealing with those is very much possible.=E2=80=
-=9D[1]
-
-As I=E2=80=99ve said, my POV is different, because I find CI breakage, ma=
-ke
-check breakage, and rejected pull requests to be worse because those are
-failures on other people=E2=80=99s machines.  That puts me personally und=
-er much
-more stress than failures on my own machine.  But it seems that you feel
-differently.
-
-[1] Or maybe you wanted to say that you find a rare intermittent failure
-that slips into make check less worse than 100 % failure of some test
-for everyone who runs the iotests.  I don=E2=80=99t know.
-I know that the 100 % failures are annoying but generally easily fixed;
-whereas the intermittent ones are the ones that stick and hard to fix.
-And those intermittent ones are unlikely to cause pull requests to be
-rejected.
-
->>>> I know you=E2=80=99ll say that we just need to ensure we can add mor=
-e tests,
->>>> then.  But for one thing, the most important tests are the ones that=
-
->>>> take the longest, like 041.  And the other of course is that adding =
-any
->>>> more tests to make check just brings me more pain, so I won=E2=80=99=
-t do it.
->>>
->>> That's something that can be fixed by tweaking the auto group.
->>>
->>> Can we run tests in 'auto' that require the system emulator? If so,
->>> let's add 030 040 041 to the default set. They take long, but they ar=
-e
->>> among the most valuable tests we have. If this makes the tests take t=
-oo
->>> much time, let's remove some less important ones instead.
->>>
->>>> [1] There is the recent case of Kevin=E2=80=99s pull request having =
-been
->>>> rejected because his test failed on anything but x64.  I=E2=80=99m t=
-orn here,
->>>> because I would have seen that failure on my -m32 build.  So it isn=E2=
-=80=99t
->>>> like it would have evaded our view for long.
->>>
->>> I messed up, so this pull request was rightly stopped. I consider thi=
-s
->>> one a feature, not a bug.
+>> #=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D svirt_t =3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+>> allow svirt_t user_home_t:file { entrypoint execute ioctl lock open re=
+ad write };
 >>
->> Sure, that was a good thing.  I just wonder whether that instance is
->> enough to justify the pain.
+>> #!!!! This avc can be allowed using the boolean 'domain_can_mmap_files=
+'
 >=20
-> Yes, making iotests stable on CI probably involves some pain, especiall=
-y
-> initially. However, if we don't fix them upstream, they'll end up on ou=
-r
-> desk again downstream because people run tests neither on your nor on m=
-y
-> laptop.
+> This is an unrelated boolean and we don't want to use that so ignore
+> this suggestion !
 >=20
-> I think we might actually save time by fixing them once and for all,
-> even if they are problems in the test cases and not in QEMU, and making=
+>> allow svirt_t virt_content_t:file map;
+>=20
+> This matches your strace.  virt_content_t is the label we use on
+> files that are exposed to QEMU read-only.
+>=20
+> The svirt policy only allows mmap on files that re exposed read-write
+> currently.
+>=20
+> I believe we can safely allow this mmap on read-only files too
+> because  the read-only restriction is enforced at time of open,
+> and any writes to the mapped file  will result in a private
+> copy on write.
+>=20
+> Please file a bz entry against the selinux-policy component for
+> whatever distro you're using, and/or Fedora rawhide, and CC me
+> on it too.
 
-> new test cases portable from the start, instead of getting individual
-> reports one at a time and having to look at the same test cases again
-> and again.
+Done. This was on Fedora 30.
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1758525
 
-You should really know I=E2=80=99m all for that and that I=E2=80=99ve don=
-e my share of
-work there.
+ Now sure about others like RHEL. RHV.
 
-But from my perspective we=E2=80=99ve said and tried that for six years a=
-nd we
-aren=E2=80=99t there still.  So to me =E2=80=9CWe should just fix it=E2=80=
-=9D of course sounds
-correct, but I also don=E2=80=99t believe it=E2=80=99ll happen any time s=
-oon.  Mostly
-because we generally don=E2=80=99t know what to fix before it breaks, but=
- also
-because that=E2=80=99s exactly what we=E2=80=99ve tried to do for at leas=
-t six years.
-
-
-So, hm.  I don=E2=80=99t quite know where we=E2=80=99re going.
-
-I still think that I personally would prefer the iotests to not run as
-part of make check, but just as CI.
-
-You do have a point that dropping the iotests from make check would
-benefit me at your expense.  (Well, it=E2=80=99d be the same result for b=
-oth of
-us, it just appears that we have different perceptions of pain.)
-
-OTOH, keeping the iotests in make check means we have to act on failure
-reports immediately.  For example, someone=E2=84=A2 needs to investigate =
-the 130
-failure Peter has reported.  I=E2=80=99ve just replied =E2=80=9CI don=E2=80=
-=99t know=E2=80=9D, CC=E2=80=99d
-Thomas, and waited whether anyone else would do anything.  Nobody did,
-and that can=E2=80=99t work.  (I also wrote that I wouldn=E2=80=99t act o=
-n it, precisely
-because I didn=E2=80=99t see the point.  I assumed that if anyone disagre=
-ed with
-that statement, they would have said something.)
-
-So acting on such reports means pain, too.  I consider it greater than
-the previous kind of pain, because I prefer =E2=80=9CThis sucks, I=E2=80=99=
-ll have to
-fix it this week or so=E2=80=9D to =E2=80=9COh crap, I=E2=80=99ll have to=
- investigate now,
-reproduce it, write an email as soon as possible, and fix it=E2=80=9D.
-
-But at least we=E2=80=99ll all have this pain as long as we share it.  An=
-d then
-it might not be so bad.
-
-Max
-
-
---VhgnGrFRQ9QJgclaJyUN354vKWLpWi6Au--
-
---4HniRnEymN8DNuz24afMHX6kkS6iNIz9U
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XPpMACgkQ9AfbAGHV
-z0DaPQf/WKLqcZwSFlGg0SfA5RXGyyMCQxZih4IxF2L00CqhdF2e9JnTsyoKVGrA
-4fuPMCgNhIlImLpM24zd9hLD4Px4Yg6dCUQBlbYFQdHszAsSgkPoi+zyQFCSQ/4M
-cq0bJMQFQfvj8Gf1Ls0BJwgf/J4gfcz8xhk9isDUVQnTMslqQ4QTOjDcHvIMK0yT
-D3thL+mfu8Yaoybetfo8tuFcpRYfm0cd3uMgJ7Jk8611QxARwk6SCC5sUq1c8SXy
-jp7w8N7Ejt4CwS9lZGJvnzfIEAZ+DcQ2ITUKb6iPpVvkYSqzGOyopfIr4bMcr1wD
-yNcXJtjTR8HfJB12anrfV8GA9negkg==
-=Jdr3
------END PGP SIGNATURE-----
-
---4HniRnEymN8DNuz24afMHX6kkS6iNIz9U--
 
