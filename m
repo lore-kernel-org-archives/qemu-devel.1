@@ -2,67 +2,66 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF36C10F14
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 00:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DCAC10F14
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 02:01:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 081A120862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 00:23:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081A120862
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C7183207FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 02:01:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7183207FF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGBNP-0007s8-6V
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 20:23:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52402)
+	id 1iGCug-0000es-A2
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 22:01:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iGBDR-0002Xu-0Y
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 20:13:02 -0400
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGCsX-0008Uo-Jx
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 21:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iGBDO-0000Ee-31
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 20:13:00 -0400
-Resent-Date: Thu, 03 Oct 2019 20:12:59 -0400
-Resent-Message-Id: <E1iGBDO-0000Ee-31@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21438)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iGBDI-0000B8-I0
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 20:12:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1570147960; cv=none; d=zoho.com; s=zohoarc; 
- b=Bcl+k0F2QbZCfrTcJTZqSs/M89UtMNgls7wdbaTDhftvuEzwxS/fga3XlUXsiKYnkDbH1W+SjIkYPKxw1dN2wf45/xSFD9F2ehFyk8KTzdWWIsvajILO2+fJFlMNJdrkyApPmPXkkPVFnfz1rk6GaAsvWIRk9F+ePATShzijB50=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1570147960;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=+/HPZKOwlRrtuMf//KGufgpnd5hhs+9QgJS6Iki75yw=; 
- b=CWgbJ9zNY1eNCT/SMW9bPVJ3r0e3TlLWgTWFpAm86qrQQxavNMejd1Yio7f6010cBTE0nge4HrDuQvnlfO1rr5Kar9pCmtikKuvPFjYB/LS/KaTxVNU/5wQdJ/hk6hHoZd4ZxAtducvT1oaFfd2kSTXdPTAvK163aT8CAp0A9Pc=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1570147958800748.8395732569935;
- Thu, 3 Oct 2019 17:12:38 -0700 (PDT)
-Subject: Re: [PATCH 0/7] fw_cfg: Run tests on big-endian
-In-Reply-To: <20191003225437.16651-1-philmd@redhat.com>
-Message-ID: <157014795715.27944.7985035778935178812@8230166b0665>
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGCsW-0007bC-7D
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 21:59:33 -0400
+Received: from cmccmta2.chinamobile.com ([221.176.66.80]:16174)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGCsU-0007Yt-2n
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 21:59:32 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.1]) by
+ rmmx-syy-dmz-app07-12007 (RichMail) with SMTP id 2ee75d96a7726c8-b150a;
+ Fri, 04 Oct 2019 09:59:14 +0800 (CST)
+X-RM-TRANSID: 2ee75d96a7726c8-b150a
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from [192.168.5.184] (unknown[180.108.8.156])
+ by rmsmtp-syy-appsvr01-12001 (RichMail) with SMTP id 2ee15d96a770ec8-9bb6e;
+ Fri, 04 Oct 2019 09:59:14 +0800 (CST)
+X-RM-TRANSID: 2ee15d96a770ec8-9bb6e
+Subject: =?UTF-8?B?UmU6IF9bUEFUQ0hfdjJfMy8zXV90ZXN0cy9taWdyYXRpb27vvJpmaXhf?=
+ =?UTF-8?Q?unreachable=5fpath=5fin=5fstress=5ftest?=
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <cover.1568170994.git.maozhongyi@cmss.chinamobile.com>
+ <555aac83ecd42d21e6311962e793dd4ce2a77902.1568170994.git.maozhongyi@cmss.chinamobile.com>
+ <28738cd1-f32d-6d25-e23f-93d3e96271c9@vivier.eu>
+ <0cac9381-6bc4-9431-5cdb-c2353857d476@cmss.chinamobile.com>
+ <b39ace2c-5826-69c0-f238-7db82e901c20@vivier.eu>
+From: maozy <maozhongyi@cmss.chinamobile.com>
+Message-ID: <13706032-5ba3-0be0-471c-2b5845b7d7b2@cmss.chinamobile.com>
+Date: Fri, 4 Oct 2019 09:59:02 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Thu, 3 Oct 2019 17:12:38 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+In-Reply-To: <b39ace2c-5826-69c0-f238-7db82e901c20@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 221.176.66.80
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,66 +73,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, thuth@redhat.com, lersek@redhat.com, liq3ea@gmail.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com
+Cc: tony.nguyen@bt.com, alex.bennee@linaro.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAwMzIyNTQzNy4xNjY1
-MS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTEwMDMyMjU0MzcuMTY2NTEt
-MS1waGlsbWRAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFUQ0ggMC83XSBmd19jZmc6IFJ1biB0ZXN0
-cyBvbiBiaWctZW5kaWFuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
-dCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBw
-YXRjaGV3LzIwMTkwOTE2MTQxNTQ0LjE3NTQwLTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+
-IHBhdGNoZXcvMjAxOTA5MTYxNDE1NDQuMTc1NDAtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcK
-U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2MDY2YWQ0IHRlc3RzL2Z3X2NmZzogUnVu
-IHRoZSB0ZXN0cyBvbiBiaWctZW5kaWFuIHRhcmdldHMKNDQyY2IwMCB0ZXN0cy9md19jZmc6IERl
-Y2xhcmUgb25lIFFGV0NGRyBmb3IgYWxsIHRlc3RzCjVhMmQyNzQgdGVzdHMvbGlicW9zL2Z3X2Nm
-ZzogUGFzcyBRVGVzdFN0YXRlIGFzIGFyZ3VtZW50CjNlYWZlNjIgdGVzdHMvZndfY2ZnOiBMZXQg
-dGhlIHRlc3RzIHVzZSBhIGNvbnRleHQKOGMzYWE3ZiB0ZXN0cy9saWJxb3MvZndfY2ZnOiBEb2N1
-bWVudCBwY19md19jZmdfaW5pdCB0byBkcm9wIHBjX2Z3X2NmZ191bmluaXQKNDRmMTllMyB0ZXN0
-cy9saWJxb3MvZndfY2ZnOiBEb2N1bWVudCBtbV9md19jZmdfaW5pdCB0byBkcm9wIG1tX2Z3X2Nm
-Z191bmluaXQKMmQ2YTBlMiB0ZXN0cy9saWJxb3MvZndfY2ZnOiBEb2N1bWVudCBpb19md19jZmdf
-aW5pdCB0byBkcm9wIGlvX2Z3X2NmZ191bmluaXQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNyBD
-aGVja2luZyBjb21taXQgMmQ2YTBlMmVmZTc2ICh0ZXN0cy9saWJxb3MvZndfY2ZnOiBEb2N1bWVu
-dCBpb19md19jZmdfaW5pdCB0byBkcm9wIGlvX2Z3X2NmZ191bmluaXQpCjIvNyBDaGVja2luZyBj
-b21taXQgNDRmMTllMzI4MDMwICh0ZXN0cy9saWJxb3MvZndfY2ZnOiBEb2N1bWVudCBtbV9md19j
-ZmdfaW5pdCB0byBkcm9wIG1tX2Z3X2NmZ191bmluaXQpCjMvNyBDaGVja2luZyBjb21taXQgOGMz
-YWE3ZjZiMTY2ICh0ZXN0cy9saWJxb3MvZndfY2ZnOiBEb2N1bWVudCBwY19md19jZmdfaW5pdCB0
-byBkcm9wIHBjX2Z3X2NmZ191bmluaXQpCjQvNyBDaGVja2luZyBjb21taXQgM2VhZmU2Mjc0Yjcx
-ICh0ZXN0cy9md19jZmc6IExldCB0aGUgdGVzdHMgdXNlIGEgY29udGV4dCkKRVJST1I6IGxpbmUg
-b3ZlciA5MCBjaGFyYWN0ZXJzCiM3NDogRklMRTogdGVzdHMvZndfY2ZnLXRlc3QuYzo3NzoKKyAg
-ICBzID0gcXRlc3RfaW5pdGYoIi1NICVzIC11dWlkIDQ2MDBjYjMyLTM4ZWMtNGIyZi04YWNiLTgx
-YzZlYTU0ZjJkOCIsIGN0eC0+bWFjaGluZV9uYW1lKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMjI3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKNS83IENoZWNraW5nIGNvbW1pdCA1YTJkMjc0YWY2NzUgKHRlc3RzL2xpYnFvcy9md19j
-Zmc6IFBhc3MgUVRlc3RTdGF0ZSBhcyBhcmd1bWVudCkKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzM4NzogRklMRTogdGVzdHMvbGlicW9zL2Z3X2NmZy5oOjI5Ogordm9pZCBxZndf
-Y2ZnX2dldChRVGVzdFN0YXRlICpxdHMsIFFGV0NGRyAqZndfY2ZnLCB1aW50MTZfdCBrZXksIHZv
-aWQgKmRhdGEsIHNpemVfdCBsZW4pOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzOTEg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggNS83IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjYvNyBD
-aGVja2luZyBjb21taXQgNDQyY2IwMDhkZTk4ICh0ZXN0cy9md19jZmc6IERlY2xhcmUgb25lIFFG
-V0NGRyBmb3IgYWxsIHRlc3RzKQo3LzcgQ2hlY2tpbmcgY29tbWl0IDYwNjZhZDRiMTgzNCAodGVz
-dHMvZndfY2ZnOiBSdW4gdGhlIHRlc3RzIG9uIGJpZy1lbmRpYW4gdGFyZ2V0cykKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMDMyMjU0Mzcu
-MTY2NTEtMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2Fn
-ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+
+
+On 10/3/19 5:23 PM, Laurent Vivier wrote:
+> Le 03/10/2019 à 09:17, maozy a écrit :
+>> Hi,  Laurent
+>>
+>> On 10/1/19 11:46 PM, Laurent Vivier wrote:
+>>> Le 11/09/2019 à 05:31, Mao Zhongyi a écrit :
+>>>> if stress function always return 0, the path
+>>>> 'if (stress(ramsizeGB, ncpus) < 0)' is nerver unreachable,
+>>>> so fix it to allow the test failed.
+>>>>
+>>>> Cc: armbru@redhat.com
+>>>> Cc: laurent@vivier.eu
+>>>> Cc: tony.nguyen@bt.com
+>>>>
+>>>> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+>>>> ---
+>>>>    tests/migration/stress.c | 5 ++---
+>>>>    1 file changed, 2 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/tests/migration/stress.c b/tests/migration/stress.c
+>>>> index 19a6eff5fd..35903d90c4 100644
+>>>> --- a/tests/migration/stress.c
+>>>> +++ b/tests/migration/stress.c
+>>>> @@ -224,6 +224,7 @@ static int stressone(unsigned long long ramsizeMB)
+>>>>                }
+>>>>            }
+>>>>        }
+>>>> +    return 0;
+>>>>    }
+>>> before the return, we have an infinite loop "while(1) { }".
+>>>
+>>> So this part is dead code.
+>>>
+>>> In fact, if the function exits, it's because it fails, otherwise it
+>>> loops infinitely, so I think we should change its type to void and
+>>> stress should always return -1.
+>> Yes, I think it's ok to change stressone typo to void because
+>> no one cares about its return value, but if make stress always
+>> return -1, main will always exited in exit_failure, like this:
+>>
+>> ...
+>>      if (stress(ramsizeGB, ncpus) < 0)
+>>          exit_failure();
+>>
+>>      exit_success();
+>> }
+>>
+>> so, perhaps also change stress typo to void may be good. then:
+>>
+>> ...
+>>      stress(ramsizeGB, ncpus);
+>>
+>>      exit_success();
+>> }
+>>
+>> Anther way , make stressone return 0 when infinite loop fails to
+>> exit, then main can handle both success and failure case.
+>>
+>> what do you think?
+>>
+> 
+> If stressone() or stress() exits it's because of a failure because the
+> test runs forever otherwise.
+> 
+> So I think there is no problem to use exit_failure() as the exit
+> function of main(): it should never be reached if the test runs without
+> error.
+
+OK, I see, thanks a lot.
+
+> 
+> Thanks,
+> Laurent
+> 
+
 
 
