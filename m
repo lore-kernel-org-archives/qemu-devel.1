@@ -2,62 +2,60 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB23C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC7FDC47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:10:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A715F20862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:10:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A715F20862
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A2CD620862
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:10:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2CD620862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGLTO-00057R-Mh
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:10:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58041)
+	id 1iGLTu-0005z9-Nv
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:10:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iGKNt-00038K-Lj
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:00:27 -0400
+ (envelope-from <david@redhat.com>) id 1iGLB7-0006oJ-3h
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iGKNr-0007D8-62
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:00:25 -0400
-Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:56318)
+ (envelope-from <david@redhat.com>) id 1iGLB5-0004qs-QX
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:51:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52164)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iGKNp-0007Bd-ED
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:00:23 -0400
-Received: from player718.ha.ovh.net (unknown [10.109.159.90])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 53A64145C43
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 12:00:18 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player718.ha.ovh.net (Postfix) with ESMTPSA id D4B15A7FAB9E;
- Fri,  4 Oct 2019 10:00:08 +0000 (UTC)
-Date: Fri, 4 Oct 2019 12:00:07 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH] xive: Make some device types not user creatable
-Message-ID: <20191004120007.24d70d6f@bahia.lan>
-In-Reply-To: <e4c1619d-b982-e4ab-eeb9-31baddd885ba@redhat.com>
-References: <157017473006.331610.2983143972519884544.stgit@bahia.lan>
- <e4c1619d-b982-e4ab-eeb9-31baddd885ba@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iGLB5-0004py-IE; Fri, 04 Oct 2019 06:51:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BF9EA3067319;
+ Fri,  4 Oct 2019 10:51:13 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-35.ams2.redhat.com [10.36.116.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EE7AE5D6B2;
+ Fri,  4 Oct 2019 10:51:11 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 3/7] s390x/mmu: Inject DAT exceptions from a single place
+Date: Fri,  4 Oct 2019 12:50:58 +0200
+Message-Id: <20191004105102.15821-4-david@redhat.com>
+In-Reply-To: <20191004105102.15821-1-david@redhat.com>
+References: <20191004105102.15821-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 04 Oct 2019 10:51:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 1743174532891187491
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrhedugddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.74.219
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,101 +67,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 4 Oct 2019 11:17:30 +0200
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+Let's return the PGM from the translation functions on error and inject
+based on that.
 
-> Hi Greg,
->=20
-> On 10/4/19 9:38 AM, Greg Kurz wrote:
-> > Some device types of the XIVE model are exposed to the QEMU command
-> > line:
-> >=20
-> > $ ppc64-softmmu/qemu-system-ppc64 -device help | grep xive
-> > name "xive-end-source", desc "XIVE END Source"
-> > name "xive-source", desc "XIVE Interrupt Source"
-> > name "xive-tctx", desc "XIVE Interrupt Thread Context"
-> >=20
-> > These are internal devices that shouldn't be instantiable by the
-> > user. By the way, they can't be because their respective realize
-> > functions expect link properties that can't be set from the command
-> > line:
-> >=20
-> > qemu-system-ppc64: -device xive-source: required link 'xive' not found:
-> >   Property '.xive' not found
-> > qemu-system-ppc64: -device xive-end-source: required link 'xive' not fo=
-und:
-> >   Property '.xive' not found
-> > qemu-system-ppc64: -device xive-tctx: required link 'cpu' not found:
-> >   Property '.cpu' not found
->=20
-> Why do you have to test that manually, isn't it what=20
-> tests/device-introspect-test.c::test_one_device does?
->=20
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/mmu_helper.c | 63 +++++++++++----------------------------
+ 1 file changed, 17 insertions(+), 46 deletions(-)
 
-Heh probably because I wasn't aware of it :)
-
-And BTW, test_one_device() can't help here since it only cares
-about 'device_add foo,help' not crashing QEMU:
-
-    help =3D qtest_hmp(qts, "device_add \"%s,help\"", type);
-
-as explained in a comment at the beginning of the file.
-
-/*
- * Covers QMP device-list-properties and HMP device_add help.  We
- * currently don't check that their output makes sense, only that QEMU
- * survives.  Useful since we've had an astounding number of crash
- * bugs around here.
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 847fb240fb..f6ae444655 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -48,26 +48,6 @@ static void trigger_access_exception(CPUS390XState *en=
+v, uint32_t type,
+     }
+ }
+=20
+-static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+-                               uint32_t type, uint64_t asc, int rw, bool=
+ exc)
+-{
+-    int ilen =3D ILEN_AUTO;
+-    uint64_t tec;
+-
+-    tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | as=
+c >> 46;
+-
+-    if (!exc) {
+-        return;
+-    }
+-
+-    /* Code accesses have an undefined ilc.  */
+-    if (rw =3D=3D MMU_INST_FETCH) {
+-        ilen =3D 2;
+-    }
+-
+-    trigger_access_exception(env, type, ilen, tec);
+-}
+-
+ /* check whether the address would be proteted by Low-Address Protection=
  */
-
-> > Hide them by setting dc->user_creatable to false in their respective
-> > class init functions.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >   hw/intc/xive.c |    3 +++
-> >   1 file changed, 3 insertions(+)
-> >=20
-> > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> > index 29df06df1136..6c54a35fd4bb 100644
-> > --- a/hw/intc/xive.c
-> > +++ b/hw/intc/xive.c
-> > @@ -670,6 +670,7 @@ static void xive_tctx_class_init(ObjectClass *klass=
-, void *data)
-> >       dc->realize =3D xive_tctx_realize;
-> >       dc->unrealize =3D xive_tctx_unrealize;
-> >       dc->vmsd =3D &vmstate_xive_tctx;
-> > +    dc->user_creatable =3D false;
-> >   }
-> >  =20
-> >   static const TypeInfo xive_tctx_info =3D {
-> > @@ -1118,6 +1119,7 @@ static void xive_source_class_init(ObjectClass *k=
-lass, void *data)
-> >       dc->props   =3D xive_source_properties;
-> >       dc->realize =3D xive_source_realize;
-> >       dc->vmsd    =3D &vmstate_xive_source;
-> > +    dc->user_creatable =3D false;
-> >   }
-> >  =20
-> >   static const TypeInfo xive_source_info =3D {
-> > @@ -1853,6 +1855,7 @@ static void xive_end_source_class_init(ObjectClas=
-s *klass, void *data)
-> >       dc->desc    =3D "XIVE END Source";
-> >       dc->props   =3D xive_end_source_properties;
-> >       dc->realize =3D xive_end_source_realize;
-> > +    dc->user_creatable =3D false;
-> >   }
-> >  =20
-> >   static const TypeInfo xive_end_source_info =3D {
-> >=20
-> >=20
+ static bool is_low_address(uint64_t addr)
+ {
+@@ -119,12 +99,10 @@ static int mmu_translate_pte(CPUS390XState *env, tar=
+get_ulong vaddr,
+                              target_ulong *raddr, int *flags, int rw, bo=
+ol exc)
+ {
+     if (pt_entry & PAGE_INVALID) {
+-        trigger_page_fault(env, vaddr, PGM_PAGE_TRANS, asc, rw, exc);
+-        return -1;
++        return PGM_PAGE_TRANS;
+     }
+     if (pt_entry & PAGE_RES0) {
+-        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
+-        return -1;
++        return PGM_TRANS_SPEC;
+     }
+     if (pt_entry & PAGE_RO) {
+         *flags &=3D ~PAGE_WRITE;
+@@ -179,13 +157,11 @@ static int mmu_translate_region(CPUS390XState *env,=
+ target_ulong vaddr,
+     new_entry =3D ldq_phys(cs->as, origin + offs);
+=20
+     if ((new_entry & REGION_ENTRY_INV) !=3D 0) {
+-        trigger_page_fault(env, vaddr, pchks[level / 4], asc, rw, exc);
+-        return -1;
++        return pchks[level / 4];
+     }
+=20
+     if ((new_entry & REGION_ENTRY_TYPE_MASK) !=3D level) {
+-        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
+-        return -1;
++        return PGM_TRANS_SPEC;
+     }
+=20
+     if (level =3D=3D ASCE_TYPE_SEGMENT) {
+@@ -197,8 +173,7 @@ static int mmu_translate_region(CPUS390XState *env, t=
+arget_ulong vaddr,
+     offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
+     if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
+         || offs > (new_entry & REGION_ENTRY_LENGTH)) {
+-        trigger_page_fault(env, vaddr, pchks[level / 4 - 1], asc, rw, ex=
+c);
+-        return -1;
++        return pchks[level / 4 - 1];
+     }
+=20
+     if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_RO)) {
+@@ -226,38 +201,31 @@ static int mmu_translate_asce(CPUS390XState *env, t=
+arget_ulong vaddr,
+     switch (level) {
+     case ASCE_TYPE_REGION1:
+         if ((vaddr >> 62) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_FIRST_TRANS, asc, rw,=
+ exc);
+-            return -1;
++            return PGM_REG_FIRST_TRANS;
+         }
+         break;
+     case ASCE_TYPE_REGION2:
+         if (vaddr & 0xffe0000000000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 51 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_SEC_TRANS, asc, rw, e=
+xc);
+-            return -1;
++            return PGM_REG_SEC_TRANS;
+         }
+         break;
+     case ASCE_TYPE_REGION3:
+         if (vaddr & 0xfffffc0000000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 40 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_THIRD_TRANS, asc, rw,=
+ exc);
+-            return -1;
++            return PGM_REG_THIRD_TRANS;
+         }
+         break;
+     case ASCE_TYPE_SEGMENT:
+         if (vaddr & 0xffffffff80000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 29 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_SEGMENT_TRANS, asc, rw, e=
+xc);
+-            return -1;
++            return PGM_SEGMENT_TRANS;
+         }
+         break;
+     }
+@@ -400,8 +368,11 @@ int mmu_translate(CPUS390XState *env, target_ulong v=
+addr, int rw, uint64_t asc,
+=20
+     /* perform the DAT translation */
+     r =3D mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw, ex=
+c);
+-    if (r) {
+-        return r;
++    if (unlikely(r)) {
++        if (exc) {
++            trigger_access_exception(env, r, ilen, tec);
++        }
++        return -1;
+     }
+=20
+     /* check for DAT protection */
+--=20
+2.21.0
 
 
