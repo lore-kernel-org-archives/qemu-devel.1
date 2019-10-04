@@ -2,65 +2,60 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CBF5C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F57C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:05:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57D7E215EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:01:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nVVThD8l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57D7E215EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 5B24B20867
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:05:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B24B20867
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGLLA-0006W5-Bz
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:01:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56630)
+	id 1iGLOh-00012T-J6
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:05:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58001)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iGKHJ-0004d6-1K
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:53:38 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iGKNo-00035P-Vf
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iGKHG-0002oi-1T
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:53:36 -0400
-Received: from ozlabs.org ([203.11.71.1]:58869)
+ (envelope-from <kwolf@redhat.com>) id 1iGKNm-0007BJ-Ih
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:00:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42224)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iGKHF-0002nl-Lw
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:53:33 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46l4vF4PMlz9sQr; Fri,  4 Oct 2019 19:53:29 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570182809;
- bh=FqwY6Q6eoQumKCr5wennTgTta4p7lmhNwQab/YlSmkU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=nVVThD8lP13+nBoqUWCc70SzqLuBxoReM58EvjNYT0sviDpqrGsm6INI5yrlqpU/x
- WIumCZwkQEvZj01c04WujpuUBwnJNKTd05MCzoFd2xzgicozUSu9TFkF9ZIp6d5C9M
- LdikoNeOfcIVpNkcXKo85TDx2KGjioGYIWGlLDOo=
-Date: Fri, 4 Oct 2019 19:52:32 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: Skip
- LinuxInitrd.test_with_2gib_file_should_exit_error_msg_with_linux_v3_6 on
- 32-bit hosts?
-Message-ID: <20191004095232.GA29310@umbus.fritz.box>
-References: <20191004052906.GC27597@umbus.fritz.box>
- <20191004083237.GA25716@redhat.com>
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1iGKNc-00076j-FN; Fri, 04 Oct 2019 06:00:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4F3C13066FBF;
+ Fri,  4 Oct 2019 10:00:06 +0000 (UTC)
+Received: from linux.fritz.box.com (unknown [10.36.118.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 37FEE60852;
+ Fri,  4 Oct 2019 10:00:05 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL v3 0/4] Block layer patches
+Date: Fri,  4 Oct 2019 11:59:55 +0200
+Message-Id: <20191004095959.22891-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="h31gzZEtNLTqOjlF"
-Content-Disposition: inline
-In-Reply-To: <20191004083237.GA25716@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 04 Oct 2019 10:00:06 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,85 +67,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit 4f59102571fce49af180cfc6d4cdd2b5df7bdb=
+14:
 
---h31gzZEtNLTqOjlF
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-oct-01-=
+2019' into staging (2019-10-01 16:21:42 +0100)
 
-On Fri, Oct 04, 2019 at 09:33:38AM +0100, Daniel P. Berrang=E9 wrote:
-> Re-adding qemu-devel since it seems to have been Bcc'd.
->=20
-> On Fri, Oct 04, 2019 at 03:29:06PM +1000, David Gibson wrote:
-> > When I run make check-acceptance in a 32-bit (i686) container, this
-> > test fails, because it tries to start a guest with 4G of RAM, which
-> > can't fit in the userspace address space on a 32-bit host, obviously.
-> >=20
-> >  (16/44) /home/dwg/src/qemu/tests/acceptance/linux_initrd.py:LinuxInitr=
-d.test_with_2gib_file_should_exit_error_msg_with_linux_v3_6: FAIL: Regex di=
-dn't match: '.*initrd is too large.*max: \\d+, need 2147483648.*' not found=
- in 'qemu-system-x86_64: -m 4096: ram size too large\n' (0.12 s)
-> >=20
-> > Should we simply skip this test on 32-bit hosts?
->=20
-> There's a thread right now asking if we should drop support for 32-bit
-> hosts entirely
->=20
->   https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg06168.html
+are available in the Git repository at:
 
-Huh.
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-> I'm curious why you were testing with 32-bit host ? Do you have some
-> use case that needs it, or was this just responding to some user bug
-> report
+for you to fetch changes up to 7e693a0500455edab21754573c32b7146138cffd:
 
-A 32-bit build (actually, a couple) is part of my routine pre-pull
-tests, precisely because I've accidentally included some things that
-broken them.
+  iotests: Remove Python 2 compatibility code (2019-10-04 11:59:16 +0200)
 
-> As long as we do support 32-bit hosts though, this test definitely needs
-> fixing. It is attempting to boot with a 2 GB initrd, so I guess RAM
-> needs to be big enough to fit that & boot the guest OS image. Possibly
-> it might still work in 2.5-3.0 GB of RAM in guest if that's sufficiently
-> small for 32-bit host testing. If not, then skipping seems reasonable,
-> as no one will ever use such huge initrds on 32-bit hosts in real
-> world.
+----------------------------------------------------------------
+Block layer patches:
 
-Right.
+- Fix internal snapshots with typical -blockdev setups
+- iotests: Require Python 3.6 or later
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+----------------------------------------------------------------
+Kevin Wolf (4):
+      block/snapshot: Restrict set of snapshot nodes
+      iotests: Test internal snapshots with -blockdev
+      iotests: Require Python 3.6 or later
+      iotests: Remove Python 2 compatibility code
 
---h31gzZEtNLTqOjlF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2XFl4ACgkQbDjKyiDZ
-s5JyrhAA464va2AQAza7DtQIeFggtld8j65w2IChoPt/jR+ue6VxUGfPWgZ6xo7W
-NxlxWnGnfWx6vcH3VEhxSl1Yf0t+iIKp1JnYDPtuTdGZYLVhIi/bWCd/HhGebTI2
-r2mTLi6xmxkhl5FMKJBmD+GI1B3AlPU7vkOMkaLNAJNmEXONvk3CFaZ3yMGXgNNb
-7FTlReAYs2SpO3mKmLN79mSKrxPmWllH3HviYggAclnjLQziE5o3ui36tu6hzX04
-Lt0+QI+O7+VXlimBt58rUUY0XSjePhdeoqj1HuvW6p8JG4eYf2UgUSax6goSVgbZ
-lXd5bfz+FSqmD3Lht9nE0OBK4rxh1r5zdnHw3cx4e/HkBc2v3y/ZuovIOXwGdoLB
-kWxRz3FR793iXPl7HHzKdVZ92hRE/0P1TM4kF9allsDGXOLrWsmyFMISzLq5xb7B
-LMWVjGFALsotTBF/SN3OtWxjMxDcaYEPUNLwvb5j5X0VZDi8NX/XSsjk/HKPd4LS
-TbYPtfriQDTLukTvCqjRaKgePno5PxOzjorsiQqzyj22ERZF6MfsS4jj51PQ3Jyj
-+iMFX7mFIncSg9dlk+amJjVq+Hu+s7h6xiCd72NmR7NMw/kmGG3lVz6NGmbiM5AV
-M7vZ9weqzpLpyumuxNVdTBXaJb2MqIn3FoDHjd5PD6EkkLfkHss=
-=7LyY
------END PGP SIGNATURE-----
-
---h31gzZEtNLTqOjlF--
+ block/snapshot.c                 |  26 ++++--
+ tests/qemu-iotests/044           |   3 -
+ tests/qemu-iotests/163           |   3 -
+ tests/qemu-iotests/267           | 168 +++++++++++++++++++++++++++++++++=
++++
+ tests/qemu-iotests/267.out       | 182 +++++++++++++++++++++++++++++++++=
+++++++
+ tests/qemu-iotests/check         |  13 ++-
+ tests/qemu-iotests/common.filter |  11 ++-
+ tests/qemu-iotests/group         |   1 +
+ tests/qemu-iotests/iotests.py    |  13 +--
+ 9 files changed, 392 insertions(+), 28 deletions(-)
+ create mode 100755 tests/qemu-iotests/267
+ create mode 100644 tests/qemu-iotests/267.out
 
