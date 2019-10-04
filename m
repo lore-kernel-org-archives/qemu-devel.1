@@ -2,56 +2,57 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F57C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:05:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26475C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:06:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B24B20867
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:05:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B24B20867
+	by mail.kernel.org (Postfix) with ESMTPS id EB57020867
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:06:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB57020867
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGLOh-00012T-J6
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:05:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58001)
+	id 1iGLPR-0001rX-Nk
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:06:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44241)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iGKNo-00035P-Vf
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:00:23 -0400
+ (envelope-from <david@redhat.com>) id 1iGLB3-0006kD-Rp
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iGKNm-0007BJ-Ih
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:00:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42224)
+ (envelope-from <david@redhat.com>) id 1iGLB2-0004p9-Lf
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:51:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36862)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1iGKNc-00076j-FN; Fri, 04 Oct 2019 06:00:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iGLB2-0004oC-Dv; Fri, 04 Oct 2019 06:51:12 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4F3C13066FBF;
- Fri,  4 Oct 2019 10:00:06 +0000 (UTC)
-Received: from linux.fritz.box.com (unknown [10.36.118.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 37FEE60852;
- Fri,  4 Oct 2019 10:00:05 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL v3 0/4] Block layer patches
-Date: Fri,  4 Oct 2019 11:59:55 +0200
-Message-Id: <20191004095959.22891-1-kwolf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A489D7F747;
+ Fri,  4 Oct 2019 10:51:11 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-35.ams2.redhat.com [10.36.116.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D2AE75D6B2;
+ Fri,  4 Oct 2019 10:51:09 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 2/7] s390x/mmu: Move DAT protection handling out of
+ mmu_translate_asce()
+Date: Fri,  4 Oct 2019 12:50:57 +0200
+Message-Id: <20191004105102.15821-3-david@redhat.com>
+In-Reply-To: <20191004105102.15821-1-david@redhat.com>
+References: <20191004105102.15821-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 04 Oct 2019 10:00:06 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Fri, 04 Oct 2019 10:51:11 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -67,50 +68,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 4f59102571fce49af180cfc6d4cdd2b5df7bdb=
-14:
+We'll reuse the ilen and tec definitions in mmu_translate
+soon also for all other DAT exceptions we inject. Move it to the caller,
+where we can later pair it up with other protection checks, like IEP.
 
-  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-oct-01-=
-2019' into staging (2019-10-01 16:21:42 +0100)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/mmu_helper.c | 39 ++++++++++++++++-----------------------
+ 1 file changed, 16 insertions(+), 23 deletions(-)
 
-are available in the Git repository at:
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 6a7ad33c4d..847fb240fb 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -48,20 +48,6 @@ static void trigger_access_exception(CPUS390XState *en=
+v, uint32_t type,
+     }
+ }
+=20
+-static void trigger_prot_fault(CPUS390XState *env, target_ulong vaddr,
+-                               uint64_t asc, int rw, bool exc)
+-{
+-    uint64_t tec;
+-
+-    tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | 4 =
+| asc >> 46;
+-
+-    if (!exc) {
+-        return;
+-    }
+-
+-    trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, tec);
+-}
+-
+ static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+                                uint32_t type, uint64_t asc, int rw, bool=
+ exc)
+ {
+@@ -229,7 +215,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
+                               int *flags, int rw, bool exc)
+ {
+     int level;
+-    int r;
+=20
+     if (asce & ASCE_REAL_SPACE) {
+         /* direct mapping */
+@@ -277,14 +262,8 @@ static int mmu_translate_asce(CPUS390XState *env, ta=
+rget_ulong vaddr,
+         break;
+     }
+=20
+-    r =3D mmu_translate_region(env, vaddr, asc, asce, level, raddr, flag=
+s, rw,
+-                             exc);
+-    if (!r && rw =3D=3D MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
+-        trigger_prot_fault(env, vaddr, asc, rw, exc);
+-        return -1;
+-    }
+-
+-    return r;
++    return mmu_translate_region(env, vaddr, asc, asce, level, raddr, fla=
+gs, rw,
++                                exc);
+ }
+=20
+ static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
+@@ -369,6 +348,10 @@ static void mmu_handle_skey(target_ulong addr, int r=
+w, int *flags)
+ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64=
+_t asc,
+                   target_ulong *raddr, int *flags, bool exc)
+ {
++    /* Code accesses have an undefined ilc, let's use 2 bytes. */
++    const int ilen =3D (rw =3D=3D MMU_INST_FETCH) ? 2 : ILEN_AUTO;
++    uint64_t tec =3D (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
++                   (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ);
+     uint64_t asce;
+     int r;
+=20
+@@ -421,6 +404,16 @@ int mmu_translate(CPUS390XState *env, target_ulong v=
+addr, int rw, uint64_t asc,
+         return r;
+     }
+=20
++    /* check for DAT protection */
++    if (unlikely(rw =3D=3D MMU_DATA_STORE && !(*flags & PAGE_WRITE))) {
++        if (exc) {
++            /* DAT sets bit 61 only */
++            tec |=3D 0x4;
++            trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
++        }
++        return -1;
++    }
++
+ nodat:
+     /* Convert real address -> absolute address */
+     *raddr =3D mmu_real2abs(env, *raddr);
+--=20
+2.21.0
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
-
-for you to fetch changes up to 7e693a0500455edab21754573c32b7146138cffd:
-
-  iotests: Remove Python 2 compatibility code (2019-10-04 11:59:16 +0200)
-
-----------------------------------------------------------------
-Block layer patches:
-
-- Fix internal snapshots with typical -blockdev setups
-- iotests: Require Python 3.6 or later
-
-----------------------------------------------------------------
-Kevin Wolf (4):
-      block/snapshot: Restrict set of snapshot nodes
-      iotests: Test internal snapshots with -blockdev
-      iotests: Require Python 3.6 or later
-      iotests: Remove Python 2 compatibility code
-
- block/snapshot.c                 |  26 ++++--
- tests/qemu-iotests/044           |   3 -
- tests/qemu-iotests/163           |   3 -
- tests/qemu-iotests/267           | 168 +++++++++++++++++++++++++++++++++=
-+++
- tests/qemu-iotests/267.out       | 182 +++++++++++++++++++++++++++++++++=
-++++++
- tests/qemu-iotests/check         |  13 ++-
- tests/qemu-iotests/common.filter |  11 ++-
- tests/qemu-iotests/group         |   1 +
- tests/qemu-iotests/iotests.py    |  13 +--
- 9 files changed, 392 insertions(+), 28 deletions(-)
- create mode 100755 tests/qemu-iotests/267
- create mode 100644 tests/qemu-iotests/267.out
 
