@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 086D5C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E954C47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:16:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C46EF20867
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:16:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6999F20867
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:16:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D46wP7YD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C46EF20867
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GI1wqkd1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6999F20867
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGKdD-00026O-3Z
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:16:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53158)
+	id 1iGKdd-0002bk-Ly
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:16:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK36-0005hk-A5
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:58 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iGK2m-0005Rp-5z
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK34-0005xu-1p
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:55 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34659 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iGK2k-0005Yu-5A
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:35 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:45751)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iGK33-0005VN-LV; Fri, 04 Oct 2019 05:38:53 -0400
+ id 1iGK2j-0005Bl-NZ; Fri, 04 Oct 2019 05:38:34 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46l4YN5ZQxz9sSJ; Fri,  4 Oct 2019 19:38:00 +1000 (AEST)
+ id 46l4YK65kFz9sRp; Fri,  4 Oct 2019 19:37:57 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570181880;
- bh=dy0eCMf0ExtyBpk5jkb+cwA1hBC4dof112IhP+OCoBg=;
+ d=gibson.dropbear.id.au; s=201602; t=1570181877;
+ bh=Kp19NRaTYZalRan3w5m7M/FYcimhEaePhZoUsGmS3Yo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=D46wP7YDP7w1Nf0kYVqPZCStPaHpTMgP2ZqFP0OtMjoMdMvZAlT+X3N2mO5iQYpsw
- lJYxD/B2CzCCyldRKp5wWc4U2Zn/B+oYaLwfxG1a8HcXx1FqAAPRzaV+L4kcFEvSDX
- YSdyvbOm7onoMVYKRbZhscSdtazKvKRdNou8FVfE=
+ b=GI1wqkd1AsnlZYxSm8/9JlHEIlHA3TGbACovzgWtse8XEITk8JXbybYkTnMo74f2U
+ CIfeSaQAynH5dbeEmUQNq0jJ6khQlTE2JYEjC5gIQw74ighLh2Gg2YL5PrtF2uDPGW
+ PpERNojWSxQtSXK8YpMTqIXA5UTzQ9CKIAo+Pnjo=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 35/53] xics: Rename misleading ics_simple_*() functions
-Date: Fri,  4 Oct 2019 19:37:29 +1000
-Message-Id: <20191004093747.31350-36-david@gibson.dropbear.id.au>
+Subject: [PULL 25/53] target/ppc: introduce dfp_finalize_decimal{64,
+ 128}() helper functions
+Date: Fri,  4 Oct 2019 19:37:19 +1000
+Message-Id: <20191004093747.31350-26-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191004093747.31350-1-david@gibson.dropbear.id.au>
 References: <20191004093747.31350-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,253 +69,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, aik@ozlabs.ru,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are a number of ics_simple_*() functions that aren't actually
-specific to TYPE_XICS_SIMPLE at all, and are equally valid on
-TYPE_XICS_BASE.  Rename them to ics_*() accordingly.
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
+Most of the DFP helper functions call decimal{64,128}FromNumber() just be=
+fore
+returning in order to convert the decNumber stored in dfp.t64 back to a
+Decimal{64,128} to write back to the FP registers.
+
+Introduce new dfp_finalize_decimal{64,128}() helper functions which both =
+enable
+the parameter list to be reduced considerably, and also help minimise the
+changes required in the next patch.
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190926185801.11176-5-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/trace-events  |  6 +++---
- hw/intc/xics.c        | 29 ++++++++++++++---------------
- hw/intc/xics_spapr.c  | 12 ++++++------
- hw/ppc/pnv_psi.c      |  4 ++--
- hw/ppc/spapr_irq.c    |  2 +-
- include/hw/ppc/xics.h |  6 +++---
- 6 files changed, 29 insertions(+), 30 deletions(-)
+ target/ppc/dfp_helper.c | 42 ++++++++++++++++++++++-------------------
+ 1 file changed, 23 insertions(+), 19 deletions(-)
 
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index fdc716c2cc..527c3f76ca 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -66,10 +66,10 @@ xics_icp_accept(uint32_t old_xirr, uint32_t new_xirr)=
- "icp_accept: XIRR 0x%"PRIx
- xics_icp_eoi(int server, uint32_t xirr, uint32_t new_xirr) "icp_eoi: ser=
-ver %d given XIRR 0x%"PRIx32" new XIRR 0x%"PRIx32
- xics_icp_irq(int server, int nr, uint8_t priority) "cpu %d trying to del=
-iver irq 0x%"PRIx32" priority 0x%x"
- xics_icp_raise(uint32_t xirr, uint8_t pending_priority) "raising IRQ new=
- XIRR=3D0x%x new pending priority=3D0x%x"
--xics_ics_simple_set_irq_msi(int srcno, int nr) "set_irq_msi: srcno %d [i=
-rq 0x%x]"
-+xics_ics_set_irq_msi(int srcno, int nr) "set_irq_msi: srcno %d [irq 0x%x=
-]"
- xics_masked_pending(void) "set_irq_msi: masked pending"
--xics_ics_simple_set_irq_lsi(int srcno, int nr) "set_irq_lsi: srcno %d [i=
-rq 0x%x]"
--xics_ics_simple_write_xive(int nr, int srcno, int server, uint8_t priori=
-ty) "ics_write_xive: irq 0x%x [src %d] server 0x%x prio 0x%x"
-+xics_ics_set_irq_lsi(int srcno, int nr) "set_irq_lsi: srcno %d [irq 0x%x=
-]"
-+xics_ics_write_xive(int nr, int srcno, int server, uint8_t priority) "ic=
-s_write_xive: irq 0x%x [src %d] server 0x%x prio 0x%x"
- xics_ics_reject(int nr, int srcno) "reject irq 0x%x [src %d]"
- xics_ics_eoi(int nr) "ics_eoi: irq 0x%x"
-=20
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 93139b0189..310dc72b46 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -428,11 +428,11 @@ static void ics_resend_lsi(ICSState *ics, int srcno=
-)
+diff --git a/target/ppc/dfp_helper.c b/target/ppc/dfp_helper.c
+index ab5e91d8ed..8e1ea2971a 100644
+--- a/target/ppc/dfp_helper.c
++++ b/target/ppc/dfp_helper.c
+@@ -191,6 +191,16 @@ static void dfp_prepare_decimal128(struct PPC_DFP *d=
+fp, ppc_fprp_t *a,
      }
  }
 =20
--static void ics_simple_set_irq_msi(ICSState *ics, int srcno, int val)
-+static void ics_set_irq_msi(ICSState *ics, int srcno, int val)
++static void dfp_finalize_decimal64(struct PPC_DFP *dfp)
++{
++    decimal64FromNumber((decimal64 *)&dfp->t64, &dfp->t, &dfp->context);
++}
++
++static void dfp_finalize_decimal128(struct PPC_DFP *dfp)
++{
++    decimal128FromNumber((decimal128 *)&dfp->t64, &dfp->t, &dfp->context=
+);
++}
++
+ static void dfp_set_FPSCR_flag(struct PPC_DFP *dfp, uint64_t flag,
+                 uint64_t enabled)
  {
-     ICSIRQState *irq =3D ics->irqs + srcno;
+@@ -422,7 +432,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc=
+_fprp_t *a,               \
+     struct PPC_DFP dfp;                                                 =
+       \
+     dfp_prepare_decimal##size(&dfp, a, b, env);                         =
+       \
+     dnop(&dfp.t, &dfp.a, &dfp.b, &dfp.context);                         =
+       \
+-    decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t, &dfp.con=
+text); \
++    dfp_finalize_decimal##size(&dfp);                                   =
+       \
+     postprocs(&dfp);                                                    =
+       \
+     if (size =3D=3D 64) {                                               =
+           \
+         set_dfp64(t, dfp.t64);                                          =
+       \
+@@ -491,7 +501,7 @@ uint32_t helper_##op(CPUPPCState *env, ppc_fprp_t *a,=
+ ppc_fprp_t *b)           \
+     struct PPC_DFP dfp;                                                 =
+       \
+     dfp_prepare_decimal##size(&dfp, a, b, env);                         =
+       \
+     dnop(&dfp.t, &dfp.a, &dfp.b, &dfp.context);                         =
+       \
+-    decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t, &dfp.con=
+text); \
++    dfp_finalize_decimal##size(&dfp);                                   =
+       \
+     postprocs(&dfp);                                                    =
+       \
+     return dfp.crbf;                                                    =
+       \
+ }
+@@ -741,8 +751,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc=
+_fprp_t *b,        \
+     dfp.a.exponent =3D (int32_t)((int8_t)(te << 3) >> 3);               =
+  \
+                                                                         =
+\
+     dfp_quantize(rmc, &dfp);                                            =
+\
+-    decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t,         =
+\
+-                              &dfp.context);                            =
+\
++    dfp_finalize_decimal##size(&dfp);                                   =
+\
+     QUA_PPs(&dfp);                                                      =
+\
+                                                                         =
+\
+     if (size =3D=3D 64) {                                               =
+    \
+@@ -764,8 +773,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc=
+_fprp_t *a,        \
+     dfp_prepare_decimal##size(&dfp, a, b, env);                         =
+\
+                                                                         =
+\
+     dfp_quantize(rmc, &dfp);                                            =
+\
+-    decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t,         =
+\
+-                              &dfp.context);                            =
+\
++    dfp_finalize_decimal##size(&dfp);                                   =
+\
+     QUA_PPs(&dfp);                                                      =
+\
+                                                                         =
+\
+     if (size =3D=3D 64) {                                               =
+    \
+@@ -847,8 +855,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc=
+_fprp_t *a,        \
+     ref_sig =3D a64 & 0x3f;                                             =
+  \
+                                                                         =
+\
+     _dfp_reround(rmc, ref_sig, xmax, &dfp);                             =
+\
+-    decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t,         =
+\
+-                              &dfp.context);                            =
+\
++    dfp_finalize_decimal##size(&dfp);                                   =
+\
+     QUA_PPs(&dfp);                                                      =
+\
+                                                                         =
+\
+     if (size =3D=3D 64) {                                               =
+    \
+@@ -871,7 +878,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc=
+_fprp_t *b,               \
+                                                                         =
+       \
+     dfp_set_round_mode_from_immediate(r, rmc, &dfp);                    =
+       \
+     decNumberToIntegralExact(&dfp.t, &dfp.b, &dfp.context);             =
+       \
+-    decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t, &dfp.con=
+text); \
++    dfp_finalize_decimal##size(&dfp);                                   =
+       \
+     postprocs(&dfp);                                                    =
+       \
+                                                                         =
+       \
+     if (size =3D=3D 64) {                                               =
+           \
+@@ -911,7 +918,7 @@ void helper_dctdp(CPUPPCState *env, ppc_fprp_t *t, pp=
+c_fprp_t *b)
 =20
--    trace_xics_ics_simple_set_irq_msi(srcno, srcno + ics->offset);
-+    trace_xics_ics_set_irq_msi(srcno, srcno + ics->offset);
+     dfp_prepare_decimal64(&dfp, 0, 0, env);
+     decimal32ToNumber((decimal32 *)&b_short, &dfp.t);
+-    decimal64FromNumber((decimal64 *)&dfp.t64, &dfp.t, &dfp.context);
++    dfp_finalize_decimal64(&dfp);
+     set_dfp64(t, dfp.t64);
+     dfp_set_FPRF_from_FRT(&dfp);
+ }
+@@ -927,7 +934,7 @@ void helper_dctqpq(CPUPPCState *env, ppc_fprp_t *t, p=
+pc_fprp_t *b)
+     dfp_check_for_VXSNAN_and_convert_to_QNaN(&dfp);
+     dfp_set_FPRF_from_FRT(&dfp);
 =20
-     if (val) {
-         if (irq->priority =3D=3D 0xff) {
-@@ -444,11 +444,11 @@ static void ics_simple_set_irq_msi(ICSState *ics, i=
-nt srcno, int val)
-     }
+-    decimal128FromNumber((decimal128 *)&dfp.t64, &dfp.t, &dfp.context);
++    dfp_finalize_decimal128(&dfp);
+     set_dfp128(t, dfp.t64);
  }
 =20
--static void ics_simple_set_irq_lsi(ICSState *ics, int srcno, int val)
-+static void ics_set_irq_lsi(ICSState *ics, int srcno, int val)
- {
-     ICSIRQState *irq =3D ics->irqs + srcno;
+@@ -963,7 +970,7 @@ void helper_drdpq(CPUPPCState *env, ppc_fprp_t *t, pp=
+c_fprp_t *b)
+     dfp_check_for_XX(&dfp);
 =20
--    trace_xics_ics_simple_set_irq_lsi(srcno, srcno + ics->offset);
-+    trace_xics_ics_set_irq_lsi(srcno, srcno + ics->offset);
-     if (val) {
-         irq->status |=3D XICS_STATUS_ASSERTED;
-     } else {
-@@ -457,7 +457,7 @@ static void ics_simple_set_irq_lsi(ICSState *ics, int=
- srcno, int val)
-     ics_resend_lsi(ics, srcno);
+     dfp.t64[0] =3D dfp.t64[1] =3D 0;
+-    decimal64FromNumber((decimal64 *)dfp.t64, &dfp.t, &dfp.context);
++    dfp_finalize_decimal64(&dfp);
+     set_dfp128(t, dfp.t64);
  }
 =20
--void ics_simple_set_irq(void *opaque, int srcno, int val)
-+void ics_set_irq(void *opaque, int srcno, int val)
- {
-     ICSState *ics =3D (ICSState *)opaque;
-=20
-@@ -467,13 +467,13 @@ void ics_simple_set_irq(void *opaque, int srcno, in=
-t val)
-     }
-=20
-     if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
--        ics_simple_set_irq_lsi(ics, srcno, val);
-+        ics_set_irq_lsi(ics, srcno, val);
-     } else {
--        ics_simple_set_irq_msi(ics, srcno, val);
-+        ics_set_irq_msi(ics, srcno, val);
-     }
- }
-=20
--static void ics_simple_write_xive_msi(ICSState *ics, int srcno)
-+static void ics_write_xive_msi(ICSState *ics, int srcno)
- {
-     ICSIRQState *irq =3D ics->irqs + srcno;
-=20
-@@ -486,13 +486,13 @@ static void ics_simple_write_xive_msi(ICSState *ics=
-, int srcno)
-     icp_irq(ics, irq->server, srcno + ics->offset, irq->priority);
- }
-=20
--static void ics_simple_write_xive_lsi(ICSState *ics, int srcno)
-+static void ics_write_xive_lsi(ICSState *ics, int srcno)
- {
-     ics_resend_lsi(ics, srcno);
- }
-=20
--void ics_simple_write_xive(ICSState *ics, int srcno, int server,
--                           uint8_t priority, uint8_t saved_priority)
-+void ics_write_xive(ICSState *ics, int srcno, int server,
-+                    uint8_t priority, uint8_t saved_priority)
- {
-     ICSIRQState *irq =3D ics->irqs + srcno;
-=20
-@@ -500,13 +500,12 @@ void ics_simple_write_xive(ICSState *ics, int srcno=
-, int server,
-     irq->priority =3D priority;
-     irq->saved_priority =3D saved_priority;
-=20
--    trace_xics_ics_simple_write_xive(ics->offset + srcno, srcno, server,
--                                     priority);
-+    trace_xics_ics_write_xive(ics->offset + srcno, srcno, server, priori=
-ty);
-=20
-     if (ics->irqs[srcno].flags & XICS_FLAGS_IRQ_LSI) {
--        ics_simple_write_xive_lsi(ics, srcno);
-+        ics_write_xive_lsi(ics, srcno);
-     } else {
--        ics_simple_write_xive_msi(ics, srcno);
-+        ics_write_xive_msi(ics, srcno);
-     }
- }
-=20
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 6577be0d92..3e9444813a 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -179,7 +179,7 @@ static void rtas_set_xive(PowerPCCPU *cpu, SpaprMachi=
-neState *spapr,
-     }
-=20
-     srcno =3D nr - ics->offset;
--    ics_simple_write_xive(ics, srcno, server, priority, priority);
-+    ics_write_xive(ics, srcno, server, priority, priority);
-=20
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
-@@ -243,8 +243,8 @@ static void rtas_int_off(PowerPCCPU *cpu, SpaprMachin=
-eState *spapr,
-     }
-=20
-     srcno =3D nr - ics->offset;
--    ics_simple_write_xive(ics, srcno, ics->irqs[srcno].server, 0xff,
--                          ics->irqs[srcno].priority);
-+    ics_write_xive(ics, srcno, ics->irqs[srcno].server, 0xff,
-+                   ics->irqs[srcno].priority);
-=20
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
-@@ -276,9 +276,9 @@ static void rtas_int_on(PowerPCCPU *cpu, SpaprMachine=
-State *spapr,
-     }
-=20
-     srcno =3D nr - ics->offset;
--    ics_simple_write_xive(ics, srcno, ics->irqs[srcno].server,
--                          ics->irqs[srcno].saved_priority,
--                          ics->irqs[srcno].saved_priority);
-+    ics_write_xive(ics, srcno, ics->irqs[srcno].server,
-+                   ics->irqs[srcno].saved_priority,
-+                   ics->irqs[srcno].saved_priority);
-=20
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 88ba8e7b9b..8ea81e9d8e 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -311,7 +311,7 @@ static void pnv_psi_set_xivr(PnvPsi *psi, uint32_t re=
-g, uint64_t val)
-      * do for now but a more accurate implementation would instead
-      * use a fixed server/prio and a remapper of the generated irq.
-      */
--    ics_simple_write_xive(ics, src, server, prio, prio);
-+    ics_write_xive(ics, src, server, prio, prio);
- }
-=20
- static uint64_t pnv_psi_reg_read(PnvPsi *psi, uint32_t offset, bool mmio=
-)
-@@ -514,7 +514,7 @@ static void pnv_psi_power8_realize(DeviceState *dev, =
-Error **errp)
-         ics_set_irq_type(ics, i, true);
-     }
-=20
--    psi->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_i=
-rqs);
-+    psi->qirqs =3D qemu_allocate_irqs(ics_set_irq, ics, ics->nr_irqs);
-=20
-     /* XSCOM region for PSI registers */
-     pnv_xscom_region_init(&psi->xscom_regs, OBJECT(dev), &pnv_psi_xscom_=
-ops,
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index d8f46b6797..ac189c5796 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -210,7 +210,7 @@ static void spapr_irq_set_irq_xics(void *opaque, int =
-srcno, int val)
- {
-     SpaprMachineState *spapr =3D opaque;
-=20
--    ics_simple_set_irq(spapr->ics, srcno, val);
-+    ics_set_irq(spapr->ics, srcno, val);
- }
-=20
- static void spapr_irq_reset_xics(SpaprMachineState *spapr, Error **errp)
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index ecca17695d..8874bad328 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -167,9 +167,9 @@ uint32_t icp_accept(ICPState *ss);
- uint32_t icp_ipoll(ICPState *ss, uint32_t *mfrr);
- void icp_eoi(ICPState *icp, uint32_t xirr);
-=20
--void ics_simple_write_xive(ICSState *ics, int nr, int server,
--                           uint8_t priority, uint8_t saved_priority);
--void ics_simple_set_irq(void *opaque, int srcno, int val);
-+void ics_write_xive(ICSState *ics, int nr, int server,
-+                    uint8_t priority, uint8_t saved_priority);
-+void ics_set_irq(void *opaque, int srcno, int val);
-=20
- static inline bool ics_irq_free(ICSState *ics, uint32_t srcno)
- {
+@@ -975,7 +982,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, ppc=
+_fprp_t *b)               \
+     dfp_prepare_decimal##size(&dfp, 0, b, env);                         =
+       \
+     get_dfp64(&b64, b);                                                 =
+       \
+     decNumberFromInt64(&dfp.t, (int64_t)b64);                           =
+       \
+-    decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t, &dfp.con=
+text); \
++    dfp_finalize_decimal##size(&dfp);                                   =
+       \
+     CFFIX_PPs(&dfp);                                                    =
+       \
+                                                                         =
+       \
+     if (size =3D=3D 64) {                                               =
+           \
+@@ -1155,8 +1162,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, p=
+pc_fprp_t *b,             \
+     if (s && sgn)  {                                                    =
+     \
+         dfp.t.bits |=3D DECNEG;                                         =
+       \
+     }                                                                   =
+     \
+-    decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t,         =
+     \
+-                              &dfp.context);                            =
+     \
++    dfp_finalize_decimal##size(&dfp);                                   =
+     \
+     dfp_set_FPRF_from_FRT(&dfp);                                        =
+     \
+     if ((size) =3D=3D 64) {                                             =
+         \
+         set_dfp64(t, dfp.t64);                                          =
+     \
+@@ -1259,8 +1265,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, p=
+pc_fprp_t *a,          \
+             dfp.t.bits &=3D ~DECSPECIAL;                                =
+    \
+         }                                                               =
+  \
+         dfp.t.exponent =3D exp - bias;                                  =
+    \
+-        decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t,     =
+  \
+-                                  &dfp.context);                        =
+  \
++        dfp_finalize_decimal##size(&dfp);                               =
+  \
+     }                                                                   =
+  \
+     if (size =3D=3D 64) {                                               =
+      \
+         set_dfp64(t, dfp.t64);                                          =
+  \
+@@ -1340,8 +1345,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, p=
+pc_fprp_t *a,    \
+             dfp.t.digits =3D max_digits - 1;                          \
+         }                                                           \
+                                                                     \
+-        decimal##size##FromNumber((decimal##size *)dfp.t64, &dfp.t, \
+-                                  &dfp.context);                    \
++        dfp_finalize_decimal##size(&dfp);                           \
+     } else {                                                        \
+         if ((size) =3D=3D 64) {                                         =
+\
+             dfp.t64[0] =3D dfp.a64[0] & 0xFFFC000000000000ULL;        \
 --=20
 2.21.0
 
