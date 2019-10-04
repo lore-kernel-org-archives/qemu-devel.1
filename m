@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8423C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 07:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2156BC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 07:22:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEAEA2084D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 07:18:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEAEA2084D
+	by mail.kernel.org (Postfix) with ESMTPS id E136D2084D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 07:22:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E136D2084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGHqu-0000OS-TD
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 03:18:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42731)
+	id 1iGHuj-0001zq-1O
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 03:22:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iGHqF-0008NN-Er
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 03:17:33 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iGHtf-0001Mf-Tr
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 03:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iGHqD-0006x2-Bx
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 03:17:31 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:33095)
+ (envelope-from <laurent@vivier.eu>) id 1iGHte-00084p-Od
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 03:21:03 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:56401)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iGHqD-0006vf-34
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 03:17:29 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iGHte-00082C-Fa
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 03:21:02 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MVv8f-1iflAG3ZGH-00RpZk; Fri, 04 Oct 2019 09:17:10 +0200
-Subject: Re: [PATCH v3 1/3] tests/migration: mem leak fix
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M3loZ-1iG0mD05C7-000vIr; Fri, 04 Oct 2019 09:20:46 +0200
+Subject: =?UTF-8?Q?Re=3a_=5bPATCH_v3_3/3=5d_tests/migration=ef=bc=9afix_unre?=
+ =?UTF-8?Q?achable_path_in_stress_test?=
 To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
 References: <cover.1570159624.git.maozhongyi@cmss.chinamobile.com>
- <bcf225d9b90600b10951ac0a87569344e150ef51.1570159624.git.maozhongyi@cmss.chinamobile.com>
+ <4d7e66c152fad6230978619000766fa4d01db078.1570159624.git.maozhongyi@cmss.chinamobile.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <86833d97-aeaf-3121-6bcc-b2ae24d07351@vivier.eu>
-Date: Fri, 4 Oct 2019 09:17:05 +0200
+Message-ID: <03660d88-52e4-f105-3f55-155736b8e179@vivier.eu>
+Date: Fri, 4 Oct 2019 09:20:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <bcf225d9b90600b10951ac0a87569344e150ef51.1570159624.git.maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <4d7e66c152fad6230978619000766fa4d01db078.1570159624.git.maozhongyi@cmss.chinamobile.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:m1GUiq64OZNfs8UZ9c+sNzfAF/ZVBct09ATstdZ8zpsXtdndOlF
- vytLKvNrWcOVEJ1Kdp6fZ0pPaKqmruaFfwo6dc/OZPONvmCRiu7MtNVtbp+6Fbg+rdnwPSN
- QwwRIBRpCCsYSX798p5z0pWX6AJHjidVgTA+xpHaM59GGRw9/4MMK5aoNpbrcYjZtDERQYg
- uxpQb/H6/h8BUaxdyWzRg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gHUJnsUcnGU=:lhhh60L7MA34K8RGa6AlWU
- mGfe1tyxcYdmxf6GWuOzLpKD/xpHGL4x7K6kt5su5KDipZXbVYniCQrMejrvbIBW2FzMlLXbq
- NjM73J8UWJ0zBmpUCRGtAb1++gwPvamcEluxkC+9ZQEz5k9a07twKbJzIrwXdMGvpiWfVq8Zq
- RdhN5RwJytnDqT83CElb77m0QOZ7rwrqGG7IWm6nFi78CJ/pbGc8Y3Nrfm5XksIhQhXCi+x9T
- rF40Q6eCO2tNOXJ7an2IFIeYbC6HOuBDRS87mfNNz2pzm1rbBh2ZH33m1EHHUfYXLw5mtqekH
- 12ybM5oUiM31tVjWaiLGdywIg6KKoNtg4hPQ2gvlSaLpUTYIRROm51Ijq6p52/f3x/OHblVNO
- FUOTN75WKLd4Avf+aYlxknKf4+AKLI9t/dhUBEv77nyLTsnW+S7PfatbU0xum9fTu8elLNRyo
- roiOPW3UydB4jaYJVrEW7ODQ9apEg6rdf0Oy35BpGhBtPL6OBSFTUOMYxMVKyXNlUGr9Fq7kr
- fhfIuaCT3sYxUOe1Hx5og7hU96/rNa3yWa1EWfJT1fUGgBVsA945Ik/a1Ozeq4cz+JjbWZZ5Z
- dN9sKGcQXDKO/Zvo2JW6GtiVfakjHoicJ/U6ghinsNFFa7Tv5X68nielvuiBTdjD5u6KcZWyd
- Qet+dZ8Ykg48gSJeNdrCtMotHA9bMtZsEjjWoM1WAK3k1mHj6F/7FX3nELbRQhJfts/2EFSov
- oQS4JDM9uQMuuJgDPEAzpm59KISIkoo71fJ3lSVm6cS+vbeKbaYGvtpXXVFDPEWkCdmt3ANLR
- q10YxkdSlKPnVQpi3Npyx8ykfBJ0j9JNYCLOgrH6QAbq0qsa4pRd0XesIovwfyENhnNfae0UR
- 5sTQ5eKDORWw1qQ8w5wbbBFQzeZ2CTdx2pMxjQoOY=
+X-Provags-ID: V03:K1:vtpo0DFymCnn7kKRJkL3l30vOuY3iJ92Pbjuk9oeeLwIG4J5f7j
+ k53HO/r/YUaslsGb6BdLAHequo2rsnbjpM6vKWD5XjEsHfr/5oH+GtU7VXt6ehSKd8fbYWI
+ jXHBH5MW7a/aOwv9vvVHx3bZMbp122AIJoQ20/Zrq6EF4hli/xquX0kkiQrqvRZy6nHFMsU
+ Q4IOTKzzy0RK5AK/Tg8vw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:n0LsazjNWww=:DBXA/AuUUIZYvV+8te8kib
+ 7XPn34mk9tq2dH4gSXoViE7iXz13nyipMxPVuHGx38Nk+pqI6MjfBCbkNA2DwnWjagnAB0jg0
+ /S9ClJuTDIwbzzLMZrPrWXzw9fC9O7eduyFPcoAFU5n2r91ETUrChD973Nk6wBi8cBA0Q5j2u
+ ls/+pyGrKsUr4ZyBoXPCdrPJtjhvwjQANL6p1MjRDK74+7onsoKvO+UtQRnfnLQvHilRgC1L5
+ XULWOH++WIzLw5eiQhuodRD0Hb8hK2QhJnkoRClL/suEC/IFN0SEmTrisUqGg8r2ON9ud9OyL
+ ddK0gWaHzFAbO5Gakx8IQou6tCGwE66jQhutVgUfKJNPeYybRmPnveNA2PQ6zZOUmizS/ognp
+ UWJHQ2m41Wrti6MKwefsujqRY2bXsYocOCQjx4fBZF6O46WMs4E25b0815MR0lJYb0Z8xi7xy
+ cnlU6xwZ2FxFelMwRxEv6Sk9x2oinqiIEFc4XL4QIQPW5CyEhGPzEGsynbv3gPmO0R/zQyyXb
+ j7peDWOr076Hh6HvrGMcAVV1v+zVrV48ccP453DAzbBUk6FtOCEzG7D6Nijx7YKfRnVau3io0
+ 0muOn0pXA+iGq3WMDi995n8XTqbITi0acgs/6jPHBgyV2TA2y8zg6uM8HJ0hw3Tvg+ldRb4Gf
+ I1OtKwP9FkM11B8XL2itHc3iYsRWdnHM3kektHkArGVPCmEMa3IGjewUQaqaz4tIh12FDslxa
+ KTMNiSUlZi5hn2SlKFSwrbpaEFRtOzFuW7R3InlSQvWYaPzq4KEmE5HNA1yLtNZ1cUOBdSofO
+ CqAWqnMCuJkBaVUq2UvuvBwX40GNixnSq2DUHZXb9R3aOOg5VSas4dIbyAijJIldV2dKfiPar
+ haaLPT13bBvaAql4z4o4carKrdrSs0NGEDZW3yzs0=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,40 +130,80 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 04/10/2019 à 05:43, Mao Zhongyi a écrit :
-> ‘data’ has the possibility of memory leaks， so use the
-> glib macros g_autofree recommended by CODING_STYLE.rst
-> to automatically release the memory that returned from
-> g_malloc().
+> If stressone() or stress() exits it's because of a failure
+> because the test runs forever otherwise, so change stressone
+> type to void and stress should always return -1 to make the
+> path of 'if (stress(ramsizeGB, ncpus) < 0)' can be reached.
 > 
 > Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  tests/migration/stress.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
+>  tests/migration/stress.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
 > 
 > diff --git a/tests/migration/stress.c b/tests/migration/stress.c
-> index d9aa4afe92..9e128eef50 100644
+> index debf34359f..b0df1323bb 100644
 > --- a/tests/migration/stress.c
 > +++ b/tests/migration/stress.c
-> @@ -170,10 +170,10 @@ static unsigned long long now(void)
->  static int stressone(unsigned long long ramsizeMB)
+> @@ -167,7 +167,7 @@ static unsigned long long now(void)
+>      return (tv.tv_sec * 1000ull) + (tv.tv_usec / 1000ull);
+>  }
+>  
+> -static int stressone(unsigned long long ramsizeMB)
+> +static void stressone(unsigned long long ramsizeMB)
 >  {
 >      size_t pagesPerMB = 1024 * 1024 / PAGE_SIZE;
-> -    char *ram = malloc(ramsizeMB * 1024 * 1024);
-> +    g_autofree char *ram = g_malloc(ramsizeMB * 1024 * 1024);
->      char *ramptr;
->      size_t i, j, k;
-> -    char *data = malloc(PAGE_SIZE);
-> +    g_autofree char *data = g_malloc(PAGE_SIZE);
->      char *dataptr;
->      size_t nMB = 0;
->      unsigned long long before, after;
-> @@ -186,7 +186,6 @@ static int stressone(unsigned long long ramsizeMB)
+>      g_autofree char *ram = g_malloc(ramsizeMB * 1024 * 1024);
+> @@ -181,12 +181,12 @@ static int stressone(unsigned long long ramsizeMB)
+>      if (!ram) {
+>          fprintf(stderr, "%s (%05d): ERROR: cannot allocate %llu MB of RAM: %s\n",
+>                  argv0, gettid(), ramsizeMB, strerror(errno));
+> -        return -1;
+> +        return;
+>      }
 >      if (!data) {
+>          fprintf(stderr, "%s (%d): ERROR: cannot allocate %d bytes of RAM: %s\n",
+>                  argv0, gettid(), PAGE_SIZE, strerror(errno));
+> -        return -1;
+> +        return;
+>      }
 
-As g_malloc() aborts on error, data is never NULL.
-There is the same thing for ram.
+Thanks to the g_malloc() you can remove this two "if () { }" blocks.
 
-Thanks,
-Laurent
+>  
+>      /* We don't care about initial state, but we do want
+> @@ -197,7 +197,7 @@ static int stressone(unsigned long long ramsizeMB)
+>      memset(ram, 0xfe, ramsizeMB * 1024 * 1024);
+>  
+>      if (random_bytes(data, PAGE_SIZE) < 0) {
+> -        return -1;
+> +        return;
+>      }
+>  
+>      before = now();
+> @@ -250,7 +250,7 @@ static int stress(unsigned long long ramsizeGB, int ncpus)
+
+you can change it to "void" too
+>  
+>      stressone(ramsizeMB);
+>  
+> -    return 0;
+> +    return -1;
+>  }
+>  
+>  
+> @@ -348,6 +348,4 @@ int main(int argc, char **argv)
+>  
+>      if (stress(ramsizeGB, ncpus) < 0)
+
+As it exits only on failure, you can remove the "if"
+
+>          exit_failure();
+> -
+> -    exit_success();
+
+and always use exit_failure().
+
+>  }
+> 
+
 
