@@ -2,58 +2,56 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D587C47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A849CC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:24:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60639215EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:23:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60639215EA
+	by mail.kernel.org (Postfix) with ESMTPS id 7CBC22070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:24:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CBC22070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGLfy-0000QI-AA
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:23:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35043)
+	id 1iGLhC-0001bK-EG
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:24:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iGKiH-0000qT-IX
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:31 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iGKhp-0008WQ-Uu
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iGKiF-00033h-W1
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49492)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iGKho-0002lp-HM
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59793)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iGKiF-00033E-OA
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iGKho-0002l5-9S
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0546C8A1CA5
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 10:21:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 867EB3090FDE
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 10:20:58 +0000 (UTC)
 Received: from localhost (ovpn-112-73.ams2.redhat.com [10.36.112.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2705B60852;
- Fri,  4 Oct 2019 10:21:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 81B5960BE1;
+ Fri,  4 Oct 2019 10:20:53 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 3/8] docs: start a document to describe D-Bus usage
-Date: Fri,  4 Oct 2019 14:20:46 +0400
-Message-Id: <20191004102051.19738-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20191004102051.19738-1-marcandre.lureau@redhat.com>
-References: <20191004102051.19738-1-marcandre.lureau@redhat.com>
+Subject: [PATCH v5 0/8] Add dbus-vmstate
+Date: Fri,  4 Oct 2019 14:20:43 +0400
+Message-Id: <20191004102051.19738-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Fri, 04 Oct 2019 10:21:27 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 04 Oct 2019 10:20:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -77,147 +75,137 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- MAINTAINERS            |  5 +++
- docs/interop/dbus.rst  | 99 ++++++++++++++++++++++++++++++++++++++++++
- docs/interop/index.rst |  1 +
- 3 files changed, 105 insertions(+)
- create mode 100644 docs/interop/dbus.rst
+Hi,
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cf63634221..60f195f8f2 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2157,6 +2157,11 @@ F: tests/migration-test.c
- F: docs/devel/migration.rst
- F: qapi/migration.json
-=20
-+D-Bus
-+M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+S: Maintained
-+F: docs/interop/dbus.rst
-+
- Seccomp
- M: Eduardo Otubo <otubo@redhat.com>
- S: Supported
-diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
-new file mode 100644
-index 0000000000..3d760e4882
---- /dev/null
-+++ b/docs/interop/dbus.rst
-@@ -0,0 +1,99 @@
-+=3D=3D=3D=3D=3D
-+D-Bus
-+=3D=3D=3D=3D=3D
-+
-+Introduction
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+QEMU may be running with various helper processes involved:
-+ - vhost-user* processes (gpu, virtfs, input, etc...)
-+ - TPM emulation (or other devices)
-+ - user networking (slirp)
-+ - network services (DHCP/DNS, samba/ftp etc)
-+ - background tasks (compression, streaming etc)
-+ - client UI
-+ - admin & cli
-+
-+Having several processes allows stricter security rules, as well as
-+greater modularity.
-+
-+While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
-+display), D-Bus is the de facto IPC of choice on Unix systems. The
-+wire format is machine friendly, good bindings exist for various
-+languages, and there are various tools available.
-+
-+Using a bus, helper processes can discover and communicate with each
-+other easily, without going through QEMU. The bus topology is also
-+easier to apprehend and debug than a mesh. However, it is wise to
-+consider the security aspects of it.
-+
-+Security
-+=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+A QEMU D-Bus bus should be private to a single VM. Thus, only
-+cooperative tasks are running on the same bus to serve the VM.
-+
-+D-Bus, the protocol and standard, doesn't have mechanisms to enforce
-+security between peers once the connection is established. Peers may
-+have additional mechanisms to enforce security rules, based for
-+example on UNIX credentials. However, because the daemon has
-+controlled who can send/recv messages to who, doesn't magically make
-+this secure. The semantics of the actual methods implemented using
-+D-Bus are just as critical. Peers need to carefully validate any
-+information they received from a peer with a different trust level.
-+
-+dbus-daemon policy
-+------------------
-+
-+dbus-daemon can enforce various policies based on the UID/GID of the
-+processes that are connected to it. It is thus a good idea to run
-+helpers as different UID from QEMU and set appropriate policies.
-+
-+Depending on the use case, you may choose different scenarios:
-+
-+ - Everything the same UID
-+
-+   - Convenient for developers
-+   - Improved reliability - crash of one part doens't take
-+     out entire VM
-+   - No security benefit over traditional QEMU
-+
-+ - Two UIDs, one for QEMU, one for dbus & helpers
-+
-+   - Moderately improved security isolation
-+
-+ - Many UIDs, one for QEMU one for dbus and one for each helpers
-+
-+   - Best security isolation
-+   - Complex to manager distinct UIDs needed for each VM
-+
-+For example, to allow only ``qemu`` user to talk to ``qemu-helper``
-+``org.qemu.Helper1`` service, a dbus-daemon policy may contain:
-+
-+.. code:: xml
-+
-+  <policy user=3D"qemu">
-+     <allow send_destination=3D"org.qemu.Helper1"/>
-+     <allow receive_sender=3D"org.qemu.Helper1"/>
-+  </policy>
-+
-+  <policy user=3D"qemu-helper">
-+     <allow own=3D"org.qemu.Helper1"/>
-+  </policy>
-+
-+
-+dbus-daemon can also perfom SELinux checks based on the security
-+context of the source and the target. For example, ``virtiofs_t``
-+could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
-+wouldn't be allowed to send a message to ``virtiofs_t``.
-+
-+See dbus-daemon man page for details.
-+
-+Guidelines
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+When implementing new D-Bus interfaces, it is recommended to follow
-+the "D-Bus API Design Guidelines":
-+https://dbus.freedesktop.org/doc/dbus-api-design.html
-+
-+The "org.qemu.*" prefix is reserved for the QEMU project.
-diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-index 3e33fb5933..ded134ea75 100644
---- a/docs/interop/index.rst
-+++ b/docs/interop/index.rst
-@@ -13,6 +13,7 @@ Contents:
-    :maxdepth: 2
-=20
-    bitmaps
-+   dbus
-    live-block-operations
-    pr-helper
-    qemu-ga
+With external processes or helpers participating to the VM support, it
+becomes necessary to handle their migration. Various options exist to
+transfer their state:
+1) as the VM memory, RAM or devices (we could say that's how
+   vhost-user devices can be handled today, they are expected to
+   restore from ring state)
+2) other "vmstate" (as with TPM emulator state blobs)
+3) left to be handled by management layer
+
+1) is not practical, since an external processes may legitimatelly
+need arbitrary state date to back a device or a service, or may not
+even have an associated device.
+
+2) needs ad-hoc code for each helper, but is simple and working
+
+3) is complicated for management layer, QEMU has the migration timing
+
+The proposed "dbus-vmstate" object will connect to a given D-Bus
+address, and save/load from org.qemu.VMState1 owners on migration.
+
+Thus helpers can easily have their state migrated with QEMU, without
+implementing ad-hoc support (such as done for TPM emulation)
+
+D-Bus is ubiquitous on Linux (it is systemd IPC), and can be made to
+work on various other OSes. There are several implementations and good
+bindings for various languages.  (the tests/dbus-vmstate-test.c is a
+good example of how simple the implementation of services can be, even
+in C)
+
+dbus-vmstate is put into use by the libvirt series "[PATCH 00/23] Use
+a slirp helper process".
+
+v5:
+- trying to fix patchew/ci: install dbus-daemon in containers, skip
+  test if unavailable
+
+v4:
+- add Daniel security scenarios to the D-Bus document
+- misc doc improvements
+- add "util: add dbus helper unit" patch, with
+  qemu_dbus_get_queued_owners()
+- add "configure: add GDBUS_CODEGEN", explaining why gio-unix is
+  required when available
+- silence the expected failing tests
+- update copyright headers, MAINTAINERS
+- add r-b/a-b tags
+- rebased
+
+(Note: patchew dbus test fails for unclear reasons, but I can't
+reproduce locally nor on travis)
+
+v3:
+- after various discussions on helper processes, we settled on a
+  preference for having a bus for communications. This version is
+  actually v1 updated.
+- added a dbus.rst document to describe D-Bus recommendations for QEMU
+- added dbus-vmstate-daemon.sh to play with the dbus-daemon configuration
+  (although it is not very useful in the context of a single UID)
+- added a new vmstate interface, so that any object can implement
+  VMStateDescription, and converted dbus-vmstate
+- added "migration: fix vmdesc leak on vmstate_save() error"
+- convert to g_auto
+
+v2:
+- D-Bus is most common and practical through a bus, but it requires a
+  daemon to be running. I argue that the benefits outweight the cost
+  of running an extra daemon in v1 in the context of multi-process
+  qemu, but it is also possible to connect in p2p mode as done in this
+  new version.
+
+Marc-Andr=C3=A9 Lureau (8):
+  vmstate: add qom interface to get id
+  vmstate: replace DeviceState with VMStateIf
+  docs: start a document to describe D-Bus usage
+  util: add dbus helper unit
+  Add dbus-vmstate object
+  configure: add GDBUS_CODEGEN
+  dockerfiles: add dbus-daemon to some of latest distributions
+  tests: add dbus-vmstate-test
+
+ MAINTAINERS                              |  12 +
+ backends/Makefile.objs                   |   4 +
+ backends/dbus-vmstate.c                  | 496 +++++++++++++++++++++++
+ configure                                |   7 +
+ docs/interop/dbus-vmstate.rst            |  74 ++++
+ docs/interop/dbus.rst                    | 104 +++++
+ docs/interop/index.rst                   |   2 +
+ hw/block/onenand.c                       |   2 +-
+ hw/core/Makefile.objs                    |   1 +
+ hw/core/qdev.c                           |  21 +-
+ hw/core/vmstate-if.c                     |  23 ++
+ hw/ide/cmd646.c                          |   2 +-
+ hw/ide/isa.c                             |   2 +-
+ hw/ide/piix.c                            |   2 +-
+ hw/ide/via.c                             |   2 +-
+ hw/misc/max111x.c                        |   2 +-
+ hw/net/eepro100.c                        |   4 +-
+ hw/nvram/eeprom93xx.c                    |   4 +-
+ hw/ppc/spapr_drc.c                       |   9 +-
+ hw/ppc/spapr_iommu.c                     |   4 +-
+ hw/s390x/s390-skeys.c                    |   2 +-
+ include/hw/vmstate-if.h                  |  40 ++
+ include/migration/register.h             |   4 +-
+ include/migration/vmstate.h              |  10 +-
+ include/qemu/dbus.h                      |  18 +
+ migration/savevm.c                       |  20 +-
+ stubs/vmstate.c                          |   4 +-
+ tests/Makefile.include                   |  23 +-
+ tests/dbus-vmstate-daemon.sh             |  95 +++++
+ tests/dbus-vmstate-test.c                | 399 ++++++++++++++++++
+ tests/dbus-vmstate1.xml                  |  12 +
+ tests/docker/dockerfiles/centos7.docker  |   1 +
+ tests/docker/dockerfiles/debian10.docker |   1 +
+ tests/docker/dockerfiles/fedora.docker   |   1 +
+ tests/docker/dockerfiles/ubuntu.docker   |   1 +
+ util/Makefile.objs                       |   3 +
+ util/dbus.c                              |  55 +++
+ 37 files changed, 1428 insertions(+), 38 deletions(-)
+ create mode 100644 backends/dbus-vmstate.c
+ create mode 100644 docs/interop/dbus-vmstate.rst
+ create mode 100644 docs/interop/dbus.rst
+ create mode 100644 hw/core/vmstate-if.c
+ create mode 100644 include/hw/vmstate-if.h
+ create mode 100644 include/qemu/dbus.h
+ create mode 100755 tests/dbus-vmstate-daemon.sh
+ create mode 100644 tests/dbus-vmstate-test.c
+ create mode 100644 tests/dbus-vmstate1.xml
+ create mode 100644 util/dbus.c
+
 --=20
 2.23.0
 
