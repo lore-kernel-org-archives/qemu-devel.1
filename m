@@ -2,62 +2,60 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B4BC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C88CC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:34:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50FAD207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:34:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hxeHxdB0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50FAD207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 11BEB207FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:34:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11BEB207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGKuY-0005EC-A3
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:34:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53505)
+	id 1iGKud-0005PT-Ph
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:34:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53792)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK3U-0006Fd-4U
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:21 -0400
+ (envelope-from <slp@redhat.com>) id 1iGK3h-0006ao-AM
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK3S-0006K4-Jy
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:19 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:37061)
+ (envelope-from <slp@redhat.com>) id 1iGK3g-0006Xo-1H
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40130)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iGK3S-00061n-7Z; Fri, 04 Oct 2019 05:39:18 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46l4YR2s5Nz9sST; Fri,  4 Oct 2019 19:38:03 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570181883;
- bh=nIuSmMjmRIP2JxH6+XRAiVaVtFEjEQi4rUDk6u8g8NA=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=hxeHxdB0zJuFJQu9sNLyDbRQh53WjgoWXFBzy24hzvER3JLDOuk47l16TCx+wbjRP
- qqYPiMhHTON9JdG5cao82aULDHuaa+jLhaYOh3VkQYpHkPWRxi67bQoRMKL8hWqeA2
- aj/RlJX/xu64MuCsg0UHzMCxCOiqgDqKH29exOh8=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 44/53] spapr: Simplify spapr_qirq() handling
-Date: Fri,  4 Oct 2019 19:37:38 +1000
-Message-Id: <20191004093747.31350-45-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191004093747.31350-1-david@gibson.dropbear.id.au>
-References: <20191004093747.31350-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iGK3f-0006XG-Ph
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:31 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0A9B610DCCAB;
+ Fri,  4 Oct 2019 09:39:31 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.79])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 34C781001B2B;
+ Fri,  4 Oct 2019 09:39:28 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 06/10] fw_cfg: add "modify" functions for all types
+Date: Fri,  4 Oct 2019 11:37:48 +0200
+Message-Id: <20191004093752.16564-7-slp@redhat.com>
+In-Reply-To: <20191004093752.16564-1-slp@redhat.com>
+References: <20191004093752.16564-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Fri, 04 Oct 2019 09:39:31 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,167 +67,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: ehabkost@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
+ lersek@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently spapr_qirq(), whic is used to find the qemu_irq for an spapr
-global irq number, redirects through the SpaprIrq::qirq method.  But
-the array of qemu_irqs is allocated in the PAPR layer, not the
-backends, and so the method implementations all return the same thing,
-just differing in the preliminary checks they make.
+This allows to alter the contents of an already added item.
 
-So, we can remove the method, and just implement spapr_qirq() directly,
-including all the relevant checks in one place.  We change all those
-checks into assert()s as well, since a failure here indicates an error in
-the calling code.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
- hw/ppc/spapr_irq.c         | 54 ++++++++++++++------------------------
- include/hw/ppc/spapr_irq.h |  1 -
- 2 files changed, 19 insertions(+), 36 deletions(-)
+ include/hw/nvram/fw_cfg.h | 42 +++++++++++++++++++++++++++++++++++++++
+ hw/nvram/fw_cfg.c         | 29 +++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+)
 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 8f79aa829f..8f179076c6 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -150,17 +150,6 @@ static void spapr_irq_free_xics(SpaprMachineState *s=
-papr, int irq, int num)
-     }
- }
+diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+index 80e435d303..b5291eefad 100644
+--- a/include/hw/nvram/fw_cfg.h
++++ b/include/hw/nvram/fw_cfg.h
+@@ -98,6 +98,20 @@ void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, voi=
+d *data, size_t len);
+  */
+ void fw_cfg_add_string(FWCfgState *s, uint16_t key, const char *value);
 =20
--static qemu_irq spapr_qirq_xics(SpaprMachineState *spapr, int irq)
--{
--    ICSState *ics =3D spapr->ics;
--
--    if (ics_valid_irq(ics, irq)) {
--        return spapr->qirqs[irq];
--    }
--
--    return NULL;
--}
--
- static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monitor =
-*mon)
- {
-     CPUState *cs;
-@@ -242,7 +231,6 @@ SpaprIrq spapr_irq_xics =3D {
-     .init        =3D spapr_irq_init_xics,
-     .claim       =3D spapr_irq_claim_xics,
-     .free        =3D spapr_irq_free_xics,
--    .qirq        =3D spapr_qirq_xics,
-     .print_info  =3D spapr_irq_print_info_xics,
-     .dt_populate =3D spapr_dt_xics,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-@@ -300,20 +288,6 @@ static void spapr_irq_free_xive(SpaprMachineState *s=
-papr, int irq, int num)
-     }
- }
-=20
--static qemu_irq spapr_qirq_xive(SpaprMachineState *spapr, int irq)
--{
--    SpaprXive *xive =3D spapr->xive;
--
--    if ((irq < SPAPR_XIRQ_BASE) || (irq >=3D xive->nr_irqs)) {
--        return NULL;
--    }
--
--    /* The sPAPR machine/device should have claimed the IRQ before */
--    assert(xive_eas_is_valid(&xive->eat[irq]));
--
--    return spapr->qirqs[irq];
--}
--
- static void spapr_irq_print_info_xive(SpaprMachineState *spapr,
-                                       Monitor *mon)
- {
-@@ -408,7 +382,6 @@ SpaprIrq spapr_irq_xive =3D {
-     .init        =3D spapr_irq_init_xive,
-     .claim       =3D spapr_irq_claim_xive,
-     .free        =3D spapr_irq_free_xive,
--    .qirq        =3D spapr_qirq_xive,
-     .print_info  =3D spapr_irq_print_info_xive,
-     .dt_populate =3D spapr_dt_xive,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xive,
-@@ -482,11 +455,6 @@ static void spapr_irq_free_dual(SpaprMachineState *s=
-papr, int irq, int num)
-     spapr_irq_xive.free(spapr, irq, num);
- }
-=20
--static qemu_irq spapr_qirq_dual(SpaprMachineState *spapr, int irq)
--{
--    return spapr_irq_current(spapr)->qirq(spapr, irq);
--}
--
- static void spapr_irq_print_info_dual(SpaprMachineState *spapr, Monitor =
-*mon)
- {
-     spapr_irq_current(spapr)->print_info(spapr, mon);
-@@ -581,7 +549,6 @@ SpaprIrq spapr_irq_dual =3D {
-     .init        =3D spapr_irq_init_dual,
-     .claim       =3D spapr_irq_claim_dual,
-     .free        =3D spapr_irq_free_dual,
--    .qirq        =3D spapr_qirq_dual,
-     .print_info  =3D spapr_irq_print_info_dual,
-     .dt_populate =3D spapr_irq_dt_populate_dual,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_dual,
-@@ -695,7 +662,25 @@ void spapr_irq_free(SpaprMachineState *spapr, int ir=
-q, int num)
-=20
- qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
- {
--    return spapr->irq->qirq(spapr, irq);
-+    /*
-+     * This interface is basically for VIO and PHB devices to find the
-+     * right qemu_irq to manipulate, so we only allow access to the
-+     * external irqs for now.  Currently anything which needs to
-+     * access the IPIs most naturally gets there via the guest side
-+     * interfaces, we can change this if we need to in future.
-+     */
-+    assert(irq >=3D SPAPR_XIRQ_BASE);
-+    assert(irq < (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
++/**
++ * fw_cfg_modify_string:
++ * @s: fw_cfg device being modified
++ * @key: selector key value for new fw_cfg item
++ * @value: NUL-terminated ascii string
++ *
++ * Replace the fw_cfg item available by selecting the given key. The new
++ * data will consist of a dynamically allocated copy of the provided str=
+ing,
++ * including its NUL terminator. The data being replaced, assumed to hav=
+e
++ * been dynamically allocated during an earlier call to either
++ * fw_cfg_add_string() or fw_cfg_modify_string(), is freed before return=
+ing.
++ */
++void fw_cfg_modify_string(FWCfgState *s, uint16_t key, const char *value=
+);
 +
-+    if (spapr->ics) {
-+        assert(ics_valid_irq(spapr->ics, irq));
-+    }
-+    if (spapr->xive) {
-+        assert(irq < spapr->xive->nr_irqs);
-+        assert(xive_eas_is_valid(&spapr->xive->eat[irq]));
-+    }
+ /**
+  * fw_cfg_add_i16:
+  * @s: fw_cfg device being modified
+@@ -136,6 +150,20 @@ void fw_cfg_modify_i16(FWCfgState *s, uint16_t key, =
+uint16_t value);
+  */
+ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uint32_t value);
+=20
++/**
++ * fw_cfg_modify_i32:
++ * @s: fw_cfg device being modified
++ * @key: selector key value for new fw_cfg item
++ * @value: 32-bit integer
++ *
++ * Replace the fw_cfg item available by selecting the given key. The new
++ * data will consist of a dynamically allocated copy of the given 32-bit
++ * value, converted to little-endian representation. The data being repl=
+aced,
++ * assumed to have been dynamically allocated during an earlier call to
++ * either fw_cfg_add_i32() or fw_cfg_modify_i32(), is freed before retur=
+ning.
++ */
++void fw_cfg_modify_i32(FWCfgState *s, uint16_t key, uint32_t value);
 +
-+    return spapr->qirqs[irq];
+ /**
+  * fw_cfg_add_i64:
+  * @s: fw_cfg device being modified
+@@ -148,6 +176,20 @@ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uin=
+t32_t value);
+  */
+ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uint64_t value);
+=20
++/**
++ * fw_cfg_modify_i64:
++ * @s: fw_cfg device being modified
++ * @key: selector key value for new fw_cfg item
++ * @value: 64-bit integer
++ *
++ * Replace the fw_cfg item available by selecting the given key. The new
++ * data will consist of a dynamically allocated copy of the given 64-bit
++ * value, converted to little-endian representation. The data being repl=
+aced,
++ * assumed to have been dynamically allocated during an earlier call to
++ * either fw_cfg_add_i64() or fw_cfg_modify_i64(), is freed before retur=
+ning.
++ */
++void fw_cfg_modify_i64(FWCfgState *s, uint16_t key, uint64_t value);
++
+ /**
+  * fw_cfg_add_file:
+  * @s: fw_cfg device being modified
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 7dc3ac378e..aef1727250 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -690,6 +690,15 @@ void fw_cfg_add_string(FWCfgState *s, uint16_t key, =
+const char *value)
+     fw_cfg_add_bytes(s, key, g_memdup(value, sz), sz);
  }
 =20
- int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
-@@ -798,7 +783,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
-     .init        =3D spapr_irq_init_xics,
-     .claim       =3D spapr_irq_claim_xics,
-     .free        =3D spapr_irq_free_xics,
--    .qirq        =3D spapr_qirq_xics,
-     .print_info  =3D spapr_irq_print_info_xics,
-     .dt_populate =3D spapr_dt_xics,
-     .cpu_intc_create =3D spapr_irq_cpu_intc_create_xics,
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index 7e26288fcd..a4e790ef60 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -44,7 +44,6 @@ typedef struct SpaprIrq {
-     void (*init)(SpaprMachineState *spapr, Error **errp);
-     int (*claim)(SpaprMachineState *spapr, int irq, bool lsi, Error **er=
-rp);
-     void (*free)(SpaprMachineState *spapr, int irq, int num);
--    qemu_irq (*qirq)(SpaprMachineState *spapr, int irq);
-     void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
-     void (*dt_populate)(SpaprMachineState *spapr, uint32_t nr_servers,
-                         void *fdt, uint32_t phandle);
++void fw_cfg_modify_string(FWCfgState *s, uint16_t key, const char *value=
+)
++{
++    size_t sz =3D strlen(value) + 1;
++    char *old;
++
++    old =3D fw_cfg_modify_bytes_read(s, key, g_memdup(value, sz), sz);
++    g_free(old);
++}
++
+ void fw_cfg_add_i16(FWCfgState *s, uint16_t key, uint16_t value)
+ {
+     uint16_t *copy;
+@@ -720,6 +729,16 @@ void fw_cfg_add_i32(FWCfgState *s, uint16_t key, uin=
+t32_t value)
+     fw_cfg_add_bytes(s, key, copy, sizeof(value));
+ }
+=20
++void fw_cfg_modify_i32(FWCfgState *s, uint16_t key, uint32_t value)
++{
++    uint32_t *copy, *old;
++
++    copy =3D g_malloc(sizeof(value));
++    *copy =3D cpu_to_le32(value);
++    old =3D fw_cfg_modify_bytes_read(s, key, copy, sizeof(value));
++    g_free(old);
++}
++
+ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uint64_t value)
+ {
+     uint64_t *copy;
+@@ -730,6 +749,16 @@ void fw_cfg_add_i64(FWCfgState *s, uint16_t key, uin=
+t64_t value)
+     fw_cfg_add_bytes(s, key, copy, sizeof(value));
+ }
+=20
++void fw_cfg_modify_i64(FWCfgState *s, uint16_t key, uint64_t value)
++{
++    uint64_t *copy, *old;
++
++    copy =3D g_malloc(sizeof(value));
++    *copy =3D cpu_to_le64(value);
++    old =3D fw_cfg_modify_bytes_read(s, key, copy, sizeof(value));
++    g_free(old);
++}
++
+ void fw_cfg_set_order_override(FWCfgState *s, int order)
+ {
+     assert(s->fw_cfg_order_override =3D=3D 0);
 --=20
 2.21.0
 
