@@ -6,59 +6,54 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F46C47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 14:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A978C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 14:49:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2374D20659
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 14:42:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2374D20659
+	by mail.kernel.org (Postfix) with ESMTPS id 3FB90215EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 14:49:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FB90215EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGOmQ-0003uA-83
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 10:42:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58013)
+	id 1iGOtq-0005yf-2n
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 10:49:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59706)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iGOkn-0003GZ-HY
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:40:23 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iGOsS-0005Ql-3D
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:48:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iGOkm-00045o-7z
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:40:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55245)
+ (envelope-from <mreitz@redhat.com>) id 1iGOsQ-0000Pu-PT
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:48:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45458)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iGOkj-00042a-9D; Fri, 04 Oct 2019 10:40:17 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iGOsN-0000N4-EQ; Fri, 04 Oct 2019 10:48:11 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 885B53C93E;
- Fri,  4 Oct 2019 14:40:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C4C173082E4E;
+ Fri,  4 Oct 2019 14:48:07 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-31.brq.redhat.com
  [10.40.204.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 97DDE60C18;
- Fri,  4 Oct 2019 14:40:12 +0000 (UTC)
-Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
- platforms
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-2-jsnow@redhat.com>
- <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
- <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
- <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
- <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
- <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
- <20191002164438.GD5819@localhost.localdomain>
- <a7f532cc-68cb-175e-6c8f-930401221ef9@redhat.com>
- <20191004101952.GC5491@linux.fritz.box>
- <d194e22c-7125-e558-0a80-131a28a87419@redhat.com>
- <CAFEAcA-4-ttpQ5S-HuEtv86TeNjBnFzp77D5ML1D9CZMYGR5Ow@mail.gmail.com>
- <2873f340-cac2-c168-d46a-e22c0571e83d@redhat.com>
- <CAFEAcA99ezCejkZi9+yVYK-SRpNOvPng9vrkF+kcuS12LQBmuQ@mail.gmail.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D1D9B5C22F;
+ Fri,  4 Oct 2019 14:48:03 +0000 (UTC)
+Subject: Re: [PATCH 3/4] block/mirror: support unaligned write in active mirror
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190912151338.21225-1-vsementsov@virtuozzo.com>
+ <20190912151338.21225-4-vsementsov@virtuozzo.com>
+ <7dec596f-0175-951e-ba3f-2eb8b2a3d8ed@redhat.com>
+ <9a857f23-73b0-44c1-dde2-ac68d45dcf93@virtuozzo.com>
+ <62e03b60-b9cb-9e59-f876-df40bba96ca0@virtuozzo.com>
+ <3dc81329-443a-288c-0ea1-4190dfc33f5e@redhat.com>
+ <5b267415-519f-f4ca-29d0-1bc9753b29f3@virtuozzo.com>
+ <292e7686-5440-fdf3-cda3-a0e1f1968089@redhat.com>
+ <3193c71d-cd5e-fa94-4dc1-dc8ebbe9ce22@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -84,18 +79,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <77909bda-ebcc-41be-2547-c81870db79ab@redhat.com>
-Date: Fri, 4 Oct 2019 16:40:10 +0200
+Message-ID: <65b4fd06-4d66-ebc3-4e0e-1e8c2d983ef6@redhat.com>
+Date: Fri, 4 Oct 2019 16:48:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA99ezCejkZi9+yVYK-SRpNOvPng9vrkF+kcuS12LQBmuQ@mail.gmail.com>
+In-Reply-To: <3193c71d-cd5e-fa94-4dc1-dc8ebbe9ce22@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="sot3Lu3Pdqn2YIRfDu62j2StjS8B7NzsU"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+ boundary="TI1E5U0LqnmMkyGa5NeipvZB5smJcQ4Qs"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Fri, 04 Oct 2019 14:40:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Fri, 04 Oct 2019 14:48:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -110,129 +105,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---sot3Lu3Pdqn2YIRfDu62j2StjS8B7NzsU
-Content-Type: multipart/mixed; boundary="6njDLKAZxWjUv3h0tNTHJ8o9mKW6ayVHW"
+--TI1E5U0LqnmMkyGa5NeipvZB5smJcQ4Qs
+Content-Type: multipart/mixed; boundary="XsNfFgH2wB9uKpAEaEHb8JOZ2slV72B1e"
 
---6njDLKAZxWjUv3h0tNTHJ8o9mKW6ayVHW
+--XsNfFgH2wB9uKpAEaEHb8JOZ2slV72B1e
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 04.10.19 16:05, Peter Maydell wrote:
-> On Fri, 4 Oct 2019 at 14:50, Max Reitz <mreitz@redhat.com> wrote:
->> On 04.10.19 15:16, Peter Maydell wrote:
->>> 'make check' does have the restriction
->>> that we don't want the tests to take too long to run, but in
->>> general the block layer should be running some reasonable subset
->>> of tests in the project's standard "run the tests please" command.
->>> (I have no opinion on exactly what that subset ought to be, beyond
->>> that it would be good if that subset doesn't have known intermittent
->>> failures in it.)
+On 04.10.19 15:22, Vladimir Sementsov-Ogievskiy wrote:
+> 04.10.2019 15:59, Max Reitz wrote:
+>> On 03.10.19 11:34, Vladimir Sementsov-Ogievskiy wrote:
+>>> 02.10.2019 18:52, Max Reitz wrote:
+>>>> On 02.10.19 17:06, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 02.10.2019 18:03, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> 02.10.2019 17:57, Max Reitz wrote:
+>>>>>>> On 12.09.19 17:13, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>> Prior 9adc1cb49af8d do_sync_target_write had a bug: it reset ali=
+gned-up
+>>>>>>>> region in the dirty bitmap, which means that we may not copy som=
+e bytes
+>>>>>>>> and assume them copied, which actually leads to producing corrup=
+ted
+>>>>>>>> target.
+>>>>>>>>
+>>>>>>>> So 9adc1cb49af8d forced dirty bitmap granularity to be
+>>>>>>>> request_alignment for mirror-top filter, so we are not working w=
+ith
+>>>>>>>> unaligned requests. However forcing large alignment obviously de=
+creases
+>>>>>>>> performance of unaligned requests.
+>>>>>>>>
+>>>>>>>> This commit provides another solution for the problem: if unalig=
+ned
+>>>>>>>> padding is already dirty, we can safely ignore it, as
+>>>>>>>> 1. It's dirty, it will be copied by mirror_iteration anyway
+>>>>>>>> 2. It's dirty, so skipping it now we don't increase dirtiness of=
+ the
+>>>>>>>>   =C2=A0=C2=A0=C2=A0 bitmap and therefore don't damage "synchron=
+icity" of the
+>>>>>>>>   =C2=A0=C2=A0=C2=A0 write-blocking mirror.
+>>>>>>>
+>>>>>>> But that=E2=80=99s not what active mirror is for.=C2=A0 The point=
+ of active mirror is
+>>>>>>> that it must converge because every guest write will contribute t=
+owards
+>>>>>>> that goal.
+>>>>>>>
+>>>>>>> If you skip active mirroring for unaligned guest writes, they wil=
+l not
+>>>>>>> contribute towards converging, but in fact lead to the opposite.
+>>>>>>>
+>>>>>>
+>>>>>> The will not contribute only if region is already dirty. Actually,=
+ after
+>>>>>> first iteration of mirroring (copying the whole disk), all followi=
+ng writes
+>>>>>> will contribute, so the whole process must converge. It is a bit s=
+imilar with
+>>>>>> running one mirror loop in normal mode, and then enable write-bloc=
+king.
+>>>>>>
+>>>>>
+>>>>>
+>>>>> In other words, we don't need "all guest writes contribute" to conv=
+erge,
+>>>>> "all guest writes don't create new dirty bits" is enough, as we hav=
+e parallel
+>>>>> mirror iteration which contiguously handles dirty bits.
+>>>>
+>>>> Hm, in a sense.  But it does mean that guest writes will not contrib=
+ute
+>>>> to convergence.
+>>>>
+>>>> And that=E2=80=99s against the current definition of write-blocking,=
+ which does
+>>>> state that =E2=80=9Cwhen data is written to the source, write it (sy=
+nchronously)
+>>>> to the target as well=E2=80=9D.
+>>>>
+>>>
+>>> Hmm, understand. But IMHO our proposed behavior is better in general.=
+
+>>> Do you think it's a problem to change spec now?
+>>> If yes, I'll resend with an option
 >>
->> Deciding the subset is difficult.  My stance was that it=E2=80=99s bet=
-ter to not
->> choose an arbitrary subset here but ensure that really everything gets=
-
->> run as part of CI, that is asynchronously so it doesn=E2=80=99t block =
-anyone and
->> can take as long as it wants.
+>> Well, the thing is that I=E2=80=99d find it weird if write-blocking wa=
+sn=E2=80=99t
+>> blocking in all cases.  And in my opinion, it makes more sense for
+>> active mirror if all writes actively contributed to convergence.
+>>
 >=20
-> I wonder if we have a terminology difference confusion here.
-> To me "CI" means "we have tests which we automatically run
-> before pushing commits to master, and if they fail then we
-> don't push". So (a) they have to run synchronously and (b) there
-> is a need for them to run in a reasonable period of time because
-> otherwise it takes too long to run the tests before pushing
-> to master and we get a backlog of unprocessed pullrequests
-> and annoying delays.
+> Why? What is the benefit in it?
+> What is "all writes actively contributed to convergence" for user?
 
-Hm, yes.  In that case, there=E2=80=99s of course no point in moving it.
+One thing I wonder about is whether it=E2=80=99s really guaranteed that t=
+he
+background job will run under full I/O load, and how often it runs.
 
-I meant moving the tests to somewhere where they run asynchronously.
+I fear that with your model, the background job might starve and the
+mirror may take a very long time.  It won=E2=80=99t diverge, but it also =
+won=E2=80=99t
+really converge.
 
->> If we decide to get pull requests based on that, then that=E2=80=99d b=
-ring even
->> more pain, but at least it=E2=80=99d be honest.  But just running half=
- of the
->> qcow2 tests to me seems only like we want to pretend we ran the iotest=
-s.
->>  So for me, iotests still break, and we need to deal with make check
->> failures on top.  I=E2=80=99d at least prefer one or the other.
+The advantage of letting all writes block is that even under full I/O
+load, the mirror job will progress at a steady pace.
+
+> I think for user there may be the following criteria:
 >=20
-> I think the ideal we're aiming for here is:
->  (1) people doing active work in the block subsystem are probably
-> often going to want to run all the iotests, and certainly the
-> subsystem maintainers will want to do that as they put together
-> pull requests.
->  (2) but people who *don't* do active work in the block subsystem
-> still sometimes touch it in passing as part of things like global
-> refactorings or other changes that touch big parts of the tree,
-> or accidentally break it with a change to some other bit of QEMU
-> entirely. These people won't run the full iotests, but it is
-> reasonable to expect them to run 'make check', and it would be good
-> if that caught "whoops you broke the block subsystem".
+> 1. guaranteed converge, with any guest write load.
+> Both current and my proposed variants are OK.
 >=20
-> Similarly, "make check" has incredibly spotty coverage of
-> various arm boards and devices, but it does do some basic
-> checks which do catch accidental breakage.
+> 2. Less impact on guest.
+> Obviously my proposed variant is better
+>=20
+> 3. Total time of mirroring
+> Seems, current may be a bit better, but I don't think that unaligned
+> tails gives significant impact.
+>=20
+> =3D=3D=3D
+>=20
+> So, assume I want [1]+[2]. And possibly
+> 2.2: Even less impact on guest: ignore not only unaligned tails if they=
+ are
+> already dirty, but full synchronous mirror operation if area is already=
+ dirty.
+>=20
+> How should I call this? Should it be separate mode, or option for write=
+-blocking?
 
-Yes, it has its use, but at the same time it means that intermittent
-failure can appear in make check because some iotest is broken.  (The
-past has shown that it=E2=80=99s hard to predict which tests will at some=
- point
-start to exhibit such behavior.)
+I don=E2=80=99t know whether it makes sense to add a separate mode or a s=
+eparate
+option just for this difference.  I don=E2=80=99t think anyone would choo=
+se the
+non-default option.
 
-This then requires immediate attention, and I simply want help with that
-from someone who really cares about having the test be part of make
-check, as I wrote in my reply to Thomas=E2=80=99s patch =E2=80=9Ciotests:=
- Do not run the
-iotests during "make check" anymore=E2=80=9D.
-
-The issues are just half as pressing when it isn=E2=80=99t make check tha=
-t=E2=80=99s
-intermittently failing.  (I hope nobody takes this as =E2=80=9CHe doesn=E2=
-=80=99t want
-to fix intermittent failures=E2=80=9D, because I do really try to do that=
-=2E  So I
-don=E2=80=99t consider this a good kind of pressure.)
-
-
-I suppose my main problem is that I=E2=80=99m just lucky that I can=E2=80=
-=99t remember a
-case where the block subsystem was really broken and iotests in make
-check would have caught it; and that I=E2=80=99m na=C3=AFve enough to exp=
-ect this to
-continue into the future.
+But I do think there=E2=80=99s quite a bit of difference in how the job b=
+ehaves
+still...  I don=E2=80=99t know. :-/
 
 Max
 
 
---6njDLKAZxWjUv3h0tNTHJ8o9mKW6ayVHW--
+--XsNfFgH2wB9uKpAEaEHb8JOZ2slV72B1e--
 
---sot3Lu3Pdqn2YIRfDu62j2StjS8B7NzsU
+--TI1E5U0LqnmMkyGa5NeipvZB5smJcQ4Qs
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XWcsACgkQ9AfbAGHV
-z0BHwwf7BVEibAmsYSWfrD1kYsomh9Ye1/rJKB1YdBLU1Ntj9qXFBCHZ/hx8WIw/
-AysXNOVIQATjj/mV7hO/T0l/LVVxo7Pa5SWzsUtnqzVlnU7Qd6sGsdEorp44RJWH
-4wBgqQ0eZ5Y2c0PCP7Z8SN8+KsgT6e80JyYMOcmQ4CAZcZp66G7e6aE09kxrDTYQ
-sVqzXLTRWgLG75c8sLelDEHeubRJktmvmMStOqyYps/8ePAL6UcPRBtQfTAvUcXX
-EmqTydusm1f5fOFt6x0JsjriRfgohWaWn/MxXyca8XokiIi57AYsfg614LeINxaZ
-6icAdTV4XsrXiUaj/iJ7bdcAZ1j3Aw==
-=3MUd
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XW6IACgkQ9AfbAGHV
+z0CfZwgAs5rjak3ozW6WfroQy8Wsp5EGeQyJ5erlrTJ4TPWztO/8eKKW5Qv+zONw
+O5WceVUXh08mz3vGFbcDg7ohFh3fBL97EhVIC/yrCwlCgUygRrG0evoJ5II4yTgt
+85CpBHgqGav/Q8PdwKBykTtvSh6pIzexc3tl3hFM0pf2X2m7+YteuoJF5Hv/51A0
+E4HsbmRLIj8o/7K+MUQqRBEfkJmmTfeMp9s1ua0AZl1JlSoRufvlj8covWdZDFpv
+bW/qSCeNsh1eMgfB1cLArQ1rar3V9kmhkrct4rkaA7enQLvSycLHZapk4Ldr6GZs
+nPMfEGmukxLxSqUZKPapu+3HxbAYnA==
+=5RPu
 -----END PGP SIGNATURE-----
 
---sot3Lu3Pdqn2YIRfDu62j2StjS8B7NzsU--
+--TI1E5U0LqnmMkyGa5NeipvZB5smJcQ4Qs--
 
