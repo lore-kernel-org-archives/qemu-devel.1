@@ -2,86 +2,86 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9F9C47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5F1C47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:55:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB03920862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:52:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VaahP1bJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB03920862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3086220862
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:55:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3086220862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGM8k-00076k-IG
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:52:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55228)
+	id 1iGMBT-0002Gn-MO
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:55:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iGM4s-0003UG-Rh
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:48:56 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1iGLhf-0002dg-4r
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:24:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iGM4r-00013h-MY
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:48:54 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44583)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iGM4r-00012u-GJ
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:48:53 -0400
-Received: by mail-wr1-x444.google.com with SMTP id z9so6763897wrl.11
- for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 04:48:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=tWO1/w2pbq76WDihTU7NTfFwpS052NS/zIcxZUmg9Z8=;
- b=VaahP1bJi2xcdpZhg4k/R8BFCQFmrQYArrykQIiM8pk+iSZTAzNfkqW01rTKJ/HBwD
- JYTCSgpQGxFSNQdKpxx/nOjFyc3hipOiPj1vJxVBvR2hiQjisBao7pHUmBVnp7iieEeU
- zpLc3/HTMMz+k75G98FtI2+Xnv6NnSSC8TriTnLcZh0r2fd4qZm23Se5aEmeJVpzbTa0
- js5WjDUkScoDwgR9xGBNmCJjWnq2Sd19Q+vYmeFKcTCzER01OVapPnAEnAEbKRhcHwQt
- X5+foWggR9vpSoK+hPcWkk81cMVzaHbR+/tN9PgZVWn6nSEPOJ1OD7TH4Z4qPajsqL26
- n7Ew==
+ (envelope-from <sgarzare@redhat.com>) id 1iGLhe-0006E6-5m
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:24:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32309)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iGLhd-0006Dj-Vu
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:24:54 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0B694882FB
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 11:24:53 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id g67so1488254wmg.4
+ for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 04:24:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=tWO1/w2pbq76WDihTU7NTfFwpS052NS/zIcxZUmg9Z8=;
- b=TzqO/gS6ryUlyjimHR9H1FKdzh5FeOqY2zob0GobxQQhg/YvEPl4uzoVUPAE1zFvLc
- Tp2LRRdn86lus/iEWx/MNk20kbIKgRgRO3kVntxrv2LvndcGOo6csSMQ7rkzcje6OVO9
- NAab/MIMclclhJejR0yqL3rwCvmOwmqhXVdtKTdpo905iDED9uTJyGYEs2r/mbkYFcRs
- WYMkPfF+wlQMq/w0HJe/yJXWfbFc2FTYDGtNrVb3Me7sr5Vu3ZBXnBQqRgg7b4phUvVo
- fYtnAwxqbeWvgjdMlEu+KnTfqt5mdTovZvYL69FnCm3F2nAxTNfFVfnUQONB4t3fEsSl
- +ayQ==
-X-Gm-Message-State: APjAAAWcfrT0fYFTsbwjkbUtjsrGuxCyqtGIM47me1II1eg4fzzNfIxZ
- aiPiQo1ERs5eZ4eWUt0xQnu62A==
-X-Google-Smtp-Source: APXvYqwTw9AH0FDLiRvJx65Zve+aM97SE6hg4t30FuS7+ZdCT2oAREl5HvYTNtylXed3Q9uIer9rnw==
-X-Received: by 2002:adf:fcc7:: with SMTP id f7mr11092345wrs.319.1570189732496; 
- Fri, 04 Oct 2019 04:48:52 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id t17sm11962094wrp.72.2019.10.04.04.48.51
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=7axWxPgFmUQkvDkucr6NN6Yf+hW64mG6LzF9pveMlE0=;
+ b=DXoF+92GeSF9mQzJ4LIkuXe+XMFw7JM86L804ZJLGHWMcnyXLMr+PYlKlnKLgwB4Q5
+ y5JNwXbN9hpObz1sJYfEIevHMDx9/B7UHLZh0TiBLLh8AzmF1MTuz2Cd/2Dy0ZgAqRyI
+ H6rd0l5XS2hQw1AMiZiq1lR9EEGcRblcVPYUnCBI4ulvOMPFp5a16j8eQZNP5XJyNxB9
+ zzUb8U16E6GDa7dKW59Skh/8rNoWUddilZW6eM2F85jk9s/nE6pWNn6kyE5cA0/dPAbW
+ j4Q8sM/UxeO5fVdsDrKjpBanNRrdKBeyUuxdd7uT4F5cxkDqR5ei9HFuh2Q1QVwBMS3k
+ aEdw==
+X-Gm-Message-State: APjAAAUtEC0rplYHtcHcn114Jtg/x8dGq08EmbGoGY/xc3gNbiOaeJx2
+ 6ol+Z1HmZx9f331NgOiVN+CIguk5AbFvevI/oTw4uOeWPDjCeZod7uW6RSemw6a+/JjHxdS7l9V
+ 40QDxOWh0mJ9FMac=
+X-Received: by 2002:a05:6000:b:: with SMTP id
+ h11mr11197413wrx.270.1570188291722; 
+ Fri, 04 Oct 2019 04:24:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzw8GpdeeYDHyku3BdBuIYvxKRzOs3ZTjzeZdxjiwIo83WT8DLfE3KykXpDwRJKQXgbC38gbg==
+X-Received: by 2002:a05:6000:b:: with SMTP id
+ h11mr11197389wrx.270.1570188291509; 
+ Fri, 04 Oct 2019 04:24:51 -0700 (PDT)
+Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it.
+ [79.52.200.174])
+ by smtp.gmail.com with ESMTPSA id h17sm9425337wme.6.2019.10.04.04.24.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Oct 2019 04:48:52 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [RFC 1/4] hw/timer/arm_timer: Add trace events
-Date: Fri,  4 Oct 2019 12:48:45 +0100
-Message-Id: <20191004114848.16831-2-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191004114848.16831-1-peter.maydell@linaro.org>
-References: <20191004114848.16831-1-peter.maydell@linaro.org>
+ Fri, 04 Oct 2019 04:24:51 -0700 (PDT)
+Date: Fri, 4 Oct 2019 13:24:48 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v6 02/10] hw/i386/pc: rename functions shared with non-PC
+ machines
+Message-ID: <20191004112448.al4a43434lebab6w@steredhat>
+References: <20191004093752.16564-1-slp@redhat.com>
+ <20191004093752.16564-3-slp@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191004093752.16564-3-slp@redhat.com>
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,115 +93,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, lersek@redhat.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add some basic trace events to the arm_timer device.
+On Fri, Oct 04, 2019 at 11:37:44AM +0200, Sergio Lopez wrote:
+> The following functions are named *pc* but are not PC-machine specific
+> but generic to the X86 architecture, rename them:
+> 
+>   load_linux                 -> x86_load_linux
+>   pc_new_cpu                 -> x86_new_cpu
+>   pc_cpus_init               -> x86_cpus_init
+>   pc_cpu_index_to_props      -> x86_cpu_index_to_props
+>   pc_get_default_cpu_node_id -> x86_get_default_cpu_node_id
+>   pc_possible_cpu_arch_ids   -> x86_possible_cpu_arch_ids
+>   old_pc_system_rom_init     -> x86_system_rom_init
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  include/hw/i386/pc.h |  2 +-
+>  hw/i386/pc.c         | 28 ++++++++++++++--------------
+>  hw/i386/pc_piix.c    |  2 +-
+>  hw/i386/pc_q35.c     |  2 +-
+>  hw/i386/pc_sysfw.c   |  6 +++---
+>  5 files changed, 20 insertions(+), 20 deletions(-)
+> 
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/timer/arm_timer.c  | 27 +++++++++++++++++++++------
- hw/timer/trace-events |  7 +++++++
- 2 files changed, 28 insertions(+), 6 deletions(-)
+LGTM!
 
-diff --git a/hw/timer/arm_timer.c b/hw/timer/arm_timer.c
-index c2e6211188b..283ae1e74a9 100644
---- a/hw/timer/arm_timer.c
-+++ b/hw/timer/arm_timer.c
-@@ -17,6 +17,7 @@
- #include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "qemu/log.h"
-+#include "trace.h"
- 
- /* Common timer implementation.  */
- 
-@@ -43,7 +44,10 @@ typedef struct {
- static void arm_timer_update(arm_timer_state *s)
- {
-     /* Update interrupts.  */
--    if (s->int_level && (s->control & TIMER_CTRL_IE)) {
-+    int level = s->int_level && (s->control & TIMER_CTRL_IE);
-+
-+    trace_sp804_arm_timer_update(level);
-+    if (level) {
-         qemu_irq_raise(s->irq);
-     } else {
-         qemu_irq_lower(s->irq);
-@@ -216,17 +220,21 @@ static uint64_t sp804_read(void *opaque, hwaddr offset,
-                            unsigned size)
- {
-     SP804State *s = (SP804State *)opaque;
-+    uint64_t res;
- 
-     if (offset < 0x20) {
--        return arm_timer_read(s->timer[0], offset);
-+        res = arm_timer_read(s->timer[0], offset);
-+        goto out;
-     }
-     if (offset < 0x40) {
--        return arm_timer_read(s->timer[1], offset - 0x20);
-+        res = arm_timer_read(s->timer[1], offset - 0x20);
-+        goto out;
-     }
- 
-     /* TimerPeriphID */
-     if (offset >= 0xfe0 && offset <= 0xffc) {
--        return sp804_ids[(offset - 0xfe0) >> 2];
-+        res = sp804_ids[(offset - 0xfe0) >> 2];
-+        goto out;
-     }
- 
-     switch (offset) {
-@@ -236,12 +244,17 @@ static uint64_t sp804_read(void *opaque, hwaddr offset,
-         qemu_log_mask(LOG_UNIMP,
-                       "%s: integration test registers unimplemented\n",
-                       __func__);
--        return 0;
-+        res = 0;
-+        goto out;
-     }
- 
-     qemu_log_mask(LOG_GUEST_ERROR,
-                   "%s: Bad offset %x\n", __func__, (int)offset);
--    return 0;
-+    res = 0;
-+
-+out:
-+    trace_sp804_read(offset, res);
-+    return res;
- }
- 
- static void sp804_write(void *opaque, hwaddr offset,
-@@ -249,6 +262,8 @@ static void sp804_write(void *opaque, hwaddr offset,
- {
-     SP804State *s = (SP804State *)opaque;
- 
-+    trace_sp804_write(offset, value);
-+
-     if (offset < 0x20) {
-         arm_timer_write(s->timer[0], offset, value);
-         return;
-diff --git a/hw/timer/trace-events b/hw/timer/trace-events
-index db02a9142cd..600b002c7bf 100644
---- a/hw/timer/trace-events
-+++ b/hw/timer/trace-events
-@@ -87,3 +87,10 @@ pl031_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
- pl031_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
- pl031_alarm_raised(void) "alarm raised"
- pl031_set_alarm(uint32_t ticks) "alarm set for %u ticks"
-+
-+# arm_timer.c
-+sp804_read(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
-+sp804_write(uint32_t addr, uint32_t value) "addr 0x%08x value 0x%08x"
-+# Note that this trace event can't distinguish which of the two timers
-+# in the sp804 is being updated
-+sp804_arm_timer_update(int level) "level %d"
--- 
-2.20.1
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
+Thanks,
+Stefano
 
