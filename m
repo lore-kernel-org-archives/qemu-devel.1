@@ -2,56 +2,58 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A849CC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC36C47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:26:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CBC22070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:24:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CBC22070B
+	by mail.kernel.org (Postfix) with ESMTPS id 9056C2070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:26:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9056C2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGLhC-0001bK-EG
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:24:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34914)
+	id 1iGLjO-0003Ll-2n
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:26:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iGKhp-0008WQ-Uu
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:03 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iGKiQ-00013A-43
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iGKho-0002lp-HM
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59793)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iGKiO-00038q-Ti
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:2678)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iGKho-0002l5-9S
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iGKiO-00038e-Ls
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:36 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 867EB3090FDE
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 10:20:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E9798C05E740
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 10:21:35 +0000 (UTC)
 Received: from localhost (ovpn-112-73.ams2.redhat.com [10.36.112.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 81B5960BE1;
- Fri,  4 Oct 2019 10:20:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 845381001B28;
+ Fri,  4 Oct 2019 10:21:31 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 0/8] Add dbus-vmstate
-Date: Fri,  4 Oct 2019 14:20:43 +0400
-Message-Id: <20191004102051.19738-1-marcandre.lureau@redhat.com>
+Subject: [PATCH v5 4/8] util: add dbus helper unit
+Date: Fri,  4 Oct 2019 14:20:47 +0400
+Message-Id: <20191004102051.19738-5-marcandre.lureau@redhat.com>
+In-Reply-To: <20191004102051.19738-1-marcandre.lureau@redhat.com>
+References: <20191004102051.19738-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Fri, 04 Oct 2019 10:20:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Fri, 04 Oct 2019 10:21:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,137 +77,131 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-
-With external processes or helpers participating to the VM support, it
-becomes necessary to handle their migration. Various options exist to
-transfer their state:
-1) as the VM memory, RAM or devices (we could say that's how
-   vhost-user devices can be handled today, they are expected to
-   restore from ring state)
-2) other "vmstate" (as with TPM emulator state blobs)
-3) left to be handled by management layer
-
-1) is not practical, since an external processes may legitimatelly
-need arbitrary state date to back a device or a service, or may not
-even have an associated device.
-
-2) needs ad-hoc code for each helper, but is simple and working
-
-3) is complicated for management layer, QEMU has the migration timing
-
-The proposed "dbus-vmstate" object will connect to a given D-Bus
-address, and save/load from org.qemu.VMState1 owners on migration.
-
-Thus helpers can easily have their state migrated with QEMU, without
-implementing ad-hoc support (such as done for TPM emulation)
-
-D-Bus is ubiquitous on Linux (it is systemd IPC), and can be made to
-work on various other OSes. There are several implementations and good
-bindings for various languages.  (the tests/dbus-vmstate-test.c is a
-good example of how simple the implementation of services can be, even
-in C)
-
-dbus-vmstate is put into use by the libvirt series "[PATCH 00/23] Use
-a slirp helper process".
-
-v5:
-- trying to fix patchew/ci: install dbus-daemon in containers, skip
-  test if unavailable
-
-v4:
-- add Daniel security scenarios to the D-Bus document
-- misc doc improvements
-- add "util: add dbus helper unit" patch, with
-  qemu_dbus_get_queued_owners()
-- add "configure: add GDBUS_CODEGEN", explaining why gio-unix is
-  required when available
-- silence the expected failing tests
-- update copyright headers, MAINTAINERS
-- add r-b/a-b tags
-- rebased
-
-(Note: patchew dbus test fails for unclear reasons, but I can't
-reproduce locally nor on travis)
-
-v3:
-- after various discussions on helper processes, we settled on a
-  preference for having a bus for communications. This version is
-  actually v1 updated.
-- added a dbus.rst document to describe D-Bus recommendations for QEMU
-- added dbus-vmstate-daemon.sh to play with the dbus-daemon configuration
-  (although it is not very useful in the context of a single UID)
-- added a new vmstate interface, so that any object can implement
-  VMStateDescription, and converted dbus-vmstate
-- added "migration: fix vmdesc leak on vmstate_save() error"
-- convert to g_auto
-
-v2:
-- D-Bus is most common and practical through a bus, but it requires a
-  daemon to be running. I argue that the benefits outweight the cost
-  of running an extra daemon in v1 in the context of multi-process
-  qemu, but it is also possible to connect in p2p mode as done in this
-  new version.
-
-Marc-Andr=C3=A9 Lureau (8):
-  vmstate: add qom interface to get id
-  vmstate: replace DeviceState with VMStateIf
-  docs: start a document to describe D-Bus usage
-  util: add dbus helper unit
-  Add dbus-vmstate object
-  configure: add GDBUS_CODEGEN
-  dockerfiles: add dbus-daemon to some of latest distributions
-  tests: add dbus-vmstate-test
-
- MAINTAINERS                              |  12 +
- backends/Makefile.objs                   |   4 +
- backends/dbus-vmstate.c                  | 496 +++++++++++++++++++++++
- configure                                |   7 +
- docs/interop/dbus-vmstate.rst            |  74 ++++
- docs/interop/dbus.rst                    | 104 +++++
- docs/interop/index.rst                   |   2 +
- hw/block/onenand.c                       |   2 +-
- hw/core/Makefile.objs                    |   1 +
- hw/core/qdev.c                           |  21 +-
- hw/core/vmstate-if.c                     |  23 ++
- hw/ide/cmd646.c                          |   2 +-
- hw/ide/isa.c                             |   2 +-
- hw/ide/piix.c                            |   2 +-
- hw/ide/via.c                             |   2 +-
- hw/misc/max111x.c                        |   2 +-
- hw/net/eepro100.c                        |   4 +-
- hw/nvram/eeprom93xx.c                    |   4 +-
- hw/ppc/spapr_drc.c                       |   9 +-
- hw/ppc/spapr_iommu.c                     |   4 +-
- hw/s390x/s390-skeys.c                    |   2 +-
- include/hw/vmstate-if.h                  |  40 ++
- include/migration/register.h             |   4 +-
- include/migration/vmstate.h              |  10 +-
- include/qemu/dbus.h                      |  18 +
- migration/savevm.c                       |  20 +-
- stubs/vmstate.c                          |   4 +-
- tests/Makefile.include                   |  23 +-
- tests/dbus-vmstate-daemon.sh             |  95 +++++
- tests/dbus-vmstate-test.c                | 399 ++++++++++++++++++
- tests/dbus-vmstate1.xml                  |  12 +
- tests/docker/dockerfiles/centos7.docker  |   1 +
- tests/docker/dockerfiles/debian10.docker |   1 +
- tests/docker/dockerfiles/fedora.docker   |   1 +
- tests/docker/dockerfiles/ubuntu.docker   |   1 +
- util/Makefile.objs                       |   3 +
- util/dbus.c                              |  55 +++
- 37 files changed, 1428 insertions(+), 38 deletions(-)
- create mode 100644 backends/dbus-vmstate.c
- create mode 100644 docs/interop/dbus-vmstate.rst
- create mode 100644 docs/interop/dbus.rst
- create mode 100644 hw/core/vmstate-if.c
- create mode 100644 include/hw/vmstate-if.h
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ MAINTAINERS         |  2 ++
+ include/qemu/dbus.h | 18 +++++++++++++++
+ util/Makefile.objs  |  3 +++
+ util/dbus.c         | 55 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 78 insertions(+)
  create mode 100644 include/qemu/dbus.h
- create mode 100755 tests/dbus-vmstate-daemon.sh
- create mode 100644 tests/dbus-vmstate-test.c
- create mode 100644 tests/dbus-vmstate1.xml
  create mode 100644 util/dbus.c
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 60f195f8f2..15212109cb 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2160,6 +2160,8 @@ F: qapi/migration.json
+ D-Bus
+ M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+ S: Maintained
++F: util/dbus.c
++F: include/qemu/dbus.h
+ F: docs/interop/dbus.rst
+=20
+ Seccomp
+diff --git a/include/qemu/dbus.h b/include/qemu/dbus.h
+new file mode 100644
+index 0000000000..efd74bef96
+--- /dev/null
++++ b/include/qemu/dbus.h
+@@ -0,0 +1,18 @@
++/*
++ * Helpers for using D-Bus
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
++
++#ifndef DBUS_H
++#define DBUS_H
++
++#include <gio/gio.h>
++
++GStrv qemu_dbus_get_queued_owners(GDBusConnection *connection,
++                                  const char *name);
++
++#endif /* DBUS_H */
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 41bf59d127..f435cfbd64 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -54,5 +54,8 @@ util-obj-$(CONFIG_INOTIFY1) +=3D filemonitor-inotify.o
+ util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
+ util-obj-$(CONFIG_POSIX) +=3D drm.o
+ util-obj-y +=3D guest-random.o
++util-obj-$(CONFIG_GIO) +=3D dbus.o
++dbus.o-cflags =3D $(GIO_CFLAGS)
++dbus.o-libs =3D $(GIO_LIBS)
+=20
+ stub-obj-y +=3D filemonitor-stub.o
+diff --git a/util/dbus.c b/util/dbus.c
+new file mode 100644
+index 0000000000..bb51870e54
+--- /dev/null
++++ b/util/dbus.c
+@@ -0,0 +1,55 @@
++/*
++ * Helpers for using D-Bus
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/dbus.h"
++#include "qemu/error-report.h"
++
++/*
++ * qemu_dbus_get_queued_owners() - return the list of queued unique name=
+s
++ * @connection: A GDBusConnection
++ * @name: a service name
++ *
++ * Return: a GStrv of unique names, or NULL on failure.
++ */
++GStrv
++qemu_dbus_get_queued_owners(GDBusConnection *connection, const char *nam=
+e)
++{
++    g_autoptr(GDBusProxy) proxy =3D NULL;
++    g_autoptr(GVariant) result =3D NULL;
++    g_autoptr(GVariant) child =3D NULL;
++    g_autoptr(GError) err =3D NULL;
++
++    proxy =3D g_dbus_proxy_new_sync(connection, G_DBUS_PROXY_FLAGS_NONE,=
+ NULL,
++                                  "org.freedesktop.DBus",
++                                  "/org/freedesktop/DBus",
++                                  "org.freedesktop.DBus",
++                                  NULL, &err);
++    if (!proxy) {
++        error_report("Failed to create DBus proxy: %s", err->message);
++        return NULL;
++    }
++
++    result =3D g_dbus_proxy_call_sync(proxy, "ListQueuedOwners",
++                                    g_variant_new("(s)", name),
++                                    G_DBUS_CALL_FLAGS_NO_AUTO_START,
++                                    -1, NULL, &err);
++    if (!result) {
++        if (g_error_matches(err,
++                            G_DBUS_ERROR,
++                            G_DBUS_ERROR_NAME_HAS_NO_OWNER)) {
++            return g_new0(char *, 1);
++        }
++        error_report("Failed to call ListQueuedOwners: %s", err->message=
+);
++        return NULL;
++    }
++
++    child =3D g_variant_get_child_value(result, 0);
++    return g_variant_dup_strv(child, NULL);
++}
 --=20
 2.23.0
 
