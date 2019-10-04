@@ -2,98 +2,82 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC56C4CED1
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 13:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9166DC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 13:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A83DD205C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 13:53:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A83DD205C9
+	by mail.kernel.org (Postfix) with ESMTPS id 67B842077B
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 13:59:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67B842077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGO1d-0003yj-Q7
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 09:53:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49986)
+	id 1iGO71-00065l-G6
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 09:59:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51129)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iGNyk-00031K-Gh
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 09:50:45 -0400
+ (envelope-from <mst@redhat.com>) id 1iGO5J-00058J-Pw
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 09:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iGNyj-0005bc-4x
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 09:50:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60410)
+ (envelope-from <mst@redhat.com>) id 1iGO5H-0001Sh-Vh
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 09:57:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36324)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iGNya-0005Ua-BE; Fri, 04 Oct 2019 09:50:32 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGO5H-0001S9-Mk
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 09:57:27 -0400
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 52AC83082128;
- Fri,  4 Oct 2019 13:50:31 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-31.brq.redhat.com
- [10.40.204.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 98296601A3;
- Fri,  4 Oct 2019 13:50:27 +0000 (UTC)
-Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
- platforms
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-2-jsnow@redhat.com>
- <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
- <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
- <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
- <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
- <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
- <20191002164438.GD5819@localhost.localdomain>
- <a7f532cc-68cb-175e-6c8f-930401221ef9@redhat.com>
- <20191004101952.GC5491@linux.fritz.box>
- <d194e22c-7125-e558-0a80-131a28a87419@redhat.com>
- <CAFEAcA-4-ttpQ5S-HuEtv86TeNjBnFzp77D5ML1D9CZMYGR5Ow@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <2873f340-cac2-c168-d46a-e22c0571e83d@redhat.com>
-Date: Fri, 4 Oct 2019 15:50:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id AEDCA7FDEE
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 13:57:25 +0000 (UTC)
+Received: by mail-qk1-f200.google.com with SMTP id d25so6333661qkk.17
+ for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 06:57:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=52myUMkbUdrDYwRnEPkiQ4KOXXEAEQ20Z3yP8g2njHg=;
+ b=NcTMvkdlsa0YawMGRADl35L+40gVgXfyPIrKwFevGGi3H39bW8cZ/ULLVZscI68SIB
+ xf3eC85tfCPtpxpIYBoiStpLLHRHbKtH7j87IOU7UTOArva3cX/7ypLAhmhYqvs2axMa
+ ljL2FHiOJzI+dJuOFrCQdPp50XjtM7YGM2r+tEGiaz3gMi1b9mhtKJDDMUs1lgw+GPhT
+ eHJxoq4IOy/hEh3YP/0bnLpbQ815eQ9UkU/1Dlt1ZLdimaipC7TGRflvLEGZF8aY2V0h
+ SNfjvY3oJVTxXGKBj15VByaeYNLzO50jtKRZbLfEzqNHvONlgb01shZ5/AcblKO7wuB2
+ ot1A==
+X-Gm-Message-State: APjAAAVzNxbVckXIyQptrQCyB5qf3oYrTcg9aN/gxpdv2cts2sgZKmNn
+ ZZ9BKxbeP6/CafzfMWsdxzLhqYEH5RHTvvoxZKkLyfIzRtfVKvu7WdjY+zS5L0klzPMBVzYDES1
+ IwldHIwRs++53tyY=
+X-Received: by 2002:a05:620a:78f:: with SMTP id
+ 15mr10565376qka.167.1570197444886; 
+ Fri, 04 Oct 2019 06:57:24 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyyCI3LlVH7HKgX3gmHeDhoLuO870NBF4PSgvCKffnvh6uKZFyjXcYGIeUeBjzMkrbfquUQvQ==
+X-Received: by 2002:a05:620a:78f:: with SMTP id
+ 15mr10565334qka.167.1570197444518; 
+ Fri, 04 Oct 2019 06:57:24 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+ by smtp.gmail.com with ESMTPSA id
+ t73sm2706323qke.113.2019.10.04.06.57.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 04 Oct 2019 06:57:23 -0700 (PDT)
+Date: Fri, 4 Oct 2019 09:57:17 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v6 00/10] Introduce the microvm machine type
+Message-ID: <20191004095539-mutt-send-email-mst@kernel.org>
+References: <20191004093752.16564-1-slp@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-4-ttpQ5S-HuEtv86TeNjBnFzp77D5ML1D9CZMYGR5Ow@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="lqp1x7wZecpSgFdXThQOtzwtwTPruFLsl"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 04 Oct 2019 13:50:31 +0000 (UTC)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20191004093752.16564-1-slp@redhat.com>
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -108,122 +92,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: ehabkost@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lqp1x7wZecpSgFdXThQOtzwtwTPruFLsl
-Content-Type: multipart/mixed; boundary="08dx4IjA7VKv8eKtgzagf2WvAgh7bc2KZ"
-
---08dx4IjA7VKv8eKtgzagf2WvAgh7bc2KZ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 04.10.19 15:16, Peter Maydell wrote:
-> On Fri, 4 Oct 2019 at 13:45, Max Reitz <mreitz@redhat.com> wrote:
->>> In the end, I don't care what code these patches touched. I do an
->>> innocent git pull, and when I finally see that it's master that break=
-s
->>> iotests and not my patches on top of it, I'm annoyed.
->>
->> Hm.  Part of my point was that this still happens all the time.
->>
->> Which is why I=E2=80=99d prefer more tests to run in CI than a handful=
- of not
->> very useful ones in make check.
->>
->> (Of course, running it in a CI won=E2=80=99t prevent iotest failures o=
-n your
->> machine, but in practice neither does the current model.)
+On Fri, Oct 04, 2019 at 11:37:42AM +0200, Sergio Lopez wrote:
+> Microvm is a machine type inspired by Firecracker and constructed
+> after the its machine model.
 >=20
-> If you want the tree to be defended against problems, then
-> you need to run tests in 'make check'. Nothing else gets consistently
-> run and has failures spotted either before code goes into the
-> tree or quickly afterwards.
-
-Yes, but part of the problem is that what does get run as part of make
-check currently does not help much.
-
-So this doesn=E2=80=99t really defend the iotests from problems.
-
-> 'make check' does have the restriction
-> that we don't want the tests to take too long to run, but in
-> general the block layer should be running some reasonable subset
-> of tests in the project's standard "run the tests please" command.
-> (I have no opinion on exactly what that subset ought to be, beyond
-> that it would be good if that subset doesn't have known intermittent
-> failures in it.)
-
-Deciding the subset is difficult.  My stance was that it=E2=80=99s better=
- to not
-choose an arbitrary subset here but ensure that really everything gets
-run as part of CI, that is asynchronously so it doesn=E2=80=99t block any=
-one and
-can take as long as it wants.
-
-If we decide to get pull requests based on that, then that=E2=80=99d brin=
-g even
-more pain, but at least it=E2=80=99d be honest.  But just running half of=
- the
-qcow2 tests to me seems only like we want to pretend we ran the iotests.
- So for me, iotests still break, and we need to deal with make check
-failures on top.  I=E2=80=99d at least prefer one or the other.
-
-
-I voted for dropping make check, because running all iotests doesn=E2=80=99=
-t
-seem feasible to me.
-
->> I still think that I personally would prefer the iotests to not run as=
-
->> part of make check, but just as CI.
+> It's a minimalist machine type without PCI nor ACPI support, designed
+> for short-lived guests. Microvm also establishes a baseline for
+> benchmarking and optimizing both QEMU and guest operating systems,
+> since it is optimized for both boot time and footprint.
 >=20
-> 'make check' *is* our CI gate, to a first approximation. Most of
-> the various travis and other setups are simply a front-end for
-> "build QEMU in various configurations and on various hosts
-> and then run 'make check'". The travis setup at the moment is
-> a bit odd, because it runs tests but it's not a gate on our
-> merging changes. Ideally I would like to fix this so that
-> rather than me personally running "make check" via a bunch
-> of scripts we have one CI setup that we trust (gitlab seems
-> the current favoured contender) and that gates changes flowing
-> into master rather than me doing it manually. We might then turn
-> travis off if it's not providing anything for us that the gitlab
-> setup doesn't.
+> ---
+>=20
+> Changelog
+> v6:
+>  - Some style fixes (Philippe Mathieu-Daud=E9)
+>  - Fix a documentation bug stating that LAPIC was in userspace (Paolo
+>    Bonzini)
+>  - Update Xen HVM code after X86MachineState introduction (Philippe
+>    Mathieu-Daud=E9)
+>  - Rename header guard from QEMU_VIRTIO_MMIO_H to HW_VIRTIO_MMIO_H
+>    (Philippe Mathieu-Daud=E9)
+>=20
+> v5:
+>  - Drop unneeded "[PATCH v4 2/8] hw/i386: Factorize e820 related
+>    functions" (Philippe Mathieu-Daud=E9)
+>  - Drop unneeded "[PATCH v4 1/8] hw/i386: Factorize PVH related
+>    functions" (Stefano Garzarella)
+>  - Split X86MachineState introduction into smaller patches (Philippe
+>    Mathieu-Daud=E9)
+>  - Change option-roms to x-option-roms and kernel-cmdline to
+>    auto-kernel-cmdline (Paolo Bonzini)
+>  - Make i8259 PIT and i8254 PIC optional (Paolo Bonzini)
+>  - Some fixes to the documentation (Paolo Bonzini)
+>  - Switch documentation format from txt to rst (Peter Maydell)
+>  - Move NMI interface to X86_MACHINE (Philippe Mathieu-Daud=E9, Paolo
+>    Bonzini)
+>=20
+> v4:
+>  - This is a complete rewrite of the whole patchset, with a focus on
+>    reusing as much existing code as possible to ease the maintenance bu=
+rden
+>    and making the machine type as compatible as possible by default. As
+>    a result, the number of lines dedicated specifically to microvm is
+>    383 (code lines measured by "cloc") and, with the default
+>    configuration, it's now able to boot both PVH ELF images and
+>    bzImages with either SeaBIOS or qboot.
+>=20
+> v3:
+>   - Add initrd support (thanks Stefano).
+>=20
+> v2:
+>   - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
+>   - Simplify machine definition (thanks Eduardo).
+>   - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
+>   - Add a patch to factorize PVH-related functions.
+>   - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
+>=20
+> ---
+> Sergio Lopez (10):
+>   hw/virtio: Factorize virtio-mmio headers
+>   hw/i386/pc: rename functions shared with non-PC machines
+>   hw/i386/pc: move shared x86 functions to x86.c and export them
+>   hw/i386: split PCMachineState deriving X86MachineState from it
+>   hw/i386: make x86.c independent from PCMachineState
+>   fw_cfg: add "modify" functions for all types
+>   hw/intc/apic: reject pic ints if isa_pic =3D=3D NULL
+>   roms: add microvm-bios (qboot) as binary and git submodule
+>   docs/microvm.rst: document the new microvm machine type
+>   hw/i386: Introduce the microvm machine type
+>=20
+>  docs/microvm.rst                 |  98 ++++
+>  default-configs/i386-softmmu.mak |   1 +
+>  include/hw/i386/microvm.h        |  83 ++++
+>  include/hw/i386/pc.h             |  28 +-
+>  include/hw/i386/x86.h            |  94 ++++
+>  include/hw/nvram/fw_cfg.h        |  42 ++
+>  include/hw/virtio/virtio-mmio.h  |  73 +++
+>  hw/acpi/cpu_hotplug.c            |  10 +-
+>  hw/i386/acpi-build.c             |  29 +-
+>  hw/i386/amd_iommu.c              |   3 +-
+>  hw/i386/intel_iommu.c            |   3 +-
+>  hw/i386/microvm.c                | 574 ++++++++++++++++++++++
+>  hw/i386/pc.c                     | 780 +++---------------------------
+>  hw/i386/pc_piix.c                |  46 +-
+>  hw/i386/pc_q35.c                 |  38 +-
+>  hw/i386/pc_sysfw.c               |  58 +--
+>  hw/i386/x86.c                    | 790 +++++++++++++++++++++++++++++++
+>  hw/i386/xen/xen-hvm.c            |  23 +-
+>  hw/intc/apic.c                   |   2 +-
+>  hw/intc/ioapic.c                 |   2 +-
+>  hw/nvram/fw_cfg.c                |  29 ++
+>  hw/virtio/virtio-mmio.c          |  48 +-
+>  .gitmodules                      |   3 +
+>  hw/i386/Kconfig                  |   4 +
+>  hw/i386/Makefile.objs            |   2 +
+>  pc-bios/bios-microvm.bin         | Bin 0 -> 65536 bytes
+>  roms/Makefile                    |   6 +
+>  roms/qboot                       |   1 +
 
-Hm, but make check also serves other purposes.  I would suppose e.g.
-distributions generally require make check to pass when building packages=
-=2E
+So I guess we want to add new files for x86 machines MAINTAINERS entry.
 
-I assumed our CI included more things than just make check, so we could
-move the iotests from out of make check but keep them as part of CI.
-
-Max
+Otherwise looks good.
+Which tree is this going to be merged through? Mine?
 
 
---08dx4IjA7VKv8eKtgzagf2WvAgh7bc2KZ--
-
---lqp1x7wZecpSgFdXThQOtzwtwTPruFLsl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XTiIACgkQ9AfbAGHV
-z0ArKQf/cYS0wd+kwKssD8I1fTXXw43yxhAJzkWbsZz19d2tBEtNgj96evtoCMd2
-RZLn8+fkE4lI2lfv5JpkMcFWAvN7jfThVhVJPbOlJgjIxo5SmPonwkQQTXT7C14F
-wcc7Deb8sF5B7hke/kc0TumsI+pB1LJ8MadKh/wF/wi6JA8EeyMrtHMEpWWyArN9
-ZAhmcA1YCj32dZ8Pw6QWP6atllnKdcoUBEQQvkql4MtU+VMmbpCT/iNlEORGIfTJ
-40qYqivPvxvxy4hV1qVYd/9Q9gmFK/bXqd8e6mlHiBSNNkd5uCE099+JgdlnCtEE
-qj5EoOuKqbgF2IMj4IoyyM3WcfELLA==
-=/61D
------END PGP SIGNATURE-----
-
---lqp1x7wZecpSgFdXThQOtzwtwTPruFLsl--
+>  28 files changed, 1963 insertions(+), 907 deletions(-)
+>  create mode 100644 docs/microvm.rst
+>  create mode 100644 include/hw/i386/microvm.h
+>  create mode 100644 include/hw/i386/x86.h
+>  create mode 100644 include/hw/virtio/virtio-mmio.h
+>  create mode 100644 hw/i386/microvm.c
+>  create mode 100644 hw/i386/x86.c
+>  create mode 100755 pc-bios/bios-microvm.bin
+>  create mode 160000 roms/qboot
+>=20
+> --=20
+> 2.21.0
 
