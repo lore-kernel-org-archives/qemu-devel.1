@@ -2,83 +2,58 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0847FC47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:58:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE5FC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:59:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D572420867
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:58:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D572420867
+	by mail.kernel.org (Postfix) with ESMTPS id B0EA620867
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:59:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0EA620867
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGLIK-0004OR-En
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:58:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54965)
+	id 1iGLIi-0004y2-A7
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:59:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34941)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iGKA6-0005ku-M3
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:46:31 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iGKhy-0000Fx-GM
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iGKA4-0003EA-N5
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:46:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40290)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iGKhx-0002ps-1M
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49430)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iGKA4-0003Dc-8u
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:46:08 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iGKhw-0002pX-Pc
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 25E1EC04D312
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 09:46:07 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id o8so2412130wmc.2
- for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 02:46:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fc5wbp4por5utFSOISUW7ek3wTwr/ogel1DqzPVItxc=;
- b=JlxGfIiipgPE/8RrbjHARLkOuEaN0TSbYq9u/uWJGIPX8eiSqDSlCrnFqDSIj2CEEv
- 7FwU2B8VCdD0zxXqd5+lhg2KuDPjDLcJH7cM4MeCrD1tTVwCkvzS9YZ8PvXYZeQ21cXN
- tvxhQln2/0UQOgwxso+zEFCcpSQk6NHkP9cMpRLa8bz/n8hqFWg0umeHiyhL2l7LCNuU
- +e7e8jmrZsvW2HSVp27teEFm83MEArPMUnYEkHxjPesO2wjENfKHUO+9lx0SgkeIXm6A
- UmHYItmq3dM2zE0p9kk09FIMPriPXr2XtP3T/6HR+j2D6yUpVt1ASKwZNprHg6hebubv
- vmjg==
-X-Gm-Message-State: APjAAAWV78dLJK0UV6YzeV6DBXkP2AR2urNETE1+u6Cvv0+fi8jsqylg
- 0P2KN6ebo0mvTOjEcKAEESu1+zY7GRY29wkXkmWppxgEiywTbLgZZr8GemnY6zlQEO2PJ1dhEw4
- vslDVoMqWyjGoe4Y=
-X-Received: by 2002:a1c:f20c:: with SMTP id s12mr893765wmc.43.1570182365827;
- Fri, 04 Oct 2019 02:46:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyRqtNrRhM0mhn3GX0nglETfsIbsVm27XG1PpHRF0oOWWLNZmMRsx3CPSNsVe2BKIk9DQeYRA==
-X-Received: by 2002:a1c:f20c:: with SMTP id s12mr893741wmc.43.1570182365513;
- Fri, 04 Oct 2019 02:46:05 -0700 (PDT)
-Received: from [192.168.1.35] (240.red-88-21-68.staticip.rima-tde.net.
- [88.21.68.240])
- by smtp.gmail.com with ESMTPSA id s12sm7500013wrn.90.2019.10.04.02.46.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Oct 2019 02:46:04 -0700 (PDT)
-Subject: Re: [PATCH v6 02/10] hw/i386/pc: rename functions shared with non-PC
- machines
-To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
-References: <20191004093752.16564-1-slp@redhat.com>
- <20191004093752.16564-3-slp@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b6731c26-978b-a50a-94ff-95a9a1c269f6@redhat.com>
-Date: Fri, 4 Oct 2019 11:46:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 143198A1C9F
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 10:21:08 +0000 (UTC)
+Received: from localhost (ovpn-112-73.ams2.redhat.com [10.36.112.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5F6CA1001B2B;
+ Fri,  4 Oct 2019 10:21:03 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 1/8] vmstate: add qom interface to get id
+Date: Fri,  4 Oct 2019 14:20:44 +0400
+Message-Id: <20191004102051.19738-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20191004102051.19738-1-marcandre.lureau@redhat.com>
+References: <20191004102051.19738-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191004093752.16564-3-slp@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Fri, 04 Oct 2019 10:21:08 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -94,235 +69,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
- imammedo@redhat.com, sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
+Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
+ dgilbert@redhat.com,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/4/19 11:37 AM, Sergio Lopez wrote:
-> The following functions are named *pc* but are not PC-machine specific
-> but generic to the X86 architecture, rename them:
->=20
->    load_linux                 -> x86_load_linux
->    pc_new_cpu                 -> x86_new_cpu
->    pc_cpus_init               -> x86_cpus_init
->    pc_cpu_index_to_props      -> x86_cpu_index_to_props
->    pc_get_default_cpu_node_id -> x86_get_default_cpu_node_id
->    pc_possible_cpu_arch_ids   -> x86_possible_cpu_arch_ids
->    old_pc_system_rom_init     -> x86_system_rom_init
->=20
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
+Add an interface to get the instance id, instead of depending on
+Device and qdev_get_dev_path().
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ MAINTAINERS                  |  2 ++
+ hw/core/Makefile.objs        |  1 +
+ hw/core/qdev.c               | 14 +++++++++++++
+ hw/core/vmstate-if.c         | 23 +++++++++++++++++++++
+ include/hw/vmstate-if.h      | 40 ++++++++++++++++++++++++++++++++++++
+ include/migration/register.h |  2 ++
+ include/migration/vmstate.h  |  2 ++
+ tests/Makefile.include       |  1 +
+ 8 files changed, 85 insertions(+)
+ create mode 100644 hw/core/vmstate-if.c
+ create mode 100644 include/hw/vmstate-if.h
 
-> ---
->   include/hw/i386/pc.h |  2 +-
->   hw/i386/pc.c         | 28 ++++++++++++++--------------
->   hw/i386/pc_piix.c    |  2 +-
->   hw/i386/pc_q35.c     |  2 +-
->   hw/i386/pc_sysfw.c   |  6 +++---
->   5 files changed, 20 insertions(+), 20 deletions(-)
->=20
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 6df4f4b6fb..d12f42e9e5 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -195,7 +195,7 @@ bool pc_machine_is_smm_enabled(PCMachineState *pcms=
-);
->   void pc_register_ferr_irq(qemu_irq irq);
->   void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
->  =20
-> -void pc_cpus_init(PCMachineState *pcms);
-> +void x86_cpus_init(PCMachineState *pcms);
->   void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)=
-;
->   void pc_smp_parse(MachineState *ms, QemuOpts *opts);
->  =20
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index bcda50efcc..fd08c6704b 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1019,8 +1019,8 @@ static bool load_elfboot(const char *kernel_filen=
-ame,
->       return true;
->   }
->  =20
-> -static void load_linux(PCMachineState *pcms,
-> -                       FWCfgState *fw_cfg)
-> +static void x86_load_linux(PCMachineState *pcms,
-> +                           FWCfgState *fw_cfg)
->   {
->       uint16_t protocol;
->       int setup_size, kernel_size, cmdline_size;
-> @@ -1374,7 +1374,7 @@ void pc_acpi_smi_interrupt(void *opaque, int irq,=
- int level)
->       }
->   }
->  =20
-> -static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **=
-errp)
-> +static void x86_cpu_new(PCMachineState *pcms, int64_t apic_id, Error *=
-*errp)
->   {
->       Object *cpu =3D NULL;
->       Error *local_err =3D NULL;
-> @@ -1490,14 +1490,14 @@ void pc_hot_add_cpu(MachineState *ms, const int=
-64_t id, Error **errp)
->           return;
->       }
->  =20
-> -    pc_new_cpu(PC_MACHINE(ms), apic_id, &local_err);
-> +    x86_cpu_new(PC_MACHINE(ms), apic_id, &local_err);
->       if (local_err) {
->           error_propagate(errp, local_err);
->           return;
->       }
->   }
->  =20
-> -void pc_cpus_init(PCMachineState *pcms)
-> +void x86_cpus_init(PCMachineState *pcms)
->   {
->       int i;
->       const CPUArchIdList *possible_cpus;
-> @@ -1518,7 +1518,7 @@ void pc_cpus_init(PCMachineState *pcms)
->                                                        ms->smp.max_cpus=
- - 1) + 1;
->       possible_cpus =3D mc->possible_cpu_arch_ids(ms);
->       for (i =3D 0; i < ms->smp.cpus; i++) {
-> -        pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal)=
-;
-> +        x86_cpu_new(pcms, possible_cpus->cpus[i].arch_id, &error_fatal=
-);
->       }
->   }
->  =20
-> @@ -1621,7 +1621,7 @@ void xen_load_linux(PCMachineState *pcms)
->       fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
->       rom_set_fw(fw_cfg);
->  =20
-> -    load_linux(pcms, fw_cfg);
-> +    x86_load_linux(pcms, fw_cfg);
->       for (i =3D 0; i < nb_option_roms; i++) {
->           assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
->                  !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
-> @@ -1756,7 +1756,7 @@ void pc_memory_init(PCMachineState *pcms,
->       }
->  =20
->       if (linux_boot) {
-> -        load_linux(pcms, fw_cfg);
-> +        x86_load_linux(pcms, fw_cfg);
->       }
->  =20
->       for (i =3D 0; i < nb_option_roms; i++) {
-> @@ -2678,7 +2678,7 @@ static void pc_machine_wakeup(MachineState *machi=
-ne)
->   }
->  =20
->   static CpuInstanceProperties
-> -pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-> +x86_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
->   {
->       MachineClass *mc =3D MACHINE_GET_CLASS(ms);
->       const CPUArchIdList *possible_cpus =3D mc->possible_cpu_arch_ids(=
-ms);
-> @@ -2687,7 +2687,7 @@ pc_cpu_index_to_props(MachineState *ms, unsigned =
-cpu_index)
->       return possible_cpus->cpus[cpu_index].props;
->   }
->  =20
-> -static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int =
-idx)
-> +static int64_t x86_get_default_cpu_node_id(const MachineState *ms, int=
- idx)
->   {
->      X86CPUTopoInfo topo;
->      PCMachineState *pcms =3D PC_MACHINE(ms);
-> @@ -2699,7 +2699,7 @@ static int64_t pc_get_default_cpu_node_id(const M=
-achineState *ms, int idx)
->      return topo.pkg_id % ms->numa_state->num_nodes;
->   }
->  =20
-> -static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-> +static const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms=
-)
->   {
->       PCMachineState *pcms =3D PC_MACHINE(ms);
->       int i;
-> @@ -2801,9 +2801,9 @@ static void pc_machine_class_init(ObjectClass *oc=
-, void *data)
->       assert(!mc->get_hotplug_handler);
->       mc->get_hotplug_handler =3D pc_get_hotplug_handler;
->       mc->hotplug_allowed =3D pc_hotplug_allowed;
-> -    mc->cpu_index_to_instance_props =3D pc_cpu_index_to_props;
-> -    mc->get_default_cpu_node_id =3D pc_get_default_cpu_node_id;
-> -    mc->possible_cpu_arch_ids =3D pc_possible_cpu_arch_ids;
-> +    mc->cpu_index_to_instance_props =3D x86_cpu_index_to_props;
-> +    mc->get_default_cpu_node_id =3D x86_get_default_cpu_node_id;
-> +    mc->possible_cpu_arch_ids =3D x86_possible_cpu_arch_ids;
->       mc->auto_enable_numa_with_memhp =3D true;
->       mc->has_hotpluggable_cpus =3D true;
->       mc->default_boot_order =3D "cad";
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 6824b72124..de09e076cd 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -152,7 +152,7 @@ static void pc_init1(MachineState *machine,
->           }
->       }
->  =20
-> -    pc_cpus_init(pcms);
-> +    x86_cpus_init(pcms);
->  =20
->       if (kvm_enabled() && pcmc->kvmclock_enabled) {
->           kvmclock_create();
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 8fad20f314..894989b64e 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -179,7 +179,7 @@ static void pc_q35_init(MachineState *machine)
->           xen_hvm_init(pcms, &ram_memory);
->       }
->  =20
-> -    pc_cpus_init(pcms);
-> +    x86_cpus_init(pcms);
->  =20
->       kvmclock_create();
->  =20
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index a9983f0bfb..28cb1f63c9 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -211,7 +211,7 @@ static void pc_system_flash_map(PCMachineState *pcm=
-s,
->       }
->   }
->  =20
-> -static void old_pc_system_rom_init(MemoryRegion *rom_memory, bool isap=
-c_ram_fw)
-> +static void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram=
-_fw)
->   {
->       char *filename;
->       MemoryRegion *bios, *isa_bios;
-> @@ -272,7 +272,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
->       BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
->  =20
->       if (!pcmc->pci_enabled) {
-> -        old_pc_system_rom_init(rom_memory, true);
-> +        x86_bios_rom_init(rom_memory, true);
->           return;
->       }
->  =20
-> @@ -293,7 +293,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
->  =20
->       if (!pflash_blk[0]) {
->           /* Machine property pflash0 not set, use ROM mode */
-> -        old_pc_system_rom_init(rom_memory, false);
-> +        x86_bios_rom_init(rom_memory, false);
->       } else {
->           if (kvm_enabled() && !kvm_readonly_mem_enabled()) {
->               /*
->=20
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 21264eae9c..cf63634221 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2147,6 +2147,8 @@ Migration
+ M: Juan Quintela <quintela@redhat.com>
+ M: Dr. David Alan Gilbert <dgilbert@redhat.com>
+ S: Maintained
++F: hw/core/vmstate-if.c
++F: include/hw/vmstate-if.h
+ F: include/migration/
+ F: migration/
+ F: scripts/vmstate-static-checker.py
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index fd0550d1d9..0edd9e635d 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -9,6 +9,7 @@ common-obj-y +=3D hotplug.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D nmi.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state-handler.o
+ common-obj-y +=3D cpu.o
++common-obj-y +=3D vmstate-if.o
+=20
+ common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
+ common-obj-$(CONFIG_XILINX_AXI) +=3D stream.o
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index cbad6c1d55..fe13ccb37f 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -1064,9 +1064,18 @@ static void device_unparent(Object *obj)
+     }
+ }
+=20
++static char *
++device_vmstate_if_get_id(VMStateIf *obj)
++{
++    DeviceState *dev =3D DEVICE(obj);
++
++    return qdev_get_dev_path(dev);
++}
++
+ static void device_class_init(ObjectClass *class, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(class);
++    VMStateIfClass *vc =3D VMSTATE_IF_CLASS(class);
+=20
+     class->unparent =3D device_unparent;
+=20
+@@ -1078,6 +1087,7 @@ static void device_class_init(ObjectClass *class, v=
+oid *data)
+      */
+     dc->hotpluggable =3D true;
+     dc->user_creatable =3D true;
++    vc->get_id =3D device_vmstate_if_get_id;
+ }
+=20
+ void device_class_set_parent_reset(DeviceClass *dc,
+@@ -1135,6 +1145,10 @@ static const TypeInfo device_type_info =3D {
+     .class_init =3D device_class_init,
+     .abstract =3D true,
+     .class_size =3D sizeof(DeviceClass),
++    .interfaces =3D (InterfaceInfo[]) {
++        { TYPE_VMSTATE_IF },
++        { }
++    }
+ };
+=20
+ static void qdev_register_types(void)
+diff --git a/hw/core/vmstate-if.c b/hw/core/vmstate-if.c
+new file mode 100644
+index 0000000000..bf453620fe
+--- /dev/null
++++ b/hw/core/vmstate-if.c
+@@ -0,0 +1,23 @@
++/*
++ * VMState interface
++ *
++ * Copyright (c) 2009-2019 Red Hat Inc
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/vmstate-if.h"
++
++static const TypeInfo vmstate_if_info =3D {
++    .name =3D TYPE_VMSTATE_IF,
++    .parent =3D TYPE_INTERFACE,
++    .class_size =3D sizeof(VMStateIfClass),
++};
++
++static void vmstate_register_types(void)
++{
++    type_register_static(&vmstate_if_info);
++}
++
++type_init(vmstate_register_types);
+diff --git a/include/hw/vmstate-if.h b/include/hw/vmstate-if.h
+new file mode 100644
+index 0000000000..8ff7f0f292
+--- /dev/null
++++ b/include/hw/vmstate-if.h
+@@ -0,0 +1,40 @@
++/*
++ * VMState interface
++ *
++ * Copyright (c) 2009-2019 Red Hat Inc
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef VMSTATE_IF_H
++#define VMSTATE_IF_H
++
++#include "qom/object.h"
++
++#define TYPE_VMSTATE_IF "vmstate-if"
++
++#define VMSTATE_IF_CLASS(klass)                                     \
++    OBJECT_CLASS_CHECK(VMStateIfClass, (klass), TYPE_VMSTATE_IF)
++#define VMSTATE_IF_GET_CLASS(obj)                           \
++    OBJECT_GET_CLASS(VMStateIfClass, (obj), TYPE_VMSTATE_IF)
++#define VMSTATE_IF(obj)                             \
++    INTERFACE_CHECK(VMStateIf, (obj), TYPE_VMSTATE_IF)
++
++typedef struct VMStateIf VMStateIf;
++
++typedef struct VMStateIfClass {
++    InterfaceClass parent_class;
++
++    char * (*get_id)(VMStateIf *obj);
++} VMStateIfClass;
++
++static inline char *vmstate_if_get_id(VMStateIf *vmif)
++{
++    if (!vmif) {
++        return NULL;
++    }
++
++    return VMSTATE_IF_GET_CLASS(vmif)->get_id(vmif);
++}
++
++#endif /* VMSTATE_IF_H */
+diff --git a/include/migration/register.h b/include/migration/register.h
+index a13359a08d..73149c9a01 100644
+--- a/include/migration/register.h
++++ b/include/migration/register.h
+@@ -14,6 +14,8 @@
+ #ifndef MIGRATION_REGISTER_H
+ #define MIGRATION_REGISTER_H
+=20
++#include "hw/vmstate-if.h"
++
+ typedef struct SaveVMHandlers {
+     /* This runs inside the iothread lock.  */
+     SaveStateHandler *save_state;
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 1fbfd099dd..bdcf8a1652 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -27,6 +27,8 @@
+ #ifndef QEMU_VMSTATE_H
+ #define QEMU_VMSTATE_H
+=20
++#include "hw/vmstate-if.h"
++
+ typedef struct VMStateInfo VMStateInfo;
+ typedef struct VMStateField VMStateField;
+=20
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3543451ed3..81ca5ba494 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -565,6 +565,7 @@ tests/test-qdev-global-props$(EXESUF): tests/test-qde=
+v-global-props.o \
+ 	hw/core/irq.o \
+ 	hw/core/fw-path-provider.o \
+ 	hw/core/reset.o \
++	hw/core/vmstate-if.o \
+ 	$(test-qapi-obj-y)
+ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+ 	migration/vmstate.o migration/vmstate-types.o migration/qemu-file.o \
+--=20
+2.23.0
+
 
