@@ -2,86 +2,83 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8F4C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 16:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E7D6C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 16:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 428EC20873
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 16:42:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 428EC20873
+	by mail.kernel.org (Postfix) with ESMTPS id 4231A215EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 16:51:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4231A215EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGQf9-0002IN-Cs
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 12:42:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49325)
+	id 1iGQnC-0004Tp-1N
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 12:50:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iGQeJ-0001ez-Ng
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:41:48 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iGQlB-0003X7-QG
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iGQeH-0004d1-Kd
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:41:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39810)
+ (envelope-from <pbonzini@redhat.com>) id 1iGQl9-0006a2-Nq
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:48:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38668)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iGQeH-0004ZB-FD
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:41:45 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iGQl9-0006Zu-Fy
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:48:51 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7ACB08E58C
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 16:41:44 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id n3so2982571wrt.9
- for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 09:41:44 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 47C25883D7
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 16:48:50 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id j125so2888736wmj.6
+ for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 09:48:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=XT3Ya3N4um8Pq0veFKNMJl0r2mpnF4FTAEmB6RtqXtU=;
- b=RSOKZJM/Z2lpyuYkt09z0e6ZfEsy7ck34hSHX5uN+Pd/QZv5tf7s4jlyGkNrVoOVJQ
- QSMYLsUnf/+ke8oq/y85rs/b1BbBKVX/bX8ZC9Jn5waLZS0rix/11zrX6iwuzXWwPsLf
- 1NYMaRb5/uxr+T2Ap3PZRTBMfnl6pFhg+qSuHDhsUV0j6bd8cEvtKQLhLU72JkIiwghE
- ufiXkuRH5p2HZllvpF9J4Pxd9Is2MltcXF78l+CTdymqW6vSx2XX3KLGlKHbQqHNv9AK
- IBrRODAu8rLkIrpXJeOLk3BMt1Sv8vMpjVHobBkD/k52R5CsZ7ZJ9bh5oELFbzSeD+Z9
- h9vA==
-X-Gm-Message-State: APjAAAXqCEsnLmBHbBTI0WuYiBiGDesIo2xgQMGuJh//ZqpEfd+pxbQx
- g6fw7aq/ovWgW/3lZ8GDhFB7KWfo6JNDDwcN3YbPG0JXyrKxxnutNUUwptUHoAYutDFXiibOfz2
- OEFBX/a1A5yft25A=
-X-Received: by 2002:a5d:4043:: with SMTP id w3mr13013672wrp.318.1570207303149; 
- Fri, 04 Oct 2019 09:41:43 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzJj1K/nvpkdRDAjVU/PdWGdx9RgVWycMbPtZDiEx4HIRFIKxtJEO+WTPzwVP72yKoXOX0Zeg==
-X-Received: by 2002:a5d:4043:: with SMTP id w3mr13013658wrp.318.1570207302853; 
- Fri, 04 Oct 2019 09:41:42 -0700 (PDT)
+ bh=XKJYFzBodqF1HRGpAhodY7Xy8ElHyqDyXGWQqyZ52C4=;
+ b=kH5xVgOMJhUKN2/mcTz0wy4EQ2dgXeYEL6ZQVhAnSYXR9wTwQ8yYG70x7sPTZawD+b
+ HcjYprshM2KZWe8HjvPSYge/HDN5nDqeB1R78hGWrnhh90K2xU8P/TD8k5XYntT0FZQJ
+ q2fW55R38f6hucl8TknimqgCfi8HcMMNW2zw+o42Oq/fC47A9EVdy4qE2lpT3GuW/+ci
+ mp4/QiR7irSrbX6mWaic8SHvQufOchbPUrFt0KePARw4oDgrynlM3M3V0ka3T69UjCaI
+ 7ChO7EBhK46tP0xK8ifv41mC1WEqWDMZWO7bLSrfvGVM5DN4AEFk6jz9PgYvo/vgqbYM
+ C7/g==
+X-Gm-Message-State: APjAAAWoAz76PIWERCiB+UnEJWJ1Ft2OSE5o+Xx/bVE8nN76z90ACMbU
+ jXS1RHQv21a4nQ2ExYXXXonfBqTrHsq8qiWfQw5RzVksNO05GQ/yZtwZqulpLu3Et2OQ58A0XvQ
+ FcHx53puKtmebTcU=
+X-Received: by 2002:a5d:43c7:: with SMTP id v7mr11146378wrr.135.1570207728890; 
+ Fri, 04 Oct 2019 09:48:48 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzMmdsYa8x9yQIxNCM1llUEAHxLXvLSkt3ftppY3OV3qeqWJfTf8bwC9fpuIsLk2j5AGKbRzA==
+X-Received: by 2002:a5d:43c7:: with SMTP id v7mr11146364wrr.135.1570207728583; 
+ Fri, 04 Oct 2019 09:48:48 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:9dd9:ce92:89b5:d1f2?
  ([2001:b07:6468:f312:9dd9:ce92:89b5:d1f2])
- by smtp.gmail.com with ESMTPSA id b12sm6726402wrt.21.2019.10.04.09.41.41
+ by smtp.gmail.com with ESMTPSA id t123sm10919993wma.40.2019.10.04.09.48.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Oct 2019 09:41:42 -0700 (PDT)
-Subject: Re: libvirt? qemu change that mmaps ELF files breaks libvirt svirt
- handling for os.kernel
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <d450afbe-06ae-f6f7-3bc0-f1a54c31907c@de.ibm.com>
- <1dc0a320-b771-072d-d1f4-4eda2ab51a1f@redhat.com>
- <a12ee0e1-44cc-e197-68e3-4a7137c8b972@de.ibm.com>
- <20191004123613.GF25716@redhat.com>
- <b44c70b1-71b6-2249-d50a-9a9e02f79259@de.ibm.com>
+ Fri, 04 Oct 2019 09:48:47 -0700 (PDT)
+Subject: Re: [PULL 12/30] Makefile: Remove generated files when doing
+ 'distclean'
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
+ <1570035113-56848-13-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA--sjm+ejLLdaQtsVC4u4adA9p+QDSJ2QKQ2hSBLt=oDw@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <f5bb2615-17cc-eedd-124d-8cec1eff979b@redhat.com>
-Date: Fri, 4 Oct 2019 18:41:41 +0200
+Message-ID: <88f324b0-65a1-1a7b-b663-27415ae11cb2@redhat.com>
+Date: Fri, 4 Oct 2019 18:48:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <b44c70b1-71b6-2249-d50a-9a9e02f79259@de.ibm.com>
+In-Reply-To: <CAFEAcA--sjm+ejLLdaQtsVC4u4adA9p+QDSJ2QKQ2hSBLt=oDw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -99,25 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Libvirt <libvir-list@redhat.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Marc Hartmayer <mhartmay@linux.ibm.com>, qemu-devel <qemu-devel@nongnu.org>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/10/19 14:47, Christian Borntraeger wrote:
->> Please file a bz entry against the selinux-policy component for
->> whatever distro you're using, and/or Fedora rawhide, and CC me
->> on it too.
+On 04/10/19 14:20, Peter Maydell wrote:
+> On Wed, 2 Oct 2019 at 18:07, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> From: Thomas Huth <thuth@redhat.com>
+>>
+>> When running "make distclean" we currently leave a lot of generated
+>> files in the build directory. Fix that.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
 > 
-> Done. This was on Fedora 30.
-> https://bugzilla.redhat.com/show_bug.cgi?id=1758525
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 3543451..48b52da 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -1176,11 +1176,21 @@ check: check-block check-qapi-schema check-unit check-softfloat check-qtest chec
+>>  check-clean:
+>>         rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+>>         rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+>> -       rm -f tests/test-qapi-gen-timestamp
+>>         rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+>> +       rm -f tests/qemu-iotests/common.env tests/qemu-iotests/check.*
+>> +       rm -f tests/test-qapi-gen-timestamp tests/qht-bench$(EXESUF) \
+>> +               tests/fp/fp-test tests/fp/*.out tests/qapi-schema/*.test.*
+>>
+>>  clean: check-clean
 > 
->  Now sure about others like RHEL. RHV.
+> Hi; this change breaks the sequence
+>  'make clean; make; make check'
+> 
+> because now 'make clean' removes tests/qemu-iotests/common.env.
+> But this file is created by 'configure', not by 'make', so if there's
+> no other reason why 'make' needs to re-run configure then we get
+> to the 'make check' stage with the file not existing, and then
+> when we try to run the iotests they fail with:
+> 
+> ./check: line 60:
+> /home/petmay01/linaro/qemu-for-merges/build/alldbg/tests/qemu-iotests/common.env:
+> No such file or directory
+> check: failed to source common.env (make sure the qemu-iotests are run
+> from tests/qemu-iotests in the build tree)
+> /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:1102:
+> recipe for target 'check-tests/check-block.sh' failed
+> 
+> thanks
+> -- PMM
 > 
 
-We'll take care of that.  Thanks!
+I've dropped this patch and will send v3 that adds back the VMX patches.
 
 Paolo
 
