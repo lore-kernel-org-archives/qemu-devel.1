@@ -2,60 +2,63 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2300C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEB0C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:32:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B534B207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:30:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B534B207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 26CBE215EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:32:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TVtoOoL4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26CBE215EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGKqj-0001q3-K6
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:30:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53754)
+	id 1iGKsj-0003b3-2x
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:32:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53578)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iGK3e-0006WQ-Rf
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:32 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iGK3W-0006JD-5Z
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iGK3c-0006V1-TO
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54978)
+ (envelope-from <dgibson@ozlabs.org>) id 1iGK3U-0006MK-IJ
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:21 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35545 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iGK3c-0006UF-L2
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:28 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D14CD306039A;
- Fri,  4 Oct 2019 09:39:27 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.79])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 29F2A101E678;
- Fri,  4 Oct 2019 09:39:19 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 05/10] hw/i386: make x86.c independent from PCMachineState
-Date: Fri,  4 Oct 2019 11:37:47 +0200
-Message-Id: <20191004093752.16564-6-slp@redhat.com>
-In-Reply-To: <20191004093752.16564-1-slp@redhat.com>
-References: <20191004093752.16564-1-slp@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iGK3U-00063r-6E; Fri, 04 Oct 2019 05:39:20 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46l4YS3G24z9sSZ; Fri,  4 Oct 2019 19:38:04 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1570181884;
+ bh=Wye/qEPS8JlbxvZNXB3cl6mwul/+AF68CA7+4TAPj1c=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=TVtoOoL4FJA4TaOWxrXr5G/+UE4TxJ1/O0Z4mC7egQNMdH3GLZXEsG0RxJSlNBaQj
+ 3Vy/ne2Bl0Gd1+2jnZ+F+7byk6PQ1+rMwGWlzWmS3Ys0V3aAaMkVpwW+QbPubpcBzq
+ p3IN59Laliob/T4dBSBm6qAmDtLQlMqPmiXhlHwM=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 48/53] spapr, xics,
+ xive: Better use of assert()s on irq claim/free paths
+Date: Fri,  4 Oct 2019 19:37:42 +1000
+Message-Id: <20191004093747.31350-49-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191004093747.31350-1-david@gibson.dropbear.id.au>
+References: <20191004093747.31350-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 04 Oct 2019 09:39:27 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,307 +70,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
- lersek@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
- sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As a last step into splitting PCMachineState and deriving
-X86MachineState from it, make the functions previously extracted from
-pc.c to x86.c independent from PCMachineState, using X86MachineState
-instead.
+The irq claim and free paths for both XICS and XIVE check for some
+validity conditions.  Some of these represent genuine runtime failures,
+however others - particularly checking that the basic irq number is in a
+sane range - could only fail in the case of bugs in the callin code.
+Therefore use assert()s instead of runtime failures for those.
 
-Signed-off-by: Sergio Lopez <slp@redhat.com>
+In addition the non backend-specific part of the claim/free paths should
+only be used for PAPR external irqs, that is in the range SPAPR_XIRQ_BASE
+to the maximum irq number.  Put assert()s for that into the top level
+dispatchers as well.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- include/hw/i386/x86.h | 13 ++++++++----
- hw/i386/pc.c          | 14 ++++++++-----
- hw/i386/pc_piix.c     |  2 +-
- hw/i386/pc_q35.c      |  2 +-
- hw/i386/x86.c         | 49 ++++++++++++++++++++-----------------------
- 5 files changed, 43 insertions(+), 37 deletions(-)
+ hw/intc/spapr_xive.c |  8 ++------
+ hw/ppc/spapr_irq.c   | 18 ++++++++++--------
+ 2 files changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index a930a7ad9d..f44359e9e9 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -73,10 +73,11 @@ typedef struct {
- #define X86_MACHINE_CLASS(class) \
-     OBJECT_CLASS_CHECK(X86MachineClass, class, TYPE_X86_MACHINE)
-=20
--uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
-+uint32_t x86_cpu_apic_id_from_index(X86MachineState *pcms,
-                                     unsigned int cpu_index);
--void x86_cpu_new(PCMachineState *pcms, int64_t apic_id, Error **errp);
--void x86_cpus_init(PCMachineState *pcms);
-+
-+void x86_cpu_new(X86MachineState *pcms, int64_t apic_id, Error **errp);
-+void x86_cpus_init(X86MachineState *pcms, int default_cpu_version);
- CpuInstanceProperties x86_cpu_index_to_props(MachineState *ms,
-                                              unsigned cpu_index);
- int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx);
-@@ -84,6 +85,10 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(Machine=
-State *ms);
-=20
- void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw);
-=20
--void x86_load_linux(PCMachineState *pcms, FWCfgState *fw_cfg);
-+void x86_load_linux(X86MachineState *x86ms,
-+                    FWCfgState *fw_cfg,
-+                    int acpi_data_size,
-+                    bool pvh_enabled,
-+                    bool linuxboot_dma_enabled);
-=20
- #endif
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 0dc1420a1f..0bf93d489c 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -982,8 +982,8 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
-=20
- void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index c1c97192a7..47b5ec0b56 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -532,9 +532,7 @@ bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t l=
+isn, bool lsi)
  {
--    PCMachineState *pcms =3D PC_MACHINE(ms);
--    int64_t apic_id =3D x86_cpu_apic_id_from_index(pcms, id);
-+    X86MachineState *x86ms =3D X86_MACHINE(ms);
-+    int64_t apic_id =3D x86_cpu_apic_id_from_index(x86ms, id);
-     Error *local_err =3D NULL;
+     XiveSource *xsrc =3D &xive->source;
 =20
-     if (id < 0) {
-@@ -998,7 +998,8 @@ void pc_hot_add_cpu(MachineState *ms, const int64_t i=
-d, Error **errp)
-         return;
-     }
+-    if (lisn >=3D xive->nr_irqs) {
+-        return false;
+-    }
++    assert(lisn < xive->nr_irqs);
 =20
--    x86_cpu_new(PC_MACHINE(ms), apic_id, &local_err);
-+
-+    x86_cpu_new(X86_MACHINE(ms), apic_id, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -1099,6 +1100,7 @@ void xen_load_linux(PCMachineState *pcms)
+     /*
+      * Set default values when allocating an IRQ number
+@@ -559,9 +557,7 @@ bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t l=
+isn, bool lsi)
+=20
+ bool spapr_xive_irq_free(SpaprXive *xive, uint32_t lisn)
  {
-     int i;
-     FWCfgState *fw_cfg;
-+    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
-     X86MachineState *x86ms =3D X86_MACHINE(pcms);
+-    if (lisn >=3D xive->nr_irqs) {
+-        return false;
+-    }
++    assert(lisn < xive->nr_irqs);
 =20
-     assert(MACHINE(pcms)->kernel_filename !=3D NULL);
-@@ -1107,7 +1109,8 @@ void xen_load_linux(PCMachineState *pcms)
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
-     rom_set_fw(fw_cfg);
-=20
--    x86_load_linux(pcms, fw_cfg);
-+    x86_load_linux(x86ms, fw_cfg, pcmc->acpi_data_size,
-+                   pcmc->pvh_enabled, pcmc->linuxboot_dma_enabled);
-     for (i =3D 0; i < nb_option_roms; i++) {
-         assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
-                !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
-@@ -1243,7 +1246,8 @@ void pc_memory_init(PCMachineState *pcms,
-     }
-=20
-     if (linux_boot) {
--        x86_load_linux(pcms, fw_cfg);
-+        x86_load_linux(x86ms, fw_cfg, pcmc->acpi_data_size,
-+                       pcmc->pvh_enabled, pcmc->linuxboot_dma_enabled);
-     }
-=20
-     for (i =3D 0; i < nb_option_roms; i++) {
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 0afa8fe6ea..a86317cdff 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -154,7 +154,7 @@ static void pc_init1(MachineState *machine,
-         }
-     }
-=20
--    x86_cpus_init(pcms);
-+    x86_cpus_init(x86ms, pcmc->default_cpu_version);
-=20
-     if (kvm_enabled() && pcmc->kvmclock_enabled) {
-         kvmclock_create();
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 8e7beb9415..8bdca373d6 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -181,7 +181,7 @@ static void pc_q35_init(MachineState *machine)
-         xen_hvm_init(pcms, &ram_memory);
-     }
-=20
--    x86_cpus_init(pcms);
-+    x86_cpus_init(x86ms, pcmc->default_cpu_version);
-=20
-     kvmclock_create();
-=20
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 4a8e254d69..55944a9a02 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -60,11 +60,10 @@ static size_t pvh_start_addr;
-  * no concept of "CPU index", and the NUMA tables on fw_cfg need the API=
-C ID of
-  * all CPUs up to max_cpus.
-  */
--uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
-+uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
-                                     unsigned int cpu_index)
- {
--    MachineState *ms =3D MACHINE(pcms);
--    X86MachineState *x86ms =3D X86_MACHINE(pcms);
-+    MachineState *ms =3D MACHINE(x86ms);
-     X86MachineClass *x86mc =3D X86_MACHINE_GET_CLASS(x86ms);
-     uint32_t correct_id;
-     static bool warned;
-@@ -83,14 +82,14 @@ uint32_t x86_cpu_apic_id_from_index(PCMachineState *p=
-cms,
-     }
- }
-=20
--void x86_cpu_new(PCMachineState *pcms, int64_t apic_id, Error **errp)
-+
-+void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
- {
-     Object *cpu =3D NULL;
-     Error *local_err =3D NULL;
-     CPUX86State *env =3D NULL;
--    X86MachineState *x86ms =3D X86_MACHINE(pcms);
-=20
--    cpu =3D object_new(MACHINE(pcms)->cpu_type);
-+    cpu =3D object_new(MACHINE(x86ms)->cpu_type);
-=20
-     env =3D &X86_CPU(cpu)->env;
-     env->nr_dies =3D x86ms->smp_dies;
-@@ -102,16 +101,14 @@ void x86_cpu_new(PCMachineState *pcms, int64_t apic=
-_id, Error **errp)
-     error_propagate(errp, local_err);
- }
-=20
--void x86_cpus_init(PCMachineState *pcms)
-+void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
- {
-     int i;
-     const CPUArchIdList *possible_cpus;
--    MachineState *ms =3D MACHINE(pcms);
--    MachineClass *mc =3D MACHINE_GET_CLASS(pcms);
--    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(mc);
--    X86MachineState *x86ms =3D X86_MACHINE(pcms);
-+    MachineState *ms =3D MACHINE(x86ms);
-+    MachineClass *mc =3D MACHINE_GET_CLASS(x86ms);
-=20
--    x86_cpu_set_default_version(pcmc->default_cpu_version);
-+    x86_cpu_set_default_version(default_cpu_version);
-=20
-     /* Calculates the limit to CPU APIC ID values
-      *
-@@ -120,11 +117,11 @@ void x86_cpus_init(PCMachineState *pcms)
-      *
-      * This is used for FW_CFG_MAX_CPUS. See comments on fw_cfg_arch_cre=
-ate().
-      */
--    x86ms->apic_id_limit =3D x86_cpu_apic_id_from_index(pcms,
-+    x86ms->apic_id_limit =3D x86_cpu_apic_id_from_index(x86ms,
-                                                       ms->smp.max_cpus -=
- 1) + 1;
-     possible_cpus =3D mc->possible_cpu_arch_ids(ms);
-     for (i =3D 0; i < ms->smp.cpus; i++) {
--        x86_cpu_new(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
-+        x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal)=
-;
-     }
- }
-=20
-@@ -152,7 +149,6 @@ int64_t x86_get_default_cpu_node_id(const MachineStat=
-e *ms, int idx)
-=20
- const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
- {
--    PCMachineState *pcms =3D PC_MACHINE(ms);
-     X86MachineState *x86ms =3D X86_MACHINE(ms);
-     int i;
-     unsigned int max_cpus =3D ms->smp.max_cpus;
-@@ -174,7 +170,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(Machin=
-eState *ms)
-=20
-         ms->possible_cpus->cpus[i].type =3D ms->cpu_type;
-         ms->possible_cpus->cpus[i].vcpus_count =3D 1;
--        ms->possible_cpus->cpus[i].arch_id =3D x86_cpu_apic_id_from_inde=
-x(pcms, i);
-+        ms->possible_cpus->cpus[i].arch_id =3D x86_cpu_apic_id_from_inde=
-x(x86ms, i);
-         x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
-                                  x86ms->smp_dies, ms->smp.cores,
-                                  ms->smp.threads, &topo);
-@@ -331,8 +327,11 @@ static bool load_elfboot(const char *kernel_filename=
-,
+     xive->eat[lisn].w &=3D cpu_to_be64(~EAS_VALID);
      return true;
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index d2ac35bbe1..025c802e7b 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -118,11 +118,7 @@ static int spapr_irq_claim_xics(SpaprMachineState *s=
+papr, int irq, bool lsi,
+     ICSState *ics =3D spapr->ics;
+=20
+     assert(ics);
+-
+-    if (!ics_valid_irq(ics, irq)) {
+-        error_setg(errp, "IRQ %d is invalid", irq);
+-        return -1;
+-    }
++    assert(ics_valid_irq(ics, irq));
+=20
+     if (!ics_irq_free(ics, irq - ics->offset)) {
+         error_setg(errp, "IRQ %d is not free", irq);
+@@ -138,9 +134,9 @@ static void spapr_irq_free_xics(SpaprMachineState *sp=
+apr, int irq)
+     ICSState *ics =3D spapr->ics;
+     uint32_t srcno =3D irq - ics->offset;
+=20
+-    if (ics_valid_irq(ics, irq)) {
+-        memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
+-    }
++    assert(ics_valid_irq(ics, irq));
++
++    memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
  }
 =20
--void x86_load_linux(PCMachineState *pcms,
--                    FWCfgState *fw_cfg)
-+void x86_load_linux(X86MachineState *x86ms,
-+                    FWCfgState *fw_cfg,
-+                    int acpi_data_size,
-+                    bool pvh_enabled,
-+                    bool linuxboot_dma_enabled)
+ static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monitor =
+*mon)
+@@ -623,6 +619,9 @@ void spapr_irq_init(SpaprMachineState *spapr, Error *=
+*errp)
+=20
+ int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
  {
-     uint16_t protocol;
-     int setup_size, kernel_size, cmdline_size;
-@@ -342,9 +341,7 @@ void x86_load_linux(PCMachineState *pcms,
-     hwaddr real_addr, prot_addr, cmdline_addr, initrd_addr =3D 0;
-     FILE *f;
-     char *vmode;
--    MachineState *machine =3D MACHINE(pcms);
--    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
--    X86MachineState *x86ms =3D X86_MACHINE(pcms);
-+    MachineState *machine =3D MACHINE(x86ms);
-     struct setup_data *setup_data;
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *initrd_filename =3D machine->initrd_filename;
-@@ -387,7 +384,7 @@ void x86_load_linux(PCMachineState *pcms,
-          * saving the PVH entry point used by the x86/HVM direct boot AB=
-I.
-          * If load_elfboot() is successful, populate the fw_cfg info.
-          */
--        if (pcmc->pvh_enabled &&
-+        if (pvh_enabled &&
-             load_elfboot(kernel_filename, kernel_size,
-                          header, pvh_start_addr, fw_cfg)) {
-             fclose(f);
-@@ -417,7 +414,7 @@ void x86_load_linux(PCMachineState *pcms,
++    assert(irq >=3D SPAPR_XIRQ_BASE);
++    assert(irq < (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
++
+     return spapr->irq->claim(spapr, irq, lsi, errp);
+ }
 =20
-                 initrd_data =3D g_mapped_file_get_contents(mapped_file);
-                 initrd_size =3D g_mapped_file_get_length(mapped_file);
--                initrd_max =3D x86ms->below_4g_mem_size - pcmc->acpi_dat=
-a_size - 1;
-+                initrd_max =3D x86ms->below_4g_mem_size - acpi_data_size=
- - 1;
-                 if (initrd_size >=3D initrd_max) {
-                     fprintf(stderr, "qemu: initrd is too large, cannot s=
-upport."
-                             "(max: %"PRIu32", need %"PRId64")\n",
-@@ -495,8 +492,8 @@ void x86_load_linux(PCMachineState *pcms,
-         initrd_max =3D 0x37ffffff;
-     }
-=20
--    if (initrd_max >=3D x86ms->below_4g_mem_size - pcmc->acpi_data_size)=
+@@ -630,6 +629,9 @@ void spapr_irq_free(SpaprMachineState *spapr, int irq=
+, int num)
  {
--        initrd_max =3D x86ms->below_4g_mem_size - pcmc->acpi_data_size -=
- 1;
-+    if (initrd_max >=3D x86ms->below_4g_mem_size - acpi_data_size) {
-+        initrd_max =3D x86ms->below_4g_mem_size - acpi_data_size - 1;
-     }
+     int i;
 =20
-     fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_ADDR, cmdline_addr);
-@@ -645,7 +642,7 @@ void x86_load_linux(PCMachineState *pcms,
-=20
-     option_rom[nb_option_roms].bootindex =3D 0;
-     option_rom[nb_option_roms].name =3D "linuxboot.bin";
--    if (pcmc->linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
-+    if (linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
-         option_rom[nb_option_roms].name =3D "linuxboot_dma.bin";
++    assert(irq >=3D SPAPR_XIRQ_BASE);
++    assert((irq + num) <=3D (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
++
+     for (i =3D irq; i < (irq + num); i++) {
+         spapr->irq->free(spapr, i);
      }
-     nb_option_roms++;
 --=20
 2.21.0
 
