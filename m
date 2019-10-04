@@ -2,50 +2,50 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7642AC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 19:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C577C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 19:14:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 485AD2133F
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 19:13:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 485AD2133F
+	by mail.kernel.org (Postfix) with ESMTPS id DC5F82133F
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 19:14:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC5F82133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGT1P-0004Rz-8M
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 15:13:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39055)
+	id 1iGT1q-0004md-TE
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 15:14:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38937)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iGSzl-0003OI-1N
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 15:12:06 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iGSyp-0002dU-00
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 15:11:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iGSzk-0000zA-0H
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 15:12:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45886)
+ (envelope-from <mreitz@redhat.com>) id 1iGSyn-0000WQ-3h
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 15:11:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57468)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iGSzh-0000vr-E7; Fri, 04 Oct 2019 15:12:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iGSyi-0000T0-AC; Fri, 04 Oct 2019 15:11:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ABF68309DEED;
- Fri,  4 Oct 2019 19:12:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8545688FFF7;
+ Fri,  4 Oct 2019 19:10:58 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-31.brq.redhat.com
  [10.40.204.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44A495D6B7;
- Fri,  4 Oct 2019 19:11:56 +0000 (UTC)
-Subject: Re: [PATCH v2 11/11] iotests : add tests for encryption key management
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 658C05D9DC;
+ Fri,  4 Oct 2019 19:10:54 +0000 (UTC)
+Subject: Re: [PATCH v2 00/11] RFC crypto/luks: encryption key managment using
+ amend interface
 To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
 References: <20190912223028.18496-1-mlevitsk@redhat.com>
- <20190912223028.18496-12-mlevitsk@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -71,18 +71,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d66665e3-5eed-eef7-f56f-6392418913bf@redhat.com>
-Date: Fri, 4 Oct 2019 21:11:54 +0200
+Message-ID: <fb2cd2e0-2718-215f-d6af-59b64b229b4f@redhat.com>
+Date: Fri, 4 Oct 2019 21:10:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190912223028.18496-12-mlevitsk@redhat.com>
+In-Reply-To: <20190912223028.18496-1-mlevitsk@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="E2G0hklPUcubadvdC04s3yHiOYaYi9pav"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 04 Oct 2019 19:12:00 +0000 (UTC)
+ boundary="qV2i7o8QLouIVRpdPWmJQBmdkrnV0vfFU"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 04 Oct 2019 19:10:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -106,76 +106,62 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E2G0hklPUcubadvdC04s3yHiOYaYi9pav
-Content-Type: multipart/mixed; boundary="KJNA0jAkzYHSgNEyvUU7tmZjS8claQF5n"
+--qV2i7o8QLouIVRpdPWmJQBmdkrnV0vfFU
+Content-Type: multipart/mixed; boundary="YmrJOB98JEuByGlowhXXS3aUvxMubCzS1"
 
---KJNA0jAkzYHSgNEyvUU7tmZjS8claQF5n
+--YmrJOB98JEuByGlowhXXS3aUvxMubCzS1
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 13.09.19 00:30, Maxim Levitsky wrote:
-> Note that currently I add tests 300-302, which are
-> placeholders to ease the rebase. In final version
-> of these patches I will update these.
+> This patch series is continuation of my work to add encryption
+> key managment to luks/qcow2 with luks.
 >=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  tests/qemu-iotests/300     | 202 +++++++++++++++++++++++++++++
->  tests/qemu-iotests/300.out |  98 +++++++++++++++
->  tests/qemu-iotests/301     |  90 +++++++++++++
->  tests/qemu-iotests/301.out |  30 +++++
->  tests/qemu-iotests/302     | 252 +++++++++++++++++++++++++++++++++++++=
+> This is second version of this patch set.
+> The changes are mostly addressing the review feedback,
+> plus I tested (and fixed sadly) the somewhat ugly code
+> that allows to still write share a raw luks device,
+> while preveting the key managment from happening in this case,
+> as it is unsafe.
+> I added a new iotest dedicated to that as well.
+>=20
+> Best regards,
+> 	Maxim Levitsky
 
->  tests/qemu-iotests/302.out |  18 +++
->  tests/qemu-iotests/303     | 228 +++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/303.out |  28 +++++
->  tests/qemu-iotests/group   |   9 ++
->  9 files changed, 955 insertions(+)
->  create mode 100755 tests/qemu-iotests/300
->  create mode 100644 tests/qemu-iotests/300.out
->  create mode 100755 tests/qemu-iotests/301
->  create mode 100644 tests/qemu-iotests/301.out
->  create mode 100644 tests/qemu-iotests/302
->  create mode 100644 tests/qemu-iotests/302.out
->  create mode 100644 tests/qemu-iotests/303
->  create mode 100644 tests/qemu-iotests/303.out
-
-[...]
-
-> diff --git a/tests/qemu-iotests/303.out b/tests/qemu-iotests/303.out
-> new file mode 100644
-> index 0000000000..1cf3917208
-> --- /dev/null
-> +++ b/tests/qemu-iotests/303.out
-> @@ -0,0 +1,28 @@
-> +qemu-img: Failed to get shared "consistent read" lock
-> +Is another process using the image [/home/mlevitsk/USERSPACE/qemu/buil=
-d-luks/tests/qemu-iotests/scratch/test.img]?
-
-Ah, this should be filtered.
+At least for an RFC looks good from my perspective.  I didn=E2=80=99t loo=
+k at
+the crypto things very closely (assuming Dan would do so), and I didn=E2=80=
+=99t
+check the iotests in detail.  (But it definitely doesn=E2=80=99t look lik=
+e they
+lack in breadth.  Maybe I=E2=80=99d like to see a test that you cannot ha=
+ve
+other useful nodes attached to the LUKS or qcow2 node while the
+amendment process is ongoing (because CONSISTENT_READ is unshared).  But
+that=E2=80=99s the only thing I can think of.)
 
 Max
 
 
---KJNA0jAkzYHSgNEyvUU7tmZjS8claQF5n--
+--YmrJOB98JEuByGlowhXXS3aUvxMubCzS1--
 
---E2G0hklPUcubadvdC04s3yHiOYaYi9pav
+--qV2i7o8QLouIVRpdPWmJQBmdkrnV0vfFU
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XmXoACgkQ9AfbAGHV
-z0CpaAf9Fx6RgFxZyaKl/hA9VSE3VrkyhLwhW5tC1UoNbKhRXAJW6BfuIknYou3/
-xiw5bQC5s1VUeeZT5H5oIcr87N/wo7THFXPGbZW+bAS8rSdydBYshHkDXLNkxgDn
-Hm/w+J2I6WemR3aOFwTMp44LCNeA2M9WZJbzbQweGCQy1/ZuxZCF1IOb8WxTBPan
-g+vnbPkUNuVN5zC5EGmU7YhQ+dD1rb4BjxeQXp3vNb/57P5KHpVfdN20cCPRqskr
-ONTQEaYpWBgojMSCepkZ/rGvZ/+6MtistZGTYz+i3+GltNvfnxmObEH/Q0sXyu6A
-d18ROoN8WRY95y5n6SoTLdVC4L1tTQ==
-=rgwH
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XmTwACgkQ9AfbAGHV
+z0AF3ggAnqEAGmWF1hxpLdPnV4GeNYqGL85NNhh+q+rE5UDPxBXHH70qjxxzll32
+1GlFMUTMev4UJkh4hmdXZrJV02Hoj4QUk++6whKdyIKY1jj7dENXl8lyOh7TaWb7
+u/xPsPA1fE2Q660P54oLq9l5gQyR1n9Z81EBFTe+p0GaXUSoiptu1CXJHB7HFzPJ
+2rezhnRXyfvRfZ68TA6eY0cpM/jOczsWzjor9EzDIF8vxI0P3R+6ePo5x/B2pgMB
+xSBaZqSksPOQyysCixVSCXskjFbBvBhdWxgIAMHegMMu/gFVJJUsGMrq7guOuUYJ
+a+ITgWMBBlPTh9utq86qIlObsEDVTg==
+=/U3q
 -----END PGP SIGNATURE-----
 
---E2G0hklPUcubadvdC04s3yHiOYaYi9pav--
+--qV2i7o8QLouIVRpdPWmJQBmdkrnV0vfFU--
 
