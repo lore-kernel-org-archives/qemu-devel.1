@@ -2,65 +2,62 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9785CC47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 06:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0178C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 06:56:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D5BC20862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 06:55:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D5BC20862
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A424F20862
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 06:56:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A424F20862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGHUt-0002Nj-E9
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 02:55:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47767)
+	id 1iGHW7-0003L1-SB
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 02:56:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iGHSr-0001VE-R4
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 02:53:22 -0400
+ (envelope-from <drjones@redhat.com>) id 1iGHUE-0002C8-UX
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 02:54:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iGHSq-000659-N8
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 02:53:21 -0400
-Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:46804)
+ (envelope-from <drjones@redhat.com>) id 1iGHUA-0006Tf-SU
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 02:54:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37390)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iGHSq-00064D-H5
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 02:53:20 -0400
-Received: from player730.ha.ovh.net (unknown [10.108.54.209])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id D7E727AF89
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 08:53:17 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player730.ha.ovh.net (Postfix) with ESMTPSA id 6BB00A6EB1E5;
- Fri,  4 Oct 2019 06:53:13 +0000 (UTC)
-Date: Fri, 4 Oct 2019 08:52:57 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 2/7] spapr, xive: Turn "nr-ends" property into
- "nr-servers" property
-Message-ID: <20191004085257.53bcfcce@bahia.lan>
-In-Reply-To: <6313a1ea-f891-d7a0-c5f1-ecf656b58bc3@kaod.org>
-References: <157010404888.246126.9768030542733152637.stgit@bahia.lan>
- <157010406203.246126.13381271918474281392.stgit@bahia.lan>
- <20191004040725.GB27597@umbus.fritz.box>
- <6313a1ea-f891-d7a0-c5f1-ecf656b58bc3@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iGHUA-0006TT-N8
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 02:54:42 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3417B309B142;
+ Fri,  4 Oct 2019 06:54:41 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 26C83608A5;
+ Fri,  4 Oct 2019 06:54:39 +0000 (UTC)
+Date: Fri, 4 Oct 2019 08:54:37 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: "Zhang, Lei" <zhang.lei@jp.fujitsu.com>
+Subject: Re: [PATCH v5 0/9] target/arm/kvm: enable SVE in guests
+Message-ID: <20191004065437.xrcdsvytouau5fus@kamzik.brq.redhat.com>
+References: <8898674D84E3B24BA3A2D289B872026A78C9895A@G01JPEXMBKW03>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 17031769365850265995
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrhedtgdegkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8898674D84E3B24BA3A2D289B872026A78C9895A@G01JPEXMBKW03>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 04 Oct 2019 06:54:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.58.91
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,38 +69,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "Mizuma, Masayoshi" <masayoshi.mizuma@fujitsu.com>, "Okamoto,
+ Takayuki" <tokamoto@jp.fujitsu.com>,
+ "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 4 Oct 2019 07:53:13 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On Thu, Oct 03, 2019 at 11:55:36PM +0000, Zhang, Lei wrote:
+> Hi Jones,
+> 
+> Thanks for your patch.
+> 
+> I have tested the v5 patch.
+> 
+> All the test is passed, except one problem.
+> The problem was reported
+> in [[Qemu-devel] [RFC QEMU v2 0/2] arm/virt: Account for guest pause time]
+> https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05713.html
 
-> >> @@ -283,11 +292,13 @@ static void spapr_xive_realize(DeviceState *dev,=
- Error **errp)
-> >>          return;
-> >>      }
-> >> =20
-> >> -    if (!xive->nr_ends) {
-> >> -        error_setg(errp, "Number of interrupt needs to be greater 0");
-> >> +    if (!xive->nr_servers) {
-> >> +        error_setg(errp, "Number of interrupt servers must be greater=
- than 0");
-> >>          return;
-> >>      }
-> >> =20
-> >> +    xive->nr_ends =3D spapr_xive_vcpu_id_to_end_idx(xive->nr_servers);
-> >=20
-> > I'd prefer not to store both nr_servers and nr_servers * 8 in the
-> > structure.  I think you just want xive->nr_servers, then derive it any
-> > any places that current look at xive->nr_ends.
->=20
-> Yes I agree. This is a small change.
->=20
+This problem is unrelated to SVE.
 
-I'm afraid it isn't that simple (see my other mail).
+> 
+> My test environment is below.
+> 
+> *QEMU
+> base + v5 pathc
+> 
+> base is 
+>     commit 860d9048c78ce59c5903c3d5209df56f38400986
+>     Merge: 8dc5728 571a8c5
+>     Author: Peter Maydell <peter.maydell@linaro.org>
+>     Date:   Tue Sep 24 13:51:51 2019 +0100
+>     
+> 
+> *libvirt
+> https://github.com/andreabolognani/libvirt/tree/sve
+> 
+> commit 236fb544ff8fcecfc618608b3ae2b65fc74e4d7c
+> 
+> *Kernel
+> 5.3.1
+> 
+> Best Regards,
+> Lei Zhang
+>
 
-> C.=20
+Since the problem you point out is not related to SVE, or this series,
+then do you agree to providing a tested-by for this series?
+
+Thanks,
+drew
 
