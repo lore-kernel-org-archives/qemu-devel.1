@@ -2,62 +2,60 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E45C3C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB2FC47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:37:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B143020862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:36:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cnKDtOac"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B143020862
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 9F5B42133F
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:37:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F5B42133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGKx9-0008Og-Aq
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:36:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53697)
+	id 1iGKxf-0000p9-31
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:37:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53846)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK3c-0006Ro-0f
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:29 -0400
+ (envelope-from <slp@redhat.com>) id 1iGK3o-0006nZ-VF
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK3a-0006T6-Hj
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:27 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42145 helo=ozlabs.org)
+ (envelope-from <slp@redhat.com>) id 1iGK3n-0006e4-QL
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54226)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iGK3a-00069F-6H; Fri, 04 Oct 2019 05:39:26 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46l4YS4VyJz9sSY; Fri,  4 Oct 2019 19:38:04 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570181884;
- bh=cy9gyLqDPGUtk2o5RpCfwdiKF45fFSPX8h9YpV09mio=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=cnKDtOacoFNp35np86GNg3aTV2XSDbHX0O15zz8fqqkYpuiSiLICc6vrPmkzsAjMA
- 3c3J2gRY+ZltBDUpLrWsXATfpqyEsOYOsov2V6AplA7oWUpyt9KgQYnLq/tFK0YSUe
- iTWHHMM/WqFKNHOBhK1iaaQNSNOZf8bMUacHCeuM=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 49/53] xive: Improve irq claim/free path
-Date: Fri,  4 Oct 2019 19:37:43 +1000
-Message-Id: <20191004093747.31350-50-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191004093747.31350-1-david@gibson.dropbear.id.au>
-References: <20191004093747.31350-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iGK3n-0006cW-L7
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:39:39 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DD1D03090FDE;
+ Fri,  4 Oct 2019 09:39:38 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.79])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 651831001B28;
+ Fri,  4 Oct 2019 09:39:31 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 07/10] hw/intc/apic: reject pic ints if isa_pic == NULL
+Date: Fri,  4 Oct 2019 11:37:49 +0200
+Message-Id: <20191004093752.16564-8-slp@redhat.com>
+In-Reply-To: <20191004093752.16564-1-slp@redhat.com>
+References: <20191004093752.16564-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 04 Oct 2019 09:39:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,192 +67,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: ehabkost@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
+ lersek@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-spapr_xive_irq_claim() returns a bool to indicate if it succeeded.
-But most of the callers and one callee use int return values and/or an
-Error * with more information instead.  In any case, ints are a more
-common idiom for success/failure states than bools (one never knows
-what sense they'll be in).
+In apic_accept_pic_intr(), reject PIC interruptions if a i8259 PIC has
+not been instantiated (isa_pic =3D=3D NULL).
 
-So instead change to an int return value to indicate presence of error
-+ an Error * to describe the details through that call chain.
-
-It also didn't actually check if the irq was already claimed, which is
-one of the primary purposes of the claim path, so do that.
-
-spapr_xive_irq_free() also returned a bool... which no callers checked
-and was always true, so just drop it.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
- hw/intc/spapr_xive.c        | 20 +++++++++-----------
- hw/intc/spapr_xive_kvm.c    |  8 ++++----
- hw/ppc/spapr_irq.c          | 11 +++++------
- include/hw/ppc/spapr_xive.h |  4 ++--
- include/hw/ppc/xive.h       |  2 +-
- 5 files changed, 21 insertions(+), 24 deletions(-)
+ hw/intc/apic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 47b5ec0b56..04879abf2e 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -528,12 +528,17 @@ static void spapr_xive_register_types(void)
+diff --git a/hw/intc/apic.c b/hw/intc/apic.c
+index bce89911dc..2a74f7b4bf 100644
+--- a/hw/intc/apic.c
++++ b/hw/intc/apic.c
+@@ -610,7 +610,7 @@ int apic_accept_pic_intr(DeviceState *dev)
 =20
- type_init(spapr_xive_register_types)
+     if ((s->apicbase & MSR_IA32_APICBASE_ENABLE) =3D=3D 0 ||
+         (lvt0 & APIC_LVT_MASKED) =3D=3D 0)
+-        return 1;
++        return isa_pic !=3D NULL;
 =20
--bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t lisn, bool lsi)
-+int spapr_xive_irq_claim(SpaprXive *xive, int lisn, bool lsi, Error **er=
-rp)
- {
-     XiveSource *xsrc =3D &xive->source;
-=20
-     assert(lisn < xive->nr_irqs);
-=20
-+    if (xive_eas_is_valid(&xive->eat[lisn])) {
-+        error_setg(errp, "IRQ %d is not free", lisn);
-+        return -EBUSY;
-+    }
-+
-     /*
-      * Set default values when allocating an IRQ number
-      */
-@@ -543,24 +548,17 @@ bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t=
- lisn, bool lsi)
-     }
-=20
-     if (kvm_irqchip_in_kernel()) {
--        Error *local_err =3D NULL;
--
--        kvmppc_xive_source_reset_one(xsrc, lisn, &local_err);
--        if (local_err) {
--            error_report_err(local_err);
--            return false;
--        }
-+        return kvmppc_xive_source_reset_one(xsrc, lisn, errp);
-     }
-=20
--    return true;
-+    return 0;
+     return 0;
  }
-=20
--bool spapr_xive_irq_free(SpaprXive *xive, uint32_t lisn)
-+void spapr_xive_irq_free(SpaprXive *xive, int lisn)
- {
-     assert(lisn < xive->nr_irqs);
-=20
-     xive->eat[lisn].w &=3D cpu_to_be64(~EAS_VALID);
--    return true;
- }
-=20
- /*
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 2006f96aec..51b334b676 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -232,14 +232,14 @@ void kvmppc_xive_sync_source(SpaprXive *xive, uint3=
-2_t lisn, Error **errp)
-  * only need to inform the KVM XIVE device about their type: LSI or
-  * MSI.
-  */
--void kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **e=
-rrp)
-+int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **er=
-rp)
- {
-     SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
-     uint64_t state =3D 0;
-=20
-     /* The KVM XIVE device is not in use */
-     if (xive->fd =3D=3D -1) {
--        return;
-+        return -ENODEV;
-     }
-=20
-     if (xive_source_irq_is_lsi(xsrc, srcno)) {
-@@ -249,8 +249,8 @@ void kvmppc_xive_source_reset_one(XiveSource *xsrc, i=
-nt srcno, Error **errp)
-         }
-     }
-=20
--    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE, srcno, &state,
--                      true, errp);
-+    return kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE, srcno, &=
-state,
-+                             true, errp);
- }
-=20
- static void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 025c802e7b..516bf00a35 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -246,7 +246,10 @@ static void spapr_irq_init_xive(SpaprMachineState *s=
-papr, Error **errp)
-=20
-     /* Enable the CPU IPIs */
-     for (i =3D 0; i < nr_servers; ++i) {
--        spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i, false);
-+        if (spapr_xive_irq_claim(spapr->xive, SPAPR_IRQ_IPI + i,
-+                                 false, errp) < 0) {
-+            return;
-+        }
-     }
-=20
-     spapr_xive_hcall_init(spapr);
-@@ -255,11 +258,7 @@ static void spapr_irq_init_xive(SpaprMachineState *s=
-papr, Error **errp)
- static int spapr_irq_claim_xive(SpaprMachineState *spapr, int irq, bool =
-lsi,
-                                 Error **errp)
- {
--    if (!spapr_xive_irq_claim(spapr->xive, irq, lsi)) {
--        error_setg(errp, "IRQ %d is invalid", irq);
--        return -1;
--    }
--    return 0;
-+    return spapr_xive_irq_claim(spapr->xive, irq, lsi, errp);
- }
-=20
- static void spapr_irq_free_xive(SpaprMachineState *spapr, int irq)
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index bfd40f01d8..0df20a6590 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -54,8 +54,8 @@ typedef struct SpaprXive {
-  */
- #define SPAPR_XIVE_BLOCK_ID 0x0
-=20
--bool spapr_xive_irq_claim(SpaprXive *xive, uint32_t lisn, bool lsi);
--bool spapr_xive_irq_free(SpaprXive *xive, uint32_t lisn);
-+int spapr_xive_irq_claim(SpaprXive *xive, int lisn, bool lsi, Error **er=
-rp);
-+void spapr_xive_irq_free(SpaprXive *xive, int lisn);
- void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
- int spapr_xive_post_load(SpaprXive *xive, int version_id);
-=20
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 6d38755f84..fd3319bd32 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -425,7 +425,7 @@ static inline uint32_t xive_nvt_cam_line(uint8_t nvt_=
-blk, uint32_t nvt_idx)
-  * KVM XIVE device helpers
-  */
-=20
--void kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **e=
-rrp);
-+int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **er=
-rp);
- void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val);
- void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
- void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp);
 --=20
 2.21.0
 
