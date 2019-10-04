@@ -2,66 +2,64 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DCAC10F14
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 02:01:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA574C10F14
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 02:30:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7183207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 02:01:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7183207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5BF12086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 02:30:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Jjn9Bf7P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5BF12086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGCug-0000es-A2
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 22:01:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57098)
+	id 1iGDMS-0008Qm-DG
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 22:30:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGCsX-0008Uo-Jx
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 21:59:34 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iGDHa-0006VV-UO
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 22:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGCsW-0007bC-7D
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 21:59:33 -0400
-Received: from cmccmta2.chinamobile.com ([221.176.66.80]:16174)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGCsU-0007Yt-2n
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 21:59:32 -0400
-Received: from spf.mail.chinamobile.com (unknown[172.16.121.1]) by
- rmmx-syy-dmz-app07-12007 (RichMail) with SMTP id 2ee75d96a7726c8-b150a;
- Fri, 04 Oct 2019 09:59:14 +0800 (CST)
-X-RM-TRANSID: 2ee75d96a7726c8-b150a
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG: 00000000
-Received: from [192.168.5.184] (unknown[180.108.8.156])
- by rmsmtp-syy-appsvr01-12001 (RichMail) with SMTP id 2ee15d96a770ec8-9bb6e;
- Fri, 04 Oct 2019 09:59:14 +0800 (CST)
-X-RM-TRANSID: 2ee15d96a770ec8-9bb6e
-Subject: =?UTF-8?B?UmU6IF9bUEFUQ0hfdjJfMy8zXV90ZXN0cy9taWdyYXRpb27vvJpmaXhf?=
- =?UTF-8?Q?unreachable=5fpath=5fin=5fstress=5ftest?=
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <cover.1568170994.git.maozhongyi@cmss.chinamobile.com>
- <555aac83ecd42d21e6311962e793dd4ce2a77902.1568170994.git.maozhongyi@cmss.chinamobile.com>
- <28738cd1-f32d-6d25-e23f-93d3e96271c9@vivier.eu>
- <0cac9381-6bc4-9431-5cdb-c2353857d476@cmss.chinamobile.com>
- <b39ace2c-5826-69c0-f238-7db82e901c20@vivier.eu>
-From: maozy <maozhongyi@cmss.chinamobile.com>
-Message-ID: <13706032-5ba3-0be0-471c-2b5845b7d7b2@cmss.chinamobile.com>
-Date: Fri, 4 Oct 2019 09:59:02 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.0
+ (envelope-from <dgibson@ozlabs.org>) id 1iGDHZ-00011V-AD
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 22:25:26 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:56017)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iGDHV-0000uF-Lx; Thu, 03 Oct 2019 22:25:24 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46kty23HRxz9sPq; Fri,  4 Oct 2019 12:25:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1570155914;
+ bh=JXYfyJWqmwUgKWts+J50NYzPm8aCRHAvHjyxMKQBlmg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Jjn9Bf7PjvM/b0KBmV0Opt4a5S9xtqHs3HiP79dufjG9saq9NPXWtEw9NQdS7LUL4
+ beicNxLifPABFQHDZxE0+YdgJFThV9lTvM3W9nWtCkGt+p5g75WZT/cPcapVFYkcgZ
+ XKQWEQQq7KLRuPjhizeKrVhU2P1MBm6L7SOfC+NM=
+Date: Fri, 4 Oct 2019 10:25:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH] ppc/pnv: Remove the XICSFabric Interface from the POWER9
+ machine
+Message-ID: <20191004002545.GA27597@umbus.fritz.box>
+References: <20191003143617.21682-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <b39ace2c-5826-69c0-f238-7db82e901c20@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 221.176.66.80
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="n8g4imXOkfNTN/H1"
+Content-Disposition: inline
+In-Reply-To: <20191003143617.21682-1-clg@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,87 +71,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tony.nguyen@bt.com, alex.bennee@linaro.org, armbru@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--n8g4imXOkfNTN/H1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 10/3/19 5:23 PM, Laurent Vivier wrote:
-> Le 03/10/2019 à 09:17, maozy a écrit :
->> Hi,  Laurent
->>
->> On 10/1/19 11:46 PM, Laurent Vivier wrote:
->>> Le 11/09/2019 à 05:31, Mao Zhongyi a écrit :
->>>> if stress function always return 0, the path
->>>> 'if (stress(ramsizeGB, ncpus) < 0)' is nerver unreachable,
->>>> so fix it to allow the test failed.
->>>>
->>>> Cc: armbru@redhat.com
->>>> Cc: laurent@vivier.eu
->>>> Cc: tony.nguyen@bt.com
->>>>
->>>> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
->>>> ---
->>>>    tests/migration/stress.c | 5 ++---
->>>>    1 file changed, 2 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/tests/migration/stress.c b/tests/migration/stress.c
->>>> index 19a6eff5fd..35903d90c4 100644
->>>> --- a/tests/migration/stress.c
->>>> +++ b/tests/migration/stress.c
->>>> @@ -224,6 +224,7 @@ static int stressone(unsigned long long ramsizeMB)
->>>>                }
->>>>            }
->>>>        }
->>>> +    return 0;
->>>>    }
->>> before the return, we have an infinite loop "while(1) { }".
->>>
->>> So this part is dead code.
->>>
->>> In fact, if the function exits, it's because it fails, otherwise it
->>> loops infinitely, so I think we should change its type to void and
->>> stress should always return -1.
->> Yes, I think it's ok to change stressone typo to void because
->> no one cares about its return value, but if make stress always
->> return -1, main will always exited in exit_failure, like this:
->>
->> ...
->>      if (stress(ramsizeGB, ncpus) < 0)
->>          exit_failure();
->>
->>      exit_success();
->> }
->>
->> so, perhaps also change stress typo to void may be good. then:
->>
->> ...
->>      stress(ramsizeGB, ncpus);
->>
->>      exit_success();
->> }
->>
->> Anther way , make stressone return 0 when infinite loop fails to
->> exit, then main can handle both success and failure case.
->>
->> what do you think?
->>
-> 
-> If stressone() or stress() exits it's because of a failure because the
-> test runs forever otherwise.
-> 
-> So I think there is no problem to use exit_failure() as the exit
-> function of main(): it should never be reached if the test runs without
-> error.
+On Thu, Oct 03, 2019 at 04:36:17PM +0200, C=E9dric Le Goater wrote:
+> The POWER8 PowerNV machine needs to implement a XICSFabric interface
+> as this is the POWER8 interrupt controller model. But the POWER9
+> machine uselessly inherits of XICSFabric from the common PowerNV
+> machine definition.
+>=20
+> Open code machine definitions to have a better control on the
+> different interfaces each machine should define.
+>=20
+> Fixes: f30c843ced50 ("ppc/pnv: Introduce PowerNV machines with fixed CPU =
+models")
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-OK, I see, thanks a lot.
+Applied to ppc-for-4.2, thanks.
 
-> 
-> Thanks,
-> Laurent
-> 
+> ---
+>  hw/ppc/pnv.c | 31 ++++++++++++++-----------------
+>  1 file changed, 14 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 77a86c6a2301..7cf64b6d2533 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -1485,23 +1485,21 @@ static void pnv_machine_class_init(ObjectClass *o=
+c, void *data)
+>          .parent        =3D TYPE_PNV9_CHIP,          \
+>      }
+> =20
+> -#define DEFINE_PNV_MACHINE_TYPE(cpu, class_initfn)      \
+> -    {                                                   \
+> -        .name          =3D MACHINE_TYPE_NAME(cpu),        \
+> -        .parent        =3D TYPE_PNV_MACHINE,              \
+> -        .instance_size =3D sizeof(PnvMachineState),       \
+> -        .instance_init =3D pnv_machine_instance_init,     \
+> -        .class_init    =3D class_initfn,                  \
+> -        .interfaces =3D (InterfaceInfo[]) {               \
+> -            { TYPE_XICS_FABRIC },                       \
+> -            { TYPE_INTERRUPT_STATS_PROVIDER },          \
+> -            { },                                        \
+> -        },                                              \
+> -    }
+> -
+>  static const TypeInfo types[] =3D {
+> -    DEFINE_PNV_MACHINE_TYPE("powernv8", pnv_machine_power8_class_init),
+> -    DEFINE_PNV_MACHINE_TYPE("powernv9", pnv_machine_power9_class_init),
+> +    {
+> +        .name          =3D MACHINE_TYPE_NAME("powernv9"),
+> +        .parent        =3D TYPE_PNV_MACHINE,
+> +        .class_init    =3D pnv_machine_power9_class_init,
+> +    },
+> +    {
+> +        .name          =3D MACHINE_TYPE_NAME("powernv8"),
+> +        .parent        =3D TYPE_PNV_MACHINE,
+> +        .class_init    =3D pnv_machine_power8_class_init,
+> +        .interfaces =3D (InterfaceInfo[]) {
+> +            { TYPE_XICS_FABRIC },
+> +            { },
+> +        },
+> +    },
+>      {
+>          .name          =3D TYPE_PNV_MACHINE,
+>          .parent        =3D TYPE_MACHINE,
+> @@ -1510,7 +1508,6 @@ static const TypeInfo types[] =3D {
+>          .instance_init =3D pnv_machine_instance_init,
+>          .class_init    =3D pnv_machine_class_init,
+>          .interfaces =3D (InterfaceInfo[]) {
+> -            { TYPE_XICS_FABRIC },
+>              { TYPE_INTERRUPT_STATS_PROVIDER },
+>              { },
+>          },
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--n8g4imXOkfNTN/H1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2WkYkACgkQbDjKyiDZ
+s5LC3w/9FWZ9xwFkz2KzYYah7AsoiUu/zJyP9gBkDQrxaS6yzSjdn9jWJx9d5M3a
+EUZXeHRd8uX2Vspq7e/jb+miBJ7afdRLZHTfjdzzd8mdZkKYcUrcSQNq6oYhSRiu
+P2ejglxzHjeA0GBdcAEnBWnvPohMiHR+tDotSsBe9heEQeapU15Nvl8qT1MR+IaK
+jiiRC4nUv8xVLQdMTVZbJXD+Pdhgi7ELWDH/+etnd7zcZtgvdzjjq1vbHGPyqGT8
+sNIywza0CJa8dUn4YY3K10rRkdMIuUliUoojmkOE/yoPkM1mqTb32u5BQXEU5JMn
+Oi5GDJc3+QNXfYga+S3kN0D/0Bjt2oy+6y6cHmiBThv9dnMECfCXtwVQmzktu/Xp
+8K53vqiSBiEYOpq7mg03GTIwMK3yPhYJJcpqiNXResCxdPlthllzg1QZbjT5AYkb
+8JffNtcQ2JQfg5LrVeDAShNs+vO9tBRi/H0QaB+uvCkN8p3tcocEmtQ31+TSgRYi
+ZwKQxt58DxmeeYogS7c7RgCm2kp/+vqbjls7Y64moTH1L3zlzeWRSmReJD4lfFhd
+blkiEHxkUqEA4qvZueGhcsCfTBRt7B9naxzGnGU08D/MZH0D0CQt7ATMKu4LZGrr
+JLdKGXqSP+kPf0n8MAWOU171UKIqgXtch5GBgG9NHzw4XTzjQqY=
+=83VT
+-----END PGP SIGNATURE-----
+
+--n8g4imXOkfNTN/H1--
 
