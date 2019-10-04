@@ -2,88 +2,66 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D82DC47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E94C47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:06:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67C6B215EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:48:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67C6B215EA
+	by mail.kernel.org (Postfix) with ESMTPS id 7B07C2077B
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:06:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B07C2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGRh6-00086a-Hd
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 13:48:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56245)
+	id 1iGRyG-0004BW-J0
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 14:06:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iGRbW-0005pl-Rx
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 13:43:00 -0400
+ (envelope-from <eblake@redhat.com>) id 1iGRxQ-0003eq-J1
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:05:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iGRbV-0003H0-UR
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 13:42:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57313)
+ (envelope-from <eblake@redhat.com>) id 1iGRxP-0005Wb-HE
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:05:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58264)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iGRbP-0003Ds-Mj; Fri, 04 Oct 2019 13:42:53 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iGRxK-0005SE-7W; Fri, 04 Oct 2019 14:05:30 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E56898980E5;
- Fri,  4 Oct 2019 17:42:50 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-31.brq.redhat.com
- [10.40.204.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C21BB5D6B7;
- Fri,  4 Oct 2019 17:42:46 +0000 (UTC)
-Subject: Re: [PATCH v2 02/11] qcrypto-luks: extend the create options for
- upcoming encryption key management
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190912223028.18496-1-mlevitsk@redhat.com>
- <20190912223028.18496-3-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e0e85ab0-e84b-0ee8-8467-ff11e803f7cf@redhat.com>
-Date: Fri, 4 Oct 2019 19:42:45 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 5DC9DC065116;
+ Fri,  4 Oct 2019 18:05:29 +0000 (UTC)
+Received: from [10.3.117.6] (ovpn-117-6.phx2.redhat.com [10.3.117.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D322710018F8;
+ Fri,  4 Oct 2019 18:05:25 +0000 (UTC)
+Subject: Re: [PATCH v9 3/3] iotests: test nbd reconnect
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190917171322.4127-1-vsementsov@virtuozzo.com>
+ <20190917171322.4127-4-vsementsov@virtuozzo.com>
+ <7f0a7890-7b3d-9fd7-954d-389a8e28106f@redhat.com>
+ <88a7e9c9-caf2-b114-93c4-7c99036c9b33@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <7854fa11-5c2d-4b88-16f8-2bbb2679efa2@redhat.com>
+Date: Fri, 4 Oct 2019 13:05:24 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190912223028.18496-3-mlevitsk@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="hfNEjsVadiHqYVdtPh9Mm4blVj5DnuNr3"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Fri, 04 Oct 2019 17:42:50 +0000 (UTC)
+In-Reply-To: <88a7e9c9-caf2-b114-93c4-7c99036c9b33@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 04 Oct 2019 18:05:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -98,73 +76,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hfNEjsVadiHqYVdtPh9Mm4blVj5DnuNr3
-Content-Type: multipart/mixed; boundary="Aw4REuJDSIFhIY2gmaIGXDOzuAmoSkj2f"
+On 9/24/19 3:31 AM, Vladimir Sementsov-Ogievskiy wrote:
 
---Aw4REuJDSIFhIY2gmaIGXDOzuAmoSkj2f
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+>>> +def qemu_nbd_popen(*args):
+>>> +    '''Run qemu-nbd in daemon mode and return the parent's exit code'''
+>>> +    return subprocess.Popen(qemu_nbd_args + ['--persistent'] + list(args))
+>>> +
+>>
+>> Should you also use a pid file here, and wait for the existence of the
+>> pid file before returning (rather than hard-coding sleep(1))?
+> 
+> What do you mean / how to do it?
+> 
+> We want to wait until listening socket is prepared..
 
-On 13.09.19 00:30, Maxim Levitsky wrote:
-> Now you can specify which slot to put the encryption key to
-> Plus add 'active' option which will let  user erase the key secret
-> instead of adding it.
-> Check that active=3Dtrue it when creating.
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  block/crypto.c             |  2 ++
->  block/crypto.h             | 16 +++++++++++
->  block/qcow2.c              |  2 ++
->  crypto/block-luks.c        | 26 +++++++++++++++---
->  qapi/crypto.json           | 19 ++++++++++++++
->  tests/qemu-iotests/082.out | 54 ++++++++++++++++++++++++++++++++++++++=
+In shell:
 
->  6 files changed, 115 insertions(+), 4 deletions(-)
+qemu-nbd --pid-file=/path/to/file ...
+while [ ! -e /path/to/file ]; do
+   sleep ... # fractional second, or exponential, or whatever...
+done
+# Now the listening socket is indeed prepared
 
-(Just doing a cursory RFC-style review)
+You'd have to translate that idiom to python.
 
-I think we also want to reject unlock-secret if it=E2=80=99s given for cr=
-eation;
-and I suppose it=E2=80=99d be more important to print which slots are OK =
-than
-the slot the user has given.  (It isn=E2=80=99t like we shouldn=E2=80=99t=
- print that
-slot index, but it=E2=80=99s more likely the user knows that than what th=
-e
-limits are.  I think.)
+Or:
 
-Max
+pre-open Unix socket at /path/to/socket
+LISTEN_PID=... LISTEN_FDS=1 qemu-nbd ... 3<>/path/to/socket
 
+Now the socket is pre-created and passed into qemu-nbd via systemd 
+socket activation, so you know the listening socket is ready without 
+having to do any loop at all.  Here's a patch in libnbd where we just 
+switched from waiting for the port to appear (because the test predated 
+qemu-nbd pidfile support) to instead using socket activation, for reference:
+https://github.com/libguestfs/libnbd/commit/352331d177
 
---Aw4REuJDSIFhIY2gmaIGXDOzuAmoSkj2f--
-
---hfNEjsVadiHqYVdtPh9Mm4blVj5DnuNr3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XhJUACgkQ9AfbAGHV
-z0Al4gf9FI6iKecp8d7SihA+8lgm6buJ3D0KwHK4HJCndnm/IUHFqQ8aopHZ2MvX
-8DMmLxYQ08l6EetWDtbz4co3buBZNCfNYda5UC3Bt3CshtfmrMCtJkgjUVOJkIv6
-dD1VmeTLRDouMEzpgVkQ4a0jABM8jKpqKc+XVe/kOKq/CxItvo9irVxfqzAeYCAr
-DHgXrUmKbHGPflirD2bYGa3OVnzK4yX0nJ1rrGyABRGfsD0EPIpOMiIe5k9m30w8
-KicSpKLYsxWoUVjajfTv9G8fk26APR/3uQlD1ARITMS4gwALkyB4yqIbeNwHWyeg
-8vFCJ9vraxpw4I3lBbsnye+JPaU7jw==
-=zG18
------END PGP SIGNATURE-----
-
---hfNEjsVadiHqYVdtPh9Mm4blVj5DnuNr3--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
