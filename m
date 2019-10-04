@@ -2,57 +2,59 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD23C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD1EC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:48:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D61F7207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:46:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D61F7207FF
+	by mail.kernel.org (Postfix) with ESMTPS id C5EA820867
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:48:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5EA820867
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGM1X-00019R-0k
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:45:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50043)
+	id 1iGM4I-0002av-9f
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:48:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1iGLdX-00071B-Ff
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:20:41 -0400
+ (envelope-from <drjones@redhat.com>) id 1iGLny-00089B-Ox
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1iGLdS-0007kv-Qx
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:20:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43778)
+ (envelope-from <drjones@redhat.com>) id 1iGLnw-0000HK-G3
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:31:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32932)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1iGLdS-0007hG-IE
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:20:34 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iGLno-0000AT-U9; Fri, 04 Oct 2019 07:31:17 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5BE5A20F0;
- Fri,  4 Oct 2019 11:20:32 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-117-64.ams2.redhat.com [10.36.117.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1ED4660BE1;
- Fri,  4 Oct 2019 11:20:27 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, quintela@redhat.com
-Subject: [PATCH v3] migration: Support gtree migration
-Date: Fri,  4 Oct 2019 13:20:25 +0200
-Message-Id: <20191004112025.28868-1-eric.auger@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 7A3B1190C021;
+ Fri,  4 Oct 2019 11:31:15 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C57919C5B;
+ Fri,  4 Oct 2019 11:31:10 +0000 (UTC)
+Date: Fri, 4 Oct 2019 13:31:07 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Subject: Re: [PATCH] target/arm/arch_dump: Add SVE notes
+Message-ID: <20191004113107.p7fa5dw5v2vchotb@kamzik.brq.redhat.com>
+References: <20191004094609.32714-1-drjones@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191004094609.32714-1-drjones@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Fri, 04 Oct 2019 11:20:32 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.70]); Fri, 04 Oct 2019 11:31:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -67,733 +69,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peterx@redhat.com
+Cc: alex.bennee@linaro.org, peter.maydell@linaro.org,
+ richard.henderson@linaro.org, Dave.Martin@arm.com, eric.auger@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce support for GTree migration. A custom save/restore
-is implemented. Each item is made of a key and a data.
+On Fri, Oct 04, 2019 at 11:46:09AM +0200, Andrew Jones wrote:
+> When dumping a guest with dump-guest-memory also dump the SVE
+> registers if they are in use.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  include/elf.h          |   2 +
+>  target/arm/arch_dump.c | 133 ++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 133 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/elf.h b/include/elf.h
+> index 3501e0c8d03a..a7c357af74ca 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -1650,6 +1650,8 @@ typedef struct elf64_shdr {
+>  #define NT_ARM_HW_BREAK 0x402           /* ARM hardware breakpoint registers */
+>  #define NT_ARM_HW_WATCH 0x403           /* ARM hardware watchpoint registers */
+>  #define NT_ARM_SYSTEM_CALL      0x404   /* ARM system call number */
+> +#define NT_ARM_SVE	0x405		/* ARM Scalable Vector Extension
+> +					   registers */
+>  
+>  /*
+>   * Physical entry point into the kernel.
+> diff --git a/target/arm/arch_dump.c b/target/arm/arch_dump.c
+> index 26a2c098687c..98976167d155 100644
+> --- a/target/arm/arch_dump.c
+> +++ b/target/arm/arch_dump.c
+> @@ -62,12 +62,23 @@ struct aarch64_user_vfp_state {
+>  
+>  QEMU_BUILD_BUG_ON(sizeof(struct aarch64_user_vfp_state) != 528);
+>  
+> +/* struct user_sve_header from arch/arm64/include/uapi/asm/ptrace.h */
+> +struct aarch64_user_sve_header {
+> +    uint32_t size;
+> +    uint32_t max_size;
+> +    uint16_t vl;
+> +    uint16_t max_vl;
+> +    uint16_t flags;
+> +    uint16_t reserved;
+> +} QEMU_PACKED;
+> +
+>  struct aarch64_note {
+>      Elf64_Nhdr hdr;
+>      char name[8]; /* align_up(sizeof("CORE"), 4) */
+>      union {
+>          struct aarch64_elf_prstatus prstatus;
+>          struct aarch64_user_vfp_state vfp;
+> +        struct aarch64_user_sve_header sve;
+>      };
+>  } QEMU_PACKED;
+>  
+> @@ -76,6 +87,8 @@ struct aarch64_note {
+>              (AARCH64_NOTE_HEADER_SIZE + sizeof(struct aarch64_elf_prstatus))
+>  #define AARCH64_PRFPREG_NOTE_SIZE \
+>              (AARCH64_NOTE_HEADER_SIZE + sizeof(struct aarch64_user_vfp_state))
+> +#define AARCH64_SVE_NOTE_SIZE(env) \
+> +            (AARCH64_NOTE_HEADER_SIZE + sve_size(env))
+>  
+>  static void aarch64_note_init(struct aarch64_note *note, DumpState *s,
+>                                const char *name, Elf64_Word namesz,
+> @@ -128,11 +141,111 @@ static int aarch64_write_elf64_prfpreg(WriteCoreDumpFunction f,
+>      return 0;
+>  }
+>  
+> +#ifdef TARGET_AARCH64
+> +static off_t sve_zreg_offset(uint32_t vq, int n)
+> +{
+> +    off_t off = sizeof(struct aarch64_user_sve_header);
+> +    return ROUND_UP(off, 16) + vq * 16 * n;
+> +}
+> +static off_t sve_preg_offset(uint32_t vq, int n)
+> +{
+> +    return sve_zreg_offset(vq, 32) + vq * 16 / 8 * n;
+> +}
+> +static off_t sve_fpsr_offset(uint32_t vq)
+> +{
+> +    off_t off = sve_preg_offset(vq, 17) + offsetof(struct aarch64_note, sve);
+> +    return ROUND_UP(off, 16) - offsetof(struct aarch64_note, sve);
+> +}
+> +static off_t sve_fpcr_offset(uint32_t vq)
+> +{
+> +    return sve_fpsr_offset(vq) + sizeof(uint32_t);
+> +}
+> +static uint32_t sve_current_vq(CPUARMState *env)
+> +{
+> +    return sve_zcr_len_for_el(env, arm_current_el(env)) + 1;
+> +}
+> +static size_t sve_size(CPUARMState *env)
+> +{
+> +    off_t off = sve_fpcr_offset(sve_current_vq(env)) +
+> +                sizeof(uint32_t) +
+> +                offsetof(struct aarch64_note, sve);
+> +    return ROUND_UP(off, 16) - offsetof(struct aarch64_note, sve);
+> +}
+> +
+> +static int aarch64_write_elf64_sve(WriteCoreDumpFunction f,
+> +                                   CPUARMState *env, int cpuid,
+> +                                   DumpState *s)
+> +{
+> +    struct aarch64_note *note;
+> +    uint32_t vq = sve_current_vq(env);
+> +    uint32_t fpr;
+> +    uint8_t *buf;
+> +    size_t size;
+> +    int ret, i;
+> +
+> +    note = g_malloc0(AARCH64_SVE_NOTE_SIZE(env));
+> +    size = sve_size(env);
+> +    buf = (uint8_t *)&note->sve;
+> +
+> +    aarch64_note_init(note, s, "LINUX", 6, NT_ARM_SVE, size);
+> +
+> +    note->sve.size = cpu_to_dump32(s, size);
+> +    note->sve.max_size = cpu_to_dump32(s, size);
 
-If the key is a pointer to an object, 2 VMSDs are passed into
-the GTree VMStateField.
+Oops. I seemed to have mixed two approaches to this note.
 
-When putting the items, the tree is traversed in sorted order by
-g_tree_foreach.
+Approach 1) do what gcore does
+Approach 2) do what section 8 "ELF coredump extensions" of Linux kernel
+            doc Documentation/arm64/sve.rst says to do
 
-On the get() path, gtrees must be allocated using the proper
-key compare, key destroy and value destroy. This must be handled
-beforehand, for example in a pre_load method.
+Approach 2 says the contents of this note should be equivalent to what
+would have been read with ptrace. However Approach 1 has it's own idea
+of what to provide in the note. Namely it uses the current vl size for
+both 'size' and 'max_size', as I've done above, and it doesn't provide
+FPSR and FPCR in the SVE note, which I did provide below. But if you do a
+ptrace then you'll see FPSR and FPCR should be provided and the max_size
+is necessarily reflective of the max, as ptrace may be called multiple
+times - whereas with a core it doesn't really matter.
 
-Tests are added to test save/dump of structs containing gtrees
-including the virtio-iommu domain/mappings scenario.
+I'll post a v2 that implements Approach 2, because that's the documented
+way to do it. I'm open to arguments for Approach 1 though.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Thanks,
+drew
 
----
-
-v2 -> v3:
-- do not include glib.h anymore
-- introduce VMSTATE_GTREE_DIRECT_KEY_V
-- use pre_load to allocate the tree and remove data pointer
-- dump the number of nnodes and add checks on get path
-
-v1 -> v2:
-- fix compilation issues reported by robots
-- fixed init of VMSD array
-- direct key now dumped as a 32b
-- removed useless cast from/to pointer
----
- include/migration/vmstate.h |  40 ++++
- migration/vmstate-types.c   | 136 ++++++++++++
- tests/test-vmstate.c        | 421 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 597 insertions(+)
-
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 1fbfd099dd..98e5305d30 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -224,6 +224,7 @@ extern const VMStateInfo vmstate_info_unused_buffer;
- extern const VMStateInfo vmstate_info_tmp;
- extern const VMStateInfo vmstate_info_bitmap;
- extern const VMStateInfo vmstate_info_qtailq;
-+extern const VMStateInfo vmstate_info_gtree;
-=20
- #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
- /*
-@@ -754,6 +755,45 @@ extern const VMStateInfo vmstate_info_qtailq;
-     .start        =3D offsetof(_type, _next),                           =
-   \
- }
-=20
-+/*
-+ * For migrating a GTree whose key is a pointer to _key_type and the
-+ * value, a pointer to _val_type
-+ * The target tree must have been properly initialized
-+ * _vmsd: Start address of the 2 element array containing the key vmsd
-+ *        and the data vmsd
-+ * _key_type: type of the key
-+ * _val_type: type of the value
-+ */
-+#define VMSTATE_GTREE_V(_field, _state, _version, _vmsd,                =
-       \
-+                        _key_type, _val_type)                           =
-       \
-+{                                                                       =
-       \
-+    .name         =3D (stringify(_field)),                              =
-         \
-+    .version_id   =3D (_version),                                       =
-         \
-+    .vmsd         =3D (_vmsd),                                          =
-         \
-+    .info         =3D &vmstate_info_gtree,                              =
-         \
-+    .start        =3D sizeof(_key_type),                                =
-         \
-+    .size         =3D sizeof(_val_type),                                =
-         \
-+    .offset       =3D offsetof(_state, _field),                         =
-         \
-+}
-+
-+/*
-+ * For migrating a GTree whose key is a uint32 and the value a pointer
-+ * to _val_type
-+ * The target tree must have been properly initialized
-+ * _vmsd: data vmsd
-+ * _val_type: type of the value
-+ */
-+#define VMSTATE_GTREE_DIRECT_KEY_V(_field, _state, _version, _vmsd, _val=
-_type) \
-+{                                                                       =
-       \
-+    .name         =3D (stringify(_field)),                              =
-         \
-+    .version_id   =3D (_version),                                       =
-         \
-+    .vmsd         =3D (_vmsd),                                          =
-         \
-+    .info         =3D &vmstate_info_gtree,                              =
-         \
-+    .start        =3D 0,                                                =
-         \
-+    .size         =3D sizeof(_val_type),                                =
-         \
-+    .offset       =3D offsetof(_state, _field),                         =
-         \
-+}
-+
- /* _f : field name
-    _f_n : num of elements field_name
-    _n : num of elements
-diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-index bee658a1b2..cba8e660fe 100644
---- a/migration/vmstate-types.c
-+++ b/migration/vmstate-types.c
-@@ -691,3 +691,139 @@ const VMStateInfo vmstate_info_qtailq =3D {
-     .get  =3D get_qtailq,
-     .put  =3D put_qtailq,
- };
-+
-+struct put_gtree_data {
-+    QEMUFile *f;
-+    const VMStateDescription *key_vmsd;
-+    const VMStateDescription *val_vmsd;
-+    QJSON *vmdesc;
-+    int ret;
-+};
-+
-+static gboolean put_gtree_elem(gpointer key, gpointer value, gpointer da=
-ta)
-+{
-+    struct put_gtree_data *capsule =3D (struct put_gtree_data *)data;
-+    QEMUFile *f =3D capsule->f;
-+    int ret;
-+
-+    qemu_put_byte(f, true);
-+
-+    /* put the key */
-+    if (!capsule->key_vmsd) {
-+        qemu_put_be32(f, GPOINTER_TO_UINT(key)); /* direct key */
-+    } else {
-+        ret =3D vmstate_save_state(f, capsule->key_vmsd, key, capsule->v=
-mdesc);
-+        if (ret) {
-+            capsule->ret =3D ret;
-+            return true;
-+        }
-+    }
-+
-+    /* put the data */
-+    ret =3D vmstate_save_state(f, capsule->val_vmsd, value, capsule->vmd=
-esc);
-+    if (ret) {
-+        capsule->ret =3D ret;
-+        return true;
-+    }
-+    return false;
-+}
-+
-+static int put_gtree(QEMUFile *f, void *pv, size_t unused_size,
-+                     const VMStateField *field, QJSON *vmdesc)
-+{
-+    bool direct_key =3D (!field->start);
-+    const VMStateDescription *key_vmsd =3D direct_key ? NULL : &field->v=
-msd[0];
-+    const VMStateDescription *val_vmsd =3D direct_key ? &field->vmsd[0] =
-:
-+                                                      &field->vmsd[1];
-+    struct put_gtree_data capsule =3D {f, key_vmsd, val_vmsd, 0};
-+    GTree **pval =3D pv;
-+    GTree *tree =3D *pval;
-+    int ret;
-+
-+    qemu_put_be32(f, g_tree_nnodes(tree));
-+    g_tree_foreach(tree, put_gtree_elem, (gpointer)&capsule);
-+    qemu_put_byte(f, false);
-+    ret =3D capsule.ret;
-+    if (ret) {
-+        error_report("%s : failed to save gtree (%d)", field->name, ret)=
-;
-+    }
-+    return ret;
-+}
-+
-+static int get_gtree(QEMUFile *f, void *pv, size_t unused_size,
-+                     const VMStateField *field)
-+{
-+    bool direct_key =3D (!field->start);
-+    const VMStateDescription *key_vmsd =3D direct_key ? NULL : &field->v=
-msd[0];
-+    const VMStateDescription *val_vmsd =3D direct_key ? &field->vmsd[0] =
-:
-+                                                      &field->vmsd[1];
-+    int version_id =3D field->version_id;
-+    size_t key_size =3D field->start;
-+    size_t val_size =3D field->size;
-+    int nnodes, count =3D 0;
-+    GTree **pval =3D pv;
-+    GTree *tree =3D *pval;
-+    void *key, *val;
-+    int ret =3D 0;
-+
-+    /* in case of direct key, the key vmsd can be {}, ie. check fields *=
-/
-+    if (!direct_key && version_id > key_vmsd->version_id) {
-+        error_report("%s %s",  key_vmsd->name, "too new");
-+        return -EINVAL;
-+    }
-+    if (!direct_key && version_id < key_vmsd->minimum_version_id) {
-+        error_report("%s %s",  key_vmsd->name, "too old");
-+        return -EINVAL;
-+    }
-+    if (version_id > val_vmsd->version_id) {
-+        error_report("%s %s",  val_vmsd->name, "too new");
-+        return -EINVAL;
-+    }
-+    if (version_id < val_vmsd->minimum_version_id) {
-+        error_report("%s %s",  val_vmsd->name, "too old");
-+        return -EINVAL;
-+    }
-+
-+    nnodes =3D qemu_get_be32(f);
-+
-+    while (qemu_get_byte(f)) {
-+        if ((++count) > nnodes) {
-+            ret =3D -EINVAL;
-+            break;
-+        }
-+        if (direct_key) {
-+            key =3D GUINT_TO_POINTER(qemu_get_be32(f));
-+        } else {
-+            key =3D g_malloc0(key_size);
-+            ret =3D vmstate_load_state(f, key_vmsd, key, version_id);
-+            if (ret) {
-+                error_report("%s : failed to load %s (%d)",
-+                             field->name, key_vmsd->name, ret);
-+                g_free(key);
-+                return ret;
-+            }
-+        }
-+        val =3D g_malloc0(val_size);
-+        ret =3D vmstate_load_state(f, val_vmsd, val, version_id);
-+        if (ret) {
-+            error_report("%s : failed to load %s (%d)",
-+                         field->name, val_vmsd->name, ret);
-+            g_free(key);
-+            g_free(val);
-+            return ret;
-+        }
-+        g_tree_insert(tree, key, val);
-+    }
-+    if (count !=3D nnodes) {
-+        error_report("%s inconsistent stream when loading the gtree",
-+                     field->name);
-+    }
-+    return ret;
-+}
-+
-+
-+const VMStateInfo vmstate_info_gtree =3D {
-+    .name =3D "gtree",
-+    .get  =3D get_gtree,
-+    .put  =3D put_gtree,
-+};
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index e80c4c6143..0a1d976a19 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -812,6 +812,423 @@ static void test_load_q(void)
-     qemu_fclose(fload);
- }
-=20
-+/* interval (key) */
-+typedef struct TestGTreeInterval {
-+    uint64_t low;
-+    uint64_t high;
-+} TestGTreeInterval;
-+
-+#define VMSTATE_INTERVAL                               \
-+{                                                      \
-+    .name =3D "interval",                                \
-+    .version_id =3D 1,                                   \
-+    .minimum_version_id =3D 1,                           \
-+    .fields =3D (VMStateField[]) {                       \
-+        VMSTATE_UINT64(low, TestGTreeInterval),        \
-+        VMSTATE_UINT64(high, TestGTreeInterval),       \
-+        VMSTATE_END_OF_LIST()                          \
-+    }                                                  \
-+}
-+
-+/* mapping (value) */
-+typedef struct TestGTreeMapping {
-+    uint64_t phys_addr;
-+    uint32_t flags;
-+} TestGTreeMapping;
-+
-+#define VMSTATE_MAPPING                               \
-+{                                                     \
-+    .name =3D "mapping",                                \
-+    .version_id =3D 1,                                  \
-+    .minimum_version_id =3D 1,                          \
-+    .fields =3D (VMStateField[]) {                      \
-+        VMSTATE_UINT64(phys_addr, TestGTreeMapping),  \
-+        VMSTATE_UINT32(flags, TestGTreeMapping),      \
-+        VMSTATE_END_OF_LIST()                         \
-+    },                                                \
-+}
-+
-+static const VMStateDescription vmstate_interval_mapping[2] =3D {
-+    VMSTATE_INTERVAL, /* key   */
-+    VMSTATE_MAPPING   /* value */
-+};
-+
-+typedef struct TestGTreeDomain {
-+    int32_t  id;
-+    GTree    *mappings;
-+} TestGTreeDomain;
-+
-+typedef struct TestGTreeIOMMU {
-+    int32_t  id;
-+    GTree    *domains;
-+} TestGTreeIOMMU;
-+
-+/* Interval comparison function */
-+static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user=
-_data)
-+{
-+    TestGTreeInterval *inta =3D (TestGTreeInterval *)a;
-+    TestGTreeInterval *intb =3D (TestGTreeInterval *)b;
-+
-+    if (inta->high < intb->low) {
-+        return -1;
-+    } else if (intb->high < inta->low) {
-+        return 1;
-+    } else {
-+        return 0;
-+    }
-+}
-+
-+/* ID comparison function */
-+static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data=
-)
-+{
-+    uint ua =3D GPOINTER_TO_UINT(a);
-+    uint ub =3D GPOINTER_TO_UINT(b);
-+    return (ua > ub) - (ua < ub);
-+}
-+
-+static void destroy_domain(gpointer data)
-+{
-+    TestGTreeDomain *domain =3D (TestGTreeDomain *)data;
-+
-+    g_tree_destroy(domain->mappings);
-+    g_free(domain);
-+}
-+
-+static int domain_preload(void *opaque)
-+{
-+    TestGTreeDomain *domain =3D opaque;
-+
-+    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,
-+                                       NULL, g_free, g_free);
-+    return 0;
-+}
-+
-+static int iommu_preload(void *opaque)
-+{
-+    TestGTreeIOMMU *iommu =3D opaque;
-+
-+    iommu->domains =3D g_tree_new_full((GCompareDataFunc)int_cmp,
-+                                     NULL, NULL, destroy_domain);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_domain =3D {
-+    .name =3D "domain",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .pre_load =3D domain_preload,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_INT32(id, TestGTreeDomain),
-+        VMSTATE_GTREE_V(mappings, TestGTreeDomain, 1,
-+                        vmstate_interval_mapping,
-+                        TestGTreeInterval, TestGTreeMapping),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_iommu =3D {
-+    .name =3D "iommu",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .pre_load =3D iommu_preload,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_INT32(id, TestGTreeIOMMU),
-+        VMSTATE_GTREE_DIRECT_KEY_V(domains, TestGTreeIOMMU, 1,
-+                                   &vmstate_domain, TestGTreeDomain),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+uint8_t first_domain_dump[] =3D {
-+    /* id */
-+    0x00, 0x0, 0x0, 0x6,
-+    0x00, 0x0, 0x0, 0x2, /* 2 mappings */
-+    0x1, /* start of a */
-+    /* a */
-+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
-+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0xFF,
-+    /* map_a */
-+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xa0, 0x00,
-+    0x00, 0x00, 0x00, 0x01,
-+    0x1, /* start of b */
-+    /* b */
-+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00,
-+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF,
-+    /* map_b */
-+    0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00,
-+    0x00, 0x00, 0x00, 0x02,
-+    0x0, /* end of gtree */
-+    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely=
- */
-+};
-+
-+static TestGTreeDomain *create_first_domain(void)
-+{
-+    TestGTreeDomain *domain;
-+    TestGTreeMapping *map_a, *map_b;
-+    TestGTreeInterval *a, *b;
-+
-+    domain =3D g_malloc0(sizeof(TestGTreeDomain));
-+    domain->id =3D 6;
-+
-+    a =3D g_malloc0(sizeof(TestGTreeInterval));
-+    a->low =3D 0x1000;
-+    a->high =3D 0x1FFF;
-+
-+    b =3D g_malloc0(sizeof(TestGTreeInterval));
-+    b->low =3D 0x4000;
-+    b->high =3D 0x4FFF;
-+
-+    map_a =3D g_malloc0(sizeof(TestGTreeMapping));
-+    map_a->phys_addr =3D 0xa000;
-+    map_a->flags =3D 1;
-+
-+    map_b =3D g_malloc0(sizeof(TestGTreeMapping));
-+    map_b->phys_addr =3D 0xe0000;
-+    map_b->flags =3D 2;
-+
-+    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,=
- NULL,
-+                                        (GDestroyNotify)g_free,
-+                                        (GDestroyNotify)g_free);
-+    g_tree_insert(domain->mappings, a, map_a);
-+    g_tree_insert(domain->mappings, b, map_b);
-+    return domain;
-+}
-+
-+static void test_gtree_save_domain(void)
-+{
-+    TestGTreeDomain *first_domain =3D create_first_domain();
-+
-+    save_vmstate(&vmstate_domain, first_domain);
-+    compare_vmstate(first_domain_dump, sizeof(first_domain_dump));
-+    destroy_domain(first_domain);
-+}
-+
-+struct match_node_data {
-+    GTree *tree;
-+    gpointer key;
-+    gpointer value;
-+};
-+
-+struct tree_cmp_data {
-+    GTree *tree1;
-+    GTree *tree2;
-+    GTraverseFunc match_node;
-+};
-+
-+static gboolean match_interval_mapping_node(gpointer key,
-+                                            gpointer value, gpointer dat=
-a)
-+{
-+    TestGTreeMapping *map_a, *map_b;
-+    TestGTreeInterval *a, *b;
-+    struct match_node_data *d =3D (struct match_node_data *)data;
-+    char *str =3D g_strdup_printf("dest");
-+
-+    g_free(str);
-+    a =3D (TestGTreeInterval *)key;
-+    b =3D (TestGTreeInterval *)d->key;
-+
-+    map_a =3D (TestGTreeMapping *)value;
-+    map_b =3D (TestGTreeMapping *)d->value;
-+
-+    assert(a->low =3D=3D b->low);
-+    assert(a->high =3D=3D b->high);
-+    assert(map_a->phys_addr =3D=3D map_b->phys_addr);
-+    assert(map_a->flags =3D=3D map_b->flags);
-+    g_tree_remove(d->tree, key);
-+    return true;
-+}
-+
-+static gboolean diff_tree(gpointer key, gpointer value, gpointer data)
-+{
-+    struct tree_cmp_data *tp =3D (struct tree_cmp_data *)data;
-+    struct match_node_data d =3D {tp->tree2, key, value};
-+
-+    g_tree_foreach(tp->tree2, tp->match_node, &d);
-+    g_tree_remove(tp->tree1, key);
-+    return false;
-+}
-+
-+static void compare_trees(GTree *tree1, GTree *tree2,
-+                          GTraverseFunc function)
-+{
-+    struct tree_cmp_data tp =3D {tree1, tree2, function};
-+
-+    g_tree_foreach(tree1, diff_tree, &tp);
-+    assert(g_tree_nnodes(tree1) =3D=3D 0);
-+    assert(g_tree_nnodes(tree2) =3D=3D 0);
-+}
-+
-+static void diff_domain(TestGTreeDomain *d1, TestGTreeDomain *d2)
-+{
-+    assert(d1->id =3D=3D d2->id);
-+    compare_trees(d1->mappings, d2->mappings, match_interval_mapping_nod=
-e);
-+}
-+
-+static gboolean match_domain_node(gpointer key, gpointer value, gpointer=
- data)
-+{
-+    uint64_t id1, id2;
-+    TestGTreeDomain *d1, *d2;
-+    struct match_node_data *d =3D (struct match_node_data *)data;
-+
-+    id1 =3D (uint64_t)key;
-+    id2 =3D (uint64_t)d->key;
-+    d1 =3D (TestGTreeDomain *)value;
-+    d2 =3D (TestGTreeDomain *)d->value;
-+    assert(id1 =3D=3D id2);
-+    diff_domain(d1, d2);
-+    g_tree_remove(d->tree, key);
-+    return true;
-+}
-+
-+static void diff_iommu(TestGTreeIOMMU *iommu1, TestGTreeIOMMU *iommu2)
-+{
-+    assert(iommu1->id =3D=3D iommu2->id);
-+    compare_trees(iommu1->domains, iommu2->domains, match_domain_node);
-+}
-+
-+static void test_gtree_load_domain(void)
-+{
-+    TestGTreeDomain *dest_domain =3D g_malloc0(sizeof(TestGTreeDomain));
-+    TestGTreeDomain *orig_domain =3D create_first_domain();
-+    QEMUFile *fload, *fsave;
-+    char eof;
-+
-+    fsave =3D open_test_file(true);
-+    qemu_put_buffer(fsave, first_domain_dump, sizeof(first_domain_dump))=
-;
-+    g_assert(!qemu_file_get_error(fsave));
-+    qemu_fclose(fsave);
-+
-+    fload =3D open_test_file(false);
-+
-+    vmstate_load_state(fload, &vmstate_domain, dest_domain, 1);
-+    eof =3D qemu_get_byte(fload);
-+    g_assert(!qemu_file_get_error(fload));
-+    g_assert_cmpint(orig_domain->id, =3D=3D, dest_domain->id);
-+    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
-+
-+    diff_domain(orig_domain, dest_domain);
-+    destroy_domain(orig_domain);
-+    destroy_domain(dest_domain);
-+    qemu_fclose(fload);
-+}
-+
-+uint8_t iommu_dump[] =3D {
-+    /* iommu id */
-+    0x00, 0x0, 0x0, 0x7,
-+    0x00, 0x0, 0x0, 0x2, /* 2 domains */
-+    0x1,/* start of domain 5 */
-+        0x00, 0x0, 0x0, 0x5, /* key =3D 5 */
-+        0x00, 0x0, 0x0, 0x5, /* domain1 id */
-+        0x00, 0x0, 0x0, 0x1, /* 1 mapping */
-+        0x1, /* start of mappings */
-+            /* c */
-+            0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-+            0x00, 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF,
-+            /* map_c */
-+            0x00, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00,
-+            0x00, 0x0, 0x0, 0x3,
-+            0x0, /* end of domain1 mappings*/
-+    0x1,/* start of domain 6 */
-+        0x00, 0x0, 0x0, 0x6, /* key =3D 6 */
-+        0x00, 0x0, 0x0, 0x6, /* domain6 id */
-+            0x00, 0x0, 0x0, 0x2, /* 2 mappings */
-+            0x1, /* start of a */
-+            /* a */
-+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
-+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0xFF,
-+            /* map_a */
-+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xa0, 0x00,
-+            0x00, 0x00, 0x00, 0x01,
-+            0x1, /* start of b */
-+            /* b */
-+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00,
-+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF,
-+            /* map_b */
-+            0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00,
-+            0x00, 0x00, 0x00, 0x02,
-+            0x0, /* end of domain6 mappings*/
-+    0x0, /* end of domains */
-+    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely=
- */
-+};
-+
-+static TestGTreeIOMMU *create_iommu(void)
-+{
-+    TestGTreeIOMMU *iommu =3D g_malloc0(sizeof(TestGTreeIOMMU));
-+    TestGTreeDomain *first_domain =3D create_first_domain();
-+    TestGTreeDomain *second_domain;
-+    TestGTreeMapping *map_c;
-+    TestGTreeInterval *c;
-+
-+    iommu->id =3D 7;
-+    iommu->domains =3D g_tree_new_full((GCompareDataFunc)int_cmp, NULL,
-+                                     NULL,
-+                                     destroy_domain);
-+
-+    second_domain =3D g_malloc0(sizeof(TestGTreeDomain));
-+    second_domain->id =3D 5;
-+    second_domain->mappings =3D g_tree_new_full((GCompareDataFunc)interv=
-al_cmp,
-+                                              NULL,
-+                                              (GDestroyNotify)g_free,
-+                                              (GDestroyNotify)g_free);
-+
-+    g_tree_insert(iommu->domains, GUINT_TO_POINTER(6), first_domain);
-+    g_tree_insert(iommu->domains, GUINT_TO_POINTER(5), second_domain);
-+
-+    c =3D g_malloc0(sizeof(TestGTreeInterval));
-+    c->low =3D 0x1000000;
-+    c->high =3D 0x1FFFFFF;
-+
-+    map_c =3D g_malloc0(sizeof(TestGTreeMapping));
-+    map_c->phys_addr =3D 0xF000000;
-+    map_c->flags =3D 0x3;
-+
-+    g_tree_insert(second_domain->mappings, c, map_c);
-+    return iommu;
-+}
-+
-+static void destroy_iommu(TestGTreeIOMMU *iommu)
-+{
-+    g_tree_destroy(iommu->domains);
-+    g_free(iommu);
-+}
-+
-+static void test_gtree_save_iommu(void)
-+{
-+    TestGTreeIOMMU *iommu =3D create_iommu();
-+
-+    save_vmstate(&vmstate_iommu, iommu);
-+    compare_vmstate(iommu_dump, sizeof(iommu_dump));
-+    destroy_iommu(iommu);
-+}
-+
-+static void test_gtree_load_iommu(void)
-+{
-+    TestGTreeIOMMU *dest_iommu =3D g_malloc0(sizeof(TestGTreeIOMMU));
-+    TestGTreeIOMMU *orig_iommu =3D create_iommu();
-+    QEMUFile *fsave, *fload;
-+    char eof;
-+    int ret;
-+
-+    fsave =3D open_test_file(true);
-+    qemu_put_buffer(fsave, iommu_dump, sizeof(iommu_dump));
-+    g_assert(!qemu_file_get_error(fsave));
-+    qemu_fclose(fsave);
-+
-+    fload =3D open_test_file(false);
-+    vmstate_load_state(fload, &vmstate_iommu, dest_iommu, 1);
-+    ret =3D qemu_file_get_error(fload);
-+    eof =3D qemu_get_byte(fload);
-+    ret =3D qemu_file_get_error(fload);
-+    g_assert(!ret);
-+    g_assert_cmpint(orig_iommu->id, =3D=3D, dest_iommu->id);
-+    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
-+
-+    diff_iommu(orig_iommu, dest_iommu);
-+    destroy_iommu(orig_iommu);
-+    destroy_iommu(dest_iommu);
-+    qemu_fclose(fload);
-+}
-+
- typedef struct TmpTestStruct {
-     TestStruct *parent;
-     int64_t diff;
-@@ -932,6 +1349,10 @@ int main(int argc, char **argv)
-                     test_arr_ptr_prim_0_load);
-     g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
-     g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
-+    g_test_add_func("/vmstate/gtree/save/savedomain", test_gtree_save_do=
-main);
-+    g_test_add_func("/vmstate/gtree/load/loaddomain", test_gtree_load_do=
-main);
-+    g_test_add_func("/vmstate/gtree/save/saveiommu", test_gtree_save_iom=
-mu);
-+    g_test_add_func("/vmstate/gtree/load/loadiommu", test_gtree_load_iom=
-mu);
-     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
-     g_test_run();
-=20
---=20
-2.20.1
-
+> +    note->sve.vl = cpu_to_dump16(s, vq * 16);
+> +    note->sve.max_vl = cpu_to_dump16(s, vq * 16);
+> +    note->sve.flags = cpu_to_dump16(s, 1);
+> +
+> +    for (i = 0; i < 32; ++i) {
+> +#ifdef HOST_WORDS_BIGENDIAN
+> +        uint64_t d[vq * 2];
+> +        int j;
+> +
+> +        for (j = 0; j < vq * 2; ++j) {
+> +            d[j] = bswap64(env->vfp.zregs[i].d[j]);
+> +        }
+> +#else
+> +        uint64_t *d = &env->vfp.zregs[i].d[0];
+> +#endif
+> +        memcpy(&buf[sve_zreg_offset(vq, i)], &d[0], vq * 16);
+> +    }
+> +
+> +    for (i = 0; i < 17; ++i) {
+> +#ifdef HOST_WORDS_BIGENDIAN
+> +        uint64_t d[DIV_ROUND_UP(vq * 2, 8)];
+> +        int j;
+> +
+> +        for (j = 0; j < DIV_ROUND_UP(vq * 2, 8); ++j) {
+> +            d[j] = bswap64(env->vfp.pregs[i].p[j]);
+> +        }
+> +#else
+> +        uint64_t *d = &env->vfp.pregs[i].p[0];
+> +#endif
+> +        memcpy(&buf[sve_preg_offset(vq, i)], &d[0], vq * 16 / 8);
+> +    }
+> +
+> +    fpr = cpu_to_dump32(s, vfp_get_fpsr(env));
+> +    memcpy(&buf[sve_fpsr_offset(vq)], &fpr, sizeof(uint32_t));
+> +
+> +    fpr = cpu_to_dump32(s, vfp_get_fpcr(env));
+> +    memcpy(&buf[sve_fpcr_offset(vq)], &fpr, sizeof(uint32_t));
+> +
+> +    ret = f(note, AARCH64_SVE_NOTE_SIZE(env), s);
+> +    g_free(note);
+> +
+> +    if (ret < 0) {
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +#endif
+> +
+>  int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+>                               int cpuid, void *opaque)
+>  {
+>      struct aarch64_note note;
+> -    CPUARMState *env = &ARM_CPU(cs)->env;
+> +    ARMCPU *cpu = ARM_CPU(cs);
+> +    CPUARMState *env = &cpu->env;
+>      DumpState *s = opaque;
+>      uint64_t pstate, sp;
+>      int ret, i;
+> @@ -163,7 +276,18 @@ int arm_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+>          return -1;
+>      }
+>  
+> -    return aarch64_write_elf64_prfpreg(f, env, cpuid, s);
+> +    ret = aarch64_write_elf64_prfpreg(f, env, cpuid, s);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +#ifdef TARGET_AARCH64
+> +    if (cpu_isar_feature(aa64_sve, cpu)) {
+> +        ret = aarch64_write_elf64_sve(f, env, cpuid, s);
+> +    }
+> +#endif
+> +
+> +    return ret;
+>  }
+>  
+>  /* struct pt_regs from arch/arm/include/asm/ptrace.h */
+> @@ -335,6 +459,11 @@ ssize_t cpu_get_note_size(int class, int machine, int nr_cpus)
+>      if (class == ELFCLASS64) {
+>          note_size = AARCH64_PRSTATUS_NOTE_SIZE;
+>          note_size += AARCH64_PRFPREG_NOTE_SIZE;
+> +#ifdef TARGET_AARCH64
+> +        if (cpu_isar_feature(aa64_sve, cpu)) {
+> +            note_size += AARCH64_SVE_NOTE_SIZE(env);
+> +        }
+> +#endif
+>      } else {
+>          note_size = ARM_PRSTATUS_NOTE_SIZE;
+>          if (arm_feature(env, ARM_FEATURE_VFP)) {
+> -- 
+> 2.20.1
+> 
 
