@@ -2,62 +2,61 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B88EC47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 250D6C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:14:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18C14215EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:12:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pPxRe5gQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C14215EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id EF04D20867
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 10:14:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF04D20867
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGKZy-0007CC-KC
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:12:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52842)
+	id 1iGKbA-0008Gu-Cu
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 06:14:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK2k-0005OO-07
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:35 -0400
+ (envelope-from <slp@redhat.com>) id 1iGK33-0005d2-T7
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK2i-0005Vc-3H
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:33 -0400
-Received: from ozlabs.org ([203.11.71.1]:58615)
+ (envelope-from <slp@redhat.com>) id 1iGK31-0005us-SR
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39800)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iGK2h-0005Rh-La; Fri, 04 Oct 2019 05:38:32 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46l4YM444Gz9sSD; Fri,  4 Oct 2019 19:37:59 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570181879;
- bh=KkBbadXgHLKHE0giSnukY5QoB/39g3F8C/fxNfwAoZ4=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=pPxRe5gQtwN1g5osgkniLUaMcKIJ4UTvFkODLWmHL6qR6FDbssNBXpKx7oA4rCKfW
- pKLiav7I/AItMmIs+NBeqhew2ffTTaZ/bTZRNABoBaJpusTwiTQe8Zeke3c7Yu9xq1
- Xp3x+ciiBwuj5gXcvFjCH5x6xBAupG2G5eN5VsKs=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 30/53] spapr: Render full FDT on ibm,
- client-architecture-support
-Date: Fri,  4 Oct 2019 19:37:24 +1000
-Message-Id: <20191004093747.31350-31-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191004093747.31350-1-david@gibson.dropbear.id.au>
-References: <20191004093747.31350-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iGK31-0005rQ-Jn
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5B9ED10DCCA2;
+ Fri,  4 Oct 2019 09:38:49 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.79])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 844411001B28;
+ Fri,  4 Oct 2019 09:38:46 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 02/10] hw/i386/pc: rename functions shared with non-PC
+ machines
+Date: Fri,  4 Oct 2019 11:37:44 +0200
+Message-Id: <20191004093752.16564-3-slp@redhat.com>
+In-Reply-To: <20191004093752.16564-1-slp@redhat.com>
+References: <20191004093752.16564-1-slp@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Fri, 04 Oct 2019 09:38:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,177 +68,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: ehabkost@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
+ lersek@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+The following functions are named *pc* but are not PC-machine specific
+but generic to the X86 architecture, rename them:
 
-The ibm,client-architecture-support call is a way for the guest to
-negotiate capabilities with a hypervisor. It is implemented as:
-- the guest calls SLOF via client interface;
-- SLOF calls QEMU (H_CAS hypercall) with an options vector from the guest=
-;
-- QEMU returns a device tree diff (which uses FDT format with
-an additional header before it);
-- SLOF walks through the partial diff tree and updates its internal tree
-with the values from the diff.
+  load_linux                 -> x86_load_linux
+  pc_new_cpu                 -> x86_new_cpu
+  pc_cpus_init               -> x86_cpus_init
+  pc_cpu_index_to_props      -> x86_cpu_index_to_props
+  pc_get_default_cpu_node_id -> x86_get_default_cpu_node_id
+  pc_possible_cpu_arch_ids   -> x86_possible_cpu_arch_ids
+  old_pc_system_rom_init     -> x86_system_rom_init
 
-This changes QEMU to simply re-render the entire tree and send it as
-an update. SLOF can handle this already mostly, [1] is needed before this
-can be applied. This stores the resulting tree in the spapr machine to ha=
-ve
-the latest valid FDT copy possible (this should not matter much as
-H_UPDATE_DT happens right after that but nevertheless).
-
-The benefit is reduced code size as there is no need for another set of
-DT rendering helpers such as spapr_fixup_cpu_dt().
-
-The downside is that the updates are bigger now (as they include all
-nodes and properties) but the difference on a '-smp 256,threads=3D1' syst=
-em
-before/after is 2.35s vs. 2.5s.
-
-[1] https://patchwork.ozlabs.org/patch/1152915/
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
- hw/ppc/spapr.c | 88 ++++++--------------------------------------------
- 1 file changed, 9 insertions(+), 79 deletions(-)
+ include/hw/i386/pc.h |  2 +-
+ hw/i386/pc.c         | 28 ++++++++++++++--------------
+ hw/i386/pc_piix.c    |  2 +-
+ hw/i386/pc_q35.c     |  2 +-
+ hw/i386/pc_sysfw.c   |  6 +++---
+ 5 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 3742a8cf06..43920c140d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -295,64 +295,6 @@ static void spapr_populate_pa_features(SpaprMachineS=
-tate *spapr,
-     _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
-ze)));
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 6df4f4b6fb..d12f42e9e5 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -195,7 +195,7 @@ bool pc_machine_is_smm_enabled(PCMachineState *pcms);
+ void pc_register_ferr_irq(qemu_irq irq);
+ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
+=20
+-void pc_cpus_init(PCMachineState *pcms);
++void x86_cpus_init(PCMachineState *pcms);
+ void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
+ void pc_smp_parse(MachineState *ms, QemuOpts *opts);
+=20
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index bcda50efcc..fd08c6704b 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1019,8 +1019,8 @@ static bool load_elfboot(const char *kernel_filenam=
+e,
+     return true;
  }
 =20
--static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
--{
--    MachineState *ms =3D MACHINE(spapr);
--    int ret =3D 0, offset, cpus_offset;
--    CPUState *cs;
--    char cpu_model[32];
--    uint32_t pft_size_prop[] =3D {0, cpu_to_be32(spapr->htab_shift)};
--
--    CPU_FOREACH(cs) {
--        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--        DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
--        int index =3D spapr_get_vcpu_id(cpu);
--        int compat_smt =3D MIN(ms->smp.threads, ppc_compat_max_vthreads(=
-cpu));
--
--        if (!spapr_is_thread0_in_vcore(spapr, cpu)) {
--            continue;
--        }
--
--        snprintf(cpu_model, 32, "%s@%x", dc->fw_name, index);
--
--        cpus_offset =3D fdt_path_offset(fdt, "/cpus");
--        if (cpus_offset < 0) {
--            cpus_offset =3D fdt_add_subnode(fdt, 0, "cpus");
--            if (cpus_offset < 0) {
--                return cpus_offset;
--            }
--        }
--        offset =3D fdt_subnode_offset(fdt, cpus_offset, cpu_model);
--        if (offset < 0) {
--            offset =3D fdt_add_subnode(fdt, cpus_offset, cpu_model);
--            if (offset < 0) {
--                return offset;
--            }
--        }
--
--        ret =3D fdt_setprop(fdt, offset, "ibm,pft-size",
--                          pft_size_prop, sizeof(pft_size_prop));
--        if (ret < 0) {
--            return ret;
--        }
--
--        if (ms->numa_state->num_nodes > 1) {
--            ret =3D spapr_fixup_cpu_numa_dt(fdt, offset, cpu);
--            if (ret < 0) {
--                return ret;
--            }
--        }
--
--        ret =3D spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt);
--        if (ret < 0) {
--            return ret;
--        }
--
--        spapr_populate_pa_features(spapr, cpu, fdt, offset);
--    }
--    return ret;
--}
--
- static hwaddr spapr_node0_size(MachineState *machine)
+-static void load_linux(PCMachineState *pcms,
+-                       FWCfgState *fw_cfg)
++static void x86_load_linux(PCMachineState *pcms,
++                           FWCfgState *fw_cfg)
  {
-     if (machine->numa_state->num_nodes) {
-@@ -983,11 +925,13 @@ static bool spapr_hotplugged_dev_before_cas(void)
-     return false;
+     uint16_t protocol;
+     int setup_size, kernel_size, cmdline_size;
+@@ -1374,7 +1374,7 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, i=
+nt level)
+     }
  }
 =20
-+static void *spapr_build_fdt(SpaprMachineState *spapr);
-+
- int spapr_h_cas_compose_response(SpaprMachineState *spapr,
-                                  target_ulong addr, target_ulong size,
-                                  SpaprOptionVector *ov5_updates)
+-static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **er=
+rp)
++static void x86_cpu_new(PCMachineState *pcms, int64_t apic_id, Error **e=
+rrp)
  {
--    void *fdt, *fdt_skel;
-+    void *fdt;
-     SpaprDeviceTreeUpdateHeader hdr =3D { .version_id =3D 1 };
+     Object *cpu =3D NULL;
+     Error *local_err =3D NULL;
+@@ -1490,14 +1490,14 @@ void pc_hot_add_cpu(MachineState *ms, const int64=
+_t id, Error **errp)
+         return;
+     }
 =20
-     if (spapr_hotplugged_dev_before_cas()) {
-@@ -1003,25 +947,7 @@ int spapr_h_cas_compose_response(SpaprMachineState =
-*spapr,
-=20
-     size -=3D sizeof(hdr);
-=20
--    /* Create skeleton */
--    fdt_skel =3D g_malloc0(size);
--    _FDT((fdt_create(fdt_skel, size)));
--    _FDT((fdt_finish_reservemap(fdt_skel)));
--    _FDT((fdt_begin_node(fdt_skel, "")));
--    _FDT((fdt_end_node(fdt_skel)));
--    _FDT((fdt_finish(fdt_skel)));
--    fdt =3D g_malloc0(size);
--    _FDT((fdt_open_into(fdt_skel, fdt, size)));
--    g_free(fdt_skel);
--
--    /* Fixup cpu nodes */
--    _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
--
--    if (spapr_dt_cas_updates(spapr, fdt, ov5_updates)) {
--        return -1;
--    }
--
--    /* Pack resulting tree */
-+    fdt =3D spapr_build_fdt(spapr);
-     _FDT((fdt_pack(fdt)));
-=20
-     if (fdt_totalsize(fdt) + sizeof(hdr) > size) {
-@@ -1033,7 +959,11 @@ int spapr_h_cas_compose_response(SpaprMachineState =
-*spapr,
-     cpu_physical_memory_write(addr, &hdr, sizeof(hdr));
-     cpu_physical_memory_write(addr + sizeof(hdr), fdt, fdt_totalsize(fdt=
-));
-     trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
--    g_free(fdt);
-+
-+    g_free(spapr->fdt_blob);
-+    spapr->fdt_size =3D fdt_totalsize(fdt);
-+    spapr->fdt_initial_size =3D spapr->fdt_size;
-+    spapr->fdt_blob =3D fdt;
-=20
-     return 0;
+-    pc_new_cpu(PC_MACHINE(ms), apic_id, &local_err);
++    x86_cpu_new(PC_MACHINE(ms), apic_id, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+     }
  }
+=20
+-void pc_cpus_init(PCMachineState *pcms)
++void x86_cpus_init(PCMachineState *pcms)
+ {
+     int i;
+     const CPUArchIdList *possible_cpus;
+@@ -1518,7 +1518,7 @@ void pc_cpus_init(PCMachineState *pcms)
+                                                      ms->smp.max_cpus - =
+1) + 1;
+     possible_cpus =3D mc->possible_cpu_arch_ids(ms);
+     for (i =3D 0; i < ms->smp.cpus; i++) {
+-        pc_new_cpu(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
++        x86_cpu_new(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
+     }
+ }
+=20
+@@ -1621,7 +1621,7 @@ void xen_load_linux(PCMachineState *pcms)
+     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
+     rom_set_fw(fw_cfg);
+=20
+-    load_linux(pcms, fw_cfg);
++    x86_load_linux(pcms, fw_cfg);
+     for (i =3D 0; i < nb_option_roms; i++) {
+         assert(!strcmp(option_rom[i].name, "linuxboot.bin") ||
+                !strcmp(option_rom[i].name, "linuxboot_dma.bin") ||
+@@ -1756,7 +1756,7 @@ void pc_memory_init(PCMachineState *pcms,
+     }
+=20
+     if (linux_boot) {
+-        load_linux(pcms, fw_cfg);
++        x86_load_linux(pcms, fw_cfg);
+     }
+=20
+     for (i =3D 0; i < nb_option_roms; i++) {
+@@ -2678,7 +2678,7 @@ static void pc_machine_wakeup(MachineState *machine=
+)
+ }
+=20
+ static CpuInstanceProperties
+-pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
++x86_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+ {
+     MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+     const CPUArchIdList *possible_cpus =3D mc->possible_cpu_arch_ids(ms)=
+;
+@@ -2687,7 +2687,7 @@ pc_cpu_index_to_props(MachineState *ms, unsigned cp=
+u_index)
+     return possible_cpus->cpus[cpu_index].props;
+ }
+=20
+-static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int id=
+x)
++static int64_t x86_get_default_cpu_node_id(const MachineState *ms, int i=
+dx)
+ {
+    X86CPUTopoInfo topo;
+    PCMachineState *pcms =3D PC_MACHINE(ms);
+@@ -2699,7 +2699,7 @@ static int64_t pc_get_default_cpu_node_id(const Mac=
+hineState *ms, int idx)
+    return topo.pkg_id % ms->numa_state->num_nodes;
+ }
+=20
+-static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
++static const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+ {
+     PCMachineState *pcms =3D PC_MACHINE(ms);
+     int i;
+@@ -2801,9 +2801,9 @@ static void pc_machine_class_init(ObjectClass *oc, =
+void *data)
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler =3D pc_get_hotplug_handler;
+     mc->hotplug_allowed =3D pc_hotplug_allowed;
+-    mc->cpu_index_to_instance_props =3D pc_cpu_index_to_props;
+-    mc->get_default_cpu_node_id =3D pc_get_default_cpu_node_id;
+-    mc->possible_cpu_arch_ids =3D pc_possible_cpu_arch_ids;
++    mc->cpu_index_to_instance_props =3D x86_cpu_index_to_props;
++    mc->get_default_cpu_node_id =3D x86_get_default_cpu_node_id;
++    mc->possible_cpu_arch_ids =3D x86_possible_cpu_arch_ids;
+     mc->auto_enable_numa_with_memhp =3D true;
+     mc->has_hotpluggable_cpus =3D true;
+     mc->default_boot_order =3D "cad";
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 6824b72124..de09e076cd 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -152,7 +152,7 @@ static void pc_init1(MachineState *machine,
+         }
+     }
+=20
+-    pc_cpus_init(pcms);
++    x86_cpus_init(pcms);
+=20
+     if (kvm_enabled() && pcmc->kvmclock_enabled) {
+         kvmclock_create();
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 8fad20f314..894989b64e 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -179,7 +179,7 @@ static void pc_q35_init(MachineState *machine)
+         xen_hvm_init(pcms, &ram_memory);
+     }
+=20
+-    pc_cpus_init(pcms);
++    x86_cpus_init(pcms);
+=20
+     kvmclock_create();
+=20
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index a9983f0bfb..28cb1f63c9 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -211,7 +211,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
+     }
+ }
+=20
+-static void old_pc_system_rom_init(MemoryRegion *rom_memory, bool isapc_=
+ram_fw)
++static void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_f=
+w)
+ {
+     char *filename;
+     MemoryRegion *bios, *isa_bios;
+@@ -272,7 +272,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
+     BlockBackend *pflash_blk[ARRAY_SIZE(pcms->flash)];
+=20
+     if (!pcmc->pci_enabled) {
+-        old_pc_system_rom_init(rom_memory, true);
++        x86_bios_rom_init(rom_memory, true);
+         return;
+     }
+=20
+@@ -293,7 +293,7 @@ void pc_system_firmware_init(PCMachineState *pcms,
+=20
+     if (!pflash_blk[0]) {
+         /* Machine property pflash0 not set, use ROM mode */
+-        old_pc_system_rom_init(rom_memory, false);
++        x86_bios_rom_init(rom_memory, false);
+     } else {
+         if (kvm_enabled() && !kvm_readonly_mem_enabled()) {
+             /*
 --=20
 2.21.0
 
