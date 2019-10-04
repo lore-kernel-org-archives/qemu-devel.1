@@ -2,67 +2,92 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAE7C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BABFAC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:58:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89CBC207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:57:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89CBC207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 900FF21D81
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:58:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900FF21D81
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGN9O-0007E2-D9
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 08:57:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46668)
+	id 1iGNA6-0008HW-Vk
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 08:58:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1iGLLA-0007Jv-Sb
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:01:41 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iGN7N-00067S-63
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 08:55:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1iGLL7-0006JK-Mn
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:01:39 -0400
-Received: from mgwym04.jp.fujitsu.com ([211.128.242.43]:12948)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
- id 1iGLKz-0005ul-I1
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:01:37 -0400
-Received: from yt-mxoi1.gw.nic.fujitsu.com (unknown [192.168.229.67]) by
- mgwym04.jp.fujitsu.com with smtp
- id 255e_808b_6e3b8c25_83d6_403b_96fa_b1a4298d9cf8;
- Fri, 04 Oct 2019 20:01:09 +0900
-Received: from g01jpfmpwkw01.exch.g01.fujitsu.local
- (g01jpfmpwkw01.exch.g01.fujitsu.local [10.0.193.38])
- by yt-mxoi1.gw.nic.fujitsu.com (Postfix) with ESMTP id 8BB1CAC014A
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 20:01:08 +0900 (JST)
-Received: from g01jpexchkw35.g01.fujitsu.local (unknown [10.0.193.4])
- by g01jpfmpwkw01.exch.g01.fujitsu.local (Postfix) with ESMTP id AD4A569228E;
- Fri,  4 Oct 2019 20:01:07 +0900 (JST)
-Received: from luna3.soft.fujitsu.com (10.124.196.199) by
- g01jpexchkw35.g01.fujitsu.local (10.0.193.50) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 4 Oct 2019 20:01:07 +0900
-From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-To: <virtio-fs@redhat.com>
-Subject: [Virtio-fs] [PATCH] virtiofsd: Add pread64() to seccomp list for
- posix_fallocate()
-Date: Fri, 4 Oct 2019 20:07:58 +0900
-Message-ID: <20191004110759.32665-1-misono.tomohiro@jp.fujitsu.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <mreitz@redhat.com>) id 1iGN7M-0006WF-7Z
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 08:55:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46516)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iGN7C-0005qY-U3; Fri, 04 Oct 2019 08:55:24 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 65B228372F0;
+ Fri,  4 Oct 2019 12:55:21 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-31.brq.redhat.com
+ [10.40.204.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B61919C69;
+ Fri,  4 Oct 2019 12:55:20 +0000 (UTC)
+Subject: Re: [PATCH 02/67] iotests.py: Add @skip_for_imgopts()
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20191001194715.2796-1-mreitz@redhat.com>
+ <20191001194715.2796-3-mreitz@redhat.com>
+ <5e803464-8257-c61e-c459-16a3b898c192@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <904ae6a9-e746-f483-c2bf-c59264ccfcfd@redhat.com>
+Date: Fri, 4 Oct 2019 14:55:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-SecurityPolicyCheck-GC: OK by FENCE-Mail
-X-TM-AS-GCONF: 00
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 211.128.242.43
-X-Mailman-Approved-At: Fri, 04 Oct 2019 08:49:27 -0400
+In-Reply-To: <5e803464-8257-c61e-c459-16a3b898c192@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="jUtK1tXoEMG8W2S8WP2IliMVyEyvz47jC"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 04 Oct 2019 12:55:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,45 +99,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, misono.tomohiro@jp.fujitsu.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I test virtiofs with NFS 4.0 as backend and notice that fallocate
-causes system hang (kernel: 5.4-rc1, qemu: virtio-fs-dev branch):
- $ mount -t virtiofs myfs /mnt
- $ dd if=/dev/urandom bs=1000 seek=1 count=1 of=/mnt/file
- $ fallocate -l 2000 /mnt/file # system hang
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jUtK1tXoEMG8W2S8WP2IliMVyEyvz47jC
+Content-Type: multipart/mixed; boundary="vyWtEGqU5esZ6WrOtUElBZLeTqbsi061N"
 
-This is because:
- 1. virtiofs supports fallocate syscall while NFS 4.0 does not.
- 2. virtiofsd uses posix_fallocate() and it fallbacks to pread64()/
-    pwrite64() sequence to reserve blocks if fallocate syscall is
-    not available.
- 3. pread64() syscall is prohibited by seccomp and virtiofsd thread
-    is killed by SIGSYS.
+--vyWtEGqU5esZ6WrOtUElBZLeTqbsi061N
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-So, just add pread64() to seccomp white list to fix this problem.
+On 03.10.19 17:19, Vladimir Sementsov-Ogievskiy wrote:
+> 01.10.2019 22:46, Max Reitz wrote:
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   tests/qemu-iotests/iotests.py | 13 +++++++++++++
+>>   1 file changed, 13 insertions(+)
+>>
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+>> index 7030900807..cdcb62c4ac 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -950,6 +950,19 @@ def skip_if_unsupported(required_formats=3D[], re=
+ad_only=3DFalse):
+>>           return func_wrapper
+>>       return skip_test_decorator
+>>  =20
+>> +def skip_for_imgopts(unsupported_opts=3D[]):
+>> +    '''Skip Test Decorator
+>> +       Skips the test if imgopts contains any of the given options'''=
 
-Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
----
- contrib/virtiofsd/seccomp.c | 1 +
- 1 file changed, 1 insertion(+)
+>> +    def skip_test_decorator(func):
+>> +        def func_wrapper(test_case: QMPTestCase, *args, **kwargs):
+>=20
+> how about
+>=20
+> unsup =3D set(imgopts) & set(unsupported_opts)
+> if unsup:
+>     test_case.case_skip('... Options {} are ...', format(..., ', '.join=
+(map(str, unsup)))
 
-diff --git a/contrib/virtiofsd/seccomp.c b/contrib/virtiofsd/seccomp.c
-index 93b679271d..88b61bca42 100644
---- a/contrib/virtiofsd/seccomp.c
-+++ b/contrib/virtiofsd/seccomp.c
-@@ -61,6 +61,7 @@ static const int syscall_whitelist[] = {
- 	SCMP_SYS(ppoll),
- 	SCMP_SYS(prctl), /* TODO restrict to just PR_SET_NAME? */
- 	SCMP_SYS(preadv),
-+	SCMP_SYS(pread64),
- 	SCMP_SYS(pwritev),
- 	SCMP_SYS(pwrite64),
- 	SCMP_SYS(read),
--- 
-2.21.0
+Sure.
 
+Max
+
+
+--vyWtEGqU5esZ6WrOtUElBZLeTqbsi061N--
+
+--jUtK1tXoEMG8W2S8WP2IliMVyEyvz47jC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XQTYACgkQ9AfbAGHV
+z0AC2ggAuo+2Hnd0010KHAEAyn26d3RQZ97g1jsSAIJtslwzITCuDYhE68Zt4mBb
+SD9NYP6xvCE3HelmbuOBlhmX+zpuNzb/iuIxNEs7dZf0Y4ZCjH21YDt1NtO05mDj
+MjBXzI79v+JSOgI1XoyEhw+ePpstXWcooKLTvapPFim9f/mAanhoThjkSKycI1Ue
+Vw6TkXbbZ1LhaSTkx6RqLyM9OimXDjZFGB5iYp905Rz5hcwxJvdsUs1iI8jJZju6
+Ng59geLC2bsHEYoP8/KG8tOsVCmyAYD7I3FJXU27du8dfTj72wGZrxJgv7Yl16qZ
+0tvk5MXieobkpRIXvi6lVv1n7SDW9w==
+=2XvR
+-----END PGP SIGNATURE-----
+
+--jUtK1tXoEMG8W2S8WP2IliMVyEyvz47jC--
 
