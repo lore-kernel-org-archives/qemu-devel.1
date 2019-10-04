@@ -2,60 +2,61 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 708EBC10F14
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 03:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 306DBC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 03:46:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CAC520700
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 03:11:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hJ+31lck"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CAC520700
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id F16C920862
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 03:46:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16C920862
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGE0A-0006eo-Br
-	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 23:11:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46624)
+	id 1iGEYT-0005GV-15
+	for qemu-devel@archiver.kernel.org; Thu, 03 Oct 2019 23:46:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43984)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iGDzA-00068I-Fs
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 23:10:29 -0400
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGEVv-0003mv-6C
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 23:44:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iGDz9-0008JH-Cd
- for qemu-devel@nongnu.org; Thu, 03 Oct 2019 23:10:28 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56505 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iGDz5-00088f-3Z; Thu, 03 Oct 2019 23:10:24 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46kvy15zhRz9sPq; Fri,  4 Oct 2019 13:10:17 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570158617;
- bh=6BzysK04Egnj4VKoHR3IxJqfPZVBBXwQCCXvuB1yqd8=;
- h=From:To:Cc:Subject:Date:From;
- b=hJ+31lckGHqwbdvDTm47x9QoXTsNuvXT6qeVH+0oXb2I0AerZUn0qIHvS9Xo8HCcs
- 9pgMe5FK3eeUDyIPQYkfmgKOsi4MW8U+Fr3pt3GP//BWN3dpQh3VqwtaaZv+V+aZN5
- DaT/f1eLiT8pWDIQYAq/9gkP45GiqIQP9rilKUZA=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: i.mitsyanko@gmail.com,
-	peter.maydell@linaro.org
-Subject: [PATCH] exynos4210_gic: Suppress gcc9 format-truncation warnings
-Date: Fri,  4 Oct 2019 12:55:09 +1000
-Message-Id: <20191004025509.3012-1-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGEVt-0001kK-Jh
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 23:44:18 -0400
+Received: from cmccmta2.chinamobile.com ([221.176.66.80]:3893)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <maozhongyi@cmss.chinamobile.com>) id 1iGEVs-0001i3-W3
+ for qemu-devel@nongnu.org; Thu, 03 Oct 2019 23:44:17 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.1]) by
+ rmmx-syy-dmz-app06-12006 (RichMail) with SMTP id 2ee65d96c006b7a-b2957;
+ Fri, 04 Oct 2019 11:44:07 +0800 (CST)
+X-RM-TRANSID: 2ee65d96c006b7a-b2957
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from maozy-host.lan (unknown[180.108.8.156])
+ by rmsmtp-syy-appsvr01-12001 (RichMail) with SMTP id 2ee15d96bff81ac-a1b01;
+ Fri, 04 Oct 2019 11:44:06 +0800 (CST)
+X-RM-TRANSID: 2ee15d96bff81ac-a1b01
+From: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/3] tests/migration: mem leak fix
+Date: Fri,  4 Oct 2019 11:43:46 +0800
+Message-Id: <bcf225d9b90600b10951ac0a87569344e150ef51.1570159624.git.maozhongyi@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1570159624.git.maozhongyi@cmss.chinamobile.com>
+References: <cover.1570159624.git.maozhongyi@cmss.chinamobile.com>
+In-Reply-To: <cover.1570159624.git.maozhongyi@cmss.chinamobile.com>
+References: <cover.1570159624.git.maozhongyi@cmss.chinamobile.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 221.176.66.80
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,51 +68,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: tony.nguyen@bt.com, alex.bennee@linaro.org, armbru@redhat.com,
+ Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-exynos4210_gic_realize() prints the number of cpus into some temporary
-buffers, but it only allows 3 bytes space for it.  That's plenty - I'm
-pretty sure that existing machines will only ever set this value to 2
-(EXYNOS4210_NCPUS).  But the compiler can't really be expected to figure
-that out.
+‘data’ has the possibility of memory leaks， so use the
+glib macros g_autofree recommended by CODING_STYLE.rst
+to automatically release the memory that returned from
+g_malloc().
 
-Some[*] gcc9 versions therefore emit -Wformat-truncation warnings.  Fix
-that by allowing more space in the temporary buffers - these are on stack
-very briefly before being essentially strdup()ed inside the memory region
-code, so there's not much cost to doing so.
-
-[*] The bizarre thing here, is that I've long gotten these warnings
-compiling in a 32-bit x86 container as host - Fedora 30 with
-gcc-9.2.1-1.fc30.i686 - but it compiles just fine on my normal x86_64 hos=
-t
-- Fedora 30 with and gcc-9.2.1-1.fc30.x86_64.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- hw/intc/exynos4210_gic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/migration/stress.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
-index a1b699b6ba..2e5e47f9ec 100644
---- a/hw/intc/exynos4210_gic.c
-+++ b/hw/intc/exynos4210_gic.c
-@@ -290,8 +290,8 @@ static void exynos4210_gic_realize(DeviceState *dev, =
-Error **errp)
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-     const char cpu_prefix[] =3D "exynos4210-gic-alias_cpu";
-     const char dist_prefix[] =3D "exynos4210-gic-alias_dist";
--    char cpu_alias_name[sizeof(cpu_prefix) + 3];
--    char dist_alias_name[sizeof(cpu_prefix) + 3];
-+    char cpu_alias_name[sizeof(cpu_prefix) + 10];
-+    char dist_alias_name[sizeof(cpu_prefix) + 10];
-     SysBusDevice *gicbusdev;
-     uint32_t i;
-=20
---=20
-2.21.0
+diff --git a/tests/migration/stress.c b/tests/migration/stress.c
+index d9aa4afe92..9e128eef50 100644
+--- a/tests/migration/stress.c
++++ b/tests/migration/stress.c
+@@ -170,10 +170,10 @@ static unsigned long long now(void)
+ static int stressone(unsigned long long ramsizeMB)
+ {
+     size_t pagesPerMB = 1024 * 1024 / PAGE_SIZE;
+-    char *ram = malloc(ramsizeMB * 1024 * 1024);
++    g_autofree char *ram = g_malloc(ramsizeMB * 1024 * 1024);
+     char *ramptr;
+     size_t i, j, k;
+-    char *data = malloc(PAGE_SIZE);
++    g_autofree char *data = g_malloc(PAGE_SIZE);
+     char *dataptr;
+     size_t nMB = 0;
+     unsigned long long before, after;
+@@ -186,7 +186,6 @@ static int stressone(unsigned long long ramsizeMB)
+     if (!data) {
+         fprintf(stderr, "%s (%d): ERROR: cannot allocate %d bytes of RAM: %s\n",
+                 argv0, gettid(), PAGE_SIZE, strerror(errno));
+-        free(ram);
+         return -1;
+     }
+ 
+@@ -198,8 +197,6 @@ static int stressone(unsigned long long ramsizeMB)
+     memset(ram, 0xfe, ramsizeMB * 1024 * 1024);
+ 
+     if (random_bytes(data, PAGE_SIZE) < 0) {
+-        free(ram);
+-        free(data);
+         return -1;
+     }
+ 
+@@ -227,9 +224,6 @@ static int stressone(unsigned long long ramsizeMB)
+             }
+         }
+     }
+-
+-    free(data);
+-    free(ram);
+ }
+ 
+ 
+-- 
+2.17.1
+
+
 
 
