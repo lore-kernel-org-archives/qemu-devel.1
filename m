@@ -2,79 +2,92 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD23C47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC531C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:57:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C5382084D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:56:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JoGDbG//"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C5382084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 750A220862
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:57:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 750A220862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGSkh-0001BC-CG
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 14:56:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35983)
+	id 1iGSlT-0002Ab-0C
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 14:57:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36853)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iGSaS-0005Dw-Gp
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:45:57 -0400
+ (envelope-from <pc@us.ibm.com>) id 1iGShP-0008NR-GX
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:53:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iGSaR-0004Zx-Eh
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:45:56 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44745)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iGSaQ-0004Ua-Fd; Fri, 04 Oct 2019 14:45:55 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w6so6602196oie.11;
- Fri, 04 Oct 2019 11:45:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=k8d1E5mr2/5/aLpC4Q9/O9VsIHNrRvEIdRReSf/BG7o=;
- b=JoGDbG//2xInBL3c4S7FV9tUIYrq0uREr7D2pgmrRtaRZPrFEbls1IMjf7X1W1DYng
- JO1VSN35ItTYIkj5ZnFO9QIOGNgz33LPkYjsvxvezrCwCy+508HcxLdwIfahzquahTGX
- JWf90yGIwUwMiHo9HEffRUXP12rRfW77NrEkszCvySZFLwLnVfhM8TNNM79LjaU7icfn
- c+8vkr0G9/3Joa4dMJ/WWmX51NYGCRLKWCdChp1wuvreh+n4GnU5/os3bpQa5HI83hIb
- VeSXoPV2pZy7zHyYOLu1beGwMfPPWW5ydhBBBd+0p/eUjA2IZASmITjxlokRwwbU6xCu
- Z2ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=k8d1E5mr2/5/aLpC4Q9/O9VsIHNrRvEIdRReSf/BG7o=;
- b=Dz61E226rSR7d/kAeSnc0esIq12xqrec3DhOfqgGLQuzNVa1kAIMRQU2h+XLPh7hsU
- 5P03jmN2jyVxOiLr2P2AAq9CEmYUuELLDOi15POZkz+8skLTRrgfkvQZf/vwfHyuLWhW
- fPdqSDB34OVfUkzqLD2xDOl8RY9wLiQ8mwms0MvxtQkkAIvAfmtyiC3yyCV3rMVyPSVQ
- mlcpqCaehdN/DtmOLJyObXpHFLXgajmyS9r7+tu4v24p6145q0R0yEkX0CnbBjhQG2OJ
- UD6TokVwkAYWKfYVNEt+hPddfDtl/2WJ+5IrFLyTnOuSvTpkZYT/0BHTq1Myfp/b7zOq
- 3t2g==
-X-Gm-Message-State: APjAAAU2l7RW98Vvd20P59TtrDt/ieI1ikG0ZnqBNMMzA+KdksPqEC6l
- T6qbchdD5r2tCFwX6ANEEZnNR0EfwZEyszO+g7w=
-X-Google-Smtp-Source: APXvYqzzNRWyMZBoQ3SsxgB98/hh3mUptlqwsyyneQ/Qw02SDHpWMpobwzp+d4h79Tug1auA+iCctIO2oGvAKn82NXQ=
-X-Received: by 2002:aca:f002:: with SMTP id o2mr8444266oih.62.1570214744577;
- Fri, 04 Oct 2019 11:45:44 -0700 (PDT)
-MIME-Version: 1.0
+ (envelope-from <pc@us.ibm.com>) id 1iGShN-0001Cr-Uo
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:53:07 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34010)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pc@us.ibm.com>)
+ id 1iGShD-00017E-3h; Fri, 04 Oct 2019 14:52:55 -0400
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x94IqBRx020349; Fri, 4 Oct 2019 14:52:45 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ve5cg6nff-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 04 Oct 2019 14:52:44 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x94IoNHq006089;
+ Fri, 4 Oct 2019 18:52:43 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma01dal.us.ibm.com with ESMTP id 2v9y5acfea-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 04 Oct 2019 18:52:43 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x94IqhhA50397670
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 4 Oct 2019 18:52:43 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0097D28058;
+ Fri,  4 Oct 2019 18:52:43 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1F8D52805C;
+ Fri,  4 Oct 2019 18:52:42 +0000 (GMT)
+Received: from oc3272150783.ibm.com (unknown [9.160.10.50])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTPS;
+ Fri,  4 Oct 2019 18:52:41 +0000 (GMT)
+To: Stefan Brankovic <stefan.brankovic@rt-rk.com>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org
 References: <1570196639-7025-1-git-send-email-stefan.brankovic@rt-rk.com>
  <1570196639-7025-2-git-send-email-stefan.brankovic@rt-rk.com>
+From: Paul Clarke <pc@us.ibm.com>
+Message-ID: <7ab3c116-7e59-9164-2c29-e37c4b415560@us.ibm.com>
+Date: Fri, 4 Oct 2019 13:52:41 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
 In-Reply-To: <1570196639-7025-2-git-send-email-stefan.brankovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 4 Oct 2019 20:45:33 +0200
-Message-ID: <CAL1e-=ih85afhTMGU8ig9GhXWFGNc3zL95L1mgxeujmWO56O-Q@mail.gmail.com>
-Subject: Re: [PATCH v2] target/ppc: Fix for optimized vsl/vsr instructions
-To: Stefan Brankovic <stefan.brankovic@rt-rk.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+Subject: Re:  [PATCH v2] target/ppc: Fix for optimized vsl/vsr instructions
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-10-04_11:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=768 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910040152
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,24 +99,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.hendreson@linaro.org,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "open list:ppc4xx" <qemu-ppc@nongnu.org>, "Paul A. Clarke" <pc@us.ibm.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: alex.bennee@linaro.org, richard.hendreson@linaro.org,
+ mark.cave-ayland@ilande.co.uk, amarkovic@wavecomp.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/4/19 8:43 AM, Stefan Brankovic wrote:
+> In previous implementation, invocation of TCG shift function could request
+> shift of TCG variable by 64 bits when variable 'sh' is 0, which is not
+> supported in TCG (values can be shifted by 0 to 63 bits). This patch fixes
+> this by using two separate invocation of TCG shift functions, with maximum
+> shift amount of 32.
+> 
+> Name of variable 'shifted' is changed to 'carry' so variable naming
+> is similar to old helper implementation.
+> 
+> Variables 'avrA' and 'avrB' are replaced with variable 'avr'.
+> 
+> Fixes: 4e6d0920e7547e6af4bbac5ffe9adfe6ea621822
 > Reported-by: Paul Clark <pc@us.ibm.com>
 
-Stefan,
+Preferred: "Paul A. Clarke" (for historical consistency)
 
-Paul's full name is Paul A. Clarke.
+> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Suggested-by: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+> Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
 
-Thanks for the fix!
+Applying this patch on top of dce5a787c05fe1a3e54d92871cdeba2af6798e0d eliminated the failures that I reported in https://bugs.launchpad.net/qemu/+bug/1841990 associated with vsl/vsr.
 
-Aleksandar
+Tested-by: Paul A. Clarke  <pc@us.ibm.com>
+
+PC
 
