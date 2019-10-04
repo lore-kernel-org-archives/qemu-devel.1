@@ -2,53 +2,54 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD066C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 09:57:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 290A7C4CED1
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 09:57:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7276B2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 72817215EA
 	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 09:57:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dJyv8Yi+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7276B2133F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gbceV4dW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72817215EA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGKKn-0007qW-1z
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 05:57:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52535)
+	id 1iGKKm-0007n0-Q7
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 05:57:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK2O-00052d-EX
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:14 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iGK2i-0005Lf-8p
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK2M-0005BE-Td
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:12 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42557 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iGK2g-0005Tt-HO
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:32 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:38251 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iGK2M-00058q-HM; Fri, 04 Oct 2019 05:38:10 -0400
+ id 1iGK2g-0005RR-2Z; Fri, 04 Oct 2019 05:38:30 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46l4YK04Khz9sRm; Fri,  4 Oct 2019 19:37:56 +1000 (AEST)
+ id 46l4YL5N2Mz9sRw; Fri,  4 Oct 2019 19:37:58 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570181877;
- bh=oFOUAI0FQ1OPjYv4ZCW6kaltnufymeOV+pdcvMdgoCY=;
+ d=gibson.dropbear.id.au; s=201602; t=1570181878;
+ bh=mcYe6Whs+n4x6tJ7GY0LQhcrxugvkVwyWbic5PeYlWk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=dJyv8Yi+pWTpa0GAdxbHUq/88k2/AWcBv9aEngXy/K3EvM3kNchsPGRKQ5MceAD2p
- 8R6WOBh31axES2aK6ilp+SNxKFXQFoSk9JU3O3Ubpuj3k9+2tNcdvGMsm+HIe2gJav
- LdAa9t9XO6IkTc5LF5x3+hgLhW3K0/rCjKd2zgTs=
+ b=gbceV4dWOdnE96x47Itx3ck2EWu2eJGP1xjgSqjXrPeubgvUkC1YgBE0GRxc2jbhS
+ xewc2HY3tdx/U0VUZ+ZVFJQ5APOOv+6aqviSQpWXon0Pf8B3B+VJkXOtJYJW9injUf
+ D197f5VtXU5M7iqfF/8vT9ZrZENN014HyHCVhefo=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 21/53] pseries: Update SLOF firmware image
-Date: Fri,  4 Oct 2019 19:37:15 +1000
-Message-Id: <20191004093747.31350-22-david@gibson.dropbear.id.au>
+Subject: [PULL 28/53] target/ppc: remove unnecessary if() around calls to
+ set_dfp{64, 128}() in DFP macros
+Date: Fri,  4 Oct 2019 19:37:22 +1000
+Message-Id: <20191004093747.31350-29-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191004093747.31350-1-david@gibson.dropbear.id.au>
 References: <20191004093747.31350-1-david@gibson.dropbear.id.au>
@@ -68,63 +69,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, aik@ozlabs.ru,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-This fixes USB host bus adapter name in the device tree to match QEMU's
-one.
+Now that the parameters to both set_dfp64() and set_dfp128() are exactly =
+the
+same, there is no need for an explicit if() statement to determine which
+function should be called based upon size. Instead we can simply use the
+preprocessor to generate the call to set_dfp##size() directly.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190926185801.11176-8-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- pc-bios/README   |   2 +-
- pc-bios/slof.bin | Bin 930656 -> 930640 bytes
- roms/SLOF        |   2 +-
- 3 files changed, 2 insertions(+), 2 deletions(-)
+ target/ppc/dfp_helper.c | 60 +++++++----------------------------------
+ 1 file changed, 10 insertions(+), 50 deletions(-)
 
-diff --git a/pc-bios/README b/pc-bios/README
-index ad78f6dc49..0b0b5d42ad 100644
---- a/pc-bios/README
-+++ b/pc-bios/README
-@@ -17,7 +17,7 @@
- - SLOF (Slimline Open Firmware) is a free IEEE 1275 Open Firmware
-   implementation for certain IBM POWER hardware.  The sources are at
-   https://github.com/aik/SLOF, and the image currently in qemu is
--  built from git tag qemu-slof-20190827.
-+  built from git tag qemu-slof-20190911.
+diff --git a/target/ppc/dfp_helper.c b/target/ppc/dfp_helper.c
+index c2bb458a78..2c65badae4 100644
+--- a/target/ppc/dfp_helper.c
++++ b/target/ppc/dfp_helper.c
+@@ -427,11 +427,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, pp=
+c_fprp_t *a,               \
+     dnop(&dfp.t, &dfp.a, &dfp.b, &dfp.context);                         =
+       \
+     dfp_finalize_decimal##size(&dfp);                                   =
+       \
+     postprocs(&dfp);                                                    =
+       \
+-    if (size =3D=3D 64) {                                               =
+           \
+-        set_dfp64(t, &dfp.vt);                                          =
+       \
+-    } else if (size =3D=3D 128) {                                       =
+           \
+-        set_dfp128(t, &dfp.vt);                                         =
+       \
+-    }                                                                   =
+       \
++    set_dfp##size(t, &dfp.vt);                                          =
+       \
+ }
 =20
- - sgabios (the Serial Graphics Adapter option ROM) provides a means for
-   legacy x86 software to communicate with an attached serial console as
-diff --git a/pc-bios/slof.bin b/pc-bios/slof.bin
-index a3a3e4933278461a08c8b58ad0da6741bb6b3d1b..2af0c5d5fc0c6aa06c34016f6=
-deb767700ad4d3f 100644
-GIT binary patch
-delta 329
-zcmaFx%;Lf`iwWjp0qL0~x=3DG2&#>pnBrpZQziG``Tr3RA~8D-fNBsm4eR3;XP@Lb<`
-zv*14z0Hypk-dkiZfUL>D&@^rH1cxn57Qv|n3WkOXMh1qK3WjD@MkZE9hP+$~Zs7`H
-zsYS(^`FRSq3g}jXb=3DNq1A0=3DCN`+p8bAZ7w$W*}w(Vpbq#+y0+}ed9$bjjSK(%0kNn
-zO^x%LuLq|Ec!*A#>F(@orJyl=3Dtsb9j`}14uK+FNeoIuP4#N6AT-{P5Yo3n!f44A#A
-cH*Di|V=3Dq=3DxC@oG>+J1K%Z+#8Rvgsum0R3EcBme*a
-
-delta 345
-zcmccc%;Lc_iwWjp3F(<7x~YjqMuuhv28o7-W`(J_r3RA~8D-fNBstW@%qJFz@LZZ%
-z`13y$0Hypk-dkiZfUL>F!q{;01cxn57LKLq3P$D%Mh1qK3WjD@#^zQAmb_dFZs7`H
-zsYS(^`FRSq3g}jXb=3DNq1A0=3DCN`+p8bAZ7w$W*}w(Vpbq#+y0+}ed9$bN9!%GngbU&
-zADehRaI;IBl7`udz3$G=3DRtg%^=3Dj!pvwm-kc4#XTl%n8I?K+L`U`7NFaw>f7pfB|##
-t^oDJ`ZsJM`rNv1~3PvfV1qvytWtqvTx_ODYsoT$P<E^h@VfK2g4FEIEd71zK
-
-diff --git a/roms/SLOF b/roms/SLOF
-index ea221600a1..bcc3c4e5c2 160000
---- a/roms/SLOF
-+++ b/roms/SLOF
-@@ -1 +1 @@
--Subproject commit ea221600a116883137ef90b2b7ab7d2472bc4f10
-+Subproject commit bcc3c4e5c21a015f4680894c4ec978a90d4a2d69
+ static void ADD_PPs(struct PPC_DFP *dfp)
+@@ -747,11 +743,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, pp=
+c_fprp_t *b,        \
+     dfp_finalize_decimal##size(&dfp);                                   =
+\
+     QUA_PPs(&dfp);                                                      =
+\
+                                                                         =
+\
+-    if (size =3D=3D 64) {                                               =
+    \
+-        set_dfp64(t, &dfp.vt);                                          =
+\
+-    } else if (size =3D=3D 128) {                                       =
+    \
+-        set_dfp128(t, &dfp.vt);                                         =
+\
+-    }                                                                   =
+\
++    set_dfp##size(t, &dfp.vt);                                          =
+\
+ }
+=20
+ DFP_HELPER_QUAI(dquai, 64)
+@@ -769,11 +761,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, pp=
+c_fprp_t *a,        \
+     dfp_finalize_decimal##size(&dfp);                                   =
+\
+     QUA_PPs(&dfp);                                                      =
+\
+                                                                         =
+\
+-    if (size =3D=3D 64) {                                               =
+    \
+-        set_dfp64(t, &dfp.vt);                                          =
+\
+-    } else if (size =3D=3D 128) {                                       =
+    \
+-        set_dfp128(t, &dfp.vt);                                         =
+\
+-    }                                                                   =
+\
++    set_dfp##size(t, &dfp.vt);                                          =
+\
+ }
+=20
+ DFP_HELPER_QUA(dqua, 64)
+@@ -851,11 +839,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, pp=
+c_fprp_t *a,        \
+     dfp_finalize_decimal##size(&dfp);                                   =
+\
+     QUA_PPs(&dfp);                                                      =
+\
+                                                                         =
+\
+-    if (size =3D=3D 64) {                                               =
+    \
+-        set_dfp64(t, &dfp.vt);                                          =
+\
+-    } else if (size =3D=3D 128) {                                       =
+    \
+-        set_dfp128(t, &dfp.vt);                                         =
+\
+-    }                                                                   =
+\
++    set_dfp##size(t, &dfp.vt);                                          =
+\
+ }
+=20
+ DFP_HELPER_RRND(drrnd, 64)
+@@ -874,11 +858,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, pp=
+c_fprp_t *b,               \
+     dfp_finalize_decimal##size(&dfp);                                   =
+       \
+     postprocs(&dfp);                                                    =
+       \
+                                                                         =
+       \
+-    if (size =3D=3D 64) {                                               =
+           \
+-        set_dfp64(t, &dfp.vt);                                          =
+       \
+-    } else if (size =3D=3D 128) {                                       =
+           \
+-        set_dfp128(t, &dfp.vt);                                         =
+       \
+-    }                                                                   =
+       \
++    set_dfp##size(t, &dfp.vt);                                          =
+       \
+ }
+=20
+ static void RINTX_PPs(struct PPC_DFP *dfp)
+@@ -978,11 +958,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, pp=
+c_fprp_t *b)               \
+     dfp_finalize_decimal##size(&dfp);                                   =
+       \
+     CFFIX_PPs(&dfp);                                                    =
+       \
+                                                                         =
+       \
+-    if (size =3D=3D 64) {                                               =
+           \
+-        set_dfp64(t, &dfp.vt);                                          =
+       \
+-    } else if (size =3D=3D 128) {                                       =
+           \
+-        set_dfp128(t, &dfp.vt);                                         =
+       \
+-    }                                                                   =
+       \
++    set_dfp##size(t, &dfp.vt);                                          =
+       \
+ }
+=20
+ static void CFFIX_PPs(struct PPC_DFP *dfp)
+@@ -1088,11 +1064,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, =
+ppc_fprp_t *b,          \
+         dfp_set_sign_##size(&dfp.vt, sgn);                              =
+  \
+     }                                                                   =
+  \
+                                                                         =
+  \
+-    if (size =3D=3D 64) {                                               =
+      \
+-        set_dfp64(t, &dfp.vt);                                          =
+  \
+-    } else if (size =3D=3D 128) {                                       =
+      \
+-        set_dfp128(t, &dfp.vt);                                         =
+  \
+-    }                                                                   =
+  \
++    set_dfp##size(t, &dfp.vt);                                          =
+  \
+ }
+=20
+ DFP_HELPER_DEDPD(ddedpd, 64)
+@@ -1160,11 +1132,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, =
+ppc_fprp_t *b,             \
+     }                                                                   =
+     \
+     dfp_finalize_decimal##size(&dfp);                                   =
+     \
+     dfp_set_FPRF_from_FRT(&dfp);                                        =
+     \
+-    if ((size) =3D=3D 64) {                                             =
+         \
+-        set_dfp64(t, &dfp.vt);                                          =
+     \
+-    } else if ((size) =3D=3D 128) {                                     =
+         \
+-        set_dfp128(t, &dfp.vt);                                         =
+     \
+-    }                                                                   =
+     \
++    set_dfp##size(t, &dfp.vt);                                          =
+     \
+ }
+=20
+ DFP_HELPER_ENBCD(denbcd, 64)
+@@ -1264,11 +1232,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, =
+ppc_fprp_t *a,          \
+         dfp.t.exponent =3D exp - bias;                                  =
+    \
+         dfp_finalize_decimal##size(&dfp);                               =
+  \
+     }                                                                   =
+  \
+-    if (size =3D=3D 64) {                                               =
+      \
+-        set_dfp64(t, &dfp.vt);                                          =
+  \
+-    } else if (size =3D=3D 128) {                                       =
+      \
+-        set_dfp128(t, &dfp.vt);                                         =
+  \
+-    }                                                                   =
+  \
++    set_dfp##size(t, &dfp.vt);                                          =
+  \
+ }
+=20
+ DFP_HELPER_IEX(diex, 64)
+@@ -1356,11 +1320,7 @@ void helper_##op(CPUPPCState *env, ppc_fprp_t *t, =
+ppc_fprp_t *a,    \
+         }                                                           \
+     }                                                               \
+                                                                     \
+-    if ((size) =3D=3D 64) {                                             =
+\
+-        set_dfp64(t, &dfp.vt);                                      \
+-    } else {                                                        \
+-        set_dfp128(t, &dfp.vt);                                     \
+-    }                                                               \
++    set_dfp##size(t, &dfp.vt);                                      \
+ }
+=20
+ DFP_HELPER_SHIFT(dscli, 64, 1)
 --=20
 2.21.0
 
