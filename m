@@ -2,78 +2,91 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7037FC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D82DC47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:48:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FDFF20862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:42:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kCNeP4cf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FDFF20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 67C6B215EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:48:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67C6B215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGRaz-0005Fv-4e
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 13:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55943)
+	id 1iGRh6-00086a-Hd
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 13:48:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56245)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iGRZD-0004E8-N4
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 13:40:36 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iGRbW-0005pl-Rx
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 13:43:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iGRZC-0002GX-6D
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 13:40:35 -0400
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:45450)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iGRZB-0002GH-TC
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 13:40:34 -0400
-Received: by mail-ot1-x32e.google.com with SMTP id 41so5955202oti.12
- for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 10:40:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3DHbq/mrGTZhpzyuW81VcvZSLrIPAAvPKJ9PwmjLBDg=;
- b=kCNeP4cfmaaPrEoN6LtciVf5foMJw5mQWwXJhm9pu5nSyg5RFTqO3yqh3j/p8Oagpp
- o7ueJLudZNYwri9Tp7ukLq264P+bm7dvgXko6FbWYevY1ySEYF0Va3m5x2pDEQUa65v5
- Hk/h7k8szTwxfzYxpN36WEs/OoFw3DXhNnPi+Zh09pEWuAw1jv/vCBJ7Y/nt8HwlDTAv
- hN9V1d+VFUkMZ+x74UkvWXxy+6FXWciNVqH0MDx8fUg96abSiFjjRM9ws0oF1qU9cCoW
- osrsREtXStAugUUg+X0IqDKRKkSAEz6JKG5NkgFQYZHXkGN9aIecyBW4dJ7yrUNyh+tJ
- uhKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3DHbq/mrGTZhpzyuW81VcvZSLrIPAAvPKJ9PwmjLBDg=;
- b=cmAUFCn+qHrIO5U/FM2bm5zkVuTXmbR/KY2fd9c7l2/zRlVqO4vOiaYllj221o+Q5A
- rD/o7fBjhNxcSXfCd1RIDMfx9IpoNE6YpA2PoYXz4fcKg7a9ttG5eMvhRuNs64PoCYW+
- f9bW2Q95XGCEVbpXoSXMGZoERiU+cj2LeMFNKhL9LDQvtRKaFubCg2/lBz3LZGA5m0vW
- drlMvTjKkQ/wSiYRmK/rK9Fs4OWzyK6mzWu9aPCZsl6CWpWmuDXnpzLRUIJwSbls5o7p
- DbqaWN3pDq6m9iw0XMgSvMKMgPLYU0X0RAPLchgQkSkFt2gSHjpjF51fnsyGlENv5vsl
- 110A==
-X-Gm-Message-State: APjAAAV2elWsQfmAyqgA23QvJtC31qWYzt0BqqGobQAD4NT+d3SuDDao
- cOZRPpoCZPmbOSENsTv0gz+/0WuU46TqhwuuwSbhyHT79Gk=
-X-Google-Smtp-Source: APXvYqy91MNequScy5vi5KOAKxHTBUmCmW8i6y5aDyWu18xiXeV+NOatWE8+5b7xEGG9k0TTHYXTzwp7AqO2XYWjfxo=
-X-Received: by 2002:a9d:562:: with SMTP id 89mr11915997otw.232.1570210832656; 
- Fri, 04 Oct 2019 10:40:32 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1iGRbV-0003H0-UR
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 13:42:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57313)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iGRbP-0003Ds-Mj; Fri, 04 Oct 2019 13:42:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E56898980E5;
+ Fri,  4 Oct 2019 17:42:50 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-31.brq.redhat.com
+ [10.40.204.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C21BB5D6B7;
+ Fri,  4 Oct 2019 17:42:46 +0000 (UTC)
+Subject: Re: [PATCH v2 02/11] qcrypto-luks: extend the create options for
+ upcoming encryption key management
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
+References: <20190912223028.18496-1-mlevitsk@redhat.com>
+ <20190912223028.18496-3-mlevitsk@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <e0e85ab0-e84b-0ee8-8467-ff11e803f7cf@redhat.com>
+Date: Fri, 4 Oct 2019 19:42:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <CAFEAcA8HGEdHs74-m3Wa7RHU_ZE5g9kEidP-9Z69zhsMkCPRZQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA8HGEdHs74-m3Wa7RHU_ZE5g9kEidP-9Z69zhsMkCPRZQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Oct 2019 18:40:21 +0100
-Message-ID: <CAFEAcA_sTc+EcDU-=kwLTLRL_ZoiXReRCfy1XeDj+4p02B3e8w@mail.gmail.com>
-Subject: Re: ptimer use of bottom-half handlers
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32e
+In-Reply-To: <20190912223028.18496-3-mlevitsk@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="hfNEjsVadiHqYVdtPh9Mm4blVj5DnuNr3"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Fri, 04 Oct 2019 17:42:50 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,46 +98,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 27 Sep 2019 at 11:01, Peter Maydell <peter.maydell@linaro.org> wrote:
-> The ptimer API is basically a down-counter (with a lot of bells
-> and whistles), with functions to do things like "read current count"
-> and "write current count". When the counter hits zero it typically
-> reloads, and the ptimer code notifies a callback function in the
-> device that's using ptimer. In the current implementation this
-> is done using a QEMU bottom-half handler, so ptimer_trigger()
-> calls replay_bh_schedule_event() on a QEMUBH that it was passed
-> by the device when it was initialized. The comment says this is
-> "to avoid reentrancy issues". That's a bit vague, but I assume the
-> idea is to avoid the code of the device's 'triggered' callback
-> being called from within eg ptimer_set_count(), because the
-> device might be in the middle of changing multiple parts of the
-> ptimer's state, its own state might not be consistent, etc.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hfNEjsVadiHqYVdtPh9Mm4blVj5DnuNr3
+Content-Type: multipart/mixed; boundary="Aw4REuJDSIFhIY2gmaIGXDOzuAmoSkj2f"
 
-In the course of trying to do some conversions of devices to
-the new API I've proposed, I figured out the other part of what
-this "to avoid reentrancy issues" probably is referring to:
-if the device's 'triggered' callback itself calls a ptimer
-function like ptimer_run() then potentially it could recurse:
- ptimer_trigger() -> trigger callback -> ptimer_run() ->
-  ptimer_reload() -> ptimer_trigger() -> ...
+--Aw4REuJDSIFhIY2gmaIGXDOzuAmoSkj2f
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I need to think a bit more carefully about what is supposed
-to happen here and what we want to have happen. I guess at
-the moment we'll just schedule the QEMU BH to run again,
-so the trigger callback is called again, but not recursively.
-So we should probably cause that to happen in the new scheme
-(conceptually, something like "the trigger callback is
-implicitly considered to be called from within a tx begin/
-commit block, so (a) it doesn't need to do begin/commit itself
-and (b) if it does something resulting in a repeat trigger
-the second call will happen after it returns, not recursively" ?)
+On 13.09.19 00:30, Maxim Levitsky wrote:
+> Now you can specify which slot to put the encryption key to
+> Plus add 'active' option which will let  user erase the key secret
+> instead of adding it.
+> Check that active=3Dtrue it when creating.
+>=20
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  block/crypto.c             |  2 ++
+>  block/crypto.h             | 16 +++++++++++
+>  block/qcow2.c              |  2 ++
+>  crypto/block-luks.c        | 26 +++++++++++++++---
+>  qapi/crypto.json           | 19 ++++++++++++++
+>  tests/qemu-iotests/082.out | 54 ++++++++++++++++++++++++++++++++++++++=
 
-thanks
--- PMM
+>  6 files changed, 115 insertions(+), 4 deletions(-)
+
+(Just doing a cursory RFC-style review)
+
+I think we also want to reject unlock-secret if it=E2=80=99s given for cr=
+eation;
+and I suppose it=E2=80=99d be more important to print which slots are OK =
+than
+the slot the user has given.  (It isn=E2=80=99t like we shouldn=E2=80=99t=
+ print that
+slot index, but it=E2=80=99s more likely the user knows that than what th=
+e
+limits are.  I think.)
+
+Max
+
+
+--Aw4REuJDSIFhIY2gmaIGXDOzuAmoSkj2f--
+
+--hfNEjsVadiHqYVdtPh9Mm4blVj5DnuNr3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XhJUACgkQ9AfbAGHV
+z0Al4gf9FI6iKecp8d7SihA+8lgm6buJ3D0KwHK4HJCndnm/IUHFqQ8aopHZ2MvX
+8DMmLxYQ08l6EetWDtbz4co3buBZNCfNYda5UC3Bt3CshtfmrMCtJkgjUVOJkIv6
+dD1VmeTLRDouMEzpgVkQ4a0jABM8jKpqKc+XVe/kOKq/CxItvo9irVxfqzAeYCAr
+DHgXrUmKbHGPflirD2bYGa3OVnzK4yX0nJ1rrGyABRGfsD0EPIpOMiIe5k9m30w8
+KicSpKLYsxWoUVjajfTv9G8fk26APR/3uQlD1ARITMS4gwALkyB4yqIbeNwHWyeg
+8vFCJ9vraxpw4I3lBbsnye+JPaU7jw==
+=zG18
+-----END PGP SIGNATURE-----
+
+--hfNEjsVadiHqYVdtPh9Mm4blVj5DnuNr3--
 
