@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B2CC47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02120C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:08:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC3BD2084D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:07:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C27532084D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 17:08:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ACatc0j1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC3BD2084D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqccnty7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C27532084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGR3d-0003UK-Db
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 13:07:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51143)
+	id 1iGR3f-0003Tg-Ex
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 13:07:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iGQvc-0007SU-6L
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:59:41 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iGQvU-0007Mg-2C
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iGQvZ-0001xI-Ga
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:59:38 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55812)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iGQvS-0001ta-Mr
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:59:31 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39670)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iGQvZ-0001wo-9n
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:59:37 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a6so6542802wma.5
- for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 09:59:37 -0700 (PDT)
+ id 1iGQvS-0001ss-7Q
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 12:59:30 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r3so8091459wrj.6
+ for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 09:59:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=Dzd4Mr7ZIdxJK23W1XqRBzN6e9anASFYpHHxSbZiu7I=;
- b=ACatc0j1FYuAcTaTIP7Ccau5wEDVSYh2NQx/E12DnMQdUCVquNVy7ujYIS9MTHJOIt
- JU+ZzhIjpvwbOFIQxOaXA99tYNTedI/Nw8vm3vk3vzEijjq8jH8dXlTzdd2rgrx3gMEA
- sZFnm9vQIK+zDyw/7Jz3g2l+Emubb+X2rwKtb5vQbxNRwEl+4bk8yzZHgdwwfJVWwWOI
- dGChAVww+0rZT8kLLhyiYznylmTqhh1moH/YNiZ9PlwY3l2pL7rFHldK5HSa7MTxvqz+
- Kiqo88m6It7FX+RQP6M/293pO49XjFc8BBqwlKPkGV9vVAm1aeUUJ6UHgmcowWHf++5S
- kckg==
+ bh=ENyllfGZkEo7zYLWR0n6K+bmlcFkTFrnASUR8ihWMqE=;
+ b=nqccnty7ksBxLKCFiLX2OGBce1x6BVWqnWL1Y9nlliPP9+mSO4m1awwUZnHwgEh0aB
+ MdQEg0ccgbVQLJn+J+rSwB3LPNxQzIWhscybVHuSh8EgUeI068Xe6zzR0O8RPe3XI+Xm
+ myjcJ3Aan8foHbvm+Pe55HGOYD+NXoQweXX1p6GtusM6yF1b4/M9LyBcbgg4yiNYGa1b
+ L35B5keAI5VKjG9ZHkiLEuigQr0f71kXupXr8xAccEqDXk1UIp9uAefj9hYWAv1vTrOQ
+ q5tHEXm5+Kcjg59f1UOfLlEuiDgoEX80288t8OOo93MI+NtzYfc6zoh6HOJ9ltM4KRWT
+ xqgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=Dzd4Mr7ZIdxJK23W1XqRBzN6e9anASFYpHHxSbZiu7I=;
- b=OgVhfIOjznAW8qLjg1SwGJf9Sq+2n8b/TaMjN5dcfwILJ4zsORx0mOmEE6bkL35If1
- ZwdVFuDmV9lfJuG0VoVjKu/PcMSByBZQypfmryWE0KbECzUgMHsmBxLgLV5ldt+YS/JY
- 51URet1UisV6dWHYQ/d8DmPBymckHpvHXcm4E/Gon6vdZSQh1IZe04POiCGRHgqj3bdc
- ncJmudElcvysuqPkXEV1P+LQYGcM50lRxaw3J7is17++1VTNXDFxVBFRs5/hOabQcGs2
- t1cA31qvk9eOUF/GCluYtLJ4/UHdW0rPWyqld241igYjdfotDAdzOyuw4nNvPDIWtQH9
- Y8FA==
-X-Gm-Message-State: APjAAAXbLNQGgmOB/P08NZhOEKXBjIFN7ILYnQoWd68R/MR+5SVNRbQc
- pU3wG8/F2HqgFxs4ApRfgiNfEDbu
-X-Google-Smtp-Source: APXvYqzqXwU4GTe/MrBoAyc3DixU96dJAZKd2S1MXxJJAZyTtSf7oMB3wrnniutk5SgnxnPQLa78/Q==
-X-Received: by 2002:a1c:6841:: with SMTP id d62mr11950449wmc.48.1570208375936; 
- Fri, 04 Oct 2019 09:59:35 -0700 (PDT)
+ bh=ENyllfGZkEo7zYLWR0n6K+bmlcFkTFrnASUR8ihWMqE=;
+ b=C7a7aUZc8xfR+nVrQuwHWwN+EntDtwZAoaSpyXKQz9zj17XJKemucoRLe5NPPD1BFs
+ AlR1wtf6aZLLHm4J+ZVdIY6eYi8isSY2RdS22WedsEZ5n5XAiz6UJA7WhzaYkxqMRbw0
+ 8y4W62Xup+oiEs7VdWojIFurZIzhodCMUod2OssgqczpuFcdUNeqCuSkXKexL8ExEmeQ
+ 2pFcxjHQBF7Q13qO9a0JWPez7OENCFgKpw06dXIf27dU11yTbQ2BMk0QSLx/WqKeT9mx
+ azJe/A9Ms7SApDEbzZHXwm6uZa+SHFHW875+Lf3+GBwtO/KntpnlBDP+6MSokWb/iLb1
+ X2ZQ==
+X-Gm-Message-State: APjAAAVLMd5tlB4KS6w5MfW8wdHV76Yq1B0guF/lPNfE+ezNpxRPfiyi
+ 250LnO95FMRp5lRdlZelCtFauKYD
+X-Google-Smtp-Source: APXvYqwoOlY22GQUnea/wndo5ciU7LKDLDCtHEf2+vOLJbaDBIQMLzkTMtEgo4jIlJyPGJR1dHTlNQ==
+X-Received: by 2002:a5d:44d2:: with SMTP id z18mr12761375wrr.122.1570208367673; 
+ Fri, 04 Oct 2019 09:59:27 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id u7sm7041270wrp.19.2019.10.04.09.59.35
+ by smtp.gmail.com with ESMTPSA id u7sm7041270wrp.19.2019.10.04.09.59.26
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 04 Oct 2019 09:59:35 -0700 (PDT)
+ Fri, 04 Oct 2019 09:59:26 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 28/29] target/i386: work around KVM_GET_MSRS bug for secondary
- execution controls
-Date: Fri,  4 Oct 2019 18:59:22 +0200
-Message-Id: <1570208363-11948-8-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 22/29] target/i386: handle filtered_features in a new function
+ mark_unavailable_features
+Date: Fri,  4 Oct 2019 18:59:16 +0200
+Message-Id: <1570208363-11948-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1570208363-11948-1-git-send-email-pbonzini@redhat.com>
 References: <1570208363-11948-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,46 +95,173 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some secondary controls are automatically enabled/disabled based on the CPUID
-values that are set for the guest.  However, they are still available at a
-global level and therefore should be present when KVM_GET_MSRS is sent to
-/dev/kvm.
-
-Unfortunately KVM forgot to include those, so fix that.
+The next patch will add a different reason for filtering features, unrelated
+to host feature support.  Extract a new function that takes care of disabling
+the features and optionally reporting them.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/kvm.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ target/i386/cpu.c | 87 ++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 48 insertions(+), 39 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 45f0a1f..be4bbfb 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -479,6 +479,23 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
-     value = msr_data.entries[0].data;
-     switch (index) {
-     case MSR_IA32_VMX_PROCBASED_CTLS2:
-+        /* KVM forgot to add these bits for some time, do this ourselves.  */
-+        if (kvm_arch_get_supported_cpuid(s, 0xD, 1, R_ECX) & CPUID_XSAVE_XSAVES) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_XSAVES << 32;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 80cfab0..83f8981 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3096,17 +3096,41 @@ static char *feature_word_description(FeatureWordInfo *f, uint32_t bit)
+     return NULL;
+ }
+ 
+-static void report_unavailable_features(FeatureWord w, uint32_t mask)
++static bool x86_cpu_have_filtered_features(X86CPU *cpu)
+ {
++    FeatureWord w;
++
++    for (w = 0; w < FEATURE_WORDS; w++) {
++        if (cpu->filtered_features[w]) {
++            return true;
 +        }
-+        if (kvm_arch_get_supported_cpuid(s, 1, 0, R_ECX) & CPUID_EXT_RDRAND) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_RDRAND_EXITING << 32;
-+        }
-+        if (kvm_arch_get_supported_cpuid(s, 7, 0, R_EBX) & CPUID_7_0_EBX_INVPCID) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_ENABLE_INVPCID << 32;
-+        }
-+        if (kvm_arch_get_supported_cpuid(s, 7, 0, R_EBX) & CPUID_7_0_EBX_RDSEED) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_RDSEED_EXITING << 32;
-+        }
-+        if (kvm_arch_get_supported_cpuid(s, 0x80000001, 0, R_EDX) & CPUID_EXT2_RDTSCP) {
-+            value |= (uint64_t)VMX_SECONDARY_EXEC_RDTSCP << 32;
-+        }
-+        /* fall through */
-     case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
-     case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
-     case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
++    }
++
++    return false;
++}
++
++static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint32_t mask,
++                                      const char *verbose_prefix)
++{
++    CPUX86State *env = &cpu->env;
+     FeatureWordInfo *f = &feature_word_info[w];
+     int i;
+     char *feat_word_str;
+ 
++    if (!cpu->force_features) {
++        env->features[w] &= ~mask;
++    }
++    cpu->filtered_features[w] |= mask;
++
++    if (!verbose_prefix) {
++        return;
++    }
++
+     for (i = 0; i < 32; ++i) {
+         if ((1UL << i) & mask) {
+             feat_word_str = feature_word_description(f, i);
+-            warn_report("%s doesn't support requested feature: %s%s%s [bit %d]",
+-                        accel_uses_host_cpuid() ? "host" : "TCG",
++            warn_report("%s: %s%s%s [bit %d]",
++                        verbose_prefix,
+                         feat_word_str,
+                         f->feat_names[i] ? "." : "",
+                         f->feat_names[i] ? f->feat_names[i] : "", i);
+@@ -3511,7 +3535,7 @@ static void x86_cpu_parse_featurestr(const char *typename, char *features,
+ }
+ 
+ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp);
+-static int x86_cpu_filter_features(X86CPU *cpu);
++static void x86_cpu_filter_features(X86CPU *cpu, bool verbose);
+ 
+ /* Build a list with the name of all features on a feature word array */
+ static void x86_cpu_list_feature_names(FeatureWordArray features,
+@@ -3576,7 +3600,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
+         next = &new->next;
+     }
+ 
+-    x86_cpu_filter_features(xc);
++    x86_cpu_filter_features(xc, false);
+ 
+     x86_cpu_list_feature_names(xc->filtered_features, next);
+ 
+@@ -3784,15 +3808,6 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
+     return r;
+ }
+ 
+-static void x86_cpu_report_filtered_features(X86CPU *cpu)
+-{
+-    FeatureWord w;
+-
+-    for (w = 0; w < FEATURE_WORDS; w++) {
+-        report_unavailable_features(w, cpu->filtered_features[w]);
+-    }
+-}
+-
+ static void x86_cpu_apply_props(X86CPU *cpu, PropValue *props)
+ {
+     PropValue *pv;
+@@ -5154,24 +5169,24 @@ out:
+  *
+  * Returns: 0 if all flags are supported by the host, non-zero otherwise.
+  */
+-static int x86_cpu_filter_features(X86CPU *cpu)
++static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
+ {
+     CPUX86State *env = &cpu->env;
+     FeatureWord w;
+-    int rv = 0;
++    const char *prefix = NULL;
++
++    if (verbose) {
++        prefix = accel_uses_host_cpuid()
++                 ? "host doesn't support requested feature"
++                 : "TCG doesn't support requested feature";
++    }
+ 
+     for (w = 0; w < FEATURE_WORDS; w++) {
+         uint32_t host_feat =
+             x86_cpu_get_supported_feature_word(w, false);
+         uint32_t requested_features = env->features[w];
+-        uint32_t available_features = requested_features & host_feat;
+-        if (!cpu->force_features) {
+-            env->features[w] = available_features;
+-        }
+-        cpu->filtered_features[w] = requested_features & ~available_features;
+-        if (cpu->filtered_features[w]) {
+-            rv = 1;
+-        }
++        uint32_t unavailable_features = requested_features & ~host_feat;
++        mark_unavailable_features(cpu, w, unavailable_features, prefix);
+     }
+ 
+     if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
+@@ -5197,13 +5212,9 @@ static int x86_cpu_filter_features(X86CPU *cpu)
+              * host can't emulate the capabilities we report on
+              * cpu_x86_cpuid(), intel-pt can't be enabled on the current host.
+              */
+-            env->features[FEAT_7_0_EBX] &= ~CPUID_7_0_EBX_INTEL_PT;
+-            cpu->filtered_features[FEAT_7_0_EBX] |= CPUID_7_0_EBX_INTEL_PT;
+-            rv = 1;
++            mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, prefix);
+         }
+     }
+-
+-    return rv;
+ }
+ 
+ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+@@ -5244,16 +5255,14 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+         goto out;
+     }
+ 
+-    if (x86_cpu_filter_features(cpu) &&
+-        (cpu->check_cpuid || cpu->enforce_cpuid)) {
+-        x86_cpu_report_filtered_features(cpu);
+-        if (cpu->enforce_cpuid) {
+-            error_setg(&local_err,
+-                       accel_uses_host_cpuid() ?
+-                           "Host doesn't support requested features" :
+-                           "TCG doesn't support requested features");
+-            goto out;
+-        }
++    x86_cpu_filter_features(cpu, cpu->check_cpuid || cpu->enforce_cpuid);
++
++    if (cpu->enforce_cpuid && x86_cpu_have_filtered_features(cpu)) {
++        error_setg(&local_err,
++                   accel_uses_host_cpuid() ?
++                       "Host doesn't support requested features" :
++                       "TCG doesn't support requested features");
++        goto out;
+     }
+ 
+     /* On AMD CPUs, some CPUID[8000_0001].EDX bits must match the bits on
 -- 
 1.8.3.1
 
