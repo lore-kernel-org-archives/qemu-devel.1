@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A83A4C47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 09:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35820C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 09:44:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7571D207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 09:44:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B15D1207FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 09:44:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Iev88hby"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7571D207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="V5WwOPuU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B15D1207FF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGK8G-0002to-V5
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 05:44:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52331)
+	id 1iGK8P-0003Ai-1N
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 05:44:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK2H-0004rg-9J
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:06 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iGK2H-0004sV-PJ
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iGK2F-000542-LM
+ (envelope-from <dgibson@ozlabs.org>) id 1iGK2F-00053o-Ey
  for qemu-devel@nongnu.org; Fri, 04 Oct 2019 05:38:05 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:44225)
+Received: from ozlabs.org ([2401:3900:2:1::2]:34791)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iGK2F-0004zu-6U; Fri, 04 Oct 2019 05:38:03 -0400
+ id 1iGK2F-0004zt-0t; Fri, 04 Oct 2019 05:38:03 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46l4YG3Q9xz9sR8; Fri,  4 Oct 2019 19:37:54 +1000 (AEST)
+ id 46l4YG4K3fz9sR6; Fri,  4 Oct 2019 19:37:54 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1570181874;
- bh=7qmQ0NPe5Pwt53ZjSvHdmIBoaYR9AETfU8EFeGxMU4g=;
+ bh=OirAMtv4UlayQDyT8sYysuEo+ORX8REYSURSmh6PVJc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Iev88hbyLbNLGqKDVxVgppkcUr7eohyidw9sXZk85HKojrJJXXTsvVa4KtLwlzgxE
- r/cP3NPe17qjECRXqOh1Dqqz5yCnWPhT5aNI1qROGp1ROrVEMQARyF+9vCt6q90J3y
- YONtyOu0xpDl7C+CXCCvRzJs2PVeDxrc7sum75bs=
+ b=V5WwOPuUGpdl8AhRKkhv+Zml06KPhXgAOURjvyyGmVBU25BVJUdwFGWXYpl9KKAXB
+ ukH0zhtqMJ5AIiTbG+gu74H0KOIdI3xr+o11uuOzwOu/ujgXDap4S0lPgnjmhVUO4T
+ 4v82yA29XZScvIGLATC1aok85sPu6SfLXdl2Lmz4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 09/53] spapr/irq: Introduce an ics_irq_free() helper
-Date: Fri,  4 Oct 2019 19:37:03 +1000
-Message-Id: <20191004093747.31350-10-david@gibson.dropbear.id.au>
+Subject: [PULL 10/53] spapr/irq: Only claim VALID interrupts at the KVM level
+Date: Fri,  4 Oct 2019 19:37:04 +1000
+Message-Id: <20191004093747.31350-11-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191004093747.31350-1-david@gibson.dropbear.id.au>
 References: <20191004093747.31350-1-david@gibson.dropbear.id.au>
@@ -77,81 +77,152 @@ Sender: "Qemu-devel"
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-It will help us to discard interrupt numbers which have not been
-claimed in the next patch.
+A typical pseries VM with 16 vCPUs, one disk, one network adapater
+uses less than 100 interrupts but the whole IRQ number space of the
+QEMU machine is allocated at reset time and it is 8K wide. This is
+wasting a considerable amount of interrupt numbers in the global IRQ
+space which has 1M interrupts per socket on a POWER9.
+
+To optimise the HW resources, only request at the KVM level interrupts
+which have been claimed by the guest. This will help to increase the
+maximum number of VMs per system and also help supporting nested guests
+using the XIVE interrupt mode.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190911133937.2716-2-clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Message-Id: <20190911133937.2716-3-clg@kaod.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <156942766014.1274533.10792048853177121231.stgit@bahia.lan>
+[dwg: Folded in fix up from Greg Kurz]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_irq.c    | 9 +++------
- include/hw/ppc/xics.h | 5 +++++
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ hw/intc/spapr_xive_kvm.c | 40 +++++++++++++++++++++++++++++++++++++---
+ hw/intc/xics_kvm.c       |  8 ++++++++
+ 2 files changed, 45 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 06fe2432ba..d8f46b6797 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -114,9 +114,6 @@ static void spapr_irq_init_xics(SpaprMachineState *sp=
-apr, int nr_irqs,
-     xics_spapr_init(spapr);
- }
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 17af4d19f5..2006f96aec 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -255,11 +255,16 @@ void kvmppc_xive_source_reset_one(XiveSource *xsrc,=
+ int srcno, Error **errp)
 =20
--#define ICS_IRQ_FREE(ics, srcno)   \
--    (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
--
- static int spapr_irq_claim_xics(SpaprMachineState *spapr, int irq, bool =
-lsi,
-                                 Error **errp)
+ static void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
  {
-@@ -129,7 +126,7 @@ static int spapr_irq_claim_xics(SpaprMachineState *sp=
-apr, int irq, bool lsi,
-         return -1;
-     }
++    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
+     int i;
 =20
--    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
-+    if (!ics_irq_free(ics, irq - ics->offset)) {
-         error_setg(errp, "IRQ %d is not free", irq);
-         return -1;
-     }
-@@ -147,7 +144,7 @@ static void spapr_irq_free_xics(SpaprMachineState *sp=
-apr, int irq, int num)
-     if (ics_valid_irq(ics, irq)) {
-         trace_spapr_irq_free(0, irq, num);
-         for (i =3D srcno; i < srcno + num; ++i) {
--            if (ICS_IRQ_FREE(ics, i)) {
-+            if (ics_irq_free(ics, i)) {
-                 trace_spapr_irq_free_warn(0, i);
-             }
-             memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
-@@ -767,7 +764,7 @@ static int ics_find_free_block(ICSState *ics, int num=
-, int alignnum)
-             return -1;
-         }
-         for (i =3D first; i < first + num; ++i) {
--            if (!ICS_IRQ_FREE(ics, i)) {
-+            if (!ics_irq_free(ics, i)) {
-                 break;
-             }
-         }
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index f2a8d6a4b4..64a2c8862a 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -179,6 +179,11 @@ void ics_simple_write_xive(ICSState *ics, int nr, in=
-t server,
-                            uint8_t priority, uint8_t saved_priority);
- void ics_simple_set_irq(void *opaque, int srcno, int val);
+     for (i =3D 0; i < xsrc->nr_irqs; i++) {
+         Error *local_err =3D NULL;
 =20
-+static inline bool ics_irq_free(ICSState *ics, uint32_t srcno)
-+{
-+    return !(ics->irqs[srcno].flags & XICS_FLAGS_IRQ_MASK);
-+}
++        if (!xive_eas_is_valid(&xive->eat[i])) {
++            continue;
++        }
 +
- void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
- void icp_pic_print_info(ICPState *icp, Monitor *mon);
- void ics_pic_print_info(ICSState *ics, Monitor *mon);
+         kvmppc_xive_source_reset_one(xsrc, i, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+@@ -328,11 +333,18 @@ uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int s=
+rcno, uint32_t offset,
+=20
+ static void kvmppc_xive_source_get_state(XiveSource *xsrc)
+ {
++    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
+     int i;
+=20
+     for (i =3D 0; i < xsrc->nr_irqs; i++) {
++        uint8_t pq;
++
++        if (!xive_eas_is_valid(&xive->eat[i])) {
++            continue;
++        }
++
+         /* Perform a load without side effect to retrieve the PQ bits */
+-        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
++        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
+=20
+         /* and save PQ locally */
+         xive_source_esb_set(xsrc, i, pq);
+@@ -521,9 +533,14 @@ static void kvmppc_xive_change_state_handler(void *o=
+paque, int running,
+      */
+     if (running) {
+         for (i =3D 0; i < xsrc->nr_irqs; i++) {
+-            uint8_t pq =3D xive_source_esb_get(xsrc, i);
++            uint8_t pq;
+             uint8_t old_pq;
+=20
++            if (!xive_eas_is_valid(&xive->eat[i])) {
++                continue;
++            }
++
++            pq =3D xive_source_esb_get(xsrc, i);
+             old_pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq <=
+< 8));
+=20
+             /*
+@@ -545,7 +562,13 @@ static void kvmppc_xive_change_state_handler(void *o=
+paque, int running,
+      * migration is in progress.
+      */
+     for (i =3D 0; i < xsrc->nr_irqs; i++) {
+-        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
++        uint8_t pq;
++
++        if (!xive_eas_is_valid(&xive->eat[i])) {
++            continue;
++        }
++
++        pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
+=20
+         /*
+          * PQ is set to PENDING to possibly catch a triggered
+@@ -655,6 +678,17 @@ int kvmppc_xive_post_load(SpaprXive *xive, int versi=
+on_id)
+             continue;
+         }
+=20
++        /*
++         * We can only restore the source config if the source has been
++         * previously set in KVM. Since we don't do that for all interru=
+pts
++         * at reset time anymore, let's do it now.
++         */
++        kvmppc_xive_source_reset_one(&xive->source, i, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return -1;
++        }
++
+         kvmppc_xive_set_source_config(xive, i, &xive->eat[i], &local_err=
+);
+         if (local_err) {
+             error_report_err(local_err);
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index a4d2e876cc..ba90d6dc96 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -190,6 +190,10 @@ void ics_get_kvm_state(ICSState *ics)
+     for (i =3D 0; i < ics->nr_irqs; i++) {
+         ICSIRQState *irq =3D &ics->irqs[i];
+=20
++        if (ics_irq_free(ics, i)) {
++            continue;
++        }
++
+         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+                           i + ics->offset, &state, false, &error_fatal);
+=20
+@@ -301,6 +305,10 @@ int ics_set_kvm_state(ICSState *ics, Error **errp)
+         Error *local_err =3D NULL;
+         int ret;
+=20
++        if (ics_irq_free(ics, i)) {
++            continue;
++        }
++
+         ret =3D ics_set_kvm_state_one(ics, i, &local_err);
+         if (ret < 0) {
+             error_propagate(errp, local_err);
 --=20
 2.21.0
 
