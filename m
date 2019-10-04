@@ -6,49 +6,56 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9661DC4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 15:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BF7C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 15:58:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BE30207FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 15:57:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BE30207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4DCA3222C0
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 15:58:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DCA3222C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGPxc-00006J-4Q
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 11:57:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41154)
+	id 1iGPyE-0000fo-Qv
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 11:58:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42236)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iGPnj-00038G-GV
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 11:47:29 -0400
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1iGPuU-0006Ll-H9
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 11:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iGPnh-0005gf-U9
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 11:47:27 -0400
-Received: from relay.sw.ru ([185.231.240.75]:36348)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1iGPuS-0000Y2-JI
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 11:54:25 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44636 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iGPnR-0005EY-J5; Fri, 04 Oct 2019 11:47:20 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iGPnL-00019e-G6; Fri, 04 Oct 2019 18:47:03 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 4/5] migration/block-dirty-bitmap: fix bitmaps migration
- during mirror job
-Date: Fri,  4 Oct 2019 18:47:00 +0300
-Message-Id: <20191004154701.3202-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191004154701.3202-1-vsementsov@virtuozzo.com>
-References: <20191004154701.3202-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1iGPuO-0000QO-93; Fri, 04 Oct 2019 11:54:20 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id BB987C4B2364335D9FB1;
+ Fri,  4 Oct 2019 23:54:12 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.439.0; Fri, 4 Oct 2019 23:54:03 +0800
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
+ <imammedo@redhat.com>
+Subject: [PATCH 1/5] hw/arm: Align ACPI blob len to PAGE size
+Date: Fri, 4 Oct 2019 16:52:58 +0100
+Message-ID: <20191004155302.4632-2-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
+References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+Content-Type: text/plain
+X-Originating-IP: [10.202.227.237]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,114 +67,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org, jsnow@redhat.com, dgilbert@redhat.com
+Cc: peter.maydell@linaro.org, lersek@redhat.com, linuxarm@huawei.com,
+ xuwei5@hisilicon.com, shannon.zhaosl@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Important thing for bitmap migration is to select destination block
-node to obtain the migrated bitmap.
+If ACPI blob length modifications happens after the initial
+virt_acpi_build() call, and the changed blob length is within
+the PAGE size boundary, then the revised size is not seen by
+the firmware on Guest reboot. The is because in the
+virt_acpi_build_update() -> acpi_ram_update() -> qemu_ram_resize()
+path, qemu_ram_resize() uses ram_block size which is aligned
+to PAGE size and the "resize callback" to update the size seen
+by firmware is not getting invoked. Hence align ACPI blob sizes
+to PAGE boundary.
 
-Prepatch, on source we use bdrv_get_device_or_node_name() to identify
-the node, and on target we do bdrv_lookup_bs.
-bdrv_get_device_or_node_name() returns blk name only for direct
-children of blk. So, bitmaps of direct children of blks are migrated by
-blk name and others - by node name.
-
-Libvirt currently is unprepared to bitmap migration by node-name,
-node-names are mostly auto-generated. So actually only migration by blk
-name works.
-
-Now, consider classic libvirt migrations assisted by mirror block job:
-mirror block job inserts filter, so our source is not a direct child of
-blk, and bitmaps are migrated by node-names. And this just don't work.
-
-Let's fix it by allowing use blk-name even if some implicit filters are
-inserted.
-
-Note, that we possibly want to allow explicit filters skipping too, but
-this is another story.
-
-Note2: we, of course, can't skip filters and use blk name to migrate
-bitmaps in filtered node by blk name for this blk if these filters have
-named bitmaps which should be migrated.
-
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1652424
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- migration/block-dirty-bitmap.c | 39 +++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+More details on this issue can be found here,
+https://patchwork.kernel.org/patch/11154757/
 
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 46641b7861..3105479c50 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -321,14 +321,48 @@ static int init_dirty_bitmap_migration(void)
- {
-     BlockDriverState *bs;
-     DirtyBitmapMigBitmapState *dbms;
-+    GHashTable *handled_by_blk = g_hash_table_new(NULL, NULL);
-+    BlockBackend *blk;
+---
+ hw/arm/virt-acpi-build.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 4cd50175e0..074e0c858e 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -790,6 +790,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     GArray *table_offsets;
+     unsigned dsdt, xsdt;
+     GArray *tables_blob = tables->table_data;
++    GArray *cmd_blob = tables->linker->cmd_blob;
+     MachineState *ms = MACHINE(vms);
  
-     dirty_bitmap_mig_state.bulk_completed = false;
-     dirty_bitmap_mig_state.prev_bs = NULL;
-     dirty_bitmap_mig_state.prev_bitmap = NULL;
-     dirty_bitmap_mig_state.no_bitmaps = false;
+     table_offsets = g_array_new(false, true /* clear */,
+@@ -854,6 +855,19 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+         build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
+     }
  
 +    /*
-+     * Use blockdevice name for direct (or filtered) children of named block
-+     * backends.
++     * Align the ACPI blob lengths to PAGE size so that on ACPI table
++     * regeneration, the length that firmware sees really gets updated
++     * through 'resize' callback in qemu_ram_resize() in the
++     * virt_acpi_build_update() -> acpi_ram_update() -> qemu_ram_resize()
++     * path.
 +     */
-+    for (blk = blk_next(NULL); blk; blk = blk_next(blk)) {
-+        const char *name = blk_name(blk);
-+
-+        if (!name || strcmp(name, "") == 0) {
-+            continue;
-+        }
-+
-+        bs = blk_bs(blk);
-+
-+        /* Skip filters without bitmaos */
-+        while (bs && bs->drv && bs->drv->is_filter &&
-+               !bdrv_has_named_bitmaps(bs))
-+        {
-+            bs = bs->backing->bs ?: bs->file->bs;
-+        }
-+
-+        if (bs && bs->drv && !bs->drv->is_filter) {
-+            if (add_bitmaps_to_list(bs, name)) {
-+                goto fail;
-+            }
-+            g_hash_table_add(handled_by_blk, bs);
-+        }
-+    }
-+
-     for (bs = bdrv_next_all_states(NULL); bs; bs = bdrv_next_all_states(bs)) {
--        if (add_bitmaps_to_list(bs, bdrv_get_device_or_node_name(bs))) {
-+        if (g_hash_table_contains(handled_by_blk, bs)) {
-+            continue;
-+        }
-+
-+        if (add_bitmaps_to_list(bs, bdrv_get_node_name(bs))) {
-             goto fail;
-         }
-     }
-@@ -342,9 +376,12 @@ static int init_dirty_bitmap_migration(void)
-         dirty_bitmap_mig_state.no_bitmaps = true;
-     }
- 
-+    g_hash_table_destroy(handled_by_blk);
-+
-     return 0;
- 
- fail:
-+    g_hash_table_destroy(handled_by_blk);
-     dirty_bitmap_mig_cleanup();
- 
-     return -1;
++    g_array_set_size(tables_blob,
++                     TARGET_PAGE_ALIGN(acpi_data_len(tables_blob)));
++    g_array_set_size(tables->rsdp,
++                     TARGET_PAGE_ALIGN(acpi_data_len(tables->rsdp)));
++    g_array_set_size(cmd_blob,
++                     TARGET_PAGE_ALIGN(acpi_data_len(cmd_blob)));
+     /* Cleanup memory that's no longer used. */
+     g_array_free(table_offsets, true);
+ }
 -- 
-2.21.0
+2.17.1
+
 
 
