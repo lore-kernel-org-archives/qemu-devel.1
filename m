@@ -2,94 +2,92 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31254C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 14:07:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B18CDC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 14:21:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F09AE20873
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 14:07:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BzeksFJx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F09AE20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 882E62133F
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 14:21:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 882E62133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGODz-0001Bk-EG
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 10:06:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52629)
+	id 1iGOS6-0004rI-EW
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 10:21:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iGOCz-0000Z5-Sd
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:05:28 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iGOQv-0003xu-UX
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:19:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iGOCy-0006MS-3g
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:05:25 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35112)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iGOCx-0006D4-SU
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:05:24 -0400
-Received: by mail-ot1-x343.google.com with SMTP id z6so5397234otb.2
- for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 07:05:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=v+zudTp73d8qRm0omNGNW6D27zZVxitCjBRiTm8dgco=;
- b=BzeksFJx9csOLM5mrTDu7018RvChY+hJBFtkUBZXBjfwhSSeZOX0d2eYbYJ7k+oJX6
- 6jN6I+2mtDtK6RZCosCyBSFhHleE/3uZ+M8aj4Oqyj5fUf/HYwSQ/nVXRsswAQ2TqUjh
- Hy8lJmd/1DWTZ4lU8gwjNZgCvG6mf0JIQ5647S5Fz6yuRvj8K79FJvlUS79m1DKr1cu/
- 3XiVFSxr3FRRHrZNZC9LdfW2FvQ5G93dStqTR0O4Ghh/AL4HH9GCKK4Du8Va4KmkPmdO
- 97Qx33QUXu4CupXYXywTitunjImtK9/UICorlMFrNnDkO0+BYS9EZ3Z3itPwLQmFTiKb
- CdSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=v+zudTp73d8qRm0omNGNW6D27zZVxitCjBRiTm8dgco=;
- b=RokB8xW4QGok9da3nJMqhzQ/qr2ifUasYdZ2Gbxo58wxI79HuipNduEwtH9pxsrfk2
- V+7IcuZh9l5wFaKLOv8xcg/8R1UyrsUK3HT4ODlPCcVjP5YvAHlwoPMUhV3sE9bEG+it
- jHgswYpCpCJqe9c45KH7NFNbkqyQmyBnHuoMVO/RqAWB55m+6N2bKv7dJdmqWA8xNiiU
- TqLRzyZi0EComes/5e39O+cb3aIO3ZlbFobD5LbAe3h8iXI24jLuJHecQE/cU65gXrQo
- Z/nK0eEriN/OC8N7bTkn5I5lo4aRc08uT/wvm2Mg2aukAfDWVG64dsvWgsW3yFnzsbJT
- I5EQ==
-X-Gm-Message-State: APjAAAUs6QS487UEAt81hjYM3+h+i2FBA9iQh3c79UzZYkmAfgD+0Xqy
- L+EnJZsEesMPtq4e5YZIFI2hSC+cGlbxpMCI6hOuTA==
-X-Google-Smtp-Source: APXvYqxF9RYvg6LxSL2SZpgH2AGlhujrWgpSOMGANLenZ0XkI4PRd69m9ovs8vmkfk7L1vM25GpDprzCS0Kn6PguklI=
-X-Received: by 2002:a05:6830:1357:: with SMTP id
- r23mr10953083otq.91.1570197911752; 
- Fri, 04 Oct 2019 07:05:11 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1iGOQu-00052q-Nm
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 10:19:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36109)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iGOQq-00050w-Uf; Fri, 04 Oct 2019 10:19:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 30FAA306729D;
+ Fri,  4 Oct 2019 14:19:43 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-31.brq.redhat.com
+ [10.40.204.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 230F95D6A5;
+ Fri,  4 Oct 2019 14:19:37 +0000 (UTC)
+Subject: Re: [PATCH v15 5/5] block/backup: use backup-top instead of write
+ notifiers
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191001131409.14202-1-vsementsov@virtuozzo.com>
+ <20191001131409.14202-6-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <35155e37-df08-4774-2e9c-7c786b9e52b5@redhat.com>
+Date: Fri, 4 Oct 2019 16:19:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <20190917234549.22910-2-jsnow@redhat.com>
- <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
- <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
- <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
- <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
- <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
- <20191002164438.GD5819@localhost.localdomain>
- <a7f532cc-68cb-175e-6c8f-930401221ef9@redhat.com>
- <20191004101952.GC5491@linux.fritz.box>
- <d194e22c-7125-e558-0a80-131a28a87419@redhat.com>
- <CAFEAcA-4-ttpQ5S-HuEtv86TeNjBnFzp77D5ML1D9CZMYGR5Ow@mail.gmail.com>
- <2873f340-cac2-c168-d46a-e22c0571e83d@redhat.com>
-In-Reply-To: <2873f340-cac2-c168-d46a-e22c0571e83d@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 4 Oct 2019 15:05:00 +0100
-Message-ID: <CAFEAcA99ezCejkZi9+yVYK-SRpNOvPng9vrkF+kcuS12LQBmuQ@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
- platforms
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <20191001131409.14202-6-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="30x2PE5I7aqpL3u2h2kuTa4ArcPDGDEUU"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 04 Oct 2019 14:19:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,64 +99,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- John Snow <jsnow@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: kwolf@redhat.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 4 Oct 2019 at 14:50, Max Reitz <mreitz@redhat.com> wrote:
-> On 04.10.19 15:16, Peter Maydell wrote:
-> > 'make check' does have the restriction
-> > that we don't want the tests to take too long to run, but in
-> > general the block layer should be running some reasonable subset
-> > of tests in the project's standard "run the tests please" command.
-> > (I have no opinion on exactly what that subset ought to be, beyond
-> > that it would be good if that subset doesn't have known intermittent
-> > failures in it.)
->
-> Deciding the subset is difficult.  My stance was that it=E2=80=99s better=
- to not
-> choose an arbitrary subset here but ensure that really everything gets
-> run as part of CI, that is asynchronously so it doesn=E2=80=99t block any=
-one and
-> can take as long as it wants.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--30x2PE5I7aqpL3u2h2kuTa4ArcPDGDEUU
+Content-Type: multipart/mixed; boundary="G0CnP07CsOaaTCj6r4hzjYNVGNESdvecz"
 
-I wonder if we have a terminology difference confusion here.
-To me "CI" means "we have tests which we automatically run
-before pushing commits to master, and if they fail then we
-don't push". So (a) they have to run synchronously and (b) there
-is a need for them to run in a reasonable period of time because
-otherwise it takes too long to run the tests before pushing
-to master and we get a backlog of unprocessed pullrequests
-and annoying delays.
+--G0CnP07CsOaaTCj6r4hzjYNVGNESdvecz
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> If we decide to get pull requests based on that, then that=E2=80=99d brin=
-g even
-> more pain, but at least it=E2=80=99d be honest.  But just running half of=
- the
-> qcow2 tests to me seems only like we want to pretend we ran the iotests.
->  So for me, iotests still break, and we need to deal with make check
-> failures on top.  I=E2=80=99d at least prefer one or the other.
+On 01.10.19 15:14, Vladimir Sementsov-Ogievskiy wrote:
+> Drop write notifiers and use filter node instead.
+>=20
+> =3D Changes =3D
+>=20
+> 1. Add filter-node-name argument for backup qmp api. We have to do it
+> in this commit, as 257 needs to be fixed.
+>=20
+> 2. There are no more write notifiers here, so is_write_notifier
+> parameter is dropped from block-copy paths.
+>=20
+> 3. To sync with in-flight requests at job finish we now have drained
+> removing of the filter, we don't need rw-lock.
+>=20
+> 4. Block-copy is now using BdrvChildren instead of BlockBackends
+>=20
+> 5. As backup-top owns these children, we also move block-copy state
+> into backup-top's ownership.
+>=20
+> =3D Iotest changes =3D
+>=20
+> 56: op-blocker doesn't shoot now, as we set it on source, but then
+> check on filter, when trying to start second backup.
+> To keep the test we instead can catch another collision: both jobs will=
 
-I think the ideal we're aiming for here is:
- (1) people doing active work in the block subsystem are probably
-often going to want to run all the iotests, and certainly the
-subsystem maintainers will want to do that as they put together
-pull requests.
- (2) but people who *don't* do active work in the block subsystem
-still sometimes touch it in passing as part of things like global
-refactorings or other changes that touch big parts of the tree,
-or accidentally break it with a change to some other bit of QEMU
-entirely. These people won't run the full iotests, but it is
-reasonable to expect them to run 'make check', and it would be good
-if that caught "whoops you broke the block subsystem".
+> get 'drive0' job-id, as job-id parameter is unspecified. To prevent
+> interleaving with file-posix locks (as they are dependent on config)
+> let's use another target for second backup.
+>=20
+> Also, it's obvious now that we'd like to drop this op-blocker at all
+> and add a test-case for two backups from one node (to different
+> destinations) actually works. But not in these series.
+>=20
+> 141: Output changed: prepatch, "Node is in use" comes from bdrv_has_blk=
 
-Similarly, "make check" has incredibly spotty coverage of
-various arm boards and devices, but it does do some basic
-checks which do catch accidental breakage.
+> check inside qmp_blockdev_del. But we've dropped block-copy blk
+> objects, so no more blk objects on source bs (job blk is on backup-top
+> filter bs). New message is from op-blocker, which is the next check in
+> qmp_blockdev_add.
+>=20
+> 257: The test wants to emulate guest write during backup. They should
+> go to filter node, not to original source node, of course. Therefore we=
 
-thanks
--- PMM
+> need to specify filter node name and use it.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block-core.json       |   8 +-
+>  include/block/block-copy.h |  14 +-
+>  include/block/block_int.h  |   1 +
+>  block/backup-top.c         |  21 +--
+>  block/backup.c             |  73 +++------
+>  block/block-copy.c         |  81 +++-------
+>  block/replication.c        |   2 +-
+>  blockdev.c                 |   1 +
+>  tests/qemu-iotests/056     |   8 +-
+>  tests/qemu-iotests/141.out |   2 +-
+>  tests/qemu-iotests/257     |   7 +-
+>  tests/qemu-iotests/257.out | 306 ++++++++++++++++++-------------------=
+
+>  12 files changed, 237 insertions(+), 287 deletions(-)
+
+[...]
+
+> diff --git a/block/block-copy.c b/block/block-copy.c
+> index fcb112da14..5404bc921d 100644
+> --- a/block/block-copy.c
+> +++ b/block/block-copy.c
+
+[...]
+
+> @@ -218,8 +183,8 @@ static int coroutine_fn block_copy_with_offload(Blo=
+ckCopyState *s,
+>      nr_clusters =3D DIV_ROUND_UP(nbytes, s->cluster_size);
+>      bdrv_reset_dirty_bitmap(s->copy_bitmap, start,
+>                              s->cluster_size * nr_clusters);
+> -    ret =3D blk_co_copy_range(s->source, start, s->target, start, nbyt=
+es,
+> -                            read_flags, s->write_flags);
+> +    ret =3D bdrv_co_copy_range(s->source, start, s->target, start, nby=
+tes,
+> +                            0, s->write_flags);
+
+The indentation=E2=80=99s off here.  I=E2=80=99ll fix it.
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--G0CnP07CsOaaTCj6r4hzjYNVGNESdvecz--
+
+--30x2PE5I7aqpL3u2h2kuTa4ArcPDGDEUU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2XVPgACgkQ9AfbAGHV
+z0B12Qf/cEbtuuzOfqg0b0Ru+6v2U3oKrpXonL7SsvLwm0Aiw1TehObSIBC8ZWNj
+fEmw2PQfc0w6OLL17IMpBGnH0I9OC7UYhFaMvFt9KjiwF4GMaB4v9jLsRDgDMb3f
+3om48QVkCtBBW5NOID/ls+8rdU/FwVwTDePbGnFFBli3vm+wJCS2nddT7GihWsyJ
+3r3N7Im+J7Sa6iidgr+D7tzVWn1eheEYeo2wfYTPMXiEVvrjgyzGtiK5/usTdGuD
+/C0OSVkHp5hcA0giY9RTZ6PeTLOcwbRIxBRwi3KYWgRXVMfX3sJO3cL8RsVD4dJO
+WwVJZ2mrO2P5VpnYHp/Dqu5tkv4n8A==
+=brh+
+-----END PGP SIGNATURE-----
+
+--30x2PE5I7aqpL3u2h2kuTa4ArcPDGDEUU--
 
