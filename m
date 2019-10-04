@@ -2,60 +2,117 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9A4C4CED1
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 08:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B2E5C47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 08:06:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8146B2084D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 08:03:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8146B2084D
+	by mail.kernel.org (Postfix) with ESMTPS id 3FAEB2084D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 08:06:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FAEB2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGIZ1-0006PM-Kf
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 04:03:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36679)
+	id 1iGIbU-0007lb-EL
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 04:06:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37090)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iGIXM-0005TM-T4
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 04:02:07 -0400
+ (envelope-from <lvivier@redhat.com>) id 1iGIaX-00075S-Vb
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 04:05:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iGIXK-0003Py-Ab
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 04:02:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52676)
+ (envelope-from <lvivier@redhat.com>) id 1iGIaW-00055W-PN
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 04:05:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38298)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iGIXJ-0003PU-Nq
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 04:02:02 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iGIaW-000551-HM
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 04:05:20 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 16AFA88307;
- Fri,  4 Oct 2019 08:02:00 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 35C1260BE1;
- Fri,  4 Oct 2019 08:01:58 +0000 (UTC)
-Date: Fri, 4 Oct 2019 10:01:57 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v12 10/11] hmat acpi: Build Memory Side Cache
- Information Structure(s)
-Message-ID: <20191004100157.7e3ce374@redhat.com>
-In-Reply-To: <20190920074349.2616-11-tao3.xu@intel.com>
-References: <20190920074349.2616-1-tao3.xu@intel.com>
- <20190920074349.2616-11-tao3.xu@intel.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 22D4681129;
+ Fri,  4 Oct 2019 08:05:19 +0000 (UTC)
+Received: from [10.36.116.215] (ovpn-116-215.ams2.redhat.com [10.36.116.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C16C319C5B;
+ Fri,  4 Oct 2019 08:05:10 +0000 (UTC)
+Subject: Re: [PATCH 7/7] tests/fw_cfg: Run the tests on big-endian targets
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191003225437.16651-1-philmd@redhat.com>
+ <20191003225437.16651-8-philmd@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <1932cc2e-830c-e542-817d-a6e5ef750c6c@redhat.com>
+Date: Fri, 4 Oct 2019 10:05:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20191003225437.16651-8-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 04 Oct 2019 08:02:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Fri, 04 Oct 2019 08:05:19 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,138 +127,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, dan.j.williams@intel.com
+Cc: Thomas Huth <thuth@redhat.com>, Li Qiang <liq3ea@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 20 Sep 2019 15:43:48 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
-
-> From: Liu Jingqi <jingqi.liu@intel.com>
+On 04/10/2019 00:54, Philippe Mathieu-Daud=C3=A9 wrote:
+> We have been restricting our fw_cfg tests to the PC machine,
+> which is a little-endian architecture.
+> The fw_cfg device is also used on the SPARC and PowerPC
+> architectures, which can run in big-endian configuration.
 >=20
-> This structure describes memory side cache information for memory
-> proximity domains if the memory side cache is present and the
-> physical device forms the memory side cache.
-> The software could use this information to effectively place
-> the data in memory to maximize the performance of the system
-> memory that use the memory side cache.
+> Since we want to be sure our device does not regress
+> regardless the endianess used, enable this test one
+> these targets.
 >=20
-> Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> The NUMA selector is X86 specific, restrict it to this arch.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
+>  tests/Makefile.include |  2 ++
+>  tests/fw_cfg-test.c    | 18 +++++++++++++++---
+>  2 files changed, 17 insertions(+), 3 deletions(-)
 >=20
-> No changes in v12.
->=20
-> Changes in v11:
->     - Move numa option patches forward.
-> ---
->  hw/acpi/hmat.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 63 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-> index e7be849581..6b260eeef5 100644
-> --- a/hw/acpi/hmat.c
-> +++ b/hw/acpi/hmat.c
-> @@ -160,13 +160,62 @@ static void build_hmat_lb(GArray *table_data, HMAT_=
-LB_Info *hmat_lb,
->      }
->  }
-> =20
-> +/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5-1=
-47 */
-> +static void build_hmat_cache(GArray *table_data, HMAT_Cache_Info *hmat_c=
-ache)
-> +{
-> +    /*
-> +     * Cache Attributes: Bits [3:0] =E2=80=93 Total Cache Levels
-> +     * for this Memory Proximity Domain
-> +     */
-> +    uint32_t cache_attr =3D hmat_cache->total_levels & 0xF;
-> +
-> +    /* Bits [7:4] : Cache Level described in this structure */
-> +    cache_attr |=3D (hmat_cache->level & 0xF) << 4;
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 3543451ed3..322bdb36ff 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -242,6 +242,7 @@ check-qtest-ppc64-$(CONFIG_VGA) +=3D tests/display-=
+vga-test$(EXESUF)
+>  check-qtest-ppc64-y +=3D tests/numa-test$(EXESUF)
+>  check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) +=3D tests/ivshmem-test$(EX=
+ESUF)
+>  check-qtest-ppc64-y +=3D tests/cpu-plug-test$(EXESUF)
+> +check-qtest-ppc64-y +=3D tests/fw_cfg-test$(EXESUF)
 
+Perhaps only a detail, but ppc64 (pseries) doesn't use fw_cfg, but ppc
+(mac99, g3beige and prep) does, so perhaps you should rather add the
+test to check-qtest-ppc-y (and it will be inherited by ppc64)?
 
-> +    /* Bits [11:8] - Cache Associativity */
-> +    cache_attr |=3D (hmat_cache->associativity & 0xF) << 8;
-> +
-> +    /* Bits [15:12] - Write Policy */
-> +    cache_attr |=3D (hmat_cache->write_policy & 0xF) << 12;
-
-s/0xF/0x7/ for  Cache Associativity /  Write Policy
-
-> +
-> +    /* Bits [31:16] - Cache Line size in bytes */
-> +    cache_attr |=3D (hmat_cache->line_size & 0xFFFF) << 16;
-> +
-> +    cache_attr =3D cpu_to_le32(cache_attr);
-> +
-> +    /* Type */
-> +    build_append_int_noprefix(table_data, 2, 2);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Length */
-> +    build_append_int_noprefix(table_data, 32, 4);
-> +    /* Proximity Domain for the Memory */
-> +    build_append_int_noprefix(table_data, hmat_cache->mem_proximity, 4);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 4);
-> +    /* Memory Side Cache Size */
-> +    build_append_int_noprefix(table_data, hmat_cache->size, 8);
-> +    /* Cache Attributes */
-> +    build_append_int_noprefix(table_data, cache_attr, 4);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /*
-> +     * Number of SMBIOS handles (n)
-> +     * Linux kernel uses Memory Side Cache Information Structure
-> +     * without SMBIOS entries for now, so set Number of SMBIOS handles
-> +     * as 0.
-> +     */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +}
-> +
->  /* Build HMAT sub table structures */
->  static void hmat_build_table_structs(GArray *table_data, NumaState *nsta=
-t)
->  {
->      uint16_t flags;
->      uint32_t *initiator_list =3D NULL;
-> -    int i, j, hrchy, type;
-> +    int i, j, hrchy, type, level;
-
-s/level/cache_level/
-
->      HMAT_LB_Info *numa_hmat_lb;
-> +    HMAT_Cache_Info *numa_hmat_cache;
-> =20
->      for (i =3D 0; i < nstat->num_nodes; i++) {
->          flags =3D 0;
-> @@ -205,6 +254,19 @@ static void hmat_build_table_structs(GArray *table_d=
-ata, NumaState *nstat)
->          }
->      }
-> =20
-> +    /*
-> +     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
-> +     * Table 5-147
-> +     */
-> +    for (i =3D 0; i < nstat->num_nodes; i++) {
-> +        for (level =3D 0; level <=3D MAX_HMAT_CACHE_LEVEL; level++) {
-> +            numa_hmat_cache =3D nstat->hmat_cache[i][level];
-> +            if (numa_hmat_cache) {
-> +                build_hmat_cache(table_data, numa_hmat_cache);
-> +            }
-> +        }
-> +    }
-> +
->      g_free(initiator_list);
->  }
-> =20
+Thanks,
+Laurent
 
 
