@@ -2,82 +2,69 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1D9C47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF0CC4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:56:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 675A020862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:55:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 675A020862
+	by mail.kernel.org (Postfix) with ESMTPS id 522EF20862
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:56:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 522EF20862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGMBV-0002GQ-AJ
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:55:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55539)
+	id 1iGMCH-00031h-Bf
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:56:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iGM6D-0004q5-Qs
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:50:18 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iGLo9-0008At-6R
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:31:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iGM6B-0001rc-1V
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:50:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53762)
+ (envelope-from <imammedo@redhat.com>) id 1iGLo7-0000JE-31
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:31:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43992)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iGM6A-0001qd-Re
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:50:14 -0400
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iGLo5-0000If-9j
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:31:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1E7CE69080
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 11:50:13 +0000 (UTC)
-Received: by mail-wm1-f71.google.com with SMTP id f63so1512090wma.7
- for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 04:50:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=IeQDfqEDiaOIX9D/Z7G68K2MD86xoGirbsLN/kUjxvk=;
- b=X47DrNknS1hSANY3yGO1IizWGe9dtwOWXhaEHJs/OU9JvvQGaIVoVd5LA01sl9HMiU
- P4a4b+EdGtzH/wrZ+VutoOHYtPT1OzaJF2i881S4rFSlPoia1UtnvJAcwTszjaQ57SZY
- vK5ELdokfqWT0nvl2H9E2r+Kj25RPyYJUu7X+Tio8HM2Ezw1x9TpuX6izfqikexqxzcR
- rSG5da1HgaA2EdzPcWx/JV9q831EXVAWFpFNPPFtKhL07LujvzSnG2E54T12IQiIMCfo
- mU7fZ4zXkUzI7DLAIjR5sSDOXYVF6HKtl+AAboz9Fwhy/erpIGHCecBpr4wrnHdjWsxi
- z0LQ==
-X-Gm-Message-State: APjAAAUabvpdPQWnO7Vj+A1/K2fDd/bCKAJmR0083T3R1Ig8sCneW6ng
- 3jUnb7J9v5QZTTHCbwAP+3ez2BNlelF4EvOxVkx4KxeEGyiwDQfWa25CjX8xFyEYFugpEeS+9JB
- 1eXdA9nnstU5ox5A=
-X-Received: by 2002:adf:b3d2:: with SMTP id x18mr11863321wrd.264.1570189811739; 
- Fri, 04 Oct 2019 04:50:11 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxHfJCTmDaBu3UkVfAVzZwF6fMiDDxwAgYxiQ0l9prsSauK+UucboFWLxbGePv+RQpALLkXBw==
-X-Received: by 2002:adf:b3d2:: with SMTP id x18mr11863298wrd.264.1570189811510; 
- Fri, 04 Oct 2019 04:50:11 -0700 (PDT)
-Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it.
- [79.52.200.174])
- by smtp.gmail.com with ESMTPSA id s10sm8925374wmf.48.2019.10.04.04.50.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Oct 2019 04:50:11 -0700 (PDT)
-Date: Fri, 4 Oct 2019 13:50:08 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH v6 08/10] roms: add microvm-bios (qboot) as binary and
- git submodule
-Message-ID: <20191004115008.rx2ory7yixbc4nny@steredhat>
-References: <20191004093752.16564-1-slp@redhat.com>
- <20191004093752.16564-9-slp@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C8FCB18C4297;
+ Fri,  4 Oct 2019 11:31:30 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5BF9F1001B2B;
+ Fri,  4 Oct 2019 11:31:25 +0000 (UTC)
+Date: Fri, 4 Oct 2019 13:31:23 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Laszlo Ersek" <lersek@redhat.com>
+Subject: Re: [edk2-devel] [Qemu-devel] [PATCH 1/2] q35: implement 128K SMRAM
+ at default SMBASE address
+Message-ID: <20191004133052.20373155@redhat.com>
+In-Reply-To: <8f179aae-8ff4-2b2b-4024-1fd1156a3225@redhat.com>
+References: <20190917130708.10281-1-imammedo@redhat.com>
+ <20190917130708.10281-2-imammedo@redhat.com>
+ <561f4440-7c06-10d7-80ce-bbfa810fec59@redhat.com>
+ <20190920102855.3fe2b689@redhat.com>
+ <a581abbc-ec03-c332-b225-6f7cd3cfadae@redhat.com>
+ <c18f1ada-3eca-d5f1-da4f-e74181c5a862@redhat.com>
+ <20190924131936.7dec5e6c@redhat.com>
+ <fb9c530c-f911-313d-6a79-5291e84327e5@redhat.com>
+ <20190930143659.6de53f70@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F7DFDB3@shsmsx102.ccr.corp.intel.com>
+ <8f179aae-8ff4-2b2b-4024-1fd1156a3225@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191004093752.16564-9-slp@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Fri, 04 Oct 2019 11:31:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -92,48 +79,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, lersek@redhat.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
- imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ Brijesh Singh <brijesh.singh@amd.com>, devel@edk2.groups.io,
+ "phillip.goerl@oracle.com" <phillip.goerl@oracle.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Yao,
+ Jiewen" <jiewen.yao@intel.com>, "Nakajima, Jun" <jun.nakajima@intel.com>,
+ "Kinney, Michael D" <michael.d.kinney@intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+ "rfc@edk2.groups.io" <rfc@edk2.groups.io>,
+ "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 04, 2019 at 11:37:50AM +0200, Sergio Lopez wrote:
-> qboot is a minimalist x86 firmware for booting Linux kernels. It does
-> the mininum amount of work required for the task, and it's able to
-> boot both PVH images and bzImages without relying on option roms.
-> 
-> This characteristics make it an ideal companion for the microvm
-> machine type.
-> 
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> ---
->  .gitmodules              |   3 +++
->  pc-bios/bios-microvm.bin | Bin 0 -> 65536 bytes
->  roms/Makefile            |   6 ++++++
->  roms/qboot               |   1 +
->  4 files changed, 10 insertions(+)
->  create mode 100755 pc-bios/bios-microvm.bin
->  create mode 160000 roms/qboot
-> 
-> diff --git a/.gitmodules b/.gitmodules
-> index c5c474169d..19792c9a11 100644
-> --- a/.gitmodules
-> +++ b/.gitmodules
-> @@ -58,3 +58,6 @@
->  [submodule "roms/opensbi"]
->  	path = roms/opensbi
->  	url = 	https://git.qemu.org/git/opensbi.git
-> +[submodule "roms/qboot"]
-> +	path = roms/qboot
-> +	url = https://github.com/bonzini/qboot
-> diff --git a/pc-bios/bios-microvm.bin b/pc-bios/bios-microvm.bin
-> new file mode 100755
+On Tue, 1 Oct 2019 20:03:20 +0200
+"Laszlo Ersek" <lersek@redhat.com> wrote:
 
-Others rom have 644 permissions, should we be aligned or doesn't matter?
+> On 09/30/19 16:22, Yao, Jiewen wrote:
+> >   
+> >> -----Original Message-----
+> >> From: devel@edk2.groups.io <devel@edk2.groups.io> On Behalf Of Igor
+> >> Mammedov
+> >> Sent: Monday, September 30, 2019 8:37 PM
+> >> To: Laszlo Ersek <lersek@redhat.com>  
+> 
+> >>> To me it looks like we need to figure out how QEMU can make the OS call
+> >>> into SMM (in the GPE cpu hotplug handler), passing in parameters and
+> >>> such. This would be step (03).
+> >>>
+> >>> Do you agree?
+> >>>
+> >>> If so, I'll ask Jiewen about such OS->SMM calls separately, because I
+> >>> seem to remember that there used to be an "SMM communcation table" of
+> >>> sorts, for flexible OS->SMM calls. However, it appears to be deprecated
+> >>> lately.  
+> >> we can try to resurrect and put over it some kind of protocol
+> >> to describe which CPUs to where hotplugged.
+> >>
+> >> or we could put a parameter into SMI status register (IO port 0xb3)
+> >> and the trigger SMI from GPE handler to tell SMI handler that cpu
+> >> hotplug happened and then use QEMU's cpu hotplug interface
+> >> to enumerate hotplugged CPUs for SMI handler.
+> >>
+> >> The later is probably simpler as we won't need to reinvent the wheel
+> >> (just reuse the interface that's already in use by GPE handler).  
+> 
+> Based on "docs/specs/acpi_cpu_hotplug.txt", this seems to boil down to a
+> bunch of IO port accesses at base 0x0cd8.
+> 
+> Is that correct?
 
-Anyway this patch LGTM:
+yep, you can use it to iterate over hotplugged CPUs.
+hw side (QEMU) uses cpu_hotplug_ops as IO write/read handlers
+and firmware side (ACPI) scannig for hotplugged CPUs is implemented
+in CPU_SCAN_METHOD.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+What we can do on QEMU side is to write agreed upon value to command port (0xB2)
+from CPU_SCAN_METHOD after taking ctrl_lock but before starting scan loop.
+That way firmware will first bring up (from fw pov) all hotplugged CPUs
+and then return control to OS to do the same from OS pov.
+
+
+> 
+> > [Jiewen] The PI specification Volume 4 - SMM defines EFI_MM_COMMUNICATION_PROTOCOL.Communicate() - It can be used to communicate between OS and SMM handler. But it requires the runtime protocol call. I am not sure how OS loader passes this information to OS kernel.
+> > 
+> > As such, I think using ACPI SCI/GPE -> software SMI handler is an easier way to achieve this. I also recommend this way.
+> > For parameter passing, we can use 1) Port B2 (1 byte), 2) Port B3 (1 byte), 3) chipset scratch register (4 bytes or 8 bytes, based upon scratch register size), 4) ACPI NVS OPREGION, if the data structure is complicated.  
+> 
+> I'm confused about the details. In two categories:
+> (1) what values to use,
+> (2) how those values are passed.
+> 
+> Assume a CPU is hotpluged, QEMU injects an SCI, and the ACPI GPE handler
+> in the OS -- which also originates from QEMU -- writes a particular byte
+> to the Data port (0xB3), and then to the Control port (0xB2),
+> broadcasting an SMI.
+> 
+> (1) What values to use.
+> 
+> Note that values ICH9_APM_ACPI_ENABLE (2) and ICH9_APM_ACPI_DISABLE (3)
+> are already reserved in QEMU for IO port 0xB2, for different purposes.
+> So we can't use those in the GPE handler.
+
+SeaBIOS writes 0x00 into command port, but it seems that's taken by
+EFI_SMM_COMMUNICATION_PROTOCOL. So we can use the next unused value
+(lets say 0x4). We probably don't have to use status port or 
+EFI_SMM_COMMUNICATION_PROTOCOL, since the value of written into 0xB2
+is sufficient to distinguish hotplug event.
+
+> Furthermote, OVMF's EFI_SMM_CONTROL2_PROTOCOL.Trigger() implementation
+> (in "OvmfPkg/SmmControl2Dxe/SmmControl2Dxe.c") writes 0 to both ports,
+> as long as the caller does not specify them.
+> 
+>   IoWrite8 (ICH9_APM_STS, DataPort    == NULL ? 0 : *DataPort);
+>   IoWrite8 (ICH9_APM_CNT, CommandPort == NULL ? 0 : *CommandPort);
+> 
+> And, there is only one Trigger() call site in edk2: namely in
+> "MdeModulePkg/Core/PiSmmCore/PiSmmIpl.c", in the
+> SmmCommunicationCommunicate() function.
+> 
+> (That function implements EFI_SMM_COMMUNICATION_PROTOCOL.Communicate().)
+> This call site passes NULL for both DataPort and CommandPort.
+> 
+> Yet further, EFI_SMM_COMMUNICATION_PROTOCOL.Communicate() is used for
+> example by the UEFI variable driver, for talking between the
+> unprivileged (runtime DXE) and privileged (SMM) half.
+> 
+> As a result, all of the software SMIs currently in use in OVMF, related
+> to actual firmware services, write 0 to both ports.
+> 
+> I guess we can choose new values, as long as we avoid 2 and 3 for the
+> control port (0xB2), because those are reserved in QEMU -- see
+> ich9_apm_ctrl_changed() in "hw/isa/lpc_ich9.c".
+> 
+> 
+> (2) How the parameters are passed.
+> 
+> 
+> (2a) For the new CPU, the SMI remains pending, until it gets an
+> INIT-SIPI-SIPI from one of the previously plugged CPUs (most likely, the
+> BSP). At that point, the new CPU will execute the "initial SMI handler
+> for hotplugged CPUs", at the default SMBASE.
+> 
+> That's a routine we'll have to write in assembly, from zero. In this
+> routine, we can read back IO ports 0xB2 and 0xB3. And QEMU will be happy
+> to provide the values last written (see apm_ioport_readb() in
+> "hw/isa/apm.c"). So we can receive the values in this routine. Alright.
+
+Potentially we can can avoid writing custom SMI handler,
+what do you think about following workflow:
+
+on system boot after initial CPUs relocation, firmware set NOP SMI handler
+at default SMBASE.
+Then as reaction to GPE triggered SMI (on cpu hotplug), after SMI rendezvous,
+a host cpu reads IO port 0xB2 and does hotplugged CPUs enumeration.
+
+  a) assuming we allow hotplug only in case of negotiated SMI broadcast
+     host CPU shoots down all in-flight INIT/SIPI/SIPI for hotpugged CPUs
+     to avoid race within relocation handler.
+
+ After that host CPU in loop
+
+  b) it prepares/initializes necessary CPU structures for a hotplugged
+     CPU if necessary and replaces NOP SMI handler with the relocation
+     SMI handler that is used during system boot.
+     
+  c) a host CPU sends NOP INIT/SIPI/SIPI to the hotplugged CPU
+
+  d) the woken up hotplugged CPU, jumps to default SMBASE and
+     executes hotplug relocation handler.
+
+  e) after the hotplugged CPU  is relocated and if there are more
+     hotplugged CPUs, a host CPU repeats b-d steps for the next
+     hotplugged CPU.
+
+  f) after all CPUs are relocated, restore NOP SMI handler at default
+     SMBASE.
+
+> (2b) On all other CPUs, the SMM foundation already accepts the SMI.
+> 
+> There point where it makes sense to start looking is SmmEntryPoint()
+> [MdeModulePkg/Core/PiSmmCore/PiSmmCore.c].
+> 
+> (2b1) This function first checks whether the SMI is synchronous. The
+> logic for determining that is based on
+> "gSmmCorePrivate->CommunicationBuffer" being non-NULL. This field is set
+> to non-NULL in SmmCommunicationCommunicate() -- see above, in (1).
+> 
+> In other words, the SMI is deemed synchronous if it was initiated with
+> EFI_SMM_COMMUNICATION_PROTOCOL.Communicate(). In that case, the
+> HandlerType GUID is extracted from the communication buffer, and passed
+> to SmiManage(). In turn, SmiManage() locates the SMI handler registered
+> with the same handler GUID, and delegates the SMI handling to that
+> specific handler.
+> 
+> This is how the UEFI variable driver is split in two halves:
+> 
+> - in "MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.c", we have
+> a call to gMmst->MmiHandlerRegister(), with HandlerType =
+> "gEfiSmmVariableProtocolGuid"
+> 
+> - in
+> "MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.c", we
+> format communication buffers with the header GUID set to the same
+> "gEfiSmmVariableProtocolGuid".
+> 
+> Of course, this is what does *not* apply to our use case, as the SMI is
+> raised by the OS (via an ACPI method), and *not* by a firmware agent
+> that calls EFI_SMM_COMMUNICATION_PROTOCOL.Communicate().
+> 
+> Therefore, we need to look further in SmmEntryPoint()
+> [MdeModulePkg/Core/PiSmmCore/PiSmmCore.c].
+> 
+> (2b2) What's left there is only the following:
+> 
+>   //
+>   // Process Asynchronous SMI sources
+>   //
+>   SmiManage (NULL, NULL, NULL, NULL);
+> 
+> 
+> So...
+> 
+> - Are we supposed to write a new DXE_SMM_DRIVER for OvmfPkg, and call
+> gMmst->MmiHandlerRegister() in it, with HandlerType=NULL? (I.e.,
+> register a "root SMI handler"?)
+> 
+> - And then in the handler, should we read IO ports 0xB2 / 0xB3?
+> 
+> - Also, is that handler where we'd somehow sync up with the hot-plugged
+> VCPU, and finally call EFI_SMM_CPU_SERVICE_PROTOCOL.SmmAddProcessor()?
+> 
+> - Does it matter what (pre-existent) CPU executes the handler? (IOW,
+> does it matter what the value of gMmst->CurrentlyExecutingCpu is?)
+> 
+> Thanks,
+> Laszlo
+> 
+> -=-=-=-=-=-=-=-=-=-=-=-
+> Groups.io Links: You receive all messages sent to this group.
+> 
+> View/Reply Online (#48353): https://edk2.groups.io/g/devel/message/48353
+> Mute This Topic: https://groups.io/mt/34201782/1958639
+> Group Owner: devel+owner@edk2.groups.io
+> Unsubscribe: https://edk2.groups.io/g/devel/unsub  [imammedo@redhat.com]
+> -=-=-=-=-=-=-=-=-=-=-=-
+> 
+
 
