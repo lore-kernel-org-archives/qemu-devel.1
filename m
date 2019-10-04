@@ -2,66 +2,65 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E94C47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D01C47404
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B07C2077B
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:06:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B07C2077B
+	by mail.kernel.org (Postfix) with ESMTPS id EFDC92077B
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 18:44:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFDC92077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGRyG-0004BW-J0
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 14:06:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58690)
+	id 1iGSYg-0003UZ-Ag
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 14:44:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iGRxQ-0003eq-J1
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:05:37 -0400
+ (envelope-from <lersek@redhat.com>) id 1iGSUv-00028Z-L7
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:40:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iGRxP-0005Wb-HE
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:05:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58264)
+ (envelope-from <lersek@redhat.com>) id 1iGSUr-0000wi-A0
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:40:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51966)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iGRxK-0005SE-7W; Fri, 04 Oct 2019 14:05:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iGSUp-0000s8-7c
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 14:40:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5DC9DC065116;
- Fri,  4 Oct 2019 18:05:29 +0000 (UTC)
-Received: from [10.3.117.6] (ovpn-117-6.phx2.redhat.com [10.3.117.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D322710018F8;
- Fri,  4 Oct 2019 18:05:25 +0000 (UTC)
-Subject: Re: [PATCH v9 3/3] iotests: test nbd reconnect
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190917171322.4127-1-vsementsov@virtuozzo.com>
- <20190917171322.4127-4-vsementsov@virtuozzo.com>
- <7f0a7890-7b3d-9fd7-954d-389a8e28106f@redhat.com>
- <88a7e9c9-caf2-b114-93c4-7c99036c9b33@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <7854fa11-5c2d-4b88-16f8-2bbb2679efa2@redhat.com>
-Date: Fri, 4 Oct 2019 13:05:24 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id B60EF10CC1EE;
+ Fri,  4 Oct 2019 18:40:03 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-253.rdu2.redhat.com
+ [10.10.121.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E2857BE40;
+ Fri,  4 Oct 2019 18:39:53 +0000 (UTC)
+Subject: Re: [PATCH 1/7] tests/libqos/fw_cfg: Document io_fw_cfg_init to drop
+ io_fw_cfg_uninit
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191003225437.16651-1-philmd@redhat.com>
+ <20191003225437.16651-2-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <0c8684e4-d8e9-cda0-3bb3-e8a31a9bbf7b@redhat.com>
+Date: Fri, 4 Oct 2019 20:39:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <88a7e9c9-caf2-b114-93c4-7c99036c9b33@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191003225437.16651-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 04 Oct 2019 18:05:29 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Fri, 04 Oct 2019 18:40:03 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -76,52 +75,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/24/19 3:31 AM, Vladimir Sementsov-Ogievskiy wrote:
+On 10/04/19 00:54, Philippe Mathieu-Daud=C3=A9 wrote:
+> Document io_fw_cfg_init() return value must be released
+> with g_free(). Directly calling g_free() we don't really
+> need io_fw_cfg_uninit(): remove it.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  tests/libqos/fw_cfg.c |  5 -----
+>  tests/libqos/fw_cfg.h | 11 +++++++++--
+>  2 files changed, 9 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+> index 1f46258f96..37c3f2cf4d 100644
+> --- a/tests/libqos/fw_cfg.c
+> +++ b/tests/libqos/fw_cfg.c
+> @@ -157,8 +157,3 @@ QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t ba=
+se)
+> =20
+>      return fw_cfg;
+>  }
+> -
+> -void io_fw_cfg_uninit(QFWCFG *fw_cfg)
+> -{
+> -    g_free(fw_cfg);
+> -}
+> diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
+> index 13325cc4ff..15604040bd 100644
+> --- a/tests/libqos/fw_cfg.h
+> +++ b/tests/libqos/fw_cfg.h
+> @@ -36,8 +36,15 @@ size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *=
+filename,
+> =20
+>  QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
+>  void mm_fw_cfg_uninit(QFWCFG *fw_cfg);
+> +/**
+> + * io_fw_cfg_init():
+> + * @qts: The #QTestState that will be referred to by the QFWCFG object=
+.
+> + * @base: The I/O address of the fw_cfg device in the guest.
+> + *
+> + * Returns a newly allocated QFWCFG object which must be released
+> + * with a call to g_free() when no longer required.
+> + */
+>  QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
+> -void io_fw_cfg_uninit(QFWCFG *fw_cfg);
+> =20
+>  static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
+>  {
+> @@ -46,7 +53,7 @@ static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
+> =20
+>  static inline void pc_fw_cfg_uninit(QFWCFG *fw_cfg)
+>  {
+> -    io_fw_cfg_uninit(fw_cfg);
+> +    g_free(fw_cfg);
+>  }
+> =20
+>  #endif
+>=20
 
->>> +def qemu_nbd_popen(*args):
->>> +    '''Run qemu-nbd in daemon mode and return the parent's exit code'''
->>> +    return subprocess.Popen(qemu_nbd_args + ['--persistent'] + list(args))
->>> +
->>
->> Should you also use a pid file here, and wait for the existence of the
->> pid file before returning (rather than hard-coding sleep(1))?
-> 
-> What do you mean / how to do it?
-> 
-> We want to wait until listening socket is prepared..
 
-In shell:
+This more or less reverts 0729d833d6d6 ("tests/libqos: Add
+io_fw_cfg_uninit() and mm_fw_cfg_uninit()", 2019-05-23).
 
-qemu-nbd --pid-file=/path/to/file ...
-while [ ! -e /path/to/file ]; do
-   sleep ... # fractional second, or exponential, or whatever...
-done
-# Now the listening socket is indeed prepared
+I'm fine either way.
 
-You'd have to translate that idiom to python.
-
-Or:
-
-pre-open Unix socket at /path/to/socket
-LISTEN_PID=... LISTEN_FDS=1 qemu-nbd ... 3<>/path/to/socket
-
-Now the socket is pre-created and passed into qemu-nbd via systemd 
-socket activation, so you know the listening socket is ready without 
-having to do any loop at all.  Here's a patch in libnbd where we just 
-switched from waiting for the port to appear (because the test predated 
-qemu-nbd pidfile support) to instead using socket activation, for reference:
-https://github.com/libguestfs/libnbd/commit/352331d177
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
