@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC36C47404
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B38C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:28:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9056C2070B
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:26:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9056C2070B
+	by mail.kernel.org (Postfix) with ESMTPS id 98AC92070B
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:28:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AC92070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGLjO-0003Ll-2n
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:26:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35079)
+	id 1iGLkK-0004Yg-1o
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:27:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35168)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iGKiQ-00013A-43
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:39 -0400
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iGKif-0001RD-QG
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iGKiO-00038q-Ti
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2678)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iGKie-0003Ka-H4
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1824)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iGKiO-00038e-Ls
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:36 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1iGKie-0003KJ-BQ
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 06:21:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E9798C05E740
- for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 10:21:35 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D7FA3090FE0
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 10:21:51 +0000 (UTC)
 Received: from localhost (ovpn-112-73.ams2.redhat.com [10.36.112.73])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 845381001B28;
- Fri,  4 Oct 2019 10:21:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 468A66012C;
+ Fri,  4 Oct 2019 10:21:47 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 4/8] util: add dbus helper unit
-Date: Fri,  4 Oct 2019 14:20:47 +0400
-Message-Id: <20191004102051.19738-5-marcandre.lureau@redhat.com>
+Subject: [PATCH v5 6/8] configure: add GDBUS_CODEGEN
+Date: Fri,  4 Oct 2019 14:20:49 +0400
+Message-Id: <20191004102051.19738-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20191004102051.19738-1-marcandre.lureau@redhat.com>
 References: <20191004102051.19738-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 04 Oct 2019 10:21:35 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Fri, 04 Oct 2019 10:21:51 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -77,131 +77,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+gdbus-codegen generated code requires gio-unix on Unix, so add it to
+GIO libs/cflags.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- MAINTAINERS         |  2 ++
- include/qemu/dbus.h | 18 +++++++++++++++
- util/Makefile.objs  |  3 +++
- util/dbus.c         | 55 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 78 insertions(+)
- create mode 100644 include/qemu/dbus.h
- create mode 100644 util/dbus.c
+ configure | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 60f195f8f2..15212109cb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2160,6 +2160,8 @@ F: qapi/migration.json
- D-Bus
- M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
- S: Maintained
-+F: util/dbus.c
-+F: include/qemu/dbus.h
- F: docs/interop/dbus.rst
+diff --git a/configure b/configure
+index 8f8446f52b..412e40cc03 100755
+--- a/configure
++++ b/configure
+@@ -3631,10 +3631,16 @@ if $pkg_config --atleast-version=3D$glib_req_ver =
+gio-2.0; then
+     gio=3Dyes
+     gio_cflags=3D$($pkg_config --cflags gio-2.0)
+     gio_libs=3D$($pkg_config --libs gio-2.0)
++    gdbus_codegen=3D$($pkg_config --variable=3Dgdbus_codegen gio-2.0)
+ else
+     gio=3Dno
+ fi
 =20
- Seccomp
-diff --git a/include/qemu/dbus.h b/include/qemu/dbus.h
-new file mode 100644
-index 0000000000..efd74bef96
---- /dev/null
-+++ b/include/qemu/dbus.h
-@@ -0,0 +1,18 @@
-+/*
-+ * Helpers for using D-Bus
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ */
++if $pkg_config --atleast-version=3D$glib_req_ver gio-unix-2.0; then
++    gio_cflags=3D"$gio_cflags $($pkg_config --cflags gio-unix-2.0)"
++    gio_libs=3D"$gio_libs $($pkg_config --libs gio-unix-2.0)"
++fi
 +
-+#ifndef DBUS_H
-+#define DBUS_H
-+
-+#include <gio/gio.h>
-+
-+GStrv qemu_dbus_get_queued_owners(GDBusConnection *connection,
-+                                  const char *name);
-+
-+#endif /* DBUS_H */
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index 41bf59d127..f435cfbd64 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -54,5 +54,8 @@ util-obj-$(CONFIG_INOTIFY1) +=3D filemonitor-inotify.o
- util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
- util-obj-$(CONFIG_POSIX) +=3D drm.o
- util-obj-y +=3D guest-random.o
-+util-obj-$(CONFIG_GIO) +=3D dbus.o
-+dbus.o-cflags =3D $(GIO_CFLAGS)
-+dbus.o-libs =3D $(GIO_LIBS)
-=20
- stub-obj-y +=3D filemonitor-stub.o
-diff --git a/util/dbus.c b/util/dbus.c
-new file mode 100644
-index 0000000000..bb51870e54
---- /dev/null
-+++ b/util/dbus.c
-@@ -0,0 +1,55 @@
-+/*
-+ * Helpers for using D-Bus
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/dbus.h"
-+#include "qemu/error-report.h"
-+
-+/*
-+ * qemu_dbus_get_queued_owners() - return the list of queued unique name=
-s
-+ * @connection: A GDBusConnection
-+ * @name: a service name
-+ *
-+ * Return: a GStrv of unique names, or NULL on failure.
-+ */
-+GStrv
-+qemu_dbus_get_queued_owners(GDBusConnection *connection, const char *nam=
-e)
-+{
-+    g_autoptr(GDBusProxy) proxy =3D NULL;
-+    g_autoptr(GVariant) result =3D NULL;
-+    g_autoptr(GVariant) child =3D NULL;
-+    g_autoptr(GError) err =3D NULL;
-+
-+    proxy =3D g_dbus_proxy_new_sync(connection, G_DBUS_PROXY_FLAGS_NONE,=
- NULL,
-+                                  "org.freedesktop.DBus",
-+                                  "/org/freedesktop/DBus",
-+                                  "org.freedesktop.DBus",
-+                                  NULL, &err);
-+    if (!proxy) {
-+        error_report("Failed to create DBus proxy: %s", err->message);
-+        return NULL;
-+    }
-+
-+    result =3D g_dbus_proxy_call_sync(proxy, "ListQueuedOwners",
-+                                    g_variant_new("(s)", name),
-+                                    G_DBUS_CALL_FLAGS_NO_AUTO_START,
-+                                    -1, NULL, &err);
-+    if (!result) {
-+        if (g_error_matches(err,
-+                            G_DBUS_ERROR,
-+                            G_DBUS_ERROR_NAME_HAS_NO_OWNER)) {
-+            return g_new0(char *, 1);
-+        }
-+        error_report("Failed to call ListQueuedOwners: %s", err->message=
-);
-+        return NULL;
-+    }
-+
-+    child =3D g_variant_get_child_value(result, 0);
-+    return g_variant_dup_strv(child, NULL);
-+}
+ # Sanity check that the current size_t matches the
+ # size that glib thinks it should be. This catches
+ # problems on multi-arch where people try to build
+@@ -6782,6 +6788,7 @@ if test "$gio" =3D "yes" ; then
+     echo "CONFIG_GIO=3Dy" >> $config_host_mak
+     echo "GIO_CFLAGS=3D$gio_cflags" >> $config_host_mak
+     echo "GIO_LIBS=3D$gio_libs" >> $config_host_mak
++    echo "GDBUS_CODEGEN=3D$gdbus_codegen" >> $config_host_mak
+ fi
+ echo "CONFIG_TLS_PRIORITY=3D\"$tls_priority\"" >> $config_host_mak
+ if test "$gnutls" =3D "yes" ; then
 --=20
 2.23.0
 
