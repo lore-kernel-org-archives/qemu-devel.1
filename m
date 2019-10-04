@@ -2,60 +2,50 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BF7C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 15:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAF11C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 15:58:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DCA3222C0
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 15:58:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DCA3222C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id A383D207FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 15:58:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A383D207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGPyE-0000fo-Qv
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 11:58:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42236)
+	id 1iGPyI-0000kp-2H
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 11:58:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iGPuU-0006Ll-H9
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 11:54:30 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iGPnj-000380-8b
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 11:47:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iGPuS-0000Y2-JI
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 11:54:25 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:44636 helo=huawei.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iGPnh-0005go-V9
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 11:47:27 -0400
+Received: from relay.sw.ru ([185.231.240.75]:36336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iGPuO-0000QO-93; Fri, 04 Oct 2019 11:54:20 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id BB987C4B2364335D9FB1;
- Fri,  4 Oct 2019 23:54:12 +0800 (CST)
-Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 4 Oct 2019 23:54:03 +0800
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
- <imammedo@redhat.com>
-Subject: [PATCH 1/5] hw/arm: Align ACPI blob len to PAGE size
-Date: Fri, 4 Oct 2019 16:52:58 +0100
-Message-ID: <20191004155302.4632-2-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
-References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iGPnR-0005EX-Hf; Fri, 04 Oct 2019 11:47:20 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iGPnK-00019e-Hh; Fri, 04 Oct 2019 18:47:02 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH 0/5] fix migration with bitmaps and mirror
+Date: Fri,  4 Oct 2019 18:46:56 +0300
+Message-Id: <20191004154701.3202-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.202.227.237]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.35
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,65 +57,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, lersek@redhat.com, linuxarm@huawei.com,
- xuwei5@hisilicon.com, shannon.zhaosl@gmail.com
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If ACPI blob length modifications happens after the initial
-virt_acpi_build() call, and the changed blob length is within
-the PAGE size boundary, then the revised size is not seen by
-the firmware on Guest reboot. The is because in the
-virt_acpi_build_update() -> acpi_ram_update() -> qemu_ram_resize()
-path, qemu_ram_resize() uses ram_block size which is aligned
-to PAGE size and the "resize callback" to update the size seen
-by firmware is not getting invoked. Hence align ACPI blob sizes
-to PAGE boundary.
+Hi all!
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
-More details on this issue can be found here,
-https://patchwork.kernel.org/patch/11154757/
+It's a continuation for
+"bitmap migration bug with -drive while block mirror runs"
+<315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
+https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg07241.html
 
----
- hw/arm/virt-acpi-build.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+The problem is that bitmaps migrated to node with same node-name or
+blk-parent name. And currently only the latter actually work in libvirt.
+And with mirror-top filter it doesn't work, because
+bdrv_get_device_or_node_name don't go through filters.
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 4cd50175e0..074e0c858e 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -790,6 +790,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     GArray *table_offsets;
-     unsigned dsdt, xsdt;
-     GArray *tables_blob = tables->table_data;
-+    GArray *cmd_blob = tables->linker->cmd_blob;
-     MachineState *ms = MACHINE(vms);
- 
-     table_offsets = g_array_new(false, true /* clear */,
-@@ -854,6 +855,19 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-         build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-     }
- 
-+    /*
-+     * Align the ACPI blob lengths to PAGE size so that on ACPI table
-+     * regeneration, the length that firmware sees really gets updated
-+     * through 'resize' callback in qemu_ram_resize() in the
-+     * virt_acpi_build_update() -> acpi_ram_update() -> qemu_ram_resize()
-+     * path.
-+     */
-+    g_array_set_size(tables_blob,
-+                     TARGET_PAGE_ALIGN(acpi_data_len(tables_blob)));
-+    g_array_set_size(tables->rsdp,
-+                     TARGET_PAGE_ALIGN(acpi_data_len(tables->rsdp)));
-+    g_array_set_size(cmd_blob,
-+                     TARGET_PAGE_ALIGN(acpi_data_len(cmd_blob)));
-     /* Cleanup memory that's no longer used. */
-     g_array_free(table_offsets, true);
- }
+Fix this by handling filtered children of block backends in separate.
+
+Max Reitz (1):
+  block: Mark commit and mirror as filter drivers
+
+Vladimir Sementsov-Ogievskiy (4):
+  migretion/block-dirty-bitmap: refactor init_dirty_bitmap_migration
+  block/dirty-bitmap: add bdrv_has_named_bitmaps helper
+  migration/block-dirty-bitmap: fix bitmaps migration during mirror job
+  iotests: 194: test also migration of dirty bitmap
+
+ include/block/block_int.h      |   8 ++-
+ include/block/dirty-bitmap.h   |   1 +
+ block/commit.c                 |   2 +
+ block/dirty-bitmap.c           |  13 ++++
+ block/mirror.c                 |   2 +
+ migration/block-dirty-bitmap.c | 118 +++++++++++++++++++++++----------
+ tests/qemu-iotests/194         |  14 ++--
+ tests/qemu-iotests/194.out     |   6 ++
+ 8 files changed, 121 insertions(+), 43 deletions(-)
+
 -- 
-2.17.1
-
+2.21.0
 
 
