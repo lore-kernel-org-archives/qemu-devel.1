@@ -2,59 +2,81 @@ Return-Path: <SRS0=aoXf=X5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8D6C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCB4C4360C
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:00:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F68A20862
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 11:58:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F68A20862
+	by mail.kernel.org (Postfix) with ESMTPS id 227D220862
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Oct 2019 12:00:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 227D220862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGMEJ-00058w-4B
-	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:58:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52504)
+	id 1iGMFY-00060n-E5
+	for qemu-devel@archiver.kernel.org; Fri, 04 Oct 2019 07:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iGLpU-0000Se-Vv
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:33:02 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1iGLtZ-00049Z-A8
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:37:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iGLpT-0000tt-UZ
- for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:33:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39516)
+ (envelope-from <sgarzare@redhat.com>) id 1iGLtU-0002dY-Ck
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:37:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55796)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1iGLpT-0000tl-P4; Fri, 04 Oct 2019 07:32:59 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iGLtS-0002bu-OK
+ for qemu-devel@nongnu.org; Fri, 04 Oct 2019 07:37:07 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D37D98A1CA3;
- Fri,  4 Oct 2019 11:32:58 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 95E9A1001B30;
- Fri,  4 Oct 2019 11:32:51 +0000 (UTC)
-Date: Fri, 4 Oct 2019 13:32:51 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH 01/11] hw/acpi/piix4: Convert reset handler to DeviceReset
-Message-ID: <20191004133251.1ca7791c@redhat.com>
-In-Reply-To: <20190926151733.25349-2-philmd@redhat.com>
-References: <20190926151733.25349-1-philmd@redhat.com>
- <20190926151733.25349-2-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 76D122DDA5
+ for <qemu-devel@nongnu.org>; Fri,  4 Oct 2019 11:37:03 +0000 (UTC)
+Received: by mail-wm1-f72.google.com with SMTP id k67so1501003wmf.3
+ for <qemu-devel@nongnu.org>; Fri, 04 Oct 2019 04:37:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=nYyj6YDcWGiMm0ouf92WE2csftH0X2pi7wgGpamH/DY=;
+ b=TRNlKtmiHjMaakuJ/fEqp1YpkOdRimkvGTY9RvVYNEa/M605bxyxdl63KnAB+izFOl
+ KFV02fN4z+HZIhguAqUUwbcbvaDmPqljz5iVN1YEfVs6OZdK3WF71eyEJi/5o4d3u3PE
+ UhDXTNM2hO7nezqum/D2brwm8kzBN4RQJii7sEpHLr031ytVDitt44EoZ0VtE7O6Titk
+ cJOaQbFEzQfEXEyNK/Pt9lSySVNkIOQgnTGkDvTwnR3skPv9odEXcbpJfG+dK7rkB6lV
+ Za7MtpoWvLx9Pan+lTHnnVa9vR0WLHGRt5w/3m168rHRhzKBdvZcA262DAd/NqSur6fo
+ J3sw==
+X-Gm-Message-State: APjAAAVTG3mbPdrWHIIU6ZlaKKjWWIk4PgVlA8AOYRzR42dJWGjwDANR
+ 05AKzcC2kUGPGOxXEEJHgIVaJp/Uv3MRLSAADBl+MRjBG33kBWsdsL120UCO+bbEyaBv+zCIyrE
+ hmh7a+kb+C8c9vBk=
+X-Received: by 2002:a7b:cb0e:: with SMTP id u14mr11473463wmj.115.1570189021741; 
+ Fri, 04 Oct 2019 04:37:01 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyUNXaLiMQ48u5WRBULnWqzCKCOoBDuqXknPFjB6h2+rQQ0R7Kj+Y4au/LlsNpN5UhsrZ7jAg==
+X-Received: by 2002:a7b:cb0e:: with SMTP id u14mr11473422wmj.115.1570189021052; 
+ Fri, 04 Oct 2019 04:37:01 -0700 (PDT)
+Received: from steredhat (host174-200-dynamic.52-79-r.retail.telecomitalia.it.
+ [79.52.200.174])
+ by smtp.gmail.com with ESMTPSA id d78sm6953224wmd.47.2019.10.04.04.36.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 04 Oct 2019 04:37:00 -0700 (PDT)
+Date: Fri, 4 Oct 2019 13:36:58 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v6 03/10] hw/i386/pc: move shared x86 functions to x86.c
+ and export them
+Message-ID: <20191004113658.ylgvrxusqmug66bn@steredhat>
+References: <20191004093752.16564-1-slp@redhat.com>
+ <20191004093752.16564-4-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Fri, 04 Oct 2019 11:32:59 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191004093752.16564-4-slp@redhat.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -69,68 +91,854 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, lersek@redhat.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 26 Sep 2019 17:17:23 +0200
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-
-> Convert the reset handler into a proper Device reset method.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+On Fri, Oct 04, 2019 at 11:37:45AM +0200, Sergio Lopez wrote:
+> Move x86 functions that will be shared between PC and non-PC machine
+> types to x86.c, along with their helpers.
+> 
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
 > ---
->  hw/acpi/piix4.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index 5742c3df87..4e079b39bd 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -27,7 +27,6 @@
->  #include "hw/pci/pci.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/acpi/acpi.h"
-> -#include "sysemu/reset.h"
->  #include "sysemu/runstate.h"
->  #include "sysemu/sysemu.h"
->  #include "qapi/error.h"
-> @@ -344,9 +343,9 @@ static const VMStateDescription vmstate_acpi =3D {
+>  include/hw/i386/pc.h  |   1 -
+>  include/hw/i386/x86.h |  35 +++
+>  hw/i386/pc.c          | 582 +----------------------------------
+>  hw/i386/pc_piix.c     |   1 +
+>  hw/i386/pc_q35.c      |   1 +
+>  hw/i386/pc_sysfw.c    |  54 +---
+>  hw/i386/x86.c         | 684 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/i386/Makefile.objs |   1 +
+>  8 files changed, 724 insertions(+), 635 deletions(-)
+>  create mode 100644 include/hw/i386/x86.h
+>  create mode 100644 hw/i386/x86.c
+> 
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index d12f42e9e5..73e2847e87 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -195,7 +195,6 @@ bool pc_machine_is_smm_enabled(PCMachineState *pcms);
+>  void pc_register_ferr_irq(qemu_irq irq);
+>  void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
+>  
+> -void x86_cpus_init(PCMachineState *pcms);
+>  void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
+>  void pc_smp_parse(MachineState *ms, QemuOpts *opts);
+>  
+> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+> new file mode 100644
+> index 0000000000..71e2b6985d
+> --- /dev/null
+> +++ b/include/hw/i386/x86.h
+> @@ -0,0 +1,35 @@
+> +/*
+> + * Copyright (c) 2019 Red Hat, Inc.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef HW_I386_X86_H
+> +#define HW_I386_X86_H
+> +
+> +#include "hw/boards.h"
+> +
+> +uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
+> +                                    unsigned int cpu_index);
+> +void x86_cpu_new(PCMachineState *pcms, int64_t apic_id, Error **errp);
+> +void x86_cpus_init(PCMachineState *pcms);
+> +CpuInstanceProperties x86_cpu_index_to_props(MachineState *ms,
+> +                                             unsigned cpu_index);
+> +int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx);
+> +const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms);
+> +
+> +void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw);
+> +
+> +void x86_load_linux(PCMachineState *x86ms, FWCfgState *fw_cfg);
+> +
+> +#endif
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index fd08c6704b..094db79fb0 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -24,6 +24,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu/units.h"
+> +#include "hw/i386/x86.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/char/serial.h"
+>  #include "hw/char/parallel.h"
+> @@ -102,9 +103,6 @@
+>  
+>  struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+>  
+> -/* Physical Address of PVH entry point read from kernel ELF NOTE */
+> -static size_t pvh_start_addr;
+> -
+>  GlobalProperty pc_compat_4_1[] = {};
+>  const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
+>  
+> @@ -866,478 +864,6 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
+>      x86_cpu_set_a20(cpu, level);
+>  }
+>  
+> -/* Calculates initial APIC ID for a specific CPU index
+> - *
+> - * Currently we need to be able to calculate the APIC ID from the CPU index
+> - * alone (without requiring a CPU object), as the QEMU<->Seabios interfaces have
+> - * no concept of "CPU index", and the NUMA tables on fw_cfg need the APIC ID of
+> - * all CPUs up to max_cpus.
+> - */
+> -static uint32_t x86_cpu_apic_id_from_index(PCMachineState *pcms,
+> -                                           unsigned int cpu_index)
+> -{
+> -    MachineState *ms = MACHINE(pcms);
+> -    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+> -    uint32_t correct_id;
+> -    static bool warned;
+> -
+> -    correct_id = x86_apicid_from_cpu_idx(pcms->smp_dies, ms->smp.cores,
+> -                                         ms->smp.threads, cpu_index);
+> -    if (pcmc->compat_apic_id_mode) {
+> -        if (cpu_index != correct_id && !warned && !qtest_enabled()) {
+> -            error_report("APIC IDs set in compatibility mode, "
+> -                         "CPU topology won't match the configuration");
+> -            warned = true;
+> -        }
+> -        return cpu_index;
+> -    } else {
+> -        return correct_id;
+> -    }
+> -}
+> -
+> -static long get_file_size(FILE *f)
+> -{
+> -    long where, size;
+> -
+> -    /* XXX: on Unix systems, using fstat() probably makes more sense */
+> -
+> -    where = ftell(f);
+> -    fseek(f, 0, SEEK_END);
+> -    size = ftell(f);
+> -    fseek(f, where, SEEK_SET);
+> -
+> -    return size;
+> -}
+> -
+> -struct setup_data {
+> -    uint64_t next;
+> -    uint32_t type;
+> -    uint32_t len;
+> -    uint8_t data[0];
+> -} __attribute__((packed));
+> -
+> -
+> -/*
+> - * The entry point into the kernel for PVH boot is different from
+> - * the native entry point.  The PVH entry is defined by the x86/HVM
+> - * direct boot ABI and is available in an ELFNOTE in the kernel binary.
+> - *
+> - * This function is passed to load_elf() when it is called from
+> - * load_elfboot() which then additionally checks for an ELF Note of
+> - * type XEN_ELFNOTE_PHYS32_ENTRY and passes it to this function to
+> - * parse the PVH entry address from the ELF Note.
+> - *
+> - * Due to trickery in elf_opts.h, load_elf() is actually available as
+> - * load_elf32() or load_elf64() and this routine needs to be able
+> - * to deal with being called as 32 or 64 bit.
+> - *
+> - * The address of the PVH entry point is saved to the 'pvh_start_addr'
+> - * global variable.  (although the entry point is 32-bit, the kernel
+> - * binary can be either 32-bit or 64-bit).
+> - */
+> -static uint64_t read_pvh_start_addr(void *arg1, void *arg2, bool is64)
+> -{
+> -    size_t *elf_note_data_addr;
+> -
+> -    /* Check if ELF Note header passed in is valid */
+> -    if (arg1 == NULL) {
+> -        return 0;
+> -    }
+> -
+> -    if (is64) {
+> -        struct elf64_note *nhdr64 = (struct elf64_note *)arg1;
+> -        uint64_t nhdr_size64 = sizeof(struct elf64_note);
+> -        uint64_t phdr_align = *(uint64_t *)arg2;
+> -        uint64_t nhdr_namesz = nhdr64->n_namesz;
+> -
+> -        elf_note_data_addr =
+> -            ((void *)nhdr64) + nhdr_size64 +
+> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+> -    } else {
+> -        struct elf32_note *nhdr32 = (struct elf32_note *)arg1;
+> -        uint32_t nhdr_size32 = sizeof(struct elf32_note);
+> -        uint32_t phdr_align = *(uint32_t *)arg2;
+> -        uint32_t nhdr_namesz = nhdr32->n_namesz;
+> -
+> -        elf_note_data_addr =
+> -            ((void *)nhdr32) + nhdr_size32 +
+> -            QEMU_ALIGN_UP(nhdr_namesz, phdr_align);
+> -    }
+> -
+> -    pvh_start_addr = *elf_note_data_addr;
+> -
+> -    return pvh_start_addr;
+> -}
+> -
+> -static bool load_elfboot(const char *kernel_filename,
+> -                   int kernel_file_size,
+> -                   uint8_t *header,
+> -                   size_t pvh_xen_start_addr,
+> -                   FWCfgState *fw_cfg)
+> -{
+> -    uint32_t flags = 0;
+> -    uint32_t mh_load_addr = 0;
+> -    uint32_t elf_kernel_size = 0;
+> -    uint64_t elf_entry;
+> -    uint64_t elf_low, elf_high;
+> -    int kernel_size;
+> -
+> -    if (ldl_p(header) != 0x464c457f) {
+> -        return false; /* no elfboot */
+> -    }
+> -
+> -    bool elf_is64 = header[EI_CLASS] == ELFCLASS64;
+> -    flags = elf_is64 ?
+> -        ((Elf64_Ehdr *)header)->e_flags : ((Elf32_Ehdr *)header)->e_flags;
+> -
+> -    if (flags & 0x00010004) { /* LOAD_ELF_HEADER_HAS_ADDR */
+> -        error_report("elfboot unsupported flags = %x", flags);
+> -        exit(1);
+> -    }
+> -
+> -    uint64_t elf_note_type = XEN_ELFNOTE_PHYS32_ENTRY;
+> -    kernel_size = load_elf(kernel_filename, read_pvh_start_addr,
+> -                           NULL, &elf_note_type, &elf_entry,
+> -                           &elf_low, &elf_high, 0, I386_ELF_MACHINE,
+> -                           0, 0);
+> -
+> -    if (kernel_size < 0) {
+> -        error_report("Error while loading elf kernel");
+> -        exit(1);
+> -    }
+> -    mh_load_addr = elf_low;
+> -    elf_kernel_size = elf_high - elf_low;
+> -
+> -    if (pvh_start_addr == 0) {
+> -        error_report("Error loading uncompressed kernel without PVH ELF Note");
+> -        exit(1);
+> -    }
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ENTRY, pvh_start_addr);
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, mh_load_addr);
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, elf_kernel_size);
+> -
+> -    return true;
+> -}
+> -
+> -static void x86_load_linux(PCMachineState *pcms,
+> -                           FWCfgState *fw_cfg)
+> -{
+> -    uint16_t protocol;
+> -    int setup_size, kernel_size, cmdline_size;
+> -    int dtb_size, setup_data_offset;
+> -    uint32_t initrd_max;
+> -    uint8_t header[8192], *setup, *kernel;
+> -    hwaddr real_addr, prot_addr, cmdline_addr, initrd_addr = 0;
+> -    FILE *f;
+> -    char *vmode;
+> -    MachineState *machine = MACHINE(pcms);
+> -    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+> -    struct setup_data *setup_data;
+> -    const char *kernel_filename = machine->kernel_filename;
+> -    const char *initrd_filename = machine->initrd_filename;
+> -    const char *dtb_filename = machine->dtb;
+> -    const char *kernel_cmdline = machine->kernel_cmdline;
+> -
+> -    /* Align to 16 bytes as a paranoia measure */
+> -    cmdline_size = (strlen(kernel_cmdline)+16) & ~15;
+> -
+> -    /* load the kernel header */
+> -    f = fopen(kernel_filename, "rb");
+> -    if (!f || !(kernel_size = get_file_size(f)) ||
+> -        fread(header, 1, MIN(ARRAY_SIZE(header), kernel_size), f) !=
+> -        MIN(ARRAY_SIZE(header), kernel_size)) {
+> -        fprintf(stderr, "qemu: could not load kernel '%s': %s\n",
+> -                kernel_filename, strerror(errno));
+> -        exit(1);
+> -    }
+> -
+> -    /* kernel protocol version */
+> -#if 0
+> -    fprintf(stderr, "header magic: %#x\n", ldl_p(header+0x202));
+> -#endif
+> -    if (ldl_p(header+0x202) == 0x53726448) {
+> -        protocol = lduw_p(header+0x206);
+> -    } else {
+> -        /*
+> -         * This could be a multiboot kernel. If it is, let's stop treating it
+> -         * like a Linux kernel.
+> -         * Note: some multiboot images could be in the ELF format (the same of
+> -         * PVH), so we try multiboot first since we check the multiboot magic
+> -         * header before to load it.
+> -         */
+> -        if (load_multiboot(fw_cfg, f, kernel_filename, initrd_filename,
+> -                           kernel_cmdline, kernel_size, header)) {
+> -            return;
+> -        }
+> -        /*
+> -         * Check if the file is an uncompressed kernel file (ELF) and load it,
+> -         * saving the PVH entry point used by the x86/HVM direct boot ABI.
+> -         * If load_elfboot() is successful, populate the fw_cfg info.
+> -         */
+> -        if (pcmc->pvh_enabled &&
+> -            load_elfboot(kernel_filename, kernel_size,
+> -                         header, pvh_start_addr, fw_cfg)) {
+> -            fclose(f);
+> -
+> -            fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+> -                strlen(kernel_cmdline) + 1);
+> -            fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
+> -
+> -            fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, sizeof(header));
+> -            fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA,
+> -                             header, sizeof(header));
+> -
+> -            /* load initrd */
+> -            if (initrd_filename) {
+> -                GMappedFile *mapped_file;
+> -                gsize initrd_size;
+> -                gchar *initrd_data;
+> -                GError *gerr = NULL;
+> -
+> -                mapped_file = g_mapped_file_new(initrd_filename, false, &gerr);
+> -                if (!mapped_file) {
+> -                    fprintf(stderr, "qemu: error reading initrd %s: %s\n",
+> -                            initrd_filename, gerr->message);
+> -                    exit(1);
+> -                }
+> -                pcms->initrd_mapped_file = mapped_file;
+> -
+> -                initrd_data = g_mapped_file_get_contents(mapped_file);
+> -                initrd_size = g_mapped_file_get_length(mapped_file);
+> -                initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
+> -                if (initrd_size >= initrd_max) {
+> -                    fprintf(stderr, "qemu: initrd is too large, cannot support."
+> -                            "(max: %"PRIu32", need %"PRId64")\n",
+> -                            initrd_max, (uint64_t)initrd_size);
+> -                    exit(1);
+> -                }
+> -
+> -                initrd_addr = (initrd_max - initrd_size) & ~4095;
+> -
+> -                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
+> -                fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
+> -                fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data,
+> -                                 initrd_size);
+> -            }
+> -
+> -            option_rom[nb_option_roms].bootindex = 0;
+> -            option_rom[nb_option_roms].name = "pvh.bin";
+> -            nb_option_roms++;
+> -
+> -            return;
+> -        }
+> -        protocol = 0;
+> -    }
+> -
+> -    if (protocol < 0x200 || !(header[0x211] & 0x01)) {
+> -        /* Low kernel */
+> -        real_addr    = 0x90000;
+> -        cmdline_addr = 0x9a000 - cmdline_size;
+> -        prot_addr    = 0x10000;
+> -    } else if (protocol < 0x202) {
+> -        /* High but ancient kernel */
+> -        real_addr    = 0x90000;
+> -        cmdline_addr = 0x9a000 - cmdline_size;
+> -        prot_addr    = 0x100000;
+> -    } else {
+> -        /* High and recent kernel */
+> -        real_addr    = 0x10000;
+> -        cmdline_addr = 0x20000;
+> -        prot_addr    = 0x100000;
+> -    }
+> -
+> -#if 0
+> -    fprintf(stderr,
+> -            "qemu: real_addr     = 0x" TARGET_FMT_plx "\n"
+> -            "qemu: cmdline_addr  = 0x" TARGET_FMT_plx "\n"
+> -            "qemu: prot_addr     = 0x" TARGET_FMT_plx "\n",
+> -            real_addr,
+> -            cmdline_addr,
+> -            prot_addr);
+> -#endif
+> -
+> -    /* highest address for loading the initrd */
+> -    if (protocol >= 0x20c &&
+> -        lduw_p(header+0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
+> -        /*
+> -         * Linux has supported initrd up to 4 GB for a very long time (2007,
+> -         * long before XLF_CAN_BE_LOADED_ABOVE_4G which was added in 2013),
+> -         * though it only sets initrd_max to 2 GB to "work around bootloader
+> -         * bugs". Luckily, QEMU firmware(which does something like bootloader)
+> -         * has supported this.
+> -         *
+> -         * It's believed that if XLF_CAN_BE_LOADED_ABOVE_4G is set, initrd can
+> -         * be loaded into any address.
+> -         *
+> -         * In addition, initrd_max is uint32_t simply because QEMU doesn't
+> -         * support the 64-bit boot protocol (specifically the ext_ramdisk_image
+> -         * field).
+> -         *
+> -         * Therefore here just limit initrd_max to UINT32_MAX simply as well.
+> -         */
+> -        initrd_max = UINT32_MAX;
+> -    } else if (protocol >= 0x203) {
+> -        initrd_max = ldl_p(header+0x22c);
+> -    } else {
+> -        initrd_max = 0x37ffffff;
+> -    }
+> -
+> -    if (initrd_max >= pcms->below_4g_mem_size - pcmc->acpi_data_size) {
+> -        initrd_max = pcms->below_4g_mem_size - pcmc->acpi_data_size - 1;
+> -    }
+> -
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_ADDR, cmdline_addr);
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE, strlen(kernel_cmdline)+1);
+> -    fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA, kernel_cmdline);
+> -
+> -    if (protocol >= 0x202) {
+> -        stl_p(header+0x228, cmdline_addr);
+> -    } else {
+> -        stw_p(header+0x20, 0xA33F);
+> -        stw_p(header+0x22, cmdline_addr-real_addr);
+> -    }
+> -
+> -    /* handle vga= parameter */
+> -    vmode = strstr(kernel_cmdline, "vga=");
+> -    if (vmode) {
+> -        unsigned int video_mode;
+> -        /* skip "vga=" */
+> -        vmode += 4;
+> -        if (!strncmp(vmode, "normal", 6)) {
+> -            video_mode = 0xffff;
+> -        } else if (!strncmp(vmode, "ext", 3)) {
+> -            video_mode = 0xfffe;
+> -        } else if (!strncmp(vmode, "ask", 3)) {
+> -            video_mode = 0xfffd;
+> -        } else {
+> -            video_mode = strtol(vmode, NULL, 0);
+> -        }
+> -        stw_p(header+0x1fa, video_mode);
+> -    }
+> -
+> -    /* loader type */
+> -    /* High nybble = B reserved for QEMU; low nybble is revision number.
+> -       If this code is substantially changed, you may want to consider
+> -       incrementing the revision. */
+> -    if (protocol >= 0x200) {
+> -        header[0x210] = 0xB0;
+> -    }
+> -    /* heap */
+> -    if (protocol >= 0x201) {
+> -        header[0x211] |= 0x80;	/* CAN_USE_HEAP */
+> -        stw_p(header+0x224, cmdline_addr-real_addr-0x200);
+> -    }
+> -
+> -    /* load initrd */
+> -    if (initrd_filename) {
+> -        GMappedFile *mapped_file;
+> -        gsize initrd_size;
+> -        gchar *initrd_data;
+> -        GError *gerr = NULL;
+> -
+> -        if (protocol < 0x200) {
+> -            fprintf(stderr, "qemu: linux kernel too old to load a ram disk\n");
+> -            exit(1);
+> -        }
+> -
+> -        mapped_file = g_mapped_file_new(initrd_filename, false, &gerr);
+> -        if (!mapped_file) {
+> -            fprintf(stderr, "qemu: error reading initrd %s: %s\n",
+> -                    initrd_filename, gerr->message);
+> -            exit(1);
+> -        }
+> -        pcms->initrd_mapped_file = mapped_file;
+> -
+> -        initrd_data = g_mapped_file_get_contents(mapped_file);
+> -        initrd_size = g_mapped_file_get_length(mapped_file);
+> -        if (initrd_size >= initrd_max) {
+> -            fprintf(stderr, "qemu: initrd is too large, cannot support."
+> -                    "(max: %"PRIu32", need %"PRId64")\n",
+> -                    initrd_max, (uint64_t)initrd_size);
+> -            exit(1);
+> -        }
+> -
+> -        initrd_addr = (initrd_max-initrd_size) & ~4095;
+> -
+> -        fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_addr);
+> -        fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
+> -        fw_cfg_add_bytes(fw_cfg, FW_CFG_INITRD_DATA, initrd_data, initrd_size);
+> -
+> -        stl_p(header+0x218, initrd_addr);
+> -        stl_p(header+0x21c, initrd_size);
+> -    }
+> -
+> -    /* load kernel and setup */
+> -    setup_size = header[0x1f1];
+> -    if (setup_size == 0) {
+> -        setup_size = 4;
+> -    }
+> -    setup_size = (setup_size+1)*512;
+> -    if (setup_size > kernel_size) {
+> -        fprintf(stderr, "qemu: invalid kernel header\n");
+> -        exit(1);
+> -    }
+> -    kernel_size -= setup_size;
+> -
+> -    setup  = g_malloc(setup_size);
+> -    kernel = g_malloc(kernel_size);
+> -    fseek(f, 0, SEEK_SET);
+> -    if (fread(setup, 1, setup_size, f) != setup_size) {
+> -        fprintf(stderr, "fread() failed\n");
+> -        exit(1);
+> -    }
+> -    if (fread(kernel, 1, kernel_size, f) != kernel_size) {
+> -        fprintf(stderr, "fread() failed\n");
+> -        exit(1);
+> -    }
+> -    fclose(f);
+> -
+> -    /* append dtb to kernel */
+> -    if (dtb_filename) {
+> -        if (protocol < 0x209) {
+> -            fprintf(stderr, "qemu: Linux kernel too old to load a dtb\n");
+> -            exit(1);
+> -        }
+> -
+> -        dtb_size = get_image_size(dtb_filename);
+> -        if (dtb_size <= 0) {
+> -            fprintf(stderr, "qemu: error reading dtb %s: %s\n",
+> -                    dtb_filename, strerror(errno));
+> -            exit(1);
+> -        }
+> -
+> -        setup_data_offset = QEMU_ALIGN_UP(kernel_size, 16);
+> -        kernel_size = setup_data_offset + sizeof(struct setup_data) + dtb_size;
+> -        kernel = g_realloc(kernel, kernel_size);
+> -
+> -        stq_p(header+0x250, prot_addr + setup_data_offset);
+> -
+> -        setup_data = (struct setup_data *)(kernel + setup_data_offset);
+> -        setup_data->next = 0;
+> -        setup_data->type = cpu_to_le32(SETUP_DTB);
+> -        setup_data->len = cpu_to_le32(dtb_size);
+> -
+> -        load_image_size(dtb_filename, setup_data->data, dtb_size);
+> -    }
+> -
+> -    memcpy(setup, header, MIN(sizeof(header), setup_size));
+> -
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, prot_addr);
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
+> -    fw_cfg_add_bytes(fw_cfg, FW_CFG_KERNEL_DATA, kernel, kernel_size);
+> -
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_ADDR, real_addr);
+> -    fw_cfg_add_i32(fw_cfg, FW_CFG_SETUP_SIZE, setup_size);
+> -    fw_cfg_add_bytes(fw_cfg, FW_CFG_SETUP_DATA, setup, setup_size);
+> -
+> -    option_rom[nb_option_roms].bootindex = 0;
+> -    option_rom[nb_option_roms].name = "linuxboot.bin";
+> -    if (pcmc->linuxboot_dma_enabled && fw_cfg_dma_enabled(fw_cfg)) {
+> -        option_rom[nb_option_roms].name = "linuxboot_dma.bin";
+> -    }
+> -    nb_option_roms++;
+> -}
+> -
+>  #define NE2000_NB_MAX 6
+>  
+>  static const int ne2000_io[NE2000_NB_MAX] = { 0x300, 0x320, 0x340, 0x360,
+> @@ -1374,24 +900,6 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level)
 >      }
->  };
-> =20
-> -static void piix4_reset(void *opaque)
-> +static void piix4_pm_reset(DeviceState *dev)
+>  }
+>  
+> -static void x86_cpu_new(PCMachineState *pcms, int64_t apic_id, Error **errp)
+> -{
+> -    Object *cpu = NULL;
+> -    Error *local_err = NULL;
+> -    CPUX86State *env = NULL;
+> -
+> -    cpu = object_new(MACHINE(pcms)->cpu_type);
+> -
+> -    env = &X86_CPU(cpu)->env;
+> -    env->nr_dies = pcms->smp_dies;
+> -
+> -    object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
+> -    object_property_set_bool(cpu, true, "realized", &local_err);
+> -
+> -    object_unref(cpu);
+> -    error_propagate(errp, local_err);
+> -}
+> -
+>  /*
+>   * This function is very similar to smp_parse()
+>   * in hw/core/machine.c but includes CPU die support.
+> @@ -1497,31 +1005,6 @@ void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp)
+>      }
+>  }
+>  
+> -void x86_cpus_init(PCMachineState *pcms)
+> -{
+> -    int i;
+> -    const CPUArchIdList *possible_cpus;
+> -    MachineState *ms = MACHINE(pcms);
+> -    MachineClass *mc = MACHINE_GET_CLASS(pcms);
+> -    PCMachineClass *pcmc = PC_MACHINE_CLASS(mc);
+> -
+> -    x86_cpu_set_default_version(pcmc->default_cpu_version);
+> -
+> -    /* Calculates the limit to CPU APIC ID values
+> -     *
+> -     * Limit for the APIC ID value, so that all
+> -     * CPU APIC IDs are < pcms->apic_id_limit.
+> -     *
+> -     * This is used for FW_CFG_MAX_CPUS. See comments on fw_cfg_arch_create().
+> -     */
+> -    pcms->apic_id_limit = x86_cpu_apic_id_from_index(pcms,
+> -                                                     ms->smp.max_cpus - 1) + 1;
+> -    possible_cpus = mc->possible_cpu_arch_ids(ms);
+> -    for (i = 0; i < ms->smp.cpus; i++) {
+> -        x86_cpu_new(pcms, possible_cpus->cpus[i].arch_id, &error_fatal);
+> -    }
+> -}
+> -
+>  static void rtc_set_cpus_count(ISADevice *rtc, uint16_t cpus_count)
 >  {
-> -    PIIX4PMState *s =3D opaque;
-> +    PIIX4PMState *s =3D PIIX4_PM(dev);
->      PCIDevice *d =3D PCI_DEVICE(s);
->      uint8_t *pci_conf =3D d->config;
-> =20
-> @@ -542,7 +541,6 @@ static void piix4_pm_realize(PCIDevice *dev, Error **=
-errp)
-> =20
->      s->machine_ready.notify =3D piix4_pm_machine_ready;
->      qemu_add_machine_init_done_notifier(&s->machine_ready);
-> -    qemu_register_reset(piix4_reset, s);
-> =20
->      piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
->                                     pci_get_bus(dev), s);
-> @@ -692,6 +690,7 @@ static void piix4_pm_class_init(ObjectClass *klass, v=
-oid *data)
->      k->device_id =3D PCI_DEVICE_ID_INTEL_82371AB_3;
->      k->revision =3D 0x03;
->      k->class_id =3D PCI_CLASS_BRIDGE_OTHER;
-> +    dc->reset =3D piix4_pm_reset;
->      dc->desc =3D "PM";
->      dc->vmsd =3D &vmstate_acpi;
->      dc->props =3D piix4_pm_properties;
+>      if (cpus_count > 0xff) {
+> @@ -2677,69 +2160,6 @@ static void pc_machine_wakeup(MachineState *machine)
+>      cpu_synchronize_all_post_reset();
+>  }
+>  
+> -static CpuInstanceProperties
+> -x86_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+> -{
+> -    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> -    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
+> -
+> -    assert(cpu_index < possible_cpus->len);
+> -    return possible_cpus->cpus[cpu_index].props;
+> -}
+> -
+> -static int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+> -{
+> -   X86CPUTopoInfo topo;
+> -   PCMachineState *pcms = PC_MACHINE(ms);
+> -
+> -   assert(idx < ms->possible_cpus->len);
+> -   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+> -                            pcms->smp_dies, ms->smp.cores,
+> -                            ms->smp.threads, &topo);
+> -   return topo.pkg_id % ms->numa_state->num_nodes;
+> -}
+> -
+> -static const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+> -{
+> -    PCMachineState *pcms = PC_MACHINE(ms);
+> -    int i;
+> -    unsigned int max_cpus = ms->smp.max_cpus;
+> -
+> -    if (ms->possible_cpus) {
+> -        /*
+> -         * make sure that max_cpus hasn't changed since the first use, i.e.
+> -         * -smp hasn't been parsed after it
+> -        */
+> -        assert(ms->possible_cpus->len == max_cpus);
+> -        return ms->possible_cpus;
+> -    }
+> -
+> -    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+> -                                  sizeof(CPUArchId) * max_cpus);
+> -    ms->possible_cpus->len = max_cpus;
+> -    for (i = 0; i < ms->possible_cpus->len; i++) {
+> -        X86CPUTopoInfo topo;
+> -
+> -        ms->possible_cpus->cpus[i].type = ms->cpu_type;
+> -        ms->possible_cpus->cpus[i].vcpus_count = 1;
+> -        ms->possible_cpus->cpus[i].arch_id = x86_cpu_apic_id_from_index(pcms, i);
+> -        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+> -                                 pcms->smp_dies, ms->smp.cores,
+> -                                 ms->smp.threads, &topo);
+> -        ms->possible_cpus->cpus[i].props.has_socket_id = true;
+> -        ms->possible_cpus->cpus[i].props.socket_id = topo.pkg_id;
+> -        if (pcms->smp_dies > 1) {
+> -            ms->possible_cpus->cpus[i].props.has_die_id = true;
+> -            ms->possible_cpus->cpus[i].props.die_id = topo.die_id;
+> -        }
+> -        ms->possible_cpus->cpus[i].props.has_core_id = true;
+> -        ms->possible_cpus->cpus[i].props.core_id = topo.core_id;
+> -        ms->possible_cpus->cpus[i].props.has_thread_id = true;
+> -        ms->possible_cpus->cpus[i].props.thread_id = topo.smt_id;
+> -    }
+> -    return ms->possible_cpus;
+> -}
+> -
+>  static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+>  {
+>      /* cpu index isn't used */
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index de09e076cd..1396451abf 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -27,6 +27,7 @@
+>  
+>  #include "qemu/units.h"
+>  #include "hw/loader.h"
+> +#include "hw/i386/x86.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/i386/apic.h"
+>  #include "hw/display/ramfb.h"
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 894989b64e..8920bd8978 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -41,6 +41,7 @@
+>  #include "hw/pci-host/q35.h"
+>  #include "hw/qdev-properties.h"
+>  #include "exec/address-spaces.h"
+> +#include "hw/i386/x86.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/i386/ich9.h"
+>  #include "hw/i386/amd_iommu.h"
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index 28cb1f63c9..69b79851be 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -31,6 +31,7 @@
+>  #include "qemu/option.h"
+>  #include "qemu/units.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/i386/x86.h"
+>  #include "hw/i386/pc.h"
+>  #include "hw/loader.h"
+>  #include "hw/qdev-properties.h"
+> @@ -211,59 +212,6 @@ static void pc_system_flash_map(PCMachineState *pcms,
+>      }
+>  }
+>  
+> -static void x86_bios_rom_init(MemoryRegion *rom_memory, bool isapc_ram_fw)
+> -{
+> -    char *filename;
+> -    MemoryRegion *bios, *isa_bios;
+> -    int bios_size, isa_bios_size;
+> -    int ret;
+> -
+> -    /* BIOS load */
+> -    if (bios_name == NULL) {
+> -        bios_name = BIOS_FILENAME;
+> -    }
+> -    filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+> -    if (filename) {
+> -        bios_size = get_image_size(filename);
+> -    } else {
+> -        bios_size = -1;
+> -    }
+> -    if (bios_size <= 0 ||
+> -        (bios_size % 65536) != 0) {
+> -        goto bios_error;
+> -    }
+> -    bios = g_malloc(sizeof(*bios));
+> -    memory_region_init_ram(bios, NULL, "pc.bios", bios_size, &error_fatal);
+> -    if (!isapc_ram_fw) {
+> -        memory_region_set_readonly(bios, true);
+> -    }
+> -    ret = rom_add_file_fixed(bios_name, (uint32_t)(-bios_size), -1);
+> -    if (ret != 0) {
+> -    bios_error:
+> -        fprintf(stderr, "qemu: could not load PC BIOS '%s'\n", bios_name);
+> -        exit(1);
+> -    }
+> -    g_free(filename);
+> -
+> -    /* map the last 128KB of the BIOS in ISA space */
+> -    isa_bios_size = MIN(bios_size, 128 * KiB);
+> -    isa_bios = g_malloc(sizeof(*isa_bios));
+> -    memory_region_init_alias(isa_bios, NULL, "isa-bios", bios,
+> -                             bios_size - isa_bios_size, isa_bios_size);
+> -    memory_region_add_subregion_overlap(rom_memory,
+> -                                        0x100000 - isa_bios_size,
+> -                                        isa_bios,
+> -                                        1);
+> -    if (!isapc_ram_fw) {
+> -        memory_region_set_readonly(isa_bios, true);
+> -    }
+> -
+> -    /* map all the bios at the top of memory */
+> -    memory_region_add_subregion(rom_memory,
+> -                                (uint32_t)(-bios_size),
+> -                                bios);
+> -}
+> -
+>  void pc_system_firmware_init(PCMachineState *pcms,
+>                               MemoryRegion *rom_memory)
+>  {
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> new file mode 100644
+> index 0000000000..6807bb8a22
+> --- /dev/null
+> +++ b/hw/i386/x86.c
+> @@ -0,0 +1,684 @@
+> +/*
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + * Copyright (c) 2019 Red Hat, Inc.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/option.h"
+> +#include "qemu/cutils.h"
+> +#include "qemu/units.h"
+> +#include "qemu-common.h"
+> +#include "qapi/error.h"
+> +#include "qapi/qmp/qerror.h"
+> +#include "qapi/qapi-visit-common.h"
+> +#include "qapi/visitor.h"
+> +#include "sysemu/qtest.h"
+> +#include "sysemu/numa.h"
+> +#include "sysemu/replay.h"
+> +#include "sysemu/sysemu.h"
+> +
+> +#include "hw/i386/x86.h"
+> +#include "hw/i386/pc.h"
+
+Just a note, could we remove the pc.h inclusion here?
 
 
