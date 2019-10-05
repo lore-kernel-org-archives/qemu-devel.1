@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D930FC4740A
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BD6C4740A
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:10:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A689D222C5
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:10:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A689D222C5
+	by mail.kernel.org (Postfix) with ESMTPS id 5F8A9222C5
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:10:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F8A9222C5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGsFo-0005xP-2a
-	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 18:10:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47816)
+	id 1iGsFs-0006CS-Hu
+	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 18:10:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47875)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iGs4z-0004le-JO
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:12 -0400
+ (envelope-from <mst@redhat.com>) id 1iGs5A-0004zT-GU
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iGs4x-00047Y-AM
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45794)
+ (envelope-from <mst@redhat.com>) id 1iGs59-0004Iu-A0
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43858)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGs4x-00046c-2V
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:07 -0400
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGs59-0004Il-1o
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:19 -0400
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3E1B33B464
- for <qemu-devel@nongnu.org>; Sat,  5 Oct 2019 21:59:06 +0000 (UTC)
-Received: by mail-qt1-f199.google.com with SMTP id c8so10910060qtd.20
- for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 14:59:06 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 30997A909
+ for <qemu-devel@nongnu.org>; Sat,  5 Oct 2019 21:59:18 +0000 (UTC)
+Received: by mail-qk1-f197.google.com with SMTP id n135so10600607qke.23
+ for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 14:59:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=ndufQ67kwp/IMCvxSdYuiln6PDFMkiFAJlZp+SBJanQ=;
- b=HI3Byl6t4HrYx9/AB4wfQPxEgvYf8Ye1k1dFHZCJVZ3YKlwO3mMh62jTtha6o/PE88
- C6zhWDHTbAAb/GAlT7wL5HYVWw7S+GqbZn5GxnWUGycbxenRoo4IgkDcaKlgxDZjqshd
- 05iZv3Stvxc59bG6wkhkAfMLPTsGkeR3OdgPA3HxgrxIGKp7kGY+Oa/bF0m12ubVi0eQ
- JhIdOkbsA4jAdwOx3ayxYus6G9dWM2y0p+kWjyN0Db09VMeQryFViUIj1kVHu79qamVV
- jRAhDBFrL/3ECvegCeTJQkRmrCsPdHSCwYFhNRyzcoSR/pw9oo87RsCm4bQl7+tO0KdO
- 2tpA==
-X-Gm-Message-State: APjAAAXJlqSyjxrJ2R0fKwVDvRBxt6EW/lkS3UVozYT1zsF+RMYmIyyo
- 6vyjmLaihLksS+r7wqnkT5aD4HXnTVyl4laflY6V77lMn24volRsdVQpObiL1nhrw0rvjoFI+nk
- apkZlkaO2WSdOwE8=
-X-Received: by 2002:a37:6584:: with SMTP id z126mr3222209qkb.460.1570312745174; 
- Sat, 05 Oct 2019 14:59:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyCYqaNfMje3DFF9wWIjwylkh4hbfZ10vAel4RFEetbLBz1xBWg3C5AdeP2MJyD1HlPE9iahg==
-X-Received: by 2002:a37:6584:: with SMTP id z126mr3222191qkb.460.1570312744928; 
- Sat, 05 Oct 2019 14:59:04 -0700 (PDT)
+ bh=uyRLkWZIbvOXn6SP4FJI/0STB7Pb+nYILJOnqJPI2nI=;
+ b=T+VEkMH+hA8ABIcWRyZ7OepU85RolMFvTpHBvafr++jUKp/OikVLar8Mupcj4PHJOv
+ 56ZrzqCVfpyrL6dW3n/J6WM7oP1TizrF3T4VJl+CvcvTh8Qm/cz0c5u73GdGjGcs6j78
+ BsuWQvucrPqLMBezbNQI+9noAMZfAdJAIW058ng78naajQxXDN5blVy9tyOAsV8e8oIo
+ yn+wYcAmOfiEKsh+dMxMaS/fIIp9aH4HXDX0zmpXH/r+7yFYB54k2nq17yaT8ua8NmZV
+ bQL7OFrAa3evt6B0izeVqY5bDzdCVjp1wpWcv/1EGsIsa9qRuEooU3F7b+bfuMaH50TF
+ jm3g==
+X-Gm-Message-State: APjAAAWrMBfdsxA7RncmbABFKRwcJ2linEyIloQqiR5x5FafHaT184w3
+ dOCG0XverXjTnSdkEfKX/LtO51HcITLKakr+AyGNxCNMhA/+UFEnRzuoseBbM/69Z44oJQla8Px
+ MdNsYcIfkW0vr3XE=
+X-Received: by 2002:ac8:7117:: with SMTP id z23mr22587923qto.309.1570312757206; 
+ Sat, 05 Oct 2019 14:59:17 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxkbD+lGUlGDbIP21T/TJ4+JKfsS0gJ9nrFf4Pr2kpezDz/By0Thcendam7bRAQFv3C8tLSzw==
+X-Received: by 2002:ac8:7117:: with SMTP id z23mr22587876qto.309.1570312756059; 
+ Sat, 05 Oct 2019 14:59:16 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
  by smtp.gmail.com with ESMTPSA id
- b130sm5569835qkc.100.2019.10.05.14.59.02
+ a36sm5289376qtk.21.2019.10.05.14.59.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 05 Oct 2019 14:59:04 -0700 (PDT)
-Date: Sat, 5 Oct 2019 17:58:59 -0400
+ Sat, 05 Oct 2019 14:59:15 -0700 (PDT)
+Date: Sat, 5 Oct 2019 17:59:11 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/19] hw/arm/virt: Add memory hotplug framework
-Message-ID: <20190918130633.4872-5-shameerali.kolothum.thodi@huawei.com>
+Subject: [PULL 07/19] hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+Message-ID: <20190918130633.4872-7-shameerali.kolothum.thodi@huawei.com>
 References: <20191005215508.28754-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -91,138 +91,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eric Auger <eric.auger@redhat.com>,
  Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Kwangwoo Lee <kwangwoo.lee@sk.com>
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20191005215859.2ycDe5A8Sb9isrKYUqHrzdNR2Iq0cVc8wm_Jklf6Kw4@z>
+Message-ID: <20191005215911.GBIvEKv8BzI9VTRqpzFY1YUAhiPnSzokY-B5OG3u6zQ@z>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-This patch adds the memory hot-plug/hot-unplug infrastructure
-in machvirt. The device memory is not yet exposed to the Guest
-either through DT or ACPI and hence both cold/hot plug of memory
-is explicitly disabled for now.
+Generate Memory Affinity Structures for PC-DIMM ranges.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+Also, Linux and Windows need ACPI SRAT table to make memory hotplug
+work properly, however currently QEMU doesn't create SRAT table if
+numa options aren't present on CLI. Hence add support(>=4.2) to
+create numa node automatically (auto_enable_numa_with_memhp) when
+QEMU is started with memory hotplug enabled but without '-numa'
+options on CLI.
+
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20190918130633.4872-5-shameerali.kolothum.thodi@huawei.com>
+Message-Id: <20190918130633.4872-7-shameerali.kolothum.thodi@huawei.com>
 Acked-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/arm/Kconfig |  2 ++
- hw/arm/virt.c  | 53 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 54 insertions(+), 1 deletion(-)
+ hw/arm/virt-acpi-build.c | 8 ++++++++
+ hw/arm/virt.c            | 2 ++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 76a2a6bcbf..39d285ad3d 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -20,6 +20,8 @@ config ARM_VIRT
-     select SMBIOS
-     select VIRTIO_MMIO
-     select ACPI_PCI
-+    select MEM_DEVICE
-+    select DIMM
- 
- config CHEETAH
-     bool
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index d74538b021..1c967e3fee 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -68,6 +68,8 @@
- #include "hw/arm/smmuv3.h"
- #include "hw/acpi/acpi.h"
- #include "target/arm/internals.h"
-+#include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1876,6 +1878,42 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
- 
-+static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                                 Error **errp)
-+{
-+
-+    /*
-+     * The device memory is not yet exposed to the Guest either through
-+     * DT or ACPI and hence both cold/hot plug of memory is explicitly
-+     * disabled for now.
-+     */
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        error_setg(errp, "memory cold/hot plug is not yet supported");
-+        return;
-+    }
-+
-+    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
-+}
-+
-+static void virt_memory_plug(HotplugHandler *hotplug_dev,
-+                             DeviceState *dev, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-+    Error *local_err = NULL;
-+
-+    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-+
-+    error_propagate(errp, local_err);
-+}
-+
-+static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **errp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_pre_plug(hotplug_dev, dev, errp);
-+    }
-+}
-+
- static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
- {
-@@ -1887,12 +1925,23 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                      SYS_BUS_DEVICE(dev));
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index cadeea0f41..c97661ad68 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -546,6 +546,14 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
          }
      }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_plug(hotplug_dev, dev, errp);
+ 
++    if (ms->device_memory) {
++        numamem = acpi_data_push(table_data, sizeof *numamem);
++        build_srat_memory(numamem, ms->device_memory->base,
++                          memory_region_size(&ms->device_memory->mr),
++                          ms->numa_state->num_nodes - 1,
++                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
 +    }
-+}
 +
-+static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                          DeviceState *dev, Error **errp)
-+{
-+    error_setg(errp, "device unplug request for unsupported device"
-+               " type: %s", object_get_typename(OBJECT(dev)));
+     build_header(linker, table_data, (void *)(table_data->data + srat_start),
+                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
  }
- 
- static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-                                                         DeviceState *dev)
- {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-+       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
-         return HOTPLUG_HANDLER(machine);
-     }
- 
-@@ -1956,7 +2005,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->kvm_type = virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-+    hc->pre_plug = virt_machine_device_pre_plug_cb;
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index f926477ba5..d221841c42 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2051,6 +2051,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
      hc->plug = virt_machine_device_plug_cb;
-+    hc->unplug_request = virt_machine_device_unplug_request_cb;
+     hc->unplug_request = virt_machine_device_unplug_request_cb;
      mc->numa_mem_supported = true;
++    mc->auto_enable_numa_with_memhp = true;
  }
+ 
+ static void virt_instance_init(Object *obj)
+@@ -2156,6 +2157,7 @@ static void virt_machine_4_1_options(MachineClass *mc)
+     virt_machine_4_2_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+     vmc->no_ged = true;
++    mc->auto_enable_numa_with_memhp = false;
+ }
+ DEFINE_VIRT_MACHINE(4, 1)
  
 -- 
 MST
