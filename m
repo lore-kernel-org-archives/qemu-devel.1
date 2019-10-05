@@ -2,80 +2,78 @@ Return-Path: <SRS0=HB7V=X6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC43FC47404
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 21:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB7DC47404
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 21:51:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7E34222C0
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 21:47:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7E34222C0
+	by mail.kernel.org (Postfix) with ESMTPS id DEFA4222C0
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 21:51:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEFA4222C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGrta-0000kC-Rf
-	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 17:47:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47089)
+	id 1iGrxk-0002Q0-V9
+	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 17:51:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47301)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iGrsU-0008LZ-JQ
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:46:15 -0400
+ (envelope-from <mst@redhat.com>) id 1iGrwU-0001r7-Lh
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:50:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iGrsT-0000Ma-0A
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:46:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47904)
+ (envelope-from <mst@redhat.com>) id 1iGrwT-0001Lt-Fz
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:50:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51880)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGrsS-0000Li-ML
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:46:12 -0400
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGrwT-0001Lc-7l
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:50:21 -0400
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A5A72C057E9F
- for <qemu-devel@nongnu.org>; Sat,  5 Oct 2019 21:46:10 +0000 (UTC)
-Received: by mail-qk1-f197.google.com with SMTP id k67so10685587qkc.3
- for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 14:46:10 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 60D25C01DDF8
+ for <qemu-devel@nongnu.org>; Sat,  5 Oct 2019 21:50:20 +0000 (UTC)
+Received: by mail-qk1-f199.google.com with SMTP id q80so10610804qke.22
+ for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 14:50:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=w9cp5WOMnA8f6hUE+AzPrHfl7EdcqEtT+8UzwMy/tUA=;
- b=il2NCozM2BgZNSCoXOyUD9/1u7I9ZBtzO8ksaTe9GEpYqwgKqUpLlqIACCXN/rad7p
- l5O4KffA5oezO/bVlsDYGCTF/8akEBPVyQ0vsfg97DwdmqyEKhZdMUi4pgSSHGE5gTkS
- 7RCQBjlsqE9HJNGRndBVzABZVpecrkUcdi/SB5UtaO65vuA9iMT1cbEY2u3Z/fnd0k3o
- WZr+GWartea9oqnCFUknLS2gi4S71/YWqapWRVBH7ssIOxwRzdAelU4FGv2OJmwHrslH
- j4aslr7pqg6iyX6nAz/R/LVipiz4DHYTNzX72euhmEvkZiQu+GfhMfuYxlFYaCF04nv1
- u2lQ==
-X-Gm-Message-State: APjAAAWmjtaXfXby5B3fEJyr0aJ5rb87kEFdD/QxZw/WOQJRPBVFAYTF
- ZeV22LVBpAkQ/6QznpYgeLbr3v1+kW4YDRqB4vFZ7tnK+sbyhYLDJypbsJrI6eVPj6f38sbjLd2
- fME1mleBq4hYuSWk=
-X-Received: by 2002:ad4:5572:: with SMTP id w18mr20866503qvy.220.1570311969972; 
- Sat, 05 Oct 2019 14:46:09 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyzUVmREyQGN2ebE9/p5KmnrPF3x0+kP/8mY6eUlFiD+kv5Ek7D6K1h7KzdijPfyFqbMnb4xA==
-X-Received: by 2002:ad4:5572:: with SMTP id w18mr20866481qvy.220.1570311969747; 
- Sat, 05 Oct 2019 14:46:09 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=Gg3NfCO7ue6juhgGyHi1y9fS/svCoSxjd396wQQDHow=;
+ b=elYkzb+zB4EGYcnLHRQveb1hYgjfSIbe+KTL3DzDfTy+c4TOav67aJf2zfN22cxfou
+ rZirnD4wwGifnOH2pJEbLK/EKswjU7nGU/7b7oi482/vQH/xK3F+Zsofubzke4nrY19+
+ 84pB9JhPs+tdcMbz1gqfXkybXQVpuAMhoObrKIvq+4oTjqaWEzYf4DfOd/Jg9RJm29Pp
+ jCREI/eqJQfq7xiQn21pVBjk58fKiwKknL1nlZQoLTFCfuzDtBSgnsr4PEwTFV5awvpx
+ 8euztkhEP30f0p7/R9R1Xl69i2Z4aL6anEqQG+Un2wNTBW+nQgXgPGctFbE7UAPO3AKf
+ uC0Q==
+X-Gm-Message-State: APjAAAUcP9dTXKYCnAG1QbMvBIXaZhR3HB8RlbwuwwiwfNVbwhH9zkHL
+ TNYBZTuzealECGA1R6uMI7jpH4ddmzUwtizclB1VQDfjoMdLyYYGfcF2Mb3/8LHX7Itwn/RCyWE
+ lleZjNwrMJnPYivk=
+X-Received: by 2002:aed:2ce7:: with SMTP id g94mr23054148qtd.255.1570312219704; 
+ Sat, 05 Oct 2019 14:50:19 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwklpkuQCm+3pG2ONx1QJE1rCIlNB5BbcZBcKpMap841qb/quVbHTPV5/egr8Qqw9wszmtQ5w==
+X-Received: by 2002:aed:2ce7:: with SMTP id g94mr23054140qtd.255.1570312219490; 
+ Sat, 05 Oct 2019 14:50:19 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
  by smtp.gmail.com with ESMTPSA id
- i30sm7337786qte.27.2019.10.05.14.46.04
+ v85sm5285896qkb.25.2019.10.05.14.50.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 05 Oct 2019 14:46:09 -0700 (PDT)
-Date: Sat, 5 Oct 2019 17:46:02 -0400
+ Sat, 05 Oct 2019 14:50:18 -0700 (PDT)
+Date: Sat, 5 Oct 2019 17:50:13 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 00/11] hw: Convert various reset() handler to DeviceReset
-Message-ID: <20191005174531-mutt-send-email-mst@kernel.org>
-References: <20190926151733.25349-1-philmd@redhat.com>
+To: qi1.zhang@intel.com
+Subject: Re: [PATCH v4] intel_iommu: TM field should not be in reserved bits
+Message-ID: <20191005174844-mutt-send-email-mst@kernel.org>
+References: <20190930050451.13618-1-qi1.zhang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190926151733.25349-1-philmd@redhat.com>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190930050451.13618-1-qi1.zhang@intel.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -90,59 +88,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
+ yadong.qi@intel.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 05:17:22PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Hi.
->=20
-> Following the thread discussion between Peter/Markus/Damien about
-> reset handlers:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg617103.html
-> I started to remove qemu_register_reset() calls from few qdevified
-> devices (the trivial ones).
->=20
-> Regards,
->=20
-> Phil.
+On Mon, Sep 30, 2019 at 01:04:51PM +0800, qi1.zhang@intel.com wrote:
+> From: "Zhang, Qi" <qi1.zhang@intel.com>
+> 
+> When dt is supported, TM field should not be Reserved(0).
+> 
+> Refer to VT-d Spec 9.8
+> 
+> Signed-off-by: Zhang, Qi <qi1.zhang@intel.com>
+> Signed-off-by: Qi, Yadong <yadong.qi@intel.com>
 
-How do you want these patches merged? Trivial tree?
+I am guessing this is really a 2 patch series right?
+So you need to format it as such with
+git format-patch --cover-letter --thread=shallow
 
-> Philippe Mathieu-Daud=E9 (11):
->   hw/acpi/piix4: Convert reset handler to DeviceReset
->   hw/ide/piix: Convert reset handler to DeviceReset
->   hw/isa/piix4: Convert reset handler to DeviceReset
->   hw/pci-host/piix: Convert reset handler to DeviceReset
->   hw/ide/sii3112: Convert reset handler to DeviceReset
->   hw/ide/via82c: Convert reset handler to DeviceReset
->   hw/isa/vt82c686: Convert reset handler to DeviceReset
->   hw/input/lm832x: Convert reset handler to DeviceReset
->   hw/pci-host/bonito: Convert reset handler to DeviceReset
->   hw/timer/etraxfs: Convert reset handler to DeviceReset
->   hw/misc/vmcoreinfo: Convert reset handler to DeviceReset
->=20
->  hw/acpi/piix4.c          |  7 +++----
->  hw/ide/piix.c            |  8 +++-----
->  hw/ide/sii3112.c         |  7 +++----
->  hw/ide/via.c             | 10 ++++------
->  hw/input/lm832x.c        | 12 +++++-------
->  hw/isa/piix4.c           |  7 +++----
->  hw/isa/vt82c686.c        | 11 ++++-------
->  hw/misc/vmcoreinfo.c     |  5 ++---
->  hw/pci-host/bonito.c     |  8 +++-----
->  hw/pci-host/piix.c       |  8 +++-----
->  hw/timer/etraxfs_timer.c |  7 +++----
->  11 files changed, 36 insertions(+), 54 deletions(-)
->=20
-> --=20
+> ---
+>  hw/i386/intel_iommu.c          | 12 ++++++++----
+>  hw/i386/intel_iommu_internal.h | 17 +++++++++++++----
+>  2 files changed, 21 insertions(+), 8 deletions(-)
+> ---
+> Changelog V2:
+>  move dt_supported flag to VTD_SPTE_PAGE_LX_RSVD_MASK and VTD_SPTE_LPAGE_LX_RSVD_MASK
+> Changelog V3:
+>  based on the change to split the arrays into two ones
+> Changelog V4:
+>  style error check
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index a118efaeaf..d62604ece3 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3549,15 +3549,19 @@ static void vtd_init(IntelIOMMUState *s)
+>       * Rsvd field masks for spte
+>       */
+>      vtd_spte_rsvd[0] = ~0ULL;
+> -    vtd_spte_rsvd[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits);
+> +    vtd_spte_rsvd[1] = VTD_SPTE_PAGE_L1_RSVD_MASK(s->aw_bits,
+> +                                                  x86_iommu->dt_supported);
+>      vtd_spte_rsvd[2] = VTD_SPTE_PAGE_L2_RSVD_MASK(s->aw_bits);
+>      vtd_spte_rsvd[3] = VTD_SPTE_PAGE_L3_RSVD_MASK(s->aw_bits);
+>      vtd_spte_rsvd[4] = VTD_SPTE_PAGE_L4_RSVD_MASK(s->aw_bits);
+>  
+>      vtd_spte_rsvd_large[0] = ~0ULL;
+> -    vtd_spte_rsvd_large[1] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits);
+> -    vtd_spte_rsvd_large[2] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits);
+> -    vtd_spte_rsvd_large[3] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits);
+> +    vtd_spte_rsvd_large[1] = VTD_SPTE_LPAGE_L1_RSVD_MASK(s->aw_bits,
+> +                                                         x86_iommu->dt_supported);
+> +    vtd_spte_rsvd_large[2] = VTD_SPTE_LPAGE_L2_RSVD_MASK(s->aw_bits,
+> +                                                         x86_iommu->dt_supported);
+> +    vtd_spte_rsvd_large[3] = VTD_SPTE_LPAGE_L3_RSVD_MASK(s->aw_bits,
+> +                                                         x86_iommu->dt_supported);
+>      vtd_spte_rsvd_large[4] = VTD_SPTE_LPAGE_L4_RSVD_MASK(s->aw_bits);
+>  
+>      if (x86_iommu_ir_supported(x86_iommu)) {
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index c1235a7063..3a839a8925 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -387,7 +387,9 @@ typedef union VTDInvDesc VTDInvDesc;
+>  #define VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
+>  
+>  /* Rsvd field masks for spte */
+> -#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw) \
+> +#define VTD_SPTE_PAGE_L1_RSVD_MASK(aw, dt_supported) \
+> +        dt_supported ? \
+> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
+>          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+>  #define VTD_SPTE_PAGE_L2_RSVD_MASK(aw) \
+>          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> @@ -395,11 +397,17 @@ typedef union VTDInvDesc VTDInvDesc;
+>          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+>  #define VTD_SPTE_PAGE_L4_RSVD_MASK(aw) \
+>          (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> -#define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw) \
+> +#define VTD_SPTE_LPAGE_L1_RSVD_MASK(aw, dt_supported) \
+> +        dt_supported ? \
+> +        (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
+>          (0x800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> -#define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw) \
+> +#define VTD_SPTE_LPAGE_L2_RSVD_MASK(aw, dt_supported) \
+> +        dt_supported ? \
+> +        (0x1ff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
+>          (0x1ff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> -#define VTD_SPTE_LPAGE_L3_RSVD_MASK(aw) \
+> +#define VTD_SPTE_LPAGE_L3_RSVD_MASK(aw, dt_supported) \
+> +        dt_supported ? \
+> +        (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM | VTD_SL_TM)) : \
+>          (0x3ffff800ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+>  #define VTD_SPTE_LPAGE_L4_RSVD_MASK(aw) \
+>          (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+> @@ -506,5 +514,6 @@ typedef struct VTDRootEntry VTDRootEntry;
+>  #define VTD_SL_W                    (1ULL << 1)
+>  #define VTD_SL_PT_BASE_ADDR_MASK(aw) (~(VTD_PAGE_SIZE - 1) & VTD_HAW_MASK(aw))
+>  #define VTD_SL_IGN_COM              0xbff0000000000000ULL
+> +#define VTD_SL_TM                   (1ULL << 62)
+>  
+>  #endif
+> -- 
 > 2.20.1
 
