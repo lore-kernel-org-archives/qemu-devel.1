@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3901AC47404
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3952BC4740A
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:18:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08FE22077B
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:18:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08FE22077B
+	by mail.kernel.org (Postfix) with ESMTPS id 0A6FA2077B
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:18:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6FA2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGsNF-0005B2-0I
-	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 18:18:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47963)
+	id 1iGsNh-0005Zd-DY
+	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 18:18:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48032)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iGs5U-0005IQ-Lm
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:41 -0400
+ (envelope-from <mst@redhat.com>) id 1iGs5q-0005dG-Kj
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:00:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iGs5T-0004Ra-L6
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45824)
+ (envelope-from <mst@redhat.com>) id 1iGs5p-0004Y2-E7
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:00:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48778)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGs5T-0004RM-Cy
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 17:59:39 -0400
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGs5p-0004XL-55
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:00:01 -0400
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 97E4E369CA
- for <qemu-devel@nongnu.org>; Sat,  5 Oct 2019 21:59:38 +0000 (UTC)
-Received: by mail-qk1-f197.google.com with SMTP id g65so10678694qkf.19
- for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 14:59:38 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5AFB6C057EC6
+ for <qemu-devel@nongnu.org>; Sat,  5 Oct 2019 21:59:59 +0000 (UTC)
+Received: by mail-qt1-f197.google.com with SMTP id m6so10854367qtk.23
+ for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 14:59:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=TIjODluR1dwfx5in3nPj8adbjCCWoVI4poFEHgVck48=;
- b=STy83Gw50oCJho4Q93P3Vnl7hR8lHvwq14pE7yEF+yReZhPQuZknikW4NJzoGXm3gT
- wsANCREgZDKiW1xL6dbN7whr+57N0U3c1HTj6qlvYna/8Cm5JxMxzh7vclMOoSUUTBxE
- BPDKfrpO4ehRMW7ibOei2iuHcJo54SCXETiZSV6wta3LtdbRSGF4zAIhL//7IK5o1f2P
- GkV1+Q3VpjnMp7OnKRcaU8+8qeVgAW71mmrO4ChcSRraaCrcY6On+tKCTvB7aVn3KDV4
- e4navhCHeSV4fRdY8RhIld6idiXjRyz7tu8D4avdAdl9yeHqUBuRYy8MgMLapvqx3YQv
- 30Iw==
-X-Gm-Message-State: APjAAAUG2A3Mf6ynmF03afVEM/wu1AtYReeGpgdYEKjJqEUTlrKL3hUf
- 64YIt8f1wGOxZFbvY1SbHv2FVQ1DpFBrfN58xQt/KkljycoASzIRdq+L/Rgm4OblIPBIL4YmfKV
- AkfxqQwgVgDSj3FM=
-X-Received: by 2002:ac8:70b:: with SMTP id g11mr22925743qth.58.1570312777602; 
- Sat, 05 Oct 2019 14:59:37 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwM52Mic4AIXUKcJ01oCy1Jz+Umt1pi+dq+8joUqOCLTHjFrxf8yaqmkB29i7kcbegi0ogdWQ==
-X-Received: by 2002:ac8:70b:: with SMTP id g11mr22925734qth.58.1570312777428; 
- Sat, 05 Oct 2019 14:59:37 -0700 (PDT)
+ bh=Amj4PpRLJKQT0ZPCZm5InuKFsg1DBINwnumBQfGWOYY=;
+ b=id8pnXKa3a1aBr+hRaLU3q/OpnseJgtYED9+yBoNvbYQO4z3UZEHYpHSpIrZ9X2yL4
+ D0fRV5JUjaddcrs+chxOvmVNfYzMUUCupmgrgLkDPbFTC/XQDzRzKaW0ORsNdjv7vtfR
+ f36kQHyQqu983rxmj0fv/qnZDAyOm3TWn6yuxefuSJ4qOx2A/0V5wHn4GHRD03Dkjb5w
+ n4QVXojDiFJyK/rMCkt0dIYQI4ss70udvCIcph+HeiR7EVGvgujC++ZY9km1oSNLK4pX
+ bF++/52Pa6m9eleO0sBl1mvRIjjaTCJkQoe1HC2SjrmH0bJwXSdkOg+XkAWWKzaTlldT
+ KPOQ==
+X-Gm-Message-State: APjAAAWnF208RtRENmiJzZA0HXLuzvD74sWhuy0t3QajCyLpgW6mv1uX
+ OkoEyzI/vCHRECQ/apErckt9s0ExrK64Uo9XVzoo1+AEVsyV23mL25K9qLcRT3mDUBCFa5xNZ+S
+ pvR6BLoeEkKa6E0A=
+X-Received: by 2002:ad4:4431:: with SMTP id e17mr20474611qvt.76.1570312798101; 
+ Sat, 05 Oct 2019 14:59:58 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqznhscbK+t07LgkmxMYHVGNvutoiIrofBzFziOHCOY3vhz5tL2SGvb6q5Yta24LjBlJS6fzPg==
+X-Received: by 2002:ad4:4431:: with SMTP id e17mr20474597qvt.76.1570312797841; 
+ Sat, 05 Oct 2019 14:59:57 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
  by smtp.gmail.com with ESMTPSA id
- c8sm5126621qko.102.2019.10.05.14.59.35
+ v13sm4374649qtp.61.2019.10.05.14.59.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 05 Oct 2019 14:59:36 -0700 (PDT)
-Date: Sat, 5 Oct 2019 17:59:33 -0400
+ Sat, 05 Oct 2019 14:59:57 -0700 (PDT)
+Date: Sat, 5 Oct 2019 17:59:53 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/19] tests: Update ACPI tables list for upcoming arm/virt
- tests
-Message-ID: <20190918130633.4872-11-shameerali.kolothum.thodi@huawei.com>
+Subject: [PULL 15/19] tests: document how to update acpi tables
+Message-ID: <20191005215508.28754-16-mst@redhat.com>
 References: <20191005215508.28754-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20191005215508.28754-1-mst@redhat.com>
 X-Mailer: git-send-email 2.22.0.678.g13338e74b8
@@ -91,53 +90,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20191005215933.0c69wiO3Zk2fNHjA_NHEMog8iDxBdEZx5evunHCdPmY@z>
 
-From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Looks like no one understands how to do it.
+Document the process.
 
-This is in preparation to add numamem and memhp tests to
-arm/virt platform. The bios-tables-test-allowed-diff.h
-is updated with a list of expected ACPI tables that needs to be
-present in tests/data/acpi/virt folder.
-
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Message-Id: <20190918130633.4872-11-shameerali.kolothum.thodi@huawei.com>
-Acked-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- tests/bios-tables-test-allowed-diff.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ tests/bios-tables-test.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
-index 7b4adbc822..3776dd2f3d 100644
---- a/tests/bios-tables-test-allowed-diff.h
-+++ b/tests/bios-tables-test-allowed-diff.h
-@@ -1,2 +1,17 @@
- /* List of comma-separated changed AML files to ignore */
- "tests/data/acpi/virt/DSDT",
-+"tests/data/acpi/virt/APIC.memhp",
-+"tests/data/acpi/virt/APIC.numamem",
-+"tests/data/acpi/virt/DSDT.memhp",
-+"tests/data/acpi/virt/DSDT.numamem",
-+"tests/data/acpi/virt/FACP.memhp",
-+"tests/data/acpi/virt/FACP.numamem",
-+"tests/data/acpi/virt/GTDT.memhp",
-+"tests/data/acpi/virt/GTDT.numamem",
-+"tests/data/acpi/virt/MCFG.memhp",
-+"tests/data/acpi/virt/MCFG.numamem",
-+"tests/data/acpi/virt/SLIT.memhp",
-+"tests/data/acpi/virt/SPCR.memhp",
-+"tests/data/acpi/virt/SPCR.numamem",
-+"tests/data/acpi/virt/SRAT.memhp",
-+"tests/data/acpi/virt/SRAT.numamem",
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 652a78773f..0b33fb265f 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -10,6 +10,33 @@
+  * See the COPYING file in the top-level directory.
+  */
+ 
++/*
++ * How to add or update the tests:
++ * Contributor:
++ * 1. add empty files for new tables, if any, under tests/data/acpi
++ * 2. list any changed files in tests/bios-tables-test-allowed-diff.h
++ * 3. commit the above *before* making changes that affect the tables
++ * Maintainer:
++ * After 1-3 above tests will pass but ignore differences with the expected files.
++ * You will also notice that tests/bios-tables-test-allowed-diff.h lists
++ * a bunch of files. This is your hint that you need to do the below:
++ * 4. Run
++ *      make check V=1
++ * this will produce a bunch of warnings about differences
++ * beween actual and expected ACPI tables. If you have IASL installed,
++ * they will also be disassembled so you can look at the disassembled
++ * output. If not - disassemble them yourself in any way you like.
++ * Look at the differences - make sure they make sense and match what the
++ * changes you are merging are supposed to do.
++ *
++ * 5. From build directory, run:
++ *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
++ * 6. Now commit any changes.
++ * 7. Before doing a pull request, make sure tests/bios-tables-test-allowed-diff.h
++ *    is empty - this will ensure following changes to ACPI tables will
++ *    be noticed.
++ */
++
+ #include "qemu/osdep.h"
+ #include <glib/gstdio.h>
+ #include "qemu-common.h"
 -- 
 MST
 
