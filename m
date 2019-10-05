@@ -2,80 +2,80 @@ Return-Path: <SRS0=HB7V=X6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64735C4740A
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F27AC4740A
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:25:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38FE320862
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:25:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38FE320862
+	by mail.kernel.org (Postfix) with ESMTPS id D82D720862
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 22:25:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D82D720862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGsUV-0004QY-P1
-	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 18:25:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48071)
+	id 1iGsUv-0005HT-Iv
+	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 18:25:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48727)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iGs60-0005oT-HV
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:00:13 -0400
+ (envelope-from <mst@redhat.com>) id 1iGsEY-0005OO-AC
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:09:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iGs5z-0004fX-6i
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:00:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41286)
+ (envelope-from <mst@redhat.com>) id 1iGsEW-00088Y-Ep
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:09:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32856)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGs5y-0004ea-Ug
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:00:11 -0400
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iGsEW-00088H-6Q
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 18:09:00 -0400
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0C5588E3C0
- for <qemu-devel@nongnu.org>; Sat,  5 Oct 2019 22:00:10 +0000 (UTC)
-Received: by mail-qk1-f199.google.com with SMTP id 10so10686909qka.2
- for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 15:00:10 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id AA31F3CBE2
+ for <qemu-devel@nongnu.org>; Sat,  5 Oct 2019 22:08:58 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id z21so10882472qtq.21
+ for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 15:08:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=L6COg8vHdvYRIvqPWLhLuhWyNWi99JbdUCTQsLNAmdA=;
- b=EyRtF4oP4AxpIc2aYLCkc3BZJo27GC2PQ8wD9FLSz87yAslZjcTyA+laaqlTkIsPD+
- oZTh9B+Szm5pdHvV5fSlfW4Zaywx6e2KNW6tARMmebfDCoL+jVFbaSsx7d8UXEt9QFvG
- K97Vyu8W4AnA59C0N0Qp6gUruut10qnxD3xX2bXaZRHE2Oj0oKx4EmrXiIB8c5fM6jNA
- TIlE6JcqeY6piH9ZHHGBRFU/+POqbwRTYanjsF18PxMZ7jlx8OvUoG4ZcwRTyS0xi+Fs
- 348K2E4jFN6H4A7T6HoUGM03UE6lwYG7e0lCwW7njIG3APSaS0tGlt8sw0+ckqqh0J9r
- 9pig==
-X-Gm-Message-State: APjAAAWKfaK4q5EX/0jExf+d+SVyNGfau9XcfgVg00tGDD2qJUh29mcx
- iV43Zkv8GLjOHoCmpEPiFWjACWeuQ3nXjVEdwvOUKmUviFnzSAgv2YgJlv5izrIw3RNT/FuA/oQ
- SVl0CroIuYxT5QrE=
-X-Received: by 2002:a0c:e785:: with SMTP id x5mr21044863qvn.71.1570312808627; 
- Sat, 05 Oct 2019 15:00:08 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqynJXnNx6EEeUDxQU2Q527xQmKnx8fDuY/Tr3qccFMZi7T9XFbN2MgW8IWzYwG9bXzWx6zZHg==
-X-Received: by 2002:a0c:e785:: with SMTP id x5mr21044851qvn.71.1570312808341; 
- Sat, 05 Oct 2019 15:00:08 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=RJ92MU8ndC/vRajtKU3wEVbU+tAsE9NkcGqIyStTSnY=;
+ b=KkpwuPDXkB4LfvaMPO+Dxj3guOCR4XpX/7bfbm7GiVDZ+NYz5Upc1zVQM0HLsIgaYs
+ WiqMLQz4C/Lv5PYDdIYdJHizc9ORx/d8c0ExdW4fNfr2zj+8zJBnEQG6rtfVJXPRwhs3
+ ZWExMmimUxrJZR+z13+MlDMZTfE1Cx5N7Qp8r8kAAclidippi94wERuPtGYNvFx33ps3
+ mFy7A31rdKcb4h97uuqily7vFNZAf7KLhh9Xl+BFeVIeWi7ha97bewUo7irtzWjukIaZ
+ MEgZHODvkj/W4QqVsjehPQPFkDgYZWZAz0xdRV2/Jdk78vUcsLTBEMcZNmkE8F0s0BR5
+ OOPQ==
+X-Gm-Message-State: APjAAAV0y6R0syzNftPwzQ/kd5Cb914qrbqW6pDxAvm3wyiWO0f9X26W
+ gk8LmVLPZI3xjVX6lQkMTafopncep8JOFgQJJzhskVbO0YaKPsUEPzhdbR+FGwHh7+HAUDNnGN0
+ BiWt3XK3l4KyTY8I=
+X-Received: by 2002:ac8:3f96:: with SMTP id d22mr23681891qtk.36.1570313337928; 
+ Sat, 05 Oct 2019 15:08:57 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzSZg5+We5q7SvKKkRLbgXA+8F8gApg/CraEvQPt5VkU2MbY4JdMiDBi0eLPX5ky6KoZAsm9Q==
+X-Received: by 2002:ac8:3f96:: with SMTP id d22mr23681876qtk.36.1570313337676; 
+ Sat, 05 Oct 2019 15:08:57 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
  by smtp.gmail.com with ESMTPSA id
- t17sm8512542qtt.57.2019.10.05.15.00.05
+ g8sm7163955qta.67.2019.10.05.15.08.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 05 Oct 2019 15:00:07 -0700 (PDT)
-Date: Sat, 5 Oct 2019 18:00:03 -0400
+ Sat, 05 Oct 2019 15:08:56 -0700 (PDT)
+Date: Sat, 5 Oct 2019 18:08:51 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 17/19] virtio: Add virtio_fs linux headers
-Message-ID: <20190930105135.27244-2-dgilbert@redhat.com>
-References: <20191005215508.28754-1-mst@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v6 00/10] Introduce the microvm machine type
+Message-ID: <20191005180721-mutt-send-email-mst@kernel.org>
+References: <20191004093752.16564-1-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20191005215508.28754-1-mst@redhat.com>
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
+In-Reply-To: <20191004093752.16564-1-slp@redhat.com>
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -90,74 +90,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Miklos Szeredi <mszeredi@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Vivek Goyal <vgoyal@redhat.com>
+Cc: ehabkost@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20191005220003.D7TNsLc_uDE6_PF-PQRK1T2NbCaysdgafVCE7gs_Buw@z>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Fri, Oct 04, 2019 at 11:37:42AM +0200, Sergio Lopez wrote:
+> Microvm is a machine type inspired by Firecracker and constructed
+> after the its machine model.
+>=20
+> It's a minimalist machine type without PCI nor ACPI support, designed
+> for short-lived guests. Microvm also establishes a baseline for
+> benchmarking and optimizing both QEMU and guest operating systems,
+> since it is optimized for both boot time and footprint.
 
-Pull in the virtio_fs.h linux header and the constant for the virtiofs
-ID; by running scripts/update-linux-headers.sh against
-Linus's tree 97f9a3c4eee55b0178b518ae7114a6a53372913d.
+Pls take a look at patchew warnings and errors.
+Both coding style issues and test failures need to be
+addressed somehow I think.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
-Message-Id: <20190930105135.27244-2-dgilbert@redhat.com>
-Acked-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/standard-headers/linux/virtio_fs.h  | 19 +++++++++++++++++++
- include/standard-headers/linux/virtio_ids.h |  2 ++
- 2 files changed, 21 insertions(+)
- create mode 100644 include/standard-headers/linux/virtio_fs.h
-
-diff --git a/include/standard-headers/linux/virtio_fs.h b/include/standard-headers/linux/virtio_fs.h
-new file mode 100644
-index 0000000000..9d88817a6b
---- /dev/null
-+++ b/include/standard-headers/linux/virtio_fs.h
-@@ -0,0 +1,19 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+
-+#ifndef _LINUX_VIRTIO_FS_H
-+#define _LINUX_VIRTIO_FS_H
-+
-+#include "standard-headers/linux/types.h"
-+#include "standard-headers/linux/virtio_ids.h"
-+#include "standard-headers/linux/virtio_config.h"
-+#include "standard-headers/linux/virtio_types.h"
-+
-+struct virtio_fs_config {
-+	/* Filesystem name (UTF-8, not NUL-terminated, padded with NULs) */
-+	uint8_t tag[36];
-+
-+	/* Number of request queues */
-+	uint32_t num_request_queues;
-+} QEMU_PACKED;
-+
-+#endif /* _LINUX_VIRTIO_FS_H */
-diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
-index 32b2f94d1f..585e07b273 100644
---- a/include/standard-headers/linux/virtio_ids.h
-+++ b/include/standard-headers/linux/virtio_ids.h
-@@ -43,6 +43,8 @@
- #define VIRTIO_ID_INPUT        18 /* virtio input */
- #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
- #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-+#define VIRTIO_ID_IOMMU        23 /* virtio IOMMU */
-+#define VIRTIO_ID_FS           26 /* virtio filesystem */
- #define VIRTIO_ID_PMEM         27 /* virtio pmem */
- 
- #endif /* _LINUX_VIRTIO_IDS_H */
--- 
-MST
-
+> ---
+>=20
+> Changelog
+> v6:
+>  - Some style fixes (Philippe Mathieu-Daud=E9)
+>  - Fix a documentation bug stating that LAPIC was in userspace (Paolo
+>    Bonzini)
+>  - Update Xen HVM code after X86MachineState introduction (Philippe
+>    Mathieu-Daud=E9)
+>  - Rename header guard from QEMU_VIRTIO_MMIO_H to HW_VIRTIO_MMIO_H
+>    (Philippe Mathieu-Daud=E9)
+>=20
+> v5:
+>  - Drop unneeded "[PATCH v4 2/8] hw/i386: Factorize e820 related
+>    functions" (Philippe Mathieu-Daud=E9)
+>  - Drop unneeded "[PATCH v4 1/8] hw/i386: Factorize PVH related
+>    functions" (Stefano Garzarella)
+>  - Split X86MachineState introduction into smaller patches (Philippe
+>    Mathieu-Daud=E9)
+>  - Change option-roms to x-option-roms and kernel-cmdline to
+>    auto-kernel-cmdline (Paolo Bonzini)
+>  - Make i8259 PIT and i8254 PIC optional (Paolo Bonzini)
+>  - Some fixes to the documentation (Paolo Bonzini)
+>  - Switch documentation format from txt to rst (Peter Maydell)
+>  - Move NMI interface to X86_MACHINE (Philippe Mathieu-Daud=E9, Paolo
+>    Bonzini)
+>=20
+> v4:
+>  - This is a complete rewrite of the whole patchset, with a focus on
+>    reusing as much existing code as possible to ease the maintenance bu=
+rden
+>    and making the machine type as compatible as possible by default. As
+>    a result, the number of lines dedicated specifically to microvm is
+>    383 (code lines measured by "cloc") and, with the default
+>    configuration, it's now able to boot both PVH ELF images and
+>    bzImages with either SeaBIOS or qboot.
+>=20
+> v3:
+>   - Add initrd support (thanks Stefano).
+>=20
+> v2:
+>   - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
+>   - Simplify machine definition (thanks Eduardo).
+>   - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
+>   - Add a patch to factorize PVH-related functions.
+>   - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
+>=20
+> ---
+> Sergio Lopez (10):
+>   hw/virtio: Factorize virtio-mmio headers
+>   hw/i386/pc: rename functions shared with non-PC machines
+>   hw/i386/pc: move shared x86 functions to x86.c and export them
+>   hw/i386: split PCMachineState deriving X86MachineState from it
+>   hw/i386: make x86.c independent from PCMachineState
+>   fw_cfg: add "modify" functions for all types
+>   hw/intc/apic: reject pic ints if isa_pic =3D=3D NULL
+>   roms: add microvm-bios (qboot) as binary and git submodule
+>   docs/microvm.rst: document the new microvm machine type
+>   hw/i386: Introduce the microvm machine type
+>=20
+>  docs/microvm.rst                 |  98 ++++
+>  default-configs/i386-softmmu.mak |   1 +
+>  include/hw/i386/microvm.h        |  83 ++++
+>  include/hw/i386/pc.h             |  28 +-
+>  include/hw/i386/x86.h            |  94 ++++
+>  include/hw/nvram/fw_cfg.h        |  42 ++
+>  include/hw/virtio/virtio-mmio.h  |  73 +++
+>  hw/acpi/cpu_hotplug.c            |  10 +-
+>  hw/i386/acpi-build.c             |  29 +-
+>  hw/i386/amd_iommu.c              |   3 +-
+>  hw/i386/intel_iommu.c            |   3 +-
+>  hw/i386/microvm.c                | 574 ++++++++++++++++++++++
+>  hw/i386/pc.c                     | 780 +++---------------------------
+>  hw/i386/pc_piix.c                |  46 +-
+>  hw/i386/pc_q35.c                 |  38 +-
+>  hw/i386/pc_sysfw.c               |  58 +--
+>  hw/i386/x86.c                    | 790 +++++++++++++++++++++++++++++++
+>  hw/i386/xen/xen-hvm.c            |  23 +-
+>  hw/intc/apic.c                   |   2 +-
+>  hw/intc/ioapic.c                 |   2 +-
+>  hw/nvram/fw_cfg.c                |  29 ++
+>  hw/virtio/virtio-mmio.c          |  48 +-
+>  .gitmodules                      |   3 +
+>  hw/i386/Kconfig                  |   4 +
+>  hw/i386/Makefile.objs            |   2 +
+>  pc-bios/bios-microvm.bin         | Bin 0 -> 65536 bytes
+>  roms/Makefile                    |   6 +
+>  roms/qboot                       |   1 +
+>  28 files changed, 1963 insertions(+), 907 deletions(-)
+>  create mode 100644 docs/microvm.rst
+>  create mode 100644 include/hw/i386/microvm.h
+>  create mode 100644 include/hw/i386/x86.h
+>  create mode 100644 include/hw/virtio/virtio-mmio.h
+>  create mode 100644 hw/i386/microvm.c
+>  create mode 100644 hw/i386/x86.c
+>  create mode 100755 pc-bios/bios-microvm.bin
+>  create mode 160000 roms/qboot
+>=20
+> --=20
+> 2.21.0
 
