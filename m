@@ -7,74 +7,71 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E170C3E8AB
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 10:22:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E21C3E8AB
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 11:57:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59E07222C0
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 10:22:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 507B2222C9
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Oct 2019 11:57:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M1lNZsjp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59E07222C0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pom8Cbpd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 507B2222C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGhCN-0003aQ-HT
-	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 06:22:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41039)
+	id 1iGigQ-0003EV-E8
+	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 07:57:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49016)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1iGhBR-00034g-4X
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 06:21:05 -0400
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1iGifW-0002ly-Hs
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 07:56:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1iGhBO-0004y3-QQ
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 06:21:04 -0400
-Received: from mail-qt1-x82a.google.com ([2607:f8b0:4864:20::82a]:39749)
+ (envelope-from <lucienmp.qemu@gmail.com>) id 1iGifV-0005C2-Hr
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 07:56:14 -0400
+Received: from mail-qk1-x734.google.com ([2607:f8b0:4864:20::734]:37499)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
- id 1iGhBN-0004xQ-9p
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 06:21:01 -0400
-Received: by mail-qt1-x82a.google.com with SMTP id n7so12281944qtb.6
- for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 03:21:00 -0700 (PDT)
+ id 1iGifV-0005Bm-Bz
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 07:56:13 -0400
+Received: by mail-qk1-x734.google.com with SMTP id u184so8377925qkd.4
+ for <qemu-devel@nongnu.org>; Sat, 05 Oct 2019 04:56:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=aioYTNXmk1DYvU6cSo3aKkbS/GZhc5ATgvlFHQSNSy0=;
- b=M1lNZsjp/BlfzBgB4dk0hNMlPr6wU3mMtPkCo/+Te/rnhXsG6iKYS0hUSeO5FXcFSV
- m6RFH+YPbu9iVw4ldULnurGgCEd2AHrVeVtRFEPA3tB2I9Du/aibgtGtoT+rEqk9ioDp
- Dd7fMoL+EXbhzuxb5rhTJNvudIxRoCoOprRagWF/Ke1WhffkHhcGYx3/ZsY7PJ8O2qfu
- xHxwzsmopW130kqD+M7ovzGZoZYXgJ/PWtN/0SKxLmnwGXTLIlITnGFct/sUvW3pVKnI
- XDzjZPP6Gi7NuYozNYcJozBgYK4ti5jpzq3vUNplRjeEHIs1VEKD78Ijt6YklMnSZFHH
- yM1Q==
+ h=mime-version:from:date:message-id:subject:to;
+ bh=D8ZyBRrCoK+KYzusWDOXGYuynlOWE1aRO7qs+J8A6iI=;
+ b=Pom8CbpdbMnWvrn8Yf4Ox2PAXNYJN73BlVxBpKVOOGQDVvvZEF48AydMx/QZW+inhr
+ K2RM0tZ75533HCBMDE7ZWEJZyXf8SafSdD60X8rhHTA6uIKGlkrTCEUZQrcr0xUsWJAO
+ TPUU9aCe2VmE15a+2pjZx7E0kivWBGBiX+hSg6hEBUokCa5DBfHXrTgPWMuWAk4d39pV
+ 6itHtzisbID5bLQ1kNjA8235LCh9CQZTuW2A7PGIVgS3o5T6H6JPg7E+SXZhZ2C7vuP2
+ c56aHxciedkgDfi3iHncgAnX+Ot/FYVMF9F/c6e8A3NTwP83urkXUgSWrcgSJZemr/hx
+ M8ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=aioYTNXmk1DYvU6cSo3aKkbS/GZhc5ATgvlFHQSNSy0=;
- b=WJbCV9jcY0OdYoHq88yKw3WIQurxLfwzYqCFnxsGGlKjxGPTPt2pNl1Toz+BvDvpkh
- L8ffGmaltzOol2PwAKTkaotuqS3vvm6uC9fKWw23jpNyJPXueT+YsWR/Es6VgHZJa6Kd
- wmFbbnY8N54VnS4ZZXgZW1/5sh1NoWS9WG61yGaKuGbrZEynWr8xOtih7P9cwTQHpng7
- vtE9QlpOcivxfJqEnGau3SHhSRxklTFaaIJKpm/1/73CmtdMaSCAUrX7hmFQUj6UN7XY
- V62vpPli55C/OLqKzGFpk1f0BTNYtkXg5GNY6BSAq1SEd9yJzs6fifVQt0VDU0p02jo2
- 2CjA==
-X-Gm-Message-State: APjAAAXypg3ydfw/+NG94XOlnvahD9qStr+6zuTv3yjjdGPDhEHVv8KE
- Aa9FbaEXSBv/81W7eLoOVirzpcvtbFwZ+qxqgWkASQ==
-X-Google-Smtp-Source: APXvYqw/T14SsqkbIBuULm3Cj0A5FxcuoFUbvDTMHSoe3s4a0vcPktXrSZPGLCpZpiuOOvSc3Agzij090AxN5kveU8c=
-X-Received: by 2002:ac8:7310:: with SMTP id x16mr19837316qto.210.1570270859481; 
- Sat, 05 Oct 2019 03:20:59 -0700 (PDT)
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=D8ZyBRrCoK+KYzusWDOXGYuynlOWE1aRO7qs+J8A6iI=;
+ b=eYVeWMnHqHl86ZelNMQSedfL+Z0LdEvxNDX0yFcmrxAtwCMIutrZV4N7r4kRD0Gn+b
+ J1JtDS8rz4BJ+o7Kbl7nRfU3HYomAQZAmy+KBZBIbrD/SFAgoMpKvjgNbCSQH2SIh642
+ lwJs1H3BqwB6z23rNviPK+rWUqib/jopM9P4mBMZkWITdFbuyVVEe+DiXCj7NM0akoe7
+ WhwV5qBuwogB0W1u/TDWC+dqcu3jYPWes4kjMw2SW7bQSpEHssDlhV9qm7QflV3svlcL
+ x7gOkcqJxrwKm5Wqiylszf9DVCs/YnKRaEJ/j1PU6YjZlYvGEbgJvFE1RT5GC2Jg75uu
+ UpeQ==
+X-Gm-Message-State: APjAAAXUmZTSBTPityB4q7PCIG/6MY7Pp0mz46R/ke8xntSxlt6tURtd
+ dFDyrrFFTfRCVuiMdSGqXpm/IerE+dNWmvg7tabE5Iq8
+X-Google-Smtp-Source: APXvYqxzgs2LwvPKg8CMK80NPnxhCClTrVxjvirl8xK/Zgw0iqsQg4MU+sZjQxkvJrzUwYme/qheV5QXP1Q5i8jc56Y=
+X-Received: by 2002:a37:48c8:: with SMTP id v191mr14912852qka.64.1570276572634; 
+ Sat, 05 Oct 2019 04:56:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <CALvKS=E-t1c+BVDn=0RbM8nBry8GcYOXh-PrziQO7XhS7W2NUw@mail.gmail.com>
-In-Reply-To: <CALvKS=E-t1c+BVDn=0RbM8nBry8GcYOXh-PrziQO7XhS7W2NUw@mail.gmail.com>
 From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
-Date: Sat, 5 Oct 2019 19:20:41 +0900
-Message-ID: <CALvKS=GB1-zDnkKxei6Dn5MNyr5kwj+vEtD_3MZyVNfzqQuRZg@mail.gmail.com>
-Subject: RFC: Why dont we move to newer capstone?
+Date: Sat, 5 Oct 2019 20:55:54 +0900
+Message-ID: <CALvKS=EoaNnNQCmdp3rjjbaAYOoow8txsn1KX=Mb37Vk3he5Kw@mail.gmail.com>
+Subject: Peculiar reply from mail list handler???
 To: QEMU Developers <qemu-devel@nongnu.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::82a
+X-Received-From: 2607:f8b0:4864:20::734
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,18 +87,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi folks,
+Hey folks,
 
-Whilst working on a m68k patch I noticed that the capstone in use
-today (3.0) doesnt support the M68K and thus a hand turned disasm
-function is used.
+The last message I sent came back with a weird reply from
+*mailer@lists.sr.ht*, claiming the list didnt support "HTML" formatted
+mail (which is the default) for gmail, and then saying it couldnt be
+delivered.
 
-The newer capstone (5.0) appears to support a few more CPU, inc. m68k.
-
-Why we move to this newer capstone?
-
-Furthermore, if making a move why not move to something with wider cpu
-support like libopcodes  ?
+Thats a confusing mail as it would imply failure in delivery.    Was I
+supposed to get this mail?
 
 Cheers,
 Luc
