@@ -2,77 +2,100 @@ Return-Path: <SRS0=2u83=X7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF6CC10F14
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 14:13:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9DDC4360C
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 16:06:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D4442080F
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 14:13:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3795D20835
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 16:06:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="v8NJwlA9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D4442080F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KcYapCxT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3795D20835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iH7Hp-0000Bh-Jc
-	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 10:13:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45840)
+	id 1iH93c-0000cT-DT
+	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 12:06:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhlb29@foxmail.com>) id 1iH7Gt-0008Ay-G0
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 10:12:28 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iH92o-0000Aw-Uf
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:06:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhlb29@foxmail.com>) id 1iH7Gm-0002nL-RZ
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 10:12:22 -0400
-Received: from smtpbg431.qq.com ([183.3.255.44]:60586 helo=qq.com)
+ (envelope-from <pbonzini@redhat.com>) id 1iH92m-0003vt-7U
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:06:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46442
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1iH7Gk-0002fo-Nt
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 10:12:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
- s=s201512; t=1570371104;
- bh=wNqnBOmMXzaZyharP+kEi8AeWEJ+JXMX7lurwzHIgjc=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=v8NJwlA9eKSnjoxgTc93yWSnoTNFDw84jc3d+8Cx0izTCAel9jjrpP5A2O65bMFAn
- yKfC3K5Ujqp6YlZIbMd+GuwS9Jq/3owwHzSIVwVB3BbmFQcfSAhqWUrE/Ak6ATEy9q
- hkGMO5+J88WQ5OO+WfCN1zM57YN7Fz2ggz7Mb7BU=
-X-QQ-SSF: 00000000000000F000000000000000G
-X-QQ-Spam: true
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 27.17.41.119
-In-Reply-To: <CAFEAcA9uneV_FY-1XV5_Wa-Lb28_ojSBP9GhWy1xyAmGcZqamg@mail.gmail.com>
-References: <tencent_363C13D92BFF319155906E6B@qq.com>
- <CAFEAcA9uneV_FY-1XV5_Wa-Lb28_ojSBP9GhWy1xyAmGcZqamg@mail.gmail.com>
-X-QQ-STYLE: 
-X-QQ-mid: webenglish1t1570371103t728989
-From: "=?ISO-8859-1?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
-To: "=?ISO-8859-1?B?UGV0ZXIgTWF5ZGVsbA==?=" <peter.maydell@linaro.org>
-Subject: Re: gdbstub and gbd segfaults on different instructions in user
- spaceemulation
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
-Date: Sun, 6 Oct 2019 22:11:43 +0800
-X-Priority: 3
-Message-ID: <tencent_3015932477789CE0580D1901@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-ReplyHash: 2112362016
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Sun, 06 Oct 2019 22:11:44 +0800 (CST)
-Feedback-ID: webenglish:foxmail.com:bgweb:bgweb19
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 183.3.255.44
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iH92l-0003u4-Ul
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:06:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1570377958;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=z7yoEbkDQ1kB+hHKsv2TCkBm65bfT4uy3xqLS2veNQo=;
+ b=KcYapCxTvp4oa3vJ2LSHiC+L+z8mDUPMpzlYbvTU7XZ3/H6AanIgNAm4qk4oCvAe0OhpBg
+ P0XHm0HoeLr/5+HtCKLvJXJ/K9+KfHlErwGUY5V7SDeAcgL3ATKSBAZ3b5Gyqnvb4L0qsc
+ WL1QQ3HPxF1rUfrAxYdYfE6nVmS4fnE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-j_ItwBgbN8CVoJuyqy8P1g-1; Sun, 06 Oct 2019 12:05:56 -0400
+Received: by mail-wm1-f69.google.com with SMTP id n3so4597493wmf.3
+ for <qemu-devel@nongnu.org>; Sun, 06 Oct 2019 09:05:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TzxWDJRON3vkxrouOX90qTTCQaVZhH9arDlwvYsLjxQ=;
+ b=euYYoSAjZXMfhR2lMYLlGAqWfVkz5IWRi9/qQ0TN4bFHqJDZTeoc73REXbX6Ikc7ZF
+ 3OamsuZ65NnDsBoY45H39W09/7L11w1ORf7jd1SOvBmMPxY0JXOjTRv2cQimXXVrTbDz
+ NiJB+AJ6ZM+VVNDk6pqzJafvMGATjv9zuqLJNy+ruzTNlbqNktiQiLTgoVZp2hnQ2jIR
+ Exk3FunmOVtJNyQ59Mcagkp8XUgBRyaCIAEvoqJpwdecq0cfPE/x2ItMpm/UW4vMqeiW
+ tbtms0UGYFHegQdS7dA+1Qx5sz7JfF6jZTOjPAJa7h+Jyk5uJeXV1b3dvmWH7ZMydo3z
+ p9cA==
+X-Gm-Message-State: APjAAAU2Hd5JmVbPESFgRhPCTbaW2FBNYjNejntMn4CVtKuuHHKVGIn2
+ w/kXj8/6Rmsrd80+IeSJUQ3D/od7+9so1VPvzXPb22wUvNrTocYkXWwqHnLrmLjgzJubi3eco9I
+ QOkCMTuJJbcZSWts=
+X-Received: by 2002:a7b:cbd6:: with SMTP id n22mr18499684wmi.39.1570377955079; 
+ Sun, 06 Oct 2019 09:05:55 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw/pP849OKRf7+fSKR1NGT3g6rj/zcnRspP0aI+5uwSIQwjWuzEvimYxtuZ8L4J/MwQpaD7nA==
+X-Received: by 2002:a7b:cbd6:: with SMTP id n22mr18499674wmi.39.1570377954761; 
+ Sun, 06 Oct 2019 09:05:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e876:e214:dc8e:2846?
+ ([2001:b07:6468:f312:e876:e214:dc8e:2846])
+ by smtp.gmail.com with ESMTPSA id t123sm20211990wma.40.2019.10.06.09.05.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 06 Oct 2019 09:05:53 -0700 (PDT)
+Subject: Re: [PATCH] cpus: kick all vCPUs when running thread=single
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20191001160426.26644-1-alex.bennee@linaro.org>
+ <5582c91e-ac0e-9f74-a3de-82f7fe25fadd@redhat.com> <874l0sl5z6.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <d25121c7-e499-95e4-840e-4de53a4469f2@redhat.com>
+Date: Sun, 6 Oct 2019 18:05:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <874l0sl5z6.fsf@linaro.org>
+Content-Language: en-US
+X-MC-Unique: j_ItwBgbN8CVoJuyqy8P1g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,123 +107,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Doug Gale <doug16k@gmail.com>,
+ qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgUGV0ZXIsCgpJIGhhdmUgZmluYWxseSBnb3QgdGhlIGNoYW5jZSB0byByZXBseS4gVGhh
-bmtzIGZvciB5b3VyIGV4cGxhbmF0aW9uLCBJIGhhdmUgbGVhcm5lZCB0aGUgaW1wb3J0YW50
-IGNvbmNlcHQgb2YgSklULgoKSSBoYXZlIGJlZW4gcGxheWluZyB3aXRoIHRoZSBsb2dnaW5n
-IG9wdGlvbnMgaW4gLWQsIGJ1dCBJIGZvdW5kIHNvbWV0aGluZyB3ZWlyZCB0aGF0IG1ha2Vz
-IGl0IHRyaWNreSBmb3IgbWUgdG8gZmlndXJlIG91dCB0aGUgY2F1c2Ugb2YgdGhlIHNlZ2Zh
-dWx0LiBBcyB5b3UgbWVudGlvbmVkLCBJIG5lZWQgdG8ga25vdyBpZiB0aGUgc2VnZmF1bHQg
-aXMgY2F1c2VkIGJ5IGd1ZXN0IHByb2dyYW0gaGF2aW5nIGJhZCBtZW0gYWNjZXNzLCBvciBR
-RU1VIGl0c2VsZiBjcmFzaGluZy4KClRvIHJlY2FwLCBJIGp1c3QgY2hhbmdlZCB0aGUgWzMx
-OjI2XSBvcGNvZGUgZmllbGQgb2YgTFcgYW5kIFNXIGluc3RydWN0aW9ucyBpbiB0cmFuc2xh
-dGUuYy4gQW5kIEkgdXNlZCB0aGlzIGZvbGxvd2luZyBsaW5lIHRvIGRpYWdub3NlOgoKJCAu
-L3FlbXUtbWlwc2VsIC1jcHUgbWFvdHUgLWQgaW5fYXNtLG5vY2hhaW4gLUQgZGVidWcubG9n
-IC1zaW5nbGVzdGVwIHRlc3QKCkFuZCBiZWxvdyBpcyBteSB3ZWlyZCBpbl9hc20gbG9nLiBU
-aGUgbG9nIGxvb2tzIHZlcnkgd2VpcmQsIHRoZSBpbnN0cnVjdGlvbnMgYXJlIGp1c3Qgbm90
-IHRoZSBvbmVzIEkgc2F3IGluIG15IG9iamR1bXAuIFRoZSBkbXVsdC5nIGluc3RydWN0aW9u
-LCBhcyB5b3UgcG9pbnRlZCBvdXQgYmVmb3JlLCBpcyBhIExvb25nc29uIGluc3RydWN0aW9u
-LiBJIGhhdmUgYWxzbyBub3RpY2VkIHRoYXQsIHRoZSBpbl9hc20gc2hvdWxkIGhhdmUgZ2l2
-ZW4gbWUgYSBsb25nZXIgbG9nLCB3aXRoIHNvbWUgb3RoZXIgcGFydHMgYmVzaWRlcyBtYWlu
-LiBUaGlzIGxvZyBvbmx5IGhhcyBtYWluIGluIGl0LgoKRG8geW91IGhhdmUgYW55IGlkZWEg
-d2hhdCBlbHNlIEkgY2FuIHRyeT8gVGhpcyBzZWdmYXVsdCBoYXMgYnVnZ2VkIG1lIGZvciAy
-IHdlZWtzLCBidXQgSSBzdGlsbCBiZWxpZXZlIHRoZXJlIGlzIGEgc29sdXRpb24sIGV2ZW4g
-aWYgdGhlIGxvZ3MgYXJlIHRyaWNreSB0byBpbnRlcnByZXQuIEkganVzdCBkb24ndCBrbm93
-IGhvdyBjaGFuZ2luZyA2IGJpdHMgb2Ygb3Bjb2RlIGZpZWxkIGNvdWxkIGxlYWQgdG8gc28g
-bWFueSBpc3N1ZXMuCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwOTA6ICBi
-b3ZjCXNwLHNwLDB4NDAwMDE0CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAw
-OTQ6ICBkbXVsdC5nCXplcm8sc3AsczgKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgw
-MDQwMDA5ODogIG5vcAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMDljOiAg
-bm9wCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYTA6ICBtb3ZlCXM4LHNw
-CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYTQ6ICBiZXF6YWxjCXplcm8s
-djAsMHg0MDAwYWMKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBhODogIGFk
-ZHUucWIJemVybyxzOCx2MAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGFj
-OiAgbm9wCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYjA6ICBub3AKCi0t
-LS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBiNDogIGJlcXphbGMJemVybyx2MCww
-eDQwMDBjMAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGI4OiAgaW5zdgl2
-MCxzOAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGJjOiAgbm9wCgotLS0t
-LS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYzA6ICBub3AKCi0tLS0tLS0tLS0tLS0t
-LS0KSU46IG1haW4KMHgwMDQwMDBjNDogIGJsdGMJczgsdjEsMHg0MDAxMDgKCi0tLS0tLS0t
-LS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBjODogIG5vcAoKLS0tLS0tLS0tLS0tLS0tLQpJ
-TjogbWFpbgoweDAwNDAwMGNjOiAgYmx0YwlzOCx2MCwweDQwMDEwMAoKLS0tLS0tLS0tLS0t
-LS0tLQpJTjogbWFpbgoweDAwNDAwMGQwOiAgbm9wCgotLS0tLS0tLS0tLS0tLS0tCklOOiBt
-YWluCjB4MDA0MDAwZDQ6ICBub3AKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQw
-MDBkODogIGFkZAl2MCx2MSx2MAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAw
-MGRjOiAgZm9yawl6ZXJvLHM4LHYwCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0
-MDAwZTA6ICBub3AKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBlNDogIG5v
-cAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGU4OiAgbW92ZQl2MCx6ZXJv
-CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZWM6ICBtb3ZlCXNwLHM4Cgot
-LS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZjA6ICBibHRjCXNwLHM4LDB4NDAw
-MTY0CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZjQ6ICBib3ZjCXNwLHNw
-LDB4NDAwMTc4CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZjg6ICBqcgly
-YQoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGZjOiAgbm9wCgotLS0tLS0t
-LS0tLS0tLS0tLS0gT3JpZ2luYWwgLS0tLS0tLS0tLS0tLS0tLS0tCkZyb206ICAiUGV0ZXIg
-TWF5ZGVsbCI7PHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47ClNlbmQgdGltZTogVHVlc2Rh
-eSwgT2N0IDEsIDIwMTkgMDoyMyBBTQpUbzogIkxpYm8gWmhvdSI8emhsYjI5QGZveG1haWwu
-Y29tPjsgCkNjOiAicWVtdS1kZXZlbCI8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgClN1Ympl
-Y3Q6ICBSZTogZ2Ric3R1YiBhbmQgZ2JkIHNlZ2ZhdWx0cyBvbiBkaWZmZXJlbnQgaW5zdHJ1
-Y3Rpb25zIGluIHVzZXIgc3BhY2VlbXVsYXRpb24KCgoKT24gTW9uLCAzMCBTZXAgMjAxOSBh
-dCAxNjo1NywgTGlibyBaaG91IDx6aGxiMjlAZm94bWFpbC5jb20+IHdyb3RlOgo+IEkgYW0g
-ZW5jb3VudGVyaW5nIHNlZ21lbnRhdGlvbiBmYXVsdCB3aGlsZSBwb3J0aW5nIG15IGN1c3Rv
-bSBJU0EgdG8gUUVNVS4gTXkgY3VzdG9tIElTQSBpcyBWRVJZIFZFUlkgc2ltcGxlLCBpdCBv
-bmx5IGNoYW5nZXMgdGhlIFszMToyNl0gb3Bjb2RlIGZpZWxkIG9mIExXIGFuZCBTVyBpbnN0
-cnVjdGlvbnMuIFRoZSBsaW5rIGhhcyBteSB2ZXJ5IHNpbXBsZSBpbXBsZW1lbnRhdGlvbjog
-aHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDkv
-bXNnMDY5NzYuaHRtbAoKPiBJIGhhdmUgdHJpZWQgMiB3YXlzIG9mIGRlYnVnZ2luZyBpdC4K
-PiBGaXJzdGx5LCBJIGNvbm5lY3RlZCBnZGItbXVsdGlhcmNoIHRvIGdkYnN0dWIsIGFuZCBJ
-IHNpbmdsZS1zdGVwcGVkIHRoZSBpbnN0cnVjdGlvbnMgaW4gbXkgRUxGLiBJbW1lZGlhdGVs
-eSBhZnRlciB0aGUgTFcgaW5zdHJ1Y3Rpb24sIHRoZSBzZWdmYXVsdCB3YXMgdGhyb3duLiBJ
-IG9ic2VydmVkIHRoZSBtZW1vcnkgbG9jYXRpb24gdXNpbmcgJ3gnIGNvbW1hbmQgYW5kIGZv
-dW5kIHRoYXQgYXQgbGVhc3QgbXkgU1cgaW5zdHJ1Y3Rpb24gd2FzIGltcGxlbWVudGVkIGNv
-cnJlY3RseS4KPiBTZWNvbmRseSwgSSB1c2VkIGdkYiB0byBkaXJlY3RseSBkZWJ1ZyBRRU1V
-LiBJIHNldCB0aGUgYnJlYWtwb2ludCBhdCBmdW5jdGlvbiBpbiB0cmFuc2xhdGUuYzpkZWNv
-ZGVfb3BjLiBQcmVzc2luZyAnYycgc2hvdWxkIGhhdmUgdGhlIHNhbWUgZWZmZWN0IGFzIHNp
-bmdsZS1zdGVwcGluZyBpbnN0cnVjdGlvbiBpbiBnZGJzdHViLiBIb3dldmVyLCB0aGUgc2Vn
-bWVudGF0aW9uIGZhdWx0IHdhc24ndCB0aHJvd24gYWZ0ZXIgTFcuIEl0IHdhcyBpbnN0ZWFk
-IHRocm93biBhZnRlciB0aGUgJ25vcCcgYWZ0ZXIgJ2pyIHIzMScgaW4gdGhlIG9iamR1bXAu
-CgooMSkgSWYgeW91J3JlIGRlYnVnZ2luZyB0aGUgUUVNVSBKSVQgaXRzZWxmLCB0aGVuIHlv
-dSdyZSBwcm9iYWJseQpiZXR0ZXIgb2ZmIHVzaW5nIFFFTVUncyBsb2dnaW5nIGZhY2lsaXRp
-ZXMgKHVuZGVyIHRoZSAtZCBvcHRpb24pCnJhdGhlciB0aGFuIHRoZSBnZGJzdHViLiBUaGUg
-Z2Ric3R1YiBpcyBnb29kIGlmIHlvdSdyZSBzdXJlIHRoYXQKUUVNVSBpcyBiYXNpY2FsbHkg
-ZnVuY3Rpb25hbCBhbmQgd2FudCB0byBkZWJ1ZyB5b3VyIGd1ZXN0LCBidXQKaWYgeW91IHN1
-c3BlY3QgYnVncyBpbiBRRU1VIGl0c2VsZiB0aGVuIGl0IGNhbiBjb25mdXNlIHlvdS4KVGhl
-IC1kIGRlYnVnIGxvZ2dpbmcgaXMgYXQgYSBtdWNoIGxvd2VyIGxldmVsLCB3aGljaCBtYWtl
-cyBpdAphIGJldHRlciBndWlkZSB0byB3aGF0IFFFTVUgaXMgcmVhbGx5IGRvaW5nLCB0aG91
-Z2ggaXQgaXMgYWxzbwp0cmlja2llciB0byBpbnRlcnByZXQuCgooMikgTm8sIGJyZWFrcG9p
-bnRpbmcgb24gZGVjb2RlX29wYyBpcyBub3QgdGhlIHNhbWUgYXMgc2luZ2xlc3RlcHBpbmcK
-YW4gaW5zdHJ1Y3Rpb24gaW4gZ2RiLiBUaGlzIGlzIGEgcmVhbGx5IGltcG9ydGFudCBjb25j
-ZXB0IGluIFFFTVUKKGFuZCBKSVRzIGluIGdlbmVyYWwpIGFuZCBpZiB5b3UgZG9uJ3QgdW5k
-ZXJzdGFuZCBpdCB5b3UncmUgZ29pbmcKdG8gYmUgdmVyeSBjb25mdXNlZC4gQSBKSVQgaGFz
-IHR3byBwaGFzZXM6CihhKSAidHJhbnNsYXRlIHRpbWUiLCB3aGVuIHdlIHRha2UgYSBibG9j
-ayBvZiBndWVzdCBpbnN0cnVjdGlvbnMKYW5kIGdlbmVyYXRlIGhvc3QgbWFjaGluZSBjb2Rl
-IGZvciB0aGVtCihiKSAiZXhlY3V0aW9uIHRpbWUiLCB3aGVuIHdlIGV4ZWN1dGUgb25lIG9y
-IG1vcmUgb2YgdGhlIGJsb2NrcwpvZiBob3N0IG1hY2hpbmUgY29kZSB0aGF0IHdlIHdyb3Rl
-IGF0IHRyYW5zbGF0ZSB0aW1lClFFTVUgY2FsbHMgdGhlIGJsb2NrcyBpdCB3b3JrcyB3aXRo
-ICJ0cmFuc2xhdGlvbiBibG9ja3MiLCBhbmQKdXN1YWxseSBpdCB3aWxsIHB1dCBtdWx0aXBs
-ZSBndWVzdCBpbnN0cnVjdGlvbnMgaW50byBlYWNoIFRCOwphIFRCIHVzdWFsbHkgc3RvcHMg
-YWZ0ZXIgYSBndWVzdCBicmFuY2ggaW5zdHJ1Y3Rpb25zLiAoWW91IGNhbgphc2sgUUVNVSB0
-byBwdXQganVzdCBvbmUgZ3Vlc3QgaW5zdHJ1Y3Rpb24gaW50byBhIFRCIHVzaW5nCnRoZSAt
-c2luZ2xlc3RlcCBjb21tYW5kIGxpbmUgb3B0aW9uIC0tIHRoaXMgaXMgc29tZXRpbWVzIHVz
-ZWZ1bAp3aGVuIGRlYnVnZ2luZy4pCgpTbyBpZiB5b3UgcHV0IGEgYnJlYWtwb2ludCBvbiBk
-ZWNvZGVfb3BjIHlvdSdsbCBzZWUgaXQgaXMgaGl0CmZvciBldmVyeSBpbnN0cnVjdGlvbiBp
-biB0aGUgVEIsIHdoaWNoIGZvciB0aGUgVEIgc3RhcnRpbmcgYXQKIjAwNDAwMDkwIDxtYWlu
-PiIgd2lsbCBiZSBldmVyeSBpbnN0cnVjdGlvbiB1cCB0byBhbmQgaW5jbHVkaW5nCnRoZSAn
-bm9wJyBpbiB0aGUgZGVsYXkgc2xvdCBvZiB0aGUgJ2pyJy4gT25jZSB0aGUgd2hvbGUgVEIg
-aXMKdHJhbnNsYXRlZCwgKnRoZW4qIHdlIHdpbGwgZXhlY3V0ZSBpdC4gSXQncyBvbmx5IGF0
-IGV4ZWN1dGUgdGltZQp0aGF0IHdlIHBlcmZvcm0gdGhlIGFjdHVhbCBvcGVyYXRpb25zIG9u
-IHRoZSBndWVzdCBDUFUgdGhhdAp0aGUgaW5zdHJ1Y3Rpb25zIHJlcXVpcmUuIElmIHRoZSBz
-ZWdmYXVsdCBpcyBiZWNhdXNlIHdlIHRoaW5rCnRoZSBndWVzdCBoYXMgbWFkZSBhIGJhZCBt
-ZW1vcnkgYWNjZXNzLCB3ZSdsbCBnZW5lcmF0ZSBpdCBoZXJlLgpJZiB0aGUgc2VnZmF1bHQg
-aXMgYW4gYWN0dWFsIGNyYXNoIGluIFFFTVUgaXRzZWxmLCBpdCB3aWxsCmhhcHBlbiBoZXJl
-IGlmIHRoZSBidWcgaXMgb25lIHRoYXQgaGFwcGVucyBhdCBleGVjdXRpb24gdGltZS4KCk5v
-dGUgdGhhdCB0aGUgLWQgbG9nZ2luZyB3aWxsIGRpc3Rpbmd1aXNoIGJldHdlZW4gdGhpbmdz
-IHRoYXQKaGFwcGVuIGF0IHRyYW5zbGF0ZSB0aW1lICh3aGljaCBpcyB3aGVuIHRoZSBpbl9h
-c20sIG9wLCBvdXRfYXNtIGV0Ywpsb2dnaW5nIGlzIHByaW50ZWQpIGFuZCB0aGluZ3MgdGhh
-dCBoYXBwZW4gYXQgZXhlY3V0aW9uIHRpbWUKKHdoaWNoIGlzIHdoZW4gY3B1LCBleGVjLCBp
-bnQsIGV0YyBsb2dzIGFyZSBwcmludGVkKS4KCnRoYW5rcwotLSBQTU0=
+On 01/10/19 19:40, Alex Benn=C3=A9e wrote:
+>=20
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>=20
+>> On 01/10/19 18:04, Alex Benn=C3=A9e wrote:
+>>> qemu_cpu_kick is used for a number of reasons including to indicate
+>>> there is work to be done. However when thread=3Dsingle the old
+>>> qemu_cpu_kick_rr_cpu only advanced the vCPU to the next executing one
+>>> which can lead to a hang in the case that:
+>>>
+>>>   a) the kick is from outside the vCPUs (e.g. iothread)
+>>>   b) the timers are paused (i.e. iothread calling run_on_cpu)
+>>>
+>>> To avoid this lets split qemu_cpu_kick_rr into two functions. One for
+>>> the timer which continues to advance to the next timeslice and another
+>>> for all other kicks.
+>>>
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> Cc: Doug Gale <doug16k@gmail.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>>  cpus.c | 24 ++++++++++++++++++------
+>>>  1 file changed, 18 insertions(+), 6 deletions(-)
+>>
+>> Looks good to me.  Single-threaded TCG is not going to have high vCPU
+>> counts anyway.
+>=20
+> Are you going to take this via your queue?
+
+I wasn't, since we have had a proper TCG maintainer for a while. :)
+
+Paolo
+
+>=20
+>>
+>> Paolo
+>>
+>>> diff --git a/cpus.c b/cpus.c
+>>> index d2c61ff155..bee7209134 100644
+>>> --- a/cpus.c
+>>> +++ b/cpus.c
+>>> @@ -949,8 +949,8 @@ static inline int64_t qemu_tcg_next_kick(void)
+>>>      return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + TCG_KICK_PERIOD;
+>>>  }
+>>>
+>>> -/* Kick the currently round-robin scheduled vCPU */
+>>> -static void qemu_cpu_kick_rr_cpu(void)
+>>> +/* Kick the currently round-robin scheduled vCPU to next */
+>>> +static void qemu_cpu_kick_rr_next_cpu(void)
+>>>  {
+>>>      CPUState *cpu;
+>>>      do {
+>>> @@ -961,6 +961,16 @@ static void qemu_cpu_kick_rr_cpu(void)
+>>>      } while (cpu !=3D atomic_mb_read(&tcg_current_rr_cpu));
+>>>  }
+>>>
+>>> +/* Kick all RR vCPUs */
+>>> +static void qemu_cpu_kick_rr_cpus(void)
+>>> +{
+>>> +    CPUState *cpu;
+>>> +
+>>> +    CPU_FOREACH(cpu) {
+>>> +        cpu_exit(cpu);
+>>> +    };
+>>> +}
+>>> +
+>>>  static void do_nothing(CPUState *cpu, run_on_cpu_data unused)
+>>>  {
+>>>  }
+>>> @@ -993,7 +1003,7 @@ void qemu_timer_notify_cb(void *opaque, QEMUClockT=
+ype type)
+>>>  static void kick_tcg_thread(void *opaque)
+>>>  {
+>>>      timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
+>>> -    qemu_cpu_kick_rr_cpu();
+>>> +    qemu_cpu_kick_rr_next_cpu();
+>>>  }
+>>>
+>>>  static void start_tcg_kick_timer(void)
+>>> @@ -1828,9 +1838,11 @@ void qemu_cpu_kick(CPUState *cpu)
+>>>  {
+>>>      qemu_cond_broadcast(cpu->halt_cond);
+>>>      if (tcg_enabled()) {
+>>> -        cpu_exit(cpu);
+>>> -        /* NOP unless doing single-thread RR */
+>>> -        qemu_cpu_kick_rr_cpu();
+>>> +        if (qemu_tcg_mttcg_enabled()) {
+>>> +            cpu_exit(cpu);
+>>> +        } else {
+>>> +            qemu_cpu_kick_rr_cpus();
+>>> +        }
+>>>      } else {
+>>>          if (hax_enabled()) {
+>>>              /*
+>>>
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
+>=20
 
 
