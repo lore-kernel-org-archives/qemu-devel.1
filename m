@@ -6,43 +6,45 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5542C47404
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 03:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5610DC4740A
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 03:20:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 897C8222C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 03:16:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 897C8222C0
+	by mail.kernel.org (Postfix) with ESMTPS id 1E494222C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 03:20:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E494222C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iGx2R-0001Xt-FE
-	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 23:16:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47052)
+	id 1iGx5m-0002me-8u
+	for qemu-devel@archiver.kernel.org; Sat, 05 Oct 2019 23:20:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iGx1D-00011k-1z
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 23:15:36 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iGx4y-0002IT-Cq
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 23:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iGx1B-000745-EJ
- for qemu-devel@nongnu.org; Sat, 05 Oct 2019 23:15:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46928)
+ (envelope-from <jsnow@redhat.com>) id 1iGx4x-0003KT-1d
+ for qemu-devel@nongnu.org; Sat, 05 Oct 2019 23:19:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45200)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iGx16-0006y7-FA; Sat, 05 Oct 2019 23:15:28 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iGx4u-0003Ih-6X; Sat, 05 Oct 2019 23:19:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8DD68A44ACD;
- Sun,  6 Oct 2019 03:15:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 69E9C10C0937;
+ Sun,  6 Oct 2019 03:19:23 +0000 (UTC)
 Received: from [10.10.120.66] (ovpn-120-66.rdu2.redhat.com [10.10.120.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1CC3D19C69;
- Sun,  6 Oct 2019 03:15:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DD25D60BFB;
+ Sun,  6 Oct 2019 03:19:20 +0000 (UTC)
 Subject: Re: bitmap migration bug with -drive while block mirror runs
-To: Peter Krempa <pkrempa@redhat.com>
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Peter Krempa <pkrempa@redhat.com>
 References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
  <d897c755-40e7-6392-23e3-c06b1a371f28@virtuozzo.com>
  <4bc910ef-0bec-cfd6-89f6-a93d35367218@redhat.com>
@@ -52,7 +54,8 @@ References: <315cff78-dcdb-a3ce-2742-da3cc9f0ca97@redhat.com>
  <73dcfdd5-ede2-250e-4680-7c1408c5a3c3@redhat.com>
  <7b0ea320-4c77-2b0f-7f12-615aa0a6d8cd@virtuozzo.com>
  <53da72e0-d265-8d0f-e47c-8338c43081e3@redhat.com>
- <20191004083307.GI6129@angien.pipo.sk>
+ <478fbdba-a3d3-6c3c-2ef5-bff714356789@virtuozzo.com>
+ <3d5512bd-2aca-58cf-1f5c-c95e6ecbfc17@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -128,18 +131,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <90ec856c-94d3-5819-a93c-243f42492d41@redhat.com>
-Date: Sat, 5 Oct 2019 23:15:22 -0400
+Message-ID: <00ec762b-9e63-4b1b-c992-19cb0cc74dfa@redhat.com>
+Date: Sat, 5 Oct 2019 23:19:18 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191004083307.GI6129@angien.pipo.sk>
+In-Reply-To: <3d5512bd-2aca-58cf-1f5c-c95e6ecbfc17@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Sun, 06 Oct 2019 03:15:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.66]); Sun, 06 Oct 2019 03:19:23 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -154,8 +157,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+Cc: qemu-devel <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
  Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -163,185 +165,143 @@ Sender: "Qemu-devel"
 
 
 
-On 10/4/19 4:33 AM, Peter Krempa wrote:
-> On Thu, Oct 03, 2019 at 19:34:56 -0400, John Snow wrote:
->> On 10/3/19 6:14 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> 03.10.2019 0:35, John Snow wrote:
->>>> On 10/2/19 6:46 AM, Peter Krempa wrote:
->>> ====
-> 
-> [...]
-> 
-> (I'm sorry if I ignored something which might require input in the
-> trimmed part but I don't have enough mental capacity to follow this
-> thread fully)
-> 
-
-Yeah, understandable -- it's getting a bit long, but I'm trying to make
-sure I understand the nuance everywhere before I start pursuing a
-particular solution.
-
-I think you caught the important parts in your replies below.
-
+On 10/4/19 9:07 AM, Eric Blake wrote:
+> On 10/4/19 4:24 AM, Vladimir Sementsov-Ogievskiy wrote:
+>=20
+>>> The way I see it, we know an auto-generated node name will never be
+>>> correct, but an explicitly specified one represents an explicit user
+>>> configuration.
 >>>
->>> If it's a problem for libvirt to keep same node-names, why should we insist?
+>>> It's wrong to use generated names for migration details, but it's nev=
+er
+>>> wrong to use explicit configuration.
+>>>
+>>> So I believe they are /already/ distinct in nature. We even already h=
+ave
+>>> code that can tell them apart.
+>>
+>> Is it restricted to create user node-names formatted like automated on=
+es?
+>=20
+> Yes. Explicit node names cannot begin with '#', while all generated nod=
+e
+> names do.
+
+Right, we already have id_wellformed which tells us which kind of node
+names are which. Automatic ones are not wellformed, explicit ones are.
+
+Peter's latest reply to my wall of text is cooling me off on the plan I
+laid out in that missive, though.
+
+>=20
+>=20
+>>> There are four cases here:
+>>>
+>>> - The bitmap is loaded to a root node with an explicit name
+>>> - The bitmap is loaded to a non-root node with an explicit name
+>>>
+>>> The blockdev case with persistence. The name represents explicit user
+>>> configuration and can be relied upon in the destination.
+>>>
+>>> - The bitmap is loaded to a root node with an implicit name, with a
+>>> named BB
+>>>
+>>> The -drive case. The named BB represents the explicit user configurat=
+ion
+>>> and can be relied upon.
+>>>
+>>> - The bitmap is loaded to a non-root node with an implicit name.
+>>
+>> So, do you suggest to save information of haw bitmap was loaded or
+>> created in
+>> BdrvDirtyBitmap structure, to distinguish, how to identify it, by blk
+>> name or
+>> by node-name? And how this information would be updated on bitmap
+>> merge? And
+>> what about creating bitmaps?
+>>
+>> So if one bitmap created in node N by blk name B, and another bitmap
+>> created in
+>> same node N by node-name N, will we migrated these bitmaps in
+>> different ways?
+>=20
+> In the -drive case (historical libvirt), the block device is named, and
+> node names are generated (it may be possible to use -drive and still
+> create explicit node names, but libvirt will never do that).=C2=A0 You =
+can
+> create a bitmap using either ('drive-name','bitmap-name'), or
+> ('generated-node-name','bitmap-name'), but for the purposes of
+> migration, only the 'drive-name' variant is migrateable.
+>=20
+> In the -blockdev case (upcoming libvirt), the block device is anonymous=
+,
+> and all node names are given by libvirt.=C2=A0 Thus, you can only creat=
+e a
+> bitmap using ('node-name','bitmap-name'), but it is also obvious that
+> migration will use the 'node-name' variant.
+>=20
+>=20
+>>>>
+>>>> If it's a problem for libvirt to keep same node-names, why should we
+>>>> insist?
+>>>>
+>>>>
+>>>
+>>> Is it really a problem? If libvirt requests migration of bitmaps, tho=
+se
+>>> bitmaps need to go somewhere. Even if it constructs a different graph
+>>> for valid reasons, it should still understand which qcow2 nodes
+>>> correlate to which other qcow2 nodes and name them accordingly.
+>>>
+>>> I don't see why this is actually a terrible constraint. Even in our
+>>> mapping proposal we're still using node-names.
 >>>
 >>>
+>=20
+> The obvious case I see is that if we have a source:
+>=20
+> Backing.qcow2 (contains bitmap1) <- Active.qcow2 (contains bitmap2)
+>=20
+> and we want to migrate AND flatten at the same time, but still preserve
+> the bitmaps as a record of changes between the points in time, then
+> libvirt needs a way to specify migration to:
+>=20
+> Flattened.qcow2 (contains bitmap1 and bitmap2)
+>=20
+> No matter which node name libvirt assigns to Flattened.qcow2, at least
+> one of the two bitmaps on the source will be migrated to a different
+> node name on the destination, while still giving the net result of a
+> bitmap logically associated with the drive (and not any particular node=
+).
+>=20
+
+A good example that clearly demonstrates the need for an explicit
+mapping provided by libvirt.
+
+>=20
+>> Ok, I'm not completely against node-name matching, keeping in mind
+>> that it is
+>> current default behavior anyway. And I see Peter not completely
+>> against too.
 >>
->> Is it really a problem? If libvirt requests migration of bitmaps, those
->> bitmaps need to go somewhere. Even if it constructs a different graph
->> for valid reasons, it should still understand which qcow2 nodes
->> correlate to which other qcow2 nodes and name them accordingly.
-> 
-> Well, no it is not a problem. Since bitmap migration has a migration
-> capability and libvirt by default disables all unknown migration
-> capabilities we can deal with it.
-> 
-> We have measures to transfer state to the destination we can
-> basically do the equivalent of the explicit mapping but with extra
-> steps.
-> 
-> We know where we want to place the bitmap and thus we can configure
-> those nodes appropriately and generate new names for everything else so
-> that nothing gets accidentally copied to wrong place.
-> 
-> My concern is though about the future. Since this is the first instance
-> of such a  migration feature which requires node names it's okay because
-> we can cheat by naming the destination "appropriately". The problem
-> will start though if there will be something else bound to the backend
-> of a disk addressed by node names which will have different semantics.
-> 
-> In that case we won't be able to cheat again.
-> 
-
-OK, I see the concern now. Though we're free to name nodes to achieve
-the bitmap semantics we want right now, graph reconfigurations in the
-future might not be able to fit within the same constraints simultaneously.
-
-Reasonable concern.
-
-Thank you for the illustrative hypothetical.
-
-> Let's assume the following example:
-> 
-> qemu adds a new feature of migrating the qcow2 L2 cache. This will
-> obviously have different implications on when it can be used than
-> bitmaps.
-> 
-> If we'd like to use either of the features but not both together on a
-> node there wouldn't be a possibility to achieve that.
-> 
-> The thing about bitmaps is that they are not really bound to the image
-> itself but rather the data in the image. As long as the user provides a
-> image with exactly the same contents the VM can use it and the bitmap
-> will be correct for it.
-> 
-> We use this in non-shared storage migration where we by default flatten
-> the backing chain into a new image. In such case a bitmap is still valid
-> but the cache in the hypothetical example is not valid to be copied over
-> for the same node name.
-> 
-> At the very least the nuances of the capability should be documented so
-> that we don't have to second guess what is going to happen.
-> 
-
-OK, understood.
-
->> I don't see why this is actually a terrible constraint. Even in our
->> mapping proposal we're still using node-names.
+>> But I'd prefer to select default name from current moment, not
+>> involving information
+>> of "how bitmap was created or loaded", as it may lead to migrating
+>> bitmaps from one
+>> node in different ways which seems inconsistent.
+>=20
+> As long as a bitmap never has both names non-generated, we should be
+> fine (it either has an explicit drive name and generated node name, or
+> it has no drive name and an explicit node name).
+>=20
 >>
+>> Current default is blk name. And node-name if blk name is not
+>> available. So I think
+>> the only thing to fix right now is skipping filters. We possibly may
+>> additionally
+>> restrict migrating bitmaps without blk name and with generated node-na=
+me.
 >>
->> So here's a summary of where I stand right now:
->>
->> - I want an API in QEMU that doesn't require libvirt.
->>
->> - I want to accommodate libvirt, but don't understand the requirement
->> that node-names must be ephemeral.
-> 
-> As I've outlined above, the node names must not be ephemeral but on the
-> same note it's then necessary to clarify when they must be stable
-> accross migration and when they must be different.
-> 
-> In the above example I'm outlining an image which has the same data but
-> it's a different image (it was converted for example). In that case the
-> bitmap migration would imply the same node name, but at the same time
-> the image is completely different and any other feature may be
-> incompatible with it.
-> 
-> The same is possible e.g. when you have multiple protocols to access the
-> same data are they the same thing and thus warrant the same node name?
-> or are they different.
-> 
-> Treating node names as ephemeral has the advantage of not trying to
-> assume the equivalence of the images on the migration channel and not
-> having to try to figure out whether they are "euqivalent enough" for the
-> given feature.
-> 
->>
->> - I would like to define a set of default behaviors (when bitmap
->> migration is enabled) that migrates only bitmaps it is confident it can
->> do so correctly and error out when it cannot.
-> 
-> This requires also defining a set of external constraints when it will
-> work. Note that they can differ with other features.
-> 
->>
->> - I'd like to amend the bitmap device name resolution to accommodate the
->> drive-mirror case.
->>
->> - Acknowledging that there might be cases where the defaults just simply
->> aren't powerful enough, allow a manual configuration that allows us to
->> select or deselect bitmaps and explicitly set their destination node-name.
-> 
-> This tangentially brings me to another question. In case when the
-> destination image already contains a bitmap with the same name, will the
-> migration of bitmaps overwrite it or merge with it?
-> 
+>=20
 
-It will emit an error, currently.
-
-> This is again one thing that should be documented.
-> 
-> In the outlined case of non-shared storage migration libvirt would
-> obviously prefer merge or having it configurable, but as said, we have
-> means to work this around by renaming the bitmap temporarily  during
-> migration and then merging it explicitly.
-> 
-
-Well, we don't know what bitmap is already there or what semantics it
-has -- so at the moment we just bail out because we can't tell what's
-going on.
-
-If you find a use case for merge or overwrite, we can add that as a
-feature, but right now we do the "safe thing".
-
-
-
-I would have still liked to find a way to migrate bitmap with a "sane
-default", but because I don't know what I don't know, it might be the
-case that node-names in the stream that aren't explicitly requested
-could be a very limiting factor in the future. Sadly, we are already
-using them -- but perhaps we can find a way to back out of that.
-
-
-So I think the safest thing, given your concern, is:
-- Any bitmap attached to a root node can be migrated using the root's
-drive name, if it has one. (This includes the drive-mirror case, if we
-fix our ability to resolve the root through the filter node.)
-
-- Any bitmap that doesn't have a named device or backend at its root
-should not be migrated without further configuration, because doing so
-requires node-names in the stream, for which we have a poor
-understanding of possible future competing constraints.
-
-
-I'm a little sad that this means that blockdev configurations can't be
-migrated without a much more verbose migration statement.
-
-I'm open to suggestions, but it sounds like we do want the ability to
-specify a migration mapping to keep migration as flexible as possible.
-
-I'll sleep on it.
-
---js
 
