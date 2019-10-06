@@ -2,66 +2,77 @@ Return-Path: <SRS0=2u83=X7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8BC1C10F14
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 08:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEF6CC10F14
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 14:13:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 758D920867
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 08:33:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D4442080F
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 14:13:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuta.io header.i=@tuta.io header.b="Aa6fdY8l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 758D920867
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=tuta.io
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="v8NJwlA9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D4442080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iH1yf-0001lw-JJ
-	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 04:33:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40279)
+	id 1iH7Hp-0000Bh-Jc
+	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 10:13:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45840)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <diodesign@tuta.io>) id 1iH1xd-0001Hr-TV
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 04:32:15 -0400
+ (envelope-from <zhlb29@foxmail.com>) id 1iH7Gt-0008Ay-G0
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 10:12:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <diodesign@tuta.io>) id 1iH1xZ-0003BB-To
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 04:32:13 -0400
-Received: from w4.tutanota.de ([81.3.6.165]:55800)
+ (envelope-from <zhlb29@foxmail.com>) id 1iH7Gm-0002nL-RZ
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 10:12:22 -0400
+Received: from smtpbg431.qq.com ([183.3.255.44]:60586 helo=qq.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <diodesign@tuta.io>)
- id 1iH1xZ-0003AV-8n; Sun, 06 Oct 2019 04:32:09 -0400
-Received: from w2.tutanota.de (unknown [192.168.1.163])
- by w4.tutanota.de (Postfix) with ESMTP id EE49C106019A;
- Sun,  6 Oct 2019 08:32:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1570350726; 
- s=s1; d=tuta.io;
- h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding;
- bh=mb4XjjOktgcw4VQhqMQojvI2U/4ggDIyEqeWXS6auic=;
- b=Aa6fdY8lNSnhdVcLlcuLwICfnn5MUT1o0TY54Sl2HUzjeadEdA0Ka9X2cUlHvovL
- T/Erz/zsLskcJZeDXxKuRXarozwvTlG3Jo2uIkdf8iKqFj5kjvo+c/pgddV+uQFImHY
- 6TL8hyP5knQRWO26Y9DZXXN5/QJm5qy5BHHVhxQ+WsHG4UOc0qWxVUR9hluBUGEichJ
- i3D+dpO8ho6iYP5hVgMdFxj+9PplBpUK6GuSy81cA0VFgWUkI1oPzQ+APnEudvOH4ft
- onH3caCn6wRQAsxVPMebiSxJOhi9g2Gp2bMqhZuBCbmgiaqW1f/AhVgnL2cYArJVPJn
- EFdQnl1uAg==
-Date: Sun, 6 Oct 2019 10:32:06 +0200 (CEST)
-From: Chris Williams <diodesign@tuta.io>
-To: Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <LqVBb_I--3-1@tuta.io>
-Subject: [PATCH v2 1/1] target/riscv/pmp: Fix bug preventing
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 81.3.6.165
+ (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1iH7Gk-0002fo-Nt
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 10:12:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+ s=s201512; t=1570371104;
+ bh=wNqnBOmMXzaZyharP+kEi8AeWEJ+JXMX7lurwzHIgjc=;
+ h=From:To:Subject:Mime-Version:Date:Message-ID;
+ b=v8NJwlA9eKSnjoxgTc93yWSnoTNFDw84jc3d+8Cx0izTCAel9jjrpP5A2O65bMFAn
+ yKfC3K5Ujqp6YlZIbMd+GuwS9Jq/3owwHzSIVwVB3BbmFQcfSAhqWUrE/Ak6ATEy9q
+ hkGMO5+J88WQ5OO+WfCN1zM57YN7Fz2ggz7Mb7BU=
+X-QQ-SSF: 00000000000000F000000000000000G
+X-QQ-Spam: true
+X-HAS-ATTACH: no
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 27.17.41.119
+In-Reply-To: <CAFEAcA9uneV_FY-1XV5_Wa-Lb28_ojSBP9GhWy1xyAmGcZqamg@mail.gmail.com>
+References: <tencent_363C13D92BFF319155906E6B@qq.com>
+ <CAFEAcA9uneV_FY-1XV5_Wa-Lb28_ojSBP9GhWy1xyAmGcZqamg@mail.gmail.com>
+X-QQ-STYLE: 
+X-QQ-mid: webenglish1t1570371103t728989
+From: "=?ISO-8859-1?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
+To: "=?ISO-8859-1?B?UGV0ZXIgTWF5ZGVsbA==?=" <peter.maydell@linaro.org>
+Subject: Re: gdbstub and gbd segfaults on different instructions in user
+ spaceemulation
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
+Date: Sun, 6 Oct 2019 22:11:43 +0800
+X-Priority: 3
+Message-ID: <tencent_3015932477789CE0580D1901@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-QQ-ReplyHash: 2112362016
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
+ id ; Sun, 06 Oct 2019 22:11:44 +0800 (CST)
+Feedback-ID: webenglish:foxmail.com:bgweb:bgweb19
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 183.3.255.44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,70 +84,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu Riscv <qemu-riscv@nongnu.org>, Qemu Devel <qemu-devel@nongnu.org>
+Cc: =?ISO-8859-1?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello. I hope you don't mind me resubmitting this patch. Please let me know=
- if
-I've formatted it incorrectly or if it needs more explanation. My previous
-attempt probably wasn't formatted quite right. This is my first time
-contributing to Qemu, so I'm keen to get it right - thanks.
-
-This fixes an issue that prevents a RISC-V CPU from executing instructions
-immediately from the base address of a PMP TOR region.
-
-When jumping to an instruction in a PMP TOR region, pmp_hart_has_privs() is
-called to validate the access. If this instruction is the very first word o=
-f a
-PMP TOR region, at address 0 relative to the start address of the region, t=
-hen
-the access will fail. This is because pmp_hart_has_privs() is called with s=
-ize
-0 to perform this validation, causing this check...
-
-e =3D pmp_is_in_range(env, i, addr + size - 1);
-
-... to fail, as (addr + size - 1) falls below the base address of the PMP
-region. Really, the access should succeed. For example, if I have a region
-spanning 0x80d96000 to 0x88d95fff and the CPU jumps to 0x80d96000, then:
-
-s =3D 0x80d96000
-e =3D 0x80d95fff
-
-And the validation fails. The size check proposed below catches these zero-=
-size
-instruction fetch access probes. The word alignment in pmpaddr{0-15} and
-earlier instruction alignment checks should prevent the execution of
-instructions over the upper boundary of the PMP region, though I'm happy to=
- give
-this more attention if this is a concern.
-
-Signed-off-by: Chris Williams <diodesign@tuta.io <mailto:diodesign@tuta.io>=
->
-
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index d4f1007109..9308672e20 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -235,8 +235,9 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulon=
-g
-addr,
-=C2=A0=C2=A0=C2=A0=C2=A0 /* 1.10 draft priv spec states there is an implici=
-t order
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 from low to high */
-=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < MAX_RISCV_PMPS; i++) {
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* catch zero-size instruction =
-checks */
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s =3D pmp_is_in_range(env,=
- i, addr);
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 e =3D pmp_is_in_range(env, i, a=
-ddr + size - 1);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 e =3D pmp_is_in_range(env, i, (=
-size =3D=3D 0) ? addr : addr + size - 1);
-
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* partially inside */
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if ((s + e) =3D=3D 1) {
+SGkgUGV0ZXIsCgpJIGhhdmUgZmluYWxseSBnb3QgdGhlIGNoYW5jZSB0byByZXBseS4gVGhh
+bmtzIGZvciB5b3VyIGV4cGxhbmF0aW9uLCBJIGhhdmUgbGVhcm5lZCB0aGUgaW1wb3J0YW50
+IGNvbmNlcHQgb2YgSklULgoKSSBoYXZlIGJlZW4gcGxheWluZyB3aXRoIHRoZSBsb2dnaW5n
+IG9wdGlvbnMgaW4gLWQsIGJ1dCBJIGZvdW5kIHNvbWV0aGluZyB3ZWlyZCB0aGF0IG1ha2Vz
+IGl0IHRyaWNreSBmb3IgbWUgdG8gZmlndXJlIG91dCB0aGUgY2F1c2Ugb2YgdGhlIHNlZ2Zh
+dWx0LiBBcyB5b3UgbWVudGlvbmVkLCBJIG5lZWQgdG8ga25vdyBpZiB0aGUgc2VnZmF1bHQg
+aXMgY2F1c2VkIGJ5IGd1ZXN0IHByb2dyYW0gaGF2aW5nIGJhZCBtZW0gYWNjZXNzLCBvciBR
+RU1VIGl0c2VsZiBjcmFzaGluZy4KClRvIHJlY2FwLCBJIGp1c3QgY2hhbmdlZCB0aGUgWzMx
+OjI2XSBvcGNvZGUgZmllbGQgb2YgTFcgYW5kIFNXIGluc3RydWN0aW9ucyBpbiB0cmFuc2xh
+dGUuYy4gQW5kIEkgdXNlZCB0aGlzIGZvbGxvd2luZyBsaW5lIHRvIGRpYWdub3NlOgoKJCAu
+L3FlbXUtbWlwc2VsIC1jcHUgbWFvdHUgLWQgaW5fYXNtLG5vY2hhaW4gLUQgZGVidWcubG9n
+IC1zaW5nbGVzdGVwIHRlc3QKCkFuZCBiZWxvdyBpcyBteSB3ZWlyZCBpbl9hc20gbG9nLiBU
+aGUgbG9nIGxvb2tzIHZlcnkgd2VpcmQsIHRoZSBpbnN0cnVjdGlvbnMgYXJlIGp1c3Qgbm90
+IHRoZSBvbmVzIEkgc2F3IGluIG15IG9iamR1bXAuIFRoZSBkbXVsdC5nIGluc3RydWN0aW9u
+LCBhcyB5b3UgcG9pbnRlZCBvdXQgYmVmb3JlLCBpcyBhIExvb25nc29uIGluc3RydWN0aW9u
+LiBJIGhhdmUgYWxzbyBub3RpY2VkIHRoYXQsIHRoZSBpbl9hc20gc2hvdWxkIGhhdmUgZ2l2
+ZW4gbWUgYSBsb25nZXIgbG9nLCB3aXRoIHNvbWUgb3RoZXIgcGFydHMgYmVzaWRlcyBtYWlu
+LiBUaGlzIGxvZyBvbmx5IGhhcyBtYWluIGluIGl0LgoKRG8geW91IGhhdmUgYW55IGlkZWEg
+d2hhdCBlbHNlIEkgY2FuIHRyeT8gVGhpcyBzZWdmYXVsdCBoYXMgYnVnZ2VkIG1lIGZvciAy
+IHdlZWtzLCBidXQgSSBzdGlsbCBiZWxpZXZlIHRoZXJlIGlzIGEgc29sdXRpb24sIGV2ZW4g
+aWYgdGhlIGxvZ3MgYXJlIHRyaWNreSB0byBpbnRlcnByZXQuIEkganVzdCBkb24ndCBrbm93
+IGhvdyBjaGFuZ2luZyA2IGJpdHMgb2Ygb3Bjb2RlIGZpZWxkIGNvdWxkIGxlYWQgdG8gc28g
+bWFueSBpc3N1ZXMuCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwOTA6ICBi
+b3ZjCXNwLHNwLDB4NDAwMDE0CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAw
+OTQ6ICBkbXVsdC5nCXplcm8sc3AsczgKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgw
+MDQwMDA5ODogIG5vcAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMDljOiAg
+bm9wCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYTA6ICBtb3ZlCXM4LHNw
+CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYTQ6ICBiZXF6YWxjCXplcm8s
+djAsMHg0MDAwYWMKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBhODogIGFk
+ZHUucWIJemVybyxzOCx2MAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGFj
+OiAgbm9wCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYjA6ICBub3AKCi0t
+LS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBiNDogIGJlcXphbGMJemVybyx2MCww
+eDQwMDBjMAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGI4OiAgaW5zdgl2
+MCxzOAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGJjOiAgbm9wCgotLS0t
+LS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYzA6ICBub3AKCi0tLS0tLS0tLS0tLS0t
+LS0KSU46IG1haW4KMHgwMDQwMDBjNDogIGJsdGMJczgsdjEsMHg0MDAxMDgKCi0tLS0tLS0t
+LS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBjODogIG5vcAoKLS0tLS0tLS0tLS0tLS0tLQpJ
+TjogbWFpbgoweDAwNDAwMGNjOiAgYmx0YwlzOCx2MCwweDQwMDEwMAoKLS0tLS0tLS0tLS0t
+LS0tLQpJTjogbWFpbgoweDAwNDAwMGQwOiAgbm9wCgotLS0tLS0tLS0tLS0tLS0tCklOOiBt
+YWluCjB4MDA0MDAwZDQ6ICBub3AKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQw
+MDBkODogIGFkZAl2MCx2MSx2MAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAw
+MGRjOiAgZm9yawl6ZXJvLHM4LHYwCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0
+MDAwZTA6ICBub3AKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBlNDogIG5v
+cAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGU4OiAgbW92ZQl2MCx6ZXJv
+CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZWM6ICBtb3ZlCXNwLHM4Cgot
+LS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZjA6ICBibHRjCXNwLHM4LDB4NDAw
+MTY0CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZjQ6ICBib3ZjCXNwLHNw
+LDB4NDAwMTc4CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZjg6ICBqcgly
+YQoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGZjOiAgbm9wCgotLS0tLS0t
+LS0tLS0tLS0tLS0gT3JpZ2luYWwgLS0tLS0tLS0tLS0tLS0tLS0tCkZyb206ICAiUGV0ZXIg
+TWF5ZGVsbCI7PHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz47ClNlbmQgdGltZTogVHVlc2Rh
+eSwgT2N0IDEsIDIwMTkgMDoyMyBBTQpUbzogIkxpYm8gWmhvdSI8emhsYjI5QGZveG1haWwu
+Y29tPjsgCkNjOiAicWVtdS1kZXZlbCI8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgClN1Ympl
+Y3Q6ICBSZTogZ2Ric3R1YiBhbmQgZ2JkIHNlZ2ZhdWx0cyBvbiBkaWZmZXJlbnQgaW5zdHJ1
+Y3Rpb25zIGluIHVzZXIgc3BhY2VlbXVsYXRpb24KCgoKT24gTW9uLCAzMCBTZXAgMjAxOSBh
+dCAxNjo1NywgTGlibyBaaG91IDx6aGxiMjlAZm94bWFpbC5jb20+IHdyb3RlOgo+IEkgYW0g
+ZW5jb3VudGVyaW5nIHNlZ21lbnRhdGlvbiBmYXVsdCB3aGlsZSBwb3J0aW5nIG15IGN1c3Rv
+bSBJU0EgdG8gUUVNVS4gTXkgY3VzdG9tIElTQSBpcyBWRVJZIFZFUlkgc2ltcGxlLCBpdCBv
+bmx5IGNoYW5nZXMgdGhlIFszMToyNl0gb3Bjb2RlIGZpZWxkIG9mIExXIGFuZCBTVyBpbnN0
+cnVjdGlvbnMuIFRoZSBsaW5rIGhhcyBteSB2ZXJ5IHNpbXBsZSBpbXBsZW1lbnRhdGlvbjog
+aHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDkv
+bXNnMDY5NzYuaHRtbAoKPiBJIGhhdmUgdHJpZWQgMiB3YXlzIG9mIGRlYnVnZ2luZyBpdC4K
+PiBGaXJzdGx5LCBJIGNvbm5lY3RlZCBnZGItbXVsdGlhcmNoIHRvIGdkYnN0dWIsIGFuZCBJ
+IHNpbmdsZS1zdGVwcGVkIHRoZSBpbnN0cnVjdGlvbnMgaW4gbXkgRUxGLiBJbW1lZGlhdGVs
+eSBhZnRlciB0aGUgTFcgaW5zdHJ1Y3Rpb24sIHRoZSBzZWdmYXVsdCB3YXMgdGhyb3duLiBJ
+IG9ic2VydmVkIHRoZSBtZW1vcnkgbG9jYXRpb24gdXNpbmcgJ3gnIGNvbW1hbmQgYW5kIGZv
+dW5kIHRoYXQgYXQgbGVhc3QgbXkgU1cgaW5zdHJ1Y3Rpb24gd2FzIGltcGxlbWVudGVkIGNv
+cnJlY3RseS4KPiBTZWNvbmRseSwgSSB1c2VkIGdkYiB0byBkaXJlY3RseSBkZWJ1ZyBRRU1V
+LiBJIHNldCB0aGUgYnJlYWtwb2ludCBhdCBmdW5jdGlvbiBpbiB0cmFuc2xhdGUuYzpkZWNv
+ZGVfb3BjLiBQcmVzc2luZyAnYycgc2hvdWxkIGhhdmUgdGhlIHNhbWUgZWZmZWN0IGFzIHNp
+bmdsZS1zdGVwcGluZyBpbnN0cnVjdGlvbiBpbiBnZGJzdHViLiBIb3dldmVyLCB0aGUgc2Vn
+bWVudGF0aW9uIGZhdWx0IHdhc24ndCB0aHJvd24gYWZ0ZXIgTFcuIEl0IHdhcyBpbnN0ZWFk
+IHRocm93biBhZnRlciB0aGUgJ25vcCcgYWZ0ZXIgJ2pyIHIzMScgaW4gdGhlIG9iamR1bXAu
+CgooMSkgSWYgeW91J3JlIGRlYnVnZ2luZyB0aGUgUUVNVSBKSVQgaXRzZWxmLCB0aGVuIHlv
+dSdyZSBwcm9iYWJseQpiZXR0ZXIgb2ZmIHVzaW5nIFFFTVUncyBsb2dnaW5nIGZhY2lsaXRp
+ZXMgKHVuZGVyIHRoZSAtZCBvcHRpb24pCnJhdGhlciB0aGFuIHRoZSBnZGJzdHViLiBUaGUg
+Z2Ric3R1YiBpcyBnb29kIGlmIHlvdSdyZSBzdXJlIHRoYXQKUUVNVSBpcyBiYXNpY2FsbHkg
+ZnVuY3Rpb25hbCBhbmQgd2FudCB0byBkZWJ1ZyB5b3VyIGd1ZXN0LCBidXQKaWYgeW91IHN1
+c3BlY3QgYnVncyBpbiBRRU1VIGl0c2VsZiB0aGVuIGl0IGNhbiBjb25mdXNlIHlvdS4KVGhl
+IC1kIGRlYnVnIGxvZ2dpbmcgaXMgYXQgYSBtdWNoIGxvd2VyIGxldmVsLCB3aGljaCBtYWtl
+cyBpdAphIGJldHRlciBndWlkZSB0byB3aGF0IFFFTVUgaXMgcmVhbGx5IGRvaW5nLCB0aG91
+Z2ggaXQgaXMgYWxzbwp0cmlja2llciB0byBpbnRlcnByZXQuCgooMikgTm8sIGJyZWFrcG9p
+bnRpbmcgb24gZGVjb2RlX29wYyBpcyBub3QgdGhlIHNhbWUgYXMgc2luZ2xlc3RlcHBpbmcK
+YW4gaW5zdHJ1Y3Rpb24gaW4gZ2RiLiBUaGlzIGlzIGEgcmVhbGx5IGltcG9ydGFudCBjb25j
+ZXB0IGluIFFFTVUKKGFuZCBKSVRzIGluIGdlbmVyYWwpIGFuZCBpZiB5b3UgZG9uJ3QgdW5k
+ZXJzdGFuZCBpdCB5b3UncmUgZ29pbmcKdG8gYmUgdmVyeSBjb25mdXNlZC4gQSBKSVQgaGFz
+IHR3byBwaGFzZXM6CihhKSAidHJhbnNsYXRlIHRpbWUiLCB3aGVuIHdlIHRha2UgYSBibG9j
+ayBvZiBndWVzdCBpbnN0cnVjdGlvbnMKYW5kIGdlbmVyYXRlIGhvc3QgbWFjaGluZSBjb2Rl
+IGZvciB0aGVtCihiKSAiZXhlY3V0aW9uIHRpbWUiLCB3aGVuIHdlIGV4ZWN1dGUgb25lIG9y
+IG1vcmUgb2YgdGhlIGJsb2NrcwpvZiBob3N0IG1hY2hpbmUgY29kZSB0aGF0IHdlIHdyb3Rl
+IGF0IHRyYW5zbGF0ZSB0aW1lClFFTVUgY2FsbHMgdGhlIGJsb2NrcyBpdCB3b3JrcyB3aXRo
+ICJ0cmFuc2xhdGlvbiBibG9ja3MiLCBhbmQKdXN1YWxseSBpdCB3aWxsIHB1dCBtdWx0aXBs
+ZSBndWVzdCBpbnN0cnVjdGlvbnMgaW50byBlYWNoIFRCOwphIFRCIHVzdWFsbHkgc3RvcHMg
+YWZ0ZXIgYSBndWVzdCBicmFuY2ggaW5zdHJ1Y3Rpb25zLiAoWW91IGNhbgphc2sgUUVNVSB0
+byBwdXQganVzdCBvbmUgZ3Vlc3QgaW5zdHJ1Y3Rpb24gaW50byBhIFRCIHVzaW5nCnRoZSAt
+c2luZ2xlc3RlcCBjb21tYW5kIGxpbmUgb3B0aW9uIC0tIHRoaXMgaXMgc29tZXRpbWVzIHVz
+ZWZ1bAp3aGVuIGRlYnVnZ2luZy4pCgpTbyBpZiB5b3UgcHV0IGEgYnJlYWtwb2ludCBvbiBk
+ZWNvZGVfb3BjIHlvdSdsbCBzZWUgaXQgaXMgaGl0CmZvciBldmVyeSBpbnN0cnVjdGlvbiBp
+biB0aGUgVEIsIHdoaWNoIGZvciB0aGUgVEIgc3RhcnRpbmcgYXQKIjAwNDAwMDkwIDxtYWlu
+PiIgd2lsbCBiZSBldmVyeSBpbnN0cnVjdGlvbiB1cCB0byBhbmQgaW5jbHVkaW5nCnRoZSAn
+bm9wJyBpbiB0aGUgZGVsYXkgc2xvdCBvZiB0aGUgJ2pyJy4gT25jZSB0aGUgd2hvbGUgVEIg
+aXMKdHJhbnNsYXRlZCwgKnRoZW4qIHdlIHdpbGwgZXhlY3V0ZSBpdC4gSXQncyBvbmx5IGF0
+IGV4ZWN1dGUgdGltZQp0aGF0IHdlIHBlcmZvcm0gdGhlIGFjdHVhbCBvcGVyYXRpb25zIG9u
+IHRoZSBndWVzdCBDUFUgdGhhdAp0aGUgaW5zdHJ1Y3Rpb25zIHJlcXVpcmUuIElmIHRoZSBz
+ZWdmYXVsdCBpcyBiZWNhdXNlIHdlIHRoaW5rCnRoZSBndWVzdCBoYXMgbWFkZSBhIGJhZCBt
+ZW1vcnkgYWNjZXNzLCB3ZSdsbCBnZW5lcmF0ZSBpdCBoZXJlLgpJZiB0aGUgc2VnZmF1bHQg
+aXMgYW4gYWN0dWFsIGNyYXNoIGluIFFFTVUgaXRzZWxmLCBpdCB3aWxsCmhhcHBlbiBoZXJl
+IGlmIHRoZSBidWcgaXMgb25lIHRoYXQgaGFwcGVucyBhdCBleGVjdXRpb24gdGltZS4KCk5v
+dGUgdGhhdCB0aGUgLWQgbG9nZ2luZyB3aWxsIGRpc3Rpbmd1aXNoIGJldHdlZW4gdGhpbmdz
+IHRoYXQKaGFwcGVuIGF0IHRyYW5zbGF0ZSB0aW1lICh3aGljaCBpcyB3aGVuIHRoZSBpbl9h
+c20sIG9wLCBvdXRfYXNtIGV0Ywpsb2dnaW5nIGlzIHByaW50ZWQpIGFuZCB0aGluZ3MgdGhh
+dCBoYXBwZW4gYXQgZXhlY3V0aW9uIHRpbWUKKHdoaWNoIGlzIHdoZW4gY3B1LCBleGVjLCBp
+bnQsIGV0YyBsb2dzIGFyZSBwcmludGVkKS4KCnRoYW5rcwotLSBQTU0=
 
 
