@@ -2,60 +2,93 @@ Return-Path: <SRS0=2u83=X7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A160AC10F14
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 20:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D08BDC4360C
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 22:03:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 766A92080F
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 20:34:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 766A92080F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 923202080F
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 22:03:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="CQH24xo/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 923202080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=digitalocean.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHDEy-00063y-Le
-	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 16:34:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35730)
+	id 1iHEca-00018X-Nb
+	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 18:03:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43744)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iHDCM-0004TM-5I
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 16:32:11 -0400
+ (envelope-from <msmarduch@digitalocean.com>) id 1iHEb4-0000Sg-NR
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 18:01:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iHDCK-0007aP-Th
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 16:32:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52224)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iHDCG-0007XO-WB; Sun, 06 Oct 2019 16:32:05 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AA52A18C8916;
- Sun,  6 Oct 2019 20:31:58 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-120-66.rdu2.redhat.com [10.10.120.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ABACA19C6A;
- Sun,  6 Oct 2019 20:31:57 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/1] IDE: deprecate ide-drive
-Date: Sun,  6 Oct 2019 16:31:50 -0400
-Message-Id: <20191006203150.13054-2-jsnow@redhat.com>
-In-Reply-To: <20191006203150.13054-1-jsnow@redhat.com>
-References: <20191006203150.13054-1-jsnow@redhat.com>
+ (envelope-from <msmarduch@digitalocean.com>) id 1iHEb1-00080b-EK
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 18:01:45 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33405)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <msmarduch@digitalocean.com>)
+ id 1iHEb0-0007zd-85
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 18:01:43 -0400
+Received: by mail-ot1-x343.google.com with SMTP id 60so9445676otu.0
+ for <qemu-devel@nongnu.org>; Sun, 06 Oct 2019 15:01:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=digitalocean.com; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9DFR8yC2x/5u/5qAWy8C41+BwugyFIuapuCKaLIFcSY=;
+ b=CQH24xo/dEdJvX6QxaIQ1ZXB482Q//hKKufBtwTAC81oFBmQfx54Ym1xpeMrMSVEOc
+ ZWP2OE4RGc7CLZ++NsXGRC2oReDrnapBbQEJzLC2MGYoRxy2JDu+bdKkUb8oGJTjudxA
+ MSOhLzhmVEtszK3RfsMdIW9Wbj37oElTZcW5g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9DFR8yC2x/5u/5qAWy8C41+BwugyFIuapuCKaLIFcSY=;
+ b=lM3RAowiAeg70KJT8na/NCSq6dctg50BtOQ5uUk8hT5qRe32rd3K0O/fc4f3/QNWGH
+ bFkomYRi7lGubCblxwbcAPPhMYOdXDz/bakxXGPYpBX1EJ19hXCSIgsGxgYhvKeHaFE1
+ cVzv87JowJAs1Hy2xnjCDi5Jf/3zyqtPOODTb1JXqtTP1MEQTiMeF+jyTlrPLzBQjXDs
+ uUOxtl2gkuw1vFI/pWjkh7FidhXicCdxm3QE813kTv8gbBUH+QHfsdiPas0xNBPxx/R1
+ suIqK1Zm+mICUCdLAs9j3s5w8TOkqQ9eBCtIZ73UITY89OXH6Py737ILOreNUmmdoqtC
+ IRbQ==
+X-Gm-Message-State: APjAAAXmvqUoYQdfZfZ6pGWwPyudTQDb2BRBIe9Kfyz9+GCN5Q0aP49U
+ /k648a4bBqGtAUw/Hg4FJuB1QQ==
+X-Google-Smtp-Source: APXvYqw19IkA27esOslvO0Wla1T1BepeOZ0b6ca9J6ipzCRIyCsCmB8hL7bG3dXPxoIEtcpXTmNWSw==
+X-Received: by 2002:a05:6830:1292:: with SMTP id
+ z18mr19510887otp.7.1570399299419; 
+ Sun, 06 Oct 2019 15:01:39 -0700 (PDT)
+Received: from ?IPv6:2600:1700:4a30:84c0:a5c5:faec:38bb:f557?
+ ([2600:1700:4a30:84c0:a5c5:faec:38bb:f557])
+ by smtp.gmail.com with ESMTPSA id a88sm4065197otb.0.2019.10.06.15.01.37
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 06 Oct 2019 15:01:38 -0700 (PDT)
+Subject: Re: [PATCH] target/i386: log guest name and memory error type AO, AR
+ for MCEs
+To: Paolo Bonzini <pbonzini@redhat.com>, mtosatti@redhat.com, armbru@redhat.com
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com,
+ qemu-trivial@nongnu.org
+References: <ceb4d639-842a-30bd-5d54-bfacb07b5cc4@digitalocean.com>
+ <c78d014f-20f4-d25f-e50a-92c960200d7e@redhat.com>
+From: Mario Smarduch <msmarduch@digitalocean.com>
+Message-ID: <5032a0a0-afff-a7e6-1adc-996dbe4cf086@digitalocean.com>
+Date: Sun, 6 Oct 2019 15:01:36 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Sun, 06 Oct 2019 20:31:58 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+In-Reply-To: <c78d014f-20f4-d25f-e50a-92c960200d7e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,92 +100,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's an old compatibility shim that just delegates to ide-cd or ide-hd.
-I'd like to refactor these some day, and getting rid of the super-object
-will make that easier.
 
-Either way, we don't need this.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- qemu-deprecated.texi          | 5 +++++
- hw/ide/qdev.c                 | 3 +++
- tests/qemu-iotests/051.pc.out | 6 ++++--
- 3 files changed, 12 insertions(+), 2 deletions(-)
+On 10/06/2019 09:11 AM, Paolo Bonzini wrote:
+> On 05/10/19 01:53, Mario Smarduch wrote:
+>> Guest [Droplet-12345678] 2019-08-02T05:00:11.940270Z qemu-system-x86_64:
+>> Guest MCE Memory Error at qemu addr 0x7f3c7622f000 and guest 78e42f000
+>> addr of type BUS_MCEERR_AR injected
+>>
+>> with enterprise logging environment we can to take further actions.
+>>
+>> Signed-off-by: Mario Smarduch <msmarduch@digitalocean.com>
+> 
+> The guest name part should be a separate patch, controlled by "-msg
+> name=on" or something like that.  The MCE parts look good okay.  Can you
+> split the patch in two?
+> 
+> Paolo
+> 
+Yes will do.
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 01245e0b1c4..f802d83983e 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -247,6 +247,11 @@ quite a bit. It will be removed without replacement =
-unless some users speaks
- up at the @email{qemu-devel@@nongnu.org} mailing list with information a=
-bout
- their usecases.
-=20
-+@subsection ide-drive (since 4.2)
-+
-+The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
-+'ide-cd' as appropriate to get an IDE hard disk or CDROM as needed.
-+
- @section System emulator machines
-=20
- @subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index 6fba6b62b87..9ecee4da074 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -279,6 +279,9 @@ static void ide_drive_realize(IDEDevice *dev, Error *=
-*errp)
- {
-     DriveInfo *dinfo =3D NULL;
-=20
-+    warn_report("The 'ide-drive' device is deprecated. "
-+                "Use 'ide-hd' or 'ide-cd' instead");
-+
-     if (dev->conf.blk) {
-         dinfo =3D blk_legacy_dinfo(dev->conf.blk);
-     }
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.ou=
-t
-index 000557c7c83..93b9a1f82ca 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -158,7 +158,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
-=20
- Testing: -drive if=3Dnone,id=3Ddisk -device ide-drive,drive=3Ddisk
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -device ide-drive,drive=3Ddisk: Device needs media, bu=
-t drive is empty
-+(qemu) QEMU_PROG: -device ide-drive,drive=3Ddisk: warning: The 'ide-driv=
-e' device is deprecated. Use 'ide-hd' or 'ide-cd' instead
-+QEMU_PROG: -device ide-drive,drive=3Ddisk: Device needs media, but drive=
- is empty
-=20
- Testing: -drive if=3Dnone,id=3Ddisk -device ide-hd,drive=3Ddisk
- QEMU X.Y.Z monitor - type 'help' for more information
-@@ -228,7 +229,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
-=20
- Testing: -drive file=3DTEST_DIR/t.qcow2,if=3Dnone,id=3Ddisk,readonly=3Do=
-n -device ide-drive,drive=3Ddisk
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -device ide-drive,drive=3Ddisk: Block node is read-onl=
-y
-+(qemu) QEMU_PROG: -device ide-drive,drive=3Ddisk: warning: The 'ide-driv=
-e' device is deprecated. Use 'ide-hd' or 'ide-cd' instead
-+QEMU_PROG: -device ide-drive,drive=3Ddisk: Block node is read-only
-=20
- Testing: -drive file=3DTEST_DIR/t.qcow2,if=3Dnone,id=3Ddisk,readonly=3Do=
-n -device ide-hd,drive=3Ddisk
- QEMU X.Y.Z monitor - type 'help' for more information
---=20
-2.21.0
-
+thanks.
 
