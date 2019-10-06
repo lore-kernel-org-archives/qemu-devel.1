@@ -2,81 +2,82 @@ Return-Path: <SRS0=2u83=X7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE9AC4360C
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 16:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66858C4360C
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 16:13:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1C7E20835
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 16:07:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C7E20835
+	by mail.kernel.org (Postfix) with ESMTPS id 3D60120835
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 16:13:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D60120835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iH94a-0001ba-Rh
-	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 12:07:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57114)
+	id 1iH99e-0003LK-DD
+	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 12:13:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iH93g-0000qV-UT
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:06:57 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iH98V-0002Yw-9D
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:11:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iH93f-0004Kk-RM
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:06:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38986)
+ (envelope-from <pbonzini@redhat.com>) id 1iH98U-0006wc-2y
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:11:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47432)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iH93f-0004K7-Lg
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:06:55 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iH98T-0006wG-To
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 12:11:54 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8031B368CF
- for <qemu-devel@nongnu.org>; Sun,  6 Oct 2019 16:06:54 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id w2so5811977wrn.4
- for <qemu-devel@nongnu.org>; Sun, 06 Oct 2019 09:06:54 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id D47A883F45
+ for <qemu-devel@nongnu.org>; Sun,  6 Oct 2019 16:11:52 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id k67so2284088wmf.3
+ for <qemu-devel@nongnu.org>; Sun, 06 Oct 2019 09:11:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=oKS4PwtC/FKhU5W3hAhSP7Bqng+IBYveqm80kdVRSfE=;
- b=nU2i5XzOaRhY2YLHnArSLjjKo2SIX+7lnz2ZkDmoyYKcnQjjMQuYOrD+xQSTAGSzFZ
- +4ihesRTF4CX3fnbh0q4ZqO+D2oVdDjAJRFaCHKJX0ErsiWRdnEmSg9uJQVgYa0lugjJ
- ZAS1bFX3qcep/gx8RrmOwLI18fdIsfLN/MeN39q/WDkGUlyvYWlPVBpZM/wEEILlu+rZ
- lGj8qcjiprNIpFrlNDamhOL83KoFGM1zigjmdW3sETW2Pr9mNAmnGy3U2WDbyBwTu6wF
- SyE9C/hgs2ivDdrdPTnCo0qpGLaVGyEt1pWofx9d8jbyfosQ2fnglFBu1xE1MXin4neq
- jEsw==
-X-Gm-Message-State: APjAAAU2UacpRIyV71miJqESrqP4FXUjsBaeKv8VinbawguWyS7HDkTe
- g3zOJrL+VR1mCbzBInFmOaY3qpGYezbmEf+5Inhh+unskWqVK3PgyyTGBPqI5sVI6OtbUXuJWKJ
- uPVo9v/+dEvHGVgA=
-X-Received: by 2002:a7b:c403:: with SMTP id k3mr18341814wmi.89.1570378013216; 
- Sun, 06 Oct 2019 09:06:53 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyyepQlMErKxTd68T0eCrSFOmRIvPIo6GG7eeMbgrARFk4KwCC9HK162I7YOjiPd387vpFbFg==
-X-Received: by 2002:a7b:c403:: with SMTP id k3mr18341800wmi.89.1570378012956; 
- Sun, 06 Oct 2019 09:06:52 -0700 (PDT)
+ bh=T4rtIVyNbX3AmeHViU22cZEfjzHvDZfc22fjcoeRsak=;
+ b=Hl5W0JsRJyKgsg2acL1szo24s4IHSFIaZZb8tMYM6U3QZv8F5AEHdRoH8YGT1kyQbw
+ /AurPEmZKQV80j5DU2epECs03eW7rf+KLbU26qNgR1AOTspBDcU5l5bGioiXNJtBd+7p
+ Op2aQOolhFyPsVUzbTTbgEvRs4/t/TgFvA2HX9BC+AEqP/oI032kE5llm6SvN38NpYpd
+ xTWUqzPkhCPplgv7FBAD5XIp8PpBjNKAT7BiBw5uKx9QZhyIdajF+qFXsll7GahTPS2G
+ QhgRkIqUmMgry0rodXWED89zFF2WPIsfeRjLoaQifGI4ALMNkP6Tz0YZFkD5kJ6u1gvb
+ o5Jw==
+X-Gm-Message-State: APjAAAVRdBm1BYGbf3qfvsEj7vYupRFzgd6tn0CjauVGarN+kHoj7zXe
+ L2tp2XqurQSMKscRNncT14mb2xILNoIfpDqRXUJ/uR5E3YFrCYDQJ7hfkcVuB3sEJkMT/7LIf0u
+ 9V+ZdyXAHxsh8JvY=
+X-Received: by 2002:adf:eb8d:: with SMTP id t13mr17867295wrn.53.1570378311416; 
+ Sun, 06 Oct 2019 09:11:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqz+jgBd0V+FfwXx3881WMWzXWPrCQYrF9njBD8483tXNBXQwwPszcV8F+8drh9J1ZfR1ivyug==
+X-Received: by 2002:adf:eb8d:: with SMTP id t13mr17867278wrn.53.1570378311168; 
+ Sun, 06 Oct 2019 09:11:51 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:e876:e214:dc8e:2846?
  ([2001:b07:6468:f312:e876:e214:dc8e:2846])
- by smtp.gmail.com with ESMTPSA id y3sm26943510wmg.2.2019.10.06.09.06.52
+ by smtp.gmail.com with ESMTPSA id a71sm11000251wme.11.2019.10.06.09.11.50
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 06 Oct 2019 09:06:52 -0700 (PDT)
-Subject: Re: [PATCH] tests/docker: only enable ubsan for test-clang
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <1569939264-12539-1-git-send-email-pbonzini@redhat.com>
- <7a5238e3-cbbf-da16-eb58-e5474c6245e8@redhat.com>
+ Sun, 06 Oct 2019 09:11:50 -0700 (PDT)
+Subject: Re: [PATCH] target/i386: log guest name and memory error type AO, AR
+ for MCEs
+To: Mario Smarduch <msmarduch@digitalocean.com>, mtosatti@redhat.com,
+ armbru@redhat.com
+References: <ceb4d639-842a-30bd-5d54-bfacb07b5cc4@digitalocean.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <bb885f16-bfb6-088e-2066-65364b533b61@redhat.com>
-Date: Sun, 6 Oct 2019 18:06:55 +0200
+Message-ID: <c78d014f-20f4-d25f-e50a-92c960200d7e@redhat.com>
+Date: Sun, 6 Oct 2019 18:11:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <7a5238e3-cbbf-da16-eb58-e5474c6245e8@redhat.com>
+In-Reply-To: <ceb4d639-842a-30bd-5d54-bfacb07b5cc4@digitalocean.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -94,27 +95,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, ehabkost@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/10/19 19:59, John Snow wrote:
+On 05/10/19 01:53, Mario Smarduch wrote:
+> Guest [Droplet-12345678] 2019-08-02T05:00:11.940270Z qemu-system-x86_64:
+> Guest MCE Memory Error at qemu addr 0x7f3c7622f000 and guest 78e42f000
+> addr of type BUS_MCEERR_AR injected
 > 
-> it looked quite like --enable-sanitizers was indeed the same as
-> -fsanitize=undefined; or at least was a superset of such.
+> with enterprise logging environment we can to take further actions.
 > 
-> I suppose the argument you're making here is that we *only* want ubsan
-> for test-clang?
-> 
-> (I guess so, since test-debug also stipulates that clang be used; but
-> enables debug.)
-> 
-> In this case, is there a use for test-clang at all, actually?
+> Signed-off-by: Mario Smarduch <msmarduch@digitalocean.com>
 
-Yes, test-clang checks that clang-specific warnings do not fire.
-Enabling ubsan isn't particularly useful in this respect, but it's okay
-for me to keep it.
+The guest name part should be a separate patch, controlled by "-msg
+name=on" or something like that.  The MCE parts look good okay.  Can you
+split the patch in two?
 
 Paolo
 
