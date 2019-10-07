@@ -2,79 +2,90 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC3BC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F421AECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:55:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76B2720679
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:54:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aaTWjo0y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76B2720679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CA30F21721
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:55:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA30F21721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHVKy-0007h9-AE
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:54:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49642)
+	id 1iHVLw-0000q9-MF
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:55:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iHV16-0006UN-Fo
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:33:46 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iHVFn-0001sU-F0
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iHV14-0006t3-44
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:33:44 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:43057)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iHV13-0006sg-UI
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:33:42 -0400
-Received: by mail-oi1-x236.google.com with SMTP id t84so12005773oih.10
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 08:33:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=z8FexeoxTTHKVSERg5hYydl14PJV/sYXDObhnDThLfc=;
- b=aaTWjo0yjkNpLdNyOFtw1zVNmswEJkBOz0yXZ+63EZrLsZ3VS2A2AYmTjdsicrdDFa
- t2WK5Vphhx96qB/tNhBIQsCi58Vx8pTVlnBpmBtT1k1kA842ezShEloW7tFWXiqLi1m6
- h4zOraOVsbfPbtXDevUlGxcUoS6gfhbGVM0tNiJM13GHYFJ5K4w+U6V8GGAbQ662c3AG
- gk9yisfrwlI9BVDBWTZuY6JbgCadWy/xIe36KNH/b8k/Kr5zqjS9RM6QTvX9RSUfPtOn
- LKs0Vo5IRosDgjXxV4T+iVmiA3rZPxnylYCCR5hM0bbDJDpHtimX0bTG/UkpqkYBSKWv
- wMNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=z8FexeoxTTHKVSERg5hYydl14PJV/sYXDObhnDThLfc=;
- b=ntNyYBnfRTYcqTrhDk9AKCPLYFAd1b3OjtiVaNHZffcEDgCadkPeOn4Pn1FxlJHZI6
- 4+VAa5MwcvZbXKmhhtjQih1HCn6Ty3QjW6knOAUQ+KeX2Io7nzopQ1syrNJwoj/Rzszn
- x3yyJhlrsqnQ6BOsLf4rp8YqBwIN8mrINmNSfKFAGRtB/J2UMX7wDGgtTze6XRTOSvWd
- XdOVylc1CdDxaVcl5x2++oc50zupar9LtJQJLI4fNh2v0tLE6EE+TolGs3Vh2OfFswl7
- 6CoOk36O6fTzAElJ/zHWAVJyS0HckTqrAv6goVvQKY5EPauWECEjZu+0M5Q43EUo3ilF
- gZuQ==
-X-Gm-Message-State: APjAAAXPWeekNRZEpGH/BzTgifZUc5/Fp+eu0tkYDgRvKaHVOuPqOLX+
- fFuTMHdoLZxqQHY5y6rfoltaVN/kpcTg6p8a7ESnUQ==
-X-Google-Smtp-Source: APXvYqyB0UUQb8jFO/dTvsspIXZLP/IWGbAR/PgznW3FH9uRJZO207nx5/ctAnW+O2XafbuQl5hlHwsfz36Q28bmWr8=
-X-Received: by 2002:aca:f54d:: with SMTP id t74mr19282692oih.170.1570462419974; 
- Mon, 07 Oct 2019 08:33:39 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1iHVFm-00062f-7B
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:48:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43690)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iHVFj-0005yn-I0; Mon, 07 Oct 2019 11:48:51 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BFCECC049E1A;
+ Mon,  7 Oct 2019 15:48:50 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.196])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E65085D9CC;
+ Mon,  7 Oct 2019 15:48:46 +0000 (UTC)
+Subject: Re: [PATCH 6/6] block/block-copy: increase buffered copy request
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191003171539.12327-1-vsementsov@virtuozzo.com>
+ <20191003171539.12327-7-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <441fc41e-0432-978a-9568-60b651cbf25b@redhat.com>
+Date: Mon, 7 Oct 2019 17:48:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20191004095959.22891-1-kwolf@redhat.com>
-In-Reply-To: <20191004095959.22891-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Oct 2019 16:33:29 +0100
-Message-ID: <CAFEAcA-pr2NV=U_jAj3-MxGZ5Drk+Exk2ADWu5keMDvm=_akCg@mail.gmail.com>
-Subject: Re: [PULL v3 0/4] Block layer patches
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::236
+In-Reply-To: <20191003171539.12327-7-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="IGDOpKAG81JZzKypHCpbzYUQdGTZ3XlOG"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 07 Oct 2019 15:48:50 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,37 +97,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 4 Oct 2019 at 11:00, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit 4f59102571fce49af180cfc6d4cdd2b5df7bdb14:
->
->   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-oct-01-2019' into staging (2019-10-01 16:21:42 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 7e693a0500455edab21754573c32b7146138cffd:
->
->   iotests: Remove Python 2 compatibility code (2019-10-04 11:59:16 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - Fix internal snapshots with typical -blockdev setups
-> - iotests: Require Python 3.6 or later
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IGDOpKAG81JZzKypHCpbzYUQdGTZ3XlOG
+Content-Type: multipart/mixed; boundary="EkYls8C4E5UJ9XdzSyWfhDu9gMoKZXn5v"
+
+--EkYls8C4E5UJ9XdzSyWfhDu9gMoKZXn5v
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 03.10.19 19:15, Vladimir Sementsov-Ogievskiy wrote:
+> No reason to limit buffered copy to one cluster. Let's allow up to 1
+> MiB.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/block-copy.h |  2 +-
+>  block/block-copy.c         | 44 +++++++++++++++++++++++++++-----------=
+
+>  2 files changed, 32 insertions(+), 14 deletions(-)
 
 
-Applied, thanks.
+Er, oops, looks like I was a bit quick there...
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+> @@ -100,17 +101,28 @@ BlockCopyState *block_copy_state_new(BdrvChild *s=
+ource, BdrvChild *target,
+>          .mem =3D qemu_co_shared_amount_new(BLOCK_COPY_MAX_MEM),
+>      };
+> =20
+> -    s->copy_range_size =3D QEMU_ALIGN_DOWN(max_transfer, cluster_size)=
+,
+> -    /*
+> -     * Set use_copy_range, consider the following:
+> -     * 1. Compression is not supported for copy_range.
+> -     * 2. copy_range does not respect max_transfer (it's a TODO), so w=
+e factor
+> -     *    that in here. If max_transfer is smaller than the job->clust=
+er_size,
+> -     *    we do not use copy_range (in that case it's zero after align=
+ing down
+> -     *    above).
+> -     */
+> -    s->use_copy_range =3D
+> -        !(write_flags & BDRV_REQ_WRITE_COMPRESSED) && s->copy_range_si=
+ze > 0;
+> +    if (max_transfer < cluster_size) {
+> +        /*
+> +         * copy_range does not respect max_transfer. We don't want to =
+bother
+> +         * with requests smaller than block-copy cluster size, so fall=
+back to
+> +         * buffered copying (read and write respect max_transfer on th=
+eir
+> +         * behalf).
+> +         */
+> +        s->use_copy_range =3D false;
+> +        s->copy_size =3D cluster_size;
+> +    } else if (write_flags & BDRV_REQ_WRITE_COMPRESSED) {
+> +        /* Compression is not supported for copy_range */
+> +        s->use_copy_range =3D false;
+> +        s->copy_size =3D MAX(cluster_size, BLOCK_COPY_MAX_BUFFER);
+> +    } else {
+> +        /*
+> +         * copy_range does not respect max_transfer (it's a TODO), so =
+we factor
+> +         * that in here.
+> +         */
+> +        s->use_copy_range =3D true;
+> +        s->copy_size =3D MIN(MAX(cluster_size, BLOCK_COPY_MAX_COPY_RAN=
+GE),
 
--- PMM
+This is already part of max_transfer, isn=E2=80=99t it?
+
+(That doesn=E2=80=99t make it wrong, but I think max_transfer will always=
+ be
+less than or equal to MAX(cluster_size, BLOCK_COPY_MAX_COPY_RANGE) anyway=
+=2E)
+
+Max
+
+> +                           QEMU_ALIGN_DOWN(max_transfer, cluster_size)=
+);
+
+
+--EkYls8C4E5UJ9XdzSyWfhDu9gMoKZXn5v--
+
+--IGDOpKAG81JZzKypHCpbzYUQdGTZ3XlOG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2bXl0ACgkQ9AfbAGHV
+z0Cccgf/fVCWEiGWvL3pIu4g/BTz8scnhzB9u+G0BL+ugdi741jc0UE/RcCPPM3V
+lS4U5+cTiYPfEKAwByzFOtIUyo2fvcvvq2u4pxT7otOFk1b/RuRrLTqa4s0BJXxP
+qqW0SMvR5cC21BgQY4H5Z9pXXqQ8+91loTxIjnkkPEw0Eg1e8xf/ANSRhpfP5TGi
+wsHCX38ngZycyzFsW2SNWNrFewHoUJnQnTIGT5J4s6cDvkyDwpNtZwhHxsm2yQn0
+lZIuQKFXdz2DGicPThqmWxeZBUejKkBsVjQDHpg5KOjh7yBwB54PCFzte0VI+PBr
+fmtYcHNcmpA5BzJxWxaM/xjd2BUM0g==
+=ozrR
+-----END PGP SIGNATURE-----
+
+--IGDOpKAG81JZzKypHCpbzYUQdGTZ3XlOG--
 
