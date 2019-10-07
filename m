@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C606ECE58D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73509C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:52:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4461B206C2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:52:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4461B206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=marvell.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38EB621721
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:52:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38EB621721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHUN4-0000cn-Be
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 10:52:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42896)
+	id 1iHUNF-0000qR-8t
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 10:52:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42908)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iHUM8-0008Hq-Qf
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:51:26 -0400
+ (envelope-from <bounces@canonical.com>) id 1iHUME-0008MC-OO
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iHUM7-0002W6-9D
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:51:24 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50000)
+ (envelope-from <bounces@canonical.com>) id 1iHUMC-0002Yl-Oz
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:51:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50178)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iHUM7-0002Vc-3Y
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:51:23 -0400
+ id 1iHUMC-0002YW-JF
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:51:28 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iHUM5-0001Dy-Jg
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 14:51:21 +0000
+ id 1iHUMB-0001K1-Dk
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 14:51:27 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 92E142E807B
- for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 14:51:21 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6462C2E807C
+ for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 14:51:27 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 Oct 2019 14:36:38 -0000
-From: Jan Glauber <jglauber@marvell.com>
+Date: Mon, 07 Oct 2019 14:44:32 -0000
+From: dann frazier <dann.frazier@canonical.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=kunpeng920; status=New; importance=Undecided;
@@ -69,9 +69,9 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: dannf jan-glauber-i jnsnow lizhengui rafaeldtinoco
 X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: Jan Glauber (jan-glauber-i)
+X-Launchpad-Bug-Modifier: dann frazier (dannf)
 References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <20191007143629.GA23062@hc>
+Message-Id: <20191007144432.GA29958@xps13.dannf>
 Subject: [Bug 1805256] Re: [Qemu-devel] qemu_futex_wait() lockups in ARM64: 2
  possible issues
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -80,7 +80,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="af2eefe214bd95389a09b7c956720881bab16807";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 71338b9d9cc3c8fea6af4c9af4049de1b88b143a
+X-Launchpad-Hash: 0966b5338673ecce5602cfb5e9023de1f17d8a51
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -98,7 +98,7 @@ Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20191007143638.Uoc9NbIJ1xf_suJ0KoSXkyBGHHmRS_crZt4PSDpwacU@z>
+Message-ID: <20191007144432.ekLCGcfeuyOFGSJ7zL1ECida8hF6wIbF9XH7zambxd0@z>
 
 On Mon, Oct 07, 2019 at 01:06:20PM +0200, Paolo Bonzini wrote:
 > On 02/10/19 11:23, Jan Glauber wrote:
@@ -181,7 +181,67 @@ or
 
 > Would you be able to test these (one by one possibly)?
 
-Sure.
+Paolo,
+  I tried them both separately and together on a Hi1620 system, each
+time it hung in the first iteration. Here's a backtrace of a run with
+both patches applied:
+
+(gdb) thread apply all bt
+
+Thread 3 (Thread 0xffff8154b820 (LWP 63900)):
+#0  0x0000ffff8b9402cc in __GI___sigtimedwait (set=3D<optimized out>, set@e=
+ntry=3D0xaaaaf1e08070, =
+
+    info=3Dinfo@entry=3D0xffff8154ad98, timeout=3Dtimeout@entry=3D0x0) at .=
+./sysdeps/unix/sysv/linux/sigtimedwait.c:42
+#1  0x0000ffff8ba77fac in __sigwait (set=3Dset@entry=3D0xaaaaf1e08070, sig=
+=3Dsig@entry=3D0xffff8154ae74)
+    at ../sysdeps/unix/sysv/linux/sigwait.c:28
+#2  0x0000aaaab7dc1610 in sigwait_compat (opaque=3D0xaaaaf1e08070) at util/=
+compatfd.c:35
+#3  0x0000aaaab7dc3e80 in qemu_thread_start (args=3D<optimized out>) at uti=
+l/qemu-thread-posix.c:519
+#4  0x0000ffff8ba6d088 in start_thread (arg=3D0xffffceefbf4f) at pthread_cr=
+eate.c:463
+#5  0x0000ffff8b9dd4ec in thread_start () at ../sysdeps/unix/sysv/linux/aar=
+ch64/clone.S:78
+
+Thread 2 (Thread 0xffff81d4c820 (LWP 63899)):
+#0  syscall () at ../sysdeps/unix/sysv/linux/aarch64/syscall.S:38
+#1  0x0000aaaab7dc4cd8 in qemu_futex_wait (val=3D<optimized out>, f=3D<opti=
+mized out>)
+    at /home/ubuntu/qemu/include/qemu/futex.h:29
+#2  qemu_event_wait (ev=3Dev@entry=3D0xaaaab7e48708 <rcu_call_ready_event>)=
+ at util/qemu-thread-posix.c:459
+#3  0x0000aaaab7ddf44c in call_rcu_thread (opaque=3D<optimized out>) at uti=
+l/rcu.c:260
+#4  0x0000aaaab7dc3e80 in qemu_thread_start (args=3D<optimized out>) at uti=
+l/qemu-thread-posix.c:519
+#5  0x0000ffff8ba6d088 in start_thread (arg=3D0xffffceefc05f) at pthread_cr=
+eate.c:463
+#6  0x0000ffff8b9dd4ec in thread_start () at ../sysdeps/unix/sysv/linux/aar=
+ch64/clone.S:78
+
+Thread 1 (Thread 0xffff81e83010 (LWP 63898)):
+#0  0x0000ffff8b9d4154 in __GI_ppoll (fds=3D0xaaaaf1e0dbc0, nfds=3D18765020=
+5809964, timeout=3D<optimized out>, =
+
+    timeout@entry=3D0x0, sigmask=3D0xffffceefbef0) at ../sysdeps/unix/sysv/=
+linux/ppoll.c:39
+#1  0x0000aaaab7dbedb0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<opt=
+imized out>, __fds=3D<optimized out>)
+    at /usr/include/aarch64-linux-gnu/bits/poll2.h:77
+#2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=3D=
+timeout@entry=3D-1) at util/qemu-timer.c:340
+#3  0x0000aaaab7dbfd2c in os_host_main_loop_wait (timeout=3D-1) at util/mai=
+n-loop.c:236
+#4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:517
+#5  0x0000aaaab7ce86e8 in convert_do_copy (s=3D0xffffceefc068) at qemu-img.=
+c:2028
+#6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-im=
+g.c:2520
+#7  0x0000aaaab7ce1e54 in main (argc=3D8, argv=3D<optimized out>) at qemu-i=
+mg.c:5097
 
 > > I've tried to verify me theory with this patch and didn't run into the
 > > issue for ~500 iterations (usually I would trigger the issue ~20 iterat=
@@ -190,15 +250,12 @@ ions).
 
 > Sorry for asking the obvious---500 iterations of what?
 
-The testcase mentioned in the Canonical issue:
-https://bugs.launchpad.net/qemu/+bug/1805256
+$ for i in $(seq 1 500); do echo "=3D=3D$i=3D=3D"; ./qemu/qemu-img convert =
+-p -f qcow2 -O qcow2 bionic-server-cloudimg-arm64.img out.img; done
+=3D=3D1=3D=3D
+    (37.19/100%)
 
-It's a simple image convert:
-qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-Usually it got stuck after 3-20 iterations.
-
---Jan
+  -dann
 
 -- =
 
