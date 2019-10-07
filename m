@@ -7,89 +7,88 @@ X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A02ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F25EC47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:10:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADCC921871
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44784206C2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:10:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g6vfBbcJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADCC921871
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oM6bIJ2U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44784206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHTfh-0001Q2-Sb
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 10:07:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37318)
+	id 1iHTig-0002hs-BK
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 10:10:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iHTei-0000fM-9S
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:06:37 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iHThv-000259-22
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:09:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iHTeh-0001Qw-3m
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:06:32 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:35807)
+ (envelope-from <richard.henderson@linaro.org>) id 1iHTht-0002SK-UN
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:09:50 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:37007)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iHTeg-0001Pa-Sn
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:06:31 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id f4so4706846ybm.2
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 07:06:30 -0700 (PDT)
+ id 1iHTht-0002S0-Qk
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:09:49 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id z125so4708894ybc.4
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 07:09:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=53CnW+BOwoF1SDSWxo0eJusDqToFk5LjiZOAa/Of/tY=;
- b=g6vfBbcJXQZOozLQsHpIZYwJQdE1FCOfXcVr9Lqa0aZqPYPiR2BMYsP+uhWw5I7Y5B
- ngcQa/4ZC8p9GzvShVYEcSIHsBMqxnNIIX0QMQI/RrrrTwDgwHZ7nViTqJGbslc7MEoc
- FepOvc4SUeD2GxKqHnlAd96Lw1k4lrSBjtPRykbexFifoVP5T4eRPCntf0Glg3j7xUHI
- 45KIk3fUErehvwGMpR0fyPxY8w/2AJLUEsmxCqLsu/1ubJ9x88Q68Lj0CwVnpRXiyH9a
- Fv4lIcys0KWYYJBv/roglhJo2T0I3bCoiXiQX5kbea1myWyj0XU0r5GrBoR9F84eY+w4
- 5Gbg==
+ bh=Ddr5Al70vUzB+KYP1WXeVhBnDvU6Y6cu1I5Fz4+jeO4=;
+ b=oM6bIJ2UgOzWJs1+zyNl1Rla6fsu8Nwc4ZKuWQIXqWkz2JFgTyOvtgqwINrit0nOZT
+ daAGzY2SCHCJT31exGWNarEnAYKRMxk0UumDL7l3sJXDUC7Ifg7+P4/cjHsQtbnXMXvH
+ 8VguJ1JcXExl5jHaKRCMxrvDYkLynshwDgakZRPAjZrQGxEDah/3K9j+A/UStDm4/Gtd
+ 0D9AYB4SaNk6bS6tZIEoSH8K5Qyt7tKxuQuoO/sdAXtdSsRRZdToBNFQhDQ8Mlp9AExQ
+ sAJIwKoqh/9a0olcZXCmfbVAt4fd9vZ33CnALj6uKGvBccwi//LoPW48OJoLRAVaCCkr
+ czxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=53CnW+BOwoF1SDSWxo0eJusDqToFk5LjiZOAa/Of/tY=;
- b=O/QdFan4ROJ4pUAdKmtzUMKXQKE3Ch2lLaugjqFbZAl14DZZiOOlLmS+B995mr2puL
- +wy+FLU14qIreniMVWuvno+mD9yWp32q4wpwh9MC6UhYV/OhCm/8zpbxyI8cz7fOknRG
- 0upUQV/jV7ww/FLxs17vq/K3UCTz5jCPeeBg8S9K4t3qffKUzGJCI52dEJ4OXQfa4Ke/
- vgcxORNw7NdxUe/+Y9ZLtwu/uVuWgWcXcDoQdTc9K4R1qqFdNu300o1weeBchFUG0Bjr
- pCS1TRLXl8wZZOnVnNSDGxBy371B7iDSDzNeHun13+EsABgDhujxn6jylnejTJxMgz6h
- FN0Q==
-X-Gm-Message-State: APjAAAXEKCOEvhCge5Ut2MXFxvG3hVB8aUhzC3yVnTAwlQAuDxPSCNeN
- kKNsv30hMysOS6SrLSv5w7jLbg==
-X-Google-Smtp-Source: APXvYqwvcvpdSBcm8ndI14T4NunkgBPyQx/IO0hoITp02OQ4UABg+bToLT/kH85W5RMZbDFAFaTVGA==
-X-Received: by 2002:a25:7691:: with SMTP id
- r139mr10929429ybc.303.1570457188677; 
- Mon, 07 Oct 2019 07:06:28 -0700 (PDT)
+ bh=Ddr5Al70vUzB+KYP1WXeVhBnDvU6Y6cu1I5Fz4+jeO4=;
+ b=DENRgvUaYkTE7Uv4DXFeh8oA+nG4re0mlSbwbp7wf3ze0S/k28Kqu3DNgE/uZfDHJs
+ AuyKWT1bjTUOkrtUG60f440aZIetjMMZjcEO64qz97IpzjrCnJ3PMi++GU1yJANjlm+J
+ 4ZleIBHRYE7XWf8l9PYumIHJfA1LnHSLtcge/TFoUcfpnRk7nG53bYLm5kybLWZ66o2c
+ GDlp/NjTtkFUPFChP+um8RV4IsXL+pjajL0QhGJbztXeAou1pgeMyh3GSDW0cpf8mx+E
+ hTvXT6194BwsVgW5Q0Ia3V/MDRWZmE2KONmP3pXPGHuzEh05Dxev251iTqF3Irf+UtUy
+ 3LUA==
+X-Gm-Message-State: APjAAAVtelCfasxh8EEEFAUzCsdwVyx/kmvvNLIoKMy7ptd87rXpMipy
+ jIOZJGR4yvOVBfuG3jQZOHHEOw==
+X-Google-Smtp-Source: APXvYqyIEDWv2w3MIOTpDHsSSwfxxJ30kHEQeCh23AUYqs9JEM1IZxdnYPRHK4671pKANxFC7/2xpQ==
+X-Received: by 2002:a25:da46:: with SMTP id n67mr11244684ybf.467.1570457388996; 
+ Mon, 07 Oct 2019 07:09:48 -0700 (PDT)
 Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id h3sm3774892ywk.40.2019.10.07.07.06.27
+ by smtp.gmail.com with ESMTPSA id y63sm3689519ywg.5.2019.10.07.07.09.38
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 07 Oct 2019 07:06:27 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 03/15] target/arm/arm-semi: Correct
- comment about gdb syscall races
+ Mon, 07 Oct 2019 07:09:48 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 04/15] target/arm/arm-semi: Make
+ semihosting code hand out its own file descriptors
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20190916141544.17540-1-peter.maydell@linaro.org>
- <20190916141544.17540-4-peter.maydell@linaro.org>
+ <20190916141544.17540-5-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <91e47043-8cd6-ed6d-eff7-6a742e669138@linaro.org>
-Date: Mon, 7 Oct 2019 10:06:25 -0400
+Message-ID: <842d1592-1cda-2c58-93bc-ed6391d093b1@linaro.org>
+Date: Mon, 7 Oct 2019 10:09:32 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190916141544.17540-4-peter.maydell@linaro.org>
+In-Reply-To: <20190916141544.17540-5-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b43
+X-Received-From: 2607:f8b0:4864:20::b41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,23 +106,43 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/16/19 7:15 AM, Peter Maydell wrote:
-> In arm_gdb_syscall() we have a comment suggesting a race
-> because the syscall completion callback might not happen
-> before the gdb_do_syscallv() call returns. The comment is
-> correct that the callback may not happen but incorrect about
-> the effects. Correct it and note the important caveat that
-> callers must never do any work of any kind after return from
-> arm_gdb_syscall() that depends on its return value.
+> Currently the Arm semihosting code returns the guest file descriptors
+> (handles) which are simply the fd values from the host OS or the
+> remote gdbstub. Part of the semihosting 2.0 specification requires
+> that we implement special handling of opening a ":semihosting-features"
+> filename. Guest fds which result from opening the special file
+> won't correspond to host fds, so to ensure that we don't end up
+> with duplicate fds we need to have QEMU code control the allocation
+> of the fd values we give the guest.
+> 
+> Add in an abstraction layer which lets us allocate new guest FD
+> values, and translate from a guest FD value back to the host one.
+> This also fixes an odd hole where a semihosting guest could
+> use the semihosting API to read, write or close file descriptors
+> that it had never allocated but which were being used by QEMU itself.
+> (This isn't a security hole, because enabling semihosting permits
+> the guest to do arbitrary file access to the whole host filesystem,
+> and so should only be done if the guest is completely trusted.)
+> 
+> Currently the only kind of guest fd is one which maps to a
+> host fd, but in a following commit we will add one which maps
+> to the :semihosting-features magic data.
+> 
+> If the guest is migrated with an open semihosting file descriptor
+> then subsequent attempts to use the fd will all fail; this is
+> not a change from the previous situation (where the host fd
+> being used on the source end would not be re-opened on the
+> destination end).
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> I'll come back to do the cleanup later, but I preferred
-> not to tangle it up with the rest of the refactoring in
-> this series; I also think it's probably easier done
-> afterwards rather than before.
+> Change since v1: we mustn't treat the return value of
+> arm_gdb_syscall() as being the new fd from gdb, as in
+> softmmu mode it is not. So we need a custom callback for open
+> that can update the guestfd association.
 > ---
->  target/arm/arm-semi.c | 19 +++++++++++++++----
->  1 file changed, 15 insertions(+), 4 deletions(-)
+>  target/arm/arm-semi.c | 232 +++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 216 insertions(+), 16 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
