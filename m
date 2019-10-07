@@ -2,75 +2,76 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D2BC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A74F9C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:02:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD4ED2084D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:01:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD4ED2084D
+	by mail.kernel.org (Postfix) with ESMTPS id 7B6E82084D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:02:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6E82084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHOt8-00008T-Kp
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 05:01:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51285)
+	id 1iHOuq-0001AX-C7
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 05:02:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51411)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <k.kozlowski.k@gmail.com>) id 1iHOrh-0007u5-Ed
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:59:38 -0400
+ (envelope-from <k.kozlowski.k@gmail.com>) id 1iHOsO-0008PX-1P
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:00:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <k.kozlowski.k@gmail.com>) id 1iHOrf-00037q-Vb
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:59:37 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43265)
+ (envelope-from <k.kozlowski.k@gmail.com>) id 1iHOsJ-0003pn-2g
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:00:19 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45027)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <k.kozlowski.k@gmail.com>)
- id 1iHOrf-00037g-Pp; Mon, 07 Oct 2019 04:59:35 -0400
-Received: by mail-wr1-f68.google.com with SMTP id j18so13427340wrq.10;
- Mon, 07 Oct 2019 01:59:35 -0700 (PDT)
+ id 1iHOsI-0003pE-Sc; Mon, 07 Oct 2019 05:00:15 -0400
+Received: by mail-wr1-f65.google.com with SMTP id z9so14190584wrl.11;
+ Mon, 07 Oct 2019 02:00:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to:user-agent;
- bh=utwvcIpWoCf4fLYtGad1B4OrN11KTAkB3AP1bTyt7PQ=;
- b=HOmrljLX8QaJ3gZlRUZ2IzOeRa66JbzbLaZonyzIKoVdsYSnzybVjf3+qXi1fX8CaV
- seKZdZpWG6/9m5ySyqI7LEwOUlaxCkNnwTJTFwCC/UaQO4HkFb5qnskrkCOEuVwafecH
- YulAuEz+iG+dTB0uweq8ILDq5Rqi796/fmcmPASvjhiBDEiBVOfdHhtakXHz1l8aNTsD
- p0YlAQsIaXt/JoeoanXIFZbkJlogMOiW1DEyI21Ah7sDM4H1K0PZ0GaFUE/M4HfeL3UA
- waoj7WGb2OxUgLtK64DzekP1W1CLQDV5x6J1ommuNf+1gUppl5O+sk03Ne8UDU5Sc0BT
- 2qyw==
-X-Gm-Message-State: APjAAAXgzBEQ45IuESbHpvSogDGfydiyPPW7FCjSJACjvslCg+xT6ZmE
- 1EKIFFknlsfV3K7QcAYZvwo=
-X-Google-Smtp-Source: APXvYqx+pYtDBfq77StySFbOlL/TxSS94tnS3HgqEwqlT3ehwcV5WckpH4hmEalZZMvEXzV53jIURw==
-X-Received: by 2002:a5d:5692:: with SMTP id f18mr23288468wrv.68.1570438774311; 
- Mon, 07 Oct 2019 01:59:34 -0700 (PDT)
+ bh=2mpH4Ugy9/Oa6ReWsoDL+YtOjgGW70O4N98QRChpJ5I=;
+ b=MhPoKHfCDGG3/fwNUEO+snGAAVGtzN9lcGtw3zQ2K/K5tzKI16NuUTrzAO2n4/LNfG
+ bz+xpJTJY1uuV+8du6G6cmrMNEgKaqNZFf2un0LdJCdOsAGVS3WKi/d4GbLwKBko9HK0
+ H1Y7EEJNQbraTRfpLy4GHGvmRZ5q92n8cTg7qdxPZkDkhR+alpoEcC+/ftAUXQfgQsHe
+ mFST3X8HnLUg7WmjPhQWDDSnrjWgLyU1b0LI+QOd34mpI33Wye6eWI4lHzma6TcnF9j3
+ AMm2VMBcfSiCnsXa3LLJJowCdOIXEOaIA/FBATi5/KV+M+NAKK3cj3K41OBNtsPA3ii3
+ /K5Q==
+X-Gm-Message-State: APjAAAWw9fUd4QbcgqiSschVp0hQyXZ/gHYY0dl/y1vKoFy7rhrIWTb/
+ 2qK0rLtdql3z5wLx3us/FtHQ7q/9K8s=
+X-Google-Smtp-Source: APXvYqxhSccF5T3WbKUTilfL09MMI8tb+dVX4luy/Y0DNluQ6NSy4sub6RCVqWNIj1W491FkxGA/Rg==
+X-Received: by 2002:adf:97cb:: with SMTP id t11mr15560441wrb.312.1570438813748; 
+ Mon, 07 Oct 2019 02:00:13 -0700 (PDT)
 Received: from pi3 ([194.230.155.145])
- by smtp.googlemail.com with ESMTPSA id r13sm24744576wrn.0.2019.10.07.01.59.32
+ by smtp.googlemail.com with ESMTPSA id h14sm22824821wro.44.2019.10.07.02.00.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Oct 2019 01:59:33 -0700 (PDT)
-Date: Mon, 7 Oct 2019 10:59:31 +0200
+ Mon, 07 Oct 2019 02:00:13 -0700 (PDT)
+Date: Mon, 7 Oct 2019 11:00:10 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 3/5] hw/sd/sdhci: Add dummy Samsung SDHCI controller
-Message-ID: <20191007085931.GA541@pi3>
+Subject: Re: [PATCH 4/5] hw/arm/exynos4210: Use the Samsung s3c SDHCI
+ controller
+Message-ID: <20191007090010.GB541@pi3>
 References: <20191005154748.21718-1-f4bug@amsat.org>
- <20191005154748.21718-4-f4bug@amsat.org>
+ <20191005154748.21718-5-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20191005154748.21718-4-f4bug@amsat.org>
+In-Reply-To: <20191005154748.21718-5-f4bug@amsat.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
+X-Received-From: 209.85.221.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,34 +98,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Oct 05, 2019 at 05:47:46PM +0200, Philippe Mathieu-Daud=C3=A9 wrote:
-> The Linux kernel access few S3C-specific registers [1] to set some
-> clock. We don't care about this part for device emulation [2]. Add
-> a dummy device to properly ignore these accesses, so we can focus
-> on the important registers missing.
-
-The CONTROL2  has also few other settings, not clock related, but they
-can be skipped as well.
+On Sat, Oct 05, 2019 at 05:47:47PM +0200, Philippe Mathieu-Daud=C3=A9 wrote:
+> The Exynos SoC has specific SDHCI registers. Use the s3c SDHCI
+> model which handle these specific registers.
+>=20
+> This silents the following "SDHC ... not implemented" warnings so
+> we can focus on the important registers missing:
+>=20
+>   $ qemu-system-arm ... -d unimp \
+>     -append "... root=3D/dev/mmcblk0 rootfstype=3Dext4 rw rootwait" \
+>     -drive file=3Dlinux-build-test/rootfs/arm/rootfs-armv5.ext2,if=3Dsd,f=
+ormat=3Draw
+>   [...]
+>   [   25.744858] sdhci: Secure Digital Host Controller Interface driver
+>   [   25.745862] sdhci: Copyright(c) Pierre Ossman
+>   [   25.783188] s3c-sdhci 12530000.sdhci: clock source 2: mmc_busclk.2 (=
+12000000 Hz)
+>   SDHC rd_4b @0x80 not implemented
+>   SDHC wr_4b @0x80 <- 0x00000020 not implemented
+>   SDHC wr_4b @0x8c <- 0x00030000 not implemented
+>   SDHC rd_4b @0x80 not implemented
+>   SDHC wr_4b @0x80 <- 0xc0004100 not implemented
+>   SDHC wr_4b @0x84 <- 0x80808080 not implemented
+>   [   26.013318] mmc0: SDHCI controller on samsung-hsmmc [12530000.sdhci]=
+ using ADMA
+>   [   26.032318] Synopsys Designware Multimedia Card Interface Driver
+>   [   42.024885] Waiting for root device /dev/mmcblk0...
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/arm/exynos4210.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
 
 Best regards,
 Krzysztof
 
->=20
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
-ee/drivers/mmc/host/sdhci-s3c-regs.h?h=3Dcc014f3
-> [2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
-ee/drivers/mmc/host/sdhci-s3c.c?h=3Dv5.3#n263
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> Eventually we should add the ADMA changes Igor sent in this patch:
-> https://patchwork.ozlabs.org/patch/181854/
-> They might solve the boot timing issues when using SD cards.
-> ---
->  hw/sd/sdhci.c         | 65 +++++++++++++++++++++++++++++++++++++++++++
->  include/hw/sd/sdhci.h |  2 ++
->  2 files changed, 67 insertions(+)
->=20
 
