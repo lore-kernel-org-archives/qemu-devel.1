@@ -2,76 +2,57 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C001C4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76171ECE595
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:11:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 606A72084D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:11:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 606A72084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4CDB02084D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:11:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CDB02084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHP3I-0004mK-Bi
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 05:11:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52619)
+	id 1iHP3V-00052A-FF
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 05:11:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52651)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <k.kozlowski.k@gmail.com>) id 1iHP2E-0003uc-IS
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:10:31 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iHP2M-00040g-43
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:10:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <k.kozlowski.k@gmail.com>) id 1iHP2D-0000Dn-4W
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:10:30 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52092)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <k.kozlowski.k@gmail.com>)
- id 1iHP2C-0000Df-UY; Mon, 07 Oct 2019 05:10:29 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 7so11776553wme.1;
- Mon, 07 Oct 2019 02:10:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=Y6nZ6LcRDjdVl8384Zn9eJ0wmkcvEHxhAf9Dve/iToI=;
- b=e0kcuL4YRtOgY8mdy7pJbwqkXOz74dA1sAZR53/W1e8cQE+DDnq7a1Z+K8Izdrm5Io
- VypejqgdVG/7Mor8u9Yhy75Ufnzk953VebirjqTtZotemAhHKQZPOzCa5gD9Nfp59Xdv
- XpcZQ+7i745+2BQC3V3r1cCq4L2Dx4mOtnIfIa75JB23md5gTST1h17O3glzDUQVKuAF
- 2+xY8WxYcyA3efAbScV3tcqMbROb19l9b/bvtvupfoufNW2tGxCZzgE+lmRTHjfe24L3
- wBjuViPCVwbNpDB/055KThs0gr+juR+YCq3AF6jVItUMZPwsM6/TloJnq4vXmmlr+XEx
- E3/g==
-X-Gm-Message-State: APjAAAXiC2/mqULyaGGJDEl+4MGwESGBm9KLNcoaq3aGyrc6pF6Yv/2z
- z5RhGEqqR+CzDNJjm1ftHsU=
-X-Google-Smtp-Source: APXvYqxOouUyRJmLoxpomBzsyAe5h6sktFWw1BD+OIqgpB8ub2dUOqNbqm0ma1+hB1RIFyX4sE1riA==
-X-Received: by 2002:a1c:1aca:: with SMTP id
- a193mr20240492wma.120.1570439427628; 
- Mon, 07 Oct 2019 02:10:27 -0700 (PDT)
-Received: from pi3 ([194.230.155.145])
- by smtp.googlemail.com with ESMTPSA id r13sm24795572wrn.0.2019.10.07.02.10.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Oct 2019 02:10:26 -0700 (PDT)
-Date: Mon, 7 Oct 2019 11:10:24 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 0/5] hw/arm/exynos4210: Add acceptance tests to the
- SMDKC210 board
-Message-ID: <20191007091024.GC541@pi3>
-References: <20191005154748.21718-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20191005154748.21718-1-f4bug@amsat.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iHP2K-0000Gj-Ne
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:10:37 -0400
+Received: from mga14.intel.com ([192.55.52.115]:12001)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1iHP2K-0000Dv-GF
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:10:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 07 Oct 2019 02:10:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,267,1566889200"; d="scan'208";a="193039245"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga007.fm.intel.com with ESMTP; 07 Oct 2019 02:10:27 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: quintela@redhat.com,
+	dgilbert@redhat.com
+Subject: [PATCH] migration/postcopy: not necessary to discard all RAM at the
+ beginning
+Date: Mon,  7 Oct 2019 17:10:08 +0800
+Message-Id: <20191007091008.9435-1-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,114 +64,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?RnLDqWTDqXJpYw==?= Basse <contact@fredericb.info>,
- Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Evgeny Voevodin <e.voevodin@samsung.com>,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-devel@nongnu.org,
- Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-arm@nongnu.org,
- Dmitry Solodkiy <d.solodkiy@samsung.com>, Cleber Rosa <crosa@redhat.com>,
- Maksim Kozlov <m.kozlov@samsung.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Guenter Roeck <linux@roeck-us.net>
+Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Oct 05, 2019 at 05:47:43PM +0200, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi all,
->=20
-> Yesterday Peter Maydell asked on IRC if I had any working Exynos4
-> image. I looked at some old backuped notes and could boot Guenter
-> initrd with BusyBox.
-> I'll use this cover letter to share my notes, they might help to
-> have this board fully usable again.
->=20
-> This board is listed as "Odd Fixes". Since we have it covered, I
-> thought it was worthwhile to have it covered by tests to avoid
-> more regressions.
->=20
-> Fr=C3=A9d=C3=A9ric Basse used this board last year:
-> https://fredericb.info/2018/03/emulating-exynos-4210-bootrom-in-qemu.html
->=20
-> I'll have a look a these particular commits he added:
->=20
-> - https://github.com/frederic/qemu-exynos-bootrom/commit/9be5c9f2253dbc04=
-ee
->=20
->    sd: add sd clock support to SDHC_CLKCON
->=20
-> - https://github.com/frederic/qemu-exynos-bootrom/commit/6f045949ee2fdec6=
-24
->=20
->    sd: always reply to ACMD41 (SD_APP_OP_COND)
->=20
-> Guenter also carries on this patch:
->=20
-> - https://github.com/groeck/qemu/commit/0a80543cc910d
->=20
->   hw/timer/exynos4210_mct: Initialize timer before starting it
->=20
->   When booting a recent Linux kernel, the qemu message "Timer with period
->   zero, disabling" is seen, apparently because a timer is started before
->   being initialized.  Fix the problem by initializing the offending timer
->   before starting it.
->=20
-> It might also be interesting to use Krzysztof's initramfs image:
-> https://github.com/krzk/tools/blob/master/run-qemu.sh#L29
+ram_discard_range() unmap page for specific range. To be specific, this
+clears related page table entries so that userfault would be triggered.
+But this step is not necessary at the very beginning.
 
-I haven't been working on QEMU since 2 years but I can try to find that
-initramfs image.
+ram_postcopy_incoming_init() is called when destination gets ADVISE
+command. ADVISE command is sent when migration thread just starts, which
+implies destination is not running yet. This means no page fault
+happened and memory region's page tables entries are empty.
 
-The recent initramfs I create, is for testing kernel under my Buildbot.
-I take standard initramfs from Arch ARM and then I add some more stuff:
-Source/instruction is here:
-https://github.com/krzk/tools/tree/master/buildbot/initramfs
-and the script making it for each boot is here:
-https://github.com/krzk/tools/blob/master/buildbot/build-slave-deploy.sh#L50
-https://github.com/krzk/tools/blob/master/pi/make-initramfs.sh
+This patch removes the discard at the beginning.
 
-Best regards,
-Krzysztof
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+---
+ migration/postcopy-ram.c | 46 ----------------------------------------
+ migration/postcopy-ram.h |  7 ------
+ migration/ram.c          | 16 --------------
+ migration/ram.h          |  1 -
+ migration/savevm.c       |  4 ----
+ 5 files changed, 74 deletions(-)
 
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 5da6de8c8b..459be8e780 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -443,32 +443,6 @@ out:
+     return ret;
+ }
+ 
+-/*
+- * Setup an area of RAM so that it *can* be used for postcopy later; this
+- * must be done right at the start prior to pre-copy.
+- * opaque should be the MIS.
+- */
+-static int init_range(RAMBlock *rb, void *opaque)
+-{
+-    const char *block_name = qemu_ram_get_idstr(rb);
+-    void *host_addr = qemu_ram_get_host_addr(rb);
+-    ram_addr_t offset = qemu_ram_get_offset(rb);
+-    ram_addr_t length = qemu_ram_get_used_length(rb);
+-    trace_postcopy_init_range(block_name, host_addr, offset, length);
+-
+-    /*
+-     * We need the whole of RAM to be truly empty for postcopy, so things
+-     * like ROMs and any data tables built during init must be zero'd
+-     * - we're going to get the copy from the source anyway.
+-     * (Precopy will just overwrite this data, so doesn't need the discard)
+-     */
+-    if (ram_discard_range(block_name, 0, length)) {
+-        return -1;
+-    }
+-
+-    return 0;
+-}
+-
+ /*
+  * At the end of migration, undo the effects of init_range
+  * opaque should be the MIS.
+@@ -506,20 +480,6 @@ static int cleanup_range(RAMBlock *rb, void *opaque)
+     return 0;
+ }
+ 
+-/*
+- * Initialise postcopy-ram, setting the RAM to a state where we can go into
+- * postcopy later; must be called prior to any precopy.
+- * called from arch_init's similarly named ram_postcopy_incoming_init
+- */
+-int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+-{
+-    if (foreach_not_ignored_block(init_range, NULL)) {
+-        return -1;
+-    }
+-
+-    return 0;
+-}
+-
+ /*
+  * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
+  * last caller wins.
+@@ -1282,12 +1242,6 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+     return false;
+ }
+ 
+-int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+-{
+-    error_report("postcopy_ram_incoming_init: No OS support");
+-    return -1;
+-}
+-
+ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+ {
+     assert(0);
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index c0ccf64a96..1c79c6e51f 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -22,13 +22,6 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
+  */
+ int postcopy_ram_incoming_setup(MigrationIncomingState *mis);
+ 
+-/*
+- * Initialise postcopy-ram, setting the RAM to a state where we can go into
+- * postcopy later; must be called prior to any precopy.
+- * called from ram.c's similarly named ram_postcopy_incoming_init
+- */
+-int postcopy_ram_incoming_init(MigrationIncomingState *mis);
+-
+ /*
+  * At the end of a migration where postcopy_ram_incoming_init was called.
+  */
+diff --git a/migration/ram.c b/migration/ram.c
+index dfc50d57d5..9a853703d8 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -4015,22 +4015,6 @@ static int ram_load_cleanup(void *opaque)
+     return 0;
+ }
+ 
+-/**
+- * ram_postcopy_incoming_init: allocate postcopy data structures
+- *
+- * Returns 0 for success and negative if there was one error
+- *
+- * @mis: current migration incoming state
+- *
+- * Allocate data structures etc needed by incoming migration with
+- * postcopy-ram. postcopy-ram's similarly names
+- * postcopy_ram_incoming_init does the work.
+- */
+-int ram_postcopy_incoming_init(MigrationIncomingState *mis)
+-{
+-    return postcopy_ram_incoming_init(mis);
+-}
+-
+ /**
+  * ram_load_postcopy: load a page in postcopy case
+  *
+diff --git a/migration/ram.h b/migration/ram.h
+index 44fe4753ad..66cbff1d52 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -58,7 +58,6 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms);
+ int ram_postcopy_send_discard_bitmap(MigrationState *ms);
+ /* For incoming postcopy discard */
+ int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+-int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+ bool postcopy_is_running(void);
+ 
+ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 9dc191e0a0..d2a427a3bf 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1674,10 +1674,6 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
+         return -1;
+     }
+ 
+-    if (ram_postcopy_incoming_init(mis)) {
+-        return -1;
+-    }
+-
+     return 0;
+ }
+ 
+-- 
+2.17.1
 
->=20
-> The 1st test added works fine, however the 2nd (SD card) is not
-> reliable so it is disabled. We might need to adapt the ADMA patch
-> Igor sent once:
-> https://patchwork.ozlabs.org/patch/181854/
->=20
-> If you want to run the Avocado tests, you need these other patches
-> pending review:
->=20
-> - https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg06439.html
->   "tests/boot_linux_console: Extract the gunzip() helper"
->=20
-> - https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg06438.html
->   "python/qemu/machine: Allow to use other serial consoles than default"
->   (only for the 2nd disabled test)
->=20
-> Regards,
->=20
-> Phil.
->=20
-> Based-on: 20190926173428.10713-16-f4bug@amsat.org
->=20
-> Philippe Mathieu-Daud=C3=A9 (5):
->   tests/boot_linux_console: Add initrd test for the Exynos4210
->   hw/sd/sdhci: Add a comment to distinct the i.MX eSDHC functions
->   hw/sd/sdhci: Add dummy Samsung SDHCI controller
->   hw/arm/exynos4210: Use the Samsung s3c SDHCI controller
->   tests/boot_linux_console: Add sdcard test for the Exynos4210
->=20
->  hw/arm/exynos4210.c                    |  2 +-
->  hw/sd/sdhci.c                          | 68 +++++++++++++++++++-
->  include/hw/sd/sdhci.h                  |  2 +
->  tests/acceptance/boot_linux_console.py | 88 ++++++++++++++++++++++++++
->  4 files changed, 158 insertions(+), 2 deletions(-)
->=20
-> --=20
-> 2.20.1
->=20
 
