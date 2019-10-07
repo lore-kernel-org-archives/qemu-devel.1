@@ -2,93 +2,90 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53129ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF6EECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:18:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BF23206C2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:17:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wTJR7CJm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BF23206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6281D206BB
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 14:18:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6281D206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHTpS-00070e-6V
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 10:17:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38620)
+	id 1iHTqb-00086U-HT
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 10:18:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iHToc-0006RM-9b
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:16:47 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iHTpa-0007GW-DZ
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:17:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iHTob-00050q-85
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:16:46 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:44672)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iHTob-00050c-37
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:16:45 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id t1so2826564ybo.11
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 07:16:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=D2fH/cmrMzZjSVJMQHsoQKsskEG8ZY0/4HJJKdU+6YU=;
- b=wTJR7CJmffBZmM8t9IwKFp2iJ2VSe+6uBLddQk3jSo+LONqU1BvQNOTB4AyK8G5mSQ
- xLVrD6TEA/qQXhCCXCVrDEj3JomWzdZgrjz2v2TceBfc/w6zynN4oc33iuHdBRXhQ7Fo
- pCAXF62k7mIvlB+GLrGzROYsRIFCBBpuvc9I+QHT6s4Fiygq9Z4UBDOjzTKEgzHAtspO
- XnZnRJsz23DFvmOViZButicrdjioZzsvMMt6L/Kv3ANtooFzd6N90ROJnFo4N1GHdvid
- wBcfou1nYvsagSQnzuNoT0do4XjHC/yIYV0YPWGsGbiICWS6l7EOFwu5dxON4RKsuLhx
- GwTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=D2fH/cmrMzZjSVJMQHsoQKsskEG8ZY0/4HJJKdU+6YU=;
- b=gUHf0tyPCghxOZdz0QT6ZLZ3ooFRwSERmiNqk9Y0y2LjxVUScL7m/3mAdpqRDy1O8M
- pEzhheXb/uzSuUXrwJegkzFGjAK6sg6zKWNZ1bE0+mq2RBP9m2EAOiRv4P1W9zbjIN/o
- 6XXSkTTBKXE4v4IK91SpSTT+jAYBb3g2dXYJYd/1MUxBMFrjy83pZDww0Oagnd2eq3Xt
- W7qkylQNwCL5eJVY7BYfmDisOk3ewWOq64czL4G3xc0oYOqcUD8VgtS3Jswj6iymkUX0
- NjDJVlkQtMOfjOEL4DtLqrRyOAEHIkL6keZptjf48zGtPaQb4dNQt7s3yQSy+6LPXEVL
- LLVQ==
-X-Gm-Message-State: APjAAAXXnP1H1a+x0guXyoT7cEb44KYzt0Q4YN3k2iel68W2ZMEybqGf
- GWnGo6L5odWQ0BDnciw4C6DPoA==
-X-Google-Smtp-Source: APXvYqx7oSmoXKWoMgSALQ6rPYuuvXNJ0DPX93CoJCw1iCpblizvw9WOYm3Z7cZLEKe6rs2+dg2U5Q==
-X-Received: by 2002:a25:2582:: with SMTP id l124mr10616474ybl.42.1570457804520; 
- Mon, 07 Oct 2019 07:16:44 -0700 (PDT)
-Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id d123sm3751214ywb.11.2019.10.07.07.16.43
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 07 Oct 2019 07:16:43 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 08/15] target/arm/arm-semi: Factor out
- implementation of SYS_WRITE
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190916141544.17540-1-peter.maydell@linaro.org>
- <20190916141544.17540-9-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <c6ef2b34-b57a-8fd5-2fce-5f5e2617ac3d@linaro.org>
-Date: Mon, 7 Oct 2019 10:16:42 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <mreitz@redhat.com>) id 1iHTpZ-0005LH-19
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 10:17:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:15239)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iHTpU-0005Jq-Uj; Mon, 07 Oct 2019 10:17:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D10A5307D934;
+ Mon,  7 Oct 2019 14:17:39 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.196])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B825E5EE1D;
+ Mon,  7 Oct 2019 14:17:35 +0000 (UTC)
+Subject: Re: [PATCH 3/6] block/block-copy: refactor copying
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191003171539.12327-1-vsementsov@virtuozzo.com>
+ <20191003171539.12327-4-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <dacae11a-0da6-d08e-05a7-d605466a5743@redhat.com>
+Date: Mon, 7 Oct 2019 16:17:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20190916141544.17540-9-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::b41
+In-Reply-To: <20191003171539.12327-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Y0hkN06j3Lvxs8jKc9qz1uf6YUCA7d4wP"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Mon, 07 Oct 2019 14:17:39 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,23 +97,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/19 7:15 AM, Peter Maydell wrote:
-> Factor out the implementation of SYS_WRITE via the
-> new function tables.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Y0hkN06j3Lvxs8jKc9qz1uf6YUCA7d4wP
+Content-Type: multipart/mixed; boundary="grq8MN6miZ9EYQ8W7Jhwjsp4IKVobnKnC"
+
+--grq8MN6miZ9EYQ8W7Jhwjsp4IKVobnKnC
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 03.10.19 19:15, Vladimir Sementsov-Ogievskiy wrote:
+> Merge copying code into one function block_copy_do_copy, which only
+> calls bdrv_ io functions and don't do any synchronization (like dirty
+> bitmap set/reset).
+>=20
+> Refactor block_copy() function so that it takes full decision about
+> size of chunk to be copied and does all the synchronization (checking
+> intersecting requests, set/reset dirty bitmaps).
+>=20
+> It will help:
+>  - introduce parallel processing of block_copy iterations: we need to
+>    calculate chunk size, start async chunk copying and go to the next
+>    iteration
+>  - simplify synchronization improvement (like memory limiting in
+>    further commit and reducing critical section (now we lock the whole
+>    requested range, when actually we need to lock only dirty region
+>    which we handle at the moment))
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  target/arm/arm-semi.c | 51 ++++++++++++++++++++++++++++---------------
->  1 file changed, 33 insertions(+), 18 deletions(-)
+>  block/block-copy.c | 113 ++++++++++++++++++++-------------------------=
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>  block/trace-events |   6 +--
+>  2 files changed, 53 insertions(+), 66 deletions(-)
+
+Looks good to me, just some clean-up path nit picks below.
+
+> diff --git a/block/block-copy.c b/block/block-copy.c
+> index 75287ce24d..cc49d2345d 100644
+> --- a/block/block-copy.c
+> +++ b/block/block-copy.c
+> @@ -126,25 +126,43 @@ void block_copy_set_callbacks(
+>  }
+> =20
+>  /*
+> - * Copy range to target with a bounce buffer and return the bytes copi=
+ed. If
+> - * error occurred, return a negative error number
+> + * block_copy_do_copy
+> + *
+> + * Do copy of cluser-aligned chunk. @end is allowed to exceed s->len o=
+nly to
+> + * cover last cluster when s->len is not aligned to clusters.
+> + *
+> + * No sync here: nor bitmap neighter intersecting requests handling, o=
+nly copy.
+> + *
+> + * Returns 0 on success.
+>   */
+> -static int coroutine_fn block_copy_with_bounce_buffer(BlockCopyState *=
+s,
+> -                                                      int64_t start,
+> -                                                      int64_t end,
+> -                                                      bool *error_is_r=
+ead)
+> +static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
+> +                                           int64_t start, int64_t end,=
+
+> +                                           bool *error_is_read)
+>  {
+>      int ret;
+> -    int nbytes;
+> -    void *bounce_buffer =3D qemu_blockalign(s->source->bs, s->cluster_=
+size);
+> +    int nbytes =3D MIN(end, s->len) - start;
+> +    void *bounce_buffer =3D NULL;
+> =20
+>      assert(QEMU_IS_ALIGNED(start, s->cluster_size));
+> -    bdrv_reset_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
+> -    nbytes =3D MIN(s->cluster_size, s->len - start);
+> +    assert(QEMU_IS_ALIGNED(end, s->cluster_size));
+> +    assert(end < s->len || end =3D=3D QEMU_ALIGN_UP(s->len, s->cluster=
+_size));
+> +
+> +    if (s->use_copy_range) {
+> +        ret =3D bdrv_co_copy_range(s->source, start, s->target, start,=
+ nbytes,
+> +                                 0, s->write_flags);
+> +        if (ret < 0) {
+> +            trace_block_copy_copy_range_fail(s, start, ret);
+> +            s->use_copy_range =3D false;
+> +        } else {
+> +            return ret;
+
+Maybe the =E2=80=9Cfail=E2=80=9D label should be called =E2=80=9Dout=E2=80=
+=9D and then we could go there
+from here.  Doesn=E2=80=99t make much of a difference here (1 LoC either =
+way),
+but maybe it=E2=80=99s a bit cleaner to always use the clean-up path in t=
+his
+function (even when there=E2=80=99s nothing to clean up).
+
+*shrug*
+
+> +        }
+> +    }
+> +
+> +    bounce_buffer =3D qemu_blockalign(s->source->bs, nbytes);
+> =20
+>      ret =3D bdrv_co_pread(s->source, start, nbytes, bounce_buffer, 0);=
+
+>      if (ret < 0) {
+> -        trace_block_copy_with_bounce_buffer_read_fail(s, start, ret);
+> +        trace_block_copy_read_fail(s, start, ret);
+>          if (error_is_read) {
+>              *error_is_read =3D true;
+>          }
+
+[...]
+
+> @@ -163,42 +181,12 @@ static int coroutine_fn block_copy_with_bounce_bu=
+ffer(BlockCopyState *s,
+> =20
+>      qemu_vfree(bounce_buffer);
+> =20
+> -    return nbytes;
+> +    return 0;
+> +
+>  fail:
+>      qemu_vfree(bounce_buffer);
+> -    bdrv_set_dirty_bitmap(s->copy_bitmap, start, s->cluster_size);
+> -    return ret;
+> -
+> -}
+
+Wouldn=E2=80=99t it be simpler to drop the =E2=80=9Cqemu_vfree(bounce_buf=
+fer); return
+0;=E2=80=9D above the fail label and just fall through?
+
+In any case:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-r~
+--grq8MN6miZ9EYQ8W7Jhwjsp4IKVobnKnC--
 
+--Y0hkN06j3Lvxs8jKc9qz1uf6YUCA7d4wP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2bSP4ACgkQ9AfbAGHV
+z0BylQf9G0u+sKOASEl+ZCWljQ04VpOSDv7Dl5F+1LhNXP/S9UcHoDBTP7r51eUR
+Q98QppZRlOKYinfbbVq/XQuC69W4J5vO7TBq6EyodCdUqhPD80y3h0Zv3+8+Gzk3
+masUp0TYjfj2WCjR01vDMugrd8LydxDJ0nCsyDQJKdmLpjm9tX62PX8tC3C+GL3u
+Y3fQ97EuqudcVSY6UOaLF4ytuPjZ4F7SQrqakrFreazoJNhwGuqLkd97EhJAwK68
+If/oGDQYBfGlPFzesC2bZVJ0zvsGq5fMOp+4Z5EnjvDxeYjn6r0i8MEka/Em7fzf
+fwZiVLsYM64uR3dsuyL902aQIsSBew==
+=FhRE
+-----END PGP SIGNATURE-----
+
+--Y0hkN06j3Lvxs8jKc9qz1uf6YUCA7d4wP--
 
