@@ -2,136 +2,55 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 841EFECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 19:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF10C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 19:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E0C320684
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 19:24:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E0C320684
+	by mail.kernel.org (Postfix) with ESMTPS id DFE52206C2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 19:49:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFE52206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHYce-0002uo-9u
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 15:24:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58129)
+	id 1iHZ0g-0000a0-1e
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 15:49:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iHYbY-0002Dt-U3
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 15:23:38 -0400
+ (envelope-from <eblake@redhat.com>) id 1iHYzw-0008Qh-9h
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 15:48:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iHYbX-00030M-F7
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 15:23:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47386)
+ (envelope-from <eblake@redhat.com>) id 1iHYzv-0008Tj-AU
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 15:48:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41230)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iHYbS-0002yD-Pd; Mon, 07 Oct 2019 15:23:31 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iHYzr-0008Ri-TX; Mon, 07 Oct 2019 15:48:44 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E217530A7B9A;
- Mon,  7 Oct 2019 19:23:29 +0000 (UTC)
-Received: from [10.18.17.165] (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 804AD61F40;
- Mon,  7 Oct 2019 19:23:23 +0000 (UTC)
-Subject: Re: [PATCH 1/1] IDE: deprecate ide-drive
-To: Markus Armbruster <armbru@redhat.com>
-References: <20191006203150.13054-1-jsnow@redhat.com>
- <20191006203150.13054-2-jsnow@redhat.com> <87pnj8holb.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4493785d-f1b8-3de5-ee79-7911949dfba4@redhat.com>
-Date: Mon, 7 Oct 2019 15:23:23 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 7376E51EE6;
+ Mon,  7 Oct 2019 19:48:42 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-162.phx2.redhat.com [10.3.116.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F9495D6A3;
+ Mon,  7 Oct 2019 19:48:41 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qemu-nbd: Document benefit of --pid-file
+Date: Mon,  7 Oct 2019 14:48:40 -0500
+Message-Id: <20191007194840.29518-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87pnj8holb.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 07 Oct 2019 19:23:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Mon, 07 Oct 2019 19:48:42 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -146,150 +65,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+One benefit of --pid-file is that it is easier to probe the file
+system to see if a pid file has been created than it is to probe if a
+socket is available for connection. Document that this is an
+intentional feature.
 
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ qemu-nbd.texi | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-On 10/7/19 5:49 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> It's an old compatibility shim that just delegates to ide-cd or ide-hd.
->> I'd like to refactor these some day, and getting rid of the super-object
->> will make that easier.
-> 
-> Device "scsi-disk" is similar.  However, it's still used by the
-> scsi_bus_legacy_add_drive() magic.  Not sure that's fully deprecated,
-> yet.  If / once it is, we can deprecate "scsi-disk", too.  Anyway, not
-> your department.
-> 
+diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+index 7f55657722bd..d495bbe8a0ed 100644
+--- a/qemu-nbd.texi
++++ b/qemu-nbd.texi
+@@ -118,7 +118,8 @@ in list mode.
+ @item --fork
+ Fork off the server process and exit the parent once the server is runni=
+ng.
+ @item --pid-file=3DPATH
+-Store the server's process ID in the given file.
++Store the server's process ID in the given file.  The pid file is not
++created until after the server socket is open.
+ @item --tls-authz=3DID
+ Specify the ID of a qauthz object previously created with the
+ --object option. This will be used to authorize connecting users
+--=20
+2.21.0
 
-Yeah. I just want to get rid of this to allow myself to do bolder things
-later on.
-
-I have literally no time to do this and it's not really anything that
-would make anyone money, but...
-
-I want to add a few explicit devices:
-
-ata-hd
-ata-cd
-sata-hd
-sata-cd
-
-With some shared state structures that implement common feature subsets,
-like ata_registers, sata_registers, atapi_registers, etc.
-
-I'd also like to separate out frontend and backend state providing a bit
-of a cleaner division between device configuration (parameters on the
-hardware creation itself), emulated device state (ATA register sets and
-state machine), and QEMU backend state (block_backend pointers, aio
-state counters, locks, etc etc etc -- Things solely purposed for
-interacting with the block module.)
-
-I'd also like to make each device type plug into ATA or SATA bus slots
-explicitly -- no more magic IDE devices.
-
-It's like the 5-year itch I can't help but want to scratch. My name's on
-this code and it's UGLY UGLY UGLY!
-
-The biggest roadblock to me actually doing this is figuring out how it
-would be even vaguely possible to migrate from ide-hd or ide-cd to the
-newer models -- it might be pretty complex, but maybe I can figure
-something out somehow...
-
-Well, suggestions welcome.
-
->> Either way, we don't need this.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  qemu-deprecated.texi          | 5 +++++
->>  hw/ide/qdev.c                 | 3 +++
->>  tests/qemu-iotests/051.pc.out | 6 ++++--
->>  3 files changed, 12 insertions(+), 2 deletions(-)
->>
->> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
->> index 01245e0b1c4..f802d83983e 100644
->> --- a/qemu-deprecated.texi
->> +++ b/qemu-deprecated.texi
->> @@ -247,6 +247,11 @@ quite a bit. It will be removed without replacement unless some users speaks
->>  up at the @email{qemu-devel@@nongnu.org} mailing list with information about
->>  their usecases.
->>  
->> +@subsection ide-drive (since 4.2)
->> +
->> +The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
->> +'ide-cd' as appropriate to get an IDE hard disk or CDROM as needed.
-> 
-> CD-ROM
-> 
-
->:[
-
->> +
->>  @section System emulator machines
->>  
->>  @subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
->> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
->> index 6fba6b62b87..9ecee4da074 100644
->> --- a/hw/ide/qdev.c
->> +++ b/hw/ide/qdev.c
->> @@ -279,6 +279,9 @@ static void ide_drive_realize(IDEDevice *dev, Error **errp)
->>  {
->>      DriveInfo *dinfo = NULL;
->>  
->> +    warn_report("The 'ide-drive' device is deprecated. "
->> +                "Use 'ide-hd' or 'ide-cd' instead");
-> 
-> Two sentences, where only the first one terminated with a period.
-> 
-> Let's say "is deprecated, please use", like we do in several other places.
-> 
-
-Alright.
-
->> +
->>      if (dev->conf.blk) {
->>          dinfo = blk_legacy_dinfo(dev->conf.blk);
->>      }
->> diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
->> index 000557c7c83..93b9a1f82ca 100644
->> --- a/tests/qemu-iotests/051.pc.out
->> +++ b/tests/qemu-iotests/051.pc.out
->> @@ -158,7 +158,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
->>  
->>  Testing: -drive if=none,id=disk -device ide-drive,drive=disk
->>  QEMU X.Y.Z monitor - type 'help' for more information
->> -(qemu) QEMU_PROG: -device ide-drive,drive=disk: Device needs media, but drive is empty
->> +(qemu) QEMU_PROG: -device ide-drive,drive=disk: warning: The 'ide-drive' device is deprecated. Use 'ide-hd' or 'ide-cd' instead
->> +QEMU_PROG: -device ide-drive,drive=disk: Device needs media, but drive is empty
->>  
->>  Testing: -drive if=none,id=disk -device ide-hd,drive=disk
->>  QEMU X.Y.Z monitor - type 'help' for more information
->> @@ -228,7 +229,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
->>  
->>  Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device ide-drive,drive=disk
->>  QEMU X.Y.Z monitor - type 'help' for more information
->> -(qemu) QEMU_PROG: -device ide-drive,drive=disk: Block node is read-only
->> +(qemu) QEMU_PROG: -device ide-drive,drive=disk: warning: The 'ide-drive' device is deprecated. Use 'ide-hd' or 'ide-cd' instead
->> +QEMU_PROG: -device ide-drive,drive=disk: Block node is read-only
->>  
->>  Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device ide-hd,drive=disk
->>  QEMU X.Y.Z monitor - type 'help' for more information
-> 
-> A few iotests still use ide-drive.  Should any of them be converted to
-> ide-hd or ide-cd now?
-> 
-
-I only saw the use in 051; (I should fix the output for non-PC too,
-actually) and in this case it can just be dropped whenever we drop the
-ide-drive definition.
-
-I'll respin to hit the tests with a stiffer scrub-brush.
-
---js
 
