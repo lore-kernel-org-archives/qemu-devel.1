@@ -2,89 +2,79 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2454C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4622C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:25:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72275206BB
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:20:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DB81206BB
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:25:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m36v3Zb/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72275206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkeley-edu.20150623.gappssmtp.com header.i=@berkeley-edu.20150623.gappssmtp.com header.b="ofNw0AVz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DB81206BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=berkeley.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHWgg-0003DU-Lk
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:20:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37021)
+	id 1iHWkr-00063o-Kt
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:25:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39016)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iHWTJ-0006oF-V6
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:06:59 -0400
+ (envelope-from <dayeol@berkeley.edu>) id 1iHWfV-00029Z-M4
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:19:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iHWTI-0004vn-In
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:06:57 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40868)
+ (envelope-from <dayeol@berkeley.edu>) id 1iHWfT-0000qE-Oo
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:19:33 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44816)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iHWTI-0004vX-CS; Mon, 07 Oct 2019 13:06:56 -0400
-Received: by mail-wr1-x442.google.com with SMTP id h4so7494229wrv.7;
- Mon, 07 Oct 2019 10:06:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=h9QPSdYlAgh15MXqatIxr3w1iFSHreJWGKOTOlnlE1I=;
- b=m36v3Zb/J0IfGdJFu2+4hn+/UczY3B6eSt/YcSsm5tXpqxY1MMQZSazW7e21aXpBxc
- o/INrxvyIe6/Tvbc6qdhoQpLNxxN5KTcCInpe7Y9mrgqFENcnSKHMbBy4HerS5FYSoCj
- 2rlNzJfGB1jlhVid5ibz2dgjhFq63D/Zn2dZrMv5A6UQfXLDqW/PWwi2Tmb0PNJaTJsX
- J4qbPFug3ONq+PNYqx87AHVKl13fj1DMymb6xc66xO4mwsJCtZN5PX2CkspPaHINXqOY
- 845a5a0KJf7t7JV77JCt2P0DlcLVTVgnsv9TtPN+LQF9q06MUko96fmVnU0RUv0IG5Ns
- I4eA==
+ (Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1iHWfT-0000pC-Gw
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:19:31 -0400
+Received: by mail-pl1-x644.google.com with SMTP id q15so7155689pll.11
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 10:19:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=berkeley-edu.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0jM2EbhQp5OuMkBVePwdxLyjvQ1BUKCkrGxUtHCHOtw=;
+ b=ofNw0AVzwCg5Fn6+pGgBca0O3aG3hwJUhMoTeM4kNG0wixUQbE+jhZUTaogKEcmQWA
+ NynqV14VDBzrlSbAZ9z11ixyvKR30wA+3senvVlD4HpCXa4A0yRxK4v5UGSQPJx7tWFL
+ sga1XMFq9MhpGzkLvbly6GlK98dR/87FpNPVJx5SQ+lFjScbbm5syURAvPPAx+WvRZN9
+ 4wYcc2slzAJ4hpPkxHTTiF4hIokoFuXjz7SY/F+liiklCPOcK9QmstOoR6+didTBr3m/
+ jS6irGKhFOOQMxFJ2CJaXX+qq9eZmPhkiz7Kwo3NWPQonkWwk7VKgwxksevrLl0rtPPT
+ 5bag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=h9QPSdYlAgh15MXqatIxr3w1iFSHreJWGKOTOlnlE1I=;
- b=VUVL09sCWDNZMyp/4y9FrZ2PaPvURyL9AIFcPjfElK3YPwDmZGM1WcblomleJcCMRT
- eSqf92oCFZZR7seMksJBTfU9zn5ooef6/gRSfEbbRARyfjBLf75srjRE1IqSCPwkmRTt
- XBTUD2Okz6IO4IksfgiWeDMuevLbLpv/qB4wI4KIQTSlDhN16P6zUtkojl0imm+GFKj6
- Hp2Gv7duPp6paqAAFNNqLpM4OvUh58DKxMsajrYhwfzYNNc79txvUEhRyWEDPqiDIQn1
- pMM86NDW5U0iS1vQ4PpOxZHeVVJ5UhjxgSK2+a85poYOAz+YQOOHFcg/tw5Qukx964Hh
- XZcw==
-X-Gm-Message-State: APjAAAUPkdBNBWYw3kwBh92dXGU7yVUs5icfnZu/M4bBg/hypjHzuLeb
- R51e8qnl6Pb9gsq4cVb/b2Jiy1dQsG0=
-X-Google-Smtp-Source: APXvYqw+qL2fPdGgBj4SUBqgBbzw5lkzAcFdayJvnJwnSluIe1brOdlO1vGk1RNReFk2Bi2Cn/BJSw==
-X-Received: by 2002:adf:e88f:: with SMTP id d15mr8093875wrm.324.1570468015165; 
- Mon, 07 Oct 2019 10:06:55 -0700 (PDT)
-Received: from x1w.redhat.com (46.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id x5sm14036603wrt.75.2019.10.07.10.06.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Oct 2019 10:06:54 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] hw: Move BCM2835 AUX device from hw/char/ to hw/misc/
-Date: Mon,  7 Oct 2019 19:06:46 +0200
-Message-Id: <20191007170646.14961-4-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191007170646.14961-1-f4bug@amsat.org>
-References: <20191007170646.14961-1-f4bug@amsat.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0jM2EbhQp5OuMkBVePwdxLyjvQ1BUKCkrGxUtHCHOtw=;
+ b=A35V/nnqfMnBfeGPHDK4okwekpwQ6dlrY4xsTfyOhs+J3ydeWzAJ2mxohqGhMp6U7l
+ Pi81DVKbcIiodmKy7/WRB95ji3VPGbA8iB0uTq31xxdYpcDv/YpTmmuHtMcLXtbeNh3S
+ q5C1j9wG7s2Lk1HFX2oAq5/OrKBjGNzb6Ey5fuP2zWrjoPSFYaCD+b6ZZnWAvPTxwbsr
+ xKl8QC8v7ldePzcvbYThMZdXpFQ09EY1BxE6NDxVUQcqBzpxpFbzScy6sJemE3EKDNjJ
+ J7RWKSkHYVST5aXGRn2LOP2PmcWD4HK/Yr2Ws5P+yzeWX/MxVubOu7/pTmpzxjLGoLa9
+ aPag==
+X-Gm-Message-State: APjAAAUC09HTk1wsA5SMDVSUEJPYUkq9JvEP+P40RpRo6oRC1NVJSFEy
+ NUhTsEkbD+oqohiop3aNkrtQkH4gD6qTxJaLFET8nA==
+X-Google-Smtp-Source: APXvYqwoErOY34fu1A4KhIrVhCcBTJiuxKyewwemH2kK0qwyYo/JBtB99M1YO28u8BB28M0fQy1FxECB4SPh1niOIkE=
+X-Received: by 2002:a17:902:2e:: with SMTP id 43mr31712457pla.55.1570468769964; 
+ Mon, 07 Oct 2019 10:19:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20191007052813.25814-1-dayeol@berkeley.edu>
+ <5583387c-5c5b-8890-999b-2ba4d75cd69d@linaro.org>
+In-Reply-To: <5583387c-5c5b-8890-999b-2ba4d75cd69d@linaro.org>
+From: Dayeol Lee <dayeol@berkeley.edu>
+Date: Mon, 7 Oct 2019 10:19:18 -0700
+Message-ID: <CACjxMEsw+Deh176JLP2aF4Pdkb_s8MiPApwMON-_K6ed61-Zyw@mail.gmail.com>
+Subject: Re: [PATCH] target/riscv: PMP violation due to wrong size parameter
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000002a65b40594554190"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,119 +86,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Marc-Andre Lureau <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The BCM2835 AUX device is a MUX between one UART block and two SPI
-blocks. Move it to the hw/misc/ folder.
+--0000000000002a65b40594554190
+Content-Type: text/plain; charset="UTF-8"
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/char/Makefile.objs                   | 1 -
- hw/char/trace-events                    | 4 ----
- hw/misc/Makefile.objs                   | 1 +
- hw/{char => misc}/bcm2835_aux.c         | 2 +-
- hw/misc/trace-events                    | 4 ++++
- include/hw/arm/bcm2835_peripherals.h    | 2 +-
- include/hw/{char => misc}/bcm2835_aux.h | 0
- 7 files changed, 7 insertions(+), 7 deletions(-)
- rename hw/{char => misc}/bcm2835_aux.c (99%)
- rename include/hw/{char => misc}/bcm2835_aux.h (100%)
+Thank you very much for the clarification!
 
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 5bd93bde9f..d6b8ce5e60 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -20,7 +20,6 @@ obj-$(CONFIG_SH4) += sh_serial.o
- obj-$(CONFIG_PSERIES) += spapr_vty.o
- obj-$(CONFIG_DIGIC) += digic-uart.o
- obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
--obj-$(CONFIG_RASPI) += bcm2835_aux.o
- 
- common-obj-$(CONFIG_RASPI) += bcm2835_miniuart.o
- common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
-diff --git a/hw/char/trace-events b/hw/char/trace-events
-index 0c86a907df..f1e6dd9918 100644
---- a/hw/char/trace-events
-+++ b/hw/char/trace-events
-@@ -1,9 +1,5 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
--# bcm2835_aux.c
--bcm2835_aux_read(uint64_t addr, uint32_t value) "read addr 0x%"PRIx64" value 0x%x"
--bcm2835_aux_write(uint64_t addr, uint32_t value) "read addr 0x%"PRIx64" value 0x%x"
--
- # bcm2835_miniuart.c
- bcm2835_miniuart_read(uint64_t addr, uint32_t value) "read addr 0x%"PRIx64" value 0x%x"
- bcm2835_miniuart_write(uint64_t addr, uint32_t value) "read addr 0x%"PRIx64" value 0x%x"
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index a150680966..9ffeee7f46 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -50,6 +50,7 @@ common-obj-$(CONFIG_OMAP) += omap_gpmc.o
- common-obj-$(CONFIG_OMAP) += omap_l4.o
- common-obj-$(CONFIG_OMAP) += omap_sdrc.o
- common-obj-$(CONFIG_OMAP) += omap_tap.o
-+common-obj-$(CONFIG_RASPI) += bcm2835_aux.o
- common-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
- common-obj-$(CONFIG_RASPI) += bcm2835_property.o
- common-obj-$(CONFIG_RASPI) += bcm2835_rng.o
-diff --git a/hw/char/bcm2835_aux.c b/hw/misc/bcm2835_aux.c
-similarity index 99%
-rename from hw/char/bcm2835_aux.c
-rename to hw/misc/bcm2835_aux.c
-index a1ca9741d6..83698e2ece 100644
---- a/hw/char/bcm2835_aux.c
-+++ b/hw/misc/bcm2835_aux.c
-@@ -12,7 +12,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "hw/char/bcm2835_aux.h"
-+#include "hw/misc/bcm2835_aux.h"
- #include "hw/irq.h"
- #include "hw/qdev-properties.h"
- #include "hw/registerfields.h"
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 74276225f8..0756d58162 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -1,5 +1,9 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
-+# bcm2835_aux.c
-+bcm2835_aux_read(uint64_t addr, uint32_t value) "read addr 0x%"PRIx64" value 0x%x"
-+bcm2835_aux_write(uint64_t addr, uint32_t value) "read addr 0x%"PRIx64" value 0x%x"
-+
- # eccmemctl.c
- ecc_mem_writel_mer(uint32_t val) "Write memory enable 0x%08x"
- ecc_mem_writel_mdr(uint32_t val) "Write memory delay 0x%08x"
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 6b17f6a382..7aae515d7e 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -13,7 +13,7 @@
- 
- #include "hw/sysbus.h"
- #include "hw/char/pl011.h"
--#include "hw/char/bcm2835_aux.h"
-+#include "hw/misc/bcm2835_aux.h"
- #include "hw/display/bcm2835_fb.h"
- #include "hw/dma/bcm2835_dma.h"
- #include "hw/intc/bcm2835_ic.h"
-diff --git a/include/hw/char/bcm2835_aux.h b/include/hw/misc/bcm2835_aux.h
-similarity index 100%
-rename from include/hw/char/bcm2835_aux.h
-rename to include/hw/misc/bcm2835_aux.h
--- 
-2.21.0
+I found tlb_set_page with size != TARGET_PAGE_SIZE makes the translation
+way too slow; the Linux doesn't seem to boot.
 
+If that's the only way to reduce PMP granularity to less than
+TARGET_PAGE_SIZE,
+Can we just set the PMP default granularity to TARGET_PAGE_SIZE as it did
+before?
+
+OR
+
+Can we bypass the partial match violation when size is unknown? (check the
+starting address only)
+
+I think both of the options does not exactly match with the ISA
+specification,
+but given that size=0 always causes the problem, I want it to be fixed as
+soon as possible.
+
+Any thoughts would be appreciated!
+
+On Mon, Oct 7, 2019, 6:00 AM Richard Henderson <richard.henderson@linaro.org>
+wrote:
+
+> On 10/6/19 10:28 PM, Dayeol Lee wrote:
+> > riscv_cpu_tlb_fill() uses the `size` parameter to check PMP violation
+> > using pmp_hart_has_privs().
+> > However, the size passed from tlb_fill(), which is called by
+> > get_page_addr_code(), is always a hard-coded value 0.
+> > This causes a false PMP violation if the instruction presents on a
+> > PMP boundary.
+> >
+> > In order to fix, simply correct the size to 4 if the access_type is
+> > MMU_INST_FETCH.
+>
+> That's not correct.
+>
+> In general, size 0 means "unknown size".  In this case, the one tlb lookup
+> is
+> going to be used by lots of instructions -- everything that fits on the
+> page.
+>
+> If you want to support PMP on things that are not page boundaries, then you
+> will also have to call tlb_set_page with size != TARGET_PAGE_SIZE.
+>
+> Fixing that will cause instructions within that page to be executed one at
+> a
+> time, which also means they will be tlb_fill'd one at a time, which means
+> that
+> you'll get the correct size value.
+>
+> Which will be 2 or 4, depending on whether the configuration supports the
+> Compressed extension, and not just 4.
+>
+>
+> r~
+>
+
+>
+
+--0000000000002a65b40594554190
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"auto"><div>Thank you very much for the clarifi=
+cation!</div><div><br></div><div>I found tlb_set_page with size !=3D TARGET=
+_PAGE_SIZE makes the translation way too slow; the Linux doesn&#39;t seem t=
+o boot.</div><div><br></div><div>If that&#39;s the only way to reduce PMP g=
+ranularity to less than TARGET_PAGE_SIZE,</div><div>Can we just set the PMP=
+ default granularity to TARGET_PAGE_SIZE as it did before?</div><div><br></=
+div><div>OR=C2=A0</div><div><br></div><div>Can we bypass the partial match =
+violation when size is unknown? (check the starting address only)</div><div=
+><br></div><div>I think both of the options does not exactly match with the=
+ ISA specification,</div><div>but given that size=3D0 always causes the pro=
+blem, I want it to be fixed as soon as possible.</div><div><br></div><div>A=
+ny thoughts would be=C2=A0appreciated!</div><div><br></div><div dir=3D"auto=
+"><div class=3D"gmail_quote" dir=3D"auto"><div dir=3D"ltr" class=3D"gmail_a=
+ttr">On Mon, Oct 7, 2019, 6:00 AM Richard Henderson &lt;<a href=3D"mailto:r=
+ichard.henderson@linaro.org" target=3D"_blank">richard.henderson@linaro.org=
+</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:=
+0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On 10/6/19 10:28 PM=
+, Dayeol Lee wrote:<br>
+&gt; riscv_cpu_tlb_fill() uses the `size` parameter to check PMP violation<=
+br>
+&gt; using pmp_hart_has_privs().<br>
+&gt; However, the size passed from tlb_fill(), which is called by<br>
+&gt; get_page_addr_code(), is always a hard-coded value 0.<br>
+&gt; This causes a false PMP violation if the instruction presents on a<br>
+&gt; PMP boundary.<br>
+&gt; <br>
+&gt; In order to fix, simply correct the size to 4 if the access_type is<br=
+>
+&gt; MMU_INST_FETCH.<br>
+<br>
+That&#39;s not correct.<br>
+<br>
+In general, size 0 means &quot;unknown size&quot;.=C2=A0 In this case, the =
+one tlb lookup is<br>
+going to be used by lots of instructions -- everything that fits on the pag=
+e.<br>
+<br>
+If you want to support PMP on things that are not page boundaries, then you=
+<br>
+will also have to call tlb_set_page with size !=3D TARGET_PAGE_SIZE.<br>
+<br>
+Fixing that will cause instructions within that page to be executed one at =
+a<br>
+time, which also means they will be tlb_fill&#39;d one at a time, which mea=
+ns that<br>
+you&#39;ll get the correct size value.<br>
+<br>
+Which will be 2 or 4, depending on whether the configuration supports the<b=
+r>
+Compressed extension, and not just 4.<br>
+<br>
+<br>
+r~<br>
+</blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
+order-left:1px #ccc solid;padding-left:1ex"><br></blockquote></div></div></=
+div>
+</div>
+
+--0000000000002a65b40594554190--
 
