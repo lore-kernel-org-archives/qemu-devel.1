@@ -6,78 +6,78 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B88C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 10:09:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D81C352AA
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 10:09:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DD582084D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 10:09:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD582084D
+	by mail.kernel.org (Postfix) with ESMTPS id 58FE12084D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 10:09:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58FE12084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHPxV-0004QZ-48
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 06:09:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59763)
+	id 1iHPxg-0004fr-Bn
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 06:09:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60049)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iHPwX-0003UM-FU
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:08:42 -0400
+ (envelope-from <philmd@redhat.com>) id 1iHPwh-0003eN-8F
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:08:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iHPwV-0000HF-Tk
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:08:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38074)
+ (envelope-from <philmd@redhat.com>) id 1iHPwg-0000Pq-9M
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:08:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59898)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHPwV-0000Gt-ON
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:08:39 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHPwg-0000PH-34
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:08:50 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 82777C04FFE0
- for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 10:08:38 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id w8so7314621wrm.3
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 03:08:38 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2B31C4FCD9
+ for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 10:08:49 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id n3so5973933wmf.3
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 03:08:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=YxSwWRKpC6ZMZxhY4f57DEJrW0GCR2ANaFJ+FdL5xLQ=;
- b=s7wQKraJg5VCUYFVHunT2DYP1M1TavQN17GrdVPhM4xtD5MsfupwO7Smb8BGoN4wlR
- pb/GqKdvUShECCgts/+fP3DVGRmvpxZaVAG0g3NhiR1ECKxvmSUp2pvuNxkrDc0HY/eA
- ktw6ThcHyDkW4C5sR+Wh1Dy/Ntm0Z/x0i6ZRaesEuRN4ptS9gVt6zc3DctmhgFGYZOCp
- e0ylHiArpZAzYuww0FSpmUVRmzXyQnA+b5phEcqTwFTCI+tCxSv+yofzl93GLnacSCUG
- FyFpc8fEr6y07/oP7OV43KqDqa40F4NhQYe40txPZXMqQBRZoi3iLWdvF6y7pt8OzkUf
- /Tuw==
-X-Gm-Message-State: APjAAAXEDctxh5EROj14wUbLEaqJj981l12X6Qt1XKbtj4comq3KqiIj
- vjuAOtsYDfMaGi4gtcyXO9yavpn3+utWiiDGewQbA4n74qUznUdm1qEfRfF51BsddUUHBhgSTXw
- tdeOoHAsj6kHqsA0=
-X-Received: by 2002:a1c:7d4b:: with SMTP id y72mr15371031wmc.177.1570442916931; 
- Mon, 07 Oct 2019 03:08:36 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxEZnJK5x5TkQgp3z0uZSJw00lCbvjOMcpaEaRBusdxh0g84EcWQ/OR0GqFim45EUkKFLFQwA==
-X-Received: by 2002:a1c:7d4b:: with SMTP id y72mr15371019wmc.177.1570442916728; 
- Mon, 07 Oct 2019 03:08:36 -0700 (PDT)
+ bh=diOWLvkRHMp26IzCTd0+dQKDG1zd8TuEniXpfbalnMQ=;
+ b=nQpAxHqJhHOKUVQLzjbohJckKbHkM9bBdKf2lFLwJSCjamQHhgjX4X8uEnynNTi9as
+ dfB15Lf8MsI5peIUu5zChkrhqb3GQX5gLzFxzyw31uk7M3diH4MqqlHDObF/q109j2em
+ XmVA50vKVT1yM+0DUoEBgupF0csU0/N+ZwFouzKfHJM1HrfUshO9AI49SfMSo9dG35pY
+ ZuUvkMt1owhgngdpHIWwQYrcEgKDR6WBUUfnz3+pxSJPaf9rWLjkZM1DDEkG4u45KsCu
+ OceyirUx5zb7kjJ+b11cwVfV36IUm51uzum3Tdjqjh0yr8gatjNJFFfk6lKo+RD3u1j3
+ 8pZQ==
+X-Gm-Message-State: APjAAAU60jaqwgqD5CcsaUQqsdaq6EoLmA6/RtS/i3TZRfGQVBUixBEt
+ jTdkJvwJNQq4HozS+T1hUozp4+BJwNZpsqvs2R4MwQcxt0pLfAUV380wvvXP/vMo9TQfjAFMuk5
+ lYIGeeVTvxYODoNY=
+X-Received: by 2002:a5d:4689:: with SMTP id u9mr21852666wrq.78.1570442927680; 
+ Mon, 07 Oct 2019 03:08:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwfIzcWmXMpsAGg8bYJB5A+TAHqfzFRSLmucHZHfd6qN9fftcLXo/ffG1fAG5INZ5QPEUv5Fg==
+X-Received: by 2002:a5d:4689:: with SMTP id u9mr21852640wrq.78.1570442927464; 
+ Mon, 07 Oct 2019 03:08:47 -0700 (PDT)
 Received: from [192.168.1.115] (46.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id l6sm16502841wmg.2.2019.10.07.03.08.35
+ by smtp.gmail.com with ESMTPSA id s1sm25114154wrg.80.2019.10.07.03.08.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Oct 2019 03:08:36 -0700 (PDT)
-Subject: Re: [PATCH 2/4] migration/postcopy: fix typo in
- mark_postcopy_blocktime_begin's comment
+ Mon, 07 Oct 2019 03:08:46 -0700 (PDT)
+Subject: Re: [PATCH 4/4] migration: report SaveStateEntry id and name on
+ failure
 To: Wei Yang <richardw.yang@linux.intel.com>, quintela@redhat.com,
  dgilbert@redhat.com
 References: <20191005220517.24029-1-richardw.yang@linux.intel.com>
- <20191005220517.24029-3-richardw.yang@linux.intel.com>
+ <20191005220517.24029-5-richardw.yang@linux.intel.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e46f93a2-6660-f00d-e4e3-19cb17b6b582@redhat.com>
-Date: Mon, 7 Oct 2019 12:08:35 +0200
+Message-ID: <d2131549-6de5-ee1b-a3bb-a7795780220d@redhat.com>
+Date: Mon, 7 Oct 2019 12:08:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191005220517.24029-3-richardw.yang@linux.intel.com>
+In-Reply-To: <20191005220517.24029-5-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -101,31 +101,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/6/19 12:05 AM, Wei Yang wrote:
+> This provides helpful information on which entry failed.
+>=20
 > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 > ---
->   migration/postcopy-ram.c | 8 +++++---
->   1 file changed, 5 insertions(+), 3 deletions(-)
+>   migration/savevm.c | 2 ++
+>   1 file changed, 2 insertions(+)
 >=20
-> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> index d2bdd21ae3..a394c7c3a6 100644
-> --- a/migration/postcopy-ram.c
-> +++ b/migration/postcopy-ram.c
-> @@ -768,9 +768,11 @@ static void mark_postcopy_blocktime_begin(uintptr_=
-t addr, uint32_t ptid,
->       atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
->       atomic_xchg(&dc->vcpu_addr[cpu], addr);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 9f0122583d..feb757de79 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1215,6 +1215,8 @@ int qemu_savevm_state_iterate(QEMUFile *f, bool p=
+ostcopy)
+>           save_section_footer(f, se);
 >  =20
-> -    /* check it here, not at the begining of the function,
-> -     * due to, check could accur early than bitmap_set in
-> -     * qemu_ufd_copy_ioctl */
-> +    /*
-> +     * check it here, not at the beginning of the function,
-> +     * due to, check could occur early than bitmap_set in
-> +     * qemu_ufd_copy_ioctl
-> +     */
->       already_received =3D ramblock_recv_bitmap_test(rb, (void *)addr);
->       if (already_received) {
->           atomic_xchg(&dc->vcpu_addr[cpu], 0);
+>           if (ret < 0) {
+> +            error_report("failed to save SaveStateEntry with id(name):=
+ %d(%s)",
+> +                         se->section_id, se->idstr);
+>               qemu_file_set_error(f, ret);
+>           }
+>           if (ret <=3D 0) {
 >=20
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
