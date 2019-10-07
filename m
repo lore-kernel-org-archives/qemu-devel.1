@@ -2,66 +2,89 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A43D4C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 21:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3611AECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 21:18:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7413D206C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 21:10:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7413D206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 02C7620867
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 21:18:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="T89o6JQz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02C7620867
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHaH6-00037t-Kf
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 17:10:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43673)
+	id 1iHaOW-0005EI-2u
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 17:18:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iHaGC-0002Ru-ID
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 17:09:41 -0400
+ (envelope-from <jimw@sifive.com>) id 1iHaNI-0004cQ-Vh
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 17:17:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iHaGB-0002we-1u
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 17:09:40 -0400
-Resent-Date: Mon, 07 Oct 2019 17:09:40 -0400
-Resent-Message-Id: <E1iHaGB-0002we-1u@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21424)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iHaGA-0002vn-QA; Mon, 07 Oct 2019 17:09:38 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1570482566; cv=none; d=zoho.com; s=zohoarc; 
- b=ZKap6WPfbN9J48u4o0K45a1AqZ3rNpksIPr5g7BveLkdlbb3mYxgzp0O8Rn8f4qQjFa5MRkre8fDV9a01aI6lDJ917iGX4zCNGzicajvOC6Nqg3nfMfK34YBSKpXGojV61ycRA7Hbr3v4Obe4Mse37cmrt4qrcX3v58OnWLvxgo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1570482566;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=UkOmG+HSTKuzqSbczfKdgkBomWCsUu1RXY1GZezXmPA=; 
- b=SvnJTqh3dr8aWDUpbdaTsrtyh1u1IKh1MP8Qd5kLN3wHZgWeMxIHzD7APrfae92uYav9CVEfOq0l/70guvzLYGqVJkPNX/O89vbHwf9O4RxVR1vDeUq4T/tNji4GZeB1cPNp0eUT/G5LxkaKerGCUyW7GRbHYXv2AgqCJkfos50=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1570482565932164.4868660307984;
- Mon, 7 Oct 2019 14:09:25 -0700 (PDT)
-Subject: Re: [PATCH 0/3] hw/arm/raspi: Split the UART block from the AUX block
-In-Reply-To: <20191007170646.14961-1-f4bug@amsat.org>
-Message-ID: <157048256446.2243.6026604079484817229@d2db2e383209>
+ (envelope-from <jimw@sifive.com>) id 1iHaNH-000778-HE
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 17:17:00 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37666)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jimw@sifive.com>) id 1iHaNH-00076s-9o
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 17:16:59 -0400
+Received: by mail-pl1-x642.google.com with SMTP id u20so7447262plq.4
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 14:16:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=katVuAhmvu3Pqz8FzvCmsgKw4pFmRYZqkjKzNJMiDk4=;
+ b=T89o6JQzfrEXYci73vfjDrZR3JC/Ex39CXExTn5KMc2sdEirUiRO0Fg3z3JXE2Xtdj
+ E/hceRjJoU1ejAZ5j/U3qpXXQm9SE6Nlz7rSCc260afl8nzuMoIxnWSIxlaE7gR8boSc
+ ush0g7yRZed5XhTJwosBnMgqwBnAR5bjowpgN3djum3KUQh13NVyK1WZhIhtmkPSBwzz
+ YPCW5JfwcPycNE+ifVSRSosm0cx15A11I3CltM16hRgoXEYpy/dTTN+X6NpHTkgTqViC
+ xiXr/5lJNflNvi40BObiHve6OtJO2VSga9tXHfhAjuCODtvsDKEhhxFEH88jMj//OPOz
+ tMfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=katVuAhmvu3Pqz8FzvCmsgKw4pFmRYZqkjKzNJMiDk4=;
+ b=j5MwXvapEcJD+djsFfoo222DTOgADCcc6u9eZ9iZV24kbxmkbqZze+hOQNrcvxSsQI
+ yxyoYSmt3qAXPKoUY9c9LpZkVXiFcIwUIiq7r20TolEanehbWFGkUbq8yQ8gSrlPIHWF
+ Ff5GadOzP7oAGFyMvCkQ/qDlGH8v0ACTjDIi3KOPNtyGmpSzidr8QLvepred+m4U/S88
+ zt0E2JQJ9/IQp7yV1qxgc9g1tW+6qU9v85xWLffQrggFkfDPJN8AGb811Inw8vsw64aK
+ TygBMA8nHzGN7qPGWFJv0cP6wZBlXSB42ZwbfLTn+14IfGx4jFWbIv6srOedYqLM8RQP
+ obDg==
+X-Gm-Message-State: APjAAAVIkgvJiGpwxbqTRgHL3dBTdpXBbjSFMcRjln51aFT4Z1mfvOis
+ GcexscLa0IAUkzpwen8KAfTy2g==
+X-Google-Smtp-Source: APXvYqxB5uFnrbRYoagnAAjyIWQlPDUydyA30pUIijwPVWm3itxc1CUbaJf1fgNJucQgjWEBlbQbfA==
+X-Received: by 2002:a17:902:ff08:: with SMTP id
+ f8mr22768763plj.309.1570483017954; 
+ Mon, 07 Oct 2019 14:16:57 -0700 (PDT)
+Received: from [10.17.0.102] ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id i74sm19200018pfe.28.2019.10.07.14.16.57
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 07 Oct 2019 14:16:57 -0700 (PDT)
+Subject: Re: [PATCH v2] target/riscv: Expose "priv" register for GDB
+To: Jonathan Behrens <jonathan@fintelia.io>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+References: <20191004151614.81516-1-jonathan@fintelia.io>
+From: Jim Wilson <jimw@sifive.com>
+Message-ID: <5393a150-71b6-a729-7530-a50df05353bd@sifive.com>
+Date: Mon, 7 Oct 2019 14:16:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: f4bug@amsat.org
-Date: Mon, 7 Oct 2019 14:09:25 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+In-Reply-To: <20191004151614.81516-1-jonathan@fintelia.io>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,53 +96,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, alistair@alistair23.me, qemu-devel@nongnu.org,
- Andrew.Baumann@microsoft.com, f4bug@amsat.org, qemu-arm@nongnu.org
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAwNzE3MDY0Ni4xNDk2
-MS0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKU3ViamVjdDogW1BBVENIIDAvM10gaHcvYXJtL3Jhc3BpOiBTcGxpdCB0aGUgVUFS
-VCBibG9jayBmcm9tIHRoZSBBVVggYmxvY2sKTWVzc2FnZS1pZDogMjAxOTEwMDcxNzA2NDYuMTQ5
-NjEtMS1mNGJ1Z0BhbXNhdC5vcmcKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozZWU0NDU5IGh3
-OiBNb3ZlIEJDTTI4MzUgQVVYIGRldmljZSBmcm9tIGh3L2NoYXIvIHRvIGh3L21pc2MvCjQxMDlh
-ZGQgaHcvY2hhci9iY20yODM1X2F1eDogVXNlIHRoZSBCQ00yODM1IG1pbml1YXJ0IGJsb2NrCmMx
-OTkwNGUgaHcvY2hhcjogQWRkIHRoZSBCQ00yODM1IG1pbml1YXJ0Cgo9PT0gT1VUUFVUIEJFR0lO
-ID09PQoxLzMgQ2hlY2tpbmcgY29tbWl0IGMxOTkwNGVhYjgwZiAoaHcvY2hhcjogQWRkIHRoZSBC
-Q00yODM1IG1pbml1YXJ0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyOTogCm5ldyBmaWxlIG1vZGUgMTAw
-NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM4MCBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAxLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi8zIENoZWNraW5nIGNvbW1pdCA0MTA5
-YWRkYWNjOWYgKGh3L2NoYXIvYmNtMjgzNV9hdXg6IFVzZSB0aGUgQkNNMjgzNSBtaW5pdWFydCBi
-bG9jaykKRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIHN0YXRpY3MgdG8gMCBvciBOVUxMCiM3Mzog
-RklMRTogaHcvY2hhci9iY20yODM1X2F1eC5jOjI4Ogorc3RhdGljIGNvbnN0IGJvb2wgYXV4X2Vu
-YWJsZV9zdXBwb3J0ZWQgPSBmYWxzZTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMzk3
-IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8z
-IENoZWNraW5nIGNvbW1pdCAzZWU0NDU5NjYwZjkgKGh3OiBNb3ZlIEJDTTI4MzUgQVVYIGRldmlj
-ZSBmcm9tIGh3L2NoYXIvIHRvIGh3L21pc2MvKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1MzogCnJlbmFt
-ZSBmcm9tIGh3L2NoYXIvYmNtMjgzNV9hdXguYwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
-LCA0OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEw
-MDcxNzA2NDYuMTQ5NjEtMS1mNGJ1Z0BhbXNhdC5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+On 10/4/19 8:16 AM, Jonathan Behrens wrote:
+> diff --git a/gdb-xml/riscv-32bit-cpu.xml b/gdb-xml/riscv-32bit-cpu.xml
+> index 0d07aaec85..d6d76aafd8 100644
+> --- a/gdb-xml/riscv-32bit-cpu.xml
+> +++ b/gdb-xml/riscv-32bit-cpu.xml
+> @@ -44,4 +44,5 @@
+>     <reg name="t5" bitsize="32" type="int"/>
+>     <reg name="t6" bitsize="32" type="int"/>
+>     <reg name="pc" bitsize="32" type="code_ptr"/>
+> +  <reg name="priv" bitsize="32" type="int"/>
+>   </feature>
 
+Adding this to the cpu register set means that the gdb "info registers" 
+command will now list a value for the mysterious undocumented "priv" 
+register.  That is likely to result in user confusion, and a few gdb bug 
+reports.
+
+Gdb incidentally already has support for a virtual priv register.  From 
+gdb/riscv-tdep.c:
+
+static const struct riscv_register_feature riscv_virtual_feature =
+{
+  "org.gnu.gdb.riscv.virtual",
+  {
+    { RISCV_PRIV_REGNUM, { "priv" }, false }
+  }
+};
+
+So the correct way to fix this is to add a 
+gdb-xml/riscv-32bit-virtual.xml file, along with code to handle this new 
+xml file and the registers in it.  Likewise for the 64-bit support.
+
+The main advantage of doing things this way is that only people that 
+care about the priv register will see it, and this will interoperate 
+with other RISC-V debuggers and targets (if any) that already have 
+virtual priv register support.
+
+Jim
 
