@@ -2,81 +2,67 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE40ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C556C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:49:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB02920684
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:44:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkeley-edu.20150623.gappssmtp.com header.i=@berkeley-edu.20150623.gappssmtp.com header.b="iGcgrGOC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB02920684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=berkeley.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 1172A206C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:49:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1172A206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHXzj-0002V4-QK
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 14:44:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52270)
+	id 1iHY4M-0004OT-3n
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 14:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52911)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dayeol@berkeley.edu>) id 1iHXwy-0001jv-J0
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:41:41 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iHY3B-0003vI-S4
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:48:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dayeol@berkeley.edu>) id 1iHXww-0006R3-Qg
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:41:40 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45311)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1iHXww-0006Qf-HN
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:41:38 -0400
-Received: by mail-pf1-x443.google.com with SMTP id y72so9167497pfb.12
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 11:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=berkeley-edu.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=KJzG2axKoZkgi+l/x9Y+YilciqreDl/CMUAdZrHp2aw=;
- b=iGcgrGOCKgHnYj0SOxs4byq0fzbx3qX+oOOzRHokaMHdEiD8mDY6Q3JygO931nMbqJ
- fzWFuzu8hPpdhWk9JEnpE9d6x6zzAzcKHAEg2Na+INFJAhv2R6MjZtcaHYVNgf4QI37D
- DJHpuk9lHL1TtvncnkAmP+sOVvxQxpuOEpdJj6gkcHoVTyTXvsbvxUILntTXb9dQ8gcf
- Z6LRr/tYlTaRBPD1Hfdz+sKjaKSnjMpdbfjjuufDgw5Vt+YvzSTKtUSVrbtfDlneELT8
- I1c74nccf5kKFy1rhccOhr50gar9wY4rJrAUbthHyDcAJkW6rmbxmppVpHe0BJjFH4+z
- 21Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=KJzG2axKoZkgi+l/x9Y+YilciqreDl/CMUAdZrHp2aw=;
- b=McRW9dQw7l+iMbYbr0P1vuy7PKEOdyKX6cW/j5ZyFTYBFikA/MrQI35C4daJSGE55c
- T6cWCbknxapoZQtFZVPD6Ljs1Sku1atenXzG+X4gPbve4SfjmftlbwHduUZ/bySnD9r+
- Di1lPdWnnlGttxpTI+3ns61WSOdAevCi94pOfLUwCQJCz+vjC7RfI7FZCkh1wQJ6BBCF
- I4jPOnqm3KnVkDLmcZcLMThcfaSPKyvyLXrNHltUPK6KuTg2AESVpalyGRIeAX40n7dM
- vEsklGq8n2lWjeO/2zty43Dogp7GpPpff8LDZ5Zw9AjcqAa+ELugg7Pk6nUk3g645Ktz
- PPHA==
-X-Gm-Message-State: APjAAAVe3qYfVvbS/1ZXsrUy8zVITFzMjK86hkCVUkuPahHWf7fO5MCf
- bJTh+IPbsmMn30wl+mSzDPqBstKKY/X2eW1tadOMGg==
-X-Google-Smtp-Source: APXvYqy56w92ZslacwtCzrc4WCV82EQC6F0vE5pppvDkBeVbKt5gFBFOxqcL+j6uZvTu+A5wjfNQqF6iLd1S+OS1L5I=
-X-Received: by 2002:aa7:8816:: with SMTP id c22mr25727116pfo.197.1570473697061; 
- Mon, 07 Oct 2019 11:41:37 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1iHY37-000067-MM
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:48:05 -0400
+Resent-Date: Mon, 07 Oct 2019 14:48:04 -0400
+Resent-Message-Id: <E1iHY37-000067-MM@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21508)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iHY34-0008Uz-5c
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:47:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1570474067; cv=none; d=zoho.com; s=zohoarc; 
+ b=EDPYeXsoPqyVYlK9lXDHTZLA/VaVqa3uMorNbMSMwZ0wyY4AknUh0vmTbZIJxb5tEmo5DmZT8hz3o4HVojIH290bUd9CELjnsXkfKGn7supa/H0aOjdYlmxN03LPy7UkydxKT00xzhvzTjS97bbnHyasUhpqnZBKo13u8msJVCc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1570474067;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=NCckCkTJQBzCYxotw2jkYYazX4LdWkbQ83/eANaIQpo=; 
+ b=aOwvOWoohmD8kZCzlnJ3udpUq9vyyJSXUnGxBnbExBVdgbPjiLMl8ThwU1ox4Qtj1Ahj0Q4IIiVrZOF54bqJ0HtS0i8NU81dEeg5KW5DPjA9exp4q3KyV9+XEjtg8ApZuMUI1t5GpSVMr+GDGdqUf1HMk3PPM9snkF0cll3Fh8c=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1570474066483276.3642664807636;
+ Mon, 7 Oct 2019 11:47:46 -0700 (PDT)
+Subject: Re: [PATCH  v9 00/13] TCG code quality tracking and perf integration
+In-Reply-To: <20191007152839.30804-1-alex.bennee@linaro.org>
+Message-ID: <157047406546.2243.8330877618140437212@d2db2e383209>
 MIME-Version: 1.0
-References: <20191007052813.25814-1-dayeol@berkeley.edu>
- <5583387c-5c5b-8890-999b-2ba4d75cd69d@linaro.org>
- <CACjxMEsw+Deh176JLP2aF4Pdkb_s8MiPApwMON-_K6ed61-Zyw@mail.gmail.com>
- <3747223d-23ee-1f28-e165-b2b0c5746b68@linaro.org>
-In-Reply-To: <3747223d-23ee-1f28-e165-b2b0c5746b68@linaro.org>
-From: Dayeol Lee <dayeol@berkeley.edu>
-Date: Mon, 7 Oct 2019 11:41:26 -0700
-Message-ID: <CACjxMEtPRxTQdOYFL97G7aYXC6KTBuGY2avf1bPJLYGEpURh=Q@mail.gmail.com>
-Subject: Re: [PATCH] target/riscv: PMP violation due to wrong size parameter
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000d7ce0905945666d7"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alex.bennee@linaro.org
+Date: Mon, 7 Oct 2019 11:47:46 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.55
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,80 +74,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: cota@braap.org, alex.bennee@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d7ce0905945666d7
-Content-Type: text/plain; charset="UTF-8"
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAwNzE1MjgzOS4zMDgw
+NC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2Nr
+ZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3
+QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAg
+IHFnYS92c3Mtd2luMzIubwogIENDICAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xYXBpLXR5
+cGVzLm8KICBDQyAgICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS12aXNpdC5vCi4vcWVt
+dS1tb25pdG9yLnRleGk6NTg1OiB3YXJuaW5nOiBAZmluZGV4IG1pc3NpbmcgYXJndW1lbnQKICBD
+QyAgICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFwaS1jb21tYW5kcy5vCi4vcWVtdS1tb25p
+dG9yLnRleGk6NTg1OiB3YXJuaW5nOiBAZmluZGV4IG1pc3NpbmcgYXJndW1lbnQKICBBUiAgICAg
+IGxpYnFlbXV1dGlsLmEKICBMSU5LICAgIGVsZjJkbXAuZXhlCiAgQ0MgICAgICBxZW11LWltZy5v
+Ci0tLQogIExJTksgICAgcWVtdS1pbWcuZXhlCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvYXJj
+aF9pbml0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9jcHVzLm8KL3RtcC9xZW11LXRlc3Qv
+c3JjL2Rpc2FzLmM6NDI1OjMxOiBlcnJvcjogJ3N0cnVjdCBfSU9fRklMRScgZGVjbGFyZWQgaW5z
+aWRlIHBhcmFtZXRlciBsaXN0IHdpbGwgbm90IGJlIHZpc2libGUgb3V0c2lkZSBvZiB0aGlzIGRl
+ZmluaXRpb24gb3IgZGVjbGFyYXRpb24gWy1XZXJyb3JdCiBzdGF0aWMgaW50IGZwcmludGZfbG9n
+KHN0cnVjdCBfSU9fRklMRSAqYSwgY29uc3QgY2hhciAqYiwgLi4uKQogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXn5+fn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2Rpc2FzLmM6IEluIGZ1
+bmN0aW9uICdmcHJpbnRmX2xvZyc6Ci90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjQzMToxODog
+ZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMSBvZiAndmZwcmludGYnIGZyb20gaW5jb21wYXRpYmxl
+IHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10KICAgICAg
+ICAgdmZwcmludGYoYSwgYiwgYXApOwogICAgICAgICAgICAgICAgICBeCkluIGZpbGUgaW5jbHVk
+ZWQgZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9xZW11L29zZGVwLmg6OTksCi0tLQog
+ICAgICAgICAgICAgICB+fn5+fn5efn5+fn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9x
+ZW11LXRlc3Qvc3JjL2Rpc2FzLmM6MzoKL3RtcC9xZW11LXRlc3Qvc3JjL2Rpc2FzLmM6IEluIGZ1
+bmN0aW9uICd0YXJnZXRfZGlzYXMnOgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9kaXNhcy9k
+aXMtYXNtLmg6NDc4OjIzOiBlcnJvcjogYXNzaWdubWVudCB0byAnZnByaW50Zl9mdW5jdGlvbicg
+e2FrYSAnaW50ICgqKShzdHJ1Y3QgX2lvYnVmICosIGNvbnN0IGNoYXIgKiwgLi4uKSd9IGZyb20g
+aW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSAnaW50ICgqKShzdHJ1Y3QgX0lPX0ZJTEUgKiwgY29u
+c3QgY2hhciAqLCAuLi4pJyBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10KICAg
+KElORk8pLmZwcmludGZfZnVuYyA9IChGUFJJTlRGX0ZVTkMpLCBcCiAgICAgICAgICAgICAgICAg
+ICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9kaXNhcy9kaXMtYXNtLmg6NDcwOjM6
+IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyAnSU5JVF9ESVNBU1NFTUJMRV9JTkZPX05PX0FS
+Q0gnCi0tLQovdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMuYzo0NTA6NTogbm90ZTogaW4gZXhwYW5z
+aW9uIG9mIG1hY3JvICdJTklUX0RJU0FTU0VNQkxFX0lORk8nCiAgICAgSU5JVF9ESVNBU1NFTUJM
+RV9JTkZPKHMuaW5mbywgb3V0LCBmcHJpbnRmX2xvZyk7CiAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjQ4MToyMTogZXJyb3I6IHBhc3NpbmcgYXJn
+dW1lbnQgMSBvZiAnZnByaW50Zl9sb2cnIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBb
+LVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10KICAgICAgICAgZnByaW50Zl9sb2co
+b3V0LCAiMHgiIFRBUkdFVF9GTVRfbHggIjogICIsIHBjKTsKICAgICAgICAgICAgICAgICAgICAg
+Xn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjQyNTo0MTogbm90ZTogZXhwZWN0ZWQgJ3N0
+cnVjdCBfSU9fRklMRSAqJyBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSAnRklMRSAqJyB7YWthICdz
+dHJ1Y3QgX2lvYnVmIConfQogc3RhdGljIGludCBmcHJpbnRmX2xvZyhzdHJ1Y3QgX0lPX0ZJTEUg
+KmEsIGNvbnN0IGNoYXIgKmIsIC4uLikKICAgICAgICAgICAgICAgICAgICAgICAgfn5+fn5+fn5+
+fn5+fn5+fn5eCi90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjQ4MzoyMTogZXJyb3I6IHBhc3Np
+bmcgYXJndW1lbnQgMSBvZiAnZnByaW50Zl9sb2cnIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIg
+dHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10KICAgICAgICAgZnByaW50
+Zl9sb2cob3V0LCAiXG4iKTsKICAgICAgICAgICAgICAgICAgICAgXn5+Ci90bXAvcWVtdS10ZXN0
+L3NyYy9kaXNhcy5jOjQyNTo0MTogbm90ZTogZXhwZWN0ZWQgJ3N0cnVjdCBfSU9fRklMRSAqJyBi
+dXQgYXJndW1lbnQgaXMgb2YgdHlwZSAnRklMRSAqJyB7YWthICdzdHJ1Y3QgX2lvYnVmIConfQog
+c3RhdGljIGludCBmcHJpbnRmX2xvZyhzdHJ1Y3QgX0lPX0ZJTEUgKmEsIGNvbnN0IGNoYXIgKmIs
+IC4uLikKICAgICAgICAgICAgICAgICAgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5eCmNjMTogYWxs
+IHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbL3RtcC9xZW11
+LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogZGlzYXMub10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2Fp
+dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGNn
+L3RjZy1vcC1ndmVjLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L3RjZy90Y2ctY29tbW9uLm8K
+LS0tCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9jcHVzLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0
+bW11L2dkYnN0dWIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvYmFsbG9vbi5vCi90bXAvcWVt
+dS10ZXN0L3NyYy9kaXNhcy5jOjQyNTozMTogZXJyb3I6ICdzdHJ1Y3QgX0lPX0ZJTEUnIGRlY2xh
+cmVkIGluc2lkZSBwYXJhbWV0ZXIgbGlzdCB3aWxsIG5vdCBiZSB2aXNpYmxlIG91dHNpZGUgb2Yg
+dGhpcyBkZWZpbml0aW9uIG9yIGRlY2xhcmF0aW9uIFstV2Vycm9yXQogc3RhdGljIGludCBmcHJp
+bnRmX2xvZyhzdHJ1Y3QgX0lPX0ZJTEUgKmEsIGNvbnN0IGNoYXIgKmIsIC4uLikKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+Ci90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5j
+OiBJbiBmdW5jdGlvbiAnZnByaW50Zl9sb2cnOgovdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMuYzo0
+MzE6MTg6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDEgb2YgJ3ZmcHJpbnRmJyBmcm9tIGluY29t
+cGF0aWJsZSBwb2ludGVyIHR5cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNd
+CiAgICAgICAgIHZmcHJpbnRmKGEsIGIsIGFwKTsKICAgICAgICAgICAgICAgICAgXgpJbiBmaWxl
+IGluY2x1ZGVkIGZyb20gL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcWVtdS9vc2RlcC5oOjk5
+LAotLS0KICAgICAgICAgICAgICAgfn5+fn5+Xn5+fn5+fn4KSW4gZmlsZSBpbmNsdWRlZCBmcm9t
+IC90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5jOjM6Ci90bXAvcWVtdS10ZXN0L3NyYy9kaXNhcy5j
+OiBJbiBmdW5jdGlvbiAndGFyZ2V0X2Rpc2FzJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUv
+ZGlzYXMvZGlzLWFzbS5oOjQ3ODoyMzogZXJyb3I6IGFzc2lnbm1lbnQgdG8gJ2ZwcmludGZfZnVu
+Y3Rpb24nIHtha2EgJ2ludCAoKikoc3RydWN0IF9pb2J1ZiAqLCBjb25zdCBjaGFyICosIC4uLikn
+fSBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGUgJ2ludCAoKikoc3RydWN0IF9JT19GSUxF
+ICosIGNvbnN0IGNoYXIgKiwgLi4uKScgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlw
+ZXNdCiAgIChJTkZPKS5mcHJpbnRmX2Z1bmMgPSAoRlBSSU5URl9GVU5DKSwgXAogICAgICAgICAg
+ICAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvZGlzYXMvZGlzLWFzbS5o
+OjQ3MDozOiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8gJ0lOSVRfRElTQVNTRU1CTEVfSU5G
+T19OT19BUkNIJwotLS0KL3RtcC9xZW11LXRlc3Qvc3JjL2Rpc2FzLmM6NDUwOjU6IG5vdGU6IGlu
+IGV4cGFuc2lvbiBvZiBtYWNybyAnSU5JVF9ESVNBU1NFTUJMRV9JTkZPJwogICAgIElOSVRfRElT
+QVNTRU1CTEVfSU5GTyhzLmluZm8sIG91dCwgZnByaW50Zl9sb2cpOwogICAgIF5+fn5+fn5+fn5+
+fn5+fn5+fn5+fgovdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMuYzo0ODE6MjE6IGVycm9yOiBwYXNz
+aW5nIGFyZ3VtZW50IDEgb2YgJ2ZwcmludGZfbG9nJyBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVy
+IHR5cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgICAgICAgIGZwcmlu
+dGZfbG9nKG91dCwgIjB4IiBUQVJHRVRfRk1UX2x4ICI6ICAiLCBwYyk7CiAgICAgICAgICAgICAg
+ICAgICAgIF5+fgovdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMuYzo0MjU6NDE6IG5vdGU6IGV4cGVj
+dGVkICdzdHJ1Y3QgX0lPX0ZJTEUgKicgYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ0ZJTEUgKicg
+e2FrYSAnc3RydWN0IF9pb2J1ZiAqJ30KIHN0YXRpYyBpbnQgZnByaW50Zl9sb2coc3RydWN0IF9J
+T19GSUxFICphLCBjb25zdCBjaGFyICpiLCAuLi4pCiAgICAgICAgICAgICAgICAgICAgICAgIH5+
+fn5+fn5+fn5+fn5+fn5+XgovdG1wL3FlbXUtdGVzdC9zcmMvZGlzYXMuYzo0ODM6MjE6IGVycm9y
+OiBwYXNzaW5nIGFyZ3VtZW50IDEgb2YgJ2ZwcmludGZfbG9nJyBmcm9tIGluY29tcGF0aWJsZSBw
+b2ludGVyIHR5cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBvaW50ZXItdHlwZXNdCiAgICAgICAg
+IGZwcmludGZfbG9nKG91dCwgIlxuIik7CiAgICAgICAgICAgICAgICAgICAgIF5+fgovdG1wL3Fl
+bXUtdGVzdC9zcmMvZGlzYXMuYzo0MjU6NDE6IG5vdGU6IGV4cGVjdGVkICdzdHJ1Y3QgX0lPX0ZJ
+TEUgKicgYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUgJ0ZJTEUgKicge2FrYSAnc3RydWN0IF9pb2J1
+ZiAqJ30KIHN0YXRpYyBpbnQgZnByaW50Zl9sb2coc3RydWN0IF9JT19GSUxFICphLCBjb25zdCBj
+aGFyICpiLCAuLi4pCiAgICAgICAgICAgICAgICAgICAgICAgIH5+fn5+fn5+fn5+fn5+fn5+Xgpj
+YzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogWy90
+bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IGRpc2FzLm9dIEVycm9yIDEKbWFrZVsxXTog
+KioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0
+ODI6IGFhcmNoNjQtc29mdG1tdS9hbGxdIEVycm9yIDIKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVu
+ZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0ODI6IHg4Nl82NC1zb2Z0bW11
+L2FsbF0gRXJyb3IgMgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAi
+Li90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+CiAgICBzeXMu
+ZXhpdChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNt
+ZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbics
+ICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD02NTlj
+NmVkZDFlZjc0ZWUzYjc5Y2Y3OTlmMGE4MGQ1MScsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHkt
+b3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScs
+ICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcs
+ICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zh
+ci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNj
+YWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
+bXAtcDVsaWpxMWQvc3JjL2RvY2tlci1zcmMuMjAxOS0xMC0wNy0xNC40My4wMy42MTUwOi92YXIv
+dG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0
+LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRl
+cj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTY1OWM2ZWRkMWVmNzRlZTNiNzljZjc5OWYw
+YTgwZDUxCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5n
+IGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXA1bGlqcTFkL3NyYycKbWFr
+ZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDRt
+NDIuOTQwcwp1c2VyICAgIDBtOC4zNjNzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
+dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTAwNzE1MjgzOS4zMDgwNC0xLWFsZXguYmVubmVl
+QGxpbmFyby5vcmcvdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
 
-On Mon, Oct 7, 2019 at 11:25 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
-
-> On 10/7/19 10:19 AM, Dayeol Lee wrote:
-> > Thank you very much for the clarification!
-> >
-> > I found tlb_set_page with size != TARGET_PAGE_SIZE makes the translation
-> way
-> > too slow; the Linux doesn't seem to boot.
->
-> To clarify, PMP specifies a range.  That range has only two end points.
-> Therefore, a maximum of 2 pages may be affected by a mis-aligned PMP
-> boundary.
->
-> It sounds like you're getting size != TARGET_PAGE_SIZE for all pages.
->
->
-The cause of the problem is not a mis-aligned PMP boundary.
-Let's say a PMP range is 0x1000 - 0x2000
-if pmp_hart_has_privs() gets addr=0x2000 and size=0,
-pmp_hart_has_privs() will ALWAYS return false because the code assumes size
-> 0.
-It checks if (addr) and (addr + size - 1) are within the PMP range for each
-PMP entry.
-(addr + size - 1) is supposed to be the last byte address of the memory
-access, but it ends up with (addr - 1) if size = 0.
-Thus, pmp_hart_has_privs() returns false as (addr - 1) = 0x1fff is within
-the range, and addr = 0x2000 is out of the range (partial match violation).
-
---000000000000d7ce0905945666d7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">On Mon, Oct 7, 2019 at 11:25 AM Richard H=
-enderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.hender=
-son@linaro.org</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquo=
-te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
-solid rgb(204,204,204);padding-left:1ex">On 10/7/19 10:19 AM, Dayeol Lee wr=
-ote:<br>
-&gt; Thank you very much for the clarification!<br>
-&gt; <br>
-&gt; I found tlb_set_page with size !=3D TARGET_PAGE_SIZE makes the transla=
-tion way<br>
-&gt; too slow; the Linux doesn&#39;t seem to boot.<br>
-<br>
-To clarify, PMP specifies a range.=C2=A0 That range has only two end points=
-.<br>
-Therefore, a maximum of 2 pages may be affected by a mis-aligned PMP bounda=
-ry.<br>
-<br>
-It sounds like you&#39;re getting size !=3D TARGET_PAGE_SIZE for all pages.=
-<br><br></blockquote><div><br></div><div>The cause of the problem is not a =
-mis-aligned PMP boundary.</div><div>Let&#39;s say a PMP range is 0x1000 - 0=
-x2000</div><div>if pmp_hart_has_privs() gets addr=3D0x2000 and size=3D0,</d=
-iv><div>pmp_hart_has_privs() will ALWAYS return false because the code assu=
-mes size &gt; 0.</div><div>It checks if (addr) and (addr=C2=A0+ size - 1) a=
-re within the PMP range for each PMP entry.</div><div>(addr=C2=A0+ size - 1=
-) is supposed to be the last byte address of the memory access, but it ends=
- up with (addr - 1) if size =3D 0.</div><div>Thus, pmp_hart_has_privs() ret=
-urns false as (addr - 1) =3D 0x1fff is within the range, and addr =3D 0x200=
-0 is out of the range (partial match violation).</div><div><br></div><div><=
-br></div><div><br></div></div></div>
-
---000000000000d7ce0905945666d7--
 
