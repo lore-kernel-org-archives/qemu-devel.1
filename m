@@ -2,71 +2,66 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A96CAC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 06:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 731A6C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 06:22:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F0182084D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 06:18:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F0182084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 428FF2084D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 06:22:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 428FF2084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHMLP-0006Tv-M7
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 02:18:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34336)
+	id 1iHMPL-0007l3-Dd
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 02:22:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34651)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iHMKm-000642-4K
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 02:17:29 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iHMOL-0007Cl-JS
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 02:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iHMKk-0005ll-EZ
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 02:17:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50428)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iHMKk-0005lC-9X
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 02:17:26 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7CA2446288;
- Mon,  7 Oct 2019 06:17:24 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 72C0A600C1;
- Mon,  7 Oct 2019 06:17:24 +0000 (UTC)
-Received: from zmail25.collab.prod.int.phx2.redhat.com
- (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 4A9B81808876;
- Mon,  7 Oct 2019 06:17:24 +0000 (UTC)
-Date: Mon, 7 Oct 2019 02:17:23 -0400 (EDT)
-From: Thomas Huth <thuth@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <1861880686.5726737.1570429043380.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1932cc2e-830c-e542-817d-a6e5ef750c6c@redhat.com>
-References: <20191003225437.16651-1-philmd@redhat.com>
- <20191003225437.16651-8-philmd@redhat.com>
- <1932cc2e-830c-e542-817d-a6e5ef750c6c@redhat.com>
-Subject: Re: [PATCH 7/7] tests/fw_cfg: Run the tests on big-endian targets
+ (envelope-from <no-reply@patchew.org>) id 1iHMOK-0007v6-39
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 02:21:09 -0400
+Resent-Date: Mon, 07 Oct 2019 02:21:09 -0400
+Resent-Message-Id: <E1iHMOK-0007v6-39@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21524)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iHMOJ-0007tT-Rz; Mon, 07 Oct 2019 02:21:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1570429249; cv=none; d=zoho.com; s=zohoarc; 
+ b=HkkSnxi+x76+GO19MJ7eTa/IqCGA1u/L6nsuHflDAqe0mDCUtImUHuw6+lJJACXTZa02wsRrz90yC3+2kYTDU+WxYH8dUKwAeK8ITTE8pmwXKFfcFCUSqtCyBjDVPHn0A+LQ3HIp+SwRIAQXA+vvDqCNTHpqhxTQR0gML0/7O8A=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1570429249;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=Qh+vNqJghHptN57k0cNYiQz8vmlx8XPJ8RJgpu1Drs8=; 
+ b=fqYaWma7RF9yTDgrvVqWKdXHrVMru2HX+3QRTWvpjg44XqnwAuCynHAwyAgqlAxBaHX7h9phKkfi4OWJBjRGpAuUAXMvYdJAnmU+yvVcM6u3/0VMOz9JhsFNsLGVEYMB+AQNtitCOJyjHcVgrSvQAU/6nJ77OyXUqkaxwANP0eI=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 157042924646341.74706414253876;
+ Sun, 6 Oct 2019 23:20:46 -0700 (PDT)
+Subject: Re: [PATCH] target/riscv: PMP violation due to wrong size parameter
+In-Reply-To: <20191007052813.25814-1-dayeol@berkeley.edu>
+Message-ID: <157042924496.31166.11860357702782230659@8230166b0665>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [84.136.96.125, 10.4.196.12, 10.5.101.130, 10.4.195.9]
-Thread-Topic: tests/fw_cfg: Run the tests on big-endian targets
-Thread-Index: wBjES5YPxxWuPQ+aV8Th1WyynTv5aA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Mon, 07 Oct 2019 06:17:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: dayeol@berkeley.edu
+Date: Sun, 6 Oct 2019 23:20:46 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.55
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,36 +73,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, dayeol@berkeley.edu,
+ kbastian@mail.uni-paderborn.de, palmer@sifive.com, qemu-devel@nongnu.org,
+ Alistair.Francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
------ Original Message -----
-> Sent: Friday, October 4, 2019 10:05:09 AM
-> On 04/10/2019 00:54, Philippe Mathieu-Daud=C3=A9 wrote:
-[...]
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index 3543451ed3..322bdb36ff 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -242,6 +242,7 @@ check-qtest-ppc64-$(CONFIG_VGA) +=3D
-> > tests/display-vga-test$(EXESUF)
-> >  check-qtest-ppc64-y +=3D tests/numa-test$(EXESUF)
-> >  check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) +=3D tests/ivshmem-test$(EX=
-ESUF)
-> >  check-qtest-ppc64-y +=3D tests/cpu-plug-test$(EXESUF)
-> > +check-qtest-ppc64-y +=3D tests/fw_cfg-test$(EXESUF)
->=20
-> Perhaps only a detail, but ppc64 (pseries) doesn't use fw_cfg, but ppc
-> (mac99, g3beige and prep) does, so perhaps you should rather add the
-> test to check-qtest-ppc-y (and it will be inherited by ppc64)?
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAwNzA1MjgxMy4yNTgx
+NC0xLWRheWVvbEBiZXJrZWxleS5lZHUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MTAwNzA1MjgxMy4yNTgx
+NC0xLWRheWVvbEBiZXJrZWxleS5lZHUKU3ViamVjdDogW1BBVENIXSB0YXJnZXQvcmlzY3Y6IFBN
+UCB2aW9sYXRpb24gZHVlIHRvIHdyb25nIHNpemUgcGFyYW1ldGVyCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
+eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
+IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3Y2E5
+NDcwIHRhcmdldC9yaXNjdjogUE1QIHZpb2xhdGlvbiBkdWUgdG8gd3Jvbmcgc2l6ZSBwYXJhbWV0
+ZXIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBj
+b25kaXRpb25hbCBzdGF0ZW1lbnRzICg0LCA2KQojNDg6IEZJTEU6IHRhcmdldC9yaXNjdi9jcHVf
+aGVscGVyLmM6NDc0OgorICAgIGlmIChhY2Nlc3NfdHlwZSA9PSBNTVVfSU5TVF9GRVRDSCkgewor
+ICAgICAgcG1wX3NpemUgPSBSSVNDVl9JTlNOX0xFTkdUSDsKCnRvdGFsOiAxIGVycm9ycywgMCB3
+YXJuaW5ncywgMzAgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDdjYTk0NzA0ODQ1MCAodGFyZ2V0L3Jp
+c2N2OiBQTVAgdmlvbGF0aW9uIGR1ZSB0byB3cm9uZyBzaXplIHBhcmFtZXRlcikgaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
+ZXcub3JnL2xvZ3MvMjAxOTEwMDcwNTI4MTMuMjU4MTQtMS1kYXllb2xAYmVya2VsZXkuZWR1L3Rl
+c3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
+b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-Yes, this should go into check-qtest-ppc-y instead of check-qtest-ppc64-y.
-
- Thanks,
-  Thomas
 
