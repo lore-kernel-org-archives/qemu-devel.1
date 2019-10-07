@@ -2,83 +2,66 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F2BC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A589AECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:42:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E02D3205F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:41:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D1OFw184"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E02D3205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 794DA21721
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:42:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 794DA21721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHSKT-0004HK-3g
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 08:41:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51962)
+	id 1iHSLV-0005KK-Kh
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 08:42:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52156)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iHSIn-0002ZF-JX
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:39:51 -0400
+ (envelope-from <drjones@redhat.com>) id 1iHSKV-0004V0-Sb
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:41:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iHSIl-0008Mj-Hw
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:39:49 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35082)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iHSIh-0008L2-Vk
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:39:45 -0400
-Received: by mail-oi1-x244.google.com with SMTP id x3so11501087oig.2
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 05:39:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YDLy2+RFcFLz/VZiKL7vYfb1b3sSo2lHhiUd1uYCkA8=;
- b=D1OFw184AbdczwBwQaC0gGJ8jkhwzU/A83+rDooq1B1TfCrkIkJPCH7itbzd8LVWue
- o/H/XSpJbwH4iXiJPvC41RTVNWDRWaok0C9oKAyy/LqL44pL4vtHKwkGyVO5Bed7/Zzk
- MKMapDzRLM0bbWJtatTG24dMykOf11CrAQ759NV5PY9/6tYFg+CG0ReiV2CRRnfNfRPy
- r0SeI+j3Cj6IeZg7NlYaeYqXB+POHdKLvBe172HVbWEk3alZ8Mqp9MvN2epGAo0raS22
- Alssyotk6tYyV168nswWmKE6PFLml9TXYh07ymSmQQQ4aggRRFiZx6CIQuk/6sCrQlQ1
- nRTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=YDLy2+RFcFLz/VZiKL7vYfb1b3sSo2lHhiUd1uYCkA8=;
- b=BAQy8isDvLl+yCLymHAsFHME/59KP0+INbdi6sQKLEpCuPh4LzJvWhzBel/07vvZxh
- VvWyFWQjyQs+DDXG/c7EXXMLqYF6PP4Tz+eXFkNhct1uIugDCm2nOnzqMg7uD7ceU50I
- r1k4i9nj71ufCDOKIbMCnCDVOGPnCCAwojFLppAFqDTexK2YTl0Pv1clwmv7MndW65FJ
- NG7IL+R/t8xP4YsiAOCLf01mVssZMNPN59WAmqwAd33yusn24rqjA52mexvr5L63fxz0
- DYwqyvQaQlTiCXo82ijzQZ0R/cnLdW0Kht9+4r7aoD4Ca2uEpaHYrGDU6nlp4F9Fspt9
- FyJw==
-X-Gm-Message-State: APjAAAV/yjW0FyGc12LEhnpzXdqmS1A9ZtlM1E+PLjzTASHNYeJ1u2QU
- u7rhAaPMMkuKkphB81sMgZI0qMHt1j8gjgxhT6zQ6g==
-X-Google-Smtp-Source: APXvYqyZk0TvroKjWrkxzYENAeCtQ4hB0Ph8Q1WCL6wQVjGJPKEydP3K9nQbwN0HyINq9/okJYJIZ32kgmvfe95TZGc=
-X-Received: by 2002:aca:50d8:: with SMTP id e207mr2234867oib.48.1570451981338; 
- Mon, 07 Oct 2019 05:39:41 -0700 (PDT)
+ (envelope-from <drjones@redhat.com>) id 1iHSKU-0000gO-IN
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:41:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57874)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iHSKQ-0000ed-Ui; Mon, 07 Oct 2019 08:41:31 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3C28F10CC1EE;
+ Mon,  7 Oct 2019 12:41:29 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 13B63196B2;
+ Mon,  7 Oct 2019 12:41:24 +0000 (UTC)
+Date: Mon, 7 Oct 2019 14:41:22 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v5 4/9] target/arm/cpu64: max cpu: Introduce sve<N>
+ properties
+Message-ID: <20191007124122.wjrrrgmvnxvxg3r6@kamzik.brq.redhat.com>
+References: <20191001125845.8793-1-drjones@redhat.com>
+ <20191001125845.8793-5-drjones@redhat.com>
+ <87d0f9j6lk.fsf@linaro.org>
 MIME-Version: 1.0
-References: <874l13qmvb.fsf@dusky.pond.sub.org>
- <20191004130242.27267-1-g.lettieri@iet.unipi.it>
- <CAFEAcA8ut__ruS4yEMT7-qCKu+BFihFwhaNoq7L1cdoqxpXx6g@mail.gmail.com>
- <87pnj8ltih.fsf@dusky.pond.sub.org>
- <CAFEAcA9KLDruPS6o85H5XJnQjoSXV2+-d=dnNGPvc80jiBthiQ@mail.gmail.com>
- <87zhicg2ce.fsf@dusky.pond.sub.org>
-In-Reply-To: <87zhicg2ce.fsf@dusky.pond.sub.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Oct 2019 13:39:30 +0100
-Message-ID: <CAFEAcA9ydS1LR+dW+mT9gCPrevov_U9jKKrEKu2De_OTWeCETg@mail.gmail.com>
-Subject: Re: [PATCH] netmap: support git-submodule build otption
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87d0f9j6lk.fsf@linaro.org>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Mon, 07 Oct 2019 12:41:29 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,27 +73,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>,
- Giuseppe Lettieri <giuseppe.lettieri@unipi.it>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, armbru@redhat.com, eric.auger@redhat.com,
+ qemu-arm@nongnu.org, imammedo@redhat.com, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 7 Oct 2019 at 13:36, Markus Armbruster <armbru@redhat.com> wrote:
-> If CI of QEMU code isn't useful, then I suspect the QEMU code isn't
-> useful, period.  Giuseppe assures us the netmap QEMU code *is* useful.
-> It followe we better make sure our CI covers it.
+On Mon, Oct 07, 2019 at 09:35:35AM +0100, Alex Benn=E9e wrote:
+>=20
+> Andrew Jones <drjones@redhat.com> writes:
+>=20
+> > Introduce cpu properties to give fine control over SVE vector lengths=
+.
+> > We introduce a property for each valid length up to the current
+> > maximum supported, which is 2048-bits. The properties are named, e.g.
+> > sve128, sve256, sve384, sve512, ..., where the number is the number o=
+f
+> > bits. See the updates to docs/arm-cpu-features.rst for a description
+> > of the semantics and for example uses.
+> >
+> > Note, as sve-max-vq is still present and we'd like to be able to
+> > support qmp_query_cpu_model_expansion with guests launched with e.g.
+> > -cpu max,sve-max-vq=3D8 on their command lines, then we do allow
+> > sve-max-vq and sve<N> properties to be provided at the same time, but
+> > this is not recommended, and is why sve-max-vq is not mentioned in th=
+e
+> > document.  If sve-max-vq is provided then it enables all lengths smal=
+ler
+> > than and including the max and disables all lengths larger. It also h=
+as
+> > the side-effect that no larger lengths may be enabled and that the ma=
+x
+> > itself cannot be disabled. Smaller non-power-of-two lengths may,
+> > however, be disabled, e.g. -cpu max,sve-max-vq=3D4,sve384=3Doff provi=
+des a
+> > guest the vector lengths 128, 256, and 512 bits.
+> >
+> > This patch has been co-authored with Richard Henderson, who reworked
+> > the target/arm/cpu64.c changes in order to push all the validation an=
+d
+> > auto-enabling/disabling steps into the finalizer, resulting in a nice
+> > LOC reduction.
+> >
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  docs/arm-cpu-features.rst | 168 +++++++++++++++++++++++++++++++--
+> >  include/qemu/bitops.h     |   1 +
+> >  target/arm/cpu.c          |  19 ++++
+> >  target/arm/cpu.h          |  19 ++++
+> >  target/arm/cpu64.c        | 192 ++++++++++++++++++++++++++++++++++++=
+-
+> >  target/arm/helper.c       |  10 +-
+> >  target/arm/monitor.c      |  12 +++
+> >  tests/arm-cpu-features.c  | 194 ++++++++++++++++++++++++++++++++++++=
+++
+> >  8 files changed, 606 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
+> > index c79dcffb5556..2ea4d6e90c02 100644
+> > --- a/docs/arm-cpu-features.rst
+> > +++ b/docs/arm-cpu-features.rst
+> > @@ -48,18 +48,31 @@ block in the script for usage) is used to issue t=
+he QMP commands.
+> >        (QEMU) query-cpu-model-expansion type=3Dfull model=3D{"name":"=
+max"}
+> >        { "return": {
+> >          "model": { "name": "max", "props": {
+> > -        "pmu": true, "aarch64": true
+> > +        "sve1664": true, "pmu": true, "sve1792": true, "sve1920": tr=
+ue,
+> > +        "sve128": true, "aarch64": true, "sve1024": true, "sve": tru=
+e,
+> > +        "sve640": true, "sve768": true, "sve1408": true, "sve256": t=
+rue,
+> > +        "sve1152": true, "sve512": true, "sve384": true, "sve1536": =
+true,
+> > +        "sve896": true, "sve1280": true, "sve2048": true
+>=20
+> Does having a list of VL's not have implications for the versioning of
+> the API? Do we need to tick a version each time a new vector length is
+> added?
+>
 
-It would be an interesting idea to have a requirement that
-any new library dependency can't be introduced into QEMU
-unless one of the systems we do builds on can be set up
-so the new code is compiled...
+Versioning the set of cpu features a versioned machine type may enable is
+a good idea, but I don't think we should add versioning to this API. Sinc=
+e
+it doesn't matter what gets returned by the expansion call as much as
+whether or not it may be enabled, we can use both existence and permissio=
+n
+to control the enabling of features. And, we don't have to do it the same
+way for all features. Here are some examples:
 
-thanks
--- PMM
+* The 'aarch64' feature doesn't exist on armv7 CPUs. So it can't be
+  enabled there.
+
+* The 'pmu' feature does exist on KVM armv7 CPUs, but KVM doesn't
+  support it, so it can't be enabled there.
+
+If we add features that could be enabled, but we don't want them to be
+available to older machine types, then we can either ensure the CPU
+property isn't added, or is removed, from the CPU model when that machine
+type is in use, or we can add code to the enable function that fails
+the enable when a machine type dependent condition check fails.
+
+Does that answer the question?
+
+Thanks,
+drew
 
