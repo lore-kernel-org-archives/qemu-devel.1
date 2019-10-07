@@ -2,93 +2,70 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5A6C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 100AAECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:54:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8BB720684
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:53:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="e3K+YYZh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8BB720684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=digitalocean.com
+	by mail.kernel.org (Postfix) with ESMTPS id DC1AB20684
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:54:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC1AB20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHXCD-0002xn-S0
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:53:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45365)
+	id 1iHXDQ-0004Dv-WF
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:54:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <msmarduch@digitalocean.com>) id 1iHXBK-0002Lu-8S
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:52:27 -0400
+ (envelope-from <armbru@redhat.com>) id 1iHXCc-0003XR-Pm
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:53:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <msmarduch@digitalocean.com>) id 1iHXBI-00043g-HC
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:52:25 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46784)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <msmarduch@digitalocean.com>)
- id 1iHXBI-000417-Au
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:52:24 -0400
-Received: by mail-ot1-x341.google.com with SMTP id 89so11704595oth.13
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 10:52:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=digitalocean.com; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=yD2BGOokKJIGeeMR/acSnJkJ4LqmGx3n92DLvLa6bAE=;
- b=e3K+YYZhLCy4Th4vU48bwr5UPeruZg+g79clIfKASicJFibWQ52jBLvYdYScH8VAum
- zV59diRedrpSUdrsXarpLXWirkpkBX6lZwtxW2QW798fkk4kpxVSlO2r+UWTYYRU33sy
- eGt6RWbYtyb/y4gyktOeCXhxF85cUUkQhAFoc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=yD2BGOokKJIGeeMR/acSnJkJ4LqmGx3n92DLvLa6bAE=;
- b=bLGxKRCROBHGruOSFLcVdgC1l5WaqrthkZah2Gn4QQ6f+3Q7w1sT3rYDNVh8Gfo3jq
- hrL8jkxrEfHALlRV3xtfylmcC/wtSQttknvzqDwgfqccVp6Tv2ZqHgLztF+xfsXhWXJV
- C68LKWGnziYy5LNVYZpTwaXadZAZ7gWJNETth0Ks06FD/WF00iQZBqagckd7opzrwHF5
- yfIqQqRLeMVL0Y1RKDN6wMBXpiHQz3ggpVwVwFSQSHLmClQKyb3OlIFomE0VHm/aKbdC
- vQEUiAIzg/mGV0EGQQe9ps/gtqV5n7sQIkiQnQlorRMRCfMIE86c5Ec8qC9QiLHCpE4u
- dUgQ==
-X-Gm-Message-State: APjAAAVFzhks+jHbHAR51zvtHwmkKtkYtyxG6qobuzRfIiSI/ZhZe3dB
- NVl+dJIkIopzvUrOam/6bmyNWA==
-X-Google-Smtp-Source: APXvYqxlyjBOHjhihOgm3Y4thApjsMu0dZk2SPcX+gE0IY/y+nlHvo+AWFPHpQL1Y+m4Zs5jXuGWdQ==
-X-Received: by 2002:a9d:5f6:: with SMTP id 109mr21297767otd.358.1570470743139; 
- Mon, 07 Oct 2019 10:52:23 -0700 (PDT)
-Received: from ?IPv6:2600:1700:4a30:84c0:901c:4ec3:b9ac:bb0d?
- ([2600:1700:4a30:84c0:901c:4ec3:b9ac:bb0d])
- by smtp.gmail.com with ESMTPSA id n186sm4814200oih.58.2019.10.07.10.52.22
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 07 Oct 2019 10:52:22 -0700 (PDT)
-Subject: Re: [PATCH] target/i386: log guest name and memory error type AO, AR
- for MCEs
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- mtosatti@redhat.com, armbru@redhat.com, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com,
- qemu-trivial@nongnu.org
-References: <ceb4d639-842a-30bd-5d54-bfacb07b5cc4@digitalocean.com>
- <8ca93883-1af3-7959-1b8c-4eeff2f2cae5@redhat.com>
-From: Mario Smarduch <msmarduch@digitalocean.com>
-Message-ID: <7ed0d4bf-5c24-4c9b-349e-438e6ad02aa6@digitalocean.com>
-Date: Mon, 7 Oct 2019 10:52:21 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+ (envelope-from <armbru@redhat.com>) id 1iHXCa-0004iv-2U
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:53:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44150)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iHXCZ-0004iQ-Qq
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:53:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 63ECFA44AC2;
+ Mon,  7 Oct 2019 17:53:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A12E6DACF;
+ Mon,  7 Oct 2019 17:53:28 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id ED0BD1138648; Mon,  7 Oct 2019 19:53:19 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] netmap: support git-submodule build otption
+References: <874l13qmvb.fsf@dusky.pond.sub.org>
+ <20191004130242.27267-1-g.lettieri@iet.unipi.it>
+ <CAFEAcA8ut__ruS4yEMT7-qCKu+BFihFwhaNoq7L1cdoqxpXx6g@mail.gmail.com>
+ <87pnj8ltih.fsf@dusky.pond.sub.org>
+ <CAFEAcA9KLDruPS6o85H5XJnQjoSXV2+-d=dnNGPvc80jiBthiQ@mail.gmail.com>
+ <87zhicg2ce.fsf@dusky.pond.sub.org>
+ <aeeb3680-71fa-55ff-40df-7abfc5a57a5a@redhat.com>
+Date: Mon, 07 Oct 2019 19:53:19 +0200
+In-Reply-To: <aeeb3680-71fa-55ff-40df-7abfc5a57a5a@redhat.com> (Thomas Huth's
+ message of "Mon, 7 Oct 2019 17:37:17 +0200")
+Message-ID: <87o8yscui8.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <8ca93883-1af3-7959-1b8c-4eeff2f2cae5@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Mon, 07 Oct 2019 17:53:42 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,190 +77,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Vincenzo Maffione <v.maffione@gmail.com>,
+ Giuseppe Lettieri <giuseppe.lettieri@unipi.it>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
+ Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Thomas Huth <thuth@redhat.com> writes:
 
+> On 07/10/2019 14.35, Markus Armbruster wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>> 
+>>> On Mon, 7 Oct 2019 at 11:50, Markus Armbruster <armbru@redhat.com> wrote:
+>>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>>> Basically new submodules are a pain so we seek to minimize
+>>>>> the use of them.
+>>>>
+>>>> I suggested making it a submodule upthread[*].  Let me try to distill
+>>>> the conversation into a rationale.  Giuseppe, please correct mistakes.
+>>>>
+>>>> To make use of QEMU's netmap backend (CONFIG_NETMAP), you have to build
+>>>> and install netmap software from sources[**].  Which pretty much ensures
+>>>> developers compile with CONFIG_NETMAP off, and the code rots.
+>>>>
+>>>> For other dependencies that aren't readily available on common
+>>>> development hosts (slirp, capstone), we use submodules to avoid such
+>>>> rot.  If the system provides, we use that, and if it doesn't, we fall
+>>>> back to the submodule.  This has served us well.
+>>>
+>>> I would put this differently. We don't use submodules to avoid
+>>> code-rot. We use submodules where a dependency is needed for us
+>>> to provide QEMU features that are sufficiently important that we
+>>> want to provide them to users even if those users don't have the
+>>> dependency available to them as a system library.
+>>>
+>>> There are lots of features of QEMU that only compile with sufficiently
+>>> recent versions of dependencies, and we don't try to submodule-ize
+>>> them because the features aren't really that important for the bulk
+>>> of our users. For instance, we provided pixman as a submodule for
+>>> a while because the features that require it (our graphics layer
+>>> code) are important to almost all users. But we didn't provide
+>>> spice as a module even when you pretty much needed to be
+>>> running bleeding-edge redhat to satisfy the version dependency
+>>> we had, because most users don't care about spice support.
+>>> Shipping our dependencies as submodules imposes real costs
+>>> on the project (for instance we then need to track the upstream
+>>> to see when we should be updating, including checking whether
+>>> we need to update to fix security issues). Submodules should be
+>>> the exception, not the rule.
+>>>
+>>>> For netmap, falling back to the submodule when the host doesn't provide
+>>>> tends not to be useful beyond compile-testing.  Because of that, we fall
+>>>> back only when the user explicitly asks for it by passing
+>>>> --enable-netmap=git to configure.  CI should do that.
+>>>
+>>> This sounds like netmap is in the same position as most of our
+>>> dependencies: OK to compile if the system provides the library,
+>>> but if the system doesn't then almost all users won't care
+>>> that the feature isn't present. If CI of the QEMU code is useful,
+>> 
+>> If CI of QEMU code isn't useful, then I suspect the QEMU code isn't
+>> useful, period.  Giuseppe assures us the netmap QEMU code *is* useful.
+>> It followe we better make sure our CI covers it.
+>> 
+>> A submodule would make sure, but it looks like it won't fly.  So let's
+>> try another tack:
+>> 
+>>> get the library supported by and shipped in distros. If you can't
+>>> get anybody in a distro (Linux or BSD) to care enough to ship the
+>>> library, this is a really niche feature, and up for consideration
+>>> for deprecate-and-drop from QEMU, I think.
+>> 
+>> Giuseppe, you mentioned netmap is in FreeBSD, and getting it into Linux
+>> is unlikely, so let's focus on FreeBSD.
+>> 
+>> We have a FreeBSD section in .patchew.yml, which makes me guess Patchew
+>> CI tests FreeBSD.  Does it test with CONFIG_NETMAP out of the box?  If
+>> not, how do we have to tweak its configuration to get CONFIG_NETMAP
+>> enabled?  Who could help with this?
+>
+> I just tried this patch here:
+>
+> diff --git a/.cirrus.yml b/.cirrus.yml
+> --- a/.cirrus.yml
+> +++ b/.cirrus.yml
+> @@ -8,7 +8,7 @@ freebsd_12_task:
+>      memory: 8G
+>    install_script: pkg install -y
+>      bash bison curl cyrus-sasl git glib gmake gnutls gsed
+> -    nettle perl5 pixman pkgconf png usbredir
+> +    nettle perl5 pixman pkgconf png usbredir netmap
+>    script:
+>      - mkdir build
+>      - cd build
+>
+> ... and looks like net/netmap.c now gets successfully compiled on
+> FreeBSD in the Cirrus-CI:
+>
+>  https://api.cirrus-ci.com/v1/task/5669479475838976/logs/main.log
 
-On 10/07/2019 03:27 AM, Philippe Mathieu-Daudé wrote:
-> Hi Mario,
-> 
-> On 10/5/19 1:53 AM, Mario Smarduch wrote:
->> In a large VPC environment we want to log memory error occurrences
->> and log them with guest name and type - there are few use cases
->>
->>
->> - if VM crashes on AR mce inform the user about the reason and
->>    resolve the case
->> - if VM hangs notify the user to reboot and resume processing
->> - if VM continues to run let the user know, he/she maybe able to
->>    correlate to vm internal outage
->> - Rawhammer attacks - isolate/determine the attacker possible
->>    migrating it off the hypervisor
->> - In general track memory errors on a hyperviosr over time to determine
->>    trends
->>
->> Monitoring our fleet we come across quite a few of these and been
->> able to take action where before there were no clues to the causes.
->>
->> When memory error occurs we get a log entry in qemu log:
->>
->> Guest [Droplet-12345678] 2019-08-02T05:00:11.940270Z qemu-system-x86_64:
->> Guest MCE Memory Error at qemu addr 0x7f3c7622f000 and guest 78e42f000
->> addr of type BUS_MCEERR_AR injected
->>
->> with enterprise logging environment we can to take further actions.
->>
->> Signed-off-by: Mario Smarduch <msmarduch@digitalocean.com>
->> ---
->>   target/i386/kvm.c | 27 ++++++++++++++++++++++-----
->>   util/qemu-error.c | 24 ++++++++++++++++++++++++
->>   2 files changed, 46 insertions(+), 5 deletions(-)
->>
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index 92069099ab..79ebccc684 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -555,9 +555,9 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr
->> paddr, int code)
->>                          (MCM_ADDR_PHYS << 6) | 0xc, flags);
->>   }
->>
->> -static void hardware_memory_error(void)
->> +static void hardware_memory_error(void *addr)
-> 
-> Maybe rename addr -> host_addr.
-yep makes it more clear.
+Awesome :)
 
-> 
->>   {
->> -    fprintf(stderr, "Hardware memory error!\n");
->> +    error_report("QEMU got Hardware memory error at addr %p", addr);
->>       exit(1);
->>   }
->>
->> @@ -581,15 +581,32 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int
->> code, void *addr)
->>               kvm_physical_memory_addr_from_host(c->kvm_state, addr,
->> &paddr)) {
->>               kvm_hwpoison_page_add(ram_addr);
->>               kvm_mce_inject(cpu, paddr, code);
->> +            /*
->> +             * Use different logging severity based on error type.
->> +             * If mcelog is running qemu va addr will help debug via
->> mcelog.
->> +             */
->> +            if (code == BUS_MCEERR_AR) {
->> +                error_report("Guest MCE Memory Error at qemu addr %p
->> and "
->> +                    "guest %lx addr of type %s injected", addr, paddr,
-> 
-> "qemu addr" is not clear IMO, 'addr' is in the host (and is virtual...
-> how does this help you?).
+> We can also add it to the vm-freebsd test:
+>
+> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> --- a/tests/vm/freebsd
+> +++ b/tests/vm/freebsd
+> @@ -54,6 +54,9 @@ class FreeBSDVM(basevm.BaseVM):
+>          # libs: opengl
+>          "libepoxy",
+>          "mesa-libs",
+> +
+> +        # libs: network
+> +        "netmap",
+>      ]
+>
+>      BUILD_SCRIPT = """
+>
+> ... then it gets compiled succesfully during "make vm-build-freebsd".
+>
+> So does that sound like a good way to keep netmap.c from bitrotting? If
+> so, I can send the above two diffs as a proper patch, if you like.
 
-Our mcelog entries are logged globally as well as qemu memory errors, if
-log entry(s) from mcelog go missing we can use the VA from qemu to
-more or less figure out its the same memory if we have some prior
-relationship (based on timestamps of entries). For some cases every
-bit helps.
-
-> 
-> For the guest paddr you should use "0x%"HWADDR_PRIx format.
-
-Yes missed that should be similar to x86_cpu_dump_state(), a bare
-pointer looks bad in qemu.
-
-> 
->> +                     "BUS_MCEERR_AR");
->> +            } else {
->> +                 warn_report("Guest MCE Memory Error at qemu addr %p
->> and "
->> +                     "guest %lx addr of type %s injected", addr,
->> +                     paddr, "BUS_MCEERR_AO");
->> +            }
->> +
->>               return;
->>           }
->>
->> -        fprintf(stderr, "Hardware memory error for memory used by "
->> -                "QEMU itself instead of guest system!\n");
->> +        if (code == BUS_MCEERR_AO) {
->> +            warn_report("Hardware memory error at addr %p of type %s "
->> +                "for memory used by QEMU itself instead of guest
->> system!",
->> +                addr, "BUS_MCEERR_AO");
->> +        }
->>       }
->>
->>       if (code == BUS_MCEERR_AR) {
->> -        hardware_memory_error();
->> +        hardware_memory_error(addr);
->>       }
->>
->>       /* Hope we are lucky for AO MCE */
->> diff --git a/util/qemu-error.c b/util/qemu-error.c
->> index f373f3b3b0..2ebafd4405 100644
->> --- a/util/qemu-error.c
->> +++ b/util/qemu-error.c
->> @@ -11,6 +11,8 @@
->>    */
->>
->>   #include "qemu/osdep.h"
->> +#include "qemu/option.h"
->> +#include "qemu/config-file.h"
->>   #include "monitor/monitor.h"
->>   #include "qemu/error-report.h"
->>
->> @@ -35,11 +37,31 @@ int error_printf(const char *fmt, ...)
->>       return ret;
->>   }
->>
->> +static const char *error_get_guestname(void)
->> +{
->> +    QemuOpts *opts = qemu_opts_find(qemu_find_opts("name"), NULL);
->> +    return qemu_opt_get(opts, "guest");
->> +}
->> +
->> +/*
->> + * Print guest name associated with error, to aid debugging errors from
->> + * multiple guests in centralized logging environment.
->> + */
->> +static void error_print_guestname(void)
->> +{
->> +    const char *name;
->> +    name = error_get_guestname();
->> +    if (name != NULL && !cur_mon) {
->> +        error_printf("Guest [%s] ", name);
->> +    }
->> +}
->> +
->>   int error_printf_unless_qmp(const char *fmt, ...)
->>   {
->>       va_list ap;
->>       int ret;
->>
->> +    error_print_guestname();
->>       va_start(ap, fmt);
->>       ret = error_vprintf_unless_qmp(fmt, ap);
->>       va_end(ap);
->> @@ -274,6 +296,7 @@ void error_report(const char *fmt, ...)
->>   {
->>       va_list ap;
->>
->> +    error_print_guestname();
->>       va_start(ap, fmt);
->>       vreport(REPORT_TYPE_ERROR, fmt, ap);
->>       va_end(ap);
->> @@ -289,6 +312,7 @@ void warn_report(const char *fmt, ...)
->>   {
->>       va_list ap;
->>
->> +    error_print_guestname();
->>       va_start(ap, fmt);
->>       vreport(REPORT_TYPE_WARNING, fmt, ap);
->>       va_end(ap);
->> -- 
->> 2.17.1
->>
+Yes, please!
 
