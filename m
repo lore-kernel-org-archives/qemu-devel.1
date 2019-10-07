@@ -2,80 +2,81 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB39ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CDDC47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:47:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8332320679
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:46:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D870920684
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:47:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l5wKWy4A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8332320679
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y4V6Nh2d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D870920684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHVDo-0008CW-Md
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:46:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48979)
+	id 1iHVE5-0000C5-Jj
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:47:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48959)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iHUwP-0002hB-UW
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:56 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iHUwO-0002fb-L9
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iHUwN-0005D5-AN
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:53 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40499)
+ (envelope-from <alex.bennee@linaro.org>) id 1iHUwK-0005Bu-W9
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:52 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41834)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iHUwN-0005Cf-0m
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:51 -0400
-Received: by mail-wr1-x442.google.com with SMTP id h4so7115109wrv.7
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 08:28:50 -0700 (PDT)
+ id 1iHUwK-0005BR-Kx
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:48 -0400
+Received: by mail-wr1-x442.google.com with SMTP id q9so15849282wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 08:28:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=T4HMZgJ1Rxlmg8Ern4sSS2h2E1T91khiCacVECvr12c=;
- b=l5wKWy4Ar2iH1p7q8hEe+nyy9Fnlm9r/RPgMLb+BDLiQwJ243rN/rSUWL8sOtyN3eb
- j4izBQsb2O3YBQq2BI6LeuPJgkaZnKb/ttSD9otLKAerni16RiEJNvWBKCM84bG5uA01
- Kt1ZAU/lHtvJ05NwXPxLo+AYo165YWX/O3VlxiOa7E41l529+LHGbW6iHKQWvOrJQVw6
- DCefmfBcQw5K+5PZ0NLTVfi3aGJdW8Owk91rdTq8H+Wz3dVmqAD+v89Df+vQAqE/O/zi
- d84ar9ZNw72LGgCf851XF/Ea6A38ekIZ/ek3Pb3fd2r02LHxmLXtfMtJMJ6BFtghiRKt
- p/mg==
+ bh=/O/UgEaGYt9Y+FF6QjgMS4U3ASkLFc3mv9nkgvjFUmw=;
+ b=y4V6Nh2dh9EpjX9c0cOKA47/Aq3gSleHgua35/dIfu1Fi0pctZdZqFnDjpM7YtE7Tz
+ KZ1LoUZfEZ1buhLxfpZa10ZYGcr0xEjEQTMm71DjOg88V9G/R/5X8Q01EGZ6/ZDfXKoS
+ lNXdyNd7xcEeAAr/91XtP6gJ0E0mYn10Y2Q59L7QQPr5cQBEK2ata0LmIJFNTUjE1Eg9
+ mn1p4lJ688G1oqjZmeBV8ipNluK/Jg5Y1picBK0M5ifN5jVcvOWYE/OYzZ9c+F3BXWxi
+ 0mk92cggqkOBCVwHcZP4ZY6T9Cm8yig5II3ve1t633SRQgzTfTNm/J+SJF4yvIX2aGH4
+ Xgkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=T4HMZgJ1Rxlmg8Ern4sSS2h2E1T91khiCacVECvr12c=;
- b=WgFJrHfd0HZNdcz2Z55Z/pzUAUL4126pFqLX5EZb71ZKFbvF5wwNNcx8a01AA+j/cY
- 0OMGiV8TT9uRXSGlEJ2qOATD0EmWD+buGiH5ri0LO1hAeGhBKouKSHkC1SIMqw/ZxQdV
- TR8tprAIirgzbKzPc03Mi/c9+5RuWFzALgTrn4RGimtxZ7kyJ3ysKStpydm6ofur4wIp
- lqSfovl7zHJX7P77P+lcAlPrRvq3fLwQaQTqNHMkBS9Zz50v7B3tAkoTUHj7qCA6K+vn
- xx954pIDyUJvJV8+ShUYPunjKPDFWGkl42Z3Kr0RMMH2jNEXLL2tg55qZc1sdJAVOP+r
- lqLQ==
-X-Gm-Message-State: APjAAAV8SasEzBryp3mANkSYf/Cv+FzK+XmcuIvYAvZ9rUyF5mCiU7ut
- eBAJNk7XAJ9my6SOYWDcVPcO0g==
-X-Google-Smtp-Source: APXvYqyFDaNCuIQMYkXvBgHoVRzBFjcVeIVJqAMQPv1/EnjNx8xLvc7NDsmW4Mxcm/AO7YeP/p3KzA==
-X-Received: by 2002:a5d:4f0b:: with SMTP id c11mr22923034wru.63.1570462129758; 
- Mon, 07 Oct 2019 08:28:49 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t123sm25635432wma.40.2019.10.07.08.28.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=/O/UgEaGYt9Y+FF6QjgMS4U3ASkLFc3mv9nkgvjFUmw=;
+ b=dzdA6/9CnttPfARw/fyQNBQks5Ac2HcmRM76lij7hS0RHZhsnLqSKKIMDcyCs3cncu
+ BTonyCbuuj7oDTscv/BuzEgqpI6eZL7WuNFv5ifyRbzSD7P+Wxz39nptllyIrirgo+UD
+ t4kMuhbraiy35+O0/CMnnbKVO9sxlaljdVceQJpGZvjIqFVG523myh5dxqJ1XxppdBIp
+ pTMmcWf8CBk7yOy69QC0fWnga2etxvQDNxq2/0uA8aEXAgE36tUdOtF1oWl+LDh/fMDA
+ WtU43TDNENTMap+cUFkyHnkjJlIthkIKQlvP/vqKCHSSN2L7/xb4f1PdSCbkGiAaTNTQ
+ pIEA==
+X-Gm-Message-State: APjAAAWIiJJweQQVsnm3ydqusX/NkfZ39Gw70AvAreX4Bt+7mKGFkaIW
+ bLwMuemGK3Xeb68z8fwsEMXxfQ==
+X-Google-Smtp-Source: APXvYqzgTqpxdRILjFSJKmJJv6+1bTCyKA696snsS0YUCzwGe4rEPVh8hPSR07yTtejwV852aaehyg==
+X-Received: by 2002:a05:6000:108c:: with SMTP id
+ y12mr21928439wrw.238.1570462127138; 
  Mon, 07 Oct 2019 08:28:47 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h7sm15903821wrs.15.2019.10.07.08.28.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 07 Oct 2019 08:28:42 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8AA471FF9B;
+ by zen.linaroharston (Postfix) with ESMTP id 446851FF99;
  Mon,  7 Oct 2019 16:28:40 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v9 11/13] accel/tcg: adding integration with linux perf
-Date: Mon,  7 Oct 2019 16:28:37 +0100
-Message-Id: <20191007152839.30804-12-alex.bennee@linaro.org>
+Subject: [PATCH  v9 09/13] Adding info [tb-list|tb] commands to HMP (WIP)
+Date: Mon,  7 Oct 2019 16:28:35 +0100
+Message-Id: <20191007152839.30804-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191007152839.30804-1-alex.bennee@linaro.org>
 References: <20191007152839.30804-1-alex.bennee@linaro.org>
@@ -97,8 +98,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "Vanderson M. do Rosario" <vandersonmr2@gmail.com>,
- Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, cota@braap.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -107,442 +109,774 @@ Sender: "Qemu-devel"
 
 From: "Vanderson M. do Rosario" <vandersonmr2@gmail.com>
 
-This commit adds support to Linux Perf in order to be able to analyze
-qemu jitted code and also to able to see the TBs PC in it.
+These commands allow the exploration of TBs generated by the TCG.
+Understand which one hotter, with more guest/host instructions... and
+examine their guest, host and IR code.
 
-When using "-perf" qemu creates a jitdump file in the current working
-directory. You then integrate the file using perf inject.
+The goal of this command is to allow the dynamic exploration of TCG
+behavior and code quality. Therefore, for now, a corresponding QMP
+command is not worthwhile.
 
-Example of use:
- perf record -k 1 qemu-x86_64 -perf ./a.out
- perf inject -j -i perf.data -o perf.data.jitted
- perf report -i perf.data.jitted
+[AJB: WIP - we still can't be safely sure a translation will succeed]
 
+Example of output:
+
+TB id:1 | phys:0x34d54 virt:0x0000000000034d54 flags:0x0000f0
+	| exec:4828932/0 guest inst cov:16.38%
+	| trans:1 ints: g:3 op:82 op_opt:34 spills:3
+	| h/g (host bytes / guest insts): 90.666664
+	| time to gen at 2.4GHz => code:3150.83(ns) IR:712.08(ns)
+	| targets: 0x0000000000034d5e (id:11), 0x0000000000034d0d (id:2)
+
+TB id:2 | phys:0x34d0d virt:0x0000000000034d0d flags:0x0000f0
+	| exec:4825842/0 guest inst cov:21.82%
+	| trans:1 ints: g:4 op:80 op_opt:38 spills:2
+	| h/g (host bytes / guest insts): 84.000000
+	| time to gen at 2.4GHz => code:3362.92(ns) IR:793.75(ns)
+	| targets: 0x0000000000034d19 (id:12), 0x0000000000034d54 (id:1)
+
+TB id:2 | phys:0x34d0d virt:0x0000000000034d0d flags:0x0000f0
+	| exec:6956495/0  guest inst cov:21.82%
+	| trans:2 ints: g:2 op:40 op_opt:19 spills:1
+	| h/g (host bytes / guest insts): 84.000000
+	| time to gen at 2.4GHz => code:3130.83(ns) IR:722.50(ns)
+	| targets: 0x0000000000034d19 (id:12), 0x0000000000034d54 (id:1)
+
+----------------
+IN:
+0x00034d0d:  89 de                    movl     %ebx, %esi
+0x00034d0f:  26 8b 0e                 movl     %es:(%esi), %ecx
+0x00034d12:  26 f6 46 08 80           testb    $0x80, %es:8(%esi)
+0x00034d17:  75 3b                    jne      0x34d54
+
+------------------------------
+
+TB id:1 | phys:0x34d54 virt:0x0000000000034d54 flags:0x0000f0
+	| exec:5202686/0 guest inst cov:11.28%
+	| trans:1 ints: g:3 op:82 op_opt:34 spills:3
+	| h/g (host bytes / guest insts): 90.666664
+	| time to gen at 2.4GHz => code:2793.75(ns) IR:614.58(ns)
+	| targets: 0x0000000000034d5e (id:3), 0x0000000000034d0d (id:2)
+
+TB id:2 | phys:0x34d0d virt:0x0000000000034d0d flags:0x0000f0
+	| exec:5199468/0 guest inst cov:15.03%
+	| trans:1 ints: g:4 op:80 op_opt:38 spills:2
+	| h/g (host bytes / guest insts): 84.000000
+	| time to gen at 2.4GHz => code:2958.75(ns) IR:719.58(ns)
+	| targets: 0x0000000000034d19 (id:4), 0x0000000000034d54 (id:1)
+
+------------------------------
+2 TBs to reach 25% of guest inst exec coverage
+Total of guest insts exec: 138346727
+
+------------------------------
+
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
-Message-Id: <20190830121903.17585-2-vandersonmr2@gmail.com>
-[AJB: rebase and various fixes]
+Message-Id: <20190829173437.5926-10-vandersonmr2@gmail.com>
+[AJB: fix authorship, dropped coverset]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
-AJB:
-   - use get_clock instead of repeating ourselves
-   - add lock for writing to file
-   - use canonical kernel.org links
-   - g_autoptr/g_autofree strings
+AJB
+  - dropped coverset for now
+  - check tbs list for valid translations
+  - document the valid but unreachable TLB case
 ---
- accel/tcg/Makefile.objs      |   2 +-
- accel/tcg/perf/Makefile.objs |   1 +
- accel/tcg/perf/jitdump.c     | 194 +++++++++++++++++++++++++++++++++++
- accel/tcg/perf/jitdump.h     |  36 +++++++
- accel/tcg/translate-all.c    |  14 +++
- docs/devel/tcg.rst           |  15 +++
- include/qemu-common.h        |   3 +
- linux-user/main.c            |   7 ++
- os-posix.c                   |   5 +
- qemu-options.hx              |  11 ++
- 10 files changed, 287 insertions(+), 1 deletion(-)
- create mode 100644 accel/tcg/perf/Makefile.objs
- create mode 100644 accel/tcg/perf/jitdump.c
- create mode 100644 accel/tcg/perf/jitdump.h
+ accel/tcg/tb-stats.c         | 319 ++++++++++++++++++++++++++++++++++-
+ disas.c                      |  31 +++-
+ hmp-commands-info.hx         |  16 ++
+ include/exec/tb-stats.h      |  33 +++-
+ include/qemu/log-for-trace.h |   4 +
+ include/qemu/log.h           |   2 +
+ monitor/misc.c               |  52 ++++++
+ util/log.c                   |  54 ++++--
+ 8 files changed, 491 insertions(+), 20 deletions(-)
 
-diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
-index 49ffe81b5d..6a1ad59199 100644
---- a/accel/tcg/Makefile.objs
-+++ b/accel/tcg/Makefile.objs
-@@ -3,6 +3,6 @@ obj-$(CONFIG_SOFTMMU) += cputlb.o
- obj-y += tcg-runtime.o tcg-runtime-gvec.o
- obj-y += cpu-exec.o cpu-exec-common.o translate-all.o
- obj-y += translator.o tb-stats.o
+diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
+index f08e5f2540..3c1cc8cd06 100644
+--- a/accel/tcg/tb-stats.c
++++ b/accel/tcg/tb-stats.c
+@@ -28,9 +28,23 @@ static enum TBStatsStatus tcg_collect_tb_stats;
+ static uint32_t default_tbstats_flag;
+ /* only accessed in safe work */
+ static GList *last_search;
 -
-+obj-y += perf/
- obj-$(CONFIG_USER_ONLY) += user-exec.o
- obj-$(call lnot,$(CONFIG_SOFTMMU)) += user-exec-stub.o
-diff --git a/accel/tcg/perf/Makefile.objs b/accel/tcg/perf/Makefile.objs
-new file mode 100644
-index 0000000000..ca9abb4f48
---- /dev/null
-+++ b/accel/tcg/perf/Makefile.objs
-@@ -0,0 +1 @@
-+obj-$(CONFIG_LINUX) += jitdump.o
-diff --git a/accel/tcg/perf/jitdump.c b/accel/tcg/perf/jitdump.c
-new file mode 100644
-index 0000000000..e1d6f2214e
---- /dev/null
-+++ b/accel/tcg/perf/jitdump.c
-@@ -0,0 +1,194 @@
-+/*
-+ * This code implements an interface to create and fill jitdump files. These files
-+ * store information used by Linux Perf to enhance the presentation of jitted
-+ * code and to allow the disassembly of jitted code.
-+ *
-+ * The jitdump file specification can be found in the Linux Kernel Source tree:
-+ *    tools/perf/Documentation/jitdump-specification.txt
-+ *
-+ * https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/tools/perf/Documentation/jitdump-specification.txt
-+ *
-+ * Copyright (c) 2019 Vanderson M. do Rosario
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include <sys/syscall.h>
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <time.h>
-+#include <elf.h>
-+
-+#include "disas/disas.h"
-+#include "jitdump.h"
-+#include "qemu-common.h"
-+#include "qemu/timer.h"
-+#include "exec/tb-stats.h"
-+
-+struct jitheader {
-+    uint32_t magic;     /* characters "jItD" */
-+    uint32_t version;   /* header version */
-+    uint32_t total_size;/* total size of header */
-+    uint32_t elf_mach;  /* elf mach target */
-+    uint32_t pad1;      /* reserved */
-+    uint32_t pid;       /* JIT process id */
-+    uint64_t timestamp; /* timestamp */
-+    uint64_t flags;     /* flags */
-+};
-+
-+enum jit_record_type {
-+    JIT_CODE_LOAD       = 0,
-+    JIT_CODE_MOVE       = 1,
-+    JIT_CODE_DEBUG_INFO = 2,
-+    JIT_CODE_CLOSE      = 3,
-+
-+    JIT_CODE_MAX,
-+};
-+
-+/* record prefix (mandatory in each record) */
-+struct jr_prefix {
-+    uint32_t id;
-+    uint32_t total_size;
-+    uint64_t timestamp;
-+};
-+
-+struct jr_code_load {
-+    struct jr_prefix p;
-+
-+    uint32_t pid;
-+    uint32_t tid;
-+    uint64_t vma;
-+    uint64_t code_addr;
-+    uint64_t code_size;
-+    uint64_t code_index;
-+};
-+
-+struct jr_code_close {
-+    struct jr_prefix p;
-+};
-+
-+struct jr_code_move {
-+    struct jr_prefix p;
-+
-+    uint32_t pid;
-+    uint32_t tid;
-+    uint64_t vma;
-+    uint64_t old_code_addr;
-+    uint64_t new_code_addr;
-+    uint64_t code_size;
-+    uint64_t code_index;
-+};
-+
-+FILE *dumpfile;
-+QemuMutex dumpfile_lock;
-+void *perf_marker;
-+
-+static uint32_t get_e_machine(void)
++static int id = 1; /* display_id increment counter */
+ uint64_t dev_time;
+ 
++static TBStatistics *get_tbstats_by_id(int id)
 +{
-+    uint32_t e_machine = EM_NONE;
-+    Elf64_Ehdr elf_header;
-+    FILE *exe = fopen("/proc/self/exe", "r");
++    GList *iter;
 +
-+    if (exe == NULL) {
-+        return e_machine;
++    for (iter = last_search; iter; iter = g_list_next(iter)) {
++        TBStatistics *tbs = iter->data;
++        if (tbs && tbs->display_id == id) {
++            return tbs;
++            break;
++        }
 +    }
-+
-+    if (fread(&elf_header, sizeof(Elf64_Ehdr), 1, exe) != 1) {
-+        goto end;
-+    }
-+
-+    e_machine = elf_header.e_machine;
-+
-+end:
-+    fclose(exe);
-+    return e_machine;
++    return NULL;
 +}
 +
-+void start_jitdump_file(void)
+ struct jit_profile_info {
+     uint64_t translations;
+     uint64_t aborted;
+@@ -274,6 +288,309 @@ void init_tb_stats_htable_if_not(void)
+     }
+ }
+ 
++static void collect_tb_stats(void *p, uint32_t hash, void *userp)
 +{
-+    g_autofree gchar *dumpfile_name = g_strdup_printf("./jit-%d.dump", getpid());
-+    dumpfile = fopen(dumpfile_name, "w+");
++    last_search = g_list_prepend(last_search, p);
++}
 +
-+    /* 'Perf record' saves mmaped files during the execution of a program and
-+     * 'perf inject' iterate over them to reconstruct all used/executed binary.
-+     * So, we create a mmap with the path of our jitdump that is processed
-+     * and used by 'perf inject' to reconstruct jitted binaries.
-+     */
-+    perf_marker = mmap(NULL, sysconf(_SC_PAGESIZE),
-+                          PROT_READ | PROT_EXEC,
-+                          MAP_PRIVATE,
-+                          fileno(dumpfile), 0);
++static void count_invalid_tbs(gpointer data, gpointer user_data)
++{
++    TranslationBlock *tb = (TranslationBlock *) data;
++    unsigned *counter = (unsigned *) user_data;
++    if (tb->cflags & CF_INVALID) {
++        *counter = *counter + 1;
++    }
++}
 +
-+    if (perf_marker == MAP_FAILED) {
-+        printf("Failed to create mmap marker file for perf %d\n", fileno(dumpfile));
-+        fclose(dumpfile);
++static int dump_tb_header(TBStatistics *tbs)
++{
++    unsigned g = stat_per_translation(tbs, code.num_guest_inst);
++    unsigned ops = stat_per_translation(tbs, code.num_tcg_ops);
++    unsigned ops_opt = stat_per_translation(tbs, code.num_tcg_ops_opt);
++    unsigned spills = stat_per_translation(tbs, code.spills);
++    unsigned h = stat_per_translation(tbs, code.out_len);
++    unsigned act = tbs->tbs->len;
++    unsigned invalid = 0;
++
++    float guest_host_prop = g ? ((float) h / g) : 0;
++
++    g_ptr_array_foreach(tbs->tbs, &count_invalid_tbs, &invalid);
++
++    qemu_log("TB id:%d | phys:0x"TB_PAGE_ADDR_FMT" virt:0x"TARGET_FMT_lx
++             " flags:%#08x %d inv/%d\n",
++             tbs->display_id, tbs->phys_pc, tbs->pc, tbs->flags,
++             invalid, act);
++
++    if (tbs_stats_enabled(tbs, TB_EXEC_STATS)) {
++        qemu_log("\t| exec:%lu/%lu guest inst cov:%.2f%%\n", tbs->executions.normal,
++                tbs->executions.atomic, tbs->executions.coverage / 100.0f);
++    }
++
++    if (tbs_stats_enabled(tbs, TB_JIT_STATS)) {
++        qemu_log("\t| trans:%lu ints: g:%u op:%u op_opt:%u spills:%d"
++             "\n\t| h/g (host bytes / guest insts): %f\n",
++             tbs->translations.total, g, ops, ops_opt, spills, guest_host_prop);
++    }
++
++    if (tbs_stats_enabled(tbs, TB_JIT_TIME)) {
++        qemu_log("\t| time to gen at 2.4GHz => code:%0.2lf(ns) IR:%0.2lf(ns)\n",
++             tbs->time.code / 2.4, tbs->time.interm / 2.4);
++    }
++
++    qemu_log("\n");
++
++    return act - invalid;
++}
++
++static gint
++inverse_sort_tbs(gconstpointer p1, gconstpointer p2, gpointer psort_by)
++{
++    const TBStatistics *tbs1 = (TBStatistics *) p1;
++    const TBStatistics *tbs2 = (TBStatistics *) p2;
++    int sort_by = *((int *) psort_by);
++    unsigned long c1 = 0;
++    unsigned long c2 = 0;
++
++    if (likely(sort_by == SORT_BY_SPILLS)) {
++        c1 = stat_per_translation(tbs1, code.spills);
++        c2 = stat_per_translation(tbs2, code.spills);
++    } else if (likely(sort_by == SORT_BY_HOTNESS)) {
++        c1 = stat_per_translation(tbs1, executions.normal);
++        c2 = stat_per_translation(tbs2, executions.normal);
++    } else if (likely(sort_by == SORT_BY_HG)) {
++        if (tbs1->code.num_guest_inst == 0) {
++            return -1;
++        }
++        if (tbs2->code.num_guest_inst == 0) {
++            return 1;
++        }
++
++        float a =
++            (float) stat_per_translation(tbs1, code.out_len) / tbs1->code.num_guest_inst;
++        float b =
++            (float) stat_per_translation(tbs2, code.out_len) / tbs2->code.num_guest_inst;
++        c1 = a <= b ? 0 : 1;
++        c2 = a <= b ? 1 : 0;
++    }
++
++    return c1 < c2 ? 1 : c1 == c2 ? 0 : -1;
++}
++
++static void dump_last_search_headers(int count)
++{
++    if (!last_search) {
++        qemu_log("No data collected yet\n");
 +        return;
 +    }
 +
-+    struct jitheader header;
-+    header.magic = 0x4A695444;
-+    header.version = 1;
-+    header.elf_mach = get_e_machine();
-+    header.total_size = sizeof(struct jitheader);
-+    header.pid = getpid();
-+    header.timestamp = get_clock();
-+    header.flags = 0;
-+
-+    fwrite(&header, header.total_size, 1, dumpfile);
-+
-+    fflush(dumpfile);
-+
-+    qemu_mutex_init(&dumpfile_lock);
-+}
-+
-+void append_load_in_jitdump_file(TranslationBlock *tb)
-+{
-+    gchar *func_name = g_strdup_printf("TB virt:0x"TARGET_FMT_lx, tb->pc);
-+
-+    /* Serialise the writing of the dump file */
-+    qemu_mutex_lock(&dumpfile_lock);
-+
-+    struct jr_code_load load_event;
-+    load_event.p.id = JIT_CODE_LOAD;
-+    load_event.p.total_size =
-+        sizeof(struct jr_code_load) + func_name->len + 1 + tb->tc.size;
-+    load_event.p.timestamp = get_clock();
-+    load_event.pid = getpid();
-+    load_event.tid = syscall(SYS_gettid);
-+    load_event.vma = tb->pc;
-+    load_event.code_addr = (uint64_t) tb->tc.ptr;
-+    load_event.code_size = tb->tc.size;
-+    load_event.code_index = tb->pc;
-+
-+    fwrite(&load_event, sizeof(struct jr_code_load), 1, dumpfile);
-+    fwrite(func_name->str, func_name->len + 1, 1, dumpfile);
-+    fwrite(tb->tc.ptr, tb->tc.size, 1, dumpfile);
-+
-+    g_free(func_name);
-+    fflush(dumpfile);
-+
-+    qemu_mutex_unlock(&dumpfile_lock);
-+}
-+
-+void close_jitdump_file(void)
-+{
-+    fclose(dumpfile);
-+    if (perf_marker != MAP_FAILED) {
-+        munmap(perf_marker, sysconf(_SC_PAGESIZE));
++    GList *l = last_search;
++    while (l != NULL && count--) {
++        TBStatistics *tbs = (TBStatistics *) l->data;
++        GList *next = l->next;
++        dump_tb_header(tbs);
++        l = next;
 +    }
 +}
 +
-+bool is_jitdump_enabled;
-+
-+void enable_jitdump(void)
++static uint64_t calculate_last_search_coverages(void)
 +{
-+    is_jitdump_enabled = true;
++    uint64_t total_exec_count = 0;
++    GList *i;
++
++    /* Compute total execution count for all tbs */
++    for (i = last_search; i; i = i->next) {
++        TBStatistics *tbs = (TBStatistics *) i->data;
++        total_exec_count +=
++            (tbs->executions.atomic + tbs->executions.normal) * tbs->code.num_guest_inst;
++    }
++
++    for (i = last_search; i; i = i->next) {
++        TBStatistics *tbs = (TBStatistics *) i->data;
++        uint64_t tb_total_execs =
++            (tbs->executions.atomic + tbs->executions.normal) * tbs->code.num_guest_inst;
++        tbs->executions.coverage = (10000 * tb_total_execs) / (total_exec_count + 1);
++    }
++
++    return total_exec_count;
 +}
 +
-+bool jitdump_enabled(void)
++static void do_dump_tbs_info(int total, int sort_by)
 +{
-+    return is_jitdump_enabled;
++    id = 1;
++    GList *i;
++    int count = total;
++
++    g_list_free(last_search);
++    last_search = NULL;
++
++    qht_iter(&tb_ctx.tb_stats, collect_tb_stats, NULL);
++
++    last_search = g_list_sort_with_data(last_search, inverse_sort_tbs, &sort_by);
++
++    if (!last_search) {
++        qemu_printf("No data collected yet!\n");
++        return;
++    }
++
++    calculate_last_search_coverages();
++
++    for (i = last_search; i && count--; i = i->next) {
++        TBStatistics *tbs = (TBStatistics *) i->data;
++        tbs->display_id = id++;
++    }
++
++    /* free the unused bits */
++    if (i) {
++        if (i->next) {
++            i->next->prev = NULL;
++        }
++        g_list_free(i->next);
++        i->next = NULL;
++    }
++
++    dump_last_search_headers(total);
 +}
-diff --git a/accel/tcg/perf/jitdump.h b/accel/tcg/perf/jitdump.h
-new file mode 100644
-index 0000000000..5d6df3ec91
---- /dev/null
-+++ b/accel/tcg/perf/jitdump.h
-@@ -0,0 +1,36 @@
++
++struct tbs_dump_info {
++    int count;
++    int sort_by;
++};
++
++static void do_dump_tbs_info_safe(CPUState *cpu, run_on_cpu_data tbdi)
++{
++    struct tbs_dump_info *info = tbdi.host_ptr;
++    qemu_log_to_monitor(true);
++    do_dump_tbs_info(info->count, info->sort_by);
++    qemu_log_to_monitor(false);
++    g_free(info);
++}
++
 +/*
-+ * QEMU Linux Perf Support
-+ *
-+ * Copyright (c) 2019 Vanderson M. do Rosario (vandersonmr2@gmail.com)
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++ * When we dump_tbs_info on a live system via the HMP we want to
++ * ensure the system is quiessent before we start outputting stuff.
++ * Otherwise we could pollute the output with other logging output.
 + */
-+#ifndef JITDUMP_H
-+#define JITDUMP_H
 +
-+#include "exec/exec-all.h"
-+
-+void start_jitdump_file(void);
-+
-+void append_load_in_jitdump_file(TranslationBlock *tb);
-+void append_move_in_jitdump_file(TranslationBlock *tb);
-+
-+void close_jitdump_file(void);
-+
-+#endif
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 871d91d559..3fafb656e7 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -58,6 +58,10 @@
- #include "sysemu/cpus.h"
- #include "sysemu/tcg.h"
- 
-+#ifdef __linux__
-+#include "perf/jitdump.h"
-+#endif
-+
- /* #define DEBUG_TB_INVALIDATE */
- /* #define DEBUG_TB_FLUSH */
- /* make various TB consistency checks */
-@@ -1167,6 +1171,11 @@ void tcg_exec_init(unsigned long tb_size)
-     cpu_gen_init();
-     page_init();
-     tb_htable_init();
-+#ifdef __linux__
-+    if (jitdump_enabled()) {
-+        start_jitdump_file();
-+    }
-+#endif
-     code_gen_alloc(tb_size);
- #if defined(CONFIG_SOFTMMU)
-     /* There's no guest base to take into account, so go ahead and
-@@ -1978,6 +1987,11 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         return existing_tb;
-     }
-     tcg_tb_insert(tb);
-+#ifdef __linux__
-+    if (jitdump_enabled()) {
-+        append_load_in_jitdump_file(tb);
-+    }
-+#endif
-     return tb;
- }
- 
-diff --git a/docs/devel/tcg.rst b/docs/devel/tcg.rst
-index 4956a30a4e..ab5639cf67 100644
---- a/docs/devel/tcg.rst
-+++ b/docs/devel/tcg.rst
-@@ -109,3 +109,18 @@ memory areas instead calls out to C code for device emulation.
- Finally, the MMU helps tracking dirty pages and pages pointed to by
- translation blocks.
- 
-+Profiling JITted code
-+---------------------
-+
-+The Linux `perf` tool will treat all JITed code as a single block as
-+unlike the main code it can't use debug information to link individual
-+program counter samples with larger functions. To overcome this
-+limitation you can use the `--perf` option to generate a map file.
-+This needs to be integrated with the `perf.data` file before the final
-+report can be viewed.
-+
-+.. code::
-+
-+  perf record -k 1 $QEMU --perf $REMAINING_ARGS
-+  perf inject -i perf.data -j -o perf.data.jitted
-+  perf report -i perf.data.jitted
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 8d84db90b0..a16e0e7eb6 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -129,4 +129,7 @@ void page_size_init(void);
-  * returned. */
- bool dump_in_progress(void);
- 
-+void enable_jitdump(void);
-+bool jitdump_enabled(void);
-+
- #endif
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 560d053f72..18f771c0be 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -377,6 +377,11 @@ static void handle_arg_strace(const char *arg)
-     do_strace = 1;
- }
- 
-+static void handle_arg_perf(const char *arg)
++void dump_tbs_info(int count, int sort_by, bool use_monitor)
 +{
-+    enable_jitdump();
++    if (use_monitor) {
++        struct tbs_dump_info *tbdi = g_new(struct tbs_dump_info, 1);
++        tbdi->count = count;
++        tbdi->sort_by = sort_by;
++        async_safe_run_on_cpu(first_cpu, do_dump_tbs_info_safe,
++                              RUN_ON_CPU_HOST_PTR(tbdi));
++    } else {
++        do_dump_tbs_info(count, sort_by);
++    }
 +}
 +
- static void handle_arg_version(const char *arg)
- {
-     printf("qemu-" TARGET_NAME " version " QEMU_FULL_VERSION
-@@ -449,6 +454,8 @@ static const struct qemu_argument arg_table[] = {
-      "",           "Seed for pseudo-random number generator"},
-     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
-      "",           "[[enable=]<pattern>][,events=<file>][,file=<file>]"},
-+    {"perf",      "QEMU_PERF",         false, handle_arg_perf,
-+     "",           "dump jitdump files to help linux perf JIT code visualization"},
-     {"version",    "QEMU_VERSION",     false, handle_arg_version,
-      "",           "display version information and exit"},
- #if defined(TARGET_XTENSA)
-diff --git a/os-posix.c b/os-posix.c
-index 86cffd2c7d..36ea3a08ca 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -191,6 +191,11 @@ int os_parse_cmd_args(int index, const char *optarg)
-     case QEMU_OPTION_enablefips:
-         fips_set_state(true);
-         break;
-+#if defined(CONFIG_TCG) && defined (CLOCK_MONOTONIC)
-+    case QEMU_OPTION_perf:
-+        enable_jitdump();
-+        break;
-+#endif
- #endif
-     default:
-         return -1;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 2a04ca6ac5..2924032c3b 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4160,6 +4160,17 @@ STEXI
- Enable FIPS 140-2 compliance mode.
- ETEXI
- 
-+#ifdef __linux__
-+DEF("perf", 0, QEMU_OPTION_perf,
-+    "-perf  dump jitdump files to help linux perf JIT code visualization\n",
-+    QEMU_ARCH_ALL)
-+#endif
-+STEXI
-+@item -perf
-+@findex -perf
-+Dumps jitdump files to help linux perf JIT code visualization
-+ETEXI
++/*
++ * We cannot always re-generate the code even if we know there are
++ * valid translations still in the cache. The reason being the guest
++ * may have un-mapped the page code. In real life this would be
++ * un-reachable as the jump cache is cleared and the following QHT
++ * lookup will do a get_page_addr_code() and fault.
++ *
++ * TODO: can we do this safely? We need to
++ *  a) somehow recover the mmu_idx for this translation
++ *  b) probe MMU_INST_FETCH to know it will succeed
++ */
++static GString *get_code_string(TBStatistics *tbs, int log_flags)
++{
++    int old_log_flags = qemu_loglevel;
 +
- HXCOMM Deprecated by -accel tcg
- DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
++    CPUState *cpu = first_cpu;
++    uint32_t cflags = curr_cflags() | CF_NOCACHE;
++    TranslationBlock *tb = NULL;
++
++    GString *code_s = g_string_new(NULL);
++    qemu_log_to_string(true, code_s);
++
++    qemu_set_log(log_flags);
++
++    if (sigsetjmp(cpu->jmp_env, 0) == 0) {
++        mmap_lock();
++        tb = tb_gen_code(cpu, tbs->pc, tbs->cs_base, tbs->flags, cflags);
++        tb_phys_invalidate(tb, -1);
++        mmap_unlock();
++    } else {
++        /*
++         * The mmap_lock is dropped by tb_gen_code if it runs out of
++         * memory.
++         */
++        qemu_log("\ncould not gen code for this TB (no longer mapped?)\n");
++        assert_no_pages_locked();
++    }
++
++    qemu_set_log(old_log_flags);
++    qemu_log_to_string(false, NULL);
++
++    if (tb) {
++        tcg_tb_remove(tb);
++    }
++
++    return code_s;
++}
++
++static void do_tb_dump_with_statistics(TBStatistics *tbs, int log_flags)
++{
++    g_autoptr(GString) code_s = NULL;
++
++    qemu_log("\n------------------------------\n\n");
++
++    if (dump_tb_header(tbs) > 0) {
++        code_s = get_code_string(tbs, log_flags);
++    } else {
++        code_s = g_string_new("cannot re-translate non-active translation");
++    }
++    qemu_log("%s", code_s->str);
++    qemu_log("------------------------------\n");
++}
++
++struct tb_dump_info {
++    int id;
++    int log_flags;
++    bool use_monitor;
++};
++
++static void do_dump_tb_info_safe(CPUState *cpu, run_on_cpu_data info)
++{
++    struct tb_dump_info *tbdi = (struct tb_dump_info *) info.host_ptr;
++
++    if (!last_search) {
++        qemu_log("no search on record\n");
++        return;
++    }
++
++    qemu_log_to_monitor(tbdi->use_monitor);
++
++    TBStatistics *tbs = get_tbstats_by_id(tbdi->id);
++    if (tbs) {
++        do_tb_dump_with_statistics(tbs, tbdi->log_flags);
++    } else {
++        qemu_log("no TB statitics found with id %d\n", tbdi->id);
++    }
++
++    qemu_log_to_monitor(false);
++
++    g_free(tbdi);
++}
++
++void dump_tb_info(int id, int log_mask, bool use_monitor)
++{
++    struct tb_dump_info *tbdi = g_new(struct tb_dump_info, 1);
++
++    tbdi->id = id;
++    tbdi->log_flags = log_mask;
++    tbdi->use_monitor = use_monitor;
++
++    async_safe_run_on_cpu(first_cpu, do_dump_tb_info_safe,
++                          RUN_ON_CPU_HOST_PTR(tbdi));
++
++    /* tbdi free'd by do_dump_tb_info_safe */
++}
++
++
+ void enable_collect_tb_stats(void)
+ {
+     init_tb_stats_htable_if_not();
+diff --git a/disas.c b/disas.c
+index 3e2bfa572b..d5292d4246 100644
+--- a/disas.c
++++ b/disas.c
+@@ -8,6 +8,8 @@
+ #include "disas/disas.h"
+ #include "disas/capstone.h"
  
++#include "qemu/log-for-trace.h"
++
+ typedef struct CPUDebug {
+     struct disassemble_info info;
+     CPUState *cpu;
+@@ -420,6 +422,22 @@ static bool cap_disas_monitor(disassemble_info *info, uint64_t pc, int count)
+ # define cap_disas_monitor(i, p, c)  false
+ #endif /* CONFIG_CAPSTONE */
+ 
++static int fprintf_log(struct _IO_FILE *a, const char *b, ...)
++{
++    va_list ap;
++    va_start(ap, b);
++
++    if (!to_string) {
++        vfprintf(a, b, ap);
++    } else {
++        qemu_vlog(b, ap);
++    }
++
++    va_end(ap);
++
++    return 1;
++}
++
+ /* Disassemble this for me please... (debugging).  */
+ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+                   target_ulong size)
+@@ -429,7 +447,7 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+     int count;
+     CPUDebug s;
+ 
+-    INIT_DISASSEMBLE_INFO(s.info, out, fprintf);
++    INIT_DISASSEMBLE_INFO(s.info, out, fprintf_log);
+ 
+     s.cpu = cpu;
+     s.info.read_memory_func = target_read_memory;
+@@ -460,11 +478,12 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+     }
+ 
+     for (pc = code; size > 0; pc += count, size -= count) {
+-	fprintf(out, "0x" TARGET_FMT_lx ":  ", pc);
+-	count = s.info.print_insn(pc, &s.info);
+-	fprintf(out, "\n");
+-	if (count < 0)
+-	    break;
++        fprintf_log(out, "0x" TARGET_FMT_lx ":  ", pc);
++        count = s.info.print_insn(pc, &s.info);
++        fprintf_log(out, "\n");
++        if (count < 0) {
++            break;
++        }
+         if (size < count) {
+             fprintf(out,
+                     "Disassembler disagrees with translator over instruction "
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index 257ee7d7a3..c8418211d9 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -289,6 +289,22 @@ ETEXI
+         .help       = "show dynamic compiler info",
+         .cmd        = hmp_info_jit,
+     },
++    {
++        .name       = "tb-list",
++        .args_type  = "number:i?,sortedby:s?",
++        .params     = "[number sortedby]",
++        .help       = "show a [number] translated blocks sorted by [sortedby]"
++                      "sortedby opts: hotness hg spills",
++        .cmd        = hmp_info_tblist,
++    },
++    {
++        .name       = "tb",
++        .args_type  = "id:i,flags:s?",
++        .params     = "id [flag1,flag2,...]",
++        .help       = "show information about one translated block by id."
++                      "dump flags can be used to set dump code level: out_asm in_asm op",
++        .cmd        = hmp_info_tb,
++    },
+ #endif
+ 
+ STEXI
+diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
+index c20a3e6439..b5e9c54b33 100644
+--- a/include/exec/tb-stats.h
++++ b/include/exec/tb-stats.h
+@@ -35,8 +35,11 @@
+ enum SortBy { SORT_BY_HOTNESS, SORT_BY_HG /* Host/Guest */, SORT_BY_SPILLS };
+ enum TbstatsCmd { START, PAUSE, STOP, FILTER };
+ 
++#define tbs_stats_enabled(tbs, JIT_STATS) \
++    (tbs && (tbs->stats_enabled & JIT_STATS))
++
+ #define tb_stats_enabled(tb, JIT_STATS) \
+-    (tb && tb->tb_stats && (tb->tb_stats->stats_enabled & JIT_STATS))
++    (tb && tb->tb_stats && tbs_stats_enabled(tb->tb_stats, JIT_STATS))
+ 
+ #define stat_per_translation(stat, name) \
+     (stat->translations.total ? stat->name / stat->translations.total : 0)
+@@ -65,6 +68,8 @@ struct TBStatistics {
+     struct {
+         unsigned long normal;
+         unsigned long atomic;
++        /* filled only when dumping x% cover set */
++        uint16_t coverage;
+     } executions;
+ 
+     /* JIT Stats - protected by lock */
+@@ -86,7 +91,6 @@ struct TBStatistics {
+ 
+     struct {
+         unsigned long total;
+-        unsigned long uncached;
+         unsigned long spanning;
+     } translations;
+ 
+@@ -107,6 +111,9 @@ struct TBStatistics {
+         int64_t opt;
+         int64_t la;
+     } time;
++
++    /* HMP information - used for referring to previous search */
++    int display_id;
+ };
+ 
+ bool tb_stats_cmp(const void *ap, const void *bp);
+@@ -133,4 +140,26 @@ void do_hmp_tbstats_safe(CPUState *cpu, run_on_cpu_data icmd);
+  */
+ void tbstats_reset_tbs(void);
+ 
++/**
++ * dump_tbs_info: report the hottest blocks
++ *
++ * @count: the limit of hotblocks
++ * @sort_by: property in which the dump will be sorted
++ * @use_monitor: redirect output to monitor
++ *
++ * Report the hottest blocks to either the log or monitor
++ */
++void dump_tbs_info(int count, int sort_by, bool use_monitor);
++
++/**
++ * dump_tb_info: dump information about one TB
++ *
++ * @id: the display id of the block (from previous search)
++ * @mask: the temporary logging mask
++ * @Use_monitor: redirect output to monitor
++ *
++ * Re-run a translation of a block at addr for the purposes of debug output
++ */
++void dump_tb_info(int id, int log_mask, bool use_monitor);
++
+ #endif
+diff --git a/include/qemu/log-for-trace.h b/include/qemu/log-for-trace.h
+index 2f0a5b080e..3de88484cb 100644
+--- a/include/qemu/log-for-trace.h
++++ b/include/qemu/log-for-trace.h
+@@ -20,6 +20,9 @@
+ 
+ /* Private global variable, don't use */
+ extern int qemu_loglevel;
++extern bool to_string;
++
++extern int32_t max_num_hot_tbs_to_dump;
+ 
+ #define LOG_TRACE          (1 << 15)
+ 
+@@ -31,5 +34,6 @@ static inline bool qemu_loglevel_mask(int mask)
+ 
+ /* main logging function */
+ int GCC_FMT_ATTR(1, 2) qemu_log(const char *fmt, ...);
++int qemu_vlog(const char *fmt, va_list va);
+ 
+ #endif
+diff --git a/include/qemu/log.h b/include/qemu/log.h
+index a8d1997cde..804cf90f0f 100644
+--- a/include/qemu/log.h
++++ b/include/qemu/log.h
+@@ -114,6 +114,8 @@ typedef struct QEMULogItem {
+ extern const QEMULogItem qemu_log_items[];
+ 
+ void qemu_set_log(int log_flags);
++void qemu_log_to_monitor(bool enable);
++void qemu_log_to_string(bool enable, GString *s);
+ void qemu_log_needs_buffers(void);
+ void qemu_set_log_filename(const char *filename, Error **errp);
+ void qemu_set_dfilter_ranges(const char *ranges, Error **errp);
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 218263d29a..af09a97085 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -504,6 +504,58 @@ static void hmp_tbstats(Monitor *mon, const QDict *qdict)
+ 
+ }
+ 
++static void hmp_info_tblist(Monitor *mon, const QDict *qdict)
++{
++    int number_int;
++    const char *sortedby_str = NULL;
++    if (!tcg_enabled()) {
++        error_report("TB information is only available with accel=tcg");
++        return;
++    }
++    if (!tb_ctx.tb_stats.map) {
++        error_report("no TB information recorded");
++        return;
++    }
++
++    number_int = qdict_get_try_int(qdict, "number", 10);
++    sortedby_str = qdict_get_try_str(qdict, "sortedby");
++
++    int sortedby = SORT_BY_HOTNESS;
++    if (sortedby_str == NULL || strcmp(sortedby_str, "hotness") == 0) {
++        sortedby = SORT_BY_HOTNESS;
++    } else if (strcmp(sortedby_str, "hg") == 0) {
++        sortedby = SORT_BY_HG;
++    } else if (strcmp(sortedby_str, "spills") == 0) {
++        sortedby = SORT_BY_SPILLS;
++    } else {
++        error_report("valid sort options are: hotness hg spills");
++        return;
++    }
++
++    dump_tbs_info(number_int, sortedby, true);
++}
++
++static void hmp_info_tb(Monitor *mon, const QDict *qdict)
++{
++    const int id = qdict_get_int(qdict, "id");
++    const char *flags = qdict_get_try_str(qdict, "flags");
++    int mask;
++
++    if (!tcg_enabled()) {
++        error_report("TB information is only available with accel=tcg");
++        return;
++    }
++
++    mask = flags ? qemu_str_to_log_mask(flags) : CPU_LOG_TB_IN_ASM;
++
++    if (!mask) {
++        error_report("Unable to parse log flags, see 'help log'");
++        return;
++    }
++
++    dump_tb_info(id, mask, true);
++}
++
+ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+ {
+     if (!tcg_enabled()) {
+diff --git a/util/log.c b/util/log.c
+index 86bd691967..fa78e2bca9 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -33,25 +33,55 @@ int qemu_loglevel;
+ static int log_append = 0;
+ static GArray *debug_regions;
+ int32_t max_num_hot_tbs_to_dump;
++static bool to_monitor;
++bool to_string;
+ 
+-/* Return the number of characters emitted.  */
+-int qemu_log(const char *fmt, ...)
++GString *string;
++
++int qemu_vlog(const char *fmt, va_list va)
+ {
+     int ret = 0;
+-    if (qemu_logfile) {
+-        va_list ap;
+-        va_start(ap, fmt);
+-        ret = vfprintf(qemu_logfile, fmt, ap);
+-        va_end(ap);
+-
+-        /* Don't pass back error results.  */
+-        if (ret < 0) {
+-            ret = 0;
++    if (to_string) {
++        if (string) {
++            g_string_append_vprintf(string, fmt, va);
+         }
++    } else if (to_monitor) {
++        ret = qemu_vprintf(fmt, va);
++    } else if (qemu_logfile) {
++        ret = vfprintf(qemu_logfile, fmt, va);
++    }
++
++    /* Don't pass back error results.  */
++    if (ret < 0) {
++        ret = 0;
+     }
+     return ret;
+ }
+ 
++/* Return the number of characters emitted.  */
++int qemu_log(const char *fmt, ...)
++{
++    int ret = 0;
++    va_list ap;
++    va_start(ap, fmt);
++
++    ret = qemu_vlog(fmt, ap);
++
++    va_end(ap);
++    return ret;
++}
++
++void qemu_log_to_monitor(bool enable)
++{
++    to_monitor = enable;
++}
++
++void qemu_log_to_string(bool enable, GString *s)
++{
++    to_string = enable;
++    string = s;
++}
++
+ static bool log_uses_own_buffers;
+ 
+ /* enable or disable low levels log */
+@@ -300,6 +330,7 @@ int qemu_str_to_log_mask(const char *str)
+             trace_enable_events((*tmp) + 6);
+             mask |= LOG_TRACE;
+ #endif
++#ifdef CONFIG_TCG
+         } else if (g_str_has_prefix(*tmp, "tb_stats")) {
+             mask |= CPU_LOG_TB_STATS;
+             set_default_tbstats_flag(TB_JIT_STATS | TB_EXEC_STATS | TB_JIT_TIME);
+@@ -329,6 +360,7 @@ int qemu_str_to_log_mask(const char *str)
+                 }
+                 set_default_tbstats_flag(flags);
+             }
++#endif
+         } else {
+             for (item = qemu_log_items; item->mask != 0; item++) {
+                 if (g_str_equal(*tmp, item->name)) {
 -- 
 2.20.1
 
