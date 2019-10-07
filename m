@@ -2,78 +2,81 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CE5C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE40ECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:44:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11A6920684
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:38:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB02920684
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:44:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pGceN9UR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A6920684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkeley-edu.20150623.gappssmtp.com header.i=@berkeley-edu.20150623.gappssmtp.com header.b="iGcgrGOC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB02920684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=berkeley.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHXth-0000Iw-2j
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 14:38:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51394)
+	id 1iHXzj-0002V4-QK
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 14:44:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52270)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iHXsA-0007dZ-KB
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:36:43 -0400
+ (envelope-from <dayeol@berkeley.edu>) id 1iHXwy-0001jv-J0
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iHXs9-0004bb-Dx
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:36:42 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:34899)
+ (envelope-from <dayeol@berkeley.edu>) id 1iHXww-0006R3-Qg
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:41:40 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45311)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iHXs9-0004bJ-6x; Mon, 07 Oct 2019 14:36:41 -0400
-Received: by mail-lf1-x142.google.com with SMTP id w6so10003366lfl.2;
- Mon, 07 Oct 2019 11:36:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1iHXww-0006Qf-HN
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:41:38 -0400
+Received: by mail-pf1-x443.google.com with SMTP id y72so9167497pfb.12
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 11:41:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=berkeley-edu.20150623.gappssmtp.com; s=20150623;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=eWbocJ1fD8v88jlZ4169MzpTZuvRPbEXw0Rq/ooBDRk=;
- b=pGceN9URwm2gWowCkm9wvuu1nmFSwTUlblMR7n3liDLVYGa5QoY0DBu4O0d6sk4dWp
- b9dzCld7hfAQI+c18FauYI0TPC7gexdjDXmL6rlZwoVFLCh2OA2wW8bHLRdELI7p0EZF
- 0qEVwrEq8rnXxAaL99Fqb4qaQ96CGBcSichg7sA98U7yZst9vb/mm51mWLRwjp6tJ22l
- tKGhbdAZnU7u7uRQnki+U3np3dP8bd2uPIG2xsE4i6euIF8jd0tQoE6h1o4LM5VwSERv
- lBhfwZPXYxM2kKSPq0696xBulOV1mBbf40uhb+Zt7eJQwVNsSjoi8ROtChzIjs/3PUdi
- cc+w==
+ :cc; bh=KJzG2axKoZkgi+l/x9Y+YilciqreDl/CMUAdZrHp2aw=;
+ b=iGcgrGOCKgHnYj0SOxs4byq0fzbx3qX+oOOzRHokaMHdEiD8mDY6Q3JygO931nMbqJ
+ fzWFuzu8hPpdhWk9JEnpE9d6x6zzAzcKHAEg2Na+INFJAhv2R6MjZtcaHYVNgf4QI37D
+ DJHpuk9lHL1TtvncnkAmP+sOVvxQxpuOEpdJj6gkcHoVTyTXvsbvxUILntTXb9dQ8gcf
+ Z6LRr/tYlTaRBPD1Hfdz+sKjaKSnjMpdbfjjuufDgw5Vt+YvzSTKtUSVrbtfDlneELT8
+ I1c74nccf5kKFy1rhccOhr50gar9wY4rJrAUbthHyDcAJkW6rmbxmppVpHe0BJjFH4+z
+ 21Jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=eWbocJ1fD8v88jlZ4169MzpTZuvRPbEXw0Rq/ooBDRk=;
- b=Pb143hB7VBhVebn9QKHWfLGGiY8PpP8VNq8mG0aUv6oeKHY0Ha+EQQbhTPnrq8zhkY
- Boy0weWBlWo3ua6rjf0aNupCSqiI50Qz/O0bjg0amaEURMp5bWgdlFugkZAfL3hQkr+6
- 2GSUPFQ1v+zZ/9d9FJqnysK3KgXi/gFO1agrknOHaSR2gU2bZrzjX88BQBd/vjfyvXHi
- a685/FwzTGMYDyTAbRYY/Idvy6C/NI4OhQlZC3eTpMhbWxnmr/c1obWRxY9odMY+7zbH
- gIb6JofG2JXT6T6jQzVFYQK8hyl7vo1lgKJJd9xnvA+qIQTcGvX0bJiNEInJ7xleUFWM
- F2QQ==
-X-Gm-Message-State: APjAAAXQ6LhcisDCK7ZIaRHNokAt9ulKup9D9Mcguygrw2sIGPtwBGIN
- wQG/DE5lI8atj9KsCO3NMICHQvJEw3cTCM/dhdM=
-X-Google-Smtp-Source: APXvYqwDDknyG3YOXTD+DUV/l9sUUtlNGwhuoulvn3OeY3eWg4lMFdAHRtDY1ijaM897i5F5dxtGzSSvzOV/UKkwgYE=
-X-Received: by 2002:ac2:5e9e:: with SMTP id b30mr17629448lfq.5.1570473399667; 
- Mon, 07 Oct 2019 11:36:39 -0700 (PDT)
+ bh=KJzG2axKoZkgi+l/x9Y+YilciqreDl/CMUAdZrHp2aw=;
+ b=McRW9dQw7l+iMbYbr0P1vuy7PKEOdyKX6cW/j5ZyFTYBFikA/MrQI35C4daJSGE55c
+ T6cWCbknxapoZQtFZVPD6Ljs1Sku1atenXzG+X4gPbve4SfjmftlbwHduUZ/bySnD9r+
+ Di1lPdWnnlGttxpTI+3ns61WSOdAevCi94pOfLUwCQJCz+vjC7RfI7FZCkh1wQJ6BBCF
+ I4jPOnqm3KnVkDLmcZcLMThcfaSPKyvyLXrNHltUPK6KuTg2AESVpalyGRIeAX40n7dM
+ vEsklGq8n2lWjeO/2zty43Dogp7GpPpff8LDZ5Zw9AjcqAa+ELugg7Pk6nUk3g645Ktz
+ PPHA==
+X-Gm-Message-State: APjAAAVe3qYfVvbS/1ZXsrUy8zVITFzMjK86hkCVUkuPahHWf7fO5MCf
+ bJTh+IPbsmMn30wl+mSzDPqBstKKY/X2eW1tadOMGg==
+X-Google-Smtp-Source: APXvYqy56w92ZslacwtCzrc4WCV82EQC6F0vE5pppvDkBeVbKt5gFBFOxqcL+j6uZvTu+A5wjfNQqF6iLd1S+OS1L5I=
+X-Received: by 2002:aa7:8816:: with SMTP id c22mr25727116pfo.197.1570473697061; 
+ Mon, 07 Oct 2019 11:41:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191004151614.81516-1-jonathan@fintelia.io>
-In-Reply-To: <20191004151614.81516-1-jonathan@fintelia.io>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 7 Oct 2019 11:31:43 -0700
-Message-ID: <CAKmqyKPFuyuC6sGCRGJGo2f_3=2z33MmuXHZov5R0pc7A9O9Jg@mail.gmail.com>
-Subject: Re: [PATCH v2] target/riscv: Expose "priv" register for GDB
-To: Jonathan Behrens <jonathan@fintelia.io>
-Content-Type: text/plain; charset="UTF-8"
+References: <20191007052813.25814-1-dayeol@berkeley.edu>
+ <5583387c-5c5b-8890-999b-2ba4d75cd69d@linaro.org>
+ <CACjxMEsw+Deh176JLP2aF4Pdkb_s8MiPApwMON-_K6ed61-Zyw@mail.gmail.com>
+ <3747223d-23ee-1f28-e165-b2b0c5746b68@linaro.org>
+In-Reply-To: <3747223d-23ee-1f28-e165-b2b0c5746b68@linaro.org>
+From: Dayeol Lee <dayeol@berkeley.edu>
+Date: Mon, 7 Oct 2019 11:41:26 -0700
+Message-ID: <CACjxMEtPRxTQdOYFL97G7aYXC6KTBuGY2avf1bPJLYGEpURh=Q@mail.gmail.com>
+Subject: Re: [PATCH] target/riscv: PMP violation due to wrong size parameter
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000d7ce0905945666d7"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,106 +88,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+ Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 4, 2019 at 8:18 AM Jonathan Behrens <jonathan@fintelia.io> wrote:
->
-> This patch enables a debugger to read and write the current privilege level via
-> a special "priv" register. When compiled with CONFIG_USER_ONLY the register is
-> still visible but is hardwired to zero.
->
-> Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
-> ---
->  gdb-xml/riscv-32bit-cpu.xml |  1 +
->  gdb-xml/riscv-64bit-cpu.xml |  1 +
->  target/riscv/cpu.c          |  2 +-
->  target/riscv/gdbstub.c      | 14 ++++++++++++++
->  4 files changed, 17 insertions(+), 1 deletion(-)
-> ---
-> Changelog V2:
-> - Use PRV_H and PRV_S instead of integer literals
->
-> diff --git a/gdb-xml/riscv-32bit-cpu.xml b/gdb-xml/riscv-32bit-cpu.xml
-> index 0d07aaec85..d6d76aafd8 100644
-> --- a/gdb-xml/riscv-32bit-cpu.xml
-> +++ b/gdb-xml/riscv-32bit-cpu.xml
-> @@ -44,4 +44,5 @@
->    <reg name="t5" bitsize="32" type="int"/>
->    <reg name="t6" bitsize="32" type="int"/>
->    <reg name="pc" bitsize="32" type="code_ptr"/>
-> +  <reg name="priv" bitsize="32" type="int"/>
->  </feature>
-> diff --git a/gdb-xml/riscv-64bit-cpu.xml b/gdb-xml/riscv-64bit-cpu.xml
-> index b8aa424ae4..0758d1b5fe 100644
-> --- a/gdb-xml/riscv-64bit-cpu.xml
-> +++ b/gdb-xml/riscv-64bit-cpu.xml
-> @@ -44,4 +44,5 @@
->    <reg name="t5" bitsize="64" type="int"/>
->    <reg name="t6" bitsize="64" type="int"/>
->    <reg name="pc" bitsize="64" type="code_ptr"/>
-> +  <reg name="priv" bitsize="64" type="int" />
->  </feature>
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index f13e298a36..347989858f 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -475,7 +475,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
->      cc->synchronize_from_tb = riscv_cpu_synchronize_from_tb;
->      cc->gdb_read_register = riscv_cpu_gdb_read_register;
->      cc->gdb_write_register = riscv_cpu_gdb_write_register;
-> -    cc->gdb_num_core_regs = 33;
-> +    cc->gdb_num_core_regs = 34;
->  #if defined(TARGET_RISCV32)
->      cc->gdb_core_xml_file = "riscv-32bit-cpu.xml";
->  #elif defined(TARGET_RISCV64)
-> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-> index ded140e8d8..7e0822145d 100644
-> --- a/target/riscv/gdbstub.c
-> +++ b/target/riscv/gdbstub.c
-> @@ -278,6 +278,12 @@ int riscv_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
->          return gdb_get_regl(mem_buf, env->gpr[n]);
->      } else if (n == 32) {
->          return gdb_get_regl(mem_buf, env->pc);
-> +    } else if (n == 33) {
-> +#ifdef CONFIG_USER_ONLY
-> +        return gdb_get_regl(mem_buf, 0);
-> +#else
-> +        return gdb_get_regl(mem_buf, env->priv);
-> +#endif
->      }
->      return 0;
->  }
-> @@ -296,6 +302,14 @@ int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
->      } else if (n == 32) {
->          env->pc = ldtul_p(mem_buf);
->          return sizeof(target_ulong);
-> +    } else if (n == 33) {
-> +#ifndef CONFIG_USER_ONLY
-> +        env->priv = ldtul_p(mem_buf) & 0x3;
-> +        if (env->priv == PRV_H) {
-> +            env->priv = PRV_S;
-> +        }
+--000000000000d7ce0905945666d7
+Content-Type: text/plain; charset="UTF-8"
 
-Why have this? There is no PRV_H so we should never be in that privilege mode.
+On Mon, Oct 7, 2019 at 11:25 AM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-Alistair
-
-> +#endif
-> +        return sizeof(target_ulong);
->      }
->      return 0;
->  }
-> --
-> 2.23.0
+> On 10/7/19 10:19 AM, Dayeol Lee wrote:
+> > Thank you very much for the clarification!
+> >
+> > I found tlb_set_page with size != TARGET_PAGE_SIZE makes the translation
+> way
+> > too slow; the Linux doesn't seem to boot.
 >
+> To clarify, PMP specifies a range.  That range has only two end points.
+> Therefore, a maximum of 2 pages may be affected by a mis-aligned PMP
+> boundary.
+>
+> It sounds like you're getting size != TARGET_PAGE_SIZE for all pages.
+>
+>
+The cause of the problem is not a mis-aligned PMP boundary.
+Let's say a PMP range is 0x1000 - 0x2000
+if pmp_hart_has_privs() gets addr=0x2000 and size=0,
+pmp_hart_has_privs() will ALWAYS return false because the code assumes size
+> 0.
+It checks if (addr) and (addr + size - 1) are within the PMP range for each
+PMP entry.
+(addr + size - 1) is supposed to be the last byte address of the memory
+access, but it ends up with (addr - 1) if size = 0.
+Thus, pmp_hart_has_privs() returns false as (addr - 1) = 0x1fff is within
+the range, and addr = 0x2000 is out of the range (partial match violation).
+
+--000000000000d7ce0905945666d7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">On Mon, Oct 7, 2019 at 11:25 AM Richard H=
+enderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.hender=
+son@linaro.org</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
+solid rgb(204,204,204);padding-left:1ex">On 10/7/19 10:19 AM, Dayeol Lee wr=
+ote:<br>
+&gt; Thank you very much for the clarification!<br>
+&gt; <br>
+&gt; I found tlb_set_page with size !=3D TARGET_PAGE_SIZE makes the transla=
+tion way<br>
+&gt; too slow; the Linux doesn&#39;t seem to boot.<br>
+<br>
+To clarify, PMP specifies a range.=C2=A0 That range has only two end points=
+.<br>
+Therefore, a maximum of 2 pages may be affected by a mis-aligned PMP bounda=
+ry.<br>
+<br>
+It sounds like you&#39;re getting size !=3D TARGET_PAGE_SIZE for all pages.=
+<br><br></blockquote><div><br></div><div>The cause of the problem is not a =
+mis-aligned PMP boundary.</div><div>Let&#39;s say a PMP range is 0x1000 - 0=
+x2000</div><div>if pmp_hart_has_privs() gets addr=3D0x2000 and size=3D0,</d=
+iv><div>pmp_hart_has_privs() will ALWAYS return false because the code assu=
+mes size &gt; 0.</div><div>It checks if (addr) and (addr=C2=A0+ size - 1) a=
+re within the PMP range for each PMP entry.</div><div>(addr=C2=A0+ size - 1=
+) is supposed to be the last byte address of the memory access, but it ends=
+ up with (addr - 1) if size =3D 0.</div><div>Thus, pmp_hart_has_privs() ret=
+urns false as (addr - 1) =3D 0x1fff is within the range, and addr =3D 0x200=
+0 is out of the range (partial match violation).</div><div><br></div><div><=
+br></div><div><br></div></div></div>
+
+--000000000000d7ce0905945666d7--
 
