@@ -2,67 +2,78 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B21C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CE5C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:38:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FA1A20684
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:35:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FA1A20684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 11A6920684
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:38:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pGceN9UR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A6920684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHXqX-0006BQ-NB
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 14:35:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50964)
+	id 1iHXth-0000Iw-2j
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 14:38:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iHXpE-0005et-Rp
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:33:42 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iHXsA-0007dZ-KB
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iHXpC-0003Hz-9b
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:33:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48746)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iHXpC-0003Gu-1H
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:33:38 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AC6C5C049E1A;
- Mon,  7 Oct 2019 18:33:36 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-11.rdu2.redhat.com
- [10.10.120.11])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2718D60127;
- Mon,  7 Oct 2019 18:33:26 +0000 (UTC)
-Subject: Re: [PATCH v2 7/7] tests/fw_cfg: Run the tests on big-endian targets
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191007151905.32766-1-philmd@redhat.com>
- <20191007151905.32766-8-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a6e070e3-a910-5aa7-68e3-94644509cdd0@redhat.com>
-Date: Mon, 7 Oct 2019 20:33:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <alistair23@gmail.com>) id 1iHXs9-0004bb-Dx
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:36:42 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:34899)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iHXs9-0004bJ-6x; Mon, 07 Oct 2019 14:36:41 -0400
+Received: by mail-lf1-x142.google.com with SMTP id w6so10003366lfl.2;
+ Mon, 07 Oct 2019 11:36:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=eWbocJ1fD8v88jlZ4169MzpTZuvRPbEXw0Rq/ooBDRk=;
+ b=pGceN9URwm2gWowCkm9wvuu1nmFSwTUlblMR7n3liDLVYGa5QoY0DBu4O0d6sk4dWp
+ b9dzCld7hfAQI+c18FauYI0TPC7gexdjDXmL6rlZwoVFLCh2OA2wW8bHLRdELI7p0EZF
+ 0qEVwrEq8rnXxAaL99Fqb4qaQ96CGBcSichg7sA98U7yZst9vb/mm51mWLRwjp6tJ22l
+ tKGhbdAZnU7u7uRQnki+U3np3dP8bd2uPIG2xsE4i6euIF8jd0tQoE6h1o4LM5VwSERv
+ lBhfwZPXYxM2kKSPq0696xBulOV1mBbf40uhb+Zt7eJQwVNsSjoi8ROtChzIjs/3PUdi
+ cc+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=eWbocJ1fD8v88jlZ4169MzpTZuvRPbEXw0Rq/ooBDRk=;
+ b=Pb143hB7VBhVebn9QKHWfLGGiY8PpP8VNq8mG0aUv6oeKHY0Ha+EQQbhTPnrq8zhkY
+ Boy0weWBlWo3ua6rjf0aNupCSqiI50Qz/O0bjg0amaEURMp5bWgdlFugkZAfL3hQkr+6
+ 2GSUPFQ1v+zZ/9d9FJqnysK3KgXi/gFO1agrknOHaSR2gU2bZrzjX88BQBd/vjfyvXHi
+ a685/FwzTGMYDyTAbRYY/Idvy6C/NI4OhQlZC3eTpMhbWxnmr/c1obWRxY9odMY+7zbH
+ gIb6JofG2JXT6T6jQzVFYQK8hyl7vo1lgKJJd9xnvA+qIQTcGvX0bJiNEInJ7xleUFWM
+ F2QQ==
+X-Gm-Message-State: APjAAAXQ6LhcisDCK7ZIaRHNokAt9ulKup9D9Mcguygrw2sIGPtwBGIN
+ wQG/DE5lI8atj9KsCO3NMICHQvJEw3cTCM/dhdM=
+X-Google-Smtp-Source: APXvYqwDDknyG3YOXTD+DUV/l9sUUtlNGwhuoulvn3OeY3eWg4lMFdAHRtDY1ijaM897i5F5dxtGzSSvzOV/UKkwgYE=
+X-Received: by 2002:ac2:5e9e:: with SMTP id b30mr17629448lfq.5.1570473399667; 
+ Mon, 07 Oct 2019 11:36:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191007151905.32766-8-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 07 Oct 2019 18:33:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191004151614.81516-1-jonathan@fintelia.io>
+In-Reply-To: <20191004151614.81516-1-jonathan@fintelia.io>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 7 Oct 2019 11:31:43 -0700
+Message-ID: <CAKmqyKPFuyuC6sGCRGJGo2f_3=2z33MmuXHZov5R0pc7A9O9Jg@mail.gmail.com>
+Subject: Re: [PATCH v2] target/riscv: Expose "priv" register for GDB
+To: Jonathan Behrens <jonathan@fintelia.io>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,129 +85,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/07/19 17:19, Philippe Mathieu-Daud=C3=A9 wrote:
-> We have been restricting our fw_cfg tests to the PC machine,
-> which is a little-endian architecture.
-> The fw_cfg device is also used on the SPARC and PowerPC
-> architectures, which can run in big-endian configuration.
->=20
-> Since we want to be sure our device does not regress
-> regardless the endianess used, enable this test one
-> these targets.
->=20
-> The NUMA selector is X86 specific, restrict it to this arch.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Fri, Oct 4, 2019 at 8:18 AM Jonathan Behrens <jonathan@fintelia.io> wrote:
+>
+> This patch enables a debugger to read and write the current privilege level via
+> a special "priv" register. When compiled with CONFIG_USER_ONLY the register is
+> still visible but is hardwired to zero.
+>
+> Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
 > ---
-> v2: test ppc32 too (lvivier)
+>  gdb-xml/riscv-32bit-cpu.xml |  1 +
+>  gdb-xml/riscv-64bit-cpu.xml |  1 +
+>  target/riscv/cpu.c          |  2 +-
+>  target/riscv/gdbstub.c      | 14 ++++++++++++++
+>  4 files changed, 17 insertions(+), 1 deletion(-)
 > ---
->  tests/Makefile.include |  2 ++
->  tests/fw_cfg-test.c    | 33 +++++++++++++++++++++++++++------
->  2 files changed, 29 insertions(+), 6 deletions(-)
->=20
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 3543451ed3..4ae3d5140a 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -226,6 +226,7 @@ check-qtest-ppc-y +=3D tests/prom-env-test$(EXESUF)
->  check-qtest-ppc-y +=3D tests/drive_del-test$(EXESUF)
->  check-qtest-ppc-y +=3D tests/boot-serial-test$(EXESUF)
->  check-qtest-ppc-$(CONFIG_M48T59) +=3D tests/m48t59-test$(EXESUF)
-> +check-qtest-ppc-y +=3D tests/fw_cfg-test$(EXESUF)
-> =20
->  check-qtest-ppc64-y +=3D $(check-qtest-ppc-y)
->  check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tests/device-plug-test$(EXESU=
-F)
-> @@ -250,6 +251,7 @@ check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) =3D tests/e=
-ndianness-test$(EXESUF)
->  check-qtest-sparc-y +=3D tests/prom-env-test$(EXESUF)
->  check-qtest-sparc-y +=3D tests/m48t59-test$(EXESUF)
->  check-qtest-sparc-y +=3D tests/boot-serial-test$(EXESUF)
-> +check-qtest-sparc-y +=3D tests/fw_cfg-test$(EXESUF)
-> =20
->  check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(E=
-XESUF)
->  check-qtest-sparc64-y +=3D tests/prom-env-test$(EXESUF)
-> diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-> index 35af0de7e6..1250e87097 100644
-> --- a/tests/fw_cfg-test.c
-> +++ b/tests/fw_cfg-test.c
-> @@ -210,13 +210,30 @@ static void test_fw_cfg_splash_time(const void *o=
-paque)
-> =20
->  int main(int argc, char **argv)
->  {
-> -    QTestCtx ctx;
-> -    int ret;
-> +    const char *arch =3D qtest_get_arch();
-> +    bool has_numa =3D false;
-> +    QTestCtx ctx =3D {};
-> +    int ret =3D 0;
-> =20
->      g_test_init(&argc, &argv, NULL);
-> =20
-> -    ctx.machine_name =3D "pc";
-> -    ctx.fw_cfg =3D pc_fw_cfg_init();
-> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
-> +        has_numa =3D true;
-> +        ctx.machine_name =3D "pc";
-> +        ctx.fw_cfg =3D pc_fw_cfg_init();
-> +    } else if (g_str_equal(arch, "sparc")) {
-> +        ctx.machine_name =3D "SS-5";
-> +        ctx.fw_cfg =3D mm_fw_cfg_init(0xd00000510ULL);
-> +    } else if (g_str_equal(arch, "ppc") || g_str_equal(arch, "ppc64"))=
- {
-> +        /*
-> +         * The mac99 machine is different for 32/64-bit target:
-> +         *
-> +         * ppc(32): the G4 which can be either little or big endian,
-> +         * ppc64:   the G5 (970FX) is only big-endian.
-> +         */
-> +        ctx.machine_name =3D "mac99";
-> +        ctx.fw_cfg =3D mm_fw_cfg_init(0xf0000510);
-> +    }
-> =20
->      qtest_add_data_func("fw_cfg/signature", &ctx, test_fw_cfg_signatur=
-e);
->      qtest_add_data_func("fw_cfg/id", &ctx, test_fw_cfg_id);
-> @@ -231,14 +248,18 @@ int main(int argc, char **argv)
->      qtest_add_func("fw_cfg/boot_device", test_fw_cfg_boot_device);
->  #endif
->      qtest_add_data_func("fw_cfg/max_cpus", &ctx, test_fw_cfg_max_cpus)=
-;
-> -    qtest_add_data_func("fw_cfg/numa", &ctx, test_fw_cfg_numa);
->      qtest_add_data_func("fw_cfg/boot_menu", &ctx, test_fw_cfg_boot_men=
-u);
->      qtest_add_data_func("fw_cfg/reboot_timeout", &ctx,
->                          test_fw_cfg_reboot_timeout);
->      qtest_add_data_func("fw_cfg/splash_time", &ctx, test_fw_cfg_splash=
-_time);
-> =20
-> -    ret =3D g_test_run();
-> +    if (has_numa) {
-> +        qtest_add_data_func("fw_cfg/numa", &ctx, test_fw_cfg_numa);
-> +    }
-> =20
-> +    if (ctx.machine_name) {
-> +        ret =3D g_test_run();
-> +    }
->      g_free(ctx.fw_cfg);
-> =20
->      return ret;
->=20
+> Changelog V2:
+> - Use PRV_H and PRV_S instead of integer literals
+>
+> diff --git a/gdb-xml/riscv-32bit-cpu.xml b/gdb-xml/riscv-32bit-cpu.xml
+> index 0d07aaec85..d6d76aafd8 100644
+> --- a/gdb-xml/riscv-32bit-cpu.xml
+> +++ b/gdb-xml/riscv-32bit-cpu.xml
+> @@ -44,4 +44,5 @@
+>    <reg name="t5" bitsize="32" type="int"/>
+>    <reg name="t6" bitsize="32" type="int"/>
+>    <reg name="pc" bitsize="32" type="code_ptr"/>
+> +  <reg name="priv" bitsize="32" type="int"/>
+>  </feature>
+> diff --git a/gdb-xml/riscv-64bit-cpu.xml b/gdb-xml/riscv-64bit-cpu.xml
+> index b8aa424ae4..0758d1b5fe 100644
+> --- a/gdb-xml/riscv-64bit-cpu.xml
+> +++ b/gdb-xml/riscv-64bit-cpu.xml
+> @@ -44,4 +44,5 @@
+>    <reg name="t5" bitsize="64" type="int"/>
+>    <reg name="t6" bitsize="64" type="int"/>
+>    <reg name="pc" bitsize="64" type="code_ptr"/>
+> +  <reg name="priv" bitsize="64" type="int" />
+>  </feature>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index f13e298a36..347989858f 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -475,7 +475,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
+>      cc->synchronize_from_tb = riscv_cpu_synchronize_from_tb;
+>      cc->gdb_read_register = riscv_cpu_gdb_read_register;
+>      cc->gdb_write_register = riscv_cpu_gdb_write_register;
+> -    cc->gdb_num_core_regs = 33;
+> +    cc->gdb_num_core_regs = 34;
+>  #if defined(TARGET_RISCV32)
+>      cc->gdb_core_xml_file = "riscv-32bit-cpu.xml";
+>  #elif defined(TARGET_RISCV64)
+> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+> index ded140e8d8..7e0822145d 100644
+> --- a/target/riscv/gdbstub.c
+> +++ b/target/riscv/gdbstub.c
+> @@ -278,6 +278,12 @@ int riscv_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+>          return gdb_get_regl(mem_buf, env->gpr[n]);
+>      } else if (n == 32) {
+>          return gdb_get_regl(mem_buf, env->pc);
+> +    } else if (n == 33) {
+> +#ifdef CONFIG_USER_ONLY
+> +        return gdb_get_regl(mem_buf, 0);
+> +#else
+> +        return gdb_get_regl(mem_buf, env->priv);
+> +#endif
+>      }
+>      return 0;
+>  }
+> @@ -296,6 +302,14 @@ int riscv_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+>      } else if (n == 32) {
+>          env->pc = ldtul_p(mem_buf);
+>          return sizeof(target_ulong);
+> +    } else if (n == 33) {
+> +#ifndef CONFIG_USER_ONLY
+> +        env->priv = ldtul_p(mem_buf) & 0x3;
+> +        if (env->priv == PRV_H) {
+> +            env->priv = PRV_S;
+> +        }
 
-Too many foreign arch bits in this patch for me to give an R-b, but
-structurally it looks OK to me.
+Why have this? There is no PRV_H so we should never be in that privilege mode.
 
-Acked-by: Laszlo Ersek <lersek@redhat.com>
+Alistair
 
-Thanks
-Laszlo
+> +#endif
+> +        return sizeof(target_ulong);
+>      }
+>      return 0;
+>  }
+> --
+> 2.23.0
+>
 
