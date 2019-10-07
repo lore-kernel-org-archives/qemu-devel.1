@@ -2,93 +2,62 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 399F6ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 13:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50803ECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 13:43:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04374206BB
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 13:42:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PGn6pZxF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04374206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 26760206BB
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 13:43:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26760206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHTHJ-0002Rn-1W
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 09:42:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60615)
+	id 1iHTIr-0003uH-3D
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 09:43:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iHTCu-0005op-DZ
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:37:49 -0400
+ (envelope-from <philmd@redhat.com>) id 1iHTBF-0003yd-QZ
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iHTCs-0008Jb-Fd
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:37:48 -0400
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:44600)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iHTCs-0008JI-B0
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:37:46 -0400
-Received: by mail-yw1-xc42.google.com with SMTP id m13so5098130ywa.11
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 06:37:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=kjGEkegORlysiCvDcBVThRl7o0UalPLlBqkuzJN6oyA=;
- b=PGn6pZxFk6UjITHYaKjIXHAs/qgRpHa3gsAO/G6gYN1NwxcbVjYpBZi5IBeOiW6k51
- M5RSAKriSKPdO/25dU8ZxtcmhF64WBzfK7lkhV/YzcAxLmmko2u52OvEFw152+aLB2sQ
- 5nskhDUOQBm7623qy8jGDz49y2SgF0LoAkacGfhT06Z2t3EE8HoOIbOKiExw8sF+PLbG
- EFc2TxQcRF4EBSXtqxNuLdq4UL8UJQCFfe5DlzusmCatdcvkOkhd4N/hZ/h0a5VeXc1h
- z9fW68+5NmkFUS88/gpySYgufVuPlhuubEvoBziQMfFu8LLGSXlRUSOnmmzD9Svs30Vu
- vJgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kjGEkegORlysiCvDcBVThRl7o0UalPLlBqkuzJN6oyA=;
- b=i3ob3jF4Ju/pZ8qd1EvqwwuKP9Yh6VT4UM/XZCJU/OxFWeH/H5gNLhP34hzLfYxtl4
- G6UYkTrH06jizoiDPtC9c7vcr1V1PSRFFuaeNMYdViYtuW+WsVaRcRXQrZLOBn1eqWBX
- 9gRg7d0z/M5KsuSvJxHEa/rwcq8zKuEm6iiTbQXI3MSG6pw6i+MZIJHbRWAGL/0jtWyw
- 1auUjo65cs7mCZE8x4NQhIFWPoLQbG18nEBEZDwCT0rP1Q1C7jk3RM4Qt46rB9VBAi1k
- ZER/PjKJLBae8E4WdA+/evMtSP08KHGcO75vQJwDCkPDDo2OhFEEuW8c/1GYtDRB6xUt
- xM6w==
-X-Gm-Message-State: APjAAAXyfQVQXbhi62x09BN1ItjWXDgWAzUvNfjiXcB04u2UGP09DSiN
- /fiR8qvtLZXH97mXz3v50hZqPw==
-X-Google-Smtp-Source: APXvYqzRbDoV11Xq8RUZa3izNtIYsb4feRG+vTQXBCk3z66HjjTgB8cwBMW6Dhq6nu19nHcJIoCGvg==
-X-Received: by 2002:a81:a903:: with SMTP id g3mr11917115ywh.188.1570455465740; 
- Mon, 07 Oct 2019 06:37:45 -0700 (PDT)
-Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id v204sm3779080ywb.23.2019.10.07.06.37.44
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 07 Oct 2019 06:37:45 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 02/15] target/arm/arm-semi: Always set
- some kind of errno for failed calls
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190916141544.17540-1-peter.maydell@linaro.org>
- <20190916141544.17540-3-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ea400570-4446-5d2d-9e19-82229b9e69e1@linaro.org>
-Date: Mon, 7 Oct 2019 09:37:43 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <philmd@redhat.com>) id 1iHTBE-0007Qv-Co
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:36:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55630)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHTBE-0007Qa-4h
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:36:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 597DC116BB23
+ for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 13:36:03 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.206.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A724C60127;
+ Mon,  7 Oct 2019 13:35:58 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 5/5] edk2 build scripts: work around TianoCore#1607 without
+ forcing Python 2
+Date: Mon,  7 Oct 2019 15:35:40 +0200
+Message-Id: <20191007133540.30623-6-philmd@redhat.com>
+In-Reply-To: <20191007133540.30623-1-philmd@redhat.com>
+References: <20191007133540.30623-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190916141544.17540-3-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::c42
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.65]); Mon, 07 Oct 2019 13:36:03 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,25 +69,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/16/19 7:15 AM, Peter Maydell wrote:
-> If we fail a semihosting call we should always set the
-> semihosting errno to something; we were failing to do
-> this for some of the "check inputs for sanity" cases.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  target/arm/arm-semi.c | 45 ++++++++++++++++++++++++++-----------------
->  1 file changed, 27 insertions(+), 18 deletions(-)
+From: Laszlo Ersek <lersek@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+It turns out that forcing python2 for running the edk2 "build" utility is
+neither necessary nor sufficient.
 
+Forcing python2 is not sufficient for two reasons:
 
-r~
+- QEMU is moving away from python2, with python2 nearing EOL,
+
+- according to my most recent testing, the lacking dependency information
+  in the makefiles that are generated by edk2's "build" utility can cause
+  parallel build failures even when "build" is executed by python2.
+
+And forcing python2 is not necessary because we can still return to the
+original idea of filtering out jobserver-related options from MAKEFLAGS.
+So do that.
+
+While at it, cut short edk2's auto-detection of the python3.* minor
+version, by setting PYTHON_COMMAND to "python3" (which we expect to be
+available wherever we intend to build edk2).
+
+With this patch, the guest UEFI binaries that are used as part of the BIO=
+S
+tables test, and the OVMF and ArmVirtQemu platform firmwares, will be
+built strictly in a single job, regardless of an outermost "-jN" make
+option. Alas, there appears to be no reliable way to build edk2 in an
+(outer make, inner make) environment, with a jobserver enabled.
+
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: John Snow <jsnow@redhat.com>
+Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reported-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <20190920083808.21399-3-lersek@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ roms/Makefile                  |  1 +
+ roms/edk2-build.sh             |  4 ++--
+ roms/edk2-funcs.sh             | 17 +++++++++++++++++
+ tests/uefi-test-tools/Makefile |  1 +
+ tests/uefi-test-tools/build.sh |  6 ++++--
+ 5 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/roms/Makefile b/roms/Makefile
+index 3ffd13cc7e..da4efa47a9 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -141,6 +141,7 @@ build-efi-roms: build-pxe-roms
+ #
+ edk2-basetools:
+ 	$(MAKE) -C edk2/BaseTools \
++		PYTHON_COMMAND=3D$${EDK2_PYTHON_COMMAND:-python3} \
+ 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
+ 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
+=20
+diff --git a/roms/edk2-build.sh b/roms/edk2-build.sh
+index 4f46f8a6a2..d5391c7637 100755
+--- a/roms/edk2-build.sh
++++ b/roms/edk2-build.sh
+@@ -27,8 +27,7 @@ shift $num_args
+=20
+ cd edk2
+=20
+-# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
+-export PYTHON_COMMAND=3Dpython2
++export PYTHON_COMMAND=3D${EDK2_PYTHON_COMMAND:-python3}
+=20
+ # Source "edksetup.sh" carefully.
+ set +e +u +C
+@@ -43,6 +42,7 @@ fi
+ # any), for the edk2 "build" utility.
+ source ../edk2-funcs.sh
+ edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
++MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
+ edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
+ qemu_edk2_set_cross_env "$emulation_target"
+=20
+diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
+index a9fae7ee89..3f4485b201 100644
+--- a/roms/edk2-funcs.sh
++++ b/roms/edk2-funcs.sh
+@@ -251,3 +251,20 @@ qemu_edk2_get_thread_count()
+     printf '1\n'
+   fi
+ }
++
++
++# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607> by
++# filtering jobserver-related flags out of MAKEFLAGS. Print the result t=
+o the
++# standard output.
++#
++# Parameters:
++#   $1: the value of the MAKEFLAGS variable
++qemu_edk2_quirk_tianocore_1607()
++{
++  local makeflags=3D"$1"
++
++  printf %s "$makeflags" \
++  | LC_ALL=3DC sed --regexp-extended \
++      --expression=3D's/--jobserver-(auth|fds)=3D[0-9]+,[0-9]+//' \
++      --expression=3D's/-j([0-9]+)?//'
++}
+diff --git a/tests/uefi-test-tools/Makefile b/tests/uefi-test-tools/Makef=
+ile
+index 7e0177d733..1dcddcdbba 100644
+--- a/tests/uefi-test-tools/Makefile
++++ b/tests/uefi-test-tools/Makefile
+@@ -100,6 +100,7 @@ Build/bios-tables-test.%.efi: build-edk2-tools
+=20
+ build-edk2-tools:
+ 	$(MAKE) -C $(edk2_dir)/BaseTools \
++		PYTHON_COMMAND=3D$${EDK2_PYTHON_COMMAND:-python3} \
+ 		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
+ 		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
+=20
+diff --git a/tests/uefi-test-tools/build.sh b/tests/uefi-test-tools/build=
+.sh
+index 8aa7935c43..3b78f30840 100755
+--- a/tests/uefi-test-tools/build.sh
++++ b/tests/uefi-test-tools/build.sh
+@@ -29,8 +29,7 @@ export PACKAGES_PATH=3D$(realpath -- "$edk2_dir")
+ export WORKSPACE=3D$PWD
+ mkdir -p Conf
+=20
+-# Work around <https://bugzilla.tianocore.org/show_bug.cgi?id=3D1607>.
+-export PYTHON_COMMAND=3Dpython2
++export PYTHON_COMMAND=3D${EDK2_PYTHON_COMMAND:-python3}
+=20
+ # Source "edksetup.sh" carefully.
+ set +e +u +C
+@@ -46,12 +45,15 @@ fi
+ source "$edk2_dir/../edk2-funcs.sh"
+ edk2_arch=3D$(qemu_edk2_get_arch "$emulation_target")
+ edk2_toolchain=3D$(qemu_edk2_get_toolchain "$emulation_target")
++MAKEFLAGS=3D$(qemu_edk2_quirk_tianocore_1607 "$MAKEFLAGS")
++edk2_thread_count=3D$(qemu_edk2_get_thread_count "$MAKEFLAGS")
+ qemu_edk2_set_cross_env "$emulation_target"
+=20
+ # Build the UEFI binary
+ mkdir -p log
+ build \
+   --arch=3D"$edk2_arch" \
++  -n "$edk2_thread_count" \
+   --buildtarget=3DDEBUG \
+   --platform=3DUefiTestToolsPkg/UefiTestToolsPkg.dsc \
+   --tagname=3D"$edk2_toolchain" \
+--=20
+2.21.0
 
 
