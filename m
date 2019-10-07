@@ -2,75 +2,95 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A932ECE58D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ADDCC47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:39:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6492921655
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:35:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6492921655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 32FC2205F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:39:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ed3jLDbU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32FC2205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHSF2-0006aC-TH
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 08:35:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49648)
+	id 1iHSIO-0001yg-9M
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 08:39:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51854)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iHS0L-00038z-8g
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:20:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iHSHQ-00012k-2G
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:38:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iHS0J-0007u0-MN
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34738)
+ (envelope-from <peter.maydell@linaro.org>) id 1iHSHO-0007uX-85
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:38:23 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40262)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iHS0J-0007tw-Gp
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:20:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iHS0I-0005v7-8a
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 12:20:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3B4232E8079
- for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 12:20:42 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iHSHN-0007u4-1h
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:38:22 -0400
+Received: by mail-ot1-x344.google.com with SMTP id y39so10782546ota.7
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 05:38:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Eitmdur7IFclm5OmiXUKql+34LRIF1lT1xgTvve69ts=;
+ b=ed3jLDbUAmrtGYFsu8M8Avqmtxo3QrYokXKJp/mvGdzrN9fY0DiqKKKErWKS5ev/vv
+ czFe8MsctlO8/5cN2sMYiWwHa0B1/rnQCsQqPMn1VLQpkuB/GySdW9A569rN8goUwuEo
+ 0zbkdrIVSNicnj3bw+cETwRAgPTsVllwuTSdF54CNbJJnhIhoSAnRCeJN6qReNdRGyDb
+ y0tDOywY/pzLB++4WLe7wKISlOjW5UdRe3jG4LKbUs2Flm8ceS5Lio0OqYfuaYwHaRng
+ OpbHL9fRManjh5WaqPNUMCFCL8nPEZBY9XYvlEN74BbOT6QMET+03Zvb71l4th9975SJ
+ R2yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Eitmdur7IFclm5OmiXUKql+34LRIF1lT1xgTvve69ts=;
+ b=hAS6ABTauZz65ZTDy6FNhpj0157gOOFjCl/LpoE2oh3cMsspk7BsZSGdZkB08U2YfJ
+ 1BP1pE849/V7KN6fO8Xzc3BNvwDftU0Ky8aZQ/KtHOop0NkYQqBIakuUqo6SRr8HrtK+
+ +sGuKJg1TL29U3rv71xMYGrd+1GEnbBpi1rXTTSZqSsDjBXDA+YdW6yS0X/VU6diN3J4
+ XNqKLwOfrUX9zH9hp5jZXBJ14r15uIwP06P5SHHBV46dzoA/+qqzHRuxt8TPaSBm+oOv
+ 8g2D3hFoSwnJCp65RI06/9p5FE+z+/ez0+btFkWLr8gGzsSjrbU69TzSUrtFwUk4l2QV
+ U0Ew==
+X-Gm-Message-State: APjAAAWEQWEL2cjJJemKYv12B84LVnkwBjN5+jSB+KoJnkmH+Smx+iuJ
+ +zBUysWBRJ0hLtGROhRMNxzTxYlcN7eql7qgEQM/2OL+Xvw=
+X-Google-Smtp-Source: APXvYqz43s/hk3CKx3en2NHRlqUEpBwheUz7q4AlYtcn+cq2YaaD9u60x9ha1rjY6xf9tJaIg2J4dgPHkpxv8fuiGYk=
+X-Received: by 2002:a9d:6d0a:: with SMTP id o10mr19552790otp.221.1570451899897; 
+ Mon, 07 Oct 2019 05:38:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20190917234549.22910-1-jsnow@redhat.com>
+ <20190917234549.22910-2-jsnow@redhat.com>
+ <a252472e-842a-8401-2743-e4ed948b066b@redhat.com>
+ <450a1f52-9589-cb98-88cb-1d3fcd5f506a@redhat.com>
+ <778487c5-566e-d133-6395-d3908db66adc@redhat.com>
+ <62cf912a-8ee9-d023-84c2-1ad6ea94e3b8@redhat.com>
+ <16eef993-c16e-3fd7-c60d-6d3c7bfb5148@redhat.com>
+ <20191002164438.GD5819@localhost.localdomain>
+ <a7f532cc-68cb-175e-6c8f-930401221ef9@redhat.com>
+ <20191004101952.GC5491@linux.fritz.box>
+ <d194e22c-7125-e558-0a80-131a28a87419@redhat.com>
+ <e7d5cc8a-7a61-70a2-7efc-8f1af8e7a41f@redhat.com>
+In-Reply-To: <e7d5cc8a-7a61-70a2-7efc-8f1af8e7a41f@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Oct 2019 13:38:08 +0100
+Message-ID: <CAFEAcA8iPnom=M+jTAmeynzTvOmC78xK42B+hb_oFv0m6k9jKw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/5] iotests: remove 'linux' from default supported
+ platforms
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 Oct 2019 12:06:12 -0000
-From: Greg Kurz <groug@kaod.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: aix ppc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gkurz leohori th-huth
-X-Launchpad-Bug-Reporter: Leonardo (leohori)
-X-Launchpad-Bug-Modifier: Greg Kurz (gkurz)
-References: <157021536568.1047.12130451733202459497.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157044997214.22049.15982083758378060194.malone@gac.canonical.com>
-Subject: [Bug 1846816] Re: Booting error on AIX 6.1 "Illegal Trap Instruction
- Interrupt in Kernel""
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="af2eefe214bd95389a09b7c956720881bab16807";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0e9c2a6a7c938e9f24e7d939f3077b25ae930929
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,173 +99,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1846816 <1846816@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are some limitations but an AIX guest can run in QEMU:
+On Mon, 7 Oct 2019 at 13:32, Thomas Huth <thuth@redhat.com> wrote:
+> On 04/10/2019 14.44, Max Reitz wrote:
+> > Whenever make check fails, it=E2=80=99s urgent.  Without iotests runnin=
+g in make
+> > check, we had some time to sort the situation out.  That=E2=80=99s no l=
+onger the
+> > case.
+> >
+> > That means we need to take care of everything immediately.  And I purel=
+y
+> > want help with that.
+>
+> While that sounds noble at a first glance, I think you've maybe got too
+> high expectations at yourself here? I mean, all other maintainers of
+> other subsystems with tests have the same "problem" if the tests for
+> their subsystem run in "make check". The "normal" behavior that I've
+> seen so far (and which I think is the right way to deal with it):
+>
+> 1) If a pull request gets rejected due to a "make check" failure, simply
+> drop the offending patches from the pull request, send a v2 pull req
+> without them, and tell the author of the offending patches to fix the
+> problem (unless the fix is completely trivial and could immediately be
+> applied to the v2 pull req). You really don't have to fix each and every
+> issue on your own as a maintainer and can redirect this to the patch
+> authors again.
+>
+> 2) If a test fails occasionally during "make check" (due to race
+> conditions or whatever), it gets disabled from "make check" if it can't
+> be fixed easily (e.g. in the qtests it gets moved to the "SPEED=3Dslow"
+> category, or in iotests it would get removed from the "auto" group).
 
-https://www.ibm.com/support/knowledgecenter/ssw_aix_72/aixnutanix/nutanix_c=
-oncepts.html
+I would agree with this and would also suggest that things tested
+in 'make check' should ideally be reducing work for the maintainer:
+if something fails 'make check' then that change won't get into
+the tree and the task of getting it to work is pushed back to the
+original patch submitter. If something causes failures but they're
+not caught by 'make check' then the patch will get into the tree and
+now it's likely the subsystem maintainer's job to track down and
+fix the bug after the fact.
 
-The command line in the bug description uses an old syntax:
+> So if you like, I can send a patch to remove 130 from the "auto" group
+> (personally, I'd rather wait to see if it fails anytime soon again, or
+> if this was maybe rather a one-time issue due to a non-clean test system
+> ...)
 
-# qemu-system-ppc64 -cpu POWER8,compat=3Dpower7 -machine pseries ...
+FWIW I haven't seen that iotest 130 failure again...
 
-This should be:
-
-# qemu-system-ppc64 -cpu POWER8 -machine pseries,max-cpu-compat=3Dpower7
-
-The following error message seems to indicate that this AIX instance
-doesn't support POWER7 architected mode (which I don't think is actively
-tested and supported by the way).
-
- qemu-system-ppc64: Couldn't negotiate a suitable PVR during CAS
-
-Maybe try again with max-cpu-compat=3Dpower8 instead ?
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1846816
-
-Title:
-  Booting error on AIX 6.1 "Illegal Trap Instruction Interrupt in
-  Kernel""
-
-Status in QEMU:
-  New
-
-Bug description:
-  # ls -ltr
-  total 8750584
-  -rw-rw-r--  1 linux linux 4274997248 Oct  4 18:33 AIX.vol1.iso
-  -rw-rw-r--  1 linux linux 4293888000 Oct  4 18:45 AIX.vol2.iso
-  -rw-rw-r--  1 linux linux  391485440 Oct  4 18:50 AIX.vol3.iso
-  -rw-r--r--  1 root  root      204608 Oct  4 19:00 AIX61.img
-
-  # qemu-system-ppc64 -cpu POWER8,compat=3Dpower7 -machine pseries -m 8192 =
--serial mon:stdio \
-  > -drive file=3D/qemu/BST/AIX61.img,if=3Dnone,id=3Ddrive-virtio-disk0 \
-  > -device virtio-scsi-pci,id=3Dscsi -device scsi-hd,drive=3Ddrive-virtio-=
-disk0 \
-  > -cdrom /qemu/BST/AIX.vol1.iso \
-  > -prom-env boot-command=3D'boot cdrom: -s verbose'
-
-  =
-
-  VNC server running on ::1:5900
-  qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ib=
-s=3Dworkaround
-
-  =
-
-  SLOF ********************************************************************=
-**
-  QEMU Starting
-   Build Date =3D Jul  3 2019 12:26:14
-   FW Version =3D git-ba1ab360eebe6338
-   Press "s" to enter Open Firmware.
-
-  Populating /vdevice methods
-  Populating /vdevice/vty@71000000
-  Populating /vdevice/nvram@71000001
-  Populating /vdevice/l-lan@71000002
-  Populating /vdevice/v-scsi@71000003
-         SCSI: Looking for devices
-            8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
-  Populating /pci@800000020000000
-                       00 0000 (D) : 1234 1111    qemu vga
-                       00 0800 (D) : 1033 0194    serial bus [ usb-xhci ]
-                       00 1000 (D) : 1af4 1004    virtio [ scsi ]
-  Populating /pci@800000020000000/scsi@2
-         SCSI: Looking for devices
-            100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"
-  Installing QEMU fb
-
-
-  Scanning USB
-    XHCI: Initializing
-      USB Keyboard
-      USB mouse
-  No console specified using screen & keyboard
-
-    Welcome to Open Firmware
-
-    Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
-    This program and the accompanying materials are made available
-    under the terms of the BSD License available at
-    http://www.opensource.org/licenses/bsd-license.php
-
-  =
-
-  Trying to load: -s verbose from: /vdevice/v-scsi@71000003/disk@8200000000=
-000000: ...   Successfully loaded
-  qemu-system-ppc64: Couldn't negotiate a suitable PVR during CAS
-  AIX
-  StarLED{814}
-
-  AIX Version 6.1
-  exec(/etc/init){1,0}
-
-  INIT: EXECUTING /sbin/rc.boot 1
-  exec(/usr/bin/sh,-c,/sbin/rc.boot 1){1114146,1}
-  exec(/sbin/rc.boot,/sbin/rc.boot,1){1114146,1}
-  + PHASE=3D1
-  + + bootinfo -p
-  exec(/usr/sbin/bootinfo,-p){1179684,1114146}
-  PLATFORM=3Dchrp
-  + [ ! -x /usr/lib/boot/bin/bootinfo_chrp ]
-  + [ 1 -eq 1 ]
-  + 1> /usr/lib/libc.a
-  + init -c unlink /usr/lib/boot/bin/!(*_chrp)
-  exec(/etc/init,-c,unlink /usr/lib/boot/bin/!(*_chrp)){1179686,1114146}
-  + chramfs -t
-  exec(/usr/sbin/chramfs,-t){1179688,1114146}
-  + init -c unlink /usr/sbin/chramfs
-  + 1> /dev/null
-  exec(/etc/init,-c,unlink /usr/sbin/chramfs){1179690,1114146}
-  + + bootinfo -t
-  exec(/usr/sbin/bootinfo,-t){1179692,1114146}
-  BOOTYPE=3D3
-  + [ 0 -ne 0 ]
-  + [ -z 3 ]
-  + unset pdev_to_ldev undolt native_netboot_cfg
-  + unset disknet_odm_init config_ATM
-  + /usr/lib/methods/showled 0x510 DEV CFG 1 START
-  exec(/usr/lib/methods/showled,0x510,DEV CFG 1 START){1179694,1114146}
-  + cfgmgr -f -v
-  exec(/usr/sbin/cfgmgr,-f,-v){1179696,1114146}
-  cfgmgr is running in phase 1
-  ----------------
-  Time: 0 LEDS: 0x538
-  Invoking top level program -- "/etc/methods/defsys"
-  exec(/bin/sh,-c,/etc/methods/defsys ){1245222,1179696}
-  exec(/etc/methods/defsys){1245222,1179696}
-  exec(/bin/sh,-c,/usr/lib/methods/define_rspc -n -c sys -s node -t chrp){1=
-310760,1245222}
-  exec(/usr/lib/methods/define_rspc,-n,-c,sys,-s,node,-t,chrp){1310760,1245=
-222}
-  Time: 0 LEDS: 0x539
-  Return code =3D 0
-  ***** stdout *****
-  sys0
-
-  *** no stderr ****
-  ----------------
-  Attempting to configure device 'sys0'
-  Time: 0 LEDS: 0x811
-  Invoking /usr/lib/methods/cfgsys_chrp -1 -l sys0
-  exec(/bin/sh,-c,/usr/lib/methods/cfgsys_chrp -1 -l sys0){1245224,1179696}
-  Number of running methods: 1
-  exec(/usr/lib/methods/cfgsys_chrp,-1,-l,sys0){1245224,1179696}
-  LED{A20}
-  Illegal Trap Instruction Interrupt in Kernel
-  04151A74      tweqi    r0,0                r0=3D0
-  KDB(0)>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1846816/+subscriptions
+thanks
+-- PMM
 
