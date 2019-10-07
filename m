@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 531AEC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 13:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D333CECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 13:42:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 277A2206BB
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 13:40:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 277A2206BB
+	by mail.kernel.org (Postfix) with ESMTPS id A8EB3206BB
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 13:42:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8EB3206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHTFZ-0000Nq-QO
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 09:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60110)
+	id 1iHTH0-00023y-Oq
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 09:42:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60163)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iHTB3-0003hv-Nw
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:35:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1iHTBB-0003sX-03
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:36:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iHTB2-0007Jo-HX
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:35:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49488)
+ (envelope-from <philmd@redhat.com>) id 1iHTB9-0007Ok-Va
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:36:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36876)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iHTB2-0007JP-Bz; Mon, 07 Oct 2019 09:35:52 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHTB9-0007OJ-QM
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 09:35:59 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8F8ED18CB8E2;
- Mon,  7 Oct 2019 13:35:51 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 16E7E30842A8
+ for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 13:35:58 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 94431600C1;
- Mon,  7 Oct 2019 13:35:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 92A0860127;
+ Mon,  7 Oct 2019 13:35:56 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/5] roms/Makefile.edk2: don't pull in submodules when building
- from tarball
-Date: Mon,  7 Oct 2019 15:35:37 +0200
-Message-Id: <20191007133540.30623-3-philmd@redhat.com>
+Subject: [PULL 4/5] edk2 build scripts: honor external BaseTools flags with
+ uefi-test-tools
+Date: Mon,  7 Oct 2019 15:35:39 +0200
+Message-Id: <20191007133540.30623-5-philmd@redhat.com>
 In-Reply-To: <20191007133540.30623-1-philmd@redhat.com>
 References: <20191007133540.30623-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Mon, 07 Oct 2019 13:35:51 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 07 Oct 2019 13:35:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -69,58 +69,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-stable@nongnu.org, Laszlo Ersek <lersek@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Bruce Rogers <brogers@suse.com>
+Cc: John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
+From: Laszlo Ersek <lersek@redhat.com>
 
-Currently the `make efi` target pulls submodules nested under the
-roms/edk2 submodule as dependencies. However, when we attempt to build
-from a tarball this fails since we are no longer in a git tree.
+Unify the recipe for "build-edk2-tools" in
+"tests/uefi-test-tools/Makefile" with the recipe for "edk2-basetools" in
+"roms/Makefile".
 
-A preceding patch will pre-populate these submodules in the tarball,
-so assume this build dependency is only needed when building from a
-git tree.
-
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Bruce Rogers <brogers@suse.com>
-Cc: qemu-stable@nongnu.org # v4.1.0
-Reported-by: Bruce Rogers <brogers@suse.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-Id: <20190912231202.12327-3-mdroth@linux.vnet.ibm.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <20190920083808.21399-2-lersek@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- roms/Makefile.edk2 | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tests/uefi-test-tools/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/roms/Makefile.edk2 b/roms/Makefile.edk2
-index c2f2ff59d5..33a074d3a4 100644
---- a/roms/Makefile.edk2
-+++ b/roms/Makefile.edk2
-@@ -46,8 +46,13 @@ all: $(foreach flashdev,$(flashdevs),../pc-bios/edk2-$=
-(flashdev).fd.bz2) \
- # files.
- .INTERMEDIATE: $(foreach flashdev,$(flashdevs),../pc-bios/edk2-$(flashde=
-v).fd)
+diff --git a/tests/uefi-test-tools/Makefile b/tests/uefi-test-tools/Makef=
+ile
+index 1d78bc14d5..7e0177d733 100644
+--- a/tests/uefi-test-tools/Makefile
++++ b/tests/uefi-test-tools/Makefile
+@@ -99,7 +99,9 @@ Build/bios-tables-test.%.efi: build-edk2-tools
+ 	+./build.sh $(edk2_dir) BiosTablesTest $* $@
 =20
-+# Fetch edk2 submodule's submodules. If it is not in a git tree, assume
-+# we're building from a tarball and that they've already been fetched by
-+# make-release/tarball scripts.
- submodules:
--	cd edk2 && git submodule update --init --force
-+	if test -d edk2/.git; then \
-+		cd edk2 && git submodule update --init --force; \
-+	fi
+ build-edk2-tools:
+-	$(MAKE) -C $(edk2_dir)/BaseTools
++	$(MAKE) -C $(edk2_dir)/BaseTools \
++		EXTRA_OPTFLAGS=3D'$(EDK2_BASETOOLS_OPTFLAGS)' \
++		EXTRA_LDFLAGS=3D'$(EDK2_BASETOOLS_LDFLAGS)'
 =20
- # See notes on the ".NOTPARALLEL" target and the "+" indicator in
- # "tests/uefi-test-tools/Makefile".
+ clean:
+ 	rm -rf Build Conf log
 --=20
 2.21.0
 
