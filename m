@@ -2,87 +2,83 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9815C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 16:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6412ECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 16:25:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DEA520673
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 16:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D4D120673
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 16:25:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v0ORVjcH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DEA520673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="f0cpZ7YZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D4D120673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHVmV-00031o-1U
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 12:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55322)
+	id 1iHVpQ-0007Dy-Sm
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 12:25:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57277)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iHVXZ-00047e-9L
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:07:18 -0400
+ (envelope-from <palmer@sifive.com>) id 1iHVg4-0005ao-RF
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iHVXX-0007l7-Rb
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:07:16 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:35283)
+ (envelope-from <palmer@sifive.com>) id 1iHVg3-0003ex-5r
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:16:04 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43780)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iHVXX-0007kq-Fp
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:07:15 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id y21so92105wmi.0
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 09:07:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iHVg2-0003ck-W2
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:16:03 -0400
+Received: by mail-pg1-x544.google.com with SMTP id i32so1198487pgl.10
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 09:16:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
  :content-transfer-encoding;
- bh=0P+yCHvg6Zq0/M0VZGGhX2NWbAulJ6mBTNGWb6Tu3QM=;
- b=v0ORVjcHaIczIYNipaLwDIDfeuMb9Im9Rkwnklxf8ofGebRRLmxrWpt2NiKuErm1G5
- BibpUOAerS3dPqTiU7ZdT7sMWjNXaEbETD9Jmd3NskOOu9xJFBsGixFCN0Fkz7tU0JYl
- owkkOJvZSGMsmrvyPva/njmnxdg0LTIzYDoDzkg3PZ6e2iaZM+aLE1wUjN5ho+LAqjDG
- OW69ajnWYvvPEOPEzmoGe7szl9JXdwma3r/mWH033xQsVzxIUMCyHRMddpV9VUXGybfV
- +XMI6xl0w/5xT/64/Pw8bCFYdvpAzkseXLMsr8X6li/TQjsnp825uXhO0XeeW3ybO7is
- +gkw==
+ bh=F5KcZ05xCSG+C6zK4MWjs4KZwuOvY5DewcEsAGMwKZg=;
+ b=f0cpZ7YZCZrJKz9CrE6m8uYUIKGkBQSzChOWh5MRov16P5UUkG+g8lMDAonrHaFKqv
+ 2GZ8wTPszQuKsom7O+Wznx8CQSU/RhnZNOvCPtkX2xkv0RnySTWQyuzY8Rs6jJ4Cvj1M
+ wt+4+3ckrXoyI1STaq6waNPmZJoiOFit228mpW+baLSHiZHUB7JpUT5YNSCSVj0COkWu
+ tE8sInmzRStYmf4loNHfBgdt9VDzbnofsTPKPrihYzULBsaeHENNR+KRF6uvmn+1CeA+
+ HtUag0WfmdyZm3g7pX9ByGjE2I+3Bh4ZYZSL2q+i4k7zE6LDcHxHH+I0q6QUB/8i/qXv
+ JSCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=0P+yCHvg6Zq0/M0VZGGhX2NWbAulJ6mBTNGWb6Tu3QM=;
- b=hAGl9YHf5jU70/Mw/fj73fra40yY2ADSSDpX9XAA41uFpUjjAGvw6klQWPfu/Z02Pj
- 4SfGV11OFFj9yThsSPkO4kMgAFBS6GgzyAvqW+HV2Q5zWcrE0NHLYDuUqBvoGSwEzyE4
- teE5yw2l6c27Wfb6YfbR7IGRMXIayZHkwpTFi1jRDv/apcps3sd3gggLLeUutKkCSJUc
- ayc2Df7IQ4Yl5wWVmVImsN43Fla5OnDGfaC+H1Rcz5MyhWqZfmEud+JEI399Tc3NWjQo
- Yibs4O0ixzZQoaAkSmm83rmoNCfP2aeZ8FBTZvtcrzcl5gbNkpnJtG5KuGn3gmknD6Tp
- gWoA==
-X-Gm-Message-State: APjAAAV11LVnnwKJ+vUW3Tig4o1y77+HAtPfERj0FieKwcuh50WpQg66
- gXvWH2pnEO8BNUDThAGMPqb94g==
-X-Google-Smtp-Source: APXvYqwANr/3WnYKNPm0VfCc77KdPgu/3nKw0WK4MRb63hoVGwenHnfSjXEn656fmB4k/28xU95tkw==
-X-Received: by 2002:a7b:c112:: with SMTP id w18mr52102wmi.88.1570464433220;
- Mon, 07 Oct 2019 09:07:13 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e15sm18928955wrt.94.2019.10.07.09.07.12
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=F5KcZ05xCSG+C6zK4MWjs4KZwuOvY5DewcEsAGMwKZg=;
+ b=jY43EPY/kCJr3gyIE90eHM5JRIk50nrvB1afpr0E2P5f0DR12RslsYqS4jeqXk0Rsk
+ kNrwnXZ0TKAio2gONKADZQpXLLUpQN9PWgayeK4DufAe6FpwR6+yFN9WPWUiUmlYDPx1
+ CxLcW2ehY0KqpxAZYf4xWV3UHtuanWEAqJEOviD4hd77GOz/w2CLPQZNTV5vIYq3gljF
+ xcSjuMcvwpI7bEFhFDuw0u0ntbrhNeujV/7wS+7kINZETlqq8iuk4vIl7xJSaE4GMOWI
+ Ebof6uyJToEbM6KWoFbklWZThiUIDipaLruwRAlV2aZwG9vd9sOoEM6VyOoLHohtxoXX
+ T4VA==
+X-Gm-Message-State: APjAAAUkC3+hBikt3jH9dmkAT3F66Xy0pSnmcWF9oircDAIssEuEgvNr
+ qP6/u2TqjKvm6G7q5LebFKrMYFr6C8w2OA==
+X-Google-Smtp-Source: APXvYqzGHulA17E5bcK9+NDhvNZyeKJDbCqySzfXkQObH6dPCdLFFd5YC0uyjfJKgCHliIZHEI+LBA==
+X-Received: by 2002:a63:6441:: with SMTP id y62mr13874896pgb.177.1570464960709; 
+ Mon, 07 Oct 2019 09:16:00 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id 7sm12841486pgj.35.2019.10.07.09.15.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Oct 2019 09:07:12 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B68381FF87;
- Mon,  7 Oct 2019 17:07:11 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] .travis.yml: reduce scope of the --enable-debug build
-Date: Mon,  7 Oct 2019 17:07:08 +0100
-Message-Id: <20191007160708.26208-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+ Mon, 07 Oct 2019 09:15:59 -0700 (PDT)
+Date: Mon, 07 Oct 2019 09:15:59 -0700 (PDT)
+X-Google-Original-Date: Mon, 07 Oct 2019 09:04:43 PDT (-0700)
+Subject: Re: [PATCH v1 24/28] target/riscv: Implement second stage MMU
+In-Reply-To: <67e93a4f45693067abb03441e159b1f4a0a48276.1566603412.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <mhng-a9412752-518e-4527-ad6c-3830ddead66d@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,42 +90,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-riscv@nongnu.org, Anup Patel <Anup.Patel@wdc.com>,
+ qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adding debug makes things run a bit slower so lets not hammer all the
-targets.
+On Fri, 23 Aug 2019 16:38:52 PDT (-0700), Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/cpu_helper.c | 96 +++++++++++++++++++++++++++++++++++----
+>  1 file changed, 86 insertions(+), 10 deletions(-)
+>
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index 8b9871f9ea..188d5cb39f 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -337,13 +337,40 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>       * (riscv_cpu_do_interrupt) is correct */
+>
+>      int mode = mmu_idx;
+> +    bool use_background = false;
+>
+> +    /*
+> +     * Check if we should use the background registers for the two
+> +     * stage translation. We don't need to check if we actually need
+> +     * two stage translation as that happened before this function
+> +     * was called. Background registers will be used if the guest has
+> +     * forced a two stage translation to be on (in HS or M mode).
+> +     */
+>      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
+>          if (get_field(*env->mstatus, MSTATUS_MPRV)) {
+>              mode = get_field(*env->mstatus, MSTATUS_MPP);
+> +
+> +            if (riscv_has_ext(env, RVH) &&
+> +                get_field(*env->mstatus, MSTATUS_MPV)) {
+> +                use_background = true;
+> +            }
+>          }
+>      }
+>
+> +    if (mode == PRV_S && access_type != MMU_INST_FETCH &&
+> +        riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
+> +        if (get_field(env->hstatus, HSTATUS_SPRV)) {
+> +            mode = get_field(*env->mstatus, SSTATUS_SPP);
+> +            use_background = true;
+> +        }
+> +    }
+> +
+> +    if (first_stage == false) {
+> +        /* We are in stage 2 translation, this is similar to stage 1. */
+> +        /* Stage 2 is always taken as U-mode */
+> +        mode = PRV_U;
+> +    }
+> +
+>      if (mode == PRV_M || !riscv_feature(env, RISCV_FEATURE_MMU)) {
+>          *physical = addr;
+>          *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+> @@ -353,13 +380,30 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>      *prot = 0;
+>
+>      target_ulong base;
+> -    int levels, ptidxbits, ptesize, vm, sum;
+> -    int mxr = get_field(*env->mstatus, MSTATUS_MXR);
+> +    int levels, ptidxbits, ptesize, vm, sum, mxr, widened;
+> +
+> +    if (first_stage == true) {
+> +        mxr = get_field(*env->mstatus, MSTATUS_MXR);
+> +    } else {
+> +        mxr = get_field(env->vsstatus, MSTATUS_MXR);
+> +    }
+>
+>      if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+> -        base = get_field(env->satp, SATP_PPN) << PGSHIFT;
+> +        if (first_stage == true) {
+> +            if (use_background) {
+> +                base = get_field(env->vsatp, SATP_PPN) << PGSHIFT;
+> +                vm = get_field(env->vsatp, SATP_MODE);
+> +            } else {
+> +                base = get_field(env->satp, SATP_PPN) << PGSHIFT;
+> +                vm = get_field(env->satp, SATP_MODE);
+> +            }
+> +            widened = 0;
+> +        } else {
+> +            base = get_field(env->hgatp, HGATP_PPN) << PGSHIFT;
+> +            vm = get_field(env->hgatp, HGATP_MODE);
+> +            widened = 2;
+> +        }
+>          sum = get_field(*env->mstatus, MSTATUS_SUM);
+> -        vm = get_field(env->satp, SATP_MODE);
+>          switch (vm) {
+>          case VM_1_10_SV32:
+>            levels = 2; ptidxbits = 10; ptesize = 4; break;
+> @@ -377,6 +421,7 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>            g_assert_not_reached();
+>          }
+>      } else {
+> +        widened = 0;
+>          base = env->sptbr << PGSHIFT;
+>          sum = !get_field(*env->mstatus, MSTATUS_PUM);
+>          vm = get_field(*env->mstatus, MSTATUS_VM);
+> @@ -397,9 +442,16 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>      }
+>
+>      CPUState *cs = env_cpu(env);
+> -    int va_bits = PGSHIFT + levels * ptidxbits;
+> -    target_ulong mask = (1L << (TARGET_LONG_BITS - (va_bits - 1))) - 1;
+> -    target_ulong masked_msbs = (addr >> (va_bits - 1)) & mask;
+> +    int va_bits = PGSHIFT + levels * ptidxbits + widened;
+> +    target_ulong mask, masked_msbs;
+> +
+> +    if (TARGET_LONG_BITS > (va_bits - 1)) {
+> +        mask = (1L << (TARGET_LONG_BITS - (va_bits - 1))) - 1;
+> +    } else {
+> +        mask = 0;
+> +    }
+> +    masked_msbs = (addr >> (va_bits - 1)) & mask;
+> +
+>      if (masked_msbs != 0 && masked_msbs != mask) {
+>          return TRANSLATE_FAIL;
+>      }
+> @@ -411,17 +463,36 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>  restart:
+>  #endif
+>      for (i = 0; i < levels; i++, ptshift -= ptidxbits) {
+> -        target_ulong idx = (addr >> (PGSHIFT + ptshift)) &
+> +        target_ulong idx;
+> +        if (i == 0) {
+> +            idx = (addr >> (PGSHIFT + ptshift)) &
+> +                           ((1 << (ptidxbits + widened)) - 1);
+> +        } else {
+> +            idx = (addr >> (PGSHIFT + ptshift)) &
+>                             ((1 << ptidxbits) - 1);
+> +        }
+>
+>          /* check that physical address of PTE is legal */
+> -        target_ulong pte_addr = base + idx * ptesize;
+> +        target_ulong pte_addr;
+> +
+> +        if (two_stage && first_stage) {
+> +            hwaddr vbase;
+> +
+> +            /* Do the second stage translation on the base PTE address. */
+> +            get_physical_address(env, &vbase, prot, base, access_type,
+> +                                 mmu_idx, false, true);
+> +
+> +            pte_addr = vbase + idx * ptesize;
+> +        } else {
+> +            pte_addr = base + idx * ptesize;
+> +        }
+>
+>          if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+>              !pmp_hart_has_privs(env, pte_addr, sizeof(target_ulong),
+>              1 << MMU_DATA_LOAD, PRV_S)) {
+>              return TRANSLATE_PMP_FAIL;
+>          }
+> +
+>  #if defined(TARGET_RISCV32)
+>          target_ulong pte = ldl_phys(cs->as, pte_addr);
+>  #elif defined(TARGET_RISCV64)
+> @@ -507,7 +578,12 @@ restart:
+>              /* for superpage mappings, make a fake leaf PTE for the TLB's
+>                 benefit. */
+>              target_ulong vpn = addr >> PGSHIFT;
+> -            *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
+> +            if (i == 0) {
+> +                *physical = (ppn | (vpn & ((1L << (ptshift + widened)) - 1))) <<
+> +                             PGSHIFT;
+> +            } else {
+> +                *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
+> +            }
+>
+>              /* set permissions on the TLB entry */
+>              if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- .travis.yml | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index d0b9e099b9..fc0888aff5 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -124,12 +124,13 @@ matrix:
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
- 
- 
-+    # --enable-debug implies --enable-debug-tcg, also runs quite a bit slower
-     - env:
--        - CONFIG="--enable-debug --enable-debug-tcg --disable-user"
-+        - CONFIG="--enable-debug --enable-debug-tcg --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
- 
- 
--    # TCG debug can be run just on it's own and is mostly agnostic to user/softmmu distinctions
-+    # TCG debug can be run just on its own and is mostly agnostic to user/softmmu distinctions
-     - env:
-         - CONFIG="--enable-debug-tcg --disable-system"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
--- 
-2.20.1
-
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
