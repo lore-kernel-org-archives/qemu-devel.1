@@ -2,64 +2,64 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5EEC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:05:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B77A3C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:07:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E5172133F
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:05:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E5172133F
+	by mail.kernel.org (Postfix) with ESMTPS id 8C8E720679
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:07:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8E720679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHO1L-0001rh-HD
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 04:05:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45226)
+	id 1iHO2q-0002y8-Oi
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 04:07:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45430)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iHO0N-0001Eg-DD
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:04:32 -0400
+ (envelope-from <armbru@redhat.com>) id 1iHO1x-0002S3-Rf
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:06:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iHO0M-000767-CR
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:04:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53132)
+ (envelope-from <armbru@redhat.com>) id 1iHO1w-0007d2-Pq
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:06:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57310)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1iHO0J-000749-6j; Mon, 07 Oct 2019 04:04:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iHO1u-0007c8-Lj; Mon, 07 Oct 2019 04:06:06 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F0677C058CA4;
- Mon,  7 Oct 2019 08:04:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E24EA10C0929;
+ Mon,  7 Oct 2019 08:06:05 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 756025D70D;
- Mon,  7 Oct 2019 08:04:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ADDFC5C219;
+ Mon,  7 Oct 2019 08:06:05 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CB5361138648; Mon,  7 Oct 2019 10:04:09 +0200 (CEST)
+ id 31E3A1138648; Mon,  7 Oct 2019 10:05:55 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v2 09/11] block/qcow2: implement blockdev-amend
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/11] RFC crypto/luks: encryption key
+ managment using amend interface
 References: <20190912223028.18496-1-mlevitsk@redhat.com>
- <20190912223028.18496-10-mlevitsk@redhat.com>
- <c26f4f4a-2f2e-84d9-a516-36c7150b6332@redhat.com>
-Date: Mon, 07 Oct 2019 10:04:09 +0200
-In-Reply-To: <c26f4f4a-2f2e-84d9-a516-36c7150b6332@redhat.com> (Max Reitz's
- message of "Fri, 4 Oct 2019 21:03:16 +0200")
-Message-ID: <875zl1j81y.fsf@dusky.pond.sub.org>
+ <632e3a8b-ee54-50e0-83a2-ea82ad8e061f@redhat.com>
+ <d371336cfe6b8428ebc9a68a9787c19082e9f0de.camel@redhat.com>
+Date: Mon, 07 Oct 2019 10:05:55 +0200
+In-Reply-To: <d371336cfe6b8428ebc9a68a9787c19082e9f0de.camel@redhat.com>
+ (Maxim Levitsky's message of "Sun, 22 Sep 2019 11:17:03 +0300")
+Message-ID: <871rvpj7z0.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 07 Oct 2019 08:04:26 +0000 (UTC)
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Mon, 07 Oct 2019 08:06:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -75,73 +75,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
+ =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Max Reitz <mreitz@redhat.com> writes:
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-> On 13.09.19 00:30, Maxim Levitsky wrote:
->> Currently only for changing crypto parameters
->
-> Yep, that elegantly avoids most of the problems we=E2=80=99d have otherwi=
-se. :-)
->
->> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-[...]
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index 4a6db98938..0eb4e45168 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -4294,6 +4294,7 @@
->>  # Driver specific image creation options for qcow2.
->>  #
->>  # @file             Node to create the image format on
->> +#                   Mandatory for create
->>  # @data-file        Node to use as an external data file in which all g=
-uest
->>  #                   data is stored so that only metadata remains in the=
- qcow2
->>  #                   file (since: 4.0)
->> @@ -4301,6 +4302,7 @@
->>  #                   standalone (read-only) raw image without looking at=
- qcow2
->>  #                   metadata (default: false; since: 4.0)
->>  # @size             Size of the virtual disk in bytes
->> +#                   Mandatory for create
->>  # @version          Compatibility level (default: v3)
->>  # @backing-file     File name of the backing file if a backing file
->>  #                   should be used
->> @@ -4315,10 +4317,10 @@
->>  # Since: 2.12
->>  ##
->>  { 'struct': 'BlockdevCreateOptionsQcow2',
->> -  'data': { 'file':             'BlockdevRef',
->> +  'data': { '*file':            'BlockdevRef',
->>              '*data-file':       'BlockdevRef',
->>              '*data-file-raw':   'bool',
->> -            'size':             'size',
->> +            '*size':            'size',
->>              '*version':         'BlockdevQcow2Version',
->>              '*backing-file':    'str',
->>              '*backing-fmt':     'BlockdevDriver',
->>=20
+> On Fri, 2019-09-20 at 17:14 -0400, John Snow wrote:
+>> 
+>> On 9/12/19 6:30 PM, Maxim Levitsky wrote:
+>> > This patch series is continuation of my work to add encryption
+>> > key managment to luks/qcow2 with luks.
+>> > 
+>> > This is second version of this patch set.
+>> > The changes are mostly addressing the review feedback,
+>> > plus I tested (and fixed sadly) the somewhat ugly code
+>> > that allows to still write share a raw luks device,
+>> > while preveting the key managment from happening in this case,
+>> > as it is unsafe.
+>> > I added a new iotest dedicated to that as well.
+>> > 
+>> > Best regards,
+>> > 	Maxim Levitsky
+>> > 
+>> 
+>> What branch is this based on?
+>> It doesn't seem to apply to origin/master.
+>> 
+>> --js
+> It is based on refactoring patch series I send before,
+> which is also under review:
+> "[PATCH v2 00/13] RFC crypto/luks: preparation for encryption key managment"
 
-My comments to the previous patch apply.
+Recommend to note such dependencies in the cover letter as
 
-> Making these fields optional makes me wonder whether it actually make
-> sense to have both create and amend share a single QAPI structure.
-> Wouldn=E2=80=99t it better to have a separate amend structure that then a=
-ctually
-> reflects what we support?  (This would also solve the problem of how to
-> express in the code what is and what isn=E2=80=99t supported through
-> blockdev-amend.)
-
-Good point.  As is, the schema is rather confusing, at least to me.  We
-reduce or avoid the confusion in documentation or in code.  I'd prefer
-code unless it leads to too much duplication.  "Too much" is of course
-subjective.  Maxim, would you mind exploring it for us?
+Based-on: <message-id>
 
