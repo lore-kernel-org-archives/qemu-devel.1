@@ -2,66 +2,79 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2F8ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 16:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF465C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 16:34:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F96B2067B
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 16:31:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F96B2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B6B12067B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 16:34:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tl3dl84N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B6B12067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHVuk-000555-Oj
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 12:31:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58437)
+	id 1iHVxj-0007Zt-63
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 12:34:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iHVmB-0003CU-6V
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:22:24 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iHVvJ-000627-2l
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:31:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iHVm9-0006gt-Oa
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:22:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56784)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1iHVm2-0006ba-0p; Mon, 07 Oct 2019 12:22:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 088BAC04BD33;
- Mon,  7 Oct 2019 16:22:12 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.231])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CB7345D70E;
- Mon,  7 Oct 2019 16:21:44 +0000 (UTC)
-Date: Mon, 7 Oct 2019 17:21:42 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH v4 06/31] python: add commit-per-subsystem.py
-Message-ID: <20191007162142.GO4656@redhat.com>
-References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
- <20191001155319.8066-7-vsementsov@virtuozzo.com>
- <20191007175514.19360a2b.cohuck@redhat.com>
- <cc355055-871d-9fb8-6f2d-f75d5cd40a3b@virtuozzo.com>
- <20191007181651.2fd72fbf.cohuck@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iHVvH-0002R9-UK
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:31:48 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43396)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iHVvH-0002Qc-PL
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 12:31:47 -0400
+Received: by mail-ot1-x341.google.com with SMTP id o44so11497546ota.10
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 09:31:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=hYJ5OWkLm6syvPnRSwa5taioeuKW9/Wqijomrn2bowE=;
+ b=Tl3dl84NuUccNvpAfjD08n5mhT4dMrMUYyFG7xd3BI59YduhBNngt3wI/9U/4g7Ef0
+ g76l/yX0w+pHo814ZfQDB38foRQc8iQ8dBf8ZbmAzADuexQ1W4nkTz7sEB0EN1kRXkvF
+ kjRJP9ut/k3RFHX03Ayh7nmEVusgsVQVNic5Zxcmu0+AYck54RTbsx9dKuEnm8Z9uiP8
+ M2CGT4PUMvLSjyTcVi0YVbP940yWzW+vn/Z4dbAOuQylyhPZeCpZjSHtFwGEiiiXG2Fw
+ XjKqYzamL8aKdGAbhL7SWjSxZeeTho63p8XGaSSe3Dxup0IEHUw7z6pAB4XELDuRgiwe
+ 1YGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hYJ5OWkLm6syvPnRSwa5taioeuKW9/Wqijomrn2bowE=;
+ b=pyyv61jzBA+HOJr8uDwPKMOkhRxx0mOq2T36KGRNx6RpheHSCbvXEzEEL7ME2+qeHi
+ AsKUJggS0qtbI0yEs/caSw0D975RmwenyYOqdSekJcXHM0f53umTGz2xMzoERW+/XXil
+ yPG2zpmjmY09K20qstB4R3JBqn89ZazYNURaqIQfRfPHnLvsNMXdvjBizJrbDJsFjY7q
+ QITO5y+kirCAp73vCCqunaZo7gtR6cDFxjCIhGGvEYmCXgPPKDvpWDgd4sBqqjc8M47U
+ kGqCUhwsoWH1rX5HUoRwuZjDe4RCsLkkAvBNqGtIv/GN17v9haA+O45dvYesftLW0y77
+ jcNw==
+X-Gm-Message-State: APjAAAUN8hsoiOarsQmxDznncU5719o2c/S/1CPdCNk24/TVeWlIFVp2
+ 5DP94Ip5q1IR9BvsfnzLLNokO/Ag2CIMa5gcV3E63Q==
+X-Google-Smtp-Source: APXvYqyLgoJLNR4SYVRZdljXKzJQFctehlUZQYcpPZRgYIMPUfZTGoWpwuwG4f/lgEk3dzROJIlVqgIUYHSs48bFLU8=
+X-Received: by 2002:a9d:562:: with SMTP id 89mr22334724otw.232.1570465904638; 
+ Mon, 07 Oct 2019 09:31:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191007181651.2fd72fbf.cohuck@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 07 Oct 2019 16:22:12 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191005215508.28754-1-mst@redhat.com>
+In-Reply-To: <20191005215508.28754-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Oct 2019 17:31:32 +0100
+Message-ID: <CAFEAcA96HPyqqCr5C4Ymtoji8srsaC0W=8t+Q-Xf=XGwt5mW=A@mail.gmail.com>
+Subject: Re: [PULL 00/19] virtio, vhost, acpi: features, fixes, tests
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,141 +86,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "pburton@wavecomp.com" <pburton@wavecomp.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "codyprime@gmail.com" <codyprime@gmail.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "arikalo@wavecomp.com" <arikalo@wavecomp.com>,
- "mst@redhat.com" <mst@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "joel@jms.id.au" <joel@jms.id.au>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "sw@weilnetz.de" <sw@weilnetz.de>,
- "groug@kaod.org" <groug@kaod.org>,
- "yuval.shaia@oracle.com" <yuval.shaia@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "integration@gluster.org" <integration@gluster.org>,
- "clg@kaod.org" <clg@kaod.org>, "stefanha@redhat.com" <stefanha@redhat.com>,
- "david@redhat.com" <david@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "andrew@aj.id.au" <andrew@aj.id.au>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 07, 2019 at 06:16:51PM +0200, Cornelia Huck wrote:
-> On Mon, 7 Oct 2019 16:10:02 +0000
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-> 
-> > 07.10.2019 18:55, Cornelia Huck wrote:
-> > > On Tue,  1 Oct 2019 18:52:54 +0300
-> > > Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-> 
-> > >> +def git_add(pattern):
-> > >> +    subprocess.run(['git', 'add', pattern])
-> > >> +
-> > >> +
-> > >> +def git_commit(msg):
-> > >> +    subprocess.run(['git', 'commit', '-m', msg], capture_output=True)
-> > >> +
-> > >> +
-> > >> +maintainers = sys.argv[1]
-> > >> +message = sys.argv[2].strip()
-> > >> +
-> > >> +subsystem = None
-> > >> +
-> > >> +shortnames = {
-> > >> +    'Block layer core': 'block',
-> > >> +    'ARM cores': 'arm',
-> > >> +    'Network Block Device (NBD)': 'nbd',
-> > >> +    'Command line option argument parsing': 'cmdline',
-> > >> +    'Character device backends': 'chardev',
-> > >> +    'S390 general architecture support': 's390'
-> > >> +}
-> > >> +
-> > >> +
-> > >> +def commit():
-> > >> +    if subsystem:
-> > >> +        msg = subsystem
-> > >> +        if msg in shortnames:
-> > >> +            msg = shortnames[msg]
-> > >> +        msg += ': ' + message
-> > >> +        git_commit(msg)
-> > >> +
-> > >> +
-> > >> +with open(maintainers) as f:
-> > >> +    for line in f:
-> > >> +        line = line.rstrip()
-> > >> +        if not line:
-> > >> +            continue
-> > >> +        if len(line) >= 2 and line[1] == ':':
-> > >> +            if line[0] == 'F' and line[3:] not in ['*', '*/']:
-> > >> +                git_add(line[3:])
-> > >> +        else:
-> > >> +            # new subsystem start
-> > >> +            commit()
-> > >> +
-> > >> +            subsystem = line
-> > >> +
-> > >> +commit()  
-> > > 
-> > > Hm... I'm not sure about the purpose of this script (and my python is
-> > > rather weak)... is this supposed to collect all changes covered by a
-> > > subsystem F: pattern into one patch?  
-> > 
-> > Yes
-> > 
-> > > If so, what happens to files
-> > > covered by multiple sections?
-> > >   
-> > 
-> > Hmm, they just go to the first of these sections, mentioned in MAINTAINERS.
-> > Is it bad I don't know, but I tried to automate it somehow. Anyway, I myself
-> > can't have better idea about how to organize patches to the subsystems which
-> > I don't know.
-> > 
-> 
-> Yeah, that is a problem I don't have a solution for, either.
-> 
-> But the script should probably get at least a comment about its
-> intended purpose and limitations? We don't really want people to start
-> using it blindly.
+On Sat, 5 Oct 2019 at 22:58, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> A couple of tweaks to the bios table test weren't
+> reviewed yet but as they are really helpful to
+> the arm tests I'm pushing, and affecting only the
+> test so fairly benign (dropped assert + a comment),
+> I cut a corner and pushed them straight away.
+> Will be easy to tweak with a patch on top or revert.
+>
+> The following changes since commit 4f59102571fce49af180cfc6d4cdd2b5df7bdb14:
+>
+>   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-oct-01-2019' into staging (2019-10-01 16:21:42 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 9d59bed1da5e5815987879346cf708344060ea63:
+>
+>   virtio: add vhost-user-fs-pci device (2019-10-05 17:43:55 -0400)
+>
+> ----------------------------------------------------------------
+> virtio, vhost, acpi: features, fixes, tests
+>
+> Tests for arm/virt ACPI tables.
+> Virtio fs support (no migration).
+> A vhost-user reconnect bugfix.
 
-Is this really a common enough problem to even justify having the
-script to start with ?
+Hi -- this summary of the changes just says it has
+updates to the test code, but the patches include:
 
-It looks like its only really usable in the case where the changes
-to each subsystem are totally self-contained, otherwise you'll get
-git bisect failures. The user still has to go back and edit each
-commit here to fill in a useful commit messages. It doesn't seem
-to save much effort over 'git add -u sub/dir/ && git commit -s'
-which is what I'd typically do for grouping changes that are
-spread across the tree.
+> Shameer Kolothum (8):
+>       hw/arm/virt: Enable device memory cold/hot plug with ACPI boot
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+which is to say actually enabling the hotplug memory feature,
+not just tweaking tests. Did you mean to put the whole feature
+in this pullreq? (If you did, that's fine, it just doesn't
+match up with the cover letter so maybe it was an accident?)
+
+thanks
+-- PMM
 
