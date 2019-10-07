@@ -2,64 +2,70 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B77A3C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E2EC4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:22:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C8E720679
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:07:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8E720679
+	by mail.kernel.org (Postfix) with ESMTPS id 3DAAC2084D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:22:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DAAC2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHO2q-0002y8-Oi
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 04:07:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45430)
+	id 1iHOI3-0006kc-Ch
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 04:22:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iHO1x-0002S3-Rf
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:06:10 -0400
+ (envelope-from <armbru@redhat.com>) id 1iHOHJ-0006Ic-1H
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:22:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iHO1w-0007d2-Pq
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:06:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57310)
+ (envelope-from <armbru@redhat.com>) id 1iHOHG-0005Vx-1J
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:22:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:13061)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1iHO1u-0007c8-Lj; Mon, 07 Oct 2019 04:06:06 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iHOHF-0005VW-P1
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:21:57 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E24EA10C0929;
- Mon,  7 Oct 2019 08:06:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EBFE910C0929;
+ Mon,  7 Oct 2019 08:21:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADDFC5C219;
- Mon,  7 Oct 2019 08:06:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6EBFE60A35;
+ Mon,  7 Oct 2019 08:21:53 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 31E3A1138648; Mon,  7 Oct 2019 10:05:55 +0200 (CEST)
+ id E458B1138648; Mon,  7 Oct 2019 10:21:47 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] RFC crypto/luks: encryption key
- managment using amend interface
-References: <20190912223028.18496-1-mlevitsk@redhat.com>
- <632e3a8b-ee54-50e0-83a2-ea82ad8e061f@redhat.com>
- <d371336cfe6b8428ebc9a68a9787c19082e9f0de.camel@redhat.com>
-Date: Mon, 07 Oct 2019 10:05:55 +0200
-In-Reply-To: <d371336cfe6b8428ebc9a68a9787c19082e9f0de.camel@redhat.com>
- (Maxim Levitsky's message of "Sun, 22 Sep 2019 11:17:03 +0300")
-Message-ID: <871rvpj7z0.fsf@dusky.pond.sub.org>
+To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
+Subject: Re: [PATCH v4 15/24] audio: add mixing-engine option (documentation)
+References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
+ <87sgonma7v.fsf@dusky.pond.sub.org>
+ <4d24c95c-0e98-2646-0b1a-6c7b3afe0e90@gmail.com>
+ <87wodwyabl.fsf@dusky.pond.sub.org>
+ <cacb71d0-494f-e05d-dece-637579b0c6d9@gmail.com>
+ <87d0fh6l2b.fsf@dusky.pond.sub.org>
+ <1a31eb0a-2f07-ae33-e272-bec46d4593a5@gmail.com>
+Date: Mon, 07 Oct 2019 10:21:47 +0200
+In-Reply-To: <1a31eb0a-2f07-ae33-e272-bec46d4593a5@gmail.com>
+ (=?utf-8?B?IlpvbHTDoW4JS8WRdsOhZ8OzIidz?= message of "Fri, 4 Oct 2019
+ 01:27:54 +0200")
+Message-ID: <87tv8lhso4.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Mon, 07 Oct 2019 08:06:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.66]); Mon, 07 Oct 2019 08:21:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,43 +80,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
+"Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
 
-> On Fri, 2019-09-20 at 17:14 -0400, John Snow wrote:
->> 
->> On 9/12/19 6:30 PM, Maxim Levitsky wrote:
->> > This patch series is continuation of my work to add encryption
->> > key managment to luks/qcow2 with luks.
->> > 
->> > This is second version of this patch set.
->> > The changes are mostly addressing the review feedback,
->> > plus I tested (and fixed sadly) the somewhat ugly code
->> > that allows to still write share a raw luks device,
->> > while preveting the key managment from happening in this case,
->> > as it is unsafe.
->> > I added a new iotest dedicated to that as well.
->> > 
->> > Best regards,
->> > 	Maxim Levitsky
->> > 
->> 
->> What branch is this based on?
->> It doesn't seem to apply to origin/master.
->> 
->> --js
-> It is based on refactoring patch series I send before,
-> which is also under review:
-> "[PATCH v2 00/13] RFC crypto/luks: preparation for encryption key managment"
+> On 2019-10-01 08:23, Markus Armbruster wrote:
+>> "Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
+>>
+>>> On 2019-09-25 11:49, Markus Armbruster wrote:
+>>>> "Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
+>>>>
+>>>>> On 2019-09-23 15:08, Markus Armbruster wrote:
+>>>>>> "K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com> writes:
+>>>>>>
+>>>>>>> This will allow us to disable mixeng when we use a decent backend.
+>>>>>>>
+>>>>>>> Disabling mixeng have a few advantages:
+>>>>>>> * we no longer convert the audio output from one format to another,=
+ when
+>>>>>>>      the underlying audio system would just convert it to a third f=
+ormat.
+>>>>>>>      We no longer convert, only the underlying system, when needed.
+>>>>>>> * the underlying system probably has better resampling and sample f=
+ormat
+>>>>>>>      converting methods anyway...
+>>>>>>> * we may support formats that the mixeng currently does not support=
+ (S24
+>>>>>>>      or float samples, more than two channels)
+>>>>>>> * when using an audio server (like pulseaudio) different sound card
+>>>>>>>      outputs will show up as separate streams, even if we use only =
+one
+>>>>>>>      backend
+>>>>>>>
+>>>>>>> Disadvantages:
+>>>>>>> * audio capturing no longer works (wavcapture, and vnc audio extens=
+ion)
+>>>>>>> * some backends only support a single playback stream or very picky
+>>>>>>>      about the audio format.  In this case we can't disable mixeng.
+>>>>>>>
+>>>>>>> However mixeng is not removed, only made optional, so this shouldn'=
+t be
+>>>>>>> a big concern.
+>>>>>>>
+>>>>>>> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gma=
+il.com>
+>>>>>>> ---
+>>>>>>>
+>>>>>>> Notes:
+>>>>>>>        Changes from v1:
+>>>>>>>             * renamed mixeng to mixing-engine
+>>>>>>>
+>>>>>>>     qapi/audio.json | 5 +++++
+>>>>>>>     qemu-options.hx | 6 ++++++
+>>>>>>>     2 files changed, 11 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/qapi/audio.json b/qapi/audio.json
+>>>>>>> index 9fefdf5186..0535eff794 100644
+>>>>>>> --- a/qapi/audio.json
+>>>>>>> +++ b/qapi/audio.json
+>>>>>>> @@ -11,6 +11,10 @@
+>>>>>>>     # General audio backend options that are used for both playback=
+ and
+>>>>>>>     # recording.
+>>>>>>>     #
+>>>>>>> +# @mixing-engine: use QEMU's mixing engine to mix all streams insi=
+de QEMU. When
+>>>>>>> +#                 set to off, fixed-settings must be also off. Not=
+ every backend
+>>>>>>> +#                 compatible with the off setting (default on, sin=
+ce 4.2)
+>>>>>>> +#
+>>>>>>
+>>>>>> Last sentence no verb.
+>>>>>>
+>>>>>> Which backends are compatible?
+>>>>>
+>>>>> Actually that's a simplification, it depends on a few things.  When
+>>>>> mixeng is off, qemu will try to use the same format as the emulated
+>>>>> sound card, and if the backend doesn't support that format, it won't
+>>>>> work (no audio).  Also attaching multiple sound cards to the same
+>>>>> audiodev might not work, if the backend doesn't support multiple
+>>>>> playback streams.  If you use pulseaudio, it'll work without problems,
+>>>>> if you use alsa, it depends on your device.  If you use a hw: device
+>>>>> directly, you'll likely only be able to use one emulated sound card
+>>>>> with a few selected audio formats.  If you use dmix: (and plug), alsa
+>>>>> will handle the conversion and mixing, so it will work no matter what
+>>>>> format the emulated sound card uses.  With OSS the situation is
+>>>>> probably similar, it depends on the kernel/hw what works and what not.
+>>>>> wav and spice certainly doesn't support multiple streams.  I'm not
+>>>>> completely sure about the other backends right now, but I think dsound
+>>>>> and coreaudio can handle the necessary sample format conversions and
+>>>>> mixing.
+>>>>>
+>>>>>> What happens when you try the off setting with incompatible backends?
+>>>>> See above.
+>>>>
+>>>> What happens *exactly*?
+>>>>
+>>>> I'm asking because I'm concerned about the user experience.  When a us=
+er
+>>>> asks for a combination of things QEMU can't provide, such as mixeng off
+>>>> with an incompatible backend, QEMU should fail with a suitable error
+>>>> message.  Does it?
+>>>
+>>> Error handling is not the best in the audio subsystem, if something
+>>> fails it generally just prints a warning to the console and continues,
+>>> and something will happen...  For example, this is what happens when I
+>>> try to open one hw device twice. I ran qemu with:
+>>>
+>>> -audiodev
+>>> alsa,id=3Dfoo,in.dev=3Dhw:1,,0,out.mixing-engine=3Doff,out.dev=3Dhw:1,,0
+>>> -device piix4-usb-uhci -device usb-audio,audiodev=3Dfoo -device
+>>> AC97,audiodev=3Dfoo
+>>>
+>>> When the guest tried to initialize the AC97 card, I got an error:
+>>>
+>>> alsa: Could not initialize DAC
+>>> alsa: Failed to open `hw:1,0':
+>>> alsa: Reason: Device or resource busy
+>>>
+>>> And it just continued. And the sound worked, but with wrong sample
+>>> rate (AC97 wants 44100 Hz, but USB audio previously opened the alsa
+>>> device with 48000 Hz).  I'll fix this bug in the next revision,
+>>> audio_pcm_hw_add_* shouldn't fall back to other HWs without mixeng.
+>>> But even with that, the result will be that one emulated sound card
+>>> will work and the other won't.
+>>>
+>>> It's not ideal, but fixing it would require a lot of effort.  Right
+>>> now, if you specify an invalid audiodev for alsa (even with mixeng),
+>>> it'll just print an error to the console and continue without audio.
+>>
+>> Should we document this general error handling deficiency somehow?
+>
+> It could be useful to mention it, especially for people who write
+> script and expect qemu to fail if they specify an invalid parameter.
+> I'm not sure how in-depth this explanation should be however.
 
-Recommend to note such dependencies in the cover letter as
+Common issue when writing documentation.
 
-Based-on: <message-id>
+One way to tackle it: start unspecific, then add specifics until it
+feels useful.
+
+The other direction can also work: write up everything, then cut until
+it feels useful.  Makes sense mostly when you need to write up
+everything anyway, say for a developer audience, or even just for
+yourself.  Nothing promotes clear thinking like writing does[*].
+
+>>>> Sometimes rejecting non-working configurations is impractical.  Is it
+>>>> here?
+>>>
+>>> I think it is.  It depends on the backend, its settings, the frontend
+>>> (emulated sound card), and how the guest uses it.  We currently don't
+>>> know what formats does a backend support, what formats can a frontend
+>>> produce, and even if we would know that, just because a frontend can
+>>> produce a format that the backend doesn't understand doesn't mean that
+>>> it will actually do it.  For example, right now with this patch series
+>>> applied, usb-audio can produce 7.1 audio.  If we want to be strict, it
+>>> means we can only use it with backends that support at least 8
+>>> channels, even if the user only wants to use stereo audio.
+>>>
+>>>> If yes, we should call out the problematic configurations in
+>>>> documentation.
+>>>
+>>> I think we should rather list known working configurations, and leave
+>>> the others as "try at your own risk" because there's too many things
+>>> that can go wrong.  (pulseaudio will work, alsa with dmix too.  Need
+>>> to check coreaudio, dsound and oss.  spice and wavcapture won't work.)
+>>
+>> Far from ideal, but better than nothing.
+>>
+>> Possibly naive idea: what about automatically falling back to mixeng on
+>> when mixeng off doesn't work?  Requires detecting "doesn't work", which
+>> I understand just isn't there.  Any other reasons why this couldn't be
+>> done?  Way out of scope for this series, of course.
+>
+> There are two cases when mixeng can help: a) when the frontend
+> requires a format not supported by the backend, and b) when multiple
+> frontends wants to use the same backend, but the backend doesn't
+> support multiple channels.  This fallback logic would help with a) but
+> it would be much harder to solve b) (I'm not saying it's impossible,
+> but it would require us to convert the already running stream back to
+> mixeng).  However, since the goal of this setting is to get rid of
+> limitations of mixeng, currently you only want to turn it off if when
+> you want to use 5.1 or 7.1 audio, where falling back to mixeng is not
+> an option.  (The other use case was when using pulseaudio, you wanted
+> different pa streams per emulated sound card, but since you can have
+> multiple -audiodevs now, it's no longer necessary to disable mixeng.)
+
+"Currently you only want to turn it off if when you want to use 5.1 or
+7.1 audio" is useful advice.  I figure it should be worked into
+documentation if it's not already there.
+
+Suggest to record the remainder of your answer for posterity by working
+it into the commit message, along with this thought:
+
+> The ideal solution is probably porting as much as possible to
+> gstreamer, but this is even more out of scope:
+> https://wiki.qemu.org/Internships/ProjectIdeas/AudioGStreamer
+
+Thanks!
+
+
+[*] "If you're thinking without writing, you only think you're
+thinking." Leslie Lamport
 
