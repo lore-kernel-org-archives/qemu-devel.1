@@ -2,76 +2,64 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A74F9C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B78C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:04:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B6E82084D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:02:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6E82084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 864BA2084D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 09:04:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 864BA2084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHOuq-0001AX-C7
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 05:02:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51411)
+	id 1iHOwQ-0002ZM-Fb
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 05:04:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <k.kozlowski.k@gmail.com>) id 1iHOsO-0008PX-1P
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:00:21 -0400
+ (envelope-from <armbru@redhat.com>) id 1iHOul-0001PV-BR
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:02:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <k.kozlowski.k@gmail.com>) id 1iHOsJ-0003pn-2g
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:00:19 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45027)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <k.kozlowski.k@gmail.com>)
- id 1iHOsI-0003pE-Sc; Mon, 07 Oct 2019 05:00:15 -0400
-Received: by mail-wr1-f65.google.com with SMTP id z9so14190584wrl.11;
- Mon, 07 Oct 2019 02:00:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=2mpH4Ugy9/Oa6ReWsoDL+YtOjgGW70O4N98QRChpJ5I=;
- b=MhPoKHfCDGG3/fwNUEO+snGAAVGtzN9lcGtw3zQ2K/K5tzKI16NuUTrzAO2n4/LNfG
- bz+xpJTJY1uuV+8du6G6cmrMNEgKaqNZFf2un0LdJCdOsAGVS3WKi/d4GbLwKBko9HK0
- H1Y7EEJNQbraTRfpLy4GHGvmRZ5q92n8cTg7qdxPZkDkhR+alpoEcC+/ftAUXQfgQsHe
- mFST3X8HnLUg7WmjPhQWDDSnrjWgLyU1b0LI+QOd34mpI33Wye6eWI4lHzma6TcnF9j3
- AMm2VMBcfSiCnsXa3LLJJowCdOIXEOaIA/FBATi5/KV+M+NAKK3cj3K41OBNtsPA3ii3
- /K5Q==
-X-Gm-Message-State: APjAAAWw9fUd4QbcgqiSschVp0hQyXZ/gHYY0dl/y1vKoFy7rhrIWTb/
- 2qK0rLtdql3z5wLx3us/FtHQ7q/9K8s=
-X-Google-Smtp-Source: APXvYqxhSccF5T3WbKUTilfL09MMI8tb+dVX4luy/Y0DNluQ6NSy4sub6RCVqWNIj1W491FkxGA/Rg==
-X-Received: by 2002:adf:97cb:: with SMTP id t11mr15560441wrb.312.1570438813748; 
- Mon, 07 Oct 2019 02:00:13 -0700 (PDT)
-Received: from pi3 ([194.230.155.145])
- by smtp.googlemail.com with ESMTPSA id h14sm22824821wro.44.2019.10.07.02.00.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Oct 2019 02:00:13 -0700 (PDT)
-Date: Mon, 7 Oct 2019 11:00:10 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 4/5] hw/arm/exynos4210: Use the Samsung s3c SDHCI
- controller
-Message-ID: <20191007090010.GB541@pi3>
-References: <20191005154748.21718-1-f4bug@amsat.org>
- <20191005154748.21718-5-f4bug@amsat.org>
+ (envelope-from <armbru@redhat.com>) id 1iHOui-0005K4-JC
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 05:02:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55436)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1iHOui-0005J9-BB; Mon, 07 Oct 2019 05:02:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 935D086663;
+ Mon,  7 Oct 2019 09:02:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FCFA5C1D4;
+ Mon,  7 Oct 2019 09:02:42 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 70FCD1138648; Mon,  7 Oct 2019 11:02:26 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] xive: Make some device types not user creatable
+References: <157017473006.331610.2983143972519884544.stgit@bahia.lan>
+Date: Mon, 07 Oct 2019 11:02:26 +0200
+In-Reply-To: <157017473006.331610.2983143972519884544.stgit@bahia.lan> (Greg
+ Kurz's message of "Fri, 04 Oct 2019 09:38:50 +0200")
+Message-ID: <87lftxhqsd.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20191005154748.21718-5-f4bug@amsat.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Mon, 07 Oct 2019 09:02:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.65
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,56 +71,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?RnLDqWTDqXJpYw==?= Basse <contact@fredericb.info>,
- Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Evgeny Voevodin <e.voevodin@samsung.com>,
- Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-devel@nongnu.org,
- Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-arm@nongnu.org,
- Dmitry Solodkiy <d.solodkiy@samsung.com>, Cleber Rosa <crosa@redhat.com>,
- Maksim Kozlov <m.kozlov@samsung.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Guenter Roeck <linux@roeck-us.net>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Oct 05, 2019 at 05:47:47PM +0200, Philippe Mathieu-Daud=C3=A9 wrote:
-> The Exynos SoC has specific SDHCI registers. Use the s3c SDHCI
-> model which handle these specific registers.
->=20
-> This silents the following "SDHC ... not implemented" warnings so
-> we can focus on the important registers missing:
->=20
->   $ qemu-system-arm ... -d unimp \
->     -append "... root=3D/dev/mmcblk0 rootfstype=3Dext4 rw rootwait" \
->     -drive file=3Dlinux-build-test/rootfs/arm/rootfs-armv5.ext2,if=3Dsd,f=
-ormat=3Draw
->   [...]
->   [   25.744858] sdhci: Secure Digital Host Controller Interface driver
->   [   25.745862] sdhci: Copyright(c) Pierre Ossman
->   [   25.783188] s3c-sdhci 12530000.sdhci: clock source 2: mmc_busclk.2 (=
-12000000 Hz)
->   SDHC rd_4b @0x80 not implemented
->   SDHC wr_4b @0x80 <- 0x00000020 not implemented
->   SDHC wr_4b @0x8c <- 0x00030000 not implemented
->   SDHC rd_4b @0x80 not implemented
->   SDHC wr_4b @0x80 <- 0xc0004100 not implemented
->   SDHC wr_4b @0x84 <- 0x80808080 not implemented
->   [   26.013318] mmc0: SDHCI controller on samsung-hsmmc [12530000.sdhci]=
- using ADMA
->   [   26.032318] Synopsys Designware Multimedia Card Interface Driver
->   [   42.024885] Waiting for root device /dev/mmcblk0...
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Greg Kurz <groug@kaod.org> writes:
+
+> Some device types of the XIVE model are exposed to the QEMU command
+> line:
+>
+> $ ppc64-softmmu/qemu-system-ppc64 -device help | grep xive
+> name "xive-end-source", desc "XIVE END Source"
+> name "xive-source", desc "XIVE Interrupt Source"
+> name "xive-tctx", desc "XIVE Interrupt Thread Context"
+>
+> These are internal devices that shouldn't be instantiable by the
+> user. By the way, they can't be because their respective realize
+> functions expect link properties that can't be set from the command
+> line:
+>
+> qemu-system-ppc64: -device xive-source: required link 'xive' not found:
+>  Property '.xive' not found
+> qemu-system-ppc64: -device xive-end-source: required link 'xive' not found:
+>  Property '.xive' not found
+> qemu-system-ppc64: -device xive-tctx: required link 'cpu' not found:
+>  Property '.cpu' not found
+>
+> Hide them by setting dc->user_creatable to false in their respective
+> class init functions.
+>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/arm/exynos4210.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/intc/xive.c |    3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 29df06df1136..6c54a35fd4bb 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -670,6 +670,7 @@ static void xive_tctx_class_init(ObjectClass *klass, void *data)
+>      dc->realize = xive_tctx_realize;
+>      dc->unrealize = xive_tctx_unrealize;
+>      dc->vmsd = &vmstate_xive_tctx;
+> +    dc->user_creatable = false;
+>  }
+>  
+>  static const TypeInfo xive_tctx_info = {
+> @@ -1118,6 +1119,7 @@ static void xive_source_class_init(ObjectClass *klass, void *data)
+>      dc->props   = xive_source_properties;
+>      dc->realize = xive_source_realize;
+>      dc->vmsd    = &vmstate_xive_source;
+> +    dc->user_creatable = false;
+>  }
+>  
+>  static const TypeInfo xive_source_info = {
+> @@ -1853,6 +1855,7 @@ static void xive_end_source_class_init(ObjectClass *klass, void *data)
+>      dc->desc    = "XIVE END Source";
+>      dc->props   = xive_end_source_properties;
+>      dc->realize = xive_end_source_realize;
+> +    dc->user_creatable = false;
+>  }
+>  
+>  static const TypeInfo xive_end_source_info = {
 
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+These all need a comment like the existing ->user_creatable = false
+have.
 
-Best regards,
-Krzysztof
+Your commit message mentions link properties.  Based on that:
 
+    /*
+     * Reason: link property 'NAME-OF-PROP' needs to be wired up.
+     */
+
+Rather minimal, though.  Several existing similar cases are a bit more
+specific, which is nice:
+
+    /*
+     * Reason: part of WHATEVER, needs to be wired up by FUNCTION().
+     */
+
+or if there is or could be more than one FUNCTION():
+
+    /*
+     * Reason: part of WHATEVER, needs to be wired up, e.g. by FUNCTION().
+     */
+
+David queued your patch already.  If it goes into master without such
+comments, please post them as a follow-up patch.
 
