@@ -2,67 +2,85 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-12.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 100AAECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 701B0ECE599
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:56:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC1AB20684
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:54:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC1AB20684
+	by mail.kernel.org (Postfix) with ESMTPS id 4B94020684
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:56:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B94020684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHXDQ-0004Dv-WF
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:54:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45508)
+	id 1iHXF2-0005N6-CW
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:56:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45878)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iHXCc-0003XR-Pm
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:53:48 -0400
+ (envelope-from <philmd@redhat.com>) id 1iHXDy-0004iM-Dd
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:55:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iHXCa-0004iv-2U
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:53:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44150)
+ (envelope-from <philmd@redhat.com>) id 1iHXDt-0005Y2-D7
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:55:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:31683)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iHXCZ-0004iQ-Qq
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:53:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHXDt-0005XJ-1T
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:55:05 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 63ECFA44AC2;
- Mon,  7 Oct 2019 17:53:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A12E6DACF;
- Mon,  7 Oct 2019 17:53:28 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id ED0BD1138648; Mon,  7 Oct 2019 19:53:19 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] netmap: support git-submodule build otption
-References: <874l13qmvb.fsf@dusky.pond.sub.org>
- <20191004130242.27267-1-g.lettieri@iet.unipi.it>
- <CAFEAcA8ut__ruS4yEMT7-qCKu+BFihFwhaNoq7L1cdoqxpXx6g@mail.gmail.com>
- <87pnj8ltih.fsf@dusky.pond.sub.org>
- <CAFEAcA9KLDruPS6o85H5XJnQjoSXV2+-d=dnNGPvc80jiBthiQ@mail.gmail.com>
- <87zhicg2ce.fsf@dusky.pond.sub.org>
- <aeeb3680-71fa-55ff-40df-7abfc5a57a5a@redhat.com>
-Date: Mon, 07 Oct 2019 19:53:19 +0200
-In-Reply-To: <aeeb3680-71fa-55ff-40df-7abfc5a57a5a@redhat.com> (Thomas Huth's
- message of "Mon, 7 Oct 2019 17:37:17 +0200")
-Message-ID: <87o8yscui8.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id EE9DF757C2
+ for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 17:55:03 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id z205so147101wmb.7
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 10:55:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ysIOHYSUMTwRT9D1EWw3AVUg8ppTg2vwmFWK7HDkU2Q=;
+ b=uj5Y21clkCrRMY45WGjczna4vt5nDtq3SpJFfbnQ6+2wlSgP7Xmo7uw5bSRYhTMurE
+ poaLsQWAQyAKOr143/4ISDUfUavWIxJg/A0zS2iKIya8oTGwd3+chvXOzWIOQK9TafHn
+ YyEjaeFDDwc0scjmhat4cxF+VBMTw0msx9M7zJRLhaiynXRNdPCtC+i40+A+uZSPSMcg
+ LxL0iHzi+80gPsYLDVStqQnEqz34ZQrI8EV1yLaTuqdSqoYztlIkRZaGxU80jzIbRKsU
+ Zh8FWViP6xvGfRrRHKknDwlpEVHoC4uSJlqOUJkqITMFtzCBN2hXnTYAfo5KGQUr8Hnp
+ hTdA==
+X-Gm-Message-State: APjAAAUiTZE5W2REVjb92ZlhY9rd8z8rZvNBTIZfcLxMIIe6zEmREm9P
+ ZQO3I/nhh4nBwJGXBETpyH8PcW6XnvhhKYSdqKyZKtkjyFVAfnxb65F7G3Ziw8ULs9YLeyFCukm
+ PxM+kuBXZ/vBF2jc=
+X-Received: by 2002:adf:fd0f:: with SMTP id e15mr11968501wrr.187.1570470902676; 
+ Mon, 07 Oct 2019 10:55:02 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwFo7W/u0eeX0UzeakQ8yqJg5PXZ5fTqXWT49glMh5QnCBcUy2A5TMT7i+dj0P/iYlwqY8rhw==
+X-Received: by 2002:adf:fd0f:: with SMTP id e15mr11968480wrr.187.1570470902447; 
+ Mon, 07 Oct 2019 10:55:02 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id w22sm235532wmc.16.2019.10.07.10.55.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 07 Oct 2019 10:55:01 -0700 (PDT)
+Subject: Re: [PULL v2 0/8] Ide patches
+To: John Snow <jsnow@redhat.com>, Sam Eiderman <shmuel.eiderman@oracle.com>
+References: <20191003193245.8993-1-jsnow@redhat.com>
+ <CAFEAcA9Z92iuYwEUdsSpej_pGiAX6H6FBaGySqKxXHGjGRueNw@mail.gmail.com>
+ <e8e86add-677c-4eb5-4629-aaadfd0be2a4@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e0945918-d1cf-abf8-218a-6c5e8be80b70@redhat.com>
+Date: Mon, 7 Oct 2019 19:55:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Mon, 07 Oct 2019 17:53:42 +0000 (UTC)
+In-Reply-To: <e8e86add-677c-4eb5-4629-aaadfd0be2a4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -77,134 +95,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>,
- Giuseppe Lettieri <giuseppe.lettieri@unipi.it>,
- Stefan Hajnoczi <stefanha@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
-
-> On 07/10/2019 14.35, Markus Armbruster wrote:
->> Peter Maydell <peter.maydell@linaro.org> writes:
->> 
->>> On Mon, 7 Oct 2019 at 11:50, Markus Armbruster <armbru@redhat.com> wrote:
->>>> Peter Maydell <peter.maydell@linaro.org> writes:
->>>>> Basically new submodules are a pain so we seek to minimize
->>>>> the use of them.
->>>>
->>>> I suggested making it a submodule upthread[*].  Let me try to distill
->>>> the conversation into a rationale.  Giuseppe, please correct mistakes.
->>>>
->>>> To make use of QEMU's netmap backend (CONFIG_NETMAP), you have to build
->>>> and install netmap software from sources[**].  Which pretty much ensures
->>>> developers compile with CONFIG_NETMAP off, and the code rots.
->>>>
->>>> For other dependencies that aren't readily available on common
->>>> development hosts (slirp, capstone), we use submodules to avoid such
->>>> rot.  If the system provides, we use that, and if it doesn't, we fall
->>>> back to the submodule.  This has served us well.
+On 10/7/19 7:35 PM, John Snow wrote:
+> On 10/7/19 8:33 AM, Peter Maydell wrote:
+>> On Thu, 3 Oct 2019 at 20:33, John Snow <jsnow@redhat.com> wrote:
 >>>
->>> I would put this differently. We don't use submodules to avoid
->>> code-rot. We use submodules where a dependency is needed for us
->>> to provide QEMU features that are sufficiently important that we
->>> want to provide them to users even if those users don't have the
->>> dependency available to them as a system library.
+>>> The following changes since commit 7f21573c822805a8e6be379d9bcf3ad9effef3dc:
 >>>
->>> There are lots of features of QEMU that only compile with sufficiently
->>> recent versions of dependencies, and we don't try to submodule-ize
->>> them because the features aren't really that important for the bulk
->>> of our users. For instance, we provided pixman as a submodule for
->>> a while because the features that require it (our graphics layer
->>> code) are important to almost all users. But we didn't provide
->>> spice as a module even when you pretty much needed to be
->>> running bleeding-edge redhat to satisfy the version dependency
->>> we had, because most users don't care about spice support.
->>> Shipping our dependencies as submodules imposes real costs
->>> on the project (for instance we then need to track the upstream
->>> to see when we should be updating, including checking whether
->>> we need to update to fix security issues). Submodules should be
->>> the exception, not the rule.
+>>>    Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-10-01' into staging (2019-10-01 13:13:38 +0100)
 >>>
->>>> For netmap, falling back to the submodule when the host doesn't provide
->>>> tends not to be useful beyond compile-testing.  Because of that, we fall
->>>> back only when the user explicitly asks for it by passing
->>>> --enable-netmap=git to configure.  CI should do that.
+>>> are available in the Git repository at:
 >>>
->>> This sounds like netmap is in the same position as most of our
->>> dependencies: OK to compile if the system provides the library,
->>> but if the system doesn't then almost all users won't care
->>> that the feature isn't present. If CI of the QEMU code is useful,
->> 
->> If CI of QEMU code isn't useful, then I suspect the QEMU code isn't
->> useful, period.  Giuseppe assures us the netmap QEMU code *is* useful.
->> It followe we better make sure our CI covers it.
->> 
->> A submodule would make sure, but it looks like it won't fly.  So let's
->> try another tack:
->> 
->>> get the library supported by and shipped in distros. If you can't
->>> get anybody in a distro (Linux or BSD) to care enough to ship the
->>> library, this is a really niche feature, and up for consideration
->>> for deprecate-and-drop from QEMU, I think.
->> 
->> Giuseppe, you mentioned netmap is in FreeBSD, and getting it into Linux
->> is unlikely, so let's focus on FreeBSD.
->> 
->> We have a FreeBSD section in .patchew.yml, which makes me guess Patchew
->> CI tests FreeBSD.  Does it test with CONFIG_NETMAP out of the box?  If
->> not, how do we have to tweak its configuration to get CONFIG_NETMAP
->> enabled?  Who could help with this?
->
-> I just tried this patch here:
->
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> --- a/.cirrus.yml
-> +++ b/.cirrus.yml
-> @@ -8,7 +8,7 @@ freebsd_12_task:
->      memory: 8G
->    install_script: pkg install -y
->      bash bison curl cyrus-sasl git glib gmake gnutls gsed
-> -    nettle perl5 pixman pkgconf png usbredir
-> +    nettle perl5 pixman pkgconf png usbredir netmap
->    script:
->      - mkdir build
->      - cd build
->
-> ... and looks like net/netmap.c now gets successfully compiled on
-> FreeBSD in the Cirrus-CI:
->
->  https://api.cirrus-ci.com/v1/task/5669479475838976/logs/main.log
+>>>    https://github.com/jnsnow/qemu.git tags/ide-pull-request
+>>>
+>>> for you to fetch changes up to f6d61c9509c56eea3cdd2d23b40d285601b1c1ca:
+>>>
+>>>    hd-geo-test: Add tests for lchs override (2019-10-03 14:36:54 -0400)
+>>>
+>>> ----------------------------------------------------------------
+>>> Pull request V2
+>>>
+>>> - Added signoff into the mirrored commits themselves (vs just the email)
+>>> - Kudos to `stg-foreach stg edit --sign`
+>>>
+>>> ----------------------------------------------------------------
+>>
+>> Hi; the new tests in hd-geo-test seem to hang on
+>> big-endian hosts (both s390x and ppc64 hung here):
+>>
+>> linux1@lxub05:~/qemu/build/all$ QTEST_QEMU_IMG=./qemu-img
+>> QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
+>> ./tests/hd-geo-test
+>> /x86_64/hd-geo/ide/none: OK
+>> /x86_64/hd-geo/ide/drive/cd_0: OK
+>> /x86_64/hd-geo/ide/drive/mbr/blank: OK
+>> /x86_64/hd-geo/ide/drive/mbr/lba: OK
+>> /x86_64/hd-geo/ide/drive/mbr/chs: OK
+>> /x86_64/hd-geo/ide/device/mbr/blank: OK
+>> /x86_64/hd-geo/ide/device/mbr/lba: OK
+>> /x86_64/hd-geo/ide/device/mbr/chs: OK
+>> /x86_64/hd-geo/ide/device/user/chs: OK
+>> /x86_64/hd-geo/ide/device/user/chst: OK
+>> /x86_64/hd-geo/override/ide:
+>>
+> 
+> :(
+> 
+>>
+>> thanks
+>> -- PMM
+>>
+> 
+> Sam, can you investigate this?
 
-Awesome :)
+Not seeing my T-b tags makes me grumble because I don't remember which I 
+reviewed and need to go check on the list.
 
-> We can also add it to the vm-freebsd test:
->
-> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-> --- a/tests/vm/freebsd
-> +++ b/tests/vm/freebsd
-> @@ -54,6 +54,9 @@ class FreeBSDVM(basevm.BaseVM):
->          # libs: opengl
->          "libepoxy",
->          "mesa-libs",
-> +
-> +        # libs: network
-> +        "netmap",
->      ]
->
->      BUILD_SCRIPT = """
->
-> ... then it gets compiled succesfully during "make vm-build-freebsd".
->
-> So does that sound like a good way to keep netmap.c from bitrotting? If
-> so, I can send the above two diffs as a proper patch, if you like.
+If the error is a endianess bug related to fw_cfg, you can add the 
+"-trace fw_cfg*" in hd-geo-test::create_args() and rerun the tests on a 
+BE system, the bug should appear straightly on stdout.
 
-Yes, please!
+Are FWLCHSEntry fields little-endian? Shouldn't 
+get_boot_devices_lchs_list() use some le32_to_cpu() call for the LCHS 
+values?
 
