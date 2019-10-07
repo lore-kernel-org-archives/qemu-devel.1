@@ -2,55 +2,49 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD6EC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 19:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 841EFECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 19:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2283F206C2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 19:12:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2283F206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 4E0C320684
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 19:24:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E0C320684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHYQi-0006kR-Ah
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 15:12:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56651)
+	id 1iHYce-0002uo-9u
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 15:24:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58129)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iHYP6-0005YE-Hz
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 15:10:45 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iHYbY-0002Dt-U3
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 15:23:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iHYP5-0005G7-Cd
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 15:10:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60788)
+ (envelope-from <jsnow@redhat.com>) id 1iHYbX-00030M-F7
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 15:23:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47386)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iHYP2-0005Ee-Qa; Mon, 07 Oct 2019 15:10:41 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iHYbS-0002yD-Pd; Mon, 07 Oct 2019 15:23:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 170D4300BEAE;
- Mon,  7 Oct 2019 19:10:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E217530A7B9A;
+ Mon,  7 Oct 2019 19:23:29 +0000 (UTC)
 Received: from [10.18.17.165] (dhcp-17-165.bos.redhat.com [10.18.17.165])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C0DD600C1;
- Mon,  7 Oct 2019 19:10:39 +0000 (UTC)
-Subject: Re: [PATCH] iotests: Do not run the iotests during "make check"
- anymore
-To: Max Reitz <mreitz@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20191002142146.6124-1-thuth@redhat.com>
- <20191002150329.GA30342@redhat.com>
- <1b6616ed-bb06-332e-6451-b2acd748e891@redhat.com>
- <1bf47905-9237-eff6-9a3e-d1693a3d597a@redhat.com>
- <e2463f58-f5f0-7391-0e70-bc2f9970bdfa@redhat.com>
- <40541b4f-047e-20d9-ded2-7c8679e3de72@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 804AD61F40;
+ Mon,  7 Oct 2019 19:23:23 +0000 (UTC)
+Subject: Re: [PATCH 1/1] IDE: deprecate ide-drive
+To: Markus Armbruster <armbru@redhat.com>
+References: <20191006203150.13054-1-jsnow@redhat.com>
+ <20191006203150.13054-2-jsnow@redhat.com> <87pnj8holb.fsf@dusky.pond.sub.org>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -126,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <dc065d9f-63c5-ba7a-c968-d1b6511a63ea@redhat.com>
-Date: Mon, 7 Oct 2019 15:10:38 -0400
+Message-ID: <4493785d-f1b8-3de5-ee79-7911949dfba4@redhat.com>
+Date: Mon, 7 Oct 2019 15:23:23 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <40541b4f-047e-20d9-ded2-7c8679e3de72@redhat.com>
+In-Reply-To: <87pnj8holb.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 07 Oct 2019 19:10:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.47]); Mon, 07 Oct 2019 19:23:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -152,82 +146,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 10/7/19 9:03 AM, Max Reitz wrote:
-> On 03.10.19 01:51, John Snow wrote:
->>
->>
->> On 10/2/19 11:50 AM, Max Reitz wrote:
->>> On 02.10.19 17:10, Thomas Huth wrote:
->>>> On 02/10/2019 17.03, Daniel P. Berrang=C3=A9 wrote:
->>>>> On Wed, Oct 02, 2019 at 04:21:46PM +0200, Thomas Huth wrote:
->>>>>> Running the iotests during "make check" is causing more headaches =
-than
->>>>>> benefits for the block layer maintainers, so let's disable the iot=
-ests
->>>>>> during "make check" again.
->>>>>>
->>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>>> ---
->>>>>>  tests/Makefile.include   | 2 +-
->>>>>>  tests/qemu-iotests/group | 2 +-
->>>>>>  2 files changed, 2 insertions(+), 2 deletions(-)
->>>>>
->>>>> I don't have any objection to removing from 'make check', but I fee=
-l
->>>>> like this commit should be modifying the travis.yml config so that
->>>>> it explicitly runs the block tests, otherwise we're loosing automat=
-ed
->>>>> CI and the block tests will increase their rate of bitrot again.
->>>>
->>>> I was planning to send a separate patch for that (once my Travis bui=
-lds
->>>> are through...), but if it is preferred, I can also send a v2 of thi=
-s
->>>> patch here where I include that change.
->>>>
->>>> Max, any preferences?
->>>
->>> I don=E2=80=99t mind either way.  I don=E2=80=99t think we=E2=80=99re=
- in danger of you
->>> forgetting to send the Travis patch.
->>>
->>> As for running the tests on macOS: Good question.  I=E2=80=99d just l=
-et them run
->>> now and maybe see later whether that decision hurts.  macOS has its o=
-wn
->>> filesystem, so it may be worth testing there.
->>>
->>> Max
->>>
->>
->> There are absolutely known bugs and problems using APFS that we have n=
-ot
->> fixed.
->=20
-> Sorry, somehow missed your reply. :-/
->=20
-> Yes, that was the idea why I said that maybe running the tests there
-> would be worth it, because it=E2=80=99s a different FS that produces, w=
-ell,
-> interesting results.
->=20
-> But on second thought, who=E2=80=99s going to address those problems?  =
-So, yeah,
-> that wouldn=E2=80=99t really help.
->=20
-> Max
->=20
+On 10/7/19 5:49 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> It's an old compatibility shim that just delegates to ide-cd or ide-hd.
+>> I'd like to refactor these some day, and getting rid of the super-object
+>> will make that easier.
+> 
+> Device "scsi-disk" is similar.  However, it's still used by the
+> scsi_bus_legacy_add_drive() magic.  Not sure that's fully deprecated,
+> yet.  If / once it is, we can deprecate "scsi-disk", too.  Anyway, not
+> your department.
+> 
 
-Yeah, the problem with APFS is I don't have access to using it to debug
-any of those problems, so they stay broken and nobody has stepped up to
-submit patches. :(
+Yeah. I just want to get rid of this to allow myself to do bolder things
+later on.
+
+I have literally no time to do this and it's not really anything that
+would make anyone money, but...
+
+I want to add a few explicit devices:
+
+ata-hd
+ata-cd
+sata-hd
+sata-cd
+
+With some shared state structures that implement common feature subsets,
+like ata_registers, sata_registers, atapi_registers, etc.
+
+I'd also like to separate out frontend and backend state providing a bit
+of a cleaner division between device configuration (parameters on the
+hardware creation itself), emulated device state (ATA register sets and
+state machine), and QEMU backend state (block_backend pointers, aio
+state counters, locks, etc etc etc -- Things solely purposed for
+interacting with the block module.)
+
+I'd also like to make each device type plug into ATA or SATA bus slots
+explicitly -- no more magic IDE devices.
+
+It's like the 5-year itch I can't help but want to scratch. My name's on
+this code and it's UGLY UGLY UGLY!
+
+The biggest roadblock to me actually doing this is figuring out how it
+would be even vaguely possible to migrate from ide-hd or ide-cd to the
+newer models -- it might be pretty complex, but maybe I can figure
+something out somehow...
+
+Well, suggestions welcome.
+
+>> Either way, we don't need this.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  qemu-deprecated.texi          | 5 +++++
+>>  hw/ide/qdev.c                 | 3 +++
+>>  tests/qemu-iotests/051.pc.out | 6 ++++--
+>>  3 files changed, 12 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+>> index 01245e0b1c4..f802d83983e 100644
+>> --- a/qemu-deprecated.texi
+>> +++ b/qemu-deprecated.texi
+>> @@ -247,6 +247,11 @@ quite a bit. It will be removed without replacement unless some users speaks
+>>  up at the @email{qemu-devel@@nongnu.org} mailing list with information about
+>>  their usecases.
+>>  
+>> +@subsection ide-drive (since 4.2)
+>> +
+>> +The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
+>> +'ide-cd' as appropriate to get an IDE hard disk or CDROM as needed.
+> 
+> CD-ROM
+> 
+
+>:[
+
+>> +
+>>  @section System emulator machines
+>>  
+>>  @subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
+>> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+>> index 6fba6b62b87..9ecee4da074 100644
+>> --- a/hw/ide/qdev.c
+>> +++ b/hw/ide/qdev.c
+>> @@ -279,6 +279,9 @@ static void ide_drive_realize(IDEDevice *dev, Error **errp)
+>>  {
+>>      DriveInfo *dinfo = NULL;
+>>  
+>> +    warn_report("The 'ide-drive' device is deprecated. "
+>> +                "Use 'ide-hd' or 'ide-cd' instead");
+> 
+> Two sentences, where only the first one terminated with a period.
+> 
+> Let's say "is deprecated, please use", like we do in several other places.
+> 
+
+Alright.
+
+>> +
+>>      if (dev->conf.blk) {
+>>          dinfo = blk_legacy_dinfo(dev->conf.blk);
+>>      }
+>> diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+>> index 000557c7c83..93b9a1f82ca 100644
+>> --- a/tests/qemu-iotests/051.pc.out
+>> +++ b/tests/qemu-iotests/051.pc.out
+>> @@ -158,7 +158,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>>  
+>>  Testing: -drive if=none,id=disk -device ide-drive,drive=disk
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+>> -(qemu) QEMU_PROG: -device ide-drive,drive=disk: Device needs media, but drive is empty
+>> +(qemu) QEMU_PROG: -device ide-drive,drive=disk: warning: The 'ide-drive' device is deprecated. Use 'ide-hd' or 'ide-cd' instead
+>> +QEMU_PROG: -device ide-drive,drive=disk: Device needs media, but drive is empty
+>>  
+>>  Testing: -drive if=none,id=disk -device ide-hd,drive=disk
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+>> @@ -228,7 +229,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>>  
+>>  Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device ide-drive,drive=disk
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+>> -(qemu) QEMU_PROG: -device ide-drive,drive=disk: Block node is read-only
+>> +(qemu) QEMU_PROG: -device ide-drive,drive=disk: warning: The 'ide-drive' device is deprecated. Use 'ide-hd' or 'ide-cd' instead
+>> +QEMU_PROG: -device ide-drive,drive=disk: Block node is read-only
+>>  
+>>  Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device ide-hd,drive=disk
+>>  QEMU X.Y.Z monitor - type 'help' for more information
+> 
+> A few iotests still use ide-drive.  Should any of them be converted to
+> ide-hd or ide-cd now?
+> 
+
+I only saw the use in 051; (I should fix the output for non-PC too,
+actually) and in this case it can just be dropped whenever we drop the
+ide-drive definition.
+
+I'll respin to hit the tests with a stiffer scrub-brush.
 
 --js
 
