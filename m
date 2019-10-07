@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F5FC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C7FECE58D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:30:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 898B22070B
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:27:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898B22070B
+	by mail.kernel.org (Postfix) with ESMTPS id 609A52070B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 12:30:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 609A52070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHS7E-0001HJ-J9
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 08:27:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48421)
+	id 1iHS9v-0002zD-Gy
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 08:30:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48519)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iHRrh-0003AU-Rr
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:11:54 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iHRrw-0003Sp-Gg
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:12:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iHRrg-0005JR-L3
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:11:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54898)
+ (envelope-from <stefanha@redhat.com>) id 1iHRrt-0005O8-WB
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 08:12:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57484)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1iHRrd-0005IX-T2; Mon, 07 Oct 2019 08:11:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1iHRrq-0005MZ-1J; Mon, 07 Oct 2019 08:11:58 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 204A476521;
- Mon,  7 Oct 2019 12:11:45 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3D7EA4E926;
+ Mon,  7 Oct 2019 12:11:57 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 108A55EE1D;
- Mon,  7 Oct 2019 12:11:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1E9410013A1;
+ Mon,  7 Oct 2019 12:11:55 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 14/16] tests/qemu-iotests: enable testing with aio options
-Date: Mon,  7 Oct 2019 13:09:35 +0100
-Message-Id: <20191007120937.5862-15-stefanha@redhat.com>
+Subject: [PATCH 16/16] block/io_uring: adds fd registration
+Date: Mon,  7 Oct 2019 13:09:37 +0100
+Message-Id: <20191007120937.5862-17-stefanha@redhat.com>
 In-Reply-To: <20191007120937.5862-1-stefanha@redhat.com>
 References: <20191007120937.5862-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 07 Oct 2019 12:11:45 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Mon, 07 Oct 2019 12:11:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -78,157 +78,353 @@ Sender: "Qemu-devel"
 
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
+File descriptor registration eliminates the need to get file descriptors
+for each request on the host kernel side.  The host kernel keeps
+references to a set of files that were registered by the application.
+These files can be quickly accessed by index instead of a traditional
+file descriptor number.
+
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/check      | 15 ++++++++++++++-
- tests/qemu-iotests/common.rc  | 14 ++++++++++++++
- tests/qemu-iotests/iotests.py | 12 ++++++++++--
- 3 files changed, 38 insertions(+), 3 deletions(-)
+v10:
+ * Add io_uring_register_files() return value to trace_luring_fd_register=
+()
+ * Fix indentation in luring_fd_unregister()
+ * Set s->fd_reg.fd_array to NULL after g_free() to avoid dangling pointe=
+rs
+ * Simplify fd registration code
+ * Add luring_fd_unregister() and call it from file-posix.c to prevent
+   fd leaks
+ * Add trace_luring_fd_unregister() trace event
+---
+ include/block/raw-aio.h |   1 +
+ block/file-posix.c      |  18 +++++
+ block/io_uring.c        | 150 +++++++++++++++++++++++++++++++++++++++-
+ block/trace-events      |   2 +
+ 4 files changed, 170 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 875399d79f..9737369512 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -132,6 +132,7 @@ sortme=3Dfalse
- expunge=3Dtrue
- have_test_arg=3Dfalse
- cachemode=3Dfalse
-+aiomode=3Dfalse
+diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
+index 251b10d273..5fe6481bc4 100644
+--- a/include/block/raw-aio.h
++++ b/include/block/raw-aio.h
+@@ -68,6 +68,7 @@ void luring_detach_aio_context(LuringState *s, AioConte=
+xt *old_context);
+ void luring_attach_aio_context(LuringState *s, AioContext *new_context);
+ void luring_io_plug(BlockDriverState *bs, LuringState *s);
+ void luring_io_unplug(BlockDriverState *bs, LuringState *s);
++void luring_fd_unregister(LuringState *s, int fd);
+ #endif
 =20
- tmp=3D"${TEST_DIR}"/$$
- rm -f $tmp.list $tmp.tmp $tmp.sed
-@@ -141,6 +142,7 @@ export IMGFMT_GENERIC=3Dtrue
- export IMGPROTO=3Dfile
- export IMGOPTS=3D""
- export CACHEMODE=3D"writeback"
-+export AIOMODE=3D"threads"
- export QEMU_IO_OPTIONS=3D""
- export QEMU_IO_OPTIONS_NO_FMT=3D""
- export CACHEMODE_IS_DEFAULT=3Dtrue
-@@ -225,6 +227,11 @@ s/ .*//p
-         CACHEMODE_IS_DEFAULT=3Dfalse
-         cachemode=3Dfalse
-         continue
-+    elif $aiomode
-+    then
-+        AIOMODE=3D"$r"
-+        aiomode=3Dfalse
-+        continue
-     fi
-=20
-     xpand=3Dtrue
-@@ -269,6 +276,7 @@ other options
-     -n                  show me, do not run tests
-     -o options          -o options to pass to qemu-img create/convert
-     -c mode             cache mode
-+    -i mode             AIO mode
-     -makecheck          pretty print output for make check
-=20
- testlist options
-@@ -433,10 +441,13 @@ testlist options
-             cachemode=3Dtrue
-             xpand=3Dfalse
-             ;;
-+        -i)
-+            aiomode=3Dtrue
-+            xpand=3Dfalse
-+            ;;
-         -T)        # deprecated timestamp option
-             xpand=3Dfalse
-             ;;
--
-         -v)
-             verbose=3Dtrue
-             xpand=3Dfalse
-@@ -515,6 +526,8 @@ done
-=20
- # Set qemu-io cache mode with $CACHEMODE we have
- QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --cache $CACHEMODE"
-+# Set qemu-io aio mode with $AIOMODE we have
-+QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --aio $AIOMODE"
-=20
- QEMU_IO_OPTIONS_NO_FMT=3D"$QEMU_IO_OPTIONS"
- if [ "$IMGOPTSSYNTAX" !=3D "true" ]; then
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index e45cdfa66b..e9630b365e 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -559,6 +559,20 @@ _default_cache_mode()
-         return
-     fi
+ #ifdef _WIN32
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 264c44fc3f..604b5427c3 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2010,6 +2010,20 @@ static int raw_co_flush_to_disk(BlockDriverState *=
+bs)
+     return raw_thread_pool_submit(bs, handle_aiocb_flush, &acb);
  }
-+_supported_aio_modes()
+=20
++static void raw_aio_detach_aio_context(BlockDriverState *bs)
 +{
-+    for mode; do
-+        if [ "$mode" =3D "$AIOMODE" ]; then
-+            return
-+        fi
-+    done
-+    _notrun "not suitable for aio mode: $AIOMODE"
-+}
-+_default_aio_mode()
-+{
-+    AIOMODE=3D"$1"
-+    QEMU_IO=3D"$QEMU_IO --aio $1"
-+}
-=20
- _unsupported_imgopts()
- {
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index b26271187c..a9e2050e73 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -58,6 +58,7 @@ imgproto =3D os.environ.get('IMGPROTO', 'file')
- test_dir =3D os.environ.get('TEST_DIR')
- output_dir =3D os.environ.get('OUTPUT_DIR', '.')
- cachemode =3D os.environ.get('CACHEMODE')
-+aiomode =3D os.environ.get('AIOMODE')
- qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
-=20
- socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_he=
-lper')
-@@ -474,6 +475,7 @@ class VM(qtest.QEMUQtestMachine):
-             options.append('file=3D%s' % path)
-             options.append('format=3D%s' % format)
-             options.append('cache=3D%s' % cachemode)
-+            options.append('aio=3D%s' % aiomode)
-=20
-         if opts:
-             options.append(opts)
-@@ -852,6 +854,10 @@ def verify_cache_mode(supported_cache_modes=3D[]):
-     if supported_cache_modes and (cachemode not in supported_cache_modes=
-):
-         notrun('not suitable for this cache mode: %s' % cachemode)
-=20
-+def verify_aio_mode(supported_aio_modes=3D[]):
-+    if supported_aio_modes and (aiomode not in supported_aio_modes):
-+        notrun('not suitable for this aio mode: %s' % aiomode)
++#ifdef CONFIG_LINUX_IO_URING
++    BDRVRawState *s =3D bs->opaque;
 +
- def supports_quorum():
-     return 'quorum' in qemu_img_pipe('--help')
++    if (s->fd >=3D 0 && s->use_linux_io_uring) {
++        LuringState *luring;
++
++        luring =3D aio_get_linux_io_uring(bdrv_get_aio_context(bs));
++        luring_fd_unregister(luring, s->fd);
++    }
++#endif
++}
++
+ static void raw_aio_attach_aio_context(BlockDriverState *bs,
+                                        AioContext *new_context)
+ {
+@@ -2994,6 +3008,7 @@ BlockDriver bdrv_file =3D {
+     .bdrv_refresh_limits =3D raw_refresh_limits,
+     .bdrv_io_plug =3D raw_aio_plug,
+     .bdrv_io_unplug =3D raw_aio_unplug,
++    .bdrv_detach_aio_context =3D raw_aio_detach_aio_context,
+     .bdrv_attach_aio_context =3D raw_aio_attach_aio_context,
 =20
-@@ -909,8 +915,9 @@ def execute_unittest(output, verbosity, debug):
+     .bdrv_co_truncate =3D raw_co_truncate,
+@@ -3470,6 +3485,7 @@ static BlockDriver bdrv_host_device =3D {
+     .bdrv_refresh_limits =3D raw_refresh_limits,
+     .bdrv_io_plug =3D raw_aio_plug,
+     .bdrv_io_unplug =3D raw_aio_unplug,
++    .bdrv_detach_aio_context =3D raw_aio_detach_aio_context,
+     .bdrv_attach_aio_context =3D raw_aio_attach_aio_context,
 =20
- def execute_test(test_function=3DNone,
-                  supported_fmts=3D[], supported_oses=3D['linux'],
--                 supported_cache_modes=3D[], unsupported_fmts=3D[],
--                 supported_protocols=3D[], unsupported_protocols=3D[]):
-+                 supported_cache_modes=3D[], supported_aio_modes=3D{},
-+                 unsupported_fmts=3D[], supported_protocols=3D[],
-+                 unsupported_protocols=3D[]):
-     """Run either unittest or script-style tests."""
+     .bdrv_co_truncate       =3D raw_co_truncate,
+@@ -3594,6 +3610,7 @@ static BlockDriver bdrv_host_cdrom =3D {
+     .bdrv_refresh_limits =3D raw_refresh_limits,
+     .bdrv_io_plug =3D raw_aio_plug,
+     .bdrv_io_unplug =3D raw_aio_unplug,
++    .bdrv_detach_aio_context =3D raw_aio_detach_aio_context,
+     .bdrv_attach_aio_context =3D raw_aio_attach_aio_context,
 =20
-     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
-@@ -927,6 +934,7 @@ def execute_test(test_function=3DNone,
-     verify_protocol(supported_protocols, unsupported_protocols)
-     verify_platform(supported_oses)
-     verify_cache_mode(supported_cache_modes)
-+    verify_aio_mode(supported_aio_modes)
+     .bdrv_co_truncate    =3D raw_co_truncate,
+@@ -3726,6 +3743,7 @@ static BlockDriver bdrv_host_cdrom =3D {
+     .bdrv_refresh_limits =3D raw_refresh_limits,
+     .bdrv_io_plug =3D raw_aio_plug,
+     .bdrv_io_unplug =3D raw_aio_unplug,
++    .bdrv_detach_aio_context =3D raw_aio_detach_aio_context,
+     .bdrv_attach_aio_context =3D raw_aio_attach_aio_context,
 =20
-     if debug:
-         output =3D sys.stdout
+     .bdrv_co_truncate    =3D raw_co_truncate,
+diff --git a/block/io_uring.c b/block/io_uring.c
+index 56892fd1ab..4d6e50ce19 100644
+--- a/block/io_uring.c
++++ b/block/io_uring.c
+@@ -46,10 +46,16 @@ typedef struct LuringQueue {
+     QSIMPLEQ_HEAD(, LuringAIOCB) submit_queue;
+ } LuringQueue;
+=20
++typedef struct LuringFd {
++    int *fd_array;
++    GHashTable *fd_lookup;
++} LuringFd;
++
+ typedef struct LuringState {
+     AioContext *aio_context;
+=20
+     struct io_uring ring;
++    LuringFd fd_reg;
+=20
+     /* io queue for submit at batch.  Protected by AioContext lock. */
+     LuringQueue io_q;
+@@ -298,6 +304,136 @@ static void ioq_init(LuringQueue *io_q)
+     io_q->blocked =3D false;
+ }
+=20
++/**
++ * luring_fd_unregister:
++ *
++ * Remove a file descriptor from the registered fds list.  This is a slo=
+w
++ * operation because all registered fds are refreshed, but this function=
+ should
++ * not be called often anyway.
++ *
++ * Only call this function while there are no requests in flight.
++ */
++void luring_fd_unregister(LuringState *s, int fd)
++{
++    LuringFd *fd_reg =3D &s->fd_reg;
++    void *value;
++    int idx;
++    int ret;
++    int nr;
++    int i;
++
++    if (!g_hash_table_lookup_extended(fd_reg->fd_lookup, GINT_TO_POINTER=
+(fd),
++                                      NULL, &value)) {
++        return;
++    }
++
++    ret =3D io_uring_unregister_files(&s->ring);
++    if (ret < 0) {
++        return;
++    }
++
++    idx =3D GPOINTER_TO_INT(value);
++    nr =3D g_hash_table_size(fd_reg->fd_lookup) - 1; /* minus this fd */
++
++    trace_luring_fd_unregister(s, fd, idx);
++
++    memmove(&fd_reg->fd_array[idx], &fd_reg->fd_array[idx + 1], nr - idx=
+);
++
++    /* Rebuild hash table */
++    g_hash_table_remove_all(fd_reg->fd_lookup);
++    for (i =3D 0; i < nr; i++) {
++        g_hash_table_insert(fd_reg->fd_lookup,
++                            GINT_TO_POINTER(fd_reg->fd_array[i]),
++                            GINT_TO_POINTER(i));
++    }
++
++    io_uring_register_files(&s->ring, fd_reg->fd_array, nr);
++}
++
++/**
++ * luring_fd_register:
++ *
++ * Register file descriptors, see luring_fd_lookup
++ */
++static int luring_fd_register(struct io_uring *ring, LuringFd *fd_reg, i=
+nt fd)
++{
++    int ret, nr;
++    GHashTable *lookup =3D fd_reg->fd_lookup;
++    nr =3D g_hash_table_size(lookup);
++
++    /* If adding new, API requires older registrations to be removed */
++    if (nr) {
++        /*
++         * See linux b19062a56726, register needs the ring mutex, any
++         * submission in progress will complete before unregistering beg=
+ins
++         * and new ones will have to wait.
++         */
++        ret =3D io_uring_unregister_files(ring);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
++    fd_reg->fd_array =3D g_realloc_n(fd_reg->fd_array, nr + 1, sizeof(in=
+t));
++    fd_reg->fd_array[nr] =3D fd;
++
++    g_hash_table_insert(lookup, GINT_TO_POINTER(fd), GINT_TO_POINTER(nr)=
+);
++    ret =3D io_uring_register_files(ring, fd_reg->fd_array, nr + 1);
++    trace_luring_fd_register(fd, nr, ret);
++    if (ret < 0) {
++        /* Leave fd_array[] alone, fd will be overwritten next time anyw=
+ay */
++        g_hash_table_remove(lookup, GINT_TO_POINTER(fd));
++        return ret;
++    }
++    return nr;
++}
++
++/**
++ * luring_fd_init:
++ *
++ * Initialize file descriptors
++ */
++static void luring_fd_init(LuringState *s)
++{
++    s->fd_reg.fd_lookup =3D g_hash_table_new(g_direct_hash, g_direct_equ=
+al);
++}
++
++/**
++ * luring_fd_cleanup:
++ *
++ * Unregisters file descriptors, TODO: error handling
++ */
++static void luring_fd_cleanup(LuringState *s)
++{
++    io_uring_unregister_files(&s->ring);
++    g_hash_table_unref(s->fd_reg.fd_lookup);
++    g_free(s->fd_reg.fd_array);
++    s->fd_reg.fd_array =3D NULL;
++}
++
++/**
++ * luring_fd_lookup:
++ *
++ * Used to lookup fd index in registered array at submission time
++ * If the lookup table has not been created or the fd is not in the tabl=
+e,
++ * the fd is registered.
++ *
++ * If registration errors, this function returns -errno.
++ *
++ * Unregistering is done in luring_detach_aio_context().
++ */
++static int luring_fd_lookup(LuringState *s, int fd)
++{
++    void *index;
++
++    if (g_hash_table_lookup_extended(s->fd_reg.fd_lookup, GINT_TO_POINTE=
+R(fd),
++                                     NULL, &index)) {
++        return GPOINTER_TO_INT(index);
++    }
++
++    return luring_fd_register(&s->ring, &s->fd_reg, fd);
++}
++
+ void luring_io_plug(BlockDriverState *bs, LuringState *s)
+ {
+     trace_luring_io_plug(s);
+@@ -329,9 +465,14 @@ void luring_io_unplug(BlockDriverState *bs, LuringSt=
+ate *s)
+ static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *=
+s,
+                             uint64_t offset, int type)
+ {
+-    int ret;
++    int ret, fd_index;
+     struct io_uring_sqe *sqes =3D &luringcb->sqeq;
+=20
++    fd_index =3D luring_fd_lookup(s, fd);
++    if (fd_index >=3D 0) {
++        fd =3D fd_index;
++    }
++
+     switch (type) {
+     case QEMU_AIO_WRITE:
+         io_uring_prep_writev(sqes, fd, luringcb->qiov->iov,
+@@ -349,7 +490,11 @@ static int luring_do_submit(int fd, LuringAIOCB *lur=
+ingcb, LuringState *s,
+                         __func__, type);
+         abort();
+     }
++
+     io_uring_sqe_set_data(sqes, luringcb);
++    if (fd_index >=3D 0) {
++        io_uring_sqe_set_flags(sqes, IOSQE_FIXED_FILE);
++    }
+=20
+     QSIMPLEQ_INSERT_TAIL(&s->io_q.submit_queue, luringcb, next);
+     s->io_q.in_queue++;
+@@ -375,6 +520,7 @@ int coroutine_fn luring_co_submit(BlockDriverState *b=
+s, LuringState *s, int fd,
+         .qiov       =3D qiov,
+         .is_read    =3D (type =3D=3D QEMU_AIO_READ),
+     };
++
+     trace_luring_co_submit(bs, s, &luringcb, fd, offset, qiov ? qiov->si=
+ze : 0,
+                            type);
+     ret =3D luring_do_submit(fd, &luringcb, s, offset, type);
+@@ -391,6 +537,7 @@ int coroutine_fn luring_co_submit(BlockDriverState *b=
+s, LuringState *s, int fd,
+=20
+ void luring_detach_aio_context(LuringState *s, AioContext *old_context)
+ {
++    luring_fd_cleanup(s);
+     aio_set_fd_handler(old_context, s->ring.ring_fd, false, NULL, NULL, =
+NULL,
+                        s);
+     qemu_bh_delete(s->completion_bh);
+@@ -403,6 +550,7 @@ void luring_attach_aio_context(LuringState *s, AioCon=
+text *new_context)
+     s->completion_bh =3D aio_bh_new(new_context, qemu_luring_completion_=
+bh, s);
+     aio_set_fd_handler(s->aio_context, s->ring.ring_fd, false,
+                        qemu_luring_completion_cb, NULL, qemu_luring_poll=
+_cb, s);
++    luring_fd_init(s);
+ }
+=20
+ LuringState *luring_init(Error **errp)
+diff --git a/block/trace-events b/block/trace-events
+index 2e3a9851b6..6a19cc00b7 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -72,6 +72,8 @@ luring_co_submit(void *bs, void *s, void *luringcb, int=
+ fd, uint64_t offset, siz
+ luring_process_completion(void *s, void *aiocb, int ret) "LuringState %p=
+ luringcb %p ret %d"
+ luring_io_uring_submit(void *s, int ret) "LuringState %p ret %d"
+ luring_resubmit_short_read(void *s, void *luringcb, int nread) "LuringSt=
+ate %p luringcb %p nread %d"
++luring_fd_register(int fd, int index, int ret) "fd %d index %d ret %d"
++luring_fd_unregister(void *s, int fd, int index) "LuringState %p fd %d i=
+ndex %d"
+=20
+ # qcow2.c
+ qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offse=
+t 0x%" PRIx64 " bytes %d"
 --=20
 2.21.0
 
