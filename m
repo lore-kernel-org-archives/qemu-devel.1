@@ -2,70 +2,64 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E2EC4740A
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20487C4740A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:30:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DAAC2084D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:22:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DAAC2084D
+	by mail.kernel.org (Postfix) with ESMTPS id E9EDE20867
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 08:30:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9EDE20867
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHOI3-0006kc-Ch
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 04:22:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47096)
+	id 1iHOPm-0000hW-1T
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 04:30:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47713)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iHOHJ-0006Ic-1H
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:22:03 -0400
+ (envelope-from <lersek@redhat.com>) id 1iHOP4-0000B5-EJ
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:30:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iHOHG-0005Vx-1J
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:22:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13061)
+ (envelope-from <lersek@redhat.com>) id 1iHOP2-0004l7-J7
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:30:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39906)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iHOHF-0005VW-P1
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:21:57 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iHOP2-0004k8-8g
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 04:30:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EBFE910C0929;
- Mon,  7 Oct 2019 08:21:56 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6EBFE60A35;
- Mon,  7 Oct 2019 08:21:53 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E458B1138648; Mon,  7 Oct 2019 10:21:47 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
-Subject: Re: [PATCH v4 15/24] audio: add mixing-engine option (documentation)
-References: <cover.1568927990.git.DirtY.iCE.hu@gmail.com>
- <68c4b4bd438e9cb5c97aed32ee31e3dabd96cbf6.1568927990.git.DirtY.iCE.hu@gmail.com>
- <87sgonma7v.fsf@dusky.pond.sub.org>
- <4d24c95c-0e98-2646-0b1a-6c7b3afe0e90@gmail.com>
- <87wodwyabl.fsf@dusky.pond.sub.org>
- <cacb71d0-494f-e05d-dece-637579b0c6d9@gmail.com>
- <87d0fh6l2b.fsf@dusky.pond.sub.org>
- <1a31eb0a-2f07-ae33-e272-bec46d4593a5@gmail.com>
-Date: Mon, 07 Oct 2019 10:21:47 +0200
-In-Reply-To: <1a31eb0a-2f07-ae33-e272-bec46d4593a5@gmail.com>
- (=?utf-8?B?IlpvbHTDoW4JS8WRdsOhZ8OzIidz?= message of "Fri, 4 Oct 2019
- 01:27:54 +0200")
-Message-ID: <87tv8lhso4.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id E09A4300CB25;
+ Mon,  7 Oct 2019 08:29:58 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-11.rdu2.redhat.com
+ [10.10.120.11])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 799DF5D6D0;
+ Mon,  7 Oct 2019 08:29:57 +0000 (UTC)
+Subject: Re: [PULL 25/30] Fix wrong behavior of cpu_memory_rw_debug() function
+ in SMM
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <1570035113-56848-1-git-send-email-pbonzini@redhat.com>
+ <1570035113-56848-26-git-send-email-pbonzini@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <5389cd77-f8bc-f4f3-9206-d2f3b47cd533@redhat.com>
+Date: Mon, 7 Oct 2019 10:29:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
+In-Reply-To: <1570035113-56848-26-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.66]); Mon, 07 Oct 2019 08:21:56 +0000 (UTC)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.46]); Mon, 07 Oct 2019 08:29:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -80,210 +74,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Dmitry Poletaev <poletaev@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
+Hi Paolo,
 
-> On 2019-10-01 08:23, Markus Armbruster wrote:
->> "Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
->>
->>> On 2019-09-25 11:49, Markus Armbruster wrote:
->>>> "Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
->>>>
->>>>> On 2019-09-23 15:08, Markus Armbruster wrote:
->>>>>> "K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com> writes:
->>>>>>
->>>>>>> This will allow us to disable mixeng when we use a decent backend.
->>>>>>>
->>>>>>> Disabling mixeng have a few advantages:
->>>>>>> * we no longer convert the audio output from one format to another,=
- when
->>>>>>>      the underlying audio system would just convert it to a third f=
-ormat.
->>>>>>>      We no longer convert, only the underlying system, when needed.
->>>>>>> * the underlying system probably has better resampling and sample f=
-ormat
->>>>>>>      converting methods anyway...
->>>>>>> * we may support formats that the mixeng currently does not support=
- (S24
->>>>>>>      or float samples, more than two channels)
->>>>>>> * when using an audio server (like pulseaudio) different sound card
->>>>>>>      outputs will show up as separate streams, even if we use only =
-one
->>>>>>>      backend
->>>>>>>
->>>>>>> Disadvantages:
->>>>>>> * audio capturing no longer works (wavcapture, and vnc audio extens=
-ion)
->>>>>>> * some backends only support a single playback stream or very picky
->>>>>>>      about the audio format.  In this case we can't disable mixeng.
->>>>>>>
->>>>>>> However mixeng is not removed, only made optional, so this shouldn'=
-t be
->>>>>>> a big concern.
->>>>>>>
->>>>>>> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gma=
-il.com>
->>>>>>> ---
->>>>>>>
->>>>>>> Notes:
->>>>>>>        Changes from v1:
->>>>>>>             * renamed mixeng to mixing-engine
->>>>>>>
->>>>>>>     qapi/audio.json | 5 +++++
->>>>>>>     qemu-options.hx | 6 ++++++
->>>>>>>     2 files changed, 11 insertions(+)
->>>>>>>
->>>>>>> diff --git a/qapi/audio.json b/qapi/audio.json
->>>>>>> index 9fefdf5186..0535eff794 100644
->>>>>>> --- a/qapi/audio.json
->>>>>>> +++ b/qapi/audio.json
->>>>>>> @@ -11,6 +11,10 @@
->>>>>>>     # General audio backend options that are used for both playback=
- and
->>>>>>>     # recording.
->>>>>>>     #
->>>>>>> +# @mixing-engine: use QEMU's mixing engine to mix all streams insi=
-de QEMU. When
->>>>>>> +#                 set to off, fixed-settings must be also off. Not=
- every backend
->>>>>>> +#                 compatible with the off setting (default on, sin=
-ce 4.2)
->>>>>>> +#
->>>>>>
->>>>>> Last sentence no verb.
->>>>>>
->>>>>> Which backends are compatible?
->>>>>
->>>>> Actually that's a simplification, it depends on a few things.  When
->>>>> mixeng is off, qemu will try to use the same format as the emulated
->>>>> sound card, and if the backend doesn't support that format, it won't
->>>>> work (no audio).  Also attaching multiple sound cards to the same
->>>>> audiodev might not work, if the backend doesn't support multiple
->>>>> playback streams.  If you use pulseaudio, it'll work without problems,
->>>>> if you use alsa, it depends on your device.  If you use a hw: device
->>>>> directly, you'll likely only be able to use one emulated sound card
->>>>> with a few selected audio formats.  If you use dmix: (and plug), alsa
->>>>> will handle the conversion and mixing, so it will work no matter what
->>>>> format the emulated sound card uses.  With OSS the situation is
->>>>> probably similar, it depends on the kernel/hw what works and what not.
->>>>> wav and spice certainly doesn't support multiple streams.  I'm not
->>>>> completely sure about the other backends right now, but I think dsound
->>>>> and coreaudio can handle the necessary sample format conversions and
->>>>> mixing.
->>>>>
->>>>>> What happens when you try the off setting with incompatible backends?
->>>>> See above.
->>>>
->>>> What happens *exactly*?
->>>>
->>>> I'm asking because I'm concerned about the user experience.  When a us=
-er
->>>> asks for a combination of things QEMU can't provide, such as mixeng off
->>>> with an incompatible backend, QEMU should fail with a suitable error
->>>> message.  Does it?
->>>
->>> Error handling is not the best in the audio subsystem, if something
->>> fails it generally just prints a warning to the console and continues,
->>> and something will happen...  For example, this is what happens when I
->>> try to open one hw device twice. I ran qemu with:
->>>
->>> -audiodev
->>> alsa,id=3Dfoo,in.dev=3Dhw:1,,0,out.mixing-engine=3Doff,out.dev=3Dhw:1,,0
->>> -device piix4-usb-uhci -device usb-audio,audiodev=3Dfoo -device
->>> AC97,audiodev=3Dfoo
->>>
->>> When the guest tried to initialize the AC97 card, I got an error:
->>>
->>> alsa: Could not initialize DAC
->>> alsa: Failed to open `hw:1,0':
->>> alsa: Reason: Device or resource busy
->>>
->>> And it just continued. And the sound worked, but with wrong sample
->>> rate (AC97 wants 44100 Hz, but USB audio previously opened the alsa
->>> device with 48000 Hz).  I'll fix this bug in the next revision,
->>> audio_pcm_hw_add_* shouldn't fall back to other HWs without mixeng.
->>> But even with that, the result will be that one emulated sound card
->>> will work and the other won't.
->>>
->>> It's not ideal, but fixing it would require a lot of effort.  Right
->>> now, if you specify an invalid audiodev for alsa (even with mixeng),
->>> it'll just print an error to the console and continue without audio.
->>
->> Should we document this general error handling deficiency somehow?
->
-> It could be useful to mention it, especially for people who write
-> script and expect qemu to fail if they specify an invalid parameter.
-> I'm not sure how in-depth this explanation should be however.
+(+Peter)
 
-Common issue when writing documentation.
+On 10/02/19 18:51, Paolo Bonzini wrote:
+> From: Dmitry Poletaev <poletaev@ispras.ru>
+> 
+> There is a problem, that you don't have access to the data using cpu_memory_rw_debug() function when in SMM. You can't remotely debug SMM mode program because of that for example.
+> Likely attrs version of get_phys_page_debug should be used to get correct asidx at the end to handle access properly.
+> Here the patch to fix it.
+> 
+> Signed-off-by: Dmitry Poletaev <poletaev@ispras.ru>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  target/i386/cpu.c    | 2 +-
+>  target/i386/cpu.h    | 3 ++-
+>  target/i386/helper.c | 5 ++++-
+>  3 files changed, 7 insertions(+), 3 deletions(-)
 
-One way to tackle it: start unspecific, then add specifics until it
-feels useful.
+If it's not too late yet -- I've just pulled the master branch and this patch doesn't appear to be on it --, can you please edit the commit message a little?
 
-The other direction can also work: write up everything, then cut until
-it feels useful.  Makes sense mostly when you need to write up
-everything anyway, say for a developer audience, or even just for
-yourself.  Nothing promotes clear thinking like writing does[*].
+It would be nice if the commit message included the following two links, to the original issue report from Dmitry (both links point to the same message, just in different archives):
 
->>>> Sometimes rejecting non-working configurations is impractical.  Is it
->>>> here?
->>>
->>> I think it is.  It depends on the backend, its settings, the frontend
->>> (emulated sound card), and how the guest uses it.  We currently don't
->>> know what formats does a backend support, what formats can a frontend
->>> produce, and even if we would know that, just because a frontend can
->>> produce a format that the backend doesn't understand doesn't mean that
->>> it will actually do it.  For example, right now with this patch series
->>> applied, usb-audio can produce 7.1 audio.  If we want to be strict, it
->>> means we can only use it with backends that support at least 8
->>> channels, even if the user only wants to use stereo audio.
->>>
->>>> If yes, we should call out the problematic configurations in
->>>> documentation.
->>>
->>> I think we should rather list known working configurations, and leave
->>> the others as "try at your own risk" because there's too many things
->>> that can go wrong.  (pulseaudio will work, alsa with dmix too.  Need
->>> to check coreaudio, dsound and oss.  spice and wavcapture won't work.)
->>
->> Far from ideal, but better than nothing.
->>
->> Possibly naive idea: what about automatically falling back to mixeng on
->> when mixeng off doesn't work?  Requires detecting "doesn't work", which
->> I understand just isn't there.  Any other reasons why this couldn't be
->> done?  Way out of scope for this series, of course.
->
-> There are two cases when mixeng can help: a) when the frontend
-> requires a format not supported by the backend, and b) when multiple
-> frontends wants to use the same backend, but the backend doesn't
-> support multiple channels.  This fallback logic would help with a) but
-> it would be much harder to solve b) (I'm not saying it's impossible,
-> but it would require us to convert the already running stream back to
-> mixeng).  However, since the goal of this setting is to get rid of
-> limitations of mixeng, currently you only want to turn it off if when
-> you want to use 5.1 or 7.1 audio, where falling back to mixeng is not
-> an option.  (The other use case was when using pulseaudio, you wanted
-> different pa streams per emulated sound card, but since you can have
-> multiple -audiodevs now, it's no longer necessary to disable mixeng.)
+  "Can not read SMI handler code with cpu_memory_rw_debug while in SMM"
+  https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg06039.html
+  http://mid.mail-archive.com/51deeefdf33168ff11234ffd96ee646d@rainloop.ispras.ru
 
-"Currently you only want to turn it off if when you want to use 5.1 or
-7.1 audio" is useful advice.  I figure it should be worked into
-documentation if it's not already there.
+(Thank you Dmitry for the patch BTW, I'll probably rely quite a bit on it in the future.)
 
-Suggest to record the remainder of your answer for posterity by working
-it into the commit message, along with this thought:
+Thank you,
+Laszlo
 
-> The ideal solution is probably porting as much as possible to
-> gstreamer, but this is even more out of scope:
-> https://wiki.qemu.org/Internships/ProjectIdeas/AudioGStreamer
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 313a2ef..8fcb571 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6245,7 +6245,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+>  #ifndef CONFIG_USER_ONLY
+>      cc->asidx_from_attrs = x86_asidx_from_attrs;
+>      cc->get_memory_mapping = x86_cpu_get_memory_mapping;
+> -    cc->get_phys_page_debug = x86_cpu_get_phys_page_debug;
+> +    cc->get_phys_page_attrs_debug = x86_cpu_get_phys_page_attrs_debug;
+>      cc->write_elf64_note = x86_cpu_write_elf64_note;
+>      cc->write_elf64_qemunote = x86_cpu_write_elf64_qemunote;
+>      cc->write_elf32_note = x86_cpu_write_elf32_note;
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 033991c..eaa5395 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1690,7 +1690,8 @@ void x86_cpu_get_memory_mapping(CPUState *cpu, MemoryMappingList *list,
+>  
+>  void x86_cpu_dump_state(CPUState *cs, FILE *f, int flags);
+>  
+> -hwaddr x86_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+> +hwaddr x86_cpu_get_phys_page_attrs_debug(CPUState *cpu, vaddr addr,
+> +                                         MemTxAttrs *attrs);
+>  
+>  int x86_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+>  int x86_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+> diff --git a/target/i386/helper.c b/target/i386/helper.c
+> index 0fa51be..c3a6e4f 100644
+> --- a/target/i386/helper.c
+> +++ b/target/i386/helper.c
+> @@ -715,7 +715,8 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
+>  }
+>  
+>  #if !defined(CONFIG_USER_ONLY)
+> -hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+> +hwaddr x86_cpu_get_phys_page_attrs_debug(CPUState *cs, vaddr addr,
+> +                                         MemTxAttrs *attrs)
+>  {
+>      X86CPU *cpu = X86_CPU(cs);
+>      CPUX86State *env = &cpu->env;
+> @@ -725,6 +726,8 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+>      uint32_t page_offset;
+>      int page_size;
+>  
+> +    *attrs = cpu_get_mem_attrs(env);
+> +
+>      a20_mask = x86_get_a20_mask(env);
+>      if (!(env->cr[0] & CR0_PG_MASK)) {
+>          pte = addr & a20_mask;
+> 
 
-Thanks!
-
-
-[*] "If you're thinking without writing, you only think you're
-thinking." Leslie Lamport
 
