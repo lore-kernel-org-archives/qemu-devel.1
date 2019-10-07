@@ -2,58 +2,87 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 738E2C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7EB8C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:32:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 452B7205C9
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:29:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452B7205C9
+	by mail.kernel.org (Postfix) with ESMTPS id 8D3A9206C2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:32:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3A9206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHUxG-0002fp-D0
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:29:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47551)
+	id 1iHV0I-0005El-Gx
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:32:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iHUoH-0003Ia-QS
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:20:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iHUux-0001L1-Rh
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:27:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iHUoF-0000Dn-5e
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:20:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47400)
+ (envelope-from <mreitz@redhat.com>) id 1iHUuv-00044d-RZ
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:27:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53598)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHUoE-0000Bd-Sb
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:20:27 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iHUup-000438-U6; Mon, 07 Oct 2019 11:27:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 23A7118C8921;
- Mon,  7 Oct 2019 15:20:25 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.206.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A98619C5B;
- Mon,  7 Oct 2019 15:20:17 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 6/7] tests/fw_cfg: Declare one QFWCFG for all tests
-Date: Mon,  7 Oct 2019 17:19:04 +0200
-Message-Id: <20191007151905.32766-7-philmd@redhat.com>
-In-Reply-To: <20191007151905.32766-1-philmd@redhat.com>
-References: <20191007151905.32766-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 2B2D4315C030;
+ Mon,  7 Oct 2019 15:27:15 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.196])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 94DF85D9CC;
+ Mon,  7 Oct 2019 15:27:13 +0000 (UTC)
+Subject: Re: [PATCH 5/6] block/block-copy: add memory limit
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191003171539.12327-1-vsementsov@virtuozzo.com>
+ <20191003171539.12327-6-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <8aa011d7-3f11-2df5-d77e-5c5176ab63ed@redhat.com>
+Date: Mon, 7 Oct 2019 17:27:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Mon, 07 Oct 2019 15:20:25 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191003171539.12327-6-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="cVkkcEO2DDbP5Zbb8803lDcaYv4c1A1pQ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Mon, 07 Oct 2019 15:27:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -68,297 +97,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Li Qiang <liq3ea@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is pointless to create/remove a QFWCFG object for each test.
-Move it to the test context and create/remove it only once.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cVkkcEO2DDbP5Zbb8803lDcaYv4c1A1pQ
+Content-Type: multipart/mixed; boundary="resBEnXDD79a3wGe4X7tMgUCixsn6vLrF"
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tests/fw_cfg-test.c | 80 ++++++++++++++++++---------------------------
- 1 file changed, 32 insertions(+), 48 deletions(-)
+--resBEnXDD79a3wGe4X7tMgUCixsn6vLrF
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index dda9a9fb07..35af0de7e6 100644
---- a/tests/fw_cfg-test.c
-+++ b/tests/fw_cfg-test.c
-@@ -25,47 +25,42 @@ static uint16_t boot_menu =3D 0;
-=20
- typedef struct {
-     const char *machine_name;
-+    QFWCFG *fw_cfg;
- } QTestCtx;
-=20
- static void test_fw_cfg_signature(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-     char buf[5];
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    qfw_cfg_get(s, fw_cfg, FW_CFG_SIGNATURE, buf, 4);
-+    qfw_cfg_get(s, ctx->fw_cfg, FW_CFG_SIGNATURE, buf, 4);
-     buf[4] =3D 0;
--
-     g_assert_cmpstr(buf, =3D=3D, "QEMU");
--    g_free(fw_cfg);
-+
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_id(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-     uint32_t id;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    id =3D qfw_cfg_get_u32(s, fw_cfg, FW_CFG_ID);
-+    id =3D qfw_cfg_get_u32(s, ctx->fw_cfg, FW_CFG_ID);
-     g_assert((id =3D=3D 1) ||
-              (id =3D=3D 3));
--    g_free(fw_cfg);
-+
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_uuid(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-=20
-     uint8_t buf[16];
-@@ -76,12 +71,10 @@ static void test_fw_cfg_uuid(const void *opaque)
-=20
-     s =3D qtest_initf("-M %s -uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8"=
+On 03.10.19 19:15, Vladimir Sementsov-Ogievskiy wrote:
+> Currently total allocation for parallel requests to block-copy instance=
+
+> is unlimited. Let's limit it to 128 MiB.
+>=20
+> For now block-copy is used only in backup, so actually we limit total
+> allocation for backup job.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/block-copy.h | 3 +++
+>  block/block-copy.c         | 5 +++++
+>  2 files changed, 8 insertions(+)
+>=20
+> diff --git a/include/block/block-copy.h b/include/block/block-copy.h
+> index e2e135ff1b..bb666e7068 100644
+> --- a/include/block/block-copy.h
+> +++ b/include/block/block-copy.h
+> @@ -16,6 +16,7 @@
+>  #define BLOCK_COPY_H
+> =20
+>  #include "block/block.h"
+> +#include "qemu/co-shared-amount.h"
+> =20
+>  typedef struct BlockCopyInFlightReq {
+>      int64_t start_byte;
+> @@ -69,6 +70,8 @@ typedef struct BlockCopyState {
+>       */
+>      ProgressResetCallbackFunc progress_reset_callback;
+>      void *progress_opaque;
+> +
+> +    QemuCoSharedAmount *mem;
+>  } BlockCopyState;
+> =20
+>  BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *tar=
+get,
+> diff --git a/block/block-copy.c b/block/block-copy.c
+> index cc49d2345d..e700c20d0f 100644
+> --- a/block/block-copy.c
+> +++ b/block/block-copy.c
+> @@ -21,6 +21,7 @@
+>  #include "qemu/units.h"
+> =20
+>  #define BLOCK_COPY_MAX_COPY_RANGE (16 * MiB)
+> +#define BLOCK_COPY_MAX_MEM (128 * MiB)
+> =20
+>  static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState =
+*s,
+>                                                         int64_t start,
+> @@ -64,6 +65,7 @@ void block_copy_state_free(BlockCopyState *s)
+>      }
+> =20
+>      bdrv_release_dirty_bitmap(s->source->bs, s->copy_bitmap);
+> +    qemu_co_shared_amount_free(s->mem);
+>      g_free(s);
+>  }
+> =20
+> @@ -95,6 +97,7 @@ BlockCopyState *block_copy_state_new(BdrvChild *sourc=
+e, BdrvChild *target,
+>          .cluster_size =3D cluster_size,
+>          .len =3D bdrv_dirty_bitmap_size(copy_bitmap),
+>          .write_flags =3D write_flags,
+> +        .mem =3D qemu_co_shared_amount_new(BLOCK_COPY_MAX_MEM),
+>      };
+> =20
+>      s->copy_range_size =3D QEMU_ALIGN_DOWN(max_transfer, cluster_size)=
 ,
-                     ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    qfw_cfg_get(s, fw_cfg, FW_CFG_UUID, buf, 16);
-+    qfw_cfg_get(s, ctx->fw_cfg, FW_CFG_UUID, buf, 16);
-     g_assert(memcmp(buf, uuid, sizeof(buf)) =3D=3D 0);
-=20
--    g_free(fw_cfg);
-     qtest_quit(s);
-=20
- }
-@@ -89,80 +82,71 @@ static void test_fw_cfg_uuid(const void *opaque)
- static void test_fw_cfg_ram_size(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u64(s, fw_cfg, FW_CFG_RAM_SIZE), =3D=3D,=
- ram_size);
-+    g_assert_cmpint(qfw_cfg_get_u64(s, ctx->fw_cfg, FW_CFG_RAM_SIZE),
-+                    =3D=3D, ram_size);
-=20
--    g_free(fw_cfg);
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_nographic(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u16(s, fw_cfg, FW_CFG_NOGRAPHIC), =3D=3D=
-, 0);
-+    g_assert_cmpint(qfw_cfg_get_u16(s, ctx->fw_cfg, FW_CFG_NOGRAPHIC), =3D=
-=3D, 0);
-=20
--    g_free(fw_cfg);
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_nb_cpus(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u16(s, fw_cfg, FW_CFG_NB_CPUS), =3D=3D, =
-nb_cpus);
-+    g_assert_cmpint(qfw_cfg_get_u16(s, ctx->fw_cfg, FW_CFG_NB_CPUS),
-+                    =3D=3D, nb_cpus);
-=20
--    g_free(fw_cfg);
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_max_cpus(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u16(s, fw_cfg, FW_CFG_MAX_CPUS), =3D=3D,=
- max_cpus);
--    g_free(fw_cfg);
-+    g_assert_cmpint(qfw_cfg_get_u16(s, ctx->fw_cfg, FW_CFG_MAX_CPUS),
-+                    =3D=3D, max_cpus);
-+
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_numa(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-     uint64_t *cpu_mask;
-     uint64_t *node_mask;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u64(s, fw_cfg, FW_CFG_NUMA), =3D=3D, nb_=
-nodes);
-+    g_assert_cmpint(qfw_cfg_get_u64(s, ctx->fw_cfg, FW_CFG_NUMA),
-+                    =3D=3D, nb_nodes);
-=20
-     cpu_mask =3D g_new0(uint64_t, max_cpus);
-     node_mask =3D g_new0(uint64_t, nb_nodes);
-=20
--    qfw_cfg_read_data(s, fw_cfg, cpu_mask, sizeof(uint64_t) * max_cpus);
--    qfw_cfg_read_data(s, fw_cfg, node_mask, sizeof(uint64_t) * nb_nodes)=
-;
-+    qfw_cfg_read_data(s, ctx->fw_cfg, cpu_mask, sizeof(uint64_t) * max_c=
-pus);
-+    qfw_cfg_read_data(s, ctx->fw_cfg, node_mask, sizeof(uint64_t) * nb_n=
-odes);
-=20
-     if (nb_nodes) {
-         g_assert(cpu_mask[0] & 0x01);
-@@ -171,72 +155,68 @@ static void test_fw_cfg_numa(const void *opaque)
-=20
-     g_free(node_mask);
-     g_free(cpu_mask);
--    g_free(fw_cfg);
-+
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_boot_menu(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-=20
-     s =3D qtest_initf("-M %s", ctx->machine_name);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    g_assert_cmpint(qfw_cfg_get_u16(s, fw_cfg, FW_CFG_BOOT_MENU),
-+    g_assert_cmpint(qfw_cfg_get_u16(s, ctx->fw_cfg, FW_CFG_BOOT_MENU),
-                     =3D=3D, boot_menu);
--    g_free(fw_cfg);
-+
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_reboot_timeout(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-     uint32_t reboot_timeout =3D 0;
-     size_t filesize;
-=20
-     s =3D qtest_initf("-M %s -boot reboot-timeout=3D15", ctx->machine_na=
-me);
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    filesize =3D qfw_cfg_get_file(s, fw_cfg, "etc/boot-fail-wait",
-+    filesize =3D qfw_cfg_get_file(s, ctx->fw_cfg, "etc/boot-fail-wait",
-                                 &reboot_timeout, sizeof(reboot_timeout))=
-;
-     g_assert_cmpint(filesize, =3D=3D, sizeof(reboot_timeout));
-     reboot_timeout =3D le32_to_cpu(reboot_timeout);
-     g_assert_cmpint(reboot_timeout, =3D=3D, 15);
--    g_free(fw_cfg);
-+
-     qtest_quit(s);
- }
-=20
- static void test_fw_cfg_splash_time(const void *opaque)
- {
-     const QTestCtx *ctx =3D opaque;
--    QFWCFG *fw_cfg;
-     QTestState *s;
-     uint16_t splash_time =3D 0;
-     size_t filesize;
-=20
-     s =3D qtest_initf("-M %s -boot splash-time=3D12", ctx->machine_name)=
-;
--    fw_cfg =3D pc_fw_cfg_init();
-=20
--    filesize =3D qfw_cfg_get_file(s, fw_cfg, "etc/boot-menu-wait",
-+    filesize =3D qfw_cfg_get_file(s, ctx->fw_cfg, "etc/boot-menu-wait",
-                                 &splash_time, sizeof(splash_time));
-     g_assert_cmpint(filesize, =3D=3D, sizeof(splash_time));
-     splash_time =3D le16_to_cpu(splash_time);
-     g_assert_cmpint(splash_time, =3D=3D, 12);
--    g_free(fw_cfg);
-+
-     qtest_quit(s);
- }
-=20
- int main(int argc, char **argv)
- {
-     QTestCtx ctx;
-+    int ret;
-=20
-     g_test_init(&argc, &argv, NULL);
-=20
-     ctx.machine_name =3D "pc";
-+    ctx.fw_cfg =3D pc_fw_cfg_init();
-=20
-     qtest_add_data_func("fw_cfg/signature", &ctx, test_fw_cfg_signature)=
-;
-     qtest_add_data_func("fw_cfg/id", &ctx, test_fw_cfg_id);
-@@ -257,5 +237,9 @@ int main(int argc, char **argv)
-                         test_fw_cfg_reboot_timeout);
-     qtest_add_data_func("fw_cfg/splash_time", &ctx, test_fw_cfg_splash_t=
-ime);
-=20
--    return g_test_run();
-+    ret =3D g_test_run();
-+
-+    g_free(ctx.fw_cfg);
-+
-+    return ret;
- }
---=20
-2.21.0
+> @@ -316,7 +319,9 @@ int coroutine_fn block_copy(BlockCopyState *s,
+> =20
+>          bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - sta=
+rt);
+> =20
+> +        qemu_co_get_amount(s->mem, chunk_end - start);
 
+Now that I see it like this, maybe the name is too short.  This sounds
+like it was trying to get some amount of coroutines.
+
+Would =E2=80=9Cqemu_co_get_from_shared_amount=E2=80=9D be too long?  (Som=
+ething like
+qemu_co_sham_alloc() would be funny, but maybe not.  :-)  Or maybe
+exactly because it=E2=80=9Ds funny.)
+
+Max
+
+>          ret =3D block_copy_do_copy(s, start, chunk_end, error_is_read)=
+;
+> +        qemu_co_put_amount(s->mem, chunk_end - start);
+>          if (ret < 0) {
+>              bdrv_set_dirty_bitmap(s->copy_bitmap, start, chunk_end - s=
+tart);
+>              break;
+>=20
+
+
+
+--resBEnXDD79a3wGe4X7tMgUCixsn6vLrF--
+
+--cVkkcEO2DDbP5Zbb8803lDcaYv4c1A1pQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2bWVAACgkQ9AfbAGHV
+z0AqIQgAo5SYPSbQJ95Y+e4GeRj2YZ8FoA9WYw0b4rUwYUFm7zesjZUBvdHKsPfW
+as75/+McPd38bx28RkCo/wZjncVaBEuIPLGGAeO92TxlNIPUv6JKsUyZZtWXm/h2
+D2+ElJpJLe+mG4nKr0wYNLjYYVYvqirywrPjPZymNnkt21gT6Yrhvol43ViMTMX0
+EcEbRPKZJjZ1hwWZQZt6gufHeFO1zf1TvCx3up6oaXsmzNTI/sDyZ4oQIxBrPUHT
+lldpj8NveIIGKyUjzyHURwm0UakTg9YWUNOnFfAvolHn/rqhVOLYw3WX0zBXuo59
+OhySiPdbFhTd+UL8BEy+sv/AwqSusg==
+=GjBG
+-----END PGP SIGNATURE-----
+
+--cVkkcEO2DDbP5Zbb8803lDcaYv4c1A1pQ--
 
