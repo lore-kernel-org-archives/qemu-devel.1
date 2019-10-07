@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EDCC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 378F2ECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:38:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B326E20640
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:38:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA39C21871
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:38:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rrM7tQa0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B326E20640
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XvqgXoNY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA39C21871
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHV5f-0001dC-8p
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:38:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48858)
+	id 1iHV69-00022U-C7
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:38:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48890)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iHUwI-0002X4-1k
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:47 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iHUwK-0002a1-AC
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iHUwG-00058q-2u
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:45 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36827)
+ (envelope-from <alex.bennee@linaro.org>) id 1iHUwH-00059r-EL
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:48 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34719)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iHUwF-00057f-Rk
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:44 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y19so15859060wrd.3
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 08:28:43 -0700 (PDT)
+ id 1iHUwH-00059F-5z
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:45 -0400
+Received: by mail-wr1-x441.google.com with SMTP id j11so10060489wrp.1
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 08:28:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZX61NvfE8BqogvWy9OM6m8VYaWtIBDMGNRtv9Ph9gpM=;
- b=rrM7tQa0mFN3QELZQjQIJXyvQi9A3nSFZmwCOVV4sas5/kauY9RdwG6BN4zPPY9P0O
- N2JYAHZOJJPJIdtWIHEKf5hFmDmiqPSFHiwZCVx1Zr+hSHFKLrdSE1m7RgzWuvCtdvo8
- J9is4NSMGayOInsWMuSZoaEaZuKW8PaFjt/qaKPsXJClxYXWpzWtWeB5d7KbXGAchtNr
- 9/T/kFkZNqUdEifaC1Algu4wmukZ8Raz/8IcbZByIAm2C/Oh/oK1cp4ttRiVuw81LeJz
- KJ5Q0vpoFDGufr6TcCaY9efUUkduh8PZsgo7+m4HMNbGaGK6jZlvnKvHI8+mGfNG2PvR
- nBAQ==
+ bh=WKb/0Q1Y5QzQgdMwznbijSAIlWY98BZFsAtX/2aCdlc=;
+ b=XvqgXoNYo+0uQDsuX9JYCGjh7Jvz9u9WK3VWwNqjE+ZDkNT0Aol2a8e/Morlr/Uexw
+ lMIT2wKY1RCGFOe8uwBhAWFJUjAGLucx0/DxRguGo+dcqXjn6SbtZMNOw9ihZ3wQY+hO
+ /58GRpv6TVcisMVxJ7aSyFoQc4zAWM4eYJBChk1FYsoE4jPX39xFpMrS2AmtSHbNNVvU
+ f/GOWADAbWvWcFTCcHQh8ZsxXdJ5izp5jmJJ3/6LukFyr8gFbqULa4nISikfLYDrLt6c
+ n8u0sMuzIy9vwX3Xos0Sc8lYZhNjPFq+MqwVDOXmZIOLHf60t3/Q1sTj8D1FlpJC7Ozd
+ 4/hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZX61NvfE8BqogvWy9OM6m8VYaWtIBDMGNRtv9Ph9gpM=;
- b=elaRpRp7Z1aMCf07f2INbl8BL1nu8f8ETWJ0hW0/G+vyHLy1/jWZpfwF80lKPsW46n
- 7V5ccKBsT7MLxZ9wCoJL352Ynyy7RLL1wPGDrLHgs5SKsXPp4OKn8XwyPHbjsp/uOxrE
- vHHaGqQeefcv+pARHcsWEYMikZwMmOV77kC8R6/hWUgb3tHq9lNlkV5crscGbEevNr9a
- DV9yuEb+VgNMQzVed/J6HTM9dxhF5A9/shes5sr9dql5gzhr6wef8zhYGr7Zikz8eFnS
- K8AcYXcLukIMORT2budiFFHy+xJcW+pYUOi9pROMbkq2AiA1/eQAz9NZh4YZ8e/7qiqr
- Ntvw==
-X-Gm-Message-State: APjAAAWUoArulBqdxOM98MqDSEAcIJwvuG3VvDc9M1xsg5SCbL3uWKya
- t+knRoxeJRdroOn95uRudclMTA==
-X-Google-Smtp-Source: APXvYqxfrpdAh6cQL9BfqbMRdP/legsmBckQ4HAaZWiH6uHQpcaCn8nsPqS9aFoN+4t7ILBxF0hecw==
-X-Received: by 2002:a5d:664b:: with SMTP id f11mr23865013wrw.285.1570462122573; 
- Mon, 07 Oct 2019 08:28:42 -0700 (PDT)
+ bh=WKb/0Q1Y5QzQgdMwznbijSAIlWY98BZFsAtX/2aCdlc=;
+ b=OZA9lgB1xNDpqw8FPNz3F/ThaCYCYIayrwzb0B8msnfiDOOE36VE/S4fcIzplATbpr
+ ZLhiiJ1wB6L3Qdt+D7KoJk6r871TVFVrEfN4+U4O3iuRBC7/mIDKMbXoNRHN2cSrnqmL
+ gMNjGKq6rchLQ8gdH8NHmbT14nbJ8WMI4yfdcqjNuV3XSA+8mxsoDpA9bYzemPLKzKJh
+ 38VySwmWqj0IMUzMRMh8Tvzt3GEq52ZKi4Re20xZsb9JjZRpKXtAUIhvH/09xo3WMKCD
+ a2CSuScf2Ta1o+4E7LyASz3IcrxkMPJCZj+oDXikiT3aMCaQ5CO3iSs7ybmh7JskjSya
+ pFsw==
+X-Gm-Message-State: APjAAAWPVEk546Jnm7HvDNvzuEjRVj0ITYXwSWGgWSJZLnGQ3k+Rm5Ka
+ 7eZSyUlopgK1cBztUc6AwK6SZQ==
+X-Google-Smtp-Source: APXvYqx2YXb8QzxbhQyVQEUqV7e7ZPpHZpXP11Cqx8Wu36Wq/DenE1kqdZEjw6eKO8Y9eVQxPTbkTQ==
+X-Received: by 2002:adf:ecc6:: with SMTP id s6mr17854287wro.174.1570462123881; 
+ Mon, 07 Oct 2019 08:28:43 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a10sm16739122wrm.52.2019.10.07.08.28.39
+ by smtp.gmail.com with ESMTPSA id f143sm31722083wme.40.2019.10.07.08.28.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Oct 2019 08:28:40 -0700 (PDT)
+ Mon, 07 Oct 2019 08:28:42 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7F6ED1FF90;
+ by zen.linaroharston (Postfix) with ESMTP id 9BE9B1FF91;
  Mon,  7 Oct 2019 16:28:39 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v9 03/13] accel: collecting JIT statistics
-Date: Mon,  7 Oct 2019 16:28:29 +0100
-Message-Id: <20191007152839.30804-4-alex.bennee@linaro.org>
+Subject: [PATCH v9 04/13] accel: replacing part of CONFIG_PROFILER with TBStats
+Date: Mon,  7 Oct 2019 16:28:30 +0100
+Message-Id: <20191007152839.30804-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191007152839.30804-1-alex.bennee@linaro.org>
 References: <20191007152839.30804-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,263 +105,418 @@ Sender: "Qemu-devel"
 
 From: "Vanderson M. do Rosario" <vandersonmr2@gmail.com>
 
-If a TB has a TBS (TBStatistics) with the TB_JIT_STATS enabled then we
-collect statistics of its translation processes and code translation.
+We add some of the statistics collected in the TCGProfiler into the
+TBStats, having the statistics not only for the whole emulation but
+for each TB. Then, we removed these stats from TCGProfiler and
+reconstruct the information for the "info jit" using the sum of all
+TBStats statistics.
 
-To help with collection we include the TCGProfile structure
-unconditionally. It will have further alterations in future commits.
+The goal is to have one unique and better way of collecting emulation
+statistics. Moreover, checking dynamiclly if the profiling is enabled
+showed to have an insignificant impact on the performance:
+https://wiki.qemu.org/Internships/ProjectIdeas/TCGCodeQuality#Overheads.
 
-Collecting the number of host instructions seems to be not simple as
-it would imply in having to modify several target source files. So,
-for now, we are only collecting the size of the host gen code.
-
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
-Message-Id: <20190829173437.5926-4-vandersonmr2@gmail.com>
+Message-Id: <20190829173437.5926-5-vandersonmr2@gmail.com>
+[AJB: fix authorship, use prof structure]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
 AJB:
-  - replace tb tracking with proper array.
-  - stash tcg counts in tcg_ctx.prof until we can update later
-  - update jit stats under a lock instead of lots of atomics
-  - don't re-count nb_ops
+  - moving profiler stuff under jit_stats lock
+  - keep TCGProf as per-ctx staging post for values
+  - delete max counters as can be interfered.
 ---
- accel/tcg/translate-all.c | 35 ++++++++++++++++++++++++++++++++++-
- accel/tcg/translator.c    |  3 +++
- include/exec/tb-stats.h   | 23 +++++++++++++++++++++++
- tcg/tcg.c                 |  9 +++++++--
- tcg/tcg.h                 | 23 +++++++++++++++++++++--
- 5 files changed, 88 insertions(+), 5 deletions(-)
+ accel/tcg/tb-stats.c      |  95 ++++++++++++++++++++++++++++++++++
+ accel/tcg/translate-all.c |  11 ++--
+ include/exec/tb-stats.h   |  11 ++++
+ tcg/tcg.c                 | 105 ++++----------------------------------
+ tcg/tcg.h                 |   9 ++--
+ 5 files changed, 125 insertions(+), 106 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index b7dd1a78e5..6fa9850a3a 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1690,10 +1690,13 @@ static TBStatistics *tb_get_stats(tb_page_addr_t phys_pc, target_ulong pc,
-     TBStatistics *new_stats = g_new0(TBStatistics, 1);
-     uint32_t hash = tb_stats_hash_func(phys_pc, pc, flags);
-     void *existing_stats = NULL;
-+
-     new_stats->phys_pc = phys_pc;
-     new_stats->pc = pc;
-     new_stats->cs_base = cs_base;
-     new_stats->flags = flags;
-+    new_stats->tbs = g_ptr_array_sized_new(4);
-+    qemu_mutex_init(&new_stats->jit_stats_lock);
+diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
+index ee0506bff1..0e64c176b3 100644
+--- a/accel/tcg/tb-stats.c
++++ b/accel/tcg/tb-stats.c
+@@ -9,6 +9,10 @@
+ #include "qemu/osdep.h"
  
-     /*
-      * All initialisation must be complete before we insert into qht
-@@ -1707,6 +1710,7 @@ static TBStatistics *tb_get_stats(tb_page_addr_t phys_pc, target_ulong pc,
-          * If there is already a TBStatistic for this TB from a previous flush
-          * then just make the new TB point to the older TBStatistic
-          */
-+        g_ptr_array_free(new_stats->tbs, true);
-         g_free(new_stats);
-         return existing_stats;
-     } else {
-@@ -1726,8 +1730,8 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     target_ulong virt_page2;
-     tcg_insn_unit *gen_code_buf;
-     int gen_code_size, search_size, max_insns;
--#ifdef CONFIG_PROFILER
-     TCGProfile *prof = &tcg_ctx->prof;
-+#ifdef CONFIG_PROFILER
-     int64_t ti;
- #endif
-     assert_memory_lock();
-@@ -1795,6 +1799,10 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         if (flag & TB_EXEC_STATS) {
-             tb->tb_stats->stats_enabled |= TB_EXEC_STATS;
-         }
+ #include "disas/disas.h"
++#include "exec/exec-all.h"
++#include "tcg.h"
 +
-+        if (flag & TB_JIT_STATS) {
-+            tb->tb_stats->stats_enabled |= TB_JIT_STATS;
-+        }
-     } else {
-         tb->tb_stats = NULL;
-     }
-@@ -1930,6 +1938,31 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     if ((pc & TARGET_PAGE_MASK) != virt_page2) {
-         phys_page2 = get_page_addr_code(env, virt_page2);
-     }
++#include "qemu/qemu-print.h"
+ 
+ #include "exec/tb-stats.h"
+ 
+@@ -18,6 +22,97 @@ enum TBStatsStatus { TB_STATS_RUNNING, TB_STATS_PAUSED, TB_STATS_STOPPED };
+ static enum TBStatsStatus tcg_collect_tb_stats;
+ static uint32_t default_tbstats_flag;
+ 
++struct jit_profile_info {
++    uint64_t translations;
++    uint64_t aborted;
++    uint64_t ops;
++    unsigned ops_max;
++    uint64_t del_ops;
++    uint64_t temps;
++    unsigned temps_max;
++    uint64_t host;
++    uint64_t guest;
++    uint64_t search_data;
++};
 +
-+    /*
-+     * Collect JIT stats when enabled. We batch them all up here to
-+     * avoid spamming the cache with atomic accesses
-+     */
-+    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
-+        TBStatistics *ts = tb->tb_stats;
-+        qemu_mutex_lock(&ts->jit_stats_lock);
++/* accumulate the statistics from all TBs */
++static void collect_jit_profile_info(void *p, uint32_t hash, void *userp)
++{
++    struct jit_profile_info *jpi = userp;
++    TBStatistics *tbs = p;
 +
-+        ts->code.num_guest_inst += prof->translation.nb_guest_insns;
-+        ts->code.num_tcg_ops += prof->translation.nb_ops_pre_opt;
-+        ts->code.num_tcg_ops_opt += tcg_ctx->nb_ops;
-+        ts->code.spills += prof->translation.nb_spills;
-+        ts->code.out_len += tb->tc.size;
++    jpi->translations += tbs->translations.total;
++    jpi->ops += tbs->code.num_tcg_ops;
++    if (stat_per_translation(tbs, code.num_tcg_ops) > jpi->ops_max) {
++        jpi->ops_max = stat_per_translation(tbs, code.num_tcg_ops);
++    }
++    jpi->del_ops += tbs->code.deleted_ops;
++    jpi->temps += tbs->code.temps;
++    if (stat_per_translation(tbs, code.temps) > jpi->temps_max) {
++        jpi->temps_max = stat_per_translation(tbs, code.temps);
++    }
++    jpi->host += tbs->code.out_len;
++    jpi->guest += tbs->code.in_len;
++    jpi->search_data += tbs->code.search_out_len;
++}
 +
-+        ts->translations.total++;
-+        if (phys_page2 != -1) {
-+            ts->translations.spanning++;
-+        }
-+
-+        g_ptr_array_add(ts->tbs, tb);
-+
-+        qemu_mutex_unlock(&ts->jit_stats_lock);
++/* dump JIT statisticis using TCGProfile and TBStats */
++void dump_jit_profile_info(TCGProfile *s)
++{
++    if (!tb_stats_collection_enabled()) {
++        return;
 +    }
 +
-     /*
-      * No explicit memory barrier is required -- tb_link_page() makes the
-      * TB visible in a consistent state.
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index ec6bd829a0..114e76db27 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -116,6 +116,9 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
-     db->tb->size = db->pc_next - db->pc_first;
-     db->tb->icount = db->num_insns;
- 
-+    /* Save number of guest instructions for TB_JIT_STATS */
-+    tcg_ctx->prof.translation.nb_guest_insns = db->num_insns;
++    struct jit_profile_info *jpi = g_new0(struct jit_profile_info, 1);
 +
++    qht_iter(&tb_ctx.tb_stats, collect_jit_profile_info, jpi);
++
++    if (jpi->translations) {
++        qemu_printf("translated TBs      %" PRId64 "\n", jpi->translations);
++        qemu_printf("avg ops/TB          %0.1f max=%d\n",
++                jpi->ops / (double) jpi->translations, jpi->ops_max);
++        qemu_printf("deleted ops/TB      %0.2f\n",
++                jpi->del_ops / (double) jpi->translations);
++        qemu_printf("avg temps/TB        %0.2f max=%d\n",
++                jpi->temps / (double) jpi->translations, jpi->temps_max);
++        qemu_printf("avg host code/TB    %0.1f\n",
++                jpi->host / (double) jpi->translations);
++        qemu_printf("avg search data/TB  %0.1f\n",
++                jpi->search_data / (double) jpi->translations);
++
++        if (s) {
++            int64_t tot = s->interm_time + s->code_time;
++            qemu_printf("JIT cycles          %" PRId64 " (%0.3f s at 2.4 GHz)\n",
++                            tot, tot / 2.4e9);
++            qemu_printf("cycles/op           %0.1f\n",
++                        jpi->ops ? (double)tot / jpi->ops : 0);
++            qemu_printf("cycles/in byte      %0.1f\n",
++                        jpi->guest ? (double)tot / jpi->guest : 0);
++            qemu_printf("cycles/out byte     %0.1f\n",
++                        jpi->host ? (double)tot / jpi->host : 0);
++            qemu_printf("cycles/search byte     %0.1f\n",
++                        jpi->search_data ? (double)tot / jpi->search_data : 0);
++            if (tot == 0) {
++                tot = 1;
++            }
++            qemu_printf("  gen_interm time   %0.1f%%\n",
++                        (double)s->interm_time / tot * 100.0);
++            qemu_printf("  gen_code time     %0.1f%%\n",
++                        (double)s->code_time / tot * 100.0);
++            qemu_printf("optim./code time    %0.1f%%\n",
++                        (double)s->opt_time / (s->code_time ? s->code_time : 1)
++                        * 100.0);
++            qemu_printf("liveness/code time  %0.1f%%\n",
++                    (double)s->la_time / (s->code_time ? s->code_time : 1) * 100.0);
++            qemu_printf("cpu_restore count   %" PRId64 "\n",
++                    s->restore_count);
++            qemu_printf("  avg cycles        %0.1f\n",
++                    s->restore_count ? (double)s->restore_time / s->restore_count : 0);
++        }
++    }
++    g_free(jpi);
++}
++
+ void init_tb_stats_htable_if_not(void)
+ {
+     if (tb_stats_collection_enabled() && !tb_ctx.tb_stats.map) {
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 6fa9850a3a..84f759a829 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1780,8 +1780,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+  tb_overflow:
+ 
+ #ifdef CONFIG_PROFILER
+-    /* includes aborted translations because of exceptions */
+-    atomic_set(&prof->tb_count1, prof->tb_count1 + 1);
+     ti = profile_getclock();
+ #endif
+ 
+@@ -1807,6 +1805,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+         tb->tb_stats = NULL;
+     }
+ 
++
+     tcg_func_start(tcg_ctx);
+ 
+     tcg_ctx->cpu = env_cpu(env);
+@@ -1828,7 +1827,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     }
+ 
+ #ifdef CONFIG_PROFILER
+-    atomic_set(&prof->tb_count, prof->tb_count + 1);
+     atomic_set(&prof->interm_time, prof->interm_time + profile_getclock() - ti);
+     ti = profile_getclock();
+ #endif
+@@ -1875,9 +1873,6 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+ 
+ #ifdef CONFIG_PROFILER
+     atomic_set(&prof->code_time, prof->code_time + profile_getclock() - ti);
+-    atomic_set(&prof->code_in_len, prof->code_in_len + tb->size);
+-    atomic_set(&prof->code_out_len, prof->code_out_len + gen_code_size);
+-    atomic_set(&prof->search_out_len, prof->search_out_len + search_size);
+ #endif
+ 
  #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(db->pc_first)) {
+@@ -1951,7 +1946,11 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+         ts->code.num_tcg_ops += prof->translation.nb_ops_pre_opt;
+         ts->code.num_tcg_ops_opt += tcg_ctx->nb_ops;
+         ts->code.spills += prof->translation.nb_spills;
++        ts->code.temps += prof->translation.temp_count;
++        ts->code.deleted_ops += prof->translation.del_op_count;
++        ts->code.in_len += tb->size;
+         ts->code.out_len += tb->tc.size;
++        ts->code.search_out_len += search_size;
+ 
+         ts->translations.total++;
+         if (phys_page2 != -1) {
 diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
-index 51aecf65e2..566ae0d2be 100644
+index 566ae0d2be..c779d6a183 100644
 --- a/include/exec/tb-stats.h
 +++ b/include/exec/tb-stats.h
-@@ -59,6 +59,28 @@ struct TBStatistics {
-         unsigned long atomic;
-     } executions;
+@@ -33,6 +33,9 @@
+ #define tb_stats_enabled(tb, JIT_STATS) \
+     (tb && tb->tb_stats && (tb->tb_stats->stats_enabled & JIT_STATS))
  
-+    /* JIT Stats - protected by lock */
-+    QemuMutex jit_stats_lock;
++#define stat_per_translation(stat, name) \
++    (stat->translations.total ? stat->name / stat->translations.total : 0)
 +
-+    struct {
-+        unsigned num_guest_inst;
-+        unsigned num_tcg_ops;
-+        unsigned num_tcg_ops_opt;
-+        unsigned spills;
-+        unsigned out_len;
-+    } code;
-+
-+    struct {
-+        unsigned long total;
-+        unsigned long uncached;
-+        unsigned long spanning;
-+    } translations;
-+
-+    /*
-+     * All persistent (cached) TranslationBlocks using
-+     * this TBStats structure. Has to be reset on a tb_flush.
-+     */
-+    GPtrArray *tbs;
- };
+ typedef struct TBStatistics TBStatistics;
  
- bool tb_stats_cmp(const void *ap, const void *bp);
-@@ -67,6 +89,7 @@ void init_tb_stats_htable_if_not(void);
+ /*
+@@ -67,7 +70,13 @@ struct TBStatistics {
+         unsigned num_tcg_ops;
+         unsigned num_tcg_ops_opt;
+         unsigned spills;
++
++        /* CONFIG_PROFILE */
++        unsigned temps;
++        unsigned deleted_ops;
++        unsigned in_len;
+         unsigned out_len;
++        unsigned search_out_len;
+     } code;
  
+     struct {
+@@ -87,6 +96,8 @@ bool tb_stats_cmp(const void *ap, const void *bp);
+ 
+ void init_tb_stats_htable_if_not(void);
+ 
++void dump_jit_profile_info(TCGProfile *s);
++
  #define TB_NOTHING    (1 << 0)
  #define TB_EXEC_STATS (1 << 1)
-+#define TB_JIT_STATS  (1 << 2)
- 
- void enable_collect_tb_stats(void);
- void disable_collect_tb_stats(void);
+ #define TB_JIT_STATS  (1 << 2)
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 16b2d0e0ec..fa2fef9f1a 100644
+index fa2fef9f1a..9c199c8a40 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -1117,6 +1117,7 @@ void tcg_func_start(TCGContext *s)
-     s->nb_labels = 0;
+@@ -1118,6 +1118,8 @@ void tcg_func_start(TCGContext *s)
      s->current_frame_offset = s->frame_start;
  
-+    s->prof.translation.nb_spills = 0;
+     s->prof.translation.nb_spills = 0;
++    s->prof.translation.del_op_count = 0;
++    s->prof.translation.temp_count = 0;
  #ifdef CONFIG_DEBUG_TCG
      s->goto_tb_issue_mask = 0;
  #endif
-@@ -3125,6 +3126,7 @@ static void temp_sync(TCGContext *s, TCGTemp *ts, TCGRegSet allocated_regs,
-         case TEMP_VAL_REG:
-             tcg_out_st(s, ts->type, ts->reg,
-                        ts->mem_base->reg, ts->mem_offset);
-+            s->prof.translation.nb_spills++;
-             break;
- 
-         case TEMP_VAL_MEM:
-@@ -3990,12 +3992,12 @@ int64_t tcg_cpu_exec_time(void)
- 
- int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- {
+@@ -2294,10 +2296,8 @@ void tcg_op_remove(TCGContext *s, TCGOp *op)
+     QTAILQ_REMOVE(&s->ops, op, link);
+     QTAILQ_INSERT_TAIL(&s->free_ops, op, link);
+     s->nb_ops--;
+-
 -#ifdef CONFIG_PROFILER
-     TCGProfile *prof = &s->prof;
+-    atomic_set(&s->prof.del_op_count, s->prof.del_op_count + 1);
 -#endif
-     int i, num_insns;
++    /* ? won't this end up op_opt - op = del_op_count ? */
++    s->prof.translation.del_op_count++;
+ }
+ 
+ static TCGOp *tcg_op_alloc(TCGOpcode opc)
+@@ -3910,16 +3910,6 @@ void tcg_profile_snapshot(TCGProfile *prof, bool counters, bool table)
+ 
+         if (counters) {
+             PROF_ADD(prof, orig, cpu_exec_time);
+-            PROF_ADD(prof, orig, tb_count1);
+-            PROF_ADD(prof, orig, tb_count);
+-            PROF_ADD(prof, orig, op_count);
+-            PROF_MAX(prof, orig, op_count_max);
+-            PROF_ADD(prof, orig, temp_count);
+-            PROF_MAX(prof, orig, temp_count_max);
+-            PROF_ADD(prof, orig, del_op_count);
+-            PROF_ADD(prof, orig, code_in_len);
+-            PROF_ADD(prof, orig, code_out_len);
+-            PROF_ADD(prof, orig, search_out_len);
+             PROF_ADD(prof, orig, interm_time);
+             PROF_ADD(prof, orig, code_time);
+             PROF_ADD(prof, orig, la_time);
+@@ -3997,26 +3987,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
      TCGOp *op;
  
-+    s->current_tb = tb;
-+
- #ifdef CONFIG_PROFILER
-     {
-         int n = 0;
-@@ -4027,6 +4029,9 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     s->current_tb = tb;
+-
+-#ifdef CONFIG_PROFILER
+-    {
+-        int n = 0;
+-
+-        QTAILQ_FOREACH(op, &s->ops, link) {
+-            n++;
+-        }
+-        atomic_set(&prof->op_count, prof->op_count + n);
+-        if (n > prof->op_count_max) {
+-            atomic_set(&prof->op_count_max, n);
+-        }
+-
+-        n = s->nb_temps;
+-        atomic_set(&prof->temp_count, prof->temp_count + n);
+-        if (n > prof->temp_count_max) {
+-            atomic_set(&prof->temp_count_max, n);
+-        }
+-    }
+-#endif
++    /* save pre-optimisation op count */
++    prof->translation.nb_ops_pre_opt = s->nb_ops;
++    prof->translation.temp_count = s->nb_temps;
+ 
+ #ifdef DEBUG_DISAS
+     if (unlikely(qemu_loglevel_mask(CPU_LOG_TB_OP)
+@@ -4029,8 +4002,6 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
      }
  #endif
  
-+    /* save pre-optimisation op count */
-+    prof->translation.nb_ops_pre_opt = s->nb_ops;
-+
+-    /* save pre-optimisation op count */
+-    prof->translation.nb_ops_pre_opt = s->nb_ops;
+ 
  #ifdef CONFIG_DEBUG_TCG
      /* Ensure all labels referenced have been emitted.  */
-     {
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index a37181c899..31571289cf 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -555,7 +555,26 @@ typedef struct TCGOp {
- /* Make sure operands fit in the bitfields above.  */
- QEMU_BUILD_BUG_ON(NB_OPS > (1 << 8));
- 
-+/*
-+ * The TCGProfile structure holds data for analysing the quality of
-+ * the code generation. The data is split between stuff that is valid
-+ * for the lifetime of a single translation and things that are valid
-+ * for the lifetime of the translator. As the former is reset for each
-+ * new translation so it should be copied elsewhere if you want to
-+ * keep it.
-+ *
-+ * The structure is safe to access within the context of translation
-+ * but accessing the data from elsewhere should be done with safe
-+ * work.
-+ */
- typedef struct TCGProfile {
-+
-+    struct {
-+        int nb_guest_insns;
-+        int nb_spills;
-+        int nb_ops_pre_opt;
-+    } translation;
-+
-     int64_t cpu_exec_time;
-     int64_t tb_count1;
-     int64_t tb_count;
-@@ -600,9 +619,7 @@ struct TCGContext {
- 
-     tcg_insn_unit *code_ptr;
+@@ -4210,70 +4181,16 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     return tcg_current_code_size(s);
+ }
  
 -#ifdef CONFIG_PROFILER
-     TCGProfile prof;
--#endif
+ void tcg_dump_info(void)
+ {
++    TCGProfile *s = NULL;
++#ifdef CONFIG_PROFILER
+     TCGProfile prof = {};
+-    const TCGProfile *s;
+-    int64_t tb_count;
+-    int64_t tb_div_count;
+-    int64_t tot;
+-
+     tcg_profile_snapshot_counters(&prof);
+     s = &prof;
+-    tb_count = s->tb_count;
+-    tb_div_count = tb_count ? tb_count : 1;
+-    tot = s->interm_time + s->code_time;
+-
+-    qemu_printf("JIT cycles          %" PRId64 " (%0.3f s at 2.4 GHz)\n",
+-                tot, tot / 2.4e9);
+-    qemu_printf("translated TBs      %" PRId64 " (aborted=%" PRId64
+-                " %0.1f%%)\n",
+-                tb_count, s->tb_count1 - tb_count,
+-                (double)(s->tb_count1 - s->tb_count)
+-                / (s->tb_count1 ? s->tb_count1 : 1) * 100.0);
+-    qemu_printf("avg ops/TB          %0.1f max=%d\n",
+-                (double)s->op_count / tb_div_count, s->op_count_max);
+-    qemu_printf("deleted ops/TB      %0.2f\n",
+-                (double)s->del_op_count / tb_div_count);
+-    qemu_printf("avg temps/TB        %0.2f max=%d\n",
+-                (double)s->temp_count / tb_div_count, s->temp_count_max);
+-    qemu_printf("avg host code/TB    %0.1f\n",
+-                (double)s->code_out_len / tb_div_count);
+-    qemu_printf("avg search data/TB  %0.1f\n",
+-                (double)s->search_out_len / tb_div_count);
+-    
+-    qemu_printf("cycles/op           %0.1f\n",
+-                s->op_count ? (double)tot / s->op_count : 0);
+-    qemu_printf("cycles/in byte      %0.1f\n",
+-                s->code_in_len ? (double)tot / s->code_in_len : 0);
+-    qemu_printf("cycles/out byte     %0.1f\n",
+-                s->code_out_len ? (double)tot / s->code_out_len : 0);
+-    qemu_printf("cycles/search byte     %0.1f\n",
+-                s->search_out_len ? (double)tot / s->search_out_len : 0);
+-    if (tot == 0) {
+-        tot = 1;
+-    }
+-    qemu_printf("  gen_interm time   %0.1f%%\n",
+-                (double)s->interm_time / tot * 100.0);
+-    qemu_printf("  gen_code time     %0.1f%%\n",
+-                (double)s->code_time / tot * 100.0);
+-    qemu_printf("optim./code time    %0.1f%%\n",
+-                (double)s->opt_time / (s->code_time ? s->code_time : 1)
+-                * 100.0);
+-    qemu_printf("liveness/code time  %0.1f%%\n",
+-                (double)s->la_time / (s->code_time ? s->code_time : 1) * 100.0);
+-    qemu_printf("cpu_restore count   %" PRId64 "\n",
+-                s->restore_count);
+-    qemu_printf("  avg cycles        %0.1f\n",
+-                s->restore_count ? (double)s->restore_time / s->restore_count : 0);
+-}
+-#else
+-void tcg_dump_info(void)
+-{
+-    qemu_printf("[TCG profiler not compiled]\n");
+-}
+ #endif
++    dump_jit_profile_info(s);
++}
  
- #ifdef CONFIG_DEBUG_TCG
-     int temps_in_use;
-@@ -651,6 +668,8 @@ struct TCGContext {
- 
-     uint16_t gen_insn_end_off[TCG_MAX_INSNS];
-     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
+ #ifdef ELF_HOST_MACHINE
+ /* In order to use this feature, the backend needs to do three things:
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 31571289cf..5296f7c075 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -573,16 +573,13 @@ typedef struct TCGProfile {
+         int nb_guest_insns;
+         int nb_spills;
+         int nb_ops_pre_opt;
 +
-+    TranslationBlock *current_tb;
- };
++        int del_op_count;
++        int temp_count;
+     } translation;
  
- extern TCGContext tcg_init_ctx;
+     int64_t cpu_exec_time;
+-    int64_t tb_count1;
+-    int64_t tb_count;
+     int64_t op_count; /* total insn count */
+-    int op_count_max; /* max insn per TB */
+-    int temp_count_max;
+-    int64_t temp_count;
+-    int64_t del_op_count;
+     int64_t code_in_len;
+     int64_t code_out_len;
+     int64_t search_out_len;
 -- 
 2.20.1
 
