@@ -6,44 +6,45 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA2DC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3819C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:12:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E65D221479
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:07:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E65D221479
+	by mail.kernel.org (Postfix) with ESMTPS id 97D2E2070B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:12:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97D2E2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHUbh-0007Hj-4E
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:07:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44979)
+	id 1iHUg3-0000Ox-OU
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:11:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iHUb1-0006oL-Dl
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:06:48 -0400
+ (envelope-from <thuth@redhat.com>) id 1iHUdh-00087t-W1
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iHUav-00036Q-Mi
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:06:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57566)
+ (envelope-from <thuth@redhat.com>) id 1iHUdg-00048p-Nk
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:09:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58402)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iHUav-00036G-Eo
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:06:41 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iHUdg-00048U-Dp; Mon, 07 Oct 2019 11:09:32 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 96AD11057878
- for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 15:06:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9746B10DCC8C;
+ Mon,  7 Oct 2019 15:09:31 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE04560A35;
- Mon,  7 Oct 2019 15:06:01 +0000 (UTC)
-Subject: Re: [PATCH] tests: document how to update acpi tables
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-References: <20191005212709.26101-1-mst@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1644460C05;
+ Mon,  7 Oct 2019 15:09:29 +0000 (UTC)
+Subject: Re: [PATCH v3 2/3] tests/migration: fix a typo in comment
+To: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>, qemu-devel@nongnu.org
+References: <cover.1570159624.git.maozhongyi@cmss.chinamobile.com>
+ <927b1b1f9365e0d5d9683746b498c16b88405174.1570159624.git.maozhongyi@cmss.chinamobile.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -89,18 +90,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <68e4bd77-e3b4-186f-8ec4-9ecbf9c69bfd@redhat.com>
-Date: Mon, 7 Oct 2019 17:06:01 +0200
+Message-ID: <d3984a36-0aea-7a3f-dd87-1cbf721d0a41@redhat.com>
+Date: Mon, 7 Oct 2019 17:09:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191005212709.26101-1-mst@redhat.com>
+In-Reply-To: <927b1b1f9365e0d5d9683746b498c16b88405174.1570159624.git.maozhongyi@cmss.chinamobile.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Mon, 07 Oct 2019 15:06:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Mon, 07 Oct 2019 15:09:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -115,65 +116,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, tony.nguyen@bt.com,
+ alex.bennee@linaro.org, armbru@redhat.com, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/10/2019 23.27, Michael S. Tsirkin wrote:
-> Looks like no one understands how to do it.
-> Document the process.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On 04/10/2019 05.43, Mao Zhongyi wrote:
+> Signed-off-by: Mao Zhongyi <maozhongyi@cmss.chinamobile.com>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  tests/bios-tables-test.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
-> 
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 652a78773f..0b33fb265f 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -10,6 +10,33 @@
->   * See the COPYING file in the top-level directory.
->   */
->  
-> +/*
-> + * How to add or update the tests:
-> + * Contributor:
-> + * 1. add empty files for new tables, if any, under tests/data/acpi
-> + * 2. list any changed files in tests/bios-tables-test-allowed-diff.h
-> + * 3. commit the above *before* making changes that affect the tables
-> + * Maintainer:
-> + * After 1-3 above tests will pass but ignore differences with the expected files.
-> + * You will also notice that tests/bios-tables-test-allowed-diff.h lists
-> + * a bunch of files. This is your hint that you need to do the below:
-> + * 4. Run
-> + *      make check V=1
-> + * this will produce a bunch of warnings about differences
-> + * beween actual and expected ACPI tables. If you have IASL installed,
+>  tests/migration/stress.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/migration/stress.c b/tests/migration/stress.c
+> index 9e128eef50..debf34359f 100644
+> --- a/tests/migration/stress.c
+> +++ b/tests/migration/stress.c
+> @@ -191,7 +191,7 @@ static int stressone(unsigned long long ramsizeMB)
+> =20
+>      /* We don't care about initial state, but we do want
+>       * to fault it all into RAM, otherwise the first iter
+> -     * of the loop below will be quite slow. We cna't use
+> +     * of the loop below will be quite slow. We can't use
+>       * 0x0 as the byte as gcc optimizes that away into a
+>       * calloc instead :-) */
+>      memset(ram, 0xfe, ramsizeMB * 1024 * 1024);
+>=20
 
-s/beween/between/
-
-With that typo fixed:
-Acked-by: Thomas Huth <thuth@redhat.com>
-
-> + * they will also be disassembled so you can look at the disassembled
-> + * output. If not - disassemble them yourself in any way you like.
-> + * Look at the differences - make sure they make sense and match what the
-> + * changes you are merging are supposed to do.
-> + *
-> + * 5. From build directory, run:
-> + *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
-> + * 6. Now commit any changes.
-> + * 7. Before doing a pull request, make sure tests/bios-tables-test-allowed-diff.h
-> + *    is empty - this will ensure following changes to ACPI tables will
-> + *    be noticed.
-> + */
-> +
->  #include "qemu/osdep.h"
->  #include <glib/gstdio.h>
->  #include "qemu-common.h"
-> 
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
