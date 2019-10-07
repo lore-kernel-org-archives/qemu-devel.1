@@ -1,65 +1,75 @@
-Return-Path: <SRS0=2u83=X7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82243C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 23:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C33BC4360C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 00:10:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54E722077B
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Oct 2019 23:57:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E722077B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
+	by mail.kernel.org (Postfix) with ESMTPS id DE9302084B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 00:10:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE9302084B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHGOl-0001nU-Ah
-	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 19:57:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52422)
+	id 1iHGbW-0004hc-2U
+	for qemu-devel@archiver.kernel.org; Sun, 06 Oct 2019 20:10:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <samuel.thibault@ens-lyon.org>) id 1iHGNQ-0000tg-SH
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 19:55:49 -0400
+ (envelope-from <zhang.lei@jp.fujitsu.com>) id 1iHGaM-000490-44
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 20:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <samuel.thibault@ens-lyon.org>) id 1iHGNP-0008Bs-Tp
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 19:55:48 -0400
-Received: from hera.aquilenet.fr ([185.233.100.1]:54132)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
- id 1iHGNP-0008Bk-O2
- for qemu-devel@nongnu.org; Sun, 06 Oct 2019 19:55:47 -0400
-Received: from localhost (localhost [127.0.0.1])
- by hera.aquilenet.fr (Postfix) with ESMTP id 230741FD4;
- Mon,  7 Oct 2019 01:55:40 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at aquilenet.fr
-Received: from hera.aquilenet.fr ([127.0.0.1])
- by localhost (hera.aquilenet.fr [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 77tFWhywbz32; Mon,  7 Oct 2019 01:55:39 +0200 (CEST)
-Received: from function.home (lfbn-bor-1-306-163.w109-215.abo.wanadoo.fr
- [109.215.28.163])
- by hera.aquilenet.fr (Postfix) with ESMTPSA id 3285E1E8A;
- Mon,  7 Oct 2019 01:55:39 +0200 (CEST)
-Received: from samy by function.home with local (Exim 4.92.2)
- (envelope-from <samuel.thibault@ens-lyon.org>)
- id 1iHGNG-0008L8-7J; Mon, 07 Oct 2019 01:55:38 +0200
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL 0/1] slirp update
-Date: Mon,  7 Oct 2019 01:55:36 +0200
-Message-Id: <20191006235537.32016-1-samuel.thibault@ens-lyon.org>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <zhang.lei@jp.fujitsu.com>) id 1iHGaJ-0004CP-QP
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 20:09:09 -0400
+Received: from mgwkm03.jp.fujitsu.com ([202.219.69.170]:61432)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhang.lei@jp.fujitsu.com>)
+ id 1iHGaI-00044d-UU
+ for qemu-devel@nongnu.org; Sun, 06 Oct 2019 20:09:07 -0400
+Received: from kw-mxoi1.gw.nic.fujitsu.com (unknown [192.168.231.131]) by
+ mgwkm03.jp.fujitsu.com with smtp
+ id 1a9a_2669_3e783ebb_7e92_47e8_a06c_4adc3808f61a;
+ Mon, 07 Oct 2019 09:08:45 +0900
+Received: from g01jpfmpwkw01.exch.g01.fujitsu.local
+ (g01jpfmpwkw01.exch.g01.fujitsu.local [10.0.193.38])
+ by kw-mxoi1.gw.nic.fujitsu.com (Postfix) with ESMTP id 4C17EAC0140
+ for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 09:08:44 +0900 (JST)
+Received: from G01JPEXCHKW18.g01.fujitsu.local
+ (G01JPEXCHKW18.g01.fujitsu.local [10.0.194.57])
+ by g01jpfmpwkw01.exch.g01.fujitsu.local (Postfix) with ESMTP id 843CA6920CA;
+ Mon,  7 Oct 2019 09:08:05 +0900 (JST)
+Received: from G01JPEXMBKW03.g01.fujitsu.local ([10.0.194.67]) by
+ g01jpexchkw18 ([10.0.194.57]) with mapi id 14.03.0439.000; Mon, 7 Oct 2019
+ 09:08:05 +0900
+From: "Zhang, Lei" <zhang.lei@jp.fujitsu.com>
+To: 'Andrew Jones' <drjones@redhat.com>
+Subject: RE: [PATCH v5 0/9] target/arm/kvm: enable SVE in guests
+Thread-Topic: [PATCH v5 0/9] target/arm/kvm: enable SVE in guests
+Thread-Index: AdV6RRHJE9mCPXEAQM+/RKszPwAtYf//4CiA//soRtA=
+Date: Mon, 7 Oct 2019 00:08:03 +0000
+Message-ID: <8898674D84E3B24BA3A2D289B872026A78C99C05@G01JPEXMBKW03>
+References: <8898674D84E3B24BA3A2D289B872026A78C9895A@G01JPEXMBKW03>
+ <20191004065437.xrcdsvytouau5fus@kamzik.brq.redhat.com>
+In-Reply-To: <20191004065437.xrcdsvytouau5fus@kamzik.brq.redhat.com>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.18.70.226]
+Content-Type: text/plain; charset="iso-2022-jp"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 185.233.100.1
+X-SecurityPolicyCheck-GC: OK by FENCE-Mail
+X-TM-AS-GCONF: 00
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.219.69.170
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,33 +81,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: "Mizuma, Masayoshi" <masayoshi.mizuma@fujitsu.com>, "Okamoto,
+ Takayuki" <tokamoto@jp.fujitsu.com>, "Matsuyama,
+ Yoshihiro" <y.matsu@jp.fujitsu.com>,
+ "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 860d9048c78ce59c5903c3d5209df56f384009=
-86:
+Hi Jones,
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20190924-pull-r=
-equest' into staging (2019-09-24 13:51:51 +0100)
+> Since the problem you point out is not related to SVE, or this series, then do you
+> agree to providing a tested-by for this series?
 
-are available in the Git repository at:
+Yes.
+Please add tested-by : zhang.lei@jp.fujitsu.com
+Thanks for your patches.
 
-  https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+Best Regards,
+Lei Zhang
 
-for you to fetch changes up to 120b721f5b590393971673a315f02969ec89cccb:
-
-  slirp: Allow non-local DNS address when restrict is off (2019-10-01 19:=
-03:08 +0200)
-
-----------------------------------------------------------------
-slirp: Allow non-local DNS address when restrict is off
-
-----------------------------------------------------------------
-Samuel Thibault (1):
-      slirp: Allow non-local DNS address when restrict is off
-
- net/slirp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> -----Original Message-----
+> From: Andrew Jones <drjones@redhat.com>
+> Sent: Friday, October 04, 2019 3:55 PM
+> To: Zhang, Lei/張 雷 <zhang.lei@jp.fujitsu.com>
+> Cc: 'qemu-devel@nongnu.org' <qemu-devel@nongnu.org>; Mizuma, Masayoshi
+> <masayoshi.mizuma@fujitsu.com>; Okamoto, Takayuki/岡本 高幸
+> <tokamoto@jp.fujitsu.com>
+> Subject: Re: [PATCH v5 0/9] target/arm/kvm: enable SVE in guests
+> 
+> On Thu, Oct 03, 2019 at 11:55:36PM +0000, Zhang, Lei wrote:
+> > Hi Jones,
+> >
+> > Thanks for your patch.
+> >
+> > I have tested the v5 patch.
+> >
+> > All the test is passed, except one problem.
+> > The problem was reported
+> > in [[Qemu-devel] [RFC QEMU v2 0/2] arm/virt: Account for guest pause
+> > time]
+> > https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05713.html
+> 
+> This problem is unrelated to SVE.
+> 
+> >
+> > My test environment is below.
+> >
+> > *QEMU
+> > base + v5 pathc
+> >
+> > base is
+> >     commit 860d9048c78ce59c5903c3d5209df56f38400986
+> >     Merge: 8dc5728 571a8c5
+> >     Author: Peter Maydell <peter.maydell@linaro.org>
+> >     Date:   Tue Sep 24 13:51:51 2019 +0100
+> >
+> >
+> > *libvirt
+> > https://github.com/andreabolognani/libvirt/tree/sve
+> >
+> > commit 236fb544ff8fcecfc618608b3ae2b65fc74e4d7c
+> >
+> > *Kernel
+> > 5.3.1
+> >
+> > Best Regards,
+> > Lei Zhang
+> >
+> 
+> Since the problem you point out is not related to SVE, or this series, then do you
+> agree to providing a tested-by for this series?
+> 
+> Thanks,
+> drew
 
