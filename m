@@ -2,55 +2,58 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA48ECE58C
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 754BDECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:22:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7357F2053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:22:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7357F2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 4B1652053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:22:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1652053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHUps-00046n-Qv
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:22:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47264)
+	id 1iHUqF-0004Yf-A7
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:22:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iHUnH-0002OX-Gt
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:19:29 -0400
+ (envelope-from <philmd@redhat.com>) id 1iHUnk-0002rF-AN
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:19:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iHUnE-0007sj-Gh
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:19:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55258)
+ (envelope-from <philmd@redhat.com>) id 1iHUni-0008I7-BY
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:19:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34612)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHUnC-0007r3-F2
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:19:24 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHUni-0008FV-49
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:19:54 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 75482800DF3;
- Mon,  7 Oct 2019 15:19:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4E7BE30ADBBF;
+ Mon,  7 Oct 2019 15:19:52 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 612D119C5B;
- Mon,  7 Oct 2019 15:19:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 10F2719D70;
+ Mon,  7 Oct 2019 15:19:25 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/7] fw_cfg: Run tests on big-endian
-Date: Mon,  7 Oct 2019 17:18:58 +0200
-Message-Id: <20191007151905.32766-1-philmd@redhat.com>
+Subject: [PATCH v2 2/7] tests/libqos/fw_cfg: Document mm_fw_cfg_init to drop
+ mm_fw_cfg_uninit
+Date: Mon,  7 Oct 2019 17:19:00 +0200
+Message-Id: <20191007151905.32766-3-philmd@redhat.com>
+In-Reply-To: <20191007151905.32766-1-philmd@redhat.com>
+References: <20191007151905.32766-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Mon, 07 Oct 2019 15:19:20 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 07 Oct 2019 15:19:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,53 +78,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series allow fw_cfg tests to run on big-endian targets.
+Document mm_fw_cfg_init() return value must be released
+with g_free(). mm_fw_cfg_uninit() was never used, remove it.
 
-since v1 [1]:
-- addressed Laszlo/Laurent/Thomas comments
-- added Laszlo R-b tags
+This partly reverts commit 0729d833d6d6:
+"tests/libqos: Add mm_fw_cfg_uninit()"
 
-This should help us to notice regression such this one
-introduced in QEMU v4.0.0:
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ tests/libqos/fw_cfg.c |  5 -----
+ tests/libqos/fw_cfg.h | 10 +++++++++-
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
-  commit ee5d0f89de3e53cdb0dcf51acc1502b310ed3bd2
-  Date:   Tue Nov 20 21:10:25 2018 -0800
-
-    fw_cfg: Fix -boot reboot-timeout error checking
-
-Later fixed in QEMU v4.1.0:
-
-  commit 04da973501b591525ce68c2925c61c8886badd4d
-  Date:   Wed Apr 24 07:06:41 2019 -0700
-
-    hw/nvram/fw_cfg: Store 'reboot-timeout' as little endian
-
-And older one that required manual testing [2], such:
-
-  commit 36b62ae6a58f9a588fd33be9386e18a2b90103f5
-
-    fw_cfg: fix endianness in fw_cfg_data_mem_read() / _write()
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00926.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2014-12/msg03762.html
-
-Philippe Mathieu-Daud=C3=A9 (7):
-  tests/libqos/fw_cfg: Document io_fw_cfg_init to drop io_fw_cfg_uninit
-  tests/libqos/fw_cfg: Document mm_fw_cfg_init to drop mm_fw_cfg_uninit
-  tests/libqos/fw_cfg: Document pc_fw_cfg_init to drop pc_fw_cfg_uninit
-  tests/fw_cfg: Let the tests use a context
-  tests/libqos/fw_cfg: Pass QTestState as argument
-  tests/fw_cfg: Declare one QFWCFG for all tests
-  tests/fw_cfg: Run the tests on big-endian targets
-
- tests/Makefile.include   |   2 +
- tests/boot-order-test.c  |  12 +--
- tests/fw_cfg-test.c      | 189 ++++++++++++++++++++++-----------------
- tests/libqos/fw_cfg.c    |  71 +++++++--------
- tests/libqos/fw_cfg.h    |  56 +++++++-----
- tests/libqos/malloc-pc.c |   6 +-
- 6 files changed, 186 insertions(+), 150 deletions(-)
-
+diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+index 37c3f2cf4d..ddeec821db 100644
+--- a/tests/libqos/fw_cfg.c
++++ b/tests/libqos/fw_cfg.c
+@@ -126,11 +126,6 @@ QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t bas=
+e)
+     return fw_cfg;
+ }
+=20
+-void mm_fw_cfg_uninit(QFWCFG *fw_cfg)
+-{
+-    g_free(fw_cfg);
+-}
+-
+ static void io_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ {
+     qtest_outw(fw_cfg->qts, fw_cfg->base, key);
+diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
+index 15604040bd..3247fd4000 100644
+--- a/tests/libqos/fw_cfg.h
++++ b/tests/libqos/fw_cfg.h
+@@ -34,8 +34,16 @@ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key)=
+;
+ size_t qfw_cfg_get_file(QFWCFG *fw_cfg, const char *filename,
+                         void *data, size_t buflen);
+=20
++/**
++ * mm_fw_cfg_init():
++ * @qts: The #QTestState that will be referred to by the QFWCFG object.
++ * @base: The MMIO base address of the fw_cfg device in the guest.
++ *
++ * Returns a newly allocated QFWCFG object which must be released
++ * with a call to g_free() when no longer required.
++ */
+ QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
+-void mm_fw_cfg_uninit(QFWCFG *fw_cfg);
++
+ /**
+  * io_fw_cfg_init():
+  * @qts: The #QTestState that will be referred to by the QFWCFG object.
 --=20
 2.21.0
 
