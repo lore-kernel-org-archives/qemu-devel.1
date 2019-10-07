@@ -2,86 +2,64 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D732ECE58D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 10:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 910F8C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 10:52:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9671920867
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 10:51:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9671920867
+	by mail.kernel.org (Postfix) with ESMTPS id 67B9120867
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 10:52:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67B9120867
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHQcO-0003oA-D6
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 06:51:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37609)
+	id 1iHQcS-0003sc-Hh
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 06:52:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iHQaP-0002aj-GP
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:49:54 -0400
+ (envelope-from <armbru@redhat.com>) id 1iHQao-0002v8-K3
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iHQaO-0008Tn-HH
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:49:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58802)
+ (envelope-from <armbru@redhat.com>) id 1iHQam-0000Bj-9H
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:50:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49070)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iHQaK-0008TA-QZ; Mon, 07 Oct 2019 06:49:49 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iHQak-0000Az-HX
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 06:50:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 87792308424C;
- Mon,  7 Oct 2019 10:49:47 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.196])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DBA06012A;
- Mon,  7 Oct 2019 10:49:46 +0000 (UTC)
-Subject: Re: [PATCH 1/1] nbd: add empty .bdrv_reopen_prepare
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190930213820.29777-1-mlevitsk@redhat.com>
- <20190930213820.29777-2-mlevitsk@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <57b527a9-5650-a9b0-6b3f-d1ee32e724e5@redhat.com>
-Date: Mon, 7 Oct 2019 12:49:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id ABD49C057F2C;
+ Mon,  7 Oct 2019 10:50:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BA6D60606;
+ Mon,  7 Oct 2019 10:50:04 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B77571138648; Mon,  7 Oct 2019 12:49:58 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] netmap: support git-submodule build otption
+References: <874l13qmvb.fsf@dusky.pond.sub.org>
+ <20191004130242.27267-1-g.lettieri@iet.unipi.it>
+ <CAFEAcA8ut__ruS4yEMT7-qCKu+BFihFwhaNoq7L1cdoqxpXx6g@mail.gmail.com>
+Date: Mon, 07 Oct 2019 12:49:58 +0200
+In-Reply-To: <CAFEAcA8ut__ruS4yEMT7-qCKu+BFihFwhaNoq7L1cdoqxpXx6g@mail.gmail.com>
+ (Peter Maydell's message of "Fri, 4 Oct 2019 14:08:36 +0100")
+Message-ID: <87pnj8ltih.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190930213820.29777-2-mlevitsk@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="SZA5iSgUGg7Y6Gp11W5HNTe95i2kogY5G"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 07 Oct 2019 10:49:47 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Mon, 07 Oct 2019 10:50:13 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -96,57 +74,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: "Daniel P . Berrange" <berrange@redhat.com>,
+ Luigi Rizzo <rizzo@iet.unipi.it>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Vincenzo Maffione <v.maffione@gmail.com>,
+ Giuseppe Lettieri <giuseppe.lettieri@unipi.it>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SZA5iSgUGg7Y6Gp11W5HNTe95i2kogY5G
-Content-Type: multipart/mixed; boundary="iKqjmXfQjMPHEtPDUNpoajBfmD3SnUuFO"
+Peter Maydell <peter.maydell@linaro.org> writes:
 
---iKqjmXfQjMPHEtPDUNpoajBfmD3SnUuFO
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+D> On Fri, 4 Oct 2019 at 14:03, Giuseppe Lettieri <g.lettieri@iet.unipi.it> wrote:
+>>
+>> From: Giuseppe Lettieri <giuseppe.lettieri@unipi.it>
+>>
+>> With this patch, netmap support can be enabled with
+>> the following options to the configure script:
+>>
+>>   --enable-netmap[=system]
+>>
+>>         Use the host system netmap installation.
+>>         Fail if not found.
+>>
+>>   --enable-netmap=git
+>>
+>>         clone the official netmap repository on
+>>         github (mostly useful for CI)
+>>
+>> Signed-off-by: Giuseppe Lettieri <giuseppe.lettieri@unipi.it>
+>> ---
+>>  .gitmodules |  3 +++
+>>  configure   | 64 +++++++++++++++++++++++++++++++++++++++++++++--------
+>>  2 files changed, 58 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/.gitmodules b/.gitmodules
+>> index c5c474169d..bf75dbc5e3 100644
+>> --- a/.gitmodules
+>> +++ b/.gitmodules
+>> @@ -58,3 +58,6 @@
+>>  [submodule "roms/opensbi"]
+>>         path = roms/opensbi
+>>         url =   https://git.qemu.org/git/opensbi.git
+>> +[submodule "netmap"]
+>> +       path = netmap
+>> +       url = https://github.com/luigirizzo/netmap.git
+>
+> Hi; this patch seems to be missing the rationale for why
+> we want to do this. New submodules:
+>  * should always be on git.qemu.org (we need to mirror them
+> in case the original upstream vanishes)
+>  * need a strong justification for why they're required
+> (ie why we can't just use whatever the system-provided
+> version of the library is, or fall back to not providing
+> the feature if the library isn't present)
+>
+> Basically new submodules are a pain so we seek to minimize
+> the use of them.
 
-On 30.09.19 23:38, Maxim Levitsky wrote:
-> Fixes commit job / qemu-img commit, when
-> commiting qcow2 file which is based on nbd export.
->=20
->=20
-> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1718727
->=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  block/nbd.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+I suggested making it a submodule upthread[*].  Let me try to distill
+the conversation into a rationale.  Giuseppe, please correct mistakes.
 
-Thanks, applied to my block branch:
+To make use of QEMU's netmap backend (CONFIG_NETMAP), you have to build
+and install netmap software from sources[**].  Which pretty much ensures
+developers compile with CONFIG_NETMAP off, and the code rots.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+For other dependencies that aren't readily available on common
+development hosts (slirp, capstone), we use submodules to avoid such
+rot.  If the system provides, we use that, and if it doesn't, we fall
+back to the submodule.  This has served us well.
 
-Max
+For netmap, falling back to the submodule when the host doesn't provide
+tends not to be useful beyond compile-testing.  Because of that, we fall
+back only when the user explicitly asks for it by passing
+--enable-netmap=git to configure.  CI should do that.
 
 
---iKqjmXfQjMPHEtPDUNpoajBfmD3SnUuFO--
 
---SZA5iSgUGg7Y6Gp11W5HNTe95i2kogY5G
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+[*] Message-ID: <87blwzho1y.fsf@dusky.pond.sub.org>
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2bGEgACgkQ9AfbAGHV
-z0BLrQf9H1a12+OeEWdt+z//KGGnvtEndzOBLDbulYuz0MM9evjXfn5otBOsF28l
-ANjhOZUWtuyfMYeiG+vlKNbjkueqdcSBEMvs68aEiQ2+dCBdXGe9mkr05lZLypOl
-Pf48PqAlmutL+RQ6K5+9nSFtbSDBqpm9I8WZ1B1EEzd6erM4sGYTjkS6xliF426x
-8cKjN6NDEx0pM1FZLI8ckxF/Dhr2+rqCHkL3oTIgeQnQt1YYAkPNqzPdeR5iM4gz
-MNaATRZEpTqxGUXHiit/Vyy+kmLxoNTSu/s80eCXe0UMJdd1MRLF6QGCFlkMD+vV
-QxCYdg70tUDPsE+o4knqFyhBsNmG4A==
-=Hn/0
------END PGP SIGNATURE-----
-
---SZA5iSgUGg7Y6Gp11W5HNTe95i2kogY5G--
+[**] FreeBSD hosts may be an exception; I'm not sure.
 
