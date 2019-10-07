@@ -6,56 +6,53 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF569C47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F053CECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:08:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9272A206C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:04:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9272A206C0
+	by mail.kernel.org (Postfix) with ESMTPS id CAC58206C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:08:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC58206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHWQv-0005Cn-LA
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:04:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36329)
+	id 1iHWUK-0007rK-MI
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36839)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iHWOr-00049n-9E
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:02:23 -0400
+ (envelope-from <drjones@redhat.com>) id 1iHWSt-0006F4-Sc
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iHWOm-0003ZH-BR
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:02:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52332)
+ (envelope-from <drjones@redhat.com>) id 1iHWSr-0004oC-Lr
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:06:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53550)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1iHWOm-0003ZD-5M; Mon, 07 Oct 2019 13:02:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <drjones@redhat.com>)
+ id 1iHWSo-0004mF-Eg; Mon, 07 Oct 2019 13:06:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 57FD8A44AC2;
- Mon,  7 Oct 2019 17:02:15 +0000 (UTC)
-Received: from gondolin (ovpn-116-231.ams2.redhat.com [10.36.116.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A2DE4600C1;
- Mon,  7 Oct 2019 17:02:09 +0000 (UTC)
-Date: Mon, 7 Oct 2019 19:02:03 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1 0/5] s390x/mmu: Implement more facilities
-Message-ID: <20191007190203.14714176.cohuck@redhat.com>
-In-Reply-To: <2cb4d6b8-4058-dca0-95e2-6e8d62741a2c@redhat.com>
-References: <20190926101627.23376-1-david@redhat.com>
- <2cb4d6b8-4058-dca0-95e2-6e8d62741a2c@redhat.com>
-Organization: Red Hat GmbH
+ by mx1.redhat.com (Postfix) with ESMTPS id 76F5C308FF23;
+ Mon,  7 Oct 2019 17:06:25 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 217635D9C9;
+ Mon,  7 Oct 2019 17:06:23 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Subject: [RFC PATCH 0/5] target/arm/kvm: Provide an option to adjust virtual
+ time
+Date: Mon,  7 Oct 2019 19:06:17 +0200
+Message-Id: <20191007170622.1814-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Mon, 07 Oct 2019 17:02:15 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Mon, 07 Oct 2019 17:06:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,70 +67,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- qemu-devel@nongnu.org, Ilya Leoshkevich <iii@linux.ibm.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, bijan.mottahedeh@oracle.com, maz@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 4 Oct 2019 15:23:32 +0200
-David Hildenbrand <david@redhat.com> wrote:
+This series is inspired by a series[1] posted by Bijan Mottahedeh about
+a year ago.  The problem described in the cover letter of [1] is easily
+reproducible and some users would like to have the option to avoid it.
+However the solution, which is to adjust the virtual counter offset each
+time the VM transitions to the running state, introduces a different
+problem, which is that the virtual and physical counters diverge.  As
+described in the cover letter of [1] this divergence is easily observed
+when comparing the output of `date` and `hwclock` after suspending the
+guest, waiting a while, and then resuming it.  Because this different
+problem may actually be worse for some users, unlike [1], the series
+posted here makes the virtual counter offset adjustment optional and not
+even enabled by default.  Besides the adjustment being optional, this
+series approaches the needed changes differently to apply them in more
+appropriate locations.  Finally, unlike [1], this series doesn't attempt
+to measure "pause time" itself.  Simply using QEMU_CLOCK_VIRTUAL, which
+only ticks when the VM is not stopped, is sufficient.
 
-> On 26.09.19 12:16, David Hildenbrand wrote:
-> > This is the follow up of:
-> >     [PATCH-for-4.2 v1 0/9] s390x: MMU changes and extensions
-> > Without the general MMU rework. It's based on:
-> >     [PATCH v2 0/7] s390x/mmu: DAT translation rewrite
-> > 
-> > This series adds adds EDAT2 MMU support, and implements/indicates related
-> > facilities (ESOP-1, ESOP-2, IEP, ...) for TCG. The QEMU CPU model is
-> > updated.
-> > 
-> > IEP under QEMU TCG seems to work just fine, when eabling it via the "max"
-> > CPU model - via kvm unit tests:
-> >     t460s: ~/git/kvm-unit-tests master $ ./s390x-run s390x/iep.elf -cpu max
-> >     [...]
-> >     PASS: iep: iep protection: Program interrupt: expected(4) == received(4)
-> >     SUMMARY: 1 tests
-> > 
-> >     EXIT: STATUS=1
-> > 
-> > Changes since "[PATCH-for-4.2 v1 0/9] s390x: MMU changes and extensions":
-> > - "s390x/mmu: Add EDAT2 translation support"
-> > -- Fix vaddr offset within 2GB page
-> > - "s390x/mmu: Implement ESOP-2 and ..."
-> > -- Squashed two patches as requested.
-> > -- Also set ilen to "2" in case of MMU_INST_FETCH on mmu_translate_real
-> > - "s390x/mmu: Implement Instruction-Execution-Protection Facility"
-> > -- Make sure s390_cpu_get_phys_page_debug() doesn't choke on IEP
-> > - "s390x/cpumodel: Add new TCG features to QEMU cpu model"
-> > -- Add comment "features introduced after the z13"
-> > 
-> > Cc: Ilya Leoshkevich <iii@linux.ibm.com>
-> > 
-> > David Hildenbrand (5):
-> >   s390x/mmu: Add EDAT2 translation support
-> >   s390x/mmu: Implement ESOP-2 and
-> >     access-exception-fetch/store-indication facility
-> >   s390x/mmu: Implement Instruction-Execution-Protection Facility
-> >   s390x/cpumodel: Prepare for changes of QEMU model
-> >   s390x/cpumodel: Add new TCG features to QEMU cpu model
-> > 
-> >  hw/s390x/s390-virtio-ccw.c  |  2 ++
-> >  target/s390x/cpu.h          |  1 +
-> >  target/s390x/gen-features.c | 11 +++++++++-
-> >  target/s390x/helper.c       |  6 +++++-
-> >  target/s390x/mmu_helper.c   | 42 +++++++++++++++++++++++++++++++++++--
-> >  5 files changed, 58 insertions(+), 4 deletions(-)
-> >   
-> 
-> @Christian (@Conny) if I can get an ACK on the last patch, I can send
-> this directly upstream.
-> 
+I've based this series on the SVE series[2] because we're adding a new
+CPU feature (kvm-adjvtime) and the SVE series introduces CPU feature
+documentation, probing, and tests that we can then immediately apply
+to kvm-adjvtime.
 
-No objections from my side, I won't get around to reviewing it in
-detail anyway.
+Additional notes
+----------------
+
+Note 1
+------
+
+As described above, when running a guest with kvm-adjtime enabled it
+will be less likely the guest OS and guest applications get surprise
+time jumps when they use the virtual counter.  However the counter will
+no longer reflect real time.  It will lag behind.  If this is a problem
+then the guest can resynchronize its time from an external source or
+even from its physical counter.  If the suspend/resume is done with
+libvirt's virsh, and the guest is running the guest agent, then it's
+also possible to use a sequence like this
+
+ $ virsh suspend $GUEST
+ $ virsh resume $GUEST
+ $ virsh domtime --sync $GUEST
+
+in order to resynchronize a guest right after the resume.  Of course
+there will still be time when the clock is not right, possibly creating
+confusing timestamps in logs, for example, and the guest must still be
+tolerant to the time synchronizations.
+
+Note 2
+------
+
+Userspace that wants to set KVM_REG_ARM_TIMER_CNT should beware that
+the KVM register ID is not correct.  This cannot be fixed because it's
+UAPI and if the UAPI headers are used then it can't be a problem.
+However, if a userspace attempts to create the ID themselves from the
+register's specification, then they will get KVM_REG_ARM_TIMER_CVAL
+instead, as the _CNT and _CVAL definitions have their register
+parameters swapped.
+
+Note 3
+------
+
+I didn't test this with a 32-bit KVM host, but the changes to kvm32.c
+are the same as kvm64.c. So what could go wrong? Test results would be
+appreciated.
+=20
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05713.html
+[2] https://patchew.org/QEMU/20191001125845.8793-1-drjones@redhat.com/
+
+Thanks,
+drew
+
+
+Andrew Jones (5):
+  target/arm/kvm64: kvm64 cpus have timer registers
+  timer: arm: Introduce functions to get the host cntfrq
+  target/arm/kvm: Implement cpu feature kvm-adjvtime
+  tests/arm-cpu-features: Check feature default values
+  target/arm/cpu: Add the kvm-adjvtime CPU property
+
+ docs/arm-cpu-features.rst | 27 +++++++++++++++++++++-
+ include/qemu/timer.h      | 16 +++++++++++++
+ target/arm/cpu.c          |  2 ++
+ target/arm/cpu.h          |  3 +++
+ target/arm/cpu64.c        |  1 +
+ target/arm/kvm.c          | 47 ++++++++++++++++++++++++++++++++++++++
+ target/arm/kvm32.c        | 15 ++++++++++++
+ target/arm/kvm64.c        | 16 +++++++++++++
+ target/arm/kvm_arm.h      | 23 +++++++++++++++++++
+ target/arm/monitor.c      |  1 +
+ tests/arm-cpu-features.c  | 48 +++++++++++++++++++++++++++++++--------
+ 11 files changed, 189 insertions(+), 10 deletions(-)
+
+--=20
+2.20.1
+
 
