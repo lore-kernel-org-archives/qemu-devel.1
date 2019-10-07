@@ -2,88 +2,79 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 701B0ECE599
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A69FECE58C
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B94020684
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 17:56:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B94020684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19BB4206C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 18:11:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Js4AJEje"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BB4206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHXF2-0005N6-CW
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 13:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45878)
+	id 1iHXTp-0001vy-5r
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 14:11:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47655)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iHXDy-0004iM-Dd
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:55:12 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iHXSs-0001Ul-Rr
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iHXDt-0005Y2-D7
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:55:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31683)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHXDt-0005XJ-1T
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 13:55:05 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EE9DF757C2
- for <qemu-devel@nongnu.org>; Mon,  7 Oct 2019 17:55:03 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id z205so147101wmb.7
- for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 10:55:03 -0700 (PDT)
+ (envelope-from <alistair23@gmail.com>) id 1iHXSr-00053B-D5
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 14:10:34 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:43722)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iHXSq-00052U-Qb; Mon, 07 Oct 2019 14:10:33 -0400
+Received: by mail-lj1-x244.google.com with SMTP id n14so14670057ljj.10;
+ Mon, 07 Oct 2019 11:10:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=OzbvGigIYTDinndI7OgOMeW5d4ZDX0kILT/nZ6Ckwmc=;
+ b=Js4AJEjeIk/3ncDbFTUzoFBeDpYo1woEVW5H1PPIVJra19G/zZh8w1mNneSbTFlYPs
+ 5zmOZQMfgf8O4PLqWl0hIVYLzewLuwsCB2W+h0h7uWNyk56DMXJ/mNP9SwwriXlGk+yU
+ l0WEOFXAPUuLtFC4mnOBphAG9Wwal8nWlac7HjTlNsoTISe/LG4yFp2bQCMXEKuVtMIZ
+ pvNIpEnJeJq4MXylybpehoHEIxjhlOXz6Av03kSdoBWD5VnbKr/CREPbUd+f4RN1XzMw
+ U0vGUbplA6OAMZ4L/OsD6SKjs+JL1BVGMBr5RVlyZlTHxq0JL7mf7HC3+MHlLxzGVkHE
+ Chwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ysIOHYSUMTwRT9D1EWw3AVUg8ppTg2vwmFWK7HDkU2Q=;
- b=uj5Y21clkCrRMY45WGjczna4vt5nDtq3SpJFfbnQ6+2wlSgP7Xmo7uw5bSRYhTMurE
- poaLsQWAQyAKOr143/4ISDUfUavWIxJg/A0zS2iKIya8oTGwd3+chvXOzWIOQK9TafHn
- YyEjaeFDDwc0scjmhat4cxF+VBMTw0msx9M7zJRLhaiynXRNdPCtC+i40+A+uZSPSMcg
- LxL0iHzi+80gPsYLDVStqQnEqz34ZQrI8EV1yLaTuqdSqoYztlIkRZaGxU80jzIbRKsU
- Zh8FWViP6xvGfRrRHKknDwlpEVHoC4uSJlqOUJkqITMFtzCBN2hXnTYAfo5KGQUr8Hnp
- hTdA==
-X-Gm-Message-State: APjAAAUiTZE5W2REVjb92ZlhY9rd8z8rZvNBTIZfcLxMIIe6zEmREm9P
- ZQO3I/nhh4nBwJGXBETpyH8PcW6XnvhhKYSdqKyZKtkjyFVAfnxb65F7G3Ziw8ULs9YLeyFCukm
- PxM+kuBXZ/vBF2jc=
-X-Received: by 2002:adf:fd0f:: with SMTP id e15mr11968501wrr.187.1570470902676; 
- Mon, 07 Oct 2019 10:55:02 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwFo7W/u0eeX0UzeakQ8yqJg5PXZ5fTqXWT49glMh5QnCBcUy2A5TMT7i+dj0P/iYlwqY8rhw==
-X-Received: by 2002:adf:fd0f:: with SMTP id e15mr11968480wrr.187.1570470902447; 
- Mon, 07 Oct 2019 10:55:02 -0700 (PDT)
-Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id w22sm235532wmc.16.2019.10.07.10.55.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Oct 2019 10:55:01 -0700 (PDT)
-Subject: Re: [PULL v2 0/8] Ide patches
-To: John Snow <jsnow@redhat.com>, Sam Eiderman <shmuel.eiderman@oracle.com>
-References: <20191003193245.8993-1-jsnow@redhat.com>
- <CAFEAcA9Z92iuYwEUdsSpej_pGiAX6H6FBaGySqKxXHGjGRueNw@mail.gmail.com>
- <e8e86add-677c-4eb5-4629-aaadfd0be2a4@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e0945918-d1cf-abf8-218a-6c5e8be80b70@redhat.com>
-Date: Mon, 7 Oct 2019 19:55:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=OzbvGigIYTDinndI7OgOMeW5d4ZDX0kILT/nZ6Ckwmc=;
+ b=d80IsKNFSumyIk3s6SpbrHgOw2PC6/1EjMkZ+0tTZnsd9+kQTL0La6xszBVsl9HGbq
+ P9MjSRiCJhtTmcHzvLf6hzOPnuHefKkFNXsDI/4T3/Y4sc/lfX2yQaYR/RJ4g4o/jB4W
+ Osq0DtnYntsE9QB1zh+ooIpOyTKmeU18gp5Rrl6YOpYohp5rs7fUTqRAsRYeQg37vcRa
+ pD0961O9EwF1Lon0xcChdYYjUAusiA7IoWkBkpgH4eP72EaPdBrTEcrbJt1YXlCFCD9R
+ NW/MJSsEbdYO40Y3l/OVY5pRI5z30tPS83dp9u2pHIt5cmmxITu04gomXPGnQGA+DFOJ
+ +q3A==
+X-Gm-Message-State: APjAAAWgWAQjZwcsmSRvEfPpyg/1u/h647qZPe8tAeY+JfBhxqf1ivip
+ Q4tXR54+EQv7735hbmLnyxq8TjuTuuicp0N3iAk=
+X-Google-Smtp-Source: APXvYqxQTadnculSdSqOymk/sfHOVIfWQfxX648K3wVxHBpXZO6Cu8imwOezZOThU7R/hcuKwxW8nja0iZ9ZKq8P338=
+X-Received: by 2002:a2e:2c02:: with SMTP id s2mr19815668ljs.156.1570471830861; 
+ Mon, 07 Oct 2019 11:10:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e8e86add-677c-4eb5-4629-aaadfd0be2a4@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <4d84c887def558fc178c31e3adc52f1c4b2fb075.1566603412.git.alistair.francis@wdc.com>
+ <mhng-87129cf6-394a-4b08-bf67-a6bb60f86245@palmer-si-x1e>
+In-Reply-To: <mhng-87129cf6-394a-4b08-bf67-a6bb60f86245@palmer-si-x1e>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 7 Oct 2019 11:05:33 -0700
+Message-ID: <CAKmqyKOV0J3w3fPUF3CGAip=j_+D_M+7X9r+2TwEZwkapsQZMQ@mail.gmail.com>
+Subject: Re: [PATCH v1 22/28] target/riscv: Allow specifying MMU stage
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,78 +86,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <Anup.Patel@wdc.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/19 7:35 PM, John Snow wrote:
-> On 10/7/19 8:33 AM, Peter Maydell wrote:
->> On Thu, 3 Oct 2019 at 20:33, John Snow <jsnow@redhat.com> wrote:
->>>
->>> The following changes since commit 7f21573c822805a8e6be379d9bcf3ad9effef3dc:
->>>
->>>    Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-10-01' into staging (2019-10-01 13:13:38 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>    https://github.com/jnsnow/qemu.git tags/ide-pull-request
->>>
->>> for you to fetch changes up to f6d61c9509c56eea3cdd2d23b40d285601b1c1ca:
->>>
->>>    hd-geo-test: Add tests for lchs override (2019-10-03 14:36:54 -0400)
->>>
->>> ----------------------------------------------------------------
->>> Pull request V2
->>>
->>> - Added signoff into the mirrored commits themselves (vs just the email)
->>> - Kudos to `stg-foreach stg edit --sign`
->>>
->>> ----------------------------------------------------------------
->>
->> Hi; the new tests in hd-geo-test seem to hang on
->> big-endian hosts (both s390x and ppc64 hung here):
->>
->> linux1@lxub05:~/qemu/build/all$ QTEST_QEMU_IMG=./qemu-img
->> QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
->> ./tests/hd-geo-test
->> /x86_64/hd-geo/ide/none: OK
->> /x86_64/hd-geo/ide/drive/cd_0: OK
->> /x86_64/hd-geo/ide/drive/mbr/blank: OK
->> /x86_64/hd-geo/ide/drive/mbr/lba: OK
->> /x86_64/hd-geo/ide/drive/mbr/chs: OK
->> /x86_64/hd-geo/ide/device/mbr/blank: OK
->> /x86_64/hd-geo/ide/device/mbr/lba: OK
->> /x86_64/hd-geo/ide/device/mbr/chs: OK
->> /x86_64/hd-geo/ide/device/user/chs: OK
->> /x86_64/hd-geo/ide/device/user/chst: OK
->> /x86_64/hd-geo/override/ide:
->>
-> 
-> :(
-> 
->>
->> thanks
->> -- PMM
->>
-> 
-> Sam, can you investigate this?
+On Thu, Oct 3, 2019 at 8:53 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Fri, 23 Aug 2019 16:38:47 PDT (-0700), Alistair Francis wrote:
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  target/riscv/cpu_helper.c | 39 ++++++++++++++++++++++++++++++---------
+> >  1 file changed, 30 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> > index 098873c83e..9aa6906acd 100644
+> > --- a/target/riscv/cpu_helper.c
+> > +++ b/target/riscv/cpu_helper.c
+> > @@ -318,10 +318,19 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
+> >   *
+> >   * Adapted from Spike's mmu_t::translate and mmu_t::walk
+> >   *
+> > + * @env: CPURISCVState
+> > + * @physical: This will be set to the calculated physical address
+> > + * @prot: The returned protection attributes
+> > + * @addr: The virtual address to be translated
+> > + * @access_type: The type of MMU access
+> > + * @mmu_idx: Indicates current privilege level
+> > + * @first_stage: Are we in first stage translation?
+> > + *               Second stage is used for hypervisor guest translation
+> >   */
+> >  static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+> >                                  int *prot, target_ulong addr,
+> > -                                int access_type, int mmu_idx)
+> > +                                int access_type, int mmu_idx,
+> > +                                bool first_stage)
+> >  {
+> >      /* NOTE: the env->pc value visible here will not be
+> >       * correct, but the value visible to the exception handler
+> > @@ -518,13 +527,23 @@ restart:
+> >  }
+> >
+> >  static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+> > -                                MMUAccessType access_type, bool pmp_violation)
+> > +                                MMUAccessType access_type, bool pmp_violation,
+> > +                                bool first_stage)
+> >  {
+> >      CPUState *cs = env_cpu(env);
+> > -    int page_fault_exceptions =
+> > -        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
+> > -        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
+> > -        !pmp_violation;
+> > +    int page_fault_exceptions;
+> > +    if (first_stage) {
+> > +        page_fault_exceptions =
+> > +            (env->priv_ver >= PRIV_VERSION_1_10_0) &&
+> > +            get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
+> > +            !pmp_violation;
+> > +            riscv_cpu_set_force_hs_excep(env, CLEAR_HS_EXCEP);
+>
+> It might just be email, but the indentation looks wrong here.
 
-Not seeing my T-b tags makes me grumble because I don't remember which I 
-reviewed and need to go check on the list.
+Yep, fixed.
 
-If the error is a endianess bug related to fw_cfg, you can add the 
-"-trace fw_cfg*" in hd-geo-test::create_args() and rerun the tests on a 
-BE system, the bug should appear straightly on stdout.
+>
+> > +    } else {
+> > +        page_fault_exceptions =
+> > +            get_field(env->hgatp, HGATP_MODE) != VM_1_10_MBARE &&
+> > +            !pmp_violation;
+> > +            riscv_cpu_set_force_hs_excep(env, FORCE_HS_EXCEP);
+> > +    }
+> >      switch (access_type) {
+> >      case MMU_INST_FETCH:
+> >          cs->exception_index = page_fault_exceptions ?
+> > @@ -551,7 +570,8 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+> >      int prot;
+> >      int mmu_idx = cpu_mmu_index(&cpu->env, false);
+> >
+> > -    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx)) {
+> > +    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx,
+> > +                             true)) {
+> >          return -1;
+> >      }
+> >      return phys_addr;
+> > @@ -613,7 +633,8 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> >      qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
+> >                    __func__, address, access_type, mmu_idx);
+> >
+> > -    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
+> > +    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx,
+> > +                               true);
+> >
+> >      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
+> >          if (get_field(*env->mstatus, MSTATUS_MPRV)) {
+> > @@ -640,7 +661,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> >      } else if (probe) {
+> >          return false;
+> >      } else {
+> > -        raise_mmu_exception(env, address, access_type, pmp_violation);
+> > +        raise_mmu_exception(env, address, access_type, pmp_violation, true);
+> >          riscv_raise_exception(env, cs->exception_index, retaddr);
+> >      }
+> >  #else
+>
+> I don't think it makes sense to split off these two (23 and 24, that add the
+> argument) out from the implementation.
 
-Are FWLCHSEntry fields little-endian? Shouldn't 
-get_boot_devices_lchs_list() use some le32_to_cpu() call for the LCHS 
-values?
+The goal was just to make it easier to review. If you want them
+combined I can easily combine them.
+
+Alistair
 
