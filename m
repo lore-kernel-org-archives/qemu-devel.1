@@ -2,90 +2,89 @@ Return-Path: <SRS0=TwS2=YA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B57DC47404
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0194C47404
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:36:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 508E1206C2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:34:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 508E1206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9B33320700
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Oct 2019 15:36:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IeovF85J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B33320700
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHV23-0006jB-Bo
-	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:34:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47902)
+	id 1iHV4E-0000IM-9f
+	for qemu-devel@archiver.kernel.org; Mon, 07 Oct 2019 11:36:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iHUqk-0005ke-RJ
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:23:04 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iHUwN-0002dd-Id
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iHUqi-0002vp-QX
- for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:23:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50540)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iHUqe-0002tj-JM; Mon, 07 Oct 2019 11:22:56 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CC4E6301A3B6;
- Mon,  7 Oct 2019 15:22:55 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.196])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AC1AF1001E75;
- Mon,  7 Oct 2019 15:22:51 +0000 (UTC)
-Subject: Re: [PATCH 4/6] util: introduce co-shared-amount
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191003171539.12327-1-vsementsov@virtuozzo.com>
- <20191003171539.12327-5-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1efcbe22-6f71-3123-ca78-886153da11b3@redhat.com>
-Date: Mon, 7 Oct 2019 17:22:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <alex.bennee@linaro.org>) id 1iHUwL-0005CA-8b
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:51 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41996)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iHUwK-0005Bc-VM
+ for qemu-devel@nongnu.org; Mon, 07 Oct 2019 11:28:49 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n14so15801927wrw.9
+ for <qemu-devel@nongnu.org>; Mon, 07 Oct 2019 08:28:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=7gCV4zFcfwB/MqyFrxlDjzbDS1zMRutLLkzPj4QW9Yk=;
+ b=IeovF85JWo8oxbPzCVzRpSEbLanGm4HKDdhNpt0WT4SqJtnnEVhnx28G+vo6fto/T+
+ 3yCJxBM6VcRPMa2M2zu1GMDqbm/l31qkQYgVujlZyaUtwSXw1M/vXaagriucXfin2TS7
+ FInyMJUXKTO6f2rTfmaJXFTPrPuEyiL+Y28tUcRg4Q9BBActsHDZXVFfEWYrA889ncoM
+ 7TTsD4G7S8VYpnVGpz/43Gpw1Fhe/y90p8EwVAh3pr/lcGECZe2oIkMMnzuuevbwPgZw
+ xm9iiLVVWD4+jTQ4GQRKvuE/EoAf1FXNdblmLsAyOpo9V/BaHgT6c7K5pNZO7cPaAD03
+ VOaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=7gCV4zFcfwB/MqyFrxlDjzbDS1zMRutLLkzPj4QW9Yk=;
+ b=tGvF+ZZ+Xzx1gdsgYmtuysUP3pRR0TMafw+P3K2077N8stezm1kZpZwH8e2JdR1qgW
+ TXIj3J4C76Iy2ceC7OCwjEkl8/3WDjUjxEgy9+fDX76kR9JfIrodXi0qw55kL1wIdJp9
+ 5jW7MdK8X+Bmy5+3gM39Ag4Ips4Mvtqr8I1CSktPzDEh+Uxv6Km8HTwhC7KnwYzvnApP
+ n5xftYBqYMeddOyD1Rzr73HUdds3QC+2vvqf1OAc+Rz6uy18O4yiqW2yNiZAREDB9zlf
+ rMY2F8hPAAB1zT+55Kald3lXg44h/XPibE0S/kWOfXK4DnTglqP7c8LHoYGJ56Nplp40
+ RSnA==
+X-Gm-Message-State: APjAAAXZOus+s3JuLTJzzQc0e5CwqQX/hFXveb8d4FHHG+opwQHa60Nc
+ T9bCBekUecInjCP4EC7QwaNzyA==
+X-Google-Smtp-Source: APXvYqyTLkdYcHSmztmzAOfAANnuxIAAt+AnxDeFfBzFrVrBhJSb41bUTDwVSi65hh9gMMLQFGszIA==
+X-Received: by 2002:adf:f950:: with SMTP id q16mr8124174wrr.225.1570462127811; 
+ Mon, 07 Oct 2019 08:28:47 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 207sm21693651wme.17.2019.10.07.08.28.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 07 Oct 2019 08:28:42 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 64F731FF9A;
+ Mon,  7 Oct 2019 16:28:40 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v9 10/13] tb-stats: dump hot TBs at the end of the execution
+Date: Mon,  7 Oct 2019 16:28:36 +0100
+Message-Id: <20191007152839.30804-11-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191007152839.30804-1-alex.bennee@linaro.org>
+References: <20191007152839.30804-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191003171539.12327-5-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="jP2oCD5I9ArhFmWOujHMNAcUbwER51dV7"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 07 Oct 2019 15:22:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,368 +96,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: "Vanderson M. do Rosario" <vandersonmr2@gmail.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jP2oCD5I9ArhFmWOujHMNAcUbwER51dV7
-Content-Type: multipart/mixed; boundary="z4REexWBJZNBE49ld8xmSvSWesDvJX9Ad"
+From: "Vanderson M. do Rosario" <vandersonmr2@gmail.com>
 
---z4REexWBJZNBE49ld8xmSvSWesDvJX9Ad
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Dump the hottest TBs if -d tb_stats,dump_limit=N is used.
 
-On 03.10.19 19:15, Vladimir Sementsov-Ogievskiy wrote:
-> Introduce an API for some shared splitable resource, like memory.
+Example of output for the 3 hottest TBs:
 
-*splittable, I suppose
+TB id:1 | phys:0x34d54 virt:0x0000000000034d54 flags:0x0000f0
+        | exec:4828932/0 guest inst cov:16.38%
+        | trans:1 ints: g:3 op:82 op_opt:34 spills:3
+        | h/g (host bytes / guest insts): 90.666664
+        | time to gen at 2.4GHz => code:3150.83(ns) IR:712.08(ns)
+        | targets: 0x0000000000034d5e (id:11), 0x0000000000034d0d (id:2)
 
-> It's going to be used by backup. Backup uses both read/write io and
-> copy_range. copy_range may consume memory implictly, so new API is
+TB id:2 | phys:0x34d0d virt:0x0000000000034d0d flags:0x0000f0
+        | exec:4825842/0 guest inst cov:21.82%
+        | trans:1 ints: g:4 op:80 op_opt:38 spills:2
+        | h/g (host bytes / guest insts): 84.000000
+        | time to gen at 2.4GHz => code:3362.92(ns) IR:793.75(ns)
+        | targets: 0x0000000000034d19 (id:12), 0x0000000000034d54 (id:1)
 
-*the new API
+TB id:3 | phys:0xec1c1 virt:0x00000000000ec1c1 flags:0x0000b0
+        | exec:872032/0 guest inst cov:1.97%
+        | trans:1 ints: g:2 op:56 op_opt:26 spills:1
+        | h/g (host bytes / guest insts): 68.000000
+        | time to gen at 2.4GHz => code:1692.08(ns) IR:473.75(ns)
+        | targets: 0x00000000000ec1c5 (id:4), 0x00000000000ec1cb (id:13)
 
-> abstract: it don't allocate any real memory but only handling out
+Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+Message-Id: <20190829173437.5926-12-vandersonmr2@gmail.com>
+[AJB: fix authorship, ad softmmu support]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-*It doesn=E2=80=99t allocate any real memory but only hands out
+---
+AJB:
+  - move vars into tb_stats.c
+  - support softmmu as well
+---
+ accel/tcg/tb-stats.c          | 21 +++++++++++++++++++++
+ include/exec/tb-stats-dump.h  | 21 +++++++++++++++++++++
+ include/exec/tb-stats-flags.h |  1 +
+ linux-user/exit.c             |  2 ++
+ stubs/tb-stats.c              |  5 +++++
+ util/log.c                    |  4 ++--
+ vl.c                          |  2 ++
+ 7 files changed, 54 insertions(+), 2 deletions(-)
+ create mode 100644 include/exec/tb-stats-dump.h
 
-> tickets.
+diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
+index 3c1cc8cd06..60a9ee4b9c 100644
+--- a/accel/tcg/tb-stats.c
++++ b/accel/tcg/tb-stats.c
+@@ -15,6 +15,7 @@
+ #include "qemu/qemu-print.h"
+ 
+ #include "exec/tb-stats.h"
++#include "exec/tb-stats-dump.h"
+ 
+ /* TBStatistic collection controls */
+ enum TBStatsStatus {
+@@ -26,6 +27,7 @@ enum TBStatsStatus {
+ 
+ static enum TBStatsStatus tcg_collect_tb_stats;
+ static uint32_t default_tbstats_flag;
++static int max_dump_tbs;
+ /* only accessed in safe work */
+ static GList *last_search;
+ static int id = 1; /* display_id increment counter */
+@@ -591,6 +593,20 @@ void dump_tb_info(int id, int log_mask, bool use_monitor)
+ }
+ 
+ 
++/*
++ * Dump the final stats
++ */
++void tb_stats_dump(void)
++{
++    if (!tb_stats_collection_enabled()) {
++        return;
++    }
++
++    dump_tbs_info(max_dump_tbs, SORT_BY_HOTNESS, false);
++}
++
++/* TBStatistic collection controls */
++
+ void enable_collect_tb_stats(void)
+ {
+     init_tb_stats_htable_if_not();
+@@ -639,3 +655,8 @@ void set_default_tbstats_flag(uint32_t flags)
+ {
+     default_tbstats_flag = flags;
+ }
++
++void set_tbstats_max_tbs(int max)
++{
++    max_dump_tbs = max;
++}
+diff --git a/include/exec/tb-stats-dump.h b/include/exec/tb-stats-dump.h
+new file mode 100644
+index 0000000000..197c6148e9
+--- /dev/null
++++ b/include/exec/tb-stats-dump.h
+@@ -0,0 +1,21 @@
++/*
++ * TB Stats common dump functions across sysemu/linux-user
++ *
++ * Copyright (c) 2019 Linaro
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
++
++#ifndef _TB_STATS_DUMP_H_
++#define _TB_STATS_DUMP_H_
++
++/**
++ * tb_stats_dump: dump final tb_stats at end of execution
++ */
++#ifdef CONFIG_TCG
++void tb_stats_dump(void);
++#else
++static inline void tb_stats_dump(void) { /* do nothing */ };
++#endif
++
++#endif /* _TB_STATS_DUMP_H_ */
+diff --git a/include/exec/tb-stats-flags.h b/include/exec/tb-stats-flags.h
+index 252304d685..a5bf44f824 100644
+--- a/include/exec/tb-stats-flags.h
++++ b/include/exec/tb-stats-flags.h
+@@ -24,6 +24,7 @@ void pause_collect_tb_stats(void);
+ bool tb_stats_collection_enabled(void);
+ bool tb_stats_collection_paused(void);
+ 
++void set_tbstats_max_tbs(int max);
+ uint32_t get_default_tbstats_flag(void);
+ void set_default_tbstats_flag(uint32_t);
+ 
+diff --git a/linux-user/exit.c b/linux-user/exit.c
+index bdda720553..c00700bb96 100644
+--- a/linux-user/exit.c
++++ b/linux-user/exit.c
+@@ -21,6 +21,7 @@
+ #ifdef TARGET_GPROF
+ #include <sys/gmon.h>
+ #endif
++#include "exec/tb-stats-dump.h"
+ 
+ #ifdef CONFIG_GCOV
+ extern void __gcov_dump(void);
+@@ -35,4 +36,5 @@ void preexit_cleanup(CPUArchState *env, int code)
+         __gcov_dump();
+ #endif
+         gdb_exit(env, code);
++        tb_stats_dump();
+ }
+diff --git a/stubs/tb-stats.c b/stubs/tb-stats.c
+index d212c2a1fa..a3e1406b88 100644
+--- a/stubs/tb-stats.c
++++ b/stubs/tb-stats.c
+@@ -21,6 +21,11 @@ bool tb_stats_collection_enabled(void)
+     return false;
+ }
+ 
++void set_tbstats_max_tbs(int max)
++{
++    return;
++}
++
+ void set_default_tbstats_flag(uint32_t flags)
+ {
+     return;
+diff --git a/util/log.c b/util/log.c
+index fa78e2bca9..b6e4f71c1f 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -32,7 +32,6 @@ FILE *qemu_logfile;
+ int qemu_loglevel;
+ static int log_append = 0;
+ static GArray *debug_regions;
+-int32_t max_num_hot_tbs_to_dump;
+ static bool to_monitor;
+ bool to_string;
+ 
+@@ -337,7 +336,8 @@ int qemu_str_to_log_mask(const char *str)
+             enable_collect_tb_stats();
+         } else if (tb_stats_collection_enabled() &&
+                    g_str_has_prefix(*tmp, "dump_limit=")) {
+-            max_num_hot_tbs_to_dump = atoi((*tmp) + 11);
++            int hot_tbs = atoi((*tmp) + 11);
++            set_tbstats_max_tbs(hot_tbs);
+         } else if (tb_stats_collection_enabled() &&
+                    g_str_has_prefix(*tmp, "level=")) {
+             uint32_t flags = 0;
+diff --git a/vl.c b/vl.c
+index 781fddaf18..9ceb401007 100644
+--- a/vl.c
++++ b/vl.c
+@@ -35,6 +35,7 @@
+ #include "sysemu/runstate.h"
+ #include "sysemu/seccomp.h"
+ #include "sysemu/tcg.h"
++#include "exec/tb-stats-dump.h"
+ 
+ #ifdef CONFIG_SDL
+ #if defined(__APPLE__) || defined(main)
+@@ -4514,6 +4515,7 @@ int main(int argc, char **argv, char **envp)
+     /* No more vcpu or device emulation activity beyond this point */
+     vm_shutdown();
+ 
++    tb_stats_dump();
+     job_cancel_sync_all();
+     bdrv_close_all();
+ 
+-- 
+2.20.1
 
-Note that allocation doesn=E2=80=99t necessarily mean you get a handle to=
- the
-allocated object.  It just means that some resource (or part of a
-resource) is now under your exclusive control.  At least that=E2=80=99s h=
-ow I
-understand the term.
-
-So this is indeed some form of allocation.
-
-> The idea is that we have some total amount of something and callers
-> should wait in coroutine queue if there is not enough of the resource
-> at the moment.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/qemu/co-shared-amount.h | 66 ++++++++++++++++++++++++++++
->  util/qemu-co-shared-amount.c    | 77 +++++++++++++++++++++++++++++++++=
-
->  util/Makefile.objs              |  1 +
->  3 files changed, 144 insertions(+)
->  create mode 100644 include/qemu/co-shared-amount.h
->  create mode 100644 util/qemu-co-shared-amount.c
->=20
-> diff --git a/include/qemu/co-shared-amount.h b/include/qemu/co-shared-a=
-mount.h
-> new file mode 100644
-> index 0000000000..e2dbc43dfd
-> --- /dev/null
-> +++ b/include/qemu/co-shared-amount.h
-> @@ -0,0 +1,66 @@
-> +/*
-> + * Generic shared amount for coroutines
-
-=E2=80=9Camount=E2=80=9D always begs the question =E2=80=9Camount of what=
-=E2=80=9D.  So maybe something
-more verbose like =E2=80=9CHelper functionality for distributing a fixed =
-total
-amount of an abstract resource among multiple coroutines=E2=80=9D would a=
-nswer
-that question.
-
-(I can=E2=80=99t come up with a better short name than shared-amount, tho=
-ugh.
-It does get the point across once the concept=E2=80=99s clear.)
-
-> + *
-> + * Copyright (c) 2019 Virtuozzo International GmbH
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaini=
-ng a copy
-> + * of this software and associated documentation files (the "Software"=
-), to deal
-> + * in the Software without restriction, including without limitation t=
-he rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
-r sell
-> + * copies of the Software, and to permit persons to whom the Software =
-is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be incl=
-uded in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXP=
-RESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABI=
-LITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT S=
-HALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
-R OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARI=
-SING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef QEMU_CO_SHARED_AMOUNT_H
-> +#define QEMU_CO_SHARED_AMOUNT_H
-> +
-> +
-> +typedef struct QemuCoSharedAmount QemuCoSharedAmount;
-> +
-> +/*
-> + * Create QemuCoSharedAmount structure
-> + *
-> + * @total: total amount to be shared between clients
-> + *
-> + * Note: this API is not thread-safe as it originally designed to be u=
-sed in
-> + * backup block-job and called from one aio context. If multiple threa=
-ds support
-> + * is needed it should be implemented (for ex., protect QemuCoSharedAm=
-ount by
-> + * mutex).
-
-I think the simple note =E2=80=9CThis API is not thread-safe=E2=80=9D wil=
-l suffice.  The
-rest seems more confusing to me than that it really helps.
-
-> + */
-> +QemuCoSharedAmount *qemu_co_shared_amount_new(uint64_t total);
-> +
-> +/*
-> + * Release QemuCoSharedAmount structure
-
-I=E2=80=99d add the note from qemu_co_put_amount():
-
-=E2=80=9CThis function may only be called once everything allocated by al=
-l
-clients has been deallocated/released.=E2=80=9D
-
-> + */
-> +void qemu_co_shared_amount_free(QemuCoSharedAmount *s);
-> +
-> +/*
-> + * Try to get n peaces. If not enough free peaces returns false, other=
-wise true.
-
-*pieces
-
-But I=E2=80=99d prefer =E2=80=9CTry to allocate an amount of @n.  Return =
-true on
-success, and false if there is too little left of the collective
-resource to fulfill the request.=E2=80=9D
-
-> + */
-> +bool qemu_co_try_get_amount(QemuCoSharedAmount *s, uint64_t n);
-> +
-> +/*
-> + * Get n peaces. If not enough yields. Return on success.
-
-I=E2=80=99d prefer =E2=80=9CAllocate an amount of $n, and, if necessary, =
-yield until
-that becomes possible.=E2=80=9D
-
-> + */
-> +void coroutine_fn qemu_co_get_amount(QemuCoSharedAmount *s, uint64_t n=
-);
-> +
-> +/*
-> + * Put n peaces. Client must not put more than it gets, still it may p=
-ut in
-> + * split: for example, get(5) and then put(3), put(2). All peaces must=
- be put
-> + * back before qemu_co_shared_amount_free call.
-
-I=E2=80=99d prefer =E2=80=9CDeallocate/Release an amount of @n.  The tota=
-l amount
-allocated by a caller does not need to be deallocated/released with a
-single call, but may be split over several calls.  For example, get(4),
-get(3), and then put(5), put(2).=E2=80=9D
-
-(And drop the qemu_co_shared_amount_free() reference, because it should
-so say there.)
-
-> + */
-> +void coroutine_fn qemu_co_put_amount(QemuCoSharedAmount *s, uint64_t n=
-);
-> +
-> +
-> +#endif /* QEMU_CO_SHARED_AMOUNT_H */
-> diff --git a/util/qemu-co-shared-amount.c b/util/qemu-co-shared-amount.=
-c
-> new file mode 100644
-> index 0000000000..8855ce5705
-> --- /dev/null
-> +++ b/util/qemu-co-shared-amount.c
-> @@ -0,0 +1,77 @@
-> +/*
-> + * Generic shared amount for coroutines
-> + *
-> + * Copyright (c) 2019 Virtuozzo International GmbH
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaini=
-ng a copy
-> + * of this software and associated documentation files (the "Software"=
-), to deal
-> + * in the Software without restriction, including without limitation t=
-he rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
-r sell
-> + * copies of the Software, and to permit persons to whom the Software =
-is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be incl=
-uded in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXP=
-RESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABI=
-LITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT S=
-HALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
-R OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARI=
-SING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/coroutine.h"
-> +#include "qemu/co-shared-amount.h"
-> +
-> +struct QemuCoSharedAmount {
-> +    uint64_t total;
-> +    uint64_t taken;
-
-I=E2=80=99d reverse the =E2=80=9Ctaken=E2=80=9D to be =E2=80=9Cavailable=E2=
-=80=9D.  Then the only purpose of
-=E2=80=9Ctotal=E2=80=9D would be as part of assertions.
-
-> +
-> +    CoQueue queue;
-> +};
-> +
-> +QemuCoSharedAmount *qemu_co_shared_amount_new(uint64_t total)
-> +{
-> +    QemuCoSharedAmount *s =3D g_new0(QemuCoSharedAmount, 1);
-> +
-> +    s->total =3D total;
-> +    qemu_co_queue_init(&s->queue);
-> +
-> +    return s;
-> +}
-> +
-> +void qemu_co_shared_amount_free(QemuCoSharedAmount *s)
-> +{
-> +    assert(s->taken =3D=3D 0);
-> +    g_free(s);
-> +}
-> +
-> +bool qemu_co_try_get_amount(QemuCoSharedAmount *s, uint64_t n)
-> +{
-> +    if (n < s->total && s->total - n >=3D s->taken) {
-
-(This=E2=80=99d become simply =E2=80=9Cs->available >=3D n=E2=80=9D)
-
-(And to be honest I have a hard time parsing that second condition.  To
-me, the natural order would appear to be =E2=80=9Cs->total - s->taken >=3D=
- n=E2=80=9D.  I
-mean, I can see that it matches by rearranging the inequation, but...
-And in this order you could drop the =E2=80=9Cn < s->total=E2=80=9D part =
-because it=E2=80=99s
-guaranteed that s->taken <=3D s->total.)
-
-> +        s->taken +=3D n;
-> +        return true;
-> +    }
-> +
-> +    return false;
-> +}
-> +
-> +void coroutine_fn qemu_co_get_amount(QemuCoSharedAmount *s, uint64_t n=
-)
-> +{
-> +    assert(n < s->total);
-> +    while (s->total - n < s->taken) {
-> +        qemu_co_queue_wait(&s->queue, NULL);
-> +    }
-> +
-> +    assert(qemu_co_try_get_amount(s, n));
-
-I=E2=80=99d refrain from putting things that should do something in asser=
-tions
-because assert() is not guaranteed to be compiled.
-
-It is in practice in qemu, but I still don=E2=80=99t like it too much.
-
-Furthermore, it appears to me that the following would be simpler:
-
-while (!qemu_co_try_get_amount(s, n)) {
-    qemu_co_queue_wait(&s->queue, NULL);
-}
-
-> +}
-> +
-> +void coroutine_fn qemu_co_put_amount(QemuCoSharedAmount *s, uint64_t n=
-)
-> +{
-> +    assert(n <=3D s->taken);
-> +    s->taken -=3D n;
-> +    qemu_co_queue_restart_all(&s->queue);
-
-It itches me to ask for a better allocation strategy (like maybe
-smallest-allocation-first), but I suppose I should just scratch myself.
-
-Max
-
-> +}
-> diff --git a/util/Makefile.objs b/util/Makefile.objs
-> index 41bf59d127..65ae18993a 100644
-> --- a/util/Makefile.objs
-> +++ b/util/Makefile.objs
-> @@ -37,6 +37,7 @@ util-obj-y +=3D rcu.o
->  util-obj-$(CONFIG_MEMBARRIER) +=3D sys_membarrier.o
->  util-obj-y +=3D qemu-coroutine.o qemu-coroutine-lock.o qemu-coroutine-=
-io.o
->  util-obj-y +=3D qemu-coroutine-sleep.o
-> +util-obj-y +=3D qemu-co-shared-amount.o
->  util-obj-y +=3D coroutine-$(CONFIG_COROUTINE_BACKEND).o
->  util-obj-y +=3D buffer.o
->  util-obj-y +=3D timed-average.o
->=20
-
-
-
---z4REexWBJZNBE49ld8xmSvSWesDvJX9Ad--
-
---jP2oCD5I9ArhFmWOujHMNAcUbwER51dV7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2bWEoACgkQ9AfbAGHV
-z0B52Af9Etbbdl7QH6/Iml2q3em9qNgkcItDKpLvFxGMYh97FJfU3EHYiy/Ars3/
-syOhPkq8d2ivhXb5kFWOYE1XIAqvv3ryqUxvlokNJRNGgxP+y99Nel8S38Ol2KO8
-4az0t2OxvomdZgmgIXlU8FBVHwG91AADKnm8povCOswX2Sp7X/YdNNeVkIEupM2M
-3N06i0b8OBwqs2xfOnlqI5E3hNz/NmvOsvKprLTQea8OAEB1EUHMW2z681gnmwBT
-nylSG5HBPCLyJnRoIuhcPw2IZFL4Rdst6PUyRs/kJkGdyLjMTSL6ySb3b5vgsmex
-WsIB6xwhicbMWgBzJ2bqVPkbjVC5ZQ==
-=ajTe
------END PGP SIGNATURE-----
-
---jP2oCD5I9ArhFmWOujHMNAcUbwER51dV7--
 
