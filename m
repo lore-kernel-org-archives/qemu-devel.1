@@ -2,92 +2,70 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62999C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 18:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CC2C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 18:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2501021721
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 18:03:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vw6oXNZl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2501021721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 173A82070B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 18:21:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173A82070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHtpE-0002JN-6q
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 14:03:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55074)
+	id 1iHu6r-0007qI-8t
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 14:21:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iHtmb-000194-7D
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 14:00:26 -0400
+ (envelope-from <armbru@redhat.com>) id 1iHu4z-0006iI-F6
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 14:19:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iHtmY-0001MY-8E
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 14:00:24 -0400
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:39809)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iHtmX-0001Lq-Li
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 14:00:21 -0400
-Received: by mail-yw1-xc44.google.com with SMTP id n11so6755735ywn.6
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 11:00:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=r+RM4lBMtla/9Yyv69ydbLXfAKQsO1byO23ggPwHXe0=;
- b=Vw6oXNZl41cB1SQeOaUG33b8Rvh2LgfxGmsjteBzXcTcarU3LI2ONGTr7mlLaU94HP
- HGQmRvVvjL7vbamEVOFEzr6p7EZaoRB3+v2NgWWPaoneWdAwBIa6UlyrbGsCuFPkHfRj
- OX18Vzjmldao39dz98AnPsoFbV8lcwPOaF3V3C3oJnj1GMojsZBeGVsU/nRRO0FcfqNS
- utLedPMELRxPXH/M1pX8bYtCVeQIot+6d0OZZS6wFTtoRmXAqtW5ExSQRG3SBBtOhNP8
- A5LJ0b6gBgDtclAMYYoEvkvvFWrPJNquFLFoMjZZw0K6AFPtWBnKLalaY6aP0rJgQb3a
- anYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=r+RM4lBMtla/9Yyv69ydbLXfAKQsO1byO23ggPwHXe0=;
- b=r/Ivg7HozsSkYdv+TBrGbj/C+KJH/ozXLo1qy119mvvzLdA1CG0G5/UAYTkJ2XqbBo
- OHVDXUvB6i9aJakWp+yF7OGkM57IJm4Qy2Im7W+SLGgkVXN35zeQTlbkfAzzMLdElEMc
- iHuYI3rBhsLdJLfY+M3nHXpdrE8UpikxoE822fru7fGui4cGh2CqH0Ibibep1bpFADk1
- 0EibcX2umoK5h2dTVIWhaaPBybiaiboCFxLyON+RsFlGwUoFasf/LJHTw7SHXacmLEa5
- jo9N7piPY65i9M8tfuUpZ83Ewsol1+Gskh1URYk24hm/fE7PdRd3mC+PIlngKXAZ/rL/
- jfKA==
-X-Gm-Message-State: APjAAAVzZuWK26fvD5p6blFCHP/V2+uWRRoVmAjVDza9lFALzw/AUYhC
- NK0E1kqo9kPrbeN4wTw1VYwthA==
-X-Google-Smtp-Source: APXvYqyiyR4YoQVnEy7MYqyeK1L+JFteT0LosKnsYx4tudJEBL1zVP+CbiXAgv50omTc+Km79homuw==
-X-Received: by 2002:a0d:fd06:: with SMTP id n6mr24439300ywf.100.1570557620492; 
- Tue, 08 Oct 2019 11:00:20 -0700 (PDT)
-Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id f68sm5256371ywb.96.2019.10.08.11.00.19
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 08 Oct 2019 11:00:19 -0700 (PDT)
-Subject: Re: [PATCH v9 08/13] tb-stats: reset the tracked TBs on a tb_flush
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191007152839.30804-1-alex.bennee@linaro.org>
- <20191007152839.30804-9-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <71068164-f2fb-571c-e7d8-6b600bd9fb2d@linaro.org>
-Date: Tue, 8 Oct 2019 14:00:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <armbru@redhat.com>) id 1iHu4v-0006NO-Ve
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 14:19:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54094)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1iHu4v-0006Ll-P6; Tue, 08 Oct 2019 14:19:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3FBBDA44ADC;
+ Tue,  8 Oct 2019 18:19:20 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CA73B19C7F;
+ Tue,  8 Oct 2019 18:19:19 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 4A1811138648; Tue,  8 Oct 2019 20:19:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v2] Makefile: Remove generated files when doing
+ 'distclean' (and 'clean')
+References: <20191008082815.8267-1-thuth@redhat.com>
+ <CAL1e-=gYkhM99Ee0LxZJ5dCjeEdC08G4_Tm3WCZpCSWvJ=b26Q@mail.gmail.com>
+ <4bfea125-eb63-f4a2-bca0-bce462f73d89@redhat.com>
+ <20191008124113.GE1192@redhat.com>
+Date: Tue, 08 Oct 2019 20:19:13 +0200
+In-Reply-To: <20191008124113.GE1192@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
+ =?utf-8?Q?ang=C3=A9=22's?=
+ message of "Tue, 8 Oct 2019 13:41:13 +0100")
+Message-ID: <8736g3drry.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20191007152839.30804-9-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::c44
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Tue, 08 Oct 2019 18:19:20 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,30 +77,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, cota@braap.org,
- Richard Henderson <rth@twiddle.net>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/19 11:28 AM, Alex Bennée wrote:
-> We keep track of translations but can only do so up until the
-> translation cache is flushed. At that point we really have no idea if
-> we can re-create a translation because all the active tracking
-> information has been reset.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  accel/tcg/tb-stats.c      | 19 +++++++++++++++++++
->  accel/tcg/translate-all.c |  2 +-
->  include/exec/tb-stats.h   |  8 ++++++++
->  3 files changed, 28 insertions(+), 1 deletion(-)
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-I still don't understand what the tbs array is for,
-but resetting it at flush is fine.
+> Given that we're aiming to convert to meson, how much effort do we really
+> want to put into fixing this inconsistency ?
+>
+> I'd argue the best way to fix "clean" and "distclean" is to delete them
+> entirely. Instead enforce that builddir !=3D srcdir when running configur=
+e,
+> so cleaning up simply means deleting the builddir sub-tree entirely.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I don't wish to belittle anybody's efforts at improving make targets
+clean and distclean, but like Daniel, I've long given up on them[*].  My
+"make distclean" is "rm -rf BUILD-DIR", and my "make clean" is "nuke-bld
+BUILD-DIR", where nuke-bld is the script below.
+
+#!/bin/sh -e
+
+if [ $# -gt 1 ]
+then
+    echo "Usage: $0 [bld-dir]" >&2
+    exit 1
+fi
+
+[ $# -eq 1 ] && cd "$1"
+
+if [ ! -e config.status ]
+then
+    echo "$0: not a build tree" >&2
+    exit 1
+fi
+
+rm -f .config.status
+mv config.status .config.status
+rm -r *
+mv .config.status config.status
+./config.status
 
 
-r~
+[*] Along with .gitignore.
 
