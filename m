@@ -2,82 +2,63 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D9CC4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 15:57:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC7EC35280
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 16:02:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1879206C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 15:57:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BXqN+9qL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1879206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3FEB22070B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 16:02:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FEB22070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHrrv-0004Ii-RO
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 11:57:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36248)
+	id 1iHrwl-0006GL-DS
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 12:02:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@gmail.com>) id 1iHrr0-0003pc-8B
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:56:52 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iHrtn-00057Y-7Y
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1iHrqy-0003HW-7r
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:56:50 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:37685)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iHrqx-0003G7-UO
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:56:48 -0400
-Received: by mail-ot1-x329.google.com with SMTP id k32so14442364otc.4
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 08:56:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=32uXc5NLA4Y6AwaqTRTzBMKdp/QflocvJgyfrMO81PY=;
- b=BXqN+9qL6b2i5hAuevlMXVKroePxB0XaP5JnJUwwG3EUQWND0iUYQ2hK+GhJHyeoSJ
- Wea3EKyc1XmXGtLsGrWVtznf0rkbs0OFiI8XDTsFS19wJAlZamMM86uZ+MkDl6rq3q+o
- +dlkG4E/0d1kKAcn+mVaEcZLxVn4k5nVfQE6kbFRQInk1H+EealMvz1YRJbOddeUp/Nk
- F4N9dPsbylVfW2XkrLN6WIdwyU8pPOAqyzTHoBHgLSTsXwYqfClp2GfyNXJJoJj2Juus
- krnTClknNJ0Z/xBgHcuPVgCh3PI4+0F2orikSCtf/fLmKyqoXfgx3C1aJZGbplvoWHsI
- u9IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=32uXc5NLA4Y6AwaqTRTzBMKdp/QflocvJgyfrMO81PY=;
- b=mZlTV6hT3qypYz2455ny1kh0AAuYedKbo7Lx4y3Dy73lFvBiJv/oqFtMyVtGLvG6DA
- xyFaeBxKd7BT72OlI74JmLkbRAkkwH0iYVtLV4wqdO7J1jNlVkxpKnr0DesfB9e+EhgH
- oKybskiHe50S93Kmn9vmjQhzfnMH1AN5j40nFMzvQBCgmW5/jHnzz5J3ahDDBh1hR7wd
- E2iE8JpARV/U6NwAZYHWkTe3U8O0opWfFKBN2O8C3dFowCrqeZqy1t7KzzJ68lQXRjYL
- 9PCMleu+Yv5kMFFTcreFZ3oH9Tuu/FdzlFtQcNMo5npf2RY+hBh0/C3ddq+pX1XPhMwq
- O99g==
-X-Gm-Message-State: APjAAAWGEPdch6tvgYcQ4XxFiACjgj9piXzrCL6JTzLYheFxX/64fuaG
- LdMy+KeGPoM0VQC7eBDAOiyguOhSoZQhoMPR1pI=
-X-Google-Smtp-Source: APXvYqwDACq+6PVKOMLM26kfuyF9S5c6PvraLunxbOQF7UTNxEUoyg8gRM5UYLleG9G9hI/BWR2mWa8mEdRWgQJBz74=
-X-Received: by 2002:a9d:67cb:: with SMTP id c11mr14685451otn.149.1570550207265; 
- Tue, 08 Oct 2019 08:56:47 -0700 (PDT)
+ (envelope-from <imammedo@redhat.com>) id 1iHrtk-00051R-Ai
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:59:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42652)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iHrtk-00050o-2i
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:59:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 05BC8300C727;
+ Tue,  8 Oct 2019 15:59:39 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C88ED60167;
+ Tue,  8 Oct 2019 15:59:32 +0000 (UTC)
+Date: Tue, 8 Oct 2019 17:59:31 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH 3/4] hw/i386: add facility to expose CPU topology over
+ fw-cfg
+Message-ID: <20191008175931.483af366@redhat.com>
+In-Reply-To: <20191008105259.5378-4-lersek@redhat.com>
+References: <20191008105259.5378-1-lersek@redhat.com>
+ <20191008105259.5378-4-lersek@redhat.com>
 MIME-Version: 1.0
-References: <20191007151905.32766-1-philmd@redhat.com>
- <20191007151905.32766-8-philmd@redhat.com>
- <CAKXe6S+B8y5fdFowN3+40baR-b4c0RDrsi+LvuNcx1g-Mx7LpA@mail.gmail.com>
- <04036864-7839-a13f-b598-53ccc99c2d8c@redhat.com>
-In-Reply-To: <04036864-7839-a13f-b598-53ccc99c2d8c@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 8 Oct 2019 23:56:10 +0800
-Message-ID: <CAKXe6S+jAcUMsdftN2VzZjnDrqs8Uc_2ukJeFzqNibfyJmm7uA@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] tests/fw_cfg: Run the tests on big-endian targets
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000034c1b70594683720"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::329
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Tue, 08 Oct 2019 15:59:39 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,429 +70,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu devel list <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000034c1b70594683720
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tue,  8 Oct 2019 12:52:58 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B410=E6=
-=9C=888=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8811:14=E5=86=99=E9=81=
-=93=EF=BC=9A
+> FW_CFG_MAX_CPUS exposes the (exclusive) maximum APIC ID to guest firmware,
+> due to historical reasons. That value is not useful to edk2, however. For
+> supporting VCPU hotplug, edk2 needs:
+>=20
+> - the boot CPU count (already exposed in FW_CFG_NB_CPUS),
+>=20
+> - and the maximum foreseen CPU count (tracked in
+>   "MachineState.smp.max_cpus", but not currently exposed).
+one can get it with current QEMU without adding new fgcfg
+(albeit in a bit awkward way)
 
-> Hi Li,
->
-> On 10/8/19 5:04 PM, Li Qiang wrote:
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com <mailto:philmd@redhat.co=
-m>> =E4=BA=8E
-> > 2019=E5=B9=B410=E6=9C=887=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=88=
-11:20=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> >     We have been restricting our fw_cfg tests to the PC machine,
-> >     which is a little-endian architecture.
-> >     The fw_cfg device is also used on the SPARC and PowerPC
-> >     architectures, which can run in big-endian configuration.
-> >
-> >     Since we want to be sure our device does not regress
-> >     regardless the endianess used, enable this test one
-> >     these targets.
-> >
-> >     The NUMA selector is X86 specific, restrict it to this arch.
-> >
-> >     Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com
-> >     <mailto:philmd@redhat.com>>
-> >     ---
-> >     v2: test ppc32 too (lvivier)
-> >     ---
-> >       tests/Makefile.include |  2 ++
-> >       tests/fw_cfg-test.c    | 33 +++++++++++++++++++++++++++------
-> >       2 files changed, 29 insertions(+), 6 deletions(-)
-> >
-> >     diff --git a/tests/Makefile.include b/tests/Makefile.include
-> >     index 3543451ed3..4ae3d5140a 100644
-> >     --- a/tests/Makefile.include
-> >     +++ b/tests/Makefile.include
-> >     @@ -226,6 +226,7 @@ check-qtest-ppc-y +=3D tests/prom-env-test$(EXE=
-SUF)
-> >       check-qtest-ppc-y +=3D tests/drive_del-test$(EXESUF)
-> >       check-qtest-ppc-y +=3D tests/boot-serial-test$(EXESUF)
-> >       check-qtest-ppc-$(CONFIG_M48T59) +=3D tests/m48t59-test$(EXESUF)
-> >     +check-qtest-ppc-y +=3D tests/fw_cfg-test$(EXESUF)
-> >
-> >       check-qtest-ppc64-y +=3D $(check-qtest-ppc-y)
-> >       check-qtest-ppc64-$(CONFIG_PSERIES) +=3D
-> tests/device-plug-test$(EXESUF)
-> >     @@ -250,6 +251,7 @@ check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) =3D
-> >     tests/endianness-test$(EXESUF)
-> >       check-qtest-sparc-y +=3D tests/prom-env-test$(EXESUF)
-> >       check-qtest-sparc-y +=3D tests/m48t59-test$(EXESUF)
-> >       check-qtest-sparc-y +=3D tests/boot-serial-test$(EXESUF)
-> >     +check-qtest-sparc-y +=3D tests/fw_cfg-test$(EXESUF)
-> >
-> >       check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D
-> >     tests/endianness-test$(EXESUF)
-> >       check-qtest-sparc64-y +=3D tests/prom-env-test$(EXESUF)
-> >     diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-> >     index 35af0de7e6..1250e87097 100644
-> >     --- a/tests/fw_cfg-test.c
-> >     +++ b/tests/fw_cfg-test.c
-> >     @@ -210,13 +210,30 @@ static void test_fw_cfg_splash_time(const voi=
-d
-> >     *opaque)
-> >
-> >       int main(int argc, char **argv)
-> >       {
-> >     -    QTestCtx ctx;
-> >     -    int ret;
-> >     +    const char *arch =3D qtest_get_arch();
-> >     +    bool has_numa =3D false;
-> >     +    QTestCtx ctx =3D {};
-> >     +    int ret =3D 0;
-> >
-> >           g_test_init(&argc, &argv, NULL);
-> >
-> >     -    ctx.machine_name =3D "pc";
-> >     -    ctx.fw_cfg =3D pc_fw_cfg_init();
-> >     +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) =
-{
-> >     +        has_numa =3D true;
-> >     +        ctx.machine_name =3D "pc";
-> >     +        ctx.fw_cfg =3D pc_fw_cfg_init();
-> >     +    } else if (g_str_equal(arch, "sparc")) {
-> >     +        ctx.machine_name =3D "SS-5";
-> >     +        ctx.fw_cfg =3D mm_fw_cfg_init(0xd00000510ULL);
-> >     +    } else if (g_str_equal(arch, "ppc") || g_str_equal(arch,
-> >     "ppc64")) {
-> >     +        /*
-> >     +         * The mac99 machine is different for 32/64-bit target:
-> >     +         *
-> >     +         * ppc(32): the G4 which can be either little or big endia=
-n,
-> >     +         * ppc64:   the G5 (970FX) is only big-endian.
-> >     +         */
-> >     +        ctx.machine_name =3D "mac99";
-> >     +        ctx.fw_cfg =3D mm_fw_cfg_init(0xf0000510);
-> >     +    }
-> >
-> >           qtest_add_data_func("fw_cfg/signature", &ctx,
-> >     test_fw_cfg_signature);
-> >           qtest_add_data_func("fw_cfg/id", &ctx, test_fw_cfg_id);
-> >     @@ -231,14 +248,18 @@ int main(int argc, char **argv)
-> >           qtest_add_func("fw_cfg/boot_device", test_fw_cfg_boot_device)=
-;
-> >       #endif
-> >           qtest_add_data_func("fw_cfg/max_cpus", &ctx,
-> >     test_fw_cfg_max_cpus);
-> >     -    qtest_add_data_func("fw_cfg/numa", &ctx, test_fw_cfg_numa);
-> >           qtest_add_data_func("fw_cfg/boot_menu", &ctx,
-> >     test_fw_cfg_boot_menu);
-> >           qtest_add_data_func("fw_cfg/reboot_timeout", &ctx,
-> >                               test_fw_cfg_reboot_timeout);
-> >           qtest_add_data_func("fw_cfg/splash_time", &ctx,
-> >     test_fw_cfg_splash_time);
-> >
-> >     -    ret =3D g_test_run();
-> >     +    if (has_numa) {
-> >     +        qtest_add_data_func("fw_cfg/numa", &ctx, test_fw_cfg_numa)=
-;
-> >     +    }
-> >
-> >     +    if (ctx.machine_name) {
-> >     +        ret =3D g_test_run();
-> >     +    }
-> >
-> >
-> > I think we can omit this if statement. In which case the
-> > ctx.machine_name will be NULL?
->
-> Here I thought about the PPC64 tests inheriting the PPC32 ones, and
-> maybe someone update the tests/Makefile.include and this test will run
-> on unexpected architectures.
+max_cpu count can be derived indirectly as result of cpu hotplug
+enumeration (IO interface at 0x0cd8-0xcf7) by writing/reading
+to/from selector register (see ACPI_CPU_SELECTOR_OFFSET_WR)
+until read value stops changing values (i.e. max cpu count
+is reached). One also can figure out present/non-present
+cpu status by reading flags register.
 
+> Add a new fw-cfg file to expose "max_cpus".
+>=20
+> While at it, expose the rest of the topology too (die / core / thread
+> counts), because I expect that the VCPU hotplug feature for OVMF will
+> ultimately need those too, and the data size is not large. This is
+> slightly complicated by the fact that the die count is specific to
+> PCMachineState, but fw_cfg_arch_create() intends to be PC-independent (see
+> commit 149c50cabcc4).
+Could you clarify why topology info is necessary?
 
-Sorry, I don't get your point here(PPC64 tests inheriting the PPC32),
-could you please explain this more?
+Potentially it's possible to extend cpu hotplug ABI to report
+arch specific apic-id (x86) or mpidr (arm) if firmware really
+needs to know topology and let guest to decode it according
+to CPU's spec.
 
+So far there were no need for it as all possible cpus are
+described in ACPI tables passed to guest, but I'm not going
+to suggest to parse them on firmware side as it's too complicated :)
 
+PS:
+The reason we started building ACPI tables in QEMU, was never
+ending story of adding more ABI and supporting it afterwards.
+So I'd try to avoid doing it if it can be helped.
 
-> So if the machine is NULL (another arch) we
->
+> For now, the feature is temporarily disabled.
+>=20
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Ref: https://bugzilla.tianocore.org/show_bug.cgi?id=3D1515
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> ---
+>  hw/i386/fw_cfg.h | 30 +++++++++++++++++++++++++++++-
+>  hw/i386/fw_cfg.c | 26 ++++++++++++++++++++++++--
+>  hw/i386/pc.c     |  4 ++--
+>  3 files changed, 55 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
+> index e0856a376996..d742435b9793 100644
+> --- a/hw/i386/fw_cfg.h
+> +++ b/hw/i386/fw_cfg.h
+> @@ -18,9 +18,37 @@
+>  #define FW_CFG_E820_TABLE       (FW_CFG_ARCH_LOCAL + 3)
+>  #define FW_CFG_HPET             (FW_CFG_ARCH_LOCAL + 4)
+> =20
+> +/**
+> + * FWCfgX86Topology: expose the X86 CPU topology to guest firmware over =
+fw-cfg.
+> + *
+> + * All fields have little-endian encoding.
+> + *
+> + * @dies:     Number of dies per package (aka socket). Set it to 1 unles=
+s the
+> + *            concrete MachineState subclass defines it differently.
+> + * @cores:    Corresponds to @CpuTopology.@cores.
+> + * @threads:  Corresponds to @CpuTopology.@threads.
+> + * @max_cpus: Corresponds to @CpuTopology.@max_cpus.
+> + *
+> + * Firmware can derive the package (aka socket) count with the following
+> + * formula:
+> + *
+> + *   DIV_ROUND_UP(@max_cpus, @dies * @cores * @threads)
+> + *
+> + * Firmware can derive APIC ID field widths and offsets per the standard
+> + * calculations in "include/hw/i386/topology.h".
+> + */
+> +typedef struct FWCfgX86Topology {
+> +  uint32_t dies;
+> +  uint32_t cores;
+> +  uint32_t threads;
+> +  uint32_t max_cpus;
+> +} QEMU_PACKED FWCfgX86Topology;
+> +
+>  FWCfgState *fw_cfg_arch_create(MachineState *ms,
+>                                 uint16_t boot_cpus,
+> -                               uint16_t apic_id_limit);
+> +                               uint16_t apic_id_limit,
+> +                               unsigned smp_dies,
+> +                               bool expose_topology);
+>  void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
+>  void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
+> =20
+> diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+> index 39b6bc60520c..33d09875014f 100644
+> --- a/hw/i386/fw_cfg.c
+> +++ b/hw/i386/fw_cfg.c
+> @@ -85,9 +85,26 @@ void fw_cfg_build_smbios(MachineState *ms, FWCfgState =
+*fw_cfg)
+>      }
+>  }
+> =20
+> +static void fw_cfg_expose_topology(FWCfgState *fw_cfg,
+> +                                   unsigned dies,
+> +                                   unsigned cores,
+> +                                   unsigned threads,
+> +                                   unsigned max_cpus)
+> +{
+> +    FWCfgX86Topology *topo =3D g_new(FWCfgX86Topology, 1);
+> +
+> +    topo->dies     =3D cpu_to_le32(dies);
+> +    topo->cores    =3D cpu_to_le32(cores);
+> +    topo->threads  =3D cpu_to_le32(threads);
+> +    topo->max_cpus =3D cpu_to_le32(max_cpus);
+> +    fw_cfg_add_file(fw_cfg, "etc/x86-smp-topology", topo, sizeof *topo);
+> +}
+> +
+>  FWCfgState *fw_cfg_arch_create(MachineState *ms,
+> -                                      uint16_t boot_cpus,
+> -                                      uint16_t apic_id_limit)
+> +                               uint16_t boot_cpus,
+> +                               uint16_t apic_id_limit,
+> +                               unsigned smp_dies,
+> +                               bool expose_topology)
+>  {
+>      FWCfgState *fw_cfg;
+>      uint64_t *numa_fw_cfg;
+> @@ -143,6 +160,11 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+>                       (1 + apic_id_limit + nb_numa_nodes) *
+>                       sizeof(*numa_fw_cfg));
+> =20
+> +    if (expose_topology) {
+> +        fw_cfg_expose_topology(fw_cfg, smp_dies, ms->smp.cores,
+> +                               ms->smp.threads, ms->smp.max_cpus);
+> +    }
+> +
+>      return fw_cfg;
+>  }
+> =20
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index bcda50efcc23..bb72b12edad2 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1738,8 +1738,8 @@ void pc_memory_init(PCMachineState *pcms,
+>                                          option_rom_mr,
+>                                          1);
+> =20
+> -    fw_cfg =3D fw_cfg_arch_create(machine,
+> -                                pcms->boot_cpus, pcms->apic_id_limit);
+> +    fw_cfg =3D fw_cfg_arch_create(machine, pcms->boot_cpus, pcms->apic_i=
+d_limit,
+> +                                pcms->smp_dies, false);
+> =20
+>      rom_set_fw(fw_cfg);
+> =20
 
-IIUC the "-M" option must has an argument, maybe?
-
-Thanks,
-Li Qiang
-
-
-
-> don't crash and return successfully, so the testsuite continue.
->
-> I might add a comment such:
->
->    if (ctx.machine_name) {
->        /* Only run whitelisted architecture. */
->        ret =3D g_test_run();
->    }
->
-> But maybe it is simpler to do at the beginning of main():
->
->    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
->    ...
->        ctx.fw_cfg =3D mm_fw_cfg_init(0xf0000510);
->    } else {
->        return 0;
->    }
->
-> What do you think?
->
-> Thanks for reviewing the whole series :)
->
-> > Thanks,
-> > Li Qiang
-> >
-> >           g_free(ctx.fw_cfg);
-> >
-> >           return ret;
-> >     --
-> >     2.21.0
-> >
->
-
---00000000000034c1b70594683720
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
-ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; =E4=BA=8E2019=E5=
-=B9=B410=E6=9C=888=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8811:14=E5=86=
-=99=E9=81=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
-:1ex">Hi Li,<br>
-<br>
-On 10/8/19 5:04 PM, Li Qiang wrote:<br>
-&gt; Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com" t=
-arget=3D"_blank">philmd@redhat.com</a> &lt;mailto:<a href=3D"mailto:philmd@=
-redhat.com" target=3D"_blank">philmd@redhat.com</a>&gt;&gt; =E4=BA=8E <br>
-&gt; 2019=E5=B9=B410=E6=9C=887=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=
-=8811:20=E5=86=99=E9=81=93=EF=BC=9A<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0We have been restricting our fw_cfg tests to the PC=
- machine,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0which is a little-endian architecture.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0The fw_cfg device is also used on the SPARC and Pow=
-erPC<br>
-&gt;=C2=A0 =C2=A0 =C2=A0architectures, which can run in big-endian configur=
-ation.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Since we want to be sure our device does not regres=
-s<br>
-&gt;=C2=A0 =C2=A0 =C2=A0regardless the endianess used, enable this test one=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0these targets.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0The NUMA selector is X86 specific, restrict it to t=
-his arch.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a h=
-ref=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@redhat.com</a><br=
->
-&gt;=C2=A0 =C2=A0 =C2=A0&lt;mailto:<a href=3D"mailto:philmd@redhat.com" tar=
-get=3D"_blank">philmd@redhat.com</a>&gt;&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0---<br>
-&gt;=C2=A0 =C2=A0 =C2=A0v2: test ppc32 too (lvivier)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0---<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0tests/Makefile.include |=C2=A0 2 ++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0tests/fw_cfg-test.c=C2=A0 =C2=A0 | 33 ++++++=
-+++++++++++++++++++++------<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A02 files changed, 29 insertions(+), 6 deletio=
-ns(-)<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0diff --git a/tests/Makefile.include b/tests/Makefil=
-e.include<br>
-&gt;=C2=A0 =C2=A0 =C2=A0index 3543451ed3..4ae3d5140a 100644<br>
-&gt;=C2=A0 =C2=A0 =C2=A0--- a/tests/Makefile.include<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+++ b/tests/Makefile.include<br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -226,6 +226,7 @@ check-qtest-ppc-y +=3D tests/pr=
-om-env-test$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-ppc-y +=3D tests/drive_del-test$=
-(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-ppc-y +=3D tests/boot-serial-tes=
-t$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-ppc-$(CONFIG_M48T59) +=3D tests/=
-m48t59-test$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+check-qtest-ppc-y +=3D tests/fw_cfg-test$(EXESUF)<=
-br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-ppc64-y +=3D $(check-qtest-ppc-y=
-)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tes=
-ts/device-plug-test$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -250,6 +251,7 @@ check-qtest-sh4eb-$(CONFIG_ISA_=
-TESTDEV) =3D<br>
-&gt;=C2=A0 =C2=A0 =C2=A0tests/endianness-test$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-sparc-y +=3D tests/prom-env-test=
-$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-sparc-y +=3D tests/m48t59-test$(=
-EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-sparc-y +=3D tests/boot-serial-t=
-est$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+check-qtest-sparc-y +=3D tests/fw_cfg-test$(EXESUF=
-)<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =
-=3D<br>
-&gt;=C2=A0 =C2=A0 =C2=A0tests/endianness-test$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0check-qtest-sparc64-y +=3D tests/prom-env-te=
-st$(EXESUF)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-tes=
-t.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0index 35af0de7e6..1250e87097 100644<br>
-&gt;=C2=A0 =C2=A0 =C2=A0--- a/tests/fw_cfg-test.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+++ b/tests/fw_cfg-test.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -210,13 +210,30 @@ static void test_fw_cfg_splas=
-h_time(const void<br>
-&gt;=C2=A0 =C2=A0 =C2=A0*opaque)<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0int main(int argc, char **argv)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0{<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 QTestCtx ctx;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 int ret;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 const char *arch =3D qtest_get_arch(=
-);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 bool has_numa =3D false;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 QTestCtx ctx =3D {};<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 int ret =3D 0;<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_test_init(&amp;argc, &amp;ar=
-gv, NULL);<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 ctx.machine_name =3D &quot;pc&quot;;=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 ctx.fw_cfg =3D pc_fw_cfg_init();<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (g_str_equal(arch, &quot;i386&quo=
-t;) || g_str_equal(arch, &quot;x86_64&quot;)) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 has_numa =3D true;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx.machine_name =3D &=
-quot;pc&quot;;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx.fw_cfg =3D pc_fw_c=
-fg_init();<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 } else if (g_str_equal(arch, &quot;s=
-parc&quot;)) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx.machine_name =3D &=
-quot;SS-5&quot;;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx.fw_cfg =3D mm_fw_c=
-fg_init(0xd00000510ULL);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 } else if (g_str_equal(arch, &quot;p=
-pc&quot;) || g_str_equal(arch,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&quot;ppc64&quot;)) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* The mac99 mach=
-ine is different for 32/64-bit target:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* ppc(32): the G=
-4 which can be either little or big endian,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* ppc64:=C2=A0 =
-=C2=A0the G5 (970FX) is only big-endian.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx.machine_name =3D &=
-quot;mac99&quot;;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx.fw_cfg =3D mm_fw_c=
-fg_init(0xf0000510);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 }<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qtest_add_data_func(&quot;fw_c=
-fg/signature&quot;, &amp;ctx,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0test_fw_cfg_signature);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qtest_add_data_func(&quot;fw_c=
-fg/id&quot;, &amp;ctx, test_fw_cfg_id);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0@@ -231,14 +248,18 @@ int main(int argc, char **arg=
-v)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qtest_add_func(&quot;fw_cfg/bo=
-ot_device&quot;, test_fw_cfg_boot_device);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0#endif<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qtest_add_data_func(&quot;fw_c=
-fg/max_cpus&quot;, &amp;ctx,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0test_fw_cfg_max_cpus);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 qtest_add_data_func(&quot;fw_cfg/num=
-a&quot;, &amp;ctx, test_fw_cfg_numa);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qtest_add_data_func(&quot;fw_c=
-fg/boot_menu&quot;, &amp;ctx,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0test_fw_cfg_boot_menu);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qtest_add_data_func(&quot;fw_c=
-fg/reboot_timeout&quot;, &amp;ctx,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0test_fw_cfg_reboot_timeout);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qtest_add_data_func(&quot;fw_c=
-fg/splash_time&quot;, &amp;ctx,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0test_fw_cfg_splash_time);<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0-=C2=A0 =C2=A0 ret =3D g_test_run();<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (has_numa) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qtest_add_data_func(&q=
-uot;fw_cfg/numa&quot;, &amp;ctx, test_fw_cfg_numa);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 }<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 if (ctx.machine_name) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D g_test_run();<=
-br>
-&gt;=C2=A0 =C2=A0 =C2=A0+=C2=A0 =C2=A0 }<br>
-&gt; <br>
-&gt; <br>
-&gt; I think we can omit this if statement. In which case the <br>
-&gt; ctx.machine_name will be NULL?<br>
-<br>
-Here I thought about the PPC64 tests inheriting the PPC32 ones, and <br>
-maybe someone update the tests/Makefile.include and this test will run <br>
-on unexpected architectures.</blockquote><div><br></div><div>Sorry, I don&#=
-39;t get your point here(PPC64 tests inheriting the PPC32),=C2=A0</div><div=
->could you please explain this more?</div><div><br></div><div>=C2=A0</div><=
-blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
-eft:1px solid rgb(204,204,204);padding-left:1ex"> So if the machine is NULL=
- (another arch) we <br></blockquote><div><br></div><div>IIUC the &quot;-M&q=
-uot; option must has an argument, maybe?</div><div><br></div><div>Thanks,</=
-div><div>Li Qiang</div><div><br></div><div>=C2=A0</div><blockquote class=3D=
-"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(2=
-04,204,204);padding-left:1ex">
-don&#39;t crash and return successfully, so the testsuite continue.<br>
-<br>
-I might add a comment such:<br>
-<br>
-=C2=A0 =C2=A0if (ctx.machine_name) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0/* Only run whitelisted architecture. */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D g_test_run();<br>
-=C2=A0 =C2=A0}<br>
-<br>
-But maybe it is simpler to do at the beginning of main():<br>
-<br>
-=C2=A0 =C2=A0if (g_str_equal(arch, &quot;i386&quot;) || g_str_equal(arch, &=
-quot;x86_64&quot;)) {<br>
-=C2=A0 =C2=A0...<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0ctx.fw_cfg =3D mm_fw_cfg_init(0xf0000510);<br>
-=C2=A0 =C2=A0} else {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
-=C2=A0 =C2=A0}<br>
-<br>
-What do you think?<br>
-<br>
-Thanks for reviewing the whole series :)<br>
-<br>
-&gt; Thanks,<br>
-&gt; Li Qiang<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_free(ctx.fw_cfg);<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return ret;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0-- <br>
-&gt;=C2=A0 =C2=A0 =C2=A02.21.0<br>
-&gt; <br>
-</blockquote></div></div>
-
---00000000000034c1b70594683720--
 
