@@ -2,81 +2,86 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD1B9C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1059ECE58E
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7512B206B6
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:43:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F2+62V3Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7512B206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A5958206B6
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:43:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5958206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHoq7-0007vi-7m
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 08:43:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60234)
+	id 1iHoq8-00080B-Ou
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 08:43:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60292)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iHonp-0006G8-1N
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1iHonz-0006QY-Km
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iHonn-0007pR-Mu
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:20 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44277)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iHonm-0007j1-G0
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:19 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w6so14577430oie.11
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 05:41:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=F4VpDAVVA0BdbVXXiCokr3TC1MIF05PM5d0Fz4YQTxU=;
- b=F2+62V3YWK8lR+PbUFikW5KJX4gyNt7Ny7LHt59MdPMSyLzupjZj6zcd/vkO4RuqMp
- t88rizSfaS0Z6TWdXRPSB/RHHNqLrC72asSStJHFo0Ic8mAUwY4L5rJHOxLsQAXj3yFk
- N/qUXwTh2bK2vG53OwVTaCP0USeXMSj4L1qBPDB1gmBElIQnwNHJOpHEOYn3IWXhnLre
- u6s7Se03gm4tVeFIfISAdVGCq1o/B3iwVaIFa64qxhITSPyEACeCZFkhl1T7lZ38g/qe
- 0kv6Krr/kz+0/4wPgrzFrzPyi/10US01yeOanNaTdPowoOZ3Xn9xhljAXfiwPBQF9N4v
- xiHg==
+ (envelope-from <philmd@redhat.com>) id 1iHonx-0008DO-Iv
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35152)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHonx-0008Cg-A3
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:29 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 661F11555C
+ for <qemu-devel@nongnu.org>; Tue,  8 Oct 2019 12:41:28 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id m6so937896wmf.2
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 05:41:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=F4VpDAVVA0BdbVXXiCokr3TC1MIF05PM5d0Fz4YQTxU=;
- b=unmDW7ULr+iACab9BTljjTwZe7pUdXFpwBOR//0Pf8n/A/PmHKRjv2eKqF/8ayMJ8t
- aSjSrNqF+xCeRKtmF4XZ2wjm6+8crHqhXrIiqxa/jHdSmoCydPOOdyEsSApM/TBJbRM2
- mgpc0YHQlZuCQhmPlMLi2CSTzXG9SUugz6Tq6EfH4AeDhbGDPgt2JJByWNZ3YvwhJHdx
- pAPrJCAf53jWcMALh1DcZ9TF8GYKocHX3PTEslbeiJEGiKvDFj6Ls3rGHNPpKnj1X4zJ
- GQyA2NEMi4tnGS/c3KSEV+c2UWAIVXJICOHnbt4u/ylSor8b++bgZXPePGIOMLkEXib9
- SCGA==
-X-Gm-Message-State: APjAAAU7kVO3tqw74Sd+QpmOz4CrL4Suq/FHgGBnAGc+Tu6TxFmlsHGc
- sBsXf+ddbhImlvfsw11sOu/BVMc8wEYWjCdDidqysg==
-X-Google-Smtp-Source: APXvYqwKsR/yv5OUIoFls/2aqqiUr3Zg70ke6psJVhdjMYzFbUoIirFeVoJLzzpDcxgO2+duzHaVZ9OyiXBqxwh4NVA=
-X-Received: by 2002:aca:f54d:: with SMTP id t74mr3781638oih.170.1570538475123; 
- Tue, 08 Oct 2019 05:41:15 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=sZGhZOzzGj383dhulzsjDYcyeCN4RRUdMfmCwxPxDR4=;
+ b=sckDOjYMtztyOOhASiQPatI1bwl4KN+JLXFKLnYe25mQMlIWjcYNKjz0IHWGTrfY4n
+ iJL4UPxQ9xBvp1gb2pEdpJ+uAjiJBg7SwpqF48K3amk21fKIceDlfbMWlleKQ0C8pICT
+ S16CYt9qmmH6tANe3noqJ5jzQ/AKZGxm2b2B4YWfkZi/OWjbei1fr/TcbVPo7Xw7rEdI
+ DDsnQA9R52K33l8+ohZzYPeADYLajN55b945JX+9TDlMfQYFjc8Y4HgpamWPKK0g54QA
+ 50a/UPMXlbehd/A0pefNdvZb0KIUHCHobIeOycAO2rLa3sCUlKOcSDN3pYk9fY5Huy2R
+ dNqg==
+X-Gm-Message-State: APjAAAUV4BNgGOTByQQUa4k8snh70lun9d46zUYrDAKJqiwOrryVoYjn
+ qX7TKQCcfCthN/1mRuCOwyghFic9moqpjkhjRSAaKAepuEcrsaAAkO6RThU8ukYb5eX616fXbqf
+ irFDm2EyHuho70Lw=
+X-Received: by 2002:a5d:6943:: with SMTP id r3mr5017279wrw.21.1570538487197;
+ Tue, 08 Oct 2019 05:41:27 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw8KH51n7d0obuSsqLgQvIcHRsB8JGHaVJrXit+wjiYHZw5N3yGc5Zv50tCI9Pq1jqV7ymY0A==
+X-Received: by 2002:a5d:6943:: with SMTP id r3mr5017258wrw.21.1570538487028;
+ Tue, 08 Oct 2019 05:41:27 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id j1sm38610417wrg.24.2019.10.08.05.41.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 08 Oct 2019 05:41:26 -0700 (PDT)
+Subject: Re: [PATCH 0/3] eliminate remaining places that abuse
+ memory_region_allocate_system_memory()
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20191008113318.7012-1-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3b7466af-2c05-f47e-f218-30a8b5ed5663@redhat.com>
+Date: Tue, 8 Oct 2019 14:41:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <20191008082815.8267-1-thuth@redhat.com>
- <CAL1e-=gYkhM99Ee0LxZJ5dCjeEdC08G4_Tm3WCZpCSWvJ=b26Q@mail.gmail.com>
- <4bfea125-eb63-f4a2-bca0-bce462f73d89@redhat.com>
-In-Reply-To: <4bfea125-eb63-f4a2-bca0-bce462f73d89@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 Oct 2019 13:41:04 +0100
-Message-ID: <CAFEAcA_+V7SNsxPSgsd04s8f7PnP3qdyXMp6NvS2inHjE08pJw@mail.gmail.com>
-Subject: Re: [PATCH v2] Makefile: Remove generated files when doing
- 'distclean' (and 'clean')
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <20191008113318.7012-1-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,40 +93,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: deller@gmx.de, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org,
+ hpoussin@reactos.org, david@gibson.dropbear.id.au, atar4qemu@gmail.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 8 Oct 2019 at 13:37, Thomas Huth <thuth@redhat.com> wrote:
->
-> On 08/10/2019 14.18, Aleksandar Markovic wrote:
-> > If I remember well, QAPI-related c files are generated while doing
-> > 'make'. If that is true, these files should be deleted by 'make clean',
-> > shouldn't they?
->
-> I think that's a philosophical question. Should "make clean" delete all
-> files that have been generated by a Makefile (i.e. not by "configure"),
-> or rather mainly the binary files?
+Hi Igor,
 
-https://www.gnu.org/software/automake/manual/html_node/Clean.html
+On 10/8/19 1:33 PM, Igor Mammedov wrote:
+> Series cleans up remaining boards that call memory_region_allocate_system_memory()
+> multiple times, violating interface contract (the function should be called only
+> once).
+> 
+> With that cleaned up, it should be possible to switch from adhoc RAM allocation
+> in memory_region_allocate_system_memory()->allocate_system_memory_nonnuma() to
+> memory-backend based allocation, remaining roadblock for doing it is deprecated
+> -mem-path fallback to RAM allocation, which is scheduled for removal at 4.3
+> merge window. So remaining patches to consolidate system RAM allocation around
+> memory-backends and aliasing -mem-path/mem-prealloc to it are postponed till
+> then.
 
-The autoconf manual suggests some heuristics:
- - If make built it, and it is commonly something that one would want
-   to rebuild (for instance, a .o file), then mostlyclean should delete it.
- - Otherwise, if make built it, then clean should delete it.
- - If configure built it, then distclean should delete it.
- - If the maintainer built it (for instance, a .info file), then
-   maintainer-clean should delete it. However maintainer-clean should
-   not delete anything that needs to exist in order to run
-'./configure && make'.
+How do we protect the codebase for new boards to not make the same mistake?
 
-Not all of that applies for QEMU, but it seems like a reasonable
-set of ideas.
+What about some code like this snippet (or nicer, but since this is a 
+developer error, and assert is enough IMO):
 
-thanks
--- PMM
+-- >8 --
+
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 4dfec5c95b..a487677672 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -484,6 +484,11 @@ static void 
+allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+                                             const char *name,
+                                             uint64_t ram_size)
+  {
++    static bool nonnuma_system_memory_allocated;
++
++    g_assert(!nonnuma_system_memory_allocated);
++    nonnuma_system_memory_allocated = true;
++
+      if (mem_path) {
+  #ifdef __linux__
+          Error *err = NULL;
+---
+
+$ hppa-softmmu/qemu-system-hppa
+**
+ERROR:/home/phil/source/qemu/hw/core/numa.c:489:allocate_system_memory_nonnuma: 
+assertion failed: (!nonnuma_system_memory_allocated)
+Aborted (core dumped)
 
