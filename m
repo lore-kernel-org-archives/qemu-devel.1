@@ -2,64 +2,90 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4265C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 19:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B8FBC4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 19:30:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9CCB206C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 19:28:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9CCB206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E7170206C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 19:30:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RosdJR2x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7170206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHv9g-0008Ue-So
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 15:28:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44151)
+	id 1iHvBV-0001Qw-3M
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 15:30:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44407)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iHuxh-0003W3-Mn
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:15:59 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iHuzx-0004GF-JT
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:18:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iHuxf-0006p1-CZ
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:15:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57362)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iHuxf-0006oh-4I
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:15:55 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 591E630B6506;
- Tue,  8 Oct 2019 19:15:54 +0000 (UTC)
-Received: from work-vm (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C87461341;
- Tue,  8 Oct 2019 19:15:53 +0000 (UTC)
-Date: Tue, 8 Oct 2019 20:15:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [PATCH 3/3] migration/postcopy: replace have_listen_thread check
- with PostcopyState check
-Message-ID: <20191008191551.GN3441@work-vm>
-References: <20191006000249.29926-1-richardw.yang@linux.intel.com>
- <20191006000249.29926-4-richardw.yang@linux.intel.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iHuzt-0007Pf-Qy
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:18:16 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37751)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iHuzs-0007ON-Hi
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:18:13 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p14so19773590wro.4
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 12:18:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=r1RlX5aZ21y+fApXWu4LFYQoo38ILKjQ+uwyiWzdwTQ=;
+ b=RosdJR2xgz2qBxkKi6FeUyZq05/bIoRtBgrbhpYsDxho5YdSYagBpbpfB6eM5rMAMy
+ RxsY/gXKD00OdygnX6R4m5zJPrufFUoP+IgF1PX8Q39fB7R8NQHUqjqMbzgiFT81/rVA
+ JR54cOvIpp1wA8+V5c4oAcf6Sl5gaIQOkgZ/8OSZKDY0hty76Rab0Y+SIF48pshiJygv
+ iMf2VmG0fNzMwIEg+35JkLoDsdYw3sefYCmxq0AHqIViPKl+G2ElNTfF+TI1CYIOgWxt
+ Ar0E7PSdIhxpr+nGnSc3MeKdb90CEoZs5+Jq8flb0QreCHQxuHACpnEJYYHGvlDPIIBm
+ 8FRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=r1RlX5aZ21y+fApXWu4LFYQoo38ILKjQ+uwyiWzdwTQ=;
+ b=NW8kJUPH9frj0Xcqfaxk6/eWgKZd+vXlW5XDTSXd1t+C53jPkTrQMsxx7Ky10ztiCE
+ 3lYXQmuxTv6LHclpJxvs/t2Mzg9CfZOBV29Vt/egrQd2xv9O+9ZfEkaWvEAThu9tfmib
+ pkirv86EDAY290SuVSSpN8mQNzDCy2IaYc8LssubxucdDzXrQV3szrAFZykO5X1qQeNg
+ S6ksL6lW9QrvbEo9jUnBG2Lia3/29xw2tLccQd+Fh/a4Jx/Lh2HVpWxF3BZwCHUWACcB
+ doMXPY2pwX/81NPmKfsBHeVC/12JyNntvwBVgG2m3qgP4tAEFda4GtTSQCYpJlV7Rt8V
+ 97uw==
+X-Gm-Message-State: APjAAAXIfq/aLMa3EewtGIs2P6EYYtRZZLyYGM9L9WfQ/wGe07DnMwKz
+ ajgid9OFEVTEpEdUrX54jGdLDQ==
+X-Google-Smtp-Source: APXvYqylBI2+spFfz0h6z3pqpIbl+Vo8DDLX2zaK8fKWvT/FeDmPuG4TU+g8mHIhxDUy+R8CT/WgnA==
+X-Received: by 2002:adf:9d84:: with SMTP id p4mr27674879wre.39.1570562289710; 
+ Tue, 08 Oct 2019 12:18:09 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id r18sm5530016wme.48.2019.10.08.12.18.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Oct 2019 12:18:09 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5E60A1FF87;
+ Tue,  8 Oct 2019 20:18:08 +0100 (BST)
+References: <20191007152839.30804-1-alex.bennee@linaro.org>
+ <20191007152839.30804-9-alex.bennee@linaro.org>
+ <71068164-f2fb-571c-e7d8-6b600bd9fb2d@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v9 08/13] tb-stats: reset the tracked TBs on a tb_flush
+In-reply-to: <71068164-f2fb-571c-e7d8-6b600bd9fb2d@linaro.org>
+Date: Tue, 08 Oct 2019 20:18:08 +0100
+Message-ID: <87ftk3hwr3.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191006000249.29926-4-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 08 Oct 2019 19:15:54 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,109 +97,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, cota@braap.org, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> After previous cleanup, postcopy thread is running only when
-> PostcopyState is LISTENNING or RUNNING. This means it is not necessary
-> to spare a variable have_listen_thread to represent the state.
-> 
-> Replace the check on have_listen_thread with PostcopyState and remove
-> the variable.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> ---
->  migration/migration.h | 1 -
->  migration/ram.c       | 2 +-
->  migration/ram.h       | 1 +
->  migration/savevm.c    | 4 +---
->  4 files changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 4f2fe193dc..a4d639663d 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -63,7 +63,6 @@ struct MigrationIncomingState {
->      /* Set this when we want the fault thread to quit */
->      bool           fault_thread_quit;
->  
-> -    bool           have_listen_thread;
->      QemuThread     listen_thread;
->      QemuSemaphore  listen_thread_sem;
->  
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 769d3f6454..dfc50d57d5 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -4188,7 +4188,7 @@ static bool postcopy_is_advised(void)
->      return ps >= POSTCOPY_INCOMING_ADVISE && ps < POSTCOPY_INCOMING_END;
->  }
->  
-> -static bool postcopy_is_running(void)
-> +bool postcopy_is_running(void)
->  {
->      PostcopyState ps = postcopy_state_get();
->      return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
-> diff --git a/migration/ram.h b/migration/ram.h
-> index bd0eee79b6..44fe4753ad 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -59,6 +59,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms);
->  /* For incoming postcopy discard */
->  int ram_discard_range(const char *block_name, uint64_t start, size_t length);
->  int ram_postcopy_incoming_init(MigrationIncomingState *mis);
-> +bool postcopy_is_running(void);
->  
->  void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
->  
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index dcad8897a3..2a0e0b94df 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1836,7 +1836,6 @@ static void *postcopy_ram_listen_thread(void *opaque)
->      qemu_loadvm_state_cleanup();
->  
->      rcu_unregister_thread();
-> -    mis->have_listen_thread = false;
->      postcopy_state_set(POSTCOPY_INCOMING_END, NULL);
 
-That now needs a big comment saying it must be the last thing in the
-thread, because now it's got meaning that it's here.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
->  
->      return NULL;
-> @@ -1880,7 +1879,6 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
->          return -1;
->      }
->  
-> -    mis->have_listen_thread = true;
->      /* Start up the listening thread and wait for it to signal ready */
->      qemu_sem_init(&mis->listen_thread_sem, 0);
->      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
-> @@ -2518,7 +2516,7 @@ int qemu_loadvm_state(QEMUFile *f)
->  
->      trace_qemu_loadvm_state_post_main(ret);
->  
-> -    if (mis->have_listen_thread) {
-> +    if (postcopy_is_running()) {
->          /* Listen thread still going, can't clean up yet */
->          return ret;
->      }
+> On 10/7/19 11:28 AM, Alex Benn=C3=A9e wrote:
+>> We keep track of translations but can only do so up until the
+>> translation cache is flushed. At that point we really have no idea if
+>> we can re-create a translation because all the active tracking
+>> information has been reset.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  accel/tcg/tb-stats.c      | 19 +++++++++++++++++++
+>>  accel/tcg/translate-all.c |  2 +-
+>>  include/exec/tb-stats.h   |  8 ++++++++
+>>  3 files changed, 28 insertions(+), 1 deletion(-)
+>
+> I still don't understand what the tbs array is for,
+> but resetting it at flush is fine.
 
-Can you explain to me why this is afe in the case of a failure in
-loadvm_postcopy_handle_listen between the start where it sets
-the state to LISTENING, and the point where it currently sets
-hasve_listen_thread ?  Wouldn't this cause qemu_loadvm_state
-not to cleanup?
+In Vanderson's original patch he kept a reference to the last translated
+tb which was incorrect - I changed it to track all the TBs associated
+with the stats entry. However the coverset and cfg commands aren't in
+this series which needed to iterate down through the TBs to their jump
+targets to build the full hot block. I suspect for now we can just drop
+the entry.
 
-Dave
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+>
+> r~
 
-> -- 
-> 2.17.1
-> 
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
 
