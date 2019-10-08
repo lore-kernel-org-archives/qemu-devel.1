@@ -2,82 +2,72 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2305C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 497E4C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:28:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A788620673
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:22:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A788620673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 13781205C9
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:28:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="tF4Mv6r/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13781205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHqNN-0004Wj-S5
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 10:22:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48343)
+	id 1iHqTg-0007qH-W3
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 10:28:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iHqGR-0005xC-Ke
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:15:00 -0400
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iHqR5-00061j-Ob
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iHqGO-0007UW-VJ
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:14:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55573)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iHqGO-0007Tf-Mb
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:14:56 -0400
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C1C7D7EBAE
- for <qemu-devel@nongnu.org>; Tue,  8 Oct 2019 14:14:54 +0000 (UTC)
-Received: by mail-pg1-f198.google.com with SMTP id m17so12602495pgh.21
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 07:14:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=vCM826/hcszwoC+8Ph2qTvE7N4HbQ/LvwAoWRfkeuwk=;
- b=DGmBrr/21I2pd83l5PKCfBKnuL1zUNhMKtcx/TxiBQ+15dup5dovBsbLpI/NJT8HDh
- p0fSkw71l+7DNeIY/iRcbfhMbri6ZtN5g/BnHQ8rV/unfvYY4IvevB1sgEiXi3/V/ajm
- PpTzH8Lkx+mSbjh6z7Tke02falqqpi5BGs6rgXYCRe1ZzX7D7g1VXOviv77UWxqre+zD
- zvDO8h6D3ajzSsDHo1vVHwEevE9e8mLHSHPf/RMRWuvlAKtlUUvGrSA6LWZ5QJ1HNxeF
- TQ1cPKEaYu4wBiELemoxeGm0b1Qj7P9/Kmq30uGk5MNXQ/kinc1jvezUsT4rGfIDwOQK
- TDkw==
-X-Gm-Message-State: APjAAAXQts6snyzZ4xTDaNAr0TRIUPBCY0ySd8U7kMr/L8SfK5WUgV7i
- MTsTdEhYqUmYjCgIUi/6YBX7rmlAAVgfdy4Im53A6m7zAib50IabXvoDXLTM5Y8D9T363/021xE
- TXi3yRepCu7Z7RTY=
-X-Received: by 2002:a65:6407:: with SMTP id a7mr14671226pgv.123.1570544094201; 
- Tue, 08 Oct 2019 07:14:54 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqypSNGmWImwmUxxVxYt4/ivdFx9XdRcKTuCUJZrDLpqAXNhhTOu7ZTBI2Kbueeyx3WgzWs/ew==
-X-Received: by 2002:a65:6407:: with SMTP id a7mr14671178pgv.123.1570544093822; 
- Tue, 08 Oct 2019 07:14:53 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id d19sm2243140pjz.5.2019.10.08.07.14.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Oct 2019 07:14:53 -0700 (PDT)
-Date: Tue, 8 Oct 2019 22:14:42 +0800
-From: Peter Xu <peterx@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH] migration: Don't try and recover return path in
- non-postcopy
-Message-ID: <20191008141442.GC10750@xz-x1>
-References: <20191007103507.31308-1-dgilbert@redhat.com>
+ (envelope-from <qemu_oss@crudebyte.com>) id 1iHqR4-0008I0-Bn
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:25:59 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:55729)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1iHqR2-0008Cj-VY
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:25:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=JjfHH10wMmWdQzIpyfW+Y+c5Zivig6jKcZR6vgyGqiM=; b=tF4Mv6r/Pgix7ExNHICCFqEp7G
+ 00JbrbQnkBhZXLdbHs2J6S6jAz3nH1ZZ/IB/74+dq1pscLJjDom4VBDZKYuY/Pv0yGihf9TSkJ5gJ
+ +JdsUxXhfnehf7f7hzPB5G04TKV310IRywmuT+vV5hj7JSzFGiBn28xvzDUh8yb7CsmIAXXvd+0Vv
+ TE6mkWZfy7BTuCR9VRpqQTSPAB1Nn9gsbYTmt/TzkPf/PfDUqtA0Fgj1+a2k0469QC+4Hakea4Ydg
+ eGSnD2iVKZagMVeO+G5tQ9BVlCJfOB+/OgLYtzgONo//qiaxiyIUu/+EogBJrNFCTzxDeRIIhPHFx
+ YRoP2EQEKv5ZeEmnSiHi3GkE0f3xfA0xK/0kOnGfGLyGBweXR80BL/EDOI3hJPUpclang8UljF3BE
+ euPVo4e2VHpduPJAziRf/P+3s/urMQvu8lx2UnJyUq2cpxjIu1uFccZoQTR41h+kbz7J2hBUz2BGf
+ f9ng5dJ1MG2Rq/br3oQk5GW14+u/6dNhZ7SDoraDN8mWjUONBkXyLLfJj9h7Bb7r6lo/vkfPQU/a1
+ D62F/se9n4cd+GeztbUHER7J8ZUbK1Jz0I2jT7JmglR8Bizx1R9mHbwT3XpjOBIYDJgkfkK50HQ+4
+ tsW5infJEVNc0XJyPopVsyW7d9iMzRnkSD1MUUOnQ=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Antonios Motakis <antonios.motakis@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 0/3] 9p: Fix file ID collisions
+Date: Tue, 08 Oct 2019 16:25:48 +0200
+Message-ID: <30797240.IXYi3n4lAo@silver>
+In-Reply-To: <20191008154729.5b16ef26@bahia.lan>
+References: <cover.1567680121.git.qemu_oss@crudebyte.com>
+ <2456208.kOTvEbKLdM@silver> <20191008154729.5b16ef26@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191007103507.31308-1-dgilbert@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,48 +79,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: groug@kaod.org, qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 07, 2019 at 11:35:07AM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Dienstag, 8. Oktober 2019 15:47:29 CEST Greg Kurz wrote:
+> On Tue, 08 Oct 2019 14:05:28 +0200
 > 
-> In normal precopy we can't do reconnection recovery - but we also
-> don't need to, since you can just rerun migration.
-> At the moment if the 'return-path' capability is on, we use
-> the return path in precopy to give a postiive 'OK' to the end
-> of migration; however if migration fails then we fall into
-> the postcopy recovery path and hang.  This fixes it by only
-> running the return path in the postcopy case.
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > On Dienstag, 8. Oktober 2019 11:14:59 CEST Greg Kurz wrote:
+> > > > No, it is not a feature. It is still a fix. :) I cannot use 9p without
+> > > > this
+> > > > fix at all, so it is not some optional "feature" for me.
+> > > 
+> > > I understand your need but this is still arguable. The 9p device has
+> > > a limitation with cross-device setups. The actual bug is to silently
+> > > cause inode number collisions in the guest. This is partly fixed by the
+> > > "9p: Treat multiple devices on one export as an error" patch. Thinking
+> > > again, it would even make sense to move "remap" from "9p: Added virtfs
+> > > option 'multidevs=remap|forbid|warn'" to its own patch. We could then
+> > > consider that the bug is fully fixed with "multidevs=forbid|warn".
+> > > 
+> > > Then comes the "remap" feature which is expected to lift the limitation
+> > > with cross-device setups, with a "not yet determined" performance cost
+> > > and light reviewing of the code.
+> > 
+> > Are these patch transfer requests addressed at me to be done?
 > 
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  migration/migration.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 5f7e4d15e9..d5d9b31bb7 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2481,7 +2481,7 @@ retry:
->  out:
->      res = qemu_file_get_error(rp);
->      if (res) {
-> -        if (res == -EIO) {
-> +        if (res == -EIO && migration_in_postcopy()) {
+> It would certainly be appreciated :) and if it happens to be done
+> before 2019-10-29, it can even be shipped with QEMU 4.2.
 
-Makes sense!  I saw that in qemu_loadvm_state_main() we're using
-(postcopy_state_get() == POSTCOPY_INCOMING_RUNNING) to check.  That
-also makes sense because I think we can't really do the recover if the
-migration stream failed at status like POSTCOPY_INCOMING_DISCARD even
-if it switched to POSTCOPY_ACTIVE... However that should really be a
-very corner case even if it's true, and afaict it's nowhere worse...
+Just to avoid any misapprehension, since today's comments of yours made me 
+sceptical: that would be
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+a) PR for QEMU 4.2 for *all* QID patches up to and including remapping with 
+variable suffix (e.g. as -multidevs=x-remap)?
 
--- 
-Peter Xu
+or is your current plan rather 
+
+b) to ship the discussed 9p patches for QEMU 4.2 only up to a certain patch 
+like multidevs=warn|forbid and all subsequent patches "might" then be merged 
+to master somewhere in distant future?
+
+Best regards,
+Christian Schoenebeck
+
+
 
