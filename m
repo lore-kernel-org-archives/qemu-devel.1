@@ -2,74 +2,66 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B74CC4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38CF1C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:53:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E7F72067B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E7F72067B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0E9612070B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:53:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E9612070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHptz-00088e-Hj
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:51:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45024)
+	id 1iHpvD-0000dq-6M
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:53:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iHpt2-0007eb-BX
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:50:49 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iHpuX-0000CM-FT
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:52:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iHpt1-0000Ag-5J
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:50:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50738)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iHpt0-00009z-Sw
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:50:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iHpsz-0002Q6-68
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 13:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2D6AB2E80D6
- for <qemu-devel@nongnu.org>; Tue,  8 Oct 2019 13:50:45 +0000 (UTC)
+ (envelope-from <imammedo@redhat.com>) id 1iHpuU-0001No-IY
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:52:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53008)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1iHpuU-0001Mq-Cb; Tue, 08 Oct 2019 09:52:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 19B07308C383;
+ Tue,  8 Oct 2019 13:52:17 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF85260606;
+ Tue,  8 Oct 2019 13:52:10 +0000 (UTC)
+Date: Tue, 8 Oct 2019 15:52:08 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH 0/3] eliminate remaining places that abuse
+ memory_region_allocate_system_memory()
+Message-ID: <20191008155208.59b22535@redhat.com>
+In-Reply-To: <3b7466af-2c05-f47e-f218-30a8b5ed5663@redhat.com>
+References: <20191008113318.7012-1-imammedo@redhat.com>
+ <3b7466af-2c05-f47e-f218-30a8b5ed5663@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Oct 2019 13:41:32 -0000
-From: Thomas Huth <1847232@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: davidhildenbrand ivmn
-X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <157053356610.22354.6751604707489617887.malonedeb@gac.canonical.com>
-Message-Id: <157054209286.681.14131269158293264044.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1847232] Re: qemu TCG in s390x mode issue with calculating HASH
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="af2eefe214bd95389a09b7c956720881bab16807";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7f5597461b1cd212353a2275e52cbceb60e1839f
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 08 Oct 2019 13:52:17 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,46 +70,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847232 <1847232@bugs.launchpad.net>
+Cc: deller@gmx.de, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, hpoussin@reactos.org, david@gibson.dropbear.id.au,
+ atar4qemu@gmail.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: s390x
+On Tue, 8 Oct 2019 14:41:25 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
--- =
+> Hi Igor,
+>=20
+> On 10/8/19 1:33 PM, Igor Mammedov wrote:
+> > Series cleans up remaining boards that call memory_region_allocate_syst=
+em_memory()
+> > multiple times, violating interface contract (the function should be ca=
+lled only
+> > once).
+> >=20
+> > With that cleaned up, it should be possible to switch from adhoc RAM al=
+location
+> > in memory_region_allocate_system_memory()->allocate_system_memory_nonnu=
+ma() to
+> > memory-backend based allocation, remaining roadblock for doing it is de=
+precated
+> > -mem-path fallback to RAM allocation, which is scheduled for removal at=
+ 4.3
+> > merge window. So remaining patches to consolidate system RAM allocation=
+ around
+> > memory-backends and aliasing -mem-path/mem-prealloc to it are postponed=
+ till
+> > then. =20
+>=20
+> How do we protect the codebase for new boards to not make the same mistak=
+e?
+>=20
+> What about some code like this snippet (or nicer, but since this is a=20
+> developer error, and assert is enough IMO):
+probably it's not worth effort (it's not too long till 4.2 softfreeze).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847232
+Like cover letter say, I'm planing to finish refactoring of
+memory_region_allocate_system_memory() and I hope this function
+will be gone during 4.3 and most boards will only need to map
+pre-created (by common code) memory-backend wherever they used to
+map RAM memory region.
 
-Title:
-  qemu TCG in s390x mode issue with calculating HASH
+> -- >8 -- =20
+>=20
+> diff --git a/hw/core/numa.c b/hw/core/numa.c
+> index 4dfec5c95b..a487677672 100644
+> --- a/hw/core/numa.c
+> +++ b/hw/core/numa.c
+> @@ -484,6 +484,11 @@ static void=20
+> allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
+>                                              const char *name,
+>                                              uint64_t ram_size)
+>   {
+> +    static bool nonnuma_system_memory_allocated;
+> +
+> +    g_assert(!nonnuma_system_memory_allocated);
+> +    nonnuma_system_memory_allocated =3D true;
+> +
+>       if (mem_path) {
+>   #ifdef __linux__
+>           Error *err =3D NULL;
+> ---
+>=20
+> $ hppa-softmmu/qemu-system-hppa
+> **
+> ERROR:/home/phil/source/qemu/hw/core/numa.c:489:allocate_system_memory_no=
+nnuma:=20
+> assertion failed: (!nonnuma_system_memory_allocated)
+> Aborted (core dumped)
 
-Status in QEMU:
-  New
-
-Bug description:
-  When using go on s390x on Debian x64 (buster) (host) and debian s390x
-  (sid) (guest) I run into the following problem :
-
-  The following occurs while trying to build a custom project :
-
-  go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
-  Get
-  https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0.0-2=
-0150613233007-fe3947df716e.mod:
-  local error: tls: bad record MAC
-
-  Doing a git bisect I find that this problem only occurs on and after
-  commit 08ef92d556c584c7faf594ff3af46df456276e1b
-
-  Before that commit, all works fine. Past this commit, build always
-  fails.
-
-  Without any proof, It looks like a hash calculation bug related to
-  using z/Arch vector facilities...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847232/+subscriptions
 
