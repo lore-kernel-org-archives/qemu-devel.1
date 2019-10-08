@@ -2,64 +2,57 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7732FC10F14
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 08:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C029C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 08:33:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C3DC206B6
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 08:07:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C3DC206B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 20EB220673
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 08:33:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20EB220673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHkWb-0001ji-DM
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 04:07:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52703)
+	id 1iHkvv-0007n6-93
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 04:33:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhengxiang9@huawei.com>) id 1iHkVZ-0000k8-Bx
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 04:06:14 -0400
+ (envelope-from <thuth@redhat.com>) id 1iHkr7-0006EU-IZ
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 04:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhengxiang9@huawei.com>) id 1iHkVY-0007lD-4o
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 04:06:13 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:42180 helo=huawei.com)
+ (envelope-from <thuth@redhat.com>) id 1iHkr2-0005YR-MT
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 04:28:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36326)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
- id 1iHkVU-0007gY-QQ; Tue, 08 Oct 2019 04:06:09 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 42FE0AF6A3E762B4E9AC;
- Tue,  8 Oct 2019 16:06:04 +0800 (CST)
-Received: from [127.0.0.1] (10.133.224.57) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 8 Oct 2019
- 16:05:54 +0800
-Subject: Re: [PATCH v18 5/6] target-arm: kvm64: inject synchronous External
- Abort
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190906083152.25716-1-zhengxiang9@huawei.com>
- <20190906083152.25716-6-zhengxiang9@huawei.com>
- <CAFEAcA-xc2XUq2Kwa1cK=4sAMq8B-2jUFAmxiGOQbmRCp-+UmQ@mail.gmail.com>
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <76f33d58-d9b5-3a68-ecfa-72fd0d7eb445@huawei.com>
-Date: Tue, 8 Oct 2019 16:05:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-xc2XUq2Kwa1cK=4sAMq8B-2jUFAmxiGOQbmRCp-+UmQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.224.57]
-X-CFilter-Loop: Reflected
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iHkr2-0005Vz-H9; Tue, 08 Oct 2019 04:28:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E6A2F18C4288;
+ Tue,  8 Oct 2019 08:28:21 +0000 (UTC)
+Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2E0765D9C9;
+ Tue,  8 Oct 2019 08:28:20 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] Makefile: Remove generated files when doing 'distclean'
+ (and 'clean')
+Date: Tue,  8 Oct 2019 10:28:15 +0200
+Message-Id: <20191008082815.8267-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Tue, 08 Oct 2019 08:28:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,140 +64,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
- Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>, QEMU
- Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- James Morse <james.morse@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When running "make distclean" we currently leave a lot of generated
+files in the build directory. These should be completely removed.
+Some of the generated files are removed in the "clean" target (which
+is a prerequisite for the "distclean" target), since binary files
+should be removed in this step already.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2:
+ - Remove tests/qemu-iotests/common.env in "distclean", not in "clean"
+ - Improved patch description
 
-On 2019/9/27 21:33, Peter Maydell wrote:
-> On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
->>
->> From: Dongjiu Geng <gengdongjiu@huawei.com>
->>
->> Introduce kvm_inject_arm_sea() function in which we will setup the type
->> of exception and the syndrome information in order to inject a virtual
->> synchronous external abort. When switching to guest, it will jump to the
->> synchronous external abort vector table entry.
->>
->> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and
->> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
->> not valid and hold an UNKNOWN value. These values will be set to KVM
->> register structures through KVM_SET_ONE_REG IOCTL.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> 
->> +/* Inject synchronous external abort */
->> +static void kvm_inject_arm_sea(CPUState *c)
-> 
-> This will cause a compilation failure at this point in
-> the patch series, because the compiler will complain about
-> a static function which is defined but never used.
-> To avoid breaking bisection, we need to put the definition
-> of the function in the same patch where it's used.
+ Makefile               |  6 +++---
+ tests/Makefile.include | 12 +++++++++++-
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-Thanks, I will merge this patch with the next patch.
-
-> 
->> +{
->> +    ARMCPU *cpu = ARM_CPU(c);
->> +    CPUARMState *env = &cpu->env;
->> +    CPUClass *cc = CPU_GET_CLASS(c);
->> +    uint32_t esr;
->> +    bool same_el;
->> +
->> +    /**
->> +     * Set the exception type to synchronous data abort
->> +     * and the target exception Level to EL1.
->> +     */
-> 
-> This comment doesn't really tell us anything that's not obvious
-> from the two lines of code that it's commenting on:
-
-Yes, I will remove this comment.
-
-> 
->> +    c->exception_index = EXCP_DATA_ABORT;
->> +    env->exception.target_el = 1;
->> +
->> +    /*
->> +     * Set the DFSC to synchronous external abort and set FnV to not valid,
->> +     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
->> +     */
->> +
->> +    /* This exception comes from lower or current exception level. */
-> 
-> This comment too is stating the obvious I think.
-
-I will remove it too.
-
-> 
->> +    same_el = arm_current_el(env) == env->exception.target_el;
->> +    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
->> +
->> +    env->exception.syndrome = esr;
->> +
->> +    /**
-> 
-> There's a stray second '*' in this comment-start.
-
-OK, I will remove this stray '*'.
-
-> 
-> 
->> +     * The vcpu thread already hold BQL, so no need hold again when
->> +     * calling do_interrupt
-> 
-> I think this requirement would be better placed as a
-> comment at the top of the function noting that callers
-> must hold the iothread lock.
-
-OK, I will add the comment at the top of the function.
-
-> 
->> +     */
->> +    cc->do_interrupt(c);
->> +}
->> +
->>  #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
->>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
->>
->> diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
->> index 5feb312941..499672ebbc 100644
->> --- a/target/arm/tlb_helper.c
->> +++ b/target/arm/tlb_helper.c
->> @@ -33,7 +33,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
->>       * ISV field.
->>       */
->>      if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
->> -        syn = syn_data_abort_no_iss(same_el,
->> +        syn = syn_data_abort_no_iss(same_el, 0,
->>                                      ea, 0, s1ptw, is_write, fsc);
->>      } else {
->>          /*
->> --
->> 2.19.1
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
-
+diff --git a/Makefile b/Makefile
+index 30f0abfb42..767b1ffb25 100644
+--- a/Makefile
++++ b/Makefile
+@@ -696,14 +696,14 @@ clean: recurse-clean
+ 		-exec rm {} +
+ 	rm -f $(edk2-decompressed)
+ 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
+-	rm -f fsdev/*.pod scsi/*.pod
++	rm -f fsdev/*.pod scsi/*.pod docs/*.pod docs/*/*.pod docs/*/.buildinfo
+ 	rm -f qemu-img-cmds.h
+ 	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+ 	@# May not be present in generated-files-y
+ 	rm -f trace/generated-tracers-dtrace.dtrace*
+ 	rm -f trace/generated-tracers-dtrace.h*
+ 	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+-	rm -f qapi-gen-timestamp
++	rm -f qapi-gen-timestamp vhost-user-input
+ 	rm -rf qga/qapi-generated
+ 	rm -f config-all-devices.mak
+ 
+@@ -724,7 +724,7 @@ distclean: clean
+ 	rm -f tests/tcg/config-*.mak
+ 	rm -f config-all-devices.mak config-all-disas.mak config.status
+ 	rm -f $(SUBDIR_DEVICES_MAK)
+-	rm -f po/*.mo tests/qemu-iotests/common.env
++	rm -f po/*.mo
+ 	rm -f roms/seabios/config.mak roms/vgabios/config.mak
+ 	rm -f qemu-doc.info qemu-doc.aux qemu-doc.cp qemu-doc.cps
+ 	rm -f qemu-doc.fn qemu-doc.fns qemu-doc.info qemu-doc.ky qemu-doc.kys
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3543451ed3..694f193fb6 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1176,11 +1176,21 @@ check: check-block check-qapi-schema check-unit check-softfloat check-qtest chec
+ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+-	rm -f tests/test-qapi-gen-timestamp
+ 	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
++	rm -f tests/test-qapi-gen-timestamp tests/qht-bench$(EXESUF) \
++		tests/fp/fp-test tests/fp/*.out tests/qapi-schema/*.test.*
+ 
+ clean: check-clean
+ 
++check-distclean:
++	rm -f tests/qemu-iotests/common.env tests/qemu-iotests/check.*
++	rm -f tests/test-qapi-types*.c tests/test-qapi-visit*.c \
++		tests/test-qapi-commands*.c tests/test-qapi-events*.c \
++		tests/test-qapi-emit-events.[ch] tests/test-qapi-introspect.c \
++		tests/include/test-qapi-*.c
++
++distclean: check-distclean
++
+ # Build the help program automatically
+ 
+ all: $(QEMU_IOTESTS_HELPERS-y)
 -- 
-
-Thanks,
-Xiang
+2.18.1
 
 
