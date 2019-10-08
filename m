@@ -2,91 +2,83 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 139E8C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BBF2C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D25CA206BB
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:11:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pz3Cnjll"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25CA206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2011F206BB
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:15:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2011F206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHpHA-0003R6-Uj
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:11:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38850)
+	id 1iHpKV-00057D-1r
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:15:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39481)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iHpG5-0002vh-Te
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:10:35 -0400
+ (envelope-from <slp@redhat.com>) id 1iHpJh-0004Ve-Kw
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iHpG4-0007yE-DF
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:10:33 -0400
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:46130)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iHpG4-0007wF-47
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:10:32 -0400
-Received: by mail-yw1-xc43.google.com with SMTP id h10so3383849ywm.13
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 06:10:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=pZBYwVCXfON5ZWQbTPWXBeSs8pU1t4DvdYb7NPJLfCY=;
- b=Pz3Cnjll/P/LDtRSeA1hgYWm8/G2Gxmprpho/daQJQo8w21GZs+BzcRXvhgzRGUsgH
- 7xFUUn9x1xzw0YqrWXu7zjfe4OzEWhMFVUCej1IBQ8TXcBx2hz3g5K9/BX1r1Sff6tup
- ULn7tVNo7E4Y6fclSYgZp7tJZpQEN0zC03+WNfwu/Q8Hc+sn2UUdRt71crcKt0E0MPzf
- sPGHdk+8RN5YkmVWwuKnF4lg8ej2UNm5+VwVKYwGvSHFbPc2n67yo6HpmOSRtd7b1tRI
- EkVy3CCTIh9m71XwBn4mNKEWZeywsasaMlM+W7xNWqbz2VrJHoQ7/xjmnr5zIaUDr3Mv
- rxEA==
+ (envelope-from <slp@redhat.com>) id 1iHpJf-0003Ew-IS
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:14:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50514)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iHpJf-0003Dd-8w
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:14:15 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5267D9B29A
+ for <qemu-devel@nongnu.org>; Tue,  8 Oct 2019 13:14:14 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id c188so958861wmd.9
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 06:14:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pZBYwVCXfON5ZWQbTPWXBeSs8pU1t4DvdYb7NPJLfCY=;
- b=KD2PfYHLt2MbxpQ5dciMsoTwUog7d6bt193Cxo6OJEq3ev+WZgKcXNE89rH4451c8u
- 27zez7KvEl7wmqbIYJ1tP5rNyddjAnsxMIPFcO0/sDjVFCMplOqqAGbrnng7+3+sP6La
- iVi/V6nfqnbChITDcRACs6FXTlDPqs9a9FjOWZGiCN/X1NrgiwN6wv72joKOPz8jKSTs
- 3Cpafe1lZCVHpa4TGvS9s92opFFD/256CPyclJ5Alym0s61c8kjJoEqWoQvupzwXc1Jb
- xCIbuI7GhaNLn5Tg1ciMxLjU5Tna/ibxkTdRx4BtBbES8Pp8pWS/FeAHehCtmAJdwS5/
- moyg==
-X-Gm-Message-State: APjAAAVnHv2RaKh9jIEbOOYhIZvZgATeK32a1jtIsV5KZRM8S/0MDsCu
- GFLJZMnVmnL+WLKVLUNq68+Jkw==
-X-Google-Smtp-Source: APXvYqzs1BpbgMgzr9hh+ANGFcxCoSw/Msw2tNwrrLJMDfL/vnTNtE99qakr+a1woItwSIpWgIKpHQ==
-X-Received: by 2002:a81:7484:: with SMTP id p126mr24218338ywc.87.1570540230786; 
- Tue, 08 Oct 2019 06:10:30 -0700 (PDT)
-Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id v62sm4670687ywc.105.2019.10.08.06.10.29
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 08 Oct 2019 06:10:30 -0700 (PDT)
-Subject: Re: [PATCH v9 02/13] accel: collecting TB execution count
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191007152839.30804-1-alex.bennee@linaro.org>
- <20191007152839.30804-3-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <1de71f0e-3380-ef5e-6f85-c75cd7fd7846@linaro.org>
-Date: Tue, 8 Oct 2019 09:10:27 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=9nBdxAt72RxYBtnsIbwHT3X71d9UE2vfBH9T8oTj9M0=;
+ b=nc47UUv0t1RD541dQ0ISQzysC11ViOuoEST+4K+O4qM1RnKyRf0FzsYH4lN5FM+2jO
+ aj7gfRcYLkH0ZTW77zhTUdAKaPLB6Z9q/aZnhrYJFiEUllzzLDHgTPA0sajrNOzY0QxO
+ kP89ClbDXkUS6KLhU48MJMPxeTzpYbtW/UcbgCz/wIm55Vsl3vykeZ0jmHTbEJnxNy4v
+ wlK639udO2Ma4EGIWS/JMZzj3iqdbLwDuEOOvokb8mHmL4Orqdg9z9BdqXtg9gABuvJW
+ Pua+WfF8jEcKXgX/76YKQlgP63cuLx6680/566JoZCe4fA+Oo3njk8Ft8q/aybFEqPt/
+ SmOQ==
+X-Gm-Message-State: APjAAAWaYo/wan1bst7mktAT84SPOpCTUd4zKkRiGAEMJ8DMXnKcPuVZ
+ mkTx6cumZRkikIA5+YEdtDPEx+qJXU089hnWPjw2MYmJY6+aQUR/1NxNc4GwaKmsWGF4902bUJr
+ xBB8W52K2QfBwUzc=
+X-Received: by 2002:a5d:630d:: with SMTP id i13mr5797596wru.230.1570540453069; 
+ Tue, 08 Oct 2019 06:14:13 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxy3c+auPTViSyzWf/xk+u0lPQ0nnhDnSopde30h/TghfqjQ7BQfbmgeeppyTSEoBCTUD2bLQ==
+X-Received: by 2002:a5d:630d:: with SMTP id i13mr5797576wru.230.1570540452882; 
+ Tue, 08 Oct 2019 06:14:12 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id o19sm4420325wmh.27.2019.10.08.06.14.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Oct 2019 06:14:12 -0700 (PDT)
+References: <157020969258.31166.12339648498600507707@8230166b0665>
+ <c273fcaf-4e43-b964-b537-d57bfac2738b@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v6 00/10] Introduce the microvm machine type
+In-reply-to: <c273fcaf-4e43-b964-b537-d57bfac2738b@redhat.com>
+Date: Tue, 08 Oct 2019 15:14:03 +0200
+Message-ID: <87pnj71isk.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191007152839.30804-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::c43
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,96 +90,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, cota@braap.org,
- "Vanderson M. do Rosario" <vandersonmr2@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: ehabkost@redhat.com, mst@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, imammedo@redhat.com, rth@twiddle.net,
+ lersek@redhat.com, sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/7/19 11:28 AM, Alex Bennée wrote:
-> +void HELPER(inc_exec_freq)(void *ptr)
-> +{
-> +    TBStatistics *stats = (TBStatistics *) ptr;
-> +    g_assert(stats);
-> +    atomic_inc(&stats->executions.normal);
-> +}
-
-tcg_debug_assert.
-
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 114ebe48bf..b7dd1a78e5 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1784,10 +1784,17 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->      /*
->       * We want to fetch the stats structure before we start code
->       * generation so we can count interesting things about this
-> -     * generation.
-> +     * generation. If dfilter is in effect we will only collect stats
-> +     * for the specified range.
->       */
-> -    if (tb_stats_collection_enabled()) {
-> +    if (tb_stats_collection_enabled() &&
-> +        qemu_log_in_addr_range(tb->pc)) {
-> +        uint32_t flag = get_default_tbstats_flag();
->          tb->tb_stats = tb_get_stats(phys_pc, pc, cs_base, flags);
-> +
-> +        if (flag & TB_EXEC_STATS) {
-> +            tb->tb_stats->stats_enabled |= TB_EXEC_STATS;
-> +        }
-
-Is this intended to be
-
-  tb->tb_stats->stats_enabled =
-      (tb->tb_stats->stats_enabled & ~TB_EXEC_STATS)
-    | (flag & TB_EXEC_STATS);
-
-so that the flag eventually gets cleared?  I also don't understand placing
-stats_enabled within a structure that is shared between multiple TB.
-
-I can only imagine that TB_EXEC_STATS should really be a bit in tb->cflags.  It
-wouldn't need to be in CF_HASH_MASK, but that seems to be the logical place to
-put it.
-
-> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-> index 70c66c538c..ec6bd829a0 100644
-> --- a/accel/tcg/translator.c
-> +++ b/accel/tcg/translator.c
-> @@ -46,6 +46,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
->  
->      ops->init_disas_context(db, cpu);
->      tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
-> +    gen_tb_exec_count(tb);
-
-Too early.  This should go after gen_tb_start().
-
->      /* Reset the temp count so that we can identify leaks */
->      tcg_clear_temp_count();
-> diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-> index 822c43cfd3..be006383b9 100644
-> --- a/include/exec/gen-icount.h
-> +++ b/include/exec/gen-icount.h
-> @@ -32,6 +32,15 @@ static inline void gen_io_end(void)
->      tcg_temp_free_i32(tmp);
->  }
->  
-> +static inline void gen_tb_exec_count(TranslationBlock *tb)
-> +{
-> +    if (tb_stats_enabled(tb, TB_EXEC_STATS)) {
-> +        TCGv_ptr ptr = tcg_const_ptr(tb->tb_stats);
-> +        gen_helper_inc_exec_freq(ptr);
-> +        tcg_temp_free_ptr(ptr);
-> +    }
-> +}
-
-I think this could go into translator.c, instead of gen-icount.h; it shouldn't
-be used anywhere else.
-
-> +#define TB_NOTHING    (1 << 0)
-
-What's this?
+--=-=-=
+Content-Type: text/plain
 
 
-r~
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> On 04/10/19 19:21, no-reply@patchew.org wrote:
+>> qemu-system-x86_64: missing kernel image file name, required by microvm
+>> Broken pipe
+>> /tmp/qemu-test/src/tests/libqtest.c:140: kill_qemu() tried to terminate QEMU process but encountered exit status 1 (expected 0)
+>> ERROR - too few tests run (expected 7, got 4)
+>> make: *** [check-qtest-x86_64] Error 1
+>> make: *** Waiting for unfinished jobs....
+>>   TEST    iotest-qcow2: 159
+>>   TEST    iotest-qcow2: 161
+>> ---
+>>     raise CalledProcessError(retcode, cmd)
+>
+> I think this needs some kind of blacklisting?
+
+I solved this issue by allowing a microvm machine to be started without
+a kernel filename (now that we always rely on a FW, we can do that ;-)
+
+Cheers,
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2ci5sACgkQ9GknjS8M
+AjVxhA//ajqhTRXX3Tn818TptRJ7bDP5V3FrxlrTyqPFKb5IVdDFLQPQRcFCc0ps
+f2Il52z/lZrdVNW6smdb2Q9jcJO3m6pZP+8oOL+0gkLkzaDxDtVZwSpJUWR1PCfU
+u88N/JH9Qp5Iv4JI84METtAqozdQCcrBorSPGKrJoyFgOqE+yXY4hPZOOQP1ogtl
+1x/Rv228y2qAaOTqUll4+Cn5SN+zEaTg+J+1JJJzvX5Ap34r4FwTvf0woxEvGcHX
+P9KBAAlvrkDwWK+DAGObpQXzloqOPRjrMMgJqrh5qp/zUKaNgLyrlV+R+RWowq8A
+aOsCVlmasGYbnb4AViT2bMXK1l7eyc2tCYJoxCkbzJev5FuvZxFAb7joya2xR7jJ
+PVD6j7xTkQawXWhFk83a9TnEloy2QPbJnAhFEUz02LnENJuRKJH16KXbivuEFWlz
+S/ETUrqelRxpV0MVBixJ4IxxgqTXXECGzY4UhapSiHD+u9F8TFmHjMUHlORUXp7g
+zIniX7fUwJKvN/HRLURyPRjOvfdxF+2Q8cY6RPrvNRrrWRsKAteL72idBT0ezPLt
+jos1bVRBP9Bn7YMfJkSpJF09zkbWK8uznGDXAovn4PTglKk0Wgd3Hyho73SSQLx+
+ajXgnzB0Lc0Z/vi5Nr/Upoj0LD/EoF1Ci55bcPo+JeGw47gsWJM=
+=NU/z
+-----END PGP SIGNATURE-----
+--=-=-=--
 
