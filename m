@@ -2,91 +2,92 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1D6C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CFEC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:05:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44965206B6
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:03:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kiMVf4CV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44965206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9AC4E206B6
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:05:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AC4E206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHlP1-0004fE-WB
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:03:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60606)
+	id 1iHlRG-0005zT-CO
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:05:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iHlMc-0003WY-By
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:01:04 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iHlOq-0004sH-VV
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:03:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iHlMa-0005BH-Qz
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:01:02 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51984)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iHlMa-00059h-Hp
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:01:00 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 7so2252969wme.1
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 02:01:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=vAhhPMJL0ehJOZSoqt01uWpB6mBxCkGGeL4TSPQMPus=;
- b=kiMVf4CVpQdCTWUDYDyMDpfRDo0nKZSd0e+EtO+EgvNN/HyaUqbqB7Xi72XCqRYBBB
- 3KglPuXcKkorOy3XX2oN94yU7wqzmMhcgzP3Uqq6lko056v3W1tIsSUFHw8jzOIImkk8
- SOnhjGy2E7ogTZNZH2etnqV/8YldVnPyrGZeLxgTcxltQ2gUuvQEixBqpBiKgY3iyB1w
- /mrCXuGJw2wgrnMqXGVlXgQlAmXEMaOzsKxsXFLrbJGUWvCkVWvnslezWkhE4tdhZDLH
- eQcOLUmGN2MCzfm1rF0wcqjr3ea3biVyoVojfYGTFL3PRuOvMjYseLR2dxHwTHFnS+AF
- wEog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=vAhhPMJL0ehJOZSoqt01uWpB6mBxCkGGeL4TSPQMPus=;
- b=sEmq3NbRLWTNtu/pNh4HexfBRP5+RAao07Au3kdrqRhcbw79oHzAxXjrx2/E+abZXH
- 4xkT5g9lpCyn3ffWD8Znd4dreEhKxEZA8xPwJeCceNGx+1I+cQLM1OB0r8bSV/5iXSTX
- OMLQa6jD4QRiiX4nl/mLSwrBkFk6nzN5op7pN78ecElcEc/379kEqmZcZakho+Nea2Wt
- lfmoSYPPu7G77XbDPUuqAbr5msw19kh5gslF9ZvvjejDeo7gKX99LitvxlahzmT4epqp
- I2TWtdyL2P4L6L3Mmsb/lhB9x/dnxIDS+MddoL7ezdNmDhOM1CFihF/cWv1HqAnyGcvV
- OJKA==
-X-Gm-Message-State: APjAAAX0NDV5lcjDmjgrq53JOqDVEVJQ70TjxmNHkqQxReRZ9Da3laTs
- iom+BLMPHWq8rxoUNJ7u9DYb/g==
-X-Google-Smtp-Source: APXvYqx3MUh+JWP6BKh15Yy88GXHFimAmVYaYPTup335XzVyboE9KWtGvFO9scQL6xnfcxnDI4YfNQ==
-X-Received: by 2002:a05:600c:387:: with SMTP id
- w7mr2970150wmd.138.1570525259118; 
- Tue, 08 Oct 2019 02:00:59 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e3sm2579747wme.39.2019.10.08.02.00.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Oct 2019 02:00:58 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D5ACC1FF87;
- Tue,  8 Oct 2019 10:00:57 +0100 (BST)
-References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-3-f4bug@amsat.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-arm@nongnu.org
-Subject: Re: [PATCH 02/19] hw/arm/bcm2835_peripherals: Improve logging
-In-reply-to: <20190926173428.10713-3-f4bug@amsat.org>
-Date: Tue, 08 Oct 2019 10:00:57 +0100
-Message-ID: <874l0jk3w6.fsf@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1iHlOp-0008IS-K5
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:03:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42736)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iHlOf-0007zi-Ei; Tue, 08 Oct 2019 05:03:10 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 17EB5C057F31;
+ Tue,  8 Oct 2019 09:03:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2240B19C68;
+ Tue,  8 Oct 2019 09:03:02 +0000 (UTC)
+Subject: Re: [PATCH 5/6] block/block-copy: add memory limit
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20191003171539.12327-1-vsementsov@virtuozzo.com>
+ <20191003171539.12327-6-vsementsov@virtuozzo.com>
+ <8aa011d7-3f11-2df5-d77e-5c5176ab63ed@redhat.com>
+ <49b99621-2d8a-f4a8-d31a-e64a727952a9@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <8bd41e8a-acfb-8f55-b2d3-ae909dc21ae7@redhat.com>
+Date: Tue, 8 Oct 2019 11:03:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <49b99621-2d8a-f4a8-d31a-e64a727952a9@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="XZlqkQZ0iNLA8wEF5xGKO1C8MF1vNflVS"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Tue, 08 Oct 2019 09:03:07 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,244 +99,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Cheng Xiang <ext-cheng.xiang@here.com>,
- =?utf-8?Q?Zolt=C3=A1n?= Baldaszti <bztemail@gmail.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Philippe =?utf-8?Q?Mathieu-Dau?= =?utf-8?Q?d=C3=A9?= <f4bug@amsat.org>,
- Esteban Bosse <estebanbosse@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Clement Deschamps <clement.deschamps@antfield.fr>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XZlqkQZ0iNLA8wEF5xGKO1C8MF1vNflVS
+Content-Type: multipart/mixed; boundary="qxnRCBA27QexKsI49KCwrfphdmM5Ky24P"
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+--qxnRCBA27QexKsI49KCwrfphdmM5Ky24P
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> Various logging improvements as once:
-> - Use 0x prefix for hex numbers
+On 07.10.19 19:10, Vladimir Sementsov-Ogievskiy wrote:
+> 07.10.2019 18:27, Max Reitz wrote:
+>> On 03.10.19 19:15, Vladimir Sementsov-Ogievskiy wrote:
+>>> Currently total allocation for parallel requests to block-copy instan=
+ce
+>>> is unlimited. Let's limit it to 128 MiB.
+>>>
+>>> For now block-copy is used only in backup, so actually we limit total=
 
-You can use "%#"PRIxNN"" as an alternative I believe but anyway:
+>>> allocation for backup job.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>>> ---
+>>>   include/block/block-copy.h | 3 +++
+>>>   block/block-copy.c         | 5 +++++
+>>>   2 files changed, 8 insertions(+)
+>>>
+>>> diff --git a/include/block/block-copy.h b/include/block/block-copy.h
+>>> index e2e135ff1b..bb666e7068 100644
+>>> --- a/include/block/block-copy.h
+>>> +++ b/include/block/block-copy.h
+>>> @@ -16,6 +16,7 @@
+>>>   #define BLOCK_COPY_H
+>>>  =20
+>>>   #include "block/block.h"
+>>> +#include "qemu/co-shared-amount.h"
+>>>  =20
+>>>   typedef struct BlockCopyInFlightReq {
+>>>       int64_t start_byte;
+>>> @@ -69,6 +70,8 @@ typedef struct BlockCopyState {
+>>>        */
+>>>       ProgressResetCallbackFunc progress_reset_callback;
+>>>       void *progress_opaque;
+>>> +
+>>> +    QemuCoSharedAmount *mem;
+>>>   } BlockCopyState;
+>>>  =20
+>>>   BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *=
+target,
+>>> diff --git a/block/block-copy.c b/block/block-copy.c
+>>> index cc49d2345d..e700c20d0f 100644
+>>> --- a/block/block-copy.c
+>>> +++ b/block/block-copy.c
+>>> @@ -21,6 +21,7 @@
+>>>   #include "qemu/units.h"
+>>>  =20
+>>>   #define BLOCK_COPY_MAX_COPY_RANGE (16 * MiB)
+>>> +#define BLOCK_COPY_MAX_MEM (128 * MiB)
+>>>  =20
+>>>   static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopySta=
+te *s,
+>>>                                                          int64_t star=
+t,
+>>> @@ -64,6 +65,7 @@ void block_copy_state_free(BlockCopyState *s)
+>>>       }
+>>>  =20
+>>>       bdrv_release_dirty_bitmap(s->source->bs, s->copy_bitmap);
+>>> +    qemu_co_shared_amount_free(s->mem);
+>>>       g_free(s);
+>>>   }
+>>>  =20
+>>> @@ -95,6 +97,7 @@ BlockCopyState *block_copy_state_new(BdrvChild *sou=
+rce, BdrvChild *target,
+>>>           .cluster_size =3D cluster_size,
+>>>           .len =3D bdrv_dirty_bitmap_size(copy_bitmap),
+>>>           .write_flags =3D write_flags,
+>>> +        .mem =3D qemu_co_shared_amount_new(BLOCK_COPY_MAX_MEM),
+>>>       };
+>>>  =20
+>>>       s->copy_range_size =3D QEMU_ALIGN_DOWN(max_transfer, cluster_si=
+ze),
+>>> @@ -316,7 +319,9 @@ int coroutine_fn block_copy(BlockCopyState *s,
+>>>  =20
+>>>           bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - =
+start);
+>>>  =20
+>>> +        qemu_co_get_amount(s->mem, chunk_end - start);
+>>
+>> Now that I see it like this, maybe the name is too short.  This sounds=
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> like it was trying to get some amount of coroutines.
+>>
+>> Would =E2=80=9Cqemu_co_get_from_shared_amount=E2=80=9D be too long?  (=
+Something like
+>> qemu_co_sham_alloc() would be funny, but maybe not.  :-)  Or maybe
+>> exactly because it=E2=80=9Ds funny.)
+>>
+>=20
+> hmm sham may be interpreted as shared memory, not only like shame..
 
+=E2=80=9Csham=E2=80=9D is also a word by itself. :-)
 
-> - Display value written during write accesses
-> - Move some logs from GUEST_ERROR to UNIMP
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> v2: Use PRIx64 format (pm215)
-> ---
->  hw/char/bcm2835_aux.c      |  5 +++--
->  hw/dma/bcm2835_dma.c       |  8 ++++----
->  hw/intc/bcm2836_control.c  |  7 ++++---
->  hw/misc/bcm2835_mbox.c     |  7 ++++---
->  hw/misc/bcm2835_property.c | 16 ++++++++++------
->  5 files changed, 25 insertions(+), 18 deletions(-)
->
-> diff --git a/hw/char/bcm2835_aux.c b/hw/char/bcm2835_aux.c
-> index 3f855196e3..a6fc1bf152 100644
-> --- a/hw/char/bcm2835_aux.c
-> +++ b/hw/char/bcm2835_aux.c
-> @@ -162,8 +162,9 @@ static void bcm2835_aux_write(void *opaque, hwaddr of=
-fset, uint64_t value,
->      switch (offset) {
->      case AUX_ENABLES:
->          if (value !=3D 1) {
-> -            qemu_log_mask(LOG_UNIMP, "%s: unsupported attempt to enable =
-SPI "
-> -                          "or disable UART\n", __func__);
-> +            qemu_log_mask(LOG_UNIMP, "%s: unsupported attempt to enable =
-SPI"
-> +                                     " or disable UART: 0x%"PRIx64"\n",
-> +                          __func__, value);
->          }
->          break;
->
-> diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
-> index 192bd377a0..6acc2b644e 100644
-> --- a/hw/dma/bcm2835_dma.c
-> +++ b/hw/dma/bcm2835_dma.c
-> @@ -180,7 +180,7 @@ static uint64_t bcm2835_dma_read(BCM2835DMAState *s, =
-hwaddr offset,
->          res =3D ch->debug;
->          break;
->      default:
-> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"HWADDR_PRIx"\=
-n",
->                        __func__, offset);
->          break;
->      }
-> @@ -228,7 +228,7 @@ static void bcm2835_dma_write(BCM2835DMAState *s, hwa=
-ddr offset,
->          ch->debug =3D value;
->          break;
->      default:
-> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"HWADDR_PRIx"\=
-n",
->                        __func__, offset);
->          break;
->      }
-> @@ -247,7 +247,7 @@ static uint64_t bcm2835_dma0_read(void *opaque, hwadd=
-r offset, unsigned size)
->          case BCM2708_DMA_ENABLE:
->              return s->enable;
->          default:
-> -            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx=
-"\n",
-> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"HWADDR_PR=
-Ix"\n",
->                            __func__, offset);
->              return 0;
->          }
-> @@ -274,7 +274,7 @@ static void bcm2835_dma0_write(void *opaque, hwaddr o=
-ffset, uint64_t value,
->              s->enable =3D (value & 0xffff);
->              break;
->          default:
-> -            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx=
-"\n",
-> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%"HWADDR_PR=
-Ix"\n",
->                            __func__, offset);
->          }
->      }
-> diff --git a/hw/intc/bcm2836_control.c b/hw/intc/bcm2836_control.c
-> index 04229b8a17..61f884ff9e 100644
-> --- a/hw/intc/bcm2836_control.c
-> +++ b/hw/intc/bcm2836_control.c
-> @@ -264,7 +264,7 @@ static uint64_t bcm2836_control_read(void *opaque, hw=
-addr offset, unsigned size)
->      } else if (offset >=3D REG_MBOX0_RDCLR && offset < REG_LIMIT) {
->          return s->mailboxes[(offset - REG_MBOX0_RDCLR) >> 2];
->      } else {
-> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx=
-"\n",
->                        __func__, offset);
->          return 0;
->      }
-> @@ -293,8 +293,9 @@ static void bcm2836_control_write(void *opaque, hwadd=
-r offset,
->      } else if (offset >=3D REG_MBOX0_RDCLR && offset < REG_LIMIT) {
->          s->mailboxes[(offset - REG_MBOX0_RDCLR) >> 2] &=3D ~val;
->      } else {
-> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-> -                      __func__, offset);
-> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx
-> +                                 " value 0x%"PRIx64"\n",
-> +                      __func__, offset, val);
->          return;
->      }
->
-> diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
-> index 79bad11631..7690b9afaf 100644
-> --- a/hw/misc/bcm2835_mbox.c
-> +++ b/hw/misc/bcm2835_mbox.c
-> @@ -176,7 +176,7 @@ static uint64_t bcm2835_mbox_read(void *opaque, hwadd=
-r offset, unsigned size)
->          break;
->
->      default:
-> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx=
-"\n",
->                        __func__, offset);
->          return 0;
->      }
-> @@ -228,8 +228,9 @@ static void bcm2835_mbox_write(void *opaque, hwaddr o=
-ffset,
->          break;
->
->      default:
-> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset %"HWADDR_PRIx"\n",
-> -                      __func__, offset);
-> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx
-> +                                 " value 0x%"PRIx64"\n",
-> +                      __func__, offset, value);
->          return;
->      }
->
-> diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-> index d86d510572..0a1a3eb5d9 100644
-> --- a/hw/misc/bcm2835_property.c
-> +++ b/hw/misc/bcm2835_property.c
-> @@ -56,7 +56,8 @@ static void bcm2835_property_mbox_push(BCM2835PropertyS=
-tate *s, uint32_t value)
->              break;
->          case 0x00010001: /* Get board model */
->              qemu_log_mask(LOG_UNIMP,
-> -                          "bcm2835_property: %x get board model NYI\n", =
-tag);
-> +                          "bcm2835_property: 0x%08x get board model NYI\=
-n",
-> +                          tag);
->              resplen =3D 4;
->              break;
->          case 0x00010002: /* Get board revision */
-> @@ -69,7 +70,8 @@ static void bcm2835_property_mbox_push(BCM2835PropertyS=
-tate *s, uint32_t value)
->              break;
->          case 0x00010004: /* Get board serial */
->              qemu_log_mask(LOG_UNIMP,
-> -                          "bcm2835_property: %x get board serial NYI\n",=
- tag);
-> +                          "bcm2835_property: 0x%08x get board serial NYI=
-\n",
-> +                          tag);
->              resplen =3D 8;
->              break;
->          case 0x00010005: /* Get ARM memory */
-> @@ -104,7 +106,8 @@ static void bcm2835_property_mbox_push(BCM2835Propert=
-yState *s, uint32_t value)
->
->          case 0x00038001: /* Set clock state */
->              qemu_log_mask(LOG_UNIMP,
-> -                          "bcm2835_property: %x set clock state NYI\n", =
-tag);
-> +                          "bcm2835_property: 0x%08x set clock state NYI\=
-n",
-> +                          tag);
->              resplen =3D 8;
->              break;
->
-> @@ -129,7 +132,8 @@ static void bcm2835_property_mbox_push(BCM2835Propert=
-yState *s, uint32_t value)
->          case 0x00038004: /* Set max clock rate */
->          case 0x00038007: /* Set min clock rate */
->              qemu_log_mask(LOG_UNIMP,
-> -                          "bcm2835_property: %x set clock rates NYI\n", =
-tag);
-> +                          "bcm2835_property: 0x%08x set clock rate NYI\n=
-",
-> +                          tag);
->              resplen =3D 8;
->              break;
->
-> @@ -274,8 +278,8 @@ static void bcm2835_property_mbox_push(BCM2835Propert=
-yState *s, uint32_t value)
->              break;
->
->          default:
-> -            qemu_log_mask(LOG_GUEST_ERROR,
-> -                          "bcm2835_property: unhandled tag %08x\n", tag);
-> +            qemu_log_mask(LOG_UNIMP,
-> +                          "bcm2835_property: unhandled tag 0x%08x\n", ta=
-g);
->              break;
->          }
+> And if we call it _alloc, the opposite should be _free, but how to
+> distinguish it from freeing the whole object? Hmm, use create/destroy f=
+or
+> the whole object maybe.
+>=20
+> May be, drop "qemu_" ? It's not very informative. Or may be drop "co_"?=
+=2E
+>=20
+> I don't like shaming my shared amount :)
+
+It=E2=80=99s worse calling it all a sham.
+
+> May be, we should imagine, what are we allocating? May be balls?
+>=20
+> struct BallAllocator
+>=20
+> ball_allocator_create
+> ball_allocator_destroy
+>=20
+> co_try_alloc_balls
+> co_alloc_balls
+> co_free_balls
+>=20
+> Or bars? Or which thing may be used for funny naming and to not interse=
+ct
+> with existing concepts like memory?
+
+I love it (thanks for making my morning), but I fear it may be
+interpreted as risqu=C3=A9.
+
+Maybe just shres for shared resource?  So alloc_from_shres?
+
+Max
+
+>>
+>>>           ret =3D block_copy_do_copy(s, start, chunk_end, error_is_re=
+ad);
+>>> +        qemu_co_put_amount(s->mem, chunk_end - start);
+>>>           if (ret < 0) {
+>>>               bdrv_set_dirty_bitmap(s->copy_bitmap, start, chunk_end =
+- start);
+>>>               break;
+>>>
+>>
+>>
+>=20
+>=20
 
 
---
-Alex Benn=C3=A9e
+
+--qxnRCBA27QexKsI49KCwrfphdmM5Ky24P--
+
+--XZlqkQZ0iNLA8wEF5xGKO1C8MF1vNflVS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2cUMUACgkQ9AfbAGHV
+z0DcNAf/Qj7WN7viqW5K0ze0tD61CDz33rLkFwShDK2UxmZ/Csi0dXlbGCFBcUgw
+28zxhqzJq00U9PBWCrFblYjOdZG44NzwsLDYrS6qr46p1vtxDP15FcDVAVIt34bJ
+8ABNfI+BNS0jCZoB1Zq7JheabLfK7U12ovdaHAmGtKYLxgozj/6b+s/o/F4J910l
+MMHstBohnDhQ8to+CkzYF3548cQNnFtPuQzqQ2W+OYkVJkaphDeyUKlF05DXyLB3
+zP4qdj+4lv4p0TvNSYZiIJa4ZctvSbKe4YNue70iyqbxyu9KpPcMNBqZRh+82Ucr
+zGOpjrbvUmIXrDzBKHYBEniZPBy9ww==
+=KH8e
+-----END PGP SIGNATURE-----
+
+--XZlqkQZ0iNLA8wEF5xGKO1C8MF1vNflVS--
 
