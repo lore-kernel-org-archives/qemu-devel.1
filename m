@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2297BC4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 10:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5657C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 10:56:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFE2E20673
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 10:55:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE2E20673
+	by mail.kernel.org (Postfix) with ESMTPS id 8E5D720673
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 10:56:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E5D720673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHn9q-0003qC-Dr
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 06:55:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46659)
+	id 1iHn9r-0003o1-Rt
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 06:55:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iHn7b-0001uT-D0
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 06:53:41 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iHn7Z-0003ro-MJ
+ (envelope-from <lersek@redhat.com>) id 1iHn7X-0001tc-2N
  for qemu-devel@nongnu.org; Tue, 08 Oct 2019 06:53:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56338)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <lersek@redhat.com>) id 1iHn7V-0003pp-KH
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 06:53:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48252)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iHn7Z-0003rE-ER
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 06:53:37 -0400
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iHn7U-0003pO-7O
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 06:53:32 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7AD703175281;
- Tue,  8 Oct 2019 10:53:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 77EB430860A5;
+ Tue,  8 Oct 2019 10:53:31 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-109.rdu2.redhat.com
  [10.10.120.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 789375D9C9;
- Tue,  8 Oct 2019 10:53:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB10D5D9C9;
+ Tue,  8 Oct 2019 10:53:26 +0000 (UTC)
 From: Laszlo Ersek <lersek@redhat.com>
 To: qemu devel list <qemu-devel@nongnu.org>
-Subject: [PATCH 4/4] hw/i386/pc: expose CPU topology over fw-cfg
-Date: Tue,  8 Oct 2019 12:52:59 +0200
-Message-Id: <20191008105259.5378-5-lersek@redhat.com>
+Subject: [PATCH 3/4] hw/i386: add facility to expose CPU topology over fw-cfg
+Date: Tue,  8 Oct 2019 12:52:58 +0200
+Message-Id: <20191008105259.5378-4-lersek@redhat.com>
 In-Reply-To: <20191008105259.5378-1-lersek@redhat.com>
 References: <20191008105259.5378-1-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 08 Oct 2019 10:53:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Tue, 08 Oct 2019 10:53:31 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -78,8 +78,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enable the small feature added in the last patch on 4.2+ PC machine types=
-.
+FW_CFG_MAX_CPUS exposes the (exclusive) maximum APIC ID to guest firmware=
+,
+due to historical reasons. That value is not useful to edk2, however. For
+supporting VCPU hotplug, edk2 needs:
+
+- the boot CPU count (already exposed in FW_CFG_NB_CPUS),
+
+- and the maximum foreseen CPU count (tracked in
+  "MachineState.smp.max_cpus", but not currently exposed).
+
+Add a new fw-cfg file to expose "max_cpus".
+
+While at it, expose the rest of the topology too (die / core / thread
+counts), because I expect that the VCPU hotplug feature for OVMF will
+ultimately need those too, and the data size is not large. This is
+slightly complicated by the fact that the die count is specific to
+PCMachineState, but fw_cfg_arch_create() intends to be PC-independent (se=
+e
+commit 149c50cabcc4).
+
+For now, the feature is temporarily disabled.
 
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
@@ -91,81 +110,120 @@ Cc: Richard Henderson <rth@twiddle.net>
 Ref: https://bugzilla.tianocore.org/show_bug.cgi?id=3D1515
 Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 ---
- include/hw/i386/pc.h | 3 +++
- hw/i386/pc.c         | 3 ++-
- hw/i386/pc_piix.c    | 2 ++
- hw/i386/pc_q35.c     | 2 ++
- 4 files changed, 9 insertions(+), 1 deletion(-)
+ hw/i386/fw_cfg.h | 30 +++++++++++++++++++++++++++++-
+ hw/i386/fw_cfg.c | 26 ++++++++++++++++++++++++--
+ hw/i386/pc.c     |  4 ++--
+ 3 files changed, 55 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 6df4f4b6fbe7..96af441453bc 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -144,6 +144,9 @@ typedef struct PCMachineClass {
+diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
+index e0856a376996..d742435b9793 100644
+--- a/hw/i386/fw_cfg.h
++++ b/hw/i386/fw_cfg.h
+@@ -18,9 +18,37 @@
+ #define FW_CFG_E820_TABLE       (FW_CFG_ARCH_LOCAL + 3)
+ #define FW_CFG_HPET             (FW_CFG_ARCH_LOCAL + 4)
 =20
-     /* Enables contiguous-apic-ID mode */
-     bool compat_apic_id_mode;
++/**
++ * FWCfgX86Topology: expose the X86 CPU topology to guest firmware over =
+fw-cfg.
++ *
++ * All fields have little-endian encoding.
++ *
++ * @dies:     Number of dies per package (aka socket). Set it to 1 unles=
+s the
++ *            concrete MachineState subclass defines it differently.
++ * @cores:    Corresponds to @CpuTopology.@cores.
++ * @threads:  Corresponds to @CpuTopology.@threads.
++ * @max_cpus: Corresponds to @CpuTopology.@max_cpus.
++ *
++ * Firmware can derive the package (aka socket) count with the following
++ * formula:
++ *
++ *   DIV_ROUND_UP(@max_cpus, @dies * @cores * @threads)
++ *
++ * Firmware can derive APIC ID field widths and offsets per the standard
++ * calculations in "include/hw/i386/topology.h".
++ */
++typedef struct FWCfgX86Topology {
++  uint32_t dies;
++  uint32_t cores;
++  uint32_t threads;
++  uint32_t max_cpus;
++} QEMU_PACKED FWCfgX86Topology;
 +
-+    /* expose x86 CPU topology over fw_cfg */
-+    bool fwcfg_topology;
- } PCMachineClass;
+ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+                                uint16_t boot_cpus,
+-                               uint16_t apic_id_limit);
++                               uint16_t apic_id_limit,
++                               unsigned smp_dies,
++                               bool expose_topology);
+ void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
+ void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
 =20
- #define TYPE_PC_MACHINE "generic-pc-machine"
+diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+index 39b6bc60520c..33d09875014f 100644
+--- a/hw/i386/fw_cfg.c
++++ b/hw/i386/fw_cfg.c
+@@ -85,9 +85,26 @@ void fw_cfg_build_smbios(MachineState *ms, FWCfgState =
+*fw_cfg)
+     }
+ }
+=20
++static void fw_cfg_expose_topology(FWCfgState *fw_cfg,
++                                   unsigned dies,
++                                   unsigned cores,
++                                   unsigned threads,
++                                   unsigned max_cpus)
++{
++    FWCfgX86Topology *topo =3D g_new(FWCfgX86Topology, 1);
++
++    topo->dies     =3D cpu_to_le32(dies);
++    topo->cores    =3D cpu_to_le32(cores);
++    topo->threads  =3D cpu_to_le32(threads);
++    topo->max_cpus =3D cpu_to_le32(max_cpus);
++    fw_cfg_add_file(fw_cfg, "etc/x86-smp-topology", topo, sizeof *topo);
++}
++
+ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+-                                      uint16_t boot_cpus,
+-                                      uint16_t apic_id_limit)
++                               uint16_t boot_cpus,
++                               uint16_t apic_id_limit,
++                               unsigned smp_dies,
++                               bool expose_topology)
+ {
+     FWCfgState *fw_cfg;
+     uint64_t *numa_fw_cfg;
+@@ -143,6 +160,11 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+                      (1 + apic_id_limit + nb_numa_nodes) *
+                      sizeof(*numa_fw_cfg));
+=20
++    if (expose_topology) {
++        fw_cfg_expose_topology(fw_cfg, smp_dies, ms->smp.cores,
++                               ms->smp.threads, ms->smp.max_cpus);
++    }
++
+     return fw_cfg;
+ }
+=20
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index bb72b12edad2..12b13ba0e1c5 100644
+index bcda50efcc23..bb72b12edad2 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -1739,7 +1739,7 @@ void pc_memory_init(PCMachineState *pcms,
+@@ -1738,8 +1738,8 @@ void pc_memory_init(PCMachineState *pcms,
+                                         option_rom_mr,
                                          1);
 =20
-     fw_cfg =3D fw_cfg_arch_create(machine, pcms->boot_cpus, pcms->apic_i=
+-    fw_cfg =3D fw_cfg_arch_create(machine,
+-                                pcms->boot_cpus, pcms->apic_id_limit);
++    fw_cfg =3D fw_cfg_arch_create(machine, pcms->boot_cpus, pcms->apic_i=
 d_limit,
--                                pcms->smp_dies, false);
-+                                pcms->smp_dies, pcmc->fwcfg_topology);
++                                pcms->smp_dies, false);
 =20
      rom_set_fw(fw_cfg);
 =20
-@@ -2798,6 +2798,7 @@ static void pc_machine_class_init(ObjectClass *oc, =
-void *data)
-     pcmc->save_tsc_khz =3D true;
-     pcmc->linuxboot_dma_enabled =3D true;
-     pcmc->pvh_enabled =3D true;
-+    pcmc->fwcfg_topology =3D true;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler =3D pc_get_hotplug_handler;
-     mc->hotplug_allowed =3D pc_hotplug_allowed;
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 6824b72124de..7fb87452889b 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -445,9 +445,11 @@ DEFINE_I440FX_MACHINE(v4_2, "pc-i440fx-4.2", NULL,
-=20
- static void pc_i440fx_4_1_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
-     pc_i440fx_4_2_machine_options(m);
-     m->alias =3D NULL;
-     m->is_default =3D 0;
-+    pcmc->fwcfg_topology =3D false;
-     compat_props_add(m->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-     compat_props_add(m->compat_props, pc_compat_4_1, pc_compat_4_1_len);
- }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 8fad20f3146a..3ec45659da02 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -377,8 +377,10 @@ DEFINE_Q35_MACHINE(v4_2, "pc-q35-4.2", NULL,
-=20
- static void pc_q35_4_1_machine_options(MachineClass *m)
- {
-+    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
-     pc_q35_4_2_machine_options(m);
-     m->alias =3D NULL;
-+    pcmc->fwcfg_topology =3D false;
-     compat_props_add(m->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-     compat_props_add(m->compat_props, pc_compat_4_1, pc_compat_4_1_len);
- }
 --=20
 2.19.1.3.g30247aa5d201
+
 
 
