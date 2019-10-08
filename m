@@ -2,81 +2,64 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F35EC4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4451C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:19:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCDB52064A
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:14:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DgLF8s6y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCDB52064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 95BC420673
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:19:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95BC420673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHqFU-0004jk-RA
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 10:14:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47283)
+	id 1iHqLB-0001Ho-Ak
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 10:19:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iHqA7-0006r1-Bf
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:08:28 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iHqJ8-00084L-7n
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iHqA2-0003ja-DM
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:08:27 -0400
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:36684)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iHqA2-0003jT-73
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:08:22 -0400
-Received: by mail-oi1-x22c.google.com with SMTP id k20so14904349oih.3
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 07:08:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=DaK4LFhDMurmiD/03hY6fQL9Kpa5N1Imhd3ePMwymoM=;
- b=DgLF8s6ysngRTKkE6pDNWG40ck+VwORjW/+Xx0pB9JJU7ymfIUMQR0YMF9JiofgGb3
- B4lYhQEGKRIsgJk6m3GMU/DZY9ZGi8kTh5TKLYzA7ocTRbo3Fxk7XD4DFGNMObdq2eHI
- BjSltVve2qMj7MHhcrPOY6iWR3JhGH7rjsbaIc4FdW24UJ8UUfytD2Ymc9xhtOrV+Hbh
- YfARTjrOw1MrihFztb79LuKTIhjlMfgKjW/5FAJvvXdK26VfPzen0Lt6v8B/c2dMs41g
- 41YLAc0FC8k/DMBv3q7xMrWJXa4fEch7zZZz9NptnpHeMGroKAyOk7mX9hmLViD7oXZF
- IR1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=DaK4LFhDMurmiD/03hY6fQL9Kpa5N1Imhd3ePMwymoM=;
- b=S+xzrV45nlVtNuQ1mXECS0jjLkcxA3UtiG0rcCTFmyF2Jux/+Ibr+gkSb7xLd8N+fi
- SuVBlPR2dSiQF9SV06DyvKYm6+1xs7Klw0aAW5d5d+YM9YYjyDEWfG6T9rzrXK0zEOid
- jhS3GZszKpkQlslICnM0iobnb31VfZAirun2Ezo+PxQvyPnPMptYsvb3UkU1M2JqJpWt
- wwoZnMFeQU5l+1iT4nwAgD1V/cISRUOq3+bfd46WzrP0goXKSg3Fn5tUuD2Q36Zas8wX
- gquyQQA66x9Ge0GaIdx7J+p/pUT0TOlOPsyaCn0KGjbksqSpR7ktq4/T1Nj5UZ5jxjLv
- /xcQ==
-X-Gm-Message-State: APjAAAVnK2ilYZpuSUF5NJKiopT7VScfAzVqCtd6f6NJ5o9wVWx45rw/
- ZyNCQxEzUrNH7xQaTK2sdvJVyFeBwyWqfNLDT8DfBpS3Ays=
-X-Google-Smtp-Source: APXvYqwZ8c0hK8JzGRNqEM31Q4u4Lk8mpCnSyI5cVt+uf7iyAH0snNUVfQwDImhVkLRG6e9ATVUfm6WZm7ZZK1Df5io=
-X-Received: by 2002:aca:b646:: with SMTP id g67mr4087596oif.163.1570543701400; 
- Tue, 08 Oct 2019 07:08:21 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1iHqJ6-0001Cs-Ll
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:17:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60446)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iHqJ6-0001BA-By
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:17:44 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 963B03086218;
+ Tue,  8 Oct 2019 14:17:43 +0000 (UTC)
+Received: from work-vm (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC76260BE2;
+ Tue,  8 Oct 2019 14:17:42 +0000 (UTC)
+Date: Tue, 8 Oct 2019 15:17:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 1/3] migration/postcopy: rename
+ postcopy_ram_enable_notify to postcopy_ram_incoming_setup
+Message-ID: <20191008141740.GD3441@work-vm>
+References: <20191001100122.17730-1-richardw.yang@linux.intel.com>
+ <20191001100122.17730-2-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-References: <20191007133540.30623-1-philmd@redhat.com>
-In-Reply-To: <20191007133540.30623-1-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 Oct 2019 15:08:10 +0100
-Message-ID: <CAFEAcA-+WMMgP36i4XBrRXhs+-nBna-ruZmyhGdn0wY0RO479Q@mail.gmail.com>
-Subject: Re: [PULL 0/5] edk2-next patches for 2019-10-07
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191001100122.17730-2-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Tue, 08 Oct 2019 14:17:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,40 +71,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 7 Oct 2019 at 14:37, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
->
-> The following changes since commit 9e5319ca52a5b9e84d55ad9c36e2c0b317a122=
-bb:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
-taging (2019-10-04 18:32:34 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/philmd/qemu.git tags/edk2-next-20191007
->
-> for you to fetch changes up to 037973bb0d2b1a3c8618ccf41caa4da3666588c3:
->
->   edk2 build scripts: work around TianoCore#1607 without forcing Python 2=
- (2019-10-07 15:14:15 +0200)
->
-> ----------------------------------------------------------------
-> Improve scripts relying on the EDK2 submodule,
-> drop Python2 dependency in EDK2 build scripts.
->
-> ----------------------------------------------------------------
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> Function postcopy_ram_incoming_setup and postcopy_ram_incoming_cleanup
+> is a pair. Rename to make it clear for audience.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+
+Yes OK.
+It really initially just setup the userfault, but it also kicks off the
+fault thread as well so it has got a bit more hairy.
 
 
-Applied, thanks.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+> ---
+>  migration/postcopy-ram.c | 4 ++--
+>  migration/postcopy-ram.h | 2 +-
+>  migration/savevm.c       | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 1f63e65ed7..b24c4a10c2 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -1094,7 +1094,7 @@ retry:
+>      return NULL;
+>  }
+>  
+> -int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+> +int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
+>  {
+>      /* Open the fd for the kernel to give us userfaults */
+>      mis->userfault_fd = syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLOCK);
+> @@ -1321,7 +1321,7 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
+>      return -1;
+>  }
+>  
+> -int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+> +int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
+>  {
+>      assert(0);
+>      return -1;
+> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+> index 9c8bd2bae0..d2668cc820 100644
+> --- a/migration/postcopy-ram.h
+> +++ b/migration/postcopy-ram.h
+> @@ -20,7 +20,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
+>   * Make all of RAM sensitive to accesses to areas that haven't yet been written
+>   * and wire up anything necessary to deal with it.
+>   */
+> -int postcopy_ram_enable_notify(MigrationIncomingState *mis);
+> +int postcopy_ram_incoming_setup(MigrationIncomingState *mis);
+>  
+>  /*
+>   * Initialise postcopy-ram, setting the RAM to a state where we can go into
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index adad938f57..f3292eb003 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1865,7 +1865,7 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+>       * shouldn't be doing anything yet so don't actually expect requests
+>       */
+>      if (migrate_postcopy_ram()) {
+> -        if (postcopy_ram_enable_notify(mis)) {
+> +        if (postcopy_ram_incoming_setup(mis)) {
+>              postcopy_ram_incoming_cleanup(mis);
+>              return -1;
+>          }
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
