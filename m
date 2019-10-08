@@ -2,86 +2,64 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1059ECE58E
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751ABC4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:47:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5958206B6
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:43:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5958206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 48EF820640
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:47:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48EF820640
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHoq8-00080B-Ou
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 08:43:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60292)
+	id 1iHotT-0002mM-AF
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 08:47:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60559)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iHonz-0006QY-Km
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:32 -0400
+ (envelope-from <zhengxiang9@huawei.com>) id 1iHopK-0007lw-RW
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:42:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iHonx-0008DO-Iv
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35152)
+ (envelope-from <zhengxiang9@huawei.com>) id 1iHopI-0001SO-4T
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:42:54 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2247 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHonx-0008Cg-A3
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:41:29 -0400
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 661F11555C
- for <qemu-devel@nongnu.org>; Tue,  8 Oct 2019 12:41:28 +0000 (UTC)
-Received: by mail-wm1-f69.google.com with SMTP id m6so937896wmf.2
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 05:41:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sZGhZOzzGj383dhulzsjDYcyeCN4RRUdMfmCwxPxDR4=;
- b=sckDOjYMtztyOOhASiQPatI1bwl4KN+JLXFKLnYe25mQMlIWjcYNKjz0IHWGTrfY4n
- iJL4UPxQ9xBvp1gb2pEdpJ+uAjiJBg7SwpqF48K3amk21fKIceDlfbMWlleKQ0C8pICT
- S16CYt9qmmH6tANe3noqJ5jzQ/AKZGxm2b2B4YWfkZi/OWjbei1fr/TcbVPo7Xw7rEdI
- DDsnQA9R52K33l8+ohZzYPeADYLajN55b945JX+9TDlMfQYFjc8Y4HgpamWPKK0g54QA
- 50a/UPMXlbehd/A0pefNdvZb0KIUHCHobIeOycAO2rLa3sCUlKOcSDN3pYk9fY5Huy2R
- dNqg==
-X-Gm-Message-State: APjAAAUV4BNgGOTByQQUa4k8snh70lun9d46zUYrDAKJqiwOrryVoYjn
- qX7TKQCcfCthN/1mRuCOwyghFic9moqpjkhjRSAaKAepuEcrsaAAkO6RThU8ukYb5eX616fXbqf
- irFDm2EyHuho70Lw=
-X-Received: by 2002:a5d:6943:: with SMTP id r3mr5017279wrw.21.1570538487197;
- Tue, 08 Oct 2019 05:41:27 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw8KH51n7d0obuSsqLgQvIcHRsB8JGHaVJrXit+wjiYHZw5N3yGc5Zv50tCI9Pq1jqV7ymY0A==
-X-Received: by 2002:a5d:6943:: with SMTP id r3mr5017258wrw.21.1570538487028;
- Tue, 08 Oct 2019 05:41:27 -0700 (PDT)
-Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id j1sm38610417wrg.24.2019.10.08.05.41.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 08 Oct 2019 05:41:26 -0700 (PDT)
-Subject: Re: [PATCH 0/3] eliminate remaining places that abuse
- memory_region_allocate_system_memory()
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20191008113318.7012-1-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3b7466af-2c05-f47e-f218-30a8b5ed5663@redhat.com>
-Date: Tue, 8 Oct 2019 14:41:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iHopD-00018s-UE; Tue, 08 Oct 2019 08:42:48 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 967A3210434A454C42DE;
+ Tue,  8 Oct 2019 20:42:37 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Tue, 8 Oct 2019
+ 20:42:31 +0800
+Subject: Re: [PATCH v18 6/6] target-arm: kvm64: handle SIGBUS signal from
+ kernel or KVM
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
+ <20190906083152.25716-7-zhengxiang9@huawei.com>
+ <CAFEAcA9Y3J8uRDN+HQO74-codKhoj5CyPW=9q3GwH8Mk_PNYTA@mail.gmail.com>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <161a9a3b-d937-0db7-0cad-ebf6bb73cca7@huawei.com>
+Date: Tue, 8 Oct 2019 20:42:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191008113318.7012-1-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA9Y3J8uRDN+HQO74-codKhoj5CyPW=9q3GwH8Mk_PNYTA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,57 +71,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: deller@gmx.de, mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org,
- hpoussin@reactos.org, david@gibson.dropbear.id.au, atar4qemu@gmail.com,
- rth@twiddle.net
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>, QEMU
+ Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ James Morse <james.morse@arm.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor,
 
-On 10/8/19 1:33 PM, Igor Mammedov wrote:
-> Series cleans up remaining boards that call memory_region_allocate_system_memory()
-> multiple times, violating interface contract (the function should be called only
-> once).
+
+On 2019/9/27 21:57, Peter Maydell wrote:
+> On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+>>
+>> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>>
+>> Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+>> translates the host VA delivered by host to guest PA, then fills this PA
+>> to guest APEI GHES memory, then notifies guest according to the SIGBUS
+>> type.
+>>
+>> If guest accesses the poisoned memory, it generates Synchronous External
+>> Abort(SEA). Then host kernel gets an APEI notification and calls
+>> memory_failure() to unmapped the affected page in stage 2, finally
+>> returns to guest.
+>>
+>> Guest continues to access PG_hwpoison page, it will trap to KVM as
+>> stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
+>> Qemu, Qemu records this error address into guest APEI GHES memory and
+>> notifes guest using Synchronous-External-Abort(SEA).
+>>
+>> Suggested-by: James Morse <james.morse@arm.com>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+>> ---
+>>  hw/acpi/acpi_ghes.c         | 252 ++++++++++++++++++++++++++++++++++++
+>>  include/hw/acpi/acpi_ghes.h |  40 ++++++
+>>  include/sysemu/kvm.h        |   2 +-
+>>  target/arm/kvm64.c          |  39 ++++++
+>>  4 files changed, 332 insertions(+), 1 deletion(-)
 > 
-> With that cleaned up, it should be possible to switch from adhoc RAM allocation
-> in memory_region_allocate_system_memory()->allocate_system_memory_nonnuma() to
-> memory-backend based allocation, remaining roadblock for doing it is deprecated
-> -mem-path fallback to RAM allocation, which is scheduled for removal at 4.3
-> merge window. So remaining patches to consolidate system RAM allocation around
-> memory-backends and aliasing -mem-path/mem-prealloc to it are postponed till
-> then.
+> I'll let somebody else review the ACPI parts as that's not my
+> area of expertise, but I'll look at the target/arm parts below:
+> 
+>> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
+>> index 20c45179ff..2d17c88045 100644
+>> --- a/hw/acpi/acpi_ghes.c
+>> +++ b/hw/acpi/acpi_ghes.c
+>> @@ -26,6 +26,168 @@
+>>  #include "sysemu/sysemu.h"
+>>  #include "qemu/error-report.h"
+>>
+>> +/* Total size for Generic Error Status Block
+> 
+> This block comment should start with '/*' on a line of its own
+> (as should others in this patch). Usually checkpatch catches these
+> but it's not infallible.
 
-How do we protect the codebase for new boards to not make the same mistake?
+Yes, checkpatch catches these and reports 'WARNING' informations. I will
+clean up all these 'WARINIG's.
 
-What about some code like this snippet (or nicer, but since this is a 
-developer error, and assert is enough IMO):
+> 
+>> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+>> index 909bcd77cf..5f57e4ed43 100644
+>> --- a/include/sysemu/kvm.h
+>> +++ b/include/sysemu/kvm.h
+>> @@ -378,7 +378,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+>>  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+>>  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
+>>
+>> -#ifdef TARGET_I386
+>> +#if defined(TARGET_I386) || defined(TARGET_AARCH64)
+>>  #define KVM_HAVE_MCE_INJECTION 1
+>>  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+>>  #endif
+> 
+> Rather than introducing a new ifdef with lots of TARGET_*,
+> I think it would be better to have target/i386/cpu.h and
+> target/arm/cpu.h do "#define KVM_HAVE_MCE_INJECTION 1"
+> (nb that the arm cpu.h needs to define it only for aarch64,
+> not for 32-bit arm host compiles).
+> 
+> and then kvm.h can just do
+> #ifdef KVM_HAVE_MCE_INJECTION
+> void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+> #endif
 
--- >8 --
+Yes, it's much better.
 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 4dfec5c95b..a487677672 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -484,6 +484,11 @@ static void 
-allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
-                                             const char *name,
-                                             uint64_t ram_size)
-  {
-+    static bool nonnuma_system_memory_allocated;
-+
-+    g_assert(!nonnuma_system_memory_allocated);
-+    nonnuma_system_memory_allocated = true;
-+
-      if (mem_path) {
-  #ifdef __linux__
-          Error *err = NULL;
----
+> 
+>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+>> index bf6edaa3f6..186d855522 100644
+>> --- a/target/arm/kvm64.c
+>> +++ b/target/arm/kvm64.c
+>> @@ -28,6 +28,8 @@
+>>  #include "kvm_arm.h"
+>>  #include "hw/boards.h"
+>>  #include "internals.h"
+>> +#include "hw/acpi/acpi.h"
+>> +#include "hw/acpi/acpi_ghes.h"
+>>
+>>  static bool have_guest_debug;
+>>
+>> @@ -1070,6 +1072,43 @@ int kvm_arch_get_registers(CPUState *cs)
+>>      return ret;
+>>  }
+>>
+>> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+>> +{
+>> +    ram_addr_t ram_addr;
+>> +    hwaddr paddr;
+>> +
+>> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+>> +
+>> +    if (acpi_enabled && addr &&
+>> +            object_property_get_bool(qdev_get_machine(), "ras", NULL)) {
+>> +        ram_addr = qemu_ram_addr_from_host(addr);
+>> +        if (ram_addr != RAM_ADDR_INVALID &&
+>> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+>> +            kvm_hwpoison_page_add(ram_addr);
+>> +            /* Asynchronous signal will be masked by main thread, so
+>> +             * only handle synchronous signal.
+>> +             */
+> 
+> I don't entirely understand this comment. The x86 version
+> of this function says:
+> 
+>     /* If we get an action required MCE, it has been injected by KVM
+>      * while the VM was running.  An action optional MCE instead should
+>      * be coming from the main thread, which qemu_init_sigbus identifies
+>      * as the "early kill" thread.
+>      */
 
-$ hppa-softmmu/qemu-system-hppa
-**
-ERROR:/home/phil/source/qemu/hw/core/numa.c:489:allocate_system_memory_nonnuma: 
-assertion failed: (!nonnuma_system_memory_allocated)
-Aborted (core dumped)
+This comment also applies to the Arm KVM.
+
+> 
+> so we can be called for action-optional MCE here (not on the vcpu
+> thread). We obviously can't deliver those as a synchronous exception
+> to a particular CPU, but is there no mechanism for reporting them
+> to the guest at all?
+
+On the one hand, the AO MCE/SEI cannot be recovered by the guest. On the other hand,
+the SIGBUS signal is masked by qemu main thread[1]. Thus we only deliver a SEA to the
+target vCPU.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg03575.html.
+
+> 
+>> +            if (code == BUS_MCEERR_AR) {
+>> +                kvm_cpu_synchronize_state(c);
+>> +                if (ACPI_GHES_CPER_FAIL !=
+>> +                    acpi_ghes_record_errors(ACPI_GHES_NOTIFY_SEA, paddr)) {
+>> +                    kvm_inject_arm_sea(c);
+>> +                } else {
+>> +                    fprintf(stderr, "failed to record the error\n");
+>> +                }
+>> +            }
+>> +            return;
+>> +        }
+>> +        fprintf(stderr, "Hardware memory error for memory used by "
+>> +                "QEMU itself instead of guest system!\n");
+>> +    }
+>> +
+>> +    if (code == BUS_MCEERR_AR) {
+>> +        fprintf(stderr, "Hardware memory error!\n");
+>> +        exit(1);
+>> +    }
+>> +}
+>> +
+>>  /* C6.6.29 BRK instruction */
+>>  static const uint32_t brk_insn = 0xd4200000;
+>>
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
+
+-- 
+
+Thanks,
+Xiang
+
 
