@@ -2,74 +2,81 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C051C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A98C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 477D6206C2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:52:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD526206C2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:54:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="DEEkaaJE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 477D6206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=foxmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Erx7bG7q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD526206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHmAP-0004ma-Fv
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38954)
+	id 1iHmCd-00068s-Tr
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:54:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhlb29@foxmail.com>) id 1iHm9H-0003zo-Gc
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:51:21 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1iHmBk-0005Vv-BX
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhlb29@foxmail.com>) id 1iHm9A-0001zk-BQ
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:51:14 -0400
-Received: from smtpbgsg2.qq.com ([54.254.200.128]:60274)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhlb29@foxmail.com>) id 1iHm97-0001t7-AG
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:51:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
- s=s201512; t=1570528234;
- bh=YzbBa4xhn6uGPDdvVzD9hJ+Z8MqA3YQ/7JFRaa0JZVU=;
- h=From:To:Subject:Mime-Version:Date:Message-ID;
- b=DEEkaaJERykKn/TC0wTmEKhq0P8e0qE6OiV7+vLVaM2YoRHsDDvysqNUdx1KRbcNj
- pDihq0HEcdSttiA0xuVz34437H3YmtmD+HxsARB/QUonMgUtaUfHxS+apEmEcH/7MF
- VyqE3q3UgvL2R8o6jwxc6eGlyo13HeUR3APh3DB4=
-X-QQ-SSF: 00000000000000F000000000000000G
-X-HAS-ATTACH: no
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 124.200.70.7
-X-QQ-STYLE: 
-X-QQ-mid: webenglish1t1570528233t168097
-From: "=?ISO-8859-1?B?TGlibyBaaG91?=" <zhlb29@foxmail.com>
-To: "=?ISO-8859-1?B?cWVtdS1kZXZlbA==?=" <qemu-devel@nongnu.org>
-Subject: Re: gdbstub and gbd segfaults on different instructions in user
- spaceemulation
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
-Date: Tue, 8 Oct 2019 17:50:33 +0800
-X-Priority: 1
-Message-ID: <tencent_1EC21D026D3BC78502F7A9F0@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1]) by smtp.qq.com (ESMTP) with SMTP
- id ; Tue, 08 Oct 2019 17:50:34 +0800 (CST)
-Feedback-ID: webenglish:foxmail.com:bgforeign:bgforeign2
-X-QQ-Bgrelay: 1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 54.254.200.128
+ (envelope-from <bmeng.cn@gmail.com>) id 1iHmBj-0003Wa-5B
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:53:52 -0400
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:43281)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1iHmBj-0003WK-17; Tue, 08 Oct 2019 05:53:51 -0400
+Received: by mail-yw1-xc44.google.com with SMTP id q7so6204792ywe.10;
+ Tue, 08 Oct 2019 02:53:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4ORxxJ0M/325MeidPci2KxTjX/RdOiKnspbSwICjoPE=;
+ b=Erx7bG7q3DXAUGzy4Lzntrwt/MSYl2IfHoa5yYHl6W3QaJxYUbSmCAAyYk1r5/FXxF
+ 3eBJ8xggvpYVUEC/NnHpSnkvAKrxp3LAjQVJ8f3CPzS0bVT1qz9u4ZCHhgXeNUTedx/r
+ Vm9hcT2H/b+Ea0YXQWYGljW3IKmeE16zhLRsdXhRvJO3HMYfXhzyELay1A/iZw+sP++E
+ TgA27dfFKZgvXHPOkjNQ22SUnm6aCnXzimJhDfJzv7hWx76GEnynKm/kYp5kZX1CIF1I
+ LO9pg/WlcXRncef2lvF6/hyJqQ22T1UQ5WiY+fctL3tMkp4zxCz1evh2iM4mfU1DUWAI
+ AoNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4ORxxJ0M/325MeidPci2KxTjX/RdOiKnspbSwICjoPE=;
+ b=oYw7yp7ZRCMBJTQOgymAMK6WQSU80a/3BO5JhnEKBrEx4FMDXJgVss8BZO/QrlUVSf
+ AajMZiotixLlro+1LoFyn9FCFyYvWZUEmxVMaW6nFcf/gaMcIimXjiN5AYzd5CKO8PYw
+ K5VAPpTKgz8wUQOZls5BvqOsjzFFDcTNREvmQEJ4Sp2hLdY2gTbL425xtK8I+qMj3l5T
+ WeTCOrmUR3tWgw9vxkao8+LGKMJSw7a7OgxO/ViNEqq2sLg/OMKnGLa/AwTcq/gfRn06
+ WCIoaCFVfkYxKcMrFkP2LlPqMOMOei7h7I1ZqxAHFJNZx2RUQAg1fYjBHsfcDelbDYna
+ t19Q==
+X-Gm-Message-State: APjAAAWJljLhxctIWoRVewLWHpRgd01VPeSsQAjgQR5UdP6M9ZaDKaoQ
+ XgaH2J60xXZrOQq3wDcJ4Ncj6ZaNSJmfzoIQtPc=
+X-Google-Smtp-Source: APXvYqzRCeqk7xeShWLGS3gYOcId3u+BTyOYQM/m050BwLplvORe2oJEVsYnVs9v9cauVZ6bwLrnVzM1Plm4eBCP4/g=
+X-Received: by 2002:a81:2f12:: with SMTP id v18mr13947029ywv.137.1570528430487; 
+ Tue, 08 Oct 2019 02:53:50 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191008001318.219367-1-jonathan@fintelia.io>
+ <20191008001318.219367-2-jonathan@fintelia.io>
+In-Reply-To: <20191008001318.219367-2-jonathan@fintelia.io>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Tue, 8 Oct 2019 17:53:37 +0800
+Message-ID: <CAEUhbmXHdj=-28inH5-ToS4tOAYOva1Lc1QCz6RGijkMrWhFdg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/3] target/riscv: Tell gdbstub the correct number of
+ CSRs
+To: Jonathan Behrens <jonathan@fintelia.io>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,132 +88,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?ISO-8859-1?B?UGV0ZXIgTWF5ZGVsbA==?= <peter.maydell@linaro.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SXMgdGhlcmUgYW55IGZvbGxvdy11cCBndXlzPyBIZWxwIHdvdWxkIGJlIGFwcHJlY2lhdGVk
-LgoKCgoKLS0tLS0tLS0tLS0tLS0tLS0tIE9yaWdpbmFsIC0tLS0tLS0tLS0tLS0tLS0tLQpG
-cm9tOiAgIkxpYm8gWmhvdSI7PHpobGIyOUBmb3htYWlsLmNvbT47CkRhdGU6ICBPY3QgNiwg
-MjAxOQpUbzogICJQZXRlciBNYXlkZWxsIjxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+OyAK
-Q2M6ICAicWVtdS1kZXZlbCI8cWVtdS1kZXZlbEBub25nbnUub3JnPjsgClN1YmplY3Q6ICBS
-ZTogIGdkYnN0dWIgYW5kIGdiZCBzZWdmYXVsdHMgb24gZGlmZmVyZW50IGluc3RydWN0aW9u
-cyBpbiB1c2VyIHNwYWNlZW11bGF0aW9uCgoKCkhpIFBldGVyLAoKSSBoYXZlIGZpbmFsbHkg
-Z290IHRoZSBjaGFuY2UgdG8gcmVwbHkuIFRoYW5rcyBmb3IgeW91ciBleHBsYW5hdGlvbiwg
-SSBoYXZlIGxlYXJuZWQgdGhlIGltcG9ydGFudCBjb25jZXB0IG9mIEpJVC4KCkkgaGF2ZSBi
-ZWVuIHBsYXlpbmcgd2l0aCB0aGUgbG9nZ2luZyBvcHRpb25zIGluIC1kLCBidXQgSSBmb3Vu
-ZCBzb21ldGhpbmcgd2VpcmQgdGhhdCBtYWtlcyBpdCB0cmlja3kgZm9yIG1lIHRvIGZpZ3Vy
-ZSBvdXQgdGhlIGNhdXNlIG9mIHRoZSBzZWdmYXVsdC4gQXMgeW91IG1lbnRpb25lZCwgSSBu
-ZWVkIHRvIGtub3cgaWYgdGhlIHNlZ2ZhdWx0IGlzIGNhdXNlZCBieSBndWVzdCBwcm9ncmFt
-IGhhdmluZyBiYWQgbWVtIGFjY2Vzcywgb3IgUUVNVSBpdHNlbGYgY3Jhc2hpbmcuCgpUbyBy
-ZWNhcCwgSSBqdXN0IGNoYW5nZWQgdGhlIFszMToyNl0gb3Bjb2RlIGZpZWxkIG9mIExXIGFu
-ZCBTVyBpbnN0cnVjdGlvbnMgaW4gdHJhbnNsYXRlLmMuIEFuZCBJIHVzZWQgdGhpcyBmb2xs
-b3dpbmcgbGluZSB0byBkaWFnbm9zZToKCiQgLi9xZW11LW1pcHNlbCAtY3B1IG1hb3R1IC1k
-IGluX2FzbSxub2NoYWluIC1EIGRlYnVnLmxvZyAtc2luZ2xlc3RlcCB0ZXN0CgpBbmQgYmVs
-b3cgaXMgbXkgd2VpcmQgaW5fYXNtIGxvZy4gVGhlIGxvZyBsb29rcyB2ZXJ5IHdlaXJkLCB0
-aGUgaW5zdHJ1Y3Rpb25zIGFyZSBqdXN0IG5vdCB0aGUgb25lcyBJIHNhdyBpbiBteSBvYmpk
-dW1wLiBUaGUgZG11bHQuZyBpbnN0cnVjdGlvbiwgYXMgeW91IHBvaW50ZWQgb3V0IGJlZm9y
-ZSwgaXMgYSBMb29uZ3NvbiBpbnN0cnVjdGlvbi4gSSBoYXZlIGFsc28gbm90aWNlZCB0aGF0
-LCB0aGUgaW5fYXNtIHNob3VsZCBoYXZlIGdpdmVuIG1lIGEgbG9uZ2VyIGxvZywgd2l0aCBz
-b21lIG90aGVyIHBhcnRzIGJlc2lkZXMgbWFpbi4gVGhpcyBsb2cgb25seSBoYXMgbWFpbiBp
-biBpdC4KCkRvIHlvdSBoYXZlIGFueSBpZGVhIHdoYXQgZWxzZSBJIGNhbiB0cnk/IFRoaXMg
-c2VnZmF1bHQgaGFzIGJ1Z2dlZCBtZSBmb3IgMiB3ZWVrcywgYnV0IEkgc3RpbGwgYmVsaWV2
-ZSB0aGVyZSBpcyBhIHNvbHV0aW9uLCBldmVuIGlmIHRoZSBsb2dzIGFyZSB0cmlja3kgdG8g
-aW50ZXJwcmV0LiBJIGp1c3QgZG9uJ3Qga25vdyBob3cgY2hhbmdpbmcgNiBiaXRzIG9mIG9w
-Y29kZSBmaWVsZCBjb3VsZCBsZWFkIHRvIHNvIG1hbnkgaXNzdWVzLgoKLS0tLS0tLS0tLS0t
-LS0tLQpJTjogbWFpbgoweDAwNDAwMDkwOiAgYm92YyBzcCxzcCwweDQwMDAxNAoKLS0tLS0t
-LS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMDk0OiAgZG11bHQuZyB6ZXJvLHNwLHM4Cgot
-LS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwOTg6ICBub3AKCi0tLS0tLS0tLS0t
-LS0tLS0KSU46IG1haW4KMHgwMDQwMDA5YzogIG5vcAoKLS0tLS0tLS0tLS0tLS0tLQpJTjog
-bWFpbgoweDAwNDAwMGEwOiAgbW92ZSBzOCxzcAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFp
-bgoweDAwNDAwMGE0OiAgYmVxemFsYyB6ZXJvLHYwLDB4NDAwMGFjCgotLS0tLS0tLS0tLS0t
-LS0tCklOOiBtYWluCjB4MDA0MDAwYTg6ICBhZGR1LnFiIHplcm8sczgsdjAKCi0tLS0tLS0t
-LS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBhYzogIG5vcAoKLS0tLS0tLS0tLS0tLS0tLQpJ
-TjogbWFpbgoweDAwNDAwMGIwOiAgbm9wCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4
-MDA0MDAwYjQ6ICBiZXF6YWxjIHplcm8sdjAsMHg0MDAwYzAKCi0tLS0tLS0tLS0tLS0tLS0K
-SU46IG1haW4KMHgwMDQwMDBiODogIGluc3YgdjAsczgKCi0tLS0tLS0tLS0tLS0tLS0KSU46
-IG1haW4KMHgwMDQwMDBiYzogIG5vcAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAw
-NDAwMGMwOiAgbm9wCgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwYzQ6ICBi
-bHRjIHM4LHYxLDB4NDAwMTA4CgotLS0tLS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAw
-Yzg6ICBub3AKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBjYzogIGJsdGMg
-czgsdjAsMHg0MDAxMDAKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBkMDog
-IG5vcAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGQ0OiAgbm9wCgotLS0t
-LS0tLS0tLS0tLS0tCklOOiBtYWluCjB4MDA0MDAwZDg6ICBhZGQgdjAsdjEsdjAKCi0tLS0t
-LS0tLS0tLS0tLS0KSU46IG1haW4KMHgwMDQwMDBkYzogIGZvcmsgemVybyxzOCx2MAoKLS0t
-LS0tLS0tLS0tLS0tLQpJTjogbWFpbgoweDAwNDAwMGUwOiAgbm9wCgotLS0tLS0tLS0tLS0t
-LS0tCklOOiBtYWluCjB4MDA0MDAwZTQ6ICBub3AKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1h
-aW4KMHgwMDQwMDBlODogIG1vdmUgdjAsemVybwoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFp
-bgoweDAwNDAwMGVjOiAgbW92ZSBzcCxzOAoKLS0tLS0tLS0tLS0tLS0tLQpJTjogbWFpbgow
-eDAwNDAwMGYwOiAgYmx0YyBzcCxzOCwweDQwMDE2NAoKLS0tLS0tLS0tLS0tLS0tLQpJTjog
-bWFpbgoweDAwNDAwMGY0OiAgYm92YyBzcCxzcCwweDQwMDE3OAoKLS0tLS0tLS0tLS0tLS0t
-LQpJTjogbWFpbgoweDAwNDAwMGY4OiAganIgcmEKCi0tLS0tLS0tLS0tLS0tLS0KSU46IG1h
-aW4KMHgwMDQwMDBmYzogIG5vcAoKLS0tLS0tLS0tLS0tLS0tLS0tIE9yaWdpbmFsIC0tLS0t
-LS0tLS0tLS0tLS0tLQpGcm9tOiAgIlBldGVyIE1heWRlbGwiOzxwZXRlci5tYXlkZWxsQGxp
-bmFyby5vcmc+OwpTZW5kIHRpbWU6IFR1ZXNkYXksIE9jdCAxLCAyMDE5IDA6MjMgQU0KVG86
-ICJMaWJvIFpob3UiPHpobGIyOUBmb3htYWlsLmNvbT47IApDYzogInFlbXUtZGV2ZWwiPHFl
-bXUtZGV2ZWxAbm9uZ251Lm9yZz47IApTdWJqZWN0OiAgUmU6IGdkYnN0dWIgYW5kIGdiZCBz
-ZWdmYXVsdHMgb24gZGlmZmVyZW50IGluc3RydWN0aW9ucyBpbiB1c2VyIHNwYWNlZW11bGF0
-aW9uCgoKCk9uIE1vbiwgMzAgU2VwIDIwMTkgYXQgMTY6NTcsIExpYm8gWmhvdSA8emhsYjI5
-QGZveG1haWwuY29tPiB3cm90ZToKPiBJIGFtIGVuY291bnRlcmluZyBzZWdtZW50YXRpb24g
-ZmF1bHQgd2hpbGUgcG9ydGluZyBteSBjdXN0b20gSVNBIHRvIFFFTVUuIE15IGN1c3RvbSBJ
-U0EgaXMgVkVSWSBWRVJZIHNpbXBsZSwgaXQgb25seSBjaGFuZ2VzIHRoZSBbMzE6MjZdIG9w
-Y29kZSBmaWVsZCBvZiBMVyBhbmQgU1cgaW5zdHJ1Y3Rpb25zLiBUaGUgbGluayBoYXMgbXkg
-dmVyeSBzaW1wbGUgaW1wbGVtZW50YXRpb246IGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNo
-aXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE5LTA5L21zZzA2OTc2Lmh0bWwKCj4gSSBoYXZlIHRy
-aWVkIDIgd2F5cyBvZiBkZWJ1Z2dpbmcgaXQuCj4gRmlyc3RseSwgSSBjb25uZWN0ZWQgZ2Ri
-LW11bHRpYXJjaCB0byBnZGJzdHViLCBhbmQgSSBzaW5nbGUtc3RlcHBlZCB0aGUgaW5zdHJ1
-Y3Rpb25zIGluIG15IEVMRi4gSW1tZWRpYXRlbHkgYWZ0ZXIgdGhlIExXIGluc3RydWN0aW9u
-LCB0aGUgc2VnZmF1bHQgd2FzIHRocm93bi4gSSBvYnNlcnZlZCB0aGUgbWVtb3J5IGxvY2F0
-aW9uIHVzaW5nICd4JyBjb21tYW5kIGFuZCBmb3VuZCB0aGF0IGF0IGxlYXN0IG15IFNXIGlu
-c3RydWN0aW9uIHdhcyBpbXBsZW1lbnRlZCBjb3JyZWN0bHkuCj4gU2Vjb25kbHksIEkgdXNl
-ZCBnZGIgdG8gZGlyZWN0bHkgZGVidWcgUUVNVS4gSSBzZXQgdGhlIGJyZWFrcG9pbnQgYXQg
-ZnVuY3Rpb24gaW4gdHJhbnNsYXRlLmM6ZGVjb2RlX29wYy4gUHJlc3NpbmcgJ2MnIHNob3Vs
-ZCBoYXZlIHRoZSBzYW1lIGVmZmVjdCBhcyBzaW5nbGUtc3RlcHBpbmcgaW5zdHJ1Y3Rpb24g
-aW4gZ2Ric3R1Yi4gSG93ZXZlciwgdGhlIHNlZ21lbnRhdGlvbiBmYXVsdCB3YXNuJ3QgdGhy
-b3duIGFmdGVyIExXLiBJdCB3YXMgaW5zdGVhZCB0aHJvd24gYWZ0ZXIgdGhlICdub3AnIGFm
-dGVyICdqciByMzEnIGluIHRoZSBvYmpkdW1wLgoKKDEpIElmIHlvdSdyZSBkZWJ1Z2dpbmcg
-dGhlIFFFTVUgSklUIGl0c2VsZiwgdGhlbiB5b3UncmUgcHJvYmFibHkKYmV0dGVyIG9mZiB1
-c2luZyBRRU1VJ3MgbG9nZ2luZyBmYWNpbGl0aWVzICh1bmRlciB0aGUgLWQgb3B0aW9uKQpy
-YXRoZXIgdGhhbiB0aGUgZ2Ric3R1Yi4gVGhlIGdkYnN0dWIgaXMgZ29vZCBpZiB5b3UncmUg
-c3VyZSB0aGF0ClFFTVUgaXMgYmFzaWNhbGx5IGZ1bmN0aW9uYWwgYW5kIHdhbnQgdG8gZGVi
-dWcgeW91ciBndWVzdCwgYnV0CmlmIHlvdSBzdXNwZWN0IGJ1Z3MgaW4gUUVNVSBpdHNlbGYg
-dGhlbiBpdCBjYW4gY29uZnVzZSB5b3UuClRoZSAtZCBkZWJ1ZyBsb2dnaW5nIGlzIGF0IGEg
-bXVjaCBsb3dlciBsZXZlbCwgd2hpY2ggbWFrZXMgaXQKYSBiZXR0ZXIgZ3VpZGUgdG8gd2hh
-dCBRRU1VIGlzIHJlYWxseSBkb2luZywgdGhvdWdoIGl0IGlzIGFsc28KdHJpY2tpZXIgdG8g
-aW50ZXJwcmV0LgoKKDIpIE5vLCBicmVha3BvaW50aW5nIG9uIGRlY29kZV9vcGMgaXMgbm90
-IHRoZSBzYW1lIGFzIHNpbmdsZXN0ZXBwaW5nCmFuIGluc3RydWN0aW9uIGluIGdkYi4gVGhp
-cyBpcyBhIHJlYWxseSBpbXBvcnRhbnQgY29uY2VwdCBpbiBRRU1VCihhbmQgSklUcyBpbiBn
-ZW5lcmFsKSBhbmQgaWYgeW91IGRvbid0IHVuZGVyc3RhbmQgaXQgeW91J3JlIGdvaW5nCnRv
-IGJlIHZlcnkgY29uZnVzZWQuIEEgSklUIGhhcyB0d28gcGhhc2VzOgooYSkgInRyYW5zbGF0
-ZSB0aW1lIiwgd2hlbiB3ZSB0YWtlIGEgYmxvY2sgb2YgZ3Vlc3QgaW5zdHJ1Y3Rpb25zCmFu
-ZCBnZW5lcmF0ZSBob3N0IG1hY2hpbmUgY29kZSBmb3IgdGhlbQooYikgImV4ZWN1dGlvbiB0
-aW1lIiwgd2hlbiB3ZSBleGVjdXRlIG9uZSBvciBtb3JlIG9mIHRoZSBibG9ja3MKb2YgaG9z
-dCBtYWNoaW5lIGNvZGUgdGhhdCB3ZSB3cm90ZSBhdCB0cmFuc2xhdGUgdGltZQpRRU1VIGNh
-bGxzIHRoZSBibG9ja3MgaXQgd29ya3Mgd2l0aCAidHJhbnNsYXRpb24gYmxvY2tzIiwgYW5k
-CnVzdWFsbHkgaXQgd2lsbCBwdXQgbXVsdGlwbGUgZ3Vlc3QgaW5zdHJ1Y3Rpb25zIGludG8g
-ZWFjaCBUQjsKYSBUQiB1c3VhbGx5IHN0b3BzIGFmdGVyIGEgZ3Vlc3QgYnJhbmNoIGluc3Ry
-dWN0aW9ucy4gKFlvdSBjYW4KYXNrIFFFTVUgdG8gcHV0IGp1c3Qgb25lIGd1ZXN0IGluc3Ry
-dWN0aW9uIGludG8gYSBUQiB1c2luZwp0aGUgLXNpbmdsZXN0ZXAgY29tbWFuZCBsaW5lIG9w
-dGlvbiAtLSB0aGlzIGlzIHNvbWV0aW1lcyB1c2VmdWwKd2hlbiBkZWJ1Z2dpbmcuKQoKU28g
-aWYgeW91IHB1dCBhIGJyZWFrcG9pbnQgb24gZGVjb2RlX29wYyB5b3UnbGwgc2VlIGl0IGlz
-IGhpdApmb3IgZXZlcnkgaW5zdHJ1Y3Rpb24gaW4gdGhlIFRCLCB3aGljaCBmb3IgdGhlIFRC
-IHN0YXJ0aW5nIGF0CiIwMDQwMDA5MCA8bWFpbj4iIHdpbGwgYmUgZXZlcnkgaW5zdHJ1Y3Rp
-b24gdXAgdG8gYW5kIGluY2x1ZGluZwp0aGUgJ25vcCcgaW4gdGhlIGRlbGF5IHNsb3Qgb2Yg
-dGhlICdqcicuIE9uY2UgdGhlIHdob2xlIFRCIGlzCnRyYW5zbGF0ZWQsICp0aGVuKiB3ZSB3
-aWxsIGV4ZWN1dGUgaXQuIEl0J3Mgb25seSBhdCBleGVjdXRlIHRpbWUKdGhhdCB3ZSBwZXJm
-b3JtIHRoZSBhY3R1YWwgb3BlcmF0aW9ucyBvbiB0aGUgZ3Vlc3QgQ1BVIHRoYXQKdGhlIGlu
-c3RydWN0aW9ucyByZXF1aXJlLiBJZiB0aGUgc2VnZmF1bHQgaXMgYmVjYXVzZSB3ZSB0aGlu
-awp0aGUgZ3Vlc3QgaGFzIG1hZGUgYSBiYWQgbWVtb3J5IGFjY2Vzcywgd2UnbGwgZ2VuZXJh
-dGUgaXQgaGVyZS4KSWYgdGhlIHNlZ2ZhdWx0IGlzIGFuIGFjdHVhbCBjcmFzaCBpbiBRRU1V
-IGl0c2VsZiwgaXQgd2lsbApoYXBwZW4gaGVyZSBpZiB0aGUgYnVnIGlzIG9uZSB0aGF0IGhh
-cHBlbnMgYXQgZXhlY3V0aW9uIHRpbWUuCgpOb3RlIHRoYXQgdGhlIC1kIGxvZ2dpbmcgd2ls
-bCBkaXN0aW5ndWlzaCBiZXR3ZWVuIHRoaW5ncyB0aGF0CmhhcHBlbiBhdCB0cmFuc2xhdGUg
-dGltZSAod2hpY2ggaXMgd2hlbiB0aGUgaW5fYXNtLCBvcCwgb3V0X2FzbSBldGMKbG9nZ2lu
-ZyBpcyBwcmludGVkKSBhbmQgdGhpbmdzIHRoYXQgaGFwcGVuIGF0IGV4ZWN1dGlvbiB0aW1l
-Cih3aGljaCBpcyB3aGVuIGNwdSwgZXhlYywgaW50LCBldGMgbG9ncyBhcmUgcHJpbnRlZCku
-Cgp0aGFua3MKLS0gUE1N
+On Tue, Oct 8, 2019 at 8:15 AM Jonathan Behrens <jonathan@fintelia.io> wrote:
+>
+> If the number of registers reported to the gdbstub code does not match the
+> number in the associated XML file, then the register numbers used by the stub
+> may get out of sync with a remote GDB instance.
 
+I am not sure how to trigger the out of sync issue. Do you know how?
 
+>
+> Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
+> ---
+>  target/riscv/gdbstub.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+> index ded140e8d8..cb5bfd3d50 100644
+> --- a/target/riscv/gdbstub.c
+> +++ b/target/riscv/gdbstub.c
+> @@ -384,7 +384,7 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
+>      }
+>
+>      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+> -                             4096, "riscv-32bit-csr.xml", 0);
+> +                             240, "riscv-32bit-csr.xml", 0);
+>  #elif defined(TARGET_RISCV64)
+>      if (env->misa & RVF) {
+>          gdb_register_coprocessor(cs, riscv_gdb_get_fpu, riscv_gdb_set_fpu,
+> @@ -392,6 +392,6 @@ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs)
+>      }
+>
+>      gdb_register_coprocessor(cs, riscv_gdb_get_csr, riscv_gdb_set_csr,
+> -                             4096, "riscv-64bit-csr.xml", 0);
+> +                             240, "riscv-64bit-csr.xml", 0);
+>  #endif
+>  }
 
+The change looks good to me.
+
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
 
