@@ -2,87 +2,80 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9692C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 17:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A67C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 17:53:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6415206B6
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 17:51:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FF5D206B6
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 17:53:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H8pXsMwd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6415206B6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="orlgcU3N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FF5D206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHtdv-00032E-SN
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 13:51:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49205)
+	id 1iHtfZ-00048U-Hf
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 13:53:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iHt7k-0006vb-0e
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 13:18:13 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iHtB3-0002LE-L3
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 13:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iHt7i-0002T0-QK
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 13:18:11 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35831)
+ (envelope-from <peter.maydell@linaro.org>) id 1iHtB2-0004Cd-IT
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 13:21:37 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:43828)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iHt7i-0002SZ-Jy
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 13:18:10 -0400
-Received: by mail-wr1-x441.google.com with SMTP id v8so20345485wrt.2
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 10:18:10 -0700 (PDT)
+ id 1iHtB2-0004CK-Bx
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 13:21:36 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id o44so14689561ota.10
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 10:21:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=meYD3iu+SqBh5zzbJLsZrb0S302wohjRCr6pGE0T3yQ=;
- b=H8pXsMwdnFTERlEMgNCj9E+kEDcEH9WKgDy1O27HZmsLslyMNGkegSx71gY5fnQ1Mu
- uNxAOlnihYFw1PJA5IaK2/AA+Mb1RdG6i9YfzbOUhpSj/x/LW+OPSeRtxo4TKb/gBvmV
- HoTcC6mVAMSpgIv5hWlt1M5LCOf8AqSmLoTI6VbTHzn+xfLvZ/gmL5BJIwhdpbrca29Q
- a1x8AB00i7ZJMu4XRWhhytllKZR8f7qttFnodKMqYMdWRT2hRvINqe2zoKr2eGwUJ2c0
- 4h9N7NELr8/686UY6gvIEIz4gEQ3T+0pBG7YxIBEg/RDH21RU4PFECfbOwYpCchWpwrV
- F+BQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TLjkqf9SpFpb97CVRwxlScyAMeg6SxMTa5nj5s7xdGM=;
+ b=orlgcU3NMZM6t1KU7pS2xugvaY4RzHvOipcOtQjsh93tamxfcuuTySJqrT7lFtx6C3
+ wPR3cdyM3wMqcoxIWdXpclUrGSSUzbFosWd7sHcLgBpOCj4aBVGU3oiw/PkzxGAXEv1T
+ H6WduJNMSF8py/g2fTcIZ/4KsarBh+TBxlpIRSE+UCirUNyv2NPr3yearpse1x/WwK0O
+ 7Dok0cGk6P2qxBR0niSb/rCwtW9MVWJy9c4qOmSgksd8v1Fdr3aQaGbCDEGUIrp6A44k
+ TFVCsTCbRU09kjiIZreGF9kCkS0lCEWZGFqfKXf56mWYyvBIfDZ7lp6vU/8FP9IkPKoY
+ M7ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=meYD3iu+SqBh5zzbJLsZrb0S302wohjRCr6pGE0T3yQ=;
- b=C52ntmC1fUqbzVgDdUDKHxMJlwZsiTF/sa+jjeNld+L7HYHzFOMZbEQ0tF1pNRlEQG
- IxC9sanE3bNxt3IxUy5bTMPzhAlDJ96WRsIDDx1+s+OZVgNKpN8y6oq8+19PE2fMGl49
- V7Bfk5IzAxLjTv1xhKgf5UNUserwuw+Q328vuvWHjvsvcaRlqqDh2YBBvO7XuO3MFa6e
- DNyRtiLsuV29yjwq2VU5wYagG1zGyyxklEIhNroBBrPhiqIM96HiYSmpBk0GgbGp4n/o
- CRLqoxqS0vPUMmZ2dBiBp6Xob1eM5kd/ei4VU8rX8f5wWXVkwJajRI1wScrKwgdMVYZQ
- ONHg==
-X-Gm-Message-State: APjAAAWlLiJlyeihku9HZ1YQ/bZWD4yqIi6yfJL3XmklV4KQ61KkKgg3
- cyyT4HOowIzGF3npTAXaXmLKug==
-X-Google-Smtp-Source: APXvYqzQo4uV3ZAGpZhIjum9TlMLdDZNun0ciWrlrbEZY3x83+LJuFP7R9AW1OMXp34IwY6LkZ5HcA==
-X-Received: by 2002:adf:f684:: with SMTP id v4mr25276739wrp.155.1570555089730; 
- Tue, 08 Oct 2019 10:18:09 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id z9sm19135541wrl.35.2019.10.08.10.18.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Oct 2019 10:18:09 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 21/21] hw/net/lan9118.c: Switch to transaction-based ptimer
- API
-Date: Tue,  8 Oct 2019 18:17:40 +0100
-Message-Id: <20191008171740.9679-22-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191008171740.9679-1-peter.maydell@linaro.org>
-References: <20191008171740.9679-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TLjkqf9SpFpb97CVRwxlScyAMeg6SxMTa5nj5s7xdGM=;
+ b=PRaV+fMH6jwI3ZcqnbaLbZcdCGCy1Wb9aCgRL2+z/OJfZ/Oe8Qte9e1RXP49JACIKo
+ +W7HuS2iHZHRFUm3PWZpABGzP7kMTG/pRctADvktBQCaARi5qW6tTzWef9pkNP+inLaI
+ LoLn+hTZjW2nTb1VsmfKQHDUQ1gcDflcaek+E3OT31eIRB81+serNfTG90SGH/6DDGG+
+ We6q8iWYMCz0GuX+YEg/8dadZxI5wfj02RpcklGp5aunR37gvBznuncCKUgUd3W836kS
+ JZp83bk8/Lj7dTYZE5IIH/Rq3lPr5miqZ/3jv6VgQV3g6lirXBM5zj9UxxQvY+ReNKz/
+ hFkA==
+X-Gm-Message-State: APjAAAXsC3G7zlPrnk/CsNFD1tpys3B6n20gGZVIjrwo4QBQUmnA/DSh
+ 141EuXBmxkAktr5OmpiuZpv4vgf3vmFhwZIWbw7wyw==
+X-Google-Smtp-Source: APXvYqxU9/VRhpO1Get+UOSPnTOmpQMoEqllRbaWXB7MpCtJKP2F5W4Lpgw/ZIIKWh76kfETQ25JAfBeN0Mgb2WtVwE=
+X-Received: by 2002:a05:6830:1357:: with SMTP id
+ r23mr26322809otq.91.1570555295393; 
+ Tue, 08 Oct 2019 10:21:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20191008145505.3641-1-stefanha@redhat.com>
+In-Reply-To: <20191008145505.3641-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 Oct 2019 18:21:24 +0100
+Message-ID: <CAFEAcA99UC=V2NzFbfdq13QbbGKKdXDVsGKhH5diZx8dmUhJoA@mail.gmail.com>
+Subject: Re: [PULL 0/4] Block patches
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,86 +87,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the cmsdk-apb-watchdog code away from bottom-half based
-ptimers to the new transaction-based ptimer API.  This just requires
-adding begin/commit calls around the various places that modify the
-ptimer state, and using the new ptimer_init() function to create the
-timer.
+On Tue, 8 Oct 2019 at 15:55, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> The following changes since commit 560009f2c8b57b7cdd31a5693ea86ab369382f49:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-10-07 15:40:53 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 4d804b5305ffb4d5fa414c38d4f1bdfb987c8d0b:
+>
+>   iotests/262: Switch source/dest VM launch order (2019-10-08 14:28:25 +0100)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> This pull request also contains the two commits from the previous pull request
+> that was dropped due to a mingw compilation error.  The compilation should now
+> be fixed.
+>
+> ----------------------------------------------------------------
+>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/net/lan9118.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
-index 0ea51433dca..ed551f2178b 100644
---- a/hw/net/lan9118.c
-+++ b/hw/net/lan9118.c
-@@ -21,7 +21,6 @@
- #include "hw/ptimer.h"
- #include "hw/qdev-properties.h"
- #include "qemu/log.h"
--#include "qemu/main-loop.h"
- #include "qemu/module.h"
- /* For crc32 */
- #include <zlib.h>
-@@ -450,8 +449,10 @@ static void lan9118_reset(DeviceState *d)
-     s->e2p_data = 0;
-     s->free_timer_start = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) / 40;
- 
-+    ptimer_transaction_begin(s->timer);
-     ptimer_stop(s->timer);
-     ptimer_set_count(s->timer, 0xffff);
-+    ptimer_transaction_commit(s->timer);
-     s->gpt_cfg = 0xffff;
- 
-     s->mac_cr = MAC_CR_PRMS;
-@@ -1100,6 +1101,7 @@ static void lan9118_writel(void *opaque, hwaddr offset,
-         break;
-     case CSR_GPT_CFG:
-         if ((s->gpt_cfg ^ val) & GPT_TIMER_EN) {
-+            ptimer_transaction_begin(s->timer);
-             if (val & GPT_TIMER_EN) {
-                 ptimer_set_count(s->timer, val & 0xffff);
-                 ptimer_run(s->timer, 0);
-@@ -1107,6 +1109,7 @@ static void lan9118_writel(void *opaque, hwaddr offset,
-                 ptimer_stop(s->timer);
-                 ptimer_set_count(s->timer, 0xffff);
-             }
-+            ptimer_transaction_commit(s->timer);
-         }
-         s->gpt_cfg = val & (GPT_TIMER_EN | 0xffff);
-         break;
-@@ -1328,7 +1331,6 @@ static void lan9118_realize(DeviceState *dev, Error **errp)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-     lan9118_state *s = LAN9118(dev);
--    QEMUBH *bh;
-     int i;
-     const MemoryRegionOps *mem_ops =
-             s->mode_16bit ? &lan9118_16bit_mem_ops : &lan9118_mem_ops;
-@@ -1349,10 +1351,11 @@ static void lan9118_realize(DeviceState *dev, Error **errp)
-     s->pmt_ctrl = 1;
-     s->txp = &s->tx_packet;
- 
--    bh = qemu_bh_new(lan9118_tick, s);
--    s->timer = ptimer_init_with_bh(bh, PTIMER_POLICY_DEFAULT);
-+    s->timer = ptimer_init(lan9118_tick, s, PTIMER_POLICY_DEFAULT);
-+    ptimer_transaction_begin(s->timer);
-     ptimer_set_freq(s->timer, 10000);
-     ptimer_set_limit(s->timer, 0xffff, 1);
-+    ptimer_transaction_commit(s->timer);
- }
- 
- static Property lan9118_properties[] = {
--- 
-2.20.1
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
