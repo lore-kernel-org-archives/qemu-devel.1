@@ -2,91 +2,60 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C03C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 11:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A523DC10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 11:35:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FF2120673
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 11:34:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LoNZXwbL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FF2120673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 72AF620673
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 11:35:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72AF620673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHnlI-0002VN-U7
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 07:34:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51426)
+	id 1iHnlw-0003Ex-5S
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 07:35:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51598)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iHnj5-0000zo-QG
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 07:32:25 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iHnk9-0001pw-Op
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 07:33:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iHnj0-0000u4-Ra
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 07:32:21 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37709)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iHniy-0000qq-Rq
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 07:32:17 -0400
-Received: by mail-wm1-x341.google.com with SMTP id f22so2748827wmc.2
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 04:32:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ofj6Equz5xEgi6bS+/yltqkzQhKqD0+OdBLZGgmbhng=;
- b=LoNZXwbL84biY2OTDkIFEZZdtYaKHDEqC71k/DXh8WmTmhBjkLSWLjtxA3ZMp+cek6
- KNu136QBy5m2k8D8ecKcN51X4DBwX4zrwoMDp6sr87FeBpu2i64PUmP8x5rkCppqf9Kn
- YcIMaTdp5S+xWL5k2+/80AGNZY2FkEDueCrtLJ1V62JTzRljQ7Yhl+HjO/61MVviglLw
- WLsF7v7wSCheoKV1DOwg9Eaw4MLSrNODTZt4D6lP71Xf50TNlfCbDhmhBpsuqoC93MC5
- /NwpM8LDiv6hReXJg3RUljeZzMQW2sHG1Rlj0jn1NC6y6KIWY9f3uYeDWnEr8fTe0edP
- i3Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ofj6Equz5xEgi6bS+/yltqkzQhKqD0+OdBLZGgmbhng=;
- b=hX/t5/GyuOaA8Afvg3TX2HVPe6FOWRfcrGbX1lswDP42PEFul/5x61OLjAZEq5BMIU
- aC3n9Kbr6SLo0qQ8HYbqacgdK1eQkz2fYxaCsCvcao8auwmYPV8KZARrS+4G7k4KFAln
- YMEf0gSGPpH6TpLZsaeVSAY9pgETRFQ+x4dnLTKkZVekes7+CHxytXOlf3sxAqQZbrso
- 6H2eoLwoUTCSfLG64JnjuKxBqR3tuCIc0JewGgZF/GM2zXTFN3FYBaJyoCfcYeS7uHwl
- AIDc3FGSoC33t7O6G1zB4dWvdrDGDEiq5DhTbja1cc4BptC9ZAFClkAWXpbZIo5E3VK8
- eMTQ==
-X-Gm-Message-State: APjAAAUv4Bm78eSOhWOOM55TNM0so63alvcmMF6ENBcjNVIMZLunwwuZ
- YM6tBGqPcVpdgoKhYXxXO2a7RQ==
-X-Google-Smtp-Source: APXvYqzHX4aDAZoonQqjU8Y2ivFfqGpO7CmTrguy6AjfTrtya6Z49eHs1cINgD0zfelAd1PiHLyrkA==
-X-Received: by 2002:a05:600c:48e:: with SMTP id
- d14mr3630238wme.175.1570534334307; 
- Tue, 08 Oct 2019 04:32:14 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y186sm6225902wmd.26.2019.10.08.04.32.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Oct 2019 04:32:13 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BDE2F1FF87;
- Tue,  8 Oct 2019 12:32:12 +0100 (BST)
-References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-8-f4bug@amsat.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <imammedo@redhat.com>) id 1iHnk8-0001Ti-LD
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 07:33:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58870)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1iHnk8-0001TD-6S; Tue, 08 Oct 2019 07:33:28 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 62C4B793EC;
+ Tue,  8 Oct 2019 11:33:27 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99A1E60BE0;
+ Tue,  8 Oct 2019 11:33:25 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 07/19] hw/misc/bcm2835_mbox: Add trace events
-In-reply-to: <20190926173428.10713-8-f4bug@amsat.org>
-Date: Tue, 08 Oct 2019 12:32:12 +0100
-Message-ID: <87wodfiibn.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Subject: [PATCH 1/3] sparc64: use memory_region_allocate_system_memory() only
+ for '-m' specified RAM
+Date: Tue,  8 Oct 2019 07:33:16 -0400
+Message-Id: <20191008113318.7012-2-imammedo@redhat.com>
+In-Reply-To: <20191008113318.7012-1-imammedo@redhat.com>
+References: <20191008113318.7012-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Tue, 08 Oct 2019 11:33:27 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,130 +67,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?utf-8?Q?Zolt=C3=A1n?= Baldaszti <bztemail@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Esteban Bosse <estebanbosse@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- qemu-arm@nongnu.org, Clement Deschamps <clement.deschamps@antfield.fr>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Cheng Xiang <ext-cheng.xiang@here.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: deller@gmx.de, mark.cave-ayland@ilande.co.uk, hpoussin@reactos.org,
+ qemu-ppc@nongnu.org, rth@twiddle.net, atar4qemu@gmail.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+memory_region_allocate_system_memory() was designed to be called for
+allocating inital RAM. Using it mutiple times within one board is not
+supported and could fail if -mem-path with non hugepage path is used.
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+Keep using memory_region_allocate_system_memory() only for initial
+RAM and use memory_region_init_ram() for the rest fixed size regions.
 
-> Add trace events for read/write accesses and IRQ.
->
-> Properties are structures used for the ARM particular MBOX.
-> Since one call in bcm2835_property.c concerns the mbox block,
-> name this trace event in the same bcm2835_mbox* namespace.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/misc/bcm2835_mbox.c     | 5 +++++
->  hw/misc/bcm2835_property.c | 2 ++
->  hw/misc/trace-events       | 6 ++++++
->  3 files changed, 13 insertions(+)
->
-> diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
-> index 77285624c9..77d2d80706 100644
-> --- a/hw/misc/bcm2835_mbox.c
-> +++ b/hw/misc/bcm2835_mbox.c
-> @@ -15,6 +15,7 @@
->  #include "migration/vmstate.h"
->  #include "qemu/log.h"
->  #include "qemu/module.h"
-> +#include "trace.h"
->
->  #define MAIL0_PEEK   0x90
->  #define MAIL0_SENDER 0x94
-> @@ -123,6 +124,7 @@ static void bcm2835_mbox_update(BCM2835MboxState *s)
->              set =3D true;
->          }
->      }
-> +    trace_bcm2835_mbox_irq(set);
->      qemu_set_irq(s->arm_irq, set);
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/sparc64/niagara.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-I'm kind surprised we don't have a common trace point for all IRQs.
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index 167143bffe..5987693659 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -36,6 +36,7 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/sysemu.h"
++#include "qapi/error.h"
+ 
+ typedef struct NiagaraBoardState {
+     MemoryRegion hv_ram;
+@@ -106,8 +107,8 @@ static void niagara_init(MachineState *machine)
+     /* init CPUs */
+     sparc64_cpu_devinit(machine->cpu_type, NIAGARA_PROM_BASE);
+     /* set up devices */
+-    memory_region_allocate_system_memory(&s->hv_ram, NULL, "sun4v-hv.ram",
+-                                         NIAGARA_HV_RAM_SIZE);
++    memory_region_init_ram(&s->hv_ram, NULL, "sun4v-hv.ram",
++                           NIAGARA_HV_RAM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_HV_RAM_BASE, &s->hv_ram);
+ 
+     memory_region_allocate_system_memory(&s->partition_ram, NULL,
+@@ -116,17 +117,17 @@ static void niagara_init(MachineState *machine)
+     memory_region_add_subregion(sysmem, NIAGARA_PARTITION_RAM_BASE,
+                                 &s->partition_ram);
+ 
+-    memory_region_allocate_system_memory(&s->nvram, NULL,
+-                                         "sun4v.nvram", NIAGARA_NVRAM_SIZE);
++    memory_region_init_ram(&s->nvram, NULL, "sun4v.nvram", NIAGARA_NVRAM_SIZE,
++                           &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_NVRAM_BASE, &s->nvram);
+-    memory_region_allocate_system_memory(&s->md_rom, NULL,
+-                                         "sun4v-md.rom", NIAGARA_MD_ROM_SIZE);
++    memory_region_init_ram(&s->md_rom, NULL, "sun4v-md.rom",
++                           NIAGARA_MD_ROM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_MD_ROM_BASE, &s->md_rom);
+-    memory_region_allocate_system_memory(&s->hv_rom, NULL,
+-                                         "sun4v-hv.rom", NIAGARA_HV_ROM_SIZE);
++    memory_region_init_ram(&s->hv_rom, NULL, "sun4v-hv.rom",
++                           NIAGARA_HV_ROM_SIZE, &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_HV_ROM_BASE, &s->hv_rom);
+-    memory_region_allocate_system_memory(&s->prom, NULL,
+-                                         "sun4v.prom", PROM_SIZE_MAX);
++    memory_region_init_ram(&s->prom, NULL, "sun4v.prom", PROM_SIZE_MAX,
++                           &error_fatal);
+     memory_region_add_subregion(sysmem, NIAGARA_PROM_BASE, &s->prom);
+ 
+     add_rom_or_fail("nvram1", NIAGARA_NVRAM_BASE);
+@@ -143,8 +144,8 @@ static void niagara_init(MachineState *machine)
+         BlockBackend *blk = blk_by_legacy_dinfo(dinfo);
+         int size = blk_getlength(blk);
+         if (size > 0) {
+-            memory_region_allocate_system_memory(&s->vdisk_ram, NULL,
+-                                                 "sun4v_vdisk.ram", size);
++            memory_region_init_ram(&s->vdisk_ram, NULL, "sun4v_vdisk.ram", size,
++                                   &error_fatal);
+             memory_region_add_subregion(get_system_memory(),
+                                         NIAGARA_VDISK_BASE, &s->vdisk_ram);
+             dinfo->is_default = 1;
+-- 
+2.18.1
 
->  }
->
-> @@ -178,8 +180,10 @@ static uint64_t bcm2835_mbox_read(void *opaque, hwad=
-dr offset, unsigned size)
->      default:
->          qemu_log_mask(LOG_UNIMP, "%s: Unsupported offset 0x%"HWADDR_PRIx=
-"\n",
->                        __func__, offset);
-> +        trace_bcm2835_mbox_read(size, offset, res);
->          return 0;
->      }
-> +    trace_bcm2835_mbox_read(size, offset, res);
->
->      bcm2835_mbox_update(s);
->
-> @@ -195,6 +199,7 @@ static void bcm2835_mbox_write(void *opaque, hwaddr o=
-ffset,
->
->      offset &=3D 0xff;
->
-> +    trace_bcm2835_mbox_write(size, offset, value);
->      switch (offset) {
->      case MAIL0_SENDER:
->          break;
-> diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
-> index 43a5465c5d..0eea2e20f7 100644
-> --- a/hw/misc/bcm2835_property.c
-> +++ b/hw/misc/bcm2835_property.c
-> @@ -13,6 +13,7 @@
->  #include "sysemu/dma.h"
->  #include "qemu/log.h"
->  #include "qemu/module.h"
-> +#include "trace.h"
->
->  /* https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interfa=
-ce */
->
-> @@ -283,6 +284,7 @@ static void bcm2835_property_mbox_push(BCM2835Propert=
-yState *s, uint32_t value)
->              break;
->          }
->
-> +        trace_bcm2835_mbox_property(tag, bufsize, resplen);
->          if (tag =3D=3D 0) {
->              break;
->          }
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index 74276225f8..1deb1d08c1 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -143,3 +143,9 @@ armsse_mhu_write(uint64_t offset, uint64_t data, unsi=
-gned size) "SSE-200 MHU wri
->
->  # aspeed_xdma.c
->  aspeed_xdma_write(uint64_t offset, uint64_t data) "XDMA write: offset 0x=
-%" PRIx64 " data 0x%" PRIx64
-> +
-> +# bcm2835_mbox.c
-> +bcm2835_mbox_write(unsigned int size, uint64_t addr, uint64_t value) "mb=
-ox write sz:%u addr:0x%"PRIx64" data:0x%"PRIx64
-> +bcm2835_mbox_read(unsigned int size, uint64_t addr, uint64_t value) "mbo=
-x read sz:%u addr:0x%"PRIx64" data:0x%"PRIx64
-> +bcm2835_mbox_irq(unsigned level) "mbox irq:ARM level:%u"
-> +bcm2835_mbox_property(uint32_t tag, uint32_t bufsize, size_t resplen) "m=
-box property tag:0x%08x in_sz:%u out_sz:%zu"
-
-Anyway:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---
-Alex Benn=C3=A9e
 
