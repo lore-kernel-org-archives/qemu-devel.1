@@ -2,117 +2,94 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CCBC4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE8BC4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:46:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEC75206BB
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:42:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B53F5206C2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:46:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ITHE6Xzv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC75206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fsqxOCKr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B53F5206C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHm0X-0007RO-31
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:42:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38051)
+	id 1iHm4U-0000lI-TB
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:46:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38363)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iHlzQ-0006Mc-Dx
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:41:09 -0400
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iHm3B-0008Sf-BH
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:45:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iHlzP-0005Kt-90
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:41:08 -0400
-Received: from mail-eopbgr20126.outbound.protection.outlook.com
- ([40.107.2.126]:47943 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iHlzL-0005Em-QD; Tue, 08 Oct 2019 05:41:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H0DiA9TencsjBqBQf08RYseHq3dvv/7kbpcVTtoMcnlSR3Caiv3ilubLqkXE7x38Wz/mwijtGzpofL17ev3dQdFuWKk4ucTNMY2m4DSlydPvOiUuCyXlT6n814l14vm4gqzLDBDeusnKQFkJngZdMjPiVmjiWDFGsW2vV0ODyqDmHkO2uXbcq2TTV5886b60ieIbpmccWY2O4am4PLEJqBOSILcIu+yjwft+nbh8aqUL69oy8iYfSSdzvqiYNqnKKzwFJStFdZrFyOdpqjBUmFetwnYbg/zv2jfx6GnR96bxTPrmazZ3Y4yYTPVbHZPc0f2iN85G8BJdTdfji/APSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=duydPSlITxzm8pmHlQ/qi1vIZlNEkeK/R7Tc8VCFAic=;
- b=VfaDmL8IOTfjSJD+8C89DhUDuz+acRPOI8/P42erWuX+RAQjHtzmLeljP+MZkXp67qpwr+SKqOW6erNnu5C8SJxlZQPiFAvsmq/XAsebCagkjBtRRtFTtZq+VYwZ9iRHI74BIZsTEqFRpqLAA31FZ/9c3o4onh4vvO64dRkA+F5WWU6S49jDJwHGRxlJD/GiVNF8jhnxYtD2tadJ7T4zspfSr4CCHDRoGKMjDpHRAHOHastoSj4wCXSqI37AMCtCzdKQArkfirAA71Ag3oI192q3Wxr3BIJISwH/2Jga8Qd/UsGZcgYlz3JeqAmEGRB951LCKeCAJ7Z1qKtlKkjF/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=duydPSlITxzm8pmHlQ/qi1vIZlNEkeK/R7Tc8VCFAic=;
- b=ITHE6XzvLkxk6tcRgnPv0lXuok/2MHpK2uMrahUPq4MClwZEvtuUyMPRGijUjVx/SyNCKEuuB4mw74hTxaxxp7SGG2qWIm0nEAGIHOTFsBYUhAEFu/U3JHGcOVcLUIIKWzSBwJeeM4lK+AC63vd9gj0+2psHoTbFm0up7TGuvVs=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5385.eurprd08.prod.outlook.com (52.133.241.7) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Tue, 8 Oct 2019 09:40:59 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2327.023; Tue, 8 Oct 2019
- 09:40:59 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, Eric Blake
- <eblake@redhat.com>
-Subject: Re: [PATCH] qemu-nbd: Document benefit of --pid-file
-Thread-Topic: [PATCH] qemu-nbd: Document benefit of --pid-file
-Thread-Index: AQHVfUg6+Pk7KfOVdEyr6uO98fDVoadQeeUAgAAEg4A=
-Date: Tue, 8 Oct 2019 09:40:59 +0000
-Message-ID: <04440b88-78f6-e177-924d-e16fc3c29b5c@virtuozzo.com>
-References: <20191007194840.29518-1-eblake@redhat.com>
- <20191008092448.GD1192@redhat.com>
-In-Reply-To: <20191008092448.GD1192@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0101CA0007.eurprd01.prod.exchangelabs.com
- (2603:10a6:3:77::17) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191008124057521
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4ec92ea7-df03-46a4-1a94-08d74bd3a038
-x-ms-traffictypediagnostic: DB8PR08MB5385:
-x-microsoft-antispam-prvs: <DB8PR08MB53850493B3CB6BE25494851FC19A0@DB8PR08MB5385.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01842C458A
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(39850400004)(346002)(136003)(376002)(366004)(189003)(199004)(186003)(99286004)(6506007)(76176011)(386003)(3846002)(31686004)(52116002)(6116002)(256004)(2906002)(305945005)(7736002)(102836004)(14444005)(26005)(66946007)(4326008)(478600001)(5660300002)(6512007)(6246003)(25786009)(66066001)(81156014)(81166006)(8676002)(64756008)(66556008)(66446008)(8936002)(2616005)(11346002)(6486002)(476003)(446003)(14454004)(66476007)(6436002)(486006)(31696002)(71200400001)(71190400001)(86362001)(229853002)(36756003)(110136005)(316002)(54906003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5385;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: VfnJLTYZk0aKHcAu4H694AJjubBKLaL633822oQdVTKnNWJrHBAoNB/fMFTLAnxIetFu4j5Nz9RDPa5kNJoylT+3U4XkXnmzUWu/IuEqNDedbo5ofPfHGmvJ/7UixLvs6rYW+VqZWernnLoeGiH8AwZbxyei6+DtvXfTme5MYQKP+rwSrmlHelXWYV5ZvGMwO108/FvYNNkPSpX71pJ5P3WeBzrbuBky8iVlfwK2PZkf67umIN1B6TzWpHbIth8HcX9oEy1y7TxTwDWoO1YSz1sGdK3qnytHQfTyOuk9o8o2TZGt+J/0PBgvpd/afzla+k51pMp6LM/gYp32jNvZE7Gq2U9Sd9dud3SVulzlnGO2ZsKTfOrkhFgTtkI3tzfQs+gvY2+T7dHmBDm3EFLb1HqwahfchmlPNaoTofZaFTI=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8006192F0D118E4098C8F14D66312B86@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iHm39-0007rg-Gf
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:45:01 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55414)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1iHm1O-0006uU-4Z; Tue, 08 Oct 2019 05:44:53 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a6so2374905wma.5;
+ Tue, 08 Oct 2019 02:43:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=sEKYBVgPKenJ354dWN21L7QcGf1JAPyfKvXWJVllcrU=;
+ b=fsqxOCKr+NQ0Ip3PYiI/tBzax2aujZGrHNp4NJh7dnZAY/atSKlTsfmDGOncVASCbA
+ tVQIgeQePrtuen58NYP912casEKEsZqdK/rZNmy+TTAKxKkW/f/JfwE6GHShEXij1Lkc
+ Bj7DsKSYv0v7Iuwj6jB3k2YMAeNA70TRMIaa0Jy4nzHw06ADn5AkdfAr4rPd00Us6J6g
+ 9KQQx+UOQ4tZypz7pu6mi7ksK6DJPq4fsMEq63L2z9Ayhzc/QTFoeECpYoInLNdBONhh
+ Mu1E7d5ul2+3pqWDctlpjEEX5xkQ5F97AyeHqX234saAW7rxx/YdKb8NFFHWw0cSQPtU
+ wPbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=sEKYBVgPKenJ354dWN21L7QcGf1JAPyfKvXWJVllcrU=;
+ b=oaR6jECVrXqow8acxVUUSvq05Yl6xEny6/Ml+56E3dA+yhLpX5L1rphhtlvg2OERzV
+ xuwDsdx1SSeXu6JJyBsvNifSu6T5t0CHpxPbvNkNLXiN0SBlstRyxK7jKpXysfuWdfD6
+ pqF1gL1aKDicvWmTuGfCpSQEcYOZAEY3NcNGciFUV3W5QBhDVA3cAn9hyIax73PDTH72
+ qJYdfWpuuLr51+/oMpU9yJZnPHhaoC/0L817W5PJAxacEuhlBesZHFu1Q/hyUlFOAjQi
+ pDYv3jnYZP7DnMwh67M7/Uvq2j+uKDMv9m7rGSw/qgHkIzPHVcOjtq4dc6RgtKcq2bhf
+ vHfQ==
+X-Gm-Message-State: APjAAAUqEqcAQDvc/kUAWO+U7IlA0qKUCOR8jq27x1OH2HaRdxDd+Szs
+ fiJdBo+VBRuALOB077QGRh8=
+X-Google-Smtp-Source: APXvYqxMnMAhWtq0zEIGn/l2SkkyaDh/ng3AEMVoaboTADB0+/p5Ry6d818Gm395HI+kGi0TxqD4FA==
+X-Received: by 2002:a1c:1f89:: with SMTP id f131mr2925133wmf.72.1570527787909; 
+ Tue, 08 Oct 2019 02:43:07 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id l7sm18760255wrv.77.2019.10.08.02.43.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 08 Oct 2019 02:43:06 -0700 (PDT)
+Subject: Re: [PATCH 05/19] hw/arm/bcm2835: Add various unimplemented
+ peripherals
+To: Alistair Francis <alistair23@gmail.com>
+References: <20190926173428.10713-1-f4bug@amsat.org>
+ <20190926173428.10713-6-f4bug@amsat.org>
+ <CAKmqyKP+ABP9J=1UJEA+HEO4+UBuyjOoyzZVEJEDiM7N63bMag@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d2ab9145-cf4e-008c-8351-51f271fa37f8@amsat.org>
+Date: Tue, 8 Oct 2019 11:43:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ec92ea7-df03-46a4-1a94-08d74bd3a038
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Oct 2019 09:40:59.5539 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tRER1F4NLWjS2RzDDGpwUCtLki6d9hmNZaOZuzIZuRqx2FBvlWOCOggaarVGyrSKx0P1JxbjcoLRx1YQcdWNt5oHqamHmgj1nKTTWn4E88M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5385
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.2.126
+In-Reply-To: <CAKmqyKP+ABP9J=1UJEA+HEO4+UBuyjOoyzZVEJEDiM7N63bMag@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,46 +101,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Zolt=c3=a1n_Baldaszti?= <bztemail@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Esteban Bosse <estebanbosse@gmail.com>, Cleber Rosa <crosa@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ Clement Deschamps <clement.deschamps@antfield.fr>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Laurent Bonnans <laurent.bonnans@here.com>,
+ Cheng Xiang <ext-cheng.xiang@here.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDguMTAuMjAxOSAxMjoyNCwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCj4gT24gTW9uLCBP
-Y3QgMDcsIDIwMTkgYXQgMDI6NDg6NDBQTSAtMDUwMCwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9u
-ZSBiZW5lZml0IG9mIC0tcGlkLWZpbGUgaXMgdGhhdCBpdCBpcyBlYXNpZXIgdG8gcHJvYmUgdGhl
-IGZpbGUNCj4+IHN5c3RlbSB0byBzZWUgaWYgYSBwaWQgZmlsZSBoYXMgYmVlbiBjcmVhdGVkIHRo
-YW4gaXQgaXMgdG8gcHJvYmUgaWYgYQ0KPj4gc29ja2V0IGlzIGF2YWlsYWJsZSBmb3IgY29ubmVj
-dGlvbi4gRG9jdW1lbnQgdGhhdCB0aGlzIGlzIGFuDQo+PiBpbnRlbnRpb25hbCBmZWF0dXJlLg0K
-PiANCj4gSSdtIG5vdCBzZWVpbmcgaG93IGNoZWNraW5nIHRoZSBwaWQgZmlsZSBpcyBiZXR0ZXIg
-dGhhbiBjaGVja2luZw0KPiB0aGUgc29ja2V0IGRpcmVjdGx5ID8gSSB0aGluayBpdCBpcyBwcm9i
-YWJseSBhY3R1YWxseSB3b3JzZS4NCj4gDQo+IFRoZSBtYWluIHByb2JsZW0gd2l0aCB0aGUgc29j
-a2V0IGlzIHRoYXQgd2hpbGUgd2UgdW5saW5rIG9uIGNsZWFuDQo+IHNodXRkb3duLCBpdCBtYXkg
-c3RpbGwgZXhpc3QgaW4gZGlzayBpZiB0aGUgcHJvY2VzcyBoYXMgZXhpdHRlZA0KPiBhYm5vcm1h
-bGx5Lg0KPiANCj4gV2l0aCB0aGUgcGlkZmlsZSB0aG91Z2ggd2UgZG9uJ3QgZXZlciB1bmxpbmsg
-aXQsIGV2ZW4gb24gY2xlYW4NCj4gc2h1dGRvd24sIGFzIHdlIGRvbid0IHVzZSB0aGUgcGlkIGZp
-bGVzIGV4aXN0YW5jZSBhcyBhIG11dHVhbA0KPiBleGNsdXNpb24gY2hlY2suIFdlIGluc3RlYWQg
-YWNxdWlyZSBmY250bCBsb2NrcyBvbiBpdC4NCj4gDQo+IElPVyB0aGUgcGlkZmlsZSBjb3VsZCBl
-eGlzdCBhbHJlYWR5IHdoZW4gcWVtdS1uYmQgc3RhcnRzIHVwIGFuZA0KPiB3aWxsIHN0aWxsIGV4
-aXN0IHdoZW4gaXQgcXVpdHMuDQoNCkdvb2QgcG9pbnQuDQoNCkkgd2FzIGp1c3QgYSBiaXQgY29u
-ZnVzZWQsIGJlY2F1c2UgcGlkIGZpbGUgaXMgc29tZXRoaW5nIHVucmVsYXRlZCB0bw0Kc29ja2V0
-LCBhbmQgd2h5IHVzZSBvbmUgdGhpbmcgdG8gY2hlY2sgdGhlIGV4aXN0ZW5jZSBvZiBhbm90aGVy
-LCBpZiB3ZQ0KY2FuIGRpcmVjdGx5IHRyeSB0byBjb25uZWN0Lg0KDQo+IA0KPj4gU2lnbmVkLW9m
-Zi1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+PiAtLS0NCj4+ICAgcWVtdS1u
-YmQudGV4aSB8IDMgKystDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDEg
-ZGVsZXRpb24oLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvcWVtdS1uYmQudGV4aSBiL3FlbXUtbmJk
-LnRleGkNCj4+IGluZGV4IDdmNTU2NTc3MjJiZC4uZDQ5NWJiZThhMGVkIDEwMDY0NA0KPj4gLS0t
-IGEvcWVtdS1uYmQudGV4aQ0KPj4gKysrIGIvcWVtdS1uYmQudGV4aQ0KPj4gQEAgLTExOCw3ICsx
-MTgsOCBAQCBpbiBsaXN0IG1vZGUuDQo+PiAgIEBpdGVtIC0tZm9yaw0KPj4gICBGb3JrIG9mZiB0
-aGUgc2VydmVyIHByb2Nlc3MgYW5kIGV4aXQgdGhlIHBhcmVudCBvbmNlIHRoZSBzZXJ2ZXIgaXMg
-cnVubmluZy4NCj4+ICAgQGl0ZW0gLS1waWQtZmlsZT1QQVRIDQo+PiAtU3RvcmUgdGhlIHNlcnZl
-cidzIHByb2Nlc3MgSUQgaW4gdGhlIGdpdmVuIGZpbGUuDQo+PiArU3RvcmUgdGhlIHNlcnZlcidz
-IHByb2Nlc3MgSUQgaW4gdGhlIGdpdmVuIGZpbGUuICBUaGUgcGlkIGZpbGUgaXMgbm90DQo+PiAr
-Y3JlYXRlZCB1bnRpbCBhZnRlciB0aGUgc2VydmVyIHNvY2tldCBpcyBvcGVuLg0KPj4gICBAaXRl
-bSAtLXRscy1hdXRoej1JRA0KPj4gICBTcGVjaWZ5IHRoZSBJRCBvZiBhIHFhdXRoeiBvYmplY3Qg
-cHJldmlvdXNseSBjcmVhdGVkIHdpdGggdGhlDQo+PiAgIC0tb2JqZWN0IG9wdGlvbi4gVGhpcyB3
-aWxsIGJlIHVzZWQgdG8gYXV0aG9yaXplIGNvbm5lY3RpbmcgdXNlcnMNCj4+IC0tIA0KPj4gMi4y
-MS4wDQo+Pg0KPj4NCj4gDQo+IFJlZ2FyZHMsDQo+IERhbmllbA0KPiANCg0KDQotLSANCkJlc3Qg
-cmVnYXJkcywNClZsYWRpbWlyDQo=
+Hi Alistair,
+
+On 9/27/19 11:42 PM, Alistair Francis wrote:
+>   On Thu, Sep 26, 2019 at 10:44 AM Philippe Mathieu-Daudé
+> <f4bug@amsat.org> wrote:
+>>
+>> Base addresses and sizes taken from the "BCM2835 ARM Peripherals"
+>> datasheet from February 06 2012:
+>> https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
+>>
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   hw/arm/bcm2835_peripherals.c         | 31 ++++++++++++++++++++++++++++
+>>   include/hw/arm/bcm2835_peripherals.h | 15 ++++++++++++++
+>>   include/hw/arm/raspi_platform.h      |  8 +++++++
+>>   3 files changed, 54 insertions(+)
+>>
+>> diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+>> index 1bd2ff41d5..fdcf616c56 100644
+>> --- a/hw/arm/bcm2835_peripherals.c
+>> +++ b/hw/arm/bcm2835_peripherals.c
+>> @@ -22,6 +22,20 @@
+>>   /* Capabilities for SD controller: no DMA, high-speed, default clocks etc. */
+>>   #define BCM2835_SDHC_CAPAREG 0x52134b4
+>>
+>> +static void create_unimp(BCM2835PeripheralState *ps,
+>> +                         UnimplementedDeviceState *uds,
+>> +                         const char *name, hwaddr ofs, hwaddr size)
+>> +{
+>> +    sysbus_init_child_obj(OBJECT(ps), name, uds,
+>> +                          sizeof(UnimplementedDeviceState),
+>> +                          TYPE_UNIMPLEMENTED_DEVICE);
+>> +    qdev_prop_set_string(DEVICE(uds), "name", name);
+>> +    qdev_prop_set_uint64(DEVICE(uds), "size", size);
+>> +    object_property_set_bool(OBJECT(uds), true, "realized", &error_fatal);
+>> +    memory_region_add_subregion_overlap(&ps->peri_mr, ofs,
+>> +                    sysbus_mmio_get_region(SYS_BUS_DEVICE(uds), 0), -1000);
+> 
+> Why not just use create_unimplemented_device() and not bother saving
+> the UnimplementedDeviceState members in the struct?
+
+create_unimplemented_device() calls
+  -> sysbus_mmio_map_overlap()
+     -> sysbus_mmio_map_common()
+       -> memory_region_del_subregion(get_system_memory())
+
+So it maps the device at *absolute* offset in the system memory.
+
+create_unimp() maps the device at offset *relative* to peri_mr.
+
+Patch 8 of this series maps the PERI (container) block at peri_base 
+(fixed at BCM2836_PERI_BASE=0x3F000000 for the 2836/2837), then patch 12 
+adds the 2838 which has PERI mapped at 0xfe000000. So we have the same 
+"container" block mapped at different addresses.
+Not the PERI block itself doesn't know its base address, all offsets are 
+relative.
+
+So using create_unimp() allow to use the same block in two different SoCs.
+
+8:  https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg00678.html
+12: https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg00684.html
+
+>> +}
+>> +
+>>   static void bcm2835_peripherals_init(Object *obj)
+>>   {
+>>       BCM2835PeripheralState *s = BCM2835_PERIPHERALS(obj);
+>> @@ -323,6 +337,23 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+>>           error_propagate(errp, err);
+>>           return;
+>>       }
+>> +
+>> +    create_unimp(s, &s->armtmr, "bcm2835-sp804", ARMCTRL_TIMER0_1_OFFSET, 0x40);
+>> +    create_unimp(s, &s->systmr, "bcm2835-systimer", ST_OFFSET, 0x20);
+>> +    create_unimp(s, &s->cprman, "bcm2835-cprman", CPRMAN_OFFSET, 0x1000);
+>> +    create_unimp(s, &s->a2w, "bcm2835-a2w", A2W_OFFSET, 0x1000);
+>> +    create_unimp(s, &s->i2s, "bcm2835-i2s", I2S_OFFSET, 0x100);
+>> +    create_unimp(s, &s->smi, "bcm2835-smi", SMI_OFFSET, 0x100);
+>> +    create_unimp(s, &s->spi[0], "bcm2835-spi0", SPI0_OFFSET, 0x20);
+>> +    create_unimp(s, &s->bscsl, "bcm2835-spis", BSC_SL_OFFSET, 0x100);
+>> +    create_unimp(s, &s->i2c[0], "bcm2835-i2c0", BSC0_OFFSET, 0x20);
+>> +    create_unimp(s, &s->i2c[1], "bcm2835-i2c1", BSC1_OFFSET, 0x20);
+>> +    create_unimp(s, &s->i2c[2], "bcm2835-i2c2", BSC2_OFFSET, 0x20);
+>> +    create_unimp(s, &s->otp, "bcm2835-otp", OTP_OFFSET, 0x80);
+>> +    create_unimp(s, &s->dbus, "bcm2835-dbus", DBUS_OFFSET, 0x8000);
+>> +    create_unimp(s, &s->ave0, "bcm2835-ave0", AVE0_OFFSET, 0x8000);
+>> +    create_unimp(s, &s->dwc2, "dwc-usb2", USB_OTG_OFFSET, 0x1000);
+>> +    create_unimp(s, &s->sdramc, "bcm2835-sdramc", SDRAMC_OFFSET, 0x100);
+>>   }
+>>
+>>   static void bcm2835_peripherals_class_init(ObjectClass *oc, void *data)
+>> diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+>> index 6b17f6a382..62a4c7b559 100644
+>> --- a/include/hw/arm/bcm2835_peripherals.h
+>> +++ b/include/hw/arm/bcm2835_peripherals.h
+>> @@ -23,6 +23,7 @@
+>>   #include "hw/sd/sdhci.h"
+>>   #include "hw/sd/bcm2835_sdhost.h"
+>>   #include "hw/gpio/bcm2835_gpio.h"
+>> +#include "hw/misc/unimp.h"
+>>
+>>   #define TYPE_BCM2835_PERIPHERALS "bcm2835-peripherals"
+>>   #define BCM2835_PERIPHERALS(obj) \
+>> @@ -37,6 +38,10 @@ typedef struct BCM2835PeripheralState {
+>>       MemoryRegion ram_alias[4];
+>>       qemu_irq irq, fiq;
+>>
+>> +    UnimplementedDeviceState systmr;
+>> +    UnimplementedDeviceState armtmr;
+>> +    UnimplementedDeviceState cprman;
+>> +    UnimplementedDeviceState a2w;
+>>       PL011State uart0;
+>>       BCM2835AuxState aux;
+>>       BCM2835FBState fb;
+>> @@ -48,6 +53,16 @@ typedef struct BCM2835PeripheralState {
+>>       SDHCIState sdhci;
+>>       BCM2835SDHostState sdhost;
+>>       BCM2835GpioState gpio;
+>> +    UnimplementedDeviceState i2s;
+>> +    UnimplementedDeviceState spi[1];
+>> +    UnimplementedDeviceState i2c[3];
+>> +    UnimplementedDeviceState otp;
+>> +    UnimplementedDeviceState dbus;
+>> +    UnimplementedDeviceState ave0;
+>> +    UnimplementedDeviceState bscsl;
+>> +    UnimplementedDeviceState smi;
+>> +    UnimplementedDeviceState dwc2;
+>> +    UnimplementedDeviceState sdramc;
+>>   } BCM2835PeripheralState;
+>>
+>>   #endif /* BCM2835_PERIPHERALS_H */
+>> diff --git a/include/hw/arm/raspi_platform.h b/include/hw/arm/raspi_platform.h
+>> index 66969fac5d..cdcbca943f 100644
+>> --- a/include/hw/arm/raspi_platform.h
+>> +++ b/include/hw/arm/raspi_platform.h
+>> @@ -38,6 +38,8 @@
+>>                                                         * Doorbells & Mailboxes */
+>>   #define CPRMAN_OFFSET           0x100000 /* Power Management, Watchdog */
+>>   #define CM_OFFSET               0x101000 /* Clock Management */
+>> +#define A2W_OFFSET              0x102000 /* Reset controller */
+>> +#define AVS_OFFSET              0x103000 /* Audio Video Standard */
+>>   #define RNG_OFFSET              0x104000
+>>   #define GPIO_OFFSET             0x200000
+>>   #define UART0_OFFSET            0x201000
+>> @@ -45,11 +47,17 @@
+>>   #define I2S_OFFSET              0x203000
+>>   #define SPI0_OFFSET             0x204000
+>>   #define BSC0_OFFSET             0x205000 /* BSC0 I2C/TWI */
+>> +#define OTP_OFFSET              0x20f000
+>> +#define BSC_SL_OFFSET           0x214000 /* SPI slave */
+>>   #define AUX_OFFSET              0x215000 /* AUX: UART1/SPI1/SPI2 */
+>>   #define EMMC1_OFFSET            0x300000
+>>   #define SMI_OFFSET              0x600000
+>>   #define BSC1_OFFSET             0x804000 /* BSC1 I2C/TWI */
+>> +#define BSC2_OFFSET             0x805000 /* BSC2 I2C/TWI */
+>> +#define DBUS_OFFSET             0x900000
+>> +#define AVE0_OFFSET             0x910000
+>>   #define USB_OTG_OFFSET          0x980000 /* DTC_OTG USB controller */
+>> +#define SDRAMC_OFFSET           0xe00000
+>>   #define DMA15_OFFSET            0xE05000 /* DMA controller, channel 15 */
+>>
+>>   /* GPU interrupts */
+>> --
+>> 2.20.1
+>>
+>>
 
