@@ -2,68 +2,56 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5406C10F14
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A67C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:59:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AF3D206C2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:58:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AF3D206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 1ECE6206C2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:59:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECE6206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHq0d-0004pf-2v
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:58:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45631)
+	id 1iHq1P-0005m7-BX
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:59:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iHpyX-0003V6-0f
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:56:29 -0400
+ (envelope-from <slp@redhat.com>) id 1iHpzF-000410-O3
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iHpyV-0004hJ-EO
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:56:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51724)
+ (envelope-from <slp@redhat.com>) id 1iHpzC-00056H-Jr
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:57:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43256)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iHpyS-0004em-4k; Tue, 08 Oct 2019 09:56:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iHpzC-00055U-C5
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:57:10 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5B4F718C4286;
- Tue,  8 Oct 2019 13:56:23 +0000 (UTC)
-Received: from [10.3.116.162] (ovpn-116-162.phx2.redhat.com [10.3.116.162])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 005DB5C1D4;
- Tue,  8 Oct 2019 13:56:22 +0000 (UTC)
-Subject: Re: [PATCH] qemu-nbd: Document benefit of --pid-file
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20191007194840.29518-1-eblake@redhat.com>
- <20191008092448.GD1192@redhat.com>
- <04440b88-78f6-e177-924d-e16fc3c29b5c@virtuozzo.com>
- <d4b715de-6d5d-6f43-e845-86ddc01c3eac@redhat.com>
- <20191008133834.GG1192@redhat.com>
- <99240aec-6d19-cea6-5b95-6bbf5a9106e8@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <de461851-39a3-0c48-9270-85e0f0859603@redhat.com>
-Date: Tue, 8 Oct 2019 08:56:22 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id D61723C93A;
+ Tue,  8 Oct 2019 13:57:08 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 438B1600CE;
+ Tue,  8 Oct 2019 13:56:55 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 00/12] Introduce the microvm machine type
+Date: Tue,  8 Oct 2019 15:55:26 +0200
+Message-Id: <20191008135537.197867-1-slp@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <99240aec-6d19-cea6-5b95-6bbf5a9106e8@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Tue, 08 Oct 2019 13:56:23 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Tue, 08 Oct 2019 13:57:08 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -78,40 +66,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: ehabkost@redhat.com, Sergio Lopez <slp@redhat.com>, mst@redhat.com,
+ lersek@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/19 8:53 AM, Vladimir Sementsov-Ogievskiy wrote:
+Microvm is a machine type inspired by Firecracker and constructed
+after the its machine model.
 
-> 
-> I've already implemented loop of attempting to connect in my series (patch 4/3).
-> It's a bit more difficult to implement, but it's done. And it's a bit better,
-> as it test exactly what we want to test. Can we proceed with it?
-> 
+It's a minimalist machine type without PCI nor ACPI support, designed
+for short-lived guests. Microvm also establishes a baseline for
+benchmarking and optimizing both QEMU and guest operating systems,
+since it is optimized for both boot time and footprint.
 
-For test purposes, yes, that's fine (a test doesn't have to be clean, 
-just work).
+---
 
->>
->> We shouldn't need todo any of those tricks IIUC.  The --fork argument is
->> supposed to only let the parent process exit once the server is running.
->>
->> IOW, if you run qemu-nbd --fork, in the foreground, then when execution
->> continues the sockets should be present & accepting connections. No need
->> to check for existance of any files or check connecting, etc.
->>
->>
->> Except that AFAICT, --fork isn't actually implemented with this semantics
->> in qemu-nbd. It looks like we only listen on the sockets after the parent
->> has already exited :-( Can we fix that to synchronize wrt socket listeners ?
+Changelog
+v7:
+ - Fix code style issues on already present code touched by this patch
+   series (Michael S. Tsirkin, Philippe Mathieu-Daud=C3=A9)
+ - Add new files to MAINTAINERS (Michael S. Tsirkin, Philippe
+   Mathieu-Daud=C3=A9)
+ - Allow starting a microvm machine without a kernel image, fixing
+   "qom-test" (Michael S. Tsirkin)
+ - Change "bios-microvm.bin" mode to 0644 (Stefano Garzarella)
+ - Remove unneeded "hw/i386/pc.h" include from x86.c (Stefano
+   Garzarella)
 
-Yes, sounds like something good to have.  I'll take a look at doing that.
+v6:
+ - Some style fixes (Philippe Mathieu-Daud=C3=A9)
+ - Fix a documentation bug stating that LAPIC was in userspace (Paolo
+   Bonzini)
+ - Update Xen HVM code after X86MachineState introduction (Philippe
+   Mathieu-Daud=C3=A9)
+ - Rename header guard from QEMU_VIRTIO_MMIO_H to HW_VIRTIO_MMIO_H
+   (Philippe Mathieu-Daud=C3=A9)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+v5:
+ - Drop unneeded "[PATCH v4 2/8] hw/i386: Factorize e820 related
+   functions" (Philippe Mathieu-Daud=C3=A9)
+ - Drop unneeded "[PATCH v4 1/8] hw/i386: Factorize PVH related
+   functions" (Stefano Garzarella)
+ - Split X86MachineState introduction into smaller patches (Philippe
+   Mathieu-Daud=C3=A9)
+ - Change option-roms to x-option-roms and kernel-cmdline to
+   auto-kernel-cmdline (Paolo Bonzini)
+ - Make i8259 PIT and i8254 PIC optional (Paolo Bonzini)
+ - Some fixes to the documentation (Paolo Bonzini)
+ - Switch documentation format from txt to rst (Peter Maydell)
+ - Move NMI interface to X86_MACHINE (Philippe Mathieu-Daud=C3=A9, Paolo
+   Bonzini)
+
+v4:
+ - This is a complete rewrite of the whole patchset, with a focus on
+   reusing as much existing code as possible to ease the maintenance burd=
+en
+   and making the machine type as compatible as possible by default. As
+   a result, the number of lines dedicated specifically to microvm is
+   383 (code lines measured by "cloc") and, with the default
+   configuration, it's now able to boot both PVH ELF images and
+   bzImages with either SeaBIOS or qboot.
+
+v3:
+  - Add initrd support (thanks Stefano).
+
+v2:
+  - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
+  - Simplify machine definition (thanks Eduardo).
+  - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
+  - Add a patch to factorize PVH-related functions.
+  - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
+
+---
+
+Sergio Lopez (12):
+  hw/virtio: Factorize virtio-mmio headers
+  hw/i386/pc: rename functions shared with non-PC machines
+  hw/i386/pc: fix code style issues on functions that will be moved out
+  hw/i386/pc: move shared x86 functions to x86.c and export them
+  hw/i386: split PCMachineState deriving X86MachineState from it
+  hw/i386: make x86.c independent from PCMachineState
+  fw_cfg: add "modify" functions for all types
+  hw/intc/apic: reject pic ints if isa_pic =3D=3D NULL
+  roms: add microvm-bios (qboot) as binary and git submodule
+  docs/microvm.rst: document the new microvm machine type
+  hw/i386: Introduce the microvm machine type
+  MAINTAINERS: add microvm related files
+
+ docs/microvm.rst                 |  98 ++++
+ default-configs/i386-softmmu.mak |   1 +
+ include/hw/i386/microvm.h        |  83 ++++
+ include/hw/i386/pc.h             |  28 +-
+ include/hw/i386/x86.h            |  96 ++++
+ include/hw/nvram/fw_cfg.h        |  42 ++
+ include/hw/virtio/virtio-mmio.h  |  73 +++
+ hw/acpi/cpu_hotplug.c            |  10 +-
+ hw/i386/acpi-build.c             |  29 +-
+ hw/i386/amd_iommu.c              |   3 +-
+ hw/i386/intel_iommu.c            |   3 +-
+ hw/i386/microvm.c                | 572 ++++++++++++++++++++++
+ hw/i386/pc.c                     | 781 +++---------------------------
+ hw/i386/pc_piix.c                |  46 +-
+ hw/i386/pc_q35.c                 |  38 +-
+ hw/i386/pc_sysfw.c               |  60 +--
+ hw/i386/x86.c                    | 795 +++++++++++++++++++++++++++++++
+ hw/i386/xen/xen-hvm.c            |  28 +-
+ hw/intc/apic.c                   |   2 +-
+ hw/intc/ioapic.c                 |   2 +-
+ hw/nvram/fw_cfg.c                |  29 ++
+ hw/virtio/virtio-mmio.c          |  48 +-
+ .gitmodules                      |   3 +
+ MAINTAINERS                      |  10 +
+ hw/i386/Kconfig                  |   4 +
+ hw/i386/Makefile.objs            |   2 +
+ pc-bios/bios-microvm.bin         | Bin 0 -> 65536 bytes
+ roms/Makefile                    |   6 +
+ roms/qboot                       |   1 +
+ 29 files changed, 1982 insertions(+), 911 deletions(-)
+ create mode 100644 docs/microvm.rst
+ create mode 100644 include/hw/i386/microvm.h
+ create mode 100644 include/hw/i386/x86.h
+ create mode 100644 include/hw/virtio/virtio-mmio.h
+ create mode 100644 hw/i386/microvm.c
+ create mode 100644 hw/i386/x86.c
+ create mode 100644 pc-bios/bios-microvm.bin
+ create mode 160000 roms/qboot
+
+--=20
+2.21.0
+
 
