@@ -6,56 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC7EC35280
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 16:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E682C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 16:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FEB22070B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 16:02:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FEB22070B
+	by mail.kernel.org (Postfix) with ESMTPS id 0EE982070B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 16:07:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE982070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHrwl-0006GL-DS
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 12:02:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36566)
+	id 1iHs1e-0003Ma-Js
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 12:07:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37412)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iHrtn-00057Y-7Y
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:59:44 -0400
+ (envelope-from <armbru@redhat.com>) id 1iHrxm-00087l-Sb
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 12:03:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iHrtk-00051R-Ai
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:59:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42652)
+ (envelope-from <armbru@redhat.com>) id 1iHrxk-0008JI-BA
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 12:03:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49902)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iHrtk-00050o-2i
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 11:59:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1iHrxd-0008AF-7M; Tue, 08 Oct 2019 12:03:41 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 05BC8300C727;
- Tue,  8 Oct 2019 15:59:39 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C88ED60167;
- Tue,  8 Oct 2019 15:59:32 +0000 (UTC)
-Date: Tue, 8 Oct 2019 17:59:31 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH 3/4] hw/i386: add facility to expose CPU topology over
- fw-cfg
-Message-ID: <20191008175931.483af366@redhat.com>
-In-Reply-To: <20191008105259.5378-4-lersek@redhat.com>
-References: <20191008105259.5378-1-lersek@redhat.com>
- <20191008105259.5378-4-lersek@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 250E510C094A;
+ Tue,  8 Oct 2019 16:03:39 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DB4D45C1D4;
+ Tue,  8 Oct 2019 16:03:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 49B981138648; Tue,  8 Oct 2019 18:03:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v4 04/31] error: auto propagated local_err
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-5-vsementsov@virtuozzo.com>
+Date: Tue, 08 Oct 2019 18:03:13 +0200
+In-Reply-To: <20191001155319.8066-5-vsementsov@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Tue, 1 Oct 2019 18:52:52 +0300")
+Message-ID: <87k19fgr7i.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 08 Oct 2019 15:59:39 +0000 (UTC)
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Tue, 08 Oct 2019 16:03:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -70,183 +72,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu devel list <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: fam@euphon.net, pburton@wavecomp.com, peter.maydell@linaro.org,
+ codyprime@gmail.com, jasowang@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, kraxel@redhat.com,
+ mreitz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com,
+ arikalo@wavecomp.com, mst@redhat.com, armbru@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, joel@jms.id.au, marcandre.lureau@redhat.com,
+ david@gibson.dropbear.id.au, farman@linux.ibm.com, ehabkost@redhat.com,
+ sw@weilnetz.de, groug@kaod.org, yuval.shaia@oracle.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, qemu-arm@nongnu.org, clg@kaod.org,
+ stefanha@redhat.com, david@redhat.com, jsnow@redhat.com, rth@twiddle.net,
+ kwolf@redhat.com, integration@gluster.org, berrange@redhat.com,
+ andrew@aj.id.au, cohuck@redhat.com, qemu-s390x@nongnu.org,
+ sundeep.lkml@gmail.com, qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  8 Oct 2019 12:52:58 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-> FW_CFG_MAX_CPUS exposes the (exclusive) maximum APIC ID to guest firmware,
-> due to historical reasons. That value is not useful to edk2, however. For
-> supporting VCPU hotplug, edk2 needs:
->=20
-> - the boot CPU count (already exposed in FW_CFG_NB_CPUS),
->=20
-> - and the maximum foreseen CPU count (tracked in
->   "MachineState.smp.max_cpus", but not currently exposed).
-one can get it with current QEMU without adding new fgcfg
-(albeit in a bit awkward way)
+> Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
+> functions with errp OUT parameter.
+>
+> It has three goals:
+>
+> 1. Fix issue with error_fatal & error_prepend/error_append_hint: user
+> can't see this additional information, because exit() happens in
+> error_setg earlier than information is added. [Reported by Greg Kurz]
+>
+> 2. Fix issue with error_abort & error_propagate: when we wrap
+> error_abort by local_err+error_propagate, resulting coredump will
+> refer to error_propagate and not to the place where error happened.
+> (the macro itself doesn't fix the issue, but it allows to [3.] drop all
+> local_err+error_propagate pattern, which will definitely fix the issue)
+> [Reported by Kevin Wolf]
+>
+> 3. Drop local_err+error_propagate pattern, which is used to workaround
+> void functions with errp parameter, when caller wants to know resulting
+> status. (Note: actually these functions could be merely updated to
+> return int error code).
 
-max_cpu count can be derived indirectly as result of cpu hotplug
-enumeration (IO interface at 0x0cd8-0xcf7) by writing/reading
-to/from selector register (see ACPI_CPU_SELECTOR_OFFSET_WR)
-until read value stops changing values (i.e. max cpu count
-is reached). One also can figure out present/non-present
-cpu status by reading flags register.
+Starting with stating your goals is an excellent idea.  But I'd love to
+next read a high-level description of how your patch achieves or enables
+achieving these goals.
 
-> Add a new fw-cfg file to expose "max_cpus".
->=20
-> While at it, expose the rest of the topology too (die / core / thread
-> counts), because I expect that the VCPU hotplug feature for OVMF will
-> ultimately need those too, and the data size is not large. This is
-> slightly complicated by the fact that the die count is specific to
-> PCMachineState, but fw_cfg_arch_create() intends to be PC-independent (see
-> commit 149c50cabcc4).
-Could you clarify why topology info is necessary?
-
-Potentially it's possible to extend cpu hotplug ABI to report
-arch specific apic-id (x86) or mpidr (arm) if firmware really
-needs to know topology and let guest to decode it according
-to CPU's spec.
-
-So far there were no need for it as all possible cpus are
-described in ACPI tables passed to guest, but I'm not going
-to suggest to parse them on firmware side as it's too complicated :)
-
-PS:
-The reason we started building ACPI tables in QEMU, was never
-ending story of adding more ABI and supporting it afterwards.
-So I'd try to avoid doing it if it can be helped.
-
-> For now, the feature is temporarily disabled.
->=20
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Ref: https://bugzilla.tianocore.org/show_bug.cgi?id=3D1515
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  hw/i386/fw_cfg.h | 30 +++++++++++++++++++++++++++++-
->  hw/i386/fw_cfg.c | 26 ++++++++++++++++++++++++--
->  hw/i386/pc.c     |  4 ++--
->  3 files changed, 55 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
-> index e0856a376996..d742435b9793 100644
-> --- a/hw/i386/fw_cfg.h
-> +++ b/hw/i386/fw_cfg.h
-> @@ -18,9 +18,37 @@
->  #define FW_CFG_E820_TABLE       (FW_CFG_ARCH_LOCAL + 3)
->  #define FW_CFG_HPET             (FW_CFG_ARCH_LOCAL + 4)
-> =20
-> +/**
-> + * FWCfgX86Topology: expose the X86 CPU topology to guest firmware over =
-fw-cfg.
-> + *
-> + * All fields have little-endian encoding.
-> + *
-> + * @dies:     Number of dies per package (aka socket). Set it to 1 unles=
-s the
-> + *            concrete MachineState subclass defines it differently.
-> + * @cores:    Corresponds to @CpuTopology.@cores.
-> + * @threads:  Corresponds to @CpuTopology.@threads.
-> + * @max_cpus: Corresponds to @CpuTopology.@max_cpus.
-> + *
-> + * Firmware can derive the package (aka socket) count with the following
-> + * formula:
-> + *
-> + *   DIV_ROUND_UP(@max_cpus, @dies * @cores * @threads)
-> + *
-> + * Firmware can derive APIC ID field widths and offsets per the standard
-> + * calculations in "include/hw/i386/topology.h".
-> + */
-> +typedef struct FWCfgX86Topology {
-> +  uint32_t dies;
-> +  uint32_t cores;
-> +  uint32_t threads;
-> +  uint32_t max_cpus;
-> +} QEMU_PACKED FWCfgX86Topology;
+[...]
+> diff --git a/include/qapi/error.h b/include/qapi/error.h
+> index 9376f59c35..02f967ac1d 100644
+> --- a/include/qapi/error.h
+> +++ b/include/qapi/error.h
+> @@ -322,6 +322,43 @@ void error_set_internal(Error **errp,
+>                          ErrorClass err_class, const char *fmt, ...)
+>      GCC_FMT_ATTR(6, 7);
+>  
+> +typedef struct ErrorPropagator {
+> +    Error *local_err;
+> +    Error **errp;
+> +} ErrorPropagator;
 > +
->  FWCfgState *fw_cfg_arch_create(MachineState *ms,
->                                 uint16_t boot_cpus,
-> -                               uint16_t apic_id_limit);
-> +                               uint16_t apic_id_limit,
-> +                               unsigned smp_dies,
-> +                               bool expose_topology);
->  void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
->  void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
-> =20
-> diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-> index 39b6bc60520c..33d09875014f 100644
-> --- a/hw/i386/fw_cfg.c
-> +++ b/hw/i386/fw_cfg.c
-> @@ -85,9 +85,26 @@ void fw_cfg_build_smbios(MachineState *ms, FWCfgState =
-*fw_cfg)
->      }
->  }
-> =20
-> +static void fw_cfg_expose_topology(FWCfgState *fw_cfg,
-> +                                   unsigned dies,
-> +                                   unsigned cores,
-> +                                   unsigned threads,
-> +                                   unsigned max_cpus)
+> +static inline void error_propagator_cleanup(ErrorPropagator *prop)
 > +{
-> +    FWCfgX86Topology *topo =3D g_new(FWCfgX86Topology, 1);
-> +
-> +    topo->dies     =3D cpu_to_le32(dies);
-> +    topo->cores    =3D cpu_to_le32(cores);
-> +    topo->threads  =3D cpu_to_le32(threads);
-> +    topo->max_cpus =3D cpu_to_le32(max_cpus);
-> +    fw_cfg_add_file(fw_cfg, "etc/x86-smp-topology", topo, sizeof *topo);
+> +    error_propagate(prop->errp, prop->local_err);
 > +}
 > +
->  FWCfgState *fw_cfg_arch_create(MachineState *ms,
-> -                                      uint16_t boot_cpus,
-> -                                      uint16_t apic_id_limit)
-> +                               uint16_t boot_cpus,
-> +                               uint16_t apic_id_limit,
-> +                               unsigned smp_dies,
-> +                               bool expose_topology)
->  {
->      FWCfgState *fw_cfg;
->      uint64_t *numa_fw_cfg;
-> @@ -143,6 +160,11 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
->                       (1 + apic_id_limit + nb_numa_nodes) *
->                       sizeof(*numa_fw_cfg));
-> =20
-> +    if (expose_topology) {
-> +        fw_cfg_expose_topology(fw_cfg, smp_dies, ms->smp.cores,
-> +                               ms->smp.threads, ms->smp.max_cpus);
-> +    }
+> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_cleanup);
 > +
->      return fw_cfg;
->  }
-> =20
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index bcda50efcc23..bb72b12edad2 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1738,8 +1738,8 @@ void pc_memory_init(PCMachineState *pcms,
->                                          option_rom_mr,
->                                          1);
-> =20
-> -    fw_cfg =3D fw_cfg_arch_create(machine,
-> -                                pcms->boot_cpus, pcms->apic_id_limit);
-> +    fw_cfg =3D fw_cfg_arch_create(machine, pcms->boot_cpus, pcms->apic_i=
-d_limit,
-> +                                pcms->smp_dies, false);
-> =20
->      rom_set_fw(fw_cfg);
-> =20
+> +/*
+> + * ERRP_AUTO_PROPAGATE
+> + *
+> + * This macro is created to be the first line of a function with Error **errp
+> + * OUT parameter. It's needed only in cases where we want to use error_prepend,
+> + * error_append_hint or dereference *errp. It's still safe (but useless) in
+> + * other cases.
+> + *
+> + * If errp is NULL or points to error_fatal, it is rewritten to point to a
+> + * local Error object, which will be automatically propagated to the original
+> + * errp on function exit (see error_propagator_cleanup).
+> + *
+> + * After invocation of this macro it is always safe to dereference errp
+> + * (as it's not NULL anymore) and to append hints (by error_append_hint)
+> + * (as, if it was error_fatal, we swapped it with a local_error to be
+> + * propagated on cleanup).
 
+Well, appending hints was always safe, it just didn't work with
+&error_fatal.  Don't worry about that now, I'll probably want to polish
+this contract comment a bit anyway, but later.
+
+> + *
+> + * Note: we don't wrap the error_abort case, as we want resulting coredump
+> + * to point to the place where the error happened, not to error_propagate.
+> + */
+> +#define ERRP_AUTO_PROPAGATE() \
+> +g_auto(ErrorPropagator) __auto_errp_prop = {.errp = errp}; \
+
+Took me a second to realize: the macro works, because the initializer
+implicitly initializes .local_error = NULL.
+
+__auto_errp_prop is an identifier reserved for any use.  I think we
+could use _auto_errp_prop, which is only reserved for use as identifiers
+with file scope in both the ordinary and tag name spaces.  See ISO/IEC
+9899:1999 7.1.3 Reserved identifiers.
+
+> +errp = ((errp == NULL || *errp == error_fatal) ? \
+> +    &__auto_errp_prop.local_err : errp)
+> +
+
+Please indent multi-line macros like elsewhere in this file:
+
+#define ERRP_AUTO_PROPAGATE()					\
+    g_auto(ErrorPropagator) __auto_errp_prop = {.errp = errp};	\
+    errp = ((errp == NULL || *errp == error_fatal)		\
+            ? &__auto_errp_prop.local_err : errp)
+
+>  /*
+>   * Special error destination to abort on error.
+>   * See error_setg() and error_propagate() for details.
+
+To be honest, the cover letter left me a bit skeptical, but now I think
+you might be up to something.  Let's see how the patches putting the
+macro to use come out.
 
