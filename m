@@ -2,88 +2,63 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6344C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4D7C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:27:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF72B206C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:25:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cEJnW3++"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF72B206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D682E206C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:27:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D682E206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHpUM-0007v8-Ps
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:25:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41542)
+	id 1iHpWM-0000rr-04
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:27:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iHpTT-0007NW-HY
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:24:24 -0400
+ (envelope-from <zhengxiang9@huawei.com>) id 1iHpV1-0000Du-I6
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iHpTS-0006pW-CO
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:24:23 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37877)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1iHpTP-0006kG-PX; Tue, 08 Oct 2019 09:24:19 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f22so3131940wmc.2;
- Tue, 08 Oct 2019 06:24:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=gKeRC+n/VO9W1X4S4Pth852h/5HkRnBZjuPEdlnecwU=;
- b=cEJnW3++qSoyjuJY8INOmGIYNIKk4/00/Nw4YSiw2yjVi3qf7M19CbWG2gNp2wK+Vq
- 031OULkHgoH0UM5QLQ7ZHgFgC6n59ITZLtzB6Ev+XsRFr7C7xAPI7sWnSTDgg6e7q4Nw
- 6hDnYDMp08tiOXQmjUR0FKoS2MXUGP7vyoIIX8TGf/Cj1/r0rC9ns112ovBnF5Ia2Usy
- p0KGc+RRruN3IEYhhTEz1gw0/Ml92HjqSOaUgIjPkOypCTaZWfuWwGK6wjrzJp3Jh+U8
- SeyQkioiIXnoWXrChYYSXdWxIpOABqNElYZ7n85pC9Vq1VT+NXsuMshSoxqGunu7GmG3
- 1q0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=gKeRC+n/VO9W1X4S4Pth852h/5HkRnBZjuPEdlnecwU=;
- b=BMxP/qmWFf6e710jJ4iI845OnxPAzA0c+eM/fRXo/w9gVdmjdr+GeGLh7AZueb0PFN
- NkmPFj00c+bhl0oaPQI6jCFK2bfYQVuAIXQoEnCynf/as7IzqvT1ptB2kTEA5dT6cHgZ
- NbRRLW3kR3bq5rg70jK5D/5k7AwuYEGmEAf6KTBURBlAq+9n+0WrCMaiDXAvRzyJbMOe
- 8Zk02lEyP4pzG2tTUP+r9Jx8f07bw7NjSue186je0GeyN04OMgo8GaSYc7Qk1yA59pY0
- ZnVt8pA0MdjCaL5D6WQTUpvJaqIIgm106HuVDls9pbfaS7u+7/kSV821elpJGet+WTbn
- 3g2A==
-X-Gm-Message-State: APjAAAVCdB9bfXj1MC8lKDcfB8b+yfgA8mTotIyEAifyvd/EFGYVC7mM
- rO3GkmcLm2IRvQn5Nt/5K44=
-X-Google-Smtp-Source: APXvYqyL2EsZpo7m99rijuoONIuWaC0LOeL6gaj3jfc464q4l6HXUz8Rsok+XQZKrDTnTxaFYCZxhg==
-X-Received: by 2002:a7b:c34e:: with SMTP id l14mr3508849wmj.123.1570541058409; 
- Tue, 08 Oct 2019 06:24:18 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id h10sm17749565wrq.95.2019.10.08.06.24.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Oct 2019 06:24:17 -0700 (PDT)
-Date: Tue, 8 Oct 2019 14:24:16 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Evgeny Yakovlev <wrfsh@yandex-team.ru>
-Subject: Re: [RFC PATCH] virtio-blk: advertise F_WCE (F_FLUSH) if
- F_CONFIG_WCE is also advertised
-Message-ID: <20191008132416.GA28104@stefanha-x1.localdomain>
-References: <1568980590-806043-1-git-send-email-wrfsh@yandex-team.ru>
+ (envelope-from <zhengxiang9@huawei.com>) id 1iHpV0-0000uQ-FB
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:25:59 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:56290 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iHpUx-0000kB-Ml; Tue, 08 Oct 2019 09:25:55 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 3AF3468A6E58B3089D74;
+ Tue,  8 Oct 2019 21:25:51 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Tue, 8 Oct 2019
+ 21:25:44 +0800
+Subject: Re: [Qemu-devel] [PATCH v18 2/6] docs: APEI GHES generation and CPER
+ record description
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
+ <20190906083152.25716-3-zhengxiang9@huawei.com>
+ <20191004102051.4e45cbd2@redhat.com>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <70a22014-27f8-0fd0-3547-e814bd1a822a@huawei.com>
+Date: Tue, 8 Oct 2019 21:25:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="UlVJffcvxoiEqYs2"
-Content-Disposition: inline
-In-Reply-To: <1568980590-806043-1-git-send-email-wrfsh@yandex-team.ru>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <20191004102051.4e45cbd2@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,105 +70,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru, qemu-block@nongnu.org,
- stefanha@redhat.com, mst@redhat.com
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, wanghaibin.wang@huawei.com, mtosatti@redhat.com,
+ linuxarm@huawei.com, qemu-devel@nongnu.org, gengdongjiu@huawei.com,
+ shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, james.morse@arm.com,
+ xuwei5@huawei.com, jonathan.cameron@huawei.com, pbonzini@redhat.com,
+ lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Igor,
 
---UlVJffcvxoiEqYs2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for your review!
 
-On Fri, Sep 20, 2019 at 02:56:30PM +0300, Evgeny Yakovlev wrote:
-> Virtio spec 1.1 (and earlier), 5.2.5.1 Driver Requirements: Device
-> Initialization:
->=20
-> "Devices SHOULD always offer VIRTIO_BLK_F_FLUSH, and MUST offer it if
-> they offer VIRTIO_BLK_F_CONFIG_WCE.
->=20
-> It looks like currently F_CONFIG_WCE and F_WCE are not connected to each
-> other. qemu will advertise F_CONFIG_WCE if config-wce argument is
-> set for virtio-blk device. While F_WCE is advertised if underlying block
-> backend actually has it's caching enabled.
-> Those two things are not related to each other.
->=20
-> Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
-> ---
->  hw/block/virtio-blk.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 1885160..b45dc0c 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -990,7 +990,8 @@ static uint64_t virtio_blk_get_features(VirtIODevice =
-*vdev, uint64_t features,
->          virtio_add_feature(&features, VIRTIO_BLK_F_SCSI);
->      }
-> =20
-> -    if (blk_enable_write_cache(s->blk)) {
-> +    if (blk_enable_write_cache(s->blk) ||
-> +        virtio_has_feature(features, VIRTIO_BLK_F_CONFIG_WCE)) {
->          virtio_add_feature(&features, VIRTIO_BLK_F_WCE);
->      }
->      if (blk_is_read_only(s->blk)) {
-> --=20
-> 2.7.4
+On 2019/10/4 16:20, Igor Mammedov wrote:
+> On Fri, 6 Sep 2019 16:31:48 +0800
+> Xiang Zheng <zhengxiang9@huawei.com> wrote:
+> 
+>> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>>
+> [...]
+>> +
+>> +(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
+>> +    guest memory, and then injects whatever interrupt (or assert whatever GPIO
+> s/whatever .../platform specific/
+> 
+> and add concrete impl info like:
+>   "in case of arm/virt machine it's ..."
 
-Sorry for the very late response.  I have been ill and am still
-recovering.
+OK, I will add the concrete impl info.
 
-The motivation for this change looks correct but this patch may cause
-host_features to change across live migration to a newer QEMU version.
-If the guest accesses VIRTIO_PCI_HOST_FEATURES before and after live
-migration it may see different values, which is unexpected.
+> 
+>> +    line) as a notification which is necessary for notifying the guest.
+> [...]
+> 
+> .
+> 
 
-The safe way of introducing guest-visible changes like this is to make
-the change conditional on the machine type version so that old guests
-see old behavior and new guests see new behavior.
+-- 
 
-Live migration compatibility can be guaranteed by adding a new property
-to virtio_blk_properties[]:
+Thanks,
+Xiang
 
-  DEFINE_PROP_BOOL("enable-wce-if-config-wce", VirtIOBlock,
-                   conf.enable_wce_if_config_wce, true),
-
-Then tweak the patch:
-
-  if (blk_enable_write_cache(s->blk) ||
-      (s->conf.enable_wce_if_config_wce &&
-       virtio_has_feature(features, VIRTIO_BLK_F_CONFIG_WCE))) {
-
-And finally disable enable_wce_if_config_wce for older machine types to
-retain compatibility:
-
-  GlobalProperty hw_compat_4_2[] =3D {
-      { "virtio-blk-device", "enable-wce-if-config-wce", "off" },
-  };
-
-(I have omitted some steps like defining
-VirtIOBlkConf.enable_wce_if_config_wce field and hooking up
-hw_compat_4_2[], but you can figure that out from the existing code.)
-
-Stefan
-
---UlVJffcvxoiEqYs2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2cjf8ACgkQnKSrs4Gr
-c8htcQgAv+p5XmGjGRU5HkAXTIjfsmGcbH9JRGQWgkFAy2aILb4SUygm3Ws44ZQL
-MW3w+xHjNEcUCmZAAKbOyrcIEOxMnbM8ArXem5MSREl7UAzse8JlxlVVhhVe8isd
-L4oyXe0vXMbYJqD80uQQiex83CeOdD/lCxHMAVmSiSX66y7ksXuYD/7Z0MYuSDW3
-xkCMLVasHxGMSPIUcHJ3wdTNdfzJEF4IRs7Dv38MnVUjPzqDGjxyGob4L7iPeIu1
-ptWMXkJt5YoC5vxFueLbWISZSJ/zzKz1uNFWXIx6TPTvtjNIVLmNySXQ8sJNmkGH
-jxJdCr25IorpzNuGhf5panWZ3Jj4JQ==
-=YMyY
------END PGP SIGNATURE-----
-
---UlVJffcvxoiEqYs2--
 
