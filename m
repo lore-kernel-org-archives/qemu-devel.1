@@ -2,84 +2,99 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC81ECE58E
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 311A0C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 832402070B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 12:56:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F03A2206BB
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 13:06:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E8LUXyK9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832402070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GAk70vVh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F03A2206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHp28-0006tS-If
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 08:56:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35627)
+	id 1iHpBt-0001Qi-4Y
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 09:06:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37710)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1iHp1G-0006Ha-BA
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:55:15 -0400
+ (envelope-from <philmd@redhat.com>) id 1iHpAj-0000X3-No
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:05:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lucienmp.qemu@gmail.com>) id 1iHp1F-0003bH-0P
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:55:14 -0400
-Received: from mail-qt1-x82b.google.com ([2607:f8b0:4864:20::82b]:36539)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
- id 1iHp1E-0003Z0-Sa
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 08:55:12 -0400
-Received: by mail-qt1-x82b.google.com with SMTP id o12so25119810qtf.3
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 05:55:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=+75ozcsMUPNQrJPXtCB4eC0RRh0TKhXhDCufF8BWhIA=;
- b=E8LUXyK9LCLFqWndcgRZf+cRHdNJXRf5S5omFAuQw3IaBsS4WI8qILxosaHFTSlC/c
- 4zP6V2myXz3qAQvAeYg5Rps1rYjHt5/yR3QG0d8RcyBUX+XTXjLqhh8+fN44QLeAkmL8
- rf0YyOzmVL4NAzGDo1t0lzKwNxHfUXsaP+cNX/+1om1Il7Od2a3Tr6e/OoZdGxXYLL59
- AJYSYEKyKJoT0kVycu29XFplI87tfazuYoimDK4CHAeDo4ORZnfoUmtCMnM6y4tyo6sl
- VQt1HAwFb/c2bAwPKN4TmygUPPOZEw0Yx60m5yUbei4cVU1xu6S4ShQ9fW8hOHF0T4zo
- c++A==
+ (envelope-from <philmd@redhat.com>) id 1iHpAh-0000w6-5J
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:05:00 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55190
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iHpAg-0000uJ-PU
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 09:04:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1570539897;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3ur/JgeUo8SUJchNzAduEPYZ0yBhjDk8b4ItfgYiapk=;
+ b=GAk70vVheOE0WzMlg9sxeVfub7A948Kqd+KFqT8/ttO/F+CSlyMl9Mm8e70Y+ft3wntgn7
+ jJgscrizzLW7dntZ+Kvjx0mKlUwvGWlQKsdRIl4k9dkhAkk1ERfulm0EoC0EB7riY5kqCj
+ LCn5sBcTUUOeWYVk86+vzwYKoQjx+jU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-111-VKzm5t0qM7OOGA93IkC5dQ-1; Tue, 08 Oct 2019 09:04:55 -0400
+Received: by mail-wr1-f70.google.com with SMTP id i14so7230298wro.19
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 06:04:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=+75ozcsMUPNQrJPXtCB4eC0RRh0TKhXhDCufF8BWhIA=;
- b=bhrcnfwsLjvWAbUt+of6K/YErCvSOwjKrv9prNyl2xtmBjembDL0roQWFdHwWt0B6i
- ycVxmlvvWzvRWH3zT/A8iRZN4UN/vuh0k74D9tOjImJMRZjSp+TZo0XUiP9aAQpobzPj
- mTbwHNtbBlbNF8rWBr/nPs/ZZVrIqrkbc/fXxnLaWYupmUiXBfZQuxhxkx7JwybHQpCJ
- EPaPvuLgwInpzD2Pia/AyfY26ct7+jxXKEJSt9uKiIlS9M0PA+BTqWRimAsyKlrB1tkM
- yTwJ3VIMb9CpyQ6Fu40dBScuyD20axivXpUHH0/8ZJpQAXrBvJYeY5hO+uonFojyl8FE
- xFTw==
-X-Gm-Message-State: APjAAAXvf0DsxlMIF/GvW6vHNA8BED4ZrgPgrmNHxX20BbDhy2jrzC5w
- pt4pwD0o2TidgSI8ZCA0QiYPl9My1tGZLpKNn+E=
-X-Google-Smtp-Source: APXvYqyK58alnT+Z8Xl7iiP/B4dCrl5uxqEBBJGCHauGfHRofBVx/hmssFrhh+iRjlUjtjkyAyahrRMLOFGcbAibq0A=
-X-Received: by 2002:ac8:fbd:: with SMTP id b58mr11336978qtk.210.1570539311415; 
- Tue, 08 Oct 2019 05:55:11 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=TcxMzLcbsOMC7x38x8/+P25nk3rjRmmupRSZyyF1VMA=;
+ b=R4RFOqahphPXTliJWAbH5DCYhPcL2ExT9yP4pqdTwlAWw0QKKG/tTLZfqIKnnElytt
+ 9xUuGhk4GR3T3RQg2/Xy183ouQFSHEsByv+Cc2lTxPSWUTALbg3g7eYBzqwhlKYOHUta
+ qtdr9gp3sXOFN0ewNXbk7zKS89kkBHwwFurORNPZ9J0+KmyHQtE/LmG74l7BEWVuo1ci
+ BgvzAb2MTWG+XU5RVaeuwvvVPx0XVfFJC/4WglKhhNX9CEKjnq5q7WOPmksUChWPdYkT
+ mPdvpWB2tC6SI0i5XnnUAiGPpsOEH5fWwTbr/+f+nlIwBBD5xemOGrtGPtjxjNdaxNQC
+ orFg==
+X-Gm-Message-State: APjAAAXbMwETYp4vHZAWDM2do1eYSAMUHF1DWgs1QdjiKeBxgbe9DQ3T
+ 9dJZC3VQ2TNPAIQm4Jkci5608VnIkwRu7DKxP/XpIXNGPZbagG15z9aDHFYpqAw0q/tqYmQ+nz6
+ aQJGSSw3dze9Nbi8=
+X-Received: by 2002:a7b:c041:: with SMTP id u1mr3663311wmc.88.1570539894090;
+ Tue, 08 Oct 2019 06:04:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxykTHkjNCNTKC4Cz+kH5hsUVEjVEJS2Au7ntkFulmeEBPMXHruJNN/ywHahUZ6AZRiWvvXqg==
+X-Received: by 2002:a7b:c041:: with SMTP id u1mr3663288wmc.88.1570539893841;
+ Tue, 08 Oct 2019 06:04:53 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id w22sm2498885wmc.16.2019.10.08.06.04.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 08 Oct 2019 06:04:53 -0700 (PDT)
+Subject: Re: [PATCH 00/97] Patch Round-up for stable 4.0.1, freeze on
+ 2019-10-10
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+References: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <78c46a05-76eb-ccec-df4d-103bee7c2760@redhat.com>
+Date: Tue, 8 Oct 2019 15:04:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <CALvKS=EoaNnNQCmdp3rjjbaAYOoow8txsn1KX=Mb37Vk3he5Kw@mail.gmail.com>
- <5ef2c575-0bae-9f0b-cf2b-437280914cec@redhat.com>
- <CAFEAcA8bs-DZPsxzE=kJ-gRT-1i6wZ4FvkK+-MaygE0Zg3A4Yw@mail.gmail.com>
- <e01f0c12-cd2f-d2f0-aac3-b8145239c45b@redhat.com>
-In-Reply-To: <e01f0c12-cd2f-d2f0-aac3-b8145239c45b@redhat.com>
-From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
-Date: Tue, 8 Oct 2019 21:54:58 +0900
-Message-ID: <CALvKS=Ht-2zkdM8LxwyTYcVrg6ALoG099GZgkZcOzPW+P7rV0g@mail.gmail.com>
-Subject: Re: Peculiar reply from mail list handler???
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191001234616.7825-1-mdroth@linux.vnet.ibm.com>
+Content-Language: en-US
+X-MC-Unique: VKzm5t0qM7OOGA93IkC5dQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::82b
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,52 +106,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 8, 2019 at 8:29 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om> wrote:
->
-> On 10/5/19 9:09 PM, Peter Maydell wrote:
-> > On Sat, 5 Oct 2019 at 18:13, John Snow <jsnow@redhat.com> wrote:
-> >> I'm not clear on the particulars of mail delivery protocols or what
-> >> lists.sr.ht is, but we indeed do not like HTML mail sent to this list.
-> >
-> > I suspect the lists.sr.ht address is just some subscriber to the
-> > QEMU mailing list -- the list server sent your mail to all
-> > the subscribers, including that one, which then complained
-> > to you. But the QEMU list itself is OK with HTML email
-> > (we prefer plain text, but we don't reject HTML).
->
-> I subscribed to sr.ht some time ago to test the service because they
-> provide a CI, git hosting, mailing list, so this might come from my
-> account. If so, I'm surprise it send email on the subscriber behalf.
->
-> Per https://man.sr.ht/lists.sr.ht/etiquette.md#plain-text:
->
->    Rich text is not desirable for development-oriented email
->    conversations, so you should disable this feature and send
->    your email as "plain text". Every email client is different,
->    you should research the options for your specific client.
->    HTML emails are rejected by all sr.ht services.
->
-> Surprisingly there is no option to allow HTML... (plain text is a design
-> feature).
+Hi Michael,
 
-Yep, I forgot to change it and was intending to just write a quick message
-without having to fire up my Linux box.  Had a "damn it" moment the
-second the reply bounced back.
+On 10/2/19 1:44 AM, Michael Roth wrote:
+> Hi everyone,
+>=20
+> The following new patches are queued for QEMU stable v4.0.1:
+>=20
+>    https://github.com/mdroth/qemu/commits/stable-4.0-staging
+>=20
+> The release is planned for 2019-10-17:
+>=20
+>    https://wiki.qemu.org/Planning/4.0
+>=20
+> Please respond here or CC qemu-stable@nongnu.org on any patches you
+> think should be included in the release.
 
-But was a little more concerned the list had its own issues as the
-domain looked a little suspect at first glance (I hadnt seen it before,
-and the style looks unusual / lazy )
+Since it is a "release", these probably fit:
 
-Anyway, something directly mailed back.  And yes I will see where the
-gmail "plain text first" options are so I dont mess it up again
+commit 45c61c6c23918e3b05ed9ecac5b2328ebae5f774
+Author: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date:   Thu Sep 12 18:12:01 2019 -0500
 
-Cheers,
-Luc
+     make-release: pull in edk2 submodules so we can build it from tarballs
+
+commit f3e330e3c319160ac04954399b5a10afc965098c
+Author: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date:   Thu Sep 12 18:12:02 2019 -0500
+
+     roms/Makefile.edk2: don't pull in submodules when building from tarbal=
+l
+
+When is the next qemu-stable release scheduled? Do we care about Python2=20
+use for this one?
+
 
