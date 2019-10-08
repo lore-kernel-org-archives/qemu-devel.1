@@ -2,97 +2,91 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17484ECE58E
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E7FC4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:07:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8A932070B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:07:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A9DD2070B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:07:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vo/yvWwZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8A932070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yiz/5XeX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A9DD2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHlT6-00088L-Ka
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:07:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32920)
+	id 1iHlTA-0008HE-KN
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:07:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iHlQ8-0005yw-4Q
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:04:41 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iHlQL-00064S-Ul
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:04:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iHlQ6-0001gi-Ue
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:04:40 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44083)
+ (envelope-from <alex.bennee@linaro.org>) id 1iHlQJ-0001w6-Qq
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:04:53 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44091)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iHlQ3-0001bU-Oj; Tue, 08 Oct 2019 05:04:36 -0400
-Received: by mail-wr1-x442.google.com with SMTP id z9so18380417wrl.11;
- Tue, 08 Oct 2019 02:04:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Sla1WAPIsDQRMT0iB64L68ydwLjhOCPjA9AsUCjvFYo=;
- b=Vo/yvWwZ1iflLA7YfFRPi3wYFyiLuQpg6NCAEPQjJXfMpr3I1Iwj8FBnwx9o+eSM7T
- AEGiO4bHA1vuVhYs1LAB00tw6cdSJ8UDm1GOolrRcT4vfA7gGUFc3XvOGdLD7/DbHXzH
- RwU1xPYfnBUvp4PIE47+MnN2xqY3FAc5yNdHB6kVDUux35gYYA56ZQF8iOIGtCXsUhfN
- cpKO0z0AcnGDh4F0RF8QtZDH/WGwtcR7iTXEYSqdk7xtrUPAlg57E/F0rODpKGYFTLMj
- rL6jksoaLzxhu33Be76sT/J5kc8Np3E6J6Mw3Qcl9WbFjzQMCLUOwzG2YOUFBxgsS8xR
- IVrw==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iHlQJ-0001u5-Dx
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:04:51 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z9so18381514wrl.11
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 02:04:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=mC5ThNNuVFG3u2PgZlIwNW8UhDb/zSvWrbCucUIxMPw=;
+ b=yiz/5XeX7cmQ2uL9TUsol1PriNU47Gln30g/5YfbAI4M2kwlczz2zncbqdrQ5hsXkO
+ 489x7Z3dtPU1+Pn3S0OGnSBATlovmU5234D8jkVEJak7UagUbPlQoT3zoZkAyFwhJd//
+ 7WNGH4vNRI0dMEOVGO9+HHNWLfyuqTV/koI+GnFwMFNk3qVj1uSWQOm1npXGZMeX5EgX
+ WNJztYZZX+2m9qFsJUUlaqcjA2TJCX2zCKOrtwFFMQ28ABu6241WAmB2xpMRqsZAEP2s
+ rZkyg58C4E0lwWBgiqLJibsiGQ31r4HSkO1MEPWoXrbyFipvCHZ/nWivxlcb2D1Rlzel
+ nADw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Sla1WAPIsDQRMT0iB64L68ydwLjhOCPjA9AsUCjvFYo=;
- b=Y5bhMRyEUNEMC4vBc47F446oLBtvZkhHRfparFoG3xZD99DkenIUZnUuHt+U+C08r1
- FhPgp9bY4aIFN5woWh24AhbnyVxIEPzkxEu0y41vfodfvkTl7VK7ehRejVv4ZLKvGQ53
- 24jZCZeIs8QZ2nxnNNgwlBvACYrEJJ//HaZPJ830Nt4HEsGp6E5KQoniDrq9ZxjPMus2
- zGlqOE0h1RolSghj9fSKeA7Jij0K7Qj5ZnYat5/9jokNm9/m4KPmYffAkyBABvq7+Up1
- +1ahmqzpTX69nK7NWnNIW7Z0a+trsp0C6hSyRaWoB0uj9Mj77p1FKBHrK52dmVDfcP2T
- us2Q==
-X-Gm-Message-State: APjAAAU2eYS/ZeCueTzjB7z1Fp0IGsgvXB09L8MG6pCGb3T7xdr3Vin5
- XshNkLdrqbzO7a+AYvabaqY=
-X-Google-Smtp-Source: APXvYqwcOzshDVoNKVg+qjLPmXxt3fTU+eoaDKG4vTS3IZc092RzmWo9IXcc2AUCaiO+fnORFss1/Q==
-X-Received: by 2002:a5d:6347:: with SMTP id b7mr20506970wrw.131.1570525474508; 
- Tue, 08 Oct 2019 02:04:34 -0700 (PDT)
-Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id r6sm2389522wmh.38.2019.10.08.02.04.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 08 Oct 2019 02:04:33 -0700 (PDT)
-Subject: Re: [RFC PATCH 14/14] hw/arm/raspi: Add the Raspberry Pi 4B board
-To: Esteban Bosse <estebanbosse@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-devel@nongnu.org,
- Pekka Enberg <penberg@iki.fi>, =?UTF-8?Q?Zolt=c3=a1n_Baldaszti?=
- <bztemail@gmail.com>
-References: <20190904171315.8354-1-f4bug@amsat.org>
- <20190904171315.8354-15-f4bug@amsat.org>
- <c8a8c7758104a1a5fe052743b5a22d3a1353de91.camel@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5f1dd044-2909-767d-5a79-8a40d330e129@amsat.org>
-Date: Tue, 8 Oct 2019 11:04:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=mC5ThNNuVFG3u2PgZlIwNW8UhDb/zSvWrbCucUIxMPw=;
+ b=nfdF23Ru9DzNgcJmXT6PAnNqGHtv5zj4U8BO46gHrZHMycLVhNaIdO77FRI87nsC90
+ QFPYxC24qEB6O1yPmuckCKMSjXsf8ip+ZkdSKBE8R7lrVNuG2U74xG9jT591j/KnxjcI
+ uQqYXnJwFhOOEzZcC7uK8pC+mfTmWMdLz7kzElRV5hz4EfFzQ60C2D2ftx3pwCe/HkBf
+ h3lZGO641wom6K43aLo/JG5qT5Zw/s82SvuLv0CSQlwiDM+VLcONf6kKvqp+Fb9hRWVT
+ fhxMcitQGkvQUIhR9jsN/o2esNMnglEIYY/5+wT7X4RezK7rpJ3DU1jKEKyW31Joi8X7
+ BPDw==
+X-Gm-Message-State: APjAAAX61dt0OhpKvTdfeeWEV7ilaF1ijANHTA84RdnCo8bqGCdN1eWa
+ 8fV9MZqHrA4/5jvyQxPRy4RKog==
+X-Google-Smtp-Source: APXvYqy22fBqzQjf2z4Y2SCynT0FUZ1n9AAJc/XeOz51pu0jNddDBfiEbDgk4Kq2gYNM4JQaSrBk2g==
+X-Received: by 2002:adf:ecc3:: with SMTP id s3mr9205319wro.197.1570525489658; 
+ Tue, 08 Oct 2019 02:04:49 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t6sm3594884wmf.8.2019.10.08.02.04.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Oct 2019 02:04:48 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 4B7681FF87;
+ Tue,  8 Oct 2019 10:04:48 +0100 (BST)
+References: <20190926173428.10713-1-f4bug@amsat.org>
+ <20190926173428.10713-4-f4bug@amsat.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-arm@nongnu.org
+Subject: Re: [PATCH 03/19] hw/arm/bcm2835_peripherals: Name various address
+ spaces
+In-reply-to: <20190926173428.10713-4-f4bug@amsat.org>
+Date: Tue, 08 Oct 2019 10:04:48 +0100
+Message-ID: <8736g3k3pr.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <c8a8c7758104a1a5fe052743b5a22d3a1353de91.camel@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,103 +98,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, Clement Deschamps <clement.deschamps@antfield.fr>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Cheng Xiang <ext-cheng.xiang@here.com>,
+ =?utf-8?Q?Zolt=C3=A1n?= Baldaszti <bztemail@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Philippe =?utf-8?Q?Mathieu-Dau?= =?utf-8?Q?d=C3=A9?= <f4bug@amsat.org>,
+ Esteban Bosse <estebanbosse@gmail.com>, Cleber Rosa <crosa@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+ Clement Deschamps <clement.deschamps@antfield.fr>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Laurent Bonnans <laurent.bonnans@here.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Esteban,
 
-On 9/29/19 5:53 PM, Esteban Bosse wrote:
-> El mié, 04-09-2019 a las 19:13 +0200, Philippe Mathieu-Daudé escribió:
->> The Raspberry Pi 4 uses a BCM2711 SoC (based on a BCM2838).
->> The SoC can handle up to 8GiB of SDRAM, but we limit it to 4GiB
->> (no 8GiB models in the market yet).
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   hw/arm/raspi.c | 31 ++++++++++++++++++++++++++++++-
->>   1 file changed, 30 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
->> index b4db39661f..59ee2f82b4 100644
->> --- a/hw/arm/raspi.c
->> +++ b/hw/arm/raspi.c
->> @@ -39,11 +39,13 @@ enum BoardIdChip {
->>       C_BCM2835 = 0,
->>       C_BCM2836 = 1,
->>       C_BCM2837 = 2,
->> +    C_BCM2711 = 3,
->>   };
->>   
->>   enum BoardIdType {
->>       T_2B = 0x04,
->>       T_3B = 0x08,
->> +    T_4B = 0x11,
->>   };
->>   
->>   enum BoardIdRevision {
->> @@ -56,6 +58,7 @@ enum BoardIdRevision {
->>   static const char *processor_typename[] = {
->>       [C_BCM2836] = TYPE_BCM2836,
->>       [C_BCM2837] = TYPE_BCM2837,
->> +    [C_BCM2711] = TYPE_BCM2838,
->>   };
->>   
->>   typedef struct BoardInfo BoardInfo;
->> @@ -90,6 +93,12 @@ static const BoardInfo bcm283x_boards[] = {
->>           .ram_size_min = 1 * GiB,
->>           .ram_size_max = 1 * GiB,
->>       },
->> +    [4] = {
->> +        .board_id = 0xc42,
->> +        .board_rev = { T_4B, R_1_1, C_BCM2711, M_SONY_UK },
->> +        .ram_size_min = 1 * GiB,
->> +        .ram_size_max = 4 * GiB,
->> +    },
->>   };
->>   
->>   typedef struct RasPiState {
->> @@ -336,4 +345,24 @@ static void raspi3_machine_init(MachineClass
->> *mc)
->>       mc->default_ram_size = 1 * GiB;
->>   }
->>   DEFINE_MACHINE("raspi3", raspi3_machine_init)
->> -#endif
->> +
->> +static void raspi4_init(MachineState *machine)
->> +{
->> +    raspi_init(machine, 4);
->> +}
->> +
->> +static void raspi4_machine_init(MachineClass *mc)
->> +{
->> +    mc->desc = "Raspberry Pi 4B";
->> +    mc->init = raspi4_init;
->> +    mc->block_default_type = IF_SD;
->> +    mc->no_parallel = 1;
->> +    mc->no_floppy = 1;
->> +    mc->no_cdrom = 1;
->> +    mc->max_cpus = BCM283X_NCPUS;
->> +    mc->min_cpus = BCM283X_NCPUS;
->> +    mc->default_cpus = BCM283X_NCPUS;
->> +    mc->default_ram_size = 1 * GiB;
-> The comercial models are: 1, 2 and 4 GiB. Why do you choose 1 GiB as
-> default?
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-Well need one default, and 1GiB is the least beefy :)
-You can start a VM with more using the '-m' switch.
+> Various address spaces from the BCM2835 are reported as
+> 'anonymous' in memory tree:
 
-Note there is also a 8GiB raspi4, but it is not yet launched apparently.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
->> +}
->> +DEFINE_MACHINE("raspi4", raspi4_machine_init)
->> +#endif /* TARGET_AARCH64 */
-> Reviewed-by: Esteban Bosse <estebanbosse@gmail.com>
+>
+>   (qemu) info mtree
+>
+>   address-space: anonymous
+>     0000000000000000-000000000000008f (prio 0, i/o): bcm2835-mbox
+>       0000000000000010-000000000000001f (prio 0, i/o): bcm2835-fb
+>       0000000000000080-000000000000008f (prio 0, i/o): bcm2835-property
+>
+>   address-space: anonymous
+>     0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
+>       0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peri=
+pherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
+>       0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>
+>   [...]
+>
+> Since the address_space_init() function takes a 'name' argument,
+> set it to correctly describe each address space:
+>
+>   (qemu) info mtree
+>
+>   address-space: bcm2835-mbox-memory
+>     0000000000000000-000000000000008f (prio 0, i/o): bcm2835-mbox
+>       0000000000000010-000000000000001f (prio 0, i/o): bcm2835-fb
+>       0000000000000080-000000000000008f (prio 0, i/o): bcm2835-property
+>
+>   address-space: bcm2835-fb-memory
+>     0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
+>       0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peri=
+pherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
+>       0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>
+>   address-space: bcm2835-property-memory
+>     0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
+>       0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peri=
+pherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
+>       0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>
+>   address-space: bcm2835-dma-memory
+>     0000000000000000-00000000ffffffff (prio 0, i/o): bcm2835-gpu
+>       0000000000000000-000000003fffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       0000000040000000-000000007fffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       000000007e000000-000000007effffff (prio 1, i/o): alias bcm2835-peri=
+pherals @bcm2835-peripherals 0000000000000000-0000000000ffffff
+>       0000000080000000-00000000bfffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>       00000000c0000000-00000000ffffffff (prio 0, i/o): alias bcm2835-gpu-=
+ram-alias[*] @ram 0000000000000000-000000003fffffff
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/display/bcm2835_fb.c    | 2 +-
+>  hw/dma/bcm2835_dma.c       | 2 +-
+>  hw/misc/bcm2835_mbox.c     | 2 +-
+>  hw/misc/bcm2835_property.c | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/display/bcm2835_fb.c b/hw/display/bcm2835_fb.c
+> index 8f856878cd..85aaa54330 100644
+> --- a/hw/display/bcm2835_fb.c
+> +++ b/hw/display/bcm2835_fb.c
+> @@ -425,7 +425,7 @@ static void bcm2835_fb_realize(DeviceState *dev, Erro=
+r **errp)
+>      s->initial_config.base =3D s->vcram_base + BCM2835_FB_OFFSET;
+>
+>      s->dma_mr =3D MEMORY_REGION(obj);
+> -    address_space_init(&s->dma_as, s->dma_mr, NULL);
+> +    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_FB "-memory");
+>
+>      bcm2835_fb_reset(dev);
+>
+> diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
+> index 6acc2b644e..1e458d7fba 100644
+> --- a/hw/dma/bcm2835_dma.c
+> +++ b/hw/dma/bcm2835_dma.c
+> @@ -383,7 +383,7 @@ static void bcm2835_dma_realize(DeviceState *dev, Err=
+or **errp)
+>      }
+>
+>      s->dma_mr =3D MEMORY_REGION(obj);
+> -    address_space_init(&s->dma_as, s->dma_mr, NULL);
+> +    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_DMA "-memory"=
+);
+>
+>      bcm2835_dma_reset(dev);
+>  }
+> diff --git a/hw/misc/bcm2835_mbox.c b/hw/misc/bcm2835_mbox.c
+> index 7690b9afaf..77285624c9 100644
+> --- a/hw/misc/bcm2835_mbox.c
+> +++ b/hw/misc/bcm2835_mbox.c
+> @@ -311,7 +311,7 @@ static void bcm2835_mbox_realize(DeviceState *dev, Er=
+ror **errp)
+>      }
+>
+>      s->mbox_mr =3D MEMORY_REGION(obj);
+> -    address_space_init(&s->mbox_as, s->mbox_mr, NULL);
+> +    address_space_init(&s->mbox_as, s->mbox_mr, TYPE_BCM2835_MBOX "-memo=
+ry");
+>      bcm2835_mbox_reset(dev);
+>  }
+>
+> diff --git a/hw/misc/bcm2835_property.c b/hw/misc/bcm2835_property.c
+> index 0a1a3eb5d9..43a5465c5d 100644
+> --- a/hw/misc/bcm2835_property.c
+> +++ b/hw/misc/bcm2835_property.c
+> @@ -407,7 +407,7 @@ static void bcm2835_property_realize(DeviceState *dev=
+, Error **errp)
+>      }
+>
+>      s->dma_mr =3D MEMORY_REGION(obj);
+> -    address_space_init(&s->dma_as, s->dma_mr, NULL);
+> +    address_space_init(&s->dma_as, s->dma_mr, TYPE_BCM2835_PROPERTY "-me=
+mory");
+>
+>      /* TODO: connect to MAC address of USB NIC device, once we emulate i=
+t */
+>      qemu_macaddr_default_if_unset(&s->macaddr);
 
-Thanks!
+
+--
+Alex Benn=C3=A9e
 
