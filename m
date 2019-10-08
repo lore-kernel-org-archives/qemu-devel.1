@@ -2,90 +2,92 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B8FBC4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 19:30:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28845C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 19:35:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7170206C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 19:30:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E497421871
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 19:35:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RosdJR2x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7170206C0
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y1XKj55w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E497421871
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHvBV-0001Qw-3M
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 15:30:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44407)
+	id 1iHvH0-0004Tg-18
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 15:35:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46527)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iHuzx-0004GF-JT
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:18:18 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iHvEY-0003GO-8e
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:33:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iHuzt-0007Pf-Qy
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:18:16 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37751)
+ (envelope-from <richard.henderson@linaro.org>) id 1iHvEW-0006kE-Nq
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:33:21 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:39161)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iHuzs-0007ON-Hi
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:18:13 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p14so19773590wro.4
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 12:18:11 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iHvEW-0006k9-IP
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 15:33:20 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id v37so6316970ybi.6
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 12:33:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=r1RlX5aZ21y+fApXWu4LFYQoo38ILKjQ+uwyiWzdwTQ=;
- b=RosdJR2xgz2qBxkKi6FeUyZq05/bIoRtBgrbhpYsDxho5YdSYagBpbpfB6eM5rMAMy
- RxsY/gXKD00OdygnX6R4m5zJPrufFUoP+IgF1PX8Q39fB7R8NQHUqjqMbzgiFT81/rVA
- JR54cOvIpp1wA8+V5c4oAcf6Sl5gaIQOkgZ/8OSZKDY0hty76Rab0Y+SIF48pshiJygv
- iMf2VmG0fNzMwIEg+35JkLoDsdYw3sefYCmxq0AHqIViPKl+G2ElNTfF+TI1CYIOgWxt
- Ar0E7PSdIhxpr+nGnSc3MeKdb90CEoZs5+Jq8flb0QreCHQxuHACpnEJYYHGvlDPIIBm
- 8FRw==
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zTW+zQM77byi14NBaZZqr3jmfYx6TCwB7mEyXcs+Ras=;
+ b=Y1XKj55wzp8fZZhY+MwRRFWy37kmORqMWlXAbgg+jsvcQk+2hevyF5q0u8JgmRzZE9
+ yYLtUzK/mtHTFu3EbInqf0mDX3DTcspcG20m77Rq9crlcP9FeuydPBuaowx77x9Zhc5J
+ R/LGH22I3QeOKwnU3jEiRCQPdohlZQ4Ql7sPnSzTSQKaBg/Stz7s7p9D9lk0To8mgfB5
+ +QRAA/EFBIP6okaejXD+OjKU/zJqMMW0rJeJyxz9ZOdEZYVaANn5MDPs32Q6iJjwC0Bu
+ QKYJbGUzDHuLUyAVN3Qh0/z0dW8Qdt4qiFDxQ7fEw2Mbx23mfK1Ru5oelcKRQAD2LUEx
+ GvZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=r1RlX5aZ21y+fApXWu4LFYQoo38ILKjQ+uwyiWzdwTQ=;
- b=NW8kJUPH9frj0Xcqfaxk6/eWgKZd+vXlW5XDTSXd1t+C53jPkTrQMsxx7Ky10ztiCE
- 3lYXQmuxTv6LHclpJxvs/t2Mzg9CfZOBV29Vt/egrQd2xv9O+9ZfEkaWvEAThu9tfmib
- pkirv86EDAY290SuVSSpN8mQNzDCy2IaYc8LssubxucdDzXrQV3szrAFZykO5X1qQeNg
- S6ksL6lW9QrvbEo9jUnBG2Lia3/29xw2tLccQd+Fh/a4Jx/Lh2HVpWxF3BZwCHUWACcB
- doMXPY2pwX/81NPmKfsBHeVC/12JyNntvwBVgG2m3qgP4tAEFda4GtTSQCYpJlV7Rt8V
- 97uw==
-X-Gm-Message-State: APjAAAXIfq/aLMa3EewtGIs2P6EYYtRZZLyYGM9L9WfQ/wGe07DnMwKz
- ajgid9OFEVTEpEdUrX54jGdLDQ==
-X-Google-Smtp-Source: APXvYqylBI2+spFfz0h6z3pqpIbl+Vo8DDLX2zaK8fKWvT/FeDmPuG4TU+g8mHIhxDUy+R8CT/WgnA==
-X-Received: by 2002:adf:9d84:: with SMTP id p4mr27674879wre.39.1570562289710; 
- Tue, 08 Oct 2019 12:18:09 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r18sm5530016wme.48.2019.10.08.12.18.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Oct 2019 12:18:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5E60A1FF87;
- Tue,  8 Oct 2019 20:18:08 +0100 (BST)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zTW+zQM77byi14NBaZZqr3jmfYx6TCwB7mEyXcs+Ras=;
+ b=d2pDInPneKgh5SCOhC7mUr2HguDca6rEWPFHcIguHJTI5U2YwscfEXIOCa4BeyHcdI
+ agDUtgw0um/iBvotXYzmSknsaDsyDzfpx5u771WGWzgjjNnPO1ZUFnBegAqhQm012qBw
+ QVLo5tORcSwywUoxGwMUEnuJt+IHfm6mTfK5HS2lOecLSq4PpSyFIq+Y5h3e5dfEKyjW
+ 4YGrx+aTftSV5mb3k9i8xMqz/XSFPXLi47JsPGsVOnw6vfaJgBBNJI6cdXkOGVrR9FNz
+ I6rZcb5y34A3FdOv8wbWwDOGsea+oReavaOgodSPYmDeLovifRpiGCS9Ph8lec89FKgs
+ n1mQ==
+X-Gm-Message-State: APjAAAV3MbOQIlCRcphURvKUkuEjjq/Z8d45uCeexbcjELU9Bhw79Tdt
+ BMXudzPdlyIZxZ7lrtCqJQgG5w==
+X-Google-Smtp-Source: APXvYqyHAmWXLsiprak5DFAUqHIIS8fuoVKx5sYk/Msk23N6Lm214P7l6qoGs0Yh0SBq2ICmA94wAQ==
+X-Received: by 2002:a25:770e:: with SMTP id s14mr15699629ybc.242.1570563199666; 
+ Tue, 08 Oct 2019 12:33:19 -0700 (PDT)
+Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
+ by smtp.gmail.com with ESMTPSA id o135sm5329920ywo.75.2019.10.08.12.33.18
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 08 Oct 2019 12:33:19 -0700 (PDT)
+Subject: Re: [PATCH v9 11/13] accel/tcg: adding integration with linux perf
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 References: <20191007152839.30804-1-alex.bennee@linaro.org>
- <20191007152839.30804-9-alex.bennee@linaro.org>
- <71068164-f2fb-571c-e7d8-6b600bd9fb2d@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v9 08/13] tb-stats: reset the tracked TBs on a tb_flush
-In-reply-to: <71068164-f2fb-571c-e7d8-6b600bd9fb2d@linaro.org>
-Date: Tue, 08 Oct 2019 20:18:08 +0100
-Message-ID: <87ftk3hwr3.fsf@linaro.org>
+ <20191007152839.30804-12-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <98aa7273-c504-1cd0-23e7-0b3226122bd8@linaro.org>
+Date: Tue, 8 Oct 2019 15:33:16 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20191007152839.30804-12-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::b41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,45 +99,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, cota@braap.org, qemu-devel@nongnu.org,
+Cc: "Vanderson M. do Rosario" <vandersonmr2@gmail.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ cota@braap.org, Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/7/19 11:28 AM, Alex Bennée wrote:
+> +static uint32_t get_e_machine(void)
+> +{
+> +    uint32_t e_machine = EM_NONE;
+> +    Elf64_Ehdr elf_header;
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Not ideal, as this appears to not work on 32-bit hosts, but the two structures
+do match up within the first 24 bytes, in which this is located.
 
-> On 10/7/19 11:28 AM, Alex Benn=C3=A9e wrote:
->> We keep track of translations but can only do so up until the
->> translation cache is flushed. At that point we really have no idea if
->> we can re-create a translation because all the active tracking
->> information has been reset.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  accel/tcg/tb-stats.c      | 19 +++++++++++++++++++
->>  accel/tcg/translate-all.c |  2 +-
->>  include/exec/tb-stats.h   |  8 ++++++++
->>  3 files changed, 28 insertions(+), 1 deletion(-)
->
-> I still don't understand what the tbs array is for,
-> but resetting it at flush is fine.
+That said, this value is present within tcg/host/tcg-target.inc.c as
+ELF_HOST_MACHINE.  So we really don't have to play /proc/self/exec games.
 
-In Vanderson's original patch he kept a reference to the last translated
-tb which was incorrect - I changed it to track all the TBs associated
-with the stats entry. However the coverset and cfg commands aren't in
-this series which needed to iterate down through the TBs to their jump
-targets to build the full hot block. I suspect for now we can just drop
-the entry.
+> +void start_jitdump_file(void)
+> +{
+> +    g_autofree gchar *dumpfile_name = g_strdup_printf("./jit-%d.dump", getpid());
+> +    dumpfile = fopen(dumpfile_name, "w+");
+> +
+> +    /* 'Perf record' saves mmaped files during the execution of a program and
+> +     * 'perf inject' iterate over them to reconstruct all used/executed binary.
+> +     * So, we create a mmap with the path of our jitdump that is processed
+> +     * and used by 'perf inject' to reconstruct jitted binaries.
+> +     */
+> +    perf_marker = mmap(NULL, sysconf(_SC_PAGESIZE),
+> +                          PROT_READ | PROT_EXEC,
+> +                          MAP_PRIVATE,
+> +                          fileno(dumpfile), 0);
 
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->
->
-> r~
+(1) sysconf(_SC_PAGESIZE) is qemu_real_host_page_size.
+(2) This is a page-sized mapping of a new, zero-sized file?
+    I assume this mapping event gets logged, and that it its
+    only purpose?
+(3) I really need to read the kernel docs...
+
+> +void append_load_in_jitdump_file(TranslationBlock *tb)
+> +{
+> +    gchar *func_name = g_strdup_printf("TB virt:0x"TARGET_FMT_lx, tb->pc);
+> +
+> +    /* Serialise the writing of the dump file */
+> +    qemu_mutex_lock(&dumpfile_lock);
+> +
+> +    struct jr_code_load load_event;
+> +    load_event.p.id = JIT_CODE_LOAD;
+> +    load_event.p.total_size =
+> +        sizeof(struct jr_code_load) + func_name->len + 1 + tb->tc.size;
+
+How does a "gchar *func_name" have ->len?  Did this used to be GString, but a
+last-minute change means it no longer compiles?
+
+> +    fflush(dumpfile);
+
+Why fflushing all of the time?  Surely the file contents doesn't matter until
+after the final close.
+
+> +    qemu_mutex_unlock(&dumpfile_lock);
+
+Why a separate qemu locking instead of using stdio's own locking (flockfile).
+
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 871d91d559..3fafb656e7 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -58,6 +58,10 @@
+>  #include "sysemu/cpus.h"
+>  #include "sysemu/tcg.h"
+>  
+> +#ifdef __linux__
+> +#include "perf/jitdump.h"
+> +#endif
+
+Why the ifdefs?  We're not dependent on other headers are we?
+Not that there's a "perf" on other hosts, but AFACT it should
+at least compile...
 
 
---
-Alex Benn=C3=A9e
+r~
 
