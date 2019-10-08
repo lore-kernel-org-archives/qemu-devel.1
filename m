@@ -2,63 +2,57 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA848C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D06C1C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:47:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DDD420659
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DDD420659
+	by mail.kernel.org (Postfix) with ESMTPS id A3A91205F4
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:47:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3A91205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHqjI-0000C2-MD
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 10:44:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49742)
+	id 1iHqlg-0001mL-MM
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 10:47:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iHqQR-0005yF-AG
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:25:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1iHqRE-00064V-7Z
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:26:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iHqQQ-0007ul-6e
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:25:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57206)
+ (envelope-from <philmd@redhat.com>) id 1iHqRD-0008Kl-4s
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:26:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45758)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iHqQQ-0007uU-0i
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:25:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1iHqR7-0008Ir-9V; Tue, 08 Oct 2019 10:26:01 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 10049806A72;
- Tue,  8 Oct 2019 14:25:17 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B125860605;
- Tue,  8 Oct 2019 14:25:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 30B4B1138648; Tue,  8 Oct 2019 16:24:45 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v4 02/31] hw/core/loader-fit: fix freeing errp in
- fit_load_fdt
-References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
- <20191001155319.8066-3-vsementsov@virtuozzo.com>
-Date: Tue, 08 Oct 2019 16:24:45 +0200
-In-Reply-To: <20191001155319.8066-3-vsementsov@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Tue, 1 Oct 2019 18:52:50 +0300")
-Message-ID: <87d0f7iac2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1CE2130ADBB4;
+ Tue,  8 Oct 2019 14:26:00 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-43.brq.redhat.com [10.40.204.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A0D5819C69;
+ Tue,  8 Oct 2019 14:25:42 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 0/8] hw: Convert various reset() handler to DeviceReset
+Date: Tue,  8 Oct 2019 16:25:31 +0200
+Message-Id: <20191008142539.7793-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Tue, 08 Oct 2019 14:25:17 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Tue, 08 Oct 2019 14:26:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,40 +67,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
- Paul Burton <pburton@wavecomp.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+Since v1:
+- Removed the pci-host devices
+- Removed the vmcoreinfo conversion (elmarco) but add a comment.
+- Added Igor's R-b tag.
 
-> fit_load_fdt forget to check that errp is not NULL and to zero it after
-> freeing. Fix it.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  hw/core/loader-fit.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-> index 953b16bc82..3ee9fb2f2e 100644
-> --- a/hw/core/loader-fit.c
-> +++ b/hw/core/loader-fit.c
-> @@ -200,7 +200,10 @@ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
->      err = fit_image_addr(itb, img_off, "load", &load_addr, errp);
->      if (err == -ENOENT) {
->          load_addr = ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
-> -        error_free(*errp);
-> +        if (errp) {
-> +            error_free(*errp);
-> +            *errp = NULL;
-> +        }
->      } else if (err) {
->          error_prepend(errp, "unable to read FDT load address from FIT: ");
->          ret = err;
+Following the thread discussion between Peter/Markus/Damien about
+reset handlers:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg617103.html
+I started to remove qemu_register_reset() calls from few qdevified
+devices (the trivial ones).
 
-Hmm.  Should we have error_clear(), similar to g_clear_error()?
+Regards,
 
-https://developer.gnome.org/glib/stable/glib-Error-Reporting.html#g-clear-error
+Phil.
+
+v1: https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg06367.html
+
+Philippe Mathieu-Daud=C3=A9 (8):
+  hw/acpi/piix4: Convert reset handler to DeviceReset
+  hw/isa/piix4: Convert reset handler to DeviceReset
+  hw/ide/piix: Convert reset handler to DeviceReset
+  hw/ide/sii3112: Convert reset handler to DeviceReset
+  hw/ide/via82c: Convert reset handler to DeviceReset
+  hw/isa/vt82c686: Convert reset handler to DeviceReset
+  hw/input/lm832x: Convert reset handler to DeviceReset
+  hw/misc/vmcoreinfo: Document its reset handler
+
+ hw/acpi/piix4.c      |  7 +++----
+ hw/ide/piix.c        |  8 +++-----
+ hw/ide/sii3112.c     |  7 +++----
+ hw/ide/via.c         | 10 ++++------
+ hw/input/lm832x.c    | 12 +++++-------
+ hw/isa/piix4.c       |  7 +++----
+ hw/isa/vt82c686.c    | 11 ++++-------
+ hw/misc/vmcoreinfo.c |  1 +
+ 8 files changed, 26 insertions(+), 37 deletions(-)
+
+--=20
+2.21.0
+
 
