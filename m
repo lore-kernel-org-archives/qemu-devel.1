@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 273CDECE58E
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E91E9C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF69220659
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:57:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF69220659
+	by mail.kernel.org (Postfix) with ESMTPS id BA25620659
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 14:57:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA25620659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHqvG-0002Qr-0f
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 10:57:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54532)
+	id 1iHqvb-0002f0-Vr
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 10:57:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54596)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iHqtY-0000d2-40
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:55:25 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iHqth-0000tu-GS
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iHqtV-0003nn-Uq
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:55:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64406)
+ (envelope-from <stefanha@redhat.com>) id 1iHqtg-00043c-5m
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 10:55:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35414)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1iHqtO-0003ev-Uf; Tue, 08 Oct 2019 10:55:15 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1iHqtd-0003wI-3D; Tue, 08 Oct 2019 10:55:29 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9879E69066;
- Tue,  8 Oct 2019 14:55:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4021EC0546FF;
+ Tue,  8 Oct 2019 14:55:28 +0000 (UTC)
 Received: from localhost (ovpn-116-36.ams2.redhat.com [10.36.116.36])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2B25910016EB;
- Tue,  8 Oct 2019 14:55:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CB6185C1D4;
+ Tue,  8 Oct 2019 14:55:27 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/4] util/ioc.c: try to reassure Coverity about
- qemu_iovec_init_extended
-Date: Tue,  8 Oct 2019 15:55:02 +0100
-Message-Id: <20191008145505.3641-2-stefanha@redhat.com>
+Subject: [PULL 3/4] block: Skip COR for inactive nodes
+Date: Tue,  8 Oct 2019 15:55:04 +0100
+Message-Id: <20191008145505.3641-4-stefanha@redhat.com>
 In-Reply-To: <20191008145505.3641-1-stefanha@redhat.com>
 References: <20191008145505.3641-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 08 Oct 2019 14:55:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Tue, 08 Oct 2019 14:55:28 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -69,62 +68,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
  "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
 
-Make it more obvious, that filling qiov corresponds to qiov allocation,
-which in turn corresponds to total_niov calculation, based on mid_niov
-(not mid_len). Still add an assertion to show that there should be no
-difference.
+We must not write data to inactive nodes, and a COR is certainly
+something we can simply not do without upsetting anyone.  So skip COR
+operations on inactive nodes.
 
-[Added mingw "error: 'mid_iov' may be used uninitialized in this
-function" compiler error fix suggested by Vladimir.
---Stefan]
-
-Reported-by: Coverity (CID 1405302)
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190910090310.14032-1-vsementsov@virtuozzo.com
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20190910090310.14032-1-vsementsov@virtuozzo.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20191001174827.11081-2-mreitz@redhat.com
+Message-Id: <20191001174827.11081-2-mreitz@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-fixup! util/ioc.c: try to reassure Coverity about qemu_iovec_init_extende=
-d
 ---
- util/iov.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/io.c | 41 +++++++++++++++++++++++++++--------------
+ 1 file changed, 27 insertions(+), 14 deletions(-)
 
-diff --git a/util/iov.c b/util/iov.c
-index 5059e10431..45ef3043ee 100644
---- a/util/iov.c
-+++ b/util/iov.c
-@@ -423,7 +423,7 @@ void qemu_iovec_init_extended(
- {
-     size_t mid_head, mid_tail;
-     int total_niov, mid_niov =3D 0;
--    struct iovec *p, *mid_iov;
-+    struct iovec *p, *mid_iov =3D NULL;
+diff --git a/block/io.c b/block/io.c
+index f8c3596131..4f9ee97c2b 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1246,11 +1246,18 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(=
+BdrvChild *child,
+     int max_transfer =3D MIN_NON_ZERO(bs->bl.max_transfer,
+                                     BDRV_REQUEST_MAX_BYTES);
+     unsigned int progress =3D 0;
++    bool skip_write;
 =20
-     if (mid_len) {
-         mid_iov =3D qiov_slice(mid_qiov, mid_offset, mid_len,
-@@ -446,7 +446,8 @@ void qemu_iovec_init_extended(
-         p++;
+     if (!drv) {
+         return -ENOMEDIUM;
      }
 =20
--    if (mid_len) {
-+    assert(!mid_niov =3D=3D !mid_len);
-+    if (mid_niov) {
-         memcpy(p, mid_iov, mid_niov * sizeof(*p));
-         p[0].iov_base =3D (uint8_t *)p[0].iov_base + mid_head;
-         p[0].iov_len -=3D mid_head;
++    /*
++     * Do not write anything when the BDS is inactive.  That is not
++     * allowed, and it would not help.
++     */
++    skip_write =3D (bs->open_flags & BDRV_O_INACTIVE);
++
+     /* FIXME We cannot require callers to have write permissions when al=
+l they
+      * are doing is a read request. If we did things right, write permis=
+sions
+      * would be obtained anyway, but internally by the copy-on-read code=
+. As
+@@ -1274,23 +1281,29 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(=
+BdrvChild *child,
+     while (cluster_bytes) {
+         int64_t pnum;
+=20
+-        ret =3D bdrv_is_allocated(bs, cluster_offset,
+-                                MIN(cluster_bytes, max_transfer), &pnum)=
+;
+-        if (ret < 0) {
+-            /* Safe to treat errors in querying allocation as if
+-             * unallocated; we'll probably fail again soon on the
+-             * read, but at least that will set a decent errno.
+-             */
++        if (skip_write) {
++            ret =3D 1; /* "already allocated", so nothing will be copied=
+ */
+             pnum =3D MIN(cluster_bytes, max_transfer);
+-        }
++        } else {
++            ret =3D bdrv_is_allocated(bs, cluster_offset,
++                                    MIN(cluster_bytes, max_transfer), &p=
+num);
++            if (ret < 0) {
++                /*
++                 * Safe to treat errors in querying allocation as if
++                 * unallocated; we'll probably fail again soon on the
++                 * read, but at least that will set a decent errno.
++                 */
++                pnum =3D MIN(cluster_bytes, max_transfer);
++            }
+=20
+-        /* Stop at EOF if the image ends in the middle of the cluster */
+-        if (ret =3D=3D 0 && pnum =3D=3D 0) {
+-            assert(progress >=3D bytes);
+-            break;
+-        }
++            /* Stop at EOF if the image ends in the middle of the cluste=
+r */
++            if (ret =3D=3D 0 && pnum =3D=3D 0) {
++                assert(progress >=3D bytes);
++                break;
++            }
+=20
+-        assert(skip_bytes < pnum);
++            assert(skip_bytes < pnum);
++        }
+=20
+         if (ret <=3D 0) {
+             QEMUIOVector local_qiov;
 --=20
 2.21.0
 
