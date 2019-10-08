@@ -2,67 +2,64 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7612C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 06:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1940C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 07:03:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74853206C2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 06:52:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74853206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B69812067B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 07:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69812067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHjML-0008Iw-IX
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 02:52:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45287)
+	id 1iHjWS-0002u4-Ns
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 03:03:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iHjLd-0007np-UH
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 02:51:55 -0400
+ (envelope-from <zhengxiang9@huawei.com>) id 1iHjVA-0002LL-N1
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 03:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iHjLc-000723-Ql
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 02:51:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36062)
+ (envelope-from <zhengxiang9@huawei.com>) id 1iHjV5-0003Rm-KG
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 03:01:44 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2246 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1iHjLY-0006zu-KW; Tue, 08 Oct 2019 02:51:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 78F0B3060860;
- Tue,  8 Oct 2019 06:51:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F9625C223;
- Tue,  8 Oct 2019 06:51:42 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9C8EB1138648; Tue,  8 Oct 2019 08:51:40 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH 1/1] IDE: deprecate ide-drive
-References: <20191006203150.13054-1-jsnow@redhat.com>
- <20191006203150.13054-2-jsnow@redhat.com>
- <87pnj8holb.fsf@dusky.pond.sub.org>
- <4493785d-f1b8-3de5-ee79-7911949dfba4@redhat.com>
-Date: Tue, 08 Oct 2019 08:51:40 +0200
-In-Reply-To: <4493785d-f1b8-3de5-ee79-7911949dfba4@redhat.com> (John Snow's
- message of "Mon, 7 Oct 2019 15:23:23 -0400")
-Message-ID: <87a7abafwj.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iHjV2-0003Ps-OU; Tue, 08 Oct 2019 03:01:37 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 25EA08A9D591A1209D42;
+ Tue,  8 Oct 2019 15:01:32 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Tue, 8 Oct 2019
+ 15:01:24 +0800
+Subject: Re: [Qemu-arm] [PATCH v18 4/6] KVM: Move hwpoison page related
+ functions into include/sysemu/kvm_int.h
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190906083152.25716-1-zhengxiang9@huawei.com>
+ <20190906083152.25716-5-zhengxiang9@huawei.com>
+ <CAFEAcA_o6NkOGptWFOoVt4pUgHU+dNyWQ9h_VfNweR17CtHSnw@mail.gmail.com>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <a857520c-f115-a096-3aeb-3d3588575c4a@huawei.com>
+Date: Tue, 8 Oct 2019 15:01:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 08 Oct 2019 06:51:47 +0000 (UTC)
+In-Reply-To: <CAFEAcA_o6NkOGptWFOoVt4pUgHU+dNyWQ9h_VfNweR17CtHSnw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,75 +71,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>, QEMU
+ Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ James Morse <james.morse@arm.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
 
-> On 10/7/19 5:49 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> It's an old compatibility shim that just delegates to ide-cd or ide-hd.
->>> I'd like to refactor these some day, and getting rid of the super-object
->>> will make that easier.
->> 
->> Device "scsi-disk" is similar.  However, it's still used by the
->> scsi_bus_legacy_add_drive() magic.  Not sure that's fully deprecated,
->> yet.  If / once it is, we can deprecate "scsi-disk", too.  Anyway, not
->> your department.
->> 
->
-> Yeah. I just want to get rid of this to allow myself to do bolder things
-> later on.
->
-> I have literally no time to do this and it's not really anything that
-> would make anyone money, but...
->
-> I want to add a few explicit devices:
->
-> ata-hd
-> ata-cd
-> sata-hd
-> sata-cd
->
-> With some shared state structures that implement common feature subsets,
-> like ata_registers, sata_registers, atapi_registers, etc.
->
-> I'd also like to separate out frontend and backend state providing a bit
-> of a cleaner division between device configuration (parameters on the
-> hardware creation itself), emulated device state (ATA register sets and
-> state machine), and QEMU backend state (block_backend pointers, aio
-> state counters, locks, etc etc etc -- Things solely purposed for
-> interacting with the block module.)
->
-> I'd also like to make each device type plug into ATA or SATA bus slots
-> explicitly -- no more magic IDE devices.
->
-> It's like the 5-year itch I can't help but want to scratch. My name's on
-> this code and it's UGLY UGLY UGLY!
 
-True!  And that's after Kraxel made it *less* ugly.  Your 5-year itch is
-actually a 10-year itch that evolved from an open sore.
+On 2019/9/27 21:19, Peter Maydell wrote:
+> On Fri, 6 Sep 2019 at 09:33, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+>>
+>> From: Dongjiu Geng <gengdongjiu@huawei.com>
+>>
+>> kvm_hwpoison_page_add() and kvm_unpoison_all() will both be used by X86
+>> and ARM platforms, so moving them into "include/sysemu/kvm_int.h" to
+>> avoid duplicate code.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+>> ---
+>>  accel/kvm/kvm-all.c      | 33 +++++++++++++++++++++++++++++++++
+>>  include/sysemu/kvm_int.h | 23 +++++++++++++++++++++++
+>>  target/arm/kvm.c         |  3 +++
+>>  target/i386/kvm.c        | 34 ----------------------------------
+>>  4 files changed, 59 insertions(+), 34 deletions(-)
+> 
+>>  static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
+>>  {
+>>  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+>> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+>> index 72b2d1b3ae..3ad49f9a28 100644
+>> --- a/include/sysemu/kvm_int.h
+>> +++ b/include/sysemu/kvm_int.h
+>> @@ -41,4 +41,27 @@ typedef struct KVMMemoryListener {
+>>  void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+>>                                    AddressSpace *as, int as_id);
+>>
+>> +/**
+>> + * kvm_hwpoison_page_add:
+>> + *
+>> + * Parameters:
+>> + *  @ram_addr: the address in the RAM for the poisoned page
+>> + *
+>> + * Add a poisoned page to the list
+>> + *
+>> + * Return: None.
+>> + */
+>> +void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+>> +
+>> +/**
+>> + * kvm_unpoison_all:
+>> + *
+>> + * Parameters:
+>> + *  @param: some data may be passed to this function
+>> + *
+>> + * Free and remove all the poisoned pages in the list
+>> + *
+>> + * Return: None.
+>> + */
+>> +void kvm_unpoison_all(void *param);
+>>  #endif
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index b2eaa50b8d..3a110be7b8 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -20,6 +20,7 @@
+>>  #include "sysemu/sysemu.h"
+>>  #include "sysemu/kvm.h"
+>>  #include "sysemu/kvm_int.h"
+>> +#include "sysemu/reset.h"
+>>  #include "kvm_arm.h"
+>>  #include "cpu.h"
+>>  #include "trace.h"
+>> @@ -195,6 +196,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>
+>>      cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
+>>
+>> +    qemu_register_reset(kvm_unpoison_all, NULL);
+>> +
+> 
+> Rather than registering the same reset handler in
+> all the architectures, we could register it in the
+> generic kvm_init() function. (For architectures that
+> don't use the poison-list functionality the reset handler
+> will harmlessly do nothing, because there will be nothing
+> in the list.)
+> 
+> This would allow you to not have to make the
+> kvm_unpoison_all() function global -- it can be static
+> in accel/tcg/kvm-all.c.
 
-> The biggest roadblock to me actually doing this is figuring out how it
-> would be even vaguely possible to migrate from ide-hd or ide-cd to the
-> newer models -- it might be pretty complex, but maybe I can figure
-> something out somehow...
+OK, I will move the register code into the kvm_init() function.
 
-Yes, that's the problem that has blocked further improvement.  Doesn't
-mean it's intractable, only that nobody has found the time to tackle it
-seriously.
+> 
+>>      return 0;
+>>  }
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
 
-> Well, suggestions welcome.
->
->>> Either way, we don't need this.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
-[...]
-> I'll respin to hit the tests with a stiffer scrub-brush.
+-- 
 
-Thanks!
+Thanks,
+Xiang
+
 
