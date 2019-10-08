@@ -2,88 +2,79 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B68C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24CEEC4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:02:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDA80206C2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:00:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDA80206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E3319206C2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 09:02:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3PsecfX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3319206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHlLy-0002YM-T2
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:00:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59838)
+	id 1iHlO5-0004GA-1Y
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 05:02:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60493)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iHlJ4-0008RA-AD
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 04:57:23 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1iHlMG-0003Bu-BZ
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iHlJ3-0000mD-9L
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 04:57:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42394)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iHlJ0-0000gh-B5; Tue, 08 Oct 2019 04:57:18 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2D978308A9E0;
- Tue,  8 Oct 2019 08:57:17 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.207])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C7B25C1D4;
- Tue,  8 Oct 2019 08:57:15 +0000 (UTC)
-Subject: Re: [PATCH] qemu-nbd: Document benefit of --pid-file
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20191007194840.29518-1-eblake@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <575a0bc2-a322-331e-a8ff-1ad360bb6613@redhat.com>
-Date: Tue, 8 Oct 2019 10:57:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <bmeng.cn@gmail.com>) id 1iHlMB-0004gb-2R
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 05:00:40 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:41795)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1iHlMA-0004ez-UF; Tue, 08 Oct 2019 05:00:35 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id 206so5643309ybc.8;
+ Tue, 08 Oct 2019 02:00:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KityKsHZrOQodKrg5hE8kA9mZCthnEQ4reQqbLW1gA0=;
+ b=f3PsecfXuRJnMJNHrxlAwnHKJEMAENfSchPfCSGJN0Hj4UEqjZ0CqacTgXXnAFQgn2
+ OSNQagtCA96x59mQPvm1CDJabi4Jod8QA4uUuotnTRWcWy/Z9iHFsjelJMprJZiK2zEg
+ sTjGwgzm6kY+yGiyrHoEGkoGy/4hGIVzZaO5XE039b+AKY/PqDbvTl1XoyUPg/xTgeMw
+ WFPE3q9tI9856y9khQcQhkPW+41cP1dOTpZR4VhN/IWmzLOXH/gAULHZ7/56cZI0bnf0
+ qBRZtOeVoSmRsXTY6L73oqgwf4BzJblyvQUuFw7BseejZTYrD9SLegvgD1tdFvahmgLA
+ omSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KityKsHZrOQodKrg5hE8kA9mZCthnEQ4reQqbLW1gA0=;
+ b=B/Tn/MVzE9NQZGFIBqG5jLrEeMzO94aE/p7GPIBYlbND/+539PzP/e7/NeX2dI1G+w
+ zT910wu/sRovKVie6F6UjjexMXmJItAuwnEQXvITuipO+j7XeQ/N0uqod2N9Vo+wOlu+
+ Vv90VR7WHijGuLnkzHuFxvxJ7yS9vBnOs5ArGss3ATdv5Yvdq2+tymya8u+NQVSlTJNJ
+ dTfcjpu9EeykpNvUPpsXrkDjFvyAPJK4L/FEgFLiT9QkndxtDBTYY5G3/CFkLwloMlXh
+ c4elBPAwdxWeooISwRMXs9lJjc/xaPibSXQ8tsaF5/9LVm2bID7ZnrteGRaSK5Zicem1
+ 4x/A==
+X-Gm-Message-State: APjAAAX5dsmk5zrFT6Q4wMhjDVN9yyPZGoTrK/cm6RYM5mHWEeT9lWkH
+ ex2Omq7CXlDfIvQ2B1kWVkIlv6B01OgG+G2mUIk=
+X-Google-Smtp-Source: APXvYqxjWjrFqPbh1q+WOZAvlXibXIeirCN15UP+5bBIoe7nh6jzUIYtKAjYeAlLAnxvOINeageA07XUX3GfHMSpezk=
+X-Received: by 2002:a25:bfc4:: with SMTP id q4mr2289949ybm.29.1570525233594;
+ Tue, 08 Oct 2019 02:00:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191007194840.29518-1-eblake@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="pLu8ifQhnhob9OKsU22wcXUhVMWHyDj5K"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Tue, 08 Oct 2019 08:57:17 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20191004151614.81516-1-jonathan@fintelia.io>
+ <5393a150-71b6-a729-7530-a50df05353bd@sifive.com>
+In-Reply-To: <5393a150-71b6-a729-7530-a50df05353bd@sifive.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Tue, 8 Oct 2019 17:00:20 +0800
+Message-ID: <CAEUhbmXXwZTu2rJ7Oen4mVSBjp+-7Jd7WBpmds1xm9m-tR+Q-A@mail.gmail.com>
+Subject: Re: [PATCH v2] target/riscv: Expose "priv" register for GDB
+To: Jim Wilson <jimw@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,71 +86,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Jonathan Behrens <jonathan@fintelia.io>, Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pLu8ifQhnhob9OKsU22wcXUhVMWHyDj5K
-Content-Type: multipart/mixed; boundary="16L7JWCl1C8zwUPbR8Agf7sDVfYuDdlqk"
+Hi Jim,
 
---16L7JWCl1C8zwUPbR8Agf7sDVfYuDdlqk
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On Tue, Oct 8, 2019 at 5:17 AM Jim Wilson <jimw@sifive.com> wrote:
+>
+> On 10/4/19 8:16 AM, Jonathan Behrens wrote:
+> > diff --git a/gdb-xml/riscv-32bit-cpu.xml b/gdb-xml/riscv-32bit-cpu.xml
+> > index 0d07aaec85..d6d76aafd8 100644
+> > --- a/gdb-xml/riscv-32bit-cpu.xml
+> > +++ b/gdb-xml/riscv-32bit-cpu.xml
+> > @@ -44,4 +44,5 @@
+> >     <reg name="t5" bitsize="32" type="int"/>
+> >     <reg name="t6" bitsize="32" type="int"/>
+> >     <reg name="pc" bitsize="32" type="code_ptr"/>
+> > +  <reg name="priv" bitsize="32" type="int"/>
+> >   </feature>
+>
+> Adding this to the cpu register set means that the gdb "info registers"
+> command will now list a value for the mysterious undocumented "priv"
 
-On 07.10.19 21:48, Eric Blake wrote:
-> One benefit of --pid-file is that it is easier to probe the file
-> system to see if a pid file has been created than it is to probe if a
-> socket is available for connection. Document that this is an
-> intentional feature.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  qemu-nbd.texi | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/qemu-nbd.texi b/qemu-nbd.texi
-> index 7f55657722bd..d495bbe8a0ed 100644
-> --- a/qemu-nbd.texi
-> +++ b/qemu-nbd.texi
-> @@ -118,7 +118,8 @@ in list mode.
->  @item --fork
->  Fork off the server process and exit the parent once the server is run=
-ning.
->  @item --pid-file=3DPATH
-> -Store the server's process ID in the given file.
-> +Store the server's process ID in the given file.  The pid file is not
-> +created until after the server socket is open.
->  @item --tls-authz=3DID
->  Specify the ID of a qauthz object previously created with the
->  --object option. This will be used to authorize connecting users
+My gdb does not list "priv" register after applying this patch.
 
-Well, not wrong, but at least most iotests do this by --fork and seeing
-when the parent exits.  But I suppose:
+>>> info registers
+ra             0x0      0x0
+sp             0x0      0x0
+gp             0x0      0x0
+tp             0x0      0x0
+t0             0x1000   4096
+t1             0x0      0
+t2             0x0      0
+fp             0x0      0x0
+s1             0x0      0
+a0             0x0      0
+a1             0x1020   4128
+a2             0x0      0
+a3             0x0      0
+a4             0x0      0
+a5             0x0      0
+a6             0x0      0
+a7             0x0      0
+s2             0x0      0
+s3             0x0      0
+s4             0x0      0
+s5             0x0      0
+s6             0x0      0
+s7             0x0      0
+s8             0x0      0
+s9             0x0      0
+s10            0x0      0
+s11            0x0      0
+t3             0x0      0
+t4             0x0      0
+t5             0x0      0
+t6             0x0      0
+pc             0x1008   0x1008
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Anything I was missing?
 
+> register.  That is likely to result in user confusion, and a few gdb bug
+> reports.
+>
+> Gdb incidentally already has support for a virtual priv register.  From
+> gdb/riscv-tdep.c:
+>
+> static const struct riscv_register_feature riscv_virtual_feature =
+> {
+>   "org.gnu.gdb.riscv.virtual",
+>   {
+>     { RISCV_PRIV_REGNUM, { "priv" }, false }
+>   }
+> };
+>
+> So the correct way to fix this is to add a
+> gdb-xml/riscv-32bit-virtual.xml file, along with code to handle this new
+> xml file and the registers in it.  Likewise for the 64-bit support.
+>
+> The main advantage of doing things this way is that only people that
+> care about the priv register will see it, and this will interoperate
+> with other RISC-V debuggers and targets (if any) that already have
+> virtual priv register support.
 
---16L7JWCl1C8zwUPbR8Agf7sDVfYuDdlqk--
-
---pLu8ifQhnhob9OKsU22wcXUhVMWHyDj5K
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2cT2oACgkQ9AfbAGHV
-z0A5IQf7BKWkHBpMqxqTMzg4iSwF+71KNADQRmzfJnGLctxZaOk7IygwrEZ4lDde
-Pco6E1D4PSm0z1oEs+Z5yAdVIqvRW+5bK5pCtsSCbjyitDTJURLCSUhdP7/1rulY
-zLm+h8ItzBR+9i8akCoyc+Cvpx/xi5swNMlxInF+Ukb2moiCguuvk/hPW8Hsy5I6
-+SQf/R09ZrVm1djW3dy2q4E2QTCr7+lDJ6UFkxxidkeaY8DDjvGu5PnZ/dq8w9i5
-0Fi9ANQRqnEU1cAtrF8OhfzHq4UjFSH6m1xqYTKkaKv9uIcq7U/0s1bxZGnYgo0T
-DdYCeV2xfXTqG/U6TiMq9Wk3ptjJ9A==
-=Mddu
------END PGP SIGNATURE-----
-
---pLu8ifQhnhob9OKsU22wcXUhVMWHyDj5K--
+Regards,
+Bin
 
