@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDA0C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 23:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0723C10F14
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 23:41:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6778F21721
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 23:39:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B969A21721
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 23:41:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Xq83Jnj3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6778F21721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nFCnRB2p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B969A21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHz4o-0002LW-BL
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 19:39:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33045)
+	id 1iHz6N-0004XB-T1
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 19:41:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=177211c83=alistair.francis@wdc.com>)
- id 1iHz2F-0000XS-T6
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 19:36:57 -0400
+ id 1iHz2B-0000S6-Jn
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 19:36:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=177211c83=alistair.francis@wdc.com>)
- id 1iHz2E-0006SK-8t
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 19:36:55 -0400
+ id 1iHz2A-0006R3-6G
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 19:36:51 -0400
 Received: from esa1.hgst.iphmx.com ([68.232.141.245]:26134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=177211c83=alistair.francis@wdc.com>)
- id 1iHz2D-0006Q6-RR; Tue, 08 Oct 2019 19:36:54 -0400
+ id 1iHz29-0006Q6-Qj; Tue, 08 Oct 2019 19:36:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1570577813; x=1602113813;
+ t=1570577809; x=1602113809;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=RmUUWqqvs0KbSgjoaH5oggrEyXhZo+WnAXQN4PPkPvE=;
- b=Xq83Jnj3D4aGruU7MyzuZgi81NMfAMG5j9UIYzjB3hA9CaV/9Mm7WOq8
- tP8RI94pDD/7ag5uucJ718s+CZ5jwTXC90sLWrzYeutLlxoZsq4APBQRZ
- j4smyDN7z9jIrCTb1r5MteKd4rowD31WeprdARaSfPsSnsIMd2yIIzIpc
- vU8n9VGkVQ5aW2cQE7lsNMN50f8aNsZoQM5s+M3nK55gGoIECPcn+xhpR
- jFnVnigpTMHAg5ILgbVxFVIVwOri8qX3ccUODhbpHnEXwtgNhYutdghhm
- 5oBwoMda8eEgd3RDLQ0LnKaWSI6fj4lhJVav97sLzsW+4dNaHuJzv0aLW g==;
-IronPort-SDR: Wffgew3yru6WU0lDxNT8zJ+e/b5fBRSQoZJF3tMh4ABEoJtsHaTKjy8Hbuyf/rFpxI56JL9yV5
- HogjofJEPn5xMufgRdWHUno96hDTZkRcBE8Ln+T4z/oGcP4806rcftDipMJ1q6W3XkT8LaG/1Y
- 1ytXgvMtE4kxrm2rYsrm8o8DlxH7ig4rTpx1VwXdMTupZtdNds9bHyl8Nay5fML6jCCkK6HncW
- /b7Hq0j9nJ/+tbHwsJWlxEulZ4zxck30bGubDbNp+zBEyoOlAizmhNwyjJUGd6QLFQJof6uD7y
- 6ME=
-X-IronPort-AV: E=Sophos;i="5.67,273,1566835200"; d="scan'208";a="227059696"
+ bh=kWWrsx1bcsXXl1QzJ4Tk9h5X2ZCbYLwy/+8InmU8BBo=;
+ b=nFCnRB2ptBmw0TQSmJ/znwgkYrJjGgFTeOwkP+DVT4w7ktBmRgiK9A/u
+ SsZWblvuFuxjQNfr1S/MrYs/WCf2Fc3bemad0ULjmr21py6/t/LFPrLAf
+ 4ZHGL2/2yupYNJj/ToLoQ8WdDtpy95TUEfGKl2pTb3xPEAFKmmzBU+DER
+ jkF2Pyr4g09BRty3k61J0eSpkc2zZk0IBmI+TahZeyrsY3MSLyfqV59BB
+ 5HrDYTbX5VnSGNPmPlWmbP7Iyd34M34qnkOrJiJfue1omqpB5HSXi6DOe
+ yXNZFlFTNdbbCw5YDLzhwRcUwRx48xVNAFU30vxwGTi7fPB/aUJ7hYYC/ w==;
+IronPort-SDR: kVtfbpcNZYIz3AuZbK4nKlbBRHBlanrXYJeYUZdPH1rRTBS/IrIBjqCkvcRAOCL4uFBTU+x0wA
+ j2QCI+4uNJY/V4jsBUq5yyKjEY0Kl/2tAFJbcrNlzxqJGYMzvy9lkUQBf48bKSyGsxr7jy/4aq
+ 7g6AMoIua7ApB9hUZlkkLsxpDxs2uYgr1c0nWBEH8oqW6xBmZYGmghcSzml8jkksM4qgNcNS5I
+ qsl6fk+g2/+43Ad5deIGQEUXYD8LRgx5M2kNGes5n4p/G+1pc05bEc9geK5kVC4b0QvkLIvsrV
+ nGk=
+X-IronPort-AV: E=Sophos;i="5.67,273,1566835200"; d="scan'208";a="227059691"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 09 Oct 2019 07:36:53 +0800
-IronPort-SDR: PWUKnYMouIFh6CyFS0MOwdttCi32N0Orard73A1NB1EVh4VKhKybvMd5tyYaCJlRrvqpfbnL9o
- 4z4zJrZVMsjGADm/ZM94H4C3MhSFJkzd6EM2XiZenyO/TNoq98UuTwQQ6BFq/z8zn2gWOGG7qY
- fZv5GpCcBMfQmBO6jxDAqqDI9CLjVbFFGLPdtvAVvKkUNLzJnnqQULj9GaYdG3GAl8bKqXh5aJ
- 3b+OocJCfJcp/Qs9gbR+AGhPrcZSAxuyv5jO2T3oRM62QzH3qKJIPih1SA7iZKeGaO7dLo49WE
- 7YvMldNlc+ejE+5NCAKnGvDm
+ by ob1.hgst.iphmx.com with ESMTP; 09 Oct 2019 07:36:49 +0800
+IronPort-SDR: 8S9p4T3edRmpRczheR7YEnHExnkK86UVXRriUTeyVzqTCFZYh+n6rwnX5ICB59bOtPesZM+sd8
+ TavoPf0bLEGmD8hZeJQqjyQKjeDjfIU2AN32HAkl403pssA9Vd1Lb7kWorLCbnOW8C9/A1E+2Y
+ z7ykdfl1x37r9PJHHemH8v5G26lRdtYoG7+uYZK3sg9FJo7zFIvHHIZcEpkFr+nbdGy+m2UWad
+ OYF3BQtNkX0gRPTzRYk9zxVTjnCpcZ1/IzlKXUMdulbWugG4yeEyz1RlAH4wqhERdoDsxlGWrQ
+ fgkONK4HhZHZkQaHLYaEe1HO
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 08 Oct 2019 16:32:53 -0700
-IronPort-SDR: WVdkHJTUEjGuKMQf5utIGnioWDqzo+BZHiW2YPylWYfUr1hpilLai/ejkrQTSC8PshENtv3oGn
- M3NQX3/nQq2C+z0FsVOnFERCr78f/8Q7mJHHlAkt3iS2Qd4l/hfAkVkPDIFNxUracqYStvioM6
- ZUQRhA8cq78U2u6buQYnNXBGXz6w+xugHJlKEkc0GPNZaa7YcOQFYKxNzOtahz0wDjB4TwdxSU
- CNZO6bJGJsDeXz6hrD00OCaWt7My6E66u/x5rqYFjakxgqR/A3Jbk4RCMbb0zV9HEWTPYljDEh
- xq8=
+ 08 Oct 2019 16:32:50 -0700
+IronPort-SDR: PpyqTvErwLcqIF4bQ/xLNCYIYheoec60zDy6Y97jXAvsP+Nf2vTvxiayjoO9AdolGSM3W7ZZfU
+ TxKjA4Ln+UYN7XD4Eo8WmbkCzaL5KNLByzbKzKglNsVhnuqDXGV1kkHJpTR5VScr9ileuZzQtV
+ ZcIzyOl8eh71Rk7K8/YP+E5UApzQKwdAOn2VrXu0uxomT2KWTpmJo7IrHcWlcloWlEQiCLNQQl
+ qX3PuSRlUqIq1IX6JIjon6FW4qcyAESruNYZn3CpGTEjPSyMntPogEGfNfusxiB0d1v3AFJydg
+ jzY=
 WDCIronportException: Internal
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.157.58])
- by uls-op-cesaip02.wdc.com with ESMTP; 08 Oct 2019 16:36:54 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 08 Oct 2019 16:36:50 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v3 5/7] riscv/virt: Manually define the machine
-Date: Tue,  8 Oct 2019 16:32:22 -0700
-Message-Id: <31a8a928cefd62773ccfbad96e85e29d15e0de94.1570577500.git.alistair.francis@wdc.com>
+Subject: [PATCH v3 4/7] riscv/sifive_u: Add the start-in-flash property
+Date: Tue,  8 Oct 2019 16:32:18 -0700
+Message-Id: <03cc7cf5c8400dffd6af60f06fe637f117747d9a.1570577500.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1570577500.git.alistair.francis@wdc.com>
 References: <cover.1570577500.git.alistair.francis@wdc.com>
@@ -104,95 +104,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of using the DEFINE_MACHINE() macro to define the machine let's
-do it manually. This allows us to use the machine object to create
-RISCVVirtState. This is required to add children and aliases to the
-machine.
-
-This patch is no functional change.
+Add a property that when set to true QEMU will jump from the ROM code to
+the start of flash memory instead of DRAM which is the default
+behaviour.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-Tested-by: Bin Meng <bmeng.cn@gmail.com>
 ---
- hw/riscv/virt.c         | 30 ++++++++++++++++++++++++------
- include/hw/riscv/virt.h |  7 ++++++-
- 2 files changed, 30 insertions(+), 7 deletions(-)
+v3:
+ - Use the start_addr variable instead of editing reset vector
+ - Fix function names
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index d36f5625ec..e4dcbadcb5 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -362,8 +362,7 @@ static inline DeviceState *gpex_pcie_init(MemoryRegion *sys_mem,
- static void riscv_virt_board_init(MachineState *machine)
- {
-     const struct MemmapEntry *memmap = virt_memmap;
--
--    RISCVVirtState *s = g_new0(RISCVVirtState, 1);
-+    RISCVVirtState *s = RISCV_VIRT_MACHINE(machine);
+ hw/riscv/sifive_u.c         | 30 +++++++++++++++++++++++++++++-
+ include/hw/riscv/sifive_u.h |  2 ++
+ 2 files changed, 31 insertions(+), 1 deletion(-)
+
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index f5741e9a38..43e9f744a3 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -314,6 +314,7 @@ static void riscv_sifive_u_init(MachineState *machine)
      MemoryRegion *system_memory = get_system_memory();
      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-@@ -499,12 +498,31 @@ static void riscv_virt_board_init(MachineState *machine)
-     g_free(plic_hart_config);
+     MemoryRegion *flash0 = g_new(MemoryRegion, 1);
++    target_ulong start_addr = memmap[SIFIVE_U_DRAM].base;
+     int i;
+ 
+     /* Initialize SoC */
+@@ -356,6 +357,10 @@ static void riscv_sifive_u_init(MachineState *machine)
+         }
+     }
+ 
++    if (s->start_in_flash) {
++        start_addr = memmap[SIFIVE_U_FLASH0].base;
++    }
++
+     /* reset vector */
+     uint32_t reset_vec[8] = {
+         0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(dtb) */
+@@ -368,7 +373,7 @@ static void riscv_sifive_u_init(MachineState *machine)
+ #endif
+         0x00028067,                    /*     jr     t0 */
+         0x00000000,
+-        memmap[SIFIVE_U_DRAM].base, /* start: .dword DRAM_BASE */
++        start_addr,                    /* start: .dword */
+         0x00000000,
+                                        /* dtb: */
+     };
+@@ -432,8 +437,31 @@ static void riscv_sifive_u_soc_init(Object *obj)
+                           TYPE_CADENCE_GEM);
  }
  
--static void riscv_virt_board_machine_init(MachineClass *mc)
-+static void riscv_virt_machine_instance_init(Object *obj)
++static bool sifive_u_get_start_in_flash(Object *obj, Error **errp)
++{
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
++
++    return s->start_in_flash;
++}
++
++static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
++{
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
++
++    s->start_in_flash = value;
++}
++
+ static void riscv_sifive_u_machine_instance_init(Object *obj)
  {
--    mc->desc = "RISC-V VirtIO Board (Privileged ISA v1.10)";
-+}
++    SiFiveUState *s = RISCV_U_MACHINE(obj);
 +
-+static void riscv_virt_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+
-+    mc->desc = "RISC-V VirtIO board";
-     mc->init = riscv_virt_board_init;
--    mc->max_cpus = 8; /* hardcoded limit in BBL */
-+    mc->max_cpus = 8;
-     mc->default_cpu_type = VIRT_CPU;
++    s->start_in_flash = false;
++    object_property_add_bool(obj, "start-in-flash", sifive_u_get_start_in_flash,
++                             sifive_u_set_start_in_flash, NULL);
++    object_property_set_description(obj, "start-in-flash",
++                                    "Set on to tell QEMU's ROM to jump to " \
++                                    "flash. Otherwise QEMU will jump to DRAM",
++                                    NULL);
  }
  
--DEFINE_MACHINE("virt", riscv_virt_board_machine_init)
-+static const TypeInfo riscv_virt_machine_typeinfo = {
-+    .name       = MACHINE_TYPE_NAME("virt"),
-+    .parent     = TYPE_MACHINE,
-+    .class_init = riscv_virt_machine_class_init,
-+    .instance_init = riscv_virt_machine_instance_init,
-+    .instance_size = sizeof(RISCVVirtState),
-+};
-+
-+static void riscv_virt_machine_init_register_types(void)
-+{
-+    type_register_static(&riscv_virt_machine_typeinfo);
-+}
-+
-+type_init(riscv_virt_machine_init_register_types)
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-index 6e5fbe5d3b..ffcdcc6dcc 100644
---- a/include/hw/riscv/virt.h
-+++ b/include/hw/riscv/virt.h
-@@ -22,13 +22,18 @@
- #include "hw/riscv/riscv_hart.h"
- #include "hw/sysbus.h"
+ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index a921079fbe..2656b43c58 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -57,6 +57,8 @@ typedef struct SiFiveUState {
  
-+#define TYPE_RISCV_VIRT_MACHINE MACHINE_TYPE_NAME("virt")
-+#define RISCV_VIRT_MACHINE(obj) \
-+    OBJECT_CHECK(RISCVVirtState, (obj), TYPE_RISCV_VIRT_MACHINE)
-+
- typedef struct {
-     /*< private >*/
--    SysBusDevice parent_obj;
-+    MachineState parent;
- 
-     /*< public >*/
-     RISCVHartArrayState soc;
-     DeviceState *plic;
-+
      void *fdt;
      int fdt_size;
- } RISCVVirtState;
++
++    bool start_in_flash;
+ } SiFiveUState;
+ 
+ enum {
 -- 
 2.23.0
 
