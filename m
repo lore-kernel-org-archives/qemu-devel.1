@@ -2,68 +2,81 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B92C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 20:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02431C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 20:37:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88C9121721
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 20:29:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C9121721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B981B21835
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 20:37:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jVOGArVa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B981B21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHw6Q-0004e1-MV
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 16:29:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39314)
+	id 1iHwEc-00088l-Su
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 16:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40550)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iHw4l-0003Ix-KD
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:27:20 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iHwCZ-0006qd-1f
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:35:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iHw4i-0004JM-Q0
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:27:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39372)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iHw4i-0004JB-HQ
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:27:16 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 36C6C69066;
- Tue,  8 Oct 2019 20:27:15 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-109.rdu2.redhat.com
- [10.10.120.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4B52210013A1;
- Tue,  8 Oct 2019 20:27:05 +0000 (UTC)
-Subject: Re: [PATCH v2 7/7] tests/fw_cfg: Run the tests on big-endian targets
-To: Li Qiang <liq3ea@gmail.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iHwCX-0007cM-RR
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:35:22 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38064)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iHwCX-0007c2-KF
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:35:21 -0400
+Received: by mail-ot1-x342.google.com with SMTP id e11so15240625otl.5
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 13:35:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=O2OwHo9MN7fRpyZkAqSHujkBVze1HAYlPsNEGEZfsLE=;
+ b=jVOGArVa3OiRya7bwg3k68g+htGbG7sMHfPd2dsrCGriK7pqYVVh0LOulNWLlhM8kh
+ L0EoKS4z+30T6p9iHXbz+AYk9yDyObZJ8U/tvR/G/49Wj8/XuZhZmRh6Rc53oQNWCyvO
+ /PwCS9Gfetd+dM+XmLgc+eeyt2oDtczfQAAppDotVt0R1AY6SbtT2u6QhODPNXgGlUkK
+ K4tLrVhPEeY0ZHCEiePYqxtg5t8puFhD+1aGxYqhP8FmStVdlZbYETNPoto3UCHsQqU6
+ 6HeWceao0n7T9looRjcdqRfhrGUgUMvvSibdPRVkdI3ClIG2po6QlFKfKLKxADevBesq
+ gdmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=O2OwHo9MN7fRpyZkAqSHujkBVze1HAYlPsNEGEZfsLE=;
+ b=JVdv3Cj8/RcLmxdzHbHsg1f3GDXluwvWAapljIdRWyDmp5NWRX8PEE4j4mgaGIXnby
+ qsfKdIRDpnHZ9AqJ12jbpsewl/PUqClmNQTRCTLuz9d1uiVaT46mEt/woM2E6K69Cpcq
+ NYsutL+4QeYq64fxrW6Bz2kI/jMP+ozNwOpfmdf0NrY1QHZYeB3M8s6CzXvE3TVfM98G
+ RCtPOuAVbpIxCCnAOS3Jw4nAoiU/HX8Grx67j1QSD0h/WcXXmtxdBlI5Tx2qmt6BPrkY
+ lrZJP61il62ftlMYCdYzer9KizE2vRiFjVCW73+U0ULiQNVJOto/kTmT/w4X2dw0p9Md
+ 4uYQ==
+X-Gm-Message-State: APjAAAV64NKpbHvV1X6rKasJV2XoY6NiDycfLnRpdIBTvcsFE1YjUzTv
+ TQgQpSE+LL+SmvRprac+FUkKK+Fpox2Ti1pjjQe0Ww==
+X-Google-Smtp-Source: APXvYqyXP7NXDIap+/WbZM1445Sd1/FVqn+adfqxf+R6W11lan33e5Qhp6VaLEwJDjkOVmaUgWdNKPkxjpARNMQBqrI=
+X-Received: by 2002:a9d:398a:: with SMTP id y10mr101939otb.97.1570566920340;
+ Tue, 08 Oct 2019 13:35:20 -0700 (PDT)
+MIME-Version: 1.0
 References: <20191007151905.32766-1-philmd@redhat.com>
  <20191007151905.32766-8-philmd@redhat.com>
  <CAKXe6S+B8y5fdFowN3+40baR-b4c0RDrsi+LvuNcx1g-Mx7LpA@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f0178880-2526-c3ee-6ad5-1d66f2e23fd9@redhat.com>
-Date: Tue, 8 Oct 2019 22:27:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
-MIME-Version: 1.0
-In-Reply-To: <CAKXe6S+B8y5fdFowN3+40baR-b4c0RDrsi+LvuNcx1g-Mx7LpA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 08 Oct 2019 20:27:15 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+ <f0178880-2526-c3ee-6ad5-1d66f2e23fd9@redhat.com>
+In-Reply-To: <f0178880-2526-c3ee-6ad5-1d66f2e23fd9@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 Oct 2019 21:35:09 +0100
+Message-ID: <CAFEAcA9Xn=UTG7otjSX5e88ewVXmCmip=d=dvHwuM_jZ8X8QqQ@mail.gmail.com>
+Subject: Re: [PATCH v2 7/7] tests/fw_cfg: Run the tests on big-endian targets
+To: Laszlo Ersek <lersek@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,141 +89,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+ Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/08/19 17:04, Li Qiang wrote:
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B41=
-0=E6=9C=887=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=8811:20=E5=86=99=E9=
-=81=93=EF=BC=9A
->=20
->> We have been restricting our fw_cfg tests to the PC machine,
->> which is a little-endian architecture.
->> The fw_cfg device is also used on the SPARC and PowerPC
->> architectures, which can run in big-endian configuration.
->>
->> Since we want to be sure our device does not regress
->> regardless the endianess used, enable this test one
->> these targets.
->>
->> The NUMA selector is X86 specific, restrict it to this arch.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->> v2: test ppc32 too (lvivier)
->> ---
->>  tests/Makefile.include |  2 ++
->>  tests/fw_cfg-test.c    | 33 +++++++++++++++++++++++++++------
->>  2 files changed, 29 insertions(+), 6 deletions(-)
->>
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index 3543451ed3..4ae3d5140a 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -226,6 +226,7 @@ check-qtest-ppc-y +=3D tests/prom-env-test$(EXESUF=
-)
->>  check-qtest-ppc-y +=3D tests/drive_del-test$(EXESUF)
->>  check-qtest-ppc-y +=3D tests/boot-serial-test$(EXESUF)
->>  check-qtest-ppc-$(CONFIG_M48T59) +=3D tests/m48t59-test$(EXESUF)
->> +check-qtest-ppc-y +=3D tests/fw_cfg-test$(EXESUF)
->>
->>  check-qtest-ppc64-y +=3D $(check-qtest-ppc-y)
->>  check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tests/device-plug-test$(EXES=
-UF)
->> @@ -250,6 +251,7 @@ check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) =3D
->> tests/endianness-test$(EXESUF)
->>  check-qtest-sparc-y +=3D tests/prom-env-test$(EXESUF)
->>  check-qtest-sparc-y +=3D tests/m48t59-test$(EXESUF)
->>  check-qtest-sparc-y +=3D tests/boot-serial-test$(EXESUF)
->> +check-qtest-sparc-y +=3D tests/fw_cfg-test$(EXESUF)
->>
->>  check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(=
-EXESUF)
->>  check-qtest-sparc64-y +=3D tests/prom-env-test$(EXESUF)
->> diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
->> index 35af0de7e6..1250e87097 100644
->> --- a/tests/fw_cfg-test.c
->> +++ b/tests/fw_cfg-test.c
->> @@ -210,13 +210,30 @@ static void test_fw_cfg_splash_time(const void
->> *opaque)
->>
->>  int main(int argc, char **argv)
->>  {
->> -    QTestCtx ctx;
->> -    int ret;
->> +    const char *arch =3D qtest_get_arch();
->> +    bool has_numa =3D false;
->> +    QTestCtx ctx =3D {};
->> +    int ret =3D 0;
->>
->>      g_test_init(&argc, &argv, NULL);
->>
->> -    ctx.machine_name =3D "pc";
->> -    ctx.fw_cfg =3D pc_fw_cfg_init();
->> +    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
->> +        has_numa =3D true;
->> +        ctx.machine_name =3D "pc";
->> +        ctx.fw_cfg =3D pc_fw_cfg_init();
->> +    } else if (g_str_equal(arch, "sparc")) {
->> +        ctx.machine_name =3D "SS-5";
->> +        ctx.fw_cfg =3D mm_fw_cfg_init(0xd00000510ULL);
->> +    } else if (g_str_equal(arch, "ppc") || g_str_equal(arch, "ppc64")=
-) {
->> +        /*
->> +         * The mac99 machine is different for 32/64-bit target:
->> +         *
->> +         * ppc(32): the G4 which can be either little or big endian,
->> +         * ppc64:   the G5 (970FX) is only big-endian.
->> +         */
->> +        ctx.machine_name =3D "mac99";
->> +        ctx.fw_cfg =3D mm_fw_cfg_init(0xf0000510);
->> +    }
->>
->>      qtest_add_data_func("fw_cfg/signature", &ctx, test_fw_cfg_signatu=
-re);
->>      qtest_add_data_func("fw_cfg/id", &ctx, test_fw_cfg_id);
->> @@ -231,14 +248,18 @@ int main(int argc, char **argv)
->>      qtest_add_func("fw_cfg/boot_device", test_fw_cfg_boot_device);
->>  #endif
->>      qtest_add_data_func("fw_cfg/max_cpus", &ctx, test_fw_cfg_max_cpus=
-);
->> -    qtest_add_data_func("fw_cfg/numa", &ctx, test_fw_cfg_numa);
->>      qtest_add_data_func("fw_cfg/boot_menu", &ctx, test_fw_cfg_boot_me=
-nu);
->>      qtest_add_data_func("fw_cfg/reboot_timeout", &ctx,
->>                          test_fw_cfg_reboot_timeout);
->>      qtest_add_data_func("fw_cfg/splash_time", &ctx,
->> test_fw_cfg_splash_time);
->>
->> -    ret =3D g_test_run();
->> +    if (has_numa) {
->> +        qtest_add_data_func("fw_cfg/numa", &ctx, test_fw_cfg_numa);
->> +    }
->>
->> +    if (ctx.machine_name) {
->> +        ret =3D g_test_run();
->> +    }
->>
->=20
-> I think we can omit this if statement. In which case the ctx.machine_na=
-me
-> will be NULL?
+On Tue, 8 Oct 2019 at 21:29, Laszlo Ersek <lersek@redhat.com> wrote:
+> In that case, the original initializer will remain in effect, from:
+>
+>   QTestCtx ctx = {};
+>
+> (Admittedly, this is an ugly GNU-ism; for standard C, it should be
+>
+>   QTestCtx ctx = { 0 };
+>
+> but the GNU-ism is used quite frequently in QEMU elsewhere, so meh :) )
 
-When "arch" differs from all of i386, x86_64, sparc, ppc, ppc64.
+This is deliberate -- some compilers grumble about "{ 0 }" in
+some situations, so we generally recommend using "{}" which
+is accepted by all compilers we care about. (Cf commit message
+for commit 039d4e3df0049bdd.)
 
-In that case, the original initializer will remain in effect, from:
-
-  QTestCtx ctx =3D {};
-
-(Admittedly, this is an ugly GNU-ism; for standard C, it should be
-
-  QTestCtx ctx =3D { 0 };
-
-but the GNU-ism is used quite frequently in QEMU elsewhere, so meh :) )
-
-Thanks
-Laszlo
+thanks
+-- PMM
 
