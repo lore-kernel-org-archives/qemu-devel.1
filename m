@@ -2,81 +2,80 @@ Return-Path: <SRS0=wvJ7=YB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02431C4360C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 20:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF52C4360C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 20:39:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B981B21835
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 20:37:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0284D21835
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Oct 2019 20:39:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jVOGArVa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B981B21835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PBMHKspl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0284D21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iHwEc-00088l-Su
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 16:37:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40550)
+	id 1iHwGR-0001NQ-6Y
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 16:39:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41155)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iHwCZ-0006qd-1f
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:35:24 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iHwFZ-0000pg-IB
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:38:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iHwCX-0007cM-RR
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:35:22 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38064)
+ (envelope-from <alistair23@gmail.com>) id 1iHwFX-0000fX-Mz
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:38:29 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:45679)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iHwCX-0007c2-KF
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 16:35:21 -0400
-Received: by mail-ot1-x342.google.com with SMTP id e11so15240625otl.5
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 13:35:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iHwFX-0000eB-De; Tue, 08 Oct 2019 16:38:27 -0400
+Received: by mail-lf1-x141.google.com with SMTP id r134so12978089lff.12;
+ Tue, 08 Oct 2019 13:38:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=O2OwHo9MN7fRpyZkAqSHujkBVze1HAYlPsNEGEZfsLE=;
- b=jVOGArVa3OiRya7bwg3k68g+htGbG7sMHfPd2dsrCGriK7pqYVVh0LOulNWLlhM8kh
- L0EoKS4z+30T6p9iHXbz+AYk9yDyObZJ8U/tvR/G/49Wj8/XuZhZmRh6Rc53oQNWCyvO
- /PwCS9Gfetd+dM+XmLgc+eeyt2oDtczfQAAppDotVt0R1AY6SbtT2u6QhODPNXgGlUkK
- K4tLrVhPEeY0ZHCEiePYqxtg5t8puFhD+1aGxYqhP8FmStVdlZbYETNPoto3UCHsQqU6
- 6HeWceao0n7T9looRjcdqRfhrGUgUMvvSibdPRVkdI3ClIG2po6QlFKfKLKxADevBesq
- gdmQ==
+ :cc; bh=XCPjj57kQgQLJcPcvoqbLBI71lfQjENYLDR7lzwPQVM=;
+ b=PBMHKsplcYsVLC+ZLjSuqIduxzRUp92gBw6p7zXj87dCJe+k66D2HwwxhK6QdgPO4v
+ DD7yyMMuRyklPAjyQngEWodVjACtqwebQ+UYhsdTRQvCOdGhI5HQPD/kkh2JKn8/+WC4
+ KFGI0k/4cmwdTXHXaWQufMNeE27FOG5D8Sb8DlE7OB126KT7t87rx54j2caCx5Jdl7Rf
+ JIQCDqdvLB6lNaU3Dg31RT3FFxiKxtIzqQ9PAQbGjIOsygiBRoaceogge74MjoTBbLVL
+ acb1eS3lxqVyILrWpYZJHjlBspXX9rk/2gb3RwlGTq2eZmRIhy/1K1WzsTzVRrq7BYO1
+ mBGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=O2OwHo9MN7fRpyZkAqSHujkBVze1HAYlPsNEGEZfsLE=;
- b=JVdv3Cj8/RcLmxdzHbHsg1f3GDXluwvWAapljIdRWyDmp5NWRX8PEE4j4mgaGIXnby
- qsfKdIRDpnHZ9AqJ12jbpsewl/PUqClmNQTRCTLuz9d1uiVaT46mEt/woM2E6K69Cpcq
- NYsutL+4QeYq64fxrW6Bz2kI/jMP+ozNwOpfmdf0NrY1QHZYeB3M8s6CzXvE3TVfM98G
- RCtPOuAVbpIxCCnAOS3Jw4nAoiU/HX8Grx67j1QSD0h/WcXXmtxdBlI5Tx2qmt6BPrkY
- lrZJP61il62ftlMYCdYzer9KizE2vRiFjVCW73+U0ULiQNVJOto/kTmT/w4X2dw0p9Md
- 4uYQ==
-X-Gm-Message-State: APjAAAV64NKpbHvV1X6rKasJV2XoY6NiDycfLnRpdIBTvcsFE1YjUzTv
- TQgQpSE+LL+SmvRprac+FUkKK+Fpox2Ti1pjjQe0Ww==
-X-Google-Smtp-Source: APXvYqyXP7NXDIap+/WbZM1445Sd1/FVqn+adfqxf+R6W11lan33e5Qhp6VaLEwJDjkOVmaUgWdNKPkxjpARNMQBqrI=
-X-Received: by 2002:a9d:398a:: with SMTP id y10mr101939otb.97.1570566920340;
- Tue, 08 Oct 2019 13:35:20 -0700 (PDT)
+ bh=XCPjj57kQgQLJcPcvoqbLBI71lfQjENYLDR7lzwPQVM=;
+ b=IrI66cuovhQuDiYYcVXFcKwpudcIFC6eS3Pd2eQZjZE7T3UHN4ULjJ+ezK0CSf0vQf
+ SthW9NYI2kz+4YJFpjDK9rZ9BnSdq+/PpDYD/h5//tJU2CeZ+jGMcp/F1+FxX+Da0SUi
+ R82wl7lfNz6mFlR1fGARbxEbXhHCqn7XQHYqDqdkUNrQnc6J9jr4z7a6lJwPY7UyBDzx
+ Zp4sb+T+6AqMuEfHJKm1/lLBvTSHn8JHTGf5BO0LqqkIHbLZlizHkQpke2faOxezy0Bk
+ 5XzcHVSaQAFYmsGUnpfnSBNx4BeIfFr70FzZ+TtMjJ2/IJC/hmUL4+On0IrCLO2YhGOv
+ WU8g==
+X-Gm-Message-State: APjAAAVyLDQ2wkAOdeNXQ2HvOAui9MWfadBVG+aQYDbXSoXguoQ2PksL
+ rETKL1EAv+NeUtSztPDTPRJCJcIwlyy3Dc2VYG0=
+X-Google-Smtp-Source: APXvYqx5XBJQKq44cAbltXdfUE+pDOK7ljgZwV+CKlWPtOeMhiXglmVudQt3hnMvc79p3w0AIoaSetKQTmdRhZgEXWg=
+X-Received: by 2002:a19:4912:: with SMTP id w18mr21093275lfa.93.1570567105492; 
+ Tue, 08 Oct 2019 13:38:25 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191007151905.32766-1-philmd@redhat.com>
- <20191007151905.32766-8-philmd@redhat.com>
- <CAKXe6S+B8y5fdFowN3+40baR-b4c0RDrsi+LvuNcx1g-Mx7LpA@mail.gmail.com>
- <f0178880-2526-c3ee-6ad5-1d66f2e23fd9@redhat.com>
-In-Reply-To: <f0178880-2526-c3ee-6ad5-1d66f2e23fd9@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 Oct 2019 21:35:09 +0100
-Message-ID: <CAFEAcA9Xn=UTG7otjSX5e88ewVXmCmip=d=dvHwuM_jZ8X8QqQ@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] tests/fw_cfg: Run the tests on big-endian targets
-To: Laszlo Ersek <lersek@redhat.com>
+References: <CAKmqyKPMOAq3oeU-_MQHBAbzTv__iKr=uR8WkCfGbH8yk4afFg@mail.gmail.com>
+ <mhng-1d294790-a5b7-4fa7-8b5e-9adf550c5d1a@palmer-si-x1e>
+In-Reply-To: <mhng-1d294790-a5b7-4fa7-8b5e-9adf550c5d1a@palmer-si-x1e>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 8 Oct 2019 13:33:26 -0700
+Message-ID: <CAKmqyKPnA=GzRVT=AVPcs0-MghBOrnms4_xx=oE0O4UkrG4r7A@mail.gmail.com>
+Subject: Re: [PATCH v2 4/7] riscv/sifive_u: Add the start-in-flash property
+To: Palmer Dabbelt <palmer@sifive.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2a00:1450:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,31 +87,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>, Bin Meng <bmeng.cn@gmail.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 8 Oct 2019 at 21:29, Laszlo Ersek <lersek@redhat.com> wrote:
-> In that case, the original initializer will remain in effect, from:
+On Tue, Oct 8, 2019 at 1:12 PM Palmer Dabbelt <palmer@sifive.com> wrote:
 >
->   QTestCtx ctx = {};
+> On Mon, 30 Sep 2019 11:04:45 PDT (-0700), alistair23@gmail.com wrote:
+> > On Fri, Sep 27, 2019 at 12:57 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >>
+> >> On Fri, Sep 27, 2019 at 8:55 AM Alistair Francis
+> >> <alistair.francis@wdc.com> wrote:
+> >> >
+> >> > Add a property that when set to true QEMU will jump from the ROM code to
+> >> > the start of flash memory instead of DRAM which is the default
+> >> > behaviour.
+> >> >
+> >> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> >> > ---
+> >> >  hw/riscv/sifive_u.c         | 27 +++++++++++++++++++++++++++
+> >> >  include/hw/riscv/sifive_u.h |  2 ++
+> >> >  2 files changed, 29 insertions(+)
+> >> >
+> >> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> >> > index f5741e9a38..33b55d0d5b 100644
+> >> > --- a/hw/riscv/sifive_u.c
+> >> > +++ b/hw/riscv/sifive_u.c
+> >> > @@ -373,6 +373,10 @@ static void riscv_sifive_u_init(MachineState *machine)
+> >> >                                         /* dtb: */
+> >> >      };
+> >> >
+> >> > +    if (s->start_in_flash) {
+> >> > +        reset_vec[6] = memmap[SIFIVE_U_FLASH0].base; /* start: .dword FLASH0_BASE */
+> >> > +    }
+> >>
+> >> Please change to use the way that patch "[v2,7/7] riscv/virt: Jump to
+> >> pflash if specified" does for consistency, ie:
+> >>
+> >>     if (s->start_in_flash) {
+> >>         start_addr = memmap[SIFIVE_U_FLASH0].base; /* start: .dword
+> >> FLASH0_BASE */
+> >>     }
+> >>
+> >> > +
+> >> >      /* copy in the reset vector in little_endian byte order */
+> >> >      for (i = 0; i < sizeof(reset_vec) >> 2; i++) {
+> >> >          reset_vec[i] = cpu_to_le32(reset_vec[i]);
+> >> > @@ -432,8 +436,31 @@ static void riscv_sifive_u_soc_init(Object *obj)
+> >> >                            TYPE_CADENCE_GEM);
+> >> >  }
+> >> >
+> >> > +static bool virt_get_start_in_flash(Object *obj, Error **errp)
+> >>
+> >> sifive_u_get_start_in_flash()
+> >>
+> >> > +{
+> >> > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
+> >> > +
+> >> > +    return s->start_in_flash;
+> >> > +}
+> >> > +
+> >> > +static void virt_set_start_in_flash(Object *obj, bool value, Error **errp)
+> >>
+> >> sifive_u_set_start_in_flash()
+> >
+> > Yep, I have fixed all of these.
 >
-> (Admittedly, this is an ugly GNU-ism; for standard C, it should be
->
->   QTestCtx ctx = { 0 };
->
-> but the GNU-ism is used quite frequently in QEMU elsewhere, so meh :) )
+> Did I miss the v3?
 
-This is deliberate -- some compilers grumble about "{ 0 }" in
-some situations, so we generally recommend using "{}" which
-is accepted by all compilers we care about. (Cf commit message
-for commit 039d4e3df0049bdd.)
+Nope, I'll send it today.
 
-thanks
--- PMM
+Alistair
+
+>
+> >
+> > Alistair
+> >
+> >>
+> >> > +{
+> >> > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
+> >> > +
+> >> > +    s->start_in_flash = value;
+> >> > +}
+> >> > +
+> >> >  static void riscv_sifive_u_machine_instance_init(Object *obj)
+> >> >  {
+> >> > +    SiFiveUState *s = RISCV_U_MACHINE(obj);
+> >> > +
+> >> > +    s->start_in_flash = false;
+> >> > +    object_property_add_bool(obj, "start-in-flash", virt_get_start_in_flash,
+> >> > +                             virt_set_start_in_flash, NULL);
+> >> > +    object_property_set_description(obj, "start-in-flash",
+> >> > +                                    "Set on to tell QEMU's ROM to jump to " \
+> >> > +                                    "flash. Otherwise QEMU will jump to DRAM",
+> >> > +                                    NULL);
+> >> >  }
+> >> >
+> >> >  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+> >> > diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> >> > index a921079fbe..2656b43c58 100644
+> >> > --- a/include/hw/riscv/sifive_u.h
+> >> > +++ b/include/hw/riscv/sifive_u.h
+> >> > @@ -57,6 +57,8 @@ typedef struct SiFiveUState {
+> >> >
+> >> >      void *fdt;
+> >> >      int fdt_size;
+> >> > +
+> >> > +    bool start_in_flash;
+> >> >  } SiFiveUState;
+> >> >
+> >>
+> >> Regards,
+> >> Bin
 
