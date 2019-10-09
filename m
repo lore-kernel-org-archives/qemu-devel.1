@@ -2,86 +2,90 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DATE_IN_PAST_06_12,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 985EEC47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E70AAECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 22:13:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71575205F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:57:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71575205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B789A218AC
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 22:13:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PnykuRYv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B789A218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIJy1-0000RW-Ic
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:57:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46989)
+	id 1iIKDL-0005tG-RP
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 18:13:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iIJMb-0004cK-Bb
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 17:19:18 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iIKCG-0005JR-IL
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 18:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iIJMZ-0003zs-LP
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 17:19:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38623)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iIJMZ-0003zf-Cs
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 17:19:15 -0400
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 81AE464043
- for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 21:19:14 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id w8so1689148wrm.3
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 14:19:14 -0700 (PDT)
+ (envelope-from <richard.henderson@linaro.org>) id 1iIKCF-00075w-6J
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 18:12:40 -0400
+Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:41265)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iIKCF-00075K-0a
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 18:12:39 -0400
+Received: by mail-yw1-xc44.google.com with SMTP id 129so1409365ywb.8
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 15:12:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=LakPK4CmK4D0XN2rFdBB+i0UJOOrNckxPFzjMv7yqwY=;
+ b=PnykuRYv9QPT8quQkJzXsKN4WShPdbCCZzLDc6eEOSE738ctM+VNP5K9yRYofSMvxN
+ EKnmumOluc0jUcEfGvZkyhproa5il6ygeeGh+IybVqRZ27m2VW8mH+detJDOWulPcEjG
+ VIOEnGBPJksb4VT43CfK4QVyXdTucT2J28W5yP48HzRr3ZMuYFamPqrxm1Dq3uWXHQgc
+ cJiwC2+6dR9lAbajZqbk3rsP69aZL3UBswcV03G+gOht5eJj7xQFvlUPs1QyvCdGe8Iw
+ 1B39KD+yBkcKmzvs5fp9a+fyTheeexOsaje1F2Tun/4b8qJ0RRvu3JllyKmp64L53y1I
+ 7BVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Zz5bhF6zfv+jR4MxHD4U4Soo4rdcQIP8qAHAJ/r2e0g=;
- b=KrEPiKG8tufkQK8qSwDa4I5vYZk+CcPU64PyhHh4yJ5kgV57CDvOuQOeY98t4e0hHR
- kHe4JKjvhKUt3tZ/MED9W7QuN9wHSa7ZRpHWE1Sdu4qWBqBefmamTMcZ26cFVpOK3tgn
- bAyGC32gUA7D/aPRvOQLYm6vevUPc7LcfkqHBH+FdeMz8nlBQFyzg2cvf0aql78fFC1G
- JlKXGmp7adLKm8pJfNBj3wbPrXm2l9ot6bnr76At5WnCecnvKF1jQ/oQv8Yn3ZViNSXJ
- +JZdlxbO3OLalt4D0bxVEzqKi4SNBMzaAMHTwJJ3NieHyBNHch3+msNahyKwQqV0pPm+
- Tp4g==
-X-Gm-Message-State: APjAAAV9glRuJu3eUSUJadAkFgVHZeadmSdIriihAZSMwKXkpd9IMwI3
- mE/ECyB+d/2hDOc2hbzIIxAjEVoBC9qUXrYlKXiDBCdmdAc89ZD4rYU/vNIID5GcVmzciKm9wfB
- G2qRvBu18Y2/ibJ4=
-X-Received: by 2002:a5d:6592:: with SMTP id q18mr5040491wru.382.1570655953127; 
- Wed, 09 Oct 2019 14:19:13 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwNCZNQfZZgNTPhUBtSUSZTx06BSOQ3+OhjHfq/mE2O2uyDEy86uvCIFtB++XKELdIzcCgSew==
-X-Received: by 2002:a5d:6592:: with SMTP id q18mr5040470wru.382.1570655952808; 
- Wed, 09 Oct 2019 14:19:12 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q15sm5644526wrg.65.2019.10.09.14.19.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Oct 2019 14:19:12 -0700 (PDT)
-Subject: Re: [PATCHv2 0/2] log guest name and memory error type AO, AR for MCEs
-To: Mario Smarduch <msmarduch@digitalocean.com>, philmd@redhat.com,
- mtosatti@redhat.com, armbru@redhat.com
-References: <20191009164459.8209-1-msmarduch@digitalocean.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+ bh=LakPK4CmK4D0XN2rFdBB+i0UJOOrNckxPFzjMv7yqwY=;
+ b=BCpp2n68Q6gN6WoVY86UYUd6uWgCD0mUcKFkQ+XjjwkiUfzhzdbMMfaAI4/1q04diN
+ FYObfbwg8jlPCfoVmVmWPKcrDOEDZWAkOJkTJIgtfLzSnyyd+8O8jYIKqQ+7FXJ6edmD
+ 4edRx8RPR0bXsi0fPHTvwqihrlWwdWBX1SYjHcg/lC/P65cqAOUHW6aGCx2mMrqW2jcu
+ 7Pk5XTY/deB2YI6OPvYTdTWeNSblvxSrMn/pqnRCNR3zlXLDrJ5vEOLVT7eq3UNuoAuW
+ 15ey66i3bBi9ICi7OjvTGaUZaqv1k0qgSUbQnWyCvacg0rLOB2aQFrB4muGcbc9MPy1M
+ 1LCg==
+X-Gm-Message-State: APjAAAVTSNDwjHp0h0/vDYDTDcoK4RDWRreDEz++ZHDYS3dRpYd1HYeN
+ lNPNYzNG14gUFheGT9LjtVzrQA==
+X-Google-Smtp-Source: APXvYqzrNr/LQBabML8VwP3J6WIPJn0hVKvilSQuCQ7faFqNgdgr408x3mK0tgf1JhhpzKqHr9xJTA==
+X-Received: by 2002:a0d:dd53:: with SMTP id g80mr4681925ywe.397.1570659157755; 
+ Wed, 09 Oct 2019 15:12:37 -0700 (PDT)
+Received: from [192.168.1.44] (67.216.151.25.pool.hargray.net. [67.216.151.25])
+ by smtp.gmail.com with ESMTPSA id c80sm956979ywa.3.2019.10.09.15.12.36
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 09 Oct 2019 15:12:36 -0700 (PDT)
+Subject: Re: [PATCH v4] s390x/tcg: MVCL: Exit to main loop if requested
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20191009110050.29271-1-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <71149051-f7b9-b3ef-8493-4e2db1644a8d@redhat.com>
-Date: Wed, 9 Oct 2019 23:19:10 +0200
+Message-ID: <33fc9e9d-7f26-ae0c-2b92-cde7175b55d5@linaro.org>
+Date: Wed, 9 Oct 2019 08:13:18 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191009164459.8209-1-msmarduch@digitalocean.com>
+In-Reply-To: <20191009110050.29271-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,53 +97,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, ehabkost@redhat.com,
- rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/19 18:44, Mario Smarduch wrote:
-> In a large VPC environment we want to log memory error occurrences
-> and log them with guest name and type - there are few use cases
+On 10/9/19 7:00 AM, David Hildenbrand wrote:
+> MVCL is interruptible and we should check for interrupts and process
+> them after writing back the variables to the registers. Let's check
+> for any exit requests and exit to the main loop. Introduce a new helper
+> function for that: cpu_loop_exit_requested().
 > 
+> When booting Fedora 30, I can see a handful of these exits and it seems
+> to work reliable. Also, Richard explained why this works correctly even
+> when MVCL is called via EXECUTE:
 > 
-> - if VM crashes on AR mce inform the user about the reason and resolve the case
-> - if VM hangs notify the user to reboot and resume processing
-> - if VM continues to run let the user know, he/she maybe able to correlate
->   to vm internal outage
-> - Rawhammer attacks - isolate/determine the attacker possible migrating it off
->   the hypervisor
-> - In general track memory errors on a hyperviosr over time to determine trends
+>     (1) TB with EXECUTE runs, at address Ae
+>         - env->psw_addr stored with Ae.
+>         - helper_ex() runs, memory address Am computed
+>           from D2a(X2a,B2a) or from psw.addr+RI2.
+>         - env->ex_value stored with memory value modified by R1a
 > 
-> Monitoring our fleet we come across quite a few of these and been
-> able to take action where before there were no clues to the causes.
+>     (2) TB of executee runs,
+>         - env->ex_value stored with 0.
+>         - helper_mvcl() runs, using and updating R1b, R1b+1, R2b, R2b+1.
 > 
-> When memory error occurs we get a log entry in qemu log:
+>     (3a) helper_mvcl() completes,
+>          - TB of executee continues, psw.addr += ilen.
+>          - Next instruction is the one following EXECUTE.
 > 
-> Guest [Droplet-12345678] 2019-08-02T05:00:11.940270Z qemu-system-x86_64:
-> Guest MCE Memory Error at QEMU addr 0x7f3c7622f000 and GUEST 0x78e42f000
-> addr of type BUS_MCEERR_AR injected
+>     (3b) helper_mvcl() exits to main loop,
+>          - cpu_loop_exit_restore() unwinds psw.addr = Ae.
+>          - Next instruction is the EXECUTE itself...
+>          - goto 1.
 > 
-> with enterprise logging environment we can to take further actions.
+> As the PoP mentiones that an interruptible instruction called via EXECUTE
+> should avoid modifying storage/registers that are used by EXECUTE itself,
+> it is fine to retrigger EXECUTE.
 > 
-> v1 -> v2:
-> - split into two patches one to get the gustname second to log MCEs 
-> - addressed comments for MCE logging
+> Cc: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 > 
-> Mario Smarduch (2):
->   util/qemu-error: add guest name helper with -msg options
->   target/i386: log MCE guest and host addresses
-> 
->  include/qemu/error-report.h |  1 +
->  qemu-options.hx             | 10 ++++++----
->  target/i386/kvm.c           | 29 ++++++++++++++++++++++++-----
->  util/qemu-error.c           | 31 +++++++++++++++++++++++++++++++
->  vl.c                        |  5 +++++
->  5 files changed, 67 insertions(+), 9 deletions(-)
-> 
+> v3 -> v4:
+> - Switch to cpu_loop_exit_requested() and perform the actual exit in the
+>   caller
 
-Queued, thanks.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Paolo
+
+r~
 
