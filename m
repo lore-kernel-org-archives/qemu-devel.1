@@ -2,80 +2,64 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B0EC4360C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 01:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46368C4360C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 01:03:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6B7C2070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 00:59:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bs0YIZRO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B7C2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1CB07206C2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 01:03:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB07206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iI0Kd-0005MY-2q
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 20:59:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39390)
+	id 1iI0OB-0006n3-A1
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 21:03:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@gmail.com>) id 1iI0Jm-0004hD-1j
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 20:59:07 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iI0N1-0006GI-1m
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:02:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1iI0Jk-00053r-NZ
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 20:59:05 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39409)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>)
- id 1iI0Jk-00053j-GL; Tue, 08 Oct 2019 20:59:04 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w144so346708oia.6;
- Tue, 08 Oct 2019 17:59:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vdJ6hUyFIr9essbPJNXSLpLm9WkR6FVlyC3k4abQwCs=;
- b=Bs0YIZROhEwuGBFhDL3EbYjAVMUsDHO+0ttSU8I1ZYOZjr2+XuXmVkv1nD3KcbvjHR
- ZQmAq3htEO0aCve7x8WoX/8y6BjLfN0pthY4JOEJ3b1PQQwoqGPjP6/xmAq+Kb+NxhTB
- qOjvw3BV5718tK79NIS1vZRy4DMnuiVKXSs82qI1PQgYJwl8GZ8DpNcdmoM6+hKLPyHy
- Zz9/EAJEvYwwrwKv481cvwA9UjhFOWARpkSQH0N6UWsDFesZjpBqGmDM7PUugUzSKf3M
- 52AX1o5VO0C2K8nzW3LLHPF57t6hJZwOlVufBvm/Jv1goMTz6q6i7d6Tr758JFT3l8py
- d/jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vdJ6hUyFIr9essbPJNXSLpLm9WkR6FVlyC3k4abQwCs=;
- b=IIt70CpiLN9KFikdgmuv1BiO2wHzVtFEpG83a0aPhSx+uGwIdwcRzVRqu74QSoJkg1
- 5eol1XhCMxOwPedjDfYIAzHQ3YatD6UnOTj4OvvGKDzGNtYZL0tp7Hctgsaonh8M65Oh
- DLnUBVsK235LP1Np0v9EoIPWHHo7t322JPlyxjKSqKU3LC42BB59Oipji9W8o25DURdz
- lOnCOVtpi0Pj5fQM1lMfARENirfkW0+ApnP4b/Ac2V7SwgNjjU11HE1bDkz/h65oR+AD
- JPukhG008q9YDkhKHABp3g7Rq6naZgWqiuCEe5DY5GJ8IOOhCPYmurIToe83jIQDdcHg
- anog==
-X-Gm-Message-State: APjAAAVyQI1snxkHdonukNMC+uqtOA2E8aoaiG7c4fM9XtZbg+jT6Z17
- 9V3N+F3hbEyJZs7WHtIm6YqGK4dNUwPn6tuWzVw=
-X-Google-Smtp-Source: APXvYqxCwVW5wQUJOt0rpJqDHnMCVurYxAs5XHTGXhBhnQzeidRJs9xOWJZ/tcotN5vtjtMaLGL45daPAcRjrr+OAOc=
-X-Received: by 2002:aca:280e:: with SMTP id 14mr343753oix.129.1570582743556;
- Tue, 08 Oct 2019 17:59:03 -0700 (PDT)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iI0My-0006hT-Ok
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:02:26 -0400
+Received: from mga14.intel.com ([192.55.52.115]:47915)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1iI0My-0006hD-Fj
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:02:24 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 08 Oct 2019 18:02:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; d="scan'208";a="183912068"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by orsmga007.jf.intel.com with ESMTP; 08 Oct 2019 18:02:21 -0700
+Date: Wed, 9 Oct 2019 09:02:04 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 3/3] migration/postcopy: handle POSTCOPY_INCOMING_RUNNING
+ corner case properly
+Message-ID: <20191009010204.GC26203@richard>
+References: <20191001100122.17730-1-richardw.yang@linux.intel.com>
+ <20191001100122.17730-4-richardw.yang@linux.intel.com>
+ <20191008164046.GF3441@work-vm>
 MIME-Version: 1.0
-References: <20191008142539.7793-1-philmd@redhat.com>
- <20191008142539.7793-2-philmd@redhat.com>
-In-Reply-To: <20191008142539.7793-2-philmd@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 9 Oct 2019 08:58:27 +0800
-Message-ID: <CAKXe6S+jpobh-nG+-x1+QMrUcCReT2AfmfPo+mGc4X+L_V1WVw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/8] hw/acpi/piix4: Convert reset handler to DeviceReset
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000085291705946fcaa8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191008164046.GF3441@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,171 +71,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- Qemu Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+ peterx@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000085291705946fcaa8
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tue, Oct 08, 2019 at 05:40:46PM +0100, Dr. David Alan Gilbert wrote:
+>* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> Currently, we set PostcopyState blindly to RUNNING, even we found the
+>> previous state is not LISTENING. This will lead to a corner case.
+>> 
+>> First let's look at the code flow:
+>> 
+>> qemu_loadvm_state_main()
+>>     ret = loadvm_process_command()
+>>         loadvm_postcopy_handle_run()
+>>             return -1;
+>>     if (ret < 0) {
+>>         if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING)
+>>             ...
+>>     }
+>> 
+>> From above snippet, the corner case is loadvm_postcopy_handle_run()
+>> always sets state to RUNNING. And then it checks the previous state. If
+>> the previous state is not LISTENING, it will return -1. But at this
+>> moment, PostcopyState is already been set to RUNNING.
+>> 
+>> Then ret is checked in qemu_loadvm_state_main(), when it is -1
+>> PostcopyState is checked. Current logic would pause postcopy and retry
+>> if PostcopyState is RUNNING. This is not what we expect, because
+>> postcopy is not active yet.
+>> 
+>> This patch makes sure state is set to RUNNING only previous state is
+>> LISTENING by introducing an old_state parameter in postcopy_state_set().
+>> New state only would be set when current state equals to old_state.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>
+>OK, it's a shame to use a pointer there, but it works.
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B410=E6=
-=9C=888=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8810:28=E5=86=99=E9=81=
-=93=EF=BC=9A
+You mean second parameter of postcopy_state_set()?
 
-> The PIIX4/PM is a PCI device within the PIIX4 chipset, it will be reset
-> when the PCI bus it stands on is reset.
->
-> Convert its reset handler into a proper Device reset method.
->
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
+I don't have a better idea. Or we introduce a new state
+POSTCOPY_INCOMING_NOCHECK. Do you feel better with this?
 
+>Note, something else; using '-1' as the return value and checking for it
+>is something we do a lot; but in this case it's an example of an error
+>we could never recover from so it never makes sense to try and recover.
+>We should probably look at different types of error.
+>
+>
+>Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+>Dave
+>
+>> ---
+>>  migration/migration.c    |  2 +-
+>>  migration/postcopy-ram.c | 13 +++++++++----
+>>  migration/postcopy-ram.h |  3 ++-
+>>  migration/savevm.c       | 11 ++++++-----
+>>  4 files changed, 18 insertions(+), 11 deletions(-)
+>> 
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 34d5e66f06..369cf3826e 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -447,7 +447,7 @@ static void process_incoming_migration_co(void *opaque)
+>>      assert(mis->from_src_file);
+>>      mis->migration_incoming_co = qemu_coroutine_self();
+>>      mis->largest_page_size = qemu_ram_pagesize_largest();
+>> -    postcopy_state_set(POSTCOPY_INCOMING_NONE);
+>> +    postcopy_state_set(POSTCOPY_INCOMING_NONE, NULL);
+>>      migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
+>>                        MIGRATION_STATUS_ACTIVE);
+>>      ret = qemu_loadvm_state(mis->from_src_file);
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index b24c4a10c2..8f741d636d 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -577,7 +577,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>>          }
+>>      }
+>>  
+>> -    postcopy_state_set(POSTCOPY_INCOMING_END);
+>> +    postcopy_state_set(POSTCOPY_INCOMING_END, NULL);
+>>  
+>>      if (mis->postcopy_tmp_page) {
+>>          munmap(mis->postcopy_tmp_page, mis->largest_page_size);
+>> @@ -626,7 +626,7 @@ int postcopy_ram_prepare_discard(MigrationIncomingState *mis)
+>>          return -1;
+>>      }
+>>  
+>> -    postcopy_state_set(POSTCOPY_INCOMING_DISCARD);
+>> +    postcopy_state_set(POSTCOPY_INCOMING_DISCARD, NULL);
+>>  
+>>      return 0;
+>>  }
+>> @@ -1457,9 +1457,14 @@ PostcopyState  postcopy_state_get(void)
+>>  }
+>>  
+>>  /* Set the state and return the old state */
+>> -PostcopyState postcopy_state_set(PostcopyState new_state)
+>> +PostcopyState postcopy_state_set(PostcopyState new_state,
+>> +                                 const PostcopyState *old_state)
+>>  {
+>> -    return atomic_xchg(&incoming_postcopy_state, new_state);
+>> +    if (!old_state) {
+>> +        return atomic_xchg(&incoming_postcopy_state, new_state);
+>> +    } else {
+>> +        return atomic_cmpxchg(&incoming_postcopy_state, *old_state, new_state);
+>> +    }
+>>  }
+>>  
+>>  /* Register a handler for external shared memory postcopy
+>> diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+>> index d2668cc820..e3dde32155 100644
+>> --- a/migration/postcopy-ram.h
+>> +++ b/migration/postcopy-ram.h
+>> @@ -109,7 +109,8 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis);
+>>  
+>>  PostcopyState postcopy_state_get(void);
+>>  /* Set the state and return the old state */
+>> -PostcopyState postcopy_state_set(PostcopyState new_state);
+>> +PostcopyState postcopy_state_set(PostcopyState new_state,
+>> +                                 const PostcopyState *old_state);
+>>  
+>>  void postcopy_fault_thread_notify(MigrationIncomingState *mis);
+>>  
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index f3292eb003..45474d9c95 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1599,7 +1599,7 @@ enum LoadVMExitCodes {
+>>  static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
+>>                                           uint16_t len)
+>>  {
+>> -    PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
+>> +    PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE, NULL);
+>>      uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
+>>      Error *local_err = NULL;
+>>  
+>> @@ -1628,7 +1628,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
+>>      }
+>>  
+>>      if (!postcopy_ram_supported_by_host(mis)) {
+>> -        postcopy_state_set(POSTCOPY_INCOMING_NONE);
+>> +        postcopy_state_set(POSTCOPY_INCOMING_NONE, NULL);
+>>          return -1;
+>>      }
+>>  
+>> @@ -1841,7 +1841,7 @@ static void *postcopy_ram_listen_thread(void *opaque)
+>>  /* After this message we must be able to immediately receive postcopy data */
+>>  static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+>>  {
+>> -    PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_LISTENING);
+>> +    PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_LISTENING, NULL);
+>>      trace_loadvm_postcopy_handle_listen();
+>>      Error *local_err = NULL;
+>>  
+>> @@ -1929,10 +1929,11 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
+>>  /* After all discards we can start running and asking for pages */
+>>  static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
+>>  {
+>> -    PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_RUNNING);
+>> +    PostcopyState old_ps = POSTCOPY_INCOMING_LISTENING;
+>> +    PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_RUNNING, &old_ps);
+>>  
+>>      trace_loadvm_postcopy_handle_run();
+>> -    if (ps != POSTCOPY_INCOMING_LISTENING) {
+>> +    if (ps != old_ps) {
+>>          error_report("CMD_POSTCOPY_RUN in wrong postcopy state (%d)", ps);
+>>          return -1;
+>>      }
+>> -- 
+>> 2.17.1
+>> 
+>--
+>Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-
-
-> ---
->  hw/acpi/piix4.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index 5742c3df87..4e079b39bd 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -27,7 +27,6 @@
->  #include "hw/pci/pci.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/acpi/acpi.h"
-> -#include "sysemu/reset.h"
->  #include "sysemu/runstate.h"
->  #include "sysemu/sysemu.h"
->  #include "qapi/error.h"
-> @@ -344,9 +343,9 @@ static const VMStateDescription vmstate_acpi =3D {
->      }
->  };
->
-> -static void piix4_reset(void *opaque)
-> +static void piix4_pm_reset(DeviceState *dev)
->  {
-> -    PIIX4PMState *s =3D opaque;
-> +    PIIX4PMState *s =3D PIIX4_PM(dev);
->      PCIDevice *d =3D PCI_DEVICE(s);
->      uint8_t *pci_conf =3D d->config;
->
-> @@ -542,7 +541,6 @@ static void piix4_pm_realize(PCIDevice *dev, Error
-> **errp)
->
->      s->machine_ready.notify =3D piix4_pm_machine_ready;
->      qemu_add_machine_init_done_notifier(&s->machine_ready);
-> -    qemu_register_reset(piix4_reset, s);
->
->      piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
->                                     pci_get_bus(dev), s);
-> @@ -692,6 +690,7 @@ static void piix4_pm_class_init(ObjectClass *klass,
-> void *data)
->      k->device_id =3D PCI_DEVICE_ID_INTEL_82371AB_3;
->      k->revision =3D 0x03;
->      k->class_id =3D PCI_CLASS_BRIDGE_OTHER;
-> +    dc->reset =3D piix4_pm_reset;
->      dc->desc =3D "PM";
->      dc->vmsd =3D &vmstate_acpi;
->      dc->props =3D piix4_pm_properties;
-> --
-> 2.21.0
->
->
->
-
---00000000000085291705946fcaa8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
-ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; =E4=BA=8E2019=E5=
-=B9=B410=E6=9C=888=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8810:28=E5=86=
-=99=E9=81=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
-:1ex">The PIIX4/PM is a PCI device within the PIIX4 chipset, it will be res=
-et<br>
-when the PCI bus it stands on is reset.<br>
-<br>
-Convert its reset handler into a proper Device reset method.<br>
-<br>
-Reviewed-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" targe=
-t=3D"_blank">imammedo@redhat.com</a>&gt;<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
-hat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br></blockquote><div><=
-br></div><div><br></div><div>Reviewed-by: Li Qiang &lt;<a href=3D"mailto:li=
-q3ea@gmail.com">liq3ea@gmail.com</a>&gt;<br></div><div>=C2=A0</div><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
- solid rgb(204,204,204);padding-left:1ex">
----<br>
-=C2=A0hw/acpi/piix4.c | 7 +++----<br>
-=C2=A01 file changed, 3 insertions(+), 4 deletions(-)<br>
-<br>
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c<br>
-index 5742c3df87..4e079b39bd 100644<br>
---- a/hw/acpi/piix4.c<br>
-+++ b/hw/acpi/piix4.c<br>
-@@ -27,7 +27,6 @@<br>
-=C2=A0#include &quot;hw/pci/pci.h&quot;<br>
-=C2=A0#include &quot;hw/qdev-properties.h&quot;<br>
-=C2=A0#include &quot;hw/acpi/acpi.h&quot;<br>
--#include &quot;sysemu/reset.h&quot;<br>
-=C2=A0#include &quot;sysemu/runstate.h&quot;<br>
-=C2=A0#include &quot;sysemu/sysemu.h&quot;<br>
-=C2=A0#include &quot;qapi/error.h&quot;<br>
-@@ -344,9 +343,9 @@ static const VMStateDescription vmstate_acpi =3D {<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0};<br>
-<br>
--static void piix4_reset(void *opaque)<br>
-+static void piix4_pm_reset(DeviceState *dev)<br>
-=C2=A0{<br>
--=C2=A0 =C2=A0 PIIX4PMState *s =3D opaque;<br>
-+=C2=A0 =C2=A0 PIIX4PMState *s =3D PIIX4_PM(dev);<br>
-=C2=A0 =C2=A0 =C2=A0PCIDevice *d =3D PCI_DEVICE(s);<br>
-=C2=A0 =C2=A0 =C2=A0uint8_t *pci_conf =3D d-&gt;config;<br>
-<br>
-@@ -542,7 +541,6 @@ static void piix4_pm_realize(PCIDevice *dev, Error **er=
-rp)<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0s-&gt;machine_ready.notify =3D piix4_pm_machine_ready;<=
-br>
-=C2=A0 =C2=A0 =C2=A0qemu_add_machine_init_done_notifier(&amp;s-&gt;machine_=
-ready);<br>
--=C2=A0 =C2=A0 qemu_register_reset(piix4_reset, s);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0piix4_acpi_system_hot_add_init(pci_address_space_io(dev=
-),<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pci_get_bus(dev), s);<=
-br>
-@@ -692,6 +690,7 @@ static void piix4_pm_class_init(ObjectClass *klass, voi=
-d *data)<br>
-=C2=A0 =C2=A0 =C2=A0k-&gt;device_id =3D PCI_DEVICE_ID_INTEL_82371AB_3;<br>
-=C2=A0 =C2=A0 =C2=A0k-&gt;revision =3D 0x03;<br>
-=C2=A0 =C2=A0 =C2=A0k-&gt;class_id =3D PCI_CLASS_BRIDGE_OTHER;<br>
-+=C2=A0 =C2=A0 dc-&gt;reset =3D piix4_pm_reset;<br>
-=C2=A0 =C2=A0 =C2=A0dc-&gt;desc =3D &quot;PM&quot;;<br>
-=C2=A0 =C2=A0 =C2=A0dc-&gt;vmsd =3D &amp;vmstate_acpi;<br>
-=C2=A0 =C2=A0 =C2=A0dc-&gt;props =3D piix4_pm_properties;<br>
--- <br>
-2.21.0<br>
-<br>
-<br>
-</blockquote></div></div>
-
---00000000000085291705946fcaa8--
+-- 
+Wei Yang
+Help you, Help me
 
