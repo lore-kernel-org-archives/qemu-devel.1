@@ -2,117 +2,64 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B796FC47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B945C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:06:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 814D320B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:03:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B134920B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:06:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="qID52BkG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 814D320B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AwZv5tEX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B134920B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIFNL-0005So-4M
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:03:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44984)
+	id 1iIFQ6-0000fv-Tu
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:06:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iI7AT-0005sI-59
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:17:58 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iI59H-0001Y9-Na
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iI7AR-0001jZ-TM
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:17:57 -0400
-Received: from mail-eopbgr10107.outbound.protection.outlook.com
- ([40.107.1.107]:18368 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iI7AL-0001hw-Cz; Wed, 09 Oct 2019 04:17:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lrC0sjYMOJS4amcj57+wVYH8i255pI75rBjSFqBMuJbfmI0+p1UWy+TtW4pbUpU295snl6XkthL8946IrkGvfxfMTvyYU/akI0DJFGCXDDEFxd37myLYxZnmcXxAFtit+L7tAp08ZteyI5jne4z8yPHwYZh01e7bWMFz7iMhmFCEN1vsGLqr4xBBum55eCa5XFvIxFuDX15ioc+NMBpES5s/4vbWyaRFMpz5SEqC3kDdGDuGuolTLoAZqhcCm/9Q9sb0i+qyuPSHlxiVS1iyIQMFoXFYwq712EbM2MsrRX8kGMGjsSkL4lbsQ0WVoSTdBqzNhBSKwPQwqTXz1O6w/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oBWq+UoL7zI4QWco+24CD9k6d72HLnL2e84PUG7PDBY=;
- b=Oz7QH+y9QX0xV0m4dY9BYLBswVxpDHp1i0yTUw+nXRMl+Ph9YiEMqcAnuN49TXZARLSYbJzi12B1DJRui4saXZjGbiK8vqHAe3aNOsbazEwbZ4TiimfZnHkGNW1SYOL1iaP6flaWawtw6O66zbCt95Eiq+Bwda2HkEic5YxJjKvNuZ6b2pVz3hOtq1I0HXyg0WS+5NiAirT+ICV1lA3BnYTyJ1xbjxTaZFKkJfgpn9ktfGBcdi8fGbUvG8mHdQJlVbLQWbH3dZu8trd9iUeyQU3VUeNfAlpspxRl7QDouAxWpwXWb3mOyBNesbHfurT4OfLousqSWL7qmzZ8bfc01A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oBWq+UoL7zI4QWco+24CD9k6d72HLnL2e84PUG7PDBY=;
- b=qID52BkGAn1+/yGuaI65loNPU+IVGKzVxgkE0CpN6XTgbNc1zHyLVZrKlnlAubgHgiVQX0McO/vRs0vsoXusE2MnLOQd+YsjA7kv1wKzok+C7bKia0H7FFvKDj7fPh4f9MhSauF3zJ2wkVYoQAHn/yNC2AGUbeHWvqztjPO0cig=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB4059.eurprd08.prod.outlook.com (20.179.10.89) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Wed, 9 Oct 2019 08:17:45 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2327.026; Wed, 9 Oct 2019
- 08:17:45 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v4 04/31] error: auto propagated local_err
-Thread-Topic: [PATCH v4 04/31] error: auto propagated local_err
-Thread-Index: AQHVeHBkmvcT9nkNqUiG56jY6f3L6qdR/5BDgAADlwA=
-Date: Wed, 9 Oct 2019 08:17:44 +0000
-Message-ID: <b330f111-4e71-c3a6-4484-22dd25906b55@virtuozzo.com>
-References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
- <20191001155319.8066-5-vsementsov@virtuozzo.com>
- <87r23m8hvb.fsf@dusky.pond.sub.org>
-In-Reply-To: <87r23m8hvb.fsf@dusky.pond.sub.org>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0342.eurprd05.prod.outlook.com
- (2603:10a6:7:92::37) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191009111739975
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 602fcbc2-1453-4783-bc18-08d74c91296d
-x-ms-traffictypediagnostic: DB8PR08MB4059:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <DB8PR08MB4059EC8348CDFE711C320951C1950@DB8PR08MB4059.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 018577E36E
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(366004)(376002)(136003)(396003)(39840400004)(199004)(189003)(6246003)(36756003)(446003)(7736002)(25786009)(486006)(4326008)(229853002)(81156014)(8676002)(8936002)(81166006)(11346002)(31696002)(86362001)(2616005)(476003)(6486002)(6306002)(6512007)(305945005)(6436002)(7416002)(7406005)(478600001)(64756008)(66556008)(66476007)(66446008)(66946007)(14454004)(5660300002)(66066001)(6916009)(2906002)(966005)(186003)(14444005)(256004)(316002)(26005)(99286004)(52116002)(76176011)(3846002)(6116002)(102836004)(386003)(6506007)(71190400001)(54906003)(71200400001)(31686004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4059;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DYPV/Os7Y7Qcj2xdZNXWXe8YHIm8UTkZgvAhrbrdFki3U8tasVI4VdLkVwAo1LZPDcKzAkB811ouveHjJoN/DqDUtuC26OJHroUXp1P2Ul/it4uP1wdQZZ+SybsYDmhd9saUs0Qm1/jgcXAn3xR3S2sKtO3f7EqBmh54xCEAMdsJSEKsz6RmXVYD8uwze8Nfvk+5HtxnbydWOVzNA3V9hoBKmpptTVDAVGvDQ4HhQFX8uRw5NpJp6bTVLo/dTw7rmjsar1Iw76v5gfJDJLhzH9iIRtgkzSPAHf/iuqmIfXE7HLw15rHSSOjA6CtZFQ/m1xX0OiRPlrP57eT4XcCwd/ME6GWTtNK88Js88KO8L3Qji+Lctnv94GNxtl+dXJcalBrQK0o2pC60bhJm8hyzx+HmjI0sdrEI6PTpbihlQACRKrkfzkX5CD8si/CaK8vEY5uJqLzw7fzJqw3h0+3diA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1F04203EDEC94040874701CC5D5D5B8F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <dgibson@ozlabs.org>) id 1iI59E-0006Zi-GL
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:35 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51361 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iI59D-0006Vn-MJ; Wed, 09 Oct 2019 02:08:32 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46p3gF1Hlpz9sR7; Wed,  9 Oct 2019 17:08:24 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1570601305;
+ bh=/FMcuDxWdVA/d9Jlyp+IKrI+II7IqXIVFk0oTgqL1Vw=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=AwZv5tEXo+C/+QxNDa0eTRPUjpZaBgWmJfr7yust2DwpB3hBf4RvCA2m/lqNDtF7P
+ dpSsxAOODyH1FsRUrFHGwGJSKP2fjqXzQC4AQ4tmRh04HherXE4UFjeoDkg8ovzEqy
+ VrqMStYWC1wRlz54gbF4Ji9fWTZlbqT94x0Q3srY=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org,
+	clg@kaod.org,
+	qemu-ppc@nongnu.org
+Subject: [PATCH v4 10/19] spapr, xics,
+ xive: Move dt_populate from SpaprIrq to SpaprInterruptController
+Date: Wed,  9 Oct 2019 17:08:09 +1100
+Message-Id: <20191009060818.29719-11-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191009060818.29719-1-david@gibson.dropbear.id.au>
+References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 602fcbc2-1453-4783-bc18-08d74c91296d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Oct 2019 08:17:44.9414 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: eYoGkYJf5xZ2e34FvjS0JF4dHE0tfE0IDV2mvO4BZ+WaEuDOeiV+V8Ztq0QKOQ7emHQzvOAOs2XEN0s3s04hofknEypDZMXELAanR2ghHkQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4059
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.107
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,79 +71,364 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "pburton@wavecomp.com" <pburton@wavecomp.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "codyprime@gmail.com" <codyprime@gmail.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "arikalo@wavecomp.com" <arikalo@wavecomp.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "joel@jms.id.au" <joel@jms.id.au>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "sw@weilnetz.de" <sw@weilnetz.de>,
- "groug@kaod.org" <groug@kaod.org>,
- "yuval.shaia@oracle.com" <yuval.shaia@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "clg@kaod.org" <clg@kaod.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "david@redhat.com" <david@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "integration@gluster.org" <integration@gluster.org>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "andrew@aj.id.au" <andrew@aj.id.au>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDkuMTAuMjAxOSAxMTowNCwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IFZsYWRpbWlyIFNl
-bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiAN
-Cj4+IEhlcmUgaXMgaW50cm9kdWNlZCBFUlJQX0FVVE9fUFJPUEFHQVRFIG1hY3JvLCB0byBiZSB1
-c2VkIGF0IHN0YXJ0IG9mDQo+PiBmdW5jdGlvbnMgd2l0aCBlcnJwIE9VVCBwYXJhbWV0ZXIuDQo+
-Pg0KPj4gSXQgaGFzIHRocmVlIGdvYWxzOg0KPj4NCj4+IDEuIEZpeCBpc3N1ZSB3aXRoIGVycm9y
-X2ZhdGFsICYgZXJyb3JfcHJlcGVuZC9lcnJvcl9hcHBlbmRfaGludDogdXNlcg0KPj4gY2FuJ3Qg
-c2VlIHRoaXMgYWRkaXRpb25hbCBpbmZvcm1hdGlvbiwgYmVjYXVzZSBleGl0KCkgaGFwcGVucyBp
-bg0KPj4gZXJyb3Jfc2V0ZyBlYXJsaWVyIHRoYW4gaW5mb3JtYXRpb24gaXMgYWRkZWQuIFtSZXBv
-cnRlZCBieSBHcmVnIEt1cnpdDQo+IA0KPiBEb25lIGluIFBBVENIIDA3LTMxLg0KPiANCj4+IDIu
-IEZpeCBpc3N1ZSB3aXRoIGVycm9yX2Fib3J0ICYgZXJyb3JfcHJvcGFnYXRlOiB3aGVuIHdlIHdy
-YXANCj4+IGVycm9yX2Fib3J0IGJ5IGxvY2FsX2VycitlcnJvcl9wcm9wYWdhdGUsIHJlc3VsdGlu
-ZyBjb3JlZHVtcCB3aWxsDQo+PiByZWZlciB0byBlcnJvcl9wcm9wYWdhdGUgYW5kIG5vdCB0byB0
-aGUgcGxhY2Ugd2hlcmUgZXJyb3IgaGFwcGVuZWQuDQo+PiAodGhlIG1hY3JvIGl0c2VsZiBkb2Vz
-bid0IGZpeCB0aGUgaXNzdWUsIGJ1dCBpdCBhbGxvd3MgdG8gWzMuXSBkcm9wIGFsbA0KPj4gbG9j
-YWxfZXJyK2Vycm9yX3Byb3BhZ2F0ZSBwYXR0ZXJuLCB3aGljaCB3aWxsIGRlZmluaXRlbHkgZml4
-IHRoZSBpc3N1ZSkNCj4+IFtSZXBvcnRlZCBieSBLZXZpbiBXb2xmXQ0KPj4NCj4+IDMuIERyb3Ag
-bG9jYWxfZXJyK2Vycm9yX3Byb3BhZ2F0ZSBwYXR0ZXJuLCB3aGljaCBpcyB1c2VkIHRvIHdvcmth
-cm91bmQNCj4+IHZvaWQgZnVuY3Rpb25zIHdpdGggZXJycCBwYXJhbWV0ZXIsIHdoZW4gY2FsbGVy
-IHdhbnRzIHRvIGtub3cgcmVzdWx0aW5nDQo+PiBzdGF0dXMuIChOb3RlOiBhY3R1YWxseSB0aGVz
-ZSBmdW5jdGlvbnMgY291bGQgYmUgbWVyZWx5IHVwZGF0ZWQgdG8NCj4+IHJldHVybiBpbnQgZXJy
-b3IgY29kZSkuDQo+IA0KPiBOb3QgZG9uZS4gIENhbiB5b3UgcHJvdG90eXBlIHRoaXMgcGFydD8g
-IEEgZmV3IG1hbnVhbGx5IGRvbmUgZXhhbXBsZXMNCj4gd291bGQgZ2l2ZSB1cyBhbiBpZGVhIGhv
-dyB0aGUgY29tcGxldGUgc29sdXRpb24gd291bGQgbG9vayBsaWtlLiAgQQ0KPiAoc2VtaS0pYXV0
-b21hdGVkIGNvbXBsZXRlIGNvbnZlcnNpb24gb2YgYSBzdWJzeXN0ZW0gd291bGQgYWRkaXRpb25h
-bGx5DQo+IGdpdmUgdXMgYW4gaWRlYSBob3cgdG8gYWN0dWFsbHkgZG8gdGhlIGNvbnZlcnNpb24u
-DQo+IA0KPiBXZSBjYW4gZGlzY3VzcyBhcHBseWluZyBFUlJQX0FVVE9fUFJPUEFHQVRFKCkgYXMg
-YSBidWcgZml4IGZvciAxLiwgYW5kDQo+IGxlYXZlIDIuIGFuZCAzLiBmb3IgbGF0ZXIuICBGZWVs
-cyBsaWtlIGEgaGFsZi1kb25lIGpvYiB0byBtZS4gIFdlJ3ZlIGdvdA0KPiB0b28gbWFueSBvZiB0
-aG9zZSBpbiB0aGUgdHJlZSBhbHJlYWR5LiAgRHVubm8uDQo+IA0KDQpJZiB1cGRhdGUgZXZlcnl0
-aGluZyBpdCdzIGFib3V0IDkwLTE0MCBwYXRjaGVzLg0KDQpUaGUgd2hvbGUgdGhpbmcgd2FzIGRv
-bmUgaW4gIltSRkMgdjIgMC85XSBlcnJvcjogYXV0byBwcm9wYWdhdGVkIGxvY2FsX2VyciINCjwy
-MDE5MDkyMzE2MTIzMS4yMjAyOC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCmh0dHBzOi8v
-bGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE5LTA5L21zZzA1MTU3Lmh0
-bWwNCg0KLSBpdCB3YXMgc28gaHVnZSwgdGhhdCBJIGRlY2lkZWQgdG8gcG9zdHBvbmUgMiBhbmQg
-My4uLg0KDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+This method depends only on the active irq controller.  Now that we've
+formalized the notion of active controller we can dispatch directly
+through that, rather than dispatching via SpaprIrq with the dual
+version having to do a second conditional dispatch.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ hw/intc/spapr_xive.c        | 125 ++++++++++++++++++------------------
+ hw/intc/xics_spapr.c        |   5 +-
+ hw/ppc/spapr.c              |   3 +-
+ hw/ppc/spapr_irq.c          |  20 +++---
+ include/hw/ppc/spapr_irq.h  |   6 +-
+ include/hw/ppc/spapr_xive.h |   2 -
+ include/hw/ppc/xics_spapr.h |   2 -
+ 7 files changed, 80 insertions(+), 83 deletions(-)
+
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 700ec5c9c1..37ffb74ca5 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -578,6 +578,68 @@ static void spapr_xive_print_info(SpaprInterruptCont=
+roller *intc, Monitor *mon)
+     spapr_xive_pic_print_info(xive, mon);
+ }
+=20
++static void spapr_xive_dt(SpaprInterruptController *intc, uint32_t nr_se=
+rvers,
++                          void *fdt, uint32_t phandle)
++{
++    SpaprXive *xive =3D SPAPR_XIVE(intc);
++    int node;
++    uint64_t timas[2 * 2];
++    /* Interrupt number ranges for the IPIs */
++    uint32_t lisn_ranges[] =3D {
++        cpu_to_be32(0),
++        cpu_to_be32(nr_servers),
++    };
++    /*
++     * EQ size - the sizes of pages supported by the system 4K, 64K,
++     * 2M, 16M. We only advertise 64K for the moment.
++     */
++    uint32_t eq_sizes[] =3D {
++        cpu_to_be32(16), /* 64K */
++    };
++    /*
++     * The following array is in sync with the reserved priorities
++     * defined by the 'spapr_xive_priority_is_reserved' routine.
++     */
++    uint32_t plat_res_int_priorities[] =3D {
++        cpu_to_be32(7),    /* start */
++        cpu_to_be32(0xf8), /* count */
++    };
++
++    /* Thread Interrupt Management Area : User (ring 3) and OS (ring 2) =
+*/
++    timas[0] =3D cpu_to_be64(xive->tm_base +
++                           XIVE_TM_USER_PAGE * (1ull << TM_SHIFT));
++    timas[1] =3D cpu_to_be64(1ull << TM_SHIFT);
++    timas[2] =3D cpu_to_be64(xive->tm_base +
++                           XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
++    timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
++
++    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename));
++
++    _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
++    _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
++
++    _FDT(fdt_setprop_string(fdt, node, "compatible", "ibm,power-ivpe"));
++    _FDT(fdt_setprop(fdt, node, "ibm,xive-eq-sizes", eq_sizes,
++                     sizeof(eq_sizes)));
++    _FDT(fdt_setprop(fdt, node, "ibm,xive-lisn-ranges", lisn_ranges,
++                     sizeof(lisn_ranges)));
++
++    /* For Linux to link the LSIs to the interrupt controller. */
++    _FDT(fdt_setprop(fdt, node, "interrupt-controller", NULL, 0));
++    _FDT(fdt_setprop_cell(fdt, node, "#interrupt-cells", 2));
++
++    /* For SLOF */
++    _FDT(fdt_setprop_cell(fdt, node, "linux,phandle", phandle));
++    _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
++
++    /*
++     * The "ibm,plat-res-int-priorities" property defines the priority
++     * ranges reserved by the hypervisor
++     */
++    _FDT(fdt_setprop(fdt, 0, "ibm,plat-res-int-priorities",
++                     plat_res_int_priorities, sizeof(plat_res_int_priori=
+ties)));
++}
++
+ static void spapr_xive_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -601,6 +663,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+     sicc->free_irq =3D spapr_xive_free_irq;
+     sicc->set_irq =3D spapr_xive_set_irq;
+     sicc->print_info =3D spapr_xive_print_info;
++    sicc->dt =3D spapr_xive_dt;
+ }
+=20
+ static const TypeInfo spapr_xive_info =3D {
+@@ -1601,65 +1664,3 @@ void spapr_xive_hcall_init(SpaprMachineState *spap=
+r)
+     spapr_register_hypercall(H_INT_SYNC, h_int_sync);
+     spapr_register_hypercall(H_INT_RESET, h_int_reset);
+ }
+-
+-void spapr_dt_xive(SpaprMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+-                   uint32_t phandle)
+-{
+-    SpaprXive *xive =3D spapr->xive;
+-    int node;
+-    uint64_t timas[2 * 2];
+-    /* Interrupt number ranges for the IPIs */
+-    uint32_t lisn_ranges[] =3D {
+-        cpu_to_be32(0),
+-        cpu_to_be32(nr_servers),
+-    };
+-    /*
+-     * EQ size - the sizes of pages supported by the system 4K, 64K,
+-     * 2M, 16M. We only advertise 64K for the moment.
+-     */
+-    uint32_t eq_sizes[] =3D {
+-        cpu_to_be32(16), /* 64K */
+-    };
+-    /*
+-     * The following array is in sync with the reserved priorities
+-     * defined by the 'spapr_xive_priority_is_reserved' routine.
+-     */
+-    uint32_t plat_res_int_priorities[] =3D {
+-        cpu_to_be32(7),    /* start */
+-        cpu_to_be32(0xf8), /* count */
+-    };
+-
+-    /* Thread Interrupt Management Area : User (ring 3) and OS (ring 2) =
+*/
+-    timas[0] =3D cpu_to_be64(xive->tm_base +
+-                           XIVE_TM_USER_PAGE * (1ull << TM_SHIFT));
+-    timas[1] =3D cpu_to_be64(1ull << TM_SHIFT);
+-    timas[2] =3D cpu_to_be64(xive->tm_base +
+-                           XIVE_TM_OS_PAGE * (1ull << TM_SHIFT));
+-    timas[3] =3D cpu_to_be64(1ull << TM_SHIFT);
+-
+-    _FDT(node =3D fdt_add_subnode(fdt, 0, xive->nodename));
+-
+-    _FDT(fdt_setprop_string(fdt, node, "device_type", "power-ivpe"));
+-    _FDT(fdt_setprop(fdt, node, "reg", timas, sizeof(timas)));
+-
+-    _FDT(fdt_setprop_string(fdt, node, "compatible", "ibm,power-ivpe"));
+-    _FDT(fdt_setprop(fdt, node, "ibm,xive-eq-sizes", eq_sizes,
+-                     sizeof(eq_sizes)));
+-    _FDT(fdt_setprop(fdt, node, "ibm,xive-lisn-ranges", lisn_ranges,
+-                     sizeof(lisn_ranges)));
+-
+-    /* For Linux to link the LSIs to the interrupt controller. */
+-    _FDT(fdt_setprop(fdt, node, "interrupt-controller", NULL, 0));
+-    _FDT(fdt_setprop_cell(fdt, node, "#interrupt-cells", 2));
+-
+-    /* For SLOF */
+-    _FDT(fdt_setprop_cell(fdt, node, "linux,phandle", phandle));
+-    _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
+-
+-    /*
+-     * The "ibm,plat-res-int-priorities" property defines the priority
+-     * ranges reserved by the hypervisor
+-     */
+-    _FDT(fdt_setprop(fdt, 0, "ibm,plat-res-int-priorities",
+-                     plat_res_int_priorities, sizeof(plat_res_int_priori=
+ties)));
+-}
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 415defe394..4eabafc7e1 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -308,8 +308,8 @@ static void ics_spapr_realize(DeviceState *dev, Error=
+ **errp)
+     spapr_register_hypercall(H_IPOLL, h_ipoll);
+ }
+=20
+-void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+-                   uint32_t phandle)
++static void xics_spapr_dt(SpaprInterruptController *intc, uint32_t nr_se=
+rvers,
++                          void *fdt, uint32_t phandle)
+ {
+     uint32_t interrupt_server_ranges_prop[] =3D {
+         0, cpu_to_be32(nr_servers),
+@@ -408,6 +408,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
+void *data)
+     sicc->free_irq =3D xics_spapr_free_irq;
+     sicc->set_irq =3D xics_spapr_set_irq;
+     sicc->print_info =3D xics_spapr_print_info;
++    sicc->dt =3D xics_spapr_dt;
+ }
+=20
+ static const TypeInfo ics_spapr_info =3D {
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6c38de5927..e880db5d38 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1255,8 +1255,7 @@ static void *spapr_build_fdt(SpaprMachineState *spa=
+pr)
+     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+=20
+     /* /interrupt controller */
+-    spapr->irq->dt_populate(spapr, spapr_max_server_number(spapr), fdt,
+-                          PHANDLE_INTC);
++    spapr_irq_dt(spapr, spapr_max_server_number(spapr), fdt, PHANDLE_INT=
+C);
+=20
+     ret =3D spapr_populate_memory(spapr, fdt);
+     if (ret < 0) {
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index a29b527232..a8005072e6 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -134,7 +134,6 @@ SpaprIrq spapr_irq_xics =3D {
+     .xics        =3D true,
+     .xive        =3D false,
+=20
+-    .dt_populate =3D spapr_dt_xics,
+     .post_load   =3D spapr_irq_post_load_xics,
+     .reset       =3D spapr_irq_reset_xics,
+     .init_kvm    =3D spapr_irq_init_kvm_xics,
+@@ -184,7 +183,6 @@ SpaprIrq spapr_irq_xive =3D {
+     .xics        =3D false,
+     .xive        =3D true,
+=20
+-    .dt_populate =3D spapr_dt_xive,
+     .post_load   =3D spapr_irq_post_load_xive,
+     .reset       =3D spapr_irq_reset_xive,
+     .init_kvm    =3D spapr_irq_init_kvm_xive,
+@@ -209,13 +207,6 @@ static SpaprIrq *spapr_irq_current(SpaprMachineState=
+ *spapr)
+         &spapr_irq_xive : &spapr_irq_xics;
+ }
+=20
+-static void spapr_irq_dt_populate_dual(SpaprMachineState *spapr,
+-                                       uint32_t nr_servers, void *fdt,
+-                                       uint32_t phandle)
+-{
+-    spapr_irq_current(spapr)->dt_populate(spapr, nr_servers, fdt, phandl=
+e);
+-}
+-
+ static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int versio=
+n_id)
+ {
+     /*
+@@ -270,7 +261,6 @@ SpaprIrq spapr_irq_dual =3D {
+     .xics        =3D true,
+     .xive        =3D true,
+=20
+-    .dt_populate =3D spapr_irq_dt_populate_dual,
+     .post_load   =3D spapr_irq_post_load_dual,
+     .reset       =3D spapr_irq_reset_dual,
+     .init_kvm    =3D NULL, /* should not be used */
+@@ -377,6 +367,15 @@ void spapr_irq_print_info(SpaprMachineState *spapr, =
+Monitor *mon)
+     sicc->print_info(spapr->active_intc, mon);
+ }
+=20
++void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
++                  void *fdt, uint32_t phandle)
++{
++    SpaprInterruptControllerClass *sicc
++        =3D SPAPR_INTC_GET_CLASS(spapr->active_intc);
++
++    sicc->dt(spapr->active_intc, nr_servers, fdt, phandle);
++}
++
+ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+ {
+     MachineState *machine =3D MACHINE(spapr);
+@@ -686,7 +685,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+     .xics        =3D true,
+     .xive        =3D false,
+=20
+-    .dt_populate =3D spapr_dt_xics,
+     .post_load   =3D spapr_irq_post_load_xics,
+     .reset       =3D spapr_irq_reset_xics,
+     .init_kvm    =3D spapr_irq_init_kvm_xics,
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index bdfeb3b107..0df95e1b5a 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -60,6 +60,8 @@ typedef struct SpaprInterruptControllerClass {
+     /* These methods should only be called on the active intc */
+     void (*set_irq)(SpaprInterruptController *intc, int irq, int val);
+     void (*print_info)(SpaprInterruptController *intc, Monitor *mon);
++    void (*dt)(SpaprInterruptController *intc, uint32_t nr_servers,
++               void *fdt, uint32_t phandle);
+ } SpaprInterruptControllerClass;
+=20
+ void spapr_irq_update_active_intc(SpaprMachineState *spapr);
+@@ -67,6 +69,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *sp=
+apr);
+ int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
+                               PowerPCCPU *cpu, Error **errp);
+ void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
++void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
++                  void *fdt, uint32_t phandle);
+=20
+ void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis);
+ int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool ali=
+gn,
+@@ -79,8 +83,6 @@ typedef struct SpaprIrq {
+     bool        xics;
+     bool        xive;
+=20
+-    void (*dt_populate)(SpaprMachineState *spapr, uint32_t nr_servers,
+-                        void *fdt, uint32_t phandle);
+     int (*post_load)(SpaprMachineState *spapr, int version_id);
+     void (*reset)(SpaprMachineState *spapr, Error **errp);
+     void (*init_kvm)(SpaprMachineState *spapr, Error **errp);
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 8f875673f5..ebe156eb30 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -58,8 +58,6 @@ void spapr_xive_pic_print_info(SpaprXive *xive, Monitor=
+ *mon);
+ int spapr_xive_post_load(SpaprXive *xive, int version_id);
+=20
+ void spapr_xive_hcall_init(SpaprMachineState *spapr);
+-void spapr_dt_xive(SpaprMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+-                   uint32_t phandle);
+ void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable);
+ void spapr_xive_map_mmio(SpaprXive *xive);
+diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+index 0b35e85c26..8e4fb6adce 100644
+--- a/include/hw/ppc/xics_spapr.h
++++ b/include/hw/ppc/xics_spapr.h
+@@ -32,8 +32,6 @@
+ #define TYPE_ICS_SPAPR "ics-spapr"
+ #define ICS_SPAPR(obj) OBJECT_CHECK(ICSState, (obj), TYPE_ICS_SPAPR)
+=20
+-void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+-                   uint32_t phandle);
+ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp);
+ void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp);
+ bool xics_kvm_has_broken_disconnect(SpaprMachineState *spapr);
+--=20
+2.21.0
+
 
