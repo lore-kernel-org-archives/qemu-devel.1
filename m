@@ -7,88 +7,88 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03451C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9007AECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:08:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF4E2218DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:08:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08585218DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:08:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E0LyCXla"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF4E2218DE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AWBWAWrh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08585218DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIEVy-0007Zd-77
+	id 1iIEVy-0007Yv-H7
 	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:08:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45754)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iI1ti-0001lf-Pt
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:40:19 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iI1tI-0001hy-Oe
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:39:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iI1B1-0000i5-CJ
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:54:08 -0400
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:36351)
+ (envelope-from <richard.henderson@linaro.org>) id 1iI1Nn-0004JM-Qn
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:07:20 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:33995)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iI1B1-0000hQ-6a
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:54:07 -0400
-Received: by mail-yw1-xc42.google.com with SMTP id x64so238420ywg.3
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 18:54:07 -0700 (PDT)
+ id 1iI1Nn-0004Iv-LD
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:07:19 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id m1so228568ybm.1
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 19:07:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=AI0lxvpzeyqMF1mskEdwNMTJzL8izBhG4L+cQezg9dI=;
- b=E0LyCXlaVp/9ErF5z41zmZJ3NtgBNT3nd8aH4RpdU2sdu/+cWTELLvPWzvH5c2cliQ
- AcciRjl2K0MoAipgfHZPmyBtfFuhpo7AMoDJ7e9VUT5hmN3wz6UVvTdbUOgHeKtEN7nY
- W2rU+rwnxDoySZpDskrC/y+nm7IF0lZQr6T6EXpwpC5z9DOh/6hIeMHn+sYoBuofHXrk
- 1itBRapx06gWERJWrENxF1BK2HWPs2gtk8vQTQ94+47vHF7TE81TMc9tPdS0+OUl19R2
- MgeL3pdRIfboxY2kJVCk5v8R4MCSE/W3D/5YosXx/R+E2uhF2ACFJ9yz6Qkho91BKcky
- 1qXw==
+ bh=lJcDxLjZN8EWAGjaDhdXnvgJ0Jgx9VJRnTuXoS6NHYE=;
+ b=AWBWAWrhRFL7qaUwhCjcI8vr4wJRMRz2fCCOQuFa4v7Mz2Xs2vjJCm7kg3ZqAt0/4C
+ vC5P5gNJGmwjOND0Ct5ALps9Th3hozAIxgL2zGPjDiQBoEPc3hhXMHMk5dekqYitdcLd
+ /RbnfdwXWXOpJUGM2UMm9OiHoa/C2ybjT4X3nRbhbSDjlBmP59WSiCHTtRrb3ZjfjUPP
+ JSe7IqV4HdkzbpQ7s1JDVJahdcLK5hsCdxVGXeHXIPU4nEDfKNUjnl+b1roczONrVGKT
+ K0ajixFUz381fi1tRVz/weg1t2VhKAsaaaOBurII7DG7ZNFRaf/Bfh5FDK1NwZUlOeIc
+ n4xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=AI0lxvpzeyqMF1mskEdwNMTJzL8izBhG4L+cQezg9dI=;
- b=iGlz0LM79XIIBq48+7kO4o7KRDh2ps8gBBtDiiwDbicukfyCU70EuQAV7AJyVuvWVE
- AjH30wCIXfLYKvUp85Qyo43qqQuJUCCAQlxx2Y0zJYkiQh/VhZLDVwUjyjSeD9Esh8M7
- Im8e0v37PQDtNV+pCxEbgOh/H2CT4z9vT9jAm+rl6easbLhrsO/uuy420sGc5FiQfszQ
- kzUYSnGK/M/rqIqVSxXl4lQbzt8V4SlQcV9N32iRgildYIbTOGddVB+ZRoPXEcBt0fQM
- yG2HKlezwRcxCzfL4Xd/JCYYCstCpMNLYiVaDBTkzfl9QYy80phGEDLwaT/b/ZxOTCPA
- 6IqQ==
-X-Gm-Message-State: APjAAAUhH83pkNRfWdUd0BrtMbUaH4JMIbVYcR6M8XnMisQzkWIhFMzx
- PaEADDYFkq+TWBUeO1ruQLO0Jjm3jZ4=
-X-Google-Smtp-Source: APXvYqzWTS7vEjiemzPMigYTPTloc+27tPe7W+nF5V+6Sj2irS/l19cO+vK70q7dTRPO5pQuWqf45Q==
-X-Received: by 2002:a0d:d98e:: with SMTP id b136mr1064631ywe.78.1570586046513; 
- Tue, 08 Oct 2019 18:54:06 -0700 (PDT)
+ bh=lJcDxLjZN8EWAGjaDhdXnvgJ0Jgx9VJRnTuXoS6NHYE=;
+ b=nLYqZaKAzTzo4NbYbYbuOGRDxOKarwqwGJn61SpzeGsvQFhxLA4y3/u/8UFa6e4Nmg
+ KmOJHE4rOG9532Baen8CEYHQ7Xb/g9IcOqx1/zn1fiWjpl/HPEGaFf+7Ym9IDVwW6lkY
+ R+icsckKiZjruq72Scf/ylisl/4KHMF7Tzw1xpE7Rmwxk8RED4M4OkS7RdcoXdSvJDDs
+ 1J17fRsSNCWWGOj0iErzgEcRLwbxLaCxYdvkcEOV3m4mzC2KGAxA9OJ5mDvKyX8huOIP
+ f2JKELPx/xb6a2ZdwnspESgtjaQiQCcbahsK4+oipGg+nHxSMDwG3OR6VRMptXaReWLR
+ d6dw==
+X-Gm-Message-State: APjAAAVXJ16oWgjgvP+1nmQbGDztDsrpbyxsNwUlW6nsN9lhT8+J6pQ0
+ yCdGlYB/NzOpXEkd9UvBvWD8SA==
+X-Google-Smtp-Source: APXvYqzpY4ROUXd8G0hwXZHXar6amEaC5KGCRQrcqxNtZ5zVKyTckqhD5vxHBj6hwSAAM8zT3ERyTg==
+X-Received: by 2002:a25:abc7:: with SMTP id v65mr514540ybi.59.1570586839088;
+ Tue, 08 Oct 2019 19:07:19 -0700 (PDT)
 Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id k6sm202373ywh.60.2019.10.08.18.54.03
+ by smtp.gmail.com with ESMTPSA id v63sm211802ywd.100.2019.10.08.19.07.00
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 08 Oct 2019 18:54:05 -0700 (PDT)
-Subject: Re: [PATCH v2 10/21] hw/timer/digic-timer.c: Switch to
+ Tue, 08 Oct 2019 19:07:18 -0700 (PDT)
+Subject: Re: [PATCH v2 20/21] hw/watchdog/cmsdk-apb-watchdog.c: Switch to
  transaction-based ptimer API
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20191008171740.9679-1-peter.maydell@linaro.org>
- <20191008171740.9679-11-peter.maydell@linaro.org>
+ <20191008171740.9679-21-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <25488035-58a7-25d5-d021-f25f7e144b01@linaro.org>
-Date: Tue, 8 Oct 2019 21:53:59 -0400
+Message-ID: <120aed7a-ef86-900a-c0fa-3525b94584f8@linaro.org>
+Date: Tue, 8 Oct 2019 22:06:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191008171740.9679-11-peter.maydell@linaro.org>
+In-Reply-To: <20191008171740.9679-21-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c42
+X-Received-From: 2607:f8b0:4864:20::b42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,15 +107,16 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/8/19 1:17 PM, Peter Maydell wrote:
-> Switch the digic-timer.c code away from bottom-half based ptimers to
-> the new transaction-based ptimer API.  This just requires adding
-> begin/commit calls around the various places that modify the ptimer
-> state, and using the new ptimer_init() function to create the timer.
+> Switch the cmsdk-apb-watchdog code away from bottom-half based
+> ptimers to the new transaction-based ptimer API.  This just requires
+> adding begin/commit calls around the various places that modify the
+> ptimer state, and using the new ptimer_init() function to create the
+> timer.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/timer/digic-timer.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
+>  hw/watchdog/cmsdk-apb-watchdog.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
