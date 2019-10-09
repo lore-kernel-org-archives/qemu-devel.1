@@ -2,66 +2,118 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C23C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFBBEC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:23:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C446206B6
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:22:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C446206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 96309206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:23:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RG+LJicR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96309206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54849 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIHXO-0005aZ-IX
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:22:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42843)
+	id 1iIHY4-0006MX-49
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:23:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iIE7U-000252-Uw
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:43:22 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIERy-0004RQ-UO
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iIE7T-0000rZ-N7
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:43:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48298)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>)
- id 1iIE7Q-0000qV-Oc; Wed, 09 Oct 2019 11:43:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 59DC42A09A1;
- Wed,  9 Oct 2019 15:43:15 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-122-151.rdu2.redhat.com
- [10.10.122.151])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CFD8F5D9E2;
- Wed,  9 Oct 2019 15:43:05 +0000 (UTC)
-Date: Wed, 9 Oct 2019 11:43:04 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 16/19] tests/boot_linux_console: Add a test for the
- Raspberry Pi 2
-Message-ID: <20191009154304.GC30349@localhost.localdomain>
-References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-17-f4bug@amsat.org>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIERx-0008QR-8e
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:04:30 -0400
+Received: from mail-eopbgr00135.outbound.protection.outlook.com
+ ([40.107.0.135]:46306 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIERw-0008Of-Fu; Wed, 09 Oct 2019 12:04:29 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T1rEhBRBnD2qKLG5GUyXZe82srMm5skpQ9QXWleb2IUsKYSfaMxWHxB5I1czpoKrDDSSyseuCU4IknYhw+vYc9x8uMP1YhEbLTLr0RR1LZPJPksnSAG/d+ykLYiDWpRciEXTo3oZdsVj2GSnTEr4oloPte3MibI4B/xgYhOIyjNsop46zktIPjhh9VVD/iizvI1vEewRIecoF4D2+cYsQ4kJNpFE04pGauGzWGtxK5gCd3evkGr2WFbKLbv4Ai/QbvLVtkKkG+mct2jYh+hQ3CQmrU6bZKbehRobqiz7LzYC/oybLA42Bb8IfoVEcF0Miy+LBGVZ1e/P0qwr8yZQYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MejXB5iWODwBDXMi1hsLLWoHT4sYYSrDP2b+VOcSduc=;
+ b=OuCBl0gyRt54lTcwNGZub/MyYJvyLtMAz/TXCcNoshz+aXI9D3agrea6c8eGwEpHMXsCqRcY7eTEA9Z+mkeYDrnfoPipwpbsaweRUStv5+K8Xnnj4AgjRblXMI55lSKMiYG6gZG/7fmISCd/v0RAFO2ITIYc6THsKoqJ120GJhxRe5sj9pkDK2x37bjYPHrYx2rM8h/nLch10YfjFGgiR/A5vAhzQwBHVXaD94xge/relUhT+lKuUdh/M6tHABw0auuIlCJg3z6QGs7hPZ4rQPF9S51wXuV5aH1ceJMli2z0PM3ST7dMyWEQjGCO1QaCC/sgR6E1q9nZwW/bZKXuXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MejXB5iWODwBDXMi1hsLLWoHT4sYYSrDP2b+VOcSduc=;
+ b=RG+LJicR083bLSebQRYoloteGTJMEBsUeTMV51Zb4U0mYVrCTPDR4Xy2Bwm1D7bIC3PrB5Hajb3fPA2kQ8hMHVewpTjfrBvY7WLDMaSe6WEXi1uHqUSpRrO8L7oZronqNyIAIVq8ah4vfQha/uv+eueN+V0tXzMVKDb3+a8Ip1U=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4188.eurprd08.prod.outlook.com (20.179.12.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.16; Wed, 9 Oct 2019 16:04:23 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2327.026; Wed, 9 Oct 2019
+ 16:04:23 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH 01/10] hbitmap: introduce HBITMAP_MAX_ORIG_SIZE
+Thread-Topic: [PATCH 01/10] hbitmap: introduce HBITMAP_MAX_ORIG_SIZE
+Thread-Index: AQHVd6HZ+dKQIl1FzUmH7s4nNm4VyadSft6AgAAISoA=
+Date: Wed, 9 Oct 2019 16:04:23 +0000
+Message-ID: <da599d8f-13b7-cee4-faa4-4c310634b9dd@virtuozzo.com>
+References: <20190930151502.7829-1-vsementsov@virtuozzo.com>
+ <20190930151502.7829-2-vsementsov@virtuozzo.com>
+ <a128842b-d3c8-adb7-ec27-c07f59fd53fc@redhat.com>
+In-Reply-To: <a128842b-d3c8-adb7-ec27-c07f59fd53fc@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR08CA0075.eurprd08.prod.outlook.com
+ (2603:10a6:7:2a::46) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191009190421416
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fc3d8fe5-679d-4dd9-97db-08d74cd25a1e
+x-ms-traffictypediagnostic: DB8PR08MB4188:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB8PR08MB418853F63D390C83EF230A3EC1950@DB8PR08MB4188.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:293;
+x-forefront-prvs: 018577E36E
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(136003)(39840400004)(376002)(346002)(396003)(189003)(199004)(66066001)(5660300002)(54906003)(53546011)(11346002)(6506007)(2616005)(446003)(386003)(26005)(8676002)(81166006)(81156014)(305945005)(316002)(7736002)(486006)(6436002)(66446008)(64756008)(76176011)(229853002)(86362001)(66476007)(14454004)(66556008)(2501003)(2906002)(36756003)(3846002)(6116002)(476003)(66946007)(110136005)(256004)(107886003)(4326008)(99286004)(31696002)(25786009)(186003)(6512007)(8936002)(71190400001)(6246003)(6486002)(478600001)(71200400001)(102836004)(52116002)(14444005)(31686004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4188;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:3; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qxUNXCs/SgiF5uF20yoFq75w57ZjuVa1CiGw4KQvfQBbQgKRwdm2dDvMQe+bESf5rEaZ6B5E8MVY+nC/Dhcj4JSsn2pe25OASNAepaSxA+1QUBJSHz5nmgcfdRdQAM2YIBZRiCezp7oX2cgYvrfp2gBsCNtdqmdI+nVWFkKQ7vn7bI9D4aIa7zTU7sffdjeVNquFVouSDxrTHVYiTkkTHRA9Uzx8f/tG1n100L9oUBYvqrDdrgus9vfAR5h41M370lDmZsZwiB96wiYbLB7pdYsk/0R9TRuQn1ls1/z+h/p9eMYf+oL5VA0h4z1IJkvRiVc4ZDA/9m+QLNvBgpqJok8BNWFN5NNoMODznkXS407FreLNL4yBGWrWXcS+BaWSijkBwtPG1LPUTxv4W8JLbt2UylFoe7UucfPO63xT8RM=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9B80CD8BF3F1764ABB4F6685F0FA91CC@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190926173428.10713-17-f4bug@amsat.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 09 Oct 2019 15:43:15 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc3d8fe5-679d-4dd9-97db-08d74cd25a1e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Oct 2019 16:04:23.5932 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2CfDWaayoPtInmZd9zAg/MeJcgQdvwzi9MKvrWnJv+5dQ1IRZVjQCwd09K8V/p8pm95Bz4o+TZFM54PWC9ct3OhchJ+4wp/kiBgKunwyj3E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4188
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,103 +125,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?iso-8859-1?Q?Zolt=E1n?= Baldaszti <bztemail@gmail.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
- Clement Deschamps <clement.deschamps@antfield.fr>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Cheng Xiang <ext-cheng.xiang@here.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 07:34:24PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Similar to the x86_64/pc test, it boots a Linux kernel on a raspi2
-> board and verify the serial is working.
->=20
-> The kernel image and DeviceTree blob are built by the Raspbian
-> project (based on Debian):
-> https://www.raspbian.org/RaspbianImages
-> as recommended by the Raspberry Pi project:
-> https://www.raspberrypi.org/downloads/raspbian/
->=20
-> If ARM is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:arm" tags.
->=20
-> Alternatively, this test can be run using:
->=20
->     $ avocado run -t arch:arm tests/acceptance
->     $ avocado run -t machine:raspi2 tests/acceptance
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
-> v3: removed debug printf (Cleber)
->     use serial_kernel_cmdline dict
-> ---
->  tests/acceptance/boot_linux_console.py | 36 ++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index 079590f0c8..7eaf6cb60e 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -318,6 +318,42 @@ class BootLinuxConsole(Test):
->          self.vm.launch()
->          self.wait_for_console_pattern('init started: BusyBox')
-> =20
-> +    def do_test_arm_raspi2(self, uart_id):
-> +        """
-> +        The kernel can be rebuilt using the kernel source referenced
-> +        and following the instructions on the on:
-> +        https://www.raspberrypi.org/documentation/linux/kernel/buildin=
-g.md
-> +        """
-> +        serial_kernel_cmdline =3D {
-> +            0: 'earlycon=3Dpl011,0x3f201000 console=3DttyAMA0',
-> +        }
-> +        deb_url =3D ('http://archive.raspberrypi.org/debian/'
-> +                   'pool/main/r/raspberrypi-firmware/'
-> +                   'raspberrypi-kernel_1.20190215-1_armhf.deb')
-> +        deb_hash =3D 'cd284220b32128c5084037553db3c482426f3972'
-> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
-> +        kernel_path =3D self.extract_from_deb(deb_path, '/boot/kernel7=
-.img')
-> +        dtb_path =3D self.extract_from_deb(deb_path, '/boot/bcm2709-rp=
-i-2-b.dtb')
-> +
-> +        self.vm.set_machine('raspi2')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
-> +                               serial_kernel_cmdline[uart_id])
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-dtb', dtb_path,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +        console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
-> +        self.wait_for_console_pattern(console_pattern)
-> +
-> +    def test_arm_raspi2_uart0(self):
-> +        """
-> +        :avocado: tags=3Darch:arm
-> +        :avocado: tags=3Dmachine:raspi2
-> +        :avocado: tags=3Ddevice:pl011
-> +        """
-> +        self.do_test_arm_raspi2(0)
-> +
->      def test_s390x_s390_ccw_virtio(self):
->          """
->          :avocado: tags=3Darch:s390x
-> --=20
-> 2.20.1
->=20
-
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+MDkuMTAuMjAxOSAxODozNCwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gOS8zMC8xOSAxMDoxNCBB
+TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IFNpZ25lZC1vZmYtYnk6
+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4N
+Cj4gDQo+IEEgYml0IGxpZ2h0IG9uIHRoZSBjb21taXQgbWVzc2FnZSBmb3IgZXhwbGFpbmluZyB3
+aHkuDQoNCklmIHVzZSBqdXN0IElOVDY0X01BWCwgdGhlIGNvbW1lbnQgYmVsb3cgbWF5IGJlIG1v
+dmUgaGVyZSwgYWNjb21wYW5pZWQgYnkNCnlvdXIgbm90ZSBhYm91dCBkaXNrIHNpemUgbGltaXQu
+DQoNCj4gDQo+PiAtLS0NCj4+IMKgIGluY2x1ZGUvcWVtdS9oYml0bWFwLmggfCA3ICsrKysrKysN
+Cj4+IMKgIHV0aWwvaGJpdG1hcC5jwqDCoMKgwqDCoMKgwqDCoCB8IDIgKysNCj4+IMKgIDIgZmls
+ZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUv
+cWVtdS9oYml0bWFwLmggYi9pbmNsdWRlL3FlbXUvaGJpdG1hcC5oDQo+PiBpbmRleCAxYmY5NDRj
+YTNkLi44MjMxN2M1MzY0IDEwMDY0NA0KPj4gLS0tIGEvaW5jbHVkZS9xZW11L2hiaXRtYXAuaA0K
+Pj4gKysrIGIvaW5jbHVkZS9xZW11L2hiaXRtYXAuaA0KPj4gQEAgLTMzLDYgKzMzLDEzIEBAIHR5
+cGVkZWYgc3RydWN0IEhCaXRtYXBJdGVyIEhCaXRtYXBJdGVyOw0KPj4gwqDCoCAqLw0KPj4gwqAg
+I2RlZmluZSBIQklUTUFQX0xFVkVMU8KgwqDCoMKgwqDCoMKgwqAgKChIQklUTUFQX0xPR19NQVhf
+U0laRSAvIEJJVFNfUEVSX0xFVkVMKSArIDEpDQo+PiArLyoNCj4+ICsgKiBXZSBoYXZlIEFQSXMg
+d2hpY2ggcmV0dXJucyBzaWduZWQgaW50NjRfdCwgdG8gYmUgYWJsZSB0byByZXR1cm4gZXJyb3Iu
+DQo+PiArICogVGhlcmVmb3JlIHdlIGNhbid0IGhhbmRsZSBiaXRtYXBzIHdpdGggYWJzb2x1dGUg
+c2l6ZSBsYXJnZXIgdGhhbg0KPj4gKyAqIChJTlQ2NF9NQVgrMSkuIFN0aWxsLCBrZWVwIGl0IElO
+VDY0X01BWCB0byBiZSBhIGJpdCBzYWZlci4NCj4+ICsgKi8NCj4+ICsjZGVmaW5lIEhCSVRNQVBf
+TUFYX09SSUdfU0laRSBJTlQ2NF9NQVgNCj4gDQo+IFRoYXQsIGFuZCBiaXRtYXBzIHJlcHJlc2Vu
+dCBkaXNrIGltYWdlcywgYnV0IGRpc2sgaW1hZ2VzIGNhbid0IGV4Y2VlZCBJTlQ2NF9NQVggYnl0
+ZXMgKHRoYW5rcyB0byBvZmZfdCBiZWluZyBzaWduZWQpLsKgIEJ1dCBkb2VzIGludHJvZHVjaW5n
+IGEgbmV3IGNvbnN0YW50IHJlYWxseSBoZWxwPw0KPiANCj4+ICsNCj4+IMKgIHN0cnVjdCBIQml0
+bWFwSXRlciB7DQo+PiDCoMKgwqDCoMKgIGNvbnN0IEhCaXRtYXAgKmhiOw0KPj4gZGlmZiAtLWdp
+dCBhL3V0aWwvaGJpdG1hcC5jIGIvdXRpbC9oYml0bWFwLmMNCj4+IGluZGV4IDc1N2QzOWUzNjAu
+LmRmMTkyMjM0ZTMgMTAwNjQ0DQo+PiAtLS0gYS91dGlsL2hiaXRtYXAuYw0KPj4gKysrIGIvdXRp
+bC9oYml0bWFwLmMNCj4+IEBAIC03MDgsNiArNzA4LDcgQEAgSEJpdG1hcCAqaGJpdG1hcF9hbGxv
+Yyh1aW50NjRfdCBzaXplLCBpbnQgZ3JhbnVsYXJpdHkpDQo+PiDCoMKgwqDCoMKgIEhCaXRtYXAg
+KmhiID0gZ19uZXcwKHN0cnVjdCBIQml0bWFwLCAxKTsNCj4+IMKgwqDCoMKgwqAgdW5zaWduZWQg
+aTsNCj4+ICvCoMKgwqAgYXNzZXJ0KHNpemUgPD0gSEJJVE1BUF9NQVhfT1JJR19TSVpFKTsNCj4g
+DQo+IG9yIGNhbiB3ZSBqdXN0IGlubGluZSBJTlQ2NF9NQVggaGVyZT8NCg0KT0sgZm9yIG1lIHRv
+by4NCg0KPiANCj4+IMKgwqDCoMKgwqAgaGItPm9yaWdfc2l6ZSA9IHNpemU7DQo+PiDCoMKgwqDC
+oMKgIGFzc2VydChncmFudWxhcml0eSA+PSAwICYmIGdyYW51bGFyaXR5IDwgNjQpOw0KPj4gQEAg
+LTczOCw2ICs3MzksNyBAQCB2b2lkIGhiaXRtYXBfdHJ1bmNhdGUoSEJpdG1hcCAqaGIsIHVpbnQ2
+NF90IHNpemUpDQo+PiDCoMKgwqDCoMKgIHVpbnQ2NF90IG51bV9lbGVtZW50cyA9IHNpemU7DQo+
+PiDCoMKgwqDCoMKgIHVpbnQ2NF90IG9sZDsNCj4+ICvCoMKgwqAgYXNzZXJ0KHNpemUgPD0gSEJJ
+VE1BUF9NQVhfT1JJR19TSVpFKTsNCj4+IMKgwqDCoMKgwqAgaGItPm9yaWdfc2l6ZSA9IHNpemU7
+DQo+PiDCoMKgwqDCoMKgIC8qIFNpemUgY29tZXMgaW4gYXMgbG9naWNhbCBlbGVtZW50cywgYWRq
+dXN0IGZvciBncmFudWxhcml0eS4gKi8NCj4+DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0K
+VmxhZGltaXINCg==
 
