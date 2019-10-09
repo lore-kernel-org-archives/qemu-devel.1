@@ -2,94 +2,91 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35FECC47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C4FEC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:50:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A0F5218AC
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:49:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A0F5218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 23667218AC
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:50:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EyTCee/T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23667218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIItx-00070u-KN
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 16:49:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50071)
+	id 1iIIux-0007fW-SG
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 16:50:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1iI7zn-0002hA-Lq
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:11:00 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iIH1h-0003BJ-KX
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 14:49:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1iI7zm-0004N9-DN
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:10:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63320)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1iI7zm-0004Mk-6J
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:10:58 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9998FTM030021
- for <qemu-devel@nongnu.org>; Wed, 9 Oct 2019 05:10:57 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vhbamu04c-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 05:10:57 -0400
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Wed, 9 Oct 2019 10:10:54 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 9 Oct 2019 10:10:51 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x999AoUA48169094
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 9 Oct 2019 09:10:50 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 330E6A4066;
- Wed,  9 Oct 2019 09:10:50 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 084D2A405F;
- Wed,  9 Oct 2019 09:10:47 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.199.35.233])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  9 Oct 2019 09:10:46 +0000 (GMT)
-From: Ganesh Goudar <ganeshgr@linux.ibm.com>
-To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
-Subject: [PATCH v15 2/7] ppc: spapr: Introduce FWNMI capability
-Date: Wed,  9 Oct 2019 14:40:05 +0530
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20191009091010.16467-1-ganeshgr@linux.ibm.com>
-References: <20191009091010.16467-1-ganeshgr@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19100909-0008-0000-0000-0000032061E7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100909-0009-0000-0000-00004A3F65BD
-Message-Id: <20191009091010.16467-3-ganeshgr@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-09_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=897 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910090087
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
-X-Mailman-Approved-At: Wed, 09 Oct 2019 16:05:46 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iIH1g-0007ad-8s
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 14:49:33 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44570)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iIH1g-0007a3-2G
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 14:49:32 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z9so4257816wrl.11
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 11:49:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=X9WSqh8lzF1/ZGPdlYYplziYGw8NTu0WSOvsFIWuniY=;
+ b=EyTCee/Ta3sMkxcw0bZzwOJoIKCF0Il+roHHD0a0hsZWJAGNPNL1jgQfST/fXU1PWh
+ KKi14LHTQKf46HjYwWSbZ9Myw28xJeHB4W7xLtGe9VVSK9IdzVZoulJJXkECtLSwENNz
+ HSUEvPekI+zFQUP/bbFqByBFrdqiVLwdmd7swdK9ATtnPkLNtmKmFa1k1cfsbIfFwhZd
+ 1FcB3rWPmbcBwpshWpUdKNw2eBXMIIbQah7/mvqbeJHGBdeW+OAxZd+VSZzZFbuGvrjZ
+ nRpqAcIVP2FvD6LSOPR8bhm6DAZbT4SXFaBZaOYX/Sy3TaNglOQLIMvjJPwO76Wi0ufc
+ 04OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=X9WSqh8lzF1/ZGPdlYYplziYGw8NTu0WSOvsFIWuniY=;
+ b=Zn+47TBBr7RC47mQuczLj07qkcksWDFTf/BX0iEP6w2319jiJd4xK0GFVgYl2jgavt
+ jJG3MnT12LHZrJmgaHk/vrvUD2lJouKlkYSXXiWqELAUqCqG4tALhxjMOGUZYu0CZbdA
+ lEz1+8Sd2bMDQh+dc7WhDslLy4oclps3JNkHXUukSi68h2573YmWxinf1nXxIcj1yxAD
+ EOGfWfrgVTu5Lc7OMAc53RZp3K56L/rkD2wIr5JQQ8UVJtofM2LZcPi6hx+DAEYA+bw1
+ ajBPdejb8i6xHrbDCxHDYpKGyIqzjC0U/Vz+xF+v1y8zr9wOtu48+5CdabPNtLCVYwWM
+ dyBA==
+X-Gm-Message-State: APjAAAVfZPctQh28MNm9YlIdJskZjKohPgN2gClqKcYcGpUroKpUwjua
+ deogY2B3uJnozIAqPWpBwnms9w==
+X-Google-Smtp-Source: APXvYqxDkr+f96MVD1mR24RFYdBX9WBO0YFQ2cTP/y7nvO09u549wxHn6l4nySb+af3QVQZrnro6/Q==
+X-Received: by 2002:adf:fcc5:: with SMTP id f5mr4071842wrs.37.1570646969809;
+ Wed, 09 Oct 2019 11:49:29 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id r18sm5083061wme.48.2019.10.09.11.49.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 09 Oct 2019 11:49:29 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 65CBC1FF87;
+ Wed,  9 Oct 2019 19:49:28 +0100 (BST)
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
+ <20190731160719.11396-51-alex.bennee@linaro.org>
+ <20190801143141.GL5034@quinoa.localdomain>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+Subject: Re: [PATCH  v4 50/54] tests/plugin: add instruction execution
+ breakdown
+In-reply-to: <20190801143141.GL5034@quinoa.localdomain>
+Date: Wed, 09 Oct 2019 19:49:28 +0100
+Message-ID: <875zkxn493.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,164 +98,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, arawinda.p@gmail.com,
- Ganesh Goudar <ganeshgr@linux.ibm.com>, groug@kaod.org
+Cc: "bobby.prani@gmail.com" <bobby.prani@gmail.com>,
+ "cota@braap.org" <cota@braap.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aravinda Prasad <arawinda.p@gmail.com>
 
-Introduce the KVM capability KVM_CAP_PPC_FWNMI so that
-the KVM causes guest exit with NMI as exit reason
-when it encounters a machine check exception on the
-address belonging to a guest. Without this capability
-enabled, KVM redirects machine check exceptions to
-guest's 0x200 vector.
+Aaron Lindsay OS <aaron@os.amperecomputing.com> writes:
 
-This patch also introduces fwnmi-mce capability to
-deal with the case when a guest with the
-KVM_CAP_PPC_FWNMI capability enabled is attempted
-to migrate to a host that does not support this
-capability.
+> On Jul 31 17:07, Alex Benn=C3=A9e wrote:
+>> + * Attempt to measure the amount of vectorisation that has been done
+>> + * on some code by counting classes of instruction. This is very much
+>> + * ARM specific.
+>
+> I suspect some of my plugins will also be architecture-specific. Does it
+> make sense to have a plugin specify to QEMU which architectures or
+> running modes (i.e. softmmu vs. linux user) it supports? Or
+> alternatively to have QEMU expose this information to the plugin so that
+> it can cleanly exit if its needs are not met?
 
-[eliminate cap_ppc_fwnmi]
-Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
-Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
----
- hw/ppc/spapr.c         |  1 +
- hw/ppc/spapr_caps.c    | 29 +++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  4 +++-
- target/ppc/kvm.c       |  8 ++++++++
- target/ppc/kvm_ppc.h   |  6 ++++++
- 5 files changed, 47 insertions(+), 1 deletion(-)
+I've exposed an information block with the qemu type in it as a string.
+This allows the plugin to take appropriate action.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 08a2a5a770..9b5f65c655 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4488,6 +4488,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] = SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] = SPAPR_CAP_ON;
-     smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] = SPAPR_CAP_OFF;
-+    smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] = SPAPR_CAP_OFF;
-     spapr_caps_add_properties(smc, &error_abort);
-     smc->irq = &spapr_irq_dual;
-     smc->dr_phb_enabled = true;
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 481dfd2a27..778bf32181 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -496,6 +496,25 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
-     }
- }
- 
-+static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
-+                                Error **errp)
-+{
-+    if (!val) {
-+        return; /* Disabled by default */
-+    }
-+
-+    if (tcg_enabled()) {
-+        /*
-+         * TCG support may not be correct in some conditions (e.g., in case
-+         * of software injected faults like duplicate SLBs).
-+         */
-+        warn_report("Firmware Assisted Non-Maskable Interrupts not supported in TCG");
-+    } else if (kvm_enabled() && kvmppc_set_fwnmi()) {
-+        error_setg(errp,
-+"Firmware Assisted Non-Maskable Interrupts not supported by KVM, try cap-fwnmi-mce=off");
-+    }
-+}
-+
- SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-     [SPAPR_CAP_HTM] = {
-         .name = "htm",
-@@ -595,6 +614,15 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-         .type = "bool",
-         .apply = cap_ccf_assist_apply,
-     },
-+    [SPAPR_CAP_FWNMI_MCE] = {
-+        .name = "fwnmi-mce",
-+        .description = "Handle fwnmi machine check exceptions",
-+        .index = SPAPR_CAP_FWNMI_MCE,
-+        .get = spapr_cap_get_bool,
-+        .set = spapr_cap_set_bool,
-+        .type = "bool",
-+        .apply = cap_fwnmi_mce_apply,
-+    },
- };
- 
- static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spapr,
-@@ -734,6 +762,7 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_MAXPAGESIZE);
- SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
- SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
- SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-+SPAPR_CAP_MIG_STATE(fwnmi, SPAPR_CAP_FWNMI_MCE);
- 
- void spapr_caps_init(SpaprMachineState *spapr)
- {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 03111fd55b..66049ac611 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -79,8 +79,10 @@ typedef enum {
- #define SPAPR_CAP_LARGE_DECREMENTER     0x08
- /* Count Cache Flush Assist HW Instruction */
- #define SPAPR_CAP_CCF_ASSIST            0x09
-+/* FWNMI machine check handling */
-+#define SPAPR_CAP_FWNMI_MCE             0x0A
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_FWNMI_MCE + 1)
- 
- /*
-  * Capability Values
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8c5b1f25cc..e9cae0ded6 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2055,6 +2055,14 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
-     }
- }
- 
-+int kvmppc_set_fwnmi(void)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-+    CPUState *cs = CPU(cpu);
-+
-+    return kvm_vcpu_enable_cap(cs, KVM_CAP_PPC_FWNMI, 0);
-+}
-+
- int kvmppc_smt_threads(void)
- {
-     return cap_ppc_smt ? cap_ppc_smt : 1;
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 98bd7d5da6..5727a5025f 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -27,6 +27,7 @@ void kvmppc_enable_h_page_init(void);
- void kvmppc_set_papr(PowerPCCPU *cpu);
- int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
- void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
-+int kvmppc_set_fwnmi(void);
- int kvmppc_smt_threads(void);
- void kvmppc_hint_smt_possible(Error **errp);
- int kvmppc_set_smt_threads(int smt);
-@@ -159,6 +160,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy)
- {
- }
- 
-+static inline int kvmppc_set_fwnmi(void)
-+{
-+    return -1;
-+}
-+
- static inline int kvmppc_smt_threads(void)
- {
-     return 1;
--- 
-2.17.2
+>
+> -Aaron
 
+
+--
+Alex Benn=C3=A9e
 
