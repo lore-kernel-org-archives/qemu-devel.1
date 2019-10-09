@@ -2,83 +2,92 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8621ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0D3ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:45:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B401F21848
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:39:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5EA921848
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:45:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="LtYA24SB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B401F21848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DwqCniKp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5EA921848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIGrq-0002Yq-8a
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:39:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41732)
+	id 1iIGxy-00080Z-7b
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:45:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wrfsh@yandex-team.ru>) id 1iIBDy-0006Z6-Ce
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 08:37:51 -0400
+ (envelope-from <stefanha@gmail.com>) id 1iIC9n-0004pk-KG
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:37:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wrfsh@yandex-team.ru>) id 1iIBDx-0004dU-4P
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 08:37:50 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:34768)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wrfsh@yandex-team.ru>)
- id 1iIBDq-0004X1-K4; Wed, 09 Oct 2019 08:37:43 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::162])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id E26342E1580;
- Wed,  9 Oct 2019 15:37:37 +0300 (MSK)
-Received: from iva8-b53eb3f76dc7.qloud-c.yandex.net
- (iva8-b53eb3f76dc7.qloud-c.yandex.net [2a02:6b8:c0c:2ca1:0:640:b53e:b3f7])
- by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- XcTfV1KpbP-badiLtx5; Wed, 09 Oct 2019 15:37:37 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1570624657; bh=x+izVrG0MHq7INz905kQuzRRPgcouZesc8IdmfEahrM=;
- h=In-Reply-To:Message-ID:From:Date:References:To:Subject:Cc;
- b=LtYA24SB7cGaUwzsnAgkNHOkGnOipHYvOnTpaTi2RmWuFPAI5xMXsc2oktcJ0G0hR
- hhyU6DHqxIVlREVUvmlJ5vCoo8YJHiUxm5i4FSbPqP5QyzqOTqIuSKUOBSSohgHX34
- E3Cy1zAayC6pC/YkOgQGt8m4FsT4YKuRnwAZl5GQ=
-Authentication-Results: mxbackcorp1j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:40c:f68c:50ff:fee9:44bd])
- by iva8-b53eb3f76dc7.qloud-c.yandex.net (nwsmtp/Yandex) with ESMTPSA id
- 6wDe77okZS-baHepNOo; Wed, 09 Oct 2019 15:37:36 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-Subject: Re: [RFC PATCH] virtio-blk: advertise F_WCE (F_FLUSH) if F_CONFIG_WCE
- is also advertised
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <1568980590-806043-1-git-send-email-wrfsh@yandex-team.ru>
- <20191008132416.GA28104@stefanha-x1.localdomain>
-From: Evgeny Yakovlev <wrfsh@yandex-team.ru>
-Message-ID: <f7d2c01d-1676-f02c-e538-f924282eb6a5@yandex-team.ru>
-Date: Wed, 9 Oct 2019 15:37:35 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <stefanha@gmail.com>) id 1iIC9l-0000BU-Jq
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:37:35 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35835)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iIC9j-00007c-H8
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:37:33 -0400
+Received: by mail-wm1-x341.google.com with SMTP id y21so2671752wmi.0
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 06:37:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=NL7rjsWuhfTgIp/hXoS0/fgYkTCfTOtpObXG4BI9cOg=;
+ b=DwqCniKpu4oLSTaieE9SKRadbwiL5hzCA/MxQ0Y3ASGGmfGOh8xz6XO/xTQwqB/S0m
+ gvfnxMPqG0L4QCl8y2Bx9NbpspOQQfZUSffUhFU/Jo/7PWgt4TwPrYF27WDXy5LNuW30
+ edz6cbHSFze33wsnLhB3lIm903MTkNrUqnCRL8WKk+n/bQku8syc1DXP60BbBuQNCeqc
+ uU+P8Xohht+fVcoyIAALtJzhjklGRxBv9jI6RWYmnf3SoU69YxZqTLQhUgkFR1eTI2WH
+ 72SPKkJ536uPCz8a9POjZRmUcTo+enf3D0AfYqyVZ/bfdpRMewOfpH7TYKuu31u4WDcm
+ ql/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=NL7rjsWuhfTgIp/hXoS0/fgYkTCfTOtpObXG4BI9cOg=;
+ b=TDedf6A6IDSs21c2F0TqRIGWrMh0EQsx+bqZwfOpbvXFDk/i9+jQeXEU/2kkMOy5uE
+ cY0TvkPA6colv0cdKGtFLYU17kmyoc5mbIp+c5Obs2Fj8vwBv+uMvm8d6R9F3bgvQJ6F
+ sJI9pqlZHUnp4D8FzuQUVkcjqdqCbaTaNiZsGX/U1UDmFlVinqlQS+fDeJlxVKRCsF6F
+ MpjBx+Qgpw3Ij5SPFaXWFJuOyJP8HtF/dV6fUI4BuM/0RNQO4+k4o6Wtk6oWc5hpelol
+ 0cXQ3JeOp/LZ6VQjkAdfsNwfteCeu/PZQlU4mF4LSkmbwPARJTnqDeRVQRhjNbqZ71gV
+ ji2A==
+X-Gm-Message-State: APjAAAXsLvceyx5ZMnKlOQm1ud0cdQfCpFT3ushmUHMLqvecLHgAsiWr
+ yLWYufA9JbAYs0WkTbsn5Fs=
+X-Google-Smtp-Source: APXvYqx+3XDkw4sqrcKj1zup6/IjoMmYNzG/9oiMqpYg88K7wX3E0SVIdrytYKpaQ+1YyArw0woyZw==
+X-Received: by 2002:a1c:7c0a:: with SMTP id x10mr2754897wmc.48.1570628246740; 
+ Wed, 09 Oct 2019 06:37:26 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id u83sm7737200wme.0.2019.10.09.06.37.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 09 Oct 2019 06:37:25 -0700 (PDT)
+Date: Wed, 9 Oct 2019 14:37:24 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v3 PATCH 07/45] multi-process: define
+ proxy-link object
+Message-ID: <20191009133724.GP5747@stefanha-x1.localdomain>
+References: <cover.1567534653.git.jag.raman@oracle.com>
+ <51220007b0f8a34cc72ff2847f5deb1f85c9c0e4.1567534653.git.jag.raman@oracle.com>
+ <20190912153435.GM23174@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20191008132416.GA28104@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 77.88.29.217
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="iq/fWD14IMVFWBCD"
+Content-Disposition: inline
+In-Reply-To: <20190912153435.GM23174@stefanha-x1.localdomain>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,96 +96,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, yc-core@yandex-team.ru, qemu-block@nongnu.org,
- stefanha@redhat.com, mst@redhat.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com,
+ Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com, mst@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com,
+ mreitz@redhat.com, ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 08.10.2019 16:24, Stefan Hajnoczi wrote:
-> On Fri, Sep 20, 2019 at 02:56:30PM +0300, Evgeny Yakovlev wrote:
->> Virtio spec 1.1 (and earlier), 5.2.5.1 Driver Requirements: Device
->> Initialization:
->>
->> "Devices SHOULD always offer VIRTIO_BLK_F_FLUSH, and MUST offer it if
->> they offer VIRTIO_BLK_F_CONFIG_WCE.
->>
->> It looks like currently F_CONFIG_WCE and F_WCE are not connected to each
->> other. qemu will advertise F_CONFIG_WCE if config-wce argument is
->> set for virtio-blk device. While F_WCE is advertised if underlying block
->> backend actually has it's caching enabled.
->> Those two things are not related to each other.
->>
->> Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
->> ---
->>   hw/block/virtio-blk.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
->> index 1885160..b45dc0c 100644
->> --- a/hw/block/virtio-blk.c
->> +++ b/hw/block/virtio-blk.c
->> @@ -990,7 +990,8 @@ static uint64_t virtio_blk_get_features(VirtIODevice *vdev, uint64_t features,
->>           virtio_add_feature(&features, VIRTIO_BLK_F_SCSI);
->>       }
->>   
->> -    if (blk_enable_write_cache(s->blk)) {
->> +    if (blk_enable_write_cache(s->blk) ||
->> +        virtio_has_feature(features, VIRTIO_BLK_F_CONFIG_WCE)) {
->>           virtio_add_feature(&features, VIRTIO_BLK_F_WCE);
->>       }
->>       if (blk_is_read_only(s->blk)) {
->> -- 
->> 2.7.4
-> Sorry for the very late response.  I have been ill and am still
-> recovering.
+--iq/fWD14IMVFWBCD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Sep 12, 2019 at 05:34:35PM +0200, Stefan Hajnoczi wrote:
+> On Tue, Sep 03, 2019 at 04:37:33PM -0400, Jagannathan Raman wrote:
+> > +    msg->num_fds =3D 0;
+> > +    for (chdr =3D CMSG_FIRSTHDR(&hdr); chdr !=3D NULL;
+> > +         chdr =3D CMSG_NXTHDR(&hdr, chdr)) {
+> > +        if ((chdr->cmsg_level =3D=3D SOL_SOCKET) &&
+> > +            (chdr->cmsg_type =3D=3D SCM_RIGHTS)) {
+> > +            fdsize =3D chdr->cmsg_len - CMSG_LEN(0);
+> > +            msg->num_fds =3D fdsize / sizeof(int);
+> > +            memcpy(msg->fds, CMSG_DATA(chdr), fdsize);
+>=20
+> Please validate num_fds before memcpy to prevent the buffer overflow.
+>=20
+> > +            break;
+> > +        }
+> > +    }
+> > +
+> > +    if (msg->size && msg->bytestream) {
+> > +        msg->data2 =3D calloc(1, msg->size);
+> > +        data =3D msg->data2;
+> > +    } else {
+> > +        data =3D (uint8_t *)&msg->data1;
+> > +    }
+> > +
+> > +    if (msg->size) {
+> > +        do {
+> > +            rc =3D read(sock, data, msg->size);
+> > +        } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN)=
+);
+> > +    }
+>=20
+> Please validate size to prevent the buffer overflow.
 
-Feel better!
+I didn't see a reply so I want to highlight that the effort to introduce
+isolation between devices is pointless if the communications link is not
+coded securely.
 
+Multi-process QEMU adds no security if one process can corrupt the
+memory of another process by sending invalid inputs.  Please audit the
+code.
 
->
-> The motivation for this change looks correct but this patch may cause
-> host_features to change across live migration to a newer QEMU version.
-> If the guest accesses VIRTIO_PCI_HOST_FEATURES before and after live
-> migration it may see different values, which is unexpected.
->
-> The safe way of introducing guest-visible changes like this is to make
-> the change conditional on the machine type version so that old guests
-> see old behavior and new guests see new behavior.
->
-> Live migration compatibility can be guaranteed by adding a new property
-> to virtio_blk_properties[]:
->
->    DEFINE_PROP_BOOL("enable-wce-if-config-wce", VirtIOBlock,
->                     conf.enable_wce_if_config_wce, true),
->
-> Then tweak the patch:
->
->    if (blk_enable_write_cache(s->blk) ||
->        (s->conf.enable_wce_if_config_wce &&
->         virtio_has_feature(features, VIRTIO_BLK_F_CONFIG_WCE))) {
->
-> And finally disable enable_wce_if_config_wce for older machine types to
-> retain compatibility:
->
->    GlobalProperty hw_compat_4_2[] = {
->        { "virtio-blk-device", "enable-wce-if-config-wce", "off" },
->    };
->
-> (I have omitted some steps like defining
-> VirtIOBlkConf.enable_wce_if_config_wce field and hooking up
-> hw_compat_4_2[], but you can figure that out from the existing code.)
+Stefan
 
+--iq/fWD14IMVFWBCD
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Why don't we just migrate host_features? That will ensure they are the 
-same. And messing up device config on destination is bad anyway.
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl2d4pQACgkQnKSrs4Gr
+c8huPwgAgtbR6wtbp0vHh7TcisSHoIbPPMdxKTId4+x4wvNn0/W5IKqXXmdzhsQh
+b51gACJCsH2ozxQquCHsvuSBtOc0guPmZEH3RL0DbjNqEwPWH+2SIHD6DJvj3knR
++PQ5MHJRQrMEdms6RIhZtAq0tCqpRkLysGz87OklA9K2chf6HOAAMLW7ALNeYcQ6
+EHwu2PI7ax4pJ7Tz/mh67D3WLbwdb+TpohbLzIl2qsPq+1/W787f055R85I313tP
+4YAo6q0nAzg0d909JQrhIqZjS9j/Hye0Kja0+Avd/vOTg5Fs/eWzTsOzRftLYC8P
+Sh8ESqHcAEmmmQgYUTo9XVfxa6MN/Q==
+=ni8F
+-----END PGP SIGNATURE-----
 
->
-> Stefan
-
-
-
+--iq/fWD14IMVFWBCD--
 
