@@ -2,56 +2,110 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B80C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B34FC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:52:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ABF1206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:51:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ABF1206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3521D206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:52:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3521D206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIG7x-0001i2-Lh
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:51:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55635)
+	id 1iIG7z-0001kF-Sd
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:51:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <w.bumiller@proxmox.com>) id 1iI90a-0000jE-GF
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:15:53 -0400
+ (envelope-from <thuth@redhat.com>) id 1iI7dH-0000RS-7w
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <w.bumiller@proxmox.com>) id 1iI90Y-0006Pr-FW
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:15:52 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:57903)
+ (envelope-from <thuth@redhat.com>) id 1iI7dE-0004aA-4c
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:47:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59472)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <w.bumiller@proxmox.com>)
- id 1iI90Y-0006PI-4V; Wed, 09 Oct 2019 06:15:50 -0400
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 155B845A82;
- Wed,  9 Oct 2019 12:10:34 +0200 (CEST)
-Date: Wed, 9 Oct 2019 12:10:32 +0200
-From: Wolfgang Bumiller <w.bumiller@proxmox.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] monitor/qmp: resume monitor when clearing its queue
-Message-ID: <20191009101032.kxts5buz7sp3cyo5@olga.proxmox.com>
-References: <20191002083003.21556-1-w.bumiller@proxmox.com>
- <87ftk28g8f.fsf@dusky.pond.sub.org>
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1iI7dD-0004Zq-T0; Wed, 09 Oct 2019 04:47:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 83035806A53;
+ Wed,  9 Oct 2019 08:47:37 +0000 (UTC)
+Received: from thuth.remote.csb (unknown [10.36.118.118])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C24875D6B0;
+ Wed,  9 Oct 2019 08:47:34 +0000 (UTC)
+Subject: Re: [PATCH] target/xtensa: regenerate and re-import test_mmuhifi_c3
+ core
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org,
+ qemu-stable@nongnu.org
+References: <20191009025753.957-1-jcmvbkbc@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <d0ab6628-6cab-f522-1f27-343c59369215@redhat.com>
+Date: Wed, 9 Oct 2019 10:47:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87ftk28g8f.fsf@dusky.pond.sub.org>
-User-Agent: NeoMutt/20180716
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191009025753.957-1-jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Wed, 09 Oct 2019 08:47:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.186.127.180
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,133 +117,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-stable@nongnu.org, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 09, 2019 at 10:39:44AM +0200, Markus Armbruster wrote:
-> Cc: Marc-Andr=E9 for additional monitor and chardev expertise.
->=20
-> Wolfgang Bumiller <w.bumiller@proxmox.com> writes:
->=20
-> > When a monitor's queue is filled up in handle_qmp_command()
-> > it gets suspended. It's the dispatcher bh's job currently to
-> > resume the monitor, which it does after processing an event
-> > from the queue. However, it is possible for a
-> > CHR_EVENT_CLOSED event to be processed before before the bh
-> > is scheduled, which will clear the queue without resuming
-> > the monitor, thereby preventing the dispatcher from reaching
-> > the resume() call.
->=20
-> Because with the request queue cleared, there's nothing for
-> monitor_qmp_requests_pop_any_with_lock() to pop, so
-> monitor_qmp_bh_dispatcher() won't look at this monitor.  It stays
-> suspended forever.  Correct?
->=20
-> Observable effect for the monitor's user?
+On 09/10/2019 04.57, Max Filippov wrote:
+> Overlay part of the test_mmuhifi_c3 core has GPL3 copyright headers in
+> it. Fix that by regenerating test_mmuhifi_c3 core overlay and
+> re-importing it.
+> 
+> Fixes: d848ea776728 ("target/xtensa: add test_mmuhifi_c3 core")
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+> ---
+>  target/xtensa/core-test_mmuhifi_c3.c          |    3 +-
+>  target/xtensa/core-test_mmuhifi_c3/core-isa.h |  116 +-
+>  .../core-test_mmuhifi_c3/gdb-config.inc.c     |  114 +-
+>  .../core-test_mmuhifi_c3/xtensa-modules.inc.c | 6384 ++++++++---------
+>  4 files changed, 3385 insertions(+), 3232 deletions(-)
 
-Yes. More easily triggered now with oob. We ran into this a longer time
-ago, but our only reliable trigger was a customized version of
--loadstate which loads the state from a separate file instead of the
-vmstate region of a qcow2. Turns out that doing this on a slow storage
-(~12s to load the data) caused our status daemon to try to poll the qmp
-socket during the load-state and give up after a 3s timeout. And since
-the BH runs in the main loop which is not even entered until after the
-loadstate has finished, but iothread handling the qmp socket does fill &
-clear the queue, the qmp socket always ended up unusable afterwards.
+FWIW,
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-Aside from that we have users reporting the same symptom (hanging qmp)
-appearing randomly on busy systems.
+Thanks for the quick update! I think we should include the patch also in
+future stable releases if necessary, so I've added qemu-stable to CC: now.
 
-> > Fix this by resuming the monitor when clearing a queue which
-> > was filled up.
-> >
-> > Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
-> > ---
-> > @Michael, we ran into this with qemu 4.0, so if the logic in this pat=
-ch
-> > is correct it may make sense to include it in the 4.0.1 roundup.
-> > A backport is at [1] as 4.0 was before the monitor/ dir split.
-> >
-> > [1] https://gitlab.com/wbumiller/qemu/commit/9d8bbb5294ed084f282174b0=
-c91e1a614e0a0714
-> >
-> >  monitor/qmp.c | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> >
-> > diff --git a/monitor/qmp.c b/monitor/qmp.c
-> > index 9d9e5d8b27..c1db5bf940 100644
-> > --- a/monitor/qmp.c
-> > +++ b/monitor/qmp.c
-> > @@ -70,9 +70,19 @@ static void qmp_request_free(QMPRequest *req)
-> >  /* Caller must hold mon->qmp.qmp_queue_lock */
-> >  static void monitor_qmp_cleanup_req_queue_locked(MonitorQMP *mon)
-> >  {
-> > +    bool need_resume =3D (!qmp_oob_enabled(mon) && mon->qmp_requests=
-->length > 0)
-> > +        || mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX;
->=20
-> Can you explain why this condition is correct?
-
-Sorry, I meant to add a comment pointing to monitor_qmp_bh_dispatcher(),
-which does the following *after* popping 1 element off the queue:
-
-    need_resume =3D !qmp_oob_enabled(mon) ||
-        mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
-    qemu_mutex_unlock(&mon->qmp_queue_lock);
-
-It's supposed to be the same condition, but _before_ popping off an
-element (hence no `- 1`), but the queue shouldn't be empty as well
-otherwise the `monitor_suspend()` in `handle_qmp_command()` hasn't
-happened, though on second though we could probably just return early in
-that case.).
-
->=20
-> >      while (!g_queue_is_empty(mon->qmp_requests)) {
-> >          qmp_request_free(g_queue_pop_head(mon->qmp_requests));
-> >      }
-> > +    if (need_resume) {
-> > +        /*
-> > +         * Pairs with the monitor_suspend() in handle_qmp_command() =
-in case the
-> > +         * queue gets cleared from a CH_EVENT_CLOSED event before th=
-e dispatch
-> > +         * bh got scheduled.
-> > +         */
-> > +        monitor_resume(&mon->common);
-> > +    }
-> >  }
-> > =20
-> >  static void monitor_qmp_cleanup_queues(MonitorQMP *mon)
->=20
-> Is monitor_qmp_cleanup_req_queue_locked() the correct place?
->=20
-> It's called from
->=20
-> * monitor_qmp_event() case CHR_EVENT_CLOSED via
->   monitor_qmp_cleanup_queues(), as part of destroying the monitor's
->   session state.
->=20
->   This is the case you're trying to fix.  Correct?
->=20
->   I figure monitor_resume() is safe because we haven't really destroyed
->   anything, yet, we merely flushed the request queue.  Correct?
->=20
-> * monitor_data_destroy() via monitor_data_destroy_qmp() when destroying
->   the monitor.
->=20
->   Can need_resume be true in this case?  If yes, is monitor_resume()
->   still safe?  We're in the middle of destroying the monitor...
-
-I thought so when first reading through it, but on second though, we
-should probably avoid this for sanity's sake.
-Maybe with a flag, or an extra parameter.
-Or we could introduce a "bool queue_filled" we set in handle_qmp_command(=
-)
-instead of "calculating" `need_resume` in 2 places and unset it in
-`monitor_data_destroy()` before clearing the queue?
-
+ Thomas
 
