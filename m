@@ -2,93 +2,65 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD437C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78122ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:22:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 971B220B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:22:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tc/9D3/1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 971B220B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4695D20B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:22:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4695D20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIEjA-0001XX-AZ
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:22:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45754)
+	id 1iIEjV-0001xJ-PH
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:22:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57080)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iI1tY-0001lf-On
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:40:09 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iI4Cw-0002cl-Mt
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 01:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iI1Fb-0004kC-GG
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:58:52 -0400
-Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:44497)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iI1Fb-0004jM-9q
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:58:51 -0400
-Received: by mail-yw1-xc41.google.com with SMTP id m13so222203ywa.11
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 18:58:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=m6ugJ2CZVH3J/yxuQHIew2ym1NF3mlhKzBBNImuLAzM=;
- b=tc/9D3/1Waw7a/DQCYges8gHFq5M9FxWxJJJYz5yyiywasadyMbwzmUyvYWkyxcZGJ
- f5XEcU5vaB11xao3hGp5hLWcBg9sHRsN49YlWKSlVvqXoUu2W9kW4usmnersGr8B/3u+
- aQ8K+xhOADdqqgAp6a6A76mKx/CO7lgw1ULaQe2F+wOiEAn9IvvEcTIymcBafNGzPSdl
- zzyOI9JrvqmZLW2nRst3uaFEEyEVDbB/05uzuMwsiz5A4xiEEsJJB28WoZU9exBRwQKe
- vIpqL7q45U+QNpEXdlMHsJhi0YWC+V8EN+aZDZHEdsCq5D6FwSTIrTw8rk1lM/ahfLqO
- UrrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=m6ugJ2CZVH3J/yxuQHIew2ym1NF3mlhKzBBNImuLAzM=;
- b=LBBFlEBrPu/Vf3H1X7eYxluykxu2xFnMGYMZp5rxyIC8GtfWdlIlYyjLyImII/q1sc
- QtU0gTml7zumhCzj4olmIuZ3vkdy2ULSB7sEaTQ3RHrL5LWe7mG5zk/Nex0GGOWc/8US
- ms4vssX3TWGLogZvOFCA1nNsOm0SX3cddXf8ZgigkhJKeGC01cEng5leTqUbDe4Q+vqf
- PcHVvmspv2fCs2xbuAOYUw8CXnGX71sbpTpxGpyGvdLp9WcKzwNAiK5wXT4FBt3Pt+Ef
- FmQehSWt3Dt6bhW5Wq93k0XNFqym737eDdL2RT+59aTGVngas5togFXZIMrmKXNXXcVN
- 4RGw==
-X-Gm-Message-State: APjAAAWjz2Ej8cbgwXGCByBLUHGzkQLt7l5Urv4YF6w3QCilj5+rhyjn
- +CI1Zy/hRIVj+EbyLE1d/O9R94X/Afw=
-X-Google-Smtp-Source: APXvYqxxhfPUj9cKWLHabQBYrh3F7+dPPA7eHhjKZraqNXWbzkMcJ0WSNanZJgx5R8Tbo7M98ZiabQ==
-X-Received: by 2002:a81:a9c1:: with SMTP id g184mr1045929ywh.320.1570586330754; 
- Tue, 08 Oct 2019 18:58:50 -0700 (PDT)
-Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id x188sm231682ywb.94.2019.10.08.18.58.49
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 08 Oct 2019 18:58:50 -0700 (PDT)
-Subject: Re: [PATCH v2 11/21] hw/timer/exynos4210_mct.c: Switch GFRC to
- transaction-based ptimer API
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20191008171740.9679-1-peter.maydell@linaro.org>
- <20191008171740.9679-12-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <6095be3c-921d-e6a7-16f8-78c652726a4c@linaro.org>
-Date: Tue, 8 Oct 2019 21:58:48 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iI4Cv-00059i-Fl
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 01:08:18 -0400
+Received: from mga01.intel.com ([192.55.52.88]:31200)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1iI4Cv-00052l-5z
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 01:08:17 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 08 Oct 2019 22:08:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; d="scan'208";a="394905421"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga006.fm.intel.com with ESMTP; 08 Oct 2019 22:08:13 -0700
+Date: Wed, 9 Oct 2019 13:07:56 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH 3/3] migration/postcopy: handle POSTCOPY_INCOMING_RUNNING
+ corner case properly
+Message-ID: <20191009050756.GA9616@richard>
+References: <20191001100122.17730-1-richardw.yang@linux.intel.com>
+ <20191001100122.17730-4-richardw.yang@linux.intel.com>
+ <20191008164046.GF3441@work-vm> <20191009010204.GC26203@richard>
+ <20191009041225.GF10750@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20191008171740.9679-12-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191009041225.GF10750@xz-x1>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c41
+X-Received-From: 192.55.52.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,24 +72,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com,
+ Wei Yang <richardw.yang@linux.intel.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/19 1:17 PM, Peter Maydell wrote:
-> We want to switch the exynos MCT code away from bottom-half based ptimers to
-> the new transaction-based ptimer API. The MCT is complicated
-> and uses multiple different ptimers, so it's clearer to switch
-> it a piece at a time. Here we change over only the GFRC.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/timer/exynos4210_mct.c | 48 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 45 insertions(+), 3 deletions(-)
+On Wed, Oct 09, 2019 at 12:12:25PM +0800, Peter Xu wrote:
+>On Wed, Oct 09, 2019 at 09:02:04AM +0800, Wei Yang wrote:
+>> On Tue, Oct 08, 2019 at 05:40:46PM +0100, Dr. David Alan Gilbert wrote:
+>> >* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> >> Currently, we set PostcopyState blindly to RUNNING, even we found the
+>> >> previous state is not LISTENING. This will lead to a corner case.
+>> >> 
+>> >> First let's look at the code flow:
+>> >> 
+>> >> qemu_loadvm_state_main()
+>> >>     ret = loadvm_process_command()
+>> >>         loadvm_postcopy_handle_run()
+>> >>             return -1;
+>> >>     if (ret < 0) {
+>> >>         if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING)
+>> >>             ...
+>> >>     }
+>> >> 
+>> >> From above snippet, the corner case is loadvm_postcopy_handle_run()
+>> >> always sets state to RUNNING. And then it checks the previous state. If
+>> >> the previous state is not LISTENING, it will return -1. But at this
+>> >> moment, PostcopyState is already been set to RUNNING.
+>> >> 
+>> >> Then ret is checked in qemu_loadvm_state_main(), when it is -1
+>> >> PostcopyState is checked. Current logic would pause postcopy and retry
+>> >> if PostcopyState is RUNNING. This is not what we expect, because
+>> >> postcopy is not active yet.
+>> >> 
+>> >> This patch makes sure state is set to RUNNING only previous state is
+>> >> LISTENING by introducing an old_state parameter in postcopy_state_set().
+>> >> New state only would be set when current state equals to old_state.
+>> >> 
+>> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> >
+>> >OK, it's a shame to use a pointer there, but it works.
+>> 
+>> You mean second parameter of postcopy_state_set()?
+>> 
+>> I don't have a better idea. Or we introduce a new state
+>> POSTCOPY_INCOMING_NOCHECK. Do you feel better with this?
+>
+>Maybe simply fix loadvm_postcopy_handle_run() to set the state after
+>the POSTCOPY_INCOMING_LISTENING check?
+>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Set state back to ps if ps is not POSTCOPY_INCOMING_LISTENING?
 
-r~
+Sounds like another option.
+
+
+-- 
+Wei Yang
+Help you, Help me
 
