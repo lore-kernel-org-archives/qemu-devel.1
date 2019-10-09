@@ -2,91 +2,64 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 180A8C4360C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 01:38:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38883C10F14
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 01:39:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D77B52070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 01:38:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XdZbuszp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77B52070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0ED9F2070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 01:39:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ED9F2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iI0vZ-0003NF-Hz
-	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 21:38:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41583)
+	id 1iI0wX-0004JY-8E
+	for qemu-devel@archiver.kernel.org; Tue, 08 Oct 2019 21:39:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41628)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iI0ul-0002rs-Ip
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:37:20 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iI0vM-0003O3-Ll
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:37:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iI0uk-0005Ir-7o
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:37:19 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:33898)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iI0uk-0005Id-2A
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:37:18 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id m1so210322ybm.1
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 18:37:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=2M0QElxVB/CyxdHrHz7p+BbYVSSnjE2w4SAIhBUcbv8=;
- b=XdZbuszpfeGTL8m/FRsqcqg1/ojxuja8/TdUl8oUztciGqycjlzMmCE0brSa5+eUJU
- XRpQ/KarU+I3LnASVWGLLVB90Dx4Qhn0j54ld08LN87ncCtTGv+bTH+c/yirMlGyYcd6
- 7uqEtU3YejDOMy0MYfquYh3SVWrIG/Whc+TPJZGYUd673om5HzEAAX+Sh8FyhndQZj1+
- +k3ZdLztGX23vCT69JTduhxxO4KgoUzKKF1hN+aybD7YyZVzq/rYt8FEMad3pP4LErv+
- IzoPbj/U/SO++6ExFqjJ+oGhXeStDlMTCINgCh+xfNYdQ9SmZJxhHf+fQ5ZVIjaX2JQ+
- 3zmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2M0QElxVB/CyxdHrHz7p+BbYVSSnjE2w4SAIhBUcbv8=;
- b=mb8t6tCENtk5MqRRhtNtc4r2qg2dfWZEHRJUgv6J3NCu3xIUn1NLTOUv90EO0xNP9v
- CJ03UQVsaPiZ4eszk53Qpb+ss5cwnqC1HBTErHuadih4qMnFk3hkqWO9PGTrRZMsnyzl
- 7wlmDR+9tIuCTmxSp3CJ8hNdqfABMkZn3UdcAj0afhDcLyCZosUpzWNV6To1ngHvcxdq
- V3xEmK1qx1AJ5dcWYnCuOhgGLhzQ3JveQ4oG7VfKO4m8sebNxUQ/cs6bIQQYZ/oTDKt5
- r04IIZRW/OoRHzc68HSIC/M7z7X77J7oXVb5mvQIvAPbFDtL6cGPXbyM9QWcguZ37xZ+
- Iy/g==
-X-Gm-Message-State: APjAAAV7LyOJsEiwXw2Bsu69QRzK9PrceQtneP1HnscVvjxMnTpbz5DG
- EW/lEQWVtg2/cLXWxuMjnRC+SQ==
-X-Google-Smtp-Source: APXvYqy78dDh8EifhxNIrXkqOIu2sFt9YcO71AwoqqWF0wd9nePaFu9g61vYxTTK7VKuYmIBw1LTng==
-X-Received: by 2002:a25:824c:: with SMTP id d12mr473415ybn.217.1570585036957; 
- Tue, 08 Oct 2019 18:37:16 -0700 (PDT)
-Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id h65sm220235ywa.62.2019.10.08.18.37.15
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 08 Oct 2019 18:37:16 -0700 (PDT)
-Subject: Re: [PATCH v1 1/1] target/riscv: Remove atomic accesses to MIP CSR
-To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <34350af3b53fadc50bfe4f1fbc452c7d3a8fe8f7.1570572202.git.alistair.francis@wdc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <8b816d13-0243-562c-7fa9-96f350935895@linaro.org>
-Date: Tue, 8 Oct 2019 21:37:11 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iI0vK-0005V1-K0
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:37:56 -0400
+Received: from mga07.intel.com ([134.134.136.100]:42098)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1iI0vK-0005Tb-8b
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:37:54 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 08 Oct 2019 18:37:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; d="scan'208";a="394868068"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga006.fm.intel.com with ESMTP; 08 Oct 2019 18:37:51 -0700
+Date: Wed, 9 Oct 2019 09:37:33 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 3/3] migration/postcopy: replace have_listen_thread check
+ with PostcopyState check
+Message-ID: <20191009013733.GF26203@richard>
+References: <20191006000249.29926-1-richardw.yang@linux.intel.com>
+ <20191006000249.29926-4-richardw.yang@linux.intel.com>
+ <20191008191551.GN3441@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <34350af3b53fadc50bfe4f1fbc452c7d3a8fe8f7.1570572202.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191008191551.GN3441@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b43
+X-Received-From: 134.134.136.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,26 +71,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@sifive.com
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/19 6:04 PM, Alistair Francis wrote:
-> Instead of relying on atomics to access the MIP register let's update
-> our helper function to instead just lock the IO mutex thread before
-> writing. This follows the same concept as used in PPC for handling
-> interrupts
-> 
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/cpu.c        |  5 ++--
->  target/riscv/cpu.h        |  9 --------
->  target/riscv/cpu_helper.c | 48 +++++++++++++++------------------------
->  target/riscv/csr.c        |  2 +-
->  4 files changed, 21 insertions(+), 43 deletions(-)
+On Tue, Oct 08, 2019 at 08:15:51PM +0100, Dr. David Alan Gilbert wrote:
+>* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> After previous cleanup, postcopy thread is running only when
+>> PostcopyState is LISTENNING or RUNNING. This means it is not necessary
+>> to spare a variable have_listen_thread to represent the state.
+>> 
+>> Replace the check on have_listen_thread with PostcopyState and remove
+>> the variable.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> ---
+>>  migration/migration.h | 1 -
+>>  migration/ram.c       | 2 +-
+>>  migration/ram.h       | 1 +
+>>  migration/savevm.c    | 4 +---
+>>  4 files changed, 3 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/migration/migration.h b/migration/migration.h
+>> index 4f2fe193dc..a4d639663d 100644
+>> --- a/migration/migration.h
+>> +++ b/migration/migration.h
+>> @@ -63,7 +63,6 @@ struct MigrationIncomingState {
+>>      /* Set this when we want the fault thread to quit */
+>>      bool           fault_thread_quit;
+>>  
+>> -    bool           have_listen_thread;
+>>      QemuThread     listen_thread;
+>>      QemuSemaphore  listen_thread_sem;
+>>  
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 769d3f6454..dfc50d57d5 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -4188,7 +4188,7 @@ static bool postcopy_is_advised(void)
+>>      return ps >= POSTCOPY_INCOMING_ADVISE && ps < POSTCOPY_INCOMING_END;
+>>  }
+>>  
+>> -static bool postcopy_is_running(void)
+>> +bool postcopy_is_running(void)
+>>  {
+>>      PostcopyState ps = postcopy_state_get();
+>>      return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
+>> diff --git a/migration/ram.h b/migration/ram.h
+>> index bd0eee79b6..44fe4753ad 100644
+>> --- a/migration/ram.h
+>> +++ b/migration/ram.h
+>> @@ -59,6 +59,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms);
+>>  /* For incoming postcopy discard */
+>>  int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+>>  int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+>> +bool postcopy_is_running(void);
+>>  
+>>  void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+>>  
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index dcad8897a3..2a0e0b94df 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1836,7 +1836,6 @@ static void *postcopy_ram_listen_thread(void *opaque)
+>>      qemu_loadvm_state_cleanup();
+>>  
+>>      rcu_unregister_thread();
+>> -    mis->have_listen_thread = false;
+>>      postcopy_state_set(POSTCOPY_INCOMING_END, NULL);
+>
+>That now needs a big comment saying it must be the last thing in the
+>thread, because now it's got meaning that it's here.
+>
+>>  
+>>      return NULL;
+>> @@ -1880,7 +1879,6 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
+>>          return -1;
+>>      }
+>>  
+>> -    mis->have_listen_thread = true;
+>>      /* Start up the listening thread and wait for it to signal ready */
+>>      qemu_sem_init(&mis->listen_thread_sem, 0);
+>>      qemu_thread_create(&mis->listen_thread, "postcopy/listen",
+>> @@ -2518,7 +2516,7 @@ int qemu_loadvm_state(QEMUFile *f)
+>>  
+>>      trace_qemu_loadvm_state_post_main(ret);
+>>  
+>> -    if (mis->have_listen_thread) {
+>> +    if (postcopy_is_running()) {
+>>          /* Listen thread still going, can't clean up yet */
+>>          return ret;
+>>      }
+>
+>Can you explain to me why this is afe in the case of a failure in
+>loadvm_postcopy_handle_listen between the start where it sets
+>the state to LISTENING, and the point where it currently sets
+>hasve_listen_thread ?  Wouldn't this cause qemu_loadvm_state
+>not to cleanup?
+>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I have to say you are right.  listen_thread may not started when PostcopyState
+is already set to LISTENING.
 
-r~
+The ugly fix may be set PostcopyState back to original one. Not sure whether
+you would like this. 
+
+>Dave
+>
+>> -- 
+>> 2.17.1
+>> 
+>--
+>Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- 
+Wei Yang
+Help you, Help me
 
