@@ -6,46 +6,44 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC6AAECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0372C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 909AE20679
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:15:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 909AE20679
+	by mail.kernel.org (Postfix) with ESMTPS id 90CF420B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:16:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90CF420B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIGUe-0003QD-VM
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:15:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57065)
+	id 1iIGVl-0004Hu-Eu
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56906)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iI9Hq-0002fA-D5
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:33:43 -0400
+ (envelope-from <david@redhat.com>) id 1iI9FV-0002Oh-Sq
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iI9Hp-0002hV-7Y
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:33:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48080)
+ (envelope-from <david@redhat.com>) id 1iI9FU-0001KC-S6
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:31:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45636)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iI9Ho-0002hO-Vi; Wed, 09 Oct 2019 06:33:41 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1iI9FU-0001K5-K6; Wed, 09 Oct 2019 06:31:16 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1C07530024DA;
- Wed,  9 Oct 2019 10:33:40 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4EEC8C087353;
+ Wed,  9 Oct 2019 10:31:15 +0000 (UTC)
 Received: from [10.36.116.112] (ovpn-116-112.ams2.redhat.com [10.36.116.112])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 16CD65C1D6;
- Wed,  9 Oct 2019 10:33:37 +0000 (UTC)
-Subject: Re: [PATCH v1 0/5] s390x/mmu: Implement more facilities
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20190926101627.23376-1-david@redhat.com>
- <2cb4d6b8-4058-dca0-95e2-6e8d62741a2c@redhat.com>
- <20191007190203.14714176.cohuck@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8205060BF4;
+ Wed,  9 Oct 2019 10:31:13 +0000 (UTC)
+Subject: Re: [PATCH v4 0/7] s390x/mmu: DAT translation rewrite
+To: qemu-devel@nongnu.org
+References: <20191004105102.15821-1-david@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -92,18 +90,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <0bd8f929-6e62-ec89-3b81-1fd023489286@redhat.com>
-Date: Wed, 9 Oct 2019 12:33:37 +0200
+Message-ID: <9d5a3bd5-dfb2-6af3-d114-3075b6e1b199@redhat.com>
+Date: Wed, 9 Oct 2019 12:31:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191007190203.14714176.cohuck@redhat.com>
+In-Reply-To: <20191004105102.15821-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 09 Oct 2019 10:33:40 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Wed, 09 Oct 2019 10:31:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -119,75 +117,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- qemu-devel@nongnu.org, Ilya Leoshkevich <iii@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07.10.19 19:02, Cornelia Huck wrote:
-> On Fri, 4 Oct 2019 15:23:32 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On 04.10.19 12:50, David Hildenbrand wrote:
+> This is a split-up of:
+>     [PATCH-for-4.2 v1 3/9] s390x/mmu: DAT translation rewrite
+> Rebased on latest upstream changes.
 > 
->> On 26.09.19 12:16, David Hildenbrand wrote:
->>> This is the follow up of:
->>>     [PATCH-for-4.2 v1 0/9] s390x: MMU changes and extensions
->>> Without the general MMU rework. It's based on:
->>>     [PATCH v2 0/7] s390x/mmu: DAT translation rewrite
->>>
->>> This series adds adds EDAT2 MMU support, and implements/indicates related
->>> facilities (ESOP-1, ESOP-2, IEP, ...) for TCG. The QEMU CPU model is
->>> updated.
->>>
->>> IEP under QEMU TCG seems to work just fine, when eabling it via the "max"
->>> CPU model - via kvm unit tests:
->>>     t460s: ~/git/kvm-unit-tests master $ ./s390x-run s390x/iep.elf -cpu max
->>>     [...]
->>>     PASS: iep: iep protection: Program interrupt: expected(4) == received(4)
->>>     SUMMARY: 1 tests
->>>
->>>     EXIT: STATUS=1
->>>
->>> Changes since "[PATCH-for-4.2 v1 0/9] s390x: MMU changes and extensions":
->>> - "s390x/mmu: Add EDAT2 translation support"
->>> -- Fix vaddr offset within 2GB page
->>> - "s390x/mmu: Implement ESOP-2 and ..."
->>> -- Squashed two patches as requested.
->>> -- Also set ilen to "2" in case of MMU_INST_FETCH on mmu_translate_real
->>> - "s390x/mmu: Implement Instruction-Execution-Protection Facility"
->>> -- Make sure s390_cpu_get_phys_page_debug() doesn't choke on IEP
->>> - "s390x/cpumodel: Add new TCG features to QEMU cpu model"
->>> -- Add comment "features introduced after the z13"
->>>
->>> Cc: Ilya Leoshkevich <iii@linux.ibm.com>
->>>
->>> David Hildenbrand (5):
->>>   s390x/mmu: Add EDAT2 translation support
->>>   s390x/mmu: Implement ESOP-2 and
->>>     access-exception-fetch/store-indication facility
->>>   s390x/mmu: Implement Instruction-Execution-Protection Facility
->>>   s390x/cpumodel: Prepare for changes of QEMU model
->>>   s390x/cpumodel: Add new TCG features to QEMU cpu model
->>>
->>>  hw/s390x/s390-virtio-ccw.c  |  2 ++
->>>  target/s390x/cpu.h          |  1 +
->>>  target/s390x/gen-features.c | 11 +++++++++-
->>>  target/s390x/helper.c       |  6 +++++-
->>>  target/s390x/mmu_helper.c   | 42 +++++++++++++++++++++++++++++++++++--
->>>  5 files changed, 58 insertions(+), 4 deletions(-)
->>>   
->>
->> @Christian (@Conny) if I can get an ACK on the last patch, I can send
->> this directly upstream.
->>
+> v3 -> v4:
+> - "s390x/mmu: Inject PGM_ADDRESSING on bogus table addresses"
+> -- s/goguous/bogus/
+> - "s390x/mmu: DAT table definition overhaul"
+> -- Fix SEGMENT_ENTRY_SFAA
+> -- Drop three unnecessary defines
+> - "s390x/mmu: Convert to non-recursive page table walk"
+> -- Reorder "REGION_ENTRY_P" checks
+> -- Drop default cases that cannot be reached
 > 
-> No objections from my side, I won't get around to reviewing it in
-> detail anyway.
+> v2 -> v3:
+> - "s390x/mmu: Inject PGM_ADDRESSING on boguous table addresses"
+> -- Keep using cs->as
+> -- Make read_table_entry() return true/false
+> - "s390x/mmu: DAT table definition overhaul"
+> -- Added a comment where to find details about s390x and used definitions
+> 
+> v1 -> v2:
+> - Cleanup old code first, before switching to non-recursive handling
+> - Fix EDAT1 translation: I was missing the vaddr offset within the 1MB
+>   page.
+> 
+> David Hildenbrand (7):
+>   s390x/mmu: Drop debug logging from MMU code
+>   s390x/mmu: Move DAT protection handling out of mmu_translate_asce()
+>   s390x/mmu: Inject DAT exceptions from a single place
+>   s390x/mmu: Inject PGM_ADDRESSING on bogus table addresses
+>   s390x/mmu: Use TARGET_PAGE_MASK in mmu_translate_pte()
+>   s390x/mmu: DAT table definition overhaul
+>   s390x/mmu: Convert to non-recursive page table walk
+> 
+>  target/s390x/cpu.h        |  78 +++++---
+>  target/s390x/mem_helper.c |  12 +-
+>  target/s390x/mmu_helper.c | 365 ++++++++++++++++----------------------
+>  3 files changed, 220 insertions(+), 235 deletions(-)
 > 
 
-Okay, thanks. I'll queue and send this soon.
+I'll queue and send this soon.
 
 -- 
 
