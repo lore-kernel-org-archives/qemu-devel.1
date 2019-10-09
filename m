@@ -6,100 +6,62 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F214AECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C23C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:22:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF3EB206B6
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:17:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF3EB206B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1C446206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:22:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C446206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIHSj-0001SK-MK
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:17:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45958)
+	id 1iIHXO-0005aZ-IX
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:22:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42843)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iIEPT-00029j-8T
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:01:59 -0400
+ (envelope-from <crosa@redhat.com>) id 1iIE7U-000252-Uw
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:43:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iIEPQ-0007ea-TL
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:01:54 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13172)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iIEPQ-0007dt-FS
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:01:52 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x99FhIvN060014
- for <qemu-devel@nongnu.org>; Wed, 9 Oct 2019 12:01:49 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vhg87xgfu-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 12:01:48 -0400
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <clg@kaod.org>;
- Wed, 9 Oct 2019 17:01:45 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 9 Oct 2019 17:01:42 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x99G1feb42008678
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 9 Oct 2019 16:01:41 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8469E4C052;
- Wed,  9 Oct 2019 16:01:41 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6320E4C050;
- Wed,  9 Oct 2019 16:01:41 +0000 (GMT)
-Received: from smtp.tls.ibm.com (unknown [9.101.4.1])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  9 Oct 2019 16:01:41 +0000 (GMT)
-Received: from yukon.kaod.org (sig-9-145-2-100.uk.ibm.com [9.145.2.100])
- by smtp.tls.ibm.com (Postfix) with ESMTP id 853F2220121;
- Wed,  9 Oct 2019 18:01:40 +0200 (CEST)
-Subject: Re: [PATCH v4 16/19] spapr: Move SpaprIrq::nr_xirqs to
- SpaprMachineClass
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
- <20191009060818.29719-17-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Date: Wed, 9 Oct 2019 18:01:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <crosa@redhat.com>) id 1iIE7T-0000rZ-N7
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:43:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48298)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>)
+ id 1iIE7Q-0000qV-Oc; Wed, 09 Oct 2019 11:43:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 59DC42A09A1;
+ Wed,  9 Oct 2019 15:43:15 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-122-151.rdu2.redhat.com
+ [10.10.122.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CFD8F5D9E2;
+ Wed,  9 Oct 2019 15:43:05 +0000 (UTC)
+Date: Wed, 9 Oct 2019 11:43:04 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 16/19] tests/boot_linux_console: Add a test for the
+ Raspberry Pi 2
+Message-ID: <20191009154304.GC30349@localhost.localdomain>
+References: <20190926173428.10713-1-f4bug@amsat.org>
+ <20190926173428.10713-17-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20191009060818.29719-17-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19100916-0020-0000-0000-0000037788B0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100916-0021-0000-0000-000021CD90DE
-Message-Id: <5cc759a5-43ef-a453-82cb-5cd162494e35@kaod.org>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-09_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=8 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910090144
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190926173428.10713-17-f4bug@amsat.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Wed, 09 Oct 2019 15:43:15 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id x99FhIvN060014
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,248 +73,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?iso-8859-1?Q?Zolt=E1n?= Baldaszti <bztemail@gmail.com>,
+ Laurent Bonnans <laurent.bonnans@here.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ Clement Deschamps <clement.deschamps@antfield.fr>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Cheng Xiang <ext-cheng.xiang@here.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/2019 08:08, David Gibson wrote:
-> For the benefit of peripheral device allocation, the number of availabl=
-e
-> irqs really wants to be the same on a given machine type version,
-> regardless of what irq backends we are using.  That's the case now, but
-> only because we make sure the different SpaprIrq instances have the sam=
-e
-> value except for the special legacy one.
+On Thu, Sep 26, 2019 at 07:34:24PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Similar to the x86_64/pc test, it boots a Linux kernel on a raspi2
+> board and verify the serial is working.
 >=20
-> Since this really only depends on machine type version, move the value =
-to
-> SpaprMachineClass instead of SpaprIrq.  This also puts the code to set =
-it
-> to the lower value on old machine types right next to setting
-> legacy_irq_allocation, which needs to go hand in hand.
+> The kernel image and DeviceTree blob are built by the Raspbian
+> project (based on Debian):
+> https://www.raspbian.org/RaspbianImages
+> as recommended by the Raspberry Pi project:
+> https://www.raspberrypi.org/downloads/raspbian/
 >=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
+> If ARM is a target being built, "make check-acceptance" will
+> automatically include this test by the use of the "arch:arm" tags.
+>=20
+> Alternatively, this test can be run using:
+>=20
+>     $ avocado run -t arch:arm tests/acceptance
+>     $ avocado run -t machine:raspi2 tests/acceptance
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 > ---
->  hw/ppc/spapr.c             |  2 ++
->  hw/ppc/spapr_irq.c         | 33 ++++++++++++++++-----------------
->  include/hw/ppc/spapr.h     |  1 +
->  include/hw/ppc/spapr_irq.h |  1 -
->  4 files changed, 19 insertions(+), 18 deletions(-)
+> v3: removed debug printf (Cleber)
+>     use serial_kernel_cmdline dict
+> ---
+>  tests/acceptance/boot_linux_console.py | 36 ++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 153cc54354..e1ff03152e 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4443,6 +4443,7 @@ static void spapr_machine_class_init(ObjectClass =
-*oc, void *data)
->      smc->irq =3D &spapr_irq_dual;
->      smc->dr_phb_enabled =3D true;
->      smc->linux_pci_probe =3D true;
-> +    smc->nr_xirqs =3D SPAPR_NR_XIRQS;
->  }
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
+boot_linux_console.py
+> index 079590f0c8..7eaf6cb60e 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -318,6 +318,42 @@ class BootLinuxConsole(Test):
+>          self.vm.launch()
+>          self.wait_for_console_pattern('init started: BusyBox')
 > =20
->  static const TypeInfo spapr_machine_info =3D {
-> @@ -4578,6 +4579,7 @@ static void spapr_machine_3_0_class_options(Machi=
-neClass *mc)
->      compat_props_add(mc->compat_props, hw_compat_3_0, hw_compat_3_0_le=
-n);
-> =20
->      smc->legacy_irq_allocation =3D true;
-> +    smc->nr_xirqs =3D 0x400;
->      smc->irq =3D &spapr_irq_xics_legacy;
-
-yes. this is clearly better to this constant at the machine level.
-
-c.=20
-
-
->  }
-> =20
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 076da31501..2768f9a765 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -106,7 +106,6 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptCont=
-roller *, Error **),
->   */
-> =20
->  SpaprIrq spapr_irq_xics =3D {
-> -    .nr_xirqs    =3D SPAPR_NR_XIRQS,
->      .xics        =3D true,
->      .xive        =3D false,
->  };
-> @@ -116,7 +115,6 @@ SpaprIrq spapr_irq_xics =3D {
->   */
-> =20
->  SpaprIrq spapr_irq_xive =3D {
-> -    .nr_xirqs    =3D SPAPR_NR_XIRQS,
->      .xics        =3D false,
->      .xive        =3D true,
->  };
-> @@ -134,7 +132,6 @@ SpaprIrq spapr_irq_xive =3D {
->   * Define values in sync with the XIVE and XICS backend
->   */
->  SpaprIrq spapr_irq_dual =3D {
-> -    .nr_xirqs    =3D SPAPR_NR_XIRQS,
->      .xics        =3D true,
->      .xive        =3D true,
->  };
-> @@ -251,16 +248,19 @@ void spapr_irq_dt(SpaprMachineState *spapr, uint3=
-2_t nr_servers,
-> =20
->  uint32_t spapr_irq_nr_msis(SpaprMachineState *spapr)
->  {
-> -    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> -        return spapr->irq->nr_xirqs;
-> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    def do_test_arm_raspi2(self, uart_id):
+> +        """
+> +        The kernel can be rebuilt using the kernel source referenced
+> +        and following the instructions on the on:
+> +        https://www.raspberrypi.org/documentation/linux/kernel/buildin=
+g.md
+> +        """
+> +        serial_kernel_cmdline =3D {
+> +            0: 'earlycon=3Dpl011,0x3f201000 console=3DttyAMA0',
+> +        }
+> +        deb_url =3D ('http://archive.raspberrypi.org/debian/'
+> +                   'pool/main/r/raspberrypi-firmware/'
+> +                   'raspberrypi-kernel_1.20190215-1_armhf.deb')
+> +        deb_hash =3D 'cd284220b32128c5084037553db3c482426f3972'
+> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
+> +        kernel_path =3D self.extract_from_deb(deb_path, '/boot/kernel7=
+.img')
+> +        dtb_path =3D self.extract_from_deb(deb_path, '/boot/bcm2709-rp=
+i-2-b.dtb')
 > +
-> +    if (smc->legacy_irq_allocation) {
-> +        return smc->nr_xirqs;
->      } else {
-> -        return SPAPR_XIRQ_BASE + spapr->irq->nr_xirqs - SPAPR_IRQ_MSI;
-> +        return SPAPR_XIRQ_BASE + smc->nr_xirqs - SPAPR_IRQ_MSI;
->      }
->  }
-> =20
->  void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->  {
->      MachineState *machine =3D MACHINE(spapr);
-> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> =20
->      if (machine_kernel_irqchip_split(machine)) {
->          error_setg(errp, "kernel_irqchip split mode not supported on p=
-series");
-> @@ -298,8 +298,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
- **errp)
->              return;
->          }
-> =20
-> -        object_property_set_int(obj, spapr->irq->nr_xirqs, "nr-irqs",
-> -                                &local_err);
-> +        object_property_set_int(obj, smc->nr_xirqs, "nr-irqs", &local_=
-err);
->          if (local_err) {
->              error_propagate(errp, local_err);
->              return;
-> @@ -320,8 +319,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
- **errp)
->          int i;
-> =20
->          dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
-> -        qdev_prop_set_uint32(dev, "nr-irqs",
-> -                             spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE);
-> +        qdev_prop_set_uint32(dev, "nr-irqs", smc->nr_xirqs + SPAPR_XIR=
-Q_BASE);
->          /*
->           * 8 XIVE END structures per CPU. One for each available
->           * priority
-> @@ -346,17 +344,18 @@ void spapr_irq_init(SpaprMachineState *spapr, Err=
-or **errp)
->      }
-> =20
->      spapr->qirqs =3D qemu_allocate_irqs(spapr_set_irq, spapr,
-> -                                      spapr->irq->nr_xirqs + SPAPR_XIR=
-Q_BASE);
-> +                                      smc->nr_xirqs + SPAPR_XIRQ_BASE)=
-;
->  }
-> =20
->  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
- **errp)
->  {
->      SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
->      int i;
-> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->      int rc;
-> =20
->      assert(irq >=3D SPAPR_XIRQ_BASE);
-> -    assert(irq < (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
-> +    assert(irq < (smc->nr_xirqs + SPAPR_XIRQ_BASE));
-> =20
->      for (i =3D 0; i < ARRAY_SIZE(intcs); i++) {
->          SpaprInterruptController *intc =3D intcs[i];
-> @@ -376,9 +375,10 @@ void spapr_irq_free(SpaprMachineState *spapr, int =
-irq, int num)
->  {
->      SpaprInterruptController *intcs[] =3D ALL_INTCS(spapr);
->      int i, j;
-> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> =20
->      assert(irq >=3D SPAPR_XIRQ_BASE);
-> -    assert((irq + num) <=3D (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
-> +    assert((irq + num) <=3D (smc->nr_xirqs + SPAPR_XIRQ_BASE));
-> =20
->      for (i =3D irq; i < (irq + num); i++) {
->          for (j =3D 0; j < ARRAY_SIZE(intcs); j++) {
-> @@ -395,6 +395,8 @@ void spapr_irq_free(SpaprMachineState *spapr, int i=
-rq, int num)
-> =20
->  qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
->  {
-> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +        self.vm.set_machine('raspi2')
+> +        self.vm.set_console()
+> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> +                               serial_kernel_cmdline[uart_id])
+> +        self.vm.add_args('-kernel', kernel_path,
+> +                         '-dtb', dtb_path,
+> +                         '-append', kernel_command_line)
+> +        self.vm.launch()
+> +        console_pattern =3D 'Kernel command line: %s' % kernel_command=
+_line
+> +        self.wait_for_console_pattern(console_pattern)
 > +
->      /*
->       * This interface is basically for VIO and PHB devices to find the
->       * right qemu_irq to manipulate, so we only allow access to the
-> @@ -403,7 +405,7 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int i=
-rq)
->       * interfaces, we can change this if we need to in future.
->       */
->      assert(irq >=3D SPAPR_XIRQ_BASE);
-> -    assert(irq < (spapr->irq->nr_xirqs + SPAPR_XIRQ_BASE));
-> +    assert(irq < (smc->nr_xirqs + SPAPR_XIRQ_BASE));
-> =20
->      if (spapr->ics) {
->          assert(ics_valid_irq(spapr->ics, irq));
-> @@ -556,10 +558,7 @@ int spapr_irq_find(SpaprMachineState *spapr, int n=
-um, bool align, Error **errp)
->      return first + ics->offset;
->  }
-> =20
-> -#define SPAPR_IRQ_XICS_LEGACY_NR_XIRQS     0x400
-> -
->  SpaprIrq spapr_irq_xics_legacy =3D {
-> -    .nr_xirqs    =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
->      .xics        =3D true,
->      .xive        =3D false,
->  };
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 763da757f0..623e8e3f93 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -119,6 +119,7 @@ struct SpaprMachineClass {
->      bool use_ohci_by_default;  /* use USB-OHCI instead of XHCI */
->      bool pre_2_10_has_unused_icps;
->      bool legacy_irq_allocation;
-> +    uint32_t nr_xirqs;
->      bool broken_host_serial_model; /* present real host info to the gu=
-est */
->      bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
->      bool linux_pci_probe;
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index befe8e01dc..5e150a6679 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -78,7 +78,6 @@ int spapr_irq_msi_alloc(SpaprMachineState *spapr, uin=
-t32_t num, bool align,
->  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t nu=
-m);
-> =20
->  typedef struct SpaprIrq {
-> -    uint32_t    nr_xirqs;
->      bool        xics;
->      bool        xive;
->  } SpaprIrq;
+> +    def test_arm_raspi2_uart0(self):
+> +        """
+> +        :avocado: tags=3Darch:arm
+> +        :avocado: tags=3Dmachine:raspi2
+> +        :avocado: tags=3Ddevice:pl011
+> +        """
+> +        self.do_test_arm_raspi2(0)
+> +
+>      def test_s390x_s390_ccw_virtio(self):
+>          """
+>          :avocado: tags=3Darch:s390x
+> --=20
+> 2.20.1
 >=20
 
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
