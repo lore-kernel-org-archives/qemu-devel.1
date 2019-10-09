@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4270C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 15:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B818C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 15:58:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EF51206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 15:57:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 122EB206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 15:58:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nsJ5KdbN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EF51206BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DfI9gLyl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 122EB206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIEL2-0005Av-CT
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 11:57:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42499)
+	id 1iIEMF-0006nV-Qy
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 11:58:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iI17S-0001cR-By
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:50:27 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iI1tV-0001hy-0U
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:40:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iI17Q-00083x-TC
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:50:26 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:46152)
+ (envelope-from <richard.henderson@linaro.org>) id 1iI1IA-0007zA-Pp
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:01:31 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:37393)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iI17Q-00083n-KI
- for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:50:24 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id h202so193037ybg.13
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 18:50:24 -0700 (PDT)
+ id 1iI1IA-0007xn-JV
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:01:30 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id z125so219446ybc.4
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 19:01:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=pRRGey9Kw0lIsuaYgixcsQ5RUwHu18e511yZ1VzoGaw=;
- b=nsJ5KdbNIcVTWQaU2tkP6YvmGjvcPYk83PN/BgJ59Esc9XlDWXPuQV03UngQUGUJSk
- Tew/2feqXzbb0XInqmCpK1iLfewqA25ui1H2Zexg6ew13yUjViG4OP/zGy9W3NbhkZw7
- gfXnd9cEkdsxAhrHJm80/m0DvyguPmvoXxzkNk3WJqcPY38RM7g8JaON1ycBO2v6DNYX
- GG7sA0blF8C2acwtAgZL01qg79NsxSnS9UrTF2w4J6A0ZXaW8vpFiBc6T7MhMzLOEhCQ
- ScjRLJ2kwAewY09YqyNIRBYChl+jrga3t2pQM22+erQx9qTbsPEN6STmmLgvBEaSttXt
- dGBA==
+ bh=KLC1qHeYjrGOJoAvGRswiHaRhVsCxf4DwneQs8vXDII=;
+ b=DfI9gLylfMQAnqdayMM5AkRqPvRODms4PRKpeeeKxfcfdefhNiOGdxH05SopdI2NvC
+ uXCTY4BuzDpckE9kpbsd1TbDjriZCcy3ROt6lpjCDDA920TNEiYkff+Ml64kCi8pJiDK
+ eVYSleQElYOwGksh4NcaXV2q3BRHXtkH1a89Q97adodx45UiWeL6kIpYYwGO9AvEO/qf
+ 5zAAwkzV9PHjNXo3NOsfBUdQaXw8zJsinr8prvXgtJdOuuw9lOjKokgbuXVIk0hs8GOB
+ JbYkvIGEf6y6PWp3dwpBGFN7IG6h0N0Jv2w2GfDJh8xn9qocifRyGK8huZve9vB+ceFH
+ erow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=pRRGey9Kw0lIsuaYgixcsQ5RUwHu18e511yZ1VzoGaw=;
- b=RxQd0+1EFwf+loLhb4Ca4ZB6z9mWrKakVaM6cU6bRLDn49OD8F1lTD54rfbpV03Cz6
- Z8vkSeIIheMxWUlb7QUehV1WWAyva0KDP0ATZCbWNmKWwpD0g3Z3IiOs3fyIXgUurgxc
- Q2Kjb9ideQ8fSwe3v3qR9N6ZjWXXYx8nLXsCtjAP84fQR6bLrRSlj0J0JTf0yGssCjl2
- VeKUC0QO75lc/kmr01KUFbUyldL0vaC0JeQV8G23RIkU9c4BT7EoEYL0Ji8fM7n/ic8h
- T5FOr5JOorAX8AOAZBWZy9MkkwVAZLva0M8GUlDzUDbhRqKpxKkpAN4pyRuDwhwEv4bQ
- M+yg==
-X-Gm-Message-State: APjAAAUjTYbRmPzjfbaoJxpYJfwGPLE0q4H7Yk0mTN4Ko8SyjpKnI8dV
- DQa25NZ/zW1CmICUB+oXL1DOlQ==
-X-Google-Smtp-Source: APXvYqzEYgmsq36EX7X32jrZH4wvrUiEF7He1CshtdsV1YkpCY3aBcdrBB7veECzGF9TtvV9uhFLUQ==
-X-Received: by 2002:a25:790a:: with SMTP id u10mr487573ybc.273.1570585823438; 
- Tue, 08 Oct 2019 18:50:23 -0700 (PDT)
+ bh=KLC1qHeYjrGOJoAvGRswiHaRhVsCxf4DwneQs8vXDII=;
+ b=plk6AnUq2e4pt1U8YlsJrSxnQfOpEXxSXh/4YoQ7+Vr6JBlwstEMDF4670k3lvQPN4
+ S+mXXvaNCmtndmWE+9BFXt6eYQAmHibjFlhEElQRRs+1gZizlceBcAX3TmlaJ609E9C5
+ p6EvrcAfwPgEDqMjJ8DB5Lgz9aIjh0YplLtzyt/QxZPCJAhVCmbp8gHK/ivk9m6x3liF
+ MQUOnI1J4+Tv2M/NOAtnu6rscr/fAA3YduPcVsdp49nuLLIsTMih/xXmTh7IKm/exByW
+ +QTNNJezm0ChYAZeMPNj5IKqAi2dcxVMGIVYjhBkdDG+mMEL7Hu+X5qjfYY0vfi0ZBMS
+ 13Dg==
+X-Gm-Message-State: APjAAAVHsPSnbP7XAN6i4kOd7FHRLjxBBNQp9RuBxrdyJGjoN/A2JJ2y
+ UETzRroPSk2lNWD5rH3riSkK5g==
+X-Google-Smtp-Source: APXvYqxoNfNK2dvPPy9hewiN3EQwXMR/AfXcbjZ37v8b30GggR4VTwvNj9OGZo22nzUgZv7Vhmo74w==
+X-Received: by 2002:a25:bd8c:: with SMTP id f12mr468238ybh.379.1570586489921; 
+ Tue, 08 Oct 2019 19:01:29 -0700 (PDT)
 Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
- by smtp.gmail.com with ESMTPSA id g81sm199521ywa.46.2019.10.08.18.50.22
+ by smtp.gmail.com with ESMTPSA id z127sm220651ywd.45.2019.10.08.19.01.21
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 08 Oct 2019 18:50:22 -0700 (PDT)
-Subject: Re: [PATCH v2 07/21] hw/timer/arm_mptimer.c: Switch to
- transaction-based ptimer API
+ Tue, 08 Oct 2019 19:01:29 -0700 (PDT)
+Subject: Re: [PATCH v2 15/21] hw/timer/exynos4210_rtc.c: Switch 1Hz ptimer to
+ transaction-based API
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20191008171740.9679-1-peter.maydell@linaro.org>
- <20191008171740.9679-8-peter.maydell@linaro.org>
+ <20191008171740.9679-16-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <dac4fae6-0cac-2f1c-43ab-fe011cb357e8@linaro.org>
-Date: Tue, 8 Oct 2019 21:50:18 -0400
+Message-ID: <e721d8ae-db00-523f-57e2-cfe11a17b91c@linaro.org>
+Date: Tue, 8 Oct 2019 22:01:13 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191008171740.9679-8-peter.maydell@linaro.org>
+In-Reply-To: <20191008171740.9679-16-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -107,15 +107,14 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/8/19 1:17 PM, Peter Maydell wrote:
-> Switch the arm_mptimer.c code away from bottom-half based ptimers to
-> the new transaction-based ptimer API.  This just requires adding
-> begin/commit calls around the various places that modify the ptimer
-> state, and using the new ptimer_init() function to create the timer.
+> Switch the exynos41210_rtc 1Hz ptimer over to the transaction-based
+> API. (We will switch the other ptimer used by this device in a
+> separate commit.)
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/timer/arm_mptimer.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
+>  hw/timer/exynos4210_rtc.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
