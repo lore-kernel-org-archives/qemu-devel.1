@@ -2,80 +2,64 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B667CC47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9547CC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:06:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E97C206B6
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:05:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E97C206B6
+	by mail.kernel.org (Postfix) with ESMTPS id 6BEBB206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:06:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BEBB206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIJ9G-0006ll-HA
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:05:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51818)
+	id 1iIJ9p-0007RH-TE
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:06:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iIHQA-0007kr-DV
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:14:51 -0400
+ (envelope-from <eblake@redhat.com>) id 1iII0A-0003Pv-Ig
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iIHQ7-0005GC-5x
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:14:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40364)
+ (envelope-from <eblake@redhat.com>) id 1iII09-0005I9-AF
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:52:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46402)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iIHQ6-0005FW-SY
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:14:47 -0400
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iII06-0005Hc-MS; Wed, 09 Oct 2019 15:51:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 293D7C04D932
- for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 19:14:45 +0000 (UTC)
-Received: by mail-qk1-f198.google.com with SMTP id g65so2962303qkf.19
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 12:14:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=5HMe4iY7ZpgxFwiPKX2MfjdttrwfGNrf+k4LC3JHN8k=;
- b=XujvjE/dJjICT2EgRTFENYvA5J59oLpBoyGiZmZLaR9BDW1v3ps2GIXu2bRjcsmRt0
- qTr0nvznIB9ZEOLxYkKxtM7GjNDHJUJsis70nnX/XwF1Q3atFpxOTjciuYYZyJNRnyT2
- GmCSmH2RPnOxr81NgtaL9yqIulx+PrT60MD6ZgTRSV4AF4IDxKI2SAoie9F26tmzhIGr
- v31IOxGCw6PTKzQij8s+bVmgUoH605Qx0zOElhhlHuKxA6772fubm5nQ/ps2wg8G82e6
- nLJDZ0JWPM1DWblKtKUpXJDqZ2oImYB5/+5Z2JP2HcmFzlnvtokMo3i8xl05SKWhy1oV
- oLtw==
-X-Gm-Message-State: APjAAAVRAyB+CRu+JA56cgaBTszaNxdVjUEiwm4PTmwz+WcKusFb3aWi
- YBY2tQmxfHaclTv38wEPe89BRPlNgjKfv1GqrKsKGWgLVVH1BPucQqBR39yJy/b7VlH3s0rGome
- uQmP0HxONVcYIBNQ=
-X-Received: by 2002:a0c:814d:: with SMTP id 71mr5395803qvc.226.1570648484385; 
- Wed, 09 Oct 2019 12:14:44 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw6J1KXq1T8FHsQVGFicsJUvpAHjMi8m2HCC3+UugTE5wot0XCMBaJZjAFYrzOHXG0/St/aeg==
-X-Received: by 2002:a0c:814d:: with SMTP id 71mr5395780qvc.226.1570648484096; 
- Wed, 09 Oct 2019 12:14:44 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- c201sm1449458qke.128.2019.10.09.12.14.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Oct 2019 12:14:43 -0700 (PDT)
-Date: Wed, 9 Oct 2019 15:14:38 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [RFC PATCH] virtio-blk: advertise F_WCE (F_FLUSH) if
- F_CONFIG_WCE is also advertised
-Message-ID: <20191009151337-mutt-send-email-mst@kernel.org>
-References: <1568980590-806043-1-git-send-email-wrfsh@yandex-team.ru>
- <20191008132416.GA28104@stefanha-x1.localdomain>
+ by mx1.redhat.com (Postfix) with ESMTPS id E29E9C057E32;
+ Wed,  9 Oct 2019 19:51:57 +0000 (UTC)
+Received: from [10.3.116.162] (ovpn-116-162.phx2.redhat.com [10.3.116.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CE7F60606;
+ Wed,  9 Oct 2019 19:51:57 +0000 (UTC)
+Subject: Re: [PATCH v2 1/4] qemu-iotests: remove bash shebang from library
+ files
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20191009194740.8079-1-crosa@redhat.com>
+ <20191009194740.8079-2-crosa@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <287afb96-bfb7-5e6e-ca1c-0e2845f8ef3c@redhat.com>
+Date: Wed, 9 Oct 2019 14:51:56 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191008132416.GA28104@stefanha-x1.localdomain>
+In-Reply-To: <20191009194740.8079-2-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Wed, 09 Oct 2019 19:51:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -90,90 +74,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yc-core@yandex-team.ru, qemu-block@nongnu.org, stefanha@redhat.com,
- Evgeny Yakovlev <wrfsh@yandex-team.ru>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 08, 2019 at 02:24:16PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Sep 20, 2019 at 02:56:30PM +0300, Evgeny Yakovlev wrote:
-> > Virtio spec 1.1 (and earlier), 5.2.5.1 Driver Requirements: Device
-> > Initialization:
-> > 
-> > "Devices SHOULD always offer VIRTIO_BLK_F_FLUSH, and MUST offer it if
-> > they offer VIRTIO_BLK_F_CONFIG_WCE.
-> > 
-> > It looks like currently F_CONFIG_WCE and F_WCE are not connected to each
-> > other. qemu will advertise F_CONFIG_WCE if config-wce argument is
-> > set for virtio-blk device. While F_WCE is advertised if underlying block
-> > backend actually has it's caching enabled.
-> > Those two things are not related to each other.
-> > 
-> > Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
-> > ---
-> >  hw/block/virtio-blk.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> > index 1885160..b45dc0c 100644
-> > --- a/hw/block/virtio-blk.c
-> > +++ b/hw/block/virtio-blk.c
-> > @@ -990,7 +990,8 @@ static uint64_t virtio_blk_get_features(VirtIODevice *vdev, uint64_t features,
-> >          virtio_add_feature(&features, VIRTIO_BLK_F_SCSI);
-> >      }
-> >  
-> > -    if (blk_enable_write_cache(s->blk)) {
-> > +    if (blk_enable_write_cache(s->blk) ||
-> > +        virtio_has_feature(features, VIRTIO_BLK_F_CONFIG_WCE)) {
-> >          virtio_add_feature(&features, VIRTIO_BLK_F_WCE);
-> >      }
-> >      if (blk_is_read_only(s->blk)) {
-> > -- 
-> > 2.7.4
+On 10/9/19 2:47 PM, Cleber Rosa wrote:
+> Due to not being able to find a reason to have shebangs on files that
+> are not executable.
 > 
-> Sorry for the very late response.  I have been ill and am still
-> recovering.
+> While at it, add a mode hint to emacs, which would be clueless or
+> plain wrong about these containing shell code.
 > 
-> The motivation for this change looks correct but this patch may cause
-> host_features to change across live migration to a newer QEMU version.
-> If the guest accesses VIRTIO_PCI_HOST_FEATURES before and after live
-> migration it may see different values, which is unexpected.
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/qemu-iotests/common.config  | 2 +-
+>   tests/qemu-iotests/common.filter  | 2 +-
+>   tests/qemu-iotests/common.nbd     | 3 +--
+>   tests/qemu-iotests/common.pattern | 2 +-
+>   tests/qemu-iotests/common.qemu    | 2 +-
+>   tests/qemu-iotests/common.rc      | 2 +-
+>   tests/qemu-iotests/common.tls     | 2 +-
+>   7 files changed, 7 insertions(+), 8 deletions(-)
 > 
-> The safe way of introducing guest-visible changes like this is to make
-> the change conditional on the machine type version so that old guests
-> see old behavior and new guests see new behavior.
-> 
-> Live migration compatibility can be guaranteed by adding a new property
-> to virtio_blk_properties[]:
-> 
->   DEFINE_PROP_BOOL("enable-wce-if-config-wce", VirtIOBlock,
->                    conf.enable_wce_if_config_wce, true),
+> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
+> index 9bd1a5a6fc..b85a6a6f96 100644
+> --- a/tests/qemu-iotests/common.config
+> +++ b/tests/qemu-iotests/common.config
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/env bash
+> +# -*- emacs mode: sh -*-
 
+I thought my version:
+# hey emacs, this file will be sourced by bash -*- mode: sh -*-
+was cuter, but that's not a requirement, and yours works  ;)
 
-is this a useful thing for users to control?
-If not we don't need to make this property part of
-the stable API - blacklist it by prefixing x- to the name:
-x-enable-wce-if-config-wce
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> Then tweak the patch:
-> 
->   if (blk_enable_write_cache(s->blk) ||
->       (s->conf.enable_wce_if_config_wce &&
->        virtio_has_feature(features, VIRTIO_BLK_F_CONFIG_WCE))) {
-> 
-> And finally disable enable_wce_if_config_wce for older machine types to
-> retain compatibility:
-> 
->   GlobalProperty hw_compat_4_2[] = {
->       { "virtio-blk-device", "enable-wce-if-config-wce", "off" },
->   };
-> 
-> (I have omitted some steps like defining
-> VirtIOBlkConf.enable_wce_if_config_wce field and hooking up
-> hw_compat_4_2[], but you can figure that out from the existing code.)
-> 
-> Stefan
-
-
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
