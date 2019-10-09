@@ -2,107 +2,74 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02686ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B40DECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B88D5206C0
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:58:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B88D5206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E0000206C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:58:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0000206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIGE8-0000Xn-35
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:58:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51100)
+	id 1iIGEg-00010h-Bm
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50103)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iI88f-0003VJ-3Q
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:20:10 -0400
+ (envelope-from <bounces@canonical.com>) id 1iI7zx-0002hM-S6
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iI88d-00074P-Fm
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:20:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63732)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iI88d-00074D-8K
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:20:07 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x999DuD8050721
- for <qemu-devel@nongnu.org>; Wed, 9 Oct 2019 05:20:06 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vhcq909c0-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 05:20:06 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <clg@kaod.org>;
- Wed, 9 Oct 2019 10:20:03 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 9 Oct 2019 10:19:53 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x999JqBB33489090
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 9 Oct 2019 09:19:52 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8B2564C04E;
- Wed,  9 Oct 2019 09:19:52 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6B0094C046;
- Wed,  9 Oct 2019 09:19:52 +0000 (GMT)
-Received: from smtp.tls.ibm.com (unknown [9.101.4.1])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  9 Oct 2019 09:19:52 +0000 (GMT)
-Received: from yukon.kaod.org (sig-9-145-55-18.uk.ibm.com [9.145.55.18])
- by smtp.tls.ibm.com (Postfix) with ESMTP id 68B23220198;
- Wed,  9 Oct 2019 11:19:51 +0200 (CEST)
-Subject: Re: [PATCH v4 09/19] spapr, xics, xive: Move print_info from SpaprIrq
- to SpaprInterruptController
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
- <20191009060818.29719-10-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Date: Wed, 9 Oct 2019 11:19:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <bounces@canonical.com>) id 1iI7zv-0004RK-9U
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:11:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60142)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iI7zv-0004R4-0T
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:11:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iI7zt-0001Vz-LM
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 09:11:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 9997B2E80C7
+ for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 09:11:05 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191009060818.29719-10-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19100909-4275-0000-0000-000003706438
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100909-4276-0000-0000-0000388367D5
-Message-Id: <a8f3f050-d5e7-8099-b9b2-c84154a7eb8e@kaod.org>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-09_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=8 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910090087
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id x999DuD8050721
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Date: Wed, 09 Oct 2019 08:58:50 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: kvm powerpcm qemu
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: sathnaga
+X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
+X-Launchpad-Bug-Modifier: Satheesh Rajendran (sathnaga)
+Message-Id: <157061153044.21976.18153238088035049329.malonedeb@gac.canonical.com>
+Subject: [Bug 1847440] [NEW] ppc64le: KVM guest fails to boot with an error
+ `virtio_scsi: probe of virtio1 failed with error -22` on master
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="af2eefe214bd95389a09b7c956720881bab16807";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 172e1dded6883305dd071eeaf1cded24731edb62
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -111,261 +78,375 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Reply-To: Bug 1847440 <1847440@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/2019 08:08, David Gibson wrote:
-> This method depends only on the active irq controller.  Now that we've
-> formalized the notion of active controller we can dispatch directly
-> through that, rather than dispatching via SpaprIrq with the dual
-> version having to do a second conditional dispatch.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+Public bug reported:
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+PowerPC KVM Guest fails to boot on current qemu master, bad commit:
+e68cd0cb5cf49d334abe17231a1d2c28b846afa2
 
-> ---
->  hw/intc/spapr_xive.c       | 15 +++++++++++++
->  hw/intc/xics_spapr.c       | 15 +++++++++++++
->  hw/ppc/spapr.c             |  2 +-
->  hw/ppc/spapr_irq.c         | 44 +++++++-------------------------------
->  include/hw/ppc/spapr_irq.h |  4 ++--
->  5 files changed, 41 insertions(+), 39 deletions(-)
->=20
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 52d5e71793..700ec5c9c1 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -564,6 +564,20 @@ static void spapr_xive_set_irq(SpaprInterruptContr=
-oller *intc, int irq, int val)
->      }
->  }
-> =20
-> +static void spapr_xive_print_info(SpaprInterruptController *intc, Moni=
-tor *mon)
-> +{
-> +    SpaprXive *xive =3D SPAPR_XIVE(intc);
-> +    CPUState *cs;
-> +
-> +    CPU_FOREACH(cs) {
-> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> +
-> +        xive_tctx_pic_print_info(spapr_cpu_state(cpu)->tctx, mon);
-> +    }
-> +
-> +    spapr_xive_pic_print_info(xive, mon);
-> +}
-> +
->  static void spapr_xive_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -586,6 +600,7 @@ static void spapr_xive_class_init(ObjectClass *klas=
-s, void *data)
->      sicc->claim_irq =3D spapr_xive_claim_irq;
->      sicc->free_irq =3D spapr_xive_free_irq;
->      sicc->set_irq =3D spapr_xive_set_irq;
-> +    sicc->print_info =3D spapr_xive_print_info;
->  }
-> =20
->  static const TypeInfo spapr_xive_info =3D {
-> diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> index 02372697f6..415defe394 100644
-> --- a/hw/intc/xics_spapr.c
-> +++ b/hw/intc/xics_spapr.c
-> @@ -381,6 +381,20 @@ static void xics_spapr_set_irq(SpaprInterruptContr=
-oller *intc, int irq, int val)
->      ics_set_irq(ics, srcno, val);
->  }
-> =20
-> +static void xics_spapr_print_info(SpaprInterruptController *intc, Moni=
-tor *mon)
-> +{
-> +    ICSState *ics =3D ICS_SPAPR(intc);
-> +    CPUState *cs;
-> +
-> +    CPU_FOREACH(cs) {
-> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> +
-> +        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
-> +    }
-> +
-> +    ics_pic_print_info(ics, mon);
-> +}
-> +
->  static void ics_spapr_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -393,6 +407,7 @@ static void ics_spapr_class_init(ObjectClass *klass=
-, void *data)
->      sicc->claim_irq =3D xics_spapr_claim_irq;
->      sicc->free_irq =3D xics_spapr_free_irq;
->      sicc->set_irq =3D xics_spapr_set_irq;
-> +    sicc->print_info =3D xics_spapr_print_info;
->  }
-> =20
->  static const TypeInfo ics_spapr_info =3D {
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 514a17ae74..6c38de5927 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4271,7 +4271,7 @@ static void spapr_pic_print_info(InterruptStatsPr=
-ovider *obj,
->  {
->      SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
-> =20
-> -    spapr->irq->print_info(spapr, mon);
-> +    spapr_irq_print_info(spapr, mon);
->      monitor_printf(mon, "irqchip: %s\n",
->                     kvm_irqchip_in_kernel() ? "in-kernel" : "emulated")=
-;
->  }
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index bfccb815ed..a29b527232 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -98,19 +98,6 @@ static void spapr_irq_init_kvm(SpaprMachineState *sp=
-apr,
->   * XICS IRQ backend.
->   */
-> =20
-> -static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monito=
-r *mon)
-> -{
-> -    CPUState *cs;
-> -
-> -    CPU_FOREACH(cs) {
-> -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> -
-> -        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
-> -    }
-> -
-> -    ics_pic_print_info(spapr->ics, mon);
-> -}
-> -
->  static int spapr_irq_post_load_xics(SpaprMachineState *spapr, int vers=
-ion_id)
->  {
->      if (!kvm_irqchip_in_kernel()) {
-> @@ -147,7 +134,6 @@ SpaprIrq spapr_irq_xics =3D {
->      .xics        =3D true,
->      .xive        =3D false,
-> =20
-> -    .print_info  =3D spapr_irq_print_info_xics,
->      .dt_populate =3D spapr_dt_xics,
->      .post_load   =3D spapr_irq_post_load_xics,
->      .reset       =3D spapr_irq_reset_xics,
-> @@ -158,20 +144,6 @@ SpaprIrq spapr_irq_xics =3D {
->   * XIVE IRQ backend.
->   */
-> =20
-> -static void spapr_irq_print_info_xive(SpaprMachineState *spapr,
-> -                                      Monitor *mon)
-> -{
-> -    CPUState *cs;
-> -
-> -    CPU_FOREACH(cs) {
-> -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> -
-> -        xive_tctx_pic_print_info(spapr_cpu_state(cpu)->tctx, mon);
-> -    }
-> -
-> -    spapr_xive_pic_print_info(spapr->xive, mon);
-> -}
-> -
->  static int spapr_irq_post_load_xive(SpaprMachineState *spapr, int vers=
-ion_id)
->  {
->      return spapr_xive_post_load(spapr->xive, version_id);
-> @@ -212,7 +184,6 @@ SpaprIrq spapr_irq_xive =3D {
->      .xics        =3D false,
->      .xive        =3D true,
-> =20
-> -    .print_info  =3D spapr_irq_print_info_xive,
->      .dt_populate =3D spapr_dt_xive,
->      .post_load   =3D spapr_irq_post_load_xive,
->      .reset       =3D spapr_irq_reset_xive,
-> @@ -238,11 +209,6 @@ static SpaprIrq *spapr_irq_current(SpaprMachineSta=
-te *spapr)
->          &spapr_irq_xive : &spapr_irq_xics;
->  }
-> =20
-> -static void spapr_irq_print_info_dual(SpaprMachineState *spapr, Monito=
-r *mon)
-> -{
-> -    spapr_irq_current(spapr)->print_info(spapr, mon);
-> -}
-> -
->  static void spapr_irq_dt_populate_dual(SpaprMachineState *spapr,
->                                         uint32_t nr_servers, void *fdt,
->                                         uint32_t phandle)
-> @@ -304,7 +270,6 @@ SpaprIrq spapr_irq_dual =3D {
->      .xics        =3D true,
->      .xive        =3D true,
-> =20
-> -    .print_info  =3D spapr_irq_print_info_dual,
->      .dt_populate =3D spapr_irq_dt_populate_dual,
->      .post_load   =3D spapr_irq_post_load_dual,
->      .reset       =3D spapr_irq_reset_dual,
-> @@ -404,6 +369,14 @@ static void spapr_set_irq(void *opaque, int irq, i=
-nt level)
->      sicc->set_irq(spapr->active_intc, irq, level);
->  }
-> =20
-> +void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon)
-> +{
-> +    SpaprInterruptControllerClass *sicc
-> +        =3D SPAPR_INTC_GET_CLASS(spapr->active_intc);
-> +
-> +    sicc->print_info(spapr->active_intc, mon);
-> +}
-> +
->  void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->  {
->      MachineState *machine =3D MACHINE(spapr);
-> @@ -713,7 +686,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
->      .xics        =3D true,
->      .xive        =3D false,
-> =20
-> -    .print_info  =3D spapr_irq_print_info_xics,
->      .dt_populate =3D spapr_dt_xics,
->      .post_load   =3D spapr_irq_post_load_xics,
->      .reset       =3D spapr_irq_reset_xics,
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index ece8d2ea48..bdfeb3b107 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -59,13 +59,14 @@ typedef struct SpaprInterruptControllerClass {
-> =20
->      /* These methods should only be called on the active intc */
->      void (*set_irq)(SpaprInterruptController *intc, int irq, int val);
-> +    void (*print_info)(SpaprInterruptController *intc, Monitor *mon);
->  } SpaprInterruptControllerClass;
-> =20
->  void spapr_irq_update_active_intc(SpaprMachineState *spapr);
-> =20
->  int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
->                                PowerPCCPU *cpu, Error **errp);
-> -
-> +void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
-> =20
->  void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis);
->  int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool a=
-lign,
-> @@ -78,7 +79,6 @@ typedef struct SpaprIrq {
->      bool        xics;
->      bool        xive;
-> =20
-> -    void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
->      void (*dt_populate)(SpaprMachineState *spapr, uint32_t nr_servers,
->                          void *fdt, uint32_t phandle);
->      int (*post_load)(SpaprMachineState *spapr, int version_id);
->=20
+Env:
+HW: IBM Power8
+Host Kernel: 5.4.0-rc2-00038-ge3280b54afed
+Guest Kernel: 4.13.9-300.fc27.ppc64le
+Qemu: https://github.com/qemu/qemu.git (master)
+Libvirt: 5.4.0
 
+Guest boot gets stuck:
+...
+[  OK  ] Mounted Kernel Configuration File System.
+[    7.598740] virtio-pci 0000:00:01.0: enabling device (0000 -> 0003)
+[    7.598828] virtio-pci 0000:00:01.0: virtio_pci: leaving for legacy driv=
+er
+[    7.598957] virtio-pci 0000:00:02.0: enabling device (0000 -> 0003)
+[    7.599017] virtio-pci 0000:00:02.0: virtio_pci: leaving for legacy driv=
+er
+[    7.599123] virtio-pci 0000:00:04.0: enabling device (0000 -> 0003)
+[    7.599182] virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy driv=
+er
+[    7.620620] synth uevent: /devices/vio: failed to send uevent
+[    7.620624] vio vio: uevent: failed to send synthetic uevent
+[  OK  ] Started udev Coldplug all Devices.
+[    7.624559] audit: type=3D1130 audit(1570610300.990:5): pid=3D1 uid=3D0 =
+auid=3D4294967295 ses=3D4294967295 subj=3Dkernel msg=3D'unit=3Dsystemd-udev=
+-trigger comm=3D"systemd" exe=3D"/usr/lib/systemd/systemd" hostname=3D? add=
+r=3D? terminal=3D? res=3Dsuccess'
+[  OK  ] Reached target System Initialization.
+[  OK  ] Reached target Basic System.
+[  OK  ] Reached target Remote File Systems (Pre).
+[  OK  ] Reached target Remote File Systems.
+[    7.642961] virtio_scsi: probe of virtio1 failed with error -22
+[ ***  ] A start job is running for dev-disk=E2=80=A621b3519a80.device (14s=
+ / no limit)
+...
+
+git bisect, yielded a bad commit
+[e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT on ibm
+,client-architecture-support, reverting this commit boot the guest
+properly.
+
+git bisect start
+# good: [9e06029aea3b2eca1d5261352e695edc1e7d7b8b] Update version for v4.1.=
+0 release
+git bisect good 9e06029aea3b2eca1d5261352e695edc1e7d7b8b
+# bad: [98b2e3c9ab3abfe476a2b02f8f51813edb90e72d] Merge remote-tracking bra=
+nch 'remotes/stefanha/tags/block-pull-request' into staging
+git bisect bad 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d
+# good: [56e6250ede81b4e4b4ddb623874d6c3cdad4a96d] target/arm: Convert T16,=
+ nop hints
+git bisect good 56e6250ede81b4e4b4ddb623874d6c3cdad4a96d
+# good: [5d69cbdfdd5cd6dadc9f0c986899844a0e4de703] tests/tcg: target/s390x:=
+ Test MVC
+git bisect good 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703
+# good: [88112488cf228df8b7588c8aa38e16ecd0dff48e] qapi: Make check_type()'=
+s array case a bit more obvious
+git bisect good 88112488cf228df8b7588c8aa38e16ecd0dff48e
+# good: [972bd57689f1e11311d86b290134ea2ed9c7c11e] ppc/kvm: Skip writing DP=
+DES back when in run time state
+git bisect good 972bd57689f1e11311d86b290134ea2ed9c7c11e
+# bad: [1aba8716c8335e88b8c358002a6e1ac89f7dd258] ppc/pnv: Remove the XICSF=
+abric Interface from the POWER9 machine
+git bisect bad 1aba8716c8335e88b8c358002a6e1ac89f7dd258
+# bad: [00ed3da9b5c2e66e796a172df3e19545462b9c90] xics: Minor fixes for XIC=
+SFabric interface
+git bisect bad 00ed3da9b5c2e66e796a172df3e19545462b9c90
+# good: [33432d7737b53c92791f90ece5dbe3b7bb1c79f5] target/ppc: introduce se=
+t_dfp{64,128}() helper functions
+git bisect good 33432d7737b53c92791f90ece5dbe3b7bb1c79f5
+# good: [f6d4c423a222f02bfa84a49c3d306d7341ec9bab] target/ppc: remove unnec=
+essary if() around calls to set_dfp{64,128}() in DFP macros
+git bisect good f6d4c423a222f02bfa84a49c3d306d7341ec9bab
+# bad: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT on=
+ ibm,client-architecture-support
+git bisect bad e68cd0cb5cf49d334abe17231a1d2c28b846afa2
+# good: [c4ec08ab70bab90685d1443d6da47293e3aa312a] spapr-pci: Stop providin=
+g assigned-addresses
+git bisect good c4ec08ab70bab90685d1443d6da47293e3aa312a
+# first bad commit: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Rende=
+r full FDT on ibm,client-architecture-support
+
+attached vmxml.
+
+qemu commandline:
+/home/sath/qemu/ppc64-softmmu/qemu-system-ppc64 -name guest=3Dvm1,debug-thr=
+eads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/li=
+bvirt/qemu/domain-19-vm1/master-key.aes -machine pseries-4.2,accel=3Dkvm,us=
+b=3Doff,dump-guest-core=3Doff -m 81920 -overcommit mem-lock=3Doff -smp 512,=
+sockets=3D1,cores=3D128,threads=3D4 -uuid fd4a5d54-0216-490e-82d2-1d4e89683=
+b3d -display none -no-user-config -nodefaults -chardev socket,id=3Dcharmoni=
+tor,fd=3D24,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dco=
+ntrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -device qemu-xhci,id=
+=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
+0,addr=3D0x2 -drive file=3D/home/sath/tests/data/avocado-vt/images/jeos-27-=
+ppc64le_vm1.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device s=
+csi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-scsi=
+0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -netdev ta=
+p,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D27 -device virtio-net-pci,netd=
+ev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:df:24,bus=3Dpci.0,addr=3D0x1 -cha=
+rdev pty,id=3Dcharserial0 -device spapr-vty,chardev=3Dcharserial0,id=3Dseri=
+al0,reg=3D0x30000000 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,a=
+ddr=3D0x4 -M pseries,ic-mode=3Dxics -msg timestamp=3Don
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: kvm powerpcm qemu
+
+** Attachment added: "KVM Guest XML"
+   https://bugs.launchpad.net/bugs/1847440/+attachment/5295817/+files/vm1.x=
+ml
+
+** Summary changed:
+
+- ppc64le: KVM guest fails to boot with an error `virtio_scsi: probe of vir=
+tio1 failed with error -22` on master(98b2e3c9ab3abfe476a2b02f8f51813edb90e=
+72d)
++ ppc64le: KVM guest fails to boot with an error `virtio_scsi: probe of vir=
+tio1 failed with error -22` on master
+
+** Description changed:
+
+- PowerPC KVM Guest fails to boot on current qemu
+- master(98b2e3c9ab3abfe476a2b02f8f51813edb90e72d),
++ PowerPC KVM Guest fails to boot on current qemu master, bad commit:
++ e68cd0cb5cf49d334abe17231a1d2c28b846afa2
+  =
+
+  Env:
+  HW: IBM Power8
+  Host Kernel: 5.4.0-rc2-00038-ge3280b54afed
+  Guest Kernel: 4.13.9-300.fc27.ppc64le
+  Qemu: https://github.com/qemu/qemu.git (master)
+  Libvirt: 5.4.0
+  =
+
+  Guest boot gets stuck:
+  ...
+  [  OK  ] Mounted Kernel Configuration File System.
+  [    7.598740] virtio-pci 0000:00:01.0: enabling device (0000 -> 0003)
+  [    7.598828] virtio-pci 0000:00:01.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.598957] virtio-pci 0000:00:02.0: enabling device (0000 -> 0003)
+  [    7.599017] virtio-pci 0000:00:02.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.599123] virtio-pci 0000:00:04.0: enabling device (0000 -> 0003)
+  [    7.599182] virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.620620] synth uevent: /devices/vio: failed to send uevent
+  [    7.620624] vio vio: uevent: failed to send synthetic uevent
+  [  OK  ] Started udev Coldplug all Devices.
+  [    7.624559] audit: type=3D1130 audit(1570610300.990:5): pid=3D1 uid=3D=
+0 auid=3D4294967295 ses=3D4294967295 subj=3Dkernel msg=3D'unit=3Dsystemd-ud=
+ev-trigger comm=3D"systemd" exe=3D"/usr/lib/systemd/systemd" hostname=3D? a=
+ddr=3D? terminal=3D? res=3Dsuccess'
+  [  OK  ] Reached target System Initialization.
+  [  OK  ] Reached target Basic System.
+  [  OK  ] Reached target Remote File Systems (Pre).
+  [  OK  ] Reached target Remote File Systems.
+  [    7.642961] virtio_scsi: probe of virtio1 failed with error -22
+  [ ***  ] A start job is running for dev-disk=E2=80=A621b3519a80.device (1=
+4s / no limit)
+  ...
+- =
+
+  =
+
+  git bisect, yielded a bad commit
+  [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT on ibm
+  ,client-architecture-support, reverting this commit boot the guest
+  properly.
+  =
+
+  git bisect start
+  # good: [9e06029aea3b2eca1d5261352e695edc1e7d7b8b] Update version for v4.=
+1.0 release
+  git bisect good 9e06029aea3b2eca1d5261352e695edc1e7d7b8b
+  # bad: [98b2e3c9ab3abfe476a2b02f8f51813edb90e72d] Merge remote-tracking b=
+ranch 'remotes/stefanha/tags/block-pull-request' into staging
+  git bisect bad 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d
+  # good: [56e6250ede81b4e4b4ddb623874d6c3cdad4a96d] target/arm: Convert T1=
+6, nop hints
+  git bisect good 56e6250ede81b4e4b4ddb623874d6c3cdad4a96d
+  # good: [5d69cbdfdd5cd6dadc9f0c986899844a0e4de703] tests/tcg: target/s390=
+x: Test MVC
+  git bisect good 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703
+  # good: [88112488cf228df8b7588c8aa38e16ecd0dff48e] qapi: Make check_type(=
+)'s array case a bit more obvious
+  git bisect good 88112488cf228df8b7588c8aa38e16ecd0dff48e
+  # good: [972bd57689f1e11311d86b290134ea2ed9c7c11e] ppc/kvm: Skip writing =
+DPDES back when in run time state
+  git bisect good 972bd57689f1e11311d86b290134ea2ed9c7c11e
+  # bad: [1aba8716c8335e88b8c358002a6e1ac89f7dd258] ppc/pnv: Remove the XIC=
+SFabric Interface from the POWER9 machine
+  git bisect bad 1aba8716c8335e88b8c358002a6e1ac89f7dd258
+  # bad: [00ed3da9b5c2e66e796a172df3e19545462b9c90] xics: Minor fixes for X=
+ICSFabric interface
+  git bisect bad 00ed3da9b5c2e66e796a172df3e19545462b9c90
+  # good: [33432d7737b53c92791f90ece5dbe3b7bb1c79f5] target/ppc: introduce =
+set_dfp{64,128}() helper functions
+  git bisect good 33432d7737b53c92791f90ece5dbe3b7bb1c79f5
+  # good: [f6d4c423a222f02bfa84a49c3d306d7341ec9bab] target/ppc: remove unn=
+ecessary if() around calls to set_dfp{64,128}() in DFP macros
+  git bisect good f6d4c423a222f02bfa84a49c3d306d7341ec9bab
+  # bad: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT =
+on ibm,client-architecture-support
+  git bisect bad e68cd0cb5cf49d334abe17231a1d2c28b846afa2
+  # good: [c4ec08ab70bab90685d1443d6da47293e3aa312a] spapr-pci: Stop provid=
+ing assigned-addresses
+  git bisect good c4ec08ab70bab90685d1443d6da47293e3aa312a
+  # first bad commit: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Ren=
+der full FDT on ibm,client-architecture-support
+  =
+
+- =
+
+  attached vmxml.
+  =
+
+  qemu commandline:
+  /home/sath/qemu/ppc64-softmmu/qemu-system-ppc64 -name guest=3Dvm1,debug-t=
+hreads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/=
+libvirt/qemu/domain-19-vm1/master-key.aes -machine pseries-4.2,accel=3Dkvm,=
+usb=3Doff,dump-guest-core=3Doff -m 81920 -overcommit mem-lock=3Doff -smp 51=
+2,sockets=3D1,cores=3D128,threads=3D4 -uuid fd4a5d54-0216-490e-82d2-1d4e896=
+83b3d -display none -no-user-config -nodefaults -chardev socket,id=3Dcharmo=
+nitor,fd=3D24,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
+control -rtc base=3Dutc -no-shutdown -boot strict=3Don -device qemu-xhci,id=
+=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
+0,addr=3D0x2 -drive file=3D/home/sath/tests/data/avocado-vt/images/jeos-27-=
+ppc64le_vm1.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device s=
+csi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-scsi=
+0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -netdev ta=
+p,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D27 -device virtio-net-pci,netd=
+ev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:df:24,bus=3Dpci.0,addr=3D0x1 -cha=
+rdev pty,id=3Dcharserial0 -device spapr-vty,chardev=3Dcharserial0,id=3Dseri=
+al0,reg=3D0x30000000 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,a=
+ddr=3D0x4 -M pseries,ic-mode=3Dxics -msg timestamp=3Don
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1847440
+
+Title:
+  ppc64le: KVM guest fails to boot with an error `virtio_scsi: probe of
+  virtio1 failed with error -22` on master
+
+Status in QEMU:
+  New
+
+Bug description:
+  PowerPC KVM Guest fails to boot on current qemu master, bad commit:
+  e68cd0cb5cf49d334abe17231a1d2c28b846afa2
+
+  Env:
+  HW: IBM Power8
+  Host Kernel: 5.4.0-rc2-00038-ge3280b54afed
+  Guest Kernel: 4.13.9-300.fc27.ppc64le
+  Qemu: https://github.com/qemu/qemu.git (master)
+  Libvirt: 5.4.0
+
+  Guest boot gets stuck:
+  ...
+  [  OK  ] Mounted Kernel Configuration File System.
+  [    7.598740] virtio-pci 0000:00:01.0: enabling device (0000 -> 0003)
+  [    7.598828] virtio-pci 0000:00:01.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.598957] virtio-pci 0000:00:02.0: enabling device (0000 -> 0003)
+  [    7.599017] virtio-pci 0000:00:02.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.599123] virtio-pci 0000:00:04.0: enabling device (0000 -> 0003)
+  [    7.599182] virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.620620] synth uevent: /devices/vio: failed to send uevent
+  [    7.620624] vio vio: uevent: failed to send synthetic uevent
+  [  OK  ] Started udev Coldplug all Devices.
+  [    7.624559] audit: type=3D1130 audit(1570610300.990:5): pid=3D1 uid=3D=
+0 auid=3D4294967295 ses=3D4294967295 subj=3Dkernel msg=3D'unit=3Dsystemd-ud=
+ev-trigger comm=3D"systemd" exe=3D"/usr/lib/systemd/systemd" hostname=3D? a=
+ddr=3D? terminal=3D? res=3Dsuccess'
+  [  OK  ] Reached target System Initialization.
+  [  OK  ] Reached target Basic System.
+  [  OK  ] Reached target Remote File Systems (Pre).
+  [  OK  ] Reached target Remote File Systems.
+  [    7.642961] virtio_scsi: probe of virtio1 failed with error -22
+  [ ***  ] A start job is running for dev-disk=E2=80=A621b3519a80.device (1=
+4s / no limit)
+  ...
+
+  git bisect, yielded a bad commit
+  [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT on
+  ibm,client-architecture-support, reverting this commit boot the guest
+  properly.
+
+  git bisect start
+  # good: [9e06029aea3b2eca1d5261352e695edc1e7d7b8b] Update version for v4.=
+1.0 release
+  git bisect good 9e06029aea3b2eca1d5261352e695edc1e7d7b8b
+  # bad: [98b2e3c9ab3abfe476a2b02f8f51813edb90e72d] Merge remote-tracking b=
+ranch 'remotes/stefanha/tags/block-pull-request' into staging
+  git bisect bad 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d
+  # good: [56e6250ede81b4e4b4ddb623874d6c3cdad4a96d] target/arm: Convert T1=
+6, nop hints
+  git bisect good 56e6250ede81b4e4b4ddb623874d6c3cdad4a96d
+  # good: [5d69cbdfdd5cd6dadc9f0c986899844a0e4de703] tests/tcg: target/s390=
+x: Test MVC
+  git bisect good 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703
+  # good: [88112488cf228df8b7588c8aa38e16ecd0dff48e] qapi: Make check_type(=
+)'s array case a bit more obvious
+  git bisect good 88112488cf228df8b7588c8aa38e16ecd0dff48e
+  # good: [972bd57689f1e11311d86b290134ea2ed9c7c11e] ppc/kvm: Skip writing =
+DPDES back when in run time state
+  git bisect good 972bd57689f1e11311d86b290134ea2ed9c7c11e
+  # bad: [1aba8716c8335e88b8c358002a6e1ac89f7dd258] ppc/pnv: Remove the XIC=
+SFabric Interface from the POWER9 machine
+  git bisect bad 1aba8716c8335e88b8c358002a6e1ac89f7dd258
+  # bad: [00ed3da9b5c2e66e796a172df3e19545462b9c90] xics: Minor fixes for X=
+ICSFabric interface
+  git bisect bad 00ed3da9b5c2e66e796a172df3e19545462b9c90
+  # good: [33432d7737b53c92791f90ece5dbe3b7bb1c79f5] target/ppc: introduce =
+set_dfp{64,128}() helper functions
+  git bisect good 33432d7737b53c92791f90ece5dbe3b7bb1c79f5
+  # good: [f6d4c423a222f02bfa84a49c3d306d7341ec9bab] target/ppc: remove unn=
+ecessary if() around calls to set_dfp{64,128}() in DFP macros
+  git bisect good f6d4c423a222f02bfa84a49c3d306d7341ec9bab
+  # bad: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT =
+on ibm,client-architecture-support
+  git bisect bad e68cd0cb5cf49d334abe17231a1d2c28b846afa2
+  # good: [c4ec08ab70bab90685d1443d6da47293e3aa312a] spapr-pci: Stop provid=
+ing assigned-addresses
+  git bisect good c4ec08ab70bab90685d1443d6da47293e3aa312a
+  # first bad commit: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Ren=
+der full FDT on ibm,client-architecture-support
+
+  attached vmxml.
+
+  qemu commandline:
+  /home/sath/qemu/ppc64-softmmu/qemu-system-ppc64 -name guest=3Dvm1,debug-t=
+hreads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/=
+libvirt/qemu/domain-19-vm1/master-key.aes -machine pseries-4.2,accel=3Dkvm,=
+usb=3Doff,dump-guest-core=3Doff -m 81920 -overcommit mem-lock=3Doff -smp 51=
+2,sockets=3D1,cores=3D128,threads=3D4 -uuid fd4a5d54-0216-490e-82d2-1d4e896=
+83b3d -display none -no-user-config -nodefaults -chardev socket,id=3Dcharmo=
+nitor,fd=3D24,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
+control -rtc base=3Dutc -no-shutdown -boot strict=3Don -device qemu-xhci,id=
+=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
+0,addr=3D0x2 -drive file=3D/home/sath/tests/data/avocado-vt/images/jeos-27-=
+ppc64le_vm1.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device s=
+csi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-scsi=
+0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -netdev ta=
+p,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D27 -device virtio-net-pci,netd=
+ev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:df:24,bus=3Dpci.0,addr=3D0x1 -cha=
+rdev pty,id=3Dcharserial0 -device spapr-vty,chardev=3Dcharserial0,id=3Dseri=
+al0,reg=3D0x30000000 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,a=
+ddr=3D0x4 -M pseries,ic-mode=3Dxics -msg timestamp=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1847440/+subscriptions
 
