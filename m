@@ -2,84 +2,75 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A070ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17023ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 361FC20B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:23:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KC8R8vOT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 361FC20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DCB5C20B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:24:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCB5C20B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIGcP-0001Ym-8j
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:23:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36106)
+	id 1iIGdP-0002bc-0O
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <beata.michalska@linaro.org>) id 1iIAPm-0001HA-Jp
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 07:46:00 -0400
+ (envelope-from <bounces@canonical.com>) id 1iICbr-0007qa-Lc
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 10:06:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <beata.michalska@linaro.org>) id 1iIAPk-0004BR-GB
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 07:45:58 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:41116)
+ (envelope-from <bounces@canonical.com>) id 1iICbq-0001sI-8c
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 10:06:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36316)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
- id 1iIAPj-000440-Kd
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 07:45:56 -0400
-Received: by mail-io1-xd44.google.com with SMTP id n26so4200112ioj.8
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 04:45:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=RV4BW2Rul1SJvLbGnsvPDgNULkZjIYo7yp+xwh6MfbQ=;
- b=KC8R8vOTKBcfyuI9fRqTnAaEg2TBr9H6W5ltiHVJ8dQyMiWynYetcUr/feR9G7dAAf
- YN1vqmHMRZrHauFjHjhJr+W9B4PsC5tCp+l65DHSOkuoDc4KUOMc6I82ZYQicIFlJynx
- u7r1x1jgs+KzhFQg59WzgBHE82GCKWcChAyUK/SZtOQEyYAzrOC8I++tVA0AVcGeVxEa
- HwXBTyI9fqoIkgorPCu7Tsl3sPamxW7bMhFoHmiIJeu0kLiuiokLwCxmKGZTSDQyWZW/
- 0ms3UxjjSQC0QjiCGM0UDWzoU8aUJ+MEfTQ9RDP+dXmO/xTpvHJ9cx1rknmkX0ndL4JT
- GjHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=RV4BW2Rul1SJvLbGnsvPDgNULkZjIYo7yp+xwh6MfbQ=;
- b=l0vchOF3yNdF3vyAjitkWYprW81fA3JAWZ3+k16leBjQTkQf9IQrh89/gOKQ7cadvp
- HZXZYziAfiSk/MZh+pVSjOlECfpJF2aXGv0oFfWdRtEGqLmYLOQR7nEwiGgRPwyD697A
- FireirM0Tnt62Mor+ke6/N5uw251CMBg//tMJb/tYy9sD6+9o1WgrgahenKY0D8GXZUx
- caEGgsiOtjk+lxE7Ci0mZ5+sSuC4WyBPNs3Tzn5NL4avbu99SwFSsCnucA+Nypqb3hhv
- oGuhCm2s5CMtbmc/lJy0dNfobk3JIUHqk0yD2RS7+52kn2DSuvyZSk5LfDpoIJTlmzwd
- pvvA==
-X-Gm-Message-State: APjAAAVwVbe/kv0bbco0LgX2DOeAU78x+90RkbYHnCF1tN+tq5O94Jt2
- YgcVdibJYUQ7/AdlN1scmKXYdmaWJSl9twtR6hSQNQ==
-X-Google-Smtp-Source: APXvYqzgeJlcbu7KFQ+jnN3mUS0sT1GujuFJYv+FVB7IepQXtX6vg6B+G08i3sE2Nvy/pU1UTh1+FpdM1zwDOOzp498=
-X-Received: by 2002:a92:2406:: with SMTP id k6mr2949553ilk.260.1570621553097; 
- Wed, 09 Oct 2019 04:45:53 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iICbq-0001sD-3L
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 10:06:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iICbo-0007ve-Cn
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 14:06:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5F0012E80CC
+ for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 14:06:32 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190910095610.4546-1-beata.michalska@linaro.org>
- <20190910095610.4546-3-beata.michalska@linaro.org>
- <e5e66d9c-16ee-a700-7608-69ec19c32b47@linaro.org>
-In-Reply-To: <e5e66d9c-16ee-a700-7608-69ec19c32b47@linaro.org>
-From: Beata Michalska <beata.michalska@linaro.org>
-Date: Wed, 9 Oct 2019 12:45:42 +0100
-Message-ID: <CADSWDzsf8=0q0bUH1iLdQ+rNgu3TU2Ee3QddhDZN5nBhH7yDSA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] Memory: Enable writeback for given
- memory region
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 09 Oct 2019 13:54:56 -0000
+From: Stefan Hajnoczi <1842787@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jamespharvey20 stefanha
+X-Launchpad-Bug-Reporter: James Harvey (jamespharvey20)
+X-Launchpad-Bug-Modifier: Stefan Hajnoczi (stefanha)
+References: <156765384458.824.9301349840467221970.malonedeb@wampee.canonical.com>
+Message-Id: <157062929646.22931.7484418076212236317.malone@gac.canonical.com>
+Subject: [Bug 1842787] Re: Writes permanently hang with very heavy I/O on
+ virtio-scsi - worse on virtio-blk
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="af2eefe214bd95389a09b7c956720881bab16807";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 858dc9547d851220d66e863b8754de7c04358b9c
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,32 +79,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, quintela@redhat.com,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- shameerali.kolothum.thodi@huawei.com, qemu-devel@nongnu.org,
- eric.auger@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com
+Reply-To: Bug 1842787 <1842787@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 24 Sep 2019 at 17:30, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 9/10/19 2:56 AM, Beata Michalska wrote:
-> > +void qemu_ram_writeback(RAMBlock *block, ram_addr_t start, ram_addr_t length);
-> > +
-> > +/* Clear whole block of mem */
-> > +#define qemu_ram_block_writeback(rb)    \
-> > +    qemu_ram_writeback(rb, 0, rb->used_length)
-> > +
->
-> Inline function, with its typechecking, is preferred.
->
->
-Noted.
-To be fixed in the next version.
+Thanks for updating us on this issue, which turned out not to be a QEMU
+bug.
 
-BR
-Beata
-> r~
+** Changed in: qemu
+       Status: New =3D> Invalid
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1842787
+
+Title:
+  Writes permanently hang with very heavy I/O on virtio-scsi - worse on
+  virtio-blk
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Up to date Arch Linux on host and guest.  linux 5.2.11.  QEMU 4.1.0.
+  Full command line at bottom.
+
+  Host gives QEMU two thin LVM volumes.  The first is the root
+  filesystem, and the second is for heavy I/O, on a Samsung 970 Evo 1TB.
+
+  When maxing out the I/O on the second virtual block device using
+  virtio-blk, I often get a "lockup" in about an hour or two.  From the
+  advise of iggy in IRC, I switched over to virtio-scsi.  It ran
+  perfectly for a few days, but then "locked up" in the same way.
+
+  By "lockup", I mean writes to the second virtual block device
+  permanently hang.  I can read files from it, but even "touch foo"
+  never times out, cannot be "kill -9"'ed, and is stuck in
+  uninterruptible sleep.
+
+  When this happens, writes to the first virtual block device with the
+  root filesystem are fine, so the O/S itself remains responsive.
+
+  The second virtual block device uses BTRFS.  But, I have also tried
+  XFS and reproduced the issue.
+
+  In guest, when this starts, it starts logging "task X blocked for more
+  than Y seconds".  Below is an example of one of these.  At this point,
+  anything that is or does in the future write to this block device gets
+  stuck in uninterruptible sleep.
+
+  -----
+
+  INFO: task kcompactd:232 blocked for more than 860 seconds.
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Not tained 5.2.11-1 #1
+  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messae.
+  kcompactd0      D    0   232      2 0x80004000
+  Call Trace:
+  =C2=A0? __schedule+0x27f/0x6d0
+  =C2=A0schedule+0x3d/0xc0
+  =C2=A0io_schedule+0x12/0x40
+  =C2=A0__lock_page+0x14a/0x250
+  =C2=A0? add_to_page_cache_lru+0xe0/0xe0
+  =C2=A0migrate_pages+0x803/0xb70
+  =C2=A0? isolate_migratepages_block+0x9f0/0x9f0
+  =C2=A0? __reset_isolation_suitable+0x110/0x110
+  =C2=A0compact_zone+0x6a2/0xd30
+  =C2=A0kcompactd_do_work+0x134/0x260
+  =C2=A0? kvm_clock_read+0x14/0x30
+  =C2=A0? kvm_sched_clock_read+0x5/0x10
+  =C2=A0kcompactd+0xd3/0x220
+  =C2=A0? wait_woken+0x80/0x80
+  =C2=A0kthread+0xfd/0x130
+  =C2=A0? kcompactd_do_work+0x260/0x260
+  =C2=A0? kthread_park+0x80/0x80
+  =C2=A0ret_from_fork+0x35/0x40
+
+  -----
+
+  In guest, there are no other dmesg/journalctl entries other than
+  "task...blocked".
+
+  On host, there are no dmesg/journalctl entries whatsoever.  Everything
+  else in host continues to work fine, including other QEMU VM's on the
+  same underlying SSD (but obviously different lvm volumes.)
+
+  I understand there might not be enough to go on here, and I also
+  understand it's possible this isn't a QEMU bug.  Happy to run given
+  commands or patches to help diagnose what's going on here.
+
+  I'm now running a custom compiled QEMU 4.1.0, with debug symbols, so I
+  can get a meaningful backtrace from the host point of view.
+
+  I've only recently tried this level of I/O, so can't say if this is a
+  new issue.
+
+  When writes are hanging, on host, I can connect to the monitor.
+  Running "info block" shows nothing unusual.
+
+  -----
+
+  /usr/bin/qemu-system-x86_64
+  =C2=A0=C2=A0=C2=A0-name arch,process=3Dqemu:arch
+  =C2=A0=C2=A0=C2=A0-no-user-config
+  =C2=A0=C2=A0=C2=A0-nodefaults
+  =C2=A0=C2=A0=C2=A0-nographic
+  =C2=A0=C2=A0=C2=A0-uuid 0528162b-2371-41d5-b8da-233fe61b6458
+  =C2=A0=C2=A0=C2=A0-pidfile /tmp/0528162b-2371-41d5-b8da-233fe61b6458.pid
+  =C2=A0=C2=A0=C2=A0-machine q35,accel=3Dkvm,vmport=3Doff,dump-guest-core=
+=3Doff
+  =C2=A0=C2=A0=C2=A0-cpu SandyBridge-IBRS
+  =C2=A0=C2=A0=C2=A0-smp cpus=3D24,cores=3D12,threads=3D1,sockets=3D2
+  =C2=A0=C2=A0=C2=A0-m 24G
+  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/usr/sh=
+are/ovmf/x64/OVMF_CODE.fd
+  =C2=A0=C2=A0=C2=A0-drive if=3Dpflash,format=3Draw,readonly,file=3D/var/qe=
+mu/0528162b-2371-41d5-b8da-233fe61b6458.fd
+  =C2=A0=C2=A0=C2=A0-monitor telnet:localhost:8000,server,nowait,nodelay
+  =C2=A0=C2=A0=C2=A0-spice unix,addr=3D/tmp/0528162b-2371-41d5-b8da-233fe61=
+b6458.sock,disable-ticketing
+  =C2=A0=C2=A0=C2=A0-device ioh3420,id=3Dpcie.1,bus=3Dpcie.0,slot=3D0
+  =C2=A0=C2=A0=C2=A0-device virtio-vga,bus=3Dpcie.1,addr=3D0
+  =C2=A0=C2=A0=C2=A0-usbdevice tablet
+  =C2=A0=C2=A0=C2=A0-netdev bridge,id=3Dnetwork0,br=3Dbr0
+  =C2=A0=C2=A0=C2=A0-device virtio-net-pci,netdev=3Dnetwork0,mac=3D02:37:de=
+:79:19:09,bus=3Dpcie.0,addr=3D3
+  =C2=A0=C2=A0=C2=A0-device virtio-scsi-pci,id=3Dscsi1
+  =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd0,file=3D/dev/lvm/arc=
+h_root,if=3Dnone,discard=3Dunmap
+  =C2=A0=C2=A0=C2=A0-device scsi-hd,drive=3Dhd0,bootindex=3D1
+  =C2=A0=C2=A0=C2=A0-drive driver=3Draw,node-name=3Dhd1,file=3D/dev/lvm/arc=
+h_nvme,if=3Dnone,discard=3Dunmap
+  =C2=A0=C2=A0=C2=A0-device scsi-hd,drive=3Dhd1,bootindex=3D2
+
+  -----
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1842787/+subscriptions
 
