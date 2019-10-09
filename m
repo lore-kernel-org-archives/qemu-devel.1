@@ -3,85 +3,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 237B4C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68857C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:13:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF3DC206B6
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:09:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF3DC206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 39900206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:13:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39900206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIJCh-0002gk-KF
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:09:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53982)
+	id 1iIJGt-0007BS-0M
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:13:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58586)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iIHbX-0002PW-6m
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:26:36 -0400
+ (envelope-from <bounces@canonical.com>) id 1iII3e-0005lR-0G
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:55:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iIHbV-00033K-EO
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:26:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50694)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iIHbV-000334-4w
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:26:33 -0400
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0861361D25
- for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 19:26:32 +0000 (UTC)
-Received: by mail-qt1-f200.google.com with SMTP id f15so3179276qth.6
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 12:26:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=cRJfSXhNqcvqJqNZ1LKHHBkk71JEqBnTH1rClqGo4gE=;
- b=SxOA77SjXfTPVsjczcfPMB1sCBwlQokhL6QcnlXGh0GwKM4KM2n5hoYPy6RiA5eFq5
- 6Al1aNvbA7q2B8oh31Ocxt7WngnW+IverTwZnFPMQiuoXdrSfUHAD9XhaeZ9LbxjDG4b
- 3WXf1Cbc3rBBQs+dqQgB5cI/SP70Y8RR7lP11R+mXkf8bSz8D73T7JbDyUCyTQ4Z5hwi
- ghOuZHNX1UZFt2KI6rlW684q/7C0qKK9P5RbJZ1JNTZW2wTT5s0m6toJKyKDsXY8Z1ho
- PIXH8wi/uMdPwnk/ocMMA0Xy+5gID2XAZW3YB7bZb0yx8ke9NaPvCNJ2tg+itv9wPfwZ
- DboA==
-X-Gm-Message-State: APjAAAXW9j066hlqoNIMksMNTxiUbOhoDc7XsnnPJJtT4uaQ3NpculiD
- YVtE0RqjueR8qrQnREWSoMx8KtYqgoyibc22BQVu1VLFX0O3adR4SncZeffbpug/P69ihcajZzA
- PB/lcDDH+4J2BzR0=
-X-Received: by 2002:a37:e50f:: with SMTP id e15mr5358075qkg.192.1570649191241; 
- Wed, 09 Oct 2019 12:26:31 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyIjoeDWVsEsgb5QbDgyFuCbkCVcTcfxKW/L7w1ocOglLe39NIEyVVeWzq0+wGBS3zcAT1lfg==
-X-Received: by 2002:a37:e50f:: with SMTP id e15mr5358053qkg.192.1570649190954; 
- Wed, 09 Oct 2019 12:26:30 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- 63sm1435500qkh.82.2019.10.09.12.26.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Oct 2019 12:26:30 -0700 (PDT)
-Date: Wed, 9 Oct 2019 15:26:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH v7 00/12] Introduce the microvm machine type
-Message-ID: <20191009152542-mutt-send-email-mst@kernel.org>
-References: <20191008135537.197867-1-slp@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iII3b-0006Q4-UH
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:55:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46626)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iII3b-0006PN-Hp
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:55:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iII3a-0008S8-BN
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 19:55:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3BC8E2E80CB
+ for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 19:55:34 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20191008135537.197867-1-slp@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 09 Oct 2019 19:48:38 -0000
+From: Andrew Randrianasulu <1847525@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: andrew-randrianasulu
+X-Launchpad-Bug-Reporter: Andrew Randrianasulu (andrew-randrianasulu)
+X-Launchpad-Bug-Modifier: Andrew Randrianasulu (andrew-randrianasulu)
+References: <157065019192.22617.14242881910317034171.malonedeb@gac.canonical.com>
+Message-Id: <157065051847.22468.13644841711647169251.malone@gac.canonical.com>
+Subject: [Bug 1847525] Re: qemu-system-i386 eats a lot of cpu after just few
+ hours, with sdl, gl=on
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="af2eefe214bd95389a09b7c956720881bab16807";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 7aac556b8317139cf0b8138b72ae0dd94f41cc96
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,145 +78,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org,
- kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
- sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
+Reply-To: Bug 1847525 <1847525@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 08, 2019 at 03:55:26PM +0200, Sergio Lopez wrote:
-> Microvm is a machine type inspired by Firecracker and constructed
-> after the its machine model.
->=20
-> It's a minimalist machine type without PCI nor ACPI support, designed
-> for short-lived guests. Microvm also establishes a baseline for
-> benchmarking and optimizing both QEMU and guest operating systems,
-> since it is optimized for both boot time and footprint.
+Illustration for this bug (link  to screenshot):
 
-Looks good overall. I think coding style needs to
-be fixed but that's a patch on top.
+https://www.imgbin.net/z/9W9eVVvbll.png
 
-series:
+as you hopefully can see, just after less than 6 hrs of guest uptime
+HOST cpu is eaten at 70% by qemu-system-i386 task .. up from just 50%
+two hours ago! By this rate it will not survive even day of uptime....
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+-- =
 
-Paolo I assume you will be merging this?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1847525
 
+Title:
+  qemu-system-i386 eats a lot of cpu after just few hours,  with
+  sdl,gl=3Don
 
-> ---
->=20
-> Changelog
-> v7:
->  - Fix code style issues on already present code touched by this patch
->    series (Michael S. Tsirkin, Philippe Mathieu-Daud=E9)
->  - Add new files to MAINTAINERS (Michael S. Tsirkin, Philippe
->    Mathieu-Daud=E9)
->  - Allow starting a microvm machine without a kernel image, fixing
->    "qom-test" (Michael S. Tsirkin)
->  - Change "bios-microvm.bin" mode to 0644 (Stefano Garzarella)
->  - Remove unneeded "hw/i386/pc.h" include from x86.c (Stefano
->    Garzarella)
->=20
-> v6:
->  - Some style fixes (Philippe Mathieu-Daud=E9)
->  - Fix a documentation bug stating that LAPIC was in userspace (Paolo
->    Bonzini)
->  - Update Xen HVM code after X86MachineState introduction (Philippe
->    Mathieu-Daud=E9)
->  - Rename header guard from QEMU_VIRTIO_MMIO_H to HW_VIRTIO_MMIO_H
->    (Philippe Mathieu-Daud=E9)
->=20
-> v5:
->  - Drop unneeded "[PATCH v4 2/8] hw/i386: Factorize e820 related
->    functions" (Philippe Mathieu-Daud=E9)
->  - Drop unneeded "[PATCH v4 1/8] hw/i386: Factorize PVH related
->    functions" (Stefano Garzarella)
->  - Split X86MachineState introduction into smaller patches (Philippe
->    Mathieu-Daud=E9)
->  - Change option-roms to x-option-roms and kernel-cmdline to
->    auto-kernel-cmdline (Paolo Bonzini)
->  - Make i8259 PIT and i8254 PIC optional (Paolo Bonzini)
->  - Some fixes to the documentation (Paolo Bonzini)
->  - Switch documentation format from txt to rst (Peter Maydell)
->  - Move NMI interface to X86_MACHINE (Philippe Mathieu-Daud=E9, Paolo
->    Bonzini)
->=20
-> v4:
->  - This is a complete rewrite of the whole patchset, with a focus on
->    reusing as much existing code as possible to ease the maintenance bu=
-rden
->    and making the machine type as compatible as possible by default. As
->    a result, the number of lines dedicated specifically to microvm is
->    383 (code lines measured by "cloc") and, with the default
->    configuration, it's now able to boot both PVH ELF images and
->    bzImages with either SeaBIOS or qboot.
->=20
-> v3:
->   - Add initrd support (thanks Stefano).
->=20
-> v2:
->   - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
->   - Simplify machine definition (thanks Eduardo).
->   - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
->   - Add a patch to factorize PVH-related functions.
->   - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
->=20
-> ---
->=20
-> Sergio Lopez (12):
->   hw/virtio: Factorize virtio-mmio headers
->   hw/i386/pc: rename functions shared with non-PC machines
->   hw/i386/pc: fix code style issues on functions that will be moved out
->   hw/i386/pc: move shared x86 functions to x86.c and export them
->   hw/i386: split PCMachineState deriving X86MachineState from it
->   hw/i386: make x86.c independent from PCMachineState
->   fw_cfg: add "modify" functions for all types
->   hw/intc/apic: reject pic ints if isa_pic =3D=3D NULL
->   roms: add microvm-bios (qboot) as binary and git submodule
->   docs/microvm.rst: document the new microvm machine type
->   hw/i386: Introduce the microvm machine type
->   MAINTAINERS: add microvm related files
->=20
->  docs/microvm.rst                 |  98 ++++
->  default-configs/i386-softmmu.mak |   1 +
->  include/hw/i386/microvm.h        |  83 ++++
->  include/hw/i386/pc.h             |  28 +-
->  include/hw/i386/x86.h            |  96 ++++
->  include/hw/nvram/fw_cfg.h        |  42 ++
->  include/hw/virtio/virtio-mmio.h  |  73 +++
->  hw/acpi/cpu_hotplug.c            |  10 +-
->  hw/i386/acpi-build.c             |  29 +-
->  hw/i386/amd_iommu.c              |   3 +-
->  hw/i386/intel_iommu.c            |   3 +-
->  hw/i386/microvm.c                | 572 ++++++++++++++++++++++
->  hw/i386/pc.c                     | 781 +++---------------------------
->  hw/i386/pc_piix.c                |  46 +-
->  hw/i386/pc_q35.c                 |  38 +-
->  hw/i386/pc_sysfw.c               |  60 +--
->  hw/i386/x86.c                    | 795 +++++++++++++++++++++++++++++++
->  hw/i386/xen/xen-hvm.c            |  28 +-
->  hw/intc/apic.c                   |   2 +-
->  hw/intc/ioapic.c                 |   2 +-
->  hw/nvram/fw_cfg.c                |  29 ++
->  hw/virtio/virtio-mmio.c          |  48 +-
->  .gitmodules                      |   3 +
->  MAINTAINERS                      |  10 +
->  hw/i386/Kconfig                  |   4 +
->  hw/i386/Makefile.objs            |   2 +
->  pc-bios/bios-microvm.bin         | Bin 0 -> 65536 bytes
->  roms/Makefile                    |   6 +
->  roms/qboot                       |   1 +
->  29 files changed, 1982 insertions(+), 911 deletions(-)
->  create mode 100644 docs/microvm.rst
->  create mode 100644 include/hw/i386/microvm.h
->  create mode 100644 include/hw/i386/x86.h
->  create mode 100644 include/hw/virtio/virtio-mmio.h
->  create mode 100644 hw/i386/microvm.c
->  create mode 100644 hw/i386/x86.c
->  create mode 100644 pc-bios/bios-microvm.bin
->  create mode 160000 roms/qboot
->=20
-> --=20
-> 2.21.0
+Status in QEMU:
+  New
+
+Bug description:
+  I already send this email to qemu-discuss@nongnu.org , but I can't see
+  it arriving in archives, so here  is copy.
+
+  Hello, all!
+
+  I use qemu-system-i386/qemu-system_x86_64 for rebuilding Slax-like live c=
+d/dvd.
+  Usually guests (with various self-compiled kernels and X stack with kde3 =
+on top of them)
+  boot up normally, but if I left them to run in GUI mode for few hours - q=
+emu process on host
+  started to eat more and more cpu for itself - more notiecable if I set ho=
+st cpu to lowest possible
+  frequency via trayfreq applet (1400Mhz in my case).
+
+  Boot line a bit complicated, but I really prefer to have sound and usb in=
+side VM.
+  qemu-system-i386 -cdrom /dev/shm/CDROM-4.4.194_5.iso -m 1.9G -enable-kvm =
+-soundhw es1370 -smp 2 -display sdl,gl=3Don -usb -cpu host -rtc clock=3Dvm
+
+  rtc clock=3Dvm was taken from https://bugs.launchpad.net/qemu/+bug/117465=
+4 but apparently not helping.
+  After just 3 hours of uptime (copied line from 'top' on host)
+
+  31943 guest     20   0 2412m 791m  38m R   51  6.7  66:36.51 qemu-
+  system-i38
+
+  I use Xorg 1.19.7 on host, with mesa git/nouveau as GL driver. But my car=
+d has not very big amount of VRAM - only 384Mb.
+  May be this limitation is playing some role .. but 'end-user' result was =
+after 1-2 day of guest uptime I run into completely frozen guest =
+
+  (may be when qemu was hitting 100 one core usage on host some internal ti=
+mer just made guest kernel too upset/froze?
+   I was sleeping or doing other things on host  for all this time, with VM=
+ just supposedly running at another virtual desktop - =
+
+  in KDE3 + built-in compositor ....)
+
+  I wonder if more mainstream desktop users (on GNOME, Xfce, etc) and/or us=
+ers of other distros (I use self-re-compiled Slackware)
+  actually can see same problem?
+
+  qemu-system-i386 --version
+  QEMU emulator version 4.1.50 (v4.1.0-1188-gc6f5012ba5-dirty)
+  but I saw same behavior for quite some time .. just never reported it in =
+hope it will go away.
+
+  cat /proc/cpuinfo
+  processor       : 0
+  vendor_id       : AuthenticAMD
+  cpu family      : 21
+  model           : 2
+  model name      : AMD FX(tm)-4300 Quad-Core Processor
+  stepping        : 0
+  microcode       : 0x6000852
+  cpu MHz         : 1399.977
+  cache size      : 2048 KB
+  physical id     : 0
+  siblings        : 4
+  core id         : 0
+  cpu cores       : 2
+  apicid          : 16
+  initial apicid  : 0
+  fpu             : yes
+  fpu_exception   : yes
+  cpuid level     : 13
+  wp              : yes
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mc=
+a cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pd=
+pe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid ap=
+erfmperf pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsav=
+e avx f16c lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse =
+3dnowprefetch osvw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext p=
+erfctr_core perfctr_nb cpb hw_pstate ssbd vmmcall bmi1 arat npt lbrv svm_lo=
+ck nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pft=
+hreshold
+  bugs            : fxsave_leak sysret_ss_attrs null_seg spectre_v1 spectre=
+_v2 spec_store_bypass
+  bogomips        : 7600.06
+  TLB size        : 1536 4K pages
+  clflush size    : 64
+  cache_alignment : 64
+  address sizes   : 48 bits physical, 48 bits virtual
+  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
+
+  [and 3x more of the same, for 3 remaining cores]
+
+  Gcc is Slackware 14.2's gcc 5.5.0, but I saw this with 4.9.2 too.
+  This might be 32-bit host problem. But may be just no-one tried to run qe=
+mu with GUI guest for literaly days?
+
+  Host kernel is
+   uname -a
+  Linux slax 5.1.12-x64 #1 SMP PREEMPT Wed Jun 19 12:31:05 MSK 2019 x86_64 =
+AMD FX(tm)-4300 Quad-Core Processor AuthenticAMD GNU/Linux
+
+  I was trying newish 5.3.2 but my compilation was not as stable as this on=
+e =
+
+  (I tend to change few things, like max cpu count, preemption mode, numa s=
+upport .... =
+
+  for more distribution-like, yet most stable  and performant for me kernel)
+
+  Kernel world is moving fast, so I'll try to recompile new 5.3.x too
+  ....
+
+  =
+
+  I guess I  should provide perf/profiler output, but for  this I need to r=
+ecompile qemu. =
+
+  I'll try to come back with more details soon.
+
+  Thanks for your attention and possible feedback!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1847525/+subscriptions
 
