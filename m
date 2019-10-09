@@ -7,59 +7,58 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 742CFC47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 582FEC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:31:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EF9520B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:29:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19891206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:31:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BD8zsfyJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EF9520B7C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Fw0PgFZT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19891206BB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIEqT-00017A-Rt
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:29:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60392)
+	id 1iIEs5-0002Lb-HA
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:31:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iI59d-0001cI-3R
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:58 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iI59E-0001XW-73
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iI59b-000707-Uq
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:57 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:45821 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iI59B-0006VJ-2s
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:31 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:53977 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iI59b-0006aJ-JZ; Wed, 09 Oct 2019 02:08:55 -0400
+ id 1iI59A-0006PI-Mw; Wed, 09 Oct 2019 02:08:29 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46p3gG2hDYz9sRW; Wed,  9 Oct 2019 17:08:26 +1100 (AEDT)
+ id 46p3gD2gkkz9sPf; Wed,  9 Oct 2019 17:08:24 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570601306;
- bh=P19XTnLDc5zaBQFC5rg5tlmv5YglHHtbZRWyyk9OMWw=;
+ d=gibson.dropbear.id.au; s=201602; t=1570601304;
+ bh=bDJ+lL6U7/EjRyMJMnAmLePHj2/5rsdcdvyY0UDu9xU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=BD8zsfyJoFG9xUBavxd6Ba6ezZv8GfJta6rGmlRFgMzopoY+RkLw4OXk0LA1jWAwX
- YaDahK1VPYebg0KVw4xEwAmLPWIdJXIeCCeu8q8kjhQuIj84Lwo3OCS2kGR7GLBWyn
- L0/OmuZAosCmkdQpYQiGis2vWcYTLjO8zQId+6TI=
+ b=Fw0PgFZTguwK62yr30BqolDZx60aWG9qPkcfW8zi8krI8c0gMkNagxYwT6moZ4hrl
+ luqsxymGe7P7OIlajDZk+XQJE8cIBXWBd/ec5Aw7eZWZre61RbiWSbbkXA+mW/Ba3m
+ NTHb9uPRXRli1uZxHRIzsWKf71xEuj8zK/3pvO1Y=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org,
 	clg@kaod.org,
 	qemu-ppc@nongnu.org
-Subject: [PATCH v4 19/19] spapr: Work around spurious warnings from vfio INTx
- initialization
-Date: Wed,  9 Oct 2019 17:08:18 +1100
-Message-Id: <20191009060818.29719-20-david@gibson.dropbear.id.au>
+Subject: [PATCH v4 03/19] target/ppc: Fix for optimized vsl/vsr instructions
+Date: Wed,  9 Oct 2019 17:08:02 +1100
+Message-Id: <20191009060818.29719-4-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191009060818.29719-1-david@gibson.dropbear.id.au>
 References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,75 +70,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Jason Wang <jasowang@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>, groug@kaod.org,
+Cc: Stefan Brankovic <stefan.brankovic@rt-rk.com>,
+ Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, groug@kaod.org,
  Laurent Vivier <laurent@vivier.eu>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "Paul A. Clark" <pc@us.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Traditional PCI INTx for vfio devices can only perform well if using
-an in-kernel irqchip.  Therefore, vfio_intx_update() issues a warning
-if an in kernel irqchip is not available.
+From: Stefan Brankovic <stefan.brankovic@rt-rk.com>
 
-We usually do have an in-kernel irqchip available for pseries machines
-on POWER hosts.  However, because the platform allows feature
-negotiation of what interrupt controller model to use, we don't
-currently initialize it until machine reset.  vfio_intx_update() is
-called (first) from vfio_realize() before that, so it can issue a
-spurious warning, even if we will have an in kernel irqchip by the
-time we need it.
+In previous implementation, invocation of TCG shift function could reques=
+t
+shift of TCG variable by 64 bits when variable 'sh' is 0, which is not
+supported in TCG (values can be shifted by 0 to 63 bits). This patch fixe=
+s
+this by using two separate invocation of TCG shift functions, with maximu=
+m
+shift amount of 32.
 
-To workaround this, make a call to spapr_irq_update_active_intc() from
-spapr_irq_init() which is called at machine realize time, before the
-vfio realize.  This call will be pretty much obsoleted by the later
-call at reset time, but it serves to suppress the spurious warning
-from VFIO.
+Name of variable 'shifted' is changed to 'carry' so variable naming
+is similar to old helper implementation.
 
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+Variables 'avrA' and 'avrB' are replaced with variable 'avr'.
 
+Fixes: 4e6d0920e7547e6af4bbac5ffe9adfe6ea621822
+Reported-by: "Paul A. Clark" <pc@us.ibm.com>
+Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Suggested-by: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Signed-off-by: Stefan Brankovic <stefan.brankovic@rt-rk.com>
+Message-Id: <1570196639-7025-2-git-send-email-stefan.brankovic@rt-rk.com>
+Tested-by: Paul A. Clarke  <pc@us.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_irq.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ target/ppc/translate/vmx-impl.inc.c | 84 ++++++++++++++---------------
+ 1 file changed, 40 insertions(+), 44 deletions(-)
 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 7964e4a1b8..3aeb523f3e 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -274,6 +274,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Error =
-**errp)
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+index 2472a5217a..81d5a7a341 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -590,40 +590,38 @@ static void trans_vsl(DisasContext *ctx)
+     int VT =3D rD(ctx->opcode);
+     int VA =3D rA(ctx->opcode);
+     int VB =3D rB(ctx->opcode);
+-    TCGv_i64 avrA =3D tcg_temp_new_i64();
+-    TCGv_i64 avrB =3D tcg_temp_new_i64();
++    TCGv_i64 avr =3D tcg_temp_new_i64();
+     TCGv_i64 sh =3D tcg_temp_new_i64();
+-    TCGv_i64 shifted =3D tcg_temp_new_i64();
++    TCGv_i64 carry =3D tcg_temp_new_i64();
+     TCGv_i64 tmp =3D tcg_temp_new_i64();
 =20
-     spapr->qirqs =3D qemu_allocate_irqs(spapr_set_irq, spapr,
-                                       smc->nr_xirqs + SPAPR_XIRQ_BASE);
-+
-+    /*
-+     * Mostly we don't actually need this until reset, except that not
-+     * having this set up can cause VFIO devices to issue a
-+     * false-positive warning during realize(), because they don't yet
-+     * have an in-kernel irq chip.
-+     */
-+    spapr_irq_update_active_intc(spapr);
+-    /* Place bits 125-127 of vB in sh. */
+-    get_avr64(avrB, VB, false);
+-    tcg_gen_andi_i64(sh, avrB, 0x07ULL);
++    /* Place bits 125-127 of vB in 'sh'. */
++    get_avr64(avr, VB, false);
++    tcg_gen_andi_i64(sh, avr, 0x07ULL);
+=20
+     /*
+-     * Save highest sh bits of lower doubleword element of vA in variabl=
+e
+-     * shifted and perform shift on lower doubleword.
++     * Save highest 'sh' bits of lower doubleword element of vA in varia=
+ble
++     * 'carry' and perform shift on lower doubleword.
+      */
+-    get_avr64(avrA, VA, false);
+-    tcg_gen_subfi_i64(tmp, 64, sh);
+-    tcg_gen_shr_i64(shifted, avrA, tmp);
+-    tcg_gen_andi_i64(shifted, shifted, 0x7fULL);
+-    tcg_gen_shl_i64(avrA, avrA, sh);
+-    set_avr64(VT, avrA, false);
++    get_avr64(avr, VA, false);
++    tcg_gen_subfi_i64(tmp, 32, sh);
++    tcg_gen_shri_i64(carry, avr, 32);
++    tcg_gen_shr_i64(carry, carry, tmp);
++    tcg_gen_shl_i64(avr, avr, sh);
++    set_avr64(VT, avr, false);
+=20
+     /*
+      * Perform shift on higher doubleword element of vA and replace lowe=
+st
+-     * sh bits with shifted.
++     * 'sh' bits with 'carry'.
+      */
+-    get_avr64(avrA, VA, true);
+-    tcg_gen_shl_i64(avrA, avrA, sh);
+-    tcg_gen_or_i64(avrA, avrA, shifted);
+-    set_avr64(VT, avrA, true);
++    get_avr64(avr, VA, true);
++    tcg_gen_shl_i64(avr, avr, sh);
++    tcg_gen_or_i64(avr, avr, carry);
++    set_avr64(VT, avr, true);
+=20
+-    tcg_temp_free_i64(avrA);
+-    tcg_temp_free_i64(avrB);
++    tcg_temp_free_i64(avr);
+     tcg_temp_free_i64(sh);
+-    tcg_temp_free_i64(shifted);
++    tcg_temp_free_i64(carry);
+     tcg_temp_free_i64(tmp);
  }
 =20
- int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error *=
-*errp)
-@@ -429,7 +437,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *=
-spapr)
-          * this.
-          */
-         new_intc =3D SPAPR_INTC(spapr->xive);
--    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-+    } else if (spapr->ov5_cas
-+               && spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-         new_intc =3D SPAPR_INTC(spapr->xive);
-     } else {
-         new_intc =3D SPAPR_INTC(spapr->ics);
+@@ -639,39 +637,37 @@ static void trans_vsr(DisasContext *ctx)
+     int VT =3D rD(ctx->opcode);
+     int VA =3D rA(ctx->opcode);
+     int VB =3D rB(ctx->opcode);
+-    TCGv_i64 avrA =3D tcg_temp_new_i64();
+-    TCGv_i64 avrB =3D tcg_temp_new_i64();
++    TCGv_i64 avr =3D tcg_temp_new_i64();
+     TCGv_i64 sh =3D tcg_temp_new_i64();
+-    TCGv_i64 shifted =3D tcg_temp_new_i64();
++    TCGv_i64 carry =3D tcg_temp_new_i64();
+     TCGv_i64 tmp =3D tcg_temp_new_i64();
+=20
+-    /* Place bits 125-127 of vB in sh. */
+-    get_avr64(avrB, VB, false);
+-    tcg_gen_andi_i64(sh, avrB, 0x07ULL);
++    /* Place bits 125-127 of vB in 'sh'. */
++    get_avr64(avr, VB, false);
++    tcg_gen_andi_i64(sh, avr, 0x07ULL);
+=20
+     /*
+-     * Save lowest sh bits of higher doubleword element of vA in variabl=
+e
+-     * shifted and perform shift on higher doubleword.
++     * Save lowest 'sh' bits of higher doubleword element of vA in varia=
+ble
++     * 'carry' and perform shift on higher doubleword.
+      */
+-    get_avr64(avrA, VA, true);
+-    tcg_gen_subfi_i64(tmp, 64, sh);
+-    tcg_gen_shl_i64(shifted, avrA, tmp);
+-    tcg_gen_andi_i64(shifted, shifted, 0xfe00000000000000ULL);
+-    tcg_gen_shr_i64(avrA, avrA, sh);
+-    set_avr64(VT, avrA, true);
++    get_avr64(avr, VA, true);
++    tcg_gen_subfi_i64(tmp, 32, sh);
++    tcg_gen_shli_i64(carry, avr, 32);
++    tcg_gen_shl_i64(carry, carry, tmp);
++    tcg_gen_shr_i64(avr, avr, sh);
++    set_avr64(VT, avr, true);
+     /*
+      * Perform shift on lower doubleword element of vA and replace highe=
+st
+-     * sh bits with shifted.
++     * 'sh' bits with 'carry'.
+      */
+-    get_avr64(avrA, VA, false);
+-    tcg_gen_shr_i64(avrA, avrA, sh);
+-    tcg_gen_or_i64(avrA, avrA, shifted);
+-    set_avr64(VT, avrA, false);
++    get_avr64(avr, VA, false);
++    tcg_gen_shr_i64(avr, avr, sh);
++    tcg_gen_or_i64(avr, avr, carry);
++    set_avr64(VT, avr, false);
+=20
+-    tcg_temp_free_i64(avrA);
+-    tcg_temp_free_i64(avrB);
++    tcg_temp_free_i64(avr);
+     tcg_temp_free_i64(sh);
+-    tcg_temp_free_i64(shifted);
++    tcg_temp_free_i64(carry);
+     tcg_temp_free_i64(tmp);
+ }
+=20
 --=20
 2.21.0
 
