@@ -2,67 +2,91 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 368EDC47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A685ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:33:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B841206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:28:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B841206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6953320B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:33:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WNemTB8u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6953320B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIIZb-0004AQ-Lj
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 16:28:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50758)
+	id 1iIIec-0000kr-5l
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 16:33:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iIHLx-0002vx-Ol
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:10:30 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iIG1x-0003yu-IV
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 13:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iIHLs-0002lr-Gz
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:10:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58042)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1iIHLk-0002hU-40; Wed, 09 Oct 2019 15:10:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E3E12769E1;
- Wed,  9 Oct 2019 19:10:13 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 291CC60167;
- Wed,  9 Oct 2019 19:09:56 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6B58F1138619; Wed,  9 Oct 2019 21:09:39 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v4 04/31] error: auto propagated local_err
-References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
- <20191001155319.8066-5-vsementsov@virtuozzo.com>
- <87r23m8hvb.fsf@dusky.pond.sub.org>
- <b330f111-4e71-c3a6-4484-22dd25906b55@virtuozzo.com>
-Date: Wed, 09 Oct 2019 21:09:39 +0200
-In-Reply-To: <b330f111-4e71-c3a6-4484-22dd25906b55@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Wed, 9 Oct 2019 08:17:44 +0000")
-Message-ID: <87a7a9zqfg.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1iIG1v-0006IM-Sf
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 13:45:45 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:56014)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iIG1v-0006Gh-7q
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 13:45:43 -0400
+Received: by mail-wm1-x344.google.com with SMTP id a6so3554039wma.5
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 10:45:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=yvzTtE61LlSGrYWSiYlzQrdkE1Q+mKQ77cfhNLNMlug=;
+ b=WNemTB8uVXHwNv392rTJ7LxGFk3ZbtgGNQdi/8M83/zcGK5BRjBEdK6JlKMitsdAQa
+ 3T03Rn/BhrrOTdnthk+v5PoNsP5KdhS3hkrrwR//bkv1wxFXLsAVg9VBC5FFqd1cCHpi
+ R6LZqM6RyDZ1TxiWqckQYCGCmUyxz7gTSoN5cgKraty3c1tdnF0+WJ0CZ4O7UtpSCUpu
+ udo+QIHdYDc6eON86hoUEFLKmUjIbni0vSQ2OlcL3iEbi5T+6XMTFCyy1kV+H1wu7RI7
+ epWIC4NPTYqcoLc1jpKRsyyGfae5pDT/a3VEbe82RIfHkDiKOuIIxoKaL1HQOu1vSUHG
+ ronA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=yvzTtE61LlSGrYWSiYlzQrdkE1Q+mKQ77cfhNLNMlug=;
+ b=gxOkJY4RvbOZhX18i17hhMNrXtW9e3QLhcKmPy8meTgTnEXvbDZDBjCKzehYzPf+x4
+ qCKPPecn+kzNOx32NYVNT5DiM2RUPVtsvsROw+WK7+bHuuQYdTDaav4veyQz2OnbQ49d
+ 3TMWURgtsvMuEnqwalXcI1Rl8+UU3wSRvBCn/Ek+gJqscX/80zmD0V/WZFYlFgg5/5pg
+ VuuWyttnguz+s6TjMx7rMM+oyo6XNYZovjr4G15bk+aHmZXKw6VlctWcuBhCA+51XjRN
+ 9Xq4CuAjIEnNjktmiAOZxtIIuT04eG2Tm8BNcV1u3CRF6xEkWZEVOkyO0i0jguqXcDpk
+ SvkQ==
+X-Gm-Message-State: APjAAAUIYE4+h8hCcuCkZCw6hBbzpPEGMeVr4wotA0miFoyXMkPurUVz
+ HEcWbbMIDjIdPa0sYthSpsSbPA==
+X-Google-Smtp-Source: APXvYqzaUiGbDcKHLy2IbOHAH7wFSSRSxTofbK80k7hfpwyCFFWKjpwFMss4wwUWAHT5BQH1kItaSA==
+X-Received: by 2002:a05:600c:218e:: with SMTP id
+ e14mr3659127wme.60.1570643138885; 
+ Wed, 09 Oct 2019 10:45:38 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 90sm4264847wrr.1.2019.10.09.10.45.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 09 Oct 2019 10:45:37 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F19EC1FF87;
+ Wed,  9 Oct 2019 18:45:36 +0100 (BST)
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
+ <20190731160719.11396-25-alex.bennee@linaro.org>
+ <20190801141431.GK5034@quinoa.localdomain>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+Subject: Re: [PATCH v4 24/54] plugins: implement helpers for resolving hwaddr
+In-reply-to: <20190801141431.GK5034@quinoa.localdomain>
+Date: Wed, 09 Oct 2019 18:45:36 +0100
+Message-ID: <877e5dn77j.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Wed, 09 Oct 2019 19:10:14 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,95 +98,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "pburton@wavecomp.com" <pburton@wavecomp.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "codyprime@gmail.com" <codyprime@gmail.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "mark.cave-ayland@ilande.co.uk" <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "sundeep.lkml@gmail.com" <sundeep.lkml@gmail.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "arikalo@wavecomp.com" <arikalo@wavecomp.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
- "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
- "joel@jms.id.au" <joel@jms.id.au>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>,
- "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "sw@weilnetz.de" <sw@weilnetz.de>,
- "groug@kaod.org" <groug@kaod.org>,
- "yuval.shaia@oracle.com" <yuval.shaia@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "clg@kaod.org" <clg@kaod.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "david@redhat.com" <david@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
- "kwolf@redhat.com" <kwolf@redhat.com>,
- "integration@gluster.org" <integration@gluster.org>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "andrew@aj.id.au" <andrew@aj.id.au>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "bobby.prani@gmail.com" <bobby.prani@gmail.com>,
+ "cota@braap.org" <cota@braap.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard
+ Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-> 09.10.2019 11:04, Markus Armbruster wrote:
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->> 
->>> Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
->>> functions with errp OUT parameter.
->>>
->>> It has three goals:
->>>
->>> 1. Fix issue with error_fatal & error_prepend/error_append_hint: user
->>> can't see this additional information, because exit() happens in
->>> error_setg earlier than information is added. [Reported by Greg Kurz]
->> 
->> Done in PATCH 07-31.
->> 
->>> 2. Fix issue with error_abort & error_propagate: when we wrap
->>> error_abort by local_err+error_propagate, resulting coredump will
->>> refer to error_propagate and not to the place where error happened.
->>> (the macro itself doesn't fix the issue, but it allows to [3.] drop all
->>> local_err+error_propagate pattern, which will definitely fix the issue)
->>> [Reported by Kevin Wolf]
->>>
->>> 3. Drop local_err+error_propagate pattern, which is used to workaround
->>> void functions with errp parameter, when caller wants to know resulting
->>> status. (Note: actually these functions could be merely updated to
->>> return int error code).
->> 
->> Not done.  Can you prototype this part?  A few manually done examples
->> would give us an idea how the complete solution would look like.  A
->> (semi-)automated complete conversion of a subsystem would additionally
->> give us an idea how to actually do the conversion.
->> 
->> We can discuss applying ERRP_AUTO_PROPAGATE() as a bug fix for 1., and
->> leave 2. and 3. for later.  Feels like a half-done job to me.  We've got
->> too many of those in the tree already.  Dunno.
->> 
->
-> If update everything it's about 90-140 patches.
->
-> The whole thing was done in "[RFC v2 0/9] error: auto propagated local_err"
-> <20190923161231.22028-1-vsementsov@virtuozzo.com>
-> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg05157.html
->
-> - it was so huge, that I decided to postpone 2 and 3...
+Aaron Lindsay OS <aaron@os.amperecomputing.com> writes:
 
-Suggest to post unsplit patches as RFC.  This lets us see how the macro
-gets used, and can also help us decide on a sensible split.  The
-automatic split isn't quite right in places, and feels excessively
-fine-grained to me.
+> On Jul 31 17:06, Alex Benn=C3=A9e wrote:
+>> We need to keep a local per-cpu copy of the data as other threads may
+>> be running. We use a automatically growing array and re-use the space
+>> for subsequent queries.
+>
+> [...]
+>
+>> +bool tlb_plugin_lookup(CPUState *cpu, target_ulong addr, int mmu_idx,
+>> +                       bool is_store, struct qemu_plugin_hwaddr *data)
+>> +{
+>> +    CPUArchState *env =3D cpu->env_ptr;
+>> +    CPUTLBEntry *tlbe =3D tlb_entry(env, mmu_idx, addr);
+>> +    target_ulong tlb_addr =3D is_store ? tlb_addr_write(tlbe) : tlbe->a=
+ddr_read;
+>> +
+>> +    if (tlb_hit(tlb_addr, addr)) {
+>> +        if (tlb_addr & TLB_MMIO) {
+>> +            data->hostaddr =3D 0;
+>> +            data->is_io =3D true;
+>> +            /* XXX: lookup device */
+>> +        } else {
+>> +            data->hostaddr =3D addr + tlbe->addend;
+>> +            data->is_io =3D false;
+>> +        }
+>> +        return true;
+>> +    }
+>> +    return false;
+>> +}
+>
+> In what cases do you expect tlb_hit() should not evaluate to true here?
+> Will returns of false only be in error cases, or do you expect it can
+> occur during normal operation? In particular, I'm interested in ensuring
+> this is as reliable as possible, since some plugins may require physical
+> addresses.
+
+Only if the API is misused and a call made outside of the hooked memory
+operation. An assert would be too strong as the plugin could then bring
+down QEMU - I guess we could use some sort of error_report...
+
+>
+>> +struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t=
+ info,
+>> +                                                  uint64_t vaddr)
+>> +{
+>> +    CPUState *cpu =3D current_cpu;
+>> +    unsigned int mmu_idx =3D info >> TRACE_MEM_MMU_SHIFT;
+>> +    struct qemu_plugin_hwaddr *hwaddr;
+>> +
+>> +    /* Ensure we have memory allocated for this work */
+>> +    if (!hwaddr_refs) {
+>> +        hwaddr_refs =3D g_array_sized_new(false, true,
+>> +                                        sizeof(struct qemu_plugin_hwadd=
+r),
+>> +                                        cpu->cpu_index + 1);
+>> +    } else if (cpu->cpu_index >=3D hwaddr_refs->len) {
+>> +        hwaddr_refs =3D g_array_set_size(hwaddr_refs, cpu->cpu_index + =
+1);
+>> +    }
+>
+> Are there one or more race conditions with the allocations here? If so,
+> could they be solved by doing the allocations at plugin initialization
+> and when the number of online cpu's changes, instead of lazily?
+
+It might be easier to just keep a __thread local array here and let TLS
+deal with it.
+
+--
+Alex Benn=C3=A9e
 
