@@ -2,81 +2,62 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 984D1C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50208C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:20:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D87D206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:19:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D87D206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1BC2B206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:20:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PkG95pcw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BC2B206BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIFc5-0007TM-56
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:19:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33708)
+	id 1iIFdb-0000eY-Lj
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:20:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iI5TC-0003aC-Pn
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:29:11 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iI7rR-0001r4-Nf
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:02:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iI5TA-0000cv-Jj
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:29:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39868)
+ (envelope-from <dgibson@ozlabs.org>) id 1iI7rQ-0000jf-Kt
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:02:21 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:52453 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iI5TA-0000YF-An
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:29:08 -0400
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 52631C004E8D
- for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 06:29:06 +0000 (UTC)
-Received: by mail-pf1-f200.google.com with SMTP id b13so1113427pfp.6
- for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 23:29:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=5MC/xpOVeO48b6oFuZVrop2DdqL+1eMShZ/UYESNK3c=;
- b=RuQ6ZN2FsXg+2C+gZBM3F4atZ58/VzzaCr1uwIDW2tjQIVImoLeL9njPFnVZN9QxY7
- MmfdPtFkjh/FMmSLKxsyw3U1U7HU3AXuz4kA+TDczG0pAsY+k+eOf3VcLWHt9OLOkixw
- DOrH9VdxMqJGoZMAymAccnV3lTWkl8DanN1hQBFZcxE6s8jUgU9i5Kzf26tOqhg0h8m8
- 3kkMzFYYPf6JcO8pSHCpln/g5AYQQIDskvLCXlP6sp6l2Pj7AaZTXUFcwcn24o2BUBQM
- voAuTEPxknmUfg9jgK2RaKDPsECemcWgRD6EwbW23USwrd9od2S1wx1rCI5zEWq0J8su
- W4sA==
-X-Gm-Message-State: APjAAAXBqjssDah78ot2S44q7NrsSz6pBwl9fAja5+gxOa08Rp3BUGii
- flY8g5q7c8VpP8xs/N6YhXAMZMYvviyuNEy/CVOJFHq5cpKAthglwejAV9eeaKC8f3Xr63WtBbx
- VTDmpihw8Ioix41o=
-X-Received: by 2002:a62:3441:: with SMTP id b62mr2056526pfa.12.1570602545690; 
- Tue, 08 Oct 2019 23:29:05 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqzVjsJgR6qN7WADec/Z0SLYVrBWhXr7sjrmz3ltEy1nB8F9VSzDJEZVxVK9sswQxutbT1Sa3A==
-X-Received: by 2002:a62:3441:: with SMTP id b62mr2056511pfa.12.1570602545403; 
- Tue, 08 Oct 2019 23:29:05 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id c11sm1599271pfj.114.2019.10.08.23.29.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Oct 2019 23:29:04 -0700 (PDT)
-Date: Wed, 9 Oct 2019 14:28:53 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v3] migration: Support gtree migration
-Message-ID: <20191009062852.GB1039@xz-x1>
-References: <20191004112025.28868-1-eric.auger@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iI7rQ-0000j7-9A; Wed, 09 Oct 2019 05:02:20 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46p7Wr3Svnz9sP7; Wed,  9 Oct 2019 20:02:16 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1570611736;
+ bh=w9U73fyFQTNRy938ES9lJPp54ztiGLkLXXWNEPCMDXQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=PkG95pcw9TAknX3hl4q2eCBoKdI31LJS54GOp6aj4vM/yXKFi9CFiy4lDFMru3d/O
+ oailfSLjWz2qzxIiBXQ4KbRNeyCf3eBFjyLycMFgV3I6B6EuPZRRem5RuUvMNNiFyA
+ og6V2DB8E1ttgIshcCCMA1qi9X9EOrDNFH/kxerQ=
+Date: Wed, 9 Oct 2019 20:02:00 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org, clg@kaod.org, qemu-ppc@nongnu.org
+Subject: Re: [PATCH v4 00/19] spapr: IRQ subsystem cleanup
+Message-ID: <20191009090200.GF5035@umbus.fritz.box>
+References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lIrNkN/7tmsD/ALM"
 Content-Disposition: inline
-In-Reply-To: <20191004112025.28868-1-eric.auger@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20191009060818.29719-1-david@gibson.dropbear.id.au>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,113 +69,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- eric.auger.pro@gmail.com
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 04, 2019 at 01:20:25PM +0200, Eric Auger wrote:
-> Introduce support for GTree migration. A custom save/restore
-> is implemented. Each item is made of a key and a data.
-> 
-> If the key is a pointer to an object, 2 VMSDs are passed into
-> the GTree VMStateField.
-> 
-> When putting the items, the tree is traversed in sorted order by
-> g_tree_foreach.
-> 
-> On the get() path, gtrees must be allocated using the proper
-> key compare, key destroy and value destroy. This must be handled
-> beforehand, for example in a pre_load method.
-> 
-> Tests are added to test save/dump of structs containing gtrees
-> including the virtio-iommu domain/mappings scenario.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Mostly looks sane to me (with Juan's comment fixed).  Some more
-trivial comments below.
+--lIrNkN/7tmsD/ALM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +/*
-> + * For migrating a GTree whose key is a pointer to _key_type and the
-> + * value, a pointer to _val_type
-> + * The target tree must have been properly initialized
-> + * _vmsd: Start address of the 2 element array containing the key vmsd
-> + *        and the data vmsd
-> + * _key_type: type of the key
-> + * _val_type: type of the value
-> + */
-> +#define VMSTATE_GTREE_V(_field, _state, _version, _vmsd,                       \
-> +                        _key_type, _val_type)                                  \
-> +{                                                                              \
-> +    .name         = (stringify(_field)),                                       \
-> +    .version_id   = (_version),                                                \
-> +    .vmsd         = (_vmsd),                                                   \
-> +    .info         = &vmstate_info_gtree,                                       \
-> +    .start        = sizeof(_key_type),                                         \
+On Wed, Oct 09, 2019 at 05:07:59PM +1100, David Gibson wrote:
+> This is a substantial rework to clean up the handling of IRQs in
+> spapr.  It includes some cleanups to both the XICS and XIVE interrupt
+> controller backends, as well as more to the common spapr irq handling
+> infrastructure.
+>=20
+> The last two patches of this series, dealing with VFIO devices, are
+> RFC only - there some problems that I'm discussing with Alex
+> Williamson.
 
-Nitpick: Are we reusing the "start" field to store the size just to
-avoid defining new field in VMStateField?  If so, not sure whether we
-can start to use unions to both keep VMStateField small while keep the
-code clean.  Like:
+Oops, I screwed up my base branch selection for git-publish - patches
+1..3 aren't supposed to be in this series (although 1..2 fit well
+enough thematically).
 
-  union {
-    struct {
-      size_t key_size;
-      size_t value_size;
-    };
-    struct {
-      size_t start;
-      size_t size;
-    };
-  }
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-?
+--lIrNkN/7tmsD/ALM
+Content-Type: application/pgp-signature; name="signature.asc"
 
-This can of course also be done on top of this patch no matter what.
+-----BEGIN PGP SIGNATURE-----
 
-[...]
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2doggACgkQbDjKyiDZ
+s5KaKA//Yz4p9y0oY2ehz0//qCK2E1cek+kEQY8KM0iCH9BuNGslkgA3VAGjV4Zg
+hCuBqTTFdhttVDPeSU+iofppwpUUXMQMqlSStSpEzG5H+JfJ1HhlAX083jtslOJf
+326q9i2w4C7jHgOMDOTgg/LZsGsi2qy8p9vJi0cUIhfz3QXlfy2c9MWyeHEEtI+8
+GOMg6vmnZJq84HTe8Subgnm38xPZZGaU+QXV78bKPuTd7cqq7MYtRBg/y8hw5ofU
+3qPipMp4FJ0ZAz34pekwse7zgEokhXGdtRPBzU1drr/LrzWCwrTUynDABbz4n+3T
+wDEVZZ9vEnb8l5kJz0Zrf3BBtEqvIt+LZiQtc7I2Tt4kHPEpB1EoI3U3XqJ00hyU
+1ZXGIxyLgbQJdiuUCEaSW4oy2z6dNWZgynKtVJ1PbhQsVxMdPGyt8e+fgasBGVlX
+K2hIQQE1LuKbhQVqy2RRoomueWoMhe/+IwxVnbPm/naOQPA0aGfR7COJfHvSNFSV
+6geXlqzKDWxFJICpSAMUfxi+uq/m2bcveBzjwrfKeH/Sr7rPxs6IzArW2NKBkf4f
+3L6GTDTTIHiUfdap5vLo/v35wzK0L/69zvKxMd2mZAZ4MaiKAGI+cvDsXIKnw2tI
+QoTG9mUrER+qm1zMjrvU5RHgeSs2fXdryQVb+9Uy63zel12/3qk=
+=6Hrb
+-----END PGP SIGNATURE-----
 
-> +static gboolean put_gtree_elem(gpointer key, gpointer value, gpointer data)
-> +{
-> +    struct put_gtree_data *capsule = (struct put_gtree_data *)data;
-> +    QEMUFile *f = capsule->f;
-> +    int ret;
-> +
-> +    qemu_put_byte(f, true);
-> +
-> +    /* put the key */
-> +    if (!capsule->key_vmsd) {
-> +        qemu_put_be32(f, GPOINTER_TO_UINT(key)); /* direct key */
-
-This is special code path for direct key case.  Can we simply define
-VMSTATE_GTREE_DIRECT_KEY_V() somehow better so that it just uses the
-VMSTATE_UINT32_V() as the key vmsd?  Then iiuc vmstate_save_state()
-could work well with that too.
-
-Also, should we avoid using UINT in all cases?  But of course if we
-start to use VMSTATE_UINT32_V then we don't have this issue.
-
-Thanks,
-
-> +    } else {
-> +        ret = vmstate_save_state(f, capsule->key_vmsd, key, capsule->vmdesc);
-> +        if (ret) {
-> +            capsule->ret = ret;
-> +            return true;
-> +        }
-> +    }
-> +
-> +    /* put the data */
-> +    ret = vmstate_save_state(f, capsule->val_vmsd, value, capsule->vmdesc);
-> +    if (ret) {
-> +        capsule->ret = ret;
-> +        return true;
-> +    }
-> +    return false;
-> +}
-
--- 
-Peter Xu
+--lIrNkN/7tmsD/ALM--
 
