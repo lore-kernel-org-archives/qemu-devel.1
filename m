@@ -2,63 +2,93 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F803C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F2EC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:28:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69FC220B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:27:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B058521848
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:28:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Cw9eeIbr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69FC220B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ntvmX040"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B058521848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52249 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIEnx-0006oE-5S
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:27:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60010)
+	id 1iIEpF-0008Mp-FZ
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:28:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iI59B-0001XN-OZ
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:31 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iI1tm-0001nN-3D
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:40:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iI59A-0006UI-Cm
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:29 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:51091 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iI599-0006PS-Jd; Wed, 09 Oct 2019 02:08:28 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46p3gD1g9yz9sPK; Wed,  9 Oct 2019 17:08:24 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570601304;
- bh=ocrX3ncUYBFcZTW4CQsb4v8fYUjtodAeqwtBgAzm4yU=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Cw9eeIbrPSyfF2nzCRKQw1YtJUUi+eEic6M8GG9fYWv7oA5CsUGdUnfkhoCeSCTUr
- HQ/aGJYhnN//iXVmT+4Arpl7bK+jewf+dP0Ye+J4cu24ihRga39aVoWEHPI3vQJ9rm
- cSqFWZwiQxmEBZ7jipIl4uHDZ2lyP/aIzUuuXyNE=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-devel@nongnu.org,
-	clg@kaod.org,
-	qemu-ppc@nongnu.org
-Subject: [PATCH v4 02/19] xics: Make some device types not user creatable
-Date: Wed,  9 Oct 2019 17:08:01 +1100
-Message-Id: <20191009060818.29719-3-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191009060818.29719-1-david@gibson.dropbear.id.au>
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
+ (envelope-from <richard.henderson@linaro.org>) id 1iI18m-0008Rl-4l
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:51:49 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:36780)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iI18l-0008Rc-TA
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:51:48 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id r2so216352ybg.3
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 18:51:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=vx31jXZ/tj4LV0ilcA62gi46ZF9JCRg+IALX3wC4EsY=;
+ b=ntvmX040gC2y8fflXBCDRhu0vZdVLN4yh3Z7WKGzlGvLijdcNzKImDH2zftXSVRG9q
+ BVkNIAc+qqJEZu6yxUcjeLp90AAl7glPrUzcPBlVjEEssEG6uBQwu6S03q9MEU110/+b
+ 4dg/irc18ZJxEiXeBLpC3XXwJFXfb24U8XCW4sJDWfkoIFCEeFPAZ7Oy2qOTdvE3MNDx
+ RPzh7lqQyDAG4gRJbDm0YaZ2/GHTacm5Z7RzrTyFhAvl6rE7szx/FB/v4iw5khZWQwO0
+ n4Qo5+/cEIxPR7P3nWcZf0F41DGReGtVMEaBZ1WLg2HS3qlhHGFwHVg8avHuH7+j/ydN
+ mHRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vx31jXZ/tj4LV0ilcA62gi46ZF9JCRg+IALX3wC4EsY=;
+ b=CbQJx19zpQlGvnoEw3FMi3FWWK/zmqLRVncF3PRv1FVxTysNHRnLYAANmFNyCq64bS
+ e9Zkb+S/1JbQtBNX2g4r1lXVMHvAE8Oq99KyGPc3YMG4Xjyyi2djTXgYQbXiL3XeOiy6
+ iSyzg5RVpeFpeFEi6R0MbEYc03Gjj7rrGY+E8ud/ge64OjLA7CC+rqmZNhDaYXjMyYMI
+ CjfPFI8lRo3PAAJ7Qyqt5XLPpgGVr5LyIl/D2jO+NwoUzATtH0nEu/E0bGTv3B3zC2tN
+ 6JrVNnSbIQUuxyei/LIv7CruXYtjp6gmmrjOZ6bKUd86/1kpUGBxWkJhB72GgYozN/lU
+ JiHw==
+X-Gm-Message-State: APjAAAVBwKq8u/AkeU5OKkCtrJ0+uoJnYk3GRGT3vgHenkseMEZg5pNN
+ zoN9KU6ROBhcDtrKhPDu6dj2hQ==
+X-Google-Smtp-Source: APXvYqwpP1WZqyw9kTdi+QO0zY7cwW65JkUV8YbW5eHpjrxFpISOj6it6v2pRM1/oGhZkGwdBmPrGg==
+X-Received: by 2002:a5b:582:: with SMTP id l2mr512454ybp.72.1570585907100;
+ Tue, 08 Oct 2019 18:51:47 -0700 (PDT)
+Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
+ by smtp.gmail.com with ESMTPSA id l40sm213827ywk.79.2019.10.08.18.51.43
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 08 Oct 2019 18:51:46 -0700 (PDT)
+Subject: Re: [PATCH v2 08/21] hw/timer/cmsdk-apb-dualtimer.c: Switch to
+ transaction-based ptimer API
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20191008171740.9679-1-peter.maydell@linaro.org>
+ <20191008171740.9679-9-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <9505434b-99f4-9b9f-d0c4-20fcb0255b02@linaro.org>
+Date: Tue, 8 Oct 2019 21:51:39 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <20191008171740.9679-9-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,83 +100,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+On 10/8/19 1:17 PM, Peter Maydell wrote:
+> Switch the cmsdk-apb-dualtimer code away from bottom-half based
+> ptimers to the new transaction-based ptimer API.  This just requires
+> adding begin/commit calls around the various places that modify the
+> ptimer state, and using the new ptimer_init() function to create the
+> timer.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/timer/cmsdk-apb-dualtimer.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 
-Some device types of the XICS model are exposed to the QEMU command
-line:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-$ ppc64-softmmu/qemu-system-ppc64 -device help | grep ic[sp]
-name "icp"
-name "ics"
-name "ics-spapr"
-name "pnv-icp", desc "PowerNV ICP"
-
-These are internal devices that shouldn't be instantiable by the
-user. By the way, they can't be because their respective realize
-functions expect link properties that can't be set from the command
-line:
-
-qemu-system-ppc64: -device icp: required link 'xics' not found:
- Property '.xics' not found
-qemu-system-ppc64: -device ics: required link 'xics' not found:
- Property '.xics' not found
-qemu-system-ppc64: -device ics-spapr: required link 'xics' not found:
- Property '.xics' not found
-qemu-system-ppc64: -device pnv-icp: required link 'xics' not found:
- Property '.xics' not found
-
-Hide them by setting dc->user_creatable to false in the base class
-"icp" and "ics" init functions.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <157017826724.337875.14822177178282524024.stgit@bahia.lan>
-Message-Id: <157045578962.865784.8551555523533955113.stgit@bahia.lan>
-[dwg: Folded reason comment into base patch]
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/intc/xics.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index dfe7dbd254..b5ac408f7b 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -369,6 +369,11 @@ static void icp_class_init(ObjectClass *klass, void =
-*data)
-=20
-     dc->realize =3D icp_realize;
-     dc->unrealize =3D icp_unrealize;
-+    /*
-+     * Reason: part of XICS interrupt controller, needs to be wired up
-+     * by icp_create().
-+     */
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo icp_info =3D {
-@@ -689,6 +694,11 @@ static void ics_class_init(ObjectClass *klass, void =
-*data)
-     dc->props =3D ics_properties;
-     dc->reset =3D ics_reset;
-     dc->vmsd =3D &vmstate_ics;
-+    /*
-+     * Reason: part of XICS interrupt controller, needs to be wired up,
-+     * e.g. by spapr_irq_init().
-+     */
-+    dc->user_creatable =3D false;
- }
-=20
- static const TypeInfo ics_info =3D {
---=20
-2.21.0
-
+r~
 
