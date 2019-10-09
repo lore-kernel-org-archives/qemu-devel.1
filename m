@@ -2,64 +2,65 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E419CECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80338ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:36:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3626206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:36:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="F6e/mGVx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3626206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 5545C206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:36:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5545C206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIEwV-0006WA-CI
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:36:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60175)
+	id 1iIEwb-0006gN-GH
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:36:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39598)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iI59J-0001YQ-Cw
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:39 -0400
+ (envelope-from <armbru@redhat.com>) id 1iI6JN-0000Kj-F3
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 03:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iI59D-0006Xs-5P
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:37 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42263 helo=ozlabs.org)
+ (envelope-from <armbru@redhat.com>) id 1iI6JM-0007G6-90
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 03:23:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43176)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iI59C-0006Un-NK; Wed, 09 Oct 2019 02:08:31 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46p3gD6z9Tz9sR4; Wed,  9 Oct 2019 17:08:24 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570601304;
- bh=rDC9en2NhOoZSU23HaAIbKZkTSIJujfTw7OzEO3MZNk=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=F6e/mGVxXLBYhxvzGsh8258Q2Ht4m+fyO0pttYtKd/l/ufbgQBw01i0pyV+G/mP2/
- JSZQJxLHxqVxZsfOXpZW6Bl7+NMSxa3NEfiKuKRTWYhQY0qHNdlK5ghJhrfVG8u2Se
- Pkj7tIqwuCk+UTSbsot3etJ8pkE5V0CUBsmJW9Zs=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-devel@nongnu.org,
-	clg@kaod.org,
-	qemu-ppc@nongnu.org
-Subject: [PATCH v4 09/19] spapr, xics,
- xive: Move print_info from SpaprIrq to SpaprInterruptController
-Date: Wed,  9 Oct 2019 17:08:08 +1100
-Message-Id: <20191009060818.29719-10-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191009060818.29719-1-david@gibson.dropbear.id.au>
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1iI6JI-0007F2-Aq; Wed, 09 Oct 2019 03:23:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4DD3D3090FD2;
+ Wed,  9 Oct 2019 07:22:59 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B06F41001B11;
+ Wed,  9 Oct 2019 07:22:56 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 32BF41138619; Wed,  9 Oct 2019 09:22:55 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v4 23/31] block: Fix error_append_hint/error_prepend usage
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-24-vsementsov@virtuozzo.com>
+Date: Wed, 09 Oct 2019 09:22:55 +0200
+In-Reply-To: <20191001155319.8066-24-vsementsov@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Tue, 1 Oct 2019 18:53:11 +0300")
+Message-ID: <87y2xu9ycw.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Wed, 09 Oct 2019 07:22:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,257 +72,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ integration@gluster.org, qemu-block@nongnu.org,
+ Jeff Cody <codyprime@gmail.com>, Stefan Weil <sw@weilnetz.de>,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This method depends only on the active irq controller.  Now that we've
-formalized the notion of active controller we can dispatch directly
-through that, rather than dispatching via SpaprIrq with the dual
-version having to do a second conditional dispatch.
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- hw/intc/spapr_xive.c       | 15 +++++++++++++
- hw/intc/xics_spapr.c       | 15 +++++++++++++
- hw/ppc/spapr.c             |  2 +-
- hw/ppc/spapr_irq.c         | 44 +++++++-------------------------------
- include/hw/ppc/spapr_irq.h |  4 ++--
- 5 files changed, 41 insertions(+), 39 deletions(-)
+> If we want to add some info to errp (by error_prepend() or
+> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+> Otherwise, this info will not be added when errp == &fatal_err
+> (the program will exit prior to the error_append_hint() or
+> error_prepend() call).  Fix such cases.
+>
+> This commit (together with its neighbors) was generated by
+>
+> git grep -l 'error_\(append_hint\|prepend\)(errp' | while read f; do \
+> spatch --sp-file scripts/coccinelle/fix-error-add-info.cocci \
+> --in-place $f; done
+>
+> and then
+>
+> ./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+>
+> (auto-msg was a file with this commit message)
+>
+> and then by hand, for not maintained changed files:
+>
+> git commit -m "<SUB-SYSTEM>: $(< auto-msg)" <FILES>
+>
+> Still, for backporting it may be more comfortable to use only the first
+> command and then do one huge commit.
+>
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/nbd.h  | 1 +
+>  block.c              | 3 +++
+>  block/backup.c       | 1 +
+>  block/dirty-bitmap.c | 1 +
+>  block/file-posix.c   | 4 ++++
+>  block/gluster.c      | 2 ++
+>  block/qcow.c         | 1 +
+>  block/qcow2-bitmap.c | 1 +
+>  block/qcow2.c        | 3 +++
+>  block/vdi.c          | 1 +
+>  block/vhdx-log.c     | 1 +
+>  block/vmdk.c         | 1 +
+>  block/vpc.c          | 1 +
+>  13 files changed, 21 insertions(+)
+>
+> diff --git a/include/block/nbd.h b/include/block/nbd.h
+> index 316fd705a9..330f40142a 100644
+> --- a/include/block/nbd.h
+> +++ b/include/block/nbd.h
+> @@ -360,6 +360,7 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+>  static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
+>                             const char *desc, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      int ret = qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
+>  
+>      if (ret < 0) {
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 52d5e71793..700ec5c9c1 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -564,6 +564,20 @@ static void spapr_xive_set_irq(SpaprInterruptControl=
-ler *intc, int irq, int val)
-     }
- }
-=20
-+static void spapr_xive_print_info(SpaprInterruptController *intc, Monito=
-r *mon)
-+{
-+    SpaprXive *xive =3D SPAPR_XIVE(intc);
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+
-+        xive_tctx_pic_print_info(spapr_cpu_state(cpu)->tctx, mon);
-+    }
-+
-+    spapr_xive_pic_print_info(xive, mon);
-+}
-+
- static void spapr_xive_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -586,6 +600,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     sicc->claim_irq =3D spapr_xive_claim_irq;
-     sicc->free_irq =3D spapr_xive_free_irq;
-     sicc->set_irq =3D spapr_xive_set_irq;
-+    sicc->print_info =3D spapr_xive_print_info;
- }
-=20
- static const TypeInfo spapr_xive_info =3D {
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 02372697f6..415defe394 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -381,6 +381,20 @@ static void xics_spapr_set_irq(SpaprInterruptControl=
-ler *intc, int irq, int val)
-     ics_set_irq(ics, srcno, val);
- }
-=20
-+static void xics_spapr_print_info(SpaprInterruptController *intc, Monito=
-r *mon)
-+{
-+    ICSState *ics =3D ICS_SPAPR(intc);
-+    CPUState *cs;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+
-+        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
-+    }
-+
-+    ics_pic_print_info(ics, mon);
-+}
-+
- static void ics_spapr_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -393,6 +407,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
-void *data)
-     sicc->claim_irq =3D xics_spapr_claim_irq;
-     sicc->free_irq =3D xics_spapr_free_irq;
-     sicc->set_irq =3D xics_spapr_set_irq;
-+    sicc->print_info =3D xics_spapr_print_info;
- }
-=20
- static const TypeInfo ics_spapr_info =3D {
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 514a17ae74..6c38de5927 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4271,7 +4271,7 @@ static void spapr_pic_print_info(InterruptStatsProv=
-ider *obj,
- {
-     SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
-=20
--    spapr->irq->print_info(spapr, mon);
-+    spapr_irq_print_info(spapr, mon);
-     monitor_printf(mon, "irqchip: %s\n",
-                    kvm_irqchip_in_kernel() ? "in-kernel" : "emulated");
- }
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index bfccb815ed..a29b527232 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -98,19 +98,6 @@ static void spapr_irq_init_kvm(SpaprMachineState *spap=
-r,
-  * XICS IRQ backend.
-  */
-=20
--static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monitor =
-*mon)
--{
--    CPUState *cs;
--
--    CPU_FOREACH(cs) {
--        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--
--        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
--    }
--
--    ics_pic_print_info(spapr->ics, mon);
--}
--
- static int spapr_irq_post_load_xics(SpaprMachineState *spapr, int versio=
-n_id)
- {
-     if (!kvm_irqchip_in_kernel()) {
-@@ -147,7 +134,6 @@ SpaprIrq spapr_irq_xics =3D {
-     .xics        =3D true,
-     .xive        =3D false,
-=20
--    .print_info  =3D spapr_irq_print_info_xics,
-     .dt_populate =3D spapr_dt_xics,
-     .post_load   =3D spapr_irq_post_load_xics,
-     .reset       =3D spapr_irq_reset_xics,
-@@ -158,20 +144,6 @@ SpaprIrq spapr_irq_xics =3D {
-  * XIVE IRQ backend.
-  */
-=20
--static void spapr_irq_print_info_xive(SpaprMachineState *spapr,
--                                      Monitor *mon)
--{
--    CPUState *cs;
--
--    CPU_FOREACH(cs) {
--        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--
--        xive_tctx_pic_print_info(spapr_cpu_state(cpu)->tctx, mon);
--    }
--
--    spapr_xive_pic_print_info(spapr->xive, mon);
--}
--
- static int spapr_irq_post_load_xive(SpaprMachineState *spapr, int versio=
-n_id)
- {
-     return spapr_xive_post_load(spapr->xive, version_id);
-@@ -212,7 +184,6 @@ SpaprIrq spapr_irq_xive =3D {
-     .xics        =3D false,
-     .xive        =3D true,
-=20
--    .print_info  =3D spapr_irq_print_info_xive,
-     .dt_populate =3D spapr_dt_xive,
-     .post_load   =3D spapr_irq_post_load_xive,
-     .reset       =3D spapr_irq_reset_xive,
-@@ -238,11 +209,6 @@ static SpaprIrq *spapr_irq_current(SpaprMachineState=
- *spapr)
-         &spapr_irq_xive : &spapr_irq_xics;
- }
-=20
--static void spapr_irq_print_info_dual(SpaprMachineState *spapr, Monitor =
-*mon)
--{
--    spapr_irq_current(spapr)->print_info(spapr, mon);
--}
--
- static void spapr_irq_dt_populate_dual(SpaprMachineState *spapr,
-                                        uint32_t nr_servers, void *fdt,
-                                        uint32_t phandle)
-@@ -304,7 +270,6 @@ SpaprIrq spapr_irq_dual =3D {
-     .xics        =3D true,
-     .xive        =3D true,
-=20
--    .print_info  =3D spapr_irq_print_info_dual,
-     .dt_populate =3D spapr_irq_dt_populate_dual,
-     .post_load   =3D spapr_irq_post_load_dual,
-     .reset       =3D spapr_irq_reset_dual,
-@@ -404,6 +369,14 @@ static void spapr_set_irq(void *opaque, int irq, int=
- level)
-     sicc->set_irq(spapr->active_intc, irq, level);
- }
-=20
-+void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon)
-+{
-+    SpaprInterruptControllerClass *sicc
-+        =3D SPAPR_INTC_GET_CLASS(spapr->active_intc);
-+
-+    sicc->print_info(spapr->active_intc, mon);
-+}
-+
- void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
- {
-     MachineState *machine =3D MACHINE(spapr);
-@@ -713,7 +686,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
-     .xics        =3D true,
-     .xive        =3D false,
-=20
--    .print_info  =3D spapr_irq_print_info_xics,
-     .dt_populate =3D spapr_dt_xics,
-     .post_load   =3D spapr_irq_post_load_xics,
-     .reset       =3D spapr_irq_reset_xics,
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index ece8d2ea48..bdfeb3b107 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -59,13 +59,14 @@ typedef struct SpaprInterruptControllerClass {
-=20
-     /* These methods should only be called on the active intc */
-     void (*set_irq)(SpaprInterruptController *intc, int irq, int val);
-+    void (*print_info)(SpaprInterruptController *intc, Monitor *mon);
- } SpaprInterruptControllerClass;
-=20
- void spapr_irq_update_active_intc(SpaprMachineState *spapr);
-=20
- int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
-                               PowerPCCPU *cpu, Error **errp);
--
-+void spapr_irq_print_info(SpaprMachineState *spapr, Monitor *mon);
-=20
- void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis);
- int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool ali=
-gn,
-@@ -78,7 +79,6 @@ typedef struct SpaprIrq {
-     bool        xics;
-     bool        xive;
-=20
--    void (*print_info)(SpaprMachineState *spapr, Monitor *mon);
-     void (*dt_populate)(SpaprMachineState *spapr, uint32_t nr_servers,
-                         void *fdt, uint32_t phandle);
-     int (*post_load)(SpaprMachineState *spapr, int version_id);
---=20
-2.21.0
-
+This is an example of commit-per-subsystem.py producing a questionable
+split.  MAINTAINERS files include/block/nbd.h under both "Block layer
+core" and "Network Block Device (NBD)".  The script picks "Block layer
+core" because it comes first.
 
