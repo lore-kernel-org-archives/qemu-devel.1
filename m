@@ -2,63 +2,62 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15596ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2149AC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:29:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD547206B6
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:27:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD547206B6
+	by mail.kernel.org (Postfix) with ESMTPS id E797D206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:29:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E797D206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIHcG-0002t1-LS
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:27:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49367)
+	id 1iIHeW-0005OK-9p
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:29:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iIEkk-0004J7-Mo
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:23:56 -0400
+ (envelope-from <crosa@redhat.com>) id 1iIEIy-0002vB-8Q
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:55:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iIEkj-0000c7-8a
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:23:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46144)
+ (envelope-from <crosa@redhat.com>) id 1iIEIx-0005U1-06
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:55:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60024)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <crosa@redhat.com>)
- id 1iIEke-0000Zc-3u; Wed, 09 Oct 2019 12:23:48 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iIEIt-0005RR-81; Wed, 09 Oct 2019 11:55:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AFB0330A5A5A;
- Wed,  9 Oct 2019 16:23:46 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D2F3B3086E2F;
+ Wed,  9 Oct 2019 15:55:05 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-122-151.rdu2.redhat.com
  [10.10.122.151])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FA75194B6;
- Wed,  9 Oct 2019 16:23:38 +0000 (UTC)
-Date: Wed, 9 Oct 2019 12:23:36 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E94DD5D9E2;
+ Wed,  9 Oct 2019 15:54:52 +0000 (UTC)
+Date: Wed, 9 Oct 2019 11:54:51 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 19/19] tests/boot_linux_console: Test SDHCI and termal
- sensor on raspi3
-Message-ID: <20191009162336.GF30349@localhost.localdomain>
+Subject: Re: [PATCH 17/19] tests/boot_linux_console: Test the raspi2 UART1
+ (16550 based)
+Message-ID: <20191009155451.GD30349@localhost.localdomain>
 References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-20-f4bug@amsat.org>
+ <20190926173428.10713-18-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190926173428.10713-20-f4bug@amsat.org>
+In-Reply-To: <20190926173428.10713-18-f4bug@amsat.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 09 Oct 2019 16:23:46 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Wed, 09 Oct 2019 15:55:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -90,96 +89,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 26, 2019 at 07:34:27PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Add a test which loads the root filesystem on a SD card.
-> Use a kernel recent enough to also test the thermal sensor.
+On Thu, Sep 26, 2019 at 07:34:25PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> The current do_test_arm_raspi2() case tests the PL011 UART0.
+> Our model also supports the AUX UART (16550 based).
+> We can very simply test the UART1 with Linux, modifying the
+> kernel command line.
 >=20
-> The kernel image comes from:
-> https://github.com/sakaki-/bcmrpi3-kernel#description
->=20
-> The cpio image used comes from the linux-build-test project:
-> https://github.com/groeck/linux-build-test
+> Add few lines to expand our previous test and cover the AUX
+> UART.
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 > ---
->  tests/acceptance/boot_linux_console.py | 45 ++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
+>  tests/acceptance/boot_linux_console.py | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 >=20
 > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
 boot_linux_console.py
-> index 2a1a23763e..5c48cacba8 100644
+> index 7eaf6cb60e..33e8f6c635 100644
 > --- a/tests/acceptance/boot_linux_console.py
 > +++ b/tests/acceptance/boot_linux_console.py
-> @@ -410,6 +410,51 @@ class BootLinuxConsole(Test):
->          self.exec_command_and_wait_for_pattern('reboot',
->                                                 'reboot: Restarting sys=
-tem')
+> @@ -326,6 +326,7 @@ class BootLinuxConsole(Test):
+>          """
+>          serial_kernel_cmdline =3D {
+>              0: 'earlycon=3Dpl011,0x3f201000 console=3DttyAMA0',
+> +            1: 'earlycon=3Duart8250,mmio32,0x3f215040 console=3DttyS1,=
+115200'
+>          }
+>          deb_url =3D ('http://archive.raspberrypi.org/debian/'
+>                     'pool/main/r/raspberrypi-firmware/'
+> @@ -336,7 +337,7 @@ class BootLinuxConsole(Test):
+>          dtb_path =3D self.extract_from_deb(deb_path, '/boot/bcm2709-rp=
+i-2-b.dtb')
 > =20
-> +    def test_arm_raspi3_initrd_sd_temp(self):
+>          self.vm.set_machine('raspi2')
+> -        self.vm.set_console()
+> +        self.vm.set_console(console_id=3Duart_id)
+>          kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+>                                 serial_kernel_cmdline[uart_id])
+>          self.vm.add_args('-kernel', kernel_path,
+> @@ -354,6 +355,14 @@ class BootLinuxConsole(Test):
+>          """
+>          self.do_test_arm_raspi2(0)
+> =20
+> +    def test_arm_raspi2_uart1(self):
 > +        """
-> +        :avocado: tags=3Darch:aarch64
-> +        :avocado: tags=3Dmachine:raspi3
+> +        :avocado: tags=3Darch:arm
+> +        :avocado: tags=3Dmachine:raspi2
+> +        :avocado: tags=3Ddevice:bcm2835_aux
 > +        """
-> +        tarball_url =3D ('https://github.com/sakaki-/bcmrpi3-kernel/re=
-leases/'
-> +                       'download/4.19.71.20190910/'
-> +                       'bcmrpi3-kernel-4.19.71.20190910.tar.xz')
-> +        tarball_hash =3D '844f117a1a6de0532ba92d2a7bceb5b2acfbb298'
-> +        tarball_path =3D self.fetch_asset(tarball_url, asset_hash=3Dta=
-rball_hash)
-> +        archive.extract(tarball_path, self.workdir)
-> +        dtb_path    =3D self.workdir + "/boot/bcm2837-rpi-3-b.dtb"
-> +        kernel_path =3D self.workdir + "/boot/kernel8.img"
-> +
-> +        rootfs_url =3D ('https://github.com/groeck/linux-build-test/ra=
-w/'
-> +                      '9b6b392ea7bc15f0d6632328d429d31c9c6273da/rootfs=
-/'
-> +                      'arm64/rootfs.ext2.gz')
-> +        rootfs_hash =3D 'dbe4136f0b4a0d2180b93fd2a3b9a784f9951d10'
-> +        rootfs_path_gz =3D self.fetch_asset(rootfs_url, asset_hash=3Dr=
-ootfs_hash)
-> +        rootfs_path =3D self.workdir + "rootfs.ext2"
-> +        gunzip(rootfs_path_gz, rootfs_path)
-
-If you drop the local gunzip method utility, you'll have to touch this.
-
-> +
-> +        self.vm.set_machine('raspi3')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
-> +                               'earlycon=3Dpl011,0x3f201000 console=3D=
-ttyAMA0 ' +
-> +                               'root=3D/dev/mmcblk0 rootwait rw ' +
-> +                               'panic=3D-1 noreboot')
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-dtb', dtb_path,
-> +                         '-append', kernel_command_line,
-> +                         '-drive', 'file=3D' + rootfs_path + ',if=3Dsd=
-,format=3Draw',
-> +                         '-no-reboot')
-> +        self.vm.launch()
-> +
-> +        self.wait_for_console_pattern('Boot successful.')
-> +
-> +        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
-> +                                               'Raspberry Pi 3 Model B=
-')
-> +        self.exec_command_and_wait_for_pattern('cat /sys/devices/virtu=
-al/' +
-> +                                               'thermal/thermal_zone0/=
-temp',
-> +                                               '25178')
-
-Nitpick: you could avoid the strings concatenation operation with:
-
-self.exec_command_and_wait_for_pattern(('cat /sys/devices/virtual/'
-                                        'thermal/thermal_zone0/temp'),
-                                       '25178')
-
-> +        self.exec_command_and_wait_for_pattern('reboot',
-> +                                               'reboot: Restarting sys=
-tem')
+> +        self.do_test_arm_raspi2(1)
 > +
 >      def test_s390x_s390_ccw_virtio(self):
 >          """
@@ -187,8 +145,6 @@ tem')
 > --=20
 > 2.20.1
 >=20
-
-Either way,
 
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 Tested-by: Cleber Rosa <crosa@redhat.com>
