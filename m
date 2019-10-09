@@ -2,109 +2,81 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0372C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB386ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:19:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90CF420B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:16:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90CF420B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B198920B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:19:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wrczNESP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B198920B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIGVl-0004Hu-Eu
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:16:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56906)
+	id 1iIGYh-0006IF-LK
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:19:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35954)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iI9FV-0002Oh-Sq
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:31:18 -0400
+ (envelope-from <beata.michalska@linaro.org>) id 1iIAOu-00017o-Vp
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 07:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iI9FU-0001KC-S6
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:31:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45636)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iI9FU-0001K5-K6; Wed, 09 Oct 2019 06:31:16 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4EEC8C087353;
- Wed,  9 Oct 2019 10:31:15 +0000 (UTC)
-Received: from [10.36.116.112] (ovpn-116-112.ams2.redhat.com [10.36.116.112])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8205060BF4;
- Wed,  9 Oct 2019 10:31:13 +0000 (UTC)
-Subject: Re: [PATCH v4 0/7] s390x/mmu: DAT translation rewrite
-To: qemu-devel@nongnu.org
-References: <20191004105102.15821-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <9d5a3bd5-dfb2-6af3-d114-3075b6e1b199@redhat.com>
-Date: Wed, 9 Oct 2019 12:31:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <beata.michalska@linaro.org>) id 1iIAOt-0003jn-Qa
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 07:45:04 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:44514)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
+ id 1iIAOt-0003jZ-La
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 07:45:03 -0400
+Received: by mail-io1-xd42.google.com with SMTP id w12so4154187iol.11
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 04:45:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Y/AJrR7wo+KKwMOBsUQrs2hpnFS2xTQIIY8tGxegkGM=;
+ b=wrczNESPfibfY1uG0dedQZgs89JD7RlvJ9VD6TU71J8DOSNUWHu1Vla8ueOQ1V3cGW
+ P3k13el+Od5jeDtoy+M95zpZwOqtETYe8lQnBtWOoon4/oFQoHPdP7R+LR+TA5bSjbQ6
+ iJ5tlYh8yNYqiO/Vry6vdI4oA8EflpoCuyxWXHF2AxNCaCPKFWPfeTAfCYSJRIjsuCoK
+ z6hcUQ4OQxPiLevtL0lArMQS+4ZwNwJSzxsOOMBUfKJaDHUudl2vkJ6LWn1PbFX/33LP
+ YlWZ6qbQmkZ00kocRa6qJJNPoMFDLaUYJFpDTtrUMQSkJtL0j3+O3Rxxa3CEEMog1qCe
+ kq4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Y/AJrR7wo+KKwMOBsUQrs2hpnFS2xTQIIY8tGxegkGM=;
+ b=fx5tYVPAN+DTTXpMVKDqzXYStnbZoQUH6pKuxQQFpCRqi+jZW5CwyvxuW/6Ya5eHYP
+ 2x47JK+9QaJ66E1VvRp2YNV9LvpioAsnopWWxV4o4xQ3X+kxsX27B+lOJPXEcE9feDoE
+ rzBTDGFEDwzELSnatGuDCdxcxrS8xojJkxQ6UwFPkQJJOnd/FjdK1k/2Ebi+cgYeU7+D
+ lxDa4zplraNlGyYaO7MHKZV6uSuhmvCb7vITknHGoAuWCobmgvyXaLdBu6E9Zm1qnrUG
+ oE8iLN30lfSbWWNTsJcfyO7zTV+vWGqD/cQvYGk7/0uyRrUzd0cWwytpH/iNXqux/yMS
+ dn7A==
+X-Gm-Message-State: APjAAAXRrmLPpWYOJYeD1HHPELXCqQow7yWRJWz4ILYo0OIWkGiltNw7
+ q6mG+FMWlkaVrKQoMLy0tel0dICcQ8xz39qasU2Xjvhq
+X-Google-Smtp-Source: APXvYqwOzPnRCjyq5qYHXQhKWrUbKx+DUyoSfsC++gCGomHJWdBHYHdprXQwukDxw97kt6uUMGl3l6xp3lZvGiz6Chs=
+X-Received: by 2002:a6b:2c02:: with SMTP id s2mr2697869ios.307.1570621502744; 
+ Wed, 09 Oct 2019 04:45:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191004105102.15821-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 09 Oct 2019 10:31:15 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+References: <20190910095610.4546-1-beata.michalska@linaro.org>
+ <20190910095610.4546-3-beata.michalska@linaro.org>
+ <d8ca7a99-ca3d-00b8-f34c-82375ecb7c4d@linaro.org>
+In-Reply-To: <d8ca7a99-ca3d-00b8-f34c-82375ecb7c4d@linaro.org>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Wed, 9 Oct 2019 12:44:51 +0100
+Message-ID: <CADSWDzvHEnn3=hYxuH4+14OwgnUV9Vd_2dDxFHATRqAOsUuTLA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] Memory: Enable writeback for given
+ memory region
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,62 +88,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, quintela@redhat.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ shameerali.kolothum.thodi@huawei.com, qemu-devel@nongnu.org,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.10.19 12:50, David Hildenbrand wrote:
-> This is a split-up of:
->     [PATCH-for-4.2 v1 3/9] s390x/mmu: DAT translation rewrite
-> Rebased on latest upstream changes.
-> 
-> v3 -> v4:
-> - "s390x/mmu: Inject PGM_ADDRESSING on bogus table addresses"
-> -- s/goguous/bogus/
-> - "s390x/mmu: DAT table definition overhaul"
-> -- Fix SEGMENT_ENTRY_SFAA
-> -- Drop three unnecessary defines
-> - "s390x/mmu: Convert to non-recursive page table walk"
-> -- Reorder "REGION_ENTRY_P" checks
-> -- Drop default cases that cannot be reached
-> 
-> v2 -> v3:
-> - "s390x/mmu: Inject PGM_ADDRESSING on boguous table addresses"
-> -- Keep using cs->as
-> -- Make read_table_entry() return true/false
-> - "s390x/mmu: DAT table definition overhaul"
-> -- Added a comment where to find details about s390x and used definitions
-> 
-> v1 -> v2:
-> - Cleanup old code first, before switching to non-recursive handling
-> - Fix EDAT1 translation: I was missing the vaddr offset within the 1MB
->   page.
-> 
-> David Hildenbrand (7):
->   s390x/mmu: Drop debug logging from MMU code
->   s390x/mmu: Move DAT protection handling out of mmu_translate_asce()
->   s390x/mmu: Inject DAT exceptions from a single place
->   s390x/mmu: Inject PGM_ADDRESSING on bogus table addresses
->   s390x/mmu: Use TARGET_PAGE_MASK in mmu_translate_pte()
->   s390x/mmu: DAT table definition overhaul
->   s390x/mmu: Convert to non-recursive page table walk
-> 
->  target/s390x/cpu.h        |  78 +++++---
->  target/s390x/mem_helper.c |  12 +-
->  target/s390x/mmu_helper.c | 365 ++++++++++++++++----------------------
->  3 files changed, 220 insertions(+), 235 deletions(-)
-> 
+On Tue, 24 Sep 2019 at 17:28, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 9/10/19 2:56 AM, Beata Michalska wrote:
+> > +int main(void) {
+> > +#if defined(_POSIX_MAPPED_FILES) && _POSIX_MAPPED_FILES > 0 \
+> > +&& defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
+> > +return msync(NULL,0, MS_SYNC);
+> > +#else
+> > +#error Not supported
+> > +#endif
+> > +}
+>
+> Is there any particular reason to check _POSIX_MAPPED_FILES &
+> _POSIX_SYNCHRONIZED_IO?  IIRC, you can use those to "safely" use MS_SYNC.  But
+> this is a configure test, and an error is in fact our defined failure case, so
+> "safely" doesn't seem particularly relevant.
+>
+> Alternately, do we even support any systems (besides perhaps windows) that do
+> not provide POSIX-2001 support, and so include msync + MS_SYNC?  My first guess
+> is that we don't.
+>
 
-I'll queue and send this soon.
+Both flags are there to verify support for msync itself.
+The check there is for posix systems , where if both set to value
+greater than '0'
+the msync call is available.
+AFAIK Windows is the only posix non-compliant system being supported . Though
+I might be wrong (?)
+I might just drop the check here and use CONFIG_POSIX to handle the
+msync call instead.
 
--- 
+> > +        msync((void *)((uintptr_t)addr & qemu_host_page_mask),
+> > +               HOST_PAGE_ALIGN(length), MS_SYNC);
+>
+> This isn't quite right.  If you move addr down to a lower address via this page
+> mask, you must also increase length by the same amount, and only afterward
+> increase length to the host page size.
+>
+> Consider addr == 0xffffff, length = 2.  This covers two pages, so you'd expect
+> the final parameters to be, for 4k page size, 0xfff000, 0x2000.
+>
+Thanks for catching this - guess I was too focused on the cache line
+size, which would not cross page boundaries. Will fix that in the next version.
 
-Thanks,
+> r~
 
-David / dhildenb
+Thank you.
+
+BR
+Beata
 
