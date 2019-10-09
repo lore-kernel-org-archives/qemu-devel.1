@@ -2,64 +2,65 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLACK,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7EE8C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81639ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:39:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F4B6206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:38:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F4B6206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5909E206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:39:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5909E206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIFuW-00042t-B4
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:38:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46993)
+	id 1iIFvl-0005GW-GH
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:39:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iI7Tq-0007yO-UF
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:38:01 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iI7sa-0001wr-Cu
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:03:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iI7Tp-0000Md-DD
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:37:58 -0400
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:39984)
+ (envelope-from <dgilbert@redhat.com>) id 1iI7sT-00016x-NE
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:03:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50572)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iI7Tp-0000L0-2i
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:37:57 -0400
-Received: from player714.ha.ovh.net (unknown [10.109.159.90])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 9FFBF1AEE4F
- for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 10:37:54 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player714.ha.ovh.net (Postfix) with ESMTPSA id 3822BAAEB6B8;
- Wed,  9 Oct 2019 08:37:40 +0000 (UTC)
-Date: Wed, 9 Oct 2019 10:37:38 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v4 19/19] spapr: Work around spurious warnings from vfio
- INTx initialization
-Message-ID: <20191009103738.01bc146a@bahia.lan>
-In-Reply-To: <20191009060818.29719-20-david@gibson.dropbear.id.au>
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
- <20191009060818.29719-20-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iI7sT-00016E-Hd
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:03:25 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 44F50C002966;
+ Wed,  9 Oct 2019 09:03:24 +0000 (UTC)
+Received: from work-vm (ovpn-117-215.ams2.redhat.com [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 541D75D9CD;
+ Wed,  9 Oct 2019 09:03:23 +0000 (UTC)
+Date: Wed, 9 Oct 2019 10:03:20 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 2/3] migration/postcopy: not necessary to do
+ postcopy_ram_incoming_cleanup when state is ADVISE
+Message-ID: <20191009090320.GC2893@work-vm>
+References: <20191001100122.17730-1-richardw.yang@linux.intel.com>
+ <20191001100122.17730-3-richardw.yang@linux.intel.com>
+ <20191008160202.GE3441@work-vm> <20191009005511.GB26203@richard>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 11268569217915656678
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedriedtgddufeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191009005511.GB26203@richard>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Wed, 09 Oct 2019 09:03:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.165.38
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,82 +72,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Jason Wang <jasowang@redhat.com>,
- Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
- clg@kaod.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed,  9 Oct 2019 17:08:18 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> Traditional PCI INTx for vfio devices can only perform well if using
-> an in-kernel irqchip.  Therefore, vfio_intx_update() issues a warning
-> if an in kernel irqchip is not available.
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> On Tue, Oct 08, 2019 at 05:02:02PM +0100, Dr. David Alan Gilbert wrote:
+> >* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> >> postcopy_ram_incoming_cleanup() does cleanup for
+> >> postcopy_ram_incoming_setup(), while the setup happens only after
+> >> migration enters LISTEN state.
+> >> 
+> >> This means there is nothing to cleanup when migration is still ADVISE
+> >> state.
+> >> 
+> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >> ---
+> >>  migration/migration.c | 1 -
+> >>  1 file changed, 1 deletion(-)
+> >> 
+> >> diff --git a/migration/migration.c b/migration/migration.c
+> >> index 5f7e4d15e9..34d5e66f06 100644
+> >> --- a/migration/migration.c
+> >> +++ b/migration/migration.c
+> >> @@ -461,7 +461,6 @@ static void process_incoming_migration_co(void *opaque)
+> >>               * but managed to complete within the precopy period, we can use
+> >>               * the normal exit.
+> >>               */
+> >> -            postcopy_ram_incoming_cleanup(mis);
+> >>          } else if (ret >= 0) {
+> >>              /*
+> >>               * Postcopy was started, cleanup should happen at the end of the
+> >
+> >I think that misses the cleanup of mlock that corresponds to the
+> >munlockall in postcopy_ram_supported_by_host - that's called very early
+> >on; I think in the advise stage.
+> >
 > 
-
-Can you elaborate on what doesn't "perform well" without an
-in-kernel irqchip ? Is it a matter of performance or is it
-actually broken or something else ?
-
-What is the impact on -machine accel=kvm,kernel-irqchip=off which
-always spit this warning ?
-
-> We usually do have an in-kernel irqchip available for pseries machines
-> on POWER hosts.  However, because the platform allows feature
-> negotiation of what interrupt controller model to use, we don't
-> currently initialize it until machine reset.  vfio_intx_update() is
-> called (first) from vfio_realize() before that, so it can issue a
-> spurious warning, even if we will have an in kernel irqchip by the
-> time we need it.
+> Thanks you are right.
 > 
-> To workaround this, make a call to spapr_irq_update_active_intc() from
-> spapr_irq_init() which is called at machine realize time, before the
-> vfio realize.  This call will be pretty much obsoleted by the later
-> call at reset time, but it serves to suppress the spurious warning
-> from VFIO.
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_irq.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 7964e4a1b8..3aeb523f3e 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -274,6 +274,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->  
->      spapr->qirqs = qemu_allocate_irqs(spapr_set_irq, spapr,
->                                        smc->nr_xirqs + SPAPR_XIRQ_BASE);
-> +
-> +    /*
-> +     * Mostly we don't actually need this until reset, except that not
-> +     * having this set up can cause VFIO devices to issue a
-> +     * false-positive warning during realize(), because they don't yet
-> +     * have an in-kernel irq chip.
-> +     */
-> +    spapr_irq_update_active_intc(spapr);
->  }
->  
->  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error **errp)
-> @@ -429,7 +437,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *spapr)
->           * this.
->           */
->          new_intc = SPAPR_INTC(spapr->xive);
-> -    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-> +    } else if (spapr->ov5_cas
-> +               && spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
->          new_intc = SPAPR_INTC(spapr->xive);
->      } else {
->          new_intc = SPAPR_INTC(spapr->ics);
+> BTW, do we need to check enable_mlock when calling munlockall() in
+> postcopy_ram_supported_by_host() ?
 
+I don't think so; it does an extra munlock in that case when nothing
+should be locked anyway, no harm.
+
+Dave
+
+> >Dave
+> >
+> >> -- 
+> >> 2.17.1
+> >> 
+> >--
+> >Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> -- 
+> Wei Yang
+> Help you, Help me
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
