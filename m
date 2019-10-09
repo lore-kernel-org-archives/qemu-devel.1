@@ -2,84 +2,111 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C19A3ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC6AAECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:15:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BA1C20679
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:15:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C7pZTAE1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA1C20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 909AE20679
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:15:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 909AE20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIGUd-0003L3-1y
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:15:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55594)
+	id 1iIGUe-0003QD-VM
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:15:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57065)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ard.biesheuvel@linaro.org>) id 1iICBJ-0004xD-4t
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:39:10 -0400
+ (envelope-from <david@redhat.com>) id 1iI9Hq-0002fA-D5
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:33:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ard.biesheuvel@linaro.org>) id 1iICBH-0000rk-Sy
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:39:08 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54634)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
- id 1iICBH-0000rF-NP
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:39:07 -0400
-Received: by mail-wm1-x342.google.com with SMTP id p7so2653027wmp.4
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 06:39:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BeMFqSJKsyOwrvCpRyYXUCY/kZFtfdELbatv0b1GTFw=;
- b=C7pZTAE1FWJybuErEkvCbmLVkPsN+vMBitx/le4Awyw4msWS2BV7r72pbsqFq9fuvi
- QKJ0+kAxfw53YH9eaaOM8Mh44cXlBkSAUXhRU3iVQB57hgCZUKhwpTSl7e8w/smMzIBC
- o6Zn/y/luNS+mmu6mELYB5CGDHBDrtl17Pu3kHlfT2YqFx8fRmwrO2nI/i4uVdup6/hw
- ZYzG3YGQh2UdN4wnbSDOtRbFlmjQBag0SaqQ5qPslSAfduQibHuOjepOKotKFnrdLyuc
- y3ef8y0YJiDgjhwtbxUZEjttKbbsyIOZoY/cIH2HD/FMh6SuZJzjNqWNq6uO7m3VuQQC
- Z+zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BeMFqSJKsyOwrvCpRyYXUCY/kZFtfdELbatv0b1GTFw=;
- b=iJHohF6siihcgoHDagLWYbti7bjPHrbyvtx3cLlRphABkTb08kHELMjBPrGFPh69YF
- oKnHNO3g8Qm1wxdasqoWBX6OtBsB6E0PMu7tr7lbMdiNZ7Lhgq969ces7o8FFAQckPm/
- lONIDHDyrhafoywwwV9M1XuI7A4IE91COE4rBrqTD4+TJD9XmiqLAjvV4d/2rlG4x0E5
- OQ1u5lwDs7n9VauiWwCOdscOuCEGIJD8tktklyy8lXpMV5Ldt+fipRwty7RhJ216Dj7g
- pzVkF318W67bj+1hg81cSgXB/IwXgjpod7uzw8KLWltaDwjFn0XTnzH/zuklRvtVD7P4
- JPPg==
-X-Gm-Message-State: APjAAAWx9iC+eHxmda6xylpcV8GPqzx4Xi7xRHf3cdOzbDkGVR/QBS7Z
- 8tezI16YrV4GoSThxoQ6KSwcWmWESBwxS+8zCylNQA==
-X-Google-Smtp-Source: APXvYqwZyvETUix4gE5vf2RVfHW70IZjQnBTLId7B3mW5ls9JJadPcFxAMrKdmG9esEjAwqjDpPwcKV8XNCLbys83cM=
-X-Received: by 2002:a1c:a651:: with SMTP id p78mr2739509wme.53.1570628346074; 
- Wed, 09 Oct 2019 06:39:06 -0700 (PDT)
+ (envelope-from <david@redhat.com>) id 1iI9Hp-0002hV-7Y
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:33:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48080)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1iI9Ho-0002hO-Vi; Wed, 09 Oct 2019 06:33:41 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1C07530024DA;
+ Wed,  9 Oct 2019 10:33:40 +0000 (UTC)
+Received: from [10.36.116.112] (ovpn-116-112.ams2.redhat.com [10.36.116.112])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 16CD65C1D6;
+ Wed,  9 Oct 2019 10:33:37 +0000 (UTC)
+Subject: Re: [PATCH v1 0/5] s390x/mmu: Implement more facilities
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20190926101627.23376-1-david@redhat.com>
+ <2cb4d6b8-4058-dca0-95e2-6e8d62741a2c@redhat.com>
+ <20191007190203.14714176.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <0bd8f929-6e62-ec89-3b81-1fd023489286@redhat.com>
+Date: Wed, 9 Oct 2019 12:33:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <21633062-b021-a8e7-0cc8-062f4c29dde5@linux.microsoft.com>
- <ca5c74db-cf5d-0c3f-eb6f-27d1092420ae@linux.microsoft.com>
- <65b49cb0-c9fb-d966-8dec-1e39d09ab8c7@redhat.com>
- <88878b22-803f-41fc-9df2-2c6eb551b98d@linux.microsoft.com>
- <CAKv+Gu8kwg_tsrH7qne3H11hUPyA6zw-J_jpUmiyJMvXo3-SNQ@mail.gmail.com>
- <5938a592-1494-ca0c-8a34-7df38dbbea0c@linux.microsoft.com>
-In-Reply-To: <5938a592-1494-ca0c-8a34-7df38dbbea0c@linux.microsoft.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Wed, 9 Oct 2019 15:38:54 +0200
-Message-ID: <CAKv+Gu_ADqW_LVUOy-kWK1FsgRXG+5f_gzpM5_QHP5pj8+40ag@mail.gmail.com>
-Subject: Re: Is kexec supported in QEMU for ARM64 (qemu-system-aarch64) with
- arm-trusted-firmware, optee, and u-boot.
-To: Lakshmi Ramasubramanian <nramas@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <20191007190203.14714176.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Wed, 09 Oct 2019 10:33:40 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,42 +118,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel@nongnu.org, Ilya Leoshkevich <iii@linux.ibm.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2 Oct 2019 at 03:32, Lakshmi Ramasubramanian
-<nramas@linux.microsoft.com> wrote:
->
-> On 10/1/19 9:30 AM, Ard Biesheuvel wrote:
->
-> >
-> > kexec is a linux concept, so whether it is supported should not depend
-> > on the secure world firmware or the underlying host.
->
-> I agree Ard.
-> When I don't use ATF I am able to do kexec in QEMU and successfully boot
-> into the new kernel.
-> Is the following expected?
->
-> When I execute kexec ("kexec -l <kernel>", followed by "kexec -e") I hit
-> the following assert in ATF (in the file
-> arm-trusted-firmware/plat/qemu/qemu_pm.c)
->
-> /*******************************************************************************
->    * Platform handler called when a power domain is about to be turned
->    * off. The target_state encodes the power state that each level should
->    * transition to.
-> ******************************************************************************/
-> void qemu_pwr_domain_off(const psci_power_state_t *target_state)
-> {
->       assert(0);
-> }
->
+On 07.10.19 19:02, Cornelia Huck wrote:
+> On Fri, 4 Oct 2019 15:23:32 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 26.09.19 12:16, David Hildenbrand wrote:
+>>> This is the follow up of:
+>>>     [PATCH-for-4.2 v1 0/9] s390x: MMU changes and extensions
+>>> Without the general MMU rework. It's based on:
+>>>     [PATCH v2 0/7] s390x/mmu: DAT translation rewrite
+>>>
+>>> This series adds adds EDAT2 MMU support, and implements/indicates related
+>>> facilities (ESOP-1, ESOP-2, IEP, ...) for TCG. The QEMU CPU model is
+>>> updated.
+>>>
+>>> IEP under QEMU TCG seems to work just fine, when eabling it via the "max"
+>>> CPU model - via kvm unit tests:
+>>>     t460s: ~/git/kvm-unit-tests master $ ./s390x-run s390x/iep.elf -cpu max
+>>>     [...]
+>>>     PASS: iep: iep protection: Program interrupt: expected(4) == received(4)
+>>>     SUMMARY: 1 tests
+>>>
+>>>     EXIT: STATUS=1
+>>>
+>>> Changes since "[PATCH-for-4.2 v1 0/9] s390x: MMU changes and extensions":
+>>> - "s390x/mmu: Add EDAT2 translation support"
+>>> -- Fix vaddr offset within 2GB page
+>>> - "s390x/mmu: Implement ESOP-2 and ..."
+>>> -- Squashed two patches as requested.
+>>> -- Also set ilen to "2" in case of MMU_INST_FETCH on mmu_translate_real
+>>> - "s390x/mmu: Implement Instruction-Execution-Protection Facility"
+>>> -- Make sure s390_cpu_get_phys_page_debug() doesn't choke on IEP
+>>> - "s390x/cpumodel: Add new TCG features to QEMU cpu model"
+>>> -- Add comment "features introduced after the z13"
+>>>
+>>> Cc: Ilya Leoshkevich <iii@linux.ibm.com>
+>>>
+>>> David Hildenbrand (5):
+>>>   s390x/mmu: Add EDAT2 translation support
+>>>   s390x/mmu: Implement ESOP-2 and
+>>>     access-exception-fetch/store-indication facility
+>>>   s390x/mmu: Implement Instruction-Execution-Protection Facility
+>>>   s390x/cpumodel: Prepare for changes of QEMU model
+>>>   s390x/cpumodel: Add new TCG features to QEMU cpu model
+>>>
+>>>  hw/s390x/s390-virtio-ccw.c  |  2 ++
+>>>  target/s390x/cpu.h          |  1 +
+>>>  target/s390x/gen-features.c | 11 +++++++++-
+>>>  target/s390x/helper.c       |  6 +++++-
+>>>  target/s390x/mmu_helper.c   | 42 +++++++++++++++++++++++++++++++++++--
+>>>  5 files changed, 58 insertions(+), 4 deletions(-)
+>>>   
+>>
+>> @Christian (@Conny) if I can get an ACK on the last patch, I can send
+>> this directly upstream.
+>>
+> 
+> No objections from my side, I won't get around to reviewing it in
+> detail anyway.
+> 
 
-Are you running with multiple CPUs?
+Okay, thanks. I'll queue and send this soon.
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
