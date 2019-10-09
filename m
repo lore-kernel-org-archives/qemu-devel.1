@@ -2,103 +2,65 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF51ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13640ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:27:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3947F206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:26:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IYGmZrn+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3947F206BB
+	by mail.kernel.org (Postfix) with ESMTPS id E1C1520679
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:27:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1C1520679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIFjA-0007zy-ON
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:26:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50536)
+	id 1iIFk6-0000zr-Jk
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:27:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43291)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iI83u-000329-Ui
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:15:16 -0400
+ (envelope-from <armbru@redhat.com>) id 1iI6xv-0004Qi-A0
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iI83t-0005r1-Ga
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:15:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51694
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1iI6xt-0005Nc-C2
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 04:04:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53818)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iI83t-0005pP-Cy
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:15:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1570612512;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=LnthtDy+kBjD5T6p/osgMCT9YrFI9qED9phS99dKGNY=;
- b=IYGmZrn+Y7PNDA6rC6gJxONNq4Q78YUAr6K2DMdAaez4UyhscJpUIpt/10uK4VvB3TNDmm
- VCr60vqHtszEhpg8ho+uIipGKXYBDlBpegFFll3Gcuxpvg4mDZjJSjjSVIO8lpZeWn+hkm
- dWsudNyl/97TLLDTkBfbTH0OOMXtvtw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-5-4RjutvMeWVqebn9BFteA-1; Wed, 09 Oct 2019 05:15:09 -0400
-Received: by mail-wr1-f71.google.com with SMTP id f3so792752wrr.23
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 02:15:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=d5tISs1KCHtwOyrKlMfPsxt9ttmffCaWBvnrP40d/kE=;
- b=DMbE9SuYGrY2QwbSbpnWcVr3G9ldqLmfPt4LObmS/E5iFUwMQXokw+NnWDh432lFhG
- EHhtAqFlXR+yZyaIagJH2oaJh+zPYgO7WlCiQelH+0m6IjzUmlTKZlshRGPfAAabt+z/
- jYaS//616Yn75tKhF4LfDj0qmO3WOH+6qU13HBPdtSBF4YheWQDwoDbexBxzSH/lsrig
- g6Xw48nmrVAxwAukNtlw/byDJ3Nnq9Jj7R7ZKYmJOdOXPyw0lEEArCAFCUB9GyCcRiQz
- Fym3mDcpqfVqAhmttjbqYWW8nfPee4w7ejvq8WVlH2GJsD3osa6c83VmL/wtlTUl6GgQ
- gOng==
-X-Gm-Message-State: APjAAAVc7C4j1cSX522UY5snkNcEY6nPKFZoJepuK7jCLhD3QDJQrBqX
- EcthzNWLo6pyAhRTjo9vBXKbPQrdfZBeW/vBkOyfL9GOmxyLH7umSNnShP3wZNAOh8eeSVsIxFU
- mnUUAo+UijGiJsP4=
-X-Received: by 2002:adf:fd46:: with SMTP id h6mr1894908wrs.243.1570612507681; 
- Wed, 09 Oct 2019 02:15:07 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwUVHG6n1HgfZB42/8Taipbw81fl/fH5o9I75fEaObZj1lOGD8vaabkYF29hWK9BWlnfx1CCw==
-X-Received: by 2002:adf:fd46:: with SMTP id h6mr1894891wrs.243.1570612507348; 
- Wed, 09 Oct 2019 02:15:07 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id 63sm2388645wri.25.2019.10.09.02.15.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Oct 2019 02:15:06 -0700 (PDT)
-Subject: Re: [Qemu-devel] qemu_futex_wait() lockups in ARM64: 2 possible issues
-To: Jan Glauber <jglauber@marvell.com>
-References: <cbe46ad6-ef6c-d155-e79a-672182c725ad@ubuntu.com>
- <d94f18f1-986f-ec19-02c0-e83e5e7af3d0@redhat.com>
- <1864070a-2f84-1d98-341e-f01ddf74ec4b@ubuntu.com>
- <20190924202517.GA21422@xps13.dannf> <20191002092253.GA3857@hc>
- <6dd73749-49b0-0fbc-b9bb-44c3736642b8@redhat.com>
- <20191007144432.GA29958@xps13.dannf>
- <065a52a9-5bb0-1259-6c73-41af60e0a05d@redhat.com> <20191009080220.GA2905@hc>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <d5367b2a-84ee-1211-a2dc-7d631c94fe3f@redhat.com>
-Date: Wed, 9 Oct 2019 11:15:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1iI6xi-0005KS-Ay; Wed, 09 Oct 2019 04:04:47 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E0EE6308FB82;
+ Wed,  9 Oct 2019 08:04:44 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D25A60605;
+ Wed,  9 Oct 2019 08:04:26 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id BC6CA1138619; Wed,  9 Oct 2019 10:04:24 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v4 04/31] error: auto propagated local_err
+References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
+ <20191001155319.8066-5-vsementsov@virtuozzo.com>
+Date: Wed, 09 Oct 2019 10:04:24 +0200
+In-Reply-To: <20191001155319.8066-5-vsementsov@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Tue, 1 Oct 2019 18:52:52 +0300")
+Message-ID: <87r23m8hvb.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20191009080220.GA2905@hc>
-Content-Language: en-US
-X-MC-Unique: 5-4RjutvMeWVqebn9BFteA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Wed, 09 Oct 2019 08:04:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,145 +72,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rafael David Tinoco <rafaeldtinoco@ubuntu.com>,
- lizhengui <lizhengui@huawei.com>, dann frazier <dann.frazier@canonical.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Bug 1805256 <1805256@bugs.launchpad.net>,
- QEMU Developers - ARM <qemu-arm@nongnu.org>
+Cc: fam@euphon.net, pburton@wavecomp.com, peter.maydell@linaro.org,
+ codyprime@gmail.com, jasowang@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, mreitz@redhat.com,
+ qemu-block@nongnu.org, quintela@redhat.com, arikalo@wavecomp.com,
+ mst@redhat.com, mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, joel@jms.id.au, marcandre.lureau@redhat.com,
+ david@gibson.dropbear.id.au, farman@linux.ibm.com, ehabkost@redhat.com,
+ sw@weilnetz.de, groug@kaod.org, yuval.shaia@oracle.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, qemu-arm@nongnu.org, clg@kaod.org,
+ stefanha@redhat.com, david@redhat.com, jsnow@redhat.com, rth@twiddle.net,
+ kwolf@redhat.com, integration@gluster.org, berrange@redhat.com,
+ andrew@aj.id.au, cohuck@redhat.com, qemu-s390x@nongnu.org,
+ sundeep.lkml@gmail.com, qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/19 10:02, Jan Glauber wrote:
-> On Mon, Oct 07, 2019 at 04:58:30PM +0200, Paolo Bonzini wrote:
->> On 07/10/19 16:44, dann frazier wrote:
->>> On Mon, Oct 07, 2019 at 01:06:20PM +0200, Paolo Bonzini wrote:
->>>> On 02/10/19 11:23, Jan Glauber wrote:
->>>>> I've looked into this on ThunderX2. The arm64 code generated for the
->>>>> atomic_[add|sub] accesses of ctx->notify_me doesn't contain any
->>>>> memory barriers. It is just plain ldaxr/stlxr.
->>>>>
->>>>> From my understanding this is not sufficient for SMP sync.
->>>>>
->>>>> If I read this comment correct:
->>>>>
->>>>>     void aio_notify(AioContext *ctx)
->>>>>     {
->>>>>         /* Write e.g. bh->scheduled before reading ctx->notify_me.  P=
-airs
->>>>>          * with atomic_or in aio_ctx_prepare or atomic_add in aio_pol=
-l.
->>>>>          */
->>>>>         smp_mb();
->>>>>         if (ctx->notify_me) {
->>>>>
->>>>> it points out that the smp_mb() should be paired. But as
->>>>> I said the used atomics don't generate any barriers at all.
->>>>
->>>> Based on the rest of the thread, this patch should also fix the bug:
->>>>
->>>> diff --git a/util/async.c b/util/async.c
->>>> index 47dcbfa..721ea53 100644
->>>> --- a/util/async.c
->>>> +++ b/util/async.c
->>>> @@ -249,7 +249,7 @@ aio_ctx_check(GSource *source)
->>>>      aio_notify_accept(ctx);
->>>> =20
->>>>      for (bh =3D ctx->first_bh; bh; bh =3D bh->next) {
->>>> -        if (bh->scheduled) {
->>>> +        if (atomic_mb_read(&bh->scheduled)) {
->>>>              return true;
->>>>          }
->>>>      }
->>>>
->>>>
->>>> And also the memory barrier in aio_notify can actually be replaced
->>>> with a SEQ_CST load:
->>>>
->>>> diff --git a/util/async.c b/util/async.c
->>>> index 47dcbfa..721ea53 100644
->>>> --- a/util/async.c
->>>> +++ b/util/async.c
->>>> @@ -349,11 +349,11 @@ LinuxAioState *aio_get_linux_aio(AioContext *ctx=
-)
->>>> =20
->>>>  void aio_notify(AioContext *ctx)
->>>>  {
->>>> -    /* Write e.g. bh->scheduled before reading ctx->notify_me.  Pairs
->>>> -     * with atomic_or in aio_ctx_prepare or atomic_add in aio_poll.
->>>> +    /* Using atomic_mb_read ensures that e.g. bh->scheduled is writte=
-n before
->>>> +     * ctx->notify_me is read.  Pairs with atomic_or in aio_ctx_prepa=
-re or
->>>> +     * atomic_add in aio_poll.
->>>>       */
->>>> -    smp_mb();
->>>> -    if (ctx->notify_me) {
->>>> +    if (atomic_mb_read(&ctx->notify_me)) {
->>>>          event_notifier_set(&ctx->notifier);
->>>>          atomic_mb_set(&ctx->notified, true);
->>>>      }
->>>>
->>>>
->>>> Would you be able to test these (one by one possibly)?
->>>
->>> Paolo,
->>>   I tried them both separately and together on a Hi1620 system, each
->>> time it hung in the first iteration. Here's a backtrace of a run with
->>> both patches applied:
->>
->> Ok, not a great start...  I'll find myself an aarch64 machine and look
->> at it more closely.  I'd like the patch to be something we can
->> understand and document, since this is probably the second most-used
->> memory barrier idiom in QEMU.
->>
->> Paolo
->=20
-> I'm still not sure what the actual issue is here, but could it be some ba=
-d
-> interaction between the notify_me and the list_lock? The are both 4 byte
-> and side-by-side:
->=20
-> address notify_me: 0xaaaadb528aa0  sizeof notify_me: 4
-> address list_lock: 0xaaaadb528aa4  sizeof list_lock: 4
->=20
-> AFAICS the generated code looks OK (all load/store exclusive done
-> with 32 bit size):
->=20
->      e6c:       885ffc01        ldaxr   w1, [x0]
->      e70:       11000821        add     w1, w1, #0x2
->      e74:       8802fc01        stlxr   w2, w1, [x0]
->=20
-> ...but if I bump notify_me size to uint64_t the issue goes away.
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-Ouch. :)  Is this with or without my patch(es)?
+> Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
+> functions with errp OUT parameter.
+>
+> It has three goals:
+>
+> 1. Fix issue with error_fatal & error_prepend/error_append_hint: user
+> can't see this additional information, because exit() happens in
+> error_setg earlier than information is added. [Reported by Greg Kurz]
 
-Also, what if you just add a dummy uint32_t after notify_me?
+Done in PATCH 07-31.
 
-Thanks,
+> 2. Fix issue with error_abort & error_propagate: when we wrap
+> error_abort by local_err+error_propagate, resulting coredump will
+> refer to error_propagate and not to the place where error happened.
+> (the macro itself doesn't fix the issue, but it allows to [3.] drop all
+> local_err+error_propagate pattern, which will definitely fix the issue)
+> [Reported by Kevin Wolf]
+>
+> 3. Drop local_err+error_propagate pattern, which is used to workaround
+> void functions with errp parameter, when caller wants to know resulting
+> status. (Note: actually these functions could be merely updated to
+> return int error code).
 
-Paolo
+Not done.  Can you prototype this part?  A few manually done examples
+would give us an idea how the complete solution would look like.  A
+(semi-)automated complete conversion of a subsystem would additionally
+give us an idea how to actually do the conversion.
 
->=20
-> BTW, the image file I convert in the testcase is ~20 GB.
->=20
-> --Jan
->=20
-> diff --git a/include/block/aio.h b/include/block/aio.h
-> index a1d6b9e24939..e8a5ea3860bb 100644
-> --- a/include/block/aio.h
-> +++ b/include/block/aio.h
-> @@ -83,7 +83,7 @@ struct AioContext {
->       * Instead, the aio_poll calls include both the prepare and the
->       * dispatch phase, hence a simple counter is enough for them.
->       */
-> -    uint32_t notify_me;
-> +    uint64_t notify_me;
-> =20
->      /* A lock to protect between QEMUBH and AioHandler adders and delete=
-r,
->       * and to ensure that no callbacks are removed while we're walking a=
-nd
->=20
-
+We can discuss applying ERRP_AUTO_PROPAGATE() as a bug fix for 1., and
+leave 2. and 3. for later.  Feels like a half-done job to me.  We've got
+too many of those in the tree already.  Dunno.
 
