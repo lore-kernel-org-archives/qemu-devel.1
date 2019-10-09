@@ -2,73 +2,84 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1099DECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 984D1C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:19:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D760B206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:17:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D760B206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6D87D206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:19:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D87D206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIFax-0005we-0D
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:17:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57865)
+	id 1iIFc5-0007TM-56
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:19:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iI9QL-0003bN-FQ
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:42:30 -0400
+ (envelope-from <peterx@redhat.com>) id 1iI5TC-0003aC-Pn
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:29:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iI9QK-0005dC-A2
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:42:29 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59110)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iI9QK-0005bg-46
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:42:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iI9QI-0008WV-QM
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 10:42:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BE66D2E80C7
- for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 10:42:26 +0000 (UTC)
+ (envelope-from <peterx@redhat.com>) id 1iI5TA-0000cv-Jj
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:29:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39868)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iI5TA-0000YF-An
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:29:08 -0400
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 52631C004E8D
+ for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 06:29:06 +0000 (UTC)
+Received: by mail-pf1-f200.google.com with SMTP id b13so1113427pfp.6
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 23:29:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=5MC/xpOVeO48b6oFuZVrop2DdqL+1eMShZ/UYESNK3c=;
+ b=RuQ6ZN2FsXg+2C+gZBM3F4atZ58/VzzaCr1uwIDW2tjQIVImoLeL9njPFnVZN9QxY7
+ MmfdPtFkjh/FMmSLKxsyw3U1U7HU3AXuz4kA+TDczG0pAsY+k+eOf3VcLWHt9OLOkixw
+ DOrH9VdxMqJGoZMAymAccnV3lTWkl8DanN1hQBFZcxE6s8jUgU9i5Kzf26tOqhg0h8m8
+ 3kkMzFYYPf6JcO8pSHCpln/g5AYQQIDskvLCXlP6sp6l2Pj7AaZTXUFcwcn24o2BUBQM
+ voAuTEPxknmUfg9jgK2RaKDPsECemcWgRD6EwbW23USwrd9od2S1wx1rCI5zEWq0J8su
+ W4sA==
+X-Gm-Message-State: APjAAAXBqjssDah78ot2S44q7NrsSz6pBwl9fAja5+gxOa08Rp3BUGii
+ flY8g5q7c8VpP8xs/N6YhXAMZMYvviyuNEy/CVOJFHq5cpKAthglwejAV9eeaKC8f3Xr63WtBbx
+ VTDmpihw8Ioix41o=
+X-Received: by 2002:a62:3441:: with SMTP id b62mr2056526pfa.12.1570602545690; 
+ Tue, 08 Oct 2019 23:29:05 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzVjsJgR6qN7WADec/Z0SLYVrBWhXr7sjrmz3ltEy1nB8F9VSzDJEZVxVK9sswQxutbT1Sa3A==
+X-Received: by 2002:a62:3441:: with SMTP id b62mr2056511pfa.12.1570602545403; 
+ Tue, 08 Oct 2019 23:29:05 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id c11sm1599271pfj.114.2019.10.08.23.29.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Oct 2019 23:29:04 -0700 (PDT)
+Date: Wed, 9 Oct 2019 14:28:53 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v3] migration: Support gtree migration
+Message-ID: <20191009062852.GB1039@xz-x1>
+References: <20191004112025.28868-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 09 Oct 2019 10:28:24 -0000
-From: Yves Lhuillier <1847467@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: amd64
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ylhuillier
-X-Launchpad-Bug-Reporter: Yves Lhuillier (ylhuillier)
-X-Launchpad-Bug-Modifier: Yves Lhuillier (ylhuillier)
-Message-Id: <157061690442.756.9495451631448947331.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1847467] [NEW] qemu-x86_64 segment prefixes error
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="af2eefe214bd95389a09b7c956720881bab16807";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 22029a976ea2d3b1c7c5b351613fd06b890758f8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191004112025.28868-1-eric.auger@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,78 +88,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847467 <1847467@bugs.launchpad.net>
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Fri, Oct 04, 2019 at 01:20:25PM +0200, Eric Auger wrote:
+> Introduce support for GTree migration. A custom save/restore
+> is implemented. Each item is made of a key and a data.
+> 
+> If the key is a pointer to an object, 2 VMSDs are passed into
+> the GTree VMStateField.
+> 
+> When putting the items, the tree is traversed in sorted order by
+> g_tree_foreach.
+> 
+> On the get() path, gtrees must be allocated using the proper
+> key compare, key destroy and value destroy. This must be handled
+> beforehand, for example in a pre_load method.
+> 
+> Tests are added to test save/dump of structs containing gtrees
+> including the virtio-iommu domain/mappings scenario.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-qemu-x86_64 version 4.1.0 (qemu-x86_64 version 4.0.0 also have the
-issue)
+Mostly looks sane to me (with Juan's comment fixed).  Some more
+trivial comments below.
 
-In 64-bit mode (x86_64) the DS, ES, SS or CS segment prefixes should be
-ignored; qemu-x86_64 does not ignore them.
+> +/*
+> + * For migrating a GTree whose key is a pointer to _key_type and the
+> + * value, a pointer to _val_type
+> + * The target tree must have been properly initialized
+> + * _vmsd: Start address of the 2 element array containing the key vmsd
+> + *        and the data vmsd
+> + * _key_type: type of the key
+> + * _val_type: type of the value
+> + */
+> +#define VMSTATE_GTREE_V(_field, _state, _version, _vmsd,                       \
+> +                        _key_type, _val_type)                                  \
+> +{                                                                              \
+> +    .name         = (stringify(_field)),                                       \
+> +    .version_id   = (_version),                                                \
+> +    .vmsd         = (_vmsd),                                                   \
+> +    .info         = &vmstate_info_gtree,                                       \
+> +    .start        = sizeof(_key_type),                                         \
 
-example: an x86_64 instructions preceded by FS DS (0x64 0x26) segment
-prefixes have the linear address of its memory reference flat-mapped (as
-if DS was in action) whereas it should be FS-mapped (offset by FS_base,
-because the DS, ES, SS or CS are just ignored).
+Nitpick: Are we reusing the "start" field to store the size just to
+avoid defining new field in VMStateField?  If so, not sure whether we
+can start to use unions to both keep VMStateField small while keep the
+code clean.  Like:
 
+  union {
+    struct {
+      size_t key_size;
+      size_t value_size;
+    };
+    struct {
+      size_t start;
+      size_t size;
+    };
+  }
 
-I attach a small C++ program that shows this discrepancy.
+?
 
-$ ./sample
-I'm not in QEMU
+This can of course also be done on top of this patch no matter what.
 
-$ qemu-x86_64 ./sample
-I'm in QEMU
+[...]
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+> +static gboolean put_gtree_elem(gpointer key, gpointer value, gpointer data)
+> +{
+> +    struct put_gtree_data *capsule = (struct put_gtree_data *)data;
+> +    QEMUFile *f = capsule->f;
+> +    int ret;
+> +
+> +    qemu_put_byte(f, true);
+> +
+> +    /* put the key */
+> +    if (!capsule->key_vmsd) {
+> +        qemu_put_be32(f, GPOINTER_TO_UINT(key)); /* direct key */
 
+This is special code path for direct key case.  Can we simply define
+VMSTATE_GTREE_DIRECT_KEY_V() somehow better so that it just uses the
+VMSTATE_UINT32_V() as the key vmsd?  Then iiuc vmstate_save_state()
+could work well with that too.
 
-** Tags: amd64
+Also, should we avoid using UINT in all cases?  But of course if we
+start to use VMSTATE_UINT32_V then we don't have this issue.
 
-** Attachment added: "small C++ program to reproduce the bug"
-   https://bugs.launchpad.net/bugs/1847467/+attachment/5295831/+files/sampl=
-e.cc
+Thanks,
 
--- =
+> +    } else {
+> +        ret = vmstate_save_state(f, capsule->key_vmsd, key, capsule->vmdesc);
+> +        if (ret) {
+> +            capsule->ret = ret;
+> +            return true;
+> +        }
+> +    }
+> +
+> +    /* put the data */
+> +    ret = vmstate_save_state(f, capsule->val_vmsd, value, capsule->vmdesc);
+> +    if (ret) {
+> +        capsule->ret = ret;
+> +        return true;
+> +    }
+> +    return false;
+> +}
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847467
-
-Title:
-  qemu-x86_64 segment prefixes error
-
-Status in QEMU:
-  New
-
-Bug description:
-  qemu-x86_64 version 4.1.0 (qemu-x86_64 version 4.0.0 also have the
-  issue)
-
-  In 64-bit mode (x86_64) the DS, ES, SS or CS segment prefixes should
-  be ignored; qemu-x86_64 does not ignore them.
-
-  example: an x86_64 instructions preceded by FS DS (0x64 0x26) segment
-  prefixes have the linear address of its memory reference flat-mapped
-  (as if DS was in action) whereas it should be FS-mapped (offset by
-  FS_base, because the DS, ES, SS or CS are just ignored).
-
-  =
-
-  I attach a small C++ program that shows this discrepancy.
-
-  $ ./sample
-  I'm not in QEMU
-
-  $ qemu-x86_64 ./sample
-  I'm in QEMU
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847467/+subscriptions
+-- 
+Peter Xu
 
