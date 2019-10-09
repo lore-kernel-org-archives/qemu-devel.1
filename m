@@ -2,64 +2,63 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9547CC47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 815A2C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:08:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BEBB206B6
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:06:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BEBB206B6
+	by mail.kernel.org (Postfix) with ESMTPS id 5085E206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:08:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5085E206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIJ9p-0007RH-TE
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:06:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58122)
+	id 1iIJC9-0001y2-EZ
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:08:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iII0A-0003Pv-Ig
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:52:03 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIH9F-0005GA-4g
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 14:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iII09-0005I9-AF
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 15:52:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46402)
+ (envelope-from <eblake@redhat.com>) id 1iIH9D-00047y-SA
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 14:57:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40018)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iII06-0005Hc-MS; Wed, 09 Oct 2019 15:51:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iIH9A-00045n-Iy; Wed, 09 Oct 2019 14:57:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E29E9C057E32;
- Wed,  9 Oct 2019 19:51:57 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2E2B918C4289;
+ Wed,  9 Oct 2019 18:57:14 +0000 (UTC)
 Received: from [10.3.116.162] (ovpn-116-162.phx2.redhat.com [10.3.116.162])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CE7F60606;
- Wed,  9 Oct 2019 19:51:57 +0000 (UTC)
-Subject: Re: [PATCH v2 1/4] qemu-iotests: remove bash shebang from library
- files
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <20191009194740.8079-1-crosa@redhat.com>
- <20191009194740.8079-2-crosa@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B5C35DA8C;
+ Wed,  9 Oct 2019 18:57:13 +0000 (UTC)
+Subject: Re: [PATCH 0/5] block/dirty-bitmap: check number and size constraints
+ against queued bitmaps
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190606184159.979-1-jsnow@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <287afb96-bfb7-5e6e-ca1c-0e2845f8ef3c@redhat.com>
-Date: Wed, 9 Oct 2019 14:51:56 -0500
+Message-ID: <ba9b72f0-42b4-f295-78e4-454cc2992346@redhat.com>
+Date: Wed, 9 Oct 2019 13:57:12 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191009194740.8079-2-crosa@redhat.com>
+In-Reply-To: <20190606184159.979-1-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 09 Oct 2019 19:51:57 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Wed, 09 Oct 2019 18:57:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,45 +73,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ vsementsov@virtuozzo.com, aihua liang <aliang@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/9/19 2:47 PM, Cleber Rosa wrote:
-> Due to not being able to find a reason to have shebangs on files that
-> are not executable.
+On 6/6/19 1:41 PM, John Snow wrote:
+> When adding new persistent dirty bitmaps, we only check constraints
+> against currently stored bitmaps, and ignore the pending number and size
+> of any bitmaps yet to be stored.
 > 
-> While at it, add a mode hint to emacs, which would be clueless or
-> plain wrong about these containing shell code.
+> Rework the "can_store" and "remove" interface to explicit "add" and "remove",
+> and begin keeping track of the queued burden when adding new bitmaps.
 > 
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->   tests/qemu-iotests/common.config  | 2 +-
->   tests/qemu-iotests/common.filter  | 2 +-
->   tests/qemu-iotests/common.nbd     | 3 +--
->   tests/qemu-iotests/common.pattern | 2 +-
->   tests/qemu-iotests/common.qemu    | 2 +-
->   tests/qemu-iotests/common.rc      | 2 +-
->   tests/qemu-iotests/common.tls     | 2 +-
->   7 files changed, 7 insertions(+), 8 deletions(-)
+> Reported-by: aihua liang <aliang@redhat.com>
+> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1712636
 > 
-> diff --git a/tests/qemu-iotests/common.config b/tests/qemu-iotests/common.config
-> index 9bd1a5a6fc..b85a6a6f96 100644
-> --- a/tests/qemu-iotests/common.config
-> +++ b/tests/qemu-iotests/common.config
-> @@ -1,4 +1,4 @@
-> -#!/usr/bin/env bash
-> +# -*- emacs mode: sh -*-
+> John Snow (5):
+>    block/qcow2-bitmap: allow bitmap_list_load to return an error code
+>    block/dirty-bitmap: Refactor bdrv_can_store_new_bitmap
+>    block/dirty-bitmap: rework bdrv_remove_persistent_dirty_bitmap
+>    block/qcow2-bitmap: Count queued bitmaps towards nb_bitmaps
+>    block/qcow2-bitmap: Count queued bitmaps towards directory_size
 
-I thought my version:
-# hey emacs, this file will be sourced by bash -*- mode: sh -*-
-was cuter, but that's not a requirement, and yours works  ;)
+Is this series worth reviving as a v2, as it solves a corner-case bug?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
