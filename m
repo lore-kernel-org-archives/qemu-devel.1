@@ -2,102 +2,89 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D92C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6591ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:09:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BF4C218AC
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:09:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BF4C218AC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 91AD2218AC
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:09:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="KY4LxdlR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91AD2218AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIHLA-0001Oo-6R
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:09:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45489)
+	id 1iIHLR-0000eh-6P
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:09:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iIEN4-0008GJ-82
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:59:27 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1iIDkZ-0007ck-Dr
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iIEN2-0006tG-Du
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:59:26 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25822)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iIEN2-0006sn-5i
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:59:24 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x99Fh2QD137178
- for <qemu-devel@nongnu.org>; Wed, 9 Oct 2019 11:59:22 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vhj8j90yc-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 11:59:22 -0400
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <clg@kaod.org>;
- Wed, 9 Oct 2019 16:59:19 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 9 Oct 2019 16:59:15 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x99FxErV47775834
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 9 Oct 2019 15:59:14 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 71F0942042;
- Wed,  9 Oct 2019 15:59:14 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 51F8742041;
- Wed,  9 Oct 2019 15:59:14 +0000 (GMT)
-Received: from smtp.tls.ibm.com (unknown [9.101.4.1])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  9 Oct 2019 15:59:14 +0000 (GMT)
-Received: from yukon.kaod.org (sig-9-145-2-100.uk.ibm.com [9.145.2.100])
- by smtp.tls.ibm.com (Postfix) with ESMTP id 77CA5220121;
- Wed,  9 Oct 2019 17:59:13 +0200 (CEST)
-Subject: Re: [PATCH v4 15/19] spapr: Remove SpaprIrq::nr_msis
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
- <20191009060818.29719-16-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Date: Wed, 9 Oct 2019 17:59:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <lukasstraub2@web.de>) id 1iIDkY-0000kd-85
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 11:19:39 -0400
+Received: from mout.web.de ([212.227.15.14]:58565)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>)
+ id 1iIDkX-0000kF-VN; Wed, 09 Oct 2019 11:19:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1570634363;
+ bh=jfWgR+QqPZ2re2sMpAU6XcfQBs/y4YRLnD/YEV5VVrQ=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=KY4LxdlRzZOl0LSz9nmL2bvRfuJyzr3h1jcEv49qbTWXqGAilZYggeJC8eDeIQJ2W
+ 3GeeiFtrtIZfxHRcny7OVgB49u2D8Zrng99zWs8iTBZNjqp7adVKNI+IgEVutcun4k
+ TkIiKH9bX8y8anS2q/I9lkSYE1xClk7zO/lPqv9E=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.16]) by smtp.web.de (mrweb004
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MgIMg-1iUmmT0FCo-00Njnx; Wed, 09
+ Oct 2019 17:19:23 +0200
+Date: Wed, 9 Oct 2019 17:19:19 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: "Zhang, Chen" <chen.zhang@intel.com>
+Subject: Re: [PATCH v6 2/4] tests/test-replication.c: Add test for for
+ secondary node continuing replication
+Message-ID: <20191009171919.6b90d779@luklap>
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D78062A756A@shsmsx102.ccr.corp.intel.com>
+References: <cover.1570280098.git.lukasstraub2@web.de>
+ <acacb35c86d6abae5c397e2e1953b67485c24d91.1570280098.git.lukasstraub2@web.de>
+ <9CFF81C0F6B98A43A459C9EDAD400D78062A756A@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191009060818.29719-16-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19100915-0012-0000-0000-000003568B38
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100915-0013-0000-0000-000021919128
-Message-Id: <cbf330ce-2f95-5af1-aff5-8bed120c7317@kaod.org>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-09_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=8 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910090144
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id x99Fh2QD137178
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Provags-ID: V03:K1:K06TgRoZmAa58S+zsqoMcF2XZpPpCDKkeBDECFTurqbU+SBzgPR
+ f7qbZaBx0qbHECof9EurEBoRABJyhAArMKYWDnsHoY67lCGPebRDjuxYIN2SqiivCfvcPQ3
+ MvnytCxejxBAbq5pGtF/ezHmgJr1rwKyxEHBzGpr0YS3OnlfmnPcvmPTYqYCKOmnfVdJzKN
+ 3xXCw8nAs2Lxt5yNSaAHg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:agOJwShfo0U=:Lp+F6bhfLbNVwlSZqe2LmS
+ 8AxkfkK8UmeN2RCqA3mahRe+TdGbABwNLcQHpq/dREYncyBfup2pD1WS9WINtczOmqrWYi9Gs
+ jwCK9tJ6MrIqF0gWzIGOv18cqwe6pJhN2sNblqoRTY5BQaZrHliXH89rRzW+V6hl+Lkz72ARO
+ o3k6Ooacb0AT2A8b80B3BCKThThQIUpCvJQQ7C+hHrrwoKoUA2u1pK+yj2ei27AqPfBmDWcWC
+ Dti3FsQ1FWS6cNKDtgvc5mZU07FkgfTvgxgk+1Jwspa1qq8wN2Cuyr+Uc+UQqJlIhCjMwlofZ
+ e0jCm5HHF89VW+aYawuYnoKlSJ5lzQPpPvGzXmCZBhn7PtKuO4EDww73T3NK/kk1tEt3+aGqj
+ jM+Kkda/y4nVmVqzgvytT1v/omgPqmoQTYnZPX/uYw6wrQ7F2Y/qdQMlx67ji0OMELbq0ysQM
+ pM41jy8lg7ANO4C05yDi018Cpc7hFiGZ+ILk9KExxv2B7cOd6Nu4M0MlzsNPU1nBuWqtcjz6F
+ 8jlEzGO5dsipoMEe6LeIAk91eTvf2bETQxFTyv1mZ5E8oTSzHyEHquhlTFTOQgCfBx/bttVAJ
+ UDtM933oFE/3ne9GLmwVeszmirbpChdRgyEs7jN/VR44S0ZdwEsHwTFYxgDhsDuXJVp5AP0MF
+ me7d//eMd0Vsf1/NzfjntdshcDx4UcV2j11tF7Ulca79vwQNiUOY+8uRh5gwTAipYiMGBwtoh
+ VehNDZhwAMeZPgM1BmPU8m8R7NZ1OGi6SYmFhBC3E95eS3NyF6FyJ/HipucHrCE+qWLIUGY3S
+ 5t5GgBgon7jM5axc0Q1l9TezsGPu6ixzwtKhAAwDOM/9sPrKWH1oStSEqRtFa0B8fAPUwjubb
+ kg5bHoQA2G/O4U6oWU1E6ZpX8MQ/LhugXRn3xpFeuzTu0FA+E09S5AB4F9jW+Xp6kLb2iWtWu
+ S48Lt8Fo34yraAPbW8VRtJgcES/jKgm58hMtSS3VT+CQK7/EIxubLcFxS9JobAk2CvYRdUSsl
+ VqkqbhxhMh+0trfzFIoJKdcwOGg8KdZFKiwSLPpQUG53ELUYeGUE1mOham5+XNeDMZhI5etB2
+ WzBG2qw6O0vVsAngvUITJTymt8QGYkCnIuxKgo8OiQma8VwmxCPwqus5DDxGq7Aizq5ZRTd2Z
+ gEUxC2RH0YbkPGIMGvOZI18f4TDGIKBcMG/slCVyXrTjfr2WPnetnTNJcFZp7Iy35d0HGs9Dv
+ n8aGpio7sifFxewn6SQeQzEbkSGz+SNAuLu0w0zRyA54FSzyMN4M17q0KFeo=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.15.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,230 +96,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/2019 08:08, David Gibson wrote:
-> The nr_msis value we use here has to line up with whether we're using
-> legacy or modern irq allocation.  Therefore it's safer to derive it bas=
-ed
-> on legacy_irq_allocation rather than having SpaprIrq contain a canned
-> value.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
+On Wed, 9 Oct 2019 06:03:03 +0000
+"Zhang, Chen" <chen.zhang@intel.com> wrote:
 
+> > -----Original Message-----
+> > From: Lukas Straub <lukasstraub2@web.de>
+> > Sent: Saturday, October 5, 2019 9:06 PM
+> > To: qemu-devel <qemu-devel@nongnu.org>
+> > Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
+> > <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
+> > Xie Changlong <xiechanglong.d@gmail.com>; Kevin Wolf
+> > <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>; qemu-block
+> > <qemu-block@nongnu.org>
+> > Subject: [PATCH v6 2/4] tests/test-replication.c: Add test for for sec=
+ondary
+> > node continuing replication
+> >
+> > This simulates the case that happens when we resume COLO after failove=
+r.
+> >
+> > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> > ---
+> >  tests/test-replication.c | 52
+> > ++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 52 insertions(+)
+> >
+> > diff --git a/tests/test-replication.c b/tests/test-replication.c index
+> > f085d1993a..8e18ecd998 100644
+> > --- a/tests/test-replication.c
+> > +++ b/tests/test-replication.c
+> > @@ -489,6 +489,56 @@ static void test_secondary_stop(void)
+> >      teardown_secondary();
+> >  }
+> >
+> > +static void test_secondary_continuous_replication(void)
+> > +{
+> > +    BlockBackend *top_blk, *local_blk;
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    top_blk =3D start_secondary();
+> > +    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
+> > +    g_assert(!local_err);
+> > +
+> > +    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
+> > +    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
+> > +    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false=
+);
+> > +
+> > +    /* replication will backup s_local_disk to s_hidden_disk */
+> > +    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
+> > +                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+> > +
+> > +    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
+> > +    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
+> > +
+> > +    /* do failover (active commit) */
+> > +    replication_stop_all(true, &local_err);
+> > +    g_assert(!local_err);
+> > +
+> > +    /* it should ignore all requests from now on */
+>
+> Should we need add teardown_secondary() here?
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+I don't think so. It is used to remove the block node after each test and =
+I'm doing that below.
 
-one minor typo below,
+Regards,
+Lukas Straub
 
-> ---
->  hw/ppc/spapr.c              |  5 ++---
->  hw/ppc/spapr_irq.c          | 26 +++++++++++++++++---------
->  hw/ppc/spapr_pci.c          |  7 ++++---
->  include/hw/pci-host/spapr.h |  4 ++--
->  include/hw/ppc/spapr_irq.h  |  4 +---
->  5 files changed, 26 insertions(+), 20 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e880db5d38..153cc54354 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1275,7 +1275,7 @@ static void *spapr_build_fdt(SpaprMachineState *s=
-papr)
->      }
-> =20
->      QLIST_FOREACH(phb, &spapr->phbs, list) {
-> -        ret =3D spapr_dt_phb(phb, PHANDLE_INTC, fdt, spapr->irq->nr_ms=
-is, NULL);
-> +        ret =3D spapr_dt_phb(spapr, phb, PHANDLE_INTC, fdt, NULL);
->          if (ret < 0) {
->              error_report("couldn't setup PCI devices in fdt");
->              exit(1);
-> @@ -3910,8 +3910,7 @@ int spapr_phb_dt_populate(SpaprDrc *drc, SpaprMac=
-hineState *spapr,
->          return -1;
->      }
-> =20
-> -    if (spapr_dt_phb(sphb, intc_phandle, fdt, spapr->irq->nr_msis,
-> -                     fdt_start_offset)) {
-> +    if (spapr_dt_phb(spapr, sphb, intc_phandle, fdt, fdt_start_offset)=
-) {
->          error_setg(errp, "unable to create FDT node for PHB %d", sphb-=
->index);
->          return -1;
->      }
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index f3d18b1dad..076da31501 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -29,9 +29,14 @@ static const TypeInfo spapr_intc_info =3D {
->      .class_size =3D sizeof(SpaprInterruptControllerClass),
->  };
-> =20
-> -void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis)
-> +static void spapr_irq_msi_init(SpaprMachineState *spapr)
->  {
-> -    spapr->irq_map_nr =3D nr_msis;
-> +    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +        /* Legacy mode doesn't use this allocater */
-
-allocater -> allocator
-
-> +        return;
-> +    }
-> +
-> +    spapr->irq_map_nr =3D spapr_irq_nr_msis(spapr);
->      spapr->irq_map =3D bitmap_new(spapr->irq_map_nr);
->  }
-> =20
-> @@ -102,7 +107,6 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptCont=
-roller *, Error **),
-> =20
->  SpaprIrq spapr_irq_xics =3D {
->      .nr_xirqs    =3D SPAPR_NR_XIRQS,
-> -    .nr_msis     =3D SPAPR_NR_MSIS,
->      .xics        =3D true,
->      .xive        =3D false,
->  };
-> @@ -113,7 +117,6 @@ SpaprIrq spapr_irq_xics =3D {
-> =20
->  SpaprIrq spapr_irq_xive =3D {
->      .nr_xirqs    =3D SPAPR_NR_XIRQS,
-> -    .nr_msis     =3D SPAPR_NR_MSIS,
->      .xics        =3D false,
->      .xive        =3D true,
->  };
-> @@ -132,7 +135,6 @@ SpaprIrq spapr_irq_xive =3D {
->   */
->  SpaprIrq spapr_irq_dual =3D {
->      .nr_xirqs    =3D SPAPR_NR_XIRQS,
-> -    .nr_msis     =3D SPAPR_NR_MSIS,
->      .xics        =3D true,
->      .xive        =3D true,
->  };
-> @@ -247,6 +249,15 @@ void spapr_irq_dt(SpaprMachineState *spapr, uint32=
-_t nr_servers,
->      sicc->dt(spapr->active_intc, nr_servers, fdt, phandle);
->  }
-> =20
-> +uint32_t spapr_irq_nr_msis(SpaprMachineState *spapr)
-> +{
-> +    if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> +        return spapr->irq->nr_xirqs;
-> +    } else {
-> +        return SPAPR_XIRQ_BASE + spapr->irq->nr_xirqs - SPAPR_IRQ_MSI;
-> +    }
-> +}
-> +
->  void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
->  {
->      MachineState *machine =3D MACHINE(spapr);
-> @@ -267,9 +278,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
- **errp)
->      }
-> =20
->      /* Initialize the MSI IRQ allocator. */
-> -    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
-> -        spapr_irq_msi_init(spapr, spapr->irq->nr_msis);
-> -    }
-> +    spapr_irq_msi_init(spapr);
-> =20
->      if (spapr->irq->xics) {
->          Error *local_err =3D NULL;
-> @@ -551,7 +560,6 @@ int spapr_irq_find(SpaprMachineState *spapr, int nu=
-m, bool align, Error **errp)
-> =20
->  SpaprIrq spapr_irq_xics_legacy =3D {
->      .nr_xirqs    =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
-> -    .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
->      .xics        =3D true,
->      .xive        =3D false,
->  };
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 01ff41d4c4..cc0e7829b6 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -2277,8 +2277,8 @@ static void spapr_phb_pci_enumerate(SpaprPhbState=
- *phb)
-> =20
->  }
-> =20
-> -int spapr_dt_phb(SpaprPhbState *phb, uint32_t intc_phandle, void *fdt,
-> -                 uint32_t nr_msis, int *node_offset)
-> +int spapr_dt_phb(SpaprMachineState *spapr, SpaprPhbState *phb,
-> +                 uint32_t intc_phandle, void *fdt, int *node_offset)
->  {
->      int bus_off, i, j, ret;
->      uint32_t bus_range[] =3D { cpu_to_be32(0), cpu_to_be32(0xff) };
-> @@ -2343,7 +2343,8 @@ int spapr_dt_phb(SpaprPhbState *phb, uint32_t int=
-c_phandle, void *fdt,
->      _FDT(fdt_setprop(fdt, bus_off, "ranges", &ranges, sizeof_ranges));
->      _FDT(fdt_setprop(fdt, bus_off, "reg", &bus_reg, sizeof(bus_reg)));
->      _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pci-config-space-type", 0=
-x1));
-> -    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", nr_msis))=
-;
-> +    _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi",
-> +                          spapr_irq_nr_msis(spapr)));
-> =20
->      /* Dynamic DMA window */
->      if (phb->ddw_enabled) {
-> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-> index 23506f05d9..8877ff51fb 100644
-> --- a/include/hw/pci-host/spapr.h
-> +++ b/include/hw/pci-host/spapr.h
-> @@ -128,8 +128,8 @@ struct SpaprPhbState {
->  #define SPAPR_PCI_NV2ATSD_WIN_SIZE   (NVGPU_MAX_NUM * NVGPU_MAX_LINKS =
-* \
->                                        64 * KiB)
-> =20
-> -int spapr_dt_phb(SpaprPhbState *phb, uint32_t intc_phandle, void *fdt,
-> -                 uint32_t nr_msis, int *node_offset);
-> +int spapr_dt_phb(SpaprMachineState *spapr, SpaprPhbState *phb,
-> +                 uint32_t intc_phandle, void *fdt, int *node_offset);
-> =20
->  void spapr_pci_rtas_init(void);
-> =20
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index 08173e714c..befe8e01dc 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -27,7 +27,6 @@
->  #define SPAPR_IRQ_MSI        (SPAPR_XIRQ_BASE + 0x0300)
-> =20
->  #define SPAPR_NR_XIRQS       0x1000
-> -#define SPAPR_NR_MSIS        (SPAPR_XIRQ_BASE + SPAPR_NR_XIRQS - SPAPR=
-_IRQ_MSI)
-> =20
->  typedef struct SpaprMachineState SpaprMachineState;
-> =20
-> @@ -73,14 +72,13 @@ void spapr_irq_print_info(SpaprMachineState *spapr,=
- Monitor *mon);
->  void spapr_irq_dt(SpaprMachineState *spapr, uint32_t nr_servers,
->                    void *fdt, uint32_t phandle);
-> =20
-> -void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis);
-> +uint32_t spapr_irq_nr_msis(SpaprMachineState *spapr);
->  int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool a=
-lign,
->                          Error **errp);
->  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t nu=
-m);
-> =20
->  typedef struct SpaprIrq {
->      uint32_t    nr_xirqs;
-> -    uint32_t    nr_msis;
->      bool        xics;
->      bool        xive;
->  } SpaprIrq;
->=20
+> Thanks
+> Zhang Chen
+>
+> > +
+> > +    /* start after failover */
+> > +    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
+> > +    g_assert(!local_err);
+> > +
+> > +    /* checkpoint */
+> > +    replication_do_checkpoint_all(&local_err);
+> > +    g_assert(!local_err);
+> > +
+> > +    /* stop */
+> > +    replication_stop_all(true, &local_err);
+> > +    g_assert(!local_err);
+> > +
+> > +    /* read from s_local_disk (0, IMG_SIZE / 2) */
+> > +    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
+> > +                  0, IMG_SIZE / 2, false);
+> > +
+> > +
+> > +    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
+> > +    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
+> > +                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+> > +
+> > +    teardown_secondary();
+> > +}
+> > +
+> >  static void test_secondary_do_checkpoint(void)
+> >  {
+> >      BlockBackend *top_blk, *local_blk;
+> > @@ -584,6 +634,8 @@ int main(int argc, char **argv)
+> >      g_test_add_func("/replication/secondary/write", test_secondary_wr=
+ite);
+> >      g_test_add_func("/replication/secondary/start", test_secondary_st=
+art);
+> >      g_test_add_func("/replication/secondary/stop",  test_secondary_st=
+op);
+> > +    g_test_add_func("/replication/secondary/continuous_replication",
+> > +                    test_secondary_continuous_replication);
+> >      g_test_add_func("/replication/secondary/do_checkpoint",
+> >                      test_secondary_do_checkpoint);
+> >      g_test_add_func("/replication/secondary/get_error_all",
+> > --
+> > 2.20.1
+>
 
 
