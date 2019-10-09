@@ -2,94 +2,84 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7E3C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBEBDC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:02:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E2C20B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 19:59:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A51D4206B6
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:02:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NV9A73xV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E2C20B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="K/cgc8ip"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51D4206B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=digitalocean.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iII7m-00007s-IC
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 15:59:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49104)
+	id 1iIIAg-0002H1-Od
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 16:02:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iIEir-0001lE-CT
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:21:58 -0400
+ (envelope-from <msmarduch@digitalocean.com>) id 1iIF69-000263-8z
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iIEip-00087L-NO
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:21:57 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35748)
+ (envelope-from <msmarduch@digitalocean.com>) id 1iIF68-0001k6-3Q
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:46:01 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39920)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iIEim-00086I-5o; Wed, 09 Oct 2019 12:21:52 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y21so3269059wmi.0;
- Wed, 09 Oct 2019 09:21:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ryoyJtHg4MPXMh4TNaCEf/rytXkNrnII8j76r7qjP8w=;
- b=NV9A73xV+T4ESvzl8E8+Qy+v5WMQhv8A6XsC3RIi4EB3sZC1yAjP8AAEeX8r50rFcQ
- 5tERpz3BkWe/fIIzNsQXuIVRmGz1mW/55fb8YilvGQ/mOt0gct3g7vericSEbIu4LyPV
- oXwDXvvSyu7Bf+SaMrQ8Dx2wjJAbWP+WWz8HMqkTQ42rpG4Yz5nZFTT5M90Y48Dti3/i
- p4WXmjD32cphW6caFoYHchy3/LoK8nn6EloFlYP+V3KM79qHb5tYrq3euTsQbnD+uwD0
- 0TO0u5yVjZ/3N3poVBfd/kAzo0BS6RESyXLPxIZhJDg5sZ0814d/cz41UDONVn36R9QL
- 591g==
+ (Exim 4.71) (envelope-from <msmarduch@digitalocean.com>)
+ id 1iIF67-0001ix-UY
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 12:46:00 -0400
+Received: by mail-oi1-x243.google.com with SMTP id w144so2329728oia.6
+ for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 09:45:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=digitalocean.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=USBhbd2qdz43lBvTF90+/aku+zY1BGuB8YB3YsvDEsk=;
+ b=K/cgc8ip8Trh/UzP24Ybq9Ru+/wEGzn3Ce8H2Df4fY0jqGSTyhWVKXsBeg1xcxRSZf
+ bzCD3XJoTx8j+2dQ6RX8zZvwa6blK+f0IVtrZWAkKTB2USKgxfdUfM+Gn93pbOlttmqP
+ jtv6b9yfDvAn27g31BvHO29aGYvnqEmQFC5b4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ryoyJtHg4MPXMh4TNaCEf/rytXkNrnII8j76r7qjP8w=;
- b=VqnKzK0lIrnGMioC+BdCAQR6PB2tZwjd43sZzT/ZcMZikIDmXheYeoINvsVuxmcu2s
- dW16hqtF8r0xZZEQVNSqJ8qmv/8rER9l1Lu77gSzB3eUcIIar1yvXy81KSGdLBsBnT2l
- mejuQ9cwL3wqmM3jDrsloSCW4SLVX7j0lXv/6yA3te1IWzkilLYHlqN3a2jqUygwX0lR
- knIIDRtPPZBvIRLy1LWEK0Fmz4trp6wiOIEpffkShOwPXkpsCAo4QzIlSlZhBmRANjI3
- jT/FVCkyfjIML/ItweZ8soOfeAAyfax/OSZlMW7d8GBuzCSdQ88NNfYg5moD58jghODq
- tHhg==
-X-Gm-Message-State: APjAAAUwUkkGUYGD34bLYxz7IJfWW1LVoV+mzUm5rqe5/vVInTj5E2Ry
- lk8N89MxXvVSrusVwwOW3C0=
-X-Google-Smtp-Source: APXvYqyl3KKtp6jsaVIGBl9OCdJOa4mPLcKtmdCCGk8Sn8Kye0iasTL+kP1aolKwpcllCuylhxwUUQ==
-X-Received: by 2002:a1c:dfc4:: with SMTP id w187mr3176103wmg.107.1570638110970; 
- Wed, 09 Oct 2019 09:21:50 -0700 (PDT)
-Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id x2sm3215916wrn.81.2019.10.09.09.21.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Oct 2019 09:21:50 -0700 (PDT)
-Subject: Re: [PATCH 18/19] tests/boot_linux_console: Boot Linux and run few
- commands on raspi3
-To: Cleber Rosa <crosa@redhat.com>
-References: <20190926173428.10713-1-f4bug@amsat.org>
- <20190926173428.10713-19-f4bug@amsat.org>
- <20191009161232.GE30349@localhost.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <81d4a5fa-8d7e-6c64-c375-b2ecce3543e0@amsat.org>
-Date: Wed, 9 Oct 2019 18:21:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
-MIME-Version: 1.0
-In-Reply-To: <20191009161232.GE30349@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=USBhbd2qdz43lBvTF90+/aku+zY1BGuB8YB3YsvDEsk=;
+ b=e/rdw9E2C7bjXb8BFV0eq68WSYi3qFeBtCjXPzhcWMkg4gc0yDc89ToWd5W2gzoirH
+ 6iooZM5IiznY2wZp7rfQ96fw3/N5zo9yp7ksHYib3e7eT5pEd+1MkYG2Q1v5/oMjrD0+
+ nCb3eHvcwXCU9XiQxrxWBXc4MTVP/k7J6rpdP8VqUmNg1SLxOM5G4DoAuW3nq64fKsn8
+ 52GsL/t1cZCZfQqcKi4bC1gL1dFKi7pyEQfq04OFkT/qjVVvlcjadyrKE4QGT3Z6Yo5O
+ QH1LvrissHfbzn4138gCCXyMe41tDdvxWdwMc+tWjEpj9eJq9NGTPHZJgJmFTQlKQaNT
+ MHKQ==
+X-Gm-Message-State: APjAAAW6WHvwKAFqpANSfZsellaPUeVF5gsolUv+UZHcwQRddSEj7yhP
+ LptHII5ChhPluNjZMuuajf1ZrQ==
+X-Google-Smtp-Source: APXvYqzSykY2vXaWT1phz43fJDxY1HjvHG5KdsjA7bg8aI5Ho+b967sZD4OAa21R66F5htQHVrwqGg==
+X-Received: by 2002:a54:4519:: with SMTP id l25mr3163818oil.143.1570639557881; 
+ Wed, 09 Oct 2019 09:45:57 -0700 (PDT)
+Received: from msmarduch-ThinkPad-T460s.attlocal.net
+ ([2600:1700:4a30:84c0:8d5e:794e:8a2e:ee89])
+ by smtp.gmail.com with ESMTPSA id q1sm789818otn.8.2019.10.09.09.45.56
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 09 Oct 2019 09:45:57 -0700 (PDT)
+From: Mario Smarduch <msmarduch@digitalocean.com>
+To: philmd@redhat.com, mtosatti@redhat.com, pbonzini@redhat.com,
+ armbru@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, rth@twiddle.net,
+ ehabkost@redhat.com, Mario Smarduch <msmarduch@digitalocean.com>
+Subject: [PATCHv2 2/2] target/i386: log MCE guest and host addresses
+Date: Wed,  9 Oct 2019 09:44:59 -0700
+Message-Id: <20191009164459.8209-3-msmarduch@digitalocean.com>
+X-Mailer: git-send-email 2.9.3
+In-Reply-To: <20191009164459.8209-1-msmarduch@digitalocean.com>
+References: <20191009164459.8209-1-msmarduch@digitalocean.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,156 +91,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Zolt=c3=a1n_Baldaszti?= <bztemail@gmail.com>,
- Laurent Bonnans <laurent.bonnans@here.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
- Clement Deschamps <clement.deschamps@antfield.fr>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Cheng Xiang <ext-cheng.xiang@here.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Pekka Enberg <penberg@iki.fi>, Guenter Roeck <linux@roeck-us.net>,
- Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/9/19 6:12 PM, Cleber Rosa wrote:
-> On Thu, Sep 26, 2019 at 07:34:26PM +0200, Philippe Mathieu-Daudé wrote:
->> Add a test which boots Linux and run basic commands using the serial
->> port console.
->>
->> The kernel image is built by the Debian project:
->> https://wiki.debian.org/RaspberryPi
->>
->> The DeviceTree blob comes from the official Raspberry Pi project:
->> https://www.raspberrypi.org/
->>
->> The cpio image used comes from the linux-build-test project:
->> https://github.com/groeck/linux-build-test
->>
->> This test can be run using:
->>
->>    $ avocado run --show=console,app run -t machine:raspi3 tests/acceptance
->>    console: [    0.000000] Linux version 4.14.0-3-arm64 (debian-kernel@lists.debian.org) (gcc version 7.2.0 (Debian 7.2.0-18)) #1 SMP Debian 4.14.12-2 (2018-01-06)
->>    console: [    0.000000] Boot CPU: AArch64 Processor [410fd034]
->>    console: [    0.000000] Machine model: Raspberry Pi 3 Model B
->>    console: [    0.000000] earlycon: pl11 at MMIO 0x000000003f201000 (options '')
->>    console: [    0.000000] bootconsole [pl11] enabled
->>    [...]
->>    console: Starting network: OK
->>    console: Found console ttyAMA0
->>    console: Boot successful.
->>    console: / # cat /proc/cpuinfo
->>    console: processor      : 0
->>    console: BogoMIPS       : 125.00
->>    console: r      : 0x41
->>    console: CPU architecture: 8
->>    console: CPU variant
->>    console: : 0x0
->>    console: CPU part       : 0xd03
->>    console: CPU revision   : 4
->>    console: / # uname -a
->>    console: Linux buildroot 4.14.0-3-arm64 #1 SMP Debian 4.14.12-2 (2018-01-06) aarch64 GNU/Linux
->>    console: reboot
->>    console: / # reboot
->>    console: / # Found console ttyAMA0
->>    console: Stopping network: OK
->>    console: Saving random seed... done.
->>    console: Stopping logging: OK
->>    console: umount: devtmpfs busy - remounted read-only
->>    console: umount: can't unmount /: Invalid argument
->>    console: The system is going down NOW!
->>    console: Sent SIGTERM to all processes
->>    console: Sent SIGKILL to all processes
->>    console: Requesting system reboot
->>    console: kvm: exiting hardware virtualization
->>    console: reboot: Restarting system
->>    PASS (11.08 s)
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> some chars are scrambled on the console...
->> ---
->>   tests/acceptance/boot_linux_console.py | 47 ++++++++++++++++++++++++++
->>   1 file changed, 47 insertions(+)
->>
->> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
->> index 33e8f6c635..2a1a23763e 100644
->> --- a/tests/acceptance/boot_linux_console.py
->> +++ b/tests/acceptance/boot_linux_console.py
->> @@ -363,6 +363,53 @@ class BootLinuxConsole(Test):
->>           """
->>           self.do_test_arm_raspi2(1)
->>   
->> +    def test_arm_raspi3_initrd_uart0(self):
->> +        """
->> +        :avocado: tags=arch:aarch64
->> +        :avocado: tags=machine:raspi3
->> +        """
->> +        deb_url = ('https://snapshot.debian.org/archive/debian/'
->> +                   '20180106T174014Z/pool/main/l/linux/'
->> +                   'linux-image-4.14.0-3-arm64_4.14.12-2_arm64.deb')
->> +        deb_hash = 'e71c995de57921921895c1162baea5df527d1c6b'
->> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
->> +        kernel_path = self.extract_from_deb(deb_path,
->> +                                            '/boot/vmlinuz-4.14.0-3-arm64')
->> +
->> +        dtb_url = ('https://github.com/raspberrypi/firmware/raw/'
->> +                   '1.20180313/boot/bcm2710-rpi-3-b.dtb')
->> +        dtb_hash = 'eb14d67133401ef2f93523be7341456d38bfc077'
->> +        dtb_path = self.fetch_asset(dtb_url, asset_hash=dtb_hash)
->> +
->> +        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
->> +                      '9b6b392ea7bc15f0d6632328d429d31c9c6273da/rootfs/'
->> +                      'arm64/rootfs.cpio.gz')
->> +        initrd_hash = '6fd05324f17bb950196b5ad9d3a0fa996339f4cd'
->> +        initrd_path_gz = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
->> +        initrd_path = self.workdir + "rootfs.cpio"
->> +        gunzip(initrd_path_gz, initrd_path)
->> +
->> +        self.vm.set_machine('raspi3')
->> +        self.vm.set_console()
->> +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
->> +                               'earlycon=pl011,0x3f201000 console=ttyAMA0 ' +
->> +                               'panic=-1 noreboot')
->> +        self.vm.add_args('-kernel', kernel_path,
->> +                         '-dtb', dtb_path,
->> +                         '-initrd', initrd_path,
->> +                         '-append', kernel_command_line,
->> +                         '-no-reboot')
->> +        self.vm.launch()
->> +
->> +        self.wait_for_console_pattern('Boot successful.')
->> +
->> +        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
->> +                                               'BogoMIPS')
->> +        self.exec_command_and_wait_for_pattern('uname -a',
->> +                                               'Debian')
->> +        self.exec_command_and_wait_for_pattern('reboot',
->> +                                               'reboot: Restarting system')
->> +
->>       def test_s390x_s390_ccw_virtio(self):
->>           """
->>           :avocado: tags=arch:s390x
->> -- 
->> 2.20.1
->>
-> 
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> 
-> And even though you mentioned some trouble with the console, I've run
-> this 100 times and had no issues that disturbed the test, so:
+Patch logs MCE AO, AR messages injected to guest or taken by QEMU itself.
+We print the QEMU address for guest MCEs, helps on hypervisors that have
+another source of MCE logging like mce log, and when they go missing.
 
-Ahaha thanks for insisting :)
+For example we found these QEMU logs:
 
-I ran the Exynos4210 test 20 times and it did not fail, I'll try 80 more 
-times.
+September 26th 2019, 17:36:02.309        Droplet-153258224: Guest MCE Memory Error at qemu addr 0x7f8ce14f5000 and guest 3d6f5000 addr of type BUS_MCEERR_AR injected   qemu-system-x86_64      amsN    ams3nodeNNNN
 
-> 
-> Tested-by: Cleber Rosa <crosa@redhat.com>
+September 27th 2019, 06:25:03.234        Droplet-153258224: Guest MCE Memory Error at qemu addr 0x7f8ce14f5000 and guest 3d6f5000 addr of type BUS_MCEERR_AR injected   qemu-system-x86_64      amsN    ams3nodeNNNN
 
-Thanks!
+The first log had a corresponding mce log entry, the second didnt (logging
+thresholds) we can infer from second entry same PA and mce type.
+
+Signed-off-by: Mario Smarduch <msmarduch@digitalocean.com>
+---
+ target/i386/kvm.c | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
+
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 11b9c85..7eeefac 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -592,9 +592,9 @@ static void kvm_mce_inject(X86CPU *cpu, hwaddr paddr, int code)
+                        (MCM_ADDR_PHYS << 6) | 0xc, flags);
+ }
+ 
+-static void hardware_memory_error(void)
++static void hardware_memory_error(void *host_addr)
+ {
+-    fprintf(stderr, "Hardware memory error!\n");
++    error_report("QEMU got Hardware memory error at addr %p", host_addr);
+     exit(1);
+ }
+ 
+@@ -618,15 +618,34 @@ void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+             kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+             kvm_hwpoison_page_add(ram_addr);
+             kvm_mce_inject(cpu, paddr, code);
++
++            /*
++             * Use different logging severity based on error type.
++             * If there is additional MCE reporting on the hypervisor, QEMU VA
++             * could be another source to identify the PA and MCE details.
++             */
++            if (code == BUS_MCEERR_AR) {
++                error_report("Guest MCE Memory Error at QEMU addr %p and "
++                    "GUEST addr 0x%" HWADDR_PRIx " of type %s injected",
++                    addr, paddr, "BUS_MCEERR_AR");
++            } else {
++                 warn_report("Guest MCE Memory Error at QEMU addr %p and "
++                     "GUEST addr 0x%" HWADDR_PRIx " of type %s injected",
++                     addr, paddr, "BUS_MCEERR_AO");
++            }
++
+             return;
+         }
+ 
+-        fprintf(stderr, "Hardware memory error for memory used by "
+-                "QEMU itself instead of guest system!\n");
++        if (code == BUS_MCEERR_AO) {
++            warn_report("Hardware memory error at addr %p of type %s "
++                "for memory used by QEMU itself instead of guest system!",
++                 addr, "BUS_MCEERR_AO");
++        }
+     }
+ 
+     if (code == BUS_MCEERR_AR) {
+-        hardware_memory_error();
++        hardware_memory_error(addr);
+     }
+ 
+     /* Hope we are lucky for AO MCE */
+-- 
+2.9.3
+
 
