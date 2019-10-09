@@ -2,120 +2,65 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C10C0ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7B9ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:08:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D75D20B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:07:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="XNZyG52O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D75D20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 75A8120B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:08:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75A8120B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIFQZ-0001PG-TM
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:07:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53023)
+	id 1iIFRS-0002sz-4v
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:08:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iI8Uf-0005ls-HV
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:42:57 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iI5db-0004YD-9J
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:39:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iI8Uc-0004rr-Px
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:42:53 -0400
-Received: from mail-eopbgr20098.outbound.protection.outlook.com
- ([40.107.2.98]:64582 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iI8Ub-0004rS-Vk
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:42:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OjwjhHrQhuCLABKkffI8ARIrBOGqpjp0/FK2vcNgfeVM8m3w08XNyjGGFiEwKGrfkWPVZgTZutxyLyxLRVf90KGM+JTp84h0uszOGLvDqzkrMr/2jB41b1RKZ7hBeMFn0wSh9XAMM0HJaIh8ER9vbvVa1Nk9UeizBzEF5qb2Dx7exQgShJUTqPVwY/D1s88og00YEed8iI/QKailQF2742MhQNntmjYHQ+EHvuGuwC/XnhOUmAx3pQ9p00C2FPT45g8IlGGNAM1dlc2GmTr52Ns3Rkj6lNBl8AjIvtqETuxffVT8t2NkBJ/z0D1C2Mk+UMb1nKS1Ex/n6b/PIueZSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r2zHZ0MHegcUmGq5SA+hyast9mVCACNC77LDY+5LRFc=;
- b=C3s1JD0dY3XV6Z7OWxhZJYPTRd54CCltydOWEf0LTNAbyJcM+dxEoO0G9RjAX5tBa/QRDOMRRRoHQXtNyPuEgu+cQH2TUQjrn6sk/xjt/PuMKkRWIFGfEjpYdzHhQpkA1oUabAKlSQaTisjQRlVmz9dyQzXmqEYzO2qC7M/Y/mRiir/qb9u1V0jNKRlg88YL7Nbg+Wz2tv5F/a1Z74tTEt4q0yYLUTzToLoWTJiNAadThf/6P8FjZXf/rB7O05Wqcy8MN1aHzsJiPWTGyRcMbtLax8U6peKkvn/ubwAMBHvrJ8vMPQSaj3koGxIjkmsD5p/zBV8IWMT4LSNil88b7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r2zHZ0MHegcUmGq5SA+hyast9mVCACNC77LDY+5LRFc=;
- b=XNZyG52O6qAGIShLzQkZQapZNftqdjG0P4ax9dk5oStvEUn3D9Du6f0k0vjhSQg0C5iYHb5QOEUFFdi098nJemSdLnVp+6l5T2Z3SGB/XTMlyRFu5lHend8qW/VLNV1L0DlDdNxpqXPDVNsOalWYET5Cbxu34004p9qjhTd6UpM=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5419.eurprd08.prod.outlook.com (52.133.241.141) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Wed, 9 Oct 2019 09:42:47 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2327.026; Wed, 9 Oct 2019
- 09:42:47 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v4 01/31] errp: rename errp to errp_in where it is
- IN-argument
-Thread-Topic: [PATCH v4 01/31] errp: rename errp to errp_in where it is
- IN-argument
-Thread-Index: AQHVeHBgGNp8AunJykKebkfVAuWGs6dQfy49gAGbvgA=
-Date: Wed, 9 Oct 2019 09:42:46 +0000
-Message-ID: <c393e6cc-ae34-78bb-2b7a-53ab6ed1dbae@virtuozzo.com>
-References: <20191001155319.8066-1-vsementsov@virtuozzo.com>
- <20191001155319.8066-2-vsementsov@virtuozzo.com>
- <878spvmwns.fsf@dusky.pond.sub.org>
-In-Reply-To: <878spvmwns.fsf@dusky.pond.sub.org>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0178.eurprd05.prod.outlook.com
- (2603:10a6:3:f8::26) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191009124244602
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a9d4302f-da95-4202-8aca-08d74c9d0a9e
-x-ms-traffictypediagnostic: DB8PR08MB5419:
-x-microsoft-antispam-prvs: <DB8PR08MB54198B5CD31C8EFC413912B3C1950@DB8PR08MB5419.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 018577E36E
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(396003)(39840400004)(376002)(366004)(346002)(199004)(189003)(54906003)(31686004)(186003)(14454004)(6916009)(2906002)(66446008)(478600001)(66066001)(66476007)(66556008)(64756008)(66946007)(5660300002)(386003)(6506007)(71190400001)(102836004)(3846002)(99286004)(76176011)(52116002)(6116002)(71200400001)(316002)(26005)(256004)(8936002)(8676002)(81166006)(81156014)(25786009)(11346002)(31696002)(86362001)(476003)(2616005)(6246003)(446003)(36756003)(7736002)(229853002)(4326008)(486006)(6512007)(6436002)(305945005)(6486002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5419;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ndtIahpnNRuMjPWQ1SN/SH7Fg2NngUbj+6Z89QznSuX9GgNtjbOcbs1zzVSMjyG81X8i9j+v4hTRys/eVbIa0Wf16trVzuryClUKlQvUhC8QtSNMNxov5tfRj6HI2/v7DH70ljOAbXAEMLUDmhdqKqcUby5DDs7Ap4xjq95Cl5Bcrfa+p6VI72DS8l3J+Uk1oB/NN1dmx91MYu0vxZMSoNpkqNZP0sHp2aFZI/Gm4uPit6svhBKL1LEfUyfcRk1qHTOrO8WzI8qf6/NHUw934tWGlI1RKQLzDE7lbMT74JeIwVkdm8TvRdCuqQULOeCv2v9k4B1Br2hoJNvkMIi1c5luuaoRYaITIHO/lLwoZzP1OxP7iodAE9DAbDvcK1/EODznpPP/iPZWekn3vM4aBT6UASrcn3EtGn5XAdsla+s=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E39844838CF35A47905C0DD8B3DA9595@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <tao3.xu@intel.com>) id 1iI5dZ-0001IK-GN
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:39:54 -0400
+Received: from mga06.intel.com ([134.134.136.31]:26032)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iI5dZ-0001FI-8G
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:39:53 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 08 Oct 2019 23:39:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; d="scan'208";a="205657378"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.191])
+ ([10.239.196.191])
+ by orsmga002.jf.intel.com with ESMTP; 08 Oct 2019 23:39:47 -0700
+Subject: Re: [PATCH v12 06/11] numa: Extend CLI to provide memory latency and
+ bandwidth information
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20190920074349.2616-1-tao3.xu@intel.com>
+ <20190920074349.2616-7-tao3.xu@intel.com>
+ <20191002171619.04a11347@redhat.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <5bfe9d25-89a1-90a6-75fb-a6aecf4844c0@intel.com>
+Date: Wed, 9 Oct 2019 14:39:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9d4302f-da95-4202-8aca-08d74c9d0a9e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Oct 2019 09:42:47.0335 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: twhREX85WiPH0w9q5CvZhu8FChax3sAuweMyNLUeBHz5u6v19lDau3eqj7cim1WtW+qOIxKRxf0PTK3e0Oo+KWaIz5l9M2B7fAuQZGK0iAw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5419
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.2.98
+In-Reply-To: <20191002171619.04a11347@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.31
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,156 +72,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>,
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>, "Williams,
+ Dan J" <dan.j.williams@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDguMTAuMjAxOSAxMjowOCwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IFZsYWRpbWlyIFNl
-bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiAN
-Cj4+IEVycm9yICoqZXJycCBpcyBhbG1vc3QgYWx3YXlzIE9VVC1hcmd1bWVudDogaXQncyBhc3N1
-bWVkIHRvIGJlIE5VTEwsIG9yDQo+PiBwb2ludGVyIHRvIE5VTEwtaW5pdGlhbGl6ZWQgcG9pbnRl
-ciwgb3IgcG9pbnRlciB0byBlcnJvcl9hYm9ydCBvcg0KPj4gZXJyb3JfZmF0YWwsIGZvciBjYWxs
-ZWUgdG8gcmVwb3J0IGVycm9yLg0KPiANCj4gWWVzLg0KPiANCj4+IEJ1dCB2ZXJ5IGZldyBmdW5j
-dGlvbnMgaW5zdGVhZCBnZXQgRXJyb3IgKiplcnJwIGFzIElOLWFyZ3VtZW50Og0KPj4gaXQncyBh
-c3N1bWVkIHRvIGJlIHNldCwgYW5kIGNhbGxlZSBzaG91bGQgY2xlYW4gaXQuDQo+IA0KPiBXaGF0
-IGRvIHlvdSBtZWFuIGJ5ICJjYWxsZWUgc2hvdWxkIGNsZWFuIj8gIExldCdzIHNlZSBiZWxvdy4N
-Cj4gDQo+PiBJbiBzdWNoIGNhc2VzLCByZW5hbWUgZXJycCB0byBlcnJwX2luLg0KPiANCj4gSSBh
-Y2tub3dsZWRnZSB0aGF0IGVycnAgYXJndW1lbnRzIHRoYXQgZG9uJ3QgaGF2ZSB0aGUgdXN1YWwg
-bWVhbmluZyBjYW4NCj4gYmUgY29uZnVzaW5nLg0KPiANCj4gTmFtaW5nIGNhbiBoZWxwLCBjb21t
-ZW50cyBjYW4gaGVscCwgYnV0IHBlcmhhcHMgd2UgY2FuIHR3ZWFrIHRoZSBjb2RlIHRvDQo+IGF2
-b2lkIHRoZSBwcm9ibGVtIGluc3RlYWQuICBMZXQncyBzZWU6DQo+IA0KPj4gU2lnbmVkLW9mZi1i
-eTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29t
-Pg0KPj4gUmV2aWV3ZWQtYnk6IEVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPg0KPj4gLS0t
-DQo+PiAgIGluY2x1ZGUvbW9uaXRvci9obXAuaCB8ICAyICstDQo+PiAgIGluY2x1ZGUvcWFwaS9l
-cnJvci5oICB8ICAyICstDQo+PiAgIHVpL3ZuYy5oICAgICAgICAgICAgICB8ICAyICstDQo+PiAg
-IG1vbml0b3IvaG1wLWNtZHMuYyAgICB8ICA4ICsrKystLS0tDQo+PiAgIHVpL3ZuYy5jICAgICAg
-ICAgICAgICB8IDEwICsrKysrLS0tLS0NCj4+ICAgdXRpbC9lcnJvci5jICAgICAgICAgIHwgIDgg
-KysrKy0tLS0NCj4+ICAgNiBmaWxlcyBjaGFuZ2VkLCAxNiBpbnNlcnRpb25zKCspLCAxNiBkZWxl
-dGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9tb25pdG9yL2htcC5oIGIvaW5j
-bHVkZS9tb25pdG9yL2htcC5oDQo+PiBpbmRleCBhMGU5NTExNDQwLi5mOTI5ODE0ZjFhIDEwMDY0
-NA0KPj4gLS0tIGEvaW5jbHVkZS9tb25pdG9yL2htcC5oDQo+PiArKysgYi9pbmNsdWRlL21vbml0
-b3IvaG1wLmgNCj4+IEBAIC0xNiw3ICsxNiw3IEBADQo+PiAgIA0KPj4gICAjaW5jbHVkZSAicWVt
-dS9yZWFkbGluZS5oIg0KPj4gICANCj4+IC12b2lkIGhtcF9oYW5kbGVfZXJyb3IoTW9uaXRvciAq
-bW9uLCBFcnJvciAqKmVycnApOw0KPj4gK3ZvaWQgaG1wX2hhbmRsZV9lcnJvcihNb25pdG9yICpt
-b24sIEVycm9yICoqZXJycF9pbik7DQo+PiAgIA0KPj4gICB2b2lkIGhtcF9pbmZvX25hbWUoTW9u
-aXRvciAqbW9uLCBjb25zdCBRRGljdCAqcWRpY3QpOw0KPj4gICB2b2lkIGhtcF9pbmZvX3ZlcnNp
-b24oTW9uaXRvciAqbW9uLCBjb25zdCBRRGljdCAqcWRpY3QpOw0KPj4gZGlmZiAtLWdpdCBhL2lu
-Y2x1ZGUvcWFwaS9lcnJvci5oIGIvaW5jbHVkZS9xYXBpL2Vycm9yLmgNCj4+IGluZGV4IDNmOTUx
-NDFhMDEuLjkzNzZmNTljMzUgMTAwNjQ0DQo+PiAtLS0gYS9pbmNsdWRlL3FhcGkvZXJyb3IuaA0K
-Pj4gKysrIGIvaW5jbHVkZS9xYXBpL2Vycm9yLmgNCj4+IEBAIC0yODMsNyArMjgzLDcgQEAgdm9p
-ZCBlcnJvcl9mcmVlKEVycm9yICplcnIpOw0KPj4gICAvKg0KPj4gICAgKiBDb252ZW5pZW5jZSBm
-dW5jdGlvbiB0byBhc3NlcnQgdGhhdCAqQGVycnAgaXMgc2V0LCB0aGVuIHNpbGVudGx5IGZyZWUg
-aXQuDQo+PiAgICAqLw0KPj4gLXZvaWQgZXJyb3JfZnJlZV9vcl9hYm9ydChFcnJvciAqKmVycnAp
-Ow0KPj4gK3ZvaWQgZXJyb3JfZnJlZV9vcl9hYm9ydChFcnJvciAqKmVycnBfaW4pOw0KPj4gICAN
-Cj4+ICAgLyoNCj4+ICAgICogQ29udmVuaWVuY2UgZnVuY3Rpb24gdG8gd2Fybl9yZXBvcnQoKSBh
-bmQgZnJlZSBAZXJyLg0KPj4gZGlmZiAtLWdpdCBhL3VpL3ZuYy5oIGIvdWkvdm5jLmgNCj4+IGlu
-ZGV4IGZlYTc5YzJmYzkuLjAwZTBiNDhmMmYgMTAwNjQ0DQo+PiAtLS0gYS91aS92bmMuaA0KPj4g
-KysrIGIvdWkvdm5jLmgNCj4+IEBAIC01NDcsNyArNTQ3LDcgQEAgdWludDMyX3QgcmVhZF91MzIo
-dWludDhfdCAqZGF0YSwgc2l6ZV90IG9mZnNldCk7DQo+PiAgIA0KPj4gICAvKiBQcm90b2NvbCBz
-dGFnZSBmdW5jdGlvbnMgKi8NCj4+ICAgdm9pZCB2bmNfY2xpZW50X2Vycm9yKFZuY1N0YXRlICp2
-cyk7DQo+PiAtc2l6ZV90IHZuY19jbGllbnRfaW9fZXJyb3IoVm5jU3RhdGUgKnZzLCBzc2l6ZV90
-IHJldCwgRXJyb3IgKiplcnJwKTsNCj4+ICtzaXplX3Qgdm5jX2NsaWVudF9pb19lcnJvcihWbmNT
-dGF0ZSAqdnMsIHNzaXplX3QgcmV0LCBFcnJvciAqKmVycnBfaW4pOw0KPj4gICANCj4+ICAgdm9p
-ZCBzdGFydF9jbGllbnRfaW5pdChWbmNTdGF0ZSAqdnMpOw0KPj4gICB2b2lkIHN0YXJ0X2F1dGhf
-dm5jKFZuY1N0YXRlICp2cyk7DQo+PiBkaWZmIC0tZ2l0IGEvbW9uaXRvci9obXAtY21kcy5jIGIv
-bW9uaXRvci9obXAtY21kcy5jDQo+PiBpbmRleCBiMjU1MWMxNmQxLi45NDFkNWQwYTQ1IDEwMDY0
-NA0KPj4gLS0tIGEvbW9uaXRvci9obXAtY21kcy5jDQo+PiArKysgYi9tb25pdG9yL2htcC1jbWRz
-LmMNCj4+IEBAIC02MCwxMSArNjAsMTEgQEANCj4+ICAgI2luY2x1ZGUgPHNwaWNlL2VudW1zLmg+
-DQo+PiAgICNlbmRpZg0KPj4gICANCj4+IC12b2lkIGhtcF9oYW5kbGVfZXJyb3IoTW9uaXRvciAq
-bW9uLCBFcnJvciAqKmVycnApDQo+PiArdm9pZCBobXBfaGFuZGxlX2Vycm9yKE1vbml0b3IgKm1v
-biwgRXJyb3IgKiplcnJwX2luKQ0KPj4gICB7DQo+PiAtICAgIGFzc2VydChlcnJwKTsNCj4+IC0g
-ICAgaWYgKCplcnJwKSB7DQo+PiAtICAgICAgICBlcnJvcl9yZXBvcnRmX2VycigqZXJycCwgIkVy
-cm9yOiAiKTsNCj4+ICsgICAgYXNzZXJ0KGVycnBfaW4pOw0KPj4gKyAgICBpZiAoKmVycnBfaW4p
-IHsNCj4+ICsgICAgICAgIGVycm9yX3JlcG9ydGZfZXJyKCplcnJwX2luLCAiRXJyb3I6ICIpOw0K
-Pj4gICAgICAgfQ0KPj4gICB9DQo+IA0KPiBUaGlzIGZ1bmN0aW9ucyBmcmVlcyB0aGUgZXJyb3Iu
-ICBJdCBsZWF2ZXMgbm90aGluZyBmb3IgdGhlIGNhbGxlciB0bw0KPiBjbGVhbiB1cC4NCj4gDQo+
-IEFsbCBjYWxsZXJzIHBhc3MgJkVSUiwgd2hlcmUgRVJSIGlzIGEgbG9jYWwgdmFyaWFibGUuICBQ
-ZXJoYXBzIGEgbW9yZQ0KPiByb2J1c3Qgd2F5IHRvIHNpZ25hbCAiQGVycnAgaXMgbm90IHRoZSB1
-c3VhbCBvdXQtYXJndW1lbnQiIHdvdWxkIGJlDQo+IHBlZWxpbmcgb2ZmIGFuIGluZGlyZWN0aW9u
-OiBwYXNzIEVSUiwgZHJvcCB0aGUgYXNzZXJ0aW9uLg0KPiANCj4+ICAgDQo+PiBkaWZmIC0tZ2l0
-IGEvdWkvdm5jLmMgYi91aS92bmMuYw0KPj4gaW5kZXggODdiODA0NWFmZS4uOWQ2Mzg0ZDliMSAx
-MDA2NDQNCj4+IC0tLSBhL3VpL3ZuYy5jDQo+PiArKysgYi91aS92bmMuYw0KPj4gQEAgLTEzMTIs
-NyArMTMxMiw3IEBAIHZvaWQgdm5jX2Rpc2Nvbm5lY3RfZmluaXNoKFZuY1N0YXRlICp2cykNCj4+
-ICAgICAgIGdfZnJlZSh2cyk7DQo+PiAgIH0NCj4+ICAgDQo+PiAtc2l6ZV90IHZuY19jbGllbnRf
-aW9fZXJyb3IoVm5jU3RhdGUgKnZzLCBzc2l6ZV90IHJldCwgRXJyb3IgKiplcnJwKQ0KPj4gK3Np
-emVfdCB2bmNfY2xpZW50X2lvX2Vycm9yKFZuY1N0YXRlICp2cywgc3NpemVfdCByZXQsIEVycm9y
-ICoqZXJycF9pbikNCj4+ICAgew0KPj4gICAgICAgaWYgKHJldCA8PSAwKSB7DQo+PiAgICAgICAg
-ICAgaWYgKHJldCA9PSAwKSB7DQo+PiBAQCAtMTMyMCwxNCArMTMyMCwxNCBAQCBzaXplX3Qgdm5j
-X2NsaWVudF9pb19lcnJvcihWbmNTdGF0ZSAqdnMsIHNzaXplX3QgcmV0LCBFcnJvciAqKmVycnAp
-DQo+PiAgICAgICAgICAgICAgIHZuY19kaXNjb25uZWN0X3N0YXJ0KHZzKTsNCj4+ICAgICAgICAg
-ICB9IGVsc2UgaWYgKHJldCAhPSBRSU9fQ0hBTk5FTF9FUlJfQkxPQ0spIHsNCj4+ICAgICAgICAg
-ICAgICAgdHJhY2Vfdm5jX2NsaWVudF9pb19lcnJvcih2cywgdnMtPmlvYywNCj4+IC0gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVycnAgPyBlcnJvcl9nZXRfcHJldHR5KCpl
-cnJwKSA6DQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlcnJwX2lu
-ID8gZXJyb3JfZ2V0X3ByZXR0eSgqZXJycF9pbikgOg0KPj4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICJVbmtub3duIik7DQo+PiAgICAgICAgICAgICAgIHZuY19kaXNj
-b25uZWN0X3N0YXJ0KHZzKTsNCj4+ICAgICAgICAgICB9DQo+PiAgIA0KPj4gLSAgICAgICAgaWYg
-KGVycnApIHsNCj4+IC0gICAgICAgICAgICBlcnJvcl9mcmVlKCplcnJwKTsNCj4+IC0gICAgICAg
-ICAgICAqZXJycCA9IE5VTEw7DQo+PiArICAgICAgICBpZiAoZXJycF9pbikgew0KPj4gKyAgICAg
-ICAgICAgIGVycm9yX2ZyZWUoKmVycnBfaW4pOw0KPj4gKyAgICAgICAgICAgICplcnJwX2luID0g
-TlVMTDsNCj4+ICAgICAgICAgICB9DQo+PiAgICAgICAgICAgcmV0dXJuIDA7DQo+PiAgICAgICB9
-DQo+IA0KPiBUaGlzIGZ1bmN0aW9uIGlzbid0IHRyaXZpYWwsIGFuZCBsYWNrcyBhIGNvbnRyYWN0
-LCBzbyBsZXQncyBmaWd1cmUgb3V0DQo+IHdoYXQgaXQgZG9lcyBhbmQgaG93IGl0J3MgdXNlZC4N
-Cj4gDQo+IEByZXQgY2FuIGJlOg0KPiANCj4gKiBaZXJvDQo+IA0KPiAgICBUcmFjZSBFT0YsIGNh
-bGwgdm5jX2Rpc2Nvbm5lY3Rfc3RhcnQoKSwgZnJlZSB0aGUgZXJyb3IsIHJldHVybiB6ZXJvLg0K
-PiANCj4gICAgQXNpZGU6IGZyZWVpbmcgdGhlIGVycm9yIHdpdGhvdXQgbG9va2luZyBhdCBpdCBm
-ZWVscyBvZGQuICBDYW4gdGhpcw0KPiAgICBoYXBwZW4/DQo+IA0KPiAqIE5lZ2F0aXZlIG90aGVy
-IHRoYW4gUUlPX0NIQU5ORUxfRVJSX0JMT0NLDQo+IA0KPiAgICBUcmFjZSB0aGUgZXJyb3IgaWYg
-YW55LCBlbHNlICJVbmtub3duIiBlcnJvciwgY2FsbA0KPiAgICB2bmNfZGlzY29ubmVjdF9zdGFy
-dCgpLCBmcmVlIHRoZSBlcnJvciBpZiBhbnksIHJldHVybiB6ZXJvLg0KPiANCj4gICAgTm90ZSB0
-aGF0IHdlIGNhbid0IGhhdmUgZXJycCAmJiAhKmVycnAgaGVyZSwgb3IgZWxzZSB0cmFjaW5nIGNy
-YXNoZXMNCj4gICAgaW4gZXJyb3JfZ2V0X3ByZXR0eSgpLg0KPiANCj4gKiBRSU9fQ0hBTk5FTF9F
-UlJfQkxPQ0sNCj4gDQo+ICAgIEZyZWUgdGhlIGVycm9yLCByZXR1cm4gemVybw0KPiANCj4gKiBQ
-b3NpdGl2ZQ0KPiANCj4gICAgRG8gbm90aGluZywgcmV0dXJuIEByZXQNCj4gDQo+IENhbGxlcnMg
-cGFzcyBvbmUgb2YgdGhlIGZvbGxvd2luZzoNCj4gDQo+ICogcmV0ID0gLTEgYW5kIGVycnAgPSBO
-VUxMDQo+IA0KPiAgICBUaGlzIHVzZXMgY2FzZSAiTmVnYXRpdmUgb3RoZXIgdGhhbiBRSU9fQ0hB
-Tk5FTF9FUlJfQkxPQ0siLiAgU2luY2UNCj4gICAgZXJyb3IgaXMgbnVsbCwgaXQgdHJhY2VzIGFu
-ICJVbmtub3duIiBlcnJvci4NCj4gDQo+ICogcmV0IGFuZCAmZXJyLCB3aGVyZSByZXQgPSBGVU4o
-Li4uLCAmZXJyKSwgYW5kIEZVTiBpcw0KPiAgICBxaW9fY2hhbm5lbF9yZWFkKCkgb3IgcWlvX2No
-YW5uZWxfd3JpdGUoKS4NCj4gDQo+ICAgIHFpb19jaGFubmVsX3JlYWQoKSwgX3dyaXRlKCkgYXJl
-IGRvY3VtZW50ZWQgdG8gcmV0dXJuIG5vbi1uZWdhdGl2ZSBvbg0KPiAgICBzdWNjZXNzLCBRSU9f
-Q0hBTk5FTF9FUlJfQkxPQ0sgb24gIndvdWxkIGJsb2NrIiwgYW5kIC0xIG9uIG90aGVyDQo+ICAg
-IGVycm9yLiAgQnkgY29udmVudGlvbiwgdGhleSBzZXQgYW4gZXJyb3IgZXhhY3RseSB3aGVuIHRo
-ZXkgZmFpbCwNCj4gICAgaS5lLiB3aGVuIHRoZXkgcmV0dXJuIGEgbmVnYXRpdmUgdmFsdWUuDQo+
-IA0KPiAgICBXaGVuIHFpb19jaGFubmVsX3JlYWQoKSAvIF93cml0ZSgpIHN1Y2NlZWQsIHdlIHVz
-ZSBjYXNlICJQb3NpdGl2ZSIgb3INCj4gICAgIlplcm8iLiAgV2UgZG9uJ3QgZnJlZSB0aGUgZXJy
-b3IsIHdoaWNoIGlzIGZpbmUsIGFzIG5vbmUgd2FzIHJldHVybmVkLg0KPiAgICBBc2lkZTogSSAq
-Z3Vlc3MqIHRoZSBjaGFubmVsIGlzIG5vbi1ibG9ja2luZywgYW5kICJ6ZXJvIiBjYW4gaGFwcGVu
-DQo+ICAgIG9ubHkgd2hlbiByZWFkIGhpdHMgRU9GLg0KPiANCj4gICAgV2hlbiBxaW9fY2hhbm5l
-bF9yZWFkKCkgLyBfd3JpdGUoKSBmYWlsLCB3ZSB1c2Ugb25lIG9mIHRoZSBlcnJvcg0KPiAgICBj
-YXNlcy4NCj4gDQo+IExvb2tzIGxpa2Ugdm5jX2NsaWVudF9pb19lcnJvcigpIHRha2VzIGFuIGVy
-cm9yIGNvZGUgQHJldCBhbmQgYW4NCj4gb3B0aW9uYWwgZXJyb3Igb2JqZWN0IGluIEBlcnJwIHdp
-dGggYWRkaXRpb25hbCBkZXRhaWxzLiAgSWYgQHJldCBpcw0KPiBub24tbmVnYXRpdmUsIEBlcnJw
-IG11c3QgYmUgbnVsbCBvciBwb2ludCB0byBudWxsLiAgSWYgQHJldCBpcyBuZWdhdGl2ZSwNCj4g
-QGVycnAgbXVzdCBiZSBudWxsIG9yIHBvaW50IHRvIG5vbi1udWxsLg0KPiANCj4gdm5jX2NsaWVu
-dF9pb19lcnJvcigpIGZyZWVzIHRoZSBlcnJvci4gIEl0IGxlYXZlcyBub3RoaW5nIGZvciB0aGUg
-Y2FsbGVyDQo+IHRvIGNsZWFuIHVwLg0KPiANCj4gSSB0aGluayB3ZSBjYW4gYWdhaW4gcGVlbCBv
-ZmYgYW4gaW5kaXJlY3Rpb24uICBUaGUgdHdvIGtpbmRzIG9mIGNhbGxzDQo+IGJlY29tZToNCj4g
-DQo+ICogcmV0ID0gLTEgYW5kIGVyciA9IE5VTEwNCj4gDQo+ICAgIE5vIHRleHR1YWwgY2hhbmdl
-LCBidXQgdGhlIE5VTEwgZ2V0cyBjb252ZXJ0ZWQgdG8gRXJyb3IgKiBpbnN0ZWFkIG9mDQo+ICAg
-IEVycm9yICoqLg0KPiANCj4gKiByZXQgYW5kIGVycg0KPiANCj4gICAgUGFzcyB0aGUgKHBvc3Np
-Ymx5IG51bGwpIGVycm9yIG9iamVjdCBpbnN0ZWFkIG9mIGEgcG9pbnRlciB0byB0aGUNCj4gICAg
-bG9jYWwgdmFyaWFibGUuDQo+IA0KPj4gZGlmZiAtLWdpdCBhL3V0aWwvZXJyb3IuYyBiL3V0aWwv
-ZXJyb3IuYw0KPj4gaW5kZXggZDQ1MzJjZTMxOC4uYjNmZjM4MzJkNiAxMDA2NDQNCj4+IC0tLSBh
-L3V0aWwvZXJyb3IuYw0KPj4gKysrIGIvdXRpbC9lcnJvci5jDQo+PiBAQCAtMjcxLDExICsyNzEs
-MTEgQEAgdm9pZCBlcnJvcl9mcmVlKEVycm9yICplcnIpDQo+PiAgICAgICB9DQo+PiAgIH0NCj4+
-ICAgDQo+PiAtdm9pZCBlcnJvcl9mcmVlX29yX2Fib3J0KEVycm9yICoqZXJycCkNCj4+ICt2b2lk
-IGVycm9yX2ZyZWVfb3JfYWJvcnQoRXJyb3IgKiplcnJwX2luKQ0KPj4gICB7DQo+PiAtICAgIGFz
-c2VydChlcnJwICYmICplcnJwKTsNCj4+IC0gICAgZXJyb3JfZnJlZSgqZXJycCk7DQo+PiAtICAg
-ICplcnJwID0gTlVMTDsNCj4+ICsgICAgYXNzZXJ0KGVycnBfaW4gJiYgKmVycnBfaW4pOw0KPj4g
-KyAgICBlcnJvcl9mcmVlKCplcnJwX2luKTsNCj4+ICsgICAgKmVycnBfaW4gPSBOVUxMOw0KPj4g
-ICB9DQo+PiAgIA0KPj4gICB2b2lkIGVycm9yX3Byb3BhZ2F0ZShFcnJvciAqKmRzdF9lcnJwLCBF
-cnJvciAqbG9jYWxfZXJyKQ0KPiANCj4gVGhpcyBmdW5jdGlvbnMgZnJlZXMgdGhlIGVycm9yLiAg
-SXQgbGVhdmVzIG5vdGhpbmcgZm9yIHRoZSBjYWxsZXIgdG8NCj4gY2xlYW4gdXAuDQo+IA0KPiBB
-bGwgY2FsbGVycyBwYXNzICZFUlIsIHdoZXJlIEVSUiBpcyBhIGxvY2FsIHZhcmlhYmxlLiAgV2Ug
-Y2FuIHBlZWwgb2ZmDQo+IGFuIGluZGlyZWN0aW9uLg0KDQoNCkJ1dCBpZiB3ZSBkcm9wIGluZGly
-ZWN0aW9uLCB3ZSdsbCBoYXZlIHRvIHNldCBsb2NhbCB2YXJpYWJsZSB0byBOVUxMIGJ5DQpoYW5k
-LiBJcyBpdCBnb29kPw0KDQpMb29rIGF0IHRlc3Rfa2V5dmFsX3BhcnNlX2xpc3QoKSBmb3IgZXhh
-bXBsZTogaXQgdXNlcyBsb2NhbCBlcnIgb2JqZWN0DQpzZXZlcmFsIHRpbWVzLCBzbyBpdCBkZXBl
-bmRzIG9uIHRoZSBmYWN0IHRoYXQgZXJyb3JfZnJlZV9vcl9hYm9ydA0Kc2V0cyBwb2ludGVyIHRv
-IE5VTEwuDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On 10/2/2019 11:16 PM, Igor Mammedov wrote:
+> On Fri, 20 Sep 2019 15:43:44 +0800
+> Tao Xu <tao3.xu@intel.com> wrote:
+> 
+[...]
+>> +struct HMAT_LB_Info {
+>> +    /* Indicates it's memory or the specified level memory side cache. */
+>> +    uint8_t     hierarchy;
+>> +
+>> +    /* Present the type of data, access/read/write latency or bandwidth. */
+>> +    uint8_t     data_type;
+>> +
+>> +    /* Array to store the latencies */
+> specify units it's stored in
+> 
+>> +    uint64_t    *latency;
+>> +
+>> +    /* Array to store the bandwidthes */
+> ditto
+> 
+>> +    uint64_t    *bandwidth;
+> btw:
+> 
+> what was the reason for picking uint64_t for storing above values?
+> 
+> it seems in this patch you dumb down bandwidth to MB/s above but
+> store latency as is.
+
+Because I want to store the bandwidth or latency value (minimum unit) 
+that user input. In HMAT, the minimum unit of bandwidth is MB/s, but in 
+QAPI, the minimum unit of size is Byte. So I convert size into MB/s and 
+time unit is "ps", need not convert.
+> 
+> and then in 9/11 build_hmat_lb you divide that on 'base' units,
+> where are guaranties that value stored here will fit into 2 bytes
+> used in HMAT to store it in the table?
+> 
+For HMAT spec, for a matrix of bandwidth or latency, there is only one 
+base (in order to save ACPI tables space). We need to extract base for a 
+matrix, but user input bandwidth or latency line by line. So after all 
+data input, we can extract the base (as in 9/11).
+
+There is another benefit. If user input different but similar units, 
+such as "10ns" and "100ps", we can also store them. Only If user input 
+big gap units, such as "1ps" and "1000ms". we can't store them and raise 
+error.
+
+> if this structure should store values in terms on HMAT table it should
+> probably use uint16_t and check that user provided value won't overflow
+> at the time of CLI parsing.
+> 
+
 
