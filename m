@@ -2,64 +2,93 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B80C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E919C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E1A620B7C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:24:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C69020B7C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:24:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oAYFrAjc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E1A620B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jSqLmJy9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C69020B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIElC-00046J-Qs
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:24:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60120)
+	id 1iIElH-0004AR-0L
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iI59H-0001Y2-7E
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:37 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iI1tj-0001hy-DP
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 22:40:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iI59E-0006Z9-8N
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:34 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:59717 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iI59C-0006Uh-Qj; Wed, 09 Oct 2019 02:08:32 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46p3gD5Xq7z9sPw; Wed,  9 Oct 2019 17:08:24 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570601304;
- bh=XUPxcRcTe2kkMQz3PgmYd462tBPoK4iFHjEdYV6FO8s=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=oAYFrAjcRgaoJpkPMk/l2hzdCn/7PKSwStpGpUHvjYfPST1BN1Xd8FLFM+KJKFcJZ
- qaLR+pkCZHn9oHEPceW78MenqYhxfErHFyq+2ZDDlNOgc9+4/INI52IAYr7qdNgjVY
- +fIfDPmxwi4nS2zqwP0H5Nfcfw4tdEq/gg0HHGZE=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-devel@nongnu.org,
-	clg@kaod.org,
-	qemu-ppc@nongnu.org
-Subject: [PATCH v4 07/19] spapr: Formalize notion of active interrupt
- controller
-Date: Wed,  9 Oct 2019 17:08:06 +1100
-Message-Id: <20191009060818.29719-8-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191009060818.29719-1-david@gibson.dropbear.id.au>
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
+ (envelope-from <richard.henderson@linaro.org>) id 1iI19u-0000D1-OI
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:52:59 -0400
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:43467)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iI19u-0000Cs-HA
+ for qemu-devel@nongnu.org; Tue, 08 Oct 2019 21:52:58 -0400
+Received: by mail-yw1-xc42.google.com with SMTP id q7so223072ywe.10
+ for <qemu-devel@nongnu.org>; Tue, 08 Oct 2019 18:52:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=KgvMEbdhTtgvvv1qwZwFb0OJP2Tb4E0OinKBcfN1thw=;
+ b=jSqLmJy9OxgdDiIwg/ClL6h9j+YsQiFsj4O0Z5eV804cRcsNbJ8cSy3JdlO/Uop6zI
+ bN6PPVAq2x8q+AzBPdWpjnHJHnRtNCZrras1rHHe2RVTqYzkcEZ9fuJt1HIHqDTMPcUZ
+ +/HPFfg2/ZdhN6WQo6a7v2woMoVq0CO5itRkXzeLt1pB2u/j7NaUeZ4Aj74pxL+JiDSM
+ c71cMd2K2KyBhZwTRHGjwswI7jUPwSDjQa5eK/eycWFMmyluC63SJZn2sSkzCf3f7VnA
+ rT+xQXV7um4vZNuHvMpApYzd4vtyCl4ZPgQxvvRbUd/RVsvWreFZMFfLXwRlr1NPD+iE
+ vy3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=KgvMEbdhTtgvvv1qwZwFb0OJP2Tb4E0OinKBcfN1thw=;
+ b=pHUtRltzUmEeJVdP/2YxIAdsvMctPQWt7EjoKG7D/BGDSpn4v4lwY2hkWrugTX5YHK
+ 0DcAid3qxpK3hMo0DwwKHm8FNdFWmk2GtdC8qW6TU7V66SCk6GDQzQ+vIMSdz5Aj5L2Y
+ 1+PNJZckcWXPkHudG5/1n1g7vGJelzHQQaFpA4cKA7nZEkbnPekUlrzP/5oetacOcyRO
+ oSgu/W6iNAv7LvSid6waMldp2wvUcsILPbpnRysFJlgapXp/Y+zxx4ePybzCtIKFGn/+
+ bU3xKoGzB5b9ifTfX9w5JyV9EGV0lJ8YA3SkiHSFMItqjcQrJl5fIQ6X5TF/YhcCKq96
+ BURQ==
+X-Gm-Message-State: APjAAAUV2og8o3Zg5Q7Q/JwATwkfQuagiGsSMS4c8RMUCsyBQXudHsJ9
+ 8ayRAkO4wfgC1n2uVo+uXorFUQ==
+X-Google-Smtp-Source: APXvYqwpn6+m2oMm4IsX3RH0zahGrn7uzX5P+y7aqT74y1CTi48i/VStV+nbkOj5kbD+nzaI1rdyyQ==
+X-Received: by 2002:a0d:dd8c:: with SMTP id g134mr977310ywe.303.1570585977926; 
+ Tue, 08 Oct 2019 18:52:57 -0700 (PDT)
+Received: from [192.168.1.44] (67.216.144.16.pool.hargray.net. [67.216.144.16])
+ by smtp.gmail.com with ESMTPSA id u138sm211977ywf.7.2019.10.08.18.52.54
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 08 Oct 2019 18:52:57 -0700 (PDT)
+Subject: Re: [PATCH v2 09/21] hw/timer/cmsdk-apb-timer.c: Switch to
+ transaction-based ptimer API
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20191008171740.9679-1-peter.maydell@linaro.org>
+ <20191008171740.9679-10-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <7a7fe093-917a-5622-9a2a-dcdae3489b3b@linaro.org>
+Date: Tue, 8 Oct 2019 21:52:49 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191008171740.9679-10-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Received-From: 2607:f8b0:4864:20::c42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,178 +100,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-spapr now has the mechanism of constructing both XICS and XIVE instances =
-of
-the SpaprInterruptController interface.  However, only one of the interru=
-pt
-controllers will actually be active at any given time, depending on featu=
-re
-negotiation with the guest.  This is handled in the current code via
-spapr_irq_current() which checks the OV5 vector from feature negotiation =
-to
-determine the current backend.
+On 10/8/19 1:17 PM, Peter Maydell wrote:
+> Switch the cmsdk-apb-timer code away from bottom-half based ptimers
+> to the new transaction-based ptimer API.  This just requires adding
+> begin/commit calls around the various places that modify the ptimer
+> state, and using the new ptimer_init() function to create the timer.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/timer/cmsdk-apb-timer.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
 
-Determining the active controller at the point we need it like this
-can be pretty confusing, because it makes it very non obvious at what
-points the active controller can change.  This can make it difficult
-to reason about the code and where a change of active controller could
-appear in sequence with other events.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Make this mechanism more explicit by adding an 'active_intc' pointer
-and an explicit spapr_irq_update_active_intc() function to update it
-from the CAS state.  We also add hooks on the intc backend which will
-get called when it is activated or deactivated.
-
-For now we just introduce the switch and hooks, later patches will
-actually start using them.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_irq.c         | 51 ++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h     |  5 ++--
- include/hw/ppc/spapr_irq.h |  5 ++++
- 3 files changed, 59 insertions(+), 2 deletions(-)
-
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 83882cfad3..249a2688ac 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -586,6 +586,7 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq=
-)
-=20
- int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
- {
-+    spapr_irq_update_active_intc(spapr);
-     return spapr->irq->post_load(spapr, version_id);
- }
-=20
-@@ -593,6 +594,8 @@ void spapr_irq_reset(SpaprMachineState *spapr, Error =
-**errp)
- {
-     assert(!spapr->irq_map || bitmap_empty(spapr->irq_map, spapr->irq_ma=
-p_nr));
-=20
-+    spapr_irq_update_active_intc(spapr);
-+
-     if (spapr->irq->reset) {
-         spapr->irq->reset(spapr, errp);
-     }
-@@ -619,6 +622,54 @@ int spapr_irq_get_phandle(SpaprMachineState *spapr, =
-void *fdt, Error **errp)
-     return phandle;
- }
-=20
-+static void set_active_intc(SpaprMachineState *spapr,
-+                            SpaprInterruptController *new_intc)
-+{
-+    SpaprInterruptControllerClass *sicc;
-+
-+    assert(new_intc);
-+
-+    if (new_intc =3D=3D spapr->active_intc) {
-+        /* Nothing to do */
-+        return;
-+    }
-+
-+    if (spapr->active_intc) {
-+        sicc =3D SPAPR_INTC_GET_CLASS(spapr->active_intc);
-+        if (sicc->deactivate) {
-+            sicc->deactivate(spapr->active_intc);
-+        }
-+    }
-+
-+    sicc =3D SPAPR_INTC_GET_CLASS(new_intc);
-+    if (sicc->activate) {
-+        sicc->activate(new_intc, &error_fatal);
-+    }
-+
-+    spapr->active_intc =3D new_intc;
-+}
-+
-+void spapr_irq_update_active_intc(SpaprMachineState *spapr)
-+{
-+    SpaprInterruptController *new_intc;
-+
-+    if (!spapr->ics) {
-+        /*
-+         * XXX before we run CAS, ov5_cas is initialized empty, which
-+         * indicates XICS, even if we have ic-mode=3Dxive.  TODO: clean
-+         * up the CAS path so that we have a clearer way of handling
-+         * this.
-+         */
-+        new_intc =3D SPAPR_INTC(spapr->xive);
-+    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-+        new_intc =3D SPAPR_INTC(spapr->xive);
-+    } else {
-+        new_intc =3D SPAPR_INTC(spapr->ics);
-+    }
-+
-+    set_active_intc(spapr, new_intc);
-+}
-+
- /*
-  * XICS legacy routines - to deprecate one day
-  */
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index cbd1a4c9f3..763da757f0 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -143,7 +143,6 @@ struct SpaprMachineState {
-     struct SpaprVioBus *vio_bus;
-     QLIST_HEAD(, SpaprPhbState) phbs;
-     struct SpaprNvram *nvram;
--    ICSState *ics;
-     SpaprRtcState rtc;
-=20
-     SpaprResizeHpt resize_hpt;
-@@ -195,9 +194,11 @@ struct SpaprMachineState {
-=20
-     int32_t irq_map_nr;
-     unsigned long *irq_map;
--    SpaprXive  *xive;
-     SpaprIrq *irq;
-     qemu_irq *qirqs;
-+    SpaprInterruptController *active_intc;
-+    ICSState *ics;
-+    SpaprXive *xive;
-=20
-     bool cmd_line_caps[SPAPR_CAP_NUM];
-     SpaprCapabilities def, eff, mig;
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index adfef0fcbe..593059eff5 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -44,6 +44,9 @@ typedef struct SpaprInterruptController SpaprInterruptC=
-ontroller;
- typedef struct SpaprInterruptControllerClass {
-     InterfaceClass parent;
-=20
-+    int (*activate)(SpaprInterruptController *intc, Error **errp);
-+    void (*deactivate)(SpaprInterruptController *intc);
-+
-     /*
-      * These methods will typically be called on all intcs, active and
-      * inactive
-@@ -55,6 +58,8 @@ typedef struct SpaprInterruptControllerClass {
-     void (*free_irq)(SpaprInterruptController *intc, int irq);
- } SpaprInterruptControllerClass;
-=20
-+void spapr_irq_update_active_intc(SpaprMachineState *spapr);
-+
- int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
-                               PowerPCCPU *cpu, Error **errp);
-=20
---=20
-2.21.0
-
+r~
 
