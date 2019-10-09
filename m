@@ -2,82 +2,64 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25789ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F2DC47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:54:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC92121848
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:53:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC92121848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7445F21848
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 16:54:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Op2PDBP8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7445F21848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIFDP-0001l1-GT
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:53:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59641)
+	id 1iIFDv-0002G2-Fw
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 12:54:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60137)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1iI54F-0000zD-E5
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:03:24 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iI59I-0001YA-2d
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1iI54C-0001nl-Gu
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:03:21 -0400
-Received: from mga06.intel.com ([134.134.136.31]:11592)
+ (envelope-from <dgibson@ozlabs.org>) id 1iI59F-0006bA-R0
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 02:08:35 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:43391 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1iI54C-0001cU-9G; Wed, 09 Oct 2019 02:03:20 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 08 Oct 2019 23:03:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; d="scan'208";a="393577637"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga005.fm.intel.com with ESMTP; 08 Oct 2019 23:03:09 -0700
-Received: from fmsmsx116.amr.corp.intel.com (10.18.116.20) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 8 Oct 2019 23:03:06 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx116.amr.corp.intel.com (10.18.116.20) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 8 Oct 2019 23:03:06 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.176]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.96]) with mapi id 14.03.0439.000;
- Wed, 9 Oct 2019 14:03:04 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
-Subject: RE: [PATCH v6 2/4] tests/test-replication.c: Add test for for
- secondary node continuing replication
-Thread-Topic: [PATCH v6 2/4] tests/test-replication.c: Add test for for
- secondary node continuing replication
-Thread-Index: AQHVe32cp1fVncNt7UaERb4FpDqX86dR1wkg
-Date: Wed, 9 Oct 2019 06:03:03 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78062A756A@shsmsx102.ccr.corp.intel.com>
-References: <cover.1570280098.git.lukasstraub2@web.de>
- <acacb35c86d6abae5c397e2e1953b67485c24d91.1570280098.git.lukasstraub2@web.de>
-In-Reply-To: <acacb35c86d6abae5c397e2e1953b67485c24d91.1570280098.git.lukasstraub2@web.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTlmMjRmZjgtZTIzNy00ZjMxLTk4YmUtODc2MGVmOTI1MjcxIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNVRTd2J1cSs5TWo2MVVzMFNSOEl5WDE0YmtyTmtHejBObVcwVFFOVFwvZ0Zjd0RlalBRem5PRWFBZ0grNGc0aTkifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iI59F-0006YA-CB; Wed, 09 Oct 2019 02:08:33 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46p3gF58dvz9sRQ; Wed,  9 Oct 2019 17:08:25 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1570601305;
+ bh=u+VNZMRj35Tr3YeqImASDIDQ2XKgQjzroD98TrDkA9w=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=Op2PDBP8ZXZIGH+3sEj6PZxjrIhRimlmo8KcAt2eEzIJIvP5hlW3a9RB78QAwfI5i
+ 8IfEEVB+oo/Q/HxNQd09j7wbkFFMTdJCp96xIYqFG3X36UXFvcDSQp9I8n8dac+Qjn
+ 0w21Dh8sfekMv4DXhg+JpSP0U8D/W7kVneOkz8Ek=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org,
+	clg@kaod.org,
+	qemu-ppc@nongnu.org
+Subject: [PATCH v4 14/19] spapr, xics,
+ xive: Move SpaprIrq::post_load hook to backends
+Date: Wed,  9 Oct 2019 17:08:13 +1100
+Message-Id: <20191009060818.29719-15-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191009060818.29719-1-david@gibson.dropbear.id.au>
+References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,115 +71,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Xie Changlong <xiechanglong.d@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ philmd@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The remaining logic in the post_load hook really belongs to the interrupt
+controller backends, and just needs to be called on the active controller
+(after the active controller is set to the right thing based on the
+incoming migration in the generic spapr_irq_post_load() logic).
 
-> -----Original Message-----
-> From: Lukas Straub <lukasstraub2@web.de>
-> Sent: Saturday, October 5, 2019 9:06 PM
-> To: qemu-devel <qemu-devel@nongnu.org>
-> Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
-> <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
-> Xie Changlong <xiechanglong.d@gmail.com>; Kevin Wolf
-> <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>; qemu-block
-> <qemu-block@nongnu.org>
-> Subject: [PATCH v6 2/4] tests/test-replication.c: Add test for for second=
-ary
-> node continuing replication
->=20
-> This simulates the case that happens when we resume COLO after failover.
->=20
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> ---
->  tests/test-replication.c | 52
-> ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
->=20
-> diff --git a/tests/test-replication.c b/tests/test-replication.c index
-> f085d1993a..8e18ecd998 100644
-> --- a/tests/test-replication.c
-> +++ b/tests/test-replication.c
-> @@ -489,6 +489,56 @@ static void test_secondary_stop(void)
->      teardown_secondary();
->  }
->=20
-> +static void test_secondary_continuous_replication(void)
-> +{
-> +    BlockBackend *top_blk, *local_blk;
-> +    Error *local_err =3D NULL;
-> +
-> +    top_blk =3D start_secondary();
-> +    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
-> +    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
-> +    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
-> +
-> +    /* replication will backup s_local_disk to s_hidden_disk */
-> +    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
-> +                  IMG_SIZE / 2, 0, IMG_SIZE, false);
-> +
-> +    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
-> +    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
-> +
-> +    /* do failover (active commit) */
-> +    replication_stop_all(true, &local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* it should ignore all requests from now on */
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ hw/intc/spapr_xive.c        |  5 +++--
+ hw/intc/xics_spapr.c        | 13 +++++++++++
+ hw/ppc/spapr_irq.c          | 45 ++++---------------------------------
+ include/hw/ppc/spapr_irq.h  |  3 +--
+ include/hw/ppc/spapr_xive.h |  1 -
+ 5 files changed, 21 insertions(+), 46 deletions(-)
 
-Should we need add teardown_secondary() here?
-
-Thanks
-Zhang Chen
-
-> +
-> +    /* start after failover */
-> +    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* checkpoint */
-> +    replication_do_checkpoint_all(&local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* stop */
-> +    replication_stop_all(true, &local_err);
-> +    g_assert(!local_err);
-> +
-> +    /* read from s_local_disk (0, IMG_SIZE / 2) */
-> +    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
-> +                  0, IMG_SIZE / 2, false);
-> +
-> +
-> +    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
-> +    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
-> +                  IMG_SIZE / 2, 0, IMG_SIZE, false);
-> +
-> +    teardown_secondary();
-> +}
-> +
->  static void test_secondary_do_checkpoint(void)
->  {
->      BlockBackend *top_blk, *local_blk;
-> @@ -584,6 +634,8 @@ int main(int argc, char **argv)
->      g_test_add_func("/replication/secondary/write", test_secondary_write=
-);
->      g_test_add_func("/replication/secondary/start", test_secondary_start=
-);
->      g_test_add_func("/replication/secondary/stop",  test_secondary_stop)=
-;
-> +    g_test_add_func("/replication/secondary/continuous_replication",
-> +                    test_secondary_continuous_replication);
->      g_test_add_func("/replication/secondary/do_checkpoint",
->                      test_secondary_do_checkpoint);
->      g_test_add_func("/replication/secondary/get_error_all",
-> --
-> 2.20.1
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 1811653aac..ba32d2cc5b 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -462,10 +462,10 @@ static int vmstate_spapr_xive_pre_save(void *opaque=
+)
+  * Called by the sPAPR IRQ backend 'post_load' method at the machine
+  * level.
+  */
+-int spapr_xive_post_load(SpaprXive *xive, int version_id)
++static int spapr_xive_post_load(SpaprInterruptController *intc, int vers=
+ion_id)
+ {
+     if (kvm_irqchip_in_kernel()) {
+-        return kvmppc_xive_post_load(xive, version_id);
++        return kvmppc_xive_post_load(SPAPR_XIVE(intc), version_id);
+     }
+=20
+     return 0;
+@@ -702,6 +702,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+     sicc->set_irq =3D spapr_xive_set_irq;
+     sicc->print_info =3D spapr_xive_print_info;
+     sicc->dt =3D spapr_xive_dt;
++    sicc->post_load =3D spapr_xive_post_load;
+ }
+=20
+ static const TypeInfo spapr_xive_info =3D {
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 90b4d48877..4f64b9a9fc 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -395,6 +395,18 @@ static void xics_spapr_print_info(SpaprInterruptCont=
+roller *intc, Monitor *mon)
+     ics_pic_print_info(ics, mon);
+ }
+=20
++static int xics_spapr_post_load(SpaprInterruptController *intc, int vers=
+ion_id)
++{
++    if (!kvm_irqchip_in_kernel()) {
++        CPUState *cs;
++        CPU_FOREACH(cs) {
++            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++            icp_resend(spapr_cpu_state(cpu)->icp);
++        }
++    }
++    return 0;
++}
++
+ static int xics_spapr_activate(SpaprInterruptController *intc, Error **e=
+rrp)
+ {
+     if (kvm_enabled()) {
+@@ -426,6 +438,7 @@ static void ics_spapr_class_init(ObjectClass *klass, =
+void *data)
+     sicc->set_irq =3D xics_spapr_set_irq;
+     sicc->print_info =3D xics_spapr_print_info;
+     sicc->dt =3D xics_spapr_dt;
++    sicc->post_load =3D xics_spapr_post_load;
+ }
+=20
+ static const TypeInfo ics_spapr_info =3D {
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index f70b331f44..f3d18b1dad 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -100,43 +100,22 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptCont=
+roller *, Error **),
+  * XICS IRQ backend.
+  */
+=20
+-static int spapr_irq_post_load_xics(SpaprMachineState *spapr, int versio=
+n_id)
+-{
+-    if (!kvm_irqchip_in_kernel()) {
+-        CPUState *cs;
+-        CPU_FOREACH(cs) {
+-            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-            icp_resend(spapr_cpu_state(cpu)->icp);
+-        }
+-    }
+-    return 0;
+-}
+-
+ SpaprIrq spapr_irq_xics =3D {
+     .nr_xirqs    =3D SPAPR_NR_XIRQS,
+     .nr_msis     =3D SPAPR_NR_MSIS,
+     .xics        =3D true,
+     .xive        =3D false,
+-
+-    .post_load   =3D spapr_irq_post_load_xics,
+ };
+=20
+ /*
+  * XIVE IRQ backend.
+  */
+=20
+-static int spapr_irq_post_load_xive(SpaprMachineState *spapr, int versio=
+n_id)
+-{
+-    return spapr_xive_post_load(spapr->xive, version_id);
+-}
+-
+ SpaprIrq spapr_irq_xive =3D {
+     .nr_xirqs    =3D SPAPR_NR_XIRQS,
+     .nr_msis     =3D SPAPR_NR_MSIS,
+     .xics        =3D false,
+     .xive        =3D true,
+-
+-    .post_load   =3D spapr_irq_post_load_xive,
+ };
+=20
+ /*
+@@ -148,21 +127,6 @@ SpaprIrq spapr_irq_xive =3D {
+  * activated after an extra machine reset.
+  */
+=20
+-/*
+- * Returns the sPAPR IRQ backend negotiated by CAS. XICS is the
+- * default.
+- */
+-static SpaprIrq *spapr_irq_current(SpaprMachineState *spapr)
+-{
+-    return spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT) ?
+-        &spapr_irq_xive : &spapr_irq_xics;
+-}
+-
+-static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int versio=
+n_id)
+-{
+-    return spapr_irq_current(spapr)->post_load(spapr, version_id);
+-}
+-
+ /*
+  * Define values in sync with the XIVE and XICS backend
+  */
+@@ -171,8 +135,6 @@ SpaprIrq spapr_irq_dual =3D {
+     .nr_msis     =3D SPAPR_NR_MSIS,
+     .xics        =3D true,
+     .xive        =3D true,
+-
+-    .post_load   =3D spapr_irq_post_load_dual,
+ };
+=20
+=20
+@@ -447,8 +409,11 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int ir=
+q)
+=20
+ int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
+ {
++    SpaprInterruptControllerClass *sicc;
++
+     spapr_irq_update_active_intc(spapr);
+-    return spapr->irq->post_load(spapr, version_id);
++    sicc =3D SPAPR_INTC_GET_CLASS(spapr->active_intc);
++    return sicc->post_load(spapr->active_intc, version_id);
+ }
+=20
+ void spapr_irq_reset(SpaprMachineState *spapr, Error **errp)
+@@ -589,8 +554,6 @@ SpaprIrq spapr_irq_xics_legacy =3D {
+     .nr_msis     =3D SPAPR_IRQ_XICS_LEGACY_NR_XIRQS,
+     .xics        =3D true,
+     .xive        =3D false,
+-
+-    .post_load   =3D spapr_irq_post_load_xics,
+ };
+=20
+ static void spapr_irq_register_types(void)
+diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+index e02e44624b..08173e714c 100644
+--- a/include/hw/ppc/spapr_irq.h
++++ b/include/hw/ppc/spapr_irq.h
+@@ -62,6 +62,7 @@ typedef struct SpaprInterruptControllerClass {
+     void (*print_info)(SpaprInterruptController *intc, Monitor *mon);
+     void (*dt)(SpaprInterruptController *intc, uint32_t nr_servers,
+                void *fdt, uint32_t phandle);
++    int (*post_load)(SpaprInterruptController *intc, int version_id);
+ } SpaprInterruptControllerClass;
+=20
+ void spapr_irq_update_active_intc(SpaprMachineState *spapr);
+@@ -82,8 +83,6 @@ typedef struct SpaprIrq {
+     uint32_t    nr_msis;
+     bool        xics;
+     bool        xive;
+-
+-    int (*post_load)(SpaprMachineState *spapr, int version_id);
+ } SpaprIrq;
+=20
+ extern SpaprIrq spapr_irq_xics;
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 64972754f9..d84bd5c229 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -55,7 +55,6 @@ typedef struct SpaprXive {
+ #define SPAPR_XIVE_BLOCK_ID 0x0
+=20
+ void spapr_xive_pic_print_info(SpaprXive *xive, Monitor *mon);
+-int spapr_xive_post_load(SpaprXive *xive, int version_id);
+=20
+ void spapr_xive_hcall_init(SpaprMachineState *spapr);
+ void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
+--=20
+2.21.0
 
 
