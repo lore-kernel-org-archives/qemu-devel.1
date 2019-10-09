@@ -2,82 +2,59 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AF6ECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D730ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:51:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE80C20679
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:50:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jq+UaPmj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE80C20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 35AAB20679
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 18:51:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35AAB20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIH2o-00046i-Kn
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:50:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56965)
+	id 1iIH3C-0004u7-Hd
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 14:51:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46311)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iICLc-0005yV-EF
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:49:49 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iIBvq-0002nN-PE
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:23:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iICLb-0005CW-E4
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:49:48 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34987)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iICLb-0005CD-8N
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:49:47 -0400
-Received: by mail-ot1-x341.google.com with SMTP id z6so1780612otb.2
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 06:49:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3g/D2fe1BvDimcQvKdf4hxfNjstsd/kFe/ZTYgk3oUI=;
- b=Jq+UaPmjbXBn5Ni0j4LCmWxovZeAmudgO2aIXalRNNAkR2OkiHQzCQWBncEDvsI4bK
- bnLxMkbu1vmyCm5KzL4A/L2pyRnEIpmoOA/Y53qJdTvY69WBUCw7OzQzlZitW/Eeec4a
- z66bDgEofGVAmSUaO/UW9YHUmTUxD2mf3mtn8udF61rncuSmG/tCls7+yRxYhIjKikzk
- IxlHj+ROsWNq45BNSqiVM4/74dzngweU9NHPgtCf02vjPtZD5obIrez3tagglwFfZmGw
- Ff0EtKkWvS8e0/2oyPvXLZ8lk6TFcGv3fV/15r3/zSl3GtFu4n/Yao2nfkbni/s7UMxt
- QauQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3g/D2fe1BvDimcQvKdf4hxfNjstsd/kFe/ZTYgk3oUI=;
- b=E96op3fJbdWSKTKpA7VpuIWk0iEyVSSdLEIGuu4aSE8ccNBm58zBrnXrTd4Z1Ayjai
- cpAUvsHUKfXrXks7rnN3k2wtGM+3J5Hk38KeiNVexAS6KSaoFZ38qgXXPufBs4RcQ5oT
- xKuMChOaMZ/u9Ob+b8dJpg/QfIHr94adngDkLD9f/POsy1oZbu3r2cmVJY6P2NCksZrM
- FU2BY9QDE8e/h8fh+t1XjR6+RbVMQPGHboMeJyAvJ4sSTUJX3OVcEjxTmuq9B7lgi/mH
- 1s7uH19Noj5WKocqEkhXOzMKmAnSD5olZqR/XVYP8xP9EcD9vXOKcY8KYv1LGI2AZ7/+
- U58Q==
-X-Gm-Message-State: APjAAAVmCUvsp8PChngiVGdSb+rV6k6caydFKRk9edB6+Setf091i6Hu
- 5FNqK9HQmZWemnfBnH8Jwh7PZTRwHzkN82ShQydDlw==
-X-Google-Smtp-Source: APXvYqz/ZpPngJLbMT6o/mhxNZgCDpzFRlVP+ordWV1SS87DcC7CudA4xmzP/GxUGmC1rcpKGREy4wGWwIxTi1loUxY=
-X-Received: by 2002:a9d:30c1:: with SMTP id r1mr2937187otg.91.1570628986270;
- Wed, 09 Oct 2019 06:49:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191008171740.9679-1-peter.maydell@linaro.org>
- <20191008171740.9679-12-peter.maydell@linaro.org>
- <09f5a1b0-8750-eaa4-c6a3-c395ded3167c@linaro.org>
- <4fb18f38-eef3-281b-f414-d257e3dfa2b1@linaro.org>
-In-Reply-To: <4fb18f38-eef3-281b-f414-d257e3dfa2b1@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 9 Oct 2019 14:49:35 +0100
-Message-ID: <CAFEAcA9ps-s3WEGjR2sVkVpZ=AAa-qcu+JyUhdVY1SnZqgBiUQ@mail.gmail.com>
-Subject: Re: [PATCH v2 11/21] hw/timer/exynos4210_mct.c: Switch GFRC to
- transaction-based ptimer API
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+ (envelope-from <imammedo@redhat.com>) id 1iIBvp-0001LB-MZ
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:23:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45390)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iIBvp-0001L3-HU
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 09:23:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AFD789B299;
+ Wed,  9 Oct 2019 13:23:08 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1503B5C1D6;
+ Wed,  9 Oct 2019 13:23:06 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC 2/3] acpi: cpuhp: add typical usecases into spec
+Date: Wed,  9 Oct 2019 09:22:51 -0400
+Message-Id: <20191009132252.17860-3-imammedo@redhat.com>
+In-Reply-To: <20191009132252.17860-1-imammedo@redhat.com>
+References: <20191009132252.17860-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.39]); Wed, 09 Oct 2019 13:23:08 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,38 +66,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 9 Oct 2019 at 02:58, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 10/8/19 9:56 PM, Richard Henderson wrote:
-> > On 10/8/19 1:17 PM, Peter Maydell wrote:
-> >> @@ -945,7 +977,7 @@ static void exynos4210_mct_update_freq(Exynos4210MCTState *s)
-> >>          DPRINTF("freq=%dHz\n", s->freq);
-> >>
-> >>          /* global timer */
-> >> -        ptimer_set_freq(s->g_timer.ptimer_frc, s->freq);
-> >> +        tx_ptimer_set_freq(s->g_timer.ptimer_frc, s->freq);
-> >>
-> >>          /* local timer */
-> >>          ptimer_set_freq(s->l_timer[0].tick_timer.ptimer_tick, s->freq);
-> >
-> > Failed to update them all, it would appear.
->
-> Ho hum.  Done in a subsequent patch.
-> I didn't realize that you weren't converting the entire file at once.
+Clarify values of "CPU selector' register and add workflows for
+  * finding CPU with pending 'insert/remove' event
+  * enumerating present/non present CPUs
 
-Yeah, the MCT device is pretty complicated and (per the commit
-message) I felt it was easier to write and debug by switching
-each ptimer one at a time rather than trying to do the whole
-lot at the same time.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ docs/specs/acpi_cpu_hotplug.txt | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-thanks
--- PMM
+diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
+index ac5903b2b1..43c5a193f0 100644
+--- a/docs/specs/acpi_cpu_hotplug.txt
++++ b/docs/specs/acpi_cpu_hotplug.txt
+@@ -54,6 +54,7 @@ write access:
+     [0x0-0x3] CPU selector: (DWORD access)
+               selects active CPU device. All following accesses to other
+               registers will read/store data from/to selected CPU.
++              Valid values: [0 .. max_cpus)
+     [0x4] CPU device control fields: (1 byte access)
+         bits:
+             0: reserved, OSPM must clear it before writing to register.
+@@ -93,3 +94,24 @@ Selecting CPU device beyond possible range has no effect on platform:
+      ignored
+    - read accesses to CPU hot-plug registers not documented above return
+      all bits set to 0.
++
++Typical usecases:
++   - Get a cpu with pending event
++     1. write 0x0 into 'Command field' register
++     2. read from 'Command data' register, CPU selector value (CPU's UID in ACPI
++        tables) and event for selected CPU from 'CPU device status fields'
++        register. If there aren't pending events, CPU selector value doesn't
++        change and 'insert' and 'remove' bits are not set.
++   - Enumerate CPUs present/non present CPUs.
++     1. set iterator to 0x0
++     2. write 0x0 into 'Command field' register and then iterator
++        into 'CPU selector' register.
++     3. read 'enabled' flag for selected CPU from 'CPU device status fields'
++        register
++     4. to continue to the next CPU, increment iterator and repeat step 2
++     5. read 'Command data' register
++     5.1 if 'Command data' register matches iterator continue to step 3.
++         (read presence bit for the next CPU)
++     5.2 if 'Command data' register has not changed, there is not CPU
++         corresponding to iterator value and the last valid iterator value
++         equals to 'max_cpus' + 1
+-- 
+2.18.1
+
 
