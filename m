@@ -2,96 +2,66 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLACK,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E924C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C865C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:27:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 301542054F
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:26:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 301542054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0A96A206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 20:27:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A96A206BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIIX3-0000GZ-GZ
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 16:26:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50223)
+	id 1iIIYI-0002D7-Gr
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 16:27:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1iI80b-0002kn-IA
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:11:50 -0400
+ (envelope-from <groug@kaod.org>) id 1iIFa8-0005he-RG
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 13:17:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1iI80W-0004cG-D4
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:11:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41762
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1iI80W-0004cC-8L
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:11:44 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9997mhh175934
- for <qemu-devel@nongnu.org>; Wed, 9 Oct 2019 05:11:43 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2vh9senk06-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 05:11:43 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Wed, 9 Oct 2019 10:11:41 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 9 Oct 2019 10:11:38 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x999BbXB27000938
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 9 Oct 2019 09:11:37 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C3094A4054;
- Wed,  9 Oct 2019 09:11:37 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A5085A4064;
- Wed,  9 Oct 2019 09:11:34 +0000 (GMT)
-Received: from localhost.localdomain.com (unknown [9.199.35.233])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  9 Oct 2019 09:11:34 +0000 (GMT)
-From: Ganesh Goudar <ganeshgr@linux.ibm.com>
-To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
-Subject: [PATCH v15 6/7] migration: Include migration support for machine
- check handling
-Date: Wed,  9 Oct 2019 14:40:09 +0530
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20191009091010.16467-1-ganeshgr@linux.ibm.com>
-References: <20191009091010.16467-1-ganeshgr@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19100909-0016-0000-0000-000002B6628B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100909-0017-0000-0000-000033176858
-Message-Id: <20191009091010.16467-7-ganeshgr@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-09_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910090087
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
-X-Mailman-Approved-At: Wed, 09 Oct 2019 16:05:49 -0400
+ (envelope-from <groug@kaod.org>) id 1iIFa6-0001lb-F7
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 13:17:00 -0400
+Received: from 6.mo178.mail-out.ovh.net ([46.105.53.132]:47062)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iIFa5-0001jA-Au
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 13:16:58 -0400
+Received: from player738.ha.ovh.net (unknown [10.109.143.208])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id 0BAF17B24E
+ for <qemu-devel@nongnu.org>; Wed,  9 Oct 2019 19:16:54 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player738.ha.ovh.net (Postfix) with ESMTPSA id 67E4AAE53814;
+ Wed,  9 Oct 2019 17:16:41 +0000 (UTC)
+Date: Wed, 9 Oct 2019 19:16:39 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v4 19/19] spapr: Work around spurious warnings from vfio
+ INTx initialization
+Message-ID: <20191009191639.4055f811@bahia.lan>
+In-Reply-To: <20191009085259.GA5035@umbus.fritz.box>
+References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
+ <20191009060818.29719-20-david@gibson.dropbear.id.au>
+ <20191009103738.01bc146a@bahia.lan>
+ <20191009085259.GA5035@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_//SDFP6flH=KkWGUDf0s+7ag";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 1586955919533316582
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedriedugdekkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.53.132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,179 +73,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, arawinda.p@gmail.com,
- Ganesh Goudar <ganeshgr@linux.ibm.com>, groug@kaod.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Jason Wang <jasowang@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>,
+ Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
+ clg@kaod.org, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aravinda Prasad <arawinda.p@gmail.com>
+--Sig_//SDFP6flH=KkWGUDf0s+7ag
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This patch includes migration support for machine check
-handling. Especially this patch blocks VM migration
-requests until the machine check error handling is
-complete as these errors are specific to the source
-hardware and is irrelevant on the target hardware.
+On Wed, 9 Oct 2019 19:52:59 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-[Do not set FWNMI cap in post_load, now its done in .apply hook]
-Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
-Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
----
- hw/ppc/spapr.c         | 41 +++++++++++++++++++++++++++++++++++++++++
- hw/ppc/spapr_events.c  | 16 +++++++++++++++-
- hw/ppc/spapr_rtas.c    |  2 ++
- include/hw/ppc/spapr.h |  2 ++
- 4 files changed, 60 insertions(+), 1 deletion(-)
+> On Wed, Oct 09, 2019 at 10:37:38AM +0200, Greg Kurz wrote:
+> > On Wed,  9 Oct 2019 17:08:18 +1100
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >=20
+> > > Traditional PCI INTx for vfio devices can only perform well if using
+> > > an in-kernel irqchip.  Therefore, vfio_intx_update() issues a warning
+> > > if an in kernel irqchip is not available.
+> >=20
+> > Can you elaborate on what doesn't "perform well" without an
+> > in-kernel irqchip ?
+>=20
+> Not really, no, but Alex Williamson tells me it is soo.
+>=20
+> > Is it a matter of performance or is it
+> > actually broken or something else ?
+>=20
+> I believe it's a matter of performance, but such a big one that it
+> makes using it without kernel irqchip infeasible in many cases.
+>=20
+> > What is the impact on -machine accel=3Dkvm,kernel-irqchip=3Doff which
+> > always spit this warning ?
+>=20
+> It should still spit that warning.
+>=20
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b7b4196545..eb267d4c43 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -46,6 +46,7 @@
- #include "migration/qemu-file-types.h"
- #include "migration/global_state.h"
- #include "migration/register.h"
-+#include "migration/blocker.h"
- #include "mmu-hash64.h"
- #include "mmu-book3s-v3.h"
- #include "cpu-models.h"
-@@ -1830,6 +1831,8 @@ static void spapr_machine_reset(MachineState *machine)
- 
-     /* Signal all vCPUs waiting on this condition */
-     qemu_cond_broadcast(&spapr->mc_delivery_cond);
-+
-+    migrate_del_blocker(spapr->fwnmi_migration_blocker);
- }
- 
- static void spapr_create_nvram(SpaprMachineState *spapr)
-@@ -2120,6 +2123,43 @@ static const VMStateDescription vmstate_spapr_dtb = {
-     },
- };
- 
-+static bool spapr_fwnmi_needed(void *opaque)
-+{
-+    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
-+
-+    return spapr->guest_machine_check_addr != -1;
-+}
-+
-+static int spapr_fwnmi_pre_save(void *opaque)
-+{
-+    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
-+
-+    /*
-+     * With -only-migratable QEMU option, we cannot block migration.
-+     * Hence check if machine check handling is in progress and print
-+     * a warning message.
-+     */
-+    if (spapr->mc_status != -1) {
-+        warn_report("A machine check is being handled during migration. The"
-+                "handler may run and log hardware error on the destination");
-+    }
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_spapr_machine_check = {
-+    .name = "spapr_machine_check",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_fwnmi_needed,
-+    .pre_save = spapr_fwnmi_pre_save,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
-+        VMSTATE_INT32(mc_status, SpaprMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_spapr = {
-     .name = "spapr",
-     .version_id = 3,
-@@ -2153,6 +2193,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_dtb,
-         &vmstate_spapr_cap_large_decr,
-         &vmstate_spapr_cap_ccf_assist,
-+        &vmstate_spapr_machine_check,
-         NULL
-     }
- };
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 5624bdac6c..ff34c2645a 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -43,6 +43,7 @@
- #include "qemu/main-loop.h"
- #include "hw/ppc/spapr_ovec.h"
- #include <libfdt.h>
-+#include "migration/blocker.h"
- 
- #define RTAS_LOG_VERSION_MASK                   0xff000000
- #define   RTAS_LOG_VERSION_6                    0x06000000
-@@ -842,6 +843,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+Yeah of course it does, but it is expected that we cannot setup
+the irqfd since we deliberately don't have an in-kernel irqchip,
+isn't it ? Why spit a warning in this case ? Or is it just a not
+very user friendly way of saying "you will have poor performance
+if the VFIO device uses PCI INTx" ?
+
+> > > We usually do have an in-kernel irqchip available for pseries machines
+> > > on POWER hosts.  However, because the platform allows feature
+> > > negotiation of what interrupt controller model to use, we don't
+> > > currently initialize it until machine reset.  vfio_intx_update() is
+> > > called (first) from vfio_realize() before that, so it can issue a
+> > > spurious warning, even if we will have an in kernel irqchip by the
+> > > time we need it.
+> > >=20
+> > > To workaround this, make a call to spapr_irq_update_active_intc() from
+> > > spapr_irq_init() which is called at machine realize time, before the
+> > > vfio realize.  This call will be pretty much obsoleted by the later
+> > > call at reset time, but it serves to suppress the spurious warning
+> > > from VFIO.
+> > >=20
+> > > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > > Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > >=20
+> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > ---
+> > >  hw/ppc/spapr_irq.c | 11 ++++++++++-
+> > >  1 file changed, 10 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> > > index 7964e4a1b8..3aeb523f3e 100644
+> > > --- a/hw/ppc/spapr_irq.c
+> > > +++ b/hw/ppc/spapr_irq.c
+> > > @@ -274,6 +274,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Er=
+ror **errp)
+> > > =20
+> > >      spapr->qirqs =3D qemu_allocate_irqs(spapr_set_irq, spapr,
+> > >                                        smc->nr_xirqs + SPAPR_XIRQ_BAS=
+E);
+> > > +
+> > > +    /*
+> > > +     * Mostly we don't actually need this until reset, except that n=
+ot
+> > > +     * having this set up can cause VFIO devices to issue a
+> > > +     * false-positive warning during realize(), because they don't y=
+et
+> > > +     * have an in-kernel irq chip.
+> > > +     */
+> > > +    spapr_irq_update_active_intc(spapr);
+> > >  }
+> > > =20
+> > >  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Err=
+or **errp)
+> > > @@ -429,7 +437,8 @@ void spapr_irq_update_active_intc(SpaprMachineSta=
+te *spapr)
+> > >           * this.
+> > >           */
+> > >          new_intc =3D SPAPR_INTC(spapr->xive);
+> > > -    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
+> > > +    } else if (spapr->ov5_cas
+> > > +               && spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT))=
  {
-     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     CPUState *cs = CPU(cpu);
-+    int ret;
-+    Error *local_err = NULL;
- 
-     if (spapr->guest_machine_check_addr == -1) {
-         /*
-@@ -871,8 +874,19 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
-             return;
-         }
-     }
--    spapr->mc_status = cpu->vcpu_id;
- 
-+    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
-+    if (ret == -EBUSY) {
-+        /*
-+         * We don't want to abort so we let the migration to continue.
-+         * In a rare case, the machine check handler will run on the target.
-+         * Though this is not preferable, it is better than aborting
-+         * the migration or killing the VM.
-+         */
-+        warn_report_err(local_err);
-+    }
-+
-+    spapr->mc_status = cpu->vcpu_id;
-     spapr_mce_dispatch_elog(cpu, recovered);
- }
- 
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index b56953841a..c652ec3caa 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -50,6 +50,7 @@
- #include "hw/ppc/fdt.h"
- #include "target/ppc/mmu-hash64.h"
- #include "target/ppc/mmu-book3s-v3.h"
-+#include "migration/blocker.h"
- 
- static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                                    uint32_t token, uint32_t nargs,
-@@ -446,6 +447,7 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-      */
-     spapr->mc_status = -1;
-     qemu_cond_signal(&spapr->mc_delivery_cond);
-+    migrate_del_blocker(spapr->fwnmi_migration_blocker);
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
- 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index dada821d21..ea7625e438 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -217,6 +217,8 @@ struct SpaprMachineState {
- 
-     unsigned gpu_numa_id;
-     SpaprTpmProxy *tpm_proxy;
-+
-+    Error *fwnmi_migration_blocker;
- };
- 
- #define H_SUCCESS         0
--- 
-2.17.2
+> > >          new_intc =3D SPAPR_INTC(spapr->xive);
+> > >      } else {
+> > >          new_intc =3D SPAPR_INTC(spapr->ics);
+> >=20
+>=20
 
+
+--Sig_//SDFP6flH=KkWGUDf0s+7ag
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2eFfcACgkQcdTV5YIv
+c9ZnJhAAsrS5hhsajvEAxfSWQcnWe+p1Ept5tSY4P/TgT8Rx9YtoT68JjE9nwjzJ
+O4TqMb73DPOjwekTVMSibOAXjeL9JGRbkXYw0W122qDIFS7BVyNz1jTwUIWbR++Z
+NKzdVQzghTQqdX12oR+u6D+oqYAf87wAcN71lycldFSef4/RjBYGirNQXEJ+Na9w
+FnMlH0rjPDsX4PALaqp51fLlV/x1VwKf5ZSaCKzS26ICuwB4oSEPcIDI23Jjy/CB
+qdcyPC7IdjI06FVkUYRE6JOpEz/uqnwS9/J+coqnrGJEsMxMGa/gSDDzH3KKB7Of
+rxVPVm0kvBePXY9QGeqS+2LdXyOyuNhkOEZtrW/2+3dYoOtgQ7BzUirLfRrZXb4r
+XtykeuYgOABAeoLq7xnS2nJ8RNMlZt5jHDSAhMbOKtPSd8g6TOAJxVvwTXEt7Zzu
+9p9Whz+rQpPxj52SD+lvGh2REH6NfGQtv8/P+AUAaVKO0RYQ5olWsR0ygqYwTpFV
+7K7QdkIWSlfnTWPaByZzbG0oYclEZ7rgw996mZ1ZuOiukYRUTAzovF4VfRL41tFu
+T2SOU8W63/DjR0KaiKorxgzoLK94/8TQXTZzcMW7ES90k4ET5dQ0cizbyWkZD6Om
+IV80/WGYbiRWe4q45DfrmyDD5dX9nUy8+3zy/ydXVULVLC5NYR4=
+=kKFx
+-----END PGP SIGNATURE-----
+
+--Sig_//SDFP6flH=KkWGUDf0s+7ag--
 
