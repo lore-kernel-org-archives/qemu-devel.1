@@ -2,70 +2,72 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA020C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BF8C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:36:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A83A5206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:34:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A83A5206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id E5ECE2054F
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 21:36:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5ECE2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIJbT-000470-27
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:34:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46438)
+	id 1iIJd6-0006Fs-Ac
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 17:36:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41870)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iIJJj-0002Ry-T2
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 17:16:22 -0400
+ (envelope-from <crosa@redhat.com>) id 1iIIyD-00044Y-Ep
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 16:54:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iIJJi-00031n-ES
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 17:16:19 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:40970)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iIJJg-0002zv-Gz
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 17:16:16 -0400
-Received: by mail-pl1-f196.google.com with SMTP id t10so1666583plr.8
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 14:16:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:mime-version
- :content-transfer-encoding:cc:from:to;
- bh=H8fNamXSWGVsAQ92a4GC/hqc7AkmkMqrSnuj2ieP89M=;
- b=B8HzRIVb7OlvW3SV0QdE+mJmPirZxAIXGS7E7CzEKGKMVztstP0X+kR+yEPKJZ3vkj
- 9pdAQVc5o4NSv9/vur51AmQZqOnFBVnNI9wtQxKksSVdC8kdW2URTHi4cMmbSDT2/qFf
- x0+FkD+c0RuE7LaShZX+avSoaB7oM23HbNhku7MPXoKeJQJImMyHIPjSb1P4k1Nl6CE0
- AMSlzPojQshS7nwlWy7YU8u0Aeh5z6BgJ6AFlOPtkDIMDYwt19tQuEGMUHHxkVNYv0RW
- yxsO55gC9ldRWiZVmYiDgCYfKBJkfa1TnlKCgYkwkIh8XxVqUtPpnTjTtXiZ1S+737+t
- S6nA==
-X-Gm-Message-State: APjAAAUGS+z/ynSYaCbVt4sW+6AbsT+d0wnqprd1ibBpjaBUnayyx1Ep
- cVpNu1FYZg3gOoRHpatjVvqPw4UpndI=
-X-Google-Smtp-Source: APXvYqw+f8eixv2AE2dlkWm8FE1Q5gaynqq37O0wzyb/PfVA0NR0LLyAiNqBmi2V+jNFfIFAajwUsQ==
-X-Received: by 2002:a17:902:9a41:: with SMTP id
- x1mr5090007plv.331.1570655771648; 
- Wed, 09 Oct 2019 14:16:11 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id l62sm4341432pfl.167.2019.10.09.14.16.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Oct 2019 14:16:09 -0700 (PDT)
-Subject: [PATCH] RISC-V: fcvt can set fflags, so set FS accordingly
-Date: Wed,  9 Oct 2019 14:15:41 -0700
-Message-Id: <20191009211541.9937-1-palmer@sifive.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <crosa@redhat.com>) id 1iIIyC-00035k-78
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 16:54:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59036)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>)
+ id 1iIIy9-00035F-Ke; Wed, 09 Oct 2019 16:54:01 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D16E71DBC;
+ Wed,  9 Oct 2019 20:54:00 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+ (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C672F6017E;
+ Wed,  9 Oct 2019 20:54:00 +0000 (UTC)
+Received: from zmail17.collab.prod.int.phx2.redhat.com
+ (zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
+ by colo-mx.corp.redhat.com (Postfix) with ESMTP id AD03E4E589;
+ Wed,  9 Oct 2019 20:54:00 +0000 (UTC)
+Date: Wed, 9 Oct 2019 16:54:00 -0400 (EDT)
+From: Cleber Rosa <crosa@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <693191110.5428739.1570654440496.JavaMail.zimbra@redhat.com>
+In-Reply-To: <287afb96-bfb7-5e6e-ca1c-0e2845f8ef3c@redhat.com>
+References: <20191009194740.8079-1-crosa@redhat.com>
+ <20191009194740.8079-2-crosa@redhat.com>
+ <287afb96-bfb7-5e6e-ca1c-0e2845f8ef3c@redhat.com>
+Subject: Re: [PATCH v2 1/4] qemu-iotests: remove bash shebang from library
+ files
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Palmer Dabbelt <palmer@sifive.com>
-To: qemu-riscv@nongnu.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.10.122.151, 10.4.195.18]
+Thread-Topic: qemu-iotests: remove bash shebang from library files
+Thread-Index: 2MRtY1XOi4WL2k8COvBkYY26ulFOgA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Wed, 09 Oct 2019 20:54:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.214.196
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,87 +79,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A user pinged me to say "my floating point heavy code works in user mode
-but not system mode", which I'm guessing is the result of a lazy FP
-save/restore issue as those still crop up from time to time as long tail
-bugs.  I figured it was worth giving the FP stuff a look to see if
-anything jumps out, and it turns out that there is a bug: converting
-float to integer can set the invalid flag, which is supposed to mark FS
-as dirty, but the emulation routine doesn't do so.
 
-This patch unconditionally marks FS as dirty for fcvt instructions that
-convert into X registers (fcvt into F registers already did so).  I
-haven't actually tried to manifest a bug here, but as far as I can tell
-the soft float stuff does set the invalid flag.
 
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
- target/riscv/insn_trans/trans_rvd.inc.c | 2 ++
- target/riscv/insn_trans/trans_rvf.inc.c | 4 ++++
- 2 files changed, 6 insertions(+)
+----- Original Message -----
+> From: "Eric Blake" <eblake@redhat.com>
+> To: "Cleber Rosa" <crosa@redhat.com>, qemu-devel@nongnu.org
+> Cc: qemu-block@nongnu.org, "Max Reitz" <mreitz@redhat.com>, "Kevin Wolf" <kwolf@redhat.com>, qemu-trivial@nongnu.org,
+> "Michael Tokarev" <mjt@tls.msk.ru>, "Laurent Vivier" <laurent@vivier.eu>
+> Sent: Wednesday, October 9, 2019 3:51:56 PM
+> Subject: Re: [PATCH v2 1/4] qemu-iotests: remove bash shebang from library files
+> 
+> On 10/9/19 2:47 PM, Cleber Rosa wrote:
+> > Due to not being able to find a reason to have shebangs on files that
+> > are not executable.
+> > 
+> > While at it, add a mode hint to emacs, which would be clueless or
+> > plain wrong about these containing shell code.
+> > 
+> > Suggested-by: Eric Blake <eblake@redhat.com>
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> >   tests/qemu-iotests/common.config  | 2 +-
+> >   tests/qemu-iotests/common.filter  | 2 +-
+> >   tests/qemu-iotests/common.nbd     | 3 +--
+> >   tests/qemu-iotests/common.pattern | 2 +-
+> >   tests/qemu-iotests/common.qemu    | 2 +-
+> >   tests/qemu-iotests/common.rc      | 2 +-
+> >   tests/qemu-iotests/common.tls     | 2 +-
+> >   7 files changed, 7 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/tests/qemu-iotests/common.config
+> > b/tests/qemu-iotests/common.config
+> > index 9bd1a5a6fc..b85a6a6f96 100644
+> > --- a/tests/qemu-iotests/common.config
+> > +++ b/tests/qemu-iotests/common.config
+> > @@ -1,4 +1,4 @@
+> > -#!/usr/bin/env bash
+> > +# -*- emacs mode: sh -*-
+> 
+> I thought my version:
+> # hey emacs, this file will be sourced by bash -*- mode: sh -*-
+> was cuter, but that's not a requirement, and yours works  ;)
+> 
 
-diff --git a/target/riscv/insn_trans/trans_rvd.inc.c b/target/riscv/insn_trans/trans_rvd.inc.c
-index 393fa0248c..8611e95486 100644
---- a/target/riscv/insn_trans/trans_rvd.inc.c
-+++ b/target/riscv/insn_trans/trans_rvd.inc.c
-@@ -371,6 +371,7 @@ static bool trans_fcvt_l_d(DisasContext *ctx, arg_fcvt_l_d *a)
-     gen_helper_fcvt_l_d(t0, cpu_env, cpu_fpr[a->rs1]);
-     gen_set_gpr(a->rd, t0);
-     tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-     return true;
- }
- 
-@@ -384,6 +385,7 @@ static bool trans_fcvt_lu_d(DisasContext *ctx, arg_fcvt_lu_d *a)
-     gen_helper_fcvt_lu_d(t0, cpu_env, cpu_fpr[a->rs1]);
-     gen_set_gpr(a->rd, t0);
-     tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-     return true;
- }
- 
-diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
-index 172dbfa919..87a250a3f2 100644
---- a/target/riscv/insn_trans/trans_rvf.inc.c
-+++ b/target/riscv/insn_trans/trans_rvf.inc.c
-@@ -237,6 +237,7 @@ static bool trans_fcvt_w_s(DisasContext *ctx, arg_fcvt_w_s *a)
-     gen_helper_fcvt_w_s(t0, cpu_env, cpu_fpr[a->rs1]);
-     gen_set_gpr(a->rd, t0);
-     tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
- 
-     return true;
- }
-@@ -251,6 +252,7 @@ static bool trans_fcvt_wu_s(DisasContext *ctx, arg_fcvt_wu_s *a)
-     gen_helper_fcvt_wu_s(t0, cpu_env, cpu_fpr[a->rs1]);
-     gen_set_gpr(a->rd, t0);
-     tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
- 
-     return true;
- }
-@@ -389,6 +391,7 @@ static bool trans_fcvt_l_s(DisasContext *ctx, arg_fcvt_l_s *a)
-     gen_helper_fcvt_l_s(t0, cpu_env, cpu_fpr[a->rs1]);
-     gen_set_gpr(a->rd, t0);
-     tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-     return true;
- }
- 
-@@ -402,6 +405,7 @@ static bool trans_fcvt_lu_s(DisasContext *ctx, arg_fcvt_lu_s *a)
-     gen_helper_fcvt_lu_s(t0, cpu_env, cpu_fpr[a->rs1]);
-     gen_set_gpr(a->rd, t0);
-     tcg_temp_free(t0);
-+    mark_fs_dirty(ctx);
-     return true;
- }
- 
--- 
-2.21.0
+I will not make any disputes on that! :)
 
+Thanks for the reviews!
+- Cleber.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
 
