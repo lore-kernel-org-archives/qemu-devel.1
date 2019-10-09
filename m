@@ -2,102 +2,67 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A6EECE58C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00951C47404
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:55:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1CEC206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:54:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1CEC206BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C8B0E206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:55:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8B0E206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIGAb-00057H-Jf
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:54:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51014)
+	id 1iIGBV-0005p0-7C
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:55:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iI889-0003Ti-DI
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:19:38 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iI7xi-0002SZ-Qq
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:08:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iI887-0006yM-V0
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:19:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:14012)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iI887-0006y0-Lm
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:19:35 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x999E4Z5136821
- for <qemu-devel@nongnu.org>; Wed, 9 Oct 2019 05:19:34 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vha7c5hdj-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 09 Oct 2019 05:19:34 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <clg@kaod.org>;
- Wed, 9 Oct 2019 10:19:32 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 9 Oct 2019 10:19:28 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id x999JRnE44106160
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 9 Oct 2019 09:19:27 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 89A0211C04A;
- Wed,  9 Oct 2019 09:19:27 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6B98411C054;
- Wed,  9 Oct 2019 09:19:27 +0000 (GMT)
-Received: from smtp.tls.ibm.com (unknown [9.101.4.1])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  9 Oct 2019 09:19:27 +0000 (GMT)
-Received: from yukon.kaod.org (sig-9-145-55-18.uk.ibm.com [9.145.55.18])
- by smtp.tls.ibm.com (Postfix) with ESMTP id 959D7220198;
- Wed,  9 Oct 2019 11:19:26 +0200 (CEST)
-Subject: Re: [PATCH v4 07/19] spapr: Formalize notion of active interrupt
- controller
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
- <20191009060818.29719-8-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Date: Wed, 9 Oct 2019 11:19:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <dgilbert@redhat.com>) id 1iI7xh-0003as-Ks
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:08:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36544)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iI7xh-0003aa-Cj
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:08:49 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 76BCC18CB8EC;
+ Wed,  9 Oct 2019 09:08:48 +0000 (UTC)
+Received: from work-vm (ovpn-117-215.ams2.redhat.com [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 23055F6C2;
+ Wed,  9 Oct 2019 09:08:44 +0000 (UTC)
+Date: Wed, 9 Oct 2019 10:08:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 3/3] migration/postcopy: handle POSTCOPY_INCOMING_RUNNING
+ corner case properly
+Message-ID: <20191009090842.GD2893@work-vm>
+References: <20191001100122.17730-1-richardw.yang@linux.intel.com>
+ <20191001100122.17730-4-richardw.yang@linux.intel.com>
+ <20191008164046.GF3441@work-vm> <20191009010204.GC26203@richard>
+ <20191009041225.GF10750@xz-x1> <20191009050756.GA9616@richard>
+ <20191009053633.GA1039@xz-x1> <20191009060728.GA14892@richard>
 MIME-Version: 1.0
-In-Reply-To: <20191009060818.29719-8-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19100909-0016-0000-0000-000002B66336
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100909-0017-0000-0000-00003317690D
-Message-Id: <62e5263d-be23-bd45-51eb-c13853341844@kaod.org>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-09_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=8 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910090087
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191009060728.GA14892@richard>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Wed, 09 Oct 2019 09:08:48 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,174 +74,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- groug@kaod.org, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/10/2019 08:08, David Gibson wrote:
-> spapr now has the mechanism of constructing both XICS and XIVE instances of
-> the SpaprInterruptController interface.  However, only one of the interrupt
-> controllers will actually be active at any given time, depending on feature
-> negotiation with the guest.  This is handled in the current code via
-> spapr_irq_current() which checks the OV5 vector from feature negotiation to
-> determine the current backend.
-> 
-> Determining the active controller at the point we need it like this
-> can be pretty confusing, because it makes it very non obvious at what
-> points the active controller can change.  This can make it difficult
-> to reason about the code and where a change of active controller could
-> appear in sequence with other events.
-> 
-> Make this mechanism more explicit by adding an 'active_intc' pointer
-> and an explicit spapr_irq_update_active_intc() function to update it
-> from the CAS state.  We also add hooks on the intc backend which will
-> get called when it is activated or deactivated.
-> 
-> For now we just introduce the switch and hooks, later patches will
-> actually start using them.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-Btw, we will need an extra xive2 pointer for the Power10 interrupt 
-controller.
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> On Wed, Oct 09, 2019 at 01:36:34PM +0800, Peter Xu wrote:
+> >On Wed, Oct 09, 2019 at 01:07:56PM +0800, Wei Yang wrote:
+> >> On Wed, Oct 09, 2019 at 12:12:25PM +0800, Peter Xu wrote:
+> >> >On Wed, Oct 09, 2019 at 09:02:04AM +0800, Wei Yang wrote:
+> >> >> On Tue, Oct 08, 2019 at 05:40:46PM +0100, Dr. David Alan Gilbert wrote:
+> >> >> >* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> >> >> >> Currently, we set PostcopyState blindly to RUNNING, even we found the
+> >> >> >> previous state is not LISTENING. This will lead to a corner case.
+> >> >> >> 
+> >> >> >> First let's look at the code flow:
+> >> >> >> 
+> >> >> >> qemu_loadvm_state_main()
+> >> >> >>     ret = loadvm_process_command()
+> >> >> >>         loadvm_postcopy_handle_run()
+> >> >> >>             return -1;
+> >> >> >>     if (ret < 0) {
+> >> >> >>         if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING)
+> >> >> >>             ...
+> >> >> >>     }
+> >> >> >> 
+> >> >> >> From above snippet, the corner case is loadvm_postcopy_handle_run()
+> >> >> >> always sets state to RUNNING. And then it checks the previous state. If
+> >> >> >> the previous state is not LISTENING, it will return -1. But at this
+> >> >> >> moment, PostcopyState is already been set to RUNNING.
+> >> >> >> 
+> >> >> >> Then ret is checked in qemu_loadvm_state_main(), when it is -1
+> >> >> >> PostcopyState is checked. Current logic would pause postcopy and retry
+> >> >> >> if PostcopyState is RUNNING. This is not what we expect, because
+> >> >> >> postcopy is not active yet.
+> >> >> >> 
+> >> >> >> This patch makes sure state is set to RUNNING only previous state is
+> >> >> >> LISTENING by introducing an old_state parameter in postcopy_state_set().
+> >> >> >> New state only would be set when current state equals to old_state.
+> >> >> >> 
+> >> >> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >> >> >
+> >> >> >OK, it's a shame to use a pointer there, but it works.
+> >> >> 
+> >> >> You mean second parameter of postcopy_state_set()?
+> >> >> 
+> >> >> I don't have a better idea. Or we introduce a new state
+> >> >> POSTCOPY_INCOMING_NOCHECK. Do you feel better with this?
+> >> >
+> >> >Maybe simply fix loadvm_postcopy_handle_run() to set the state after
+> >> >the POSTCOPY_INCOMING_LISTENING check?
+> >> >
+> >> 
+> >> Set state back to ps if ps is not POSTCOPY_INCOMING_LISTENING?
+> >> 
+> >> Sounds like another option.
+> >
+> >Even simpler?
+> >
+> >  ps = postcopy_state_get();
+> >  if (ps != INCOMING)
 
-C.
+  ^^ LISTENING
 
-> ---
->  hw/ppc/spapr_irq.c         | 51 ++++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h     |  5 ++--
->  include/hw/ppc/spapr_irq.h |  5 ++++
->  3 files changed, 59 insertions(+), 2 deletions(-)
+> >    return -1;
+> >  postcopy_state_set(RUNNING);
+> >
 > 
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index 83882cfad3..249a2688ac 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -586,6 +586,7 @@ qemu_irq spapr_qirq(SpaprMachineState *spapr, int irq)
->  
->  int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
->  {
-> +    spapr_irq_update_active_intc(spapr);
->      return spapr->irq->post_load(spapr, version_id);
->  }
->  
-> @@ -593,6 +594,8 @@ void spapr_irq_reset(SpaprMachineState *spapr, Error **errp)
->  {
->      assert(!spapr->irq_map || bitmap_empty(spapr->irq_map, spapr->irq_map_nr));
->  
-> +    spapr_irq_update_active_intc(spapr);
-> +
->      if (spapr->irq->reset) {
->          spapr->irq->reset(spapr, errp);
->      }
-> @@ -619,6 +622,54 @@ int spapr_irq_get_phandle(SpaprMachineState *spapr, void *fdt, Error **errp)
->      return phandle;
->  }
->  
-> +static void set_active_intc(SpaprMachineState *spapr,
-> +                            SpaprInterruptController *new_intc)
-> +{
-> +    SpaprInterruptControllerClass *sicc;
-> +
-> +    assert(new_intc);
-> +
-> +    if (new_intc == spapr->active_intc) {
-> +        /* Nothing to do */
-> +        return;
-> +    }
-> +
-> +    if (spapr->active_intc) {
-> +        sicc = SPAPR_INTC_GET_CLASS(spapr->active_intc);
-> +        if (sicc->deactivate) {
-> +            sicc->deactivate(spapr->active_intc);
-> +        }
-> +    }
-> +
-> +    sicc = SPAPR_INTC_GET_CLASS(new_intc);
-> +    if (sicc->activate) {
-> +        sicc->activate(new_intc, &error_fatal);
-> +    }
-> +
-> +    spapr->active_intc = new_intc;
-> +}
-> +
-> +void spapr_irq_update_active_intc(SpaprMachineState *spapr)
-> +{
-> +    SpaprInterruptController *new_intc;
-> +
-> +    if (!spapr->ics) {
-> +        /*
-> +         * XXX before we run CAS, ov5_cas is initialized empty, which
-> +         * indicates XICS, even if we have ic-mode=xive.  TODO: clean
-> +         * up the CAS path so that we have a clearer way of handling
-> +         * this.
-> +         */
-> +        new_intc = SPAPR_INTC(spapr->xive);
-> +    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-> +        new_intc = SPAPR_INTC(spapr->xive);
-> +    } else {
-> +        new_intc = SPAPR_INTC(spapr->ics);
-> +    }
-> +
-> +    set_active_intc(spapr, new_intc);
-> +}
-> +
->  /*
->   * XICS legacy routines - to deprecate one day
->   */
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index cbd1a4c9f3..763da757f0 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -143,7 +143,6 @@ struct SpaprMachineState {
->      struct SpaprVioBus *vio_bus;
->      QLIST_HEAD(, SpaprPhbState) phbs;
->      struct SpaprNvram *nvram;
-> -    ICSState *ics;
->      SpaprRtcState rtc;
->  
->      SpaprResizeHpt resize_hpt;
-> @@ -195,9 +194,11 @@ struct SpaprMachineState {
->  
->      int32_t irq_map_nr;
->      unsigned long *irq_map;
-> -    SpaprXive  *xive;
->      SpaprIrq *irq;
->      qemu_irq *qirqs;
-> +    SpaprInterruptController *active_intc;
-> +    ICSState *ics;
-> +    SpaprXive *xive;
->  
->      bool cmd_line_caps[SPAPR_CAP_NUM];
->      SpaprCapabilities def, eff, mig;
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index adfef0fcbe..593059eff5 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -44,6 +44,9 @@ typedef struct SpaprInterruptController SpaprInterruptController;
->  typedef struct SpaprInterruptControllerClass {
->      InterfaceClass parent;
->  
-> +    int (*activate)(SpaprInterruptController *intc, Error **errp);
-> +    void (*deactivate)(SpaprInterruptController *intc);
-> +
->      /*
->       * These methods will typically be called on all intcs, active and
->       * inactive
-> @@ -55,6 +58,8 @@ typedef struct SpaprInterruptControllerClass {
->      void (*free_irq)(SpaprInterruptController *intc, int irq);
->  } SpaprInterruptControllerClass;
->  
-> +void spapr_irq_update_active_intc(SpaprMachineState *spapr);
-> +
->  int spapr_irq_cpu_intc_create(SpaprMachineState *spapr,
->                                PowerPCCPU *cpu, Error **errp);
->  
+> Looks good to me.
 > 
+> Dave,
+> 
+> Do you feel good with it?
 
+Yes, I think so; it's simpler.
+
+Dave
+
+> >Thanks,
+> >
+> >-- 
+> >Peter Xu
+> 
+> -- 
+> Wei Yang
+> Help you, Help me
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
