@@ -2,64 +2,60 @@ Return-Path: <SRS0=qKtL=YC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00951C47404
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3503ECE58C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:57:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8B0E206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:55:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8B0E206BB
+	by mail.kernel.org (Postfix) with ESMTPS id B6E11206C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Oct 2019 17:57:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6E11206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIGBV-0005p0-7C
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:55:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49828)
+	id 1iIGDc-000094-KF
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 13:57:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iI7xi-0002SZ-Qq
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:08:51 -0400
+ (envelope-from <cohuck@redhat.com>) id 1iI9TN-0003vt-Vd
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:45:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iI7xh-0003as-Ks
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:08:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36544)
+ (envelope-from <cohuck@redhat.com>) id 1iI9TL-0006Pe-Pm
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 06:45:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51520)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iI7xh-0003aa-Cj
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 05:08:49 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1iI9TL-0006PK-Ju; Wed, 09 Oct 2019 06:45:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 76BCC18CB8EC;
- Wed,  9 Oct 2019 09:08:48 +0000 (UTC)
-Received: from work-vm (ovpn-117-215.ams2.redhat.com [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 23055F6C2;
- Wed,  9 Oct 2019 09:08:44 +0000 (UTC)
-Date: Wed, 9 Oct 2019 10:08:42 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [PATCH 3/3] migration/postcopy: handle POSTCOPY_INCOMING_RUNNING
- corner case properly
-Message-ID: <20191009090842.GD2893@work-vm>
-References: <20191001100122.17730-1-richardw.yang@linux.intel.com>
- <20191001100122.17730-4-richardw.yang@linux.intel.com>
- <20191008164046.GF3441@work-vm> <20191009010204.GC26203@richard>
- <20191009041225.GF10750@xz-x1> <20191009050756.GA9616@richard>
- <20191009053633.GA1039@xz-x1> <20191009060728.GA14892@richard>
+ by mx1.redhat.com (Postfix) with ESMTPS id 8B77510DCC95;
+ Wed,  9 Oct 2019 10:45:34 +0000 (UTC)
+Received: from gondolin (ovpn-117-191.ams2.redhat.com [10.36.117.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5A58F60A9F;
+ Wed,  9 Oct 2019 10:45:29 +0000 (UTC)
+Date: Wed, 9 Oct 2019 12:45:27 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v4 6/7] s390x/mmu: DAT table definition overhaul
+Message-ID: <20191009124527.490a18f7.cohuck@redhat.com>
+In-Reply-To: <20191004105102.15821-7-david@redhat.com>
+References: <20191004105102.15821-1-david@redhat.com>
+ <20191004105102.15821-7-david@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191009060728.GA14892@richard>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Wed, 09 Oct 2019 09:08:48 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.64]); Wed, 09 Oct 2019 10:45:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,92 +70,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, quintela@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> On Wed, Oct 09, 2019 at 01:36:34PM +0800, Peter Xu wrote:
-> >On Wed, Oct 09, 2019 at 01:07:56PM +0800, Wei Yang wrote:
-> >> On Wed, Oct 09, 2019 at 12:12:25PM +0800, Peter Xu wrote:
-> >> >On Wed, Oct 09, 2019 at 09:02:04AM +0800, Wei Yang wrote:
-> >> >> On Tue, Oct 08, 2019 at 05:40:46PM +0100, Dr. David Alan Gilbert wrote:
-> >> >> >* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> >> >> >> Currently, we set PostcopyState blindly to RUNNING, even we found the
-> >> >> >> previous state is not LISTENING. This will lead to a corner case.
-> >> >> >> 
-> >> >> >> First let's look at the code flow:
-> >> >> >> 
-> >> >> >> qemu_loadvm_state_main()
-> >> >> >>     ret = loadvm_process_command()
-> >> >> >>         loadvm_postcopy_handle_run()
-> >> >> >>             return -1;
-> >> >> >>     if (ret < 0) {
-> >> >> >>         if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING)
-> >> >> >>             ...
-> >> >> >>     }
-> >> >> >> 
-> >> >> >> From above snippet, the corner case is loadvm_postcopy_handle_run()
-> >> >> >> always sets state to RUNNING. And then it checks the previous state. If
-> >> >> >> the previous state is not LISTENING, it will return -1. But at this
-> >> >> >> moment, PostcopyState is already been set to RUNNING.
-> >> >> >> 
-> >> >> >> Then ret is checked in qemu_loadvm_state_main(), when it is -1
-> >> >> >> PostcopyState is checked. Current logic would pause postcopy and retry
-> >> >> >> if PostcopyState is RUNNING. This is not what we expect, because
-> >> >> >> postcopy is not active yet.
-> >> >> >> 
-> >> >> >> This patch makes sure state is set to RUNNING only previous state is
-> >> >> >> LISTENING by introducing an old_state parameter in postcopy_state_set().
-> >> >> >> New state only would be set when current state equals to old_state.
-> >> >> >> 
-> >> >> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> >> >> >
-> >> >> >OK, it's a shame to use a pointer there, but it works.
-> >> >> 
-> >> >> You mean second parameter of postcopy_state_set()?
-> >> >> 
-> >> >> I don't have a better idea. Or we introduce a new state
-> >> >> POSTCOPY_INCOMING_NOCHECK. Do you feel better with this?
-> >> >
-> >> >Maybe simply fix loadvm_postcopy_handle_run() to set the state after
-> >> >the POSTCOPY_INCOMING_LISTENING check?
-> >> >
-> >> 
-> >> Set state back to ps if ps is not POSTCOPY_INCOMING_LISTENING?
-> >> 
-> >> Sounds like another option.
-> >
-> >Even simpler?
-> >
-> >  ps = postcopy_state_get();
-> >  if (ps != INCOMING)
+On Fri,  4 Oct 2019 12:51:01 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-  ^^ LISTENING
+> Let's use consitent names for the region/section/page table entries and
 
-> >    return -1;
-> >  postcopy_state_set(RUNNING);
-> >
+Can you still fixup s/consitent/consistent/ before picking up? :)
+
+> for the macros to extract relevant parts from virtual address. Make them
+> match the definitions in the PoP - e.g., how the relevant bits are actually
+> called.
 > 
-> Looks good to me.
+> Introduce defines for all bits declared in the PoP. This will come in
+> handy in follow-up patches.
 > 
-> Dave,
+> Add a note where additional information about s390x and the used
+> definitions can be found.
 > 
-> Do you feel good with it?
-
-Yes, I think so; it's simpler.
-
-Dave
-
-> >Thanks,
-> >
-> >-- 
-> >Peter Xu
-> 
-> -- 
-> Wei Yang
-> Help you, Help me
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Acked-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/cpu.h        | 78 +++++++++++++++++++++++++++++----------
+>  target/s390x/mem_helper.c | 12 +++---
+>  target/s390x/mmu_helper.c | 37 ++++++++++---------
+>  3 files changed, 84 insertions(+), 43 deletions(-)
 
