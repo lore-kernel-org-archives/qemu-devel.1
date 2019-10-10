@@ -2,54 +2,56 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C4BEC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 672B2C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:18:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED07820659
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:18:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED07820659
+	by mail.kernel.org (Postfix) with ESMTPS id 4265120659
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:18:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4265120659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIQqO-0003MQ-23
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 01:18:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39132)
+	id 1iIQqQ-0003P3-Fe
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 01:18:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39144)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iIQp5-0002XT-RR
+ (envelope-from <tao3.xu@intel.com>) id 1iIQp6-0002XU-MD
  for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iIQp3-0004Oj-40
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:10 -0400
-Received: from mga17.intel.com ([192.55.52.151]:24358)
+ (envelope-from <tao3.xu@intel.com>) id 1iIQp4-0004Qv-AT
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:12 -0400
+Received: from mga17.intel.com ([192.55.52.151]:24363)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iIQp2-0004L4-TH
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:09 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iIQp4-0004Lg-21
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:10 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Oct 2019 22:17:00 -0700
+ 09 Oct 2019 22:17:04 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,279,1566889200"; d="scan'208";a="193089168"
+X-IronPort-AV: E=Sophos;i="5.67,279,1566889200"; d="scan'208";a="193089188"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga008.fm.intel.com with ESMTP; 09 Oct 2019 22:16:59 -0700
+ by fmsmga008.fm.intel.com with ESMTP; 09 Oct 2019 22:17:02 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
  mtosatti@redhat.com
-Subject: [PATCH v6 0/2] x86: Enable user wait instructions
-Date: Thu, 10 Oct 2019 13:16:55 +0800
-Message-Id: <20191010051657.28163-1-tao3.xu@intel.com>
+Subject: [PATCH v6 2/2] target/i386: Add support for save/load
+ IA32_UMWAIT_CONTROL MSR
+Date: Thu, 10 Oct 2019 13:16:57 +0800
+Message-Id: <20191010051657.28163-3-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191010051657.28163-1-tao3.xu@intel.com>
+References: <20191010051657.28163-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -71,69 +73,138 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
+UMWAIT and TPAUSE instructions use 32bits IA32_UMWAIT_CONTROL at MSR
+index E1H to determines the maximum time in TSC-quanta that the processor
+can reside in either C0.1 or C0.2.
 
-UMONITOR arms address monitoring hardware using an address. A store
-to an address within the specified address range triggers the
-monitoring hardware to wake up the processor waiting in umwait.
+This patch is to Add support for save/load IA32_UMWAIT_CONTROL MSR in
+guest.
 
-UMWAIT instructs the processor to enter an implementation-dependent
-optimized state while monitoring a range of addresses. The optimized
-state may be either a light-weight power/performance optimized state
-(c0.1 state) or an improved power/performance optimized state
-(c0.2 state).
+Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
+Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+---
 
-TPAUSE instructs the processor to enter an implementation-dependent
-optimized state c0.1 or c0.2 state and wake up when time-stamp counter
-reaches specified timeout.
+No changes in v5 and v6.
 
-Availability of the user wait instructions is indicated by the presence
-of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
-
-The patches enable the umonitor, umwait and tpause features in KVM.
-Because umwait and tpause can put a (psysical) CPU into a power saving
-state, by default we dont't expose it in kvm and provide a capability to
-enable it. Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
-QEMU use "-overcommit cpu-pm=on, a VM can use UMONITOR, UMWAIT and TPAUSE
-instructions. If the instruction causes a delay, the amount of time
-delayed is called here the physical delay. The physical delay is first
-computed by determining the virtual delay (the time to delay relative to
-the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT and TPAUSE cause
-an invalid-opcode exception(#UD).
-
-The release document ref below link:
-https://software.intel.com/sites/default/files/\
-managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
-
-Changelog:
-v6:
-	Only remove CPUID_7_0_ECX_WAITPKG if enable_cpu_pm is not set.
-        (Paolo)
-v5:
-	Remove CPUID_7_0_ECX_WAITPKG if enable_cpu_pm is not set. (Paolo)
-v4:
-	Set IA32_UMWAIT_CONTROL 32bits
-v3:
-	Simplify the patches, expose user wait instructions when the guest
-	has CPUID (Paolo)
-v2:
-	Separated from the series
-	https://www.mail-archive.com/qemu-devel@nongnu.org/msg549526.html
-	Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
-	QEMU use "-overcommit cpu-pm=on"	
-v1:
-	Sent out with MOVDIRI/MOVDIR64B instructions patches
-
-Tao Xu (2):
-  x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE
-  target/i386: Add support for save/load IA32_UMWAIT_CONTROL MSR
-
- target/i386/cpu.c     |  3 ++-
- target/i386/cpu.h     |  3 +++
- target/i386/kvm.c     | 17 +++++++++++++++++
+Changes in v4:
+        Set IA32_UMWAIT_CONTROL 32bits
+---
+ target/i386/cpu.h     |  2 ++
+ target/i386/kvm.c     | 13 +++++++++++++
  target/i386/machine.c | 20 ++++++++++++++++++++
- 4 files changed, 42 insertions(+), 1 deletion(-)
+ 3 files changed, 35 insertions(+)
 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 4e3206c8a2..134d14d14d 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -451,6 +451,7 @@ typedef enum X86Seg {
+ 
+ #define MSR_IA32_BNDCFGS                0x00000d90
+ #define MSR_IA32_XSS                    0x00000da0
++#define MSR_IA32_UMWAIT_CONTROL         0xe1
+ 
+ #define MSR_IA32_VMX_BASIC              0x00000480
+ #define MSR_IA32_VMX_PINBASED_CTLS      0x00000481
+@@ -1534,6 +1535,7 @@ typedef struct CPUX86State {
+     uint16_t fpregs_format_vmstate;
+ 
+     uint64_t xss;
++    uint32_t umwait;
+ 
+     TPRAccess tpr_access_type;
+ 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index d2a85b1572..9d21e22529 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -95,6 +95,7 @@ static bool has_msr_hv_stimer;
+ static bool has_msr_hv_frequencies;
+ static bool has_msr_hv_reenlightenment;
+ static bool has_msr_xss;
++static bool has_msr_umwait;
+ static bool has_msr_spec_ctrl;
+ static bool has_msr_virt_ssbd;
+ static bool has_msr_smi_count;
+@@ -1944,6 +1945,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+             case MSR_IA32_XSS:
+                 has_msr_xss = true;
+                 break;
++            case MSR_IA32_UMWAIT_CONTROL:
++                has_msr_umwait = true;
++                break;
+             case HV_X64_MSR_CRASH_CTL:
+                 has_msr_hv_crash = true;
+                 break;
+@@ -2623,6 +2627,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+     if (has_msr_xss) {
+         kvm_msr_entry_add(cpu, MSR_IA32_XSS, env->xss);
+     }
++    if (has_msr_umwait) {
++        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, env->umwait);
++    }
+     if (has_msr_spec_ctrl) {
+         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
+     }
+@@ -3036,6 +3043,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+     if (has_msr_xss) {
+         kvm_msr_entry_add(cpu, MSR_IA32_XSS, 0);
+     }
++    if (has_msr_umwait) {
++        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, 0);
++    }
+     if (has_msr_spec_ctrl) {
+         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
+     }
+@@ -3288,6 +3298,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_IA32_XSS:
+             env->xss = msrs[i].data;
+             break;
++        case MSR_IA32_UMWAIT_CONTROL:
++            env->umwait = msrs[i].data;
++            break;
+         default:
+             if (msrs[i].index >= MSR_MC0_CTL &&
+                 msrs[i].index < MSR_MC0_CTL + (env->mcg_cap & 0xff) * 4) {
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 2767b3096d..6481f846f6 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -943,6 +943,25 @@ static const VMStateDescription vmstate_xss = {
+     }
+ };
+ 
++static bool umwait_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++    CPUX86State *env = &cpu->env;
++
++    return env->umwait != 0;
++}
++
++static const VMStateDescription vmstate_umwait = {
++    .name = "cpu/umwait",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = umwait_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(env.umwait, X86CPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ #ifdef TARGET_X86_64
+ static bool pkru_needed(void *opaque)
+ {
+@@ -1391,6 +1410,7 @@ VMStateDescription vmstate_x86_cpu = {
+         &vmstate_msr_hyperv_reenlightenment,
+         &vmstate_avx512,
+         &vmstate_xss,
++        &vmstate_umwait,
+         &vmstate_tsc_khz,
+         &vmstate_msr_smi_count,
+ #ifdef TARGET_X86_64
 -- 
 2.20.1
 
