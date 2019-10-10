@@ -2,65 +2,60 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC77C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 20:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F7DC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 20:54:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8424E208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 20:34:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8424E208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id DEE99208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 20:54:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEE99208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIf8k-00070k-Kd
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 16:34:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44537)
+	id 1iIfS3-0003Bj-0N
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 16:54:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iIf7x-0006OI-UE
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 16:33:41 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1iIfQn-0002QL-0W
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 16:53:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iIf7u-0002Gb-1D
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 16:33:37 -0400
-Received: from 5.mo6.mail-out.ovh.net ([46.105.54.31]:32885)
+ (envelope-from <eric.auger@redhat.com>) id 1iIfQj-0008TU-1B
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 16:53:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53922)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iIf7s-0002E9-D2
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 16:33:33 -0400
-Received: from player774.ha.ovh.net (unknown [10.109.160.62])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id B95051E4E8D
- for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 22:33:17 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player774.ha.ovh.net (Postfix) with ESMTPSA id D9990AD2CD68;
- Thu, 10 Oct 2019 20:33:06 +0000 (UTC)
-Date: Thu, 10 Oct 2019 22:33:04 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v4 17/19] spapr: Remove last pieces of SpaprIrq
-Message-ID: <20191010223304.0cf7ccd3@bahia.lan>
-In-Reply-To: <20191010082958.12e17561@bahia.lan>
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
- <20191009060818.29719-18-david@gibson.dropbear.id.au>
- <20191009190215.7e05c017@bahia.lan>
- <20191010020209.GC28552@umbus.fritz.box>
- <20191010082958.12e17561@bahia.lan>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iIfQh-0008O0-2Z
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 16:53:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 73FDF18C426D;
+ Thu, 10 Oct 2019 20:52:55 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-245.ams2.redhat.com [10.36.116.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6C5F05D9C3;
+ Thu, 10 Oct 2019 20:52:48 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, quintela@redhat.com
+Subject: [PATCH v4] migration: Support gtree migration
+Date: Thu, 10 Oct 2019 22:52:42 +0200
+Message-Id: <20191010205242.711-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/PR.seAh37LLFO3YhG/3R6uI";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Ovh-Tracer-Id: 10776269483761375718
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrieefgdduheehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Thu, 10 Oct 2019 20:52:55 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.54.31
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,653 +67,780 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
+Cc: peterx@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/PR.seAh37LLFO3YhG/3R6uI
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Introduce support for GTree migration. A custom save/restore
+is implemented. Each item is made of a key and a data.
 
-On Thu, 10 Oct 2019 08:29:58 +0200
-Greg Kurz <groug@kaod.org> wrote:
+If the key is a pointer to an object, 2 VMSDs are passed into
+the GTree VMStateField.
 
-> On Thu, 10 Oct 2019 13:02:09 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Wed, Oct 09, 2019 at 07:02:15PM +0200, Greg Kurz wrote:
-> > > On Wed,  9 Oct 2019 17:08:16 +1100
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >=20
-> > > > The only thing remaining in this structure are the flags to allow e=
-ither
-> > > > XICS or XIVE to be present.  These actually make more sense as spapr
-> > > > capabilities - that way they can take advantage of the existing
-> > > > infrastructure to sanity check capability states across migration a=
-nd so
-> > > > forth.
-> > > >=20
-> > >=20
-> > > The user can now choose the interrupt controller mode either through
-> > > ic-mode or through cap-xics/cap-xive. I guess it doesn't break anythi=
-ng
-> > > to expose another API to do the same thing but it raises some questio=
-ns.
-> > >=20
-> > > We should at least document somewhere that ic-mode is an alias to the=
-se
-> > > caps, and maybe state which is the preferred method (I personally vote
-> > > for the caps).
-> > >=20
-> > > Also, we must keep ic-mode for the moment to stay compatible with the
-> > > existing pseries-4.0 and pseries-4.1 machine types, but will we
-> > > keep ic-mode forever ? If no, maybe start by not allowing it for
-> > > pseries-4.2 ?
-> >=20
-> > I'm actually inclined to keep it for now, maybe even leave it as the
-> > suggested way to configure this.  The caps are nice from an internal
-> > organization point of view, but ic-mode is arguably a more user
-> > friendly way of configuring it.  The conversion of one to the other is
-> > straightforward, isolated ans small, so I'm not especially bothered by
-> > keeping it around.
-> >=20
->=20
-> Fair enough.
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
+When putting the items, the tree is traversed in sorted order by
+g_tree_foreach.
 
-But unfortunately this still requires care :-\
+On the get() path, gtrees must be allocated using the proper
+key compare, key destroy and value destroy. This must be handled
+beforehand, for example in a pre_load method.
 
-qemu-system-ppc64: cap-xive higher level (1) in incoming stream than on des=
-tination (0)
-qemu-system-ppc64: error while loading state for instance 0x0 of device 'sp=
-apr'
-qemu-system-ppc64: load of migration failed: Invalid argument
+Tests are added to test save/dump of structs containing gtrees
+including the virtio-iommu domain/mappings scenario.
 
-or
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-qemu-system-ppc64: cap-xics higher level (1) in incoming stream than on des=
-tination (0)
-qemu-system-ppc64: error while loading state for instance 0x0 of device 'sp=
-apr'
-qemu-system-ppc64: load of migration failed: Invalid argument
+---
 
-when migrating from QEMU 4.1 with ic-mode=3Dxics and ic-mode=3Dxive respect=
-ively.
+v3 -> v4:
+- properly initialize capsule.vmdesc in put_gtree()
+- use uintptr_t
+- add trace points
+- I did not use unions in VMStateField as suggested by Peter as
+  this may complexify the struct. This can be added later on
+  though.
 
-This happens because the existing pseries-4.1 machine type doesn't send the
-new caps and the logic in spapr_caps_post_migration() wrongly assumes that
-the source has both caps set:
+v2 -> v3:
+- do not include glib.h anymore
+- introduce VMSTATE_GTREE_DIRECT_KEY_V
+- use pre_load to allocate the tree and remove data pointer
+- dump the number of nnodes and add checks on get path
 
-    srccaps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
-    for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
-        /* If not default value then assume came in with the migration */
-        if (spapr->mig.caps[i] !=3D spapr->def.caps[i]) {
+v1 -> v2:
+- fix compilation issues reported by robots
+- fixed init of VMSD array
+- direct key now dumped as a 32b
+- removed useless cast from/to pointer
+---
+ include/migration/vmstate.h |  40 ++++
+ migration/trace-events      |   5 +
+ migration/vmstate-types.c   | 148 +++++++++++++
+ tests/test-vmstate.c        | 421 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 614 insertions(+)
 
-spapr->mig.caps[SPAPR_CAP_XICS] =3D 0
-spapr->mig.caps[SPAPR_CAP_XIVE] =3D 0
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 1fbfd099dd..78caff55ef 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -224,6 +224,7 @@ extern const VMStateInfo vmstate_info_unused_buffer;
+ extern const VMStateInfo vmstate_info_tmp;
+ extern const VMStateInfo vmstate_info_bitmap;
+ extern const VMStateInfo vmstate_info_qtailq;
++extern const VMStateInfo vmstate_info_gtree;
+=20
+ #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
+ /*
+@@ -754,6 +755,45 @@ extern const VMStateInfo vmstate_info_qtailq;
+     .start        =3D offsetof(_type, _next),                           =
+   \
+ }
+=20
++/*
++ * For migrating a GTree whose key is a pointer to _key_type and the
++ * value, a pointer to _val_type
++ * The target tree must have been properly initialized
++ * _vmsd: Start address of the 2 element array containing the key vmsd
++ *        and the data vmsd
++ * _key_type: type of the key
++ * _val_type: type of the value
++ */
++#define VMSTATE_GTREE_V(_field, _state, _version, _vmsd,                =
+       \
++                        _key_type, _val_type)                           =
+       \
++{                                                                       =
+       \
++    .name         =3D (stringify(_field)),                              =
+         \
++    .version_id   =3D (_version),                                       =
+         \
++    .vmsd         =3D (_vmsd),                                          =
+         \
++    .info         =3D &vmstate_info_gtree,                              =
+         \
++    .start        =3D sizeof(_key_type),                                =
+         \
++    .size         =3D sizeof(_val_type),                                =
+         \
++    .offset       =3D offsetof(_state, _field),                         =
+         \
++}
++
++/*
++ * For migrating a GTree with direct key and the value a pointer
++ * to _val_type
++ * The target tree must have been properly initialized
++ * _vmsd: data vmsd
++ * _val_type: type of the value
++ */
++#define VMSTATE_GTREE_DIRECT_KEY_V(_field, _state, _version, _vmsd, _val=
+_type) \
++{                                                                       =
+       \
++    .name         =3D (stringify(_field)),                              =
+         \
++    .version_id   =3D (_version),                                       =
+         \
++    .vmsd         =3D (_vmsd),                                          =
+         \
++    .info         =3D &vmstate_info_gtree,                              =
+         \
++    .start        =3D 0,                                                =
+         \
++    .size         =3D sizeof(_val_type),                                =
+         \
++    .offset       =3D offsetof(_state, _field),                         =
+         \
++}
++
+ /* _f : field name
+    _f_n : num of elements field_name
+    _n : num of elements
+diff --git a/migration/trace-events b/migration/trace-events
+index 858d415d56..6dee7b5389 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -71,6 +71,11 @@ get_qtailq_end(const char *name, const char *reason, i=
+nt val) "%s %s/%d"
+ put_qtailq(const char *name, int version_id) "%s v%d"
+ put_qtailq_end(const char *name, const char *reason) "%s %s"
+=20
++get_gtree(const char *field_name, const char *key_vmsd_name, const char =
+*val_vmsd_name, uint32_t nnodes) "%s(%s/%s) nnodes=3D%d"
++get_gtree_end(const char *field_name, const char *key_vmsd_name, const c=
+har *val_vmsd_name, int ret) "%s(%s/%s) %d"
++put_gtree(const char *field_name, const char *key_vmsd_name, const char =
+*val_vmsd_name, uint32_t nnodes) "%s(%s/%s) nnodes=3D%d"
++put_gtree_end(const char *field_name, const char *key_vmsd_name, const c=
+har *val_vmsd_name, int ret) "%s(%s/%s) %d"
++
+ # qemu-file.c
+ qemu_file_fclose(void) ""
+=20
+diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+index bee658a1b2..7a6d66f241 100644
+--- a/migration/vmstate-types.c
++++ b/migration/vmstate-types.c
+@@ -691,3 +691,151 @@ const VMStateInfo vmstate_info_qtailq =3D {
+     .get  =3D get_qtailq,
+     .put  =3D put_qtailq,
+ };
++
++struct put_gtree_data {
++    QEMUFile *f;
++    const VMStateDescription *key_vmsd;
++    const VMStateDescription *val_vmsd;
++    QJSON *vmdesc;
++    int ret;
++};
++
++static gboolean put_gtree_elem(gpointer key, gpointer value, gpointer da=
+ta)
++{
++    struct put_gtree_data *capsule =3D (struct put_gtree_data *)data;
++    QEMUFile *f =3D capsule->f;
++    int ret;
++
++    qemu_put_byte(f, true);
++
++    /* put the key */
++    if (!capsule->key_vmsd) {
++        qemu_put_be64(f, (uint64_t)(uintptr_t)(key)); /* direct key */
++    } else {
++        ret =3D vmstate_save_state(f, capsule->key_vmsd, key, capsule->v=
+mdesc);
++        if (ret) {
++            capsule->ret =3D ret;
++            return true;
++        }
++    }
++
++    /* put the data */
++    ret =3D vmstate_save_state(f, capsule->val_vmsd, value, capsule->vmd=
+esc);
++    if (ret) {
++        capsule->ret =3D ret;
++        return true;
++    }
++    return false;
++}
++
++static int put_gtree(QEMUFile *f, void *pv, size_t unused_size,
++                     const VMStateField *field, QJSON *vmdesc)
++{
++    bool direct_key =3D (!field->start);
++    const VMStateDescription *key_vmsd =3D direct_key ? NULL : &field->v=
+msd[0];
++    const VMStateDescription *val_vmsd =3D direct_key ? &field->vmsd[0] =
+:
++                                                      &field->vmsd[1];
++    const char *key_vmsd_name =3D direct_key ? "direct" : key_vmsd->name=
+;
++    struct put_gtree_data capsule =3D {
++        .f =3D f,
++        .key_vmsd =3D key_vmsd,
++        .val_vmsd =3D val_vmsd,
++        .vmdesc =3D vmdesc,
++        .ret =3D 0};
++    GTree **pval =3D pv;
++    GTree *tree =3D *pval;
++    uint32_t nnodes =3D g_tree_nnodes(tree);
++    int ret;
++
++    trace_put_gtree(field->name, key_vmsd_name, val_vmsd->name, nnodes);
++    qemu_put_be32(f, nnodes);
++    g_tree_foreach(tree, put_gtree_elem, (gpointer)&capsule);
++    qemu_put_byte(f, false);
++    ret =3D capsule.ret;
++    if (ret) {
++        error_report("%s : failed to save gtree (%d)", field->name, ret)=
+;
++    }
++    trace_put_gtree_end(field->name, key_vmsd_name, val_vmsd->name, ret)=
+;
++    return ret;
++}
++
++static int get_gtree(QEMUFile *f, void *pv, size_t unused_size,
++                     const VMStateField *field)
++{
++    bool direct_key =3D (!field->start);
++    const VMStateDescription *key_vmsd =3D direct_key ? NULL : &field->v=
+msd[0];
++    const VMStateDescription *val_vmsd =3D direct_key ? &field->vmsd[0] =
+:
++                                                      &field->vmsd[1];
++    const char *key_vmsd_name =3D direct_key ? "direct" : key_vmsd->name=
+;
++    int version_id =3D field->version_id;
++    size_t key_size =3D field->start;
++    size_t val_size =3D field->size;
++    int nnodes, count =3D 0;
++    GTree **pval =3D pv;
++    GTree *tree =3D *pval;
++    void *key, *val;
++    int ret =3D 0;
++
++    /* in case of direct key, the key vmsd can be {}, ie. check fields *=
+/
++    if (!direct_key && version_id > key_vmsd->version_id) {
++        error_report("%s %s",  key_vmsd->name, "too new");
++        return -EINVAL;
++    }
++    if (!direct_key && version_id < key_vmsd->minimum_version_id) {
++        error_report("%s %s",  key_vmsd->name, "too old");
++        return -EINVAL;
++    }
++    if (version_id > val_vmsd->version_id) {
++        error_report("%s %s",  val_vmsd->name, "too new");
++        return -EINVAL;
++    }
++    if (version_id < val_vmsd->minimum_version_id) {
++        error_report("%s %s",  val_vmsd->name, "too old");
++        return -EINVAL;
++    }
++
++    nnodes =3D qemu_get_be32(f);
++    trace_get_gtree(field->name, key_vmsd_name, val_vmsd->name, nnodes);
++
++    while (qemu_get_byte(f)) {
++        if ((++count) > nnodes) {
++            ret =3D -EINVAL;
++            break;
++        }
++        if (direct_key) {
++            key =3D (void *)(uintptr_t)qemu_get_be64(f);
++        } else {
++            key =3D g_malloc0(key_size);
++            ret =3D vmstate_load_state(f, key_vmsd, key, version_id);
++            if (ret) {
++                error_report("%s : failed to load %s (%d)",
++                             field->name, key_vmsd->name, ret);
++                g_free(key);
++                return ret;
++            }
++        }
++        val =3D g_malloc0(val_size);
++        ret =3D vmstate_load_state(f, val_vmsd, val, version_id);
++        if (ret) {
++            error_report("%s : failed to load %s (%d)",
++                         field->name, val_vmsd->name, ret);
++            g_free(key);
++            g_free(val);
++            return ret;
++        }
++        g_tree_insert(tree, key, val);
++    }
++    if (count !=3D nnodes) {
++        error_report("%s inconsistent stream when loading the gtree",
++                     field->name);
++    }
++    trace_get_gtree_end(field->name, key_vmsd_name, val_vmsd->name, ret)=
+;
++    return ret;
++}
++
++
++const VMStateInfo vmstate_info_gtree =3D {
++    .name =3D "gtree",
++    .get  =3D get_gtree,
++    .put  =3D put_gtree,
++};
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index e80c4c6143..aae92e883b 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -812,6 +812,423 @@ static void test_load_q(void)
+     qemu_fclose(fload);
+ }
+=20
++/* interval (key) */
++typedef struct TestGTreeInterval {
++    uint64_t low;
++    uint64_t high;
++} TestGTreeInterval;
++
++#define VMSTATE_INTERVAL                               \
++{                                                      \
++    .name =3D "interval",                                \
++    .version_id =3D 1,                                   \
++    .minimum_version_id =3D 1,                           \
++    .fields =3D (VMStateField[]) {                       \
++        VMSTATE_UINT64(low, TestGTreeInterval),        \
++        VMSTATE_UINT64(high, TestGTreeInterval),       \
++        VMSTATE_END_OF_LIST()                          \
++    }                                                  \
++}
++
++/* mapping (value) */
++typedef struct TestGTreeMapping {
++    uint64_t phys_addr;
++    uint32_t flags;
++} TestGTreeMapping;
++
++#define VMSTATE_MAPPING                               \
++{                                                     \
++    .name =3D "mapping",                                \
++    .version_id =3D 1,                                  \
++    .minimum_version_id =3D 1,                          \
++    .fields =3D (VMStateField[]) {                      \
++        VMSTATE_UINT64(phys_addr, TestGTreeMapping),  \
++        VMSTATE_UINT32(flags, TestGTreeMapping),      \
++        VMSTATE_END_OF_LIST()                         \
++    },                                                \
++}
++
++static const VMStateDescription vmstate_interval_mapping[2] =3D {
++    VMSTATE_INTERVAL, /* key   */
++    VMSTATE_MAPPING   /* value */
++};
++
++typedef struct TestGTreeDomain {
++    int32_t  id;
++    GTree    *mappings;
++} TestGTreeDomain;
++
++typedef struct TestGTreeIOMMU {
++    int32_t  id;
++    GTree    *domains;
++} TestGTreeIOMMU;
++
++/* Interval comparison function */
++static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user=
+_data)
++{
++    TestGTreeInterval *inta =3D (TestGTreeInterval *)a;
++    TestGTreeInterval *intb =3D (TestGTreeInterval *)b;
++
++    if (inta->high < intb->low) {
++        return -1;
++    } else if (intb->high < inta->low) {
++        return 1;
++    } else {
++        return 0;
++    }
++}
++
++/* ID comparison function */
++static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data=
+)
++{
++    uint ua =3D GPOINTER_TO_UINT(a);
++    uint ub =3D GPOINTER_TO_UINT(b);
++    return (ua > ub) - (ua < ub);
++}
++
++static void destroy_domain(gpointer data)
++{
++    TestGTreeDomain *domain =3D (TestGTreeDomain *)data;
++
++    g_tree_destroy(domain->mappings);
++    g_free(domain);
++}
++
++static int domain_preload(void *opaque)
++{
++    TestGTreeDomain *domain =3D opaque;
++
++    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,
++                                       NULL, g_free, g_free);
++    return 0;
++}
++
++static int iommu_preload(void *opaque)
++{
++    TestGTreeIOMMU *iommu =3D opaque;
++
++    iommu->domains =3D g_tree_new_full((GCompareDataFunc)int_cmp,
++                                     NULL, NULL, destroy_domain);
++    return 0;
++}
++
++static const VMStateDescription vmstate_domain =3D {
++    .name =3D "domain",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .pre_load =3D domain_preload,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_INT32(id, TestGTreeDomain),
++        VMSTATE_GTREE_V(mappings, TestGTreeDomain, 1,
++                        vmstate_interval_mapping,
++                        TestGTreeInterval, TestGTreeMapping),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_iommu =3D {
++    .name =3D "iommu",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .pre_load =3D iommu_preload,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_INT32(id, TestGTreeIOMMU),
++        VMSTATE_GTREE_DIRECT_KEY_V(domains, TestGTreeIOMMU, 1,
++                                   &vmstate_domain, TestGTreeDomain),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++uint8_t first_domain_dump[] =3D {
++    /* id */
++    0x00, 0x0, 0x0, 0x6,
++    0x00, 0x0, 0x0, 0x2, /* 2 mappings */
++    0x1, /* start of a */
++    /* a */
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0xFF,
++    /* map_a */
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xa0, 0x00,
++    0x00, 0x00, 0x00, 0x01,
++    0x1, /* start of b */
++    /* b */
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00,
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF,
++    /* map_b */
++    0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00,
++    0x00, 0x00, 0x00, 0x02,
++    0x0, /* end of gtree */
++    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely=
+ */
++};
++
++static TestGTreeDomain *create_first_domain(void)
++{
++    TestGTreeDomain *domain;
++    TestGTreeMapping *map_a, *map_b;
++    TestGTreeInterval *a, *b;
++
++    domain =3D g_malloc0(sizeof(TestGTreeDomain));
++    domain->id =3D 6;
++
++    a =3D g_malloc0(sizeof(TestGTreeInterval));
++    a->low =3D 0x1000;
++    a->high =3D 0x1FFF;
++
++    b =3D g_malloc0(sizeof(TestGTreeInterval));
++    b->low =3D 0x4000;
++    b->high =3D 0x4FFF;
++
++    map_a =3D g_malloc0(sizeof(TestGTreeMapping));
++    map_a->phys_addr =3D 0xa000;
++    map_a->flags =3D 1;
++
++    map_b =3D g_malloc0(sizeof(TestGTreeMapping));
++    map_b->phys_addr =3D 0xe0000;
++    map_b->flags =3D 2;
++
++    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,=
+ NULL,
++                                        (GDestroyNotify)g_free,
++                                        (GDestroyNotify)g_free);
++    g_tree_insert(domain->mappings, a, map_a);
++    g_tree_insert(domain->mappings, b, map_b);
++    return domain;
++}
++
++static void test_gtree_save_domain(void)
++{
++    TestGTreeDomain *first_domain =3D create_first_domain();
++
++    save_vmstate(&vmstate_domain, first_domain);
++    compare_vmstate(first_domain_dump, sizeof(first_domain_dump));
++    destroy_domain(first_domain);
++}
++
++struct match_node_data {
++    GTree *tree;
++    gpointer key;
++    gpointer value;
++};
++
++struct tree_cmp_data {
++    GTree *tree1;
++    GTree *tree2;
++    GTraverseFunc match_node;
++};
++
++static gboolean match_interval_mapping_node(gpointer key,
++                                            gpointer value, gpointer dat=
+a)
++{
++    TestGTreeMapping *map_a, *map_b;
++    TestGTreeInterval *a, *b;
++    struct match_node_data *d =3D (struct match_node_data *)data;
++    char *str =3D g_strdup_printf("dest");
++
++    g_free(str);
++    a =3D (TestGTreeInterval *)key;
++    b =3D (TestGTreeInterval *)d->key;
++
++    map_a =3D (TestGTreeMapping *)value;
++    map_b =3D (TestGTreeMapping *)d->value;
++
++    assert(a->low =3D=3D b->low);
++    assert(a->high =3D=3D b->high);
++    assert(map_a->phys_addr =3D=3D map_b->phys_addr);
++    assert(map_a->flags =3D=3D map_b->flags);
++    g_tree_remove(d->tree, key);
++    return true;
++}
++
++static gboolean diff_tree(gpointer key, gpointer value, gpointer data)
++{
++    struct tree_cmp_data *tp =3D (struct tree_cmp_data *)data;
++    struct match_node_data d =3D {tp->tree2, key, value};
++
++    g_tree_foreach(tp->tree2, tp->match_node, &d);
++    g_tree_remove(tp->tree1, key);
++    return false;
++}
++
++static void compare_trees(GTree *tree1, GTree *tree2,
++                          GTraverseFunc function)
++{
++    struct tree_cmp_data tp =3D {tree1, tree2, function};
++
++    g_tree_foreach(tree1, diff_tree, &tp);
++    assert(g_tree_nnodes(tree1) =3D=3D 0);
++    assert(g_tree_nnodes(tree2) =3D=3D 0);
++}
++
++static void diff_domain(TestGTreeDomain *d1, TestGTreeDomain *d2)
++{
++    assert(d1->id =3D=3D d2->id);
++    compare_trees(d1->mappings, d2->mappings, match_interval_mapping_nod=
+e);
++}
++
++static gboolean match_domain_node(gpointer key, gpointer value, gpointer=
+ data)
++{
++    uint64_t id1, id2;
++    TestGTreeDomain *d1, *d2;
++    struct match_node_data *d =3D (struct match_node_data *)data;
++
++    id1 =3D (uint64_t)key;
++    id2 =3D (uint64_t)d->key;
++    d1 =3D (TestGTreeDomain *)value;
++    d2 =3D (TestGTreeDomain *)d->value;
++    assert(id1 =3D=3D id2);
++    diff_domain(d1, d2);
++    g_tree_remove(d->tree, key);
++    return true;
++}
++
++static void diff_iommu(TestGTreeIOMMU *iommu1, TestGTreeIOMMU *iommu2)
++{
++    assert(iommu1->id =3D=3D iommu2->id);
++    compare_trees(iommu1->domains, iommu2->domains, match_domain_node);
++}
++
++static void test_gtree_load_domain(void)
++{
++    TestGTreeDomain *dest_domain =3D g_malloc0(sizeof(TestGTreeDomain));
++    TestGTreeDomain *orig_domain =3D create_first_domain();
++    QEMUFile *fload, *fsave;
++    char eof;
++
++    fsave =3D open_test_file(true);
++    qemu_put_buffer(fsave, first_domain_dump, sizeof(first_domain_dump))=
+;
++    g_assert(!qemu_file_get_error(fsave));
++    qemu_fclose(fsave);
++
++    fload =3D open_test_file(false);
++
++    vmstate_load_state(fload, &vmstate_domain, dest_domain, 1);
++    eof =3D qemu_get_byte(fload);
++    g_assert(!qemu_file_get_error(fload));
++    g_assert_cmpint(orig_domain->id, =3D=3D, dest_domain->id);
++    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
++
++    diff_domain(orig_domain, dest_domain);
++    destroy_domain(orig_domain);
++    destroy_domain(dest_domain);
++    qemu_fclose(fload);
++}
++
++uint8_t iommu_dump[] =3D {
++    /* iommu id */
++    0x00, 0x0, 0x0, 0x7,
++    0x00, 0x0, 0x0, 0x2, /* 2 domains */
++    0x1,/* start of domain 5 */
++        0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x0, 0x5, /* key =3D 5 */
++        0x00, 0x0, 0x0, 0x5, /* domain1 id */
++        0x00, 0x0, 0x0, 0x1, /* 1 mapping */
++        0x1, /* start of mappings */
++            /* c */
++            0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
++            0x00, 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF,
++            /* map_c */
++            0x00, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00,
++            0x00, 0x0, 0x0, 0x3,
++            0x0, /* end of domain1 mappings*/
++    0x1,/* start of domain 6 */
++        0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x0, 0x6, /* key =3D 6 */
++        0x00, 0x0, 0x0, 0x6, /* domain6 id */
++            0x00, 0x0, 0x0, 0x2, /* 2 mappings */
++            0x1, /* start of a */
++            /* a */
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0xFF,
++            /* map_a */
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xa0, 0x00,
++            0x00, 0x00, 0x00, 0x01,
++            0x1, /* start of b */
++            /* b */
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00,
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF,
++            /* map_b */
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00,
++            0x00, 0x00, 0x00, 0x02,
++            0x0, /* end of domain6 mappings*/
++    0x0, /* end of domains */
++    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely=
+ */
++};
++
++static TestGTreeIOMMU *create_iommu(void)
++{
++    TestGTreeIOMMU *iommu =3D g_malloc0(sizeof(TestGTreeIOMMU));
++    TestGTreeDomain *first_domain =3D create_first_domain();
++    TestGTreeDomain *second_domain;
++    TestGTreeMapping *map_c;
++    TestGTreeInterval *c;
++
++    iommu->id =3D 7;
++    iommu->domains =3D g_tree_new_full((GCompareDataFunc)int_cmp, NULL,
++                                     NULL,
++                                     destroy_domain);
++
++    second_domain =3D g_malloc0(sizeof(TestGTreeDomain));
++    second_domain->id =3D 5;
++    second_domain->mappings =3D g_tree_new_full((GCompareDataFunc)interv=
+al_cmp,
++                                              NULL,
++                                              (GDestroyNotify)g_free,
++                                              (GDestroyNotify)g_free);
++
++    g_tree_insert(iommu->domains, GUINT_TO_POINTER(6), first_domain);
++    g_tree_insert(iommu->domains, (gpointer)0x0000000000000005, second_d=
+omain);
++
++    c =3D g_malloc0(sizeof(TestGTreeInterval));
++    c->low =3D 0x1000000;
++    c->high =3D 0x1FFFFFF;
++
++    map_c =3D g_malloc0(sizeof(TestGTreeMapping));
++    map_c->phys_addr =3D 0xF000000;
++    map_c->flags =3D 0x3;
++
++    g_tree_insert(second_domain->mappings, c, map_c);
++    return iommu;
++}
++
++static void destroy_iommu(TestGTreeIOMMU *iommu)
++{
++    g_tree_destroy(iommu->domains);
++    g_free(iommu);
++}
++
++static void test_gtree_save_iommu(void)
++{
++    TestGTreeIOMMU *iommu =3D create_iommu();
++
++    save_vmstate(&vmstate_iommu, iommu);
++    compare_vmstate(iommu_dump, sizeof(iommu_dump));
++    destroy_iommu(iommu);
++}
++
++static void test_gtree_load_iommu(void)
++{
++    TestGTreeIOMMU *dest_iommu =3D g_malloc0(sizeof(TestGTreeIOMMU));
++    TestGTreeIOMMU *orig_iommu =3D create_iommu();
++    QEMUFile *fsave, *fload;
++    char eof;
++    int ret;
++
++    fsave =3D open_test_file(true);
++    qemu_put_buffer(fsave, iommu_dump, sizeof(iommu_dump));
++    g_assert(!qemu_file_get_error(fsave));
++    qemu_fclose(fsave);
++
++    fload =3D open_test_file(false);
++    vmstate_load_state(fload, &vmstate_iommu, dest_iommu, 1);
++    ret =3D qemu_file_get_error(fload);
++    eof =3D qemu_get_byte(fload);
++    ret =3D qemu_file_get_error(fload);
++    g_assert(!ret);
++    g_assert_cmpint(orig_iommu->id, =3D=3D, dest_iommu->id);
++    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
++
++    diff_iommu(orig_iommu, dest_iommu);
++    destroy_iommu(orig_iommu);
++    destroy_iommu(dest_iommu);
++    qemu_fclose(fload);
++}
++
+ typedef struct TmpTestStruct {
+     TestStruct *parent;
+     int64_t diff;
+@@ -932,6 +1349,10 @@ int main(int argc, char **argv)
+                     test_arr_ptr_prim_0_load);
+     g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
+     g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
++    g_test_add_func("/vmstate/gtree/save/savedomain", test_gtree_save_do=
+main);
++    g_test_add_func("/vmstate/gtree/load/loaddomain", test_gtree_load_do=
+main);
++    g_test_add_func("/vmstate/gtree/save/saveiommu", test_gtree_save_iom=
+mu);
++    g_test_add_func("/vmstate/gtree/load/loadiommu", test_gtree_load_iom=
+mu);
+     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
+     g_test_run();
+=20
+--=20
+2.20.1
 
-            srccaps.caps[i] =3D spapr->mig.caps[i];
-
-srcaps.caps[SPAPR_CAP_XICS] =3D 1
-srcaps.caps[SPAPR_CAP_XIVE] =3D 1
-
-        }
-    }
-
-and breaks
-
-    for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
-        SpaprCapabilityInfo *info =3D &capability_table[i];
-
-        if (srccaps.caps[i] > dstcaps.caps[i]) {
-
-srcaps.caps[SPAPR_CAP_XICS] =3D 0 when ic-mode=3Dxive
-srcaps.caps[SPAPR_CAP_XIVE] =3D 0 when ic-mode=3Dxics
-
-            error_report("cap-%s higher level (%d) in incoming stream than =
-on destination (%d)",
-                         info->name, srccaps.caps[i], dstcaps.caps[i]);
-            ok =3D false;
-        }
-
-Maybe we shouldn't check capabilities that we know the source
-isn't supposed to send, eg. by having a smc->max_cap ?
-
-> > >=20
-> > > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > ---
-> > > >  hw/ppc/spapr.c             | 40 ++++++++++--------
-> > > >  hw/ppc/spapr_caps.c        | 64 +++++++++++++++++++++++++++++
-> > > >  hw/ppc/spapr_hcall.c       |  7 ++--
-> > > >  hw/ppc/spapr_irq.c         | 84 ++--------------------------------=
-----
-> > > >  include/hw/ppc/spapr.h     | 10 +++--
-> > > >  include/hw/ppc/spapr_irq.h | 10 -----
-> > > >  6 files changed, 103 insertions(+), 112 deletions(-)
-> > > >=20
-> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > > index e1ff03152e..bf9fdb1693 100644
-> > > > --- a/hw/ppc/spapr.c
-> > > > +++ b/hw/ppc/spapr.c
-> > > > @@ -1072,12 +1072,13 @@ static void spapr_dt_ov5_platform_support(S=
-paprMachineState *spapr, void *fdt,
-> > > >          26, 0x40, /* Radix options: GTSE =3D=3D yes. */
-> > > >      };
-> > > > =20
-> > > > -    if (spapr->irq->xics && spapr->irq->xive) {
-> > > > +    if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > > > +        && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > >          val[1] =3D SPAPR_OV5_XIVE_BOTH;
-> > > > -    } else if (spapr->irq->xive) {
-> > > > +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > >          val[1] =3D SPAPR_OV5_XIVE_EXPLOIT;
-> > > >      } else {
-> > > > -        assert(spapr->irq->xics);
-> > > > +        assert(spapr_get_cap(spapr, SPAPR_CAP_XICS));
-> > > >          val[1] =3D SPAPR_OV5_XIVE_LEGACY;
-> > > >      }
-> > > > =20
-> > > > @@ -2075,6 +2076,8 @@ static const VMStateDescription vmstate_spapr=
- =3D {
-> > > >          &vmstate_spapr_dtb,
-> > > >          &vmstate_spapr_cap_large_decr,
-> > > >          &vmstate_spapr_cap_ccf_assist,
-> > > > +        &vmstate_spapr_cap_xics,
-> > > > +        &vmstate_spapr_cap_xive,
-> > > >          NULL
-> > > >      }
-> > > >  };
-> > > > @@ -2775,7 +2778,7 @@ static void spapr_machine_init(MachineState *=
-machine)
-> > > >      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
-> > > > =20
-> > > >      /* advertise XIVE on POWER9 machines */
-> > > > -    if (spapr->irq->xive) {
-> > > > +    if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > >          spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
-> > > >      }
-> > > > =20
-> > > > @@ -3242,14 +3245,18 @@ static void spapr_set_vsmt(Object *obj, Vis=
-itor *v, const char *name,
-> > > >  static char *spapr_get_ic_mode(Object *obj, Error **errp)
-> > > >  {
-> > > >      SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> > > > =20
-> > > > -    if (spapr->irq =3D=3D &spapr_irq_xics_legacy) {
-> > > > +    if (smc->legacy_irq_allocation) {
-> > > >          return g_strdup("legacy");
-> > > > -    } else if (spapr->irq =3D=3D &spapr_irq_xics) {
-> > > > +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > > > +               && !spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > >          return g_strdup("xics");
-> > > > -    } else if (spapr->irq =3D=3D &spapr_irq_xive) {
-> > > > +    } else if (!spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > > > +               && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > >          return g_strdup("xive");
-> > > > -    } else if (spapr->irq =3D=3D &spapr_irq_dual) {
-> > > > +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > > > +               && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > >          return g_strdup("dual");
-> > > >      }
-> > > >      g_assert_not_reached();
-> > > > @@ -3266,11 +3273,14 @@ static void spapr_set_ic_mode(Object *obj, =
-const char *value, Error **errp)
-> > > > =20
-> > > >      /* The legacy IRQ backend can not be set */
-> > > >      if (strcmp(value, "xics") =3D=3D 0) {
-> > > > -        spapr->irq =3D &spapr_irq_xics;
-> > > > +        object_property_set_bool(obj, true, "cap-xics", errp);
-> > > > +        object_property_set_bool(obj, false, "cap-xive", errp);
-> > > >      } else if (strcmp(value, "xive") =3D=3D 0) {
-> > > > -        spapr->irq =3D &spapr_irq_xive;
-> > > > +        object_property_set_bool(obj, false, "cap-xics", errp);
-> > > > +        object_property_set_bool(obj, true, "cap-xive", errp);
-> > > >      } else if (strcmp(value, "dual") =3D=3D 0) {
-> > > > -        spapr->irq =3D &spapr_irq_dual;
-> > > > +        object_property_set_bool(obj, true, "cap-xics", errp);
-> > > > +        object_property_set_bool(obj, true, "cap-xive", errp);
-> > > >      } else {
-> > > >          error_setg(errp, "Bad value for \"ic-mode\" property");
-> > > >      }
-> > > > @@ -3309,7 +3319,6 @@ static void spapr_set_host_serial(Object *obj=
-, const char *value, Error **errp)
-> > > >  static void spapr_instance_init(Object *obj)
-> > > >  {
-> > > >      SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > > > -    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> > > > =20
-> > > >      spapr->htab_fd =3D -1;
-> > > >      spapr->use_hotplug_event_source =3D true;
-> > > > @@ -3345,7 +3354,6 @@ static void spapr_instance_init(Object *obj)
-> > > >                               spapr_get_msix_emulation, NULL, NULL);
-> > > > =20
-> > > >      /* The machine class defines the default interrupt controller =
-mode */
-> > > > -    spapr->irq =3D smc->irq;
-> > > >      object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
-> > > >                              spapr_set_ic_mode, NULL);
-> > > >      object_property_set_description(obj, "ic-mode",
-> > > > @@ -4439,8 +4447,9 @@ static void spapr_machine_class_init(ObjectCl=
-ass *oc, void *data)
-> > > >      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_=
-OFF;
-> > > >      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_=
-CAP_ON;
-> > > >      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
-> > > > +    smc->default_caps.caps[SPAPR_CAP_XICS] =3D SPAPR_CAP_ON;
-> > > > +    smc->default_caps.caps[SPAPR_CAP_XIVE] =3D SPAPR_CAP_ON;
-> > > >      spapr_caps_add_properties(smc, &error_abort);
-> > > > -    smc->irq =3D &spapr_irq_dual;
-> > > >      smc->dr_phb_enabled =3D true;
-> > > >      smc->linux_pci_probe =3D true;
-> > > >      smc->nr_xirqs =3D SPAPR_NR_XIRQS;
-> > > > @@ -4539,7 +4548,7 @@ static void spapr_machine_4_0_class_options(M=
-achineClass *mc)
-> > > >      spapr_machine_4_1_class_options(mc);
-> > > >      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_=
-0_len);
-> > > >      smc->phb_placement =3D phb_placement_4_0;
-> > > > -    smc->irq =3D &spapr_irq_xics;
-> > > > +    smc->default_caps.caps[SPAPR_CAP_XIVE] =3D SPAPR_CAP_OFF;
-> > > >      smc->pre_4_1_migration =3D true;
-> > > >  }
-> > > > =20
-> > > > @@ -4580,7 +4589,6 @@ static void spapr_machine_3_0_class_options(M=
-achineClass *mc)
-> > > > =20
-> > > >      smc->legacy_irq_allocation =3D true;
-> > > >      smc->nr_xirqs =3D 0x400;
-> > > > -    smc->irq =3D &spapr_irq_xics_legacy;
-> > > >  }
-> > > > =20
-> > > >  DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
-> > > > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> > > > index 481dfd2a27..e06fd386f6 100644
-> > > > --- a/hw/ppc/spapr_caps.c
-> > > > +++ b/hw/ppc/spapr_caps.c
-> > > > @@ -496,6 +496,42 @@ static void cap_ccf_assist_apply(SpaprMachineS=
-tate *spapr, uint8_t val,
-> > > >      }
-> > > >  }
-> > > > =20
-> > > > +static void cap_xics_apply(SpaprMachineState *spapr, uint8_t val, =
-Error **errp)
-> > > > +{
-> > > > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> > > > +
-> > > > +    if (!val) {
-> > > > +        if (!spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > > +            error_setg(errp,
-> > > > +"No interrupt controllers enabled, try cap-xics=3Don or cap-xive=
-=3Don");
-> > > > +            return;
-> > > > +        }
-> > > > +
-> > > > +        if (smc->legacy_irq_allocation) {
-> > > > +            error_setg(errp, "This machine version requires XICS s=
-upport");
-> > > > +            return;
-> > > > +        }
-> > > > +    }
-> > > > +}
-> > > > +
-> > > > +static void cap_xive_apply(SpaprMachineState *spapr, uint8_t val, =
-Error **errp)
-> > > > +{
-> > > > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> > > > +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> > > > +
-> > > > +    if (val) {
-> > > > +        if (smc->legacy_irq_allocation) {
-> > > > +            error_setg(errp, "This machine version cannot support =
-XIVE");
-> > > > +            return;
-> > > > +        }
-> > > > +        if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> > > > +                              spapr->max_compat_pvr)) {
-> > > > +            error_setg(errp, "XIVE requires POWER9 CPU");
-> > > > +            return;
-> > > > +        }
-> > > > +    }
-> > > > +}
-> > > > +
-> > > >  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-> > > >      [SPAPR_CAP_HTM] =3D {
-> > > >          .name =3D "htm",
-> > > > @@ -595,6 +631,24 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP=
-_NUM] =3D {
-> > > >          .type =3D "bool",
-> > > >          .apply =3D cap_ccf_assist_apply,
-> > > >      },
-> > > > +    [SPAPR_CAP_XICS] =3D {
-> > > > +        .name =3D "xics",
-> > > > +        .description =3D "Allow XICS interrupt controller",
-> > > > +        .index =3D SPAPR_CAP_XICS,
-> > > > +        .get =3D spapr_cap_get_bool,
-> > > > +        .set =3D spapr_cap_set_bool,
-> > > > +        .type =3D "bool",
-> > > > +        .apply =3D cap_xics_apply,
-> > > > +    },
-> > > > +    [SPAPR_CAP_XIVE] =3D {
-> > > > +        .name =3D "xive",
-> > > > +        .description =3D "Allow XIVE interrupt controller",
-> > > > +        .index =3D SPAPR_CAP_XIVE,
-> > > > +        .get =3D spapr_cap_get_bool,
-> > > > +        .set =3D spapr_cap_set_bool,
-> > > > +        .type =3D "bool",
-> > > > +        .apply =3D cap_xive_apply,
-> > > > +    },
-> > > >  };
-> > > > =20
-> > > >  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *=
-spapr,
-> > > > @@ -641,6 +695,14 @@ static SpaprCapabilities default_caps_with_cpu=
-(SpaprMachineState *spapr,
-> > > >          caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
-> > > >      }
-> > > > =20
-> > > > +    /*
-> > > > +     * POWER8 machines don't have XIVE
-> > > > +     */
-> > > > +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_3_00,
-> > > > +                               0, spapr->max_compat_pvr)) {
-> > > > +        caps.caps[SPAPR_CAP_XIVE] =3D SPAPR_CAP_OFF;
-> > > > +    }
-> > > > +
-> > > >      return caps;
-> > > >  }
-> > > > =20
-> > > > @@ -734,6 +796,8 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_=
-HPT_MAXPAGESIZE);
-> > > >  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
-> > > >  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
-> > > >  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-> > > > +SPAPR_CAP_MIG_STATE(xics, SPAPR_CAP_XICS);
-> > > > +SPAPR_CAP_MIG_STATE(xive, SPAPR_CAP_XIVE);
-> > > > =20
-> > > >  void spapr_caps_init(SpaprMachineState *spapr)
-> > > >  {
-> > > > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > > > index 140f05c1c6..cb4c6edf63 100644
-> > > > --- a/hw/ppc/spapr_hcall.c
-> > > > +++ b/hw/ppc/spapr_hcall.c
-> > > > @@ -1784,13 +1784,13 @@ static target_ulong h_client_architecture_s=
-upport(PowerPCCPU *cpu,
-> > > >       * terminate the boot.
-> > > >       */
-> > > >      if (guest_xive) {
-> > > > -        if (!spapr->irq->xive) {
-> > > > +        if (!spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > >              error_report(
-> > > >  "Guest requested unavailable interrupt mode (XIVE), try the ic-mod=
-e=3Dxive or ic-mode=3Ddual machine property");
-> > > >              exit(EXIT_FAILURE);
-> > > >          }
-> > > >      } else {
-> > > > -        if (!spapr->irq->xics) {
-> > > > +        if (!spapr_get_cap(spapr, SPAPR_CAP_XICS)) {
-> > > >              error_report(
-> > > >  "Guest requested unavailable interrupt mode (XICS), either don't s=
-et the ic-mode machine property or try ic-mode=3Dxics or ic-mode=3Ddual");
-> > > >              exit(EXIT_FAILURE);
-> > > > @@ -1804,7 +1804,8 @@ static target_ulong h_client_architecture_sup=
-port(PowerPCCPU *cpu,
-> > > >       */
-> > > >      if (!spapr->cas_reboot) {
-> > > >          spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIV=
-E_EXPLOIT)
-> > > > -            && spapr->irq->xics && spapr->irq->xive;
-> > > > +            && spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > > > +            && spapr_get_cap(spapr, SPAPR_CAP_XIVE);
-> > > >      }
-> > > > =20
-> > > >      spapr_ovec_cleanup(ov5_updates);
-> > > > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> > > > index 2768f9a765..473fc8780a 100644
-> > > > --- a/hw/ppc/spapr_irq.c
-> > > > +++ b/hw/ppc/spapr_irq.c
-> > > > @@ -101,90 +101,19 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterru=
-ptController *, Error **),
-> > > >      return 0;
-> > > >  }
-> > > > =20
-> > > > -/*
-> > > > - * XICS IRQ backend.
-> > > > - */
-> > > > -
-> > > > -SpaprIrq spapr_irq_xics =3D {
-> > > > -    .xics        =3D true,
-> > > > -    .xive        =3D false,
-> > > > -};
-> > > > -
-> > > > -/*
-> > > > - * XIVE IRQ backend.
-> > > > - */
-> > > > -
-> > > > -SpaprIrq spapr_irq_xive =3D {
-> > > > -    .xics        =3D false,
-> > > > -    .xive        =3D true,
-> > > > -};
-> > > > -
-> > > > -/*
-> > > > - * Dual XIVE and XICS IRQ backend.
-> > > > - *
-> > > > - * Both interrupt mode, XIVE and XICS, objects are created but the
-> > > > - * machine starts in legacy interrupt mode (XICS). It can be chang=
-ed
-> > > > - * by the CAS negotiation process and, in that case, the new mode =
-is
-> > > > - * activated after an extra machine reset.
-> > > > - */
-> > > > -
-> > > > -/*
-> > > > - * Define values in sync with the XIVE and XICS backend
-> > > > - */
-> > > > -SpaprIrq spapr_irq_dual =3D {
-> > > > -    .xics        =3D true,
-> > > > -    .xive        =3D true,
-> > > > -};
-> > > > -
-> > > > -
-> > > >  static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
-> > > >  {
-> > > >      MachineState *machine =3D MACHINE(spapr);
-> > > > =20
-> > > > -    /*
-> > > > -     * Sanity checks on non-P9 machines. On these, XIVE is not
-> > > > -     * advertised, see spapr_dt_ov5_platform_support()
-> > > > -     */
-> > > > -    if (!ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGI=
-CAL_3_00,
-> > > > -                               0, spapr->max_compat_pvr)) {
-> > > > -        /*
-> > > > -         * If the 'dual' interrupt mode is selected, force XICS as=
- CAS
-> > > > -         * negotiation is useless.
-> > > > -         */
-> > > > -        if (spapr->irq =3D=3D &spapr_irq_dual) {
-> > > > -            spapr->irq =3D &spapr_irq_xics;
-> > > > -            return 0;
-> > > > -        }
-> > > > -
-> > > > -        /*
-> > > > -         * Non-P9 machines using only XIVE is a bogus setup. We ha=
-ve two
-> > > > -         * scenarios to take into account because of the compat mo=
-de:
-> > > > -         *
-> > > > -         * 1. POWER7/8 machines should fail to init later on when =
-creating
-> > > > -         *    the XIVE interrupt presenters because a POWER9 excep=
-tion
-> > > > -         *    model is required.
-> > > > -
-> > > > -         * 2. POWER9 machines using the POWER8 compat mode won't f=
-ail and
-> > > > -         *    will let the OS boot with a partial XIVE setup : DT
-> > > > -         *    properties but no hcalls.
-> > > > -         *
-> > > > -         * To cover both and not confuse the OS, add an early fail=
-ure in
-> > > > -         * QEMU.
-> > > > -         */
-> > > > -        if (spapr->irq =3D=3D &spapr_irq_xive) {
-> > > > -            error_setg(errp, "XIVE-only machines require a POWER9 =
-CPU");
-> > > > -            return -1;
-> > > > -        }
-> > > > -    }
-> > > > -
-> > > >      /*
-> > > >       * On a POWER9 host, some older KVM XICS devices cannot be des=
-troyed and
-> > > >       * re-created. Detect that early to avoid QEMU to exit later w=
-hen the
-> > > >       * guest reboots.
-> > > >       */
-> > > >      if (kvm_enabled() &&
-> > > > -        spapr->irq =3D=3D &spapr_irq_dual &&
-> > > >          machine_kernel_irqchip_required(machine) &&
-> > > > +        spapr_get_cap(spapr, SPAPR_CAP_XICS) &&
-> > > > +        spapr_get_cap(spapr, SPAPR_CAP_XIVE) &&
-> > > >          xics_kvm_has_broken_disconnect(spapr)) {
-> > > >          error_setg(errp, "KVM is too old to support ic-mode=3Ddual=
-,kernel-irqchip=3Don");
-> > > >          return -1;
-> > > > @@ -280,7 +209,7 @@ void spapr_irq_init(SpaprMachineState *spapr, E=
-rror **errp)
-> > > >      /* Initialize the MSI IRQ allocator. */
-> > > >      spapr_irq_msi_init(spapr);
-> > > > =20
-> > > > -    if (spapr->irq->xics) {
-> > > > +    if (spapr_get_cap(spapr, SPAPR_CAP_XICS)) {
-> > > >          Error *local_err =3D NULL;
-> > > >          Object *obj;
-> > > > =20
-> > > > @@ -313,7 +242,7 @@ void spapr_irq_init(SpaprMachineState *spapr, E=
-rror **errp)
-> > > >          spapr->ics =3D ICS_SPAPR(obj);
-> > > >      }
-> > > > =20
-> > > > -    if (spapr->irq->xive) {
-> > > > +    if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > > >          uint32_t nr_servers =3D spapr_max_server_number(spapr);
-> > > >          DeviceState *dev;
-> > > >          int i;
-> > > > @@ -558,11 +487,6 @@ int spapr_irq_find(SpaprMachineState *spapr, i=
-nt num, bool align, Error **errp)
-> > > >      return first + ics->offset;
-> > > >  }
-> > > > =20
-> > > > -SpaprIrq spapr_irq_xics_legacy =3D {
-> > > > -    .xics        =3D true,
-> > > > -    .xive        =3D false,
-> > > > -};
-> > > > -
-> > > >  static void spapr_irq_register_types(void)
-> > > >  {
-> > > >      type_register_static(&spapr_intc_info);
-> > > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > > index 623e8e3f93..d3b4dd7de3 100644
-> > > > --- a/include/hw/ppc/spapr.h
-> > > > +++ b/include/hw/ppc/spapr.h
-> > > > @@ -79,8 +79,12 @@ typedef enum {
-> > > >  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
-> > > >  /* Count Cache Flush Assist HW Instruction */
-> > > >  #define SPAPR_CAP_CCF_ASSIST            0x09
-> > > > +/* XICS interrupt controller */
-> > > > +#define SPAPR_CAP_XICS                  0x0a
-> > > > +/* XIVE interrupt controller */
-> > > > +#define SPAPR_CAP_XIVE                  0x0b
-> > > >  /* Num Caps */
-> > > > -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
-> > > > +#define SPAPR_CAP_NUM                   (SPAPR_CAP_XIVE + 1)
-> > > > =20
-> > > >  /*
-> > > >   * Capability Values
-> > > > @@ -131,7 +135,6 @@ struct SpaprMachineClass {
-> > > >                            hwaddr *nv2atsd, Error **errp);
-> > > >      SpaprResizeHpt resize_hpt_default;
-> > > >      SpaprCapabilities default_caps;
-> > > > -    SpaprIrq *irq;
-> > > >  };
-> > > > =20
-> > > >  /**
-> > > > @@ -195,7 +198,6 @@ struct SpaprMachineState {
-> > > > =20
-> > > >      int32_t irq_map_nr;
-> > > >      unsigned long *irq_map;
-> > > > -    SpaprIrq *irq;
-> > > >      qemu_irq *qirqs;
-> > > >      SpaprInterruptController *active_intc;
-> > > >      ICSState *ics;
-> > > > @@ -870,6 +872,8 @@ extern const VMStateDescription vmstate_spapr_c=
-ap_hpt_maxpagesize;
-> > > >  extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
-> > > >  extern const VMStateDescription vmstate_spapr_cap_large_decr;
-> > > >  extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
-> > > > +extern const VMStateDescription vmstate_spapr_cap_xics;
-> > > > +extern const VMStateDescription vmstate_spapr_cap_xive;
-> > > > =20
-> > > >  static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int =
-cap)
-> > > >  {
-> > > > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> > > > index 5e150a6679..71aee13743 100644
-> > > > --- a/include/hw/ppc/spapr_irq.h
-> > > > +++ b/include/hw/ppc/spapr_irq.h
-> > > > @@ -77,16 +77,6 @@ int spapr_irq_msi_alloc(SpaprMachineState *spapr=
-, uint32_t num, bool align,
-> > > >                          Error **errp);
-> > > >  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_=
-t num);
-> > > > =20
-> > > > -typedef struct SpaprIrq {
-> > > > -    bool        xics;
-> > > > -    bool        xive;
-> > > > -} SpaprIrq;
-> > > > -
-> > > > -extern SpaprIrq spapr_irq_xics;
-> > > > -extern SpaprIrq spapr_irq_xics_legacy;
-> > > > -extern SpaprIrq spapr_irq_xive;
-> > > > -extern SpaprIrq spapr_irq_dual;
-> > > > -
-> > > >  void spapr_irq_init(SpaprMachineState *spapr, Error **errp);
-> > > >  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, E=
-rror **errp);
-> > > >  void spapr_irq_free(SpaprMachineState *spapr, int irq, int num);
-> > >=20
-> >=20
->=20
-
-
---Sig_/PR.seAh37LLFO3YhG/3R6uI
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl2flYAACgkQcdTV5YIv
-c9aKVQ/+PwZRWksX5zxDoxj/kOuhMuo57IDtZWUQx8Pp/vzKT8B8xPOxyflt4WYB
-vzy/E70qGprmkC570U2fQGJqzzSkOkeJv/AgPab0JUjz0Ic3hStrMDjl1ABHFvjG
-zla3rwr8jKBnBZzqCQY1EjDo7exwDiwTutpSiKtSEKGoPly6H7v7trzXZvjqYI6q
-Nc1UZVVO4aD5d/gY1cbXFJxaEvyoQEfPGU1XjijUZe43NnSb7ysgbJQMzKUjcWKe
-PqJxPwK8472jAB4tjHL+KqHEzqyoaRNyTZACulQHeIGfiKDlncEs++c9mgb9e0Qa
-Se47E6oof7m0qkJRWVJwwyR1nwhlQF78YUvjcjjd0NbCR2xdD9QY20Uz/n45u2dH
-qKF5VIRPJlMGqCoHaAvs0bJXaU8AbzKLoyucvcXJIl32ZxN8p58JWTSTMcmdq/Lx
-LOFVvAcfmve1j/jmSMHAdIcz8T4CTKYwqP7TXO9E14opXGJYoixZ19frTT6Bjm6I
-X1ATw4z1b+A63W7DZMQCzbOo9UiAHpQc29qhToLmcczD8cknyiMk0sj0IUJ0/Yj8
-b3fHFd3WzUAgnUQ2h5Iuwu/U0v19loOF8MkjgzZM97YI7sU/VsjhkyZxN4U9if8y
-83fLkmfCGdjP29Rf37w9TdOR9nZ3aHtjcyzh9yBeSzmzheNgllI=
-=0Z3K
------END PGP SIGNATURE-----
-
---Sig_/PR.seAh37LLFO3YhG/3R6uI--
 
