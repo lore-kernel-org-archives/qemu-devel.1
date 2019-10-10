@@ -2,64 +2,63 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BD3C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 18:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7351BC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 18:20:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE4F7206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 18:12:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE4F7206B6
+	by mail.kernel.org (Postfix) with ESMTPS id 4B18D20659
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 18:20:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B18D20659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIcv9-0000KD-2B
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 14:12:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55288)
+	id 1iId3P-0002va-Fd
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 14:20:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iIcuQ-0008Fh-LI
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:11:31 -0400
+ (envelope-from <eblake@redhat.com>) id 1iId1b-00028c-C1
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iIcuP-00054F-GC
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:11:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34204)
+ (envelope-from <eblake@redhat.com>) id 1iId1a-0007iw-CB
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:18:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49950)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iIcuP-000534-AQ
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:11:29 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iId1V-0007go-UJ; Thu, 10 Oct 2019 14:18:50 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8EA39801663
- for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 18:11:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 44A486696C;
+ Thu, 10 Oct 2019 18:18:48 +0000 (UTC)
 Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 48CF16061E;
- Thu, 10 Oct 2019 18:11:28 +0000 (UTC)
-Subject: Re: [PATCH v3 3/3] qapi: Allow introspecting fix for savevm's
- cooperation with blockdev
-To: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org
-References: <cover.1570705279.git.pkrempa@redhat.com>
- <be94d24847d38cb5a1172ed22d0f86e7c0ec8562.1570705279.git.pkrempa@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D2138194B6;
+ Thu, 10 Oct 2019 18:18:47 +0000 (UTC)
+Subject: Re: [PATCH 01/23] iotests: Introduce $SOCK_DIR
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20191010152457.17713-1-mreitz@redhat.com>
+ <20191010152457.17713-2-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <0785d26d-6495-3b23-40d7-a19bcd02181e@redhat.com>
-Date: Thu, 10 Oct 2019 13:11:27 -0500
+Message-ID: <28d6c3e1-7efa-7e31-0b95-c8b5c79f75dc@redhat.com>
+Date: Thu, 10 Oct 2019 13:18:47 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <be94d24847d38cb5a1172ed22d0f86e7c0ec8562.1570705279.git.pkrempa@redhat.com>
+In-Reply-To: <20191010152457.17713-2-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Thu, 10 Oct 2019 18:11:28 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Thu, 10 Oct 2019 18:18:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,73 +73,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/10/19 6:05 AM, Peter Krempa wrote:
-
-In addition to Markus' review,
-
-> 'savevm' was buggy as it considered all monitor-owned block device nodes
-> for snapshot. With introduction of -blockdev the common usage made all
-
-With the introduction of -blockdev, the common usage
-
-> nodes including protocol and backing file nodes monitor-owned and thus
-
-nodes be monitor-owned
-
-> considered for snapshot.
+On 10/10/19 10:24 AM, Max Reitz wrote:
+> Unix sockets generally have a maximum path length.  Depending on your
+> $TEST_DIR, it may be exceeded and then all tests that create and use
+> Unix sockets there may fail.
 > 
-> This is a problem since the 'file' protocol nodes can't have internal
-> snapshots and it does not make sense to take snapshot of nodes
-> representing backing files.
+> Circumvent this by adding a new scratch directory specifically for
+> Unix socket files.  It defaults to a temporary directory (mktemp -d)
+> that is completely removed after the iotests are done.
 > 
-> This was fixed by commit 05f4aced658a02b02 clients need to be able to
-> detect whether this fix is present.
+> (By default, mktemp -d creates a /tmp/tmp.XXXXXXXXXX directory, which
+> should be short enough for our use cases.)
 > 
-> Since savevm does not have an QMP alternative, add the feature for the
-> 'human-monitor-command' backdoor which is used to call this command in
-> modern use.
-> 
-> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->   qapi/misc.json | 9 ++++++++-
->   1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 6bd11f50e6..5d0070aa43 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -1020,6 +1020,12 @@
->   #
->   # @cpu-index: The CPU to use for commands that require an implicit CPU
->   #
-> +# Features:
-> +# @savevm-blockdev-monitor-nodes: If present, the HMP command savevm only
-> +#                                 snapshots monitor-owned nodes if they have no
-> +#                                 parents. This allows to use 'savevm' with
-> +#                                 -blockdev. (since 4.2)
+>   tests/qemu-iotests/check | 17 +++++++++++++++++
 
-s/to use/the use of/
+> +tmp_sock_dir=false
+> +if [ -z "$SOCK_DIR" ]; then
+> +    SOCK_DIR=$(mktemp -d)
+> +    tmp_sock_dir=true
+> +fi
+> +
+> +if [ ! -d "$SOCK_DIR" ]; then
+> +    mkdir "$SOCK_DIR"
+> +fi
 
-> +#
->   # Returns: the output of the command as a string
->   #
->   # Since: 0.14.0
-> @@ -1047,7 +1053,8 @@
->   ##
->   { 'command': 'human-monitor-command',
->     'data': {'command-line': 'str', '*cpu-index': 'int'},
-> -  'returns': 'str' }
-> +  'returns': 'str',
-> +  'features': [ 'savevm-blockdev-monitor-nodes' ] }
-> 
->   ##
->   # @change:
-> 
+Should this use mkdir -p, in case two parallel processes compete with 
+the same SOCK_DIR?
+
+What if SOCK_DIR is set to something that is not a directory (say a 
+file), at which point mkdir fails, but you don't seem to be catching 
+that failure.
+
+Otherwise looks good.
 
 -- 
 Eric Blake, Principal Software Engineer
