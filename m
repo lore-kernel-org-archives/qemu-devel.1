@@ -2,62 +2,62 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAF9C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BF2C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:25:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE6F3214E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:25:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE6F3214E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2721E2190F
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:25:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2721E2190F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIYRi-0002vx-Lg
+	id 1iIYRi-0002y5-PM
 	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 09:25:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40640)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iIYJV-0001BM-4a
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:17:06 -0400
+ (envelope-from <philmd@redhat.com>) id 1iIYIm-000847-QP
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iIYJT-0002Nk-Mw
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:17:04 -0400
-Received: from 6.mo6.mail-out.ovh.net ([87.98.177.69]:47666)
+ (envelope-from <philmd@redhat.com>) id 1iIYIk-00020n-4A
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:16:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:31514)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iIYJT-0002Mz-Fv
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:17:03 -0400
-Received: from player772.ha.ovh.net (unknown [10.109.159.140])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 09A5E1E50AE
- for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 15:17:00 +0200 (CEST)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: groug@kaod.org)
- by player772.ha.ovh.net (Postfix) with ESMTPSA id 5DBF9ACB3692;
- Thu, 10 Oct 2019 13:16:59 +0000 (UTC)
-Date: Thu, 10 Oct 2019 15:16:56 +0200
-From: Greg Kurz <groug@kaod.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PULL 0/4] 9p patches 2019-10-08
-Message-ID: <20191010151656.5aec944b@bahia.lan>
-In-Reply-To: <20191008151925.1021706-1-groug@kaod.org>
-References: <20191008151925.1021706-1-groug@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1iIYIf-0001zD-Qq; Thu, 10 Oct 2019 09:16:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id EAC193065603;
+ Thu, 10 Oct 2019 13:16:12 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BE5BD600C4;
+ Thu, 10 Oct 2019 13:15:52 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v3 2/8] hw/isa/piix4: Convert reset handler to DeviceReset
+Date: Thu, 10 Oct 2019 15:15:21 +0200
+Message-Id: <20191010131527.32513-3-philmd@redhat.com>
+In-Reply-To: <20191010131527.32513-1-philmd@redhat.com>
+References: <20191010131527.32513-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 3408099020807444800
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrieefgdeihecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Thu, 10 Oct 2019 13:16:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.177.69
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,58 +69,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter,
+The PIIX4/ISA is a PCI device within the PIIX4 chipset, it will be reset
+when the PCI bus it stands on is reset.
 
-As said on IRC, please ignore this PR, I'm about to post a v2.
-Sorry for the noise.
+Convert its reset handler into a proper Device reset method.
 
-Cheers,
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/isa/piix4.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
---
-Greg
-
-On Tue,  8 Oct 2019 17:19:21 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> The following changes since commit 0f0b43868a566068fc137632fd51bd3cbb23f350:
-> 
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.2-20191004' into staging (2019-10-07 13:49:02 +0100)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/gkurz/qemu.git tags/9p-next-2019-10-08
-> 
-> for you to fetch changes up to bc6c3cbf43dcc55e34e05bfcbd302bf1a4b92af7:
-> 
->   9p: Treat multiple devices on one export as an error (2019-10-08 11:50:11 +0200)
-> 
-> ----------------------------------------------------------------
-> The most notable change is to detect cross-device setups and warn the
-> user that this may result in inode number collisions and chaos in the
-> guest. The rest is cosmetic cleanup.
-> 
-> ----------------------------------------------------------------
-> Antonios Motakis (2):
->       9p: unsigned type for type, version, path
->       9p: Treat multiple devices on one export as an error
-> 
-> Greg Kurz (2):
->       9p: Simplify error path of v9fs_device_realize_common()
->       fsdev: Add return value to fsdev_throttle_parse_opts()
-> 
->  fsdev/9p-marshal.h          |  6 +--
->  fsdev/qemu-fsdev-throttle.c |  4 +-
->  fsdev/qemu-fsdev-throttle.h |  2 +-
->  hw/9pfs/9p-local.c          |  7 +++-
->  hw/9pfs/9p-proxy.c          |  4 ++
->  hw/9pfs/9p.c                | 92 ++++++++++++++++++++++++++++++++-------------
->  hw/9pfs/9p.h                |  1 +
->  hw/9pfs/trace-events        | 14 +++----
->  8 files changed, 88 insertions(+), 42 deletions(-)
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+index 3294056cd5..890d999abf 100644
+--- a/hw/isa/piix4.c
++++ b/hw/isa/piix4.c
+@@ -28,7 +28,6 @@
+ #include "hw/isa/isa.h"
+ #include "hw/sysbus.h"
+ #include "migration/vmstate.h"
+-#include "sysemu/reset.h"
+=20
+ PCIDevice *piix4_dev;
+=20
+@@ -40,9 +39,9 @@ typedef struct PIIX4State {
+ #define PIIX4_PCI_DEVICE(obj) \
+     OBJECT_CHECK(PIIX4State, (obj), TYPE_PIIX4_PCI_DEVICE)
+=20
+-static void piix4_reset(void *opaque)
++static void piix4_isa_reset(DeviceState *dev)
+ {
+-    PIIX4State *d =3D opaque;
++    PIIX4State *d =3D PIIX4_PCI_DEVICE(dev);
+     uint8_t *pci_conf =3D d->dev.config;
+=20
+     pci_conf[0x04] =3D 0x07; // master, memory and I/O
+@@ -97,7 +96,6 @@ static void piix4_realize(PCIDevice *dev, Error **errp)
+         return;
+     }
+     piix4_dev =3D &d->dev;
+-    qemu_register_reset(piix4_reset, d);
+ }
+=20
+ int piix4_init(PCIBus *bus, ISABus **isa_bus, int devfn)
+@@ -118,6 +116,7 @@ static void piix4_class_init(ObjectClass *klass, void=
+ *data)
+     k->vendor_id =3D PCI_VENDOR_ID_INTEL;
+     k->device_id =3D PCI_DEVICE_ID_INTEL_82371AB_0;
+     k->class_id =3D PCI_CLASS_BRIDGE_ISA;
++    dc->reset =3D piix4_isa_reset;
+     dc->desc =3D "ISA bridge";
+     dc->vmsd =3D &vmstate_piix4;
+     /*
+--=20
+2.21.0
 
 
