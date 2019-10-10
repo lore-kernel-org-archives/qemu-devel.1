@@ -2,66 +2,87 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DE9C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DD9C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:43:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC4022064A
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:43:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC4022064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id AB2FF2064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:43:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="f2Y3EBWt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB2FF2064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cloud.ionos.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIXmf-0001Ov-5S
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 08:43:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57966)
+	id 1iIXmz-0002OI-CI
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 08:43:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iIXdO-0006Ch-Qg
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 08:33:35 -0400
+ (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
+ id 1iIXIg-0005gU-UB
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 08:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iIXdN-0001W0-20
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 08:33:34 -0400
-Resent-Date: Thu, 10 Oct 2019 08:33:34 -0400
-Resent-Message-Id: <E1iIXdN-0001W0-20@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21464)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iIXdM-0001Vo-Qf; Thu, 10 Oct 2019 08:33:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1570710804; cv=none; d=zoho.com; s=zohoarc; 
- b=Jth9Umw1SaLPqUntiyM+N5WzSAL9xSd8ii470AvWO8eu7utbSzrlWP6HAI9yRPWiMxGfzwIxzfNvajQmOBeG9wlVz73F83byyFPObXNFYFID09HxgCUEFFoTXKl2nMlQ35W7wWVYK5Z7cTNWCF8S8l/BH4OjNZ4+bN5xGsidu20=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1570710804;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=XbQ58X9xW7Uqdxkcc9Yo/qnDb32nRp5oqvYjDj3Ry/s=; 
- b=FKz7g2YC3Rbj1JZEEllHhSYn74MIdo/hG3tWR6xzbA7IWpsQn/WdjWsKFqR2xScEEk8KEu0TPyJjw+E9MRIyKRAgehFG0W+HIoIq0/f0gIzaEuG4Pwd8s+TSzdbQnkkbQJWucIIIzWV0BoOTRb9eE/30fSslndpdpxazHa0/caQ=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1570710802228450.0882761261963;
- Thu, 10 Oct 2019 05:33:22 -0700 (PDT)
-In-Reply-To: <20191010113356.5017-1-david@redhat.com>
-Subject: Re: [PULL 00/31] s390x/tcg update
-Message-ID: <157071080075.7138.17215740269377233027@37313f22b938>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: david@redhat.com
-Date: Thu, 10 Oct 2019 05:33:22 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+ (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
+ id 1iIXIf-00024D-LF
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 08:12:10 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:37745)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
+ id 1iIXIf-00023j-6o
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 08:12:09 -0400
+Received: by mail-ed1-x544.google.com with SMTP id r4so5246975edy.4
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 05:12:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=cloud.ionos.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=O05afTw00yJcZG1EFAC8CfJufdnfwcI7yyhOpKWurQA=;
+ b=f2Y3EBWtW39HjwSfQ/iRVm976oQ6/A+jwY6KSpbBmLkStIy6559VgbSvd+ZxtCIC+e
+ kYcpSJ5zQU6PhDCDOHOSain23mqP3zw70LYZ5fmYIM59R0gAFkQspUQDQmG+wvSXQ5Lp
+ /+KD0TO6j6dSRHSxTe9uCGXc06fHFfHoklHGKZWAldHIgVl8jI8nvzrM5Sxelcw84gri
+ ePID/2Hl/0AxIkNilJyH8RTi9NX9Tzrw7hpLNvdp/gs3fqRMsZVVufe9hm6wePN7+JRJ
+ wE4ET34pdwPnNfX8B6qlALn9taxr5U1QOyMomd6wo6NFedZufQ4M2CvJA31ZdlSFS206
+ 6RsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=O05afTw00yJcZG1EFAC8CfJufdnfwcI7yyhOpKWurQA=;
+ b=D4Z/+9QnvfHaXMOVLM5EKaIT5qu38mD5K23VNcQpmrE1Y301NPsmG4nLgOBAp2w239
+ YV/au9uHUz98FNf/7pp1GK8Z/0JJdiVVrUiOJy41p4Da0rwr+WjdlebJfq4goYojFwmc
+ z7+b7ibMb7vcPVJZLhTfp0MOEyQntCQCG/bGcXXJaRNM7976aa8MpF8hsCVwb6tUls9D
+ RCPAA3a7Am/0sf1gkp0NvPZpwElI/NdK/TEikr/VkVm1OFyjGQpcgBZhKxwvKhYZzso6
+ i/ZCKLpuqB0Ij2fybMN/Vquh1rIq9vk6BG93h1jFSpCU67n/xg7mEJiPbdZZv0C523B4
+ 3JKg==
+X-Gm-Message-State: APjAAAUUsbZiXkHt3wl3JeusJH1gqLr3V6/Stdkgv4djyQHDx+s5r8nb
+ 8+FMNQHhBU8EE+BlTmmDm9VHPBL/nE4=
+X-Google-Smtp-Source: APXvYqwQa6RxW1XPv+X3yDdM8QYFtxTI9MY7LgAje4I6iuThRWfn4ULgs6cwWUz/5RGzRvUmZq5yIQ==
+X-Received: by 2002:a50:afa1:: with SMTP id h30mr7733758edd.126.1570709527019; 
+ Thu, 10 Oct 2019 05:12:07 -0700 (PDT)
+Received: from msennikovskii2.pb.local
+ ([2001:1438:4010:2558:31c1:ae55:82cf:3681])
+ by smtp.googlemail.com with ESMTPSA id c22sm949157edc.9.2019.10.10.05.12.06
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Thu, 10 Oct 2019 05:12:06 -0700 (PDT)
+From: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
+To: qemu-devel@nongnu.org, jasowang@redhat.com, stefanha@redhat.com,
+ mst@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: [PATCH v3] virtio-net: prevent offloads reset on migration
+Date: Thu, 10 Oct 2019 14:11:15 +0200
+Message-Id: <1570709475-32073-2-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1570709475-32073-1-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
+References: <1570709475-32073-1-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,47 +94,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com, david@redhat.com,
- cohuck@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
+Cc: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxMDExMzM1Ni41MDE3
-LTEtZGF2aWRAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
-ci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFu
-ZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwg
-eW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRvY2tlci1pbWFn
-ZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3Jh
-IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgc3R1YnMv
-cGNfbWFkdF9jcHVfZW50cnkubwogIENDICAgICAgc3R1YnMvdm1nZW5pZC5vCiAgQ0MgICAgICBz
-dHVicy94ZW4tY29tbW9uLm8KbWFrZTogKioqIFtNYWtlZmlsZTo5OTQ6IGRvY3MvaW50ZXJvcC9p
-bmRleC5odG1sXSBFcnJvciAyCm1ha2U6ICoqKiBEZWxldGluZyBmaWxlICdkb2NzL2ludGVyb3Av
-aW5kZXguaHRtbCcKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KVHJh
-Y2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nl
-c3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21t
-YW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11
-Lmluc3RhbmNlLnV1aWQ9YWMzNGVjYWQzZTUzNGRmOGIwZWFjYmIyMTUyNTYzZTgnLCAnLXUnLCAn
-MTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICct
-ZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywg
-J1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPScsICct
-ZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5j
-YWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90
-bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXdrMW90ZHViL3NyYy9kb2NrZXItc3JjLjIwMTktMTAtMTAt
-MDguMzEuMDcuMTA0MTM6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIv
-dG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0
-dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YWMzNGVj
-YWQzZTUzNGRmOGIwZWFjYmIyMTUyNTYzZTgKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJv
-ciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
-bXAtd2sxb3RkdWIvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFd
-IEVycm9yIDIKCnJlYWwgICAgMm0xMi40OThzCnVzZXIgICAgMG02LjY2NHMKCgpUaGUgZnVsbCBs
-b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMDEwMTEzMzU2
-LjUwMTctMS1kYXZpZEByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlw
-ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Currently offloads disabled by guest via the VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET
+command are not preserved on VM migration.
+Instead all offloads reported by guest features (via VIRTIO_PCI_GUEST_FEATURES)
+get enabled.
+What happens is: first the VirtIONet::curr_guest_offloads gets restored
+and offloads are getting set correctly:
+
+ #0  qemu_set_offload (nc=0x555556a11400, csum=1, tso4=0, tso6=0, ecn=0, ufo=0) at net/net.c:474
+ #1  virtio_net_apply_guest_offloads (n=0x555557701ca0) at hw/net/virtio-net.c:720
+ #2  virtio_net_post_load_device (opaque=0x555557701ca0, version_id=11) at hw/net/virtio-net.c:2334
+ #3  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577c80 <vmstate_virtio_net_device>, opaque=0x555557701ca0, version_id=11)
+     at migration/vmstate.c:168
+ #4  virtio_load (vdev=0x555557701ca0, f=0x5555569dc010, version_id=11) at hw/virtio/virtio.c:2197
+ #5  virtio_device_get (f=0x5555569dc010, opaque=0x555557701ca0, size=0, field=0x55555668cd00 <__compound_literal.5>) at hw/virtio/virtio.c:2036
+ #6  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577ce0 <vmstate_virtio_net>, opaque=0x555557701ca0, version_id=11) at migration/vmstate.c:143
+ #7  vmstate_load (f=0x5555569dc010, se=0x5555578189e0) at migration/savevm.c:829
+ #8  qemu_loadvm_section_start_full (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2211
+ #9  qemu_loadvm_state_main (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2395
+ #10 qemu_loadvm_state (f=0x5555569dc010) at migration/savevm.c:2467
+ #11 process_incoming_migration_co (opaque=0x0) at migration/migration.c:449
+
+However later on the features are getting restored, and offloads get reset to
+everything supported by features:
+
+ #0  qemu_set_offload (nc=0x555556a11400, csum=1, tso4=1, tso6=1, ecn=0, ufo=0) at net/net.c:474
+ #1  virtio_net_apply_guest_offloads (n=0x555557701ca0) at hw/net/virtio-net.c:720
+ #2  virtio_net_set_features (vdev=0x555557701ca0, features=5104441767) at hw/net/virtio-net.c:773
+ #3  virtio_set_features_nocheck (vdev=0x555557701ca0, val=5104441767) at hw/virtio/virtio.c:2052
+ #4  virtio_load (vdev=0x555557701ca0, f=0x5555569dc010, version_id=11) at hw/virtio/virtio.c:2220
+ #5  virtio_device_get (f=0x5555569dc010, opaque=0x555557701ca0, size=0, field=0x55555668cd00 <__compound_literal.5>) at hw/virtio/virtio.c:2036
+ #6  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577ce0 <vmstate_virtio_net>, opaque=0x555557701ca0, version_id=11) at migration/vmstate.c:143
+ #7  vmstate_load (f=0x5555569dc010, se=0x5555578189e0) at migration/savevm.c:829
+ #8  qemu_loadvm_section_start_full (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2211
+ #9  qemu_loadvm_state_main (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2395
+ #10 qemu_loadvm_state (f=0x5555569dc010) at migration/savevm.c:2467
+ #11 process_incoming_migration_co (opaque=0x0) at migration/migration.c:449
+
+Fix this by making the virtio_net_set_features not reset
+the curr_guest_offloads in case the VM runstate is RUN_STATE_INMIGRATE
+
+Signed-off-by: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
+---
+ hw/net/virtio-net.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index b9e1cd7..49be172 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -767,7 +767,14 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
+     n->rsc6_enabled = virtio_has_feature(features, VIRTIO_NET_F_RSC_EXT) &&
+         virtio_has_feature(features, VIRTIO_NET_F_GUEST_TSO6);
+ 
+-    if (n->has_vnet_hdr) {
++    /*
++     * In case of RUN_STATE_INMIGRATE the virtio_net_set_features
++     * is called as part of VM state restore process.
++     * At this stage we do not want the curr_guest_offloads to be reset,
++     * i.e. want to preserve them in the same state as was set
++     * by the guest on the source machine.
++     */
++    if (n->has_vnet_hdr && !runstate_check(RUN_STATE_INMIGRATE)) {
+         n->curr_guest_offloads =
+             virtio_net_guest_offloads_by_features(features);
+         virtio_net_apply_guest_offloads(n);
+-- 
+2.7.4
 
 
