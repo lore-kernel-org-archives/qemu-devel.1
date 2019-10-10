@@ -3,56 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E07C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA736C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:37:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E009E208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:36:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E009E208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 7FF2E2053B
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:37:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF2E2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIWk6-0005P9-LW
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:36:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49996)
+	id 1iIWlD-0007FS-5n
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:37:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49916)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iIWi0-0003Mu-2J
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:21 -0400
+ (envelope-from <david@redhat.com>) id 1iIWhp-00037R-Pq
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iIWhy-0005dJ-CJ
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50918)
+ (envelope-from <david@redhat.com>) id 1iIWho-0005Yt-Cd
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44166)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iIWhy-0005cz-49; Thu, 10 Oct 2019 07:34:14 -0400
+ id 1iIWho-0005YT-4V; Thu, 10 Oct 2019 07:34:04 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 52FE1801664;
- Thu, 10 Oct 2019 11:34:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3B37F1DCD;
+ Thu, 10 Oct 2019 11:34:03 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-138.ams2.redhat.com [10.36.117.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A9F55C1B5;
- Thu, 10 Oct 2019 11:34:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA2005C1B5;
+ Thu, 10 Oct 2019 11:34:01 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 03/31] s390x/mmu: Inject DAT exceptions from a single place
-Date: Thu, 10 Oct 2019 13:33:28 +0200
-Message-Id: <20191010113356.5017-4-david@redhat.com>
+Subject: [PULL 01/31] s390x/mmu: Drop debug logging from MMU code
+Date: Thu, 10 Oct 2019 13:33:26 +0200
+Message-Id: <20191010113356.5017-2-david@redhat.com>
 In-Reply-To: <20191010113356.5017-1-david@redhat.com>
 References: <20191010113356.5017-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Thu, 10 Oct 2019 11:34:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.71]); Thu, 10 Oct 2019 11:34:03 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,164 +75,200 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's return the PGM from the translation functions on error and inject
-based on that.
+Let's get it out of the way to make some further refactorings easier.
+Personally, I've never used these debug statements at all. And if I had
+to debug issues, I used plain GDB instead (debug prints are just way too
+much noise in the MMU). We might want to introduce tracing at some point
+instead, so we can able selected events on demand.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mmu_helper.c | 63 +++++++++++----------------------------
- 1 file changed, 17 insertions(+), 46 deletions(-)
+ target/s390x/mmu_helper.c | 51 ---------------------------------------
+ 1 file changed, 51 deletions(-)
 
 diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 847fb240fb..f6ae444655 100644
+index 7e6b0d0508..6a7ad33c4d 100644
 --- a/target/s390x/mmu_helper.c
 +++ b/target/s390x/mmu_helper.c
-@@ -48,26 +48,6 @@ static void trigger_access_exception(CPUS390XState *en=
-v, uint32_t type,
-     }
- }
+@@ -28,31 +28,6 @@
+ #include "hw/hw.h"
+ #include "hw/s390x/storage-keys.h"
 =20
--static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
--                               uint32_t type, uint64_t asc, int rw, bool=
- exc)
--{
--    int ilen =3D ILEN_AUTO;
--    uint64_t tec;
+-/* #define DEBUG_S390 */
+-/* #define DEBUG_S390_PTE */
+-/* #define DEBUG_S390_STDOUT */
 -
--    tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | as=
+-#ifdef DEBUG_S390
+-#ifdef DEBUG_S390_STDOUT
+-#define DPRINTF(fmt, ...) \
+-    do { fprintf(stderr, fmt, ## __VA_ARGS__); \
+-         if (qemu_log_separate()) qemu_log(fmt, ##__VA_ARGS__); } while =
+(0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { qemu_log(fmt, ## __VA_ARGS__); } while (0)
+-#endif
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
+-
+-#ifdef DEBUG_S390_PTE
+-#define PTE_DPRINTF DPRINTF
+-#else
+-#define PTE_DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
+-
+ /* Fetch/store bits in the translation exception code: */
+ #define FS_READ  0x800
+ #define FS_WRITE 0x400
+@@ -80,8 +55,6 @@ static void trigger_prot_fault(CPUS390XState *env, targ=
+et_ulong vaddr,
+=20
+     tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | 4 =
+| asc >> 46;
+=20
+-    DPRINTF("%s: trans_exc_code=3D%016" PRIx64 "\n", __func__, tec);
+-
+     if (!exc) {
+         return;
+     }
+@@ -97,8 +70,6 @@ static void trigger_page_fault(CPUS390XState *env, targ=
+et_ulong vaddr,
+=20
+     tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | as=
 c >> 46;
+=20
+-    DPRINTF("%s: trans_exc_code=3D%016" PRIx64 "\n", __func__, tec);
 -
--    if (!exc) {
--        return;
--    }
--
--    /* Code accesses have an undefined ilc.  */
--    if (rw =3D=3D MMU_INST_FETCH) {
--        ilen =3D 2;
--    }
--
--    trigger_access_exception(env, type, ilen, tec);
--}
--
- /* check whether the address would be proteted by Low-Address Protection=
- */
- static bool is_low_address(uint64_t addr)
- {
-@@ -119,12 +99,10 @@ static int mmu_translate_pte(CPUS390XState *env, tar=
-get_ulong vaddr,
+     if (!exc) {
+         return;
+     }
+@@ -162,7 +133,6 @@ static int mmu_translate_pte(CPUS390XState *env, targ=
+et_ulong vaddr,
                               target_ulong *raddr, int *flags, int rw, bo=
 ol exc)
  {
      if (pt_entry & PAGE_INVALID) {
--        trigger_page_fault(env, vaddr, PGM_PAGE_TRANS, asc, rw, exc);
--        return -1;
-+        return PGM_PAGE_TRANS;
+-        DPRINTF("%s: PTE=3D0x%" PRIx64 " invalid\n", __func__, pt_entry)=
+;
+         trigger_page_fault(env, vaddr, PGM_PAGE_TRANS, asc, rw, exc);
+         return -1;
      }
-     if (pt_entry & PAGE_RES0) {
--        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
--        return -1;
-+        return PGM_TRANS_SPEC;
+@@ -175,9 +145,6 @@ static int mmu_translate_pte(CPUS390XState *env, targ=
+et_ulong vaddr,
      }
-     if (pt_entry & PAGE_RO) {
-         *flags &=3D ~PAGE_WRITE;
-@@ -179,13 +157,11 @@ static int mmu_translate_region(CPUS390XState *env,=
+=20
+     *raddr =3D pt_entry & ASCE_ORIGIN;
+-
+-    PTE_DPRINTF("%s: PTE=3D0x%" PRIx64 "\n", __func__, pt_entry);
+-
+     return 0;
+ }
+=20
+@@ -197,7 +164,6 @@ static int mmu_translate_segment(CPUS390XState *env, =
+target_ulong vaddr,
+     if ((st_entry & SEGMENT_ENTRY_FC) && (env->cregs[0] & CR0_EDAT)) {
+         /* Decode EDAT1 segment frame absolute address (1MB page) */
+         *raddr =3D (st_entry & 0xfffffffffff00000ULL) | (vaddr & 0xfffff=
+);
+-        PTE_DPRINTF("%s: SEG=3D0x%" PRIx64 "\n", __func__, st_entry);
+         return 0;
+     }
+=20
+@@ -205,8 +171,6 @@ static int mmu_translate_segment(CPUS390XState *env, =
+target_ulong vaddr,
+     origin =3D st_entry & SEGMENT_ENTRY_ORIGIN;
+     offs  =3D (vaddr & VADDR_PX) >> 9;
+     pt_entry =3D ldq_phys(cs->as, origin + offs);
+-    PTE_DPRINTF("%s: 0x%" PRIx64 " + 0x%" PRIx64 " =3D> 0x%016" PRIx64 "=
+\n",
+-                __func__, origin, offs, pt_entry);
+     return mmu_translate_pte(env, vaddr, asc, pt_entry, raddr, flags, rw=
+, exc);
+ }
+=20
+@@ -223,17 +187,12 @@ static int mmu_translate_region(CPUS390XState *env,=
  target_ulong vaddr,
+         PGM_REG_SEC_TRANS, PGM_REG_FIRST_TRANS
+     };
+=20
+-    PTE_DPRINTF("%s: 0x%" PRIx64 "\n", __func__, entry);
+-
+     origin =3D entry & REGION_ENTRY_ORIGIN;
+     offs =3D (vaddr >> (17 + 11 * level / 4)) & 0x3ff8;
+=20
      new_entry =3D ldq_phys(cs->as, origin + offs);
+-    PTE_DPRINTF("%s: 0x%" PRIx64 " + 0x%" PRIx64 " =3D> 0x%016" PRIx64 "=
+\n",
+-                __func__, origin, offs, new_entry);
 =20
      if ((new_entry & REGION_ENTRY_INV) !=3D 0) {
--        trigger_page_fault(env, vaddr, pchks[level / 4], asc, rw, exc);
--        return -1;
-+        return pchks[level / 4];
+-        DPRINTF("%s: invalid region\n", __func__);
+         trigger_page_fault(env, vaddr, pchks[level / 4], asc, rw, exc);
+         return -1;
      }
-=20
-     if ((new_entry & REGION_ENTRY_TYPE_MASK) !=3D level) {
--        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
--        return -1;
-+        return PGM_TRANS_SPEC;
-     }
-=20
-     if (level =3D=3D ASCE_TYPE_SEGMENT) {
-@@ -197,8 +173,7 @@ static int mmu_translate_region(CPUS390XState *env, t=
+@@ -252,7 +211,6 @@ static int mmu_translate_region(CPUS390XState *env, t=
 arget_ulong vaddr,
      offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
      if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
          || offs > (new_entry & REGION_ENTRY_LENGTH)) {
--        trigger_page_fault(env, vaddr, pchks[level / 4 - 1], asc, rw, ex=
+-        DPRINTF("%s: invalid offset or len (%lx)\n", __func__, new_entry=
+);
+         trigger_page_fault(env, vaddr, pchks[level / 4 - 1], asc, rw, ex=
 c);
--        return -1;
-+        return pchks[level / 4 - 1];
+         return -1;
      }
-=20
-     if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_RO)) {
-@@ -226,38 +201,31 @@ static int mmu_translate_asce(CPUS390XState *env, t=
-arget_ulong vaddr,
-     switch (level) {
-     case ASCE_TYPE_REGION1:
-         if ((vaddr >> 62) > (asce & ASCE_TABLE_LENGTH)) {
--            trigger_page_fault(env, vaddr, PGM_REG_FIRST_TRANS, asc, rw,=
- exc);
--            return -1;
-+            return PGM_REG_FIRST_TRANS;
-         }
+@@ -289,8 +247,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
          break;
      case ASCE_TYPE_REGION2:
          if (vaddr & 0xffe0000000000000ULL) {
--            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
--            return -1;
-+            return PGM_ASCE_TYPE;
+-            DPRINTF("%s: vaddr doesn't fit 0x%16" PRIx64
+-                    " 0xffe0000000000000ULL\n", __func__, vaddr);
+             trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+             return -1;
          }
-         if ((vaddr >> 51 & 3) > (asce & ASCE_TABLE_LENGTH)) {
--            trigger_page_fault(env, vaddr, PGM_REG_SEC_TRANS, asc, rw, e=
-xc);
--            return -1;
-+            return PGM_REG_SEC_TRANS;
-         }
+@@ -301,8 +257,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
          break;
      case ASCE_TYPE_REGION3:
          if (vaddr & 0xfffffc0000000000ULL) {
--            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
--            return -1;
-+            return PGM_ASCE_TYPE;
+-            DPRINTF("%s: vaddr doesn't fit 0x%16" PRIx64
+-                    " 0xfffffc0000000000ULL\n", __func__, vaddr);
+             trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+             return -1;
          }
-         if ((vaddr >> 40 & 3) > (asce & ASCE_TABLE_LENGTH)) {
--            trigger_page_fault(env, vaddr, PGM_REG_THIRD_TRANS, asc, rw,=
- exc);
--            return -1;
-+            return PGM_REG_THIRD_TRANS;
-         }
+@@ -313,8 +267,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
+get_ulong vaddr,
          break;
      case ASCE_TYPE_SEGMENT:
          if (vaddr & 0xffffffff80000000ULL) {
--            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
--            return -1;
-+            return PGM_ASCE_TYPE;
+-            DPRINTF("%s: vaddr doesn't fit 0x%16" PRIx64
+-                    " 0xffffffff80000000ULL\n", __func__, vaddr);
+             trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+             return -1;
          }
-         if ((vaddr >> 29 & 3) > (asce & ASCE_TABLE_LENGTH)) {
--            trigger_page_fault(env, vaddr, PGM_SEGMENT_TRANS, asc, rw, e=
-xc);
--            return -1;
-+            return PGM_SEGMENT_TRANS;
-         }
+@@ -449,15 +401,12 @@ int mmu_translate(CPUS390XState *env, target_ulong =
+vaddr, int rw, uint64_t asc,
+=20
+     switch (asc) {
+     case PSW_ASC_PRIMARY:
+-        PTE_DPRINTF("%s: asc=3Dprimary\n", __func__);
+         asce =3D env->cregs[1];
          break;
-     }
-@@ -400,8 +368,11 @@ int mmu_translate(CPUS390XState *env, target_ulong v=
-addr, int rw, uint64_t asc,
-=20
-     /* perform the DAT translation */
-     r =3D mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw, ex=
-c);
--    if (r) {
--        return r;
-+    if (unlikely(r)) {
-+        if (exc) {
-+            trigger_access_exception(env, r, ilen, tec);
-+        }
-+        return -1;
-     }
-=20
-     /* check for DAT protection */
+     case PSW_ASC_HOME:
+-        PTE_DPRINTF("%s: asc=3Dhome\n", __func__);
+         asce =3D env->cregs[13];
+         break;
+     case PSW_ASC_SECONDARY:
+-        PTE_DPRINTF("%s: asc=3Dsecondary\n", __func__);
+         asce =3D env->cregs[7];
+         break;
+     case PSW_ASC_ACCREG:
 --=20
 2.21.0
 
