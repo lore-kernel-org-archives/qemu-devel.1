@@ -6,54 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B16C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E07C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:36:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEEB22053B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:36:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEEB22053B
+	by mail.kernel.org (Postfix) with ESMTPS id E009E208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:36:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E009E208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIWjv-00054y-GO
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:36:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49952)
+	id 1iIWk6-0005P9-LW
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:36:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iIWht-0003CS-5o
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:10 -0400
+ (envelope-from <david@redhat.com>) id 1iIWi0-0003Mu-2J
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iIWhs-0005af-2T
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42542)
+ (envelope-from <david@redhat.com>) id 1iIWhy-0005dJ-CJ
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50918)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iIWhr-0005aK-Qw; Thu, 10 Oct 2019 07:34:08 -0400
+ id 1iIWhy-0005cz-49; Thu, 10 Oct 2019 07:34:14 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 074CF3C93D;
- Thu, 10 Oct 2019 11:34:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 52FE1801664;
+ Thu, 10 Oct 2019 11:34:13 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-138.ams2.redhat.com [10.36.117.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 84B1F5C1B5;
- Thu, 10 Oct 2019 11:34:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A9F55C1B5;
+ Thu, 10 Oct 2019 11:34:07 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 02/31] s390x/mmu: Move DAT protection handling out of
- mmu_translate_asce()
-Date: Thu, 10 Oct 2019 13:33:27 +0200
-Message-Id: <20191010113356.5017-3-david@redhat.com>
+Subject: [PULL 03/31] s390x/mmu: Inject DAT exceptions from a single place
+Date: Thu, 10 Oct 2019 13:33:28 +0200
+Message-Id: <20191010113356.5017-4-david@redhat.com>
 In-Reply-To: <20191010113356.5017-1-david@redhat.com>
 References: <20191010113356.5017-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 10 Oct 2019 11:34:07 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Thu, 10 Oct 2019 11:34:13 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -76,105 +75,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We'll reuse the ilen and tec definitions in mmu_translate
-soon also for all other DAT exceptions we inject. Move it to the caller,
-where we can later pair it up with other protection checks, like IEP.
+Let's return the PGM from the translation functions on error and inject
+based on that.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mmu_helper.c | 39 ++++++++++++++++-----------------------
- 1 file changed, 16 insertions(+), 23 deletions(-)
+ target/s390x/mmu_helper.c | 63 +++++++++++----------------------------
+ 1 file changed, 17 insertions(+), 46 deletions(-)
 
 diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 6a7ad33c4d..847fb240fb 100644
+index 847fb240fb..f6ae444655 100644
 --- a/target/s390x/mmu_helper.c
 +++ b/target/s390x/mmu_helper.c
-@@ -48,20 +48,6 @@ static void trigger_access_exception(CPUS390XState *en=
+@@ -48,26 +48,6 @@ static void trigger_access_exception(CPUS390XState *en=
 v, uint32_t type,
      }
  }
 =20
--static void trigger_prot_fault(CPUS390XState *env, target_ulong vaddr,
--                               uint64_t asc, int rw, bool exc)
+-static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
+-                               uint32_t type, uint64_t asc, int rw, bool=
+ exc)
 -{
+-    int ilen =3D ILEN_AUTO;
 -    uint64_t tec;
 -
--    tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | 4 =
-| asc >> 46;
+-    tec =3D vaddr | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ) | as=
+c >> 46;
 -
 -    if (!exc) {
 -        return;
 -    }
 -
--    trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, tec);
--}
--
- static void trigger_page_fault(CPUS390XState *env, target_ulong vaddr,
-                                uint32_t type, uint64_t asc, int rw, bool=
- exc)
- {
-@@ -229,7 +215,6 @@ static int mmu_translate_asce(CPUS390XState *env, tar=
-get_ulong vaddr,
-                               int *flags, int rw, bool exc)
- {
-     int level;
--    int r;
-=20
-     if (asce & ASCE_REAL_SPACE) {
-         /* direct mapping */
-@@ -277,14 +262,8 @@ static int mmu_translate_asce(CPUS390XState *env, ta=
-rget_ulong vaddr,
-         break;
-     }
-=20
--    r =3D mmu_translate_region(env, vaddr, asc, asce, level, raddr, flag=
-s, rw,
--                             exc);
--    if (!r && rw =3D=3D MMU_DATA_STORE && !(*flags & PAGE_WRITE)) {
--        trigger_prot_fault(env, vaddr, asc, rw, exc);
--        return -1;
+-    /* Code accesses have an undefined ilc.  */
+-    if (rw =3D=3D MMU_INST_FETCH) {
+-        ilen =3D 2;
 -    }
 -
--    return r;
-+    return mmu_translate_region(env, vaddr, asc, asce, level, raddr, fla=
-gs, rw,
-+                                exc);
- }
-=20
- static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
-@@ -369,6 +348,10 @@ static void mmu_handle_skey(target_ulong addr, int r=
-w, int *flags)
- int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64=
-_t asc,
-                   target_ulong *raddr, int *flags, bool exc)
+-    trigger_access_exception(env, type, ilen, tec);
+-}
+-
+ /* check whether the address would be proteted by Low-Address Protection=
+ */
+ static bool is_low_address(uint64_t addr)
  {
-+    /* Code accesses have an undefined ilc, let's use 2 bytes. */
-+    const int ilen =3D (rw =3D=3D MMU_INST_FETCH) ? 2 : ILEN_AUTO;
-+    uint64_t tec =3D (vaddr & TARGET_PAGE_MASK) | (asc >> 46) |
-+                   (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ);
-     uint64_t asce;
-     int r;
+@@ -119,12 +99,10 @@ static int mmu_translate_pte(CPUS390XState *env, tar=
+get_ulong vaddr,
+                              target_ulong *raddr, int *flags, int rw, bo=
+ol exc)
+ {
+     if (pt_entry & PAGE_INVALID) {
+-        trigger_page_fault(env, vaddr, PGM_PAGE_TRANS, asc, rw, exc);
+-        return -1;
++        return PGM_PAGE_TRANS;
+     }
+     if (pt_entry & PAGE_RES0) {
+-        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
+-        return -1;
++        return PGM_TRANS_SPEC;
+     }
+     if (pt_entry & PAGE_RO) {
+         *flags &=3D ~PAGE_WRITE;
+@@ -179,13 +157,11 @@ static int mmu_translate_region(CPUS390XState *env,=
+ target_ulong vaddr,
+     new_entry =3D ldq_phys(cs->as, origin + offs);
 =20
-@@ -421,6 +404,16 @@ int mmu_translate(CPUS390XState *env, target_ulong v=
-addr, int rw, uint64_t asc,
-         return r;
+     if ((new_entry & REGION_ENTRY_INV) !=3D 0) {
+-        trigger_page_fault(env, vaddr, pchks[level / 4], asc, rw, exc);
+-        return -1;
++        return pchks[level / 4];
      }
 =20
-+    /* check for DAT protection */
-+    if (unlikely(rw =3D=3D MMU_DATA_STORE && !(*flags & PAGE_WRITE))) {
+     if ((new_entry & REGION_ENTRY_TYPE_MASK) !=3D level) {
+-        trigger_page_fault(env, vaddr, PGM_TRANS_SPEC, asc, rw, exc);
+-        return -1;
++        return PGM_TRANS_SPEC;
+     }
+=20
+     if (level =3D=3D ASCE_TYPE_SEGMENT) {
+@@ -197,8 +173,7 @@ static int mmu_translate_region(CPUS390XState *env, t=
+arget_ulong vaddr,
+     offs =3D (vaddr >> (28 + 11 * (level - 4) / 4)) & 3;
+     if (offs < ((new_entry & REGION_ENTRY_TF) >> 6)
+         || offs > (new_entry & REGION_ENTRY_LENGTH)) {
+-        trigger_page_fault(env, vaddr, pchks[level / 4 - 1], asc, rw, ex=
+c);
+-        return -1;
++        return pchks[level / 4 - 1];
+     }
+=20
+     if ((env->cregs[0] & CR0_EDAT) && (new_entry & REGION_ENTRY_RO)) {
+@@ -226,38 +201,31 @@ static int mmu_translate_asce(CPUS390XState *env, t=
+arget_ulong vaddr,
+     switch (level) {
+     case ASCE_TYPE_REGION1:
+         if ((vaddr >> 62) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_FIRST_TRANS, asc, rw,=
+ exc);
+-            return -1;
++            return PGM_REG_FIRST_TRANS;
+         }
+         break;
+     case ASCE_TYPE_REGION2:
+         if (vaddr & 0xffe0000000000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 51 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_SEC_TRANS, asc, rw, e=
+xc);
+-            return -1;
++            return PGM_REG_SEC_TRANS;
+         }
+         break;
+     case ASCE_TYPE_REGION3:
+         if (vaddr & 0xfffffc0000000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 40 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_REG_THIRD_TRANS, asc, rw,=
+ exc);
+-            return -1;
++            return PGM_REG_THIRD_TRANS;
+         }
+         break;
+     case ASCE_TYPE_SEGMENT:
+         if (vaddr & 0xffffffff80000000ULL) {
+-            trigger_page_fault(env, vaddr, PGM_ASCE_TYPE, asc, rw, exc);
+-            return -1;
++            return PGM_ASCE_TYPE;
+         }
+         if ((vaddr >> 29 & 3) > (asce & ASCE_TABLE_LENGTH)) {
+-            trigger_page_fault(env, vaddr, PGM_SEGMENT_TRANS, asc, rw, e=
+xc);
+-            return -1;
++            return PGM_SEGMENT_TRANS;
+         }
+         break;
+     }
+@@ -400,8 +368,11 @@ int mmu_translate(CPUS390XState *env, target_ulong v=
+addr, int rw, uint64_t asc,
+=20
+     /* perform the DAT translation */
+     r =3D mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw, ex=
+c);
+-    if (r) {
+-        return r;
++    if (unlikely(r)) {
 +        if (exc) {
-+            /* DAT sets bit 61 only */
-+            tec |=3D 0x4;
-+            trigger_access_exception(env, PGM_PROTECTION, ilen, tec);
++            trigger_access_exception(env, r, ilen, tec);
 +        }
 +        return -1;
-+    }
-+
- nodat:
-     /* Convert real address -> absolute address */
-     *raddr =3D mmu_real2abs(env, *raddr);
+     }
+=20
+     /* check for DAT protection */
 --=20
 2.21.0
 
