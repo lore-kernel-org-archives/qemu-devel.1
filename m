@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAEBC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:27:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FF5C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:28:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FDF9214E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:27:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FDF9214E0
+	by mail.kernel.org (Postfix) with ESMTPS id 590FF214E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:28:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 590FF214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIaLk-0007yh-PQ
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 11:27:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60489)
+	id 1iIaME-0008O2-23
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 11:28:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60767)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIaJV-0005mB-S6
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIaJv-0006Bu-1N
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIaJT-0004JX-VC
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46070)
+ (envelope-from <mreitz@redhat.com>) id 1iIaJu-0004WK-1u
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60676)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIaJQ-0004Ge-06; Thu, 10 Oct 2019 11:25:08 -0400
+ id 1iIaJq-0004VT-Qg; Thu, 10 Oct 2019 11:25:34 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6F2033086E22;
- Thu, 10 Oct 2019 15:25:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0DD3818C8933;
+ Thu, 10 Oct 2019 15:25:34 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D4F7160BE1;
- Thu, 10 Oct 2019 15:25:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7922060C18;
+ Thu, 10 Oct 2019 15:25:33 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 02/23] iotests.py: Store socket files in $SOCK_DIR
-Date: Thu, 10 Oct 2019 17:24:36 +0200
-Message-Id: <20191010152457.17713-3-mreitz@redhat.com>
+Subject: [PATCH 11/23] iotests/182: Create socket in $SOCK_DIR
+Date: Thu, 10 Oct 2019 17:24:45 +0200
+Message-Id: <20191010152457.17713-12-mreitz@redhat.com>
 In-Reply-To: <20191010152457.17713-1-mreitz@redhat.com>
 References: <20191010152457.17713-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 10 Oct 2019 15:25:06 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Thu, 10 Oct 2019 15:25:34 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,142 +73,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-iotests.py itself does not store socket files, but it machine.py and
-qtest.py do.  iotests.py needs to pass the respective path to them, and
-they need to adhere to it.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- python/qemu/machine.py        | 15 ++++++++++++---
- python/qemu/qtest.py          |  9 ++++++---
- tests/qemu-iotests/iotests.py |  4 +++-
- 3 files changed, 21 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/182 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 128a3d1dc2..2024e8b1b1 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -71,7 +71,7 @@ class QEMUMachine(object):
+diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
+index 7f494eb9bb..1ccb850055 100755
+--- a/tests/qemu-iotests/182
++++ b/tests/qemu-iotests/182
+@@ -31,7 +31,7 @@ _cleanup()
+ {
+     _cleanup_test_img
+     rm -f "$TEST_IMG.overlay"
+-    rm -f "$TEST_DIR/nbd.socket"
++    rm -f "$SOCK_DIR/nbd.socket"
+ }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
 =20
-     def __init__(self, binary, args=3DNone, wrapper=3DNone, name=3DNone,
-                  test_dir=3D"/var/tmp", monitor_address=3DNone,
--                 socket_scm_helper=3DNone):
-+                 socket_scm_helper=3DNone, sock_dir=3DNone):
-         '''
-         Initialize a QEMUMachine
-=20
-@@ -90,6 +90,8 @@ class QEMUMachine(object):
-             wrapper =3D []
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
-+        if sock_dir is None:
-+            sock_dir =3D test_dir
-         self._name =3D name
-         self._monitor_address =3D monitor_address
-         self._vm_monitor =3D None
-@@ -106,12 +108,14 @@ class QEMUMachine(object):
-         self._qemu_full_args =3D None
-         self._test_dir =3D test_dir
-         self._temp_dir =3D None
-+        self._sock_dir =3D sock_dir
-         self._launched =3D False
-         self._machine =3D None
-         self._console_set =3D False
-         self._console_device_type =3D None
-         self._console_address =3D None
-         self._console_socket =3D None
-+        self._remove_files =3D []
-=20
-         # just in case logging wasn't configured by the main script:
-         logging.basicConfig()
-@@ -236,8 +240,9 @@ class QEMUMachine(object):
-         if self._machine is not None:
-             args.extend(['-machine', self._machine])
-         if self._console_set:
--            self._console_address =3D os.path.join(self._temp_dir,
-+            self._console_address =3D os.path.join(self._sock_dir,
-                                                  self._name + "-console.=
-sock")
-+            self._remove_files.append(self._console_address)
-             chardev =3D ('socket,id=3Dconsole,path=3D%s,server,nowait' %
-                        self._console_address)
-             args.extend(['-chardev', chardev])
-@@ -253,8 +258,9 @@ class QEMUMachine(object):
-         if self._monitor_address is not None:
-             self._vm_monitor =3D self._monitor_address
-         else:
--            self._vm_monitor =3D os.path.join(self._temp_dir,
-+            self._vm_monitor =3D os.path.join(self._sock_dir,
-                                             self._name + "-monitor.sock"=
-)
-+            self._remove_files.append(self._vm_monitor)
-         self._qemu_log_path =3D os.path.join(self._temp_dir, self._name =
-+ ".log")
-         self._qemu_log_file =3D open(self._qemu_log_path, 'wb')
-=20
-@@ -279,6 +285,9 @@ class QEMUMachine(object):
-             shutil.rmtree(self._temp_dir)
-             self._temp_dir =3D None
-=20
-+        while len(self._remove_files) > 0:
-+            self._remove_if_exists(self._remove_files.pop())
-+
-     def launch(self):
-         """
-         Launch the VM and make sure we cleanup and expose the
-diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
-index 3f1d2cb325..d24ad04256 100644
---- a/python/qemu/qtest.py
-+++ b/python/qemu/qtest.py
-@@ -84,14 +84,17 @@ class QEMUQtestMachine(QEMUMachine):
-     '''A QEMU VM'''
-=20
-     def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"/va=
-r/tmp",
--                 socket_scm_helper=3DNone):
-+                 socket_scm_helper=3DNone, sock_dir=3DNone):
-         if name is None:
-             name =3D "qemu-%d" % os.getpid()
-+        if sock_dir is None:
-+            sock_dir =3D test_dir
-         super(QEMUQtestMachine,
-               self).__init__(binary, args, name=3Dname, test_dir=3Dtest_=
-dir,
--                             socket_scm_helper=3Dsocket_scm_helper)
-+                             socket_scm_helper=3Dsocket_scm_helper,
-+                             sock_dir=3Dsock_dir)
-         self._qtest =3D None
--        self._qtest_path =3D os.path.join(test_dir, name + "-qtest.sock"=
-)
-+        self._qtest_path =3D os.path.join(sock_dir, name + "-qtest.sock"=
-)
-=20
-     def _base_args(self):
-         args =3D super(QEMUQtestMachine, self)._base_args()
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-index 3a8f378f90..49cd205a97 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -57,6 +57,7 @@ qemu_opts =3D os.environ.get('QEMU_OPTIONS', '').strip(=
-).split(' ')
- imgfmt =3D os.environ.get('IMGFMT', 'raw')
- imgproto =3D os.environ.get('IMGPROTO', 'file')
- test_dir =3D os.environ.get('TEST_DIR')
-+sock_dir =3D os.environ.get('SOCK_DIR')
- output_dir =3D os.environ.get('OUTPUT_DIR', '.')
- cachemode =3D os.environ.get('CACHEMODE')
- qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
-@@ -445,7 +446,8 @@ class VM(qtest.QEMUQtestMachine):
-         name =3D "qemu%s-%d" % (path_suffix, os.getpid())
-         super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
-                                  test_dir=3Dtest_dir,
--                                 socket_scm_helper=3Dsocket_scm_helper)
-+                                 socket_scm_helper=3Dsocket_scm_helper,
-+                                 sock_dir=3Dsock_dir)
-         self._num_drives =3D 0
-=20
-     def add_object(self, opts):
+@@ -133,7 +133,7 @@ success_or_failure=3Dy _send_qemu_cmd $QEMU_HANDLE \
+           'addr': {
+               'type': 'unix',
+               'data': {
+-                  'path': '$TEST_DIR/nbd.socket'
++                  'path': '$SOCK_DIR/nbd.socket'
+               } } } }" \
+     'return' \
+     'error'
 --=20
 2.21.0
 
