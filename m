@@ -2,66 +2,57 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71918C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD33BC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:21:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 497072067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:20:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497072067B
+	by mail.kernel.org (Postfix) with ESMTPS id A80D32067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:21:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A80D32067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIbBN-0008Al-2Q
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 12:20:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41552)
+	id 1iIbBq-0000a5-9t
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 12:21:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39266)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iIb6D-000330-5W
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 12:15:34 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iIaqX-0005cx-V7
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:59:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iIb6C-0000XY-33
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 12:15:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58064)
+ (envelope-from <stefanha@redhat.com>) id 1iIaqW-0003F1-Jg
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:59:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35342)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iIb6B-0000Wt-Sp
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 12:15:32 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iIaqW-0003ET-B7
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:59:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 260201056F83;
- Thu, 10 Oct 2019 16:15:31 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-48.rdu2.redhat.com
- [10.10.120.48])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A4126092F;
- Thu, 10 Oct 2019 16:15:22 +0000 (UTC)
-Subject: Re: [PATCH 3/4] hw/i386: add facility to expose CPU topology over
- fw-cfg
-To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-References: <20191008105259.5378-1-lersek@redhat.com>
- <20191008105259.5378-4-lersek@redhat.com>
- <20191008175931.483af366@redhat.com>
- <20191010055733-mutt-send-email-mst@kernel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <55d7aaf3-4f21-c120-a867-6988bcca678e@redhat.com>
-Date: Thu, 10 Oct 2019 18:15:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mx1.redhat.com (Postfix) with ESMTPS id 9695B18C4262
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 15:59:19 +0000 (UTC)
+Received: from localhost (ovpn-117-170.ams2.redhat.com [10.36.117.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 19E315DD64;
+ Thu, 10 Oct 2019 15:59:15 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 4/7] libqos: add MSI-X callbacks to QVirtioPCIDevice
+Date: Thu, 10 Oct 2019 16:58:50 +0100
+Message-Id: <20191010155853.4325-5-stefanha@redhat.com>
+In-Reply-To: <20191010155853.4325-1-stefanha@redhat.com>
+References: <20191010155853.4325-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191010055733-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.64]); Thu, 10 Oct 2019 16:15:31 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.62]); Thu, 10 Oct 2019 15:59:19 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -76,44 +67,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/10/19 12:01, Michael S. Tsirkin wrote:
-> On Tue, Oct 08, 2019 at 05:59:31PM +0200, Igor Mammedov wrote:
+The MSI-X vectors are programmed differently in the VIRTIO 1.0 and
+Legacy interfaces.  Introduce callbacks so different implementations can
+be used depending on the interface version.
 
->> So far there were no need for it as all possible cpus are
->> described in ACPI tables passed to guest, but I'm not going
->> to suggest to parse them on firmware side as it's too complicated :)
-> 
-> We can always add a QEMU specific data table by the way.
-> Format would be up to us and would be easy to parse.
-> I don't see a big advantage as compared to fw cfg though.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/libqos/virtio-pci.h | 12 ++++++++++++
+ tests/libqos/virtio-pci.c | 36 +++++++++++++++++++++++++++---------
+ 2 files changed, 39 insertions(+), 9 deletions(-)
 
-I'd like to comment just on this part.
+diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
+index 0d105d67b3..443e53affc 100644
+--- a/tests/libqos/virtio-pci.h
++++ b/tests/libqos/virtio-pci.h
+@@ -14,16 +14,28 @@
+ #include "libqos/pci.h"
+ #include "libqos/qgraph.h"
+=20
++typedef struct QVirtioPCIMSIXOps QVirtioPCIMSIXOps;
++
+ typedef struct QVirtioPCIDevice {
+     QOSGraphObject obj;
+     QVirtioDevice vdev;
+     QPCIDevice *pdev;
+     QPCIBar bar;
++    const QVirtioPCIMSIXOps *msix_ops;
+     uint16_t config_msix_entry;
+     uint64_t config_msix_addr;
+     uint32_t config_msix_data;
+ } QVirtioPCIDevice;
+=20
++struct QVirtioPCIMSIXOps {
++    /* Set the Configuration Vector for MSI-X */
++    void (*set_config_vector)(QVirtioPCIDevice *d, uint16_t entry);
++
++    /* Set the Queue Vector for MSI-X */
++    void (*set_queue_vector)(QVirtioPCIDevice *d, uint16_t vq_idx,
++                             uint16_t entry);
++};
++
+ typedef struct QVirtQueuePCI {
+     QVirtQueue vq;
+     uint16_t msix_entry;
+diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
+index 4772239b61..a3362c1b54 100644
+--- a/tests/libqos/virtio-pci.c
++++ b/tests/libqos/virtio-pci.c
+@@ -271,6 +271,30 @@ static const QVirtioBus qvirtio_pci_legacy =3D {
+     .virtqueue_kick =3D qvirtio_pci_virtqueue_kick,
+ };
+=20
++static void qvirtio_pci_set_config_vector(QVirtioPCIDevice *d, uint16_t =
+entry)
++{
++    uint16_t vector;
++
++    qpci_io_writew(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR, entry);
++    vector =3D qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR);
++    g_assert_cmphex(vector, !=3D, VIRTIO_MSI_NO_VECTOR);
++}
++
++static void qvirtio_pci_set_queue_vector(QVirtioPCIDevice *d, uint16_t v=
+q_idx, uint16_t entry)
++{
++    uint16_t vector;
++
++    qvirtio_pci_queue_select(&d->vdev, vq_idx);
++    qpci_io_writew(d->pdev, d->bar, VIRTIO_MSI_QUEUE_VECTOR, entry);
++    vector =3D qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_QUEUE_VECTOR);
++    g_assert_cmphex(vector, !=3D, VIRTIO_MSI_NO_VECTOR);
++}
++
++static const QVirtioPCIMSIXOps qvirtio_pci_msix_ops_legacy =3D {
++    .set_config_vector =3D qvirtio_pci_set_config_vector,
++    .set_queue_vector =3D qvirtio_pci_set_queue_vector,
++};
++
+ void qvirtio_pci_device_enable(QVirtioPCIDevice *d)
+ {
+     qpci_device_enable(d->pdev);
+@@ -285,7 +309,6 @@ void qvirtio_pci_device_disable(QVirtioPCIDevice *d)
+ void qvirtqueue_pci_msix_setup(QVirtioPCIDevice *d, QVirtQueuePCI *vqpci=
+,
+                                         QGuestAllocator *alloc, uint16_t=
+ entry)
+ {
+-    uint16_t vector;
+     uint32_t control;
+     uint64_t off;
+=20
+@@ -311,16 +334,12 @@ void qvirtqueue_pci_msix_setup(QVirtioPCIDevice *d,=
+ QVirtQueuePCI *vqpci,
+                    off + PCI_MSIX_ENTRY_VECTOR_CTRL,
+                    control & ~PCI_MSIX_ENTRY_CTRL_MASKBIT);
+=20
+-    qvirtio_pci_queue_select(&d->vdev, vqpci->vq.index);
+-    qpci_io_writew(d->pdev, d->bar, VIRTIO_MSI_QUEUE_VECTOR, entry);
+-    vector =3D qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_QUEUE_VECTOR);
+-    g_assert_cmphex(vector, !=3D, VIRTIO_MSI_NO_VECTOR);
++    d->msix_ops->set_queue_vector(d, vqpci->vq.index, entry);
+ }
+=20
+ void qvirtio_pci_set_msix_configuration_vector(QVirtioPCIDevice *d,
+                                         QGuestAllocator *alloc, uint16_t=
+ entry)
+ {
+-    uint16_t vector;
+     uint32_t control;
+     uint64_t off;
+=20
+@@ -348,9 +367,7 @@ void qvirtio_pci_set_msix_configuration_vector(QVirti=
+oPCIDevice *d,
+                    off + PCI_MSIX_ENTRY_VECTOR_CTRL,
+                    control & ~PCI_MSIX_ENTRY_CTRL_MASKBIT);
+=20
+-    qpci_io_writew(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR, entry);
+-    vector =3D qpci_io_readw(d->pdev, d->bar, VIRTIO_MSI_CONFIG_VECTOR);
+-    g_assert_cmphex(vector, !=3D, VIRTIO_MSI_NO_VECTOR);
++    d->msix_ops->set_config_vector(d, entry);
+ }
+=20
+ void qvirtio_pci_destructor(QOSGraphObject *obj)
+@@ -371,6 +388,7 @@ static void qvirtio_pci_init_legacy(QVirtioPCIDevice =
+*dev)
+ {
+     dev->vdev.device_type =3D qpci_config_readw(dev->pdev, PCI_SUBSYSTEM=
+_ID);
+     dev->vdev.bus =3D &qvirtio_pci_legacy;
++    dev->msix_ops =3D &qvirtio_pci_msix_ops_legacy;
+     dev->vdev.big_endian =3D qtest_big_endian(dev->pdev->bus->qts);
+ }
+=20
+--=20
+2.21.0
 
-*If* we decide to expose the information through some kind of data table
-(as opposed to the modern CPU hotplug register block), then the
-representation *must* be a dedicated fw_cfg blob. It cannot be an ACPI
-table.
-
-The reason is that *selecting* the fw_cfg blob that contains the ACPI
-linker/loader script is a very specific action (it re-generates the ACPI
-payload, with dependencies on assigned PCI resources). Therefore, it is
-done in a super-particular spot in the firmware.
-
-On the other hand, the "possible CPUs count" is needed much earlier than
-that. I need to fetch that info way before PCI resource assignment
-appears on the radar.
-
-So please let us stick with "ACPI is only for the guest OS to read" rule
--- it's not only a parsing convenience for the firmware, but a real
-necessity.
-
-Thanks
-Laszlo
 
