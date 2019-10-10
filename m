@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1E04C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:50:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13811C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6349E2067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:50:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6349E2067B
+	by mail.kernel.org (Postfix) with ESMTPS id C1EF320B7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:53:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1EF320B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIeRz-0001rY-C8
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 15:50:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37925)
+	id 1iIeUi-000404-Vb
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 15:53:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iIeO1-0007WQ-7i
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:46:10 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIeS9-0002aZ-RQ
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:50:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iIeO0-0004cU-7R
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:46:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34732)
+ (envelope-from <eblake@redhat.com>) id 1iIeS8-0005mb-NN
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:50:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36370)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iIeNy-0004bk-0a; Thu, 10 Oct 2019 15:46:06 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1iIeS6-0005lh-Ck; Thu, 10 Oct 2019 15:50:22 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 29CAC30604B1;
- Thu, 10 Oct 2019 19:46:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 61F5E3018ECB;
+ Thu, 10 Oct 2019 19:50:21 +0000 (UTC)
 Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AE9BC600F8;
- Thu, 10 Oct 2019 19:46:04 +0000 (UTC)
-Subject: Re: [PATCH 20/23] iotests/223: Create socket in $SOCK_DIR
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CB816100EBD9;
+ Thu, 10 Oct 2019 19:50:20 +0000 (UTC)
+Subject: Re: [PATCH 04/23] iotests: Filter $SOCK_DIR
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20191010152457.17713-1-mreitz@redhat.com>
- <20191010152457.17713-21-mreitz@redhat.com>
+ <20191010152457.17713-5-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <24098b59-d68d-45ec-e52e-633f8f3788f9@redhat.com>
-Date: Thu, 10 Oct 2019 14:46:04 -0500
+Message-ID: <727638b4-8588-76eb-1428-9b2a9a8df380@redhat.com>
+Date: Thu, 10 Oct 2019 14:50:20 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191010152457.17713-21-mreitz@redhat.com>
+In-Reply-To: <20191010152457.17713-5-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 10 Oct 2019 19:46:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Thu, 10 Oct 2019 19:50:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -82,11 +82,25 @@ Sender: "Qemu-devel"
 On 10/10/19 10:24 AM, Max Reitz wrote:
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->   tests/qemu-iotests/223 | 14 +++++++-------
->   1 file changed, 7 insertions(+), 7 deletions(-)
+>   tests/qemu-iotests/common.filter | 8 ++++++--
+>   1 file changed, 6 insertions(+), 2 deletions(-)
 > 
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> @@ -218,7 +221,8 @@ _filter_nbd()
+>       # Filter out the TCP port number since this changes between runs.
+>       $SED -e '/nbd\/.*\.c:/d' \
+>           -e 's#127\.0\.0\.1:[0-9]*#127.0.0.1:PORT#g' \
+> -        -e "s#?socket=$TEST_DIR#?socket=TEST_DIR#g" \
+> +        -e "s#?socket=$SOCK_DIR#?socket=TEST_DIR#g" \
+> +        -e "s#?socket=$SOCK_DIR#?socket=SOCK_DIR#g" \
+>           -e 's#\(foo\|PORT/\?\|.sock\): Failed to .*$#\1#'
+
+This goes away in 23, but this looks crazy.  Don't you really want the 
+first line to replace $TEST_DIR with TEST_DIR (not $SOCK_DIR with 
+TEST_DIR)?  Otherwise, bisection is likely to break until all the 
+intermediate patches have made the conversion to stop using TEST_DIR.
+
+I already gave R-b, but you'll need to fix this one.
 
 -- 
 Eric Blake, Principal Software Engineer
