@@ -2,65 +2,56 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1953CC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B91FC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:06:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58268208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:02:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58268208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D400420B7C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:06:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D400420B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIatT-00066f-0a
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 12:02:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38892)
+	id 1iIaxl-0000eC-QQ
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 12:06:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34374)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iIapW-0004q1-R5
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:58:22 -0400
+ (envelope-from <pl@kamp.de>) id 1iIaRh-0006GZ-QY
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:33:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iIapU-0002cl-Ty
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:58:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:25452)
+ (envelope-from <pl@kamp.de>) id 1iIaRg-000789-21
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:33:41 -0400
+Received: from kerio.kamp.de ([195.62.97.192]:43649)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iIapU-0002cB-JY
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:58:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CD4FA801661;
- Thu, 10 Oct 2019 15:58:15 +0000 (UTC)
-Received: from Igors-MacBook-Pro (unknown [10.36.112.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0CFA65E7B2;
- Thu, 10 Oct 2019 15:57:58 +0000 (UTC)
-Date: Thu, 10 Oct 2019 17:57:54 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [RFC 0/3] acpi: cphp: add CPHP_GET_CPU_ID_CMD command to cpu
- hotplug MMIO interface
-Message-ID: <20191010175754.7c62cf8f@Igors-MacBook-Pro>
-In-Reply-To: <20191010095459-mutt-send-email-mst@kernel.org>
-References: <20191009132252.17860-1-imammedo@redhat.com>
- <20191010055356-mutt-send-email-mst@kernel.org>
- <20191010153815.4f7a3fc9@redhat.com>
- <20191010095459-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.67]); Thu, 10 Oct 2019 15:58:15 +0000 (UTC)
+ (Exim 4.71) (envelope-from <pl@kamp.de>) id 1iIaRf-00075E-Nh
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:33:39 -0400
+X-Footer: a2FtcC5kZQ==
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 17:33:26 +0200
+Received: (qmail 43439 invoked from network); 10 Oct 2019 15:33:29 -0000
+Received: from lieven-pc.kamp-intra.net (HELO lieven-pc)
+ (relay@kamp.de@::ffff:172.21.12.60)
+ by submission.kamp.de with ESMTPS (DHE-RSA-AES256-GCM-SHA384 encrypted) ESMTPA;
+ 10 Oct 2019 15:33:29 -0000
+Received: by lieven-pc (Postfix, from userid 1060)
+ id 86FAC13D878; Thu, 10 Oct 2019 17:33:29 +0200 (CEST)
+From: Peter Lieven <pl@kamp.de>
+To: qemu-block@nongnu.org
+Subject: [RESEND PATCH V4] block/vhdx: add check for truncated image files
+Date: Thu, 10 Oct 2019 17:33:27 +0200
+Message-Id: <20191010153327.18696-1-pl@kamp.de>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 195.62.97.192
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,137 +63,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, codyprime@gmail.com, Peter Lieven <pl@kamp.de>,
+ qemu-devel@nongnu.org, mreitz@redhat.com, jhf@kamp.de
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 10 Oct 2019 09:59:42 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+qemu is currently not able to detect truncated vhdx image files.
+Add a basic check if all allocated blocks are reachable at open and
+report all errors during bdrv_co_check.
 
-> On Thu, Oct 10, 2019 at 03:39:12PM +0200, Igor Mammedov wrote:
-> > On Thu, 10 Oct 2019 05:56:55 -0400
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >=20
-> > > On Wed, Oct 09, 2019 at 09:22:49AM -0400, Igor Mammedov wrote:
-> > > > As an alternative to passing to firmware topology info via new fwcf=
-g files
-> > > > so it could recreate APIC IDs based on it and order CPUs are enumer=
-ated,
-> > > >=20
-> > > > extend CPU hotplug interface to return APIC ID as response to the n=
-ew command
-> > > > CPHP_GET_CPU_ID_CMD. =20
-> > >=20
-> > > One big piece missing here is motivation:
-> > I thought the only willing reader was Laszlo (who is aware of context)
-> > so I skipped on details and confused others :/
-> >=20
-> > > Who's going to use this interface?
-> > In current state it's for firmware, since ACPI tables can cheat
-> > by having APIC IDs statically built in.
-> >=20
-> > If we were creating CPU objects in ACPI dynamically
-> > we would be using this command as well.
->=20
-> I'm not sure how it's even possible to create devices dynamically. Well
-> I guess it's possible with LoadTable. Is this what you had in
-> mind?
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+V4: - allow partial last blocks [Kevin]
+    - report offsets in error messages [Kevin]
+    - check for start and end offset after eof
 
-Yep. I even played this shiny toy and I can say it's very tempting one.
-On the  other side, even problem of legacy OSes not working with it aside,
-it's hard to debug and reproduce compared to static tables.
-So from maintaining pov I dislike it enough to be against it.
+V3: - check for bdrv_getlength failure [Kevin]
+    - use uint32_t for i [Kevin]
+    - check for BAT entry overflow [Kevin]
+    - break on !errcnt in second check
 
+V2: - add error reporting [Kevin]
+    - use bdrv_getlength instead of bdrv_get_allocated_file_size [Kevin]
+    - factor out BAT entry check and add error reporting for region
+      overlaps
+    - already check on vhdx_open
 
-> > It would save
-> > us quite a bit space in ACPI blob but it would be a pain
-> > to debug and diagnose problems in ACPI tables, so I'd rather
-> > stay with static CPU descriptions in ACPI tables for the sake
-> > of maintenance.
-> > > So far CPU hotplug was used by the ACPI, so we didn't
-> > > really commit to a fixed interface too strongly.
-> > >=20
-> > > Is this a replacement to Laszlo's fw cfg interface?
-> > > If yes is the idea that OVMF going to depend on CPU hotplug directly =
-then?
-> > > It does not depend on it now, does it?
-> > It doesn't, but then it doesn't support cpu hotplug,
-> > OVMF(SMM) needs to cooperate with QEMU "and" ACPI tables to perform
-> > the task and using the same interface/code path between all involved
-> > parties makes the task easier with the least amount of duplicated
-> > interfaces and more robust.
-> >=20
-> > Re-implementing alternative interface for firmware (fwcfg or what not)
-> > would work as well, but it's only question of time when ACPI and
-> > this new interface disagree on how world works and process falls
-> > apart.
->=20
-> Then we should consider switching acpi to use fw cfg.
-> Or build another interface that can scale.
+ block/vhdx.c | 120 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 103 insertions(+), 17 deletions(-)
 
-Could be an option, it would be a pain to write a driver in AML for fwcfg a=
-ccess though
-(I've looked at possibility to access fwcfg from AML about a year ago and g=
-ave up.
-I'm definitely not volunteering for the second attempt and can't even give =
-an estimate
-it it's viable approach).
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 6a09d0a55c..371f226286 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -24,6 +24,7 @@
+ #include "qemu/option.h"
+ #include "qemu/crc32c.h"
+ #include "qemu/bswap.h"
++#include "qemu/error-report.h"
+ #include "vhdx.h"
+ #include "migration/blocker.h"
+ #include "qemu/uuid.h"
+@@ -235,6 +236,9 @@ static int vhdx_region_check(BDRVVHDXState *s, uint64_t start, uint64_t length)
+     end = start + length;
+     QLIST_FOREACH(r, &s->regions, entries) {
+         if (!((start >= r->end) || (end <= r->start))) {
++            error_report("VHDX region %" PRIu64 "-%" PRIu64 " overlaps with "
++                         "region %" PRIu64 "-%." PRIu64, start, end, r->start,
++                         r->end);
+             ret = -EINVAL;
+             goto exit;
+         }
+@@ -877,6 +881,95 @@ static void vhdx_calc_bat_entries(BDRVVHDXState *s)
+ 
+ }
+ 
++static int vhdx_check_bat_entries(BlockDriverState *bs, int *errcnt)
++{
++    BDRVVHDXState *s = bs->opaque;
++    int64_t image_file_size = bdrv_getlength(bs->file->bs);
++    uint64_t payblocks = s->chunk_ratio;
++    uint64_t i;
++    int ret = 0;
++
++    if (image_file_size < 0) {
++        error_report("Could not determinate VHDX image file size.");
++        return image_file_size;
++    }
++
++    for (i = 0; i < s->bat_entries; i++) {
++        if ((s->bat[i] & VHDX_BAT_STATE_BIT_MASK) ==
++            PAYLOAD_BLOCK_FULLY_PRESENT) {
++            uint64_t offset = s->bat[i] & VHDX_BAT_FILE_OFF_MASK;
++            /*
++             * Allow that the last block exists only partially. The VHDX spec
++             * states that the image file can only grow in blocksize increments,
++             * but QEMU created images with partial last blocks in the past.
++             */
++            uint32_t block_length = MIN(s->block_size,
++                bs->total_sectors * BDRV_SECTOR_SIZE - i * s->block_size);
++            /*
++             * Check for BAT entry overflow.
++             */
++            if (offset > INT64_MAX - s->block_size) {
++                error_report("VHDX BAT entry %" PRIu64 " offset overflow.", i);
++                ret = -EINVAL;
++                if (!errcnt) {
++                    break;
++                }
++                (*errcnt)++;
++            }
++            /*
++             * Check if fully allocated BAT entries do not reside after
++             * end of the image file.
++             */
++            if (offset >= image_file_size) {
++                error_report("VHDX BAT entry %" PRIu64 " start offset %" PRIu64
++                             " points after end of file (%" PRIi64 "). Image"
++                             " has probably been truncated.",
++                             i, offset, image_file_size);
++                ret = -EINVAL;
++                if (!errcnt) {
++                    break;
++                }
++                (*errcnt)++;
++            } else if (offset + block_length > image_file_size) {
++                error_report("VHDX BAT entry %" PRIu64 " end offset %" PRIu64
++                             " points after end of file (%" PRIi64 "). Image"
++                             " has probably been truncated.",
++                             i, offset + block_length - 1, image_file_size);
++                ret = -EINVAL;
++                if (!errcnt) {
++                    break;
++                }
++                (*errcnt)++;
++            }
++
++            /*
++             * verify populated BAT field file offsets against
++             * region table and log entries
++             */
++            if (payblocks--) {
++                /* payload bat entries */
++                int ret2;
++                ret2 = vhdx_region_check(s, offset, s->block_size);
++                if (ret2 < 0) {
++                    ret = -EINVAL;
++                    if (!errcnt) {
++                        break;
++                    }
++                    (*errcnt)++;
++                }
++            } else {
++                payblocks = s->chunk_ratio;
++                /*
++                 * Once differencing files are supported, verify sector bitmap
++                 * blocks here
++                 */
++            }
++        }
++    }
++
++    return ret;
++}
++
+ static void vhdx_close(BlockDriverState *bs)
+ {
+     BDRVVHDXState *s = bs->opaque;
+@@ -981,25 +1074,15 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
+-    uint64_t payblocks = s->chunk_ratio;
+-    /* endian convert, and verify populated BAT field file offsets against
+-     * region table and log entries */
++    /* endian convert populated BAT field entires */
+     for (i = 0; i < s->bat_entries; i++) {
+         s->bat[i] = le64_to_cpu(s->bat[i]);
+-        if (payblocks--) {
+-            /* payload bat entries */
+-            if ((s->bat[i] & VHDX_BAT_STATE_BIT_MASK) ==
+-                    PAYLOAD_BLOCK_FULLY_PRESENT) {
+-                ret = vhdx_region_check(s, s->bat[i] & VHDX_BAT_FILE_OFF_MASK,
+-                                        s->block_size);
+-                if (ret < 0) {
+-                    goto fail;
+-                }
+-            }
+-        } else {
+-            payblocks = s->chunk_ratio;
+-            /* Once differencing files are supported, verify sector bitmap
+-             * blocks here */
++    }
++
++    if (!(flags & BDRV_O_CHECK)) {
++        ret = vhdx_check_bat_entries(bs, NULL);
++        if (ret < 0) {
++            goto fail;
+         }
+     }
+ 
+@@ -2072,6 +2155,9 @@ static int coroutine_fn vhdx_co_check(BlockDriverState *bs,
+     if (s->log_replayed_on_open) {
+         result->corruptions_fixed++;
+     }
++
++    vhdx_check_bat_entries(bs, &result->corruptions);
++
+     return 0;
+ }
+ 
+-- 
+2.17.1
 
-But what scaling issue you are talking about, exactly?
-With current CPU hotplug interface we can handle upto UNIT32_MAX cpus, and =
-extend
-interface without need to increase IO window we are using now.
-
-Granted IO access it not fastest compared to fwcfg in DMA mode, but we alre=
-ady
-doing stop machine when switching to SMM which is orders of magnitude slowe=
-r.
-Consensus was to compromise on speed of CPU hotplug versus more complex and=
- more
-problematic unicast SMM mode in OVMF (can't find a particular email but we =
-have discussed
-it with Laszlo already, when I considered ways to optimize hotplug speed)
-
-> > > If answers to all of the above is yes, then I don't really like it: it
-> > > is better to keep all paravirt stuff in one place, namely in fw cfg.
-> > Lets discuss, what cpu hotplug fwcfg interface could look like in=20
-> >  [PATCH 3/4] hw/i386: add facility to expose CPU topology over  fw-cfg
-> > mail thread and clarify (dis)likes with concrete reasons.
-> >=20
-> > So far I managed to convince myself that we ought to reuse
-> > and extend current CPU hotplug interface with firmware features,
-> > to endup with consolidated cpu hotplug process without
-> > introducing duplicate ABIs, but I could be wrong so
-> > lets see if fwcfg will be the better approach.
-> >=20
-> > =20
-> > > > CC: Laszlo Ersek <lersek@redhat.com>
-> > > > CC: Eduardo Habkost <ehabkost@redhat.com>
-> > > > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > CC: Gerd Hoffmann <kraxel@redhat.com>
-> > > > CC: Paolo Bonzini <pbonzini@redhat.com>
-> > > > CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > > > CC: Richard Henderson <rth@twiddle.net>
-> > > > =20
-> > > > Igor Mammedov (3):
-> > > >   acpi: cpuhp: fix 'Command data' description is spec
-> > > >   acpi: cpuhp: add typical usecases into spec
-> > > >   acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command
-> > > >=20
-> > > >  docs/specs/acpi_cpu_hotplug.txt | 37 +++++++++++++++++++++++++++++=
-+---
-> > > >  hw/acpi/cpu.c                   | 15 +++++++++++++
-> > > >  hw/acpi/trace-events            |  1 +
-> > > >  3 files changed, 50 insertions(+), 3 deletions(-)
-> > > >=20
-> > > > --=20
-> > > > 2.18.1 =20
-> > >=20
->=20
 
 
