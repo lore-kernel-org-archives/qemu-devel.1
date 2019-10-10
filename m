@@ -2,67 +2,67 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F03C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B921DC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:19:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29C9021920
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:17:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C9021920
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8D160208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:19:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D160208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIYJU-0008KT-6T
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 09:17:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40224)
+	id 1iIYLs-0002V5-4Q
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 09:19:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40377)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iIYHo-00078J-65
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:15:21 -0400
+ (envelope-from <lersek@redhat.com>) id 1iIYIW-0007g8-A4
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iIYHm-0001ig-EF
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:15:19 -0400
-Resent-Date: Thu, 10 Oct 2019 09:15:19 -0400
-Resent-Message-Id: <E1iIYHm-0001ig-EF@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21497)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iIYHm-0001iK-67
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:15:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1570713304; cv=none; d=zoho.com; s=zohoarc; 
- b=Szgf9gsf54YVkNjujFeNCH3yoVHVmk8tbOcsIVeZjbrU5+NFqyOQcqjeC5Smlao+XbKIQXv0XIZ7ZR2bSWbMTFP3uQ3L4hxfF1J/8aWde/HVcjBjqH344IMxfUnvF2rywBFfkAjxZQzt+xwfrgZx3t0cXFiX7XVIsj91Lh84JF4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1570713304;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=JuXqxE2jonW9JSE+7Ho0jzP9eNdbHgvJPlOx8PCvHBc=; 
- b=aoOSvuVgABgIyKK3pyXDRg8zqCS9LBwBDCjKnEn9FbQIJhIZQuiI1racBQ9+5xXQc2BEXyyQN1kAWbA2GLoBcN3gTigpR3CT5ZYDCQbUblJA8HFbY2zEtcl4kaxlD2OdOLsYix56PD0Pu6SX6FTseWpkOfV47M9BeRHhny51x+g=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1570713302913589.7599983334851;
- Thu, 10 Oct 2019 06:15:02 -0700 (PDT)
-In-Reply-To: <1570709475-32073-2-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
-Subject: Re: [PATCH v3] virtio-net: prevent offloads reset on migration
-Message-ID: <157071330156.7138.10951394337252973749@37313f22b938>
+ (envelope-from <lersek@redhat.com>) id 1iIYIU-0001vj-Qh
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:16:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12705)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iIYIU-0001vW-HT
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:16:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C5A60898106;
+ Thu, 10 Oct 2019 13:16:01 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-48.rdu2.redhat.com
+ [10.10.120.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BCF485D6A5;
+ Thu, 10 Oct 2019 13:15:52 +0000 (UTC)
+Subject: Re: [RFC 2/3] acpi: cpuhp: add typical usecases into spec
+From: Laszlo Ersek <lersek@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20191009132252.17860-1-imammedo@redhat.com>
+ <20191009132252.17860-3-imammedo@redhat.com>
+ <e97f3e1c-651f-ca81-d38d-c184e3db7697@redhat.com>
+Message-ID: <82e2a266-84bd-8e09-f86b-3b82281d4fdf@redhat.com>
+Date: Thu, 10 Oct 2019 15:15:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mikhail.sennikovskii@cloud.ionos.com
-Date: Thu, 10 Oct 2019 06:15:02 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <e97f3e1c-651f-ca81-d38d-c184e3db7697@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Thu, 10 Oct 2019 13:16:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,89 +74,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, jasowang@redhat.com, dgilbert@redhat.com,
- qemu-devel@nongnu.org, mikhail.sennikovskii@cloud.ionos.com,
- stefanha@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTcwNzA5NDc1LTMyMDczLTIt
-Z2l0LXNlbmQtZW1haWwtbWlraGFpbC5zZW5uaWtvdnNraWlAY2xvdWQuaW9ub3MuY29tLwoKCgpI
-aSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVz
-dC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxv
-dy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1
-Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFr
-ZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVz
-dC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody90aW1lci9tYzE0NjgxOHJ0Yy5v
-CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvY2hhci92aXJ0aW8tc2VyaWFsLWJ1cy5vCi90
-bXAvcWVtdS10ZXN0L3NyYy9ody9uZXQvdmlydGlvLW5ldC5jOiBJbiBmdW5jdGlvbiAndmlydGlv
-X25ldF9zZXRfZmVhdHVyZXMnOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvbmV0L3ZpcnRpby1uZXQu
-Yzo3ODA6NTogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdydW5zdGF0
-ZV9jaGVjaycgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgICAgaWYg
-KG4tPmhhc192bmV0X2hkciAmJiAhcnVuc3RhdGVfY2hlY2soUlVOX1NUQVRFX0lOTUlHUkFURSkp
-IHsKICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ody9uZXQvdmlydGlvLW5ldC5jOjc4MDo1OiBl
-cnJvcjogbmVzdGVkIGV4dGVybiBkZWNsYXJhdGlvbiBvZiAncnVuc3RhdGVfY2hlY2snIFstV2Vy
-cm9yPW5lc3RlZC1leHRlcm5zXQovdG1wL3FlbXUtdGVzdC9zcmMvaHcvbmV0L3ZpcnRpby1uZXQu
-Yzo3ODA6NDQ6IGVycm9yOiAnUlVOX1NUQVRFX0lOTUlHUkFURScgdW5kZWNsYXJlZCAoZmlyc3Qg
-dXNlIGluIHRoaXMgZnVuY3Rpb24pCiAgICAgaWYgKG4tPmhhc192bmV0X2hkciAmJiAhcnVuc3Rh
-dGVfY2hlY2soUlVOX1NUQVRFX0lOTUlHUkFURSkpIHsKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy9ody9uZXQvdmlydGlvLW5l
-dC5jOjc4MDo0NDogbm90ZTogZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQg
-b25seSBvbmNlIGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4KY2MxOiBhbGwgd2Fybmlu
-Z3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtody9uZXQvdmlydGlvLW5l
-dC5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
-CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvY29yZS9tYWNoaW5lLXFtcC1jbWRzLm8KICBD
-QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9jb3JlL251bWEubwotLS0KICBDQyAgICAgIGFhcmNo
-NjQtc29mdG1tdS9ody9kbWEvcHhhMnh4X2RtYS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
-aHcvZ3Bpby9vbWFwX2dwaW8ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2dwaW8vaW14
-X2dwaW8ubwptYWtlOiAqKiogW3g4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgptYWtlOiAqKiog
-V2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11
-L2h3L2dwaW8vYmNtMjgzNV9ncGlvLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9ncGlv
-L25yZjUxX2dwaW8ubwotLS0KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vaGlnaGJh
-bmsubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9pbnRlZ3JhdG9yY3AubwovdG1w
-L3FlbXUtdGVzdC9zcmMvaHcvbmV0L3ZpcnRpby1uZXQuYzogSW4gZnVuY3Rpb24gJ3ZpcnRpb19u
-ZXRfc2V0X2ZlYXR1cmVzJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L25ldC92aXJ0aW8tbmV0LmM6
-NzgwOjU6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiAncnVuc3RhdGVf
-Y2hlY2snIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogICAgIGlmIChu
-LT5oYXNfdm5ldF9oZHIgJiYgIXJ1bnN0YXRlX2NoZWNrKFJVTl9TVEFURV9JTk1JR1JBVEUpKSB7
-CiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvbmV0L3ZpcnRpby1uZXQuYzo3ODA6NTogZXJy
-b3I6IG5lc3RlZCBleHRlcm4gZGVjbGFyYXRpb24gb2YgJ3J1bnN0YXRlX2NoZWNrJyBbLVdlcnJv
-cj1uZXN0ZWQtZXh0ZXJuc10KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L25ldC92aXJ0aW8tbmV0LmM6
-NzgwOjQ0OiBlcnJvcjogJ1JVTl9TVEFURV9JTk1JR1JBVEUnIHVuZGVjbGFyZWQgKGZpcnN0IHVz
-ZSBpbiB0aGlzIGZ1bmN0aW9uKQogICAgIGlmIChuLT5oYXNfdm5ldF9oZHIgJiYgIXJ1bnN0YXRl
-X2NoZWNrKFJVTl9TVEFURV9JTk1JR1JBVEUpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvbmV0L3ZpcnRpby1uZXQu
-Yzo3ODA6NDQ6IG5vdGU6IGVhY2ggdW5kZWNsYXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9u
-bHkgb25jZSBmb3IgZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluCmNjMTogYWxsIHdhcm5pbmdz
-IGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbaHcvbmV0L3ZpcnRpby1uZXQu
-b10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgog
-IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9tYWluc3RvbmUubwptYWtlOiAqKiogW2Fh
-cmNoNjQtc29mdG1tdS9hbGxdIEVycm9yIDIKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxh
-c3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjYyLCBpbiA8bW9k
-dWxlPgogICAgc3lzLmV4aXQobWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJv
-cihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdb
-J3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3Rh
-bmNlLnV1aWQ9MTE5ZDM3ZDgwZWQzNDgwNTg2YmUzNDk5ZGZlMTg2OGUnLCAnLXUnLCAnMTAwMScs
-ICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdU
-QVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9Jywg
-Jy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAn
-Q0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUv
-cWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC00aWRiZGtjaC9zcmMvZG9ja2VyLXNyYy4yMDE5LTEwLTEwLTA5LjEy
-LjQwLjEyNjU2Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAv
-cWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAy
-LgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0xMTlkMzdkODBl
-ZDM0ODA1ODZiZTM0OTlkZmUxODY4ZQptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEK
-bWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC00
-aWRiZGtjaC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVy
-cm9yIDIKCnJlYWwgICAgMm0yMi4yMjBzCnVzZXIgICAgMG04LjI1NnMKCgpUaGUgZnVsbCBsb2cg
-aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NzA3MDk0NzUtMzIwNzMt
-Mi1naXQtc2VuZC1lbWFpbC1taWtoYWlsLnNlbm5pa292c2tpaUBjbG91ZC5pb25vcy5jb20vdGVz
-dGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 10/10/19 15:04, Laszlo Ersek wrote:
+> On 10/09/19 15:22, Igor Mammedov wrote:
+>> Clarify values of "CPU selector' register and add workflows for
+> 
+> mismatched quotes (double vs. single)
+> 
+>>   * finding CPU with pending 'insert/remove' event
+>>   * enumerating present/non present CPUs
+>>
+>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> ---
+>>  docs/specs/acpi_cpu_hotplug.txt | 22 ++++++++++++++++++++++
+>>  1 file changed, 22 insertions(+)
+>>
+>> diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
+>> index ac5903b2b1..43c5a193f0 100644
+>> --- a/docs/specs/acpi_cpu_hotplug.txt
+>> +++ b/docs/specs/acpi_cpu_hotplug.txt
+>> @@ -54,6 +54,7 @@ write access:
+>>      [0x0-0x3] CPU selector: (DWORD access)
+> 
+> Please clarify the endianness.
+> 
+>>                selects active CPU device. All following accesses to other
+>>                registers will read/store data from/to selected CPU.
+>> +              Valid values: [0 .. max_cpus)
+> 
+> Nice; appreciate the bracket on the left side vs. the paren on the right
+> side!
+> 
+>>      [0x4] CPU device control fields: (1 byte access)
+>>          bits:
+>>              0: reserved, OSPM must clear it before writing to register.
+>> @@ -93,3 +94,24 @@ Selecting CPU device beyond possible range has no effect on platform:
+>>       ignored
+>>     - read accesses to CPU hot-plug registers not documented above return
+>>       all bits set to 0.
+>> +
+>> +Typical usecases:
+>> +   - Get a cpu with pending event
+>> +     1. write 0x0 into 'Command field' register
+>> +     2. read from 'Command data' register, CPU selector value (CPU's UID in ACPI
+>> +        tables)
+> 
+> OK.
+> 
+> I suggest putting this as: "read the CPU selector value (the CPU's UID
+> in the ACPI tables) from the 'Command data' register"
+> 
+>> and event for selected CPU from 'CPU device status fields'
+> 
+> OK.
+> 
+>> +        register. If there aren't pending events, CPU selector value doesn't
+> 
+> OK.
+> 
+> I suggest s/aren't/are no/
+> 
+>> +        change
+> 
+> So this feels important: *change* is relative to a previous value. In
+> order to determine change, I have to
+> 
+> - either read the "command data" register before writing 0x0 to
+> "command", and then compare the old value against the new value
+> 
+> - or even set "command data" to a bogus value myself (against which I
+> can compare the new value, after writing the command register).
+> 
+> So, what is the previous selector value that the change is relative to?
+> 
+>> and 'insert' and 'remove' bits are not set.
+> 
+> Ah, so is the order of steps actually this:
+> 
+> 1. write 0x0 to command
+> 
+> 2. read device status field
+> 
+> 3. if bit#1 or bit#2 is set (insert or remove event), read CPU selector
+> affected by those event(s) from the command data field
+> 
+> 4. otherwise, no pending event
+> 
+> ?
+> 
+>> +   - Enumerate CPUs present/non present CPUs.
+>> +     1. set iterator to 0x0
+> 
+> OK
+> 
+>> +     2. write 0x0 into 'Command field' register
+> 
+> ... this may update the device status field, and the command data field
+> (to a selector with pending events)
+> 
+>> and then iterator
+>> +        into 'CPU selector' register.
+> 
+> ... so in case command 0x0 selected a CPU with pending events, we ignore
+> that, and select our iterator anyway. OK.
+> 
+>> +     3. read 'enabled' flag for selected CPU from 'CPU device status fields'
+>> +        register
+> 
+> OK
+> 
+>> +     4. to continue to the next CPU, increment iterator
+> 
+> OK
+> 
+>> and repeat step 2
+> 
+> not sure why writing 0x0 to "command" again is useful, but I'll see it
+> below; OK
+> 
+>> +     5. read 'Command data' register
+> 
+> oookay... so if writing 0x0 to command selected a CPU with pending
+> events, we get the selector of *that* CPU (regardless of what iterator
+> we have presently)
+> 
+> Otherwise we get an indeterminate value.
+> 
+>> +     5.1 if 'Command data' register matches iterator continue to step 3.
+> 
+> uhhh... what? :) At this point, the command data register can be in two
+> states:
+> 
+> - if the last 0x0 command selected a CPU with events pending, then that
+> selector is available in the command data register.
+> 
+> I don't understand why comparing that against the iterator is helpful.
+> 
+> - If there was no CPU with pending events, we're comparing an
+> indeterminate value against the iterator. Why?
+> 
+> I think the "command data" field must change under some circumstances
+> that are currently not documented. (I.e. it seems like "command data"
+> does not *only* change when command 0x0 can find a CPU with pending events.)
+
+After looking at cpu_hotplug_rd(), I think I know what's going on.
+
+Every time command 0 is written, and there is no CPU with pending
+events, the command data register will read as 0!
+
+This seems like a core piece of information, and it's not documented in
+the text file anywhere. It only says (with patch#1 applied),
+
+  in case of error or unsupported command reads is 0x0
+
+Command 0 is *not* unsupported. Therefore, this documentation is only
+self-consistent if:
+
+- selecting a non-existent (>=max_cpus) CPU via the selector register is
+an *error*
+
+- asking for a CPU with pending events (with command 0x0), and finding
+none, is also an *error*.
+
+Let me re-read the patch set with this information in mind.
+
+Thanks
+Laszlo
+
+
+>> +         (read presence bit for the next CPU)
+>> +     5.2 if 'Command data' register has not changed, there is not CPU
+>> +         corresponding to iterator value and the last valid iterator value
+>> +         equals to 'max_cpus' + 1
+>>
+> 
 
 
