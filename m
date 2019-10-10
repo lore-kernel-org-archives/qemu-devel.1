@@ -2,84 +2,64 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA846C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 18:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BD3C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 18:12:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A14C7206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 18:09:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A14C7206B6
+	by mail.kernel.org (Postfix) with ESMTPS id DE4F7206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 18:12:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE4F7206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIcsr-0007AE-SZ
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 14:09:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54980)
+	id 1iIcv9-0000KD-2B
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 14:12:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iIcro-0005uR-Qi
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:08:49 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIcuQ-0008Fh-LI
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:11:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iIcrn-00040V-Pi
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:08:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40844)
+ (envelope-from <eblake@redhat.com>) id 1iIcuP-00054F-GC
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:11:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34204)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iIcrn-00040N-HP
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:08:47 -0400
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iIcuP-000534-AQ
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 14:11:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A64712BF73
- for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 18:08:46 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id o8so2962188wmc.2
- for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 11:08:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=fQDz1oDruGyS52AzLiEXTpW1VZB4PAAKFZAgQe0HdRk=;
- b=V6S7cjwuCS+UrKnxq1QwkBlT/RgxYzmNS79tojna4nBIMbJcG2sJcW0/t02t/nggHd
- o3UFkWSgB9511TjLRaBg8MzQ9MMQnNm9HjVeF8PEq0ntECYe5krSZO/0PguKuWimuTke
- +/cPz9fZwzfeC4W6V+USfba5yKmKYWyj5kwFD11DCcAB2rQC69jeiibVIwQYmNvz2QpL
- 4vXQK6ULHFqKUCC+Kl0sSiHLJn1nrqFli6QOzXm5mN4BgyIDTrNy6BYgsYPdAcxfwDxL
- DLEDCu6Cs5VqAGS3aqsM+yIOfD4Yy652JjzD8L96qjca/6VFhI4aalVeDXcklev1l4kQ
- 3Vyg==
-X-Gm-Message-State: APjAAAXEWkvFmbUsQpddBdDQFl1iQ/dfrhP9Xmx3OQa3OAw+IOYjRHrf
- 6haeRnItUvhZVu18rm+Hw6qO9vBd0V2q5JhW9oX7QtBpciW3I7kXgwP/PiBT+T7e0uz21v7e2/K
- isnjcjjZTQXSKU4s=
-X-Received: by 2002:a5d:420c:: with SMTP id n12mr9320095wrq.85.1570730925458; 
- Thu, 10 Oct 2019 11:08:45 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwAVC8K25Hk6J9oAD1JUH47vm1yJmhG9q+EzO/SlDnxqOz9zXCc4QzTBI2g/PfFPILwG8v5dg==
-X-Received: by 2002:a5d:420c:: with SMTP id n12mr9320083wrq.85.1570730925271; 
- Thu, 10 Oct 2019 11:08:45 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- i7sm8965518wrm.87.2019.10.10.11.08.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Oct 2019 11:08:44 -0700 (PDT)
-Date: Thu, 10 Oct 2019 14:08:41 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH 3/4] hw/i386: add facility to expose CPU topology over
- fw-cfg
-Message-ID: <20191010140724-mutt-send-email-mst@kernel.org>
-References: <20191008105259.5378-1-lersek@redhat.com>
- <20191008105259.5378-4-lersek@redhat.com>
- <20191008175931.483af366@redhat.com>
- <20191010055733-mutt-send-email-mst@kernel.org>
- <20191010144812.20fd8b5d@redhat.com>
- <0032ef80-4e75-5802-8a7a-098e9ff57cfa@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 8EA39801663
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 18:11:28 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 48CF16061E;
+ Thu, 10 Oct 2019 18:11:28 +0000 (UTC)
+Subject: Re: [PATCH v3 3/3] qapi: Allow introspecting fix for savevm's
+ cooperation with blockdev
+To: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org
+References: <cover.1570705279.git.pkrempa@redhat.com>
+ <be94d24847d38cb5a1172ed22d0f86e7c0ec8562.1570705279.git.pkrempa@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <0785d26d-6495-3b23-40d7-a19bcd02181e@redhat.com>
+Date: Thu, 10 Oct 2019 13:11:27 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0032ef80-4e75-5802-8a7a-098e9ff57cfa@redhat.com>
+In-Reply-To: <be94d24847d38cb5a1172ed22d0f86e7c0ec8562.1570705279.git.pkrempa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Thu, 10 Oct 2019 18:11:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -94,41 +74,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 10, 2019 at 06:23:00PM +0200, Laszlo Ersek wrote:
-> On 10/10/19 14:48, Igor Mammedov wrote:
-> 
-> > it doesn't really matter if it's ACPI blob or fw_cfg,
-> > what firmware needs is a table of possible CPUs with APIC IDs.
-> 
-> To repeat my previous point:
-> 
-> Not necessarily taking sides between "data table" and "register block",
-> but *if* we opt for "data table", then it *must* be fw_cfg.
-> 
-> > But if we go this route (i.e. not reuse CPU hotplug interface),
-> > the table alone is not enough, one would need to build a protocol
-> > between ACPI and firmware to communicate what CPUs to (un)hotplug.
-> 
-> That's for sure, yes -- for finding out what CPU has been hotplugged,
-> the hotplug SMI handler in the firmware has to look at the register
-> block no matter what.
+On 10/10/19 6:05 AM, Peter Krempa wrote:
 
-I thought all that's done by ACPI, with ACPI returning an event
-to the OSPM reporting what happened.
+In addition to Markus' review,
 
-> The "data table" vs "register block" question only arises *afterwards*,
-> for translating the CPU selector (fetched from the register block) to
-> the APIC-ID domain. (The generic edk2 infrastructure requires APIC-IDs).
+> 'savevm' was buggy as it considered all monitor-owned block device nodes
+> for snapshot. With introduction of -blockdev the common usage made all
+
+With the introduction of -blockdev, the common usage
+
+> nodes including protocol and backing file nodes monitor-owned and thus
+
+nodes be monitor-owned
+
+> considered for snapshot.
 > 
-> Thanks
-> Laszlo
+> This is a problem since the 'file' protocol nodes can't have internal
+> snapshots and it does not make sense to take snapshot of nodes
+> representing backing files.
+> 
+> This was fixed by commit 05f4aced658a02b02 clients need to be able to
+> detect whether this fix is present.
+> 
+> Since savevm does not have an QMP alternative, add the feature for the
+> 'human-monitor-command' backdoor which is used to call this command in
+> modern use.
+> 
+> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+> ---
+>   qapi/misc.json | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index 6bd11f50e6..5d0070aa43 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1020,6 +1020,12 @@
+>   #
+>   # @cpu-index: The CPU to use for commands that require an implicit CPU
+>   #
+> +# Features:
+> +# @savevm-blockdev-monitor-nodes: If present, the HMP command savevm only
+> +#                                 snapshots monitor-owned nodes if they have no
+> +#                                 parents. This allows to use 'savevm' with
+> +#                                 -blockdev. (since 4.2)
+
+s/to use/the use of/
+
+> +#
+>   # Returns: the output of the command as a string
+>   #
+>   # Since: 0.14.0
+> @@ -1047,7 +1053,8 @@
+>   ##
+>   { 'command': 'human-monitor-command',
+>     'data': {'command-line': 'str', '*cpu-index': 'int'},
+> -  'returns': 'str' }
+> +  'returns': 'str',
+> +  'features': [ 'savevm-blockdev-monitor-nodes' ] }
+> 
+>   ##
+>   # @change:
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
