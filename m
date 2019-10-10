@@ -3,62 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F390C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 03:27:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C4BEC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:18:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45B962086D
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 03:27:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45B962086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED07820659
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:18:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED07820659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIP6s-0004Uw-En
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 23:27:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57870)
+	id 1iIQqO-0003MQ-23
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 01:18:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iIP6F-0003y9-Ab
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 23:26:48 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iIQp5-0002XT-RR
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iIP6E-0001tp-AP
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 23:26:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38712)
+ (envelope-from <tao3.xu@intel.com>) id 1iIQp3-0004Oj-40
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:10 -0400
+Received: from mga17.intel.com ([192.55.52.151]:24358)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iIP6E-0001tj-4t
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 23:26:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 55D213002607;
- Thu, 10 Oct 2019 03:26:45 +0000 (UTC)
-Received: from localhost (ovpn-116-5.gru2.redhat.com [10.97.116.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6D1BE5D9E2;
- Thu, 10 Oct 2019 03:26:40 +0000 (UTC)
-Date: Thu, 10 Oct 2019 00:26:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Subject: Re: [Qemu-devel] [RFC 2 PATCH 02/16] hw/i386: Rename X86CPUTopoInfo
- structure to X86CPUTopoIDs
-Message-ID: <20191010032639.GC21666@habkost.net>
-References: <156779689013.21957.1631551572950676212.stgit@localhost.localdomain>
- <156779710892.21957.12320825183231112713.stgit@localhost.localdomain>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iIQp2-0004L4-TH
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:09 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 09 Oct 2019 22:17:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,279,1566889200"; d="scan'208";a="193089168"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+ by fmsmga008.fm.intel.com with ESMTP; 09 Oct 2019 22:16:59 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+ mtosatti@redhat.com
+Subject: [PATCH v6 0/2] x86: Enable user wait instructions
+Date: Thu, 10 Oct 2019 13:16:55 +0800
+Message-Id: <20191010051657.28163-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <156779710892.21957.12320825183231112713.stgit@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 10 Oct 2019 03:26:45 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,28 +65,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "ssg.sos.staff" <ssg.sos.staff@amd.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 06, 2019 at 07:11:50PM +0000, Moger, Babu wrote:
-> Rename few data structures related to X86 topology.
-> X86CPUTopoIDs will have individual arch ids. Next
-> patch introduces X86CPUTopoInfo which will have all
-> topology information(like cores, threads etc..).
-> 
-> Adds node_id and ccx_id. This will be required to support
-> new epyc mode mode. There is no functional change.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
+
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+(c0.1 state) or an improved power/performance optimized state
+(c0.2 state).
+
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
+
+Availability of the user wait instructions is indicated by the presence
+of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
+
+The patches enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it in kvm and provide a capability to
+enable it. Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
+QEMU use "-overcommit cpu-pm=on, a VM can use UMONITOR, UMWAIT and TPAUSE
+instructions. If the instruction causes a delay, the amount of time
+delayed is called here the physical delay. The physical delay is first
+computed by determining the virtual delay (the time to delay relative to
+the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT and TPAUSE cause
+an invalid-opcode exception(#UD).
+
+The release document ref below link:
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+
+Changelog:
+v6:
+	Only remove CPUID_7_0_ECX_WAITPKG if enable_cpu_pm is not set.
+        (Paolo)
+v5:
+	Remove CPUID_7_0_ECX_WAITPKG if enable_cpu_pm is not set. (Paolo)
+v4:
+	Set IA32_UMWAIT_CONTROL 32bits
+v3:
+	Simplify the patches, expose user wait instructions when the guest
+	has CPUID (Paolo)
+v2:
+	Separated from the series
+	https://www.mail-archive.com/qemu-devel@nongnu.org/msg549526.html
+	Use kvm capability to enable UMONITOR, UMWAIT and TPAUSE when
+	QEMU use "-overcommit cpu-pm=on"	
+v1:
+	Sent out with MOVDIRI/MOVDIR64B instructions patches
+
+Tao Xu (2):
+  x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE
+  target/i386: Add support for save/load IA32_UMWAIT_CONTROL MSR
+
+ target/i386/cpu.c     |  3 ++-
+ target/i386/cpu.h     |  3 +++
+ target/i386/kvm.c     | 17 +++++++++++++++++
+ target/i386/machine.c | 20 ++++++++++++++++++++
+ 4 files changed, 42 insertions(+), 1 deletion(-)
 
 -- 
-Eduardo
+2.20.1
+
 
