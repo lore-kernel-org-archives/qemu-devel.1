@@ -2,68 +2,60 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 327BEC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF0FECE58E
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:23:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EED0B20650
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:22:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="cfAwwyPZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EED0B20650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qq.com
+	by mail.kernel.org (Postfix) with ESMTPS id 472E9208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:23:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 472E9208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIYOW-0006Dw-L9
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 09:22:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56137)
+	id 1iIYPL-00079A-TT
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 09:23:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <77389867@qq.com>) id 1iIXOQ-0002mZ-NT
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 08:18:07 -0400
+ (envelope-from <philmd@redhat.com>) id 1iIYIT-0007cO-QX
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:16:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <77389867@qq.com>) id 1iIXOI-0004eW-Re
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 08:17:59 -0400
-Received: from smtpbg520.qq.com ([203.205.250.49]:44116 helo=smtpbg.qq.com)
+ (envelope-from <philmd@redhat.com>) id 1iIYIS-0001v4-GC
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:16:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45724)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <77389867@qq.com>) id 1iIXOG-0004bv-Jw
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 08:17:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
- t=1570709866; bh=UmFuA8CwFtIXYdMSOvix4lQQaA4EJj4v/H8X4PdRHrY=;
- h=From:To:Subject:Date:Message-Id;
- b=cfAwwyPZ5xyD5OfDGBk21RmTE8m5QmR9MOshE7nZdrtsn9+B1RC4sv6etbcpa1+CZ
- KZwaZVjY28gGwc4OiZ56tzfRjJwKCcIyPDw7U/9uorBHviD3q3f7WJd93lLoo6bjW1
- E4LLn3q9dqJqeR+MzkZd6dGrdFeehYtNqaANH8pc=
-X-QQ-mid: esmtp6t1570709864t2dqpp8gv
-Received: from localhost.localdomain (unknown [106.11.34.9])
- by esmtp4.qq.com (ESMTP) with 
- id ; Thu, 10 Oct 2019 20:17:04 +0800 (CST)
-X-QQ-SSF: C1000000000000B0S9101400000000Z
-X-QQ-FEAT: 8J5uQ3aAL2Gs+OgdMksO5mxvlczfyYDbA9zP9XXv3e9lmy8ZuJ1RiY+Fg0EbR
- PG1jEJ8zeYpsmWtPCPgUdkn0MHJl7FGWV6L0XX5Mr1DZOCnAyDyRsBDrSHHJBIp43RUyoWH
- BTBKWSOCtnh7d1gLvr88k4laJIGlJOXjBLJrje4fTgzu1o4VEt0OpAGZKizaqSD1XO19XWB
- OYg0Et1ZfB7tzhw5eizcRYuM9C6ELRIuDUOoap5XqyK/dAsleKaYKpBg0qyxG9zcA22Yu6I
- XFHaO/cFYjyupbtnDWuhFEg8sJNQeaCc3tjmXJ4IuxM5eE
-X-QQ-GoodBg: 0
-From: Tianjia Zhang <77389867@qq.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tests: fix counting typo error
-Date: Thu, 10 Oct 2019 20:17:02 +0800
-Message-Id: <20191010121702.90142-1-77389867@qq.com>
-X-Mailer: git-send-email 2.17.1
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtp:qq.com:bgweb:bgweb5
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 203.205.250.49
-X-Mailman-Approved-At: Thu, 10 Oct 2019 09:17:54 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>)
+ id 1iIYIH-0001qr-Gw; Thu, 10 Oct 2019 09:15:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9A6ED308C38C;
+ Thu, 10 Oct 2019 13:15:45 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.241])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3FB6960167;
+ Thu, 10 Oct 2019 13:15:30 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v3 0/8] hw: Convert various reset() handler to DeviceReset
+Date: Thu, 10 Oct 2019 15:15:19 +0200
+Message-Id: <20191010131527.32513-1-philmd@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Thu, 10 Oct 2019 13:15:45 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,33 +67,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tianjia Zhang <77389867@qq.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of global variables, local variables should be incrementing,
-This is a typo fix.
+Only patch 3/8 is missing review:
+- hw/ide/piix: Convert reset handler to DeviceReset
 
-Signed-off-by: Tianjia Zhang <77389867@qq.com>
----
- tests/test-rcu-list.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Since v2:
+- Fixed PIIX_IDE conversion (Li)
+- Added more R-b tag.
 
-diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
-index 6f076473e0..c0fc47ded4 100644
---- a/tests/test-rcu-list.c
-+++ b/tests/test-rcu-list.c
-@@ -219,7 +219,7 @@ static void *rcu_q_updater(void *arg)
-             j++;
-             if (target_el == j) {
-                 struct list_element *new_el = g_new(struct list_element, 1);
--                n_nodes += n_nodes_local;
-+                n_nodes_local++;
-                 TEST_LIST_INSERT_AFTER_RCU(el, new_el, entry);
-                 break;
-             }
--- 
-2.17.1
+Since v1:
+- Removed the pci-host devices
+- Removed the vmcoreinfo conversion (elmarco) but add a comment.
+- Added Igor's R-b tag.
+
+Following the thread discussion between Peter/Markus/Damien about
+reset handlers:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg617103.html
+I started to remove qemu_register_reset() calls from few qdevified
+devices (the trivial ones).
+
+Regards,
+
+Phil.
+
+v2: https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01677.html
+v1: https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg06367.html
+
+Philippe Mathieu-Daud=C3=A9 (8):
+  hw/acpi/piix4: Convert reset handler to DeviceReset
+  hw/isa/piix4: Convert reset handler to DeviceReset
+  hw/ide/piix: Convert reset handler to DeviceReset
+  hw/ide/sii3112: Convert reset handler to DeviceReset
+  hw/ide/via82c: Convert reset handler to DeviceReset
+  hw/isa/vt82c686: Convert reset handler to DeviceReset
+  hw/input/lm832x: Convert reset handler to DeviceReset
+  hw/misc/vmcoreinfo: Add comment about reset handler
+
+ hw/acpi/piix4.c      |  7 +++----
+ hw/ide/piix.c        |  9 ++++-----
+ hw/ide/sii3112.c     |  7 +++----
+ hw/ide/via.c         | 10 ++++------
+ hw/input/lm832x.c    | 12 +++++-------
+ hw/isa/piix4.c       |  7 +++----
+ hw/isa/vt82c686.c    | 11 ++++-------
+ hw/misc/vmcoreinfo.c |  4 ++++
+ 8 files changed, 30 insertions(+), 37 deletions(-)
+
+--=20
+2.21.0
 
 
