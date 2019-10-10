@@ -2,90 +2,111 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55EBAC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 09:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD18C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 09:39:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 207952064A
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 09:22:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="tchtendE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 207952064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id C260520679
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 09:39:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C260520679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIUeL-0001vk-5p
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 05:22:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36007)
+	id 1iIUul-0004pZ-PY
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 05:39:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iIUaT-0000rR-Au
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:18:22 -0400
+ (envelope-from <thuth@redhat.com>) id 1iIUu7-0004OD-8G
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iIUaS-0002Q3-6v
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:18:21 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:35972)
+ (envelope-from <thuth@redhat.com>) id 1iIUu5-0001eI-EJ
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:38:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51868)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iIUaR-0002Oj-9A
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:18:20 -0400
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 4077E96F51;
- Thu, 10 Oct 2019 09:18:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1570699096;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VXgZNvFEvBq9bipsOFNgdnF18T5jVE3t7BbVhV80a4E=;
- b=tchtendEzROdl0b/8mJ7VEnX14UJ1OVHg9y8QzJqdxdZtQNmsVX6fb68pKYn9QW6PWtnA5
- mDsD08WOyRxLK7uL5YDy8JLxA3KHhj1fa9sXWlv9vSK3pl6p4TrJkGS2a/gPRtqT0PXi9v
- vCBngJFrKGtwSUGMHlUZ1GZAwUYZh0o=
-Subject: Re: [PATCH v4 02/10] hw/core: create Resettable QOM interface
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190821163341.16309-1-damien.hedde@greensocs.com>
- <20190821163341.16309-3-damien.hedde@greensocs.com>
- <20190911080642.GC13785@umbus.fritz.box>
- <1a3b4d7b-77a9-46af-e6f4-dc7b3ba13b4f@greensocs.com>
- <20190918091135.GA22790@umbus.fritz.box>
- <f482912f-9541-f90c-bd80-5c95322e670d@greensocs.com>
- <CAFEAcA8pja6bOh4vwqWco=1ZtqR0mJFUuZT+WjJwYuA5AZZuQg@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <e609c0a6-849c-57b5-aa5c-a261797cdc30@greensocs.com>
-Date: Thu, 10 Oct 2019 11:18:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.0
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iIUu5-0001dx-6d
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:38:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BD07A308FE8F;
+ Thu, 10 Oct 2019 09:38:35 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E576A5D6A5;
+ Thu, 10 Oct 2019 09:38:31 +0000 (UTC)
+Subject: Re: [PATCH 4/5] travis.yml: Fix the ccache lines
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20191009170701.14756-1-thuth@redhat.com>
+ <20191009170701.14756-5-thuth@redhat.com>
+ <910285f7-d470-cf0b-85b2-a2264cf23ea3@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <1ab2f569-a256-9627-0725-e54f52ce8c81@redhat.com>
+Date: Thu, 10 Oct 2019 11:38:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8pja6bOh4vwqWco=1ZtqR0mJFUuZT+WjJwYuA5AZZuQg@mail.gmail.com>
+In-Reply-To: <910285f7-d470-cf0b-85b2-a2264cf23ea3@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1570699096;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VXgZNvFEvBq9bipsOFNgdnF18T5jVE3t7BbVhV80a4E=;
- b=vI87+iCvo/K4kVw6KeSpMuzfiufQ9ByrVqIXQxr04oAXV670whfTb/kH3adaDkLInJmRvt
- 8Ynq6OHQri3pFDxgwQdGYZ4YvJNCZTcf5Iu81sPJVY6vfSUPEL8WzFR7phjxESw0GjvEUh
- P0hEtlzXaHL1Jb6/MbEZmINMX7kzoMI=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1570699096; a=rsa-sha256; cv=none;
- b=SSz7wUw4EdzYPRjVaSI9kjYS5fIhzOQHi7Dsm0dhSh/hnkR2z/4oFT2MJjH/xB55yDqKHe
- aITVXkVTltA8Vfvp6bfazt6qkc2vh/iIrpIDVb+AFl8GQgtzGx7i1hRI6cVmTgf6+MbKWW
- lyP7QvNdNhJSIJq1+tuYNjhTTYiLBFc=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 10 Oct 2019 09:38:35 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,47 +118,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Edgar Iglesias <edgar.iglesias@xilinx.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/27/19 3:07 PM, Peter Maydell wrote:
-> On Tue, 24 Sep 2019 at 12:21, Damien Hedde <damien.hedde@greensocs.com> wrote:
-> 
-> My takes:
->  * I think we should keep the reset type. Among other things,
->    we probably want a reset type for "PCI bus reset" and
->    "SCSI bus reset", when we come to conversion of those
->  * I don't have an opinion about the phase names
->  * I think we should look at what we're doing for dynamic
->    changes of the reset tree. This falls into two parts,
->    both of which have come up in this thread:
->     - hotplug, ie what state should a hotplugged device
->       get set up to if it's plugged into a bus that's
->       currently in reset
->     - the modification of the qbus tree during reset,
->       like the raspi sd card thing
->    These feel related to me, so maybe handling the first
->    gives a better answer to handling the second ?
-> 
+On 09/10/2019 21.04, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 10/9/19 7:07 PM, Thomas Huth wrote:
+>> The "command -v ccache && ccache ..." likely were supposed to test
+>> the availability of ccache before running the program. But this
+>> shell construct causes Travis to abort if ccache is not available.
+>=20
+> Oops.
+>=20
+> Why can't you install ccache if these are Ubuntu systems?
+> It is even more wanted if the arm64 machine are slow...
 
-Sorry for the delayed answer, I did not had much time to work on this
-last week.
+I just tried to add "ccache" to the list of packages that should be
+installed, but I don't see a difference in the runtime.
 
-Regarding hotplug, right now hotplugged device are reset during the
-'realize' step. So here is what I propose:
-+ we always do the phase 1 and 2.
-+ do the 3rd phase (to leave reset) if the device is not plugged in a
-bus under reset.
+First run with ccache enabled:
 
-For general case, like the raspi, it can be handled in set_parent_bus()
-qdev function.
+ https://travis-ci.com/huth/qemu/jobs/244117945
 
-Damien
+Second run where I'd expect a speedup:
+
+ https://travis-ci.com/huth/qemu/jobs/244124599
+
+The statistics at the end say that it had only 1 cache hit. Any ideas
+what might be wrong here?
+
+ Thomas
 
