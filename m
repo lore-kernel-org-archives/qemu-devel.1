@@ -6,53 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 167B4C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDFEC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:59:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD5FD208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:58:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD5FD208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 35DAF208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:59:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35DAF208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIX5p-00074q-TA
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:58:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50583)
+	id 1iIX6l-0008By-W7
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:59:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50837)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iIWjn-0005Sz-Mq
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:36:12 -0400
+ (envelope-from <david@redhat.com>) id 1iIWkd-0006tH-Pn
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:37:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iIWjm-0006QO-Ja
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:36:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48114)
+ (envelope-from <david@redhat.com>) id 1iIWkc-0006fZ-EL
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:36:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58152)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iIWjm-0006QE-AK; Thu, 10 Oct 2019 07:36:06 -0400
+ id 1iIWkc-0006fE-4W; Thu, 10 Oct 2019 07:36:58 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7F27010CC1E3;
- Thu, 10 Oct 2019 11:36:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5931E81F07;
+ Thu, 10 Oct 2019 11:36:57 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-138.ams2.redhat.com [10.36.117.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9B9B5E1C2;
- Thu, 10 Oct 2019 11:35:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 83C235C1B5;
+ Thu, 10 Oct 2019 11:36:55 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 22/31] target/s390x: Return exception from translate_pages
-Date: Thu, 10 Oct 2019 13:33:47 +0200
-Message-Id: <20191010113356.5017-23-david@redhat.com>
+Subject: [PULL 31/31] s390x/tcg: MVCL: Exit to main loop if requested
+Date: Thu, 10 Oct 2019 13:33:56 +0200
+Message-Id: <20191010113356.5017-32-david@redhat.com>
 In-Reply-To: <20191010113356.5017-1-david@redhat.com>
 References: <20191010113356.5017-1-david@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.65]); Thu, 10 Oct 2019 11:36:05 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Thu, 10 Oct 2019 11:36:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -68,89 +69,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+MVCL is interruptible and we should check for interrupts and process
+them after writing back the variables to the registers. Let's check
+for any exit requests and exit to the main loop. Introduce a new helper
+function for that: cpu_loop_exit_requested().
 
-Do not raise the exception directly within translate_pages,
-but pass it back so that caller may do so.
+When booting Fedora 30, I can see a handful of these exits and it seems
+to work reliable. Also, Richard explained why this works correctly even
+when MVCL is called via EXECUTE:
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20191001171614.8405-11-richard.henderson@linaro.org>
+    (1) TB with EXECUTE runs, at address Ae
+        - env->psw_addr stored with Ae.
+        - helper_ex() runs, memory address Am computed
+          from D2a(X2a,B2a) or from psw.addr+RI2.
+        - env->ex_value stored with memory value modified by R1a
+
+    (2) TB of executee runs,
+        - env->ex_value stored with 0.
+        - helper_mvcl() runs, using and updating R1b, R1b+1, R2b, R2b+1.
+
+    (3a) helper_mvcl() completes,
+         - TB of executee continues, psw.addr +=3D ilen.
+         - Next instruction is the one following EXECUTE.
+
+    (3b) helper_mvcl() exits to main loop,
+         - cpu_loop_exit_restore() unwinds psw.addr =3D Ae.
+         - Next instruction is the EXECUTE itself...
+         - goto 1.
+
+As the PoP mentiones that an interruptible instruction called via EXECUTE
+should avoid modifying storage/registers that are used by EXECUTE itself,
+it is fine to retrigger EXECUTE.
+
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mmu_helper.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ include/exec/exec-all.h   | 17 +++++++++++++++++
+ target/s390x/mem_helper.c | 11 ++++++++++-
+ 2 files changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 001d0a9c8a..869debd30a 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -451,25 +451,22 @@ nodat:
-  * the MEMOP interface.
-  */
- static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
--                           target_ulong *pages, bool is_write)
-+                           target_ulong *pages, bool is_write, uint64_t =
-*tec)
- {
-     uint64_t asc =3D cpu->env.psw.mask & PSW_MASK_ASC;
-     CPUS390XState *env =3D &cpu->env;
-     int ret, i, pflags;
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 49db07ba0b..04795c49bf 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -72,6 +72,23 @@ void QEMU_NORETURN cpu_loop_exit(CPUState *cpu);
+ void QEMU_NORETURN cpu_loop_exit_restore(CPUState *cpu, uintptr_t pc);
+ void QEMU_NORETURN cpu_loop_exit_atomic(CPUState *cpu, uintptr_t pc);
 =20
-     for (i =3D 0; i < nr_pages; i++) {
--        uint64_t tec;
--
--        ret =3D mmu_translate(env, addr, is_write, asc, &pages[i], &pfla=
-gs, &tec);
-+        ret =3D mmu_translate(env, addr, is_write, asc, &pages[i], &pfla=
-gs, tec);
-         if (ret) {
--            trigger_access_exception(env, ret, ILEN_AUTO, tec);
--            return -EFAULT;
-+            return ret;
-         }
-         if (!address_space_access_valid(&address_space_memory, pages[i],
-                                         TARGET_PAGE_SIZE, is_write,
-                                         MEMTXATTRS_UNSPECIFIED)) {
--            trigger_access_exception(env, PGM_ADDRESSING, ILEN_AUTO, 0);
--            return -EFAULT;
-+            *tec =3D 0; /* unused */
-+            return PGM_ADDRESSING;
-         }
-         addr +=3D TARGET_PAGE_SIZE;
++/**
++ * cpu_loop_exit_requested:
++ * @cpu: The CPU state to be tested
++ *
++ * Indicate if somebody asked for a return of the CPU to the main loop
++ * (e.g., via cpu_exit() or cpu_interrupt()).
++ *
++ * This is helpful for architectures that support interruptible
++ * instructions. After writing back all state to registers/memory, this
++ * call can be used to check if it makes sense to return to the main loo=
+p
++ * or to continue executing the interruptible instruction.
++ */
++static inline bool cpu_loop_exit_requested(CPUState *cpu)
++{
++    return (int32_t)atomic_read(&cpu_neg(cpu)->icount_decr.u32) < 0;
++}
++
+ #if !defined(CONFIG_USER_ONLY)
+ void cpu_reloading_memory_map(void);
+ /**
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 4254548935..2325767f17 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1015,6 +1015,7 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t =
+r1, uint32_t r2)
+     uint64_t srclen =3D env->regs[r2 + 1] & 0xffffff;
+     uint64_t src =3D get_address(env, r2);
+     uint8_t pad =3D env->regs[r2 + 1] >> 24;
++    CPUState *cs =3D env_cpu(env);
+     S390Access srca, desta;
+     uint32_t cc, cur_len;
+=20
+@@ -1065,7 +1066,15 @@ uint32_t HELPER(mvcl)(CPUS390XState *env, uint32_t=
+ r1, uint32_t r2)
+         env->regs[r1 + 1] =3D deposit64(env->regs[r1 + 1], 0, 24, destle=
+n);
+         set_address_zero(env, r1, dest);
+=20
+-        /* TODO: Deliver interrupts. */
++        /*
++         * MVCL is interruptible. Return to the main loop if requested a=
+fter
++         * writing back all state to registers. If no interrupt will get
++         * injected, we'll end up back in this handler and continue proc=
+essing
++         * the remaining parts.
++         */
++        if (destlen && unlikely(cpu_loop_exit_requested(cs))) {
++            cpu_loop_exit_restore(cs, ra);
++        }
      }
-@@ -497,6 +494,7 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, u=
-int8_t ar, void *hostbuf,
- {
-     int currlen, nr_pages, i;
-     target_ulong *pages;
-+    uint64_t tec;
-     int ret;
-=20
-     if (kvm_enabled()) {
-@@ -510,8 +508,10 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, =
-uint8_t ar, void *hostbuf,
-                + 1;
-     pages =3D g_malloc(nr_pages * sizeof(*pages));
-=20
--    ret =3D translate_pages(cpu, laddr, nr_pages, pages, is_write);
--    if (ret =3D=3D 0 && hostbuf !=3D NULL) {
-+    ret =3D translate_pages(cpu, laddr, nr_pages, pages, is_write, &tec)=
-;
-+    if (ret) {
-+        trigger_access_exception(&cpu->env, ret, ILEN_AUTO, tec);
-+    } else if (hostbuf !=3D NULL) {
-         /* Copy data by stepping through the area page by page */
-         for (i =3D 0; i < nr_pages; i++) {
-             currlen =3D MIN(len, TARGET_PAGE_SIZE - (laddr % TARGET_PAGE=
-_SIZE));
+     return cc;
+ }
 --=20
 2.21.0
 
