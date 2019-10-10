@@ -3,56 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7F3C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 14:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F041C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 14:42:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3D72208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 14:41:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D72208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 73E4A208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 14:42:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E4A208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIZcv-0001xL-L9
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 10:41:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52683)
+	id 1iIZeL-0003do-DA
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 10:42:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52513)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iIZXS-0002is-U8
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:35:39 -0400
+ (envelope-from <slp@redhat.com>) id 1iIZWc-0001S8-KA
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iIZXR-00026u-Gc
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:35:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36741)
+ (envelope-from <slp@redhat.com>) id 1iIZWb-0001MX-KD
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:34:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6762)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iIZXR-00025x-8L
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:35:33 -0400
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iIZWb-0001LM-Ey
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:34:41 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7E11B18C4262;
- Thu, 10 Oct 2019 14:35:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AD30F4E8AC;
+ Thu, 10 Oct 2019 14:34:40 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.122])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CDA7560BE1;
- Thu, 10 Oct 2019 14:35:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DCE6760C05;
+ Thu, 10 Oct 2019 14:34:37 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 13/15] docs/microvm.rst: document the new microvm machine
- type
-Date: Thu, 10 Oct 2019 16:31:24 +0200
-Message-Id: <20191010143125.67246-15-slp@redhat.com>
+Subject: [PATCH v8 06/15] hw/i386/pc: remove commented out code from
+ x86_load_linux()
+Date: Thu, 10 Oct 2019 16:31:17 +0200
+Message-Id: <20191010143125.67246-8-slp@redhat.com>
 In-Reply-To: <20191010143125.67246-1-slp@redhat.com>
 References: <20191010143125.67246-1-slp@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Thu, 10 Oct 2019 14:35:32 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Thu, 10 Oct 2019 14:34:40 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,123 +75,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document the new microvm machine type.
+Follow checkpatch.pl recommendation and remove commented out code from
+x86_load_linux().
 
 Signed-off-by: Sergio Lopez <slp@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- docs/microvm.rst | 98 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
- create mode 100644 docs/microvm.rst
+ hw/i386/pc.c | 13 -------------
+ 1 file changed, 13 deletions(-)
 
-diff --git a/docs/microvm.rst b/docs/microvm.rst
-new file mode 100644
-index 0000000000..dc36ecf7c3
---- /dev/null
-+++ b/docs/microvm.rst
-@@ -0,0 +1,98 @@
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Microvm Machine Type
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Microvm is a machine type inspired by ``Firecracker`` and constructed
-+after the its machine model.
-+
-+It's a minimalist machine type without ``PCI`` nor ``ACPI`` support,
-+designed for short-lived guests. Microvm also establishes a baseline
-+for benchmarking and optimizing both QEMU and guest operating systems,
-+since it is optimized for both boot time and footprint.
-+
-+
-+Supported devices
-+-----------------
-+
-+The microvm machine type supports the following devices:
-+
-+- ISA bus
-+- i8259 PIC (optional)
-+- i8254 PIT (optional)
-+- MC146818 RTC (optional)
-+- One ISA serial port (optional)
-+- LAPIC
-+- IOAPIC (with kernel-irqchip=3Dsplit by default)
-+- kvmclock (if using KVM)
-+- fw_cfg
-+- Up to eight virtio-mmio devices (configured by the user)
-+
-+
-+Using the microvm machine type
-+------------------------------
-+
-+Machine-specific options
-+~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+It supports the following machine-specific options:
-+
-+- microvm.x-option-roms=3Dbool (Set off to disable loading option ROMs)
-+- microvm.pit=3DOnOffAuto (Enable i8254 PIT)
-+- microvm.isa-serial=3Dbool (Set off to disable the instantiation an ISA=
- serial port)
-+- microvm.pic=3DOnOffAuto (Enable i8259 PIC)
-+- microvm.rtc=3DOnOffAuto (Enable MC146818 RTC)
-+- microvm.auto-kernel-cmdline=3Dbool (Set off to disable adding virtio-m=
-mio devices to the kernel cmdline)
-+
-+
-+Boot options
-+~~~~~~~~~~~~
-+
-+By default, microvm uses ``qboot`` as its BIOS, to obtain better boot
-+times, but it's also compatible with ``SeaBIOS``.
-+
-+As no current FW is able to boot from a block device using
-+``virtio-mmio`` as its transport, a microvm-based VM needs to be run
-+using a host-side kernel and, optionally, an initrd image.
-+
-+
-+Running a microvm-based VM
-+~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+By default, microvm aims for maximum compatibility, enabling both
-+legacy and non-legacy devices. In this example, a VM is created
-+without passing any additional machine-specific option, using the
-+legacy ``ISA serial`` device as console::
-+
-+  $ qemu-system-x86_64 -M microvm \
-+     -enable-kvm -cpu host -m 512m -smp 2 \
-+     -kernel vmlinux -append "earlyprintk=3DttyS0 console=3DttyS0 root=3D=
-/dev/vda" \
-+     -nodefaults -no-user-config -nographic \
-+     -serial stdio \
-+     -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
-+     -device virtio-blk-device,drive=3Dtest \
-+     -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
-+     -device virtio-net-device,netdev=3Dtap0
-+
-+While the example above works, you might be interested in reducing the
-+footprint further by disabling some legacy devices. If you're using
-+``KVM``, you can disable the ``RTC``, making the Guest rely on
-+``kvmclock`` exclusively. Additionally, if your host's CPUs have the
-+``TSC_DEADLINE`` feature, you can also disable both the i8259 PIC and
-+the i8254 PIT (make sure you're also emulating a CPU with such feature
-+in the guest).
-+
-+This is an example of a VM with all optional legacy features
-+disabled::
-+
-+  $ qemu-system-x86_64 \
-+     -M microvm,x-option-roms=3Doff,pit=3Doff,pic=3Doff,isa-serial=3Doff=
-,rtc=3Doff \
-+     -enable-kvm -cpu host -m 512m -smp 2 \
-+     -kernel vmlinux -append "console=3Dhvc0 root=3D/dev/vda" \
-+     -nodefaults -no-user-config -nographic \
-+     -chardev stdio,id=3Dvirtiocon0,server \
-+     -device virtio-serial-device \
-+     -device virtconsole,chardev=3Dvirtiocon0 \
-+     -drive id=3Dtest,file=3Dtest.img,format=3Draw,if=3Dnone \
-+     -device virtio-blk-device,drive=3Dtest \
-+     -netdev tap,id=3Dtap0,script=3Dno,downscript=3Dno \
-+     -device virtio-net-device,netdev=3Dtap0
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 90e2d68096..f19d4ac0bd 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1061,9 +1061,6 @@ static void x86_load_linux(PCMachineState *pcms,
+     }
+=20
+     /* kernel protocol version */
+-#if 0
+-    fprintf(stderr, "header magic: %#x\n", ldl_p(header+0x202));
+-#endif
+     if (ldl_p(header + 0x202) =3D=3D 0x53726448) {
+         protocol =3D lduw_p(header + 0x206);
+     } else {
+@@ -1155,16 +1152,6 @@ static void x86_load_linux(PCMachineState *pcms,
+         prot_addr    =3D 0x100000;
+     }
+=20
+-#if 0
+-    fprintf(stderr,
+-            "qemu: real_addr     =3D 0x" TARGET_FMT_plx "\n"
+-            "qemu: cmdline_addr  =3D 0x" TARGET_FMT_plx "\n"
+-            "qemu: prot_addr     =3D 0x" TARGET_FMT_plx "\n",
+-            real_addr,
+-            cmdline_addr,
+-            prot_addr);
+-#endif
+-
+     /* highest address for loading the initrd */
+     if (protocol >=3D 0x20c &&
+         lduw_p(header + 0x236) & XLF_CAN_BE_LOADED_ABOVE_4G) {
 --=20
 2.21.0
 
