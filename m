@@ -2,92 +2,63 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4E0ECE58E
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 10:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E1CC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 10:59:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9313620673
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 10:55:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9313620673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id EC76E2067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 10:58:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC76E2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIW6q-0000wD-QJ
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 06:55:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45505)
+	id 1iIW9r-00034x-5q
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 06:58:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iIW5t-0008Jv-Ry
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 06:54:54 -0400
+ (envelope-from <berrange@redhat.com>) id 1iIW9C-0002eM-1g
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 06:58:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iIW5s-0004nI-KG
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 06:54:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39238)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iIW5s-0004mg-CK
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 06:54:52 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9A9RdL1145158
- for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 06:54:49 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vj18kmcun-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 06:54:49 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Thu, 10 Oct 2019 11:54:46 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 10 Oct 2019 11:54:45 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9AAsiuD36110386
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 10 Oct 2019 10:54:44 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A7DABAE045;
- Thu, 10 Oct 2019 10:54:44 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8F984AE05D;
- Thu, 10 Oct 2019 10:54:44 +0000 (GMT)
-Received: from bahia.tls.ibm.com (unknown [9.101.4.41])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 10 Oct 2019 10:54:44 +0000 (GMT)
-Subject: [PATCH] MAINTAINERS: Downgrade status of virtio-9p to "Odd Fixes"
-From: Greg Kurz <groug@kaod.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 10 Oct 2019 12:54:44 +0200
-User-Agent: StGit/unknown-version
+ (envelope-from <berrange@redhat.com>) id 1iIW99-000659-Ep
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 06:58:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51716)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iIW99-00064V-95
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 06:58:15 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D5A8218C4283;
+ Thu, 10 Oct 2019 10:58:13 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8697610013A1;
+ Thu, 10 Oct 2019 10:58:10 +0000 (UTC)
+Date: Thu, 10 Oct 2019 11:58:08 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 5/5] travis.yml: Compile on arm64, too
+Message-ID: <20191010105808.GH28562@redhat.com>
+References: <20191009170701.14756-1-thuth@redhat.com>
+ <20191009170701.14756-6-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19101010-0028-0000-0000-000003A8D1F9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19101010-0029-0000-0000-0000246AD9F9
-Message-Id: <157070488435.1269583.3974249154337634870.stgit@bahia.tls.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-10_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=703 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910100084
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191009170701.14756-6-thuth@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.62]); Thu, 10 Oct 2019 10:58:13 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,32 +70,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg Kurz <groug@kaod.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Latest submissions for 9pfs made me realize that I no longer have time
-and motivation to actively support it. I'll stay around for odd fixes
-though.
+On Wed, Oct 09, 2019 at 07:07:01PM +0200, Thomas Huth wrote:
+> Travis now features an arm64 build host, so let's check compilation
+> there, too.
+> 
+> Unfortunately, there are some quirks:
+> - block/ssh.c does not compile properly in this environment, so we have
+>   to use --disable-libssh until that problem is fixed.
+> - test-util-filemonitor fails, so we can not run the unit tests there
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- MAINTAINERS |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Do you have any more info on this failure ?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3ca814850e0c..fe4dc51b081f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1517,7 +1517,7 @@ F: tests/virtio-balloon-test.c
- 
- virtio-9p
- M: Greg Kurz <groug@kaod.org>
--S: Supported
-+S: Odd Fixes
- F: hw/9pfs/
- X: hw/9pfs/xen-9p*
- F: fsdev/
+Running tests with FILEMONITOR_DEBUG=1 env variable set will make
+it print more info
 
+
+Skipping unit tests seems to throw away the main benefit of using
+the travis arm64 hosts, as it is the tests which add value over
+our cross-compiled arm builds.
+
+> - The file system size seems to be very limited, so the iotest tests
+>   can't be used and the hd-geo-test fails (thus we can't compile
+>   x86_64-softmmu here and run "check-qtest" afterwards)
+> - Compiling seems to be quite a bit slower than on the x86 builders,
+>   so we better limit the target list to some few architectures.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  .travis.yml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index 0c88e8757b..357ca02890 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -342,3 +342,9 @@ matrix:
+>          - CONFIG="--target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
+>          - TEST_CMD="make -j3 check-tcg V=1"
+>          - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
+> +
+> +    # Non-x86 builds:
+> +    - env:
+> +        - CONFIG="--disable-libssh --target-list=aarch64-softmmu,ppc64-softmmu,s390x-softmmu,x86_64-linux-user"
+> +        - TEST_CMD="make check-qtest check-softfloat -j3 V=1"
+> +      arch: arm64
+> -- 
+> 2.18.1
+> 
+> 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
