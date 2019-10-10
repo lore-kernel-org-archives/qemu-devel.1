@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C79C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A363CC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:40:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9C9B20B7C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:38:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9C9B20B7C
+	by mail.kernel.org (Postfix) with ESMTPS id 3479E2190F
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:40:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3479E2190F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIWmI-0000Yf-Gu
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:38:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50031)
+	id 1iIWnn-0002QM-KR
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:40:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50032)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iIWiB-0003RS-0k
+ (envelope-from <david@redhat.com>) id 1iIWiB-0003RT-1I
  for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iIWi9-0005jx-5W
+ (envelope-from <david@redhat.com>) id 1iIWi7-0005hY-7G
  for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:34:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35470)
+Received: from mx1.redhat.com ([209.132.183.28]:33232)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iIWi7-0005fh-5f; Thu, 10 Oct 2019 07:34:25 -0400
+ id 1iIWi5-0005f0-AW; Thu, 10 Oct 2019 07:34:22 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BB81583F3D;
- Thu, 10 Oct 2019 11:34:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EEB4F368E2;
+ Thu, 10 Oct 2019 11:34:18 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-117-138.ams2.redhat.com [10.36.117.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 44CE45C1B5;
- Thu, 10 Oct 2019 11:34:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9B3F25C1B5;
+ Thu, 10 Oct 2019 11:34:13 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 05/31] s390x/mmu: Use TARGET_PAGE_MASK in mmu_translate_pte()
-Date: Thu, 10 Oct 2019 13:33:30 +0200
-Message-Id: <20191010113356.5017-6-david@redhat.com>
+Subject: [PULL 04/31] s390x/mmu: Inject PGM_ADDRESSING on bogus table addresses
+Date: Thu, 10 Oct 2019 13:33:29 +0200
+Message-Id: <20191010113356.5017-5-david@redhat.com>
 In-Reply-To: <20191010113356.5017-1-david@redhat.com>
 References: <20191010113356.5017-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 10 Oct 2019 11:34:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Thu, 10 Oct 2019 11:34:19 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,30 +75,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While ASCE_ORIGIN is not wrong, it is certainly confusing. We want a
-page frame address.
+Let's document how it works and inject PGM_ADDRESSING if reading of
+table entries fails.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/mmu_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/s390x/mmu_helper.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
 diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 71dee0a5d9..aaf5b23513 100644
+index f6ae444655..71dee0a5d9 100644
 --- a/target/s390x/mmu_helper.c
 +++ b/target/s390x/mmu_helper.c
-@@ -129,7 +129,7 @@ static int mmu_translate_pte(CPUS390XState *env, targ=
-et_ulong vaddr,
-         *flags &=3D ~PAGE_WRITE;
-     }
-=20
--    *raddr =3D pt_entry & ASCE_ORIGIN;
-+    *raddr =3D pt_entry & TARGET_PAGE_MASK;
-     return 0;
+@@ -93,6 +93,27 @@ target_ulong mmu_real2abs(CPUS390XState *env, target_u=
+long raddr)
+     return raddr;
  }
 =20
++static inline bool read_table_entry(CPUS390XState *env, hwaddr gaddr,
++                                    uint64_t *entry)
++{
++    CPUState *cs =3D env_cpu(env);
++
++    /*
++     * According to the PoP, these table addresses are "unpredictably re=
+al
++     * or absolute". Also, "it is unpredictable whether the address wrap=
+s
++     * or an addressing exception is recognized".
++     *
++     * We treat them as absolute addresses and don't wrap them.
++     */
++    if (unlikely(address_space_read(cs->as, gaddr, MEMTXATTRS_UNSPECIFIE=
+D,
++                                    (uint8_t *)entry, sizeof(*entry)) !=3D
++                 MEMTX_OK)) {
++        return false;
++    }
++    *entry =3D be64_to_cpu(*entry);
++    return true;
++}
++
+ /* Decode page table entry (normal 4KB page) */
+ static int mmu_translate_pte(CPUS390XState *env, target_ulong vaddr,
+                              uint64_t asc, uint64_t pt_entry,
+@@ -118,7 +139,6 @@ static int mmu_translate_segment(CPUS390XState *env, =
+target_ulong vaddr,
+                                  target_ulong *raddr, int *flags, int rw=
+,
+                                  bool exc)
+ {
+-    CPUState *cs =3D env_cpu(env);
+     uint64_t origin, offs, pt_entry;
+=20
+     if (st_entry & SEGMENT_ENTRY_RO) {
+@@ -134,7 +154,9 @@ static int mmu_translate_segment(CPUS390XState *env, =
+target_ulong vaddr,
+     /* Look up 4KB page entry */
+     origin =3D st_entry & SEGMENT_ENTRY_ORIGIN;
+     offs  =3D (vaddr & VADDR_PX) >> 9;
+-    pt_entry =3D ldq_phys(cs->as, origin + offs);
++    if (!read_table_entry(env, origin + offs, &pt_entry)) {
++        return PGM_ADDRESSING;
++    }
+     return mmu_translate_pte(env, vaddr, asc, pt_entry, raddr, flags, rw=
+, exc);
+ }
+=20
+@@ -144,7 +166,6 @@ static int mmu_translate_region(CPUS390XState *env, t=
+arget_ulong vaddr,
+                                 target_ulong *raddr, int *flags, int rw,
+                                 bool exc)
+ {
+-    CPUState *cs =3D env_cpu(env);
+     uint64_t origin, offs, new_entry;
+     const int pchks[4] =3D {
+         PGM_SEGMENT_TRANS, PGM_REG_THIRD_TRANS,
+@@ -154,7 +175,9 @@ static int mmu_translate_region(CPUS390XState *env, t=
+arget_ulong vaddr,
+     origin =3D entry & REGION_ENTRY_ORIGIN;
+     offs =3D (vaddr >> (17 + 11 * level / 4)) & 0x3ff8;
+=20
+-    new_entry =3D ldq_phys(cs->as, origin + offs);
++    if (!read_table_entry(env, origin + offs, &new_entry)) {
++        return PGM_ADDRESSING;
++    }
+=20
+     if ((new_entry & REGION_ENTRY_INV) !=3D 0) {
+         return pchks[level / 4];
 --=20
 2.21.0
 
