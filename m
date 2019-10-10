@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2588DECE58D
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 02:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54BC4C47404
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 02:08:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6A5520B7C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 02:07:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EB7921848
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 02:08:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ojf50ZV7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6A5520B7C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aiqh0Lts"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EB7921848
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iINrA-0006GB-Lc
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 22:07:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52350)
+	id 1iINsa-00007G-80
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 22:08:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52352)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iINpI-0004uR-VR
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 22:05:16 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iINpJ-0004uT-Bx
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 22:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iINpG-0003pA-8n
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 22:05:12 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:53821)
+ (envelope-from <dgibson@ozlabs.org>) id 1iINpG-0003pO-Dz
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 22:05:13 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:42019 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iINpF-0003nY-FI; Wed, 09 Oct 2019 22:05:10 -0400
+ id 1iINpF-0003nT-A5; Wed, 09 Oct 2019 22:05:10 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46pZCw47D8z9sPW; Thu, 10 Oct 2019 13:05:00 +1100 (AEDT)
+ id 46pZCw3MFRz9sCJ; Thu, 10 Oct 2019 13:05:00 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1570673100;
- bh=llBE6b25+78jun+YwahNGUyuJf/7c6p8XbEPRH305qA=;
+ bh=tNjVhRESv/Ft1a98n25kN5c3AvgGj+N5vkjfxLrDK9E=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ojf50ZV7hbhYDCFuySlGrS7CgUchkFKkWSJIp/fdeNlELTcbvAwGbxrq/ifpDUO99
- +BviJ1uLpZKh4nCXi7SIg8j0CKer7giECrCRW+v7x9RrK1+bxnecEgPs3jSSQ0UUX1
- ZdCriso7iCiI6t4KJ10nEG13k8g2RMW8oREJ+B/8=
-Date: Thu, 10 Oct 2019 13:02:09 +1100
+ b=aiqh0Lts8APj/hIuc9cTYryn4EztGlhcsN33PT+V1ISJFTeQIUndl/sfsxS0p4qd7
+ 9lQytFs3hgJ1IU4wLcpzi3EMZdgFv0bEb4E6Bm76+B9G2wqTC0uTtfsYqv8V1+8O83
+ etyuwtrRXnUJFM0OXHMCXlO42GiCtElfKsvi7BcE=
+Date: Thu, 10 Oct 2019 12:59:13 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Subject: Re: [PATCH v4 17/19] spapr: Remove last pieces of SpaprIrq
-Message-ID: <20191010020209.GC28552@umbus.fritz.box>
+Message-ID: <20191010015913.GB28552@umbus.fritz.box>
 References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
  <20191009060818.29719-18-david@gibson.dropbear.id.au>
- <20191009190215.7e05c017@bahia.lan>
+ <e3ee1543-2993-c2c3-7d9a-2eab96113f89@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ALfTUftag+2gvp1h"
+ protocol="application/pgp-signature"; boundary="oLBj+sq0vYjzfsbl"
 Content-Disposition: inline
-In-Reply-To: <20191009190215.7e05c017@bahia.lan>
+In-Reply-To: <e3ee1543-2993-c2c3-7d9a-2eab96113f89@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,8 +73,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- clg@kaod.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
  =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
  philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -82,44 +82,37 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---ALfTUftag+2gvp1h
-Content-Type: text/plain; charset=us-ascii
+--oLBj+sq0vYjzfsbl
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 09, 2019 at 07:02:15PM +0200, Greg Kurz wrote:
-> On Wed,  9 Oct 2019 17:08:16 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
+On Wed, Oct 09, 2019 at 06:44:53PM +0200, C=E9dric Le Goater wrote:
+> On 09/10/2019 08:08, David Gibson wrote:
 > > The only thing remaining in this structure are the flags to allow either
 > > XICS or XIVE to be present.  These actually make more sense as spapr
 > > capabilities - that way they can take advantage of the existing
 > > infrastructure to sanity check capability states across migration and so
 > > forth.
 > >=20
->=20
-> The user can now choose the interrupt controller mode either through
-> ic-mode or through cap-xics/cap-xive. I guess it doesn't break anything
-> to expose another API to do the same thing but it raises some questions.
->=20
-> We should at least document somewhere that ic-mode is an alias to these
-> caps, and maybe state which is the preferred method (I personally vote
-> for the caps).
->=20
-> Also, we must keep ic-mode for the moment to stay compatible with the
-> existing pseries-4.0 and pseries-4.1 machine types, but will we
-> keep ic-mode forever ? If no, maybe start by not allowing it for
-> pseries-4.2 ?
-
-I'm actually inclined to keep it for now, maybe even leave it as the
-suggested way to configure this.  The caps are nice from an internal
-organization point of view, but ic-mode is arguably a more user
-friendly way of configuring it.  The conversion of one to the other is
-straightforward, isolated ans small, so I'm not especially bothered by
-keeping it around.
-
->=20
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> Nice. That is what you had in mind :) Let's make sure we use your
+> cap framework for the next major change, power10.
+
+Yeah, adding a cap-xive2 should be pretty straightforward.
+
+> ic-mode should
+> be deprecated one day I suppose.
+
+I guess.  I'm not in a great rush, since the compat code for it is
+pretty simple and localized.
+
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> C.
+>=20
+>=20
 > > ---
 > >  hw/ppc/spapr.c             | 40 ++++++++++--------
 > >  hw/ppc/spapr_caps.c        | 64 +++++++++++++++++++++++++++++
@@ -614,6 +607,7 @@ m);
 > >  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
  **errp);
 > >  void spapr_irq_free(SpaprMachineState *spapr, int irq, int num);
+> >=20
 >=20
 
 --=20
@@ -622,25 +616,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ALfTUftag+2gvp1h
+--oLBj+sq0vYjzfsbl
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2ekSEACgkQbDjKyiDZ
-s5Lyaw//cBIxXESxe9edKF6KY+huLwUjU7Y6lK7bGc6bbt6LwH3sn9INurZjzOTX
-9zk4YF9aiSvc2E33YmQiSk7puOIHarZ61fT/yv97po19V7kw5ZLzruimXIgrVp1W
-bUQnxF3Xf6HjjRgLW76lcAu0+5BoizGbjnfy+5lEXetlRVxx0X3j/u50Cyd2NXO3
-ZS+ZppXIy/ybG7tksYEDc8UnFUFMjWYgRHXqrNTyQFJ2i30tbvualtUt4mpS4cHU
-DeBRKUH9fE0Nb+UUlQLaqU4JF75zjEXKcxcChr5Vpy0uAOycLhnSdY7bbbgmijR7
-5E3tM6ZvlqgPvRv3UZESXIkrEB38MSQUjtQn5moSZtPkrjblWfwjs/c/6Ydn8LnV
-Q6nfVng1cCQqXn5nHugfNqeaB+nv+0DqbSZ0cC7QLCGT4/c33jOCBjaKoz22Po4g
-RpMlnF8VvhJxUe8qIhZVChYUa53Cy2MyJ6L1zAVgE6ZFJ4jJshcl2eOzijhjw6Vn
-S3WKqHVUUNIdyzUu9YP9JtUBMGS4MHpN1ZpZZJ64Nk765CkVezCEOncmJnzchkDB
-58CEXME45jj5gGVBnXoLbj/KagvhQgI0IH/MO+WIhUWFUpNXzMLLGR3Xm2jfLQL1
-QAnO9EU6koD6A4sg38VnwhaxKm1bJ7dS/MLCNZe0ePGiXpRUG1A=
-=4s4v
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2ekHAACgkQbDjKyiDZ
+s5K0FRAAnOXrLMDNK8QRIUSfbuXAIbHWbterfjZfqyrbKsvnBhdZ0qeZ9SrQjkyx
+DeBo4iVS0l/DbMwgP/I95Ydqo6PBoIVSs45QUW/Dbsv8ZDSa7KhSxCM3oc0IQD2E
+dH6rg8XOZq1kERsgOtcqm3RMR2zu94F2QyBpq8lRz8cnXWmuiC5DhYSNBktnqS5T
+pE5VRG6Tf9Y+vbJBJPn9dAhErvHJF97/+/csc/6WNR1v7FWtsFqbMTcCONg6Car6
+gaM5se5zeqkUYZE8RUOMtyQSt2IzY4WJX2d9tX2UJ7RH8DkiZIb6gK6o/5xsmNeP
+hdA09OtmK2OhLv3fwdZoeZhk4vy9lUjvEUItSAFKb9UzIWNPG9kyADxH7iV5XrTK
+vLvQALqRaoqc3c29qX+fit0WkADauSFQBSSy2Tw/UBY4BJFSbmGJhpN2dI3ldkBb
+GPdUyrJFZMqA0zKhHEVYTbCZUfSOvG377MBqP0lt2OHS1+057WrEghcv8vjbNNO6
+vdGBnwyo+AcMA1pHJK8BR2V7/5zwykVM9ON/gAsB9mw7IWu7qxHEjE04zBSQVV0l
+Gq0tNl+rBnfOk/GIAXH3SHXYh3kb2IIyfCA8ke8J1i5YJ4huIPp85Jzq+y68t+ik
+JfHl4e6uWgthLLDBWVqWnllz5Uf0Iy21YCPkLe+MPFeiPMjFQPw=
+=4ZTI
 -----END PGP SIGNATURE-----
 
---ALfTUftag+2gvp1h--
+--oLBj+sq0vYjzfsbl--
 
