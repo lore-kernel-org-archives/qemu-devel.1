@@ -2,63 +2,63 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03258C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CF6C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:33:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8209206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:29:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8209206B6
+	by mail.kernel.org (Postfix) with ESMTPS id 02E00206A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:33:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02E00206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIe8I-0003va-Ne
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 15:29:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35721)
+	id 1iIeCA-0007RQ-6e
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 15:33:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36262)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iIe7U-00031r-4x
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:29:04 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIeAi-0005sC-R5
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:32:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iIe7T-0004IR-6x
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:29:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34426)
+ (envelope-from <eblake@redhat.com>) id 1iIeAh-0005fC-Lh
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:32:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59608)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iIe7R-0004Hp-6l; Thu, 10 Oct 2019 15:29:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iIeAe-0005WW-9D; Thu, 10 Oct 2019 15:32:20 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 67F188372F2;
- Thu, 10 Oct 2019 19:29:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0084C883C2;
+ Thu, 10 Oct 2019 19:32:10 +0000 (UTC)
 Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EF4C15F7D7;
- Thu, 10 Oct 2019 19:28:59 +0000 (UTC)
-Subject: Re: [PATCH 13/23] iotests/192: Create socket in $SOCK_DIR
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3816F600F8;
+ Thu, 10 Oct 2019 19:32:09 +0000 (UTC)
+Subject: Re: [PATCH 14/23] iotests/194: Create sockets in $SOCK_DIR
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20191010152457.17713-1-mreitz@redhat.com>
- <20191010152457.17713-14-mreitz@redhat.com>
+ <20191010152457.17713-15-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <20bb503c-a483-75b0-c1f5-7d19d01fdfe2@redhat.com>
-Date: Thu, 10 Oct 2019 14:28:59 -0500
+Message-ID: <66d1d5c8-1bdd-48f3-c755-7a3d6376ded1@redhat.com>
+Date: Thu, 10 Oct 2019 14:32:08 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191010152457.17713-14-mreitz@redhat.com>
+In-Reply-To: <20191010152457.17713-15-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Thu, 10 Oct 2019 19:29:00 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Thu, 10 Oct 2019 19:32:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -82,12 +82,28 @@ Sender: "Qemu-devel"
 On 10/10/19 10:24 AM, Max Reitz wrote:
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->   tests/qemu-iotests/192     | 4 ++--
->   tests/qemu-iotests/192.out | 2 +-
->   2 files changed, 3 insertions(+), 3 deletions(-)
+>   tests/qemu-iotests/194 | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+> index d746ab1e21..72e47e8833 100755
+> --- a/tests/qemu-iotests/194
+> +++ b/tests/qemu-iotests/194
+> @@ -26,8 +26,8 @@ iotests.verify_platform(['linux'])
+>   
+>   with iotests.FilePath('source.img') as source_img_path, \
+>        iotests.FilePath('dest.img') as dest_img_path, \
+> -     iotests.FilePath('migration.sock') as migration_sock_path, \
+> -     iotests.FilePath('nbd.sock') as nbd_sock_path, \
+> +     iotests.FilePaths(['migration.sock', 'nbd.sock'], iotests.sock_dir) as \
+> +         [migration_sock_path, nbd_sock_path], \
+>        iotests.VM('source') as source_vm, \
+>        iotests.VM('dest') as dest_vm:
+>   
+> 
 
 -- 
 Eric Blake, Principal Software Engineer
