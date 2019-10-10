@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0295C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:49:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D3D0C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96702206A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:49:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96702206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 5BD57206A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:51:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD57206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIahK-00047M-LI
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 11:49:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60862)
+	id 1iIajH-0004ys-RR
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 11:51:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60790)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIaK6-0006NQ-Q3
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:51 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIaJx-0006Fa-BJ
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIaK5-0004bO-RO
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58832)
+ (envelope-from <mreitz@redhat.com>) id 1iIaJw-0004XN-BA
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40170)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIaK0-0004Z6-Ai; Thu, 10 Oct 2019 11:25:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iIaJu-0004WD-6O; Thu, 10 Oct 2019 11:25:38 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 74CB4308C21C;
- Thu, 10 Oct 2019 15:25:43 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6A15030603AD;
+ Thu, 10 Oct 2019 15:25:37 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E1C80194B6;
- Thu, 10 Oct 2019 15:25:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D8CF60BE1;
+ Thu, 10 Oct 2019 15:25:36 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 14/23] iotests/194: Create sockets in $SOCK_DIR
-Date: Thu, 10 Oct 2019 17:24:48 +0200
-Message-Id: <20191010152457.17713-15-mreitz@redhat.com>
+Subject: [PATCH 12/23] iotests/183: Create socket in $SOCK_DIR
+Date: Thu, 10 Oct 2019 17:24:46 +0200
+Message-Id: <20191010152457.17713-13-mreitz@redhat.com>
 In-Reply-To: <20191010152457.17713-1-mreitz@redhat.com>
 References: <20191010152457.17713-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 10 Oct 2019 15:25:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Thu, 10 Oct 2019 15:25:37 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,25 +75,22 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/194 | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/183 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index d746ab1e21..72e47e8833 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -26,8 +26,8 @@ iotests.verify_platform(['linux'])
+diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+index 04fb344d08..bced83fae0 100755
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -26,7 +26,7 @@ echo "QA output created by $seq"
 =20
- with iotests.FilePath('source.img') as source_img_path, \
-      iotests.FilePath('dest.img') as dest_img_path, \
--     iotests.FilePath('migration.sock') as migration_sock_path, \
--     iotests.FilePath('nbd.sock') as nbd_sock_path, \
-+     iotests.FilePaths(['migration.sock', 'nbd.sock'], iotests.sock_dir)=
- as \
-+         [migration_sock_path, nbd_sock_path], \
-      iotests.VM('source') as source_vm, \
-      iotests.VM('dest') as dest_vm:
+ status=3D1 # failure is the default!
 =20
+-MIG_SOCKET=3D"${TEST_DIR}/migrate"
++MIG_SOCKET=3D"${SOCK_DIR}/migrate"
+=20
+ _cleanup()
+ {
 --=20
 2.21.0
 
