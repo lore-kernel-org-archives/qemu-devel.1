@@ -2,63 +2,61 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2315BC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 14:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C71E2C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 14:17:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EABF6206A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 14:14:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EABF6206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 994DB206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 14:17:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 994DB206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIZCq-0007qw-53
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 10:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49640)
+	id 1iIZGM-0001Cy-Q0
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 10:17:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50243)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iIZCD-0007PX-E3
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:13:38 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iIZFb-0000o6-5g
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:17:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iIZCB-0002SW-Eq
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:13:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39284)
+ (envelope-from <ehabkost@redhat.com>) id 1iIZFZ-0004Y4-V8
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:17:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49022)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iIZCB-0002SA-5U
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:13:35 -0400
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iIZFZ-0004Xv-MF
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 10:17:05 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2F63C3082E24;
- Thu, 10 Oct 2019 14:13:34 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-48.rdu2.redhat.com
- [10.10.120.48])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7073260BE1;
- Thu, 10 Oct 2019 14:13:23 +0000 (UTC)
-Subject: Re: [RFC 2/3] acpi: cpuhp: add typical usecases into spec
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+ by mx1.redhat.com (Postfix) with ESMTPS id BAE75307D88C;
+ Thu, 10 Oct 2019 14:17:04 +0000 (UTC)
+Received: from localhost (ovpn-116-5.gru2.redhat.com [10.97.116.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 574CB60BE1;
+ Thu, 10 Oct 2019 14:16:54 +0000 (UTC)
+Date: Thu, 10 Oct 2019 11:16:52 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [RFC 0/3] acpi: cphp: add CPHP_GET_CPU_ID_CMD command to cpu
+ hotplug MMIO interface
+Message-ID: <20191010141652.GD21666@habkost.net>
 References: <20191009132252.17860-1-imammedo@redhat.com>
- <20191009132252.17860-3-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <2b10ca48-c734-4f41-9521-136c44060812@redhat.com>
-Date: Thu, 10 Oct 2019 16:13:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ <20191010055356-mutt-send-email-mst@kernel.org>
+ <20191010153815.4f7a3fc9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191009132252.17860-3-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191010153815.4f7a3fc9@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 10 Oct 2019 14:13:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Thu, 10 Oct 2019 14:17:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,93 +71,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/09/19 15:22, Igor Mammedov wrote:
-> Clarify values of "CPU selector' register and add workflows for
->   * finding CPU with pending 'insert/remove' event
->   * enumerating present/non present CPUs
+On Thu, Oct 10, 2019 at 03:39:12PM +0200, Igor Mammedov wrote:
+> On Thu, 10 Oct 2019 05:56:55 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  docs/specs/acpi_cpu_hotplug.txt | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
+> > On Wed, Oct 09, 2019 at 09:22:49AM -0400, Igor Mammedov wrote:
+> > > As an alternative to passing to firmware topology info via new fwcfg files
+> > > so it could recreate APIC IDs based on it and order CPUs are enumerated,
+> > > 
+> > > extend CPU hotplug interface to return APIC ID as response to the new command
+> > > CPHP_GET_CPU_ID_CMD.  
+> > 
+> > One big piece missing here is motivation:
+> I thought the only willing reader was Laszlo (who is aware of context)
+> so I skipped on details and confused others :/
 > 
-> diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
-> index ac5903b2b1..43c5a193f0 100644
-> --- a/docs/specs/acpi_cpu_hotplug.txt
-> +++ b/docs/specs/acpi_cpu_hotplug.txt
-> @@ -54,6 +54,7 @@ write access:
->      [0x0-0x3] CPU selector: (DWORD access)
->                selects active CPU device. All following accesses to other
->                registers will read/store data from/to selected CPU.
-> +              Valid values: [0 .. max_cpus)
->      [0x4] CPU device control fields: (1 byte access)
->          bits:
->              0: reserved, OSPM must clear it before writing to register.
-> @@ -93,3 +94,24 @@ Selecting CPU device beyond possible range has no effect on platform:
->       ignored
->     - read accesses to CPU hot-plug registers not documented above return
->       all bits set to 0.
-> +
-> +Typical usecases:
-> +   - Get a cpu with pending event
-> +     1. write 0x0 into 'Command field' register
-> +     2. read from 'Command data' register, CPU selector value (CPU's UID in ACPI
-> +        tables) and event for selected CPU from 'CPU device status fields'
-> +        register. If there aren't pending events, CPU selector value doesn't
-> +        change and 'insert' and 'remove' bits are not set.
-
-Okay, so based on the "Command data" documentation I'm suggesting in
-<http://mid.mail-archive.com/cd0713b5-fd64-d3e1-7f83-3a0725b819a3@redhat.com>,
-I propose:
-
-1. Store 0x0 to the 'CPU selector' register.
-2. Store 0x0 to the 'Command field' register.
-3. Read the 'CPU device status fields' register.
-4. If both bit#1 and bit#2 are clear in the value read, there is no CPU
-   with a pending event.
-5. Otherwise, read the 'Command data' register. The value read is the
-   selector of the CPU with the pending event (which is already
-   selected).
-
-> +   - Enumerate CPUs present/non present CPUs.
-> +     1. set iterator to 0x0
-> +     2. write 0x0 into 'Command field' register and then iterator
-> +        into 'CPU selector' register.
-> +     3. read 'enabled' flag for selected CPU from 'CPU device status fields'
-> +        register
-> +     4. to continue to the next CPU, increment iterator and repeat step 2
-> +     5. read 'Command data' register
-> +     5.1 if 'Command data' register matches iterator continue to step 3.
-> +         (read presence bit for the next CPU)
-> +     5.2 if 'Command data' register has not changed, there is not CPU
-> +         corresponding to iterator value and the last valid iterator value
-> +         equals to 'max_cpus' + 1
+> > Who's going to use this interface?
+> In current state it's for firmware, since ACPI tables can cheat
+> by having APIC IDs statically built in.
+> 
+> If we were creating CPU objects in ACPI dynamically
+> we would be using this command as well. It would save
+> us quite a bit space in ACPI blob but it would be a pain
+> to debug and diagnose problems in ACPI tables, so I'd rather
+> stay with static CPU descriptions in ACPI tables for the sake
+> of maintenance.
+> 
+> > So far CPU hotplug was used by the ACPI, so we didn't
+> > really commit to a fixed interface too strongly.
+> > 
+> > Is this a replacement to Laszlo's fw cfg interface?
+> > If yes is the idea that OVMF going to depend on CPU hotplug directly then?
+> > It does not depend on it now, does it?
+> It doesn't, but then it doesn't support cpu hotplug,
+> OVMF(SMM) needs to cooperate with QEMU "and" ACPI tables to perform
+> the task and using the same interface/code path between all involved
+> parties makes the task easier with the least amount of duplicated
+> interfaces and more robust.
+> 
+> Re-implementing alternative interface for firmware (fwcfg or what not)
+> would work as well, but it's only question of time when ACPI and
+> this new interface disagree on how world works and process falls
+> apart.
+> 
+> > If answers to all of the above is yes, then I don't really like it: it
+> > is better to keep all paravirt stuff in one place, namely in fw cfg.
+> Lets discuss, what cpu hotplug fwcfg interface could look like in 
+>  [PATCH 3/4] hw/i386: add facility to expose CPU topology over  fw-cfg
+> mail thread and clarify (dis)likes with concrete reasons.
+> 
+> So far I managed to convince myself that we ought to reuse
+> and extend current CPU hotplug interface with firmware features,
+> to endup with consolidated cpu hotplug process without
+> introducing duplicate ABIs, but I could be wrong so
+> lets see if fwcfg will be the better approach.
 > 
 
-How about:
+I was more inclined towards the approach in this patch, because I
+see it as just a bug fix in the CPU hotplug interface (which
+should have been using the hardware CPU identifier as the CPU
+selector since the beginning).
 
-01. Set the present CPU count to 0.
-02. Set the iterator to 0.
-03. Store 0x0 to the 'Command field' register.
-04. Store 0x0 to the 'CPU selector' register.
-05. Read the 'CPU device status fields' register.
-06. If bit#0 is set, increment the present CPU count.
-07. Increment the iterator.
-08. Store the iterator to the 'CPU selector' register.
-09. Read the 'Command data' register.
-10. If the value read is zero, then the iterator equals "max_cpus";
-    exit now.
-11. Goto 05.
+Providing the missing information in fw_cfg isn't necessarily
+bad, but please document it explicitly as a
+  hotplug_cpu_selector => cpu_hardware_id
+mapping, so people won't use "CPU index" as a generic identifier
+elsewhere.
 
-Thanks
-Laszlo
+-- 
+Eduardo
 
