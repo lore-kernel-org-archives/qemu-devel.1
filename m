@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 996DAC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09CA6C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F25E20673
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:13:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F25E20673
+	by mail.kernel.org (Postfix) with ESMTPS id D4B6920673
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:14:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4B6920673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIXKH-0006qJ-31
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 08:13:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51622)
+	id 1iIXKT-00078H-NB
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 08:14:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52121)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIWqj-0006HN-Dh
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:18 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIWrP-00077e-TN
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:44:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIWqh-00085F-S1
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59368)
+ (envelope-from <mreitz@redhat.com>) id 1iIWrO-0008LY-Nc
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40416)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIWqe-00083b-Io; Thu, 10 Oct 2019 07:43:12 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1iIWrM-0008Kd-88; Thu, 10 Oct 2019 07:43:56 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C6B18308FE8F;
- Thu, 10 Oct 2019 11:43:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7930A18CB8E5;
+ Thu, 10 Oct 2019 11:43:55 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 41EC75DAAC;
- Thu, 10 Oct 2019 11:43:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DBEC5D6A5;
+ Thu, 10 Oct 2019 11:43:54 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 04/36] block/qcow2: refactor qcow2_co_pwritev_part
-Date: Thu, 10 Oct 2019 13:42:28 +0200
-Message-Id: <20191010114300.7746-5-mreitz@redhat.com>
+Subject: [PULL 24/36] file-posix: account discard operations
+Date: Thu, 10 Oct 2019 13:42:48 +0200
+Message-Id: <20191010114300.7746-25-mreitz@redhat.com>
 In-Reply-To: <20191010114300.7746-1-mreitz@redhat.com>
 References: <20191010114300.7746-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 10 Oct 2019 11:43:11 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Thu, 10 Oct 2019 11:43:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -73,242 +73,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Similarly to previous commit, prepare for parallelizing write-loop
-iterations.
+This will help to identify how many of the user-issued discard operations
+(accounted on a device level) have actually suceeded down on the host fil=
+e
+(even though the numbers will not be exactly the same if non-raw format
+driver is used (e.g. qcow2 sending metadata discards)).
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190916175324.18478-5-vsementsov@virtuozzo.com
+Note that these numbers will not include discards triggered by
+write-zeroes + MAY_UNMAP calls.
+
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190923121737.83281-9-anton.nefedov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 154 +++++++++++++++++++++++++++++---------------------
- 1 file changed, 90 insertions(+), 64 deletions(-)
+ block/file-posix.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6feb169f7c..164b22e4a2 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2242,6 +2242,88 @@ static int handle_alloc_space(BlockDriverState *bs=
-, QCowL2Meta *l2meta)
-     return 0;
+diff --git a/block/file-posix.c b/block/file-posix.c
+index f12c06de2d..f3934c4e10 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -161,6 +161,11 @@ typedef struct BDRVRawState {
+     bool needs_alignment;
+     bool drop_cache;
+     bool check_cache_dropped;
++    struct {
++        uint64_t discard_nb_ok;
++        uint64_t discard_nb_failed;
++        uint64_t discard_bytes_ok;
++    } stats;
+=20
+     PRManager *pr_mgr;
+ } BDRVRawState;
+@@ -2660,11 +2665,22 @@ static void coroutine_fn raw_co_invalidate_cache(=
+BlockDriverState *bs,
+ #endif /* !__linux__ */
  }
 =20
-+/*
-+ * qcow2_co_pwritev_task
-+ * Called with s->lock unlocked
-+ * l2meta  - if not NULL, qcow2_co_pwritev_task() will consume it. Calle=
-r must
-+ *           not use it somehow after qcow2_co_pwritev_task() call
-+ */
-+static coroutine_fn int qcow2_co_pwritev_task(BlockDriverState *bs,
-+                                              uint64_t file_cluster_offs=
-et,
-+                                              uint64_t offset, uint64_t =
-bytes,
-+                                              QEMUIOVector *qiov,
-+                                              uint64_t qiov_offset,
-+                                              QCowL2Meta *l2meta)
++static void raw_account_discard(BDRVRawState *s, uint64_t nbytes, int re=
+t)
 +{
-+    int ret;
-+    BDRVQcow2State *s =3D bs->opaque;
-+    void *crypt_buf =3D NULL;
-+    int offset_in_cluster =3D offset_into_cluster(s, offset);
-+    QEMUIOVector encrypted_qiov;
-+
-+    if (bs->encrypted) {
-+        assert(s->crypto);
-+        assert(bytes <=3D QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
-+        crypt_buf =3D qemu_try_blockalign(bs->file->bs, bytes);
-+        if (crypt_buf =3D=3D NULL) {
-+            ret =3D -ENOMEM;
-+            goto out_unlocked;
-+        }
-+        qemu_iovec_to_buf(qiov, qiov_offset, crypt_buf, bytes);
-+
-+        if (qcow2_co_encrypt(bs, file_cluster_offset + offset_in_cluster=
-,
-+                             offset, crypt_buf, bytes) < 0)
-+        {
-+            ret =3D -EIO;
-+            goto out_unlocked;
-+        }
-+
-+        qemu_iovec_init_buf(&encrypted_qiov, crypt_buf, bytes);
-+        qiov =3D &encrypted_qiov;
-+        qiov_offset =3D 0;
++    if (ret) {
++        s->stats.discard_nb_failed++;
++    } else {
++        s->stats.discard_nb_ok++;
++        s->stats.discard_bytes_ok +=3D nbytes;
 +    }
-+
-+    /* Try to efficiently initialize the physical space with zeroes */
-+    ret =3D handle_alloc_space(bs, l2meta);
-+    if (ret < 0) {
-+        goto out_unlocked;
-+    }
-+
-+    /*
-+     * If we need to do COW, check if it's possible to merge the
-+     * writing of the guest data together with that of the COW regions.
-+     * If it's not possible (or not necessary) then write the
-+     * guest data now.
-+     */
-+    if (!merge_cow(offset, bytes, qiov, qiov_offset, l2meta)) {
-+        BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
-+        trace_qcow2_writev_data(qemu_coroutine_self(),
-+                                file_cluster_offset + offset_in_cluster)=
-;
-+        ret =3D bdrv_co_pwritev_part(s->data_file,
-+                                   file_cluster_offset + offset_in_clust=
-er,
-+                                   bytes, qiov, qiov_offset, 0);
-+        if (ret < 0) {
-+            goto out_unlocked;
-+        }
-+    }
-+
-+    qemu_co_mutex_lock(&s->lock);
-+
-+    ret =3D qcow2_handle_l2meta(bs, &l2meta, true);
-+    goto out_locked;
-+
-+out_unlocked:
-+    qemu_co_mutex_lock(&s->lock);
-+
-+out_locked:
-+    qcow2_handle_l2meta(bs, &l2meta, false);
-+    qemu_co_mutex_unlock(&s->lock);
-+
-+    qemu_vfree(crypt_buf);
-+
-+    return ret;
 +}
 +
- static coroutine_fn int qcow2_co_pwritev_part(
-         BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-         QEMUIOVector *qiov, size_t qiov_offset, int flags)
-@@ -2251,15 +2333,10 @@ static coroutine_fn int qcow2_co_pwritev_part(
-     int ret;
-     unsigned int cur_bytes; /* number of sectors in current iteration */
-     uint64_t cluster_offset;
--    QEMUIOVector encrypted_qiov;
--    uint64_t bytes_done =3D 0;
--    uint8_t *cluster_data =3D NULL;
-     QCowL2Meta *l2meta =3D NULL;
+ static coroutine_fn int
+ raw_do_pdiscard(BlockDriverState *bs, int64_t offset, int bytes, bool bl=
+kdev)
+ {
+     BDRVRawState *s =3D bs->opaque;
+     RawPosixAIOData acb;
++    int ret;
 =20
-     trace_qcow2_writev_start_req(qemu_coroutine_self(), offset, bytes);
-=20
--    qemu_co_mutex_lock(&s->lock);
--
-     while (bytes !=3D 0) {
-=20
-         l2meta =3D NULL;
-@@ -2273,6 +2350,8 @@ static coroutine_fn int qcow2_co_pwritev_part(
-                             - offset_in_cluster);
-         }
-=20
-+        qemu_co_mutex_lock(&s->lock);
-+
-         ret =3D qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
-                                          &cluster_offset, &l2meta);
-         if (ret < 0) {
-@@ -2290,73 +2369,20 @@ static coroutine_fn int qcow2_co_pwritev_part(
-=20
-         qemu_co_mutex_unlock(&s->lock);
-=20
--        if (bs->encrypted) {
--            assert(s->crypto);
--            if (!cluster_data) {
--                cluster_data =3D qemu_try_blockalign(bs->file->bs,
--                                                   QCOW_MAX_CRYPT_CLUSTE=
-RS
--                                                   * s->cluster_size);
--                if (cluster_data =3D=3D NULL) {
--                    ret =3D -ENOMEM;
--                    goto out_unlocked;
--                }
--            }
--
--            assert(cur_bytes <=3D QCOW_MAX_CRYPT_CLUSTERS * s->cluster_s=
-ize);
--            qemu_iovec_to_buf(qiov, qiov_offset + bytes_done,
--                              cluster_data, cur_bytes);
--
--            if (qcow2_co_encrypt(bs, cluster_offset + offset_in_cluster,=
- offset,
--                                 cluster_data, cur_bytes) < 0) {
--                ret =3D -EIO;
--                goto out_unlocked;
--            }
--
--            qemu_iovec_init_buf(&encrypted_qiov, cluster_data, cur_bytes=
-);
--        }
--
--        /* Try to efficiently initialize the physical space with zeroes =
-*/
--        ret =3D handle_alloc_space(bs, l2meta);
-+        ret =3D qcow2_co_pwritev_task(bs, cluster_offset, offset, cur_by=
-tes,
-+                                    qiov, qiov_offset, l2meta);
-+        l2meta =3D NULL; /* l2meta is consumed by qcow2_co_pwritev_task(=
-) */
-         if (ret < 0) {
--            goto out_unlocked;
--        }
--
--        /* If we need to do COW, check if it's possible to merge the
--         * writing of the guest data together with that of the COW regio=
-ns.
--         * If it's not possible (or not necessary) then write the
--         * guest data now. */
--        if (!merge_cow(offset, cur_bytes,
--                       bs->encrypted ? &encrypted_qiov : qiov,
--                       bs->encrypted ? 0 : qiov_offset + bytes_done, l2m=
-eta))
--        {
--            BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
--            trace_qcow2_writev_data(qemu_coroutine_self(),
--                                    cluster_offset + offset_in_cluster);
--            ret =3D bdrv_co_pwritev_part(
--                    s->data_file, cluster_offset + offset_in_cluster, cu=
-r_bytes,
--                    bs->encrypted ? &encrypted_qiov : qiov,
--                    bs->encrypted ? 0 : qiov_offset + bytes_done, 0);
--            if (ret < 0) {
--                goto out_unlocked;
--            }
--        }
--
--        qemu_co_mutex_lock(&s->lock);
--
--        ret =3D qcow2_handle_l2meta(bs, &l2meta, true);
--        if (ret) {
--            goto out_locked;
-+            goto fail_nometa;
-         }
-=20
-         bytes -=3D cur_bytes;
-         offset +=3D cur_bytes;
--        bytes_done +=3D cur_bytes;
-+        qiov_offset +=3D cur_bytes;
-         trace_qcow2_writev_done_part(qemu_coroutine_self(), cur_bytes);
+     acb =3D (RawPosixAIOData) {
+         .bs             =3D bs,
+@@ -2678,7 +2694,9 @@ raw_do_pdiscard(BlockDriverState *bs, int64_t offse=
+t, int bytes, bool blkdev)
+         acb.aio_type |=3D QEMU_AIO_BLKDEV;
      }
-     ret =3D 0;
--    goto out_locked;
 =20
--out_unlocked:
-     qemu_co_mutex_lock(&s->lock);
+-    return raw_thread_pool_submit(bs, handle_aiocb_discard, &acb);
++    ret =3D raw_thread_pool_submit(bs, handle_aiocb_discard, &acb);
++    raw_account_discard(s, bytes, ret);
++    return ret;
+ }
 =20
- out_locked:
-@@ -2364,7 +2390,7 @@ out_locked:
+ static coroutine_fn int
+@@ -3301,10 +3319,12 @@ static int fd_open(BlockDriverState *bs)
+ static coroutine_fn int
+ hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
+ {
++    BDRVRawState *s =3D bs->opaque;
+     int ret;
 =20
-     qemu_co_mutex_unlock(&s->lock);
-=20
--    qemu_vfree(cluster_data);
-+fail_nometa:
-     trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
-=20
-     return ret;
+     ret =3D fd_open(bs);
+     if (ret < 0) {
++        raw_account_discard(s, bytes, ret);
+         return ret;
+     }
+     return raw_do_pdiscard(bs, offset, bytes, true);
 --=20
 2.21.0
 
