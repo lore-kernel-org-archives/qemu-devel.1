@@ -2,85 +2,65 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1827C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 17:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A6EC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 17:10:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91E7E2067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 17:09:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mail.ru header.i=@mail.ru header.b="BwvslfUF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91E7E2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=mail.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 907DB2067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 17:10:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 907DB2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIbvz-0008FA-OW
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 13:09:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47461)
+	id 1iIbxm-0001Wc-Pw
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 13:10:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jusual@mail.ru>) id 1iIbvB-0007pn-NT
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 13:08:14 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iIbwV-0000Qn-4i
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 13:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jusual@mail.ru>) id 1iIbvA-0000m6-C8
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 13:08:13 -0400
-Received: from smtp40.i.mail.ru ([94.100.177.100]:40792)
+ (envelope-from <imammedo@redhat.com>) id 1iIbwS-00012p-Lo
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 13:09:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49832)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jusual@mail.ru>) id 1iIbv9-0000ln-P2
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 13:08:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru;
- s=mail2; 
- h=Content-Type:Cc:To:Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version;
- bh=Smcudi6WvXNiujziFxQ+rzk0507Xo5NWXQGspSMQDv8=; 
- b=BwvslfUF6pHYFhGZxIeSg5/UPm4Ow90v0qs37m4pnXR6XCsMVMmC1MvYkjMD0zXEQl/dmLkMBubamYDrE/2wmJSmfZGWuP30TWNsAeDOyAdSQYHsAGD5BAGBwETcztmPc8u121hxrHivSP4sATV+2zIU9fSFw+D5Qw6QGj1USAs=;
-Received: by smtp40.i.mail.ru with esmtpa (envelope-from <jusual@mail.ru>)
- id 1iIbv6-0006XH-Je
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 20:08:08 +0300
-Received: by mail-lj1-f179.google.com with SMTP id j19so7029630lja.1
- for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 10:08:08 -0700 (PDT)
-X-Gm-Message-State: APjAAAX1aKQRRL4Yhzc7AcsjUqQeG8MPnp2Ohx1nmT4LiljSfLAW5U1e
- AlcoPuWCAYehKX5kWaIaTJ38dasJtkwPrQYpXENw8g==
-X-Google-Smtp-Source: APXvYqzghEgm7pB9ul4DeS0IjIqzVQ3qCQ/xux72muOUDHx1DS1hAHPhO3DotsBI/Ea4H+0rVqJ/c/RGVHx8XujGJUU=
-X-Received: by 2002:a2e:9e85:: with SMTP id f5mr7123853ljk.203.1570727288203; 
- Thu, 10 Oct 2019 10:08:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iIbwR-00012Y-Bh
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 13:09:32 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 47859C057F31;
+ Thu, 10 Oct 2019 17:09:30 +0000 (UTC)
+Received: from Igors-MacBook-Pro (unknown [10.36.112.10])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 223BC60600;
+ Thu, 10 Oct 2019 17:09:19 +0000 (UTC)
+Date: Thu, 10 Oct 2019 19:09:16 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [RFC 0/3] acpi: cphp: add CPHP_GET_CPU_ID_CMD command to cpu
+ hotplug MMIO interface
+Message-ID: <20191010190916.4563a5eb@Igors-MacBook-Pro>
+In-Reply-To: <20191010141652.GD21666@habkost.net>
+References: <20191009132252.17860-1-imammedo@redhat.com>
+ <20191010055356-mutt-send-email-mst@kernel.org>
+ <20191010153815.4f7a3fc9@redhat.com>
+ <20191010141652.GD21666@habkost.net>
 MIME-Version: 1.0
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-28-armbru@redhat.com>
- <8c2a6fad-6ac1-21b1-c17c-e1bd5ac41c9f@redhat.com>
- <87a7ckrat7.fsf@dusky.pond.sub.org>
- <ee3709c9-f351-081a-3aeb-53b7b6036b0a@redhat.com>
- <87imr8l0ti.fsf_-_@dusky.pond.sub.org>
- <878spwct7p.fsf_-_@dusky.pond.sub.org>
-In-Reply-To: <878spwct7p.fsf_-_@dusky.pond.sub.org>
-From: Julia Suvorova <jusual@mail.ru>
-Date: Thu, 10 Oct 2019 19:07:57 +0200
-X-Gmail-Original-Message-ID: <CAMDeoFUdzL0-Mqj=-RcJUZAS4GTSemnmOZ9V9nuoYvHCAW7Pcg@mail.gmail.com>
-Message-ID: <CAMDeoFUdzL0-Mqj=-RcJUZAS4GTSemnmOZ9V9nuoYvHCAW7Pcg@mail.gmail.com>
-Subject: Re: Is network backend vde worth keeping? (was: Is network backend
- netmap worth keeping?)
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- renzo@cs.unibo.it, 
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, 
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Authentication-Results: smtp40.i.mail.ru; auth=pass smtp.auth=jusual@mail.ru
- smtp.mailfrom=jusual@mail.ru
-X-77F55803: 2D1AD755E866B1545A78504BD2AC2941EF4240A57205167398B7DE5AC6068369935C91B1721AA75B2CD4A999522F0939
-X-7FA49CB5: 0D63561A33F958A5889FC3F9B25866C37A64F7FA1A6C233CAB1A450743822BAC8941B15DA834481FA18204E546F3947CEDCF5861DED71B2F389733CBF5DBD5E9C8A9BA7A39EFB7666BA297DBC24807EA117882F44604297287769387670735209ECD01F8117BC8BEA471835C12D1D977C4224003CC8364767815B9869FA544D8D32BA5DBAC0009BE9E8FC8737B5C224950E8A67647349DF376E601842F6C81A12EF20D2F80756B5F5C318D1F9ECD513A76E601842F6C81A127C277FBC8AE2E8BDD05361B700AE1BB3AA81AA40904B5D99449624AB7ADAF37F910319684D6E05D725E5C173C3A84C361DD96311B40C2D43A24D03A4753F5B01F42DF47398C4A6DC4224003CC836476C0CAF46E325F83A50BF2EBBBDD9D6B0F5D41B9178041F3E72623479134186CDE6BA297DBC24807EABDAD6C7F3747799A
-X-Mailru-Sender: 4C235FE2E5D2D8903F5BB8719A0E45F69750A78EF78D2A0096FF3C4319F3FE0F976AF1CB91E6F681342D7E53901C55FD6F53C80213D1719C4487B406A59785443329DBF425CF03A167EA787935ED9F1B
-X-Mras: OK
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 94.100.177.100
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Thu, 10 Oct 2019 17:09:30 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,33 +72,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 7, 2019 at 8:23 PM Markus Armbruster <armbru@redhat.com> wrote:
->
-> Markus Armbruster <armbru@redhat.com> writes:
->
-> > Please excuse the attention-grabbing subject.
->
-> Again.
->
-> [...]
-> > So, to make use of QEMU's netmap backend (CONFIG_NETMAP), you have to
-> > build and install netmap software from sources.  Which pretty much
->
-> CONFIG_VDE seems to be similarly cumbersome to build-test.
->
-> > ensures nobody uses it.  It was added in commit 58952137b0b (Nov 2013).
-> [...]
->
-> The vde backend was added in commit 8a16d273887 (Jul 2008).  The commit
-> message blames it on Luca Bigliardi.  Julia (cc'ed) fixed a bug in 2018.
+On Thu, 10 Oct 2019 11:16:52 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-This was a bugzilla entry dated 2010 from the BiteSizedTasks list. You
-can definitely ignore this commit when deciding whether to keep vde
-backend.
+> On Thu, Oct 10, 2019 at 03:39:12PM +0200, Igor Mammedov wrote:
+> > On Thu, 10 Oct 2019 05:56:55 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > 
+> > > On Wed, Oct 09, 2019 at 09:22:49AM -0400, Igor Mammedov wrote:
+> > > > As an alternative to passing to firmware topology info via new fwcfg files
+> > > > so it could recreate APIC IDs based on it and order CPUs are enumerated,
+> > > > 
+> > > > extend CPU hotplug interface to return APIC ID as response to the new command
+> > > > CPHP_GET_CPU_ID_CMD.  
+> > > 
+> > > One big piece missing here is motivation:
+> > I thought the only willing reader was Laszlo (who is aware of context)
+> > so I skipped on details and confused others :/
+> > 
+> > > Who's going to use this interface?
+> > In current state it's for firmware, since ACPI tables can cheat
+> > by having APIC IDs statically built in.
+> > 
+> > If we were creating CPU objects in ACPI dynamically
+> > we would be using this command as well. It would save
+> > us quite a bit space in ACPI blob but it would be a pain
+> > to debug and diagnose problems in ACPI tables, so I'd rather
+> > stay with static CPU descriptions in ACPI tables for the sake
+> > of maintenance.
+> > 
+> > > So far CPU hotplug was used by the ACPI, so we didn't
+> > > really commit to a fixed interface too strongly.
+> > > 
+> > > Is this a replacement to Laszlo's fw cfg interface?
+> > > If yes is the idea that OVMF going to depend on CPU hotplug directly then?
+> > > It does not depend on it now, does it?
+> > It doesn't, but then it doesn't support cpu hotplug,
+> > OVMF(SMM) needs to cooperate with QEMU "and" ACPI tables to perform
+> > the task and using the same interface/code path between all involved
+> > parties makes the task easier with the least amount of duplicated
+> > interfaces and more robust.
+> > 
+> > Re-implementing alternative interface for firmware (fwcfg or what not)
+> > would work as well, but it's only question of time when ACPI and
+> > this new interface disagree on how world works and process falls
+> > apart.
+> > 
+> > > If answers to all of the above is yes, then I don't really like it: it
+> > > is better to keep all paravirt stuff in one place, namely in fw cfg.
+> > Lets discuss, what cpu hotplug fwcfg interface could look like in 
+> >  [PATCH 3/4] hw/i386: add facility to expose CPU topology over  fw-cfg
+> > mail thread and clarify (dis)likes with concrete reasons.
+> > 
+> > So far I managed to convince myself that we ought to reuse
+> > and extend current CPU hotplug interface with firmware features,
+> > to endup with consolidated cpu hotplug process without
+> > introducing duplicate ABIs, but I could be wrong so
+> > lets see if fwcfg will be the better approach.
+> > 
+> 
+> I was more inclined towards the approach in this patch, because I
+> see it as just a bug fix in the CPU hotplug interface (which
+> should have been using the hardware CPU identifier as the CPU
+> selector since the beginning).
+> 
+> Providing the missing information in fw_cfg isn't necessarily
+> bad, but please document it explicitly as a
+>   hotplug_cpu_selector => cpu_hardware_id
+> mapping, so people won't use "CPU index" as a generic identifier
+> elsewhere.
 
-Best regards, Julia Suvorova.
+Currently cpu_selector is UID (or whatever you'd like to name it)
+for a CPU instance in ACPI tables. It just happens to be non sparse
+range [0..max_cpus) and was just a convenient way to make up IDs
+and handle them on hw side (requires simple array).
+
+Sure I'll document it as such to avoid mis-understanding,
+plus a bunch of other fixes to the spec.
+
 
