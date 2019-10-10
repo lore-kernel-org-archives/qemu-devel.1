@@ -6,53 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED5D6C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49113C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:56:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C172B208C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:56:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C172B208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 1ED65208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:56:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ED65208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIX3S-0004TR-KY
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:56:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50727)
+	id 1iIX3i-0004tM-PR
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:56:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51672)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iIWkT-0006cO-W8
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:36:50 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIWqm-0006Mc-H2
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iIWkT-0006bv-0k
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:36:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:31218)
+ (envelope-from <mreitz@redhat.com>) id 1iIWql-00086b-H6
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54960)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iIWkS-0006bg-RZ; Thu, 10 Oct 2019 07:36:48 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1iIWqi-00085T-T8; Thu, 10 Oct 2019 07:43:17 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1913958;
- Thu, 10 Oct 2019 11:36:48 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-138.ams2.redhat.com [10.36.117.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CDAC05C1B5;
- Thu, 10 Oct 2019 11:36:42 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 26/31] target/s390x: Rely on unwinding in s390_cpu_virt_mem_rw
-Date: Thu, 10 Oct 2019 13:33:51 +0200
-Message-Id: <20191010113356.5017-27-david@redhat.com>
-In-Reply-To: <20191010113356.5017-1-david@redhat.com>
-References: <20191010113356.5017-1-david@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 22EF689810E;
+ Thu, 10 Oct 2019 11:43:16 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BAFE45C241;
+ Thu, 10 Oct 2019 11:43:15 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 06/36] block/backup: fix max_transfer handling for copy_range
+Date: Thu, 10 Oct 2019 13:42:30 +0200
+Message-Id: <20191010114300.7746-7-mreitz@redhat.com>
+In-Reply-To: <20191010114300.7746-1-mreitz@redhat.com>
+References: <20191010114300.7746-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 10 Oct 2019 11:36:48 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Thu, 10 Oct 2019 11:43:16 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -68,43 +67,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-For TCG, we will always call s390_cpu_virt_mem_handle_exc,
-which will go through the unwinder to set ILEN.  For KVM,
-we do not go through do_program_interrupt, so this argument
-is unused.
+Of course, QEMU_ALIGN_UP is a typo, it should be QEMU_ALIGN_DOWN, as we
+are trying to find aligned size which satisfy both source and target.
+Also, don't ignore too small max_transfer. In this case seems safer to
+disable copy_range.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20191001171614.8405-15-richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Fixes: 9ded4a0114968e
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190920142056.12778-2-vsementsov@virtuozzo.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- target/s390x/mmu_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/backup.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 869debd30a..df58fb73ba 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -510,7 +510,7 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, u=
-int8_t ar, void *hostbuf,
+diff --git a/block/backup.c b/block/backup.c
+index 763f0d7ff6..db20249063 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -741,12 +741,19 @@ BlockJob *backup_job_create(const char *job_id, Blo=
+ckDriverState *bs,
+     job->cluster_size =3D cluster_size;
+     job->copy_bitmap =3D copy_bitmap;
+     copy_bitmap =3D NULL;
+-    job->use_copy_range =3D !compress; /* compression isn't supported fo=
+r it */
+     job->copy_range_size =3D MIN_NON_ZERO(blk_get_max_transfer(job->comm=
+on.blk),
+                                         blk_get_max_transfer(job->target=
+));
+-    job->copy_range_size =3D MAX(job->cluster_size,
+-                               QEMU_ALIGN_UP(job->copy_range_size,
+-                                             job->cluster_size));
++    job->copy_range_size =3D QEMU_ALIGN_DOWN(job->copy_range_size,
++                                           job->cluster_size);
++    /*
++     * Set use_copy_range, consider the following:
++     * 1. Compression is not supported for copy_range.
++     * 2. copy_range does not respect max_transfer (it's a TODO), so we =
+factor
++     *    that in here. If max_transfer is smaller than the job->cluster=
+_size,
++     *    we do not use copy_range (in that case it's zero after alignin=
+g down
++     *    above).
++     */
++    job->use_copy_range =3D !compress && job->copy_range_size > 0;
 =20
-     ret =3D translate_pages(cpu, laddr, nr_pages, pages, is_write, &tec)=
-;
-     if (ret) {
--        trigger_access_exception(&cpu->env, ret, ILEN_AUTO, tec);
-+        trigger_access_exception(&cpu->env, ret, ILEN_UNWIND, tec);
-     } else if (hostbuf !=3D NULL) {
-         /* Copy data by stepping through the area page by page */
-         for (i =3D 0; i < nr_pages; i++) {
+     /* Required permissions are already taken with target's blk_new() */
+     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
 --=20
 2.21.0
 
