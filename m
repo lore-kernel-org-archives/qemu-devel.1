@@ -2,65 +2,85 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC06BC10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A2D9C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:14:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8361121835
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:11:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8361121835
+	by mail.kernel.org (Postfix) with ESMTPS id 044DF208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 16:14:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 044DF208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41877 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIb1y-0005a3-Jz
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 12:11:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35742)
+	id 1iIb5K-0001bQ-Vj
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 12:14:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iIaY8-0005c2-P1
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:40:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1iIaeu-0002km-Lw
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:47:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iIaY5-00023v-3D
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:40:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49320)
+ (envelope-from <philmd@redhat.com>) id 1iIaes-0004dQ-Qc
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:47:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49174)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iIaXz-0001yH-LM; Thu, 10 Oct 2019 11:40:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iIaes-0004ca-Hx
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:47:18 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EB8B180F7C;
- Thu, 10 Oct 2019 15:40:08 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B71B2194BB;
- Thu, 10 Oct 2019 15:39:50 +0000 (UTC)
-Subject: Re: [PATCH] qcow2-bitmaps: fix qcow2_can_store_new_dirty_bitmap
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190607184802.100945-1-vsementsov@virtuozzo.com>
- <f218e52c-8b0b-07cc-519f-23e9612b2320@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <6fde60fa-a4fb-eaf8-3830-5d358afb121f@redhat.com>
-Date: Thu, 10 Oct 2019 10:39:49 -0500
+ by mx1.redhat.com (Postfix) with ESMTPS id ABED4C034E71
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 15:47:15 +0000 (UTC)
+Received: by mail-wr1-f72.google.com with SMTP id l12so2938311wrm.6
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 08:47:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=W84v35mLOg0JGBptKr1AmpPQK9RVN2nFNy+aZylg2Y8=;
+ b=Gx4xOftptC/ubxTXj/b0E4JbXSYJyqzWGNpflJCTDWvRliY4JAmji9hM5KPyksOhEy
+ zecVwKrRQrIb9hW5S7X4hbAXp9HSDKFfTYkz2HMcqka/5l7+kJ/npRBjxkLRvhYjL/FN
+ 2mV4UGz72Ah9giVm94DXy/VdZmbnZwipc2YaylIbzxQCK0I4+Vlql+bOszOgYXI4aHLF
+ kK0Wlg6qo4ZBp2mmFQ4jhXUwrCg3f06fcynKh6Z5gKpGpFRSmGUoAX5RUxPXpvy7F4gq
+ hVqCgNsK0b0gnlILzuzhBdukBN6ld/EmvFuo85khMAB9JezxYTPxdEKXO78E8wNvZiEB
+ qZ+Q==
+X-Gm-Message-State: APjAAAWD5YQZ8LO3rH8W7vP0eKY99JT1he2vRywscqavXQFsXCpKbPYs
+ k7R9E4opbRt5febPaj1s/mGmzjeeDvcXOfe7zMwcuqYtO/6sGG6zxdcPIVvqEjP1b5N6706zaem
+ 8v1pPzY5i0qEsnxo=
+X-Received: by 2002:a5d:67c5:: with SMTP id n5mr4679447wrw.72.1570722434482;
+ Thu, 10 Oct 2019 08:47:14 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqya0uy32gEXJp989rqoyjdDBcMDQlO6+HyrduW7YTFwFNYWmBJYKV1Qkq/DTmlbdHXU8Gy9eg==
+X-Received: by 2002:a5d:67c5:: with SMTP id n5mr4679427wrw.72.1570722434273;
+ Thu, 10 Oct 2019 08:47:14 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id z4sm5665583wrh.93.2019.10.10.08.47.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 10 Oct 2019 08:47:13 -0700 (PDT)
+Subject: Re: [PATCH v8 04/15] hw/i386/pc: replace use of strtol with
+ qemu_strtol in x86_load_linux()
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20191010143125.67246-1-slp@redhat.com>
+ <20191010143125.67246-5-slp@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f147fefc-1bec-2ac1-b5d6-35bcfdddf2fc@redhat.com>
+Date: Thu, 10 Oct 2019 17:47:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <f218e52c-8b0b-07cc-519f-23e9612b2320@virtuozzo.com>
+In-Reply-To: <20191010143125.67246-5-slp@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 10 Oct 2019 15:40:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -75,49 +95,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/7/19 1:53 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 07.06.2019 21:48, Vladimir Sementsov-Ogievskiy wrote:
->> qcow2_can_store_new_dirty_bitmap works wrong, as it considers only
->> bitmaps already stored in the qcow2 image and ignores persistent
->> BdrvDirtyBitmap objects.
->>
->> So, let's instead count persistent BdrvDirtyBitmaps. We load all qcow2
->> bitmaps on open, so there should not be any bitmap in the image for
->> which we don't have BdrvDirtyBitmaps version. If it is - it's a kind of
->> corruption, and no reason to check for corruptions here (open() and
->> close() are better places for it).
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>
->> Hi!
->>
->> Patch is better than discussing I thing, so here is my counter-suggestion for
->> "[PATCH 0/5] block/dirty-bitmap: check number and size constraints against queued bitmaps"
->> by John.
->>
->> It's of course needs some additional refactoring, as first assert shows bad design,
->> I just wrote it in such manner to make minimum changes to fix the bug.
->>
+Hi Sergio,
 
->> +    assert(!bdrv_find_dirty_bitmap(bs, name));
+On 10/10/19 4:31 PM, Sergio Lopez wrote:
+> Follow checkpatch.pl recommendation and replace the use of strtol with
+> qemu_strtol in x86_load_linux().
 > 
-> exactly bad, this should be checked in qmp_block_dirty_bitmap_add(), before checks around
-> persistence. and aio_context_acquire may be dropped..
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>   hw/i386/pc.c | 11 +++++++++--
+>   1 file changed, 9 insertions(+), 2 deletions(-)
 > 
-> But anyway, idea is clear I think, consider it as RFC patch
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 77e86bfc3d..e6bcc3ff42 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -68,6 +68,7 @@
+>   #include "qemu/config-file.h"
+>   #include "qemu/error-report.h"
+>   #include "qemu/option.h"
+> +#include "qemu/cutils.h"
+>   #include "hw/acpi/acpi.h"
+>   #include "hw/acpi/cpu_hotplug.h"
+>   #include "hw/boards.h"
+> @@ -1201,7 +1202,8 @@ static void x86_load_linux(PCMachineState *pcms,
+>       /* handle vga= parameter */
+>       vmode = strstr(kernel_cmdline, "vga=");
+>       if (vmode) {
+> -        unsigned int video_mode;
+> +        long video_mode;
 
-Are you planning to post a v2, as this affects at least 
-https://bugzilla.redhat.com/show_bug.cgi?id=1712636
+Why do you change 'video_mode' to a signed type?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> +        int ret;
+>           /* skip "vga=" */
+>           vmode += 4;
+>           if (!strncmp(vmode, "normal", 6)) {
+> @@ -1211,7 +1213,12 @@ static void x86_load_linux(PCMachineState *pcms,
+>           } else if (!strncmp(vmode, "ask", 3)) {
+>               video_mode = 0xfffd;
+>           } else {
+> -            video_mode = strtol(vmode, NULL, 0);
+> +            ret = qemu_strtol(vmode, NULL, 0, &video_mode);
+> +            if (ret != 0) {
+> +                fprintf(stderr, "qemu: can't parse 'vga' parameter: %s\n",
+> +                        strerror(-ret));
+> +                exit(1);
+> +            }
+>           }
+>           stw_p(header + 0x1fa, video_mode);
+>       }
+> 
 
