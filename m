@@ -2,65 +2,63 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54BC4C47404
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 02:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A435C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 03:26:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EB7921848
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 02:08:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aiqh0Lts"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EB7921848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id ECE902086D
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 03:26:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE902086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iINsa-00007G-80
-	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 22:08:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52352)
+	id 1iIP64-0003bo-4K
+	for qemu-devel@archiver.kernel.org; Wed, 09 Oct 2019 23:26:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iINpJ-0004uT-Bx
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 22:05:15 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iIP5I-0003CE-5F
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 23:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iINpG-0003pO-Dz
- for qemu-devel@nongnu.org; Wed, 09 Oct 2019 22:05:13 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42019 helo=ozlabs.org)
+ (envelope-from <ehabkost@redhat.com>) id 1iIP5F-0001fN-6p
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 23:25:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59326)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iINpF-0003nT-A5; Wed, 09 Oct 2019 22:05:10 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 46pZCw3MFRz9sCJ; Thu, 10 Oct 2019 13:05:00 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1570673100;
- bh=tNjVhRESv/Ft1a98n25kN5c3AvgGj+N5vkjfxLrDK9E=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=aiqh0Lts8APj/hIuc9cTYryn4EztGlhcsN33PT+V1ISJFTeQIUndl/sfsxS0p4qd7
- 9lQytFs3hgJ1IU4wLcpzi3EMZdgFv0bEb4E6Bm76+B9G2wqTC0uTtfsYqv8V1+8O83
- etyuwtrRXnUJFM0OXHMCXlO42GiCtElfKsvi7BcE=
-Date: Thu, 10 Oct 2019 12:59:13 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v4 17/19] spapr: Remove last pieces of SpaprIrq
-Message-ID: <20191010015913.GB28552@umbus.fritz.box>
-References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
- <20191009060818.29719-18-david@gibson.dropbear.id.au>
- <e3ee1543-2993-c2c3-7d9a-2eab96113f89@kaod.org>
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iIP5E-0001ew-Os
+ for qemu-devel@nongnu.org; Wed, 09 Oct 2019 23:25:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8372918CB8E5;
+ Thu, 10 Oct 2019 03:25:43 +0000 (UTC)
+Received: from localhost (ovpn-116-5.gru2.redhat.com [10.97.116.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4FD3B5D6A5;
+ Thu, 10 Oct 2019 03:25:39 +0000 (UTC)
+Date: Thu, 10 Oct 2019 00:25:38 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Subject: Re: [Qemu-devel] [RFC 2 PATCH 01/16] numa: Split the numa
+ functionality
+Message-ID: <20191010032538.GB21666@habkost.net>
+References: <156779689013.21957.1631551572950676212.stgit@localhost.localdomain>
+ <156779710184.21957.13351592831416903368.stgit@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="oLBj+sq0vYjzfsbl"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e3ee1543-2993-c2c3-7d9a-2eab96113f89@kaod.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <156779710184.21957.13351592831416903368.stgit@localhost.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Thu, 10 Oct 2019 03:25:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,569 +70,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- philmd@redhat.com
+Cc: "mst@redhat.com" <mst@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "ssg.sos.staff" <ssg.sos.staff@amd.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
 
---oLBj+sq0vYjzfsbl
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+First of all, sorry for taking more than a month to start
+reviewing this.
 
-On Wed, Oct 09, 2019 at 06:44:53PM +0200, C=E9dric Le Goater wrote:
-> On 09/10/2019 08:08, David Gibson wrote:
-> > The only thing remaining in this structure are the flags to allow either
-> > XICS or XIVE to be present.  These actually make more sense as spapr
-> > capabilities - that way they can take advantage of the existing
-> > infrastructure to sanity check capability states across migration and so
-> > forth.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Nice. That is what you had in mind :) Let's make sure we use your
-> cap framework for the next major change, power10.
+On Fri, Sep 06, 2019 at 07:11:43PM +0000, Moger, Babu wrote:
+> To support new epyc mode, we need to know the number of numa nodes
+> in advance to generate apic id correctly. [...]
 
-Yeah, adding a cap-xive2 should be pretty straightforward.
+This explains that we need to initialize numa_info earlier than
+something...
 
-> ic-mode should
-> be deprecated one day I suppose.
+>                                     [...] So, split the numa
+> initialization into two. The function parse_numa initializes numa_info
+> and updates nb_numa_nodes. And then parse_numa_node does the numa node
+> initialization.
 
-I guess.  I'm not in a great rush, since the compat code for it is
-pretty simple and localized.
+...but I miss what "something" is.
 
-> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> C.
->=20
->=20
-> > ---
-> >  hw/ppc/spapr.c             | 40 ++++++++++--------
-> >  hw/ppc/spapr_caps.c        | 64 +++++++++++++++++++++++++++++
-> >  hw/ppc/spapr_hcall.c       |  7 ++--
-> >  hw/ppc/spapr_irq.c         | 84 ++------------------------------------
-> >  include/hw/ppc/spapr.h     | 10 +++--
-> >  include/hw/ppc/spapr_irq.h | 10 -----
-> >  6 files changed, 103 insertions(+), 112 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index e1ff03152e..bf9fdb1693 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1072,12 +1072,13 @@ static void spapr_dt_ov5_platform_support(Spapr=
-MachineState *spapr, void *fdt,
-> >          26, 0x40, /* Radix options: GTSE =3D=3D yes. */
-> >      };
-> > =20
-> > -    if (spapr->irq->xics && spapr->irq->xive) {
-> > +    if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > +        && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> >          val[1] =3D SPAPR_OV5_XIVE_BOTH;
-> > -    } else if (spapr->irq->xive) {
-> > +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> >          val[1] =3D SPAPR_OV5_XIVE_EXPLOIT;
-> >      } else {
-> > -        assert(spapr->irq->xics);
-> > +        assert(spapr_get_cap(spapr, SPAPR_CAP_XICS));
-> >          val[1] =3D SPAPR_OV5_XIVE_LEGACY;
-> >      }
-> > =20
-> > @@ -2075,6 +2076,8 @@ static const VMStateDescription vmstate_spapr =3D=
- {
-> >          &vmstate_spapr_dtb,
-> >          &vmstate_spapr_cap_large_decr,
-> >          &vmstate_spapr_cap_ccf_assist,
-> > +        &vmstate_spapr_cap_xics,
-> > +        &vmstate_spapr_cap_xive,
-> >          NULL
-> >      }
-> >  };
-> > @@ -2775,7 +2778,7 @@ static void spapr_machine_init(MachineState *mach=
-ine)
-> >      spapr_ovec_set(spapr->ov5, OV5_DRMEM_V2);
-> > =20
-> >      /* advertise XIVE on POWER9 machines */
-> > -    if (spapr->irq->xive) {
-> > +    if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> >          spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
-> >      }
-> > =20
-> > @@ -3242,14 +3245,18 @@ static void spapr_set_vsmt(Object *obj, Visitor=
- *v, const char *name,
-> >  static char *spapr_get_ic_mode(Object *obj, Error **errp)
-> >  {
-> >      SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> > =20
-> > -    if (spapr->irq =3D=3D &spapr_irq_xics_legacy) {
-> > +    if (smc->legacy_irq_allocation) {
-> >          return g_strdup("legacy");
-> > -    } else if (spapr->irq =3D=3D &spapr_irq_xics) {
-> > +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > +               && !spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> >          return g_strdup("xics");
-> > -    } else if (spapr->irq =3D=3D &spapr_irq_xive) {
-> > +    } else if (!spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > +               && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> >          return g_strdup("xive");
-> > -    } else if (spapr->irq =3D=3D &spapr_irq_dual) {
-> > +    } else if (spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > +               && spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> >          return g_strdup("dual");
-> >      }
-> >      g_assert_not_reached();
-> > @@ -3266,11 +3273,14 @@ static void spapr_set_ic_mode(Object *obj, cons=
-t char *value, Error **errp)
-> > =20
-> >      /* The legacy IRQ backend can not be set */
-> >      if (strcmp(value, "xics") =3D=3D 0) {
-> > -        spapr->irq =3D &spapr_irq_xics;
-> > +        object_property_set_bool(obj, true, "cap-xics", errp);
-> > +        object_property_set_bool(obj, false, "cap-xive", errp);
-> >      } else if (strcmp(value, "xive") =3D=3D 0) {
-> > -        spapr->irq =3D &spapr_irq_xive;
-> > +        object_property_set_bool(obj, false, "cap-xics", errp);
-> > +        object_property_set_bool(obj, true, "cap-xive", errp);
-> >      } else if (strcmp(value, "dual") =3D=3D 0) {
-> > -        spapr->irq =3D &spapr_irq_dual;
-> > +        object_property_set_bool(obj, true, "cap-xics", errp);
-> > +        object_property_set_bool(obj, true, "cap-xive", errp);
-> >      } else {
-> >          error_setg(errp, "Bad value for \"ic-mode\" property");
-> >      }
-> > @@ -3309,7 +3319,6 @@ static void spapr_set_host_serial(Object *obj, co=
-nst char *value, Error **errp)
-> >  static void spapr_instance_init(Object *obj)
-> >  {
-> >      SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > -    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> > =20
-> >      spapr->htab_fd =3D -1;
-> >      spapr->use_hotplug_event_source =3D true;
-> > @@ -3345,7 +3354,6 @@ static void spapr_instance_init(Object *obj)
-> >                               spapr_get_msix_emulation, NULL, NULL);
-> > =20
-> >      /* The machine class defines the default interrupt controller mode=
- */
-> > -    spapr->irq =3D smc->irq;
-> >      object_property_add_str(obj, "ic-mode", spapr_get_ic_mode,
-> >                              spapr_set_ic_mode, NULL);
-> >      object_property_set_description(obj, "ic-mode",
-> > @@ -4439,8 +4447,9 @@ static void spapr_machine_class_init(ObjectClass =
-*oc, void *data)
-> >      smc->default_caps.caps[SPAPR_CAP_NESTED_KVM_HV] =3D SPAPR_CAP_OFF;
-> >      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_=
-ON;
-> >      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
-> > +    smc->default_caps.caps[SPAPR_CAP_XICS] =3D SPAPR_CAP_ON;
-> > +    smc->default_caps.caps[SPAPR_CAP_XIVE] =3D SPAPR_CAP_ON;
-> >      spapr_caps_add_properties(smc, &error_abort);
-> > -    smc->irq =3D &spapr_irq_dual;
-> >      smc->dr_phb_enabled =3D true;
-> >      smc->linux_pci_probe =3D true;
-> >      smc->nr_xirqs =3D SPAPR_NR_XIRQS;
-> > @@ -4539,7 +4548,7 @@ static void spapr_machine_4_0_class_options(Machi=
-neClass *mc)
-> >      spapr_machine_4_1_class_options(mc);
-> >      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_le=
-n);
-> >      smc->phb_placement =3D phb_placement_4_0;
-> > -    smc->irq =3D &spapr_irq_xics;
-> > +    smc->default_caps.caps[SPAPR_CAP_XIVE] =3D SPAPR_CAP_OFF;
-> >      smc->pre_4_1_migration =3D true;
-> >  }
-> > =20
-> > @@ -4580,7 +4589,6 @@ static void spapr_machine_3_0_class_options(Machi=
-neClass *mc)
-> > =20
-> >      smc->legacy_irq_allocation =3D true;
-> >      smc->nr_xirqs =3D 0x400;
-> > -    smc->irq =3D &spapr_irq_xics_legacy;
-> >  }
-> > =20
-> >  DEFINE_SPAPR_MACHINE(3_0, "3.0", false);
-> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> > index 481dfd2a27..e06fd386f6 100644
-> > --- a/hw/ppc/spapr_caps.c
-> > +++ b/hw/ppc/spapr_caps.c
-> > @@ -496,6 +496,42 @@ static void cap_ccf_assist_apply(SpaprMachineState=
- *spapr, uint8_t val,
-> >      }
-> >  }
-> > =20
-> > +static void cap_xics_apply(SpaprMachineState *spapr, uint8_t val, Erro=
-r **errp)
-> > +{
-> > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> > +
-> > +    if (!val) {
-> > +        if (!spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> > +            error_setg(errp,
-> > +"No interrupt controllers enabled, try cap-xics=3Don or cap-xive=3Don"=
-);
-> > +            return;
-> > +        }
-> > +
-> > +        if (smc->legacy_irq_allocation) {
-> > +            error_setg(errp, "This machine version requires XICS suppo=
-rt");
-> > +            return;
-> > +        }
-> > +    }
-> > +}
-> > +
-> > +static void cap_xive_apply(SpaprMachineState *spapr, uint8_t val, Erro=
-r **errp)
-> > +{
-> > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> > +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
-> > +
-> > +    if (val) {
-> > +        if (smc->legacy_irq_allocation) {
-> > +            error_setg(errp, "This machine version cannot support XIVE=
-");
-> > +            return;
-> > +        }
-> > +        if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> > +                              spapr->max_compat_pvr)) {
-> > +            error_setg(errp, "XIVE requires POWER9 CPU");
-> > +            return;
-> > +        }
-> > +    }
-> > +}
-> > +
-> >  SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-> >      [SPAPR_CAP_HTM] =3D {
-> >          .name =3D "htm",
-> > @@ -595,6 +631,24 @@ SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM=
-] =3D {
-> >          .type =3D "bool",
-> >          .apply =3D cap_ccf_assist_apply,
-> >      },
-> > +    [SPAPR_CAP_XICS] =3D {
-> > +        .name =3D "xics",
-> > +        .description =3D "Allow XICS interrupt controller",
-> > +        .index =3D SPAPR_CAP_XICS,
-> > +        .get =3D spapr_cap_get_bool,
-> > +        .set =3D spapr_cap_set_bool,
-> > +        .type =3D "bool",
-> > +        .apply =3D cap_xics_apply,
-> > +    },
-> > +    [SPAPR_CAP_XIVE] =3D {
-> > +        .name =3D "xive",
-> > +        .description =3D "Allow XIVE interrupt controller",
-> > +        .index =3D SPAPR_CAP_XIVE,
-> > +        .get =3D spapr_cap_get_bool,
-> > +        .set =3D spapr_cap_set_bool,
-> > +        .type =3D "bool",
-> > +        .apply =3D cap_xive_apply,
-> > +    },
-> >  };
-> > =20
-> >  static SpaprCapabilities default_caps_with_cpu(SpaprMachineState *spap=
-r,
-> > @@ -641,6 +695,14 @@ static SpaprCapabilities default_caps_with_cpu(Spa=
-prMachineState *spapr,
-> >          caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
-> >      }
-> > =20
-> > +    /*
-> > +     * POWER8 machines don't have XIVE
-> > +     */
-> > +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_3_00,
-> > +                               0, spapr->max_compat_pvr)) {
-> > +        caps.caps[SPAPR_CAP_XIVE] =3D SPAPR_CAP_OFF;
-> > +    }
-> > +
-> >      return caps;
-> >  }
-> > =20
-> > @@ -734,6 +796,8 @@ SPAPR_CAP_MIG_STATE(hpt_maxpagesize, SPAPR_CAP_HPT_=
-MAXPAGESIZE);
-> >  SPAPR_CAP_MIG_STATE(nested_kvm_hv, SPAPR_CAP_NESTED_KVM_HV);
-> >  SPAPR_CAP_MIG_STATE(large_decr, SPAPR_CAP_LARGE_DECREMENTER);
-> >  SPAPR_CAP_MIG_STATE(ccf_assist, SPAPR_CAP_CCF_ASSIST);
-> > +SPAPR_CAP_MIG_STATE(xics, SPAPR_CAP_XICS);
-> > +SPAPR_CAP_MIG_STATE(xive, SPAPR_CAP_XIVE);
-> > =20
-> >  void spapr_caps_init(SpaprMachineState *spapr)
-> >  {
-> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > index 140f05c1c6..cb4c6edf63 100644
-> > --- a/hw/ppc/spapr_hcall.c
-> > +++ b/hw/ppc/spapr_hcall.c
-> > @@ -1784,13 +1784,13 @@ static target_ulong h_client_architecture_suppo=
-rt(PowerPCCPU *cpu,
-> >       * terminate the boot.
-> >       */
-> >      if (guest_xive) {
-> > -        if (!spapr->irq->xive) {
-> > +        if (!spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> >              error_report(
-> >  "Guest requested unavailable interrupt mode (XIVE), try the ic-mode=3D=
-xive or ic-mode=3Ddual machine property");
-> >              exit(EXIT_FAILURE);
-> >          }
-> >      } else {
-> > -        if (!spapr->irq->xics) {
-> > +        if (!spapr_get_cap(spapr, SPAPR_CAP_XICS)) {
-> >              error_report(
-> >  "Guest requested unavailable interrupt mode (XICS), either don't set t=
-he ic-mode machine property or try ic-mode=3Dxics or ic-mode=3Ddual");
-> >              exit(EXIT_FAILURE);
-> > @@ -1804,7 +1804,8 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
-> >       */
-> >      if (!spapr->cas_reboot) {
-> >          spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_EX=
-PLOIT)
-> > -            && spapr->irq->xics && spapr->irq->xive;
-> > +            && spapr_get_cap(spapr, SPAPR_CAP_XICS)
-> > +            && spapr_get_cap(spapr, SPAPR_CAP_XIVE);
-> >      }
-> > =20
-> >      spapr_ovec_cleanup(ov5_updates);
-> > diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> > index 2768f9a765..473fc8780a 100644
-> > --- a/hw/ppc/spapr_irq.c
-> > +++ b/hw/ppc/spapr_irq.c
-> > @@ -101,90 +101,19 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptCo=
-ntroller *, Error **),
-> >      return 0;
-> >  }
-> > =20
-> > -/*
-> > - * XICS IRQ backend.
-> > - */
-> > -
-> > -SpaprIrq spapr_irq_xics =3D {
-> > -    .xics        =3D true,
-> > -    .xive        =3D false,
-> > -};
-> > -
-> > -/*
-> > - * XIVE IRQ backend.
-> > - */
-> > -
-> > -SpaprIrq spapr_irq_xive =3D {
-> > -    .xics        =3D false,
-> > -    .xive        =3D true,
-> > -};
-> > -
-> > -/*
-> > - * Dual XIVE and XICS IRQ backend.
-> > - *
-> > - * Both interrupt mode, XIVE and XICS, objects are created but the
-> > - * machine starts in legacy interrupt mode (XICS). It can be changed
-> > - * by the CAS negotiation process and, in that case, the new mode is
-> > - * activated after an extra machine reset.
-> > - */
-> > -
-> > -/*
-> > - * Define values in sync with the XIVE and XICS backend
-> > - */
-> > -SpaprIrq spapr_irq_dual =3D {
-> > -    .xics        =3D true,
-> > -    .xive        =3D true,
-> > -};
-> > -
-> > -
-> >  static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
-> >  {
-> >      MachineState *machine =3D MACHINE(spapr);
-> > =20
-> > -    /*
-> > -     * Sanity checks on non-P9 machines. On these, XIVE is not
-> > -     * advertised, see spapr_dt_ov5_platform_support()
-> > -     */
-> > -    if (!ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_=
-3_00,
-> > -                               0, spapr->max_compat_pvr)) {
-> > -        /*
-> > -         * If the 'dual' interrupt mode is selected, force XICS as CAS
-> > -         * negotiation is useless.
-> > -         */
-> > -        if (spapr->irq =3D=3D &spapr_irq_dual) {
-> > -            spapr->irq =3D &spapr_irq_xics;
-> > -            return 0;
-> > -        }
-> > -
-> > -        /*
-> > -         * Non-P9 machines using only XIVE is a bogus setup. We have t=
-wo
-> > -         * scenarios to take into account because of the compat mode:
-> > -         *
-> > -         * 1. POWER7/8 machines should fail to init later on when crea=
-ting
-> > -         *    the XIVE interrupt presenters because a POWER9 exception
-> > -         *    model is required.
-> > -
-> > -         * 2. POWER9 machines using the POWER8 compat mode won't fail =
-and
-> > -         *    will let the OS boot with a partial XIVE setup : DT
-> > -         *    properties but no hcalls.
-> > -         *
-> > -         * To cover both and not confuse the OS, add an early failure =
-in
-> > -         * QEMU.
-> > -         */
-> > -        if (spapr->irq =3D=3D &spapr_irq_xive) {
-> > -            error_setg(errp, "XIVE-only machines require a POWER9 CPU"=
-);
-> > -            return -1;
-> > -        }
-> > -    }
-> > -
-> >      /*
-> >       * On a POWER9 host, some older KVM XICS devices cannot be destroy=
-ed and
-> >       * re-created. Detect that early to avoid QEMU to exit later when =
-the
-> >       * guest reboots.
-> >       */
-> >      if (kvm_enabled() &&
-> > -        spapr->irq =3D=3D &spapr_irq_dual &&
-> >          machine_kernel_irqchip_required(machine) &&
-> > +        spapr_get_cap(spapr, SPAPR_CAP_XICS) &&
-> > +        spapr_get_cap(spapr, SPAPR_CAP_XIVE) &&
-> >          xics_kvm_has_broken_disconnect(spapr)) {
-> >          error_setg(errp, "KVM is too old to support ic-mode=3Ddual,ker=
-nel-irqchip=3Don");
-> >          return -1;
-> > @@ -280,7 +209,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
- **errp)
-> >      /* Initialize the MSI IRQ allocator. */
-> >      spapr_irq_msi_init(spapr);
-> > =20
-> > -    if (spapr->irq->xics) {
-> > +    if (spapr_get_cap(spapr, SPAPR_CAP_XICS)) {
-> >          Error *local_err =3D NULL;
-> >          Object *obj;
-> > =20
-> > @@ -313,7 +242,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
- **errp)
-> >          spapr->ics =3D ICS_SPAPR(obj);
-> >      }
-> > =20
-> > -    if (spapr->irq->xive) {
-> > +    if (spapr_get_cap(spapr, SPAPR_CAP_XIVE)) {
-> >          uint32_t nr_servers =3D spapr_max_server_number(spapr);
-> >          DeviceState *dev;
-> >          int i;
-> > @@ -558,11 +487,6 @@ int spapr_irq_find(SpaprMachineState *spapr, int n=
-um, bool align, Error **errp)
-> >      return first + ics->offset;
-> >  }
-> > =20
-> > -SpaprIrq spapr_irq_xics_legacy =3D {
-> > -    .xics        =3D true,
-> > -    .xive        =3D false,
-> > -};
-> > -
-> >  static void spapr_irq_register_types(void)
-> >  {
-> >      type_register_static(&spapr_intc_info);
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 623e8e3f93..d3b4dd7de3 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -79,8 +79,12 @@ typedef enum {
-> >  #define SPAPR_CAP_LARGE_DECREMENTER     0x08
-> >  /* Count Cache Flush Assist HW Instruction */
-> >  #define SPAPR_CAP_CCF_ASSIST            0x09
-> > +/* XICS interrupt controller */
-> > +#define SPAPR_CAP_XICS                  0x0a
-> > +/* XIVE interrupt controller */
-> > +#define SPAPR_CAP_XIVE                  0x0b
-> >  /* Num Caps */
-> > -#define SPAPR_CAP_NUM                   (SPAPR_CAP_CCF_ASSIST + 1)
-> > +#define SPAPR_CAP_NUM                   (SPAPR_CAP_XIVE + 1)
-> > =20
-> >  /*
-> >   * Capability Values
-> > @@ -131,7 +135,6 @@ struct SpaprMachineClass {
-> >                            hwaddr *nv2atsd, Error **errp);
-> >      SpaprResizeHpt resize_hpt_default;
-> >      SpaprCapabilities default_caps;
-> > -    SpaprIrq *irq;
-> >  };
-> > =20
-> >  /**
-> > @@ -195,7 +198,6 @@ struct SpaprMachineState {
-> > =20
-> >      int32_t irq_map_nr;
-> >      unsigned long *irq_map;
-> > -    SpaprIrq *irq;
-> >      qemu_irq *qirqs;
-> >      SpaprInterruptController *active_intc;
-> >      ICSState *ics;
-> > @@ -870,6 +872,8 @@ extern const VMStateDescription vmstate_spapr_cap_h=
-pt_maxpagesize;
-> >  extern const VMStateDescription vmstate_spapr_cap_nested_kvm_hv;
-> >  extern const VMStateDescription vmstate_spapr_cap_large_decr;
-> >  extern const VMStateDescription vmstate_spapr_cap_ccf_assist;
-> > +extern const VMStateDescription vmstate_spapr_cap_xics;
-> > +extern const VMStateDescription vmstate_spapr_cap_xive;
-> > =20
-> >  static inline uint8_t spapr_get_cap(SpaprMachineState *spapr, int cap)
-> >  {
-> > diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> > index 5e150a6679..71aee13743 100644
-> > --- a/include/hw/ppc/spapr_irq.h
-> > +++ b/include/hw/ppc/spapr_irq.h
-> > @@ -77,16 +77,6 @@ int spapr_irq_msi_alloc(SpaprMachineState *spapr, ui=
-nt32_t num, bool align,
-> >                          Error **errp);
-> >  void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t nu=
-m);
-> > =20
-> > -typedef struct SpaprIrq {
-> > -    bool        xics;
-> > -    bool        xive;
-> > -} SpaprIrq;
-> > -
-> > -extern SpaprIrq spapr_irq_xics;
-> > -extern SpaprIrq spapr_irq_xics_legacy;
-> > -extern SpaprIrq spapr_irq_xive;
-> > -extern SpaprIrq spapr_irq_dual;
-> > -
-> >  void spapr_irq_init(SpaprMachineState *spapr, Error **errp);
-> >  int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error=
- **errp);
-> >  void spapr_irq_free(SpaprMachineState *spapr, int irq, int num);
-> >=20
->=20
+The sequence of events here will be:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+* parse_numa_opts()
+  * for each -numa option:
+    * parse_numa()
+      * set_numa_options()
+        * parse_numa_info()
+          * here ms->numa_state->num_nodes is incremented [1]
+* parse_numa_node_opts()
+  * for each -numa option:
+    * parse_numa_node()
+      * set_numa_node_options()
+        * here are the operations that are being delayed by this
+          patch [2]
 
---oLBj+sq0vYjzfsbl
-Content-Type: application/pgp-signature; name="signature.asc"
+What exactly makes it necessary for [2] to happen after [1] is
+done for all NUMA nodes?
 
------BEGIN PGP SIGNATURE-----
+This needs to be clear in the code, otherwise somebody will try to refactor
+this in the future and merge set_numa_node_options() and parse_numa_info()
+again, not knowing why ordering between [1] and [2] is so important.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2ekHAACgkQbDjKyiDZ
-s5K0FRAAnOXrLMDNK8QRIUSfbuXAIbHWbterfjZfqyrbKsvnBhdZ0qeZ9SrQjkyx
-DeBo4iVS0l/DbMwgP/I95Ydqo6PBoIVSs45QUW/Dbsv8ZDSa7KhSxCM3oc0IQD2E
-dH6rg8XOZq1kERsgOtcqm3RMR2zu94F2QyBpq8lRz8cnXWmuiC5DhYSNBktnqS5T
-pE5VRG6Tf9Y+vbJBJPn9dAhErvHJF97/+/csc/6WNR1v7FWtsFqbMTcCONg6Car6
-gaM5se5zeqkUYZE8RUOMtyQSt2IzY4WJX2d9tX2UJ7RH8DkiZIb6gK6o/5xsmNeP
-hdA09OtmK2OhLv3fwdZoeZhk4vy9lUjvEUItSAFKb9UzIWNPG9kyADxH7iV5XrTK
-vLvQALqRaoqc3c29qX+fit0WkADauSFQBSSy2Tw/UBY4BJFSbmGJhpN2dI3ldkBb
-GPdUyrJFZMqA0zKhHEVYTbCZUfSOvG377MBqP0lt2OHS1+057WrEghcv8vjbNNO6
-vdGBnwyo+AcMA1pHJK8BR2V7/5zwykVM9ON/gAsB9mw7IWu7qxHEjE04zBSQVV0l
-Gq0tNl+rBnfOk/GIAXH3SHXYh3kb2IIyfCA8ke8J1i5YJ4huIPp85Jzq+y68t+ik
-JfHl4e6uWgthLLDBWVqWnllz5Uf0Iy21YCPkLe+MPFeiPMjFQPw=
-=4ZTI
------END PGP SIGNATURE-----
+In addition to documenting it better, I suggest saving the CPU
+index list in NodeInfo, instead of calling qemu_opts_foreach()
+twice.  (Probably a good idea to document the new field as
+internal, though.  We don't want machine-specific code to be
+looking at the CPU index list.)
 
---oLBj+sq0vYjzfsbl--
+Also, would it work if the delayed initialization is done at
+numa_complete_configuration() instead of a new
+parse_numa_node_opts() function?  We already have 2 separate
+steps in NUMA initialization (parse_numa_node() and
+numa_complete_configuration()), so it would be nice to avoid
+adding a 3rd one.
+
+Putting all the suggestions together, the code would look like this:
+
+
+static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+                            Error **errp)
+{
+    /* ... */
+    numa_info[nodenr].cpu_indexes = QAPI_CLONE(node->cpus, uint16List);
+    /* ... */
+}
+
+void numa_complete_configuration(MachineState *ms)
+{
+    /* ... */
+    for (i = 0; i < ms->numa_state->num_nodes; i++) {
+        /*
+         * numa_node_complete_configuration() needs to be called after all
+         * nodes were already parsed, because <insert reason here>,
+         */
+        numa_node_complete_configuration(numa_info[i]);
+    }
+}
+
+void numa_node_complete_configuration(MachineState *ms, NodeInfo *node)
+{
+    for (cpu_index = node->cpu_indexes; cpu_index; cpu_index = cpu_index->next) {
+        CpuInstanceProperties props;
+        props = mc->cpu_index_to_instance_props(ms, cpu_index->value);
+        props.node_id = nodenr;
+        props.has_node_id = true;
+        machine_set_cpu_numa_node(ms, &props, &err);
+    }
+}
+
+
+> 
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  hw/core/numa.c        |  106 +++++++++++++++++++++++++++++++++++--------------
+>  include/sysemu/numa.h |    2 +
+>  vl.c                  |    2 +
+>  3 files changed, 80 insertions(+), 30 deletions(-)
+> 
+> diff --git a/hw/core/numa.c b/hw/core/numa.c
+> index a11431483c..27fa6b5e1d 100644
+> --- a/hw/core/numa.c
+> +++ b/hw/core/numa.c
+> @@ -55,14 +55,10 @@ bool have_numa_distance;
+>  NodeInfo numa_info[MAX_NODES];
+>  
+>  
+> -static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+> +static void parse_numa_info(MachineState *ms, NumaNodeOptions *node,
+>                              Error **errp)
+>  {
+> -    Error *err = NULL;
+>      uint16_t nodenr;
+> -    uint16List *cpus = NULL;
+> -    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> -    unsigned int max_cpus = ms->smp.max_cpus;
+>  
+>      if (node->has_nodeid) {
+>          nodenr = node->nodeid;
+> @@ -81,29 +77,6 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+>          return;
+>      }
+>  
+> -    if (!mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id) {
+> -        error_setg(errp, "NUMA is not supported by this machine-type");
+> -        return;
+> -    }
+> -    for (cpus = node->cpus; cpus; cpus = cpus->next) {
+> -        CpuInstanceProperties props;
+> -        if (cpus->value >= max_cpus) {
+> -            error_setg(errp,
+> -                       "CPU index (%" PRIu16 ")"
+> -                       " should be smaller than maxcpus (%d)",
+> -                       cpus->value, max_cpus);
+> -            return;
+> -        }
+> -        props = mc->cpu_index_to_instance_props(ms, cpus->value);
+> -        props.node_id = nodenr;
+> -        props.has_node_id = true;
+> -        machine_set_cpu_numa_node(ms, &props, &err);
+> -        if (err) {
+> -            error_propagate(errp, err);
+> -            return;
+> -        }
+> -    }
+> -
+>      have_memdevs = have_memdevs ? : node->has_memdev;
+>      have_mem = have_mem ? : node->has_mem;
+>      if ((node->has_mem && have_memdevs) || (node->has_memdev && have_mem)) {
+> @@ -177,7 +150,7 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+>  
+>      switch (object->type) {
+>      case NUMA_OPTIONS_TYPE_NODE:
+> -        parse_numa_node(ms, &object->u.node, &err);
+> +        parse_numa_info(ms, &object->u.node, &err);
+>          if (err) {
+>              goto end;
+>          }
+> @@ -242,6 +215,73 @@ end:
+>      return 0;
+>  }
+>  
+> +void set_numa_node_options(MachineState *ms, NumaOptions *object, Error **errp)
+> +{
+> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> +    NumaNodeOptions *node = &object->u.node;
+> +    unsigned int max_cpus = ms->smp.max_cpus;
+> +    uint16List *cpus = NULL;
+> +    Error *err = NULL;
+> +    uint16_t nodenr;
+> +
+> +    if (node->has_nodeid) {
+> +        nodenr = node->nodeid;
+> +    } else {
+> +        error_setg(errp, "NUMA node information is not available");
+> +    }
+> +
+> +    if (!mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id) {
+> +        error_setg(errp, "NUMA is not supported by this machine-type");
+> +        return;
+> +    }
+> +
+> +    for (cpus = node->cpus; cpus; cpus = cpus->next) {
+> +        CpuInstanceProperties props;
+> +        if (cpus->value >= max_cpus) {
+> +            error_setg(errp,
+> +                       "CPU index (%" PRIu16 ")"
+> +                       " should be smaller than maxcpus (%d)",
+> +                       cpus->value, max_cpus);
+> +            return;
+> +         }
+> +         props = mc->cpu_index_to_instance_props(ms, cpus->value);
+> +         props.node_id = nodenr;
+> +         props.has_node_id = true;
+> +         machine_set_cpu_numa_node(ms, &props, &err);
+> +         if (err) {
+> +            error_propagate(errp, err);
+> +            return;
+> +         }
+> +    }
+> +}
+> +
+> +static int parse_numa_node(void *opaque, QemuOpts *opts, Error **errp)
+> +{
+> +    NumaOptions *object = NULL;
+> +    MachineState *ms = MACHINE(opaque);
+> +    Error *err = NULL;
+> +    Visitor *v = opts_visitor_new(opts);
+> +
+> +    visit_type_NumaOptions(v, NULL, &object, &err);
+> +    visit_free(v);
+> +    if (err) {
+> +        goto end;
+> +    }
+> +
+> +    if (object->type == NUMA_OPTIONS_TYPE_NODE) {
+> +        set_numa_node_options(ms, object, &err);
+> +    }
+> +
+> +end:
+> +    qapi_free_NumaOptions(object);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  /* If all node pair distances are symmetric, then only distances
+>   * in one direction are enough. If there is even one asymmetric
+>   * pair, though, then all distances must be provided. The
+> @@ -368,7 +408,7 @@ void numa_complete_configuration(MachineState *ms)
+>      if (ms->ram_slots > 0 && nb_numa_nodes == 0 &&
+>          mc->auto_enable_numa_with_memhp) {
+>              NumaNodeOptions node = { };
+> -            parse_numa_node(ms, &node, &error_abort);
+> +            parse_numa_info(ms, &node, &error_abort);
+>      }
+>  
+>      assert(max_numa_nodeid <= MAX_NODES);
+> @@ -448,6 +488,12 @@ void parse_numa_opts(MachineState *ms)
+>      qemu_opts_foreach(qemu_find_opts("numa"), parse_numa, ms, &error_fatal);
+>  }
+>  
+> +void parse_numa_node_opts(MachineState *ms)
+> +{
+> +    qemu_opts_foreach(qemu_find_opts("numa"), parse_numa_node,
+> +                      ms, &error_fatal);
+> +}
+> +
+>  void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
+>  {
+>      int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 01a263eba2..ca109adaa6 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -24,7 +24,9 @@ struct NumaNodeMem {
+>  extern NodeInfo numa_info[MAX_NODES];
+>  
+>  void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp);
+> +void set_numa_node_options(MachineState *ms, NumaOptions *object, Error **errp);
+>  void parse_numa_opts(MachineState *ms);
+> +void parse_numa_node_opts(MachineState *ms);
+>  void numa_complete_configuration(MachineState *ms);
+>  void query_numa_node_mem(NumaNodeMem node_mem[]);
+>  extern QemuOptsList qemu_numa_opts;
+> diff --git a/vl.c b/vl.c
+> index b426b32134..711d2ae5da 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4339,6 +4339,8 @@ int main(int argc, char **argv, char **envp)
+>      }
+>      parse_numa_opts(current_machine);
+>  
+> +    parse_numa_node_opts(current_machine);
+> +
+>      /* do monitor/qmp handling at preconfig state if requested */
+>      main_loop();
+>  
+> 
+
+-- 
+Eduardo
 
