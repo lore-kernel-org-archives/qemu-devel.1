@@ -2,57 +2,84 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C9CC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D481C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57FBB206A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:51:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57FBB206A1
+	by mail.kernel.org (Postfix) with ESMTPS id D54AD206A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 11:52:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D54AD206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIWyv-0006wu-3o
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:51:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50464)
+	id 1iIX01-0000KF-DY
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 07:52:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iIWj7-0004Uu-8R
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:35:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1iIWpz-00059o-Mw
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:42:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iIWj4-00069c-I8
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:35:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58092)
+ (envelope-from <philmd@redhat.com>) id 1iIWpy-0007vj-II
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:42:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50706)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1iIWj3-00067s-Dg; Thu, 10 Oct 2019 07:35:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iIWpy-0007vM-9p
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:42:30 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A7F2B307D96D;
- Thu, 10 Oct 2019 11:35:19 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-138.ams2.redhat.com [10.36.117.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E46CB5C553;
- Thu, 10 Oct 2019 11:35:09 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 19/31] target/s390x: Return exception from mmu_translate_real
-Date: Thu, 10 Oct 2019 13:33:44 +0200
-Message-Id: <20191010113356.5017-20-david@redhat.com>
-In-Reply-To: <20191010113356.5017-1-david@redhat.com>
-References: <20191010113356.5017-1-david@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 68FDD69084
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 11:42:29 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id o8so2510279wmc.2
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 04:42:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5dO50rGa5s7OXTG5VGdHfyey22rtFDO/NsLBek7cOw4=;
+ b=QVGS+WZKfkfIk/SjEsTgHKkj4Ql8HQKx97z1n2pFEazmnBJ7j0G6QAfFslI/+IxoK2
+ dm7Uj6tr9t/de0r0jBXC+5PcM4Gc26nkmk7/U/0PNk9wu2VwTcJlduSqEUcRe4vfOsnv
+ +Do/wNa88QfiZ1KFAJii9l2UgkeqXpeJU3nyy1IQnIkwt4qipoEo4PhkuOJEyQKl8vQy
+ l4TUFrT6A9hSl7OU1QE/eVvmfjgCXiAeOrJBERX8npXNJ9iQxKOP3wDNUvKSdWA23ede
+ LOtL9lGn3pQXQ7mwoCrg6J+merA/N2v5oPlBLzKg+v0aYacP5xRD8amr5dSvtsVynD5k
+ zUnA==
+X-Gm-Message-State: APjAAAVhge7VgBYPhHpPujp59wIzITy98AGNLw7ehr5ZdQ2EntrMWJMw
+ 5t+3jiPTg4wROkkIi9CcSDegLfjFed5WDsrmB3I/AX7FIdBpwOjQmxT3DDqwel3KLPzaOdUNQW9
+ e7vxalzlaaEhkzQk=
+X-Received: by 2002:a7b:ce07:: with SMTP id m7mr7468873wmc.117.1570707748132; 
+ Thu, 10 Oct 2019 04:42:28 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwSfNv41CgNc7hLGs1AZBJ8KJLdk5gufq5w8Z1yUh27hgSkLoT5PjPhQZKyzOWI9CAJxPkKDQ==
+X-Received: by 2002:a7b:ce07:: with SMTP id m7mr7468855wmc.117.1570707747956; 
+ Thu, 10 Oct 2019 04:42:27 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id r10sm6831401wml.46.2019.10.10.04.42.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 10 Oct 2019 04:42:27 -0700 (PDT)
+Subject: Re: [PATCH v2 1/1] IDE: deprecate ide-drive
+To: Peter Krempa <pkrempa@redhat.com>
+References: <20191009224303.10232-1-jsnow@redhat.com>
+ <20191009224303.10232-2-jsnow@redhat.com>
+ <518ae20b-049d-19ee-1e86-c48466ba0655@redhat.com>
+ <20191010112650.GR6129@angien.pipo.sk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <10bb29c8-2375-25cd-af67-edddca1be5d7@redhat.com>
+Date: Thu, 10 Oct 2019 13:42:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 10 Oct 2019 11:35:19 +0000 (UTC)
+In-Reply-To: <20191010112650.GR6129@angien.pipo.sk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -68,102 +95,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+On 10/10/19 1:26 PM, Peter Krempa wrote:
+> On Thu, Oct 10, 2019 at 13:22:37 +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+>> On 10/10/19 12:43 AM, John Snow wrote:
+>>> It's an old compatibility shim that just delegates to ide-cd or ide-h=
+d.
+>>> I'd like to refactor these some day, and getting rid of the super-obj=
+ect
+>>> will make that easier.
+>>>
+>>> Either way, we don't need this.
+>>>
+>>> Libvirt-checked-by: Peter Krempa <pkrempa@redhat.com>
+>>
+>> Peter made a comment regarding Laszlo's Regression-tested-by tag:
+>>
+>>    [...] nobody else is using
+>>    this convention (there are exactly 0 instances of
+>>    "Regression-tested-by" in the project git log as far as
+>>    I can see), and so in practice people reading the commits
+>>    won't really know what you meant by it. Everybody else
+>>    on the project uses "Tested-by" to mean either of the
+>>    two cases you describe above, without distinction...
+>>
+>> It probably applies to 'Libvirt-checked-by' too.
+>=20
+> I certainly didn't test it. So feel free to drop that line altogether.
 
-Do not raise the exception directly within mmu_translate_real,
-but pass it back so that caller may do so.
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20191001171614.8405-8-richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/excp_helper.c |  4 ++--
- target/s390x/internal.h    |  2 +-
- target/s390x/mmu_helper.c  | 14 ++++++--------
- 3 files changed, 9 insertions(+), 11 deletions(-)
-
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index ab2ed47fef..906b87c071 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -147,8 +147,8 @@ bool s390_cpu_tlb_fill(CPUState *cs, vaddr address, i=
-nt size,
-         if (!(env->psw.mask & PSW_MASK_64)) {
-             vaddr &=3D 0x7fffffff;
-         }
--        fail =3D mmu_translate_real(env, vaddr, access_type, &raddr, &pr=
-ot);
--        excp =3D 0; /* exception already raised */
-+        excp =3D mmu_translate_real(env, vaddr, access_type, &raddr, &pr=
-ot, &tec);
-+        fail =3D excp;
-     } else {
-         g_assert_not_reached();
-     }
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index c243fa725b..c4388aaf23 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -362,7 +362,7 @@ void probe_write_access(CPUS390XState *env, uint64_t =
-addr, uint64_t len,
- int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64=
-_t asc,
-                   target_ulong *raddr, int *flags, bool exc);
- int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
--                       target_ulong *addr, int *flags);
-+                       target_ulong *addr, int *flags, uint64_t *tec);
-=20
-=20
- /* misc_helper.c */
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 4a794dadcf..e8281d4413 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -554,14 +554,11 @@ void s390_cpu_virt_mem_handle_exc(S390CPU *cpu, uin=
-tptr_t ra)
-  * @param rw     0 =3D read, 1 =3D write, 2 =3D code fetch
-  * @param addr   the translated address is stored to this pointer
-  * @param flags  the PAGE_READ/WRITE/EXEC flags are stored to this point=
-er
-- * @return       0 if the translation was successful, < 0 if a fault occ=
-urred
-+ * @return       0 =3D success, !=3D 0, the exception to raise
-  */
- int mmu_translate_real(CPUS390XState *env, target_ulong raddr, int rw,
--                       target_ulong *addr, int *flags)
-+                       target_ulong *addr, int *flags, uint64_t *tec)
- {
--    /* Code accesses have an undefined ilc, let's use 2 bytes. */
--    uint64_t tec =3D (raddr & TARGET_PAGE_MASK) |
--                   (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ);
-     const bool lowprot_enabled =3D env->cregs[0] & CR0_LOWPROT;
-=20
-     *flags =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-@@ -570,9 +567,10 @@ int mmu_translate_real(CPUS390XState *env, target_ul=
-ong raddr, int rw,
-         *flags |=3D PAGE_WRITE_INV;
-         if (is_low_address(raddr) && rw =3D=3D MMU_DATA_STORE) {
-             /* LAP sets bit 56 */
--            tec |=3D 0x80;
--            trigger_access_exception(env, PGM_PROTECTION, ILEN_AUTO, tec=
-);
--            return -EACCES;
-+            *tec =3D (raddr & TARGET_PAGE_MASK)
-+                 | (rw =3D=3D MMU_DATA_STORE ? FS_WRITE : FS_READ)
-+                 | 0x80;
-+            return PGM_PROTECTION;
-         }
-     }
-=20
---=20
-2.21.0
-
+But you reviewed it, can we use your 'Reviewed-by' instead?
 
