@@ -2,67 +2,80 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A3AC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 09:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C1DC10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 09:16:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB80D2067B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 09:04:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB80D2067B
+	by mail.kernel.org (Postfix) with ESMTPS id 49F9E2067B
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 09:16:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49F9E2067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIUNM-0005Sp-Md
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 05:04:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33860)
+	id 1iIUYU-0007rU-RH
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 05:16:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35616)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iIUM8-0004au-GO
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:03:34 -0400
+ (envelope-from <slp@redhat.com>) id 1iIUXT-00078r-CL
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:15:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iIUM5-0003Xf-Td
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:03:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47894)
+ (envelope-from <slp@redhat.com>) id 1iIUXR-0000Ly-E1
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:15:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35736)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1iIUM5-0003XS-Kq; Thu, 10 Oct 2019 05:03:29 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iIUXR-0000Il-5E
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 05:15:13 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D4C7F7FDCD;
- Thu, 10 Oct 2019 09:03:28 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C1A410013A1;
- Thu, 10 Oct 2019 09:03:23 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CB76C1138619; Thu, 10 Oct 2019 11:03:21 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Subject: Re: [PATCH] monitor/qmp: resume monitor when clearing its queue
-References: <20191002083003.21556-1-w.bumiller@proxmox.com>
- <87ftk28g8f.fsf@dusky.pond.sub.org>
- <20191009101032.kxts5buz7sp3cyo5@olga.proxmox.com>
- <8736g1zq1f.fsf@dusky.pond.sub.org>
- <20191010081259.vecmxlbfhm7x64t5@olga.proxmox.com>
-Date: Thu, 10 Oct 2019 11:03:21 +0200
-In-Reply-To: <20191010081259.vecmxlbfhm7x64t5@olga.proxmox.com> (Wolfgang
- Bumiller's message of "Thu, 10 Oct 2019 10:12:59 +0200")
-Message-ID: <87h84hrmzq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id 145A38E584
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 09:15:11 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id y18so2434926wrw.8
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 02:15:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=uAj8ZgJA0/Wne9MKUd7Krp3v+SVQnHVQW7VqyTNIiyU=;
+ b=RJPzJhGjm+QmQY3GVl5cZhC2Xcarr/NEY/WVXbM1kPj7OS3K/REstyT/0Zzsgkna1i
+ Hxp29Ah/y9F79UL+SAgAZArwiBuxs6I6FOeeVYC/AHs7EEN5o1sSQCO/iuIj8Lyq8ZGF
+ vPfAePeKppesdnvO2fnrXkdWLhBlK4eLBKQ5kHs4ZRDWyPegzpOo5tYz6VMfG1UzNz69
+ oc/cN3mRteJiv5O+HOi04hqaVWmRP3hxrKumbS84HRDa049r/2b4OpTvsJtapAKYOg64
+ lZS2N/PlAfX/0vp1hNXEOUPOusQ1n8ISF6N7Qdk6tUogb5GOMId5hm8xPyyRUpjcXuH1
+ looA==
+X-Gm-Message-State: APjAAAWFyK4J0nOwJkw0pxAYe0OioIC1eJi42/RjK627ripRp1T5C/VJ
+ vsDcclc5/d/bnU0wsjJT3+n+idlt2CisQjXOeZeh92xUfymDx5dAN1ZzD+0QiD0ieOJu/73qoM1
+ tgyAdVyhnsTLb7MQ=
+X-Received: by 2002:a5d:6551:: with SMTP id z17mr7304560wrv.386.1570698909709; 
+ Thu, 10 Oct 2019 02:15:09 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxerRii7Lrc3BkzrZ0n1ouz1cuzw+2AgnsVw6o2zFxy6dcPD9CENLtvoC3WJAIKC0h9W393aA==
+X-Received: by 2002:a5d:6551:: with SMTP id z17mr7304531wrv.386.1570698909461; 
+ Thu, 10 Oct 2019 02:15:09 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id q19sm11283995wra.89.2019.10.10.02.15.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 10 Oct 2019 02:15:08 -0700 (PDT)
+References: <20191008135537.197867-1-slp@redhat.com>
+ <20191009152542-mutt-send-email-mst@kernel.org>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v7 00/12] Introduce the microvm machine type
+In-reply-to: <20191009152542-mutt-send-email-mst@kernel.org>
+Date: Thu, 10 Oct 2019 11:15:06 +0200
+Message-ID: <87woddrmg5.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 10 Oct 2019 09:03:28 +0000 (UTC)
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -77,217 +90,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-stable@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: ehabkost@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, philmd@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Wolfgang Bumiller <w.bumiller@proxmox.com> writes:
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Oct 09, 2019 at 09:18:04PM +0200, Markus Armbruster wrote:
->> Wolfgang Bumiller <w.bumiller@proxmox.com> writes:
+
+Michael S. Tsirkin <mst@redhat.com> writes:
+
+> On Tue, Oct 08, 2019 at 03:55:26PM +0200, Sergio Lopez wrote:
+>> Microvm is a machine type inspired by Firecracker and constructed
+>> after the its machine model.
 >>=20
->> > On Wed, Oct 09, 2019 at 10:39:44AM +0200, Markus Armbruster wrote:
->> >> Cc: Marc-Andr=C3=A9 for additional monitor and chardev expertise.
->> >>=20
->> >> Wolfgang Bumiller <w.bumiller@proxmox.com> writes:
->> >>=20
->> >> > When a monitor's queue is filled up in handle_qmp_command()
->> >> > it gets suspended. It's the dispatcher bh's job currently to
->> >> > resume the monitor, which it does after processing an event
->> >> > from the queue. However, it is possible for a
->> >> > CHR_EVENT_CLOSED event to be processed before before the bh
->> >> > is scheduled, which will clear the queue without resuming
->> >> > the monitor, thereby preventing the dispatcher from reaching
->> >> > the resume() call.
->> >>=20
->> >> Because with the request queue cleared, there's nothing for
->> >> monitor_qmp_requests_pop_any_with_lock() to pop, so
->> >> monitor_qmp_bh_dispatcher() won't look at this monitor.  It stays
->> >> suspended forever.  Correct?
->> >>=20
->> >> Observable effect for the monitor's user?
->> >
->> > Yes.
->>=20
->> I was too terse, let me try again: what exactly breaks for the monitor's
->> user?
+>> It's a minimalist machine type without PCI nor ACPI support, designed
+>> for short-lived guests. Microvm also establishes a baseline for
+>> benchmarking and optimizing both QEMU and guest operating systems,
+>> since it is optimized for both boot time and footprint.
 >
-> Any new connections to qmp will be accept()ed and show the greeting
-> ({"QMP":{"version"...}}), but not respond to any messages sent
-> afterwards (though in my tests sometimes (after a few more attempts to
-> reconnect/talk to the same qmp socket), not even the greeting would
-> appear anymore).
+> Looks good overall. I think coding style needs to
+> be fixed but that's a patch on top.
 
-Work this into your commit message, please :)
+v7 includes patch "[PATCH v7 03/12] hw/i386/pc: fix code style issues on
+functions that will be moved out". Or do you mean some other coding
+style issues?
 
->> >      More easily triggered now with oob. We ran into this a longer time
->> > ago, but our only reliable trigger was a customized version of
->> > -loadstate which loads the state from a separate file instead of the
->> > vmstate region of a qcow2. Turns out that doing this on a slow storage
->> > (~12s to load the data) caused our status daemon to try to poll the qmp
->> > socket during the load-state and give up after a 3s timeout. And since
->> > the BH runs in the main loop which is not even entered until after the
->> > loadstate has finished, but iothread handling the qmp socket does fill=
- &
->> > clear the queue, the qmp socket always ended up unusable afterwards.
->> >
->> > Aside from that we have users reporting the same symptom (hanging qmp)
->> > appearing randomly on busy systems.
->> >
->> >> > Fix this by resuming the monitor when clearing a queue which
->> >> > was filled up.
->> >> >
->> >> > Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
->> >> > ---
->> >> > @Michael, we ran into this with qemu 4.0, so if the logic in this p=
-atch
->> >> > is correct it may make sense to include it in the 4.0.1 roundup.
->> >> > A backport is at [1] as 4.0 was before the monitor/ dir split.
->> >> >
->> >> > [1] https://gitlab.com/wbumiller/qemu/commit/9d8bbb5294ed084f282174=
-b0c91e1a614e0a0714
->> >> >
->> >> >  monitor/qmp.c | 10 ++++++++++
->> >> >  1 file changed, 10 insertions(+)
->> >> >
->> >> > diff --git a/monitor/qmp.c b/monitor/qmp.c
->> >> > index 9d9e5d8b27..c1db5bf940 100644
->> >> > --- a/monitor/qmp.c
->> >> > +++ b/monitor/qmp.c
->> >> > @@ -70,9 +70,19 @@ static void qmp_request_free(QMPRequest *req)
->> >> >  /* Caller must hold mon->qmp.qmp_queue_lock */
->> >> >  static void monitor_qmp_cleanup_req_queue_locked(MonitorQMP *mon)
->> >> >  {
->> >> > +    bool need_resume =3D (!qmp_oob_enabled(mon) && mon->qmp_reques=
-ts->length > 0)
->> >> > +        || mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX;
->> >>=20
->> >> Can you explain why this condition is correct?
->> >
->> > Sorry, I meant to add a comment pointing to monitor_qmp_bh_dispatcher(=
-),
->> > which does the following *after* popping 1 element off the queue:
->> >
->> >     need_resume =3D !qmp_oob_enabled(mon) ||
->> >         mon->qmp_requests->length =3D=3D QMP_REQ_QUEUE_LEN_MAX - 1;
->> >     qemu_mutex_unlock(&mon->qmp_queue_lock);
->> >
->> > It's supposed to be the same condition, but _before_ popping off an
->> > element (hence no `- 1`), but the queue shouldn't be empty as well
->> > otherwise the `monitor_suspend()` in `handle_qmp_command()` hasn't
->> > happened, though on second though we could probably just return early =
-in
->> > that case.).
->>=20
->> I see.
->>=20
->> Could we monitor_resume() unconditionally here?
+Thanks,
+Sergio.
+
+> series:
 >
-> We can't, because suspend()/resume() employ a counter, which would
-> become unbalanced and could easily become negative by queuing a command
-> without filling the queue up and quickly disconnecting.
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 >
->>=20
->> >> >      while (!g_queue_is_empty(mon->qmp_requests)) {
->> >> >          qmp_request_free(g_queue_pop_head(mon->qmp_requests));
->> >> >      }
->> >> > +    if (need_resume) {
->> >> > +        /*
->> >> > +         * Pairs with the monitor_suspend() in handle_qmp_command(=
-) in case the
->> >> > +         * queue gets cleared from a CH_EVENT_CLOSED event before =
-the dispatch
->> >> > +         * bh got scheduled.
->> >> > +         */
->> >> > +        monitor_resume(&mon->common);
->> >> > +    }
->> >> >  }
->> >> >=20=20
->> >> >  static void monitor_qmp_cleanup_queues(MonitorQMP *mon)
->> >>=20
->> >> Is monitor_qmp_cleanup_req_queue_locked() the correct place?
->> >>=20
->> >> It's called from
->> >>=20
->> >> * monitor_qmp_event() case CHR_EVENT_CLOSED via
->> >>   monitor_qmp_cleanup_queues(), as part of destroying the monitor's
->> >>   session state.
->> >>=20
->> >>   This is the case you're trying to fix.  Correct?
->> >>=20
->> >>   I figure monitor_resume() is safe because we haven't really destroy=
-ed
->> >>   anything, yet, we merely flushed the request queue.  Correct?
->> >>=20
->> >> * monitor_data_destroy() via monitor_data_destroy_qmp() when destroyi=
-ng
->> >>   the monitor.
->> >>=20
->> >>   Can need_resume be true in this case?  If yes, is monitor_resume()
->> >>   still safe?  We're in the middle of destroying the monitor...
->> >
->> > I thought so when first reading through it, but on second though, we
->> > should probably avoid this for sanity's sake.
->> > Maybe with a flag, or an extra parameter.
->> > Or we could introduce a "bool queue_filled" we set in handle_qmp_comma=
-nd()
->> > instead of "calculating" `need_resume` in 2 places and unset it in
->> > `monitor_data_destroy()` before clearing the queue?
->>=20
->> Could we simply call monitor_resume() in monitor_qmp_event() right after
->> monitor_qmp_cleanup_queues()?
+> Paolo I assume you will be merging this?
 >
-> We'd still need to make sure the suspend counter is balanced out with
-> the corresponding suspend() calls.
+>
+>> ---
+>>=20
+>> Changelog
+>> v7:
+>>  - Fix code style issues on already present code touched by this patch
+>>    series (Michael S. Tsirkin, Philippe Mathieu-Daud=C3=A9)
+>>  - Add new files to MAINTAINERS (Michael S. Tsirkin, Philippe
+>>    Mathieu-Daud=C3=A9)
+>>  - Allow starting a microvm machine without a kernel image, fixing
+>>    "qom-test" (Michael S. Tsirkin)
+>>  - Change "bios-microvm.bin" mode to 0644 (Stefano Garzarella)
+>>  - Remove unneeded "hw/i386/pc.h" include from x86.c (Stefano
+>>    Garzarella)
+>>=20
+>> v6:
+>>  - Some style fixes (Philippe Mathieu-Daud=C3=A9)
+>>  - Fix a documentation bug stating that LAPIC was in userspace (Paolo
+>>    Bonzini)
+>>  - Update Xen HVM code after X86MachineState introduction (Philippe
+>>    Mathieu-Daud=C3=A9)
+>>  - Rename header guard from QEMU_VIRTIO_MMIO_H to HW_VIRTIO_MMIO_H
+>>    (Philippe Mathieu-Daud=C3=A9)
+>>=20
+>> v5:
+>>  - Drop unneeded "[PATCH v4 2/8] hw/i386: Factorize e820 related
+>>    functions" (Philippe Mathieu-Daud=C3=A9)
+>>  - Drop unneeded "[PATCH v4 1/8] hw/i386: Factorize PVH related
+>>    functions" (Stefano Garzarella)
+>>  - Split X86MachineState introduction into smaller patches (Philippe
+>>    Mathieu-Daud=C3=A9)
+>>  - Change option-roms to x-option-roms and kernel-cmdline to
+>>    auto-kernel-cmdline (Paolo Bonzini)
+>>  - Make i8259 PIT and i8254 PIC optional (Paolo Bonzini)
+>>  - Some fixes to the documentation (Paolo Bonzini)
+>>  - Switch documentation format from txt to rst (Peter Maydell)
+>>  - Move NMI interface to X86_MACHINE (Philippe Mathieu-Daud=C3=A9, Paolo
+>>    Bonzini)
+>>=20
+>> v4:
+>>  - This is a complete rewrite of the whole patchset, with a focus on
+>>    reusing as much existing code as possible to ease the maintenance bur=
+den
+>>    and making the machine type as compatible as possible by default. As
+>>    a result, the number of lines dedicated specifically to microvm is
+>>    383 (code lines measured by "cloc") and, with the default
+>>    configuration, it's now able to boot both PVH ELF images and
+>>    bzImages with either SeaBIOS or qboot.
+>>=20
+>> v3:
+>>   - Add initrd support (thanks Stefano).
+>>=20
+>> v2:
+>>   - Drop "[PATCH 1/4] hw/i386: Factorize CPU routine".
+>>   - Simplify machine definition (thanks Eduardo).
+>>   - Remove use of unneeded NUMA-related callbacks (thanks Eduardo).
+>>   - Add a patch to factorize PVH-related functions.
+>>   - Replace use of Linux's Zero Page with PVH (thanks Maran and Paolo).
+>>=20
+>> ---
+>>=20
+>> Sergio Lopez (12):
+>>   hw/virtio: Factorize virtio-mmio headers
+>>   hw/i386/pc: rename functions shared with non-PC machines
+>>   hw/i386/pc: fix code style issues on functions that will be moved out
+>>   hw/i386/pc: move shared x86 functions to x86.c and export them
+>>   hw/i386: split PCMachineState deriving X86MachineState from it
+>>   hw/i386: make x86.c independent from PCMachineState
+>>   fw_cfg: add "modify" functions for all types
+>>   hw/intc/apic: reject pic ints if isa_pic =3D=3D NULL
+>>   roms: add microvm-bios (qboot) as binary and git submodule
+>>   docs/microvm.rst: document the new microvm machine type
+>>   hw/i386: Introduce the microvm machine type
+>>   MAINTAINERS: add microvm related files
+>>=20
+>>  docs/microvm.rst                 |  98 ++++
+>>  default-configs/i386-softmmu.mak |   1 +
+>>  include/hw/i386/microvm.h        |  83 ++++
+>>  include/hw/i386/pc.h             |  28 +-
+>>  include/hw/i386/x86.h            |  96 ++++
+>>  include/hw/nvram/fw_cfg.h        |  42 ++
+>>  include/hw/virtio/virtio-mmio.h  |  73 +++
+>>  hw/acpi/cpu_hotplug.c            |  10 +-
+>>  hw/i386/acpi-build.c             |  29 +-
+>>  hw/i386/amd_iommu.c              |   3 +-
+>>  hw/i386/intel_iommu.c            |   3 +-
+>>  hw/i386/microvm.c                | 572 ++++++++++++++++++++++
+>>  hw/i386/pc.c                     | 781 +++---------------------------
+>>  hw/i386/pc_piix.c                |  46 +-
+>>  hw/i386/pc_q35.c                 |  38 +-
+>>  hw/i386/pc_sysfw.c               |  60 +--
+>>  hw/i386/x86.c                    | 795 +++++++++++++++++++++++++++++++
+>>  hw/i386/xen/xen-hvm.c            |  28 +-
+>>  hw/intc/apic.c                   |   2 +-
+>>  hw/intc/ioapic.c                 |   2 +-
+>>  hw/nvram/fw_cfg.c                |  29 ++
+>>  hw/virtio/virtio-mmio.c          |  48 +-
+>>  .gitmodules                      |   3 +
+>>  MAINTAINERS                      |  10 +
+>>  hw/i386/Kconfig                  |   4 +
+>>  hw/i386/Makefile.objs            |   2 +
+>>  pc-bios/bios-microvm.bin         | Bin 0 -> 65536 bytes
+>>  roms/Makefile                    |   6 +
+>>  roms/qboot                       |   1 +
+>>  29 files changed, 1982 insertions(+), 911 deletions(-)
+>>  create mode 100644 docs/microvm.rst
+>>  create mode 100644 include/hw/i386/microvm.h
+>>  create mode 100644 include/hw/i386/x86.h
+>>  create mode 100644 include/hw/virtio/virtio-mmio.h
+>>  create mode 100644 hw/i386/microvm.c
+>>  create mode 100644 hw/i386/x86.c
+>>  create mode 100644 pc-bios/bios-microvm.bin
+>>  create mode 160000 roms/qboot
+>>=20
+>> --=20
+>> 2.21.0
 
-You made me look at ->suspend_cnt, and now I feel nauseous.
 
-monitor_suspend() increments, and monitor_resume() decrements.  This
-permits "recursive" suspension.  Fair enough.  I'd expect
-monitor_resume() to assert the decrement doesn't go negative, but that's
-detail.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The nauseating part is in monitor_event():
+-----BEGIN PGP SIGNATURE-----
 
-    switch (event) {
-    case CHR_EVENT_MUX_IN:
-        qemu_mutex_lock(&mon->mon_lock);
-        mon->mux_out =3D 0;
-        qemu_mutex_unlock(&mon->mon_lock);
-        if (mon->reset_seen) {
-            readline_restart(hmp_mon->rs);
---->        monitor_resume(mon);
-            monitor_flush(mon);
-        } else {
---->        atomic_mb_set(&mon->suspend_cnt, 0);
-        }
-        break;
-
-    case CHR_EVENT_MUX_OUT:
-        if (mon->reset_seen) {
-            if (atomic_mb_read(&mon->suspend_cnt) =3D=3D 0) {
-                monitor_printf(mon, "\n");
-            }
-            monitor_flush(mon);
---->        monitor_suspend(mon);
-        } else {
---->        atomic_inc(&mon->suspend_cnt);
-        }
-        qemu_mutex_lock(&mon->mon_lock);
-        mon->mux_out =3D 1;
-        qemu_mutex_unlock(&mon->mon_lock);
-        break;
-
-
-If mon->reset_seen(), we use monitor_resume() and monitor_suspend() like
-a good boy.
-
-Else, we mess with mon->suspend_cnt directly.  Worse, we don't just
-decrement, we go all the way to zero!
-
-Gerd, this goes back to your a7aec5da4d "monitor: fix muxing".  It's
-been ten years, but I have to ask anyway: why?
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2e9poACgkQ9GknjS8M
+AjWoxg//fogBr5Oc2joIUBYO+j71LhoU5/8fGrV9ZiAW8L/hOVhWrHiYr0AHI1Mc
+h2sQrCbmcj5TGWyXkpeCQN+ZtZ3RWfI98Fd0Zimdz8n7CSH5COZpkijqz6O7Ba+G
+buxq/xzCiopkQ8U06VVkFVnjJHsnLNuwcNai8+oOE7spdb3mNJ9KQeDOgNuLEZbJ
+WrDJyBJxcwQr+fav0TpoaYRJvXby/b3yhpk/kFQYIhXa1slW75B8GhzfBQT8VObr
+RW1x32tNfc/a1PIQW/N198gK5jAJLnkzqTad36cHyLSg/pwm7Mgbti14AkrFJslW
+Ru+t5eDGPtKzGn9+OUK3GNu1eFjwQ0jazWoskGLlUaQwdim6znui19w7BzE2NtRy
+TD/kZ3JFF+NzCHOohQJBgVMdMDD/jpKLQ1woW8L7QTDCPCOHxByW5mwHg5V3+++r
+kgsITJZyXzC+tek/MD3o/Jq4aCy/DOdB3yFW/WH5wBE9t/o5r80/xkS5OrY6NyuR
+/kGWMPrEb6Dbo6JJZHnGQ3sKyyNdw9OHBxXr/NZFcQX0leDVeHVHv2b9LtLbn+vq
+t1jntDST+i0+wRMv2ub7X5zqqDyF7T9MDB+Rjq0r6CyrC9mW4z0GT4G8aUHG/FLW
+t7ch1wGbkzkSmungVoP883lTsuuqpsMobNRNJRe0KgAZqU0Xs7Y=
+=KtGr
+-----END PGP SIGNATURE-----
+--=-=-=--
 
