@@ -2,63 +2,63 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16491C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C62BC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:24:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFA82206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:21:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFA82206B6
+	by mail.kernel.org (Postfix) with ESMTPS id E3857206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 19:24:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3857206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIe0P-0003q9-9R
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 15:21:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34614)
+	id 1iIe2z-0005y9-Np
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 15:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34986)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iIdzb-0003JW-1q
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:20:56 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIe2B-0005KC-9H
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iIdzZ-0002Ha-Nq
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:20:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59814)
+ (envelope-from <eblake@redhat.com>) id 1iIe2A-0002up-5L
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:23:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49576)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iIdzZ-0002HN-FM
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 15:20:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iIe28-0002tZ-5e; Thu, 10 Oct 2019 15:23:32 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8D58BA26692;
- Thu, 10 Oct 2019 19:20:52 +0000 (UTC)
-Received: from localhost (ovpn-116-5.gru2.redhat.com [10.97.116.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3920A50D08;
- Thu, 10 Oct 2019 19:20:41 +0000 (UTC)
-Date: Thu, 10 Oct 2019 16:20:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [RFC 0/3] acpi: cphp: add CPHP_GET_CPU_ID_CMD command to cpu
- hotplug MMIO interface
-Message-ID: <20191010192039.GE4084@habkost.net>
-References: <20191009132252.17860-1-imammedo@redhat.com>
- <20191010055356-mutt-send-email-mst@kernel.org>
- <20191010153815.4f7a3fc9@redhat.com>
- <20191010095459-mutt-send-email-mst@kernel.org>
- <20191010175754.7c62cf8f@Igors-MacBook-Pro>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5FA9D300D219;
+ Thu, 10 Oct 2019 19:23:31 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E7637100EBD5;
+ Thu, 10 Oct 2019 19:23:30 +0000 (UTC)
+Subject: Re: [PATCH 08/23] iotests/143: Create socket in $SOCK_DIR
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20191010152457.17713-1-mreitz@redhat.com>
+ <20191010152457.17713-9-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <f438a00d-accf-0d12-d1bb-603d518d8cd1@redhat.com>
+Date: Thu, 10 Oct 2019 14:23:30 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191010175754.7c62cf8f@Igors-MacBook-Pro>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.68]); Thu, 10 Oct 2019 19:20:52 +0000 (UTC)
+In-Reply-To: <20191010152457.17713-9-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Thu, 10 Oct 2019 19:23:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,102 +73,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 10, 2019 at 05:57:54PM +0200, Igor Mammedov wrote:
-> On Thu, 10 Oct 2019 09:59:42 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 10/10/19 10:24 AM, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   tests/qemu-iotests/143     | 6 +++---
+>   tests/qemu-iotests/143.out | 2 +-
+>   2 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> > On Thu, Oct 10, 2019 at 03:39:12PM +0200, Igor Mammedov wrote:
-> > > On Thu, 10 Oct 2019 05:56:55 -0400
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > 
-> > > > On Wed, Oct 09, 2019 at 09:22:49AM -0400, Igor Mammedov wrote:
-> > > > > As an alternative to passing to firmware topology info via new fwcfg files
-> > > > > so it could recreate APIC IDs based on it and order CPUs are enumerated,
-> > > > > 
-> > > > > extend CPU hotplug interface to return APIC ID as response to the new command
-> > > > > CPHP_GET_CPU_ID_CMD.  
-> > > > 
-> > > > One big piece missing here is motivation:
-> > > I thought the only willing reader was Laszlo (who is aware of context)
-> > > so I skipped on details and confused others :/
-> > > 
-> > > > Who's going to use this interface?
-> > > In current state it's for firmware, since ACPI tables can cheat
-> > > by having APIC IDs statically built in.
-> > > 
-> > > If we were creating CPU objects in ACPI dynamically
-> > > we would be using this command as well.
-> > 
-> > I'm not sure how it's even possible to create devices dynamically. Well
-> > I guess it's possible with LoadTable. Is this what you had in
-> > mind?
-> 
-> Yep. I even played this shiny toy and I can say it's very tempting one.
-> On the  other side, even problem of legacy OSes not working with it aside,
-> it's hard to debug and reproduce compared to static tables.
-> So from maintaining pov I dislike it enough to be against it.
-> 
-> 
-> > > It would save
-> > > us quite a bit space in ACPI blob but it would be a pain
-> > > to debug and diagnose problems in ACPI tables, so I'd rather
-> > > stay with static CPU descriptions in ACPI tables for the sake
-> > > of maintenance.
-> > > > So far CPU hotplug was used by the ACPI, so we didn't
-> > > > really commit to a fixed interface too strongly.
-> > > > 
-> > > > Is this a replacement to Laszlo's fw cfg interface?
-> > > > If yes is the idea that OVMF going to depend on CPU hotplug directly then?
-> > > > It does not depend on it now, does it?
-> > > It doesn't, but then it doesn't support cpu hotplug,
-> > > OVMF(SMM) needs to cooperate with QEMU "and" ACPI tables to perform
-> > > the task and using the same interface/code path between all involved
-> > > parties makes the task easier with the least amount of duplicated
-> > > interfaces and more robust.
-> > > 
-> > > Re-implementing alternative interface for firmware (fwcfg or what not)
-> > > would work as well, but it's only question of time when ACPI and
-> > > this new interface disagree on how world works and process falls
-> > > apart.
-> > 
-> > Then we should consider switching acpi to use fw cfg.
-> > Or build another interface that can scale.
-> 
-> Could be an option, it would be a pain to write a driver in AML for fwcfg access though
-> (I've looked at possibility to access fwcfg from AML about a year ago and gave up.
-> I'm definitely not volunteering for the second attempt and can't even give an estimate
-> it it's viable approach).
-> 
-> But what scaling issue you are talking about, exactly?
-> With current CPU hotplug interface we can handle upto UNIT32_MAX cpus, and extend
-> interface without need to increase IO window we are using now.
-> 
-> Granted IO access it not fastest compared to fwcfg in DMA mode, but we already
-> doing stop machine when switching to SMM which is orders of magnitude slower.
-> Consensus was to compromise on speed of CPU hotplug versus more complex and more
-> problematic unicast SMM mode in OVMF (can't find a particular email but we have discussed
-> it with Laszlo already, when I considered ways to optimize hotplug speed)
-
-If we were designing the interface from the ground up, I would
-agree with Michael.  But I don't see why we would reimplement
-everything from scratch now, if just providing the
-cpu_selector => cpu_hardware_id mapping to firmware is enough to
-make the existing interface work.
-
-If somebody is really unhappy with the current interface and
-wants to implement a new purely fw_cfg-based one (and write the
-corresponding ACPI code), they would be welcome.  I just don't
-see why we should spend our time doing that now.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
-Eduardo
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
