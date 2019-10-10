@@ -4,54 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 672B2C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51549C4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:19:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4265120659
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:18:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4265120659
+	by mail.kernel.org (Postfix) with ESMTPS id 2673920659
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 05:19:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2673920659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIQqQ-0003P3-Fe
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 01:18:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39144)
+	id 1iIQrY-0004hA-Bc
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 01:19:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39130)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iIQp6-0002XU-MD
+ (envelope-from <tao3.xu@intel.com>) id 1iIQp5-0002XR-L8
  for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iIQp4-0004Qv-AT
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:12 -0400
-Received: from mga17.intel.com ([192.55.52.151]:24363)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iIQp4-0004Lg-21
+ (envelope-from <tao3.xu@intel.com>) id 1iIQp3-0004Op-9l
  for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:10 -0400
+Received: from mga17.intel.com ([192.55.52.151]:24361)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iIQp3-0004LM-2c
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 01:17:09 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Oct 2019 22:17:04 -0700
+ 09 Oct 2019 22:17:02 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,279,1566889200"; d="scan'208";a="193089188"
+X-IronPort-AV: E=Sophos;i="5.67,279,1566889200"; d="scan'208";a="193089179"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga008.fm.intel.com with ESMTP; 09 Oct 2019 22:17:02 -0700
+ by fmsmga008.fm.intel.com with ESMTP; 09 Oct 2019 22:17:00 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
  mtosatti@redhat.com
-Subject: [PATCH v6 2/2] target/i386: Add support for save/load
- IA32_UMWAIT_CONTROL MSR
-Date: Thu, 10 Oct 2019 13:16:57 +0800
-Message-Id: <20191010051657.28163-3-tao3.xu@intel.com>
+Subject: [PATCH v6 1/2] x86/cpu: Add support for UMONITOR/UMWAIT/TPAUSE
+Date: Thu, 10 Oct 2019 13:16:56 +0800
+Message-Id: <20191010051657.28163-2-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191010051657.28163-1-tao3.xu@intel.com>
 References: <20191010051657.28163-1-tao3.xu@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -73,138 +74,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UMWAIT and TPAUSE instructions use 32bits IA32_UMWAIT_CONTROL at MSR
-index E1H to determines the maximum time in TSC-quanta that the processor
-can reside in either C0.1 or C0.2.
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
+This patch adds support for user wait instructions in KVM. Availability
+of the user wait instructions is indicated by the presence of the CPUID
+feature flag WAITPKG CPUID.0x07.0x0:ECX[5]. User wait instructions may
+be executed at any privilege level, and use IA32_UMWAIT_CONTROL MSR to
+set the maximum time.
 
-This patch is to Add support for save/load IA32_UMWAIT_CONTROL MSR in
-guest.
+The patch enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it to kvm and enable it only when
+guest CPUID has it. And use QEMU command-line "-overcommit cpu-pm=on"
+(enable_cpu_pm is enabled), a VM can use UMONITOR, UMWAIT and TPAUSE
+instructions. If the instruction causes a delay, the amount of time
+delayed is called here the physical delay. The physical delay is first
+computed by determining the virtual delay (the time to delay relative to
+the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT and TPAUSE cause
+an invalid-opcode exception(#UD).
+
+The release document ref below link:
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
 
 Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
 Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
-No changes in v5 and v6.
-
-Changes in v4:
-        Set IA32_UMWAIT_CONTROL 32bits
+Changes in v6:
+    - Only remove CPUID_7_0_ECX_WAITPKG if enable_cpu_pm is not set.
+    (Paolo)
 ---
- target/i386/cpu.h     |  2 ++
- target/i386/kvm.c     | 13 +++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 3 files changed, 35 insertions(+)
+ target/i386/cpu.c | 3 ++-
+ target/i386/cpu.h | 1 +
+ target/i386/kvm.c | 4 ++++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 44f1bbdcac..631558aa49 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1058,7 +1058,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         .type = CPUID_FEATURE_WORD,
+         .feat_names = {
+             NULL, "avx512vbmi", "umip", "pku",
+-            NULL /* ospke */, NULL, "avx512vbmi2", NULL,
++            NULL /* ospke */, "waitpkg", "avx512vbmi2", NULL,
+             "gfni", "vaes", "vpclmulqdq", "avx512vnni",
+             "avx512bitalg", NULL, "avx512-vpopcntdq", NULL,
+             "la57", NULL, NULL, NULL,
+@@ -5490,6 +5490,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+             host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
+                        &cpu->mwait.ecx, &cpu->mwait.edx);
+             env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
++            env->features[FEAT_7_0_ECX] |= CPUID_7_0_ECX_WAITPKG;
+         }
+     }
+ 
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 4e3206c8a2..134d14d14d 100644
+index eaa5395aa5..4e3206c8a2 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -451,6 +451,7 @@ typedef enum X86Seg {
- 
- #define MSR_IA32_BNDCFGS                0x00000d90
- #define MSR_IA32_XSS                    0x00000da0
-+#define MSR_IA32_UMWAIT_CONTROL         0xe1
- 
- #define MSR_IA32_VMX_BASIC              0x00000480
- #define MSR_IA32_VMX_PINBASED_CTLS      0x00000481
-@@ -1534,6 +1535,7 @@ typedef struct CPUX86State {
-     uint16_t fpregs_format_vmstate;
- 
-     uint64_t xss;
-+    uint32_t umwait;
- 
-     TPRAccess tpr_access_type;
- 
+@@ -701,6 +701,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+ #define CPUID_7_0_ECX_OSPKE    (1U << 4)
++#define CPUID_7_0_ECX_WAITPKG  (1U << 5) /* UMONITOR/UMWAIT/TPAUSE Instructions */
+ #define CPUID_7_0_ECX_VBMI2    (1U << 6) /* Additional VBMI Instrs */
+ #define CPUID_7_0_ECX_GFNI     (1U << 8)
+ #define CPUID_7_0_ECX_VAES     (1U << 9)
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index d2a85b1572..9d21e22529 100644
+index 11b9c854b5..d2a85b1572 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -95,6 +95,7 @@ static bool has_msr_hv_stimer;
- static bool has_msr_hv_frequencies;
- static bool has_msr_hv_reenlightenment;
- static bool has_msr_xss;
-+static bool has_msr_umwait;
- static bool has_msr_spec_ctrl;
- static bool has_msr_virt_ssbd;
- static bool has_msr_smi_count;
-@@ -1944,6 +1945,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_IA32_XSS:
-                 has_msr_xss = true;
-                 break;
-+            case MSR_IA32_UMWAIT_CONTROL:
-+                has_msr_umwait = true;
-+                break;
-             case HV_X64_MSR_CRASH_CTL:
-                 has_msr_hv_crash = true;
-                 break;
-@@ -2623,6 +2627,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_xss) {
-         kvm_msr_entry_add(cpu, MSR_IA32_XSS, env->xss);
-     }
-+    if (has_msr_umwait) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, env->umwait);
-+    }
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
-     }
-@@ -3036,6 +3043,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_xss) {
-         kvm_msr_entry_add(cpu, MSR_IA32_XSS, 0);
-     }
-+    if (has_msr_umwait) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, 0);
-+    }
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
-     }
-@@ -3288,6 +3298,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_XSS:
-             env->xss = msrs[i].data;
-             break;
-+        case MSR_IA32_UMWAIT_CONTROL:
-+            env->umwait = msrs[i].data;
-+            break;
-         default:
-             if (msrs[i].index >= MSR_MC0_CTL &&
-                 msrs[i].index < MSR_MC0_CTL + (env->mcg_cap & 0xff) * 4) {
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 2767b3096d..6481f846f6 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -943,6 +943,25 @@ static const VMStateDescription vmstate_xss = {
-     }
- };
- 
-+static bool umwait_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->umwait != 0;
-+}
-+
-+static const VMStateDescription vmstate_umwait = {
-+    .name = "cpu/umwait",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = umwait_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.umwait, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- #ifdef TARGET_X86_64
- static bool pkru_needed(void *opaque)
- {
-@@ -1391,6 +1410,7 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_msr_hyperv_reenlightenment,
-         &vmstate_avx512,
-         &vmstate_xss,
-+        &vmstate_umwait,
-         &vmstate_tsc_khz,
-         &vmstate_msr_smi_count,
- #ifdef TARGET_X86_64
+@@ -401,6 +401,10 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+         if (host_tsx_blacklisted()) {
+             ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+         }
++    } else if (function == 7 && index == 0 && reg == R_ECX) {
++        if (!enable_cpu_pm) {
++            ret &= ~CPUID_7_0_ECX_WAITPKG;
++        }
+     } else if (function == 7 && index == 0 && reg == R_EDX) {
+         /*
+          * Linux v4.17-v4.20 incorrectly return ARCH_CAPABILITIES on SVM hosts.
 -- 
 2.20.1
 
