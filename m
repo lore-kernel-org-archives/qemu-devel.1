@@ -2,63 +2,88 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86809C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F86CC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:49:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57894206A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:46:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57894206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 5C00C206A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 13:49:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C00C206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIYmQ-0007gR-EZ
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 09:46:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42515)
+	id 1iIYoY-0001tE-Ix
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 09:49:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iIYXR-00023K-LP
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:31:30 -0400
+ (envelope-from <philmd@redhat.com>) id 1iIYjG-0005L4-FG
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iIYXQ-0001Xr-EN
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:31:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47018)
+ (envelope-from <philmd@redhat.com>) id 1iIYjF-0006bI-3a
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:43:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50918)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iIYXQ-0001Xe-6c
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:31:28 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iIYjE-0006aa-Qx
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 09:43:41 -0400
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6ED5F7BDDA;
- Thu, 10 Oct 2019 13:31:27 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-48.rdu2.redhat.com
- [10.10.120.48])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A29F75DA2C;
- Thu, 10 Oct 2019 13:31:25 +0000 (UTC)
-Subject: Re: [RFC 1/3] acpi: cpuhp: fix 'Command data' description is spec
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20191009132252.17860-1-imammedo@redhat.com>
- <20191009132252.17860-2-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <fbbc58a6-7117-c76a-58ae-5e9a78890a8f@redhat.com>
-Date: Thu, 10 Oct 2019 15:31:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mx1.redhat.com (Postfix) with ESMTPS id B18293CA03
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 13:43:39 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id g67so1797960wmg.4
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 06:43:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Q2fRCbwTFySOnCK3JiOVij95RQS5p6saSe3jyZO1Srw=;
+ b=cFKw2dsBjmQ9BGQeZZ4HoDkw5Kn/ZJhlJ0+by4mWqjOidoZ4rDOwF96JiDZYipoNbW
+ t47v78GV3VcJv8T3N/FiR9btYpx5groSDOhwhW4axZc8HDiRO+eIXwi5eFiA9EAuPaNY
+ bHsqm7EVPCC1WSno2iKjyYpukt09FEOoSWxwKD3dKCeK63gIdbh2m34b02IN3F7okSwD
+ IbKEvaPatLvQ6g1waZ1/SGPoNOakvTJGkvg57BsTf0Y+W5xQsjQMddkrMoLuSvPR9xU8
+ VkYqTUYP5oKDX0qKsFd7QXICXYEeTi0gsZISVqr8ClVvUjC91pevivpGW9GxEAE3NRqk
+ bKfA==
+X-Gm-Message-State: APjAAAXlMiRIZWAVRg0/HGm3owwnO6Y6MMkSV81axWWD9KZUkg2ff273
+ 5oqKUoimFGBzamdx8gq/bhqcxFIdSQkuyjQyzZTTveby/KoBLBu7ymrt7mCP8IJhkyGL6fLtERc
+ s5eANEBKfBYzAzWY=
+X-Received: by 2002:a5d:4302:: with SMTP id h2mr9061145wrq.35.1570715018463;
+ Thu, 10 Oct 2019 06:43:38 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyphqiezS7CZW6yRExGo180HhTTpCFevCRLPdLi2ZJPPkNkEcZR2YJj+f93dTSnIj8ARzaUaA==
+X-Received: by 2002:a5d:4302:: with SMTP id h2mr9061100wrq.35.1570715018125;
+ Thu, 10 Oct 2019 06:43:38 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id s10sm9456944wmf.48.2019.10.10.06.43.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 10 Oct 2019 06:43:37 -0700 (PDT)
+Subject: Re: [PATCH 1/5] tests/boot_linux_console: Add initrd test for the
+ Exynos4210
+To: Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <20191005154748.21718-1-f4bug@amsat.org>
+ <20191005154748.21718-2-f4bug@amsat.org>
+ <CAFEAcA8ME5U5=rNLRSvNx7LmanqHhn_KWj6qtgym_=W1M9WDoA@mail.gmail.com>
+ <20191008214907.GA28137@localhost.localdomain>
+ <CAFEAcA9DzeObmtsc2VJmw=1yruANZ6ajY2SG0cAPdehkeRN3wA@mail.gmail.com>
+ <20191009190743.GA6019@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d2011e56-8c5f-9f57-04eb-16581866fd48@redhat.com>
+Date: Thu, 10 Oct 2019 15:43:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191009132252.17860-2-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191009190743.GA6019@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Thu, 10 Oct 2019 13:31:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,65 +98,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Evgeny Voevodin <e.voevodin@samsung.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Sven Schnelle <svens@stackframe.org>,
+ Helge Deller <deller@gmx.de>, Markus Armbruster <armbru@redhat.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Maksim Kozlov <m.kozlov@samsung.com>, Guenter Roeck <linux@roeck-us.net>,
+ Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Basse?= <contact@fredericb.info>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Dmitry Solodkiy <d.solodkiy@samsung.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-2nd round:
+On 10/9/19 9:07 PM, Cleber Rosa wrote:
+> On Wed, Oct 09, 2019 at 02:38:02PM +0100, Peter Maydell wrote:
+>> On Tue, 8 Oct 2019 at 22:49, Cleber Rosa <crosa@redhat.com> wrote:
+>>> On Mon, Oct 07, 2019 at 05:28:49PM +0100, Peter Maydell wrote:
+ >>>
+ >>>> Do our other acceptance tests download random third-party
+ >>>> (ie "not a well-known distro") binaries for the tests ?
+ >>>> It seems a bit hazardous for reproducability and trustability
+ >>>> reasons...
+[...]
+>>> I find it hard to judge precisely how much of a third-party some of
+>>> these are.  I remember Philippe mentioning that one of them, I guess
+>>> the images used on linux_ssh_mips_malta.py, were "as official as it
+>>> gets" (my words, from my often misleading memory).
+>>>
+>>> Reproducibility is definitely an issue, in the sense given that some
+>>> of these can indeed go away, but as long as they're available the hash
+>>> recorded in the test should guarantee that we're running the same
+>>> images.
 
-On 10/09/19 15:22, Igor Mammedov wrote:
-> QEMU returns 0, in case of erro or invalid value in 'Command field',
-> make spec match reality, i.e.
+So this thread is a follow up on:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg546430.html
 
-AHA! so this is exactly where you meant to list the particular cases
-when "command data" reads as 0:
-- CPU >= max_cpus selected,
-- CPU with pending events asked for, but none found
+For Open Source software I can understand we want to be able to rebuild 
+them, and should provide a link about how to rebuild.
 
-> Also fix returned value description  in case 'Command field' == 0x0,
-> it's in not PXM but CPU selector value with pending event
+I don't want to rebuild images myself, I want to focus on testing QEMU. 
+I tried once to build a MIPSsim kernel and it was a total nightmare:
+https://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg04071.html
+(Thomas Huth eventually succeeded using buildroot).
+
+>>> Do you think we should do something different here?
+>>
+>> I'm not sure, which is why I asked whether this new test
+>> was in line with what we've done previously. Since these
+>> are just test cases and we don't redistribute them to
+>> other people there's less of a traceability/reproducibility
+>> worry, and if we check hashes on download that cuts off
+>> a lot of "fail to notice if the image changes for some
+>> reason" possible problems.
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  docs/specs/acpi_cpu_hotplug.txt | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
-> index ee219c8358..ac5903b2b1 100644
-> --- a/docs/specs/acpi_cpu_hotplug.txt
-> +++ b/docs/specs/acpi_cpu_hotplug.txt
-> @@ -44,9 +44,10 @@ read access:
->             3-7: reserved and should be ignored by OSPM
->      [0x5-0x7] reserved
->      [0x8] Command data: (DWORD access)
-> -          in case of error or unsupported command reads is 0xFFFFFFFF
-> +          in case of error or unsupported command reads is 0x0
->            current 'Command field' value:
-> -              0: returns PXM value corresponding to device
-> +              0: returns CPU selector value corresponding to a CPU with
-> +                 pending event.
->  
->  write access:
->      offset:
-> 
+> Yep, because I have no clue how to do improve on this (redistributing
+> the binaries is definitely not on the improvement side, and neither
+> is not testing some machine types), the current approach seems good.
 
-How about:
+QEMU machines are not restricted to running Linux or other Open Source 
+software. It seems important to be able to test for regressions with 
+closed-source code too, because it usually has been well tested on real 
+hardware.
 
-    [0x8] Command data: (DWORD access, little endian)
-          If the "CPU selector" value last stored by the guest refers to
-          an impossible CPU, then 0.
-          Otherwise, if the "Command field" value last stored by the
-          guest differs from 0, then 0.
-          Otherwise, if there is at least one CPU with a pending event,
-          then that CPU has been selected; the command data register
-          returns that selector.
-          Otherwise, 0.
+I just posted a firmware test:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg651012.html
 
-Thanks
-Laszlo
+I could find it stored compressed and uuencoded on the Wayback Machine.
+Since I don't want to abuse from this amazing service, and other script 
+to decode/uncompress it, I stored it on a new repository with its SHA-1
+(the default hash used by Avocado):
+https://github.com/philmd/qemu-testing-blob/tree/master/hppa/hp9000/712
+
+Is this acceptable? Incorrect?
+
+Regarding Avocado tests, maybe we can simply add a "untrusted" or 
+"closedsource" tag, so people willing to test untrusted binaries could 
+still run the tests using 'avocado --tag untrusted_software', and we 
+could skip these tests by default.
+
+I am very interested because I already experimented with:
+
+- AIX on PReP/40p
+- some RTOS on Canon PowerShot A1100
+- VxWorks on MIPS and SPARC
+- closed-source bootloader for Raspi3/4
+
+Regards,
+
+Phil.
 
