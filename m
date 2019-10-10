@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D743C4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D6DC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:26:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7367320B7C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:25:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7367320B7C
+	by mail.kernel.org (Postfix) with ESMTPS id 5DD43208C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:26:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DD43208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIXV7-0003zC-Af
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 08:25:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51998)
+	id 1iIXWG-0005HI-T3
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 08:26:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52053)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIWrF-0006pW-I6
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:50 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIWrJ-0006wX-Gd
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIWrE-0008IC-CZ
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:20545)
+ (envelope-from <mreitz@redhat.com>) id 1iIWrI-0008Jc-9N
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55984)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIWrB-0008GR-UA; Thu, 10 Oct 2019 07:43:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1iIWrF-0008IZ-Ux; Thu, 10 Oct 2019 07:43:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2A85A20E9;
- Thu, 10 Oct 2019 11:43:45 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 386D087638;
+ Thu, 10 Oct 2019 11:43:49 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C4D9C5DA2C;
- Thu, 10 Oct 2019 11:43:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D2A77600C4;
+ Thu, 10 Oct 2019 11:43:48 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 19/36] block: add empty account cookie type
-Date: Thu, 10 Oct 2019 13:42:43 +0200
-Message-Id: <20191010114300.7746-20-mreitz@redhat.com>
+Subject: [PULL 21/36] scsi: store unmap offset and nb_sectors in request struct
+Date: Thu, 10 Oct 2019 13:42:45 +0200
+Message-Id: <20191010114300.7746-22-mreitz@redhat.com>
 In-Reply-To: <20191010114300.7746-1-mreitz@redhat.com>
 References: <20191010114300.7746-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.71]); Thu, 10 Oct 2019 11:43:45 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Thu, 10 Oct 2019 11:43:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -75,69 +75,55 @@ Sender: "Qemu-devel"
 
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Each block_acct_done/failed call is designed to correspond to a
-previous block_acct_start call, which initializes the stats cookie.
-However sometimes it is not the case, e.g. some error paths might
-report the same cookie twice because it is hard to accurately track if
-the cookie was reported yet or not.
-
-This patch cleans the cookie after report.
-(Note: block_acct_failed/done without a previous block_acct_start at
-all should be avoided. Uninitialized cookie might hold a garbage value
-and there is still "< BLOCK_MAX_IOTYPE" assertion for that)
-
-It will be particularly useful in ide code where it's hard to
-keep track whether the request done its accounting or not: in the
-following patch of the series, trim requests will do the accounting
-separately.
+it allows to report it in the error handler
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190923121737.83281-4-anton.nefedov@virtuozzo.com
+Message-id: 20190923121737.83281-6-anton.nefedov@virtuozzo.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/accounting.h | 1 +
- block/accounting.c         | 6 ++++++
- 2 files changed, 7 insertions(+)
+ hw/scsi/scsi-disk.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/include/block/accounting.h b/include/block/accounting.h
-index ba8b04d572..878b4c3581 100644
---- a/include/block/accounting.h
-+++ b/include/block/accounting.h
-@@ -33,6 +33,7 @@ typedef struct BlockAcctTimedStats BlockAcctTimedStats;
- typedef struct BlockAcctStats BlockAcctStats;
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 915641a0f1..b3dd21800d 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -1608,8 +1608,6 @@ static void scsi_unmap_complete_noio(UnmapCBData *d=
+ata, int ret)
+ {
+     SCSIDiskReq *r =3D data->r;
+     SCSIDiskState *s =3D DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
+-    uint64_t sector_num;
+-    uint32_t nb_sectors;
 =20
- enum BlockAcctType {
-+    BLOCK_ACCT_NONE =3D 0,
-     BLOCK_ACCT_READ,
-     BLOCK_ACCT_WRITE,
-     BLOCK_ACCT_FLUSH,
-diff --git a/block/accounting.c b/block/accounting.c
-index 70a3d9a426..8d41c8a83a 100644
---- a/block/accounting.c
-+++ b/block/accounting.c
-@@ -195,6 +195,10 @@ static void block_account_one_io(BlockAcctStats *sta=
-ts, BlockAcctCookie *cookie,
-=20
-     assert(cookie->type < BLOCK_MAX_IOTYPE);
-=20
-+    if (cookie->type =3D=3D BLOCK_ACCT_NONE) {
-+        return;
-+    }
-+
-     qemu_mutex_lock(&stats->lock);
-=20
-     if (failed) {
-@@ -217,6 +221,8 @@ static void block_account_one_io(BlockAcctStats *stat=
-s, BlockAcctCookie *cookie,
+     assert(r->req.aiocb =3D=3D NULL);
+     if (scsi_disk_req_check_error(r, ret, false)) {
+@@ -1617,16 +1615,18 @@ static void scsi_unmap_complete_noio(UnmapCBData =
+*data, int ret)
      }
 =20
-     qemu_mutex_unlock(&stats->lock);
-+
-+    cookie->type =3D BLOCK_ACCT_NONE;
- }
+     if (data->count > 0) {
+-        sector_num =3D ldq_be_p(&data->inbuf[0]);
+-        nb_sectors =3D ldl_be_p(&data->inbuf[8]) & 0xffffffffULL;
+-        if (!check_lba_range(s, sector_num, nb_sectors)) {
++        r->sector =3D ldq_be_p(&data->inbuf[0])
++            * (s->qdev.blocksize / BDRV_SECTOR_SIZE);
++        r->sector_count =3D (ldl_be_p(&data->inbuf[8]) & 0xffffffffULL)
++            * (s->qdev.blocksize / BDRV_SECTOR_SIZE);
++        if (!check_lba_range(s, r->sector, r->sector_count)) {
+             scsi_check_condition(r, SENSE_CODE(LBA_OUT_OF_RANGE));
+             goto done;
+         }
 =20
- void block_acct_done(BlockAcctStats *stats, BlockAcctCookie *cookie)
+         r->req.aiocb =3D blk_aio_pdiscard(s->qdev.conf.blk,
+-                                        sector_num * s->qdev.blocksize,
+-                                        nb_sectors * s->qdev.blocksize,
++                                        r->sector * BDRV_SECTOR_SIZE,
++                                        r->sector_count * BDRV_SECTOR_SI=
+ZE,
+                                         scsi_unmap_complete, data);
+         data->count--;
+         data->inbuf +=3D 16;
 --=20
 2.21.0
 
