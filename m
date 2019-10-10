@@ -2,54 +2,56 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 975ABC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAEBC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:27:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66D7B214E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:27:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66D7B214E0
+	by mail.kernel.org (Postfix) with ESMTPS id 2FDF9214E0
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 15:27:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FDF9214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIaLf-0007rz-6V
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 11:27:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60430)
+	id 1iIaLk-0007yh-PQ
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 11:27:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60489)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIaJO-0005j6-6O
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:07 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIaJV-0005mB-S6
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIaJM-0004GB-MW
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39904)
+ (envelope-from <mreitz@redhat.com>) id 1iIaJT-0004JX-VC
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 11:25:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46070)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIaJJ-0004F5-P4; Thu, 10 Oct 2019 11:25:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iIaJQ-0004Ge-06; Thu, 10 Oct 2019 11:25:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BC497316D8C2;
- Thu, 10 Oct 2019 15:25:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6F2033086E22;
+ Thu, 10 Oct 2019 15:25:06 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2520560852;
- Thu, 10 Oct 2019 15:24:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D4F7160BE1;
+ Thu, 10 Oct 2019 15:25:05 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 00/23] iotests: Add and use $SOCK_DIR
-Date: Thu, 10 Oct 2019 17:24:34 +0200
-Message-Id: <20191010152457.17713-1-mreitz@redhat.com>
+Subject: [PATCH 02/23] iotests.py: Store socket files in $SOCK_DIR
+Date: Thu, 10 Oct 2019 17:24:36 +0200
+Message-Id: <20191010152457.17713-3-mreitz@redhat.com>
+In-Reply-To: <20191010152457.17713-1-mreitz@redhat.com>
+References: <20191010152457.17713-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 10 Oct 2019 15:25:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Thu, 10 Oct 2019 15:25:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -71,73 +73,142 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+iotests.py itself does not store socket files, but it machine.py and
+qtest.py do.  iotests.py needs to pass the respective path to them, and
+they need to adhere to it.
 
-Perhaps the main reason we cannot run important tests such as 041 in CI
-is that when they care Unix sockets in $TEST_DIR, the path may become
-too long to connect to them.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ python/qemu/machine.py        | 15 ++++++++++++---
+ python/qemu/qtest.py          |  9 ++++++---
+ tests/qemu-iotests/iotests.py |  4 +++-
+ 3 files changed, 21 insertions(+), 7 deletions(-)
 
-To get by this problem, this series lets the check script create a new
-temporary directory (mktemp -d) and then makes the iotests use it for
-all Unix sockets.
-
-
-Max Reitz (23):
-  iotests: Introduce $SOCK_DIR
-  iotests.py: Store socket files in $SOCK_DIR
-  iotests.py: Add @base_dir to FilePaths etc.
-  iotests: Filter $SOCK_DIR
-  iotests: Let common.nbd create socket in $SOCK_DIR
-  iotests/083: Create socket in $SOCK_DIR
-  iotests/140: Create socket in $SOCK_DIR
-  iotests/143: Create socket in $SOCK_DIR
-  iotests/147: Create socket in $SOCK_DIR
-  iotests/181: Create socket in $SOCK_DIR
-  iotests/182: Create socket in $SOCK_DIR
-  iotests/183: Create socket in $SOCK_DIR
-  iotests/192: Create socket in $SOCK_DIR
-  iotests/194: Create sockets in $SOCK_DIR
-  iotests/201: Create socket in $SOCK_DIR
-  iotests/205: Create socket in $SOCK_DIR
-  iotests/208: Create socket in $SOCK_DIR
-  iotests/209: Create socket in $SOCK_DIR
-  iotests/222: Create socket in $SOCK_DIR
-  iotests/223: Create socket in $SOCK_DIR
-  iotests/240: Create socket in $SOCK_DIR
-  iotests/267: Create socket in $SOCK_DIR
-  iotests: Drop TEST_DIR filter from _filter_nbd
-
- python/qemu/machine.py           | 15 +++++++++++---
- python/qemu/qtest.py             |  9 ++++++---
- tests/qemu-iotests/083           |  6 +++---
- tests/qemu-iotests/083.out       | 34 ++++++++++++++++----------------
- tests/qemu-iotests/140           |  8 ++++----
- tests/qemu-iotests/140.out       |  2 +-
- tests/qemu-iotests/143           |  6 +++---
- tests/qemu-iotests/143.out       |  2 +-
- tests/qemu-iotests/147           |  2 +-
- tests/qemu-iotests/181           |  2 +-
- tests/qemu-iotests/182           |  4 ++--
- tests/qemu-iotests/183           |  2 +-
- tests/qemu-iotests/192           |  4 ++--
- tests/qemu-iotests/192.out       |  2 +-
- tests/qemu-iotests/194           |  4 ++--
- tests/qemu-iotests/201           |  2 +-
- tests/qemu-iotests/205           |  2 +-
- tests/qemu-iotests/208           |  2 +-
- tests/qemu-iotests/209           |  3 ++-
- tests/qemu-iotests/222           |  2 +-
- tests/qemu-iotests/223           | 14 ++++++-------
- tests/qemu-iotests/240           |  4 ++--
- tests/qemu-iotests/241           |  2 --
- tests/qemu-iotests/267           |  4 ++--
- tests/qemu-iotests/267.out       |  2 +-
- tests/qemu-iotests/check         | 17 ++++++++++++++++
- tests/qemu-iotests/common.filter |  7 +++++--
- tests/qemu-iotests/common.nbd    |  2 +-
- tests/qemu-iotests/iotests.py    | 16 ++++++++-------
- 29 files changed, 107 insertions(+), 74 deletions(-)
-
+diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+index 128a3d1dc2..2024e8b1b1 100644
+--- a/python/qemu/machine.py
++++ b/python/qemu/machine.py
+@@ -71,7 +71,7 @@ class QEMUMachine(object):
+=20
+     def __init__(self, binary, args=3DNone, wrapper=3DNone, name=3DNone,
+                  test_dir=3D"/var/tmp", monitor_address=3DNone,
+-                 socket_scm_helper=3DNone):
++                 socket_scm_helper=3DNone, sock_dir=3DNone):
+         '''
+         Initialize a QEMUMachine
+=20
+@@ -90,6 +90,8 @@ class QEMUMachine(object):
+             wrapper =3D []
+         if name is None:
+             name =3D "qemu-%d" % os.getpid()
++        if sock_dir is None:
++            sock_dir =3D test_dir
+         self._name =3D name
+         self._monitor_address =3D monitor_address
+         self._vm_monitor =3D None
+@@ -106,12 +108,14 @@ class QEMUMachine(object):
+         self._qemu_full_args =3D None
+         self._test_dir =3D test_dir
+         self._temp_dir =3D None
++        self._sock_dir =3D sock_dir
+         self._launched =3D False
+         self._machine =3D None
+         self._console_set =3D False
+         self._console_device_type =3D None
+         self._console_address =3D None
+         self._console_socket =3D None
++        self._remove_files =3D []
+=20
+         # just in case logging wasn't configured by the main script:
+         logging.basicConfig()
+@@ -236,8 +240,9 @@ class QEMUMachine(object):
+         if self._machine is not None:
+             args.extend(['-machine', self._machine])
+         if self._console_set:
+-            self._console_address =3D os.path.join(self._temp_dir,
++            self._console_address =3D os.path.join(self._sock_dir,
+                                                  self._name + "-console.=
+sock")
++            self._remove_files.append(self._console_address)
+             chardev =3D ('socket,id=3Dconsole,path=3D%s,server,nowait' %
+                        self._console_address)
+             args.extend(['-chardev', chardev])
+@@ -253,8 +258,9 @@ class QEMUMachine(object):
+         if self._monitor_address is not None:
+             self._vm_monitor =3D self._monitor_address
+         else:
+-            self._vm_monitor =3D os.path.join(self._temp_dir,
++            self._vm_monitor =3D os.path.join(self._sock_dir,
+                                             self._name + "-monitor.sock"=
+)
++            self._remove_files.append(self._vm_monitor)
+         self._qemu_log_path =3D os.path.join(self._temp_dir, self._name =
++ ".log")
+         self._qemu_log_file =3D open(self._qemu_log_path, 'wb')
+=20
+@@ -279,6 +285,9 @@ class QEMUMachine(object):
+             shutil.rmtree(self._temp_dir)
+             self._temp_dir =3D None
+=20
++        while len(self._remove_files) > 0:
++            self._remove_if_exists(self._remove_files.pop())
++
+     def launch(self):
+         """
+         Launch the VM and make sure we cleanup and expose the
+diff --git a/python/qemu/qtest.py b/python/qemu/qtest.py
+index 3f1d2cb325..d24ad04256 100644
+--- a/python/qemu/qtest.py
++++ b/python/qemu/qtest.py
+@@ -84,14 +84,17 @@ class QEMUQtestMachine(QEMUMachine):
+     '''A QEMU VM'''
+=20
+     def __init__(self, binary, args=3DNone, name=3DNone, test_dir=3D"/va=
+r/tmp",
+-                 socket_scm_helper=3DNone):
++                 socket_scm_helper=3DNone, sock_dir=3DNone):
+         if name is None:
+             name =3D "qemu-%d" % os.getpid()
++        if sock_dir is None:
++            sock_dir =3D test_dir
+         super(QEMUQtestMachine,
+               self).__init__(binary, args, name=3Dname, test_dir=3Dtest_=
+dir,
+-                             socket_scm_helper=3Dsocket_scm_helper)
++                             socket_scm_helper=3Dsocket_scm_helper,
++                             sock_dir=3Dsock_dir)
+         self._qtest =3D None
+-        self._qtest_path =3D os.path.join(test_dir, name + "-qtest.sock"=
+)
++        self._qtest_path =3D os.path.join(sock_dir, name + "-qtest.sock"=
+)
+=20
+     def _base_args(self):
+         args =3D super(QEMUQtestMachine, self)._base_args()
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 3a8f378f90..49cd205a97 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -57,6 +57,7 @@ qemu_opts =3D os.environ.get('QEMU_OPTIONS', '').strip(=
+).split(' ')
+ imgfmt =3D os.environ.get('IMGFMT', 'raw')
+ imgproto =3D os.environ.get('IMGPROTO', 'file')
+ test_dir =3D os.environ.get('TEST_DIR')
++sock_dir =3D os.environ.get('SOCK_DIR')
+ output_dir =3D os.environ.get('OUTPUT_DIR', '.')
+ cachemode =3D os.environ.get('CACHEMODE')
+ qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
+@@ -445,7 +446,8 @@ class VM(qtest.QEMUQtestMachine):
+         name =3D "qemu%s-%d" % (path_suffix, os.getpid())
+         super(VM, self).__init__(qemu_prog, qemu_opts, name=3Dname,
+                                  test_dir=3Dtest_dir,
+-                                 socket_scm_helper=3Dsocket_scm_helper)
++                                 socket_scm_helper=3Dsocket_scm_helper,
++                                 sock_dir=3Dsock_dir)
+         self._num_drives =3D 0
+=20
+     def add_object(self, opts):
 --=20
 2.21.0
 
