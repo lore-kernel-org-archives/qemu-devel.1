@@ -2,64 +2,63 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FCCC4360C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 07:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2EBC4360C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 07:33:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E00F2190F
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 07:11:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E00F2190F
+	by mail.kernel.org (Postfix) with ESMTPS id 2F5CD218AC
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 07:33:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F5CD218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iISbl-00042r-9S
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 03:11:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48313)
+	id 1iISx3-0002bD-Ba
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 03:33:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51338)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iISSf-0004Iv-9i
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 03:02:11 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1iISw2-0001za-BL
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 03:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iISSd-0000ft-Ll
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 03:02:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42512)
+ (envelope-from <eric.auger@redhat.com>) id 1iISvz-0002P8-O2
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 03:32:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40314)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1iISSd-0000eq-DV; Thu, 10 Oct 2019 03:02:07 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iISvz-0002Of-I4
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 03:32:27 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6529D99D2E;
- Thu, 10 Oct 2019 07:02:05 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A23651001DE0;
- Thu, 10 Oct 2019 07:02:02 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1FEDD1138619; Thu, 10 Oct 2019 09:02:01 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCHv2 1/2] util/qemu-error: add guest name helper with -msg
- options
-References: <20191009164459.8209-1-msmarduch@digitalocean.com>
- <20191009164459.8209-2-msmarduch@digitalocean.com>
- <3f24a34d-de91-c996-ffd8-306d0e0ce6a0@redhat.com>
-Date: Thu, 10 Oct 2019 09:02:01 +0200
-In-Reply-To: <3f24a34d-de91-c996-ffd8-306d0e0ce6a0@redhat.com> (Paolo
- Bonzini's message of "Wed, 9 Oct 2019 23:16:50 +0200")
-Message-ID: <874l0hulqu.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id A991D302246D;
+ Thu, 10 Oct 2019 07:32:25 +0000 (UTC)
+Received: from [10.36.116.245] (ovpn-116-245.ams2.redhat.com [10.36.116.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D27285D6A5;
+ Thu, 10 Oct 2019 07:32:21 +0000 (UTC)
+Subject: Re: [PATCH v3] migration: Support gtree migration
+To: quintela@redhat.com
+References: <20191004112025.28868-1-eric.auger@redhat.com>
+ <87a7aguole.fsf@trasno.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <61dac94a-7774-714f-ca4f-f02452130854@redhat.com>
+Date: Thu, 10 Oct 2019 09:32:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <87a7aguole.fsf@trasno.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 10 Oct 2019 07:02:05 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Thu, 10 Oct 2019 07:32:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,33 +73,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, qemu-trivial@nongnu.org, mtosatti@redhat.com,
- qemu-devel@nongnu.org, Mario Smarduch <msmarduch@digitalocean.com>,
- philmd@redhat.com, rth@twiddle.net
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Hi Juan,
 
-> On 09/10/19 18:44, Mario Smarduch wrote:
->>  };
->> @@ -1263,6 +1267,7 @@ static void realtime_init(void)
->>  static void configure_msg(QemuOpts *opts)
->>  {
->>      enable_timestamp_msg = qemu_opt_get_bool(opts, "timestamp", true);
->> +    enable_guestname_msg = qemu_opt_get_bool(opts, "name", false);
->>  }
->
-> Before, the msg option certainly had a timestamp suboption, but this
-> might not be the case now.  So that "true" needs to become "false".
-> I'll fix it up when applying.
+On 10/5/19 12:34 AM, Juan Quintela wrote:
+> Eric Auger <eric.auger@redhat.com> wrote:
+>> Introduce support for GTree migration. A custom save/restore
+>> is implemented. Each item is made of a key and a data.
+>>
+>> If the key is a pointer to an object, 2 VMSDs are passed into
+>> the GTree VMStateField.
+>>
+>> When putting the items, the tree is traversed in sorted order by
+>> g_tree_foreach.
+>>
+>> On the get() path, gtrees must be allocated using the proper
+>> key compare, key destroy and value destroy. This must be handled
+>> beforehand, for example in a pre_load method.
+>>
+>> Tests are added to test save/dump of structs containing gtrees
+>> including the virtio-iommu domain/mappings scenario.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> Overal I like the patch.  I think that I found a minor error.
+> 
+> 
+>> +static int put_gtree(QEMUFile *f, void *pv, size_t unused_size,
+>> +                     const VMStateField *field, QJSON *vmdesc)
+>> +{
+>> +    bool direct_key = (!field->start);
+>> +    const VMStateDescription *key_vmsd = direct_key ? NULL : &field->vmsd[0];
+>> +    const VMStateDescription *val_vmsd = direct_key ? &field->vmsd[0] :
+>> +                                                      &field->vmsd[1];
+>> +    struct put_gtree_data capsule = {f, key_vmsd, val_vmsd, 0};
+> 
+> Please, consider change the last line to:
+> 
+>        struct put_gtree_data capsule = {
+>            .f = f,
+>            .key_vmsd = key_vmsd,
+>            .val_vmsd = val_vmsd,
+>            .ret = 0};
+> 
+> It makes much easier make changes on the future.
+> 
+> Once here, I think that you are missing on the middle a:
+> 
+>           .vmdesc = vmdesc,
+> 
+> No?  At least you use it on put_gtree_elem, and I don't see any place
+> where you assign it.  When I did the change is when I noticed that it
+> was missing.
 
-Hold your horses.
+You are completely right. Thank you for catching this.
 
-Before this patch, -msg "" enables timestamps.  If you apply it with
-your fixup, it doesn't anymore.  I don't disagree with that change, but
-it needs to be its own commit, with a proper explanation.
-
-I have more comments on this patch.
+Eric
+> 
+>> +    GTree **pval = pv;
+>> +    GTree *tree = *pval;
+>> +    int ret;
+>> +
+>> +    qemu_put_be32(f, g_tree_nnodes(tree));
+>> +    g_tree_foreach(tree, put_gtree_elem, (gpointer)&capsule);
+>> +    qemu_put_byte(f, false);
+>> +    ret = capsule.ret;
+>> +    if (ret) {
+>> +        error_report("%s : failed to save gtree (%d)", field->name, ret);
+>> +    }
+>> +    return ret;
+>> +}
+> 
+> As said before, with this changes you have my reviewed-by.
+> 
+> Later, Juan.
+> 
 
