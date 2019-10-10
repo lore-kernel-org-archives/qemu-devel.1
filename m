@@ -2,56 +2,83 @@ Return-Path: <SRS0=X6L9=YD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2B4C10F14
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCA0C10F14
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:08:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D638D20650
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:07:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D638D20650
+	by mail.kernel.org (Postfix) with ESMTPS id 836A320650
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Oct 2019 12:08:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 836A320650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIXEN-0007dL-Ec
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 08:07:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51526)
+	id 1iIXEl-00082h-68
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 08:08:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIWqd-00067K-BM
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:12 -0400
+ (envelope-from <philmd@redhat.com>) id 1iIWoW-0003Zd-3G
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIWqb-00082Q-Oe
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:43:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52624)
+ (envelope-from <philmd@redhat.com>) id 1iIWoU-0007dq-Ab
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:41:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34294)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIWqV-00080s-A8; Thu, 10 Oct 2019 07:43:03 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iIWoT-0007dH-FZ
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 07:40:57 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 89E403060396;
- Thu, 10 Oct 2019 11:43:02 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 29417600C4;
- Thu, 10 Oct 2019 11:43:02 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 00/36] Block patches
-Date: Thu, 10 Oct 2019 13:42:24 +0200
-Message-Id: <20191010114300.7746-1-mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 045068E587
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 11:40:56 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id k4so2638824wru.1
+ for <qemu-devel@nongnu.org>; Thu, 10 Oct 2019 04:40:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vZFU/Zorlb933nx9ib6PRKLtSYdiskEC9Tb6QaFsmFI=;
+ b=AX0i2E9VPv8D46ZuPuAnavC/wesx4MlHSd3UhT/R+2649l3UbTPPZE2LylxCXQERbW
+ VoALkqXGTvim4qCNp7tM3v8yuAKoqer1ur149gr6DcV2z2EMreVtjUCcgJNUQKxjK4ZU
+ MIXbG+w6BGY2lCWJ95fXxQfL58cdq0+ycZOgNRYMJdwznyhR9iUMFsyz2GQnIFlgvNen
+ N08rzPK1HS9CmMGSxBUxPx/+r9R13DtIG1YPMEAH2cLKOAOcglbtWH4TuOHygoVftTpu
+ hi7Eg+rNxQwwMqWZ6GyViLTOiWvtye1x23r08svsLHPF6LM5DiYzt05gMxvUvJk91Avz
+ SMXg==
+X-Gm-Message-State: APjAAAUKeTkX++NkvvRymq5y8S0HcfHPAqN9kydMzitGdKnv+WWFvsX3
+ E7t7BR1/6mbpBp+yRDKmQbLxSLoLn5oykk+dTYA/LjlJSUCIIG33jzWrPAQUJSlYc9EAWCEKb9B
+ MQeXuyzv29UynzF0=
+X-Received: by 2002:adf:fc42:: with SMTP id e2mr8676772wrs.100.1570707654803; 
+ Thu, 10 Oct 2019 04:40:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqySNn6IIrBPQkQeCkXNAVO8VhDB01xx8fXaS56SpDRCmEDoygi0MdgFxmgE3Gyb7aKeVPqQmA==
+X-Received: by 2002:adf:fc42:: with SMTP id e2mr8676756wrs.100.1570707654642; 
+ Thu, 10 Oct 2019 04:40:54 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id b144sm7302480wmb.3.2019.10.10.04.40.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 10 Oct 2019 04:40:54 -0700 (PDT)
+Subject: Re: [PATCH v7 12/12] MAINTAINERS: add microvm related files
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20191008135537.197867-1-slp@redhat.com>
+ <20191008135537.197867-13-slp@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <425fbf8d-582e-4d30-8cc7-062d4d21dfd0@redhat.com>
+Date: Thu, 10 Oct 2019 13:40:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 10 Oct 2019 11:43:02 +0000 (UTC)
+In-Reply-To: <20191008135537.197867-13-slp@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -67,132 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, kraxel@redhat.com, pbonzini@redhat.com,
+ imammedo@redhat.com, sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e7=
-2d:
+On 10/8/19 3:55 PM, Sergio Lopez wrote:
+> Add a new "Microvm" section under "X86 Machines" with the new files
+> related to this machine type.
+>=20
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>   MAINTAINERS | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3ca814850e..dfdc4f9b57 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1275,6 +1275,16 @@ F: include/hw/timer/hpet.h
+>   F: include/hw/timer/i8254*
+>   F: include/hw/timer/mc146818rtc*
+>  =20
+> +Microvm
+> +M: Sergio Lopez <slp@redhat.com>
+> +M: Paolo Bonzini <pbonzini@redhat.com>
+> +S: Maintained
+> +F: docs/microvm.rst
+> +F: hw/i386/microvm.c
+> +F: include/hw/i386/microvm.h
+> +F: roms/qboot
+> +F: pc-bios/bios-microvm.bin
+> +
+>   Machine core
+>   M: Eduardo Habkost <ehabkost@redhat.com>
+>   M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>=20
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
- into staging (2019-10-08 16:08:35 +0100)
-
-are available in the Git repository at:
-
-  https://github.com/XanClic/qemu.git tags/pull-block-2019-10-10
-
-for you to fetch changes up to 35f05b2e2ee59e077bf949057dc0959ddd6e5249:
-
-  iotests/162: Fix for newer Linux 5.3+ (2019-10-10 12:13:23 +0200)
-
-----------------------------------------------------------------
-Block patches:
-- Parallelized request handling for qcow2
-- Backup job refactoring to use a filter node instead of before-write
-  notifiers
-- Add discard accounting information to file-posix nodes
-- Allow trivial reopening of nbd nodes
-- Some iotest fixes
-
-----------------------------------------------------------------
-Anton Nefedov (9):
-  qapi: group BlockDeviceStats fields
-  qapi: add unmap to BlockDeviceStats
-  block: add empty account cookie type
-  ide: account UNMAP (TRIM) operations
-  scsi: store unmap offset and nb_sectors in request struct
-  scsi: move unmap error checking to the complete callback
-  scsi: account unmap operations
-  file-posix: account discard operations
-  qapi: query-blockstat: add driver specific file-posix stats
-
-Daniel P. Berrang=C3=A9 (1):
-  tests: fix I/O test for hosts defaulting to LUKSv2
-
-Max Reitz (4):
-  iotests: Fix 125 for growth_mode =3D metadata
-  iotests: Disable 125 on broken XFS versions
-  iotests: Use stat -c %b in 125
-  iotests/162: Fix for newer Linux 5.3+
-
-Maxim Levitsky (1):
-  nbd: add empty .bdrv_reopen_prepare
-
-Vladimir Sementsov-Ogievskiy (21):
-  qemu-iotests: ignore leaks on failure paths in 026
-  block: introduce aio task pool
-  block/qcow2: refactor qcow2_co_preadv_part
-  block/qcow2: refactor qcow2_co_pwritev_part
-  block/qcow2: introduce parallel subrequest handling in read and write
-  block/backup: fix max_transfer handling for copy_range
-  block/backup: fix backup_cow_with_offload for last cluster
-  block/backup: split shareable copying part from backup_do_cow
-  block/backup: improve comment about image fleecing
-  block/backup: introduce BlockCopyState
-  block/backup: fix block-comment style
-  block: move block_copy from block/backup.c to separate file
-  block: teach bdrv_debug_breakpoint skip filters with backing
-  iotests: prepare 124 and 257 bitmap querying for backup-top filter
-  iotests: 257: drop unused Drive.device field
-  iotests: 257: drop device_add
-  block/backup: move in-flight requests handling from backup to
-    block-copy
-  block/backup: move write_flags calculation inside backup_job_create
-  block/block-copy: split block_copy_set_callbacks function
-  block: introduce backup-top filter driver
-  block/backup: use backup-top instead of write notifiers
-
- block/Makefile.objs                |   4 +
- qapi/block-core.json               |  89 +++-
- block/backup-top.h                 |  41 ++
- block/qcow2.h                      |   3 +
- include/block/accounting.h         |   2 +
- include/block/aio_task.h           |  54 +++
- include/block/block-copy.h         |  93 ++++
- include/block/block.h              |   1 +
- include/block/block_int.h          |   2 +
- block.c                            |  43 +-
- block/accounting.c                 |   6 +
- block/aio_task.c                   | 124 +++++
- block/backup-top.c                 | 276 +++++++++++
- block/backup.c                     | 443 ++++--------------
- block/block-copy.c                 | 345 ++++++++++++++
- block/file-posix.c                 |  54 ++-
- block/nbd.c                        |  15 +
- block/qapi.c                       |  11 +
- block/qcow2.c                      | 466 ++++++++++++-------
- block/replication.c                |   2 +-
- blockdev.c                         |   1 +
- hw/ide/core.c                      |  12 +
- hw/scsi/scsi-disk.c                |  34 +-
- block/trace-events                 |  15 +-
- tests/qemu-iotests/026             |   6 +-
- tests/qemu-iotests/026.out         |  80 +---
- tests/qemu-iotests/026.out.nocache |  80 +---
- tests/qemu-iotests/056             |   8 +-
- tests/qemu-iotests/124             |  83 ++--
- tests/qemu-iotests/125             |  45 +-
- tests/qemu-iotests/141.out         |   2 +-
- tests/qemu-iotests/149             |   2 +-
- tests/qemu-iotests/149.out         |  44 +-
- tests/qemu-iotests/162             |   2 +-
- tests/qemu-iotests/162.out         |   2 +-
- tests/qemu-iotests/227.out         |  18 +
- tests/qemu-iotests/257             |  91 ++--
- tests/qemu-iotests/257.out         | 714 ++++++++++++-----------------
- tests/qemu-iotests/common.rc       |  17 +
- tests/qemu-iotests/iotests.py      |  27 ++
- 40 files changed, 2108 insertions(+), 1249 deletions(-)
- create mode 100644 block/backup-top.h
- create mode 100644 include/block/aio_task.h
- create mode 100644 include/block/block-copy.h
- create mode 100644 block/aio_task.c
- create mode 100644 block/backup-top.c
- create mode 100644 block/block-copy.c
-
---=20
-2.21.0
-
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
