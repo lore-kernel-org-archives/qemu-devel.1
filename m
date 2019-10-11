@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A78C6C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0B8C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:03:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 818F92054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:02:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 818F92054F
+	by mail.kernel.org (Postfix) with ESMTPS id 9E8BD2054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E8BD2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyIh-0004nL-Pg
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:01:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36524)
+	id 1iIyJk-0006JG-FA
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:03:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQz-0006Li-Lm
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:30 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRC-0006io-Js
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0004a4-8E
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:29 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48178)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0004oh-Mz
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:42 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48486)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQx-0004J0-UM
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
+ id 1iIxR8-0004WR-Aj
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQm-0003XG-EM; Fri, 11 Oct 2019 19:06:16 +0300
+ id 1iIxQw-0003XG-2C; Fri, 11 Oct 2019 19:06:26 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 061/126] NVDIMM: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:47 +0300
-Message-Id: <20191011160552.22907-62-vsementsov@virtuozzo.com>
+Subject: [RFC v5 088/126] Cryptography: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:14 +0300
+Message-Id: <20191011160552.22907-89-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,9 +61,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ armbru@redhat.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -112,68 +111,242 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/mem/nvdimm.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+ crypto/block-luks.c | 56 +++++++++++++++++++--------------------------
+ crypto/secret.c     | 17 ++++++--------
+ crypto/tlssession.c |  7 +++---
+ 3 files changed, 33 insertions(+), 47 deletions(-)
 
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index 375f9a588a..e84d860688 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -44,29 +44,27 @@ static void nvdimm_get_label_size(Object *obj, Visitor *v, const char *name,
- static void nvdimm_set_label_size(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
+diff --git a/crypto/block-luks.c b/crypto/block-luks.c
+index 4861db810c..45c21c2fcc 100644
+--- a/crypto/block-luks.c
++++ b/crypto/block-luks.c
+@@ -442,8 +442,8 @@ qcrypto_block_luks_store_header(QCryptoBlock *block,
+                                 void *opaque,
+                                 Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     NVDIMMDevice *nvdimm = NVDIMM(obj);
+     const QCryptoBlockLUKS *luks = block->opaque;
 -    Error *local_err = NULL;
-     uint64_t value;
+     size_t i;
+     g_autofree QCryptoBlockLUKSHeader *hdr_copy = NULL;
  
-     if (nvdimm->nvdimm_mr) {
--        error_setg(&local_err, "cannot change property value");
--        goto out;
-+        error_setg(errp, "cannot change property value");
-+        return;
-     }
+@@ -469,10 +469,9 @@ qcrypto_block_luks_store_header(QCryptoBlock *block,
  
--    visit_type_size(v, name, &value, &local_err);
+     /* Write out the partition header and key slot headers */
+     writefunc(block, 0, (const uint8_t *)hdr_copy, sizeof(*hdr_copy),
+-              opaque, &local_err);
++              opaque, errp);
+ 
 -    if (local_err) {
--        goto out;
-+    visit_type_size(v, name, &value, errp);
+-        error_propagate(errp, local_err);
 +    if (*errp) {
-+        return;
+         return -1;
      }
-     if (value < MIN_NAMESPACE_LABEL_SIZE) {
--        error_setg(&local_err, "Property '%s.%s' (0x%" PRIx64 ") is required"
-+        error_setg(errp, "Property '%s.%s' (0x%" PRIx64 ") is required"
-                    " at least 0x%lx", object_get_typename(obj),
-                    name, value, MIN_NAMESPACE_LABEL_SIZE);
--        goto out;
-+        return;
-     }
- 
-     nvdimm->label_size = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void nvdimm_init(Object *obj)
-@@ -126,13 +124,12 @@ static void nvdimm_prepare_memory_region(NVDIMMDevice *nvdimm, Error **errp)
- static MemoryRegion *nvdimm_md_get_memory_region(MemoryDeviceState *md,
-                                                  Error **errp)
+     return 0;
+@@ -603,9 +602,9 @@ qcrypto_block_luks_check_header(const QCryptoBlockLUKS *luks, Error **errp)
+ static int
+ qcrypto_block_luks_parse_header(QCryptoBlockLUKS *luks, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     NVDIMMDevice *nvdimm = NVDIMM(md);
+     g_autofree char *cipher_mode = g_strdup(luks->header.cipher_mode);
+     char *ivgen_name, *ivhash_name;
 -    Error *local_err = NULL;
  
-     if (!nvdimm->nvdimm_mr) {
--        nvdimm_prepare_memory_region(nvdimm, &local_err);
+     /*
+      * The cipher_mode header contains a string that we have
+@@ -632,17 +631,15 @@ qcrypto_block_luks_parse_header(QCryptoBlockLUKS *luks, Error **errp)
+         ivhash_name++;
+ 
+         luks->ivgen_hash_alg = qcrypto_block_luks_hash_name_lookup(ivhash_name,
+-                                                                   &local_err);
 -        if (local_err) {
 -            error_propagate(errp, local_err);
-+        nvdimm_prepare_memory_region(nvdimm, errp);
++                                                                   errp);
 +        if (*errp) {
-             return NULL;
+             return -1;
          }
      }
+ 
+     luks->cipher_mode = qcrypto_block_luks_cipher_mode_lookup(cipher_mode,
+-                                                              &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                                                              errp);
++    if (*errp) {
+         return -1;
+     }
+ 
+@@ -650,24 +647,21 @@ qcrypto_block_luks_parse_header(QCryptoBlockLUKS *luks, Error **errp)
+             qcrypto_block_luks_cipher_name_lookup(luks->header.cipher_name,
+                                                   luks->cipher_mode,
+                                                   luks->header.master_key_len,
+-                                                  &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                                                  errp);
++    if (*errp) {
+         return -1;
+     }
+ 
+     luks->hash_alg =
+             qcrypto_block_luks_hash_name_lookup(luks->header.hash_spec,
+-                                                &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                                                errp);
++    if (*errp) {
+         return -1;
+     }
+ 
+     luks->ivgen_alg = qcrypto_block_luks_ivgen_name_lookup(ivgen_name,
+-                                                           &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                                                           errp);
++    if (*errp) {
+         return -1;
+     }
+ 
+@@ -679,9 +673,8 @@ qcrypto_block_luks_parse_header(QCryptoBlockLUKS *luks, Error **errp)
+         luks->ivgen_cipher_alg =
+                 qcrypto_block_luks_essiv_cipher(luks->cipher_alg,
+                                                 luks->ivgen_hash_alg,
+-                                                &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                                                errp);
++        if (*errp) {
+             return -1;
+         }
+     } else {
+@@ -1186,9 +1179,9 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+                           void *opaque,
+                           Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QCryptoBlockLUKS *luks;
+     QCryptoBlockCreateOptionsLUKS luks_opts;
+-    Error *local_err = NULL;
+     g_autofree uint8_t *masterkey = NULL;
+     size_t header_sectors;
+     size_t split_key_sectors;
+@@ -1298,9 +1291,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+         luks->ivgen_cipher_alg =
+                 qcrypto_block_luks_essiv_cipher(luks_opts.cipher_alg,
+                                                 luks_opts.ivgen_hash_alg,
+-                                                &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                                                errp);
++        if (*errp) {
+             goto error;
+         }
+     } else {
+@@ -1364,9 +1356,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+                                        luks->header.master_key_salt,
+                                        QCRYPTO_BLOCK_LUKS_SALT_LEN,
+                                        QCRYPTO_BLOCK_LUKS_DIGEST_LEN,
+-                                       &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                                       errp);
++    if (*errp) {
+         goto error;
+     }
+ 
+@@ -1439,9 +1430,8 @@ qcrypto_block_luks_create(QCryptoBlock *block,
+         block->sector_size;
+ 
+     /* Reserve header space to match payload offset */
+-    initfunc(block, block->payload_offset, opaque, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    initfunc(block, block->payload_offset, opaque, errp);
++    if (*errp) {
+         goto error;
+     }
+ 
+diff --git a/crypto/secret.c b/crypto/secret.c
+index 1cf0ad0ce8..962d2c1d44 100644
+--- a/crypto/secret.c
++++ b/crypto/secret.c
+@@ -178,27 +178,25 @@ qcrypto_secret_prop_set_loaded(Object *obj,
+                                bool value,
+                                Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QCryptoSecret *secret = QCRYPTO_SECRET(obj);
+ 
+     if (value) {
+-        Error *local_err = NULL;
+         uint8_t *input = NULL;
+         size_t inputlen = 0;
+         uint8_t *output = NULL;
+         size_t outputlen = 0;
+ 
+-        qcrypto_secret_load_data(secret, &input, &inputlen, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        qcrypto_secret_load_data(secret, &input, &inputlen, errp);
++        if (*errp) {
+             return;
+         }
+ 
+         if (secret->keyid) {
+             qcrypto_secret_decrypt(secret, input, inputlen,
+-                                   &output, &outputlen, &local_err);
++                                   &output, &outputlen, errp);
+             g_free(input);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
++            if (*errp) {
+                 return;
+             }
+             input = output;
+@@ -206,10 +204,9 @@ qcrypto_secret_prop_set_loaded(Object *obj,
+         } else {
+             if (secret->format != QCRYPTO_SECRET_FORMAT_RAW) {
+                 qcrypto_secret_decode(input, inputlen,
+-                                      &output, &outputlen, &local_err);
++                                      &output, &outputlen, errp);
+                 g_free(input);
+-                if (local_err) {
+-                    error_propagate(errp, local_err);
++                if (*errp) {
+                     return;
+                 }
+                 input = output;
+diff --git a/crypto/tlssession.c b/crypto/tlssession.c
+index 33203e8ca7..abb3912304 100644
+--- a/crypto/tlssession.c
++++ b/crypto/tlssession.c
+@@ -256,13 +256,13 @@ static int
+ qcrypto_tls_session_check_certificate(QCryptoTLSSession *session,
+                                       Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+     unsigned int status;
+     const gnutls_datum_t *certs;
+     unsigned int nCerts, i;
+     time_t now;
+     gnutls_x509_crt_t cert = NULL;
+-    Error *err = NULL;
+ 
+     now = time(NULL);
+     if (now == ((time_t)-1)) {
+@@ -354,9 +354,8 @@ qcrypto_tls_session_check_certificate(QCryptoTLSSession *session,
+                 bool allow;
+ 
+                 allow = qauthz_is_allowed_by_id(session->authzid,
+-                                                session->peername, &err);
+-                if (err) {
+-                    error_propagate(errp, err);
++                                                session->peername, errp);
++                if (*errp) {
+                     goto error;
+                 }
+                 if (!allow) {
 -- 
 2.21.0
 
