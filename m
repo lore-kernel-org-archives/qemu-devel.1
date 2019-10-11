@@ -2,64 +2,64 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67312C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DDA4C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 20:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36FC72084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:41:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36FC72084C
+	by mail.kernel.org (Postfix) with ESMTPS id 2DAFD214E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 20:07:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DAFD214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ0ma-0002dQ-BL
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 15:41:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40289)
+	id 1iJ1Bw-00042n-80
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 16:07:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iJ0lC-0001cL-De
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:39:35 -0400
+ (envelope-from <crosa@redhat.com>) id 1iJ1A3-0002Yu-LW
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 16:05:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iJ0lB-0006DD-3e
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:39:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36632)
+ (envelope-from <crosa@redhat.com>) id 1iJ1A2-0001Pq-N6
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 16:05:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41398)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iJ0l6-0006C8-VA; Fri, 11 Oct 2019 15:39:29 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <crosa@redhat.com>)
+ id 1iJ19y-0001HW-Qc; Fri, 11 Oct 2019 16:05:10 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6243D316D794;
- Fri, 11 Oct 2019 19:39:27 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A97D85D9CA;
- Fri, 11 Oct 2019 19:39:24 +0000 (UTC)
-Subject: Re: [RFC v5 099/126] nbd: introduce ERRP_AUTO_PROPAGATE
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-100-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <dc6ea838-82f2-9ed6-f16e-512a8c7ae569@redhat.com>
-Date: Fri, 11 Oct 2019 14:39:24 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 40E802D1EF1;
+ Fri, 11 Oct 2019 20:05:08 +0000 (UTC)
+Received: from dhcp-17-179.bos.redhat.com (dhcp-17-179.bos.redhat.com
+ [10.18.17.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DD140A7D0;
+ Fri, 11 Oct 2019 20:05:02 +0000 (UTC)
+Date: Fri, 11 Oct 2019 16:05:01 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Nir Soffer <nsoffer@redhat.com>
+Subject: Re: [PATCH v2 1/4] qemu-iotests: remove bash shebang from library
+ files
+Message-ID: <20191011200501.GA18783@dhcp-17-179.bos.redhat.com>
+References: <20191009194740.8079-1-crosa@redhat.com>
+ <20191009194740.8079-2-crosa@redhat.com>
+ <20191011093610.GD5158@localhost.localdomain>
+ <CAMRbyyu=NdwhKFwb=JzMyHfbnP4XzzpaHTCd7ucT7tLEk9HdFA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191011160552.22907-100-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMRbyyu=NdwhKFwb=JzMyHfbnP4XzzpaHTCd7ucT7tLEk9HdFA@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 11 Oct 2019 19:39:27 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Fri, 11 Oct 2019 20:05:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -74,47 +74,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- armbru@redhat.com, qemu-block@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/11/19 11:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> If we want to add some info to errp (by error_prepend() or
-> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-> Otherwise, this info will not be added when errp == &fatal_err
-> (the program will exit prior to the error_append_hint() or
-> error_prepend() call).  Fix such cases.
+On Fri, Oct 11, 2019 at 02:27:25PM +0300, Nir Soffer wrote:
+> On Fri, Oct 11, 2019, 12:36 Kevin Wolf <kwolf@redhat.com> wrote:
 > 
-> If we want to check error after errp-function call, we need to
-> introduce local_err and than propagate it to errp. Instead, use
-> ERRP_AUTO_PROPAGATE macro, benefits are:
-> 1. No need of explicit error_propagate call
-> 2. No need of explicit local_err variable: use errp directly
-> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
->     &error_fatel, this means that we don't break error_abort
->     (we'll abort on error_set, not on error_propagate)
+> > Am 09.10.2019 um 21:47 hat Cleber Rosa geschrieben:
+> > > Due to not being able to find a reason to have shebangs on files that
+> > > are not executable.
+> > >
+> > > While at it, add a mode hint to emacs, which would be clueless or
+> > > plain wrong about these containing shell code.
+> >
+> > vim still doesn't like the change.
+> >
+> > Of course, we could also add another line for vim and for every other
+> > editor in use, but actually, I think I'd prefer just dropping this
+> > patch. It even makes each file a few bytes larger instead of saving
+> > something. Shebang lines are a shorter and more portable format
+> > indicator than the alternatives.
+> >
+> > So I think in the end we have found a good reason to keep them. :-)
+> >
 > 
+> What about .sh suffix? Should be most portable way.
+> 
+> >
 
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/nbd.h |  1 +
->  block/nbd.c         | 49 +++++++++++++++++++++------------------------
->  nbd/client.c        |  5 +++++
->  nbd/server.c        |  5 +++++
->  4 files changed, 34 insertions(+), 26 deletions(-)
+That's the approach I tend to follow for my sh code.  Explicit is
+better than implicit if you ask me.
 
-One of the few patches with a net gain rather than loss of lines, but 
-that's because of lots of error_prepend use (where you add the macro 
-without removing error_propagate).
+Kevin,
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Do you have any strong feelings here?  I'd be fine with either this
+or dropping the patch.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Thanks,
+- Cleber.
 
