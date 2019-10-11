@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A7B1ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 621B4C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:06:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40DBB2054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:05:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40DBB2054F
+	by mail.kernel.org (Postfix) with ESMTPS id 352A2206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:06:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352A2206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyM0-0001OS-Rq
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:05:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37051)
+	id 1iIyMl-0002q4-Tj
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:06:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36243)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRE-0006lz-Df
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:46 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQr-00067u-OK
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRB-0004qU-7A
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:44 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48262)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQq-0004N3-GQ
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:21 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47950)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxRA-0004Mj-U9; Fri, 11 Oct 2019 12:06:41 -0400
+ id 1iIxQq-0004Ab-9G
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:20 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQp-0003XG-Hj; Fri, 11 Oct 2019 19:06:19 +0300
+ id 1iIxQZ-0003XG-UG; Fri, 11 Oct 2019 19:06:04 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 068/126] scsi: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:54 +0300
-Message-Id: <20191011160552.22907-69-vsementsov@virtuozzo.com>
+Subject: [RFC v5 018/126] hw/usb: rename Error ** parameter to more common errp
+Date: Fri, 11 Oct 2019 19:04:04 +0300
+Message-Id: <20191011160552.22907-19-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -59,92 +60,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, qemu-block@nongnu.org, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: vsementsov@virtuozzo.com, armbru@redhat.com,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
-
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
-
-This commit (together with its neighbors) was generated by
-
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
-
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
-
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- scsi/pr-manager-helper.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ hw/usb/dev-network.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-index ca27c93283..f41eaa8524 100644
---- a/scsi/pr-manager-helper.c
-+++ b/scsi/pr-manager-helper.c
-@@ -101,13 +101,13 @@ static int pr_manager_helper_write(PRManagerHelper *pr_mgr,
- static int pr_manager_helper_initialize(PRManagerHelper *pr_mgr,
-                                         Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     char *path = g_strdup(pr_mgr->path);
-     SocketAddress saddr = {
-         .type = SOCKET_ADDRESS_TYPE_UNIX,
-         .u.q_unix.path = path
-     };
-     QIOChannelSocket *sioc = qio_channel_socket_new();
--    Error *local_err = NULL;
+diff --git a/hw/usb/dev-network.c b/hw/usb/dev-network.c
+index 5de6213cc4..b81a8abe83 100644
+--- a/hw/usb/dev-network.c
++++ b/hw/usb/dev-network.c
+@@ -1342,7 +1342,7 @@ static NetClientInfo net_usbnet_info = {
+     .cleanup = usbnet_cleanup,
+ };
  
-     uint32_t flags;
-     int r;
-@@ -116,11 +116,10 @@ static int pr_manager_helper_initialize(PRManagerHelper *pr_mgr,
-     qio_channel_set_name(QIO_CHANNEL(sioc), "pr-manager-helper");
-     qio_channel_socket_connect_sync(sioc,
-                                     &saddr,
--                                    &local_err);
-+                                    errp);
-     g_free(path);
--    if (local_err) {
-+    if (*errp) {
-         object_unref(OBJECT(sioc));
--        error_propagate(errp, local_err);
-         return -ENOTCONN;
-     }
+-static void usb_net_realize(USBDevice *dev, Error **errrp)
++static void usb_net_realize(USBDevice *dev, Error **errp)
+ {
+     USBNetState *s = USB_NET(dev);
  
 -- 
 2.21.0
