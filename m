@@ -6,43 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D97ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D52DAC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:26:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F0E9206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:25:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F0E9206A1
+	by mail.kernel.org (Postfix) with ESMTPS id A7600206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:26:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7600206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxjQ-0003Os-W7
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:25:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35910)
+	id 1iIxkG-0004tT-G6
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:26:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36413)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQW-0005ZB-Fj
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:01 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQx-0006Hf-CB
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQV-00041W-Bd
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:00 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47796)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQv-0004Uj-Sj
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48114)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQV-00040O-3D
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:05:59 -0400
+ id 1iIxQv-0004GN-LU
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:25 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQT-0003XG-Lr; Fri, 11 Oct 2019 19:05:57 +0300
+ id 1iIxQk-0003XG-9F; Fri, 11 Oct 2019 19:06:14 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 005/126] vnc: drop Error pointer indirection in
- vnc_client_io_error
-Date: Fri, 11 Oct 2019 19:03:51 +0300
-Message-Id: <20191011160552.22907-6-vsementsov@virtuozzo.com>
+Subject: [RFC v5 054/126] virtio-9p: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:40 +0300
+Message-Id: <20191011160552.22907-55-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,91 +60,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, armbru@redhat.com,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't need Error **, as all callers pass local Error object, which
-isn't used after the call, or NULL. Use Error * instead.
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- ui/vnc.h |  2 +-
- ui/vnc.c | 20 +++++++-------------
- 2 files changed, 8 insertions(+), 14 deletions(-)
+ hw/9pfs/9p-local.c | 8 ++++----
+ hw/9pfs/9p.c       | 1 +
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/ui/vnc.h b/ui/vnc.h
-index fea79c2fc9..4e2637ce6c 100644
---- a/ui/vnc.h
-+++ b/ui/vnc.h
-@@ -547,7 +547,7 @@ uint32_t read_u32(uint8_t *data, size_t offset);
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 35635e7e7e..aac7989f16 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -1477,9 +1477,9 @@ static void error_append_security_model_hint(Error **errp_in)
  
- /* Protocol stage functions */
- void vnc_client_error(VncState *vs);
--size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp);
-+size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error *err);
- 
- void start_client_init(VncState *vs);
- void start_auth_vnc(VncState *vs);
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 87b8045afe..4100d6e404 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1312,7 +1312,7 @@ void vnc_disconnect_finish(VncState *vs)
-     g_free(vs);
- }
- 
--size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
-+size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error *err)
+ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
  {
-     if (ret <= 0) {
-         if (ret == 0) {
-@@ -1320,15 +1320,11 @@ size_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
-             vnc_disconnect_start(vs);
-         } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
-             trace_vnc_client_io_error(vs, vs->ioc,
--                                      errp ? error_get_pretty(*errp) :
--                                      "Unknown");
-+                                      err ? error_get_pretty(err) : "Unknown");
-             vnc_disconnect_start(vs);
-         }
++    ERRP_AUTO_PROPAGATE();
+     const char *sec_model = qemu_opt_get(opts, "security_model");
+     const char *path = qemu_opt_get(opts, "path");
+-    Error *local_err = NULL;
  
--        if (errp) {
--            error_free(*errp);
--            *errp = NULL;
--        }
-+        error_free(err);
-         return 0;
+     if (!sec_model) {
+         error_setg(errp, "security_model property not set");
+@@ -1507,9 +1507,9 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+         return -1;
      }
-     return ret;
-@@ -1361,10 +1357,9 @@ size_t vnc_client_write_buf(VncState *vs, const uint8_t *data, size_t datalen)
+ 
+-    fsdev_throttle_parse_opts(opts, &fse->fst, &local_err);
+-    if (local_err) {
+-        error_propagate_prepend(errp, local_err,
++    fsdev_throttle_parse_opts(opts, &fse->fst, errp);
++    if (*errp) {
++        error_prepend(errp,
+                                 "invalid throttle configuration: ");
+         return -1;
+     }
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index cce2366219..1df2749e03 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3552,6 +3552,7 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
+ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
+                                Error **errp)
  {
-     Error *err = NULL;
-     ssize_t ret;
--    ret = qio_channel_write(
--        vs->ioc, (const char *)data, datalen, &err);
-+    ret = qio_channel_write(vs->ioc, (const char *)data, datalen, &err);
-     VNC_DEBUG("Wrote wire %p %zd -> %ld\n", data, datalen, ret);
--    return vnc_client_io_error(vs, ret, &err);
-+    return vnc_client_io_error(vs, ret, err);
- }
- 
- 
-@@ -1488,10 +1483,9 @@ size_t vnc_client_read_buf(VncState *vs, uint8_t *data, size_t datalen)
- {
-     ssize_t ret;
-     Error *err = NULL;
--    ret = qio_channel_read(
--        vs->ioc, (char *)data, datalen, &err);
-+    ret = qio_channel_read(vs->ioc, (char *)data, datalen, &err);
-     VNC_DEBUG("Read wire %p %zd -> %ld\n", data, datalen, ret);
--    return vnc_client_io_error(vs, ret, &err);
-+    return vnc_client_io_error(vs, ret, err);
- }
- 
- 
++    ERRP_AUTO_PROPAGATE();
+     int i, len;
+     struct stat stat;
+     FsDriverEntry *fse;
 -- 
 2.21.0
 
