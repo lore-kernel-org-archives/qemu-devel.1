@@ -2,51 +2,51 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B208FECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07675C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:55:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88F2020679
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:54:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88F2020679
+	by mail.kernel.org (Postfix) with ESMTPS id D21A221A4A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:55:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21A221A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIpkY-000443-Of
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:54:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36789)
+	id 1iIpm4-0005pr-U9
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:55:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37269)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIpft-0006wK-6v
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:49:22 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIpiU-0001cy-5v
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:52:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIpfs-00065j-0e
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:49:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:22439)
+ (envelope-from <mreitz@redhat.com>) id 1iIpiS-0007aA-J1
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:52:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51188)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIpfp-00062r-AW; Fri, 11 Oct 2019 03:49:17 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1iIpiN-0007XX-Uh; Fri, 11 Oct 2019 03:51:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 81A7C18CB8E0;
- Fri, 11 Oct 2019 07:49:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C66C818CB8E8;
+ Fri, 11 Oct 2019 07:51:54 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-40.ams2.redhat.com
  [10.36.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BF1835D9DC;
- Fri, 11 Oct 2019 07:49:14 +0000 (UTC)
-Subject: Re: Problems with c8bb23cbdbe3 on ppc64le
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Qemu-block <qemu-block@nongnu.org>
-References: <2e7d321c-89f4-f3fd-8331-6bc276880de2@redhat.com>
- <5ba5d289-4450-135c-f058-a7e498725058@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1097360600;
+ Fri, 11 Oct 2019 07:51:52 +0000 (UTC)
+Subject: Re: [PATCH 01/23] iotests: Introduce $SOCK_DIR
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20191010152457.17713-1-mreitz@redhat.com>
+ <20191010152457.17713-2-mreitz@redhat.com>
+ <28d6c3e1-7efa-7e31-0b95-c8b5c79f75dc@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <cd53cd86-e93c-297a-c08e-3fc1ae2618ac@redhat.com>
-Date: Fri, 11 Oct 2019 09:49:11 +0200
+Message-ID: <de01a842-4418-c3f4-7521-d11ae10d2866@redhat.com>
+Date: Fri, 11 Oct 2019 09:51:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <5ba5d289-4450-135c-f058-a7e498725058@virtuozzo.com>
+In-Reply-To: <28d6c3e1-7efa-7e31-0b95-c8b5c79f75dc@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="SsADHb2C5JxHd56Kv6KZFI5komTiO6KuA"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="y87eIPQbEVqP3XnoQomm7hycFd90Lh6Uw"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 11 Oct 2019 07:49:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.63]); Fri, 11 Oct 2019 07:51:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -98,94 +98,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SsADHb2C5JxHd56Kv6KZFI5komTiO6KuA
-Content-Type: multipart/mixed; boundary="hxaVx7MgZUtnqJ1Ca31TBJTencdfFQ1ov"
+--y87eIPQbEVqP3XnoQomm7hycFd90Lh6Uw
+Content-Type: multipart/mixed; boundary="7uLSqz0Cr1J1qBP1FGInxhBykxNhTzarR"
 
---hxaVx7MgZUtnqJ1Ca31TBJTencdfFQ1ov
+--7uLSqz0Cr1J1qBP1FGInxhBykxNhTzarR
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 10.10.19 18:15, Anton Nefedov wrote:
-> On 10/10/2019 6:17 PM, Max Reitz wrote:
->> Hi everyone,
+On 10.10.19 20:18, Eric Blake wrote:
+> On 10/10/19 10:24 AM, Max Reitz wrote:
+>> Unix sockets generally have a maximum path length.=C2=A0 Depending on =
+your
+>> $TEST_DIR, it may be exceeded and then all tests that create and use
+>> Unix sockets there may fail.
 >>
->> (CCs just based on tags in the commit in question)
+>> Circumvent this by adding a new scratch directory specifically for
+>> Unix socket files.=C2=A0 It defaults to a temporary directory (mktemp =
+-d)
+>> that is completely removed after the iotests are done.
 >>
->> I have two bug reports which claim problems of qcow2 on XFS on ppc64le=
-
->> machines since qemu 4.1.0.  One of those is about bad performance
->> (sorry, is isn=E2=80=99t public :-/), the other about data corruption
->> (https://bugzilla.redhat.com/show_bug.cgi?id=3D1751934).
+>> (By default, mktemp -d creates a /tmp/tmp.XXXXXXXXXX directory, which
+>> should be short enough for our use cases.)
 >>
->> It looks like in both cases reverting c8bb23cbdbe3 solves the problem
->> (which optimized COW of unallocated areas).
->>
->> I think I=E2=80=99ve looked at every angle but can=E2=80=98t find what=
- could be wrong
->> with it.  Do any of you have any idea? :-/
->>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 tests/qemu-iotests/check | 17 +++++++++++++++++
 >=20
-> hi,
+>> +tmp_sock_dir=3Dfalse
+>> +if [ -z "$SOCK_DIR" ]; then
+>> +=C2=A0=C2=A0=C2=A0 SOCK_DIR=3D$(mktemp -d)
+>> +=C2=A0=C2=A0=C2=A0 tmp_sock_dir=3Dtrue
+>> +fi
+>> +
+>> +if [ ! -d "$SOCK_DIR" ]; then
+>> +=C2=A0=C2=A0=C2=A0 mkdir "$SOCK_DIR"
+>> +fi
 >=20
-> oh, that patch strikes again..
->=20
-> I don't quite follow, was this bug confirmed to happen on x86? Comment =
-8
-> (https://bugzilla.redhat.com/show_bug.cgi?id=3D1751934#c8) mentioned th=
-at
-> (or was that mixed up with the old xfsctl bug?)
+> Should this use mkdir -p, in case two parallel processes compete with
+> the same SOCK_DIR?
 
-I think that was mixed up with the xfsctl bug, yes.
+I would have used mkdir -p, but I saw we used this construct for
+TEST_DIR, so I thought I=E2=80=98d just go for the same.
 
-> Regardless of the platform, does it reproduce? That's comforting
-> already; worst case we can trace each and every request then (unless it=
+> What if SOCK_DIR is set to something that is not a directory (say a
+> file), at which point mkdir fails, but you don't seem to be catching
+> that failure.
 
-> will stop to reproduce this way).
+Well, the same applies to TEST_DIR.  And technically, as long as we
+don=E2=80=99t use mkdir -p for either, not catching the error at least he=
+lps
+circumvent the potential race. O:-)
 
-I haven=E2=80=99t been able to reproduce it yet (wrestling with the test =
-system
-and getting ppc64 machines provisioned), but as far as I know it
-reproduces reliably on ppc64, but only there.
-
-> Also, perhaps it's worth to try to replace fallocate with write(0)?
-> Either in qcow2 (in the patch, bdrv_co_pwrite_zeroes -> bdrv_co_pwritev=
-)
-> or in the file driver. It might hint whether it's misbehaving fallocate=
-
-> (in qemu or in kernel) or something else.
-
-Good idea, that should at least tell us something about the corruption.
+(I=E2=80=99ll convert both to mkdir -p with error handling.)
 
 Max
 
+> Otherwise looks good.
 
---hxaVx7MgZUtnqJ1Ca31TBJTencdfFQ1ov--
 
---SsADHb2C5JxHd56Kv6KZFI5komTiO6KuA
+
+--7uLSqz0Cr1J1qBP1FGInxhBykxNhTzarR--
+
+--y87eIPQbEVqP3XnoQomm7hycFd90Lh6Uw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2gM/cACgkQ9AfbAGHV
-z0DYYQgAg6+lu0lI4EpHsdYyOjmwi2cZJ5klnu8QNcSxdMqigxgtM8Wt/udzm6qV
-Qgy+e1h0k6SiUTii/7OZ0hzUPRtmM/ZkYPD8dMHzacBkCx5AVdgf567n7W8D+BRt
-XHJFxP+obnRM+gePM7w2RvCqorVxarxTrYnVoCfrsrHqSGhVzrNONMTrVw0oe07y
-sPX8I7+PcZUx0k6tWeDebIqZXdB1p6/hHWFxnZxiOKy5RvCmSeY/N4TNq/1yRq5m
-idcCjEa3jHDUyhlIGHMLw2uNNS5N7K6AH/ql8zzr8pbhOWjJ+sbI08WtYoCWhZg5
-qsRHTay4hP510NLVMe8PJL/8xai7eA==
-=R9Rn
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2gNJYACgkQ9AfbAGHV
+z0BbSAgAlv5vgfSXX/7ZTm5Cd+ZEaeJKH6W/ogbJchgvEUcBVDKuu5SrS8UsE6yv
+4BaQtoHTW6cfK/Mm6o6XrD5grfucmwufycP0eBuIG+oTYIam9FYGQas6hic3kxgl
+TzdeSwOfpXoppXIbAREEdQPPsNm0Jt3E2XV5hnqIK9WNbRC/1grn5iYPQZGk6h3j
+EVeS0YWePfrh1yRjOALFfvkoP23V22OoMcvGdDsfO3zPVzTuLrydrMw4X05+bupa
+t/ncE8280ZSunEpp+lE8zJASIs64zc8M1TDldnZCLQ9UCnBMBjYCj+gCEbgc/enA
+EvbgR1zRoSitofLYpNbK5DcodPgOpw==
+=4an6
 -----END PGP SIGNATURE-----
 
---SsADHb2C5JxHd56Kv6KZFI5komTiO6KuA--
+--y87eIPQbEVqP3XnoQomm7hycFd90Lh6Uw--
 
