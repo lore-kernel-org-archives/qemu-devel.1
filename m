@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704B4ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B726C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:46:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 452372089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:44:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452372089F
+	by mail.kernel.org (Postfix) with ESMTPS id 0FAC4206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:46:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FAC4206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIy28-0001Aw-MY
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:44:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36338)
+	id 1iIy3X-0002KW-FR
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:46:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQv-0006E6-9Y
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:26 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR7-0006YZ-2D
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQu-0004RF-0g
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:25 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48044)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0004jG-Mt
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:36 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48376)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQt-0004DL-Pu
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:23 -0400
+ id 1iIxR4-0004QH-Et
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:34 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQi-0003XG-C1; Fri, 11 Oct 2019 19:06:12 +0300
+ id 1iIxQs-0003XG-Vh; Fri, 11 Oct 2019 19:06:23 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 049/126] USB (serial adapter): introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:35 +0300
-Message-Id: <20191011160552.22907-50-vsementsov@virtuozzo.com>
+Subject: [RFC v5 079/126] cryptodev: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:05 +0300
+Message-Id: <20191011160552.22907-80-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,9 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ vsementsov@virtuozzo.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,35 +110,78 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/usb/dev-serial.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ backends/cryptodev-vhost-user.c | 10 ++++------
+ backends/cryptodev.c            | 14 ++++++--------
+ 2 files changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-index 45cc74128a..72959b4005 100644
---- a/hw/usb/dev-serial.c
-+++ b/hw/usb/dev-serial.c
-@@ -484,8 +484,8 @@ static void usb_serial_event(void *opaque, int event)
- 
- static void usb_serial_realize(USBDevice *dev, Error **errp)
+diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
+index b344283940..8bab46fd77 100644
+--- a/backends/cryptodev-vhost-user.c
++++ b/backends/cryptodev-vhost-user.c
+@@ -177,17 +177,16 @@ static void cryptodev_vhost_user_event(void *opaque, int event)
+ static void cryptodev_vhost_user_init(
+              CryptoDevBackend *backend, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     USBSerialState *s = USB_SERIAL_DEV(dev);
+     int queues = backend->conf.peers.queues;
+     size_t i;
 -    Error *local_err = NULL;
+     Chardev *chr;
+     CryptoDevBackendClient *cc;
+     CryptoDevBackendVhostUser *s =
+                       CRYPTODEV_BACKEND_VHOST_USER(backend);
  
-     usb_desc_create_serial(dev);
-     usb_desc_init(dev);
-@@ -496,9 +496,8 @@ static void usb_serial_realize(USBDevice *dev, Error **errp)
-         return;
-     }
- 
--    usb_check_attach(dev, &local_err);
+-    chr = cryptodev_vhost_claim_chardev(s, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    usb_check_attach(dev, errp);
++    chr = cryptodev_vhost_claim_chardev(s, errp);
 +    if (*errp) {
          return;
      }
  
+@@ -204,8 +203,7 @@ static void cryptodev_vhost_user_init(
+         backend->conf.peers.ccs[i] = cc;
+ 
+         if (i == 0) {
+-            if (!qemu_chr_fe_init(&s->chr, chr, &local_err)) {
+-                error_propagate(errp, local_err);
++            if (!qemu_chr_fe_init(&s->chr, chr, errp)) {
+                 return;
+             }
+         }
+diff --git a/backends/cryptodev.c b/backends/cryptodev.c
+index 5a9735684e..6fd039567d 100644
+--- a/backends/cryptodev.c
++++ b/backends/cryptodev.c
+@@ -153,22 +153,20 @@ static void
+ cryptodev_backend_set_queues(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CryptoDevBackend *backend = CRYPTODEV_BACKEND(obj);
+-    Error *local_err = NULL;
+     uint32_t value;
+ 
+-    visit_type_uint32(v, name, &value, &local_err);
+-    if (local_err) {
+-        goto out;
++    visit_type_uint32(v, name, &value, errp);
++    if (*errp) {
++        return;
+     }
+     if (!value) {
+-        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
++        error_setg(errp, "Property '%s.%s' doesn't take value '%"
+                    PRIu32 "'", object_get_typename(obj), name, value);
+-        goto out;
++        return;
+     }
+     backend->conf.peers.queues = value;
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void
 -- 
 2.21.0
 
