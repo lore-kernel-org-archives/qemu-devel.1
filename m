@@ -2,89 +2,64 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB36ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B8DECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:19:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4325B206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:16:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UMRE9ePa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4325B206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8F1E1206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:19:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F1E1206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIumq-0007nS-Dl
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:16:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33498)
+	id 1iIupJ-0000zb-LX
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:19:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34651)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iIulu-0007Ge-CX
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:15:55 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iIuoU-0000XD-Pq
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iIult-00030h-6Q
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:15:54 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44583)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iIult-0002tO-06
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:15:53 -0400
-Received: by mail-wr1-x441.google.com with SMTP id z9so11882714wrl.11
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:15:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=IQDSHGDUpjTTiA3YFHv/P6F8WWupFZbnrzEiEAU9mjE=;
- b=UMRE9ePaVOfcHSWz4IvfMJLS8eSvXZVwA0N2XK7xIcTux015JllIDuw+5QP3kGMdsJ
- ktJtfOnAa+b2zd0eYobvJDigud55HrrTtv4kXWHm4p0pe3PQIA4rSV5l486J0f08gEAp
- Or78ZLdgf0n33Sgm5AXXOZgj0CPyjBnwRHA8j2MI+UdHJTucXvk/7rnBz1ONgGIZ9uR4
- J0PapXngYc6tmzz0Fue70+ViuhKDkgZdCtKSnEmi+rGDZ4odMjfvDUfzyUtV071vDf+4
- q0+uyqJTAkv6DbS5SlYVEyI2pxp130TRie2nBADm0i24qcb9/QEpz/RylKepnXoe9ey5
- PZuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=IQDSHGDUpjTTiA3YFHv/P6F8WWupFZbnrzEiEAU9mjE=;
- b=onSuy+GE1q/4rKRTxLR6lQTEM1fjPnTk7M8gBCoH2jo2hNSta3A44iwCTgBTywyQV+
- wyh5QQIhwPKgiMcrZl+25fKiuZoUSrbh8rP26r8BtCX4xUcY0ZzOeqjuPr4+D68sniky
- FYESjGOu841bG5ueyG80hMifJNDjE5c67CBRx5V8lePZk/omseCrlYyEXfTgZG9z22QY
- X0Eh+fZeQZlvfNePwqQzL4CFF72eOHPcR3Jz8Z/MA4hDUQXjvKa1Sxqtc6hSnmKPj/0r
- bxcwxnFzTZtdDSrR2Ex65CZalL3lrtv4wKfw7dMWwV0+vqtlojmyYN1jXqtXwXom4j5N
- S21Q==
-X-Gm-Message-State: APjAAAUY2UYV84WLaQpaYNuqULRBKkmVn8BzUXHX0nX9nMUiqfnRH9++
- Nd2Uelb1TWTxrZnXEG1EaEa1Bw==
-X-Google-Smtp-Source: APXvYqynhXMt3u6Ny5iTmo2msaqVnrb6ausacEAxSGJB8StSR1b32TUD/agHoTdEzH9RitRdQBz4Dg==
-X-Received: by 2002:adf:f6cd:: with SMTP id y13mr645789wrp.164.1570799749325; 
- Fri, 11 Oct 2019 06:15:49 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u7sm13434433wrp.19.2019.10.11.06.15.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Oct 2019 06:15:48 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9A7741FF87;
- Fri, 11 Oct 2019 14:15:47 +0100 (BST)
-References: <20191010180412.26236-1-mst@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [RFC 1/2] virtio: new post_load hook
-In-reply-to: <20191010180412.26236-1-mst@redhat.com>
-Date: Fri, 11 Oct 2019 14:15:47 +0100
-Message-ID: <871rvjmni4.fsf@linaro.org>
+ (envelope-from <dgilbert@redhat.com>) id 1iIuoS-0005nx-FZ
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:18:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36948)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iIuoS-0005nH-9j
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:18:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AE5F718C8914;
+ Fri, 11 Oct 2019 13:18:30 +0000 (UTC)
+Received: from work-vm (ovpn-117-210.ams2.redhat.com [10.36.117.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D317E5D772;
+ Fri, 11 Oct 2019 13:18:29 +0000 (UTC)
+Date: Fri, 11 Oct 2019 14:18:27 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH] migration: use migration_is_active to represent active
+ state
+Message-ID: <20191011131827.GA18007@work-vm>
+References: <20190717005341.14140-1-richardw.yang@linux.intel.com>
+ <20191008122116.GC3441@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191008122116.GC3441@work-vm>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Fri, 11 Oct 2019 13:18:30 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,81 +71,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mikhail.sennikovskii@cloud.ionos.com, dgilbert@redhat.com,
- stefanha@redhat.com
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> * Wei Yang (richardw.yang@linux.intel.com) wrote:
+> > Wrap the check into a function to make it easy to read.
+> > 
+> > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Michael S. Tsirkin <mst@redhat.com> writes:
+Queued
 
-> Post load hook in virtio vmsd is called early while device is processed,
-> and when VirtIODevice core isn't fully initialized.  Most device
-> specific code isn't ready to deal with a device in such state, and
-> behaves weirdly.
->
-> Add a new post_load hook in a device class instead.  Devices should use
-> this unless they specifically want to verify the migration stream as
-> it's processed, e.g. for bounds checking.
->
-> Suggested-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/virtio/virtio.c         | 7 +++++++
->  include/hw/virtio/virtio.h | 6 ++++++
->  2 files changed, 13 insertions(+)
->
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 527df03bfd..54a46e204c 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2291,6 +2291,13 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, i=
-nt version_id)
->      }
->      rcu_read_unlock();
->
-> +    if (vdc->post_load) {
-> +        ret =3D vdc->post_load(vdev);
-> +        if (ret) {
-> +            return ret;
-> +        }
-
-I see this pattern repeated above because we get early exits on error
-but here it seems superfluous. Why not:
-
-    return vdc->_post_load(vdev)
-
-?
-
-
-> +    }
-> +
->      return 0;
->  }
->
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 48e8d04ff6..ca4f9c0bcc 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -158,6 +158,12 @@ typedef struct VirtioDeviceClass {
->       */
->      void (*save)(VirtIODevice *vdev, QEMUFile *f);
->      int (*load)(VirtIODevice *vdev, QEMUFile *f, int version_id);
-> +    /* Post load hook in vmsd is called early while device is processed,=
- and
-> +     * when VirtIODevice isn't fully initialized.  Devices should use th=
-is instead,
-> +     * unless they specifically want to verify the migration stream as i=
-t's
-> +     * processed, e.g. for bounds checking.
-> +     */
-> +    int (*post_load)(VirtIODevice *vdev);
->      const VMStateDescription *vmsd;
->  } VirtioDeviceClass;
-
-
+> 
+> > ---
+> >  include/migration/misc.h |  1 +
+> >  migration/migration.c    | 12 ++++++++----
+> >  2 files changed, 9 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/include/migration/misc.h b/include/migration/misc.h
+> > index 5cdbabd094..42d6abc920 100644
+> > --- a/include/migration/misc.h
+> > +++ b/include/migration/misc.h
+> > @@ -61,6 +61,7 @@ void migration_object_init(void);
+> >  void migration_shutdown(void);
+> >  void qemu_start_incoming_migration(const char *uri, Error **errp);
+> >  bool migration_is_idle(void);
+> > +bool migration_is_active(MigrationState *);
+> >  void add_migration_state_change_notifier(Notifier *notify);
+> >  void remove_migration_state_change_notifier(Notifier *notify);
+> >  bool migration_in_setup(MigrationState *);
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 43fd8297ef..4c066fc85c 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -1529,8 +1529,7 @@ static void migrate_fd_cleanup(MigrationState *s)
+> >          qemu_fclose(tmp);
+> >      }
+> >  
+> > -    assert((s->state != MIGRATION_STATUS_ACTIVE) &&
+> > -           (s->state != MIGRATION_STATUS_POSTCOPY_ACTIVE));
+> > +    assert(!migration_is_active(s));
+> >  
+> >      if (s->state == MIGRATION_STATUS_CANCELLING) {
+> >          migrate_set_state(&s->state, MIGRATION_STATUS_CANCELLING,
+> > @@ -1690,6 +1689,12 @@ bool migration_is_idle(void)
+> >      return false;
+> >  }
+> >  
+> > +bool migration_is_active(MigrationState *s)
+> > +{
+> > +    return (s->state == MIGRATION_STATUS_ACTIVE ||
+> > +            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE);
+> > +}
+> > +
+> >  void migrate_init(MigrationState *s)
+> >  {
+> >      /*
+> > @@ -3226,8 +3231,7 @@ static void *migration_thread(void *opaque)
+> >  
+> >      trace_migration_thread_setup_complete();
+> >  
+> > -    while (s->state == MIGRATION_STATUS_ACTIVE ||
+> > -           s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> > +    while (migration_is_active(s)) {
+> >          int64_t current_time;
+> >  
+> >          if (urgent || !qemu_file_rate_limit(s->to_dst_file)) {
+> > -- 
+> > 2.17.1
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 --
-Alex Benn=C3=A9e
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
