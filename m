@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 572BFC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 869A8C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:43:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2772E206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:43:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2772E206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 5A51B206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:43:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A51B206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ2gy-0001YI-T9
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:43:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55443)
+	id 1iJ2h1-0001gz-Sp
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:43:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55453)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iJ2Rm-0003kp-JF
+ (envelope-from <jsnow@redhat.com>) id 1iJ2Rn-0003lT-8v
  for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iJ2Rk-0001S5-J8
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40843)
+ (envelope-from <jsnow@redhat.com>) id 1iJ2Rm-0001Sd-11
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44122)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iJ2Rf-0001OH-4P; Fri, 11 Oct 2019 17:27:31 -0400
+ id 1iJ2Ri-0001Ps-KY; Fri, 11 Oct 2019 17:27:34 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 838513D966;
- Fri, 11 Oct 2019 21:27:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C54CACCFE6;
+ Fri, 11 Oct 2019 21:27:33 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 260831EC;
- Fri, 11 Oct 2019 21:27:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2A1331EC;
+ Fri, 11 Oct 2019 21:27:30 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 15/19] iotests: add test 260 to check bitmap life after
- snapshot + commit
-Date: Fri, 11 Oct 2019 17:25:46 -0400
-Message-Id: <20191011212550.27269-16-jsnow@redhat.com>
+Subject: [PULL 17/19] qcow2-bitmap: move bitmap reopen-rw code to
+ qcow2_reopen_commit
+Date: Fri, 11 Oct 2019 17:25:48 -0400
+Message-Id: <20191011212550.27269-18-jsnow@redhat.com>
 In-Reply-To: <20191011212550.27269-1-jsnow@redhat.com>
 References: <20191011212550.27269-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 11 Oct 2019 21:27:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Fri, 11 Oct 2019 21:27:33 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -81,208 +81,134 @@ Sender: "Qemu-devel"
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+The only reason I can imagine for this strange code at the very-end of
+bdrv_reopen_commit is the fact that bs->read_only updated after
+calling drv->bdrv_reopen_commit in bdrv_reopen_commit. And in the same
+time, prior to previous commit, qcow2_reopen_bitmaps_rw did a wrong
+check for being writable, when actually it only need writable file
+child not self.
+
+So, as it's fixed, let's move things to correct place.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190927122355.7344-8-vsementsov@virtuozzo.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Acked-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190927122355.7344-10-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/qemu-iotests/260     | 89 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/260.out | 52 ++++++++++++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 142 insertions(+)
- create mode 100755 tests/qemu-iotests/260
- create mode 100644 tests/qemu-iotests/260.out
+ include/block/block_int.h |  6 ------
+ block.c                   | 19 -------------------
+ block/qcow2.c             | 15 ++++++++++++++-
+ 3 files changed, 14 insertions(+), 26 deletions(-)
 
-diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
-new file mode 100755
-index 00000000000..4f6082c9d22
---- /dev/null
-+++ b/tests/qemu-iotests/260
-@@ -0,0 +1,89 @@
-+#!/usr/bin/env python
-+#
-+# Tests for temporary external snapshot when we have bitmaps.
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 1e54486ad14..9ceca23ef75 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -546,12 +546,6 @@ struct BlockDriver {
+                              uint64_t parent_perm, uint64_t parent_share=
+d,
+                              uint64_t *nperm, uint64_t *nshared);
+=20
+-    /**
+-     * Bitmaps should be marked as 'IN_USE' in the image on reopening im=
+age
+-     * as rw. This handler should realize it. It also should unset reado=
+nly
+-     * field of BlockDirtyBitmap's in case of success.
+-     */
+-    int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
+     bool (*bdrv_co_can_store_new_dirty_bitmap)(BlockDriverState *bs,
+                                                const char *name,
+                                                uint32_t granularity,
+diff --git a/block.c b/block.c
+index c548885608d..ba09d97e0a2 100644
+--- a/block.c
++++ b/block.c
+@@ -3935,16 +3935,12 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_s=
+tate)
+     BlockDriver *drv;
+     BlockDriverState *bs;
+     BdrvChild *child;
+-    bool old_can_write, new_can_write;
+=20
+     assert(reopen_state !=3D NULL);
+     bs =3D reopen_state->bs;
+     drv =3D bs->drv;
+     assert(drv !=3D NULL);
+=20
+-    old_can_write =3D
+-        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE=
+);
+-
+     /* If there are any driver level actions to take */
+     if (drv->bdrv_reopen_commit) {
+         drv->bdrv_reopen_commit(reopen_state);
+@@ -3988,21 +3984,6 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_st=
+ate)
+     }
+=20
+     bdrv_refresh_limits(bs, NULL);
+-
+-    new_can_write =3D
+-        !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE=
+);
+-    if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) =
+{
+-        Error *local_err =3D NULL;
+-        if (drv->bdrv_reopen_bitmaps_rw(bs, &local_err) < 0) {
+-            /* This is not fatal, bitmaps just left read-only, so all fo=
+llowing
+-             * writes will fail. User can remove read-only bitmaps to un=
+block
+-             * writes.
+-             */
+-            error_reportf_err(local_err,
+-                              "%s: Failed to make dirty bitmaps writable=
+: ",
+-                              bdrv_get_node_name(bs));
+-        }
+-    }
+ }
+=20
+ /*
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7ab1aad9779..b652bf884e5 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1834,6 +1834,20 @@ fail:
+ static void qcow2_reopen_commit(BDRVReopenState *state)
+ {
+     qcow2_update_options_commit(state->bs, state->opaque);
++    if (state->flags & BDRV_O_RDWR) {
++        Error *local_err =3D NULL;
 +
-+import iotests
-+from iotests import qemu_img_create, file_path, log, filter_qmp_event
-+
-+iotests.verify_image_format(supported_fmts=3D['qcow2'])
-+
-+base, top =3D file_path('base', 'top')
-+size =3D 64 * 1024 * 3
-+
-+
-+def print_bitmap(msg, vm):
-+    result =3D vm.qmp('query-block')['return'][0]
-+    if 'dirty-bitmaps' in result:
-+        bitmap =3D result['dirty-bitmaps'][0]
-+        log('{}: name=3D{} dirty-clusters=3D{}'.format(msg, bitmap['name=
-'],
-+            bitmap['count'] // 64 // 1024))
-+    else:
-+        log(msg + ': not found')
-+
-+
-+def test(persistent, restart):
-+    assert persistent or not restart
-+    log("\nTestcase {}persistent {} restart\n".format(
-+            '' if persistent else 'non-', 'with' if restart else 'withou=
-t'))
-+
-+    qemu_img_create('-f', iotests.imgfmt, base, str(size))
-+
-+    vm =3D iotests.VM().add_drive(base)
-+    vm.launch()
-+
-+    vm.qmp_log('block-dirty-bitmap-add', node=3D'drive0', name=3D'bitmap=
-0',
-+               persistent=3Dpersistent)
-+    vm.hmp_qemu_io('drive0', 'write 0 64K')
-+    print_bitmap('initial bitmap', vm)
-+
-+    vm.qmp_log('blockdev-snapshot-sync', device=3D'drive0', snapshot_fil=
-e=3Dtop,
-+               format=3Diotests.imgfmt, filters=3D[iotests.filter_qmp_te=
-stfiles])
-+    vm.hmp_qemu_io('drive0', 'write 64K 512')
-+    print_bitmap('check that no bitmaps are in snapshot', vm)
-+
-+    if restart:
-+        log("... Restart ...")
-+        vm.shutdown()
-+        vm =3D iotests.VM().add_drive(top)
-+        vm.launch()
-+
-+    vm.qmp_log('block-commit', device=3D'drive0', top=3Dtop,
-+               filters=3D[iotests.filter_qmp_testfiles])
-+    ev =3D vm.events_wait((('BLOCK_JOB_READY', None),
-+                         ('BLOCK_JOB_COMPLETED', None)))
-+    log(filter_qmp_event(ev))
-+    if (ev['event'] =3D=3D 'BLOCK_JOB_COMPLETED'):
-+        vm.shutdown()
-+        log(vm.get_log())
-+        exit()
-+
-+    vm.qmp_log('block-job-complete', device=3D'drive0')
-+    ev =3D vm.event_wait('BLOCK_JOB_COMPLETED')
-+    log(filter_qmp_event(ev))
-+    print_bitmap('check bitmap after commit', vm)
-+
-+    vm.hmp_qemu_io('drive0', 'write 128K 64K')
-+    print_bitmap('check updated bitmap', vm)
-+
-+    vm.shutdown()
-+
-+
-+test(persistent=3DFalse, restart=3DFalse)
-+test(persistent=3DTrue, restart=3DFalse)
-+test(persistent=3DTrue, restart=3DTrue)
-diff --git a/tests/qemu-iotests/260.out b/tests/qemu-iotests/260.out
-new file mode 100644
-index 00000000000..2f0d98d0365
---- /dev/null
-+++ b/tests/qemu-iotests/260.out
-@@ -0,0 +1,52 @@
-+
-+Testcase non-persistent without restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "=
-node": "drive0", "persistent": false}}
-+{"return": {}}
-+initial bitmap: name=3Dbitmap0 dirty-clusters=3D1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", =
-"format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TE=
-ST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microsecon=
-ds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"micros=
-econds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=3Dbitmap0 dirty-clusters=3D2
-+check updated bitmap: name=3Dbitmap0 dirty-clusters=3D3
-+
-+Testcase persistent without restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "=
-node": "drive0", "persistent": true}}
-+{"return": {}}
-+initial bitmap: name=3Dbitmap0 dirty-clusters=3D1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", =
-"format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TE=
-ST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microsecon=
-ds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"micros=
-econds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=3Dbitmap0 dirty-clusters=3D2
-+check updated bitmap: name=3Dbitmap0 dirty-clusters=3D3
-+
-+Testcase persistent with restart
-+
-+{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "=
-node": "drive0", "persistent": true}}
-+{"return": {}}
-+initial bitmap: name=3Dbitmap0 dirty-clusters=3D1
-+{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", =
-"format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
-+{"return": {}}
-+check that no bitmaps are in snapshot: not found
-+... Restart ...
-+{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TE=
-ST_DIR/PID-top"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microsecon=
-ds": "USECS", "seconds": "SECS"}}
-+{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
-+{"return": {}}
-+{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0,=
- "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"micros=
-econds": "USECS", "seconds": "SECS"}}
-+check bitmap after commit: name=3Dbitmap0 dirty-clusters=3D2
-+check updated bitmap: name=3Dbitmap0 dirty-clusters=3D3
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5805a79d9e8..0c1e5ef4140 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -273,6 +273,7 @@
- 256 rw quick
- 257 rw
- 258 rw quick
-+260 rw auto quick
- 262 rw quick migration
- 263 rw quick
- 265 rw auto quick
++        if (qcow2_reopen_bitmaps_rw(state->bs, &local_err) < 0) {
++            /*
++             * This is not fatal, bitmaps just left read-only, so all fo=
+llowing
++             * writes will fail. User can remove read-only bitmaps to un=
+block
++             * writes or retry reopen.
++             */
++            error_reportf_err(local_err,
++                              "%s: Failed to make dirty bitmaps writable=
+: ",
++                              bdrv_get_node_name(state->bs));
++        }
++    }
+     g_free(state->opaque);
+ }
+=20
+@@ -5262,7 +5276,6 @@ BlockDriver bdrv_qcow2 =3D {
+     .bdrv_detach_aio_context  =3D qcow2_detach_aio_context,
+     .bdrv_attach_aio_context  =3D qcow2_attach_aio_context,
+=20
+-    .bdrv_reopen_bitmaps_rw =3D qcow2_reopen_bitmaps_rw,
+     .bdrv_co_can_store_new_dirty_bitmap =3D qcow2_co_can_store_new_dirty=
+_bitmap,
+     .bdrv_co_remove_persistent_dirty_bitmap =3D
+             qcow2_co_remove_persistent_dirty_bitmap,
 --=20
 2.21.0
 
