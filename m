@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 259E3C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB51CECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F01522084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:40:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F01522084C
+	by mail.kernel.org (Postfix) with ESMTPS id A3AF02084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:40:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3AF02084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyu9-0005TP-KR
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:40:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41352)
+	id 1iIyuH-0005nS-GV
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:40:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37304)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlO-0006n8-Ld
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:36 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRM-0006zh-F7
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlM-0002Vz-MU
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:34 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49794)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRK-0004xO-Mr
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:52 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48560)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxlK-0002Sc-Sh; Fri, 11 Oct 2019 12:27:32 -0400
+ id 1iIxRK-0004cJ-Fa; Fri, 11 Oct 2019 12:06:50 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR1-0003XG-5G; Fri, 11 Oct 2019 19:06:31 +0300
+ id 1iIxQy-0003XG-Qf; Fri, 11 Oct 2019 19:06:29 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 100/126] NFS: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:26 +0300
-Message-Id: <20191011160552.22907-101-vsementsov@virtuozzo.com>
+Subject: [RFC v5 097/126] VDI: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:23 +0300
+Message-Id: <20191011160552.22907-98-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,7 +60,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, armbru@redhat.com,
+ qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, armbru@redhat.com,
  Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -110,38 +110,75 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nfs.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ block/vdi.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index f39acfdb28..ec0dbe3385 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -561,21 +561,20 @@ out:
- static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
-                                                      Error **errp)
+diff --git a/block/vdi.c b/block/vdi.c
+index 806ba7f53c..0f2e0723f9 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -371,11 +371,11 @@ static int vdi_probe(const uint8_t *buf, int buf_size, const char *filename)
+ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+                     Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     BlockdevOptionsNfs *opts = NULL;
-     Visitor *v;
-     const QDictEntry *e;
+     BDRVVdiState *s = bs->opaque;
+     VdiHeader header;
+     size_t bmap_size;
+     int ret;
 -    Error *local_err = NULL;
+     QemuUUID uuid_link, uuid_parent;
  
-     v = qobject_input_visitor_new_flat_confused(options, errp);
-     if (!v) {
-         return NULL;
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
+@@ -496,9 +496,8 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The vdi format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (*errp) {
+         error_free(s->migration_blocker);
+         goto fail_free_bmap;
      }
+@@ -735,6 +734,7 @@ nonallocating_write:
+ static int coroutine_fn vdi_co_do_create(BlockdevCreateOptions *create_options,
+                                          size_t block_size, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockdevCreateOptionsVdi *vdi_opts;
+     int ret = 0;
+     uint64_t bytes = 0;
+@@ -899,13 +899,13 @@ static int coroutine_fn vdi_co_create(BlockdevCreateOptions *create_options,
+ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+                                            Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QDict *qdict = NULL;
+     BlockdevCreateOptions *create_options = NULL;
+     BlockDriverState *bs_file = NULL;
+     uint64_t block_size = DEFAULT_CLUSTER_SIZE;
+     bool is_static = false;
+     Visitor *v;
+-    Error *local_err = NULL;
+     int ret;
  
--    visit_type_BlockdevOptionsNfs(v, NULL, &opts, &local_err);
-+    visit_type_BlockdevOptionsNfs(v, NULL, &opts, errp);
+     /* Parse options and convert legacy syntax.
+@@ -956,11 +956,10 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+         ret = -EINVAL;
+         goto done;
+     }
+-    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
++    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
      visit_free(v);
  
 -    if (local_err) {
 -        error_propagate(errp, local_err);
 +    if (*errp) {
-         return NULL;
+         ret = -EINVAL;
+         goto done;
      }
- 
 -- 
 2.21.0
 
