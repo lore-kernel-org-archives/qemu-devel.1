@@ -2,75 +2,67 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8C3C4360C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 02:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD30C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 03:31:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D7FF214E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 02:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7FF214E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F351721929
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 03:31:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F351721929
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIl6R-0002cJ-Br
-	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 22:56:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43498)
+	id 1iIldx-0000N7-4V
+	for qemu-devel@archiver.kernel.org; Thu, 10 Oct 2019 23:31:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49024)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iIl5f-0002AW-Jy
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 22:55:41 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iIlcy-0008JY-5v
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 23:30:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iIl5d-0000VI-7e
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 22:55:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48796)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iIl5c-0000T5-Gx
- for qemu-devel@nongnu.org; Thu, 10 Oct 2019 22:55:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iIl5b-0004yJ-0B
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 02:55:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D8A832E80CB
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 02:55:34 +0000 (UTC)
+ (envelope-from <ehabkost@redhat.com>) id 1iIlct-0000FB-Sf
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 23:30:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47576)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iIlct-0000Da-Ib
+ for qemu-devel@nongnu.org; Thu, 10 Oct 2019 23:29:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E6B77307D88C;
+ Fri, 11 Oct 2019 03:29:57 +0000 (UTC)
+Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A09CF5D717;
+ Fri, 11 Oct 2019 03:29:54 +0000 (UTC)
+Date: Fri, 11 Oct 2019 00:29:53 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Subject: Re: [Qemu-devel] [RFC 2 PATCH 07/16] hw/386: Add new epyc mode
+ topology decoding functions
+Message-ID: <20191011032953.GD29387@habkost.net>
+References: <156779689013.21957.1631551572950676212.stgit@localhost.localdomain>
+ <156779714362.21957.2682347975717100335.stgit@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <156779714362.21957.2682347975717100335.stgit@localhost.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 11 Oct 2019 03:29:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Oct 2019 02:30:57 -0000
-From: David Gibson <1847440@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: kvm powerpcm qemu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dwg sathnaga
-X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
-X-Launchpad-Bug-Modifier: David Gibson (dwg)
-References: <157061153044.21976.18153238088035049329.malonedeb@gac.canonical.com>
-Message-Id: <20191011023057.GA4080@umbus.fritz.box>
-Subject: Re: [Bug 1847440] [NEW] ppc64le: KVM guest fails to boot with an
- error `virtio_scsi: probe of virtio1 failed with error -22` on master
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="af2eefe214bd95389a09b7c956720881bab16807";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ba5b6acf9c1b91a3ceb3333cadac15cc385c3f50
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,265 +71,344 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847440 <1847440@bugs.launchpad.net>
+Cc: "mst@redhat.com" <mst@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "ssg.sos.staff" <ssg.sos.staff@amd.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 10, 2019 at 07:16:49AM -0000, Launchpad Bug Tracker wrote:
-> You have been subscribed to a public bug by Satheesh Rajendran (sathnaga):
-> =
+On Fri, Sep 06, 2019 at 07:12:25PM +0000, Moger, Babu wrote:
+> These functions add support for building new epyc mode topology
+> given smp details like numa nodes, cores, threads and sockets.
+> Subsequent patches will use these functions to build the topology.
+>=20
+> The topology details are available in Processor Programming Reference (=
+PPR)
+> for AMD Family 17h Model 01h, Revision B1 Processors.
+> It is available at https://www.amd.com/en/support/tech-docs
+>=20
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  include/hw/i386/topology.h |  174 ++++++++++++++++++++++++++++++++++++=
+++++++++
+>  1 file changed, 174 insertions(+)
+>=20
+> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+> index 5a61d53f05..6fd4184f07 100644
+> --- a/include/hw/i386/topology.h
+> +++ b/include/hw/i386/topology.h
+> @@ -62,6 +62,22 @@ typedef struct X86CPUTopoInfo {
+>      unsigned nr_threads;
+>  } X86CPUTopoInfo;
+> =20
+> +/*
+> + * Definitions used for building CPUID Leaf 0x8000001D and 0x8000001E
+> + * Please refer to the AMD64 Architecture Programmer=E2=80=99s Manual =
+Volume 3.
+> + * Define the constants to build the cpu topology. Right now, TOPOEXT
+> + * feature is enabled only on EPYC. So, these constants are based on
+> + * EPYC supported configurations. We may need to handle the cases if
+> + * these values change in future.
+> + */
+> +
+> +/* Maximum core complexes in a node */
+> +#define MAX_CCX                  2
 
-> PowerPC KVM Guest fails to boot on current qemu master, bad commit:
-> e68cd0cb5cf49d334abe17231a1d2c28b846afa2
-> =
+I suggest a more explicit name like MAX_CCX_IN_NODE.
 
-> Env:
-> HW: IBM Power9
-> Host Kernel: 5.4.0-rc2-00038-ge3280b54afed
-> Guest Kernel: 4.13.9-300.fc27.ppc64le
-> Qemu: https://github.com/qemu/qemu.git (master)
-> Libvirt: 5.4.0
-> =
+> +/* Maximum cores in a core complex */
+> +#define MAX_CORES_IN_CCX         4
+> +/* Maximum cores in a node */
+> +#define MAX_CORES_IN_NODE        8
+> +
 
-> Guest boot gets stuck:
-> ...
-> [  OK  ] Mounted Kernel Configuration File System.
-> [    7.598740] virtio-pci 0000:00:01.0: enabling device (0000 -> 0003)
-> [    7.598828] virtio-pci 0000:00:01.0: virtio_pci: leaving for legacy dr=
-iver
-> [    7.598957] virtio-pci 0000:00:02.0: enabling device (0000 -> 0003)
-> [    7.599017] virtio-pci 0000:00:02.0: virtio_pci: leaving for legacy dr=
-iver
-> [    7.599123] virtio-pci 0000:00:04.0: enabling device (0000 -> 0003)
-> [    7.599182] virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy dr=
-iver
-> [    7.620620] synth uevent: /devices/vio: failed to send uevent
-> [    7.620624] vio vio: uevent: failed to send synthetic uevent
-> [  OK  ] Started udev Coldplug all Devices.
-> [    7.624559] audit: type=3D1130 audit(1570610300.990:5): pid=3D1 uid=3D=
-0 auid=3D4294967295 ses=3D4294967295 subj=3Dkernel msg=3D'unit=3Dsystemd-ud=
-ev-trigger comm=3D"systemd" exe=3D"/usr/lib/systemd/systemd" hostname=3D? a=
-ddr=3D? terminal=3D? res=3Dsuccess'
-> [  OK  ] Reached target System Initialization.
-> [  OK  ] Reached target Basic System.
-> [  OK  ] Reached target Remote File Systems (Pre).
-> [  OK  ] Reached target Remote File Systems.
-> [    7.642961] virtio_scsi: probe of virtio1 failed with error -22
-> [ ***  ] A start job is running for dev-disk=E2=80=A621b3519a80.device (1=
-4s / no limit)
-> ...
-> =
+Having limits isn't necessarily bad, but if we look at the code
+that use those constants below:
 
-> git bisect, yielded a bad commit
-> [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT on ibm
-> ,client-architecture-support, reverting this commit boot the guest
-> properly.
-> =
+[...]
+> +/*
+> + * Figure out the number of nodes required to build this config.
+> + * Max cores in a nodes is 8
+> + */
+> +static inline int nodes_in_pkg(X86CPUTopoInfo *topo_info)
+> +{
+> +    /*
+> +     * Create a config with user given (nr_nodes > 1) numa node config=
+,
+> +     * else go with a standard configuration
+> +     */
+> +    if (topo_info->numa_nodes > 1) {
+> +        return DIV_ROUND_UP(topo_info->numa_nodes, topo_info->nr_socke=
+ts);
+> +    } else {
+> +        return DIV_ROUND_UP(topo_info->nr_cores, MAX_CORES_IN_NODE);
+> +    }
+> +}
 
-> git bisect start
-> # good: [9e06029aea3b2eca1d5261352e695edc1e7d7b8b] Update version for v4.=
-1.0 release
-> git bisect good 9e06029aea3b2eca1d5261352e695edc1e7d7b8b
-> # bad: [98b2e3c9ab3abfe476a2b02f8f51813edb90e72d] Merge remote-tracking b=
-ranch 'remotes/stefanha/tags/block-pull-request' into staging
-> git bisect bad 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d
-> # good: [56e6250ede81b4e4b4ddb623874d6c3cdad4a96d] target/arm: Convert T1=
-6, nop hints
-> git bisect good 56e6250ede81b4e4b4ddb623874d6c3cdad4a96d
-> # good: [5d69cbdfdd5cd6dadc9f0c986899844a0e4de703] tests/tcg: target/s390=
-x: Test MVC
-> git bisect good 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703
-> # good: [88112488cf228df8b7588c8aa38e16ecd0dff48e] qapi: Make check_type(=
-)'s array case a bit more obvious
-> git bisect good 88112488cf228df8b7588c8aa38e16ecd0dff48e
-> # good: [972bd57689f1e11311d86b290134ea2ed9c7c11e] ppc/kvm: Skip writing =
-DPDES back when in run time state
-> git bisect good 972bd57689f1e11311d86b290134ea2ed9c7c11e
-> # bad: [1aba8716c8335e88b8c358002a6e1ac89f7dd258] ppc/pnv: Remove the XIC=
-SFabric Interface from the POWER9 machine
-> git bisect bad 1aba8716c8335e88b8c358002a6e1ac89f7dd258
-> # bad: [00ed3da9b5c2e66e796a172df3e19545462b9c90] xics: Minor fixes for X=
-ICSFabric interface
-> git bisect bad 00ed3da9b5c2e66e796a172df3e19545462b9c90
-> # good: [33432d7737b53c92791f90ece5dbe3b7bb1c79f5] target/ppc: introduce =
-set_dfp{64,128}() helper functions
-> git bisect good 33432d7737b53c92791f90ece5dbe3b7bb1c79f5
-> # good: [f6d4c423a222f02bfa84a49c3d306d7341ec9bab] target/ppc: remove unn=
-ecessary if() around calls to set_dfp{64,128}() in DFP macros
-> git bisect good f6d4c423a222f02bfa84a49c3d306d7341ec9bab
-> # bad: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT =
-on ibm,client-architecture-support
-> git bisect bad e68cd0cb5cf49d334abe17231a1d2c28b846afa2
-> # good: [c4ec08ab70bab90685d1443d6da47293e3aa312a] spapr-pci: Stop provid=
-ing assigned-addresses
-> git bisect good c4ec08ab70bab90685d1443d6da47293e3aa312a
-> # first bad commit: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2]
-> spapr: Render full FDT on ibm,client-architecture-support
+Here we are trying to choose a default value for the number of
+nodes, but it's better to let the CPU or machine code choose it.
+Otherwise, this will be very painful to maintain if new CPUs with
+different limits appear.  I would just let the number of nodes
+per package to be configurable in the command-line.
 
-Ah, dammit, I thought we'd fixed the problems with that patch :(.
+> +
+> +/*
+> + * Decide the number of cores in a core complex with the given nr_core=
+s using
+> + * following set constants MAX_CCX, MAX_CORES_IN_CCX, MAX_CORES_IN_DIE=
+ and
+> + * MAX_NODES_PER_SOCKET. Maintain symmetry as much as possible
+> + * L3 cache is shared across all cores in a core complex. So, this wil=
+l also
+> + * tell us how many cores are sharing the L3 cache.
+> + */
+> +static inline int cores_in_ccx(X86CPUTopoInfo *topo_info)
+> +{
+> +    int nodes;
+> +
+> +    /* Get the number of nodes required to build this config */
+> +    nodes =3D nodes_in_pkg(topo_info);
+> +
+> +    /*
+> +     * Divide the cores accros all the core complexes
+> +     * Return rounded up value
+> +     */
+> +    return DIV_ROUND_UP(topo_info->nr_cores, nodes * MAX_CCX);
+> +}
 
-> =
+Same here.  This will become painful to maintain if CPUs with a
+different CCX-per-node limit appear.  I suggest just letting the
+number of cores per CCX to be configurable in the command-line.
+The "cores" option is already defined as "cores per die" when
+nr_dies > 1.  We can easily define it to mean "cores per CCX"
+when nr_ccxs > 1.
 
-> attached vmxml.
-> =
+If you still want to impose limits to some of those parameters, I
+suggest placing those limits in the CPU model table, not in
+global constants.
 
-> qemu commandline:
-> /home/sath/qemu/ppc64-softmmu/qemu-system-ppc64 -name guest=3Dvm1,debug-t=
-hreads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/=
-libvirt/qemu/domain-19-vm1/master-key.aes -machine pseries-4.2,accel=3Dkvm,=
-usb=3Doff,dump-guest-core=3Doff -m 81920 -overcommit mem-lock=3Doff -smp 51=
-2,sockets=3D1,cores=3D128,threads=3D4 -uuid fd4a5d54-0216-490e-82d2-1d4e896=
-83b3d -display none -no-user-config -nodefaults -chardev socket,id=3Dcharmo=
-nitor,fd=3D24,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
-control -rtc base=3Dutc -no-shutdown -boot strict=3Don -device qemu-xhci,id=
-=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
-0,addr=3D0x2 -drive file=3D/home/sath/tests/data/avocado-vt/images/jeos-27-=
-ppc64le_vm1.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device s=
-csi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-scsi=
-0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -netdev ta=
-p,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D27 -device virtio-net-pci,netd=
-ev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:df:24,bus=3Dpci.0,addr=3D0x1 -cha=
-rdev pty,id=3Dcharserial0 -device spapr-vty,chardev=3Dcharserial0,id=3Dseri=
-al0,reg=3D0x30000000 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,a=
-ddr=3D0x4 -M pseries,ic-mode=3Dxics -msg timestamp=3Don
-> =
 
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
-> =
+> +
+> +/*
+> + * Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
+> + *
+> + * The caller must make sure core_id < nr_cores and smt_id < nr_thread=
+s.
+> + */
+> +static inline apic_id_t x86_apicid_from_topo_ids_epyc(X86CPUTopoInfo *=
+topo_info,
+> +                                                  const X86CPUTopoIDs =
+*topo_ids)
+> +{
+> +    unsigned nr_ccxs =3D MAX_CCX;
 
-> =
+I suggest adding nr_ccxs to X86CPUTopoInfo, instead of making it
+fixed.
 
-> ** Tags: kvm powerpcm qemu
+> +    unsigned nr_nodes =3D nodes_in_pkg(topo_info);
 
--- =
+Same here: isn't it better to have a nr_nodes_per_pkg field in
+X86CPUTopoInfo, and make it configurable in the command-line?
 
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> +    unsigned nr_cores =3D MAX_CORES_IN_CCX;
 
--- =
+nr_cores is already in X86CPUTopoInfo, why aren't you using it?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847440
+Similar questions at x86_topo_ids_from_apicid_epyc() [1].
 
-Title:
-  ppc64le: KVM guest fails to boot with an error `virtio_scsi: probe of
-  virtio1 failed with error -22` on master
+> +    unsigned nr_threads =3D topo_info->nr_threads;
+> +
+> +    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(nr_nodes, nr_c=
+cxs,
+> +                                                        nr_cores, nr_t=
+hreads)) |
+> +           (topo_ids->node_id  << apicid_node_offset(nr_ccxs, nr_cores=
+,
+> +                                                     nr_threads)) |
+> +           (topo_ids->ccx_id  << apicid_ccx_offset(nr_cores, nr_thread=
+s)) |
+> +           (topo_ids->core_id << apicid_core_offset(nr_threads)) |
+> +           topo_ids->smt_id;
+> +}
+> +
+> +static inline void x86_topo_ids_from_idx_epyc(X86CPUTopoInfo *topo_inf=
+o,
+> +                                              unsigned cpu_index,
+> +                                              X86CPUTopoIDs *topo_ids)
+> +{
+> +    unsigned nr_cores =3D topo_info->nr_cores;
 
-Status in QEMU:
-  New
+Is nr_cores cores-per-ccx?  cores-per-node?  cores-per-pkg?
 
-Bug description:
-  PowerPC KVM Guest fails to boot on current qemu master, bad commit:
-  e68cd0cb5cf49d334abe17231a1d2c28b846afa2
 
-  Env:
-  HW: IBM Power9
-  Host Kernel: 5.4.0-rc2-00038-ge3280b54afed
-  Guest Kernel: 4.13.9-300.fc27.ppc64le
-  Qemu: https://github.com/qemu/qemu.git (master)
-  Libvirt: 5.4.0
+> +    unsigned nr_threads =3D topo_info->nr_threads;
+> +    unsigned core_index =3D cpu_index / nr_threads % nr_cores;
 
-  Guest boot gets stuck:
-  ...
-  [  OK  ] Mounted Kernel Configuration File System.
-  [    7.598740] virtio-pci 0000:00:01.0: enabling device (0000 -> 0003)
-  [    7.598828] virtio-pci 0000:00:01.0: virtio_pci: leaving for legacy dr=
-iver
-  [    7.598957] virtio-pci 0000:00:02.0: enabling device (0000 -> 0003)
-  [    7.599017] virtio-pci 0000:00:02.0: virtio_pci: leaving for legacy dr=
-iver
-  [    7.599123] virtio-pci 0000:00:04.0: enabling device (0000 -> 0003)
-  [    7.599182] virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy dr=
-iver
-  [    7.620620] synth uevent: /devices/vio: failed to send uevent
-  [    7.620624] vio vio: uevent: failed to send synthetic uevent
-  [  OK  ] Started udev Coldplug all Devices.
-  [    7.624559] audit: type=3D1130 audit(1570610300.990:5): pid=3D1 uid=3D=
-0 auid=3D4294967295 ses=3D4294967295 subj=3Dkernel msg=3D'unit=3Dsystemd-ud=
-ev-trigger comm=3D"systemd" exe=3D"/usr/lib/systemd/systemd" hostname=3D? a=
-ddr=3D? terminal=3D? res=3Dsuccess'
-  [  OK  ] Reached target System Initialization.
-  [  OK  ] Reached target Basic System.
-  [  OK  ] Reached target Remote File Systems (Pre).
-  [  OK  ] Reached target Remote File Systems.
-  [    7.642961] virtio_scsi: probe of virtio1 failed with error -22
-  [ ***  ] A start job is running for dev-disk=E2=80=A621b3519a80.device (1=
-4s / no limit)
-  ...
+It's hard to understand what this variable means.  Is it a unique
+identifier for a core inside the whole system?  Is it unique
+inside a package?  Unique inside a node?  Unique inside a ccx?
 
-  git bisect, yielded a bad commit
-  [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT on
-  ibm,client-architecture-support, reverting this commit boot the guest
-  properly.
 
-  git bisect start
-  # good: [9e06029aea3b2eca1d5261352e695edc1e7d7b8b] Update version for v4.=
-1.0 release
-  git bisect good 9e06029aea3b2eca1d5261352e695edc1e7d7b8b
-  # bad: [98b2e3c9ab3abfe476a2b02f8f51813edb90e72d] Merge remote-tracking b=
-ranch 'remotes/stefanha/tags/block-pull-request' into staging
-  git bisect bad 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d
-  # good: [56e6250ede81b4e4b4ddb623874d6c3cdad4a96d] target/arm: Convert T1=
-6, nop hints
-  git bisect good 56e6250ede81b4e4b4ddb623874d6c3cdad4a96d
-  # good: [5d69cbdfdd5cd6dadc9f0c986899844a0e4de703] tests/tcg: target/s390=
-x: Test MVC
-  git bisect good 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703
-  # good: [88112488cf228df8b7588c8aa38e16ecd0dff48e] qapi: Make check_type(=
-)'s array case a bit more obvious
-  git bisect good 88112488cf228df8b7588c8aa38e16ecd0dff48e
-  # good: [972bd57689f1e11311d86b290134ea2ed9c7c11e] ppc/kvm: Skip writing =
-DPDES back when in run time state
-  git bisect good 972bd57689f1e11311d86b290134ea2ed9c7c11e
-  # bad: [1aba8716c8335e88b8c358002a6e1ac89f7dd258] ppc/pnv: Remove the XIC=
-SFabric Interface from the POWER9 machine
-  git bisect bad 1aba8716c8335e88b8c358002a6e1ac89f7dd258
-  # bad: [00ed3da9b5c2e66e796a172df3e19545462b9c90] xics: Minor fixes for X=
-ICSFabric interface
-  git bisect bad 00ed3da9b5c2e66e796a172df3e19545462b9c90
-  # good: [33432d7737b53c92791f90ece5dbe3b7bb1c79f5] target/ppc: introduce =
-set_dfp{64,128}() helper functions
-  git bisect good 33432d7737b53c92791f90ece5dbe3b7bb1c79f5
-  # good: [f6d4c423a222f02bfa84a49c3d306d7341ec9bab] target/ppc: remove unn=
-ecessary if() around calls to set_dfp{64,128}() in DFP macros
-  git bisect good f6d4c423a222f02bfa84a49c3d306d7341ec9bab
-  # bad: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT =
-on ibm,client-architecture-support
-  git bisect bad e68cd0cb5cf49d334abe17231a1d2c28b846afa2
-  # good: [c4ec08ab70bab90685d1443d6da47293e3aa312a] spapr-pci: Stop provid=
-ing assigned-addresses
-  git bisect good c4ec08ab70bab90685d1443d6da47293e3aa312a
-  # first bad commit: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Ren=
-der full FDT on ibm,client-architecture-support
+> +    unsigned ccx_cores =3D cores_in_ccx(topo_info);
+> +
+> +    topo_ids->smt_id =3D cpu_index % nr_threads;
+> +    topo_ids->core_id =3D core_index % ccx_cores; /* core id inside th=
+e ccx */
+> +    topo_ids->ccx_id =3D (core_index % (ccx_cores * MAX_CCX)) / ccx_co=
+res;
+> +    topo_ids->node_id =3D core_index / (ccx_cores * MAX_CCX);
 
-  attached vmxml.
+It looks like we have one extra constraint we must ensure
+elsewhere in the code: we need to make sure the node topology in
+topo->node_id matches the node topology defined using -numa,
+don't we?
 
-  qemu commandline:
-  /home/sath/qemu/ppc64-softmmu/qemu-system-ppc64 -name guest=3Dvm1,debug-t=
-hreads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/=
-libvirt/qemu/domain-19-vm1/master-key.aes -machine pseries-4.2,accel=3Dkvm,=
-usb=3Doff,dump-guest-core=3Doff -m 81920 -overcommit mem-lock=3Doff -smp 51=
-2,sockets=3D1,cores=3D128,threads=3D4 -uuid fd4a5d54-0216-490e-82d2-1d4e896=
-83b3d -display none -no-user-config -nodefaults -chardev socket,id=3Dcharmo=
-nitor,fd=3D24,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
-control -rtc base=3Dutc -no-shutdown -boot strict=3Don -device qemu-xhci,id=
-=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
-0,addr=3D0x2 -drive file=3D/home/sath/tests/data/avocado-vt/images/jeos-27-=
-ppc64le_vm1.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device s=
-csi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-scsi=
-0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -netdev ta=
-p,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D27 -device virtio-net-pci,netd=
-ev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:df:24,bus=3Dpci.0,addr=3D0x1 -cha=
-rdev pty,id=3Dcharserial0 -device spapr-vty,chardev=3Dcharserial0,id=3Dseri=
-al0,reg=3D0x30000000 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,a=
-ddr=3D0x4 -M pseries,ic-mode=3Dxics -msg timestamp=3Don
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847440/+subscriptions
+> +    topo_ids->pkg_id =3D cpu_index / (nr_cores * nr_threads);
+
+Now, these calculations are over my head.  It's hard to
+understand what "nr_cores" mean, or what "ccx_cores * MAX_CCX" is
+calculating.
+
+I will try to compare with the existing x86_topo_ids_from_idx()
+function, to see if we can make the hierarchy clearer:
+
+Existing code is:
+
+    topo->pkg_id =3D cpu_index / (nr_dies * nr_cores * nr_threads);
+    topo->die_id =3D cpu_index / (nr_cores * nr_threads) % nr_dies;
+    topo->core_id =3D cpu_index / nr_threads % nr_cores;
+    topo->smt_id =3D cpu_index % nr_threads;
+
+The code is hierarchical, but not 100% clear.  Let's try to make
+it clearer:
+
+    unsigned threads_per_core =3D topo->nr_threads;
+    unsigned   cores_per_die  =3D topo->nr_cores;
+    unsigned    dies_per_pkg  =3D topo->nr_dies;
+
+    unsigned threads_per_die  =3D threads_per_core * cores_per_die;
+    unsigned threads_per_pkg  =3D threads_per_die  *  dies_per_pkg;
+
+    unsigned thread_index =3D cpu_index;
+    unsigned   core_index =3D cpu_index / threads_per_core;
+    unsigned    die_index =3D cpu_index / threads_per_die;
+    unsigned    pkg_index =3D cpu_index / threads_per_pkg;
+
+    topo-> smt_id =3D thread_index % threads_per_core;
+    topo->core_id =3D   core_index %   cores_per_die;
+    topo-> die_id =3D    die_index %    dies_per_pkg;
+    topo-> pkg_id =3D    pkg_index;
+
+The logic above should be equivalent to the existing
+x86_topo_ids_from_idx() function.
+
+Can we make it better for the smt/core/ccx/node/pkg case too?
+Let's try:
+
+    unsigned threads_per_core =3D topo->nr_threads;
+    unsigned   cores_per_ccx  =3D topo->nr_cores;
+    unsigned    ccxs_per_node =3D topo->nr_ccxs;
+    unsigned   nodes_per_pkg  =3D topo->nodes_per_pkg;
+
+    unsigned threads_per_ccx  =3D threads_per_core * cores_per_ccx;
+    unsigned threads_per_node =3D threads_per_ccx  *  ccxs_per_node;
+    unsigned threads_per_pkg  =3D threads_per_node * nodes_per_pkg;
+
+    unsigned thread_index =3D cpu_index;
+    unsigned   core_index =3D cpu_index / threads_per_core;
+    unsigned    ccx_index =3D cpu_index / threads_per_ccx;
+    unsigned   node_index =3D cpu_index / threads_per_node;
+    unsigned    pkg_index =3D cpu_index / threads_per_pkg;
+
+    topo-> smt_id =3D thread_index % threads_per_core;
+    topo->core_id =3D   core_index %   cores_per_ccx;
+    topo-> ccx_id =3D    ccx_index %    ccxs_per_node;
+    topo->node_id =3D   node_index %   nodes_per_pkg;
+    topo-> pkg_id =3D    pkg_index;
+
+The logic above probably isn't equivalent to the code you wrote.
+The point here is that each variable is very clearly defined with
+a "per_*" suffix to avoid confusion, and all parameters are
+coming from X86CPUTopoInfo.
+
+> +}
+> +
+> +/*
+> + * Calculate thread/core/package IDs for a specific topology,
+> + * based on APIC ID
+> + */
+> +static inline void x86_topo_ids_from_apicid_epyc(apic_id_t apicid,
+> +                                            X86CPUTopoInfo *topo_info,
+> +                                            X86CPUTopoIDs *topo_ids)
+> +{
+> +    unsigned nr_nodes =3D nodes_in_pkg(topo_info);
+> +    unsigned nr_cores =3D MAX_CORES_IN_CCX;
+> +    unsigned nr_threads =3D topo_info->nr_threads;
+> +    unsigned nr_ccxs =3D MAX_CCX;
+
+Same questions as in x86_apicid_from_topo_ids_epyc() [1]:
+shouldn't nr_cores, nr_ccxs and nr_nodes come from
+X86CPUTopoInfo?
+
+> +
+> +    topo_ids->smt_id =3D apicid &
+> +                   ~(0xFFFFFFFFUL << apicid_smt_width(nr_threads));
+> +
+> +    topo_ids->core_id =3D (apicid >> apicid_core_offset(nr_threads)) &
+> +                   ~(0xFFFFFFFFUL << apicid_core_width(nr_cores));
+> +
+> +    topo_ids->ccx_id =3D (apicid >> apicid_ccx_offset(nr_cores, nr_thr=
+eads)) &
+> +                   ~(0xFFFFFFFFUL << apicid_ccx_width(nr_ccxs));
+> +
+> +    topo_ids->node_id =3D (apicid >> apicid_node_offset(nr_ccxs, nr_co=
+res,
+> +                                                      nr_threads)) &
+> +                   ~(0xFFFFFFFFUL << apicid_node_width(nr_nodes));
+> +
+> +    topo_ids->pkg_id =3D apicid >> apicid_pkg_offset_epyc(nr_nodes, nr=
+_ccxs,
+> +                                                        nr_cores, nr_t=
+hreads);
+> +}
+> +
+> +/*
+> + * Make APIC ID for the CPU 'cpu_index'
+> + *
+> + * 'cpu_index' is a sequential, contiguous ID for the CPU.
+> + */
+> +static inline apic_id_t x86_apicid_from_cpu_idx_epyc(X86CPUTopoInfo *t=
+opo_info,
+> +                                                     unsigned cpu_inde=
+x)
+> +{
+> +    X86CPUTopoIDs topo_ids;
+> +    x86_topo_ids_from_idx_epyc(topo_info, cpu_index, &topo_ids);
+> +    return x86_apicid_from_topo_ids_epyc(topo_info, &topo_ids);
+> +}
+
+If we make nodes_per_pkg=3D=3D1 by default, treat nr_ccxs and nr_dies
+as synonyms, and make all parameters come from X86CPUTopoInfo,
+can't we reuse exactly the same topology code for both EPYC and
+non-EPYC?  It would be better than having two separate sets of
+functions.
+
+I have one additional request: please add unit tests for the
+functions above to test-x86-cpuid.c.  There may be opportunities
+for refactoring this code later, and unit tests will be important
+to make sure we don't break anything.
+
+> +
+>  /* Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
+>   *
+>   * The caller must make sure core_id < nr_cores and smt_id < nr_thread=
+s.
+>=20
+
+--=20
+Eduardo
 
