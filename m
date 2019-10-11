@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD10C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB0EC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:50:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F4E2206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:49:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F4E2206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 632D2206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:50:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 632D2206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIy6G-0004xf-R9
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:49:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36378)
+	id 1iIy7M-0006DB-Td
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:50:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQw-0006Fp-7f
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR9-0006dN-Kc
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQu-0004Sn-W1
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:26 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47872)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR6-0004m2-PZ
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:39 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48422)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQu-000464-NT; Fri, 11 Oct 2019 12:06:24 -0400
+ id 1iIxR6-0004TB-GT
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:36 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQY-0003XG-NT; Fri, 11 Oct 2019 19:06:03 +0300
+ id 1iIxQu-0003XG-IJ; Fri, 11 Oct 2019 19:06:24 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 015/126] hw/s390x: rename Error ** parameter to more common
- errp
-Date: Fri, 11 Oct 2019 19:04:01 +0300
-Message-Id: <20191011160552.22907-16-vsementsov@virtuozzo.com>
+Subject: [RFC v5 084/126] SLIRP: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:10 +0300
+Message-Id: <20191011160552.22907-85-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,48 +60,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, armbru@redhat.com,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>,
+ armbru@redhat.com, Greg Kurz <groug@kaod.org>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
+
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/s390x/event-facility.c | 2 +-
- hw/s390x/s390-stattrib.c  | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ net/slirp.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 66205697ae..dc733ee2af 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -439,7 +439,7 @@ static void sclp_event_set_allow_all_mask_sizes(Object *obj, bool value,
-     ef->allow_all_mask_sizes = value;
- }
+diff --git a/net/slirp.c b/net/slirp.c
+index c4334ee876..cbde9ba2a9 100644
+--- a/net/slirp.c
++++ b/net/slirp.c
+@@ -941,6 +941,7 @@ static ssize_t guestfwd_write(const void *buf, size_t len, void *chr)
  
--static bool sclp_event_get_allow_all_mask_sizes(Object *obj, Error **e)
-+static bool sclp_event_get_allow_all_mask_sizes(Object *obj, Error **errp)
+ static int slirp_guestfwd(SlirpState *s, const char *config_str, Error **errp)
  {
-     SCLPEventFacility *ef = (SCLPEventFacility *)obj;
++    ERRP_AUTO_PROPAGATE();
+     /* TODO: IPv6 */
+     struct in_addr server = { .s_addr = 0 };
+     struct GuestFwd *fwd;
+@@ -979,7 +980,6 @@ static int slirp_guestfwd(SlirpState *s, const char *config_str, Error **errp)
+             return -1;
+         }
+     } else {
+-        Error *err = NULL;
+         /*
+          * FIXME: sure we want to support implicit
+          * muxed monitors here?
+@@ -993,9 +993,8 @@ static int slirp_guestfwd(SlirpState *s, const char *config_str, Error **errp)
+         }
  
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-index bf5ac014c4..58121b9f68 100644
---- a/hw/s390x/s390-stattrib.c
-+++ b/hw/s390x/s390-stattrib.c
-@@ -352,7 +352,8 @@ static void s390_stattrib_class_init(ObjectClass *oc, void *data)
-     dc->realize = s390_stattrib_realize;
- }
- 
--static inline bool s390_stattrib_get_migration_enabled(Object *obj, Error **e)
-+static inline bool s390_stattrib_get_migration_enabled(Object *obj,
-+                                                       Error **errp)
- {
-     S390StAttribState *s = S390_STATTRIB(obj);
- 
+         fwd = g_new(struct GuestFwd, 1);
+-        qemu_chr_fe_init(&fwd->hd, chr, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        qemu_chr_fe_init(&fwd->hd, chr, errp);
++        if (*errp) {
+             object_unparent(OBJECT(chr));
+             g_free(fwd);
+             return -1;
 -- 
 2.21.0
 
