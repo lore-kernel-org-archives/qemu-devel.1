@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A19C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8388EC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:36:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4044F21D7D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:34:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4044F21D7D
+	by mail.kernel.org (Postfix) with ESMTPS id 5BD582084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:36:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD582084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyob-0006Rz-Or
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:34:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40634)
+	id 1iIypx-0000Eg-38
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:36:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxhP-0001Bo-Gw
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:29 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQz-0006Ka-3K
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxhO-0008Pg-4G
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:27 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49718)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQx-0004XG-JO
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48156)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxhM-0008Oh-Md
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:26 -0400
+ id 1iIxQx-0004IY-9e
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxRA-0003XG-22; Fri, 11 Oct 2019 19:06:40 +0300
+ id 1iIxQl-0003XG-RQ; Fri, 11 Oct 2019 19:06:15 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 126/126] util/qemu-config.c: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:52 +0300
-Message-Id: <20191011160552.22907-127-vsementsov@virtuozzo.com>
+Subject: [RFC v5 059/126] virtio-rng: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:45 +0300
+Message-Id: <20191011160552.22907-60-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,7 +60,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ vsementsov@virtuozzo.com, Amit Shah <amit@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
  Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -110,83 +112,64 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- util/qemu-config.c | 29 ++++++++++++-----------------
- 1 file changed, 12 insertions(+), 17 deletions(-)
+ backends/rng.c         | 7 +++----
+ hw/virtio/virtio-rng.c | 7 +++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/util/qemu-config.c b/util/qemu-config.c
-index 772f5a219e..13e2f797ba 100644
---- a/util/qemu-config.c
-+++ b/util/qemu-config.c
-@@ -478,10 +478,10 @@ int qemu_read_config_file(const char *filename)
- static void config_parse_qdict_section(QDict *options, QemuOptsList *opts,
-                                        Error **errp)
+diff --git a/backends/rng.c b/backends/rng.c
+index 391888b8b3..aa3b85f418 100644
+--- a/backends/rng.c
++++ b/backends/rng.c
+@@ -53,9 +53,9 @@ static void rng_backend_complete(UserCreatable *uc, Error **errp)
+ 
+ static void rng_backend_prop_set_opened(Object *obj, bool value, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     QemuOpts *subopts;
-     QDict *subqdict;
-     QList *list = NULL;
--    Error *local_err = NULL;
-     size_t orig_size, enum_size;
-     char *prefix;
- 
-@@ -493,15 +493,13 @@ static void config_parse_qdict_section(QDict *options, QemuOptsList *opts,
-         goto out;
-     }
- 
--    subopts = qemu_opts_create(opts, NULL, 0, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    subopts = qemu_opts_create(opts, NULL, 0, errp);
-+    if (*errp) {
-         goto out;
-     }
- 
--    qemu_opts_absorb_qdict(subopts, subqdict, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_opts_absorb_qdict(subopts, subqdict, errp);
-+    if (*errp) {
-         goto out;
-     }
- 
-@@ -538,16 +536,14 @@ static void config_parse_qdict_section(QDict *options, QemuOptsList *opts,
-             }
- 
-             opt_name = g_strdup_printf("%s.%u", opts->name, i++);
--            subopts = qemu_opts_create(opts, opt_name, 1, &local_err);
-+            subopts = qemu_opts_create(opts, opt_name, 1, errp);
-             g_free(opt_name);
--            if (local_err) {
--                error_propagate(errp, local_err);
-+            if (*errp) {
-                 goto out;
-             }
- 
--            qemu_opts_absorb_qdict(subopts, section, &local_err);
--            if (local_err) {
--                error_propagate(errp, local_err);
-+            qemu_opts_absorb_qdict(subopts, section, errp);
-+            if (*errp) {
-                 qemu_opts_del(subopts);
-                 goto out;
-             }
-@@ -569,13 +565,12 @@ out:
- void qemu_config_parse_qdict(QDict *options, QemuOptsList **lists,
-                              Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int i;
+     RngBackend *s = RNG_BACKEND(obj);
+     RngBackendClass *k = RNG_BACKEND_GET_CLASS(s);
 -    Error *local_err = NULL;
  
-     for (i = 0; lists[i]; i++) {
--        config_parse_qdict_section(options, lists[i], &local_err);
+     if (value == s->opened) {
+         return;
+@@ -67,9 +67,8 @@ static void rng_backend_prop_set_opened(Object *obj, bool value, Error **errp)
+     }
+ 
+     if (k->opened) {
+-        k->opened(s, &local_err);
 -        if (local_err) {
 -            error_propagate(errp, local_err);
-+        config_parse_qdict_section(options, lists[i], errp);
++        k->opened(s, errp);
 +        if (*errp) {
              return;
          }
      }
+diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
+index e93bed020f..6db2c49677 100644
+--- a/hw/virtio/virtio-rng.c
++++ b/hw/virtio/virtio-rng.c
+@@ -174,9 +174,9 @@ static void virtio_rng_set_status(VirtIODevice *vdev, uint8_t status)
+ 
+ static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+     VirtIORNG *vrng = VIRTIO_RNG(dev);
+-    Error *local_err = NULL;
+ 
+     if (vrng->conf.period_ms <= 0) {
+         error_setg(errp, "'period' parameter expects a positive integer");
+@@ -195,9 +195,8 @@ static void virtio_rng_device_realize(DeviceState *dev, Error **errp)
+         Object *default_backend = object_new(TYPE_RNG_BUILTIN);
+ 
+         user_creatable_complete(USER_CREATABLE(default_backend),
+-                                &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                                errp);
++        if (*errp) {
+             object_unref(default_backend);
+             return;
+         }
 -- 
 2.21.0
 
