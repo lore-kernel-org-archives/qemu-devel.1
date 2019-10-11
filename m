@@ -2,52 +2,71 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDC6C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 09:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF119ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 09:15:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4010B2084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 09:15:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4010B2084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9668D2084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 09:15:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9668D2084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIr0n-0007bQ-5U
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 05:15:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49519)
+	id 1iIr0r-0007ih-I9
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 05:15:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50372)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIqtM-0005xB-ED
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:07:21 -0400
+ (envelope-from <pkrempa@redhat.com>) id 1iIqyu-0005ul-RT
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:13:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIqtL-0004Ba-Cv
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:07:20 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60318)
+ (envelope-from <pkrempa@redhat.com>) id 1iIqyt-0006lz-Ss
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:13:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35660)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIqtH-000477-MU; Fri, 11 Oct 2019 05:07:15 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIqtF-0000XM-0j; Fri, 11 Oct 2019 12:07:13 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 5/5] Revert "mirror: Only mirror granularity-aligned chunks"
-Date: Fri, 11 Oct 2019 12:07:11 +0300
-Message-Id: <20191011090711.19940-6-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191011090711.19940-1-vsementsov@virtuozzo.com>
-References: <20191011090711.19940-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>)
+ id 1iIqyr-0006kZ-Jp; Fri, 11 Oct 2019 05:13:01 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BADB18372E9;
+ Fri, 11 Oct 2019 09:13:00 +0000 (UTC)
+Received: from andariel.pipo.sk (ovpn-204-231.brq.redhat.com [10.40.204.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CBE310013D9;
+ Fri, 11 Oct 2019 09:12:50 +0000 (UTC)
+Date: Fri, 11 Oct 2019 11:12:47 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v2 1/1] IDE: deprecate ide-drive
+Message-ID: <20191011091247.GD1979@andariel.pipo.sk>
+References: <20191009224303.10232-1-jsnow@redhat.com>
+ <20191009224303.10232-2-jsnow@redhat.com>
+ <518ae20b-049d-19ee-1e86-c48466ba0655@redhat.com>
+ <20191010112650.GR6129@angien.pipo.sk>
+ <10bb29c8-2375-25cd-af67-edddca1be5d7@redhat.com>
+ <20191010115436.GS6129@angien.pipo.sk>
+ <1a35d92f-ccb1-9e54-193b-a1b193c3e696@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="IMjqdzrDRly81ofr"
+Content-Disposition: inline
+In-Reply-To: <1a35d92f-ccb1-9e54-193b-a1b193c3e696@redhat.com>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 11 Oct 2019 09:13:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,79 +78,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit 9adc1cb49af8d4e54f57980b1eed5c0a4b2dafa6.
-    "mirror: Only mirror granularity-aligned chunks"
 
-Since previous commit unaligned chunks are supported by
-do_sync_target_write.
+--IMjqdzrDRly81ofr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/mirror.c | 29 -----------------------------
- 1 file changed, 29 deletions(-)
+On Thu, Oct 10, 2019 at 14:08:12 -0400, John Snow wrote:
+> On 10/10/19 7:54 AM, Peter Krempa wrote:
+> > On Thu, Oct 10, 2019 at 13:42:26 +0200, Philippe Mathieu-Daud=E9 wrote:
+> >> On 10/10/19 1:26 PM, Peter Krempa wrote:
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 1ed1d79ff8..eecb2d5793 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1488,15 +1488,6 @@ static void bdrv_mirror_top_child_perm(BlockDriverState *bs, BdrvChild *c,
-     *nshared = BLK_PERM_ALL;
- }
- 
--static void bdrv_mirror_top_refresh_limits(BlockDriverState *bs, Error **errp)
--{
--    MirrorBDSOpaque *s = bs->opaque;
--
--    if (s && s->job && s->job->copy_mode == MIRROR_COPY_MODE_WRITE_BLOCKING) {
--        bs->bl.request_alignment = s->job->granularity;
--    }
--}
--
- /* Dummy node that provides consistent read to its users without requiring it
-  * from its backing file and that allows writes on the backing file chain. */
- static BlockDriver bdrv_mirror_top = {
-@@ -1509,7 +1500,6 @@ static BlockDriver bdrv_mirror_top = {
-     .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
-     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
-     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
--    .bdrv_refresh_limits        = bdrv_mirror_top_refresh_limits,
- };
- 
- static BlockJob *mirror_start_job(
-@@ -1657,25 +1647,6 @@ static BlockJob *mirror_start_job(
-         s->should_complete = true;
-     }
- 
--    /*
--     * Must be called before we start tracking writes, but after
--     *
--     *     ((MirrorBlockJob *)
--     *         ((MirrorBDSOpaque *)
--     *             mirror_top_bs->opaque
--     *         )->job
--     *     )->copy_mode
--     *
--     * has the correct value.
--     * (We start tracking writes as of the following
--     * bdrv_create_dirty_bitmap() call.)
--     */
--    bdrv_refresh_limits(mirror_top_bs, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        goto fail;
--    }
--
-     s->dirty_bitmap = bdrv_create_dirty_bitmap(bs, granularity, NULL, errp);
-     if (!s->dirty_bitmap) {
-         goto fail;
--- 
-2.21.0
+[...]
 
+> > To be honest, I didn't really review the code nor the documentation.
+> > I actually reviewed only the idea itself in the context of integration
+> > with libvirt and that's why I didn't go for 'Reviewed-by:'.
+> >=20
+> > The gist of the citation above is that we should stick to well known
+> > tags with their well known meanings and I think that considering this a
+> > 'review' would be a stretch of the definiton.
+> >=20
+>=20
+> I wasn't aware that PMM wanted to avoid non-standard tags; I consider
+> them to be for human use, but I can change that behavior.
+>=20
+> Peter, I'll change it to an ACK (as suggested by Kevin) is that's OK by y=
+ou.
+
+Sure! I'll spell it out even for compliance:
+
+ACKed-by: Peter Krempa <pkrempa@redhat.com>
+
+--IMjqdzrDRly81ofr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAl2gR48ACgkQHGwCByjY
+1GpDgA/8DbOVMkrsad4mVFvBJCyWG8yxm06OPPjBm9tZfz0SFHZCVtwgdxO7LzHz
+cDMFam2j8TkMHIUw6C4HMksO+x+SaCzXW4BMk6/IzN2duAFV16zrxCJTyVf92Y+g
+MRqEj+Fkpk4QDynzFkzZj70pAseKuiiw0b7ayzncHWeJHUvn+/FpdKSp9l/NCNXI
+BS5+57YFNmAu83bYhQw1KiSeT1L7Nof21XdbksraSjf2bX7ZQqe6Ilx57F7UV2eW
+x5NZ1awH1K6k2WEHX9uNnwZM29aRw7F2S/ofXSsbSGnJM6QYue3IonFK1wpXfZUZ
+yxGGC2nxvqEVJjR7WmHofKja75VvrJDpNcVomgkPY8neSfCnoiYWaDhZS6UVbpkL
+qmDkkoozG2GcigeJXHknrOKieZPmKtc8vdbbgkWO9+2H6RUTfTvOUm5kp0s827PO
+NNacvDNf3xJYTE9HevADAUlFOu+RxlgepZTJ2hb4qeeAYo9JPoa+FBe3Llqo0Nxj
+fMP6pN6Q/mmHR5S/uDHHnfDOJsSlS37zz1JVgBtZpV3TEweGnDgg+cD2NT5HuBFP
+1Zf1WgQvdNFkuIibwt0efb4n94Z8S3H3ck8XdE12w01uNnR7Ns3oTDee/GP7KUyV
+lFha+q987IhgUJ14Xr9X3Su6mGrG3wLURHRAonxRD610afSiPEU=
+=tBnA
+-----END PGP SIGNATURE-----
+
+--IMjqdzrDRly81ofr--
 
