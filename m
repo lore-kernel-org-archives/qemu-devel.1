@@ -3,58 +3,57 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30355ECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6A3C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0048E206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:19:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0048E206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 89DD1206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:20:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89DD1206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ0Ro-0002Ki-M6
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 15:19:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37393)
+	id 1iJ0T0-00048b-B7
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 15:20:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37520)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iJ0PL-00006p-13
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:01 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iJ0PW-0000GR-4b
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iJ0PJ-0003hK-Up
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:16:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50580)
+ (envelope-from <dgilbert@redhat.com>) id 1iJ0PU-0003oR-Ur
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37872)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iJ0PJ-0003gm-Or
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:16:57 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iJ0PU-0003nW-LF
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:08 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 03E2D309843A;
- Fri, 11 Oct 2019 19:16:57 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 829CE18CB8F0;
+ Fri, 11 Oct 2019 19:17:07 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-210.ams2.redhat.com
  [10.36.117.210])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE5F75D6C8;
- Fri, 11 Oct 2019 19:16:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 58E7C5D784;
+ Fri, 11 Oct 2019 19:17:06 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, quintela@redhat.com, eric.auger@redhat.com,
  richardw.yang@linux.intel.com
-Subject: [PULL 01/21] migration: use migration_is_active to represent active
- state
-Date: Fri, 11 Oct 2019 20:16:26 +0100
-Message-Id: <20191011191646.226814-2-dgilbert@redhat.com>
+Subject: [PULL 08/21] migration/postcopy: allocate tmp_page in setup stage
+Date: Fri, 11 Oct 2019 20:16:33 +0100
+Message-Id: <20191011191646.226814-9-dgilbert@redhat.com>
 In-Reply-To: <20191011191646.226814-1-dgilbert@redhat.com>
 References: <20191011191646.226814-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 11 Oct 2019 19:16:57 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Fri, 11 Oct 2019 19:17:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -77,66 +76,126 @@ Sender: "Qemu-devel"
 
 From: Wei Yang <richardw.yang@linux.intel.com>
 
-Wrap the check into a function to make it easy to read.
+During migration, a tmp page is allocated so that we could place a whole
+host page during postcopy.
+
+Currently the page is allocated during load stage, this is a little bit
+late. And more important, if we failed to allocate it, the error is not
+checked properly. Even it is NULL, we would still use it.
+
+This patch moves the allocation to setup stage and if failed error
+message would be printed and caller would notice it.
 
 Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Message-Id: <20190717005341.14140-1-richardw.yang@linux.intel.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/misc.h |  1 +
- migration/migration.c    | 12 ++++++++----
- 2 files changed, 9 insertions(+), 4 deletions(-)
+ migration/postcopy-ram.c | 40 ++++++++++------------------------------
+ migration/postcopy-ram.h |  7 -------
+ migration/ram.c          |  2 +-
+ 3 files changed, 11 insertions(+), 38 deletions(-)
 
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index b9d8e787af..d2762257aa 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -60,6 +60,7 @@ void migration_object_init(void);
- void migration_shutdown(void);
- void qemu_start_incoming_migration(const char *uri, Error **errp);
- bool migration_is_idle(void);
-+bool migration_is_active(MigrationState *);
- void add_migration_state_change_notifier(Notifier *notify);
- void remove_migration_state_change_notifier(Notifier *notify);
- bool migration_in_setup(MigrationState *);
-diff --git a/migration/migration.c b/migration/migration.c
-index 5f7e4d15e9..0c51aa6ac7 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1533,8 +1533,7 @@ static void migrate_fd_cleanup(MigrationState *s)
-         qemu_fclose(tmp);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 1f63e65ed7..9a16f52a79 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -1134,6 +1134,16 @@ int postcopy_ram_enable_notify(MigrationIncomingSt=
+ate *mis)
+         return -1;
      }
 =20
--    assert((s->state !=3D MIGRATION_STATUS_ACTIVE) &&
--           (s->state !=3D MIGRATION_STATUS_POSTCOPY_ACTIVE));
-+    assert(!migration_is_active(s));
-=20
-     if (s->state =3D=3D MIGRATION_STATUS_CANCELLING) {
-         migrate_set_state(&s->state, MIGRATION_STATUS_CANCELLING,
-@@ -1703,6 +1702,12 @@ bool migration_is_idle(void)
-     return false;
++    mis->postcopy_tmp_page =3D mmap(NULL, mis->largest_page_size,
++                                  PROT_READ | PROT_WRITE, MAP_PRIVATE |
++                                  MAP_ANONYMOUS, -1, 0);
++    if (mis->postcopy_tmp_page =3D=3D MAP_FAILED) {
++        mis->postcopy_tmp_page =3D NULL;
++        error_report("%s: Failed to map postcopy_tmp_page %s",
++                     __func__, strerror(errno));
++        return -1;
++    }
++
+     /*
+      * Ballooning can mark pages as absent while we're postcopying
+      * that would cause false userfaults.
+@@ -1260,30 +1270,6 @@ int postcopy_place_page_zero(MigrationIncomingStat=
+e *mis, void *host,
+     }
  }
 =20
-+bool migration_is_active(MigrationState *s)
-+{
-+    return (s->state =3D=3D MIGRATION_STATUS_ACTIVE ||
-+            s->state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE);
-+}
-+
- void migrate_init(MigrationState *s)
- {
-     /*
-@@ -3266,8 +3271,7 @@ static void *migration_thread(void *opaque)
+-/*
+- * Returns a target page of memory that can be mapped at a later point i=
+n time
+- * using postcopy_place_page
+- * The same address is used repeatedly, postcopy_place_page just takes t=
+he
+- * backing page away.
+- * Returns: Pointer to allocated page
+- *
+- */
+-void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+-{
+-    if (!mis->postcopy_tmp_page) {
+-        mis->postcopy_tmp_page =3D mmap(NULL, mis->largest_page_size,
+-                             PROT_READ | PROT_WRITE, MAP_PRIVATE |
+-                             MAP_ANONYMOUS, -1, 0);
+-        if (mis->postcopy_tmp_page =3D=3D MAP_FAILED) {
+-            mis->postcopy_tmp_page =3D NULL;
+-            error_report("%s: %s", __func__, strerror(errno));
+-            return NULL;
+-        }
+-    }
+-
+-    return mis->postcopy_tmp_page;
+-}
+-
+ #else
+ /* No target OS support, stubs just fail */
+ void fill_destination_postcopy_migration_info(MigrationInfo *info)
+@@ -1341,12 +1327,6 @@ int postcopy_place_page_zero(MigrationIncomingStat=
+e *mis, void *host,
+     return -1;
+ }
 =20
-     trace_migration_thread_setup_complete();
+-void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+-{
+-    assert(0);
+-    return NULL;
+-}
+-
+ int postcopy_wake_shared(struct PostCopyFD *pcfd,
+                          uint64_t client_addr,
+                          RAMBlock *rb)
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 9c8bd2bae0..fb4cd11d28 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -100,13 +100,6 @@ typedef enum {
+     POSTCOPY_INCOMING_END
+ } PostcopyState;
 =20
--    while (s->state =3D=3D MIGRATION_STATUS_ACTIVE ||
--           s->state =3D=3D MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-+    while (migration_is_active(s)) {
-         int64_t current_time;
+-/*
+- * Allocate a page of memory that can be mapped at a later point in time
+- * using postcopy_place_page
+- * Returns: Pointer to allocated page
+- */
+-void *postcopy_get_tmp_page(MigrationIncomingState *mis);
+-
+ PostcopyState postcopy_state_get(void);
+ /* Set the state and return the old state */
+ PostcopyState postcopy_state_set(PostcopyState new_state);
+diff --git a/migration/ram.c b/migration/ram.c
+index e29c8b3408..071687ef37 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -4032,7 +4032,7 @@ static int ram_load_postcopy(QEMUFile *f)
+     bool matches_target_page_size =3D false;
+     MigrationIncomingState *mis =3D migration_incoming_get_current();
+     /* Temporary page that is later 'placed' */
+-    void *postcopy_host_page =3D postcopy_get_tmp_page(mis);
++    void *postcopy_host_page =3D mis->postcopy_tmp_page;
+     void *last_host =3D NULL;
+     bool all_zero =3D false;
 =20
-         if (urgent || !qemu_file_rate_limit(s->to_dst_file)) {
 --=20
 2.23.0
 
