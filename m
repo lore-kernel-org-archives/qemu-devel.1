@@ -2,48 +2,49 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B90C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CDDC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:34:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77B782064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:31:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77B782064A
+	by mail.kernel.org (Postfix) with ESMTPS id 4F42E2064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:34:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F42E2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIpOG-0000c9-GK
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:31:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33499)
+	id 1iIpR3-0002K0-CK
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:34:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34039)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iIpKd-0006tX-HH
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:27:25 -0400
+ (envelope-from <thuth@redhat.com>) id 1iIpOx-0001LM-Kg
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:31:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iIpKc-00053c-3V
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:27:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60194)
+ (envelope-from <thuth@redhat.com>) id 1iIpOw-00076t-Ft
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:31:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42688)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iIpKY-00052X-4o; Fri, 11 Oct 2019 03:27:18 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1iIpOq-00072Y-KU; Fri, 11 Oct 2019 03:31:45 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 46C61309DEE1;
- Fri, 11 Oct 2019 07:27:17 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D09730833B0;
+ Fri, 11 Oct 2019 07:31:43 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5E1FA194BE;
- Fri, 11 Oct 2019 07:27:16 +0000 (UTC)
-Subject: Re: [PATCH 00/23] iotests: Add and use $SOCK_DIR
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D0A281001B20;
+ Fri, 11 Oct 2019 07:31:42 +0000 (UTC)
+Subject: Re: [PATCH 06/23] iotests/083: Create socket in $SOCK_DIR
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20191010152457.17713-1-mreitz@redhat.com>
+ <20191010152457.17713-7-mreitz@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -89,18 +90,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <5f346ee9-9ffe-7290-eb0e-50d2ab28d363@redhat.com>
-Date: Fri, 11 Oct 2019 09:27:15 +0200
+Message-ID: <aae6acd0-e88d-eae3-86d8-4035fe52b195@redhat.com>
+Date: Fri, 11 Oct 2019 09:31:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191010152457.17713-1-mreitz@redhat.com>
+In-Reply-To: <20191010152457.17713-7-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 11 Oct 2019 07:27:17 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.44]); Fri, 11 Oct 2019 07:31:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -121,170 +122,11 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/10/2019 17.24, Max Reitz wrote:
-> Hi,
->=20
-> Perhaps the main reason we cannot run important tests such as 041 in CI
-> is that when they care Unix sockets in $TEST_DIR, the path may become
-> too long to connect to them.
->=20
-> To get by this problem, this series lets the check script create a new
-> temporary directory (mktemp -d) and then makes the iotests use it for
-> all Unix sockets.
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/083     |  6 +++---
+>  tests/qemu-iotests/083.out | 34 +++++++++++++++++-----------------
+>  2 files changed, 20 insertions(+), 20 deletions(-)
 
-Thanks a lot for tackling this!
-
-I gave it a try, and most tests work fine now indeed when I run them in
-a directory with a veeeery long file name.
-
-I still get an error with 028 though:
-
-
-$ ./check -qcow2 028
-QEMU          --
-"/home/thuth/tmp/qemu-with-very-long-directory-name-012345678901234567890=
-1234567890123456789012345678901234567890123456789012345678901234567890123=
-4567890123456789/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_=
-64"
--nodefaults -display none -machine accel=3Dqtest
-QEMU_IMG      --
-"/home/thuth/tmp/qemu-with-very-long-directory-name-012345678901234567890=
-1234567890123456789012345678901234567890123456789012345678901234567890123=
-4567890123456789/tests/qemu-iotests/../../qemu-img"
-
-QEMU_IO       --
-"/home/thuth/tmp/qemu-with-very-long-directory-name-012345678901234567890=
-1234567890123456789012345678901234567890123456789012345678901234567890123=
-4567890123456789/tests/qemu-iotests/../../qemu-io"
- --cache writeback -f qcow2
-QEMU_NBD      --
-"/home/thuth/tmp/qemu-with-very-long-directory-name-012345678901234567890=
-1234567890123456789012345678901234567890123456789012345678901234567890123=
-4567890123456789/tests/qemu-iotests/../../qemu-nbd"
-
-IMGFMT        -- qcow2 (compat=3D1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/x86_64 thuth 4.18.0-80.11.2.el8_0.x86_64
-TEST_DIR      --
-/home/thuth/tmp/qemu-with-very-long-directory-name-0123456789012345678901=
-2345678901234567890123456789012345678901234567890123456789012345678901234=
-567890123456789/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.YEmubpCxRH
-SOCKET_SCM_HELPER --
-/home/thuth/tmp/qemu-with-very-long-directory-name-0123456789012345678901=
-2345678901234567890123456789012345678901234567890123456789012345678901234=
-567890123456789/tests/qemu-iotests/socket_scm_helper
-
-028      fail       [09:11:52] [09:11:53]                    output
-mismatch (see 028.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/028.out	2019-08-16
-18:00:39.258741027 +0200
-+++
-/home/thuth/tmp/qemu-with-very-long-directory-name-0123456789012345678901=
-2345678901234567890123456789012345678901234567890123456789012345678901234=
-567890123456789/tests/qemu-iotests/028.out.bad
-2019-10-11 09:11:53.822111901 +0200
-@@ -468,7 +468,8 @@
-
- block-backup
-
--Formatting 'TEST_DIR/t.IMGFMT.copy', fmt=3DIMGFMT size=3D4294968832
-backing_file=3DTEST_DIR/t.IMGFMT.base backing_fmt=3DIMGFMT
-+(qemu)
-+Timeout waiting for Formatting on handle 0
- (qemu) info block-jobs
- No active jobs
- =3D=3D=3D IO: pattern 195
-Failures: 028
-Failed 1 of 1 iotests
-
-
-028 works fine if I start it from a directory with a short filename.
-
-
-I also saw an error with "./check -raw 055" once, but it does not seem
-to be reproducible:
-
-
-055      fail       [09:08:28] [09:10:57]                    output
-mismatch (see 055.out.bad)
---- /home/thuth/devel/qemu/tests/qemu-iotests/055.out	2019-08-16
-18:00:39.262741079 +0200
-+++
-/home/thuth/tmp/qemu-with-very-long-directory-name-0123456789012345678901=
-2345678901234567890123456789012345678901234567890123456789012345678901234=
-567890123456789/tests/qemu-iotests/055.out.bad
-2019-10-11 09:10:57.059254617 +0200
-@@ -1,5 +1,35 @@
--..............................
-+WARNING:qemu.machine:qemu received signal 9:
-/home/thuth/tmp/qemu-with-very-long-directory-name-0123456789012345678901=
-2345678901234567890123456789012345678901234567890123456789012345678901234=
-567890123456789/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_6=
-4
--chardev socket,id=3Dmon,path=3D/tmp/tmp.3mKmQDU7Ft/qemu-24878-monitor.so=
-ck
--mon chardev=3Dmon,mode=3Dcontrol -display none -vga none -qtest
-unix:path=3D/tmp/tmp.3mKmQDU7Ft/qemu-24878-qtest.sock -accel qtest
--nodefaults -display none -machine accel=3Dqtest -drive
-if=3Dvirtio,id=3Ddrive0,file=3Dblkdebug::/home/thuth/tmp/qemu-with-very-l=
-ong-directory-name-012345678901234567890123456789012345678901234567890123=
-45678901234567890123456789012345678901234567890123456789/tests/qemu-iotes=
-ts/scratch/test.img,format=3Draw,cache=3Dwriteback
--drive
-if=3Dnone,id=3Ddrive1,file=3D/home/thuth/tmp/qemu-with-very-long-director=
-y-name-012345678901234567890123456789012345678901234567890123456789012345=
-67890123456789012345678901234567890123456789/tests/qemu-iotests/scratch/b=
-lockdev-target.img,format=3Dvmdk,cache=3Dwriteback
-+E.............................
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+ERROR: test_complete_compress_blockdev_backup
-(__main__.TestDriveCompression)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File
-"/home/thuth/devel/qemu/tests/qemu-iotests/../../python/qemu/qmp.py",
-line 122, in __get_events
-+    ret =3D self.__json_read(only_event=3DTrue)
-+  File
-"/home/thuth/devel/qemu/tests/qemu-iotests/../../python/qemu/qmp.py",
-line 82, in __json_read
-+    data =3D self.__sockfile.readline()
-+  File "/usr/lib64/python3.6/socket.py", line 586, in readinto
-+    return self._sock.recv_into(b)
-+socket.timeout: timed out
-+
-+During handling of the above exception, another exception occurred:
-+
-+Traceback (most recent call last):
-+  File "055", line 499, in test_complete_compress_blockdev_backup
-+    target=3D'drive1')
-+  File "055", line 484, in do_test_compress_complete
-+    self.wait_until_completed()
-+  File "/home/thuth/devel/qemu/tests/qemu-iotests/iotests.py", line
-751, in wait_until_completed
-+    for event in self.vm.get_qmp_events(wait=3Dwait):
-+  File
-"/home/thuth/devel/qemu/tests/qemu-iotests/../../python/qemu/machine.py",=
- line
-406, in get_qmp_events
-+    events =3D self._qmp.get_events(wait=3Dwait)
-+  File
-"/home/thuth/devel/qemu/tests/qemu-iotests/../../python/qemu/qmp.py",
-line 236, in get_events
-+    self.__get_events(wait)
-+  File
-"/home/thuth/devel/qemu/tests/qemu-iotests/../../python/qemu/qmp.py",
-line 124, in __get_events
-+    raise QMPTimeoutError("Timeout waiting for event")
-+qemu.qmp.QMPTimeoutError: Timeout waiting for event
-+
- ----------------------------------------------------------------------
- Ran 30 tests
-
--OK
-+FAILED (errors=3D1)
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
