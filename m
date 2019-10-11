@@ -2,79 +2,85 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 621C4C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE87EC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:02:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 371582089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:01:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 371582089F
+	by mail.kernel.org (Postfix) with ESMTPS id C856021D7D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:02:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C856021D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIuXr-0003Fo-2I
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:01:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59039)
+	id 1iIuYq-0004cs-WE
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:02:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iIuUb-00013Z-PH
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:58:03 -0400
+ (envelope-from <mst@redhat.com>) id 1iIuWr-0003Sr-Fp
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iIuUZ-0006hO-GN
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:58:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35716)
+ (envelope-from <mst@redhat.com>) id 1iIuWp-0007yG-6E
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:00:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55056)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iIuUX-0006gc-IC
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:57:57 -0400
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iIuWo-0007xi-U3
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:00:19 -0400
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2056F85537
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 12:57:56 +0000 (UTC)
-Received: by mail-qk1-f197.google.com with SMTP id s28so8821679qkm.5
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 05:57:56 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7B7AD51F16
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 13:00:17 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id k53so9337301qtk.0
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:00:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=sY+7n7v0PzzW5WxNKnKDDwdlZ+22HePsvTrlwIh3xDM=;
- b=BGYr/CyS5p0UllBY2Wfn18HF8ETa66XX+e1QTcHNBKCu5kAB+FXC98DnzX3u6TORdf
- +1ap8omc0m4Ah+U/ONSpAlkQc5fQKy/isJW0cYksl/VcfjsK8yqkOyXlZOPFLk8FDt2a
- cLbhZoy1UNrb5QP8lpaCiVYVCNcPNYRgrDtg0jPZz5SQwlI7PMoXSd4BaQy83FinHTRK
- ZSSlUNuKQdWQC7B97P/1jlQLzFxadASttnv4dkqrFoRLWxwPOgAaMd1eKsiPCNy7nbPN
- 4coQ7BGbaFCK24kklkJ+QvRL7kmZmvz4sUgYX38EzoqSfbng5ioaUQQ0dFQuSAJ526/4
- kEKw==
-X-Gm-Message-State: APjAAAW7G9MEPQrFvrLBTkwtISZgNZoJwlWmLRVD/7Q27b97bTFl/+VO
- Sl9HakK0wck3FN2q4g1uiHvWhX1n8UZj8+amgIWth6af26GqzeftAXc/TzGUGdc9TY/NM7Ittxa
- hMQvnlsHMwAFxAnI=
-X-Received: by 2002:ae9:eb42:: with SMTP id b63mr15363545qkg.323.1570798675287; 
- Fri, 11 Oct 2019 05:57:55 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqza4/VQBFS8GjeK3kCfLsZaeKnqb6WbrU3aDyqi8TGMeBxwRXnx7LVm2mipVY8fnvGWTovI/A==
-X-Received: by 2002:ae9:eb42:: with SMTP id b63mr15363525qkg.323.1570798674925; 
- Fri, 11 Oct 2019 05:57:54 -0700 (PDT)
+ bh=Z/aR1vLs+4n9Xu1c+z2vc+oIGUT9Z+Zv5pj3DkZNfNA=;
+ b=OUU1rq7oThRUeO/owLj5srRCUsFUt8NUhWKy9xCAhfCmH31kkXKh1+bIkRSNQCYx/w
+ URX0vCnsx+QRhvkv8cEQqzyosXSAE17ti7j/Sw7Vl70VoP6kyPhT5C75t+s7NYoaFOPx
+ /w+ac5yUZoUbzPdipzHWzToaMEbpaGT279LGOvalYoBckTVtiVPY6C9VvTdlW63Elfd4
+ WT3szvlma1SfiDzLmeR2c7ydkQd4O9mPnvWpm0seXZTS+LAR5ZauSmld0JKzgcDOmt0E
+ cAko/cW8f6XZEdOr8eAHC+TzHA4w1LJRKZC/pZcUJ+YNGNNXLHBzN1s6D3o60d6eoCHa
+ QGHw==
+X-Gm-Message-State: APjAAAWBfI7B4gLwlwuMXRVQ3NzdHIqiiUn6l5r/SZGSWlUcFQo0GwO4
+ DkdtPH2xY1nNPpvuLvEXpGNgOC2a3jbYTE8ZsdMqcv8rY1Z+4xzw2KIP70m7JHjFn9sMtSuivRv
+ ezrqQ4RX/05ozSjw=
+X-Received: by 2002:a37:9a0d:: with SMTP id c13mr15731002qke.93.1570798816654; 
+ Fri, 11 Oct 2019 06:00:16 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwfs5gQIgjM7GiT+ZRk5rFLGA7fbs5w5rZpbJPRURSox2wXuU/vRECCqjr/tUxr8NlBRsyKZg==
+X-Received: by 2002:a37:9a0d:: with SMTP id c13mr15730955qke.93.1570798816290; 
+ Fri, 11 Oct 2019 06:00:16 -0700 (PDT)
 Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
  by smtp.gmail.com with ESMTPSA id
- u27sm6090001qta.90.2019.10.11.05.57.51
+ c14sm4532533qta.80.2019.10.11.06.00.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Oct 2019 05:57:54 -0700 (PDT)
-Date: Fri, 11 Oct 2019 08:57:48 -0400
+ Fri, 11 Oct 2019 06:00:15 -0700 (PDT)
+Date: Fri, 11 Oct 2019 09:00:10 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v3 07/10] migration: add new migration state wait-unplug
-Message-ID: <20191011085334-mutt-send-email-mst@kernel.org>
-References: <20191011112015.11785-1-jfreimann@redhat.com>
- <20191011112015.11785-8-jfreimann@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [RFC 0/3] acpi: cphp: add CPHP_GET_CPU_ID_CMD command to cpu
+ hotplug MMIO interface
+Message-ID: <20191011085852-mutt-send-email-mst@kernel.org>
+References: <20191009132252.17860-1-imammedo@redhat.com>
+ <20191010055356-mutt-send-email-mst@kernel.org>
+ <20191010153815.4f7a3fc9@redhat.com>
+ <20191010095459-mutt-send-email-mst@kernel.org>
+ <20191010175754.7c62cf8f@Igors-MacBook-Pro>
+ <20191010192039.GE4084@habkost.net>
+ <e17adca7-f5f4-3a28-a4a2-6b921c1c2e2f@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191011112015.11785-8-jfreimann@redhat.com>
+In-Reply-To: <e17adca7-f5f4-3a28-a4a2-6b921c1c2e2f@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -89,257 +95,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: parav@mellanox.com, aadam@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, alex.williamson@redhat.com, laine@redhat.com,
- ailan@redhat.com, ehabkost@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 11, 2019 at 01:20:12PM +0200, Jens Freimann wrote:
-> This patch adds a new migration state called wait-unplug.  It is entered
-> after the SETUP state and will transition into ACTIVE once all devices
-> were succesfully unplugged from the guest.
+On Fri, Oct 11, 2019 at 10:01:42AM +0200, Laszlo Ersek wrote:
+> On 10/10/19 21:20, Eduardo Habkost wrote:
+> > On Thu, Oct 10, 2019 at 05:57:54PM +0200, Igor Mammedov wrote:
+> >> On Thu, 10 Oct 2019 09:59:42 -0400
+> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >>
+> >>> On Thu, Oct 10, 2019 at 03:39:12PM +0200, Igor Mammedov wrote:
+> >>>> On Thu, 10 Oct 2019 05:56:55 -0400
+> >>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >>>>
+> >>>>> On Wed, Oct 09, 2019 at 09:22:49AM -0400, Igor Mammedov wrote:
+> >>>>>> As an alternative to passing to firmware topology info via new fwcfg files
+> >>>>>> so it could recreate APIC IDs based on it and order CPUs are enumerated,
+> >>>>>>
+> >>>>>> extend CPU hotplug interface to return APIC ID as response to the new command
+> >>>>>> CPHP_GET_CPU_ID_CMD.  
+> >>>>>
+> >>>>> One big piece missing here is motivation:
+> >>>> I thought the only willing reader was Laszlo (who is aware of context)
+> >>>> so I skipped on details and confused others :/
+> >>>>
+> >>>>> Who's going to use this interface?
+> >>>> In current state it's for firmware, since ACPI tables can cheat
+> >>>> by having APIC IDs statically built in.
+> >>>>
+> >>>> If we were creating CPU objects in ACPI dynamically
+> >>>> we would be using this command as well.
+> >>>
+> >>> I'm not sure how it's even possible to create devices dynamically. Well
+> >>> I guess it's possible with LoadTable. Is this what you had in
+> >>> mind?
+> >>
+> >> Yep. I even played this shiny toy and I can say it's very tempting one.
+> >> On the  other side, even problem of legacy OSes not working with it aside,
+> >> it's hard to debug and reproduce compared to static tables.
+> >> So from maintaining pov I dislike it enough to be against it.
+> >>
+> >>
+> >>>> It would save
+> >>>> us quite a bit space in ACPI blob but it would be a pain
+> >>>> to debug and diagnose problems in ACPI tables, so I'd rather
+> >>>> stay with static CPU descriptions in ACPI tables for the sake
+> >>>> of maintenance.
+> >>>>> So far CPU hotplug was used by the ACPI, so we didn't
+> >>>>> really commit to a fixed interface too strongly.
+> >>>>>
+> >>>>> Is this a replacement to Laszlo's fw cfg interface?
+> >>>>> If yes is the idea that OVMF going to depend on CPU hotplug directly then?
+> >>>>> It does not depend on it now, does it?
+> >>>> It doesn't, but then it doesn't support cpu hotplug,
+> >>>> OVMF(SMM) needs to cooperate with QEMU "and" ACPI tables to perform
+> >>>> the task and using the same interface/code path between all involved
+> >>>> parties makes the task easier with the least amount of duplicated
+> >>>> interfaces and more robust.
+> >>>>
+> >>>> Re-implementing alternative interface for firmware (fwcfg or what not)
+> >>>> would work as well, but it's only question of time when ACPI and
+> >>>> this new interface disagree on how world works and process falls
+> >>>> apart.
+> >>>
+> >>> Then we should consider switching acpi to use fw cfg.
+> >>> Or build another interface that can scale.
+> >>
+> >> Could be an option, it would be a pain to write a driver in AML for fwcfg access though
+> >> (I've looked at possibility to access fwcfg from AML about a year ago and gave up.
+> >> I'm definitely not volunteering for the second attempt and can't even give an estimate
+> >> it it's viable approach).
+> >>
+> >> But what scaling issue you are talking about, exactly?
+> >> With current CPU hotplug interface we can handle upto UNIT32_MAX cpus, and extend
+> >> interface without need to increase IO window we are using now.
+> >>
+> >> Granted IO access it not fastest compared to fwcfg in DMA mode, but we already
+> >> doing stop machine when switching to SMM which is orders of magnitude slower.
+> >> Consensus was to compromise on speed of CPU hotplug versus more complex and more
+> >> problematic unicast SMM mode in OVMF (can't find a particular email but we have discussed
+> >> it with Laszlo already, when I considered ways to optimize hotplug speed)
+> > 
+> > If we were designing the interface from the ground up, I would
+> > agree with Michael.  But I don't see why we would reimplement
+> > everything from scratch now, if just providing the
+> > cpu_selector => cpu_hardware_id mapping to firmware is enough to
+> > make the existing interface work.
+> > 
+> > If somebody is really unhappy with the current interface and
+> > wants to implement a new purely fw_cfg-based one (and write the
+> > corresponding ACPI code), they would be welcome.
 > 
-> So if a guest doesn't respond or takes long to honor the unplug request
-> the user will see the migration state 'wait-unplug'.
+> Let me re-iterate the difficulties quickly:
 > 
-> In the migration thread we query failover devices if they're are still
-> pending the guest unplug. When all are unplugged the migration
-> continues. We give it a defined number of iterations including small
-> waiting periods before we proceed.
+> - DMA-based fw_cfg is troublesome in SEV guests (do you want to mess
+> with page table entries in AML methods? or pre-allocate an always
+> decrypted opregion? how large?)
 > 
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-> ---
->  include/migration/vmstate.h |  2 ++
->  migration/migration.c       | 34 ++++++++++++++++++++++++++++++++++
->  migration/migration.h       |  3 +++
->  migration/savevm.c          | 36 ++++++++++++++++++++++++++++++++++++
->  migration/savevm.h          |  1 +
->  qapi/migration.json         |  5 ++++-
->  6 files changed, 80 insertions(+), 1 deletion(-)
+> - IO port based fw_cfg does not support writes (and I reckon that, when
+> the *OS* handles a hotplug event, it does have to talk back to QEMU)
 > 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index 1fbfd099dd..39ef125225 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -186,6 +186,8 @@ struct VMStateDescription {
->      int (*pre_save)(void *opaque);
->      int (*post_save)(void *opaque);
->      bool (*needed)(void *opaque);
-> +    bool (*dev_unplug_pending)(void *opaque);
-> +
->      const VMStateField *fields;
->      const VMStateDescription **subsections;
->  };
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 5f7e4d15e9..a17d9fb990 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -52,9 +52,14 @@
->  #include "hw/qdev-properties.h"
->  #include "monitor/monitor.h"
->  #include "net/announce.h"
-> +#include "qemu/queue.h"
->  
->  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
->  
-> +/* Time in milliseconds to wait for guest OS to unplug PCI device */
-> +#define FAILOVER_GUEST_UNPLUG_WAIT 10000
+> - the CPU hotplug AML would have to arbitrate with Linux's own fw_cfg
+> driver (which exposes fw_cfg files to userspace, yay! /s)
+> 
+> In the phys world, CPU hotplug takes dedicated RAS hardware. Shoehorning
+> CPU hotplug into *firmware* config, when in two use cases [*], the
+> firmware shouldn't even know about CPU hotplug, feels messy.
+> 
+> [*] being (a) SeaBIOS, and (b) OVMF built without SMM
 
-This value should be controllable from QMP.
-And I think the default should be infinite wait.
+I agree. So ACPI should use a dedicated interface.
 
-> +#define FAILOVER_UNPLUG_RETRIES 5
+> > I just don't see why we should spend our time doing that now.
+> 
+> I have to agree, we're already spread thin.
+> 
+> ... I must admit: I didn't expect this, but now I've grown to *prefer*
+> the CPU hotplug register block!
+> 
+> Laszlo
 
+OK, send an ack then.
 
-This is a bit of a hack. We really should just
-have unplug signal wakeup, or time expire.
-E.g. a new kind of notifier?
-
-> +
->  /* Amount of time to allocate to each "chunk" of bandwidth-throttled
->   * data. */
->  #define BUFFER_DELAY     100
-> @@ -954,6 +959,9 @@ static void fill_source_migration_info(MigrationInfo *info)
->      case MIGRATION_STATUS_CANCELLED:
->          info->has_status = true;
->          break;
-> +    case MIGRATION_STATUS_WAIT_UNPLUG:
-> +        info->has_status = true;
-> +        break;
->      }
->      info->status = s->state;
->  }
-> @@ -1695,6 +1703,7 @@ bool migration_is_idle(void)
->      case MIGRATION_STATUS_COLO:
->      case MIGRATION_STATUS_PRE_SWITCHOVER:
->      case MIGRATION_STATUS_DEVICE:
-> +    case MIGRATION_STATUS_WAIT_UNPLUG:
->          return false;
->      case MIGRATION_STATUS__MAX:
->          g_assert_not_reached();
-> @@ -3224,6 +3233,8 @@ static void *migration_thread(void *opaque)
->      int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
->      MigThrError thr_error;
->      bool urgent = false;
-> +    bool all_unplugged = true;
-> +    int i = 0;
->  
->      rcu_register_thread();
->  
-> @@ -3260,6 +3271,27 @@ static void *migration_thread(void *opaque)
->  
->      qemu_savevm_state_setup(s->to_dst_file);
->  
-> +    migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> +                      MIGRATION_STATUS_WAIT_UNPLUG);
-> +
-> +    while (i < FAILOVER_UNPLUG_RETRIES &&
-> +           s->state == MIGRATION_STATUS_WAIT_UNPLUG) {
-> +        i++;
-> +        qemu_sem_timedwait(&s->wait_unplug_sem, FAILOVER_GUEST_UNPLUG_WAIT);
-
-Should be FAILOVER_GUEST_UNPLUG_WAIT / FAILOVER_UNPLUG_RETRIES
-
-such that time set is the total.
-
-> +        all_unplugged = qemu_savevm_state_guest_unplug_pending();
-> +        if (all_unplugged) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    if (all_unplugged) {
-> +        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
-> +                MIGRATION_STATUS_ACTIVE);
-> +    } else {
-> +        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
-> +                          MIGRATION_STATUS_CANCELLING);
-> +    }
-> +
->      s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
->      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->                        MIGRATION_STATUS_ACTIVE);
-> @@ -3508,6 +3540,7 @@ static void migration_instance_finalize(Object *obj)
->      qemu_mutex_destroy(&ms->qemu_file_lock);
->      g_free(params->tls_hostname);
->      g_free(params->tls_creds);
-> +    qemu_sem_destroy(&ms->wait_unplug_sem);
->      qemu_sem_destroy(&ms->rate_limit_sem);
->      qemu_sem_destroy(&ms->pause_sem);
->      qemu_sem_destroy(&ms->postcopy_pause_sem);
-> @@ -3553,6 +3586,7 @@ static void migration_instance_init(Object *obj)
->      qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
->      qemu_sem_init(&ms->rp_state.rp_sem, 0);
->      qemu_sem_init(&ms->rate_limit_sem, 0);
-> +    qemu_sem_init(&ms->wait_unplug_sem, 0);
->      qemu_mutex_init(&ms->qemu_file_lock);
->  }
->  
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 4f2fe193dc..79b3dda146 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -206,6 +206,9 @@ struct MigrationState
->      /* Flag set once the migration thread called bdrv_inactivate_all */
->      bool block_inactive;
->  
-> +    /* Migration is waiting for guest to unplug device */
-> +    QemuSemaphore wait_unplug_sem;
-> +
->      /* Migration is paused due to pause-before-switchover */
->      QemuSemaphore pause_sem;
->  
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index bb9462a54d..26e5bde687 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -942,6 +942,20 @@ static void qemu_savevm_command_send(QEMUFile *f,
->      qemu_fflush(f);
->  }
->  
-> +static int qemu_savevm_nr_failover_devices(void)
-> +{
-> +    SaveStateEntry *se;
-> +    int n = 0;
-> +
-> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> +        if (se->vmsd && se->vmsd->dev_unplug_pending) {
-> +            n++;
-> +        }
-> +    }
-> +
-> +    return n;
-> +}
-> +
->  void qemu_savevm_send_colo_enable(QEMUFile *f)
->  {
->      trace_savevm_send_colo_enable();
-> @@ -1113,6 +1127,28 @@ void qemu_savevm_state_header(QEMUFile *f)
->      }
->  }
->  
-> +bool qemu_savevm_state_guest_unplug_pending(void)
-> +{
-> +    int nr_failover_devs;
-> +    SaveStateEntry *se;
-> +    bool ret = false;
-> +    int n = 0;
-> +
-> +    nr_failover_devs = qemu_savevm_nr_failover_devices();
-> +
-> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> +        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
-> +            continue;
-> +        }
-> +        ret = se->vmsd->dev_unplug_pending(se->opaque);
-> +        if (!ret) {
-> +            n++;
-> +        }
-> +    }
-> +
-> +    return n == nr_failover_devs;
-> +}
-> +
->  void qemu_savevm_state_setup(QEMUFile *f)
->  {
->      SaveStateEntry *se;
-> diff --git a/migration/savevm.h b/migration/savevm.h
-> index 51a4b9caa8..ba64a7e271 100644
-> --- a/migration/savevm.h
-> +++ b/migration/savevm.h
-> @@ -31,6 +31,7 @@
->  
->  bool qemu_savevm_state_blocked(Error **errp);
->  void qemu_savevm_state_setup(QEMUFile *f);
-> +bool qemu_savevm_state_guest_unplug_pending(void);
->  int qemu_savevm_state_resume_prepare(MigrationState *s);
->  void qemu_savevm_state_header(QEMUFile *f);
->  int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 52e69e2868..5a06cd489f 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -133,6 +133,9 @@
->  # @device: During device serialisation when pause-before-switchover is enabled
->  #        (since 2.11)
->  #
-> +# @wait-unplug: wait for device unplug request by guest OS to be completed.
-> +#               (since 4.2)
-> +#
->  # Since: 2.3
->  #
->  ##
-> @@ -140,7 +143,7 @@
->    'data': [ 'none', 'setup', 'cancelling', 'cancelled',
->              'active', 'postcopy-active', 'postcopy-paused',
->              'postcopy-recover', 'completed', 'failed', 'colo',
-> -            'pre-switchover', 'device' ] }
-> +            'pre-switchover', 'device', 'wait-unplug' ] }
->  
->  ##
->  # @MigrationInfo:
-> -- 
-> 2.21.0
+-- 
+MST
 
