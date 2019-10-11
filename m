@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 759FBC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7170C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:58:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FCD0206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EE4B206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:58:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wwp8+Qu6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FCD0206A1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Poo6VVOb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EE4B206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIvPd-0005UC-Sv
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:56:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39137)
+	id 1iIvQm-000762-JP
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:58:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iIvJE-0005rz-T0
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:50:22 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iIvIR-0004Xg-TN
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:49:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iIvJC-00040l-VG
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:50:20 -0400
-Received: from mail-yw1-xc44.google.com ([2607:f8b0:4864:20::c44]:33851)
+ (envelope-from <richard.henderson@linaro.org>) id 1iIvIQ-0003Zv-Dk
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:49:31 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:44135)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iIvJC-00040B-PW
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:50:18 -0400
-Received: by mail-yw1-xc44.google.com with SMTP id d192so3502414ywa.1
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:50:18 -0700 (PDT)
+ id 1iIvIQ-0003Zk-9z
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:49:30 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id v1so3104969ybo.11
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:49:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=gkEtlZocr6O/mWH7/aygI9iXL6Dz4HHREZjJWg4Qrng=;
- b=wwp8+Qu6RGOlIFhs6T/cduZ9+7xx7QHuofeIZykJOyjRtvAulxMJS6WRUBoHax4XQI
- n8ULfE+TwkRXbgtJJ0mgtDbEz0nNOSDGAEY3ncYQgB7fpglyxpC9vsS9j8skLu5PcDMU
- opobpojpG7J9aGtRcVBjn/vDpUQcQSzzqlodm5U0PEqs8c/V9B1ay7FB3QA+2syhA5KJ
- JAqssTbx5Kc1shhhCms50O+l0w2wYpmVMnblf0Vq88lMpbi/OZKXPC8bxq6rJlyjO30x
- NKNHtoAgoi0Pn1d6fFBqsRIX+pMJ/G9Z/7iPcndCGlnhSHT4hK9pnnZfgBEDhs0hWm1D
- 5AAg==
+ bh=r9X7MHlhfHbrqaHdgvR1bkMzXUVo8hSG+v4LG+XZx8A=;
+ b=Poo6VVObvaKR5zc8NhUBJgzcLkT4q15OAJQXYFKSBYfDQSi4xkiIVlczoIonrh96cG
+ o2riE7VsWvkmFKwVXKzUmf92RZi6NP8jmZt8igaE51uar+ZTcWH03unPaAnViHAeDmgW
+ HeZbV7TejDPro+v4Wr5LPVT4LdZLzZJI+S1skMGS8gwQ8tPjJLcOEHmeF4+d1MSdlamL
+ fA/D5NHZuvLV1df8JhvqBM7F12HQ0sCBhdmWSKkebAJUsCsrZa2M8+LCREUHj/PYGFDN
+ 7xTn1TffpwB5ABbr2/KzH4zsSxJL6okHYYSg9F09HJTgnsfFes7Lku3D0EFyPCIUzadg
+ vhuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=gkEtlZocr6O/mWH7/aygI9iXL6Dz4HHREZjJWg4Qrng=;
- b=Wy0x9pBm48RB0aoNkGYm57v3XcZSVIRLrI0VpCJFGNi8WbrFG3VKOyHqB4lgYDICjM
- X90lNgDglBkyXcVKuqgFcLqNrtlDQmCsiWph4F04XFk3P/ilmAH0FJes8MGGrkfAjAm1
- rrWBcj9UTF+NM7PUpRyTrmgqApGdWuPB6smbzb8ABTPqdrx69Qy0WhMrSlL03UuNFcul
- dyemoBzZ55qiaes3KnFc/rqkebHglsuY9lWnPVHTXP+bu8MMapU/53VX+v1wBDSuBKwH
- aaSLbJ+ALpdh7EeyWuAPpaBOcE9NSCbAJMMnCKzfUhBl+l/1se9NcPm9h3kjnPXu+3Hm
- NdGA==
-X-Gm-Message-State: APjAAAWMzfoPJmfEjubh6ZX2rtdk0yP6oWwUD14IHGE+y1t4xsEYeohB
- vmr8bnXgr/4iPqUZYybFM4+0RZcBHfw=
-X-Google-Smtp-Source: APXvYqxgVb2EzfAdw1GLbaCMBKbtUppFiMwhWjS6LeFIdIIaKmJce+8RIIwAOj+Gs3ku1d3LuWatPA==
-X-Received: by 2002:a81:6ac6:: with SMTP id f189mr2154219ywc.469.1570801817716; 
- Fri, 11 Oct 2019 06:50:17 -0700 (PDT)
+ bh=r9X7MHlhfHbrqaHdgvR1bkMzXUVo8hSG+v4LG+XZx8A=;
+ b=WZHbwEixjyQ40gdbHhUEz9oiaF5iei3ZXV1cgncz8dNV9gHdAPGakiStiXgyepdiO5
+ QjD0zryZeKUdTvy4fUCGEv3CKzwxGpU77uiCBp6Q4Oa5qE0Gq+XPZJJWWYT2x1XPQfI1
+ rF4Y2bhaWwyTeJKeWmrsBrgxi2z0IRjt2I8/QR5a48Y1dMSLQgqgNYYqGF/rGtQboKiw
+ 182ZEam89zv/6f28h3rlUyW8PQV23GC7AHan4gpZbtjauDByevnno4IyifJ/trSDZS4P
+ /Z6kHziBzvor/IjRoZE4cYnJKJ/PshXKFU700bMzOp8zKQ2rNOqLh307YNjvJJotbQqP
+ aN+g==
+X-Gm-Message-State: APjAAAWMeeY61kMX2fs402X+nLb6lHTXaeZ/mzpSW59hwOwEpQIltGsl
+ DrJNHMfdXpReUyk7L463gY+76CZnPMU=
+X-Google-Smtp-Source: APXvYqzj88f8WKyPxwO7+Y0auTyWghjkhuNbb9yg4Ru/gJYH9fHknW9XTHzFjibCY6hfLdDVUtaizw==
+X-Received: by 2002:a25:3b51:: with SMTP id i78mr10622118yba.186.1570801769339; 
+ Fri, 11 Oct 2019 06:49:29 -0700 (PDT)
 Received: from cloudburst.gateway.pace.com (67.216.151.25.pool.hargray.net.
  [67.216.151.25])
- by smtp.gmail.com with ESMTPSA id f68sm2534000ywb.96.2019.10.11.06.50.16
+ by smtp.gmail.com with ESMTPSA id f68sm2534000ywb.96.2019.10.11.06.49.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Oct 2019 06:50:17 -0700 (PDT)
+ Fri, 11 Oct 2019 06:49:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 11/22] target/arm: Implement LDG, STG, ST2G instructions
-Date: Fri, 11 Oct 2019 09:47:33 -0400
-Message-Id: <20191011134744.2477-12-richard.henderson@linaro.org>
+Subject: [PATCH v5 05/22] target/arm: Suppress tag check for sp+offset
+Date: Fri, 11 Oct 2019 09:47:27 -0400
+Message-Id: <20191011134744.2477-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191011134744.2477-1-richard.henderson@linaro.org>
 References: <20191011134744.2477-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c44
+X-Received-From: 2607:f8b0:4864:20::b42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,334 +95,179 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+R0078 specifies that base register, or base register plus immediate
+offset, is unchecked when the base register is SP.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2: Split out allocation_tag_mem.  Handle atomicity of stores.
-v3: Add X[t] input to these insns; require pre-cleaned addresses.
-v5: Fix !32-byte aligned operation of st2g.
+v2: Include writeback addresses as checked.
 ---
- target/arm/helper-a64.h    |   5 ++
- target/arm/mte_helper.c    | 154 +++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c | 115 +++++++++++++++++++++++++++
- 3 files changed, 274 insertions(+)
+ target/arm/translate-a64.c | 36 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index 31f848ca03..88a0241915 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -110,3 +110,8 @@ DEF_HELPER_FLAGS_3(irg, TCG_CALL_NO_RWG, i64, env, i64, i64)
- DEF_HELPER_FLAGS_4(addg, TCG_CALL_NO_RWG_SE, i64, env, i64, i32, i32)
- DEF_HELPER_FLAGS_4(subg, TCG_CALL_NO_RWG_SE, i64, env, i64, i32, i32)
- DEF_HELPER_FLAGS_2(gmi, TCG_CALL_NO_RWG_SE, i64, i64, i64)
-+DEF_HELPER_FLAGS_3(ldg, TCG_CALL_NO_WG, i64, env, i64, i64)
-+DEF_HELPER_FLAGS_3(stg, TCG_CALL_NO_WG, void, env, i64, i64)
-+DEF_HELPER_FLAGS_3(st2g, TCG_CALL_NO_WG, void, env, i64, i64)
-+DEF_HELPER_FLAGS_3(stg_parallel, TCG_CALL_NO_WG, void, env, i64, i64)
-+DEF_HELPER_FLAGS_3(st2g_parallel, TCG_CALL_NO_WG, void, env, i64, i64)
-diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
-index 251dfff1e1..f1dd1cc0dd 100644
---- a/target/arm/mte_helper.c
-+++ b/target/arm/mte_helper.c
-@@ -25,8 +25,21 @@
- #include "exec/helper-proto.h"
- 
- 
-+static uint8_t *allocation_tag_mem(CPUARMState *env, uint64_t ptr,
-+                                   bool write, uintptr_t ra)
-+{
-+    /* Tag storage not implemented.  */
-+    return NULL;
-+}
-+
- static int get_allocation_tag(CPUARMState *env, uint64_t ptr, uintptr_t ra)
- {
-+    uint8_t *mem = allocation_tag_mem(env, ptr, false, ra);
-+
-+    if (mem) {
-+        int ofs = extract32(ptr, LOG2_TAG_GRANULE, 1) * 4;
-+        return extract32(atomic_read(mem), ofs, 4);
-+    }
-     /* Tag storage not implemented.  */
-     return -1;
- }
-@@ -260,3 +273,144 @@ uint64_t HELPER(gmi)(uint64_t ptr, uint64_t mask)
-     int tag = allocation_tag_from_addr(ptr);
-     return mask | (1ULL << tag);
- }
-+
-+uint64_t HELPER(ldg)(CPUARMState *env, uint64_t ptr, uint64_t xt)
-+{
-+    int el;
-+    uint64_t sctlr;
-+    int rtag;
-+
-+    /* Trap if accessing an invalid page.  */
-+    rtag = get_allocation_tag(env, ptr, GETPC());
-+
-+    /*
-+     * The tag is squashed to zero if the page does not support tags,
-+     * or if the OS is denying access to the tags.
-+     */
-+    el = arm_current_el(env);
-+    sctlr = arm_sctlr(env, el);
-+    if (rtag < 0 || !allocation_tag_access_enabled(env, el, sctlr)) {
-+        rtag = 0;
-+    }
-+
-+    return address_with_allocation_tag(xt, rtag);
-+}
-+
-+static void check_tag_aligned(CPUARMState *env, uint64_t ptr, uintptr_t ra)
-+{
-+    if (unlikely(!QEMU_IS_ALIGNED(ptr, TAG_GRANULE))) {
-+        arm_cpu_do_unaligned_access(env_cpu(env), ptr, MMU_DATA_STORE,
-+                                    cpu_mmu_index(env, false), ra);
-+        g_assert_not_reached();
-+    }
-+}
-+
-+/* For use in a non-parallel context, store to the given nibble.  */
-+static void store_tag1(uint64_t ptr, uint8_t *mem, int tag)
-+{
-+    int ofs = extract32(ptr, LOG2_TAG_GRANULE, 1) * 4;
-+    uint8_t old = atomic_read(mem);
-+    uint8_t new = deposit32(old, ofs, 4, tag);
-+
-+    atomic_set(mem, new);
-+}
-+
-+/* For use in a parallel context, atomically store to the given nibble.  */
-+static void store_tag1_parallel(uint64_t ptr, uint8_t *mem, int tag)
-+{
-+    int ofs = extract32(ptr, LOG2_TAG_GRANULE, 1) * 4;
-+    uint8_t old = atomic_read(mem);
-+
-+    while (1) {
-+        uint8_t new = deposit32(old, ofs, 4, tag);
-+        uint8_t cmp = atomic_cmpxchg(mem, old, new);
-+        if (likely(cmp == old)) {
-+            return;
-+        }
-+        old = cmp;
-+    }
-+}
-+
-+typedef void stg_store1(uint64_t, uint8_t *, int);
-+
-+static void do_stg(CPUARMState *env, uint64_t ptr, uint64_t xt,
-+                   uintptr_t ra, stg_store1 store1)
-+{
-+    int el;
-+    uint64_t sctlr;
-+    uint8_t *mem;
-+
-+    check_tag_aligned(env, ptr, ra);
-+
-+    /* Trap if accessing an invalid page.  */
-+    mem = allocation_tag_mem(env, ptr, true, ra);
-+
-+    /* Store if page supports tags and access is enabled.  */
-+    el = arm_current_el(env);
-+    sctlr = arm_sctlr(env, el);
-+    if (mem && allocation_tag_access_enabled(env, el, sctlr)) {
-+        store1(ptr, mem, allocation_tag_from_addr(xt));
-+    }
-+}
-+
-+void HELPER(stg)(CPUARMState *env, uint64_t ptr, uint64_t xt)
-+{
-+    do_stg(env, ptr, xt, GETPC(), store_tag1);
-+}
-+
-+void HELPER(stg_parallel)(CPUARMState *env, uint64_t ptr, uint64_t xt)
-+{
-+    do_stg(env, ptr, xt, GETPC(), store_tag1_parallel);
-+}
-+
-+static void do_st2g(CPUARMState *env, uint64_t ptr1, uint64_t xt,
-+                    uintptr_t ra, stg_store1 store1)
-+{
-+    int el, tag;
-+    uint64_t ptr2, sctlr;
-+    uint8_t *mem1, *mem2;
-+
-+    check_tag_aligned(env, ptr1, ra);
-+
-+    el = arm_current_el(env);
-+    sctlr = arm_sctlr(env, el);
-+    tag = allocation_tag_from_addr(xt);
-+
-+    /*
-+     * Trap if accessing an invalid page(s).
-+     * This takes priority over !allocation_tag_access_enabled.
-+     */
-+    mem1 = allocation_tag_mem(env, ptr1, true, ra);
-+
-+    if (ptr1 & TAG_GRANULE) {
-+        /* The two stores are unaligned and modify two bytes.  */
-+        ptr2 = ptr1 + TAG_GRANULE;
-+        mem2 = allocation_tag_mem(env, ptr2, true, ra);
-+
-+        /* Store if page supports tags and access is enabled.  */
-+        if ((mem1 || mem2) && allocation_tag_access_enabled(env, el, sctlr)) {
-+            if (mem1) {
-+                store1(ptr1, mem1, tag);
-+            }
-+            if (mem2) {
-+                store1(ptr2, mem2, tag);
-+            }
-+        }
-+    } else {
-+        /* The two stores are aligned 32, and modify one byte.  */
-+        if (mem1 && allocation_tag_access_enabled(env, el, sctlr)) {
-+            tag |= tag << 4;
-+            atomic_set(mem1, tag);
-+        }
-+    }
-+}
-+
-+void HELPER(st2g)(CPUARMState *env, uint64_t ptr, uint64_t xt)
-+{
-+    do_st2g(env, ptr, xt, GETPC(), store_tag1);
-+}
-+
-+void HELPER(st2g_parallel)(CPUARMState *env, uint64_t ptr, uint64_t xt)
-+{
-+    do_st2g(env, ptr, xt, GETPC(), store_tag1_parallel);
-+}
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index cf341c98d3..c17b36ebb2 100644
+index 8e4fea6b4c..18d45fba87 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -3559,6 +3559,118 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-     }
- }
- 
-+/*
-+ * Load/Store memory tags
-+ *
-+ *  31 30 29         24     22  21     12    10      5      0
-+ * +-----+-------------+-----+---+------+-----+------+------+
-+ * | 1 1 | 0 1 1 0 0 1 | op1 | 1 | imm9 | op2 |  Rn  |  Rt  |
-+ * +-----+-------------+-----+---+------+-----+------+------+
-+ */
-+static void disas_ldst_tag(DisasContext *s, uint32_t insn)
-+{
-+    int rt = extract32(insn, 0, 5);
-+    int rn = extract32(insn, 5, 5);
-+    uint64_t offset = sextract64(insn, 12, 9) << LOG2_TAG_GRANULE;
-+    int op2 = extract32(insn, 10, 3);
-+    int op1 = extract32(insn, 22, 2);
-+    bool is_load = false, is_pair = false, is_zero = false;
-+    int index = 0;
-+    TCGv_i64 dirty_addr, clean_addr, tcg_rt;
-+
-+    if ((insn & 0xff200000) != 0xd9200000
-+        || !dc_isar_feature(aa64_mte_insn_reg, s)) {
-+        goto do_unallocated;
-+    }
-+
-+    switch (op1) {
-+    case 0: /* STG */
-+        if (op2 != 0) {
-+            /* STG */
-+            index = op2 - 2;
-+            break;
-+        }
-+        goto do_unallocated;
-+    case 1:
-+        if (op2 != 0) {
-+            /* STZG */
-+            is_zero = true;
-+            index = op2 - 2;
-+        } else {
-+            /* LDG */
-+            is_load = true;
-+        }
-+        break;
-+    case 2:
-+        if (op2 != 0) {
-+            /* ST2G */
-+            is_pair = true;
-+            index = op2 - 2;
-+            break;
-+        }
-+        goto do_unallocated;
-+    case 3:
-+        if (op2 != 0) {
-+            /* STZ2G */
-+            is_pair = is_zero = true;
-+            index = op2 - 2;
-+            break;
-+        }
-+        goto do_unallocated;
-+
-+    default:
-+    do_unallocated:
-+        unallocated_encoding(s);
-+        return;
-+    }
-+
-+    dirty_addr = read_cpu_reg_sp(s, rn, true);
-+    if (index <= 0) {
-+        /* pre-index or signed offset */
-+        tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
-+    }
-+
-+    clean_addr = clean_data_tbi(s, dirty_addr, false);
-+    tcg_rt = cpu_reg(s, rt);
-+
-+    if (is_load) {
-+        gen_helper_ldg(tcg_rt, cpu_env, clean_addr, tcg_rt);
-+    } else if (tb_cflags(s->base.tb) & CF_PARALLEL) {
-+        if (is_pair) {
-+            gen_helper_st2g_parallel(cpu_env, clean_addr, tcg_rt);
-+        } else {
-+            gen_helper_stg_parallel(cpu_env, clean_addr, tcg_rt);
-+        }
-+    } else {
-+        if (is_pair) {
-+            gen_helper_st2g(cpu_env, clean_addr, tcg_rt);
-+        } else {
-+            gen_helper_stg(cpu_env, clean_addr, tcg_rt);
-+        }
-+    }
-+
-+    if (is_zero) {
-+        TCGv_i64 tcg_zero = tcg_const_i64(0);
-+        int mem_index = get_mem_index(s);
-+        int i, n = (1 + is_pair) << LOG2_TAG_GRANULE;
-+
-+        for (i = 0; i < n; i += 8) {
-+            tcg_gen_qemu_st_i64(tcg_zero, clean_addr, mem_index, MO_Q);
-+            tcg_gen_addi_i64(clean_addr, clean_addr, 8);
-+        }
-+        tcg_temp_free_i64(tcg_zero);
-+    }
-+
-+    if (index != 0) {
-+        /* pre-index or post-index */
-+        if (index > 0) {
-+            /* post-index */
-+            tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
-+        }
-+        tcg_gen_mov_i64(cpu_reg_sp(s, rn), dirty_addr);
-+    }
-+}
-+
- /* Loads and stores */
- static void disas_ldst(DisasContext *s, uint32_t insn)
+@@ -211,12 +211,12 @@ static void gen_a64_set_pc(DisasContext *s, TCGv_i64 src)
+  * This is always a fresh temporary, as we need to be able to
+  * increment this independently of a dirty write-back address.
+  */
+-static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr)
++static TCGv_i64 clean_data_tbi(DisasContext *s, TCGv_i64 addr, bool check)
  {
-@@ -3583,6 +3695,9 @@ static void disas_ldst(DisasContext *s, uint32_t insn)
-     case 0x0d: /* AdvSIMD load/store single structure */
-         disas_ldst_single_struct(s, insn);
-         break;
-+    case 0x19: /* Load/store tag */
-+        disas_ldst_tag(s, insn);
-+        break;
-     default:
-         unallocated_encoding(s);
-         break;
+     TCGv_i64 clean = new_tmp_a64(s);
+ 
+     /* Note that s->mte_active already includes a check for s->tbid != 0. */
+-    if (!s->mte_active) {
++    if (!check || !s->mte_active) {
+         gen_top_byte_ignore(s, clean, addr, s->tbid);
+     } else if (!regime_has_2_ranges(s->mmu_idx)) {
+         gen_helper_mte_check1(clean, cpu_env, addr);
+@@ -2334,7 +2334,7 @@ static void gen_compare_and_swap(DisasContext *s, int rs, int rt,
+     if (rn == 31) {
+         gen_check_sp_alignment(s);
+     }
+-    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+     tcg_gen_atomic_cmpxchg_i64(tcg_rs, clean_addr, tcg_rs, tcg_rt, memidx,
+                                size | MO_ALIGN | s->be_data);
+ }
+@@ -2352,7 +2352,7 @@ static void gen_compare_and_swap_pair(DisasContext *s, int rs, int rt,
+     if (rn == 31) {
+         gen_check_sp_alignment(s);
+     }
+-    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+ 
+     if (size == 2) {
+         TCGv_i64 cmp = tcg_temp_new_i64();
+@@ -2477,7 +2477,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+         if (is_lasr) {
+             tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+         }
+-        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+         gen_store_exclusive(s, rs, rt, rt2, clean_addr, size, false);
+         return;
+ 
+@@ -2486,7 +2486,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+         if (rn == 31) {
+             gen_check_sp_alignment(s);
+         }
+-        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+         s->is_ldex = true;
+         gen_load_exclusive(s, rt, rt2, clean_addr, size, false);
+         if (is_lasr) {
+@@ -2506,7 +2506,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+             gen_check_sp_alignment(s);
+         }
+         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+-        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+         do_gpr_st(s, cpu_reg(s, rt), clean_addr, size, true, rt,
+                   disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
+         return;
+@@ -2522,7 +2522,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+         if (rn == 31) {
+             gen_check_sp_alignment(s);
+         }
+-        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++        clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+         do_gpr_ld(s, cpu_reg(s, rt), clean_addr, size, false, false, true, rt,
+                   disas_ldst_compute_iss_sf(size, false, 0), is_lasr);
+         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
+@@ -2536,7 +2536,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+             if (is_lasr) {
+                 tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
+             }
+-            clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++            clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+             gen_store_exclusive(s, rs, rt, rt2, clean_addr, size, true);
+             return;
+         }
+@@ -2554,7 +2554,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+             if (rn == 31) {
+                 gen_check_sp_alignment(s);
+             }
+-            clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++            clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+             s->is_ldex = true;
+             gen_load_exclusive(s, rt, rt2, clean_addr, size, true);
+             if (is_lasr) {
+@@ -2744,7 +2744,7 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+     if (!postindex) {
+         tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+     }
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, wback || rn != 31);
+ 
+     if (is_vector) {
+         if (is_load) {
+@@ -2882,7 +2882,7 @@ static void disas_ldst_reg_imm9(DisasContext *s, uint32_t insn,
+     if (!post_index) {
+         tcg_gen_addi_i64(dirty_addr, dirty_addr, imm9);
+     }
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, writeback || rn != 31);
+ 
+     if (is_vector) {
+         if (is_store) {
+@@ -2989,7 +2989,7 @@ static void disas_ldst_reg_roffset(DisasContext *s, uint32_t insn,
+     ext_and_shift_reg(tcg_rm, tcg_rm, opt, shift ? size : 0);
+ 
+     tcg_gen_add_i64(dirty_addr, dirty_addr, tcg_rm);
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, true);
+ 
+     if (is_vector) {
+         if (is_store) {
+@@ -3074,7 +3074,7 @@ static void disas_ldst_reg_unsigned_imm(DisasContext *s, uint32_t insn,
+     dirty_addr = read_cpu_reg_sp(s, rn, 1);
+     offset = imm12 << size;
+     tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, rn != 31);
+ 
+     if (is_vector) {
+         if (is_store) {
+@@ -3158,7 +3158,7 @@ static void disas_ldst_atomic(DisasContext *s, uint32_t insn,
+     if (rn == 31) {
+         gen_check_sp_alignment(s);
+     }
+-    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn));
++    clean_addr = clean_data_tbi(s, cpu_reg_sp(s, rn), rn != 31);
+     tcg_rs = read_cpu_reg(s, rs, true);
+ 
+     if (o3_opc == 1) { /* LDCLR */
+@@ -3220,7 +3220,7 @@ static void disas_ldst_pac(DisasContext *s, uint32_t insn,
+     tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
+ 
+     /* Note that "clean" and "dirty" here refer to TBI not PAC.  */
+-    clean_addr = clean_data_tbi(s, dirty_addr);
++    clean_addr = clean_data_tbi(s, dirty_addr, is_wback || rn != 31);
+ 
+     tcg_rt = cpu_reg(s, rt);
+     do_gpr_ld(s, tcg_rt, clean_addr, size, /* is_signed */ false,
+@@ -3380,7 +3380,7 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+     elements = (is_q ? 16 : 8) / ebytes;
+ 
+     tcg_rn = cpu_reg_sp(s, rn);
+-    clean_addr = clean_data_tbi(s, tcg_rn);
++    clean_addr = clean_data_tbi(s, tcg_rn, is_postidx || rn != 31);
+     tcg_ebytes = tcg_const_i64(ebytes);
+ 
+     for (r = 0; r < rpt; r++) {
+@@ -3523,7 +3523,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+     }
+ 
+     tcg_rn = cpu_reg_sp(s, rn);
+-    clean_addr = clean_data_tbi(s, tcg_rn);
++    clean_addr = clean_data_tbi(s, tcg_rn, is_postidx || rn != 31);
+     tcg_ebytes = tcg_const_i64(ebytes);
+ 
+     for (xs = 0; xs < selem; xs++) {
 -- 
 2.17.1
 
