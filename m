@@ -2,69 +2,61 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB72C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 11:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F740C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 11:14:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90D41206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 11:12:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90D41206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 5E118206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 11:14:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E118206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIsq1-0003Q0-JH
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 07:12:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42192)
+	id 1iIssW-0004ed-H7
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 07:14:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iIsp7-0002rf-9g
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 07:11:06 -0400
+ (envelope-from <armbru@redhat.com>) id 1iIsre-0004Cv-02
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 07:13:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iIsp5-0004t3-01
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 07:11:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56620)
+ (envelope-from <armbru@redhat.com>) id 1iIsrc-0006RZ-Sh
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 07:13:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37772)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iIsp4-0004sh-Qm
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 07:11:02 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iIsrc-0006R6-NF
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 07:13:40 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 065B73065603;
- Fri, 11 Oct 2019 11:11:02 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id F12BBC05AA57;
+ Fri, 11 Oct 2019 11:13:39 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB074196B2;
- Fri, 11 Oct 2019 11:11:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C262F6012A;
+ Fri, 11 Oct 2019 11:13:39 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2B22E1138619; Fri, 11 Oct 2019 13:10:54 +0200 (CEST)
+ id 81F041138619; Fri, 11 Oct 2019 13:13:37 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v2 2/2] qapi: Allow introspecting fix for savevm's
- cooperation with blockdev
-References: <cover.1568989362.git.pkrempa@redhat.com>
- <992ea9ca130b4fb6dbf82726aa3b1d8040c16944.1568989362.git.pkrempa@redhat.com>
- <87r23w2rbp.fsf@dusky.pond.sub.org>
- <b15fdae1-1e70-fe13-701e-48a04d56c93f@redhat.com>
- <87a7ajuzpw.fsf@dusky.pond.sub.org>
- <20191010150733.GE7616@localhost.localdomain>
- <87r23jlsql.fsf@dusky.pond.sub.org>
- <20191011090036.GA5158@localhost.localdomain>
-Date: Fri, 11 Oct 2019 13:10:54 +0200
-In-Reply-To: <20191011090036.GA5158@localhost.localdomain> (Kevin Wolf's
- message of "Fri, 11 Oct 2019 11:00:36 +0200")
-Message-ID: <8736fzfsg1.fsf@dusky.pond.sub.org>
+To: Tianjia Zhang <77389867@qq.com>
+Subject: Re: [PATCH] tests: fix counting typo error
+References: <20191010121702.90142-1-77389867@qq.com>
+Date: Fri, 11 Oct 2019 13:13:37 +0200
+In-Reply-To: <20191010121702.90142-1-77389867@qq.com> (Tianjia Zhang's message
+ of "Thu, 10 Oct 2019 20:17:02 +0800")
+Message-ID: <87y2xredr2.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 11 Oct 2019 11:11:02 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Fri, 11 Oct 2019 11:13:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -79,58 +71,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Tianjia Zhang <77389867@qq.com> writes:
 
-> Am 11.10.2019 um 08:08 hat Markus Armbruster geschrieben:
->> Kevin Wolf <kwolf@redhat.com> writes:
->> 
->> > Am 02.10.2019 um 13:57 hat Markus Armbruster geschrieben:
-[...]
->> >> So the problem is certain (common & sane) -blockdev use makes savevm
->> >> create additional, unwanted snapshots.
->> >
->> > Actually, the most common protocol driver is file-posix, which doesn't
->> > support snapshots, so usually the result was that savevm just fails
->> > because it can't snapshot something that it (incorrectly) thinks it
->> > should snapshot.
->> 
->> v3's commit message:
->> 
->>     qapi: Allow introspecting fix for savevm's cooperation with blockdev
->>     
->>     'savevm' was buggy as it considered all monitor-owned block device nodes
->>     for snapshot. With introduction of -blockdev the common usage made all
->>     nodes including protocol and backing file nodes monitor-owned and thus
->>     considered for snapshot.
->>     
->>     This is a problem since the 'file' protocol nodes can't have internal
->>     snapshots and it does not make sense to take snapshot of nodes
->>     representing backing files.
->>     
->>     This was fixed by commit 05f4aced658a02b02 clients need to be able to
->>     detect whether this fix is present.
+> Instead of global variables, local variables should be incrementing,
+> This is a typo fix.
+
+Impact?
+
+The commit message calls it a "typo", which suggests there is none.  The
+patch makes me suspect the bug is more serious than that.
+
 >
-> Something is missing in this sentence. I think you lost the "but" from
-> the original message.
-
-I fixed this in v4 by inserting a period.  I wasn't aware we had lost a
-"but".
-
->>     Since savevm does not have an QMP alternative, add the feature for the
->>     'human-monitor-command' backdoor which is used to call this command in
->>     modern use.
->>     
->>     Signed-off-by: Peter Krempa <pkrempa@redhat.com>
->>  
->> Kevin, is this explanation sufficiently correct & complete?
+> Signed-off-by: Tianjia Zhang <77389867@qq.com>
+> ---
+>  tests/test-rcu-list.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Looks good to me otherwise.
-
-Thanks!
+> diff --git a/tests/test-rcu-list.c b/tests/test-rcu-list.c
+> index 6f076473e0..c0fc47ded4 100644
+> --- a/tests/test-rcu-list.c
+> +++ b/tests/test-rcu-list.c
+> @@ -219,7 +219,7 @@ static void *rcu_q_updater(void *arg)
+>              j++;
+>              if (target_el == j) {
+>                  struct list_element *new_el = g_new(struct list_element, 1);
+> -                n_nodes += n_nodes_local;
+> +                n_nodes_local++;
+>                  TEST_LIST_INSERT_AFTER_RCU(el, new_el, entry);
+>                  break;
+>              }
 
