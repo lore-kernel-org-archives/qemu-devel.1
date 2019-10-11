@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7218ECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EE5ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:29:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE0722064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:28:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0722064A
+	by mail.kernel.org (Postfix) with ESMTPS id 7F2392064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:29:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2392064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyiN-0006oZ-Lm
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:28:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41263)
+	id 1iIyix-0007Vo-IM
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:29:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlA-0006jV-8D
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:21 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRD-0006jF-2U
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxl6-0002J0-Hc
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:19 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49774)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0004om-NW
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:42 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48468)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxl4-0002GX-LT; Fri, 11 Oct 2019 12:27:14 -0400
+ id 1iIxR8-0004WH-B7
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR7-0003XG-GU; Fri, 11 Oct 2019 19:06:37 +0300
+ id 1iIxQw-0003XG-9B; Fri, 11 Oct 2019 19:06:26 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 113/126] qcow: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:39 +0300
-Message-Id: <20191011160552.22907-114-vsementsov@virtuozzo.com>
+Subject: [RFC v5 089/126] I/O Channels: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:15 +0300
+Message-Id: <20191011160552.22907-90-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +61,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
- Greg Kurz <groug@kaod.org>
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ armbru@redhat.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,77 +111,81 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ io/dns-resolver.c | 7 +++----
+ io/net-listener.c | 7 +++----
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 5bdf72ba33..c58d3e36be 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -117,11 +117,11 @@ static QemuOptsList qcow_runtime_opts = {
- static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-                      Error **errp)
+diff --git a/io/dns-resolver.c b/io/dns-resolver.c
+index 6ebe2a5650..a45c5ca0c8 100644
+--- a/io/dns-resolver.c
++++ b/io/dns-resolver.c
+@@ -52,13 +52,13 @@ static int qio_dns_resolver_lookup_sync_inet(QIODNSResolver *resolver,
+                                              SocketAddress ***addrs,
+                                              Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     BDRVQcowState *s = bs->opaque;
-     unsigned int len, i, shift;
-     int ret;
-     QCowHeader header;
--    Error *local_err = NULL;
-     QCryptoBlockOpenOptions *crypto_opts = NULL;
-     unsigned int cflags = 0;
-     QDict *encryptopts = NULL;
-@@ -314,9 +314,8 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-     error_setg(&s->migration_blocker, "The qcow format used by node '%s' "
-                "does not support live migration",
-                bdrv_get_device_or_node_name(bs));
--    ret = migrate_add_blocker(s->migration_blocker, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    ret = migrate_add_blocker(s->migration_blocker, errp);
-+    if (*errp) {
-         error_free(s->migration_blocker);
-         goto fail;
+     struct addrinfo ai, *res, *e;
+     InetSocketAddress *iaddr = &addr->u.inet;
+     char port[33];
+     char uaddr[INET6_ADDRSTRLEN + 1];
+     char uport[33];
+     int rc;
+-    Error *err = NULL;
+     size_t i;
+ 
+     *naddrs = 0;
+@@ -69,11 +69,10 @@ static int qio_dns_resolver_lookup_sync_inet(QIODNSResolver *resolver,
+     if (iaddr->has_numeric && iaddr->numeric) {
+         ai.ai_flags |= AI_NUMERICHOST | AI_NUMERICSERV;
      }
-@@ -942,12 +941,12 @@ exit:
- static int coroutine_fn qcow_co_create_opts(const char *filename,
-                                             QemuOpts *opts, Error **errp)
+-    ai.ai_family = inet_ai_family_from_address(iaddr, &err);
++    ai.ai_family = inet_ai_family_from_address(iaddr, errp);
+     ai.ai_socktype = SOCK_STREAM;
+ 
+-    if (err) {
+-        error_propagate(errp, err);
++    if (*errp) {
+         return -1;
+     }
+ 
+diff --git a/io/net-listener.c b/io/net-listener.c
+index 5d8a226872..ba000e7ede 100644
+--- a/io/net-listener.c
++++ b/io/net-listener.c
+@@ -65,11 +65,11 @@ int qio_net_listener_open_sync(QIONetListener *listener,
+                                int num,
+                                Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptions *create_options = NULL;
-     BlockDriverState *bs = NULL;
-     QDict *qdict;
-     Visitor *v;
-     const char *val;
--    Error *local_err = NULL;
-     int ret;
+     QIODNSResolver *resolver = qio_dns_resolver_get_instance();
+     SocketAddress **resaddrs;
+     size_t nresaddrs;
+     size_t i;
+-    Error *err = NULL;
+     bool success = false;
  
-     static const QDictRenames opt_renames[] = {
-@@ -977,9 +976,8 @@ static int coroutine_fn qcow_co_create_opts(const char *filename,
+     if (qio_dns_resolver_lookup_sync(resolver,
+@@ -84,7 +84,7 @@ int qio_net_listener_open_sync(QIONetListener *listener,
+         QIOChannelSocket *sioc = qio_channel_socket_new();
+ 
+         if (qio_channel_socket_listen_sync(sioc, resaddrs[i], num,
+-                                           err ? NULL : &err) == 0) {
++                                           *errp ? NULL : errp) == 0) {
+             success = true;
+ 
+             qio_net_listener_add(listener, sioc);
+@@ -96,10 +96,9 @@ int qio_net_listener_open_sync(QIONetListener *listener,
+     g_free(resaddrs);
+ 
+     if (success) {
+-        error_free(err);
++        error_free_errp(errp);
+         return 0;
+     } else {
+-        error_propagate(errp, err);
+         return -1;
      }
- 
-     /* Create and open the file (protocol layer) */
--    ret = bdrv_create_file(filename, opts, &local_err);
-+    ret = bdrv_create_file(filename, opts, errp);
-     if (ret < 0) {
--        error_propagate(errp, local_err);
-         goto fail;
-     }
- 
-@@ -1000,11 +998,10 @@ static int coroutine_fn qcow_co_create_opts(const char *filename,
-         goto fail;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
+ }
 -- 
 2.21.0
 
