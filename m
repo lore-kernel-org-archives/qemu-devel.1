@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ACC1C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC5CECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:26:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3AD820673
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:24:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3AD820673
+	by mail.kernel.org (Postfix) with ESMTPS id 7BDEF20673
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:26:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BDEF20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIza3-0005RD-PK
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:23:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40488)
+	id 1iIzcc-00086V-CD
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:26:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40548)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgu-0000Um-8F
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:57 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxh9-0000pN-1l
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgs-00086y-O6
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:56 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49656)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxh7-0008IJ-L3
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:10 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49680)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxgs-00086p-H3
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:54 -0400
+ id 1iIxh7-0008H0-BL; Fri, 11 Oct 2019 12:23:09 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR9-0003XG-CQ; Fri, 11 Oct 2019 19:06:39 +0300
+ id 1iIxR5-0003XG-8N; Fri, 11 Oct 2019 19:06:35 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 122/126] iothread.c: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:48 +0300
-Message-Id: <20191011160552.22907-123-vsementsov@virtuozzo.com>
+Subject: [RFC v5 108/126] blkverify: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:34 +0300
+Message-Id: <20191011160552.22907-109-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +59,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,84 +110,56 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- iothread.c | 27 +++++++++++----------------
- 1 file changed, 11 insertions(+), 16 deletions(-)
+ block/blkverify.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/iothread.c b/iothread.c
-index 7130be58e3..726b60df53 100644
---- a/iothread.c
-+++ b/iothread.c
-@@ -163,15 +163,14 @@ static void iothread_init_gcontext(IOThread *iothread)
- 
- static void iothread_complete(UserCreatable *obj, Error **errp)
- {
--    Error *local_error = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     IOThread *iothread = IOTHREAD(obj);
-     char *name, *thread_name;
- 
-     iothread->stopping = false;
-     iothread->running = true;
--    iothread->ctx = aio_context_new(&local_error);
-+    iothread->ctx = aio_context_new(errp);
-     if (!iothread->ctx) {
--        error_propagate(errp, local_error);
-         return;
-     }
- 
-@@ -185,9 +184,8 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
-                                 iothread->poll_max_ns,
-                                 iothread->poll_grow,
-                                 iothread->poll_shrink,
--                                &local_error);
--    if (local_error) {
--        error_propagate(errp, local_error);
-+                                errp);
-+    if (*errp) {
-         aio_context_unref(iothread->ctx);
-         iothread->ctx = NULL;
-         return;
-@@ -237,21 +235,21 @@ static void iothread_get_poll_param(Object *obj, Visitor *v,
- static void iothread_set_poll_param(Object *obj, Visitor *v,
-         const char *name, void *opaque, Error **errp)
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 304b0a1368..96e54f8439 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -110,35 +110,32 @@ static QemuOptsList runtime_opts = {
+ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
+                           Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     IOThread *iothread = IOTHREAD(obj);
-     PollParamInfo *info = opaque;
-     int64_t *field = (void *)iothread + info->offset;
+     BDRVBlkverifyState *s = bs->opaque;
+     QemuOpts *opts;
 -    Error *local_err = NULL;
-     int64_t value;
+     int ret;
  
--    visit_type_int64(v, name, &value, &local_err);
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
 -    if (local_err) {
--        goto out;
-+    visit_type_int64(v, name, &value, errp);
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, options, errp);
 +    if (*errp) {
-+        return;
+         ret = -EINVAL;
+         goto fail;
      }
  
-     if (value < 0) {
--        error_setg(&local_err, "%s value must be in range [0, %"PRId64"]",
-+        error_setg(errp, "%s value must be in range [0, %"PRId64"]",
-                    info->name, INT64_MAX);
--        goto out;
-+        return;
+     /* Open the raw file */
+     bs->file = bdrv_open_child(qemu_opt_get(opts, "x-raw"), options, "raw",
+-                               bs, &child_file, false, &local_err);
+-    if (local_err) {
++                               bs, &child_file, false, errp);
++    if (*errp) {
+         ret = -EINVAL;
+-        error_propagate(errp, local_err);
+         goto fail;
      }
  
-     *field = value;
-@@ -261,11 +259,8 @@ static void iothread_set_poll_param(Object *obj, Visitor *v,
-                                     iothread->poll_max_ns,
-                                     iothread->poll_grow,
-                                     iothread->poll_shrink,
--                                    &local_err);
-+                                    errp);
+     /* Open the test file */
+     s->test_file = bdrv_open_child(qemu_opt_get(opts, "x-image"), options,
+                                    "test", bs, &child_format, false,
+-                                   &local_err);
+-    if (local_err) {
++                                   errp);
++    if (*errp) {
+         ret = -EINVAL;
+-        error_propagate(errp, local_err);
+         goto fail;
      }
--
--out:
--    error_propagate(errp, local_err);
- }
  
- static void iothread_class_init(ObjectClass *klass, void *class_data)
 -- 
 2.21.0
 
