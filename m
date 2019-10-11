@@ -6,43 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD79C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A151ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:37:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63BB12084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:37:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63BB12084C
+	by mail.kernel.org (Postfix) with ESMTPS id 331212084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:37:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 331212084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyqp-0001ER-E0
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:37:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41604)
+	id 1iIyrJ-0001lL-1E
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:37:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37273)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmI-0007jg-JH
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:31 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRL-0006yE-Lm
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmH-0002tX-6e
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:30 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49982)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRK-0004x5-0P
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:51 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48542)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxmG-0002tD-W2
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:29 -0400
+ id 1iIxRJ-0004bD-Oh; Fri, 11 Oct 2019 12:06:49 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR9-0003XG-PN; Fri, 11 Oct 2019 19:06:39 +0300
+ id 1iIxQy-0003XG-8Z; Fri, 11 Oct 2019 19:06:28 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 125/126] tests/test-image-locking.c: introduce
- ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:51 +0300
-Message-Id: <20191011160552.22907-126-vsementsov@virtuozzo.com>
+Subject: [RFC v5 096/126] VHDX: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:22 +0300
+Message-Id: <20191011160552.22907-97-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,8 +59,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, Jeff Cody <codyprime@gmail.com>, armbru@redhat.com,
+ Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,37 +110,101 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/test-image-locking.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ block/vhdx-log.c |  1 +
+ block/vhdx.c     | 22 +++++++++-------------
+ 2 files changed, 10 insertions(+), 13 deletions(-)
 
-diff --git a/tests/test-image-locking.c b/tests/test-image-locking.c
-index ba057bd66c..4c996bdf55 100644
---- a/tests/test-image-locking.c
-+++ b/tests/test-image-locking.c
-@@ -35,20 +35,19 @@ static BlockBackend *open_image(const char *path,
-                                 uint64_t perm, uint64_t shared_perm,
-                                 Error **errp)
+diff --git a/block/vhdx-log.c b/block/vhdx-log.c
+index fdd3a7adc3..176e03327b 100644
+--- a/block/vhdx-log.c
++++ b/block/vhdx-log.c
+@@ -748,6 +748,7 @@ exit:
+ int vhdx_parse_log(BlockDriverState *bs, BDRVVHDXState *s, bool *flushed,
+                    Error **errp)
  {
--    Error *local_err = NULL;
 +    ERRP_AUTO_PROPAGATE();
-     BlockBackend *blk;
-     QDict *options = qdict_new();
+     int ret = 0;
+     VHDXHeader *hdr;
+     VHDXLogSequence logs = { 0 };
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 6a09d0a55c..e3ca23214c 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -898,11 +898,11 @@ static void vhdx_close(BlockDriverState *bs)
+ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
+                      Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVVHDXState *s = bs->opaque;
+     int ret = 0;
+     uint32_t i;
+     uint64_t signature;
+-    Error *local_err = NULL;
  
-     qdict_put_str(options, "driver", "raw");
--    blk = blk_new_open(path, NULL, options, BDRV_O_RDWR, &local_err);
-+    blk = blk_new_open(path, NULL, options, BDRV_O_RDWR, errp);
-     if (blk) {
--        g_assert_null(local_err);
-+        g_assert_null(*errp);
-         if (blk_set_perm(blk, perm, shared_perm, errp)) {
-             blk_unref(blk);
-             blk = NULL;
-         }
-     } else {
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+@@ -931,9 +931,8 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
+      * header update */
+     vhdx_guid_generate(&s->session_guid);
+ 
+-    vhdx_parse_header(bs, s, &local_err);
+-    if (local_err != NULL) {
 -        error_propagate(errp, local_err);
++    vhdx_parse_header(bs, s, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
      }
-     return blk;
- }
+@@ -1007,9 +1006,8 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The vhdx format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (*errp) {
+         error_free(s->migration_blocker);
+         goto fail;
+     }
+@@ -1966,11 +1964,11 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
+                                             QemuOpts *opts,
+                                             Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockdevCreateOptions *create_options = NULL;
+     QDict *qdict;
+     Visitor *v;
+     BlockDriverState *bs = NULL;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     static const QDictRenames opt_renames[] = {
+@@ -1989,9 +1987,8 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
+     }
+ 
+     /* Create and open the file (protocol layer) */
+-    ret = bdrv_create_file(filename, opts, &local_err);
++    ret = bdrv_create_file(filename, opts, errp);
+     if (ret < 0) {
+-        error_propagate(errp, local_err);
+         goto fail;
+     }
+ 
+@@ -2012,11 +2009,10 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
+         goto fail;
+     }
+ 
+-    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
++    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
+     visit_free(v);
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
+     }
 -- 
 2.21.0
 
