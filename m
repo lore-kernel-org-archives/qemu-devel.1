@@ -2,63 +2,63 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D00C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E9DC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:54:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 264C02084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:53:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264C02084C
+	by mail.kernel.org (Postfix) with ESMTPS id 69A812084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:54:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69A812084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ2qa-0005Dg-CA
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:53:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55582)
+	id 1iJ2rz-0006k5-KL
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:54:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iJ2Sq-00055F-Ux
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:28:46 -0400
+ (envelope-from <eblake@redhat.com>) id 1iJ2aQ-0003V0-6k
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iJ2Sp-0001gv-SC
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:28:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33104)
+ (envelope-from <eblake@redhat.com>) id 1iJ2aP-00048K-7P
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:36:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57746)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iJ2Sp-0001gg-LS
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:28:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iJ2aM-00047l-SN; Fri, 11 Oct 2019 17:36:31 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E4FBD30A5404;
- Fri, 11 Oct 2019 21:28:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 211FA10A8126;
+ Fri, 11 Oct 2019 21:36:30 +0000 (UTC)
 Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E9B310018F8;
- Fri, 11 Oct 2019 21:28:42 +0000 (UTC)
-To: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC8CE194BB;
+ Fri, 11 Oct 2019 21:36:29 +0000 (UTC)
+Subject: Re: [PATCH 2/4] qemu-io: Support help options for --object
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20191011205551.32149-1-kwolf@redhat.com>
+ <20191011205551.32149-3-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Subject: ideas towards requiring VPATH build
 Organization: Red Hat, Inc.
-Message-ID: <aa953b8f-daa2-e6dc-da4b-b7cb598c2c0e@redhat.com>
-Date: Fri, 11 Oct 2019 16:28:41 -0500
+Message-ID: <edbd7033-32c1-2152-f0cd-5d6f204c0cad@redhat.com>
+Date: Fri, 11 Oct 2019 16:36:29 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
+In-Reply-To: <20191011205551.32149-3-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 11 Oct 2019 21:28:42 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.64]); Fri, 11 Oct 2019 21:36:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -73,39 +73,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I know we've talked about enforcing a VPATH build, but haven't yet 
-flipped the switch.  This week, I've played with using a VPATH build (cd 
-qemu; mkdir -p build; cd ./build; ../configure ...; make ...), but find 
-my old habits of expecting an in-tree build to just work (cd qemu; make 
-...) hard to overcome.  So this is what I've come up with: if you place 
-the following file in-tree, then any 'make ...' command you type in-tree 
-without using -C will have the same effect as if you had typed the same 
-command in the build directory, but without having to manually remember 
-to switch to the build directory.
+On 10/11/19 3:55 PM, Kevin Wolf wrote:
+> Instead of parsing help options as normal object properties and
+> returning an error, provide the same help functionality as the system
+> emulator in qemu-io, too.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   qemu-io.c | 9 ++++++++-
+>   1 file changed, 8 insertions(+), 1 deletion(-)
+> 
 
-Perhaps this can be a starting point for a patch to actually include 
-this file in qemu.git as part of the larger effort to force VPATH 
-builds, while still having the convenience of in-tree make working for 
-those who were used to it.  (I places an echo and sleep in my file to 
-remind myself when I forgot to use the build directory, but that is not 
-mandatory if we want GNUmakefile stored in qemu.git).
-
-Presumably, any full switch to force a VPATH build would also include 
-creating the build directory as needed (my hack assumes that it already 
-exists).
-
-$ cat GNUmakefile
-# Hack for redirecting while reminding myself to use distinct builddir
-%: force
-	@echo 'changing directory to build...'
-	@sleep 2
-	@$(MAKE) -C build -f Makefile $(MAKECMDGOALS)
-force: ;
-GNUmakefile: ;
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
