@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45074C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6648AC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:51:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0986206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:49:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0986206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 3741E206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:51:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3741E206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIz2G-0006K5-NQ
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:49:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36837)
+	id 1iIz4B-00006A-29
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:51:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0006bJ-Ef
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:41 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmd-0007vk-1b
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR6-0004kw-0D
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48408)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxma-0003Cy-Ty
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:50 -0400
+Received: from relay.sw.ru ([185.231.240.75]:50016)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR5-0004SQ-Nu
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
+ id 1iIxmZ-0003Ca-TE; Fri, 11 Oct 2019 12:28:48 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQu-0003XG-8Y; Fri, 11 Oct 2019 19:06:24 +0300
+ id 1iIxR4-0003XG-1s; Fri, 11 Oct 2019 19:06:34 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 083/126] QMP: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:09 +0300
-Message-Id: <20191011160552.22907-84-vsementsov@virtuozzo.com>
+Subject: [RFC v5 106/126] Quorum: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:32 +0300
+Message-Id: <20191011160552.22907-107-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +59,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, armbru@redhat.com,
+ Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,35 +110,101 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- monitor/qmp-cmds.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ block/quorum.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-index c6faa3eaf0..2db3199a2e 100644
---- a/monitor/qmp-cmds.c
-+++ b/monitor/qmp-cmds.c
-@@ -126,9 +126,9 @@ void qmp_x_exit_preconfig(Error **errp)
- 
- void qmp_cont(Error **errp)
+diff --git a/block/quorum.c b/block/quorum.c
+index df68adcfaa..5c531e1ec5 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -861,8 +861,8 @@ static QemuOptsList quorum_runtime_opts = {
+ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+                        Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     BlockBackend *blk;
-     BlockJob *job;
+     BDRVQuorumState *s = bs->opaque;
 -    Error *local_err = NULL;
- 
-     /* if there is a dump in background, we should wait until the dump
-      * finished */
-@@ -161,9 +161,8 @@ void qmp_cont(Error **errp)
-      * If there are no inactive block nodes (e.g. because the VM was just
-      * paused rather than completing a migration), bdrv_inactivate_all() simply
-      * doesn't do anything. */
--    bdrv_invalidate_cache_all(&local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    bdrv_invalidate_cache_all(errp);
-+    if (*errp) {
-         return;
+     QemuOpts *opts = NULL;
+     const char *pattern_str;
+     bool *opened;
+@@ -874,27 +874,27 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+     /* count how many different children are present */
+     s->num_children = qdict_array_entries(options, "children.");
+     if (s->num_children < 0) {
+-        error_setg(&local_err, "Option children is not a valid array");
++        error_setg(errp, "Option children is not a valid array");
+         ret = -EINVAL;
+         goto exit;
      }
+     if (s->num_children < 1) {
+-        error_setg(&local_err,
++        error_setg(errp,
+                    "Number of provided children must be 1 or more");
+         ret = -EINVAL;
+         goto exit;
+     }
+ 
+     opts = qemu_opts_create(&quorum_runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
++    qemu_opts_absorb_qdict(opts, options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto exit;
+     }
+ 
+     s->threshold = qemu_opt_get_number(opts, QUORUM_OPT_VOTE_THRESHOLD, 0);
+     /* and validate it against s->num_children */
+-    ret = quorum_valid_threshold(s->threshold, s->num_children, &local_err);
++    ret = quorum_valid_threshold(s->threshold, s->num_children, errp);
+     if (ret < 0) {
+         goto exit;
+     }
+@@ -907,7 +907,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+                               -EINVAL, NULL);
+     }
+     if (ret < 0) {
+-        error_setg(&local_err, "Please set read-pattern as fifo or quorum");
++        error_setg(errp, "Please set read-pattern as fifo or quorum");
+         goto exit;
+     }
+     s->read_pattern = ret;
+@@ -915,7 +915,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+     if (s->read_pattern == QUORUM_READ_PATTERN_QUORUM) {
+         s->is_blkverify = qemu_opt_get_bool(opts, QUORUM_OPT_BLKVERIFY, false);
+         if (s->is_blkverify && (s->num_children != 2 || s->threshold != 2)) {
+-            error_setg(&local_err, "blkverify=on can only be set if there are "
++            error_setg(errp, "blkverify=on can only be set if there are "
+                        "exactly two files and vote-threshold is 2");
+             ret = -EINVAL;
+             goto exit;
+@@ -924,7 +924,7 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+         s->rewrite_corrupted = qemu_opt_get_bool(opts, QUORUM_OPT_REWRITE,
+                                                  false);
+         if (s->rewrite_corrupted && s->is_blkverify) {
+-            error_setg(&local_err,
++            error_setg(errp,
+                        "rewrite-corrupted=on cannot be used with blkverify=on");
+             ret = -EINVAL;
+             goto exit;
+@@ -941,8 +941,8 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
+         assert(ret < 32);
+ 
+         s->children[i] = bdrv_open_child(NULL, options, indexstr, bs,
+-                                         &child_format, false, &local_err);
+-        if (local_err) {
++                                         &child_format, false, errp);
++        if (*errp) {
+             ret = -EINVAL;
+             goto close_exit;
+         }
+@@ -969,7 +969,6 @@ close_exit:
+ exit:
+     qemu_opts_del(opts);
+     /* propagate error */
+-    error_propagate(errp, local_err);
+     return ret;
+ }
  
 -- 
 2.21.0
