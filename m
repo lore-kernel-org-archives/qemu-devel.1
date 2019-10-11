@@ -2,52 +2,67 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B85EECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ACDAECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:48:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA29D206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:46:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA29D206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F909206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:48:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F909206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIz08-0004aw-Mw
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:46:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37336)
+	id 1iIz1V-0005ad-Pw
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:48:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44892)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRN-00070y-6A
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:54 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIy9F-00015H-Om
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:52:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRL-0004y8-Es
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:53 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48578)
+ (envelope-from <eblake@redhat.com>) id 1iIy9E-0007Z4-PN
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:52:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12687)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxRL-0004cu-6b; Fri, 11 Oct 2019 12:06:51 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQz-0003XG-AJ; Fri, 11 Oct 2019 19:06:29 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC v5 098/126] iSCSI: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:24 +0300
-Message-Id: <20191011160552.22907-99-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iIy9D-0007TA-0p
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:52:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0BCC582A4C9;
+ Fri, 11 Oct 2019 16:52:09 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 88F3A3DA3;
+ Fri, 11 Oct 2019 16:52:08 +0000 (UTC)
+Subject: Re: [RFC v5 010/126] hw/core/qdev: cleanup Error ** variables
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ <20191011160552.22907-11-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <c51fce8f-ee95-1705-85b3-6a9d27b31f3f@redhat.com>
+Date: Fri, 11 Oct 2019 11:52:07 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <20191011160552.22907-11-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Fri, 11 Oct 2019 16:52:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,178 +74,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>, armbru@redhat.com,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+On 10/11/19 11:03 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Rename Error ** parameter in check_only_migratable to common errp.
+> 
+> In device_set_realized:
+> 
+>   - Move "if (local_err != NULL)" closer to error setters.
+> 
+>   - Drop 'Error **local_errp': it doesn't save any LoCs, but it's very
+>     unusual.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   hw/core/qdev.c | 28 +++++++++++++---------------
+>   1 file changed, 13 insertions(+), 15 deletions(-)
+> 
 
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+> @@ -894,27 +893,26 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>          }
+>   
+>       } else if (!value && dev->realized) {
+> -        Error **local_errp = NULL;
+> +        /* We want to catch in local_err only first error */
 
-This commit (together with its neighbors) was generated by
+grammar:
+/* We want local_err to track only the first error */
 
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
+>           QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+> -            local_errp = local_err ? NULL : &local_err;
+>               object_property_set_bool(OBJECT(bus), false, "realized",
+> -                                     local_errp);
+> +                                     local_err ? NULL : &local_err);
+>           }
 
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
+Otherwise,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/iscsi.c | 36 +++++++++++++++---------------------
- 1 file changed, 15 insertions(+), 21 deletions(-)
-
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 506bf5f875..bd825fe40e 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -1779,6 +1779,7 @@ static void iscsi_save_designator(IscsiLun *lun,
- static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-                       Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     IscsiLun *iscsilun = bs->opaque;
-     struct iscsi_context *iscsi = NULL;
-     struct scsi_task *task = NULL;
-@@ -1786,7 +1787,6 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-     struct scsi_inquiry_supported_pages *inq_vpd;
-     char *initiator_name = NULL;
-     QemuOpts *opts;
--    Error *local_err = NULL;
-     const char *transport_name, *portal, *target;
- #if LIBISCSI_API_VERSION >= (20160603)
-     enum iscsi_transport_type transport;
-@@ -1794,9 +1794,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-     int i, ret = 0, timeout = 0, lun;
- 
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_opts_absorb_qdict(opts, options, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -1850,9 +1849,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     /* check if we got CHAP username/password via the options */
--    apply_chap(iscsi, opts, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
-+    apply_chap(iscsi, opts, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -1864,9 +1862,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     /* check if we got HEADER_DIGEST via the options */
--    apply_header_digest(iscsi, opts, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
-+    apply_header_digest(iscsi, opts, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -1918,9 +1915,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-         flags &= ~BDRV_O_RDWR;
-     }
- 
--    iscsi_readcapacity_sync(iscsilun, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
-+    iscsi_readcapacity_sync(iscsilun, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -2124,8 +2120,8 @@ static void iscsi_reopen_commit(BDRVReopenState *reopen_state)
- static int coroutine_fn iscsi_co_truncate(BlockDriverState *bs, int64_t offset,
-                                           PreallocMode prealloc, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     IscsiLun *iscsilun = bs->opaque;
--    Error *local_err = NULL;
- 
-     if (prealloc != PREALLOC_MODE_OFF) {
-         error_setg(errp, "Unsupported preallocation mode '%s'",
-@@ -2138,9 +2134,8 @@ static int coroutine_fn iscsi_co_truncate(BlockDriverState *bs, int64_t offset,
-         return -ENOTSUP;
-     }
- 
--    iscsi_readcapacity_sync(iscsilun, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
-+    iscsi_readcapacity_sync(iscsilun, errp);
-+    if (*errp) {
-         return -EIO;
-     }
- 
-@@ -2159,12 +2154,12 @@ static int coroutine_fn iscsi_co_truncate(BlockDriverState *bs, int64_t offset,
- static int coroutine_fn iscsi_co_create_opts(const char *filename, QemuOpts *opts,
-                                              Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret = 0;
-     int64_t total_size = 0;
-     BlockDriverState *bs;
-     IscsiLun *iscsilun = NULL;
-     QDict *bs_options;
--    Error *local_err = NULL;
- 
-     bs = bdrv_new();
- 
-@@ -2175,9 +2170,8 @@ static int coroutine_fn iscsi_co_create_opts(const char *filename, QemuOpts *opt
-     iscsilun = bs->opaque;
- 
-     bs_options = qdict_new();
--    iscsi_parse_filename(filename, bs_options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    iscsi_parse_filename(filename, bs_options, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-     } else {
-         ret = iscsi_open(bs, bs_options, 0, NULL);
 -- 
-2.21.0
-
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
