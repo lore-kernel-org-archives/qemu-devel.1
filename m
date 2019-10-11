@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E225C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6973BC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:37:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A2432089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:36:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A2432089F
+	by mail.kernel.org (Postfix) with ESMTPS id 239CD2089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:37:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 239CD2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxtt-0006m0-FT
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:36:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36144)
+	id 1iIxuh-0007n5-OA
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:37:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQm-0005ya-Bm
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:17 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR2-0006RG-Na
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQl-0004HD-8C
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:16 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47874)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR0-0004dZ-TX
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:32 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47964)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQl-00046G-0Y
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:15 -0400
+ id 1iIxR0-0004Ar-JU; Fri, 11 Oct 2019 12:06:30 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQZ-0003XG-KW; Fri, 11 Oct 2019 19:06:03 +0300
+ id 1iIxQf-0003XG-79; Fri, 11 Oct 2019 19:06:09 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 017/126] hw/tpm: rename Error ** parameter to more common errp
-Date: Fri, 11 Oct 2019 19:04:03 +0300
-Message-Id: <20191011160552.22907-18-vsementsov@virtuozzo.com>
+Subject: [RFC v5 037/126] S390 Machines: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:23 +0300
+Message-Id: <20191011160552.22907-38-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,54 +59,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, armbru@redhat.com,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ vsementsov@virtuozzo.com, Matthew Rosato <mjrosato@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ armbru@redhat.com, Greg Kurz <groug@kaod.org>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
+
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/tpm/tpm_emulator.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/s390x/ipl.c          | 24 +++++++++++-------------
+ hw/s390x/s390-pci-bus.c | 37 ++++++++++++++++---------------------
+ 2 files changed, 27 insertions(+), 34 deletions(-)
 
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-index 22f9113432..10d587ed40 100644
---- a/hw/tpm/tpm_emulator.c
-+++ b/hw/tpm/tpm_emulator.c
-@@ -155,7 +155,7 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
-                                      const uint8_t *in, uint32_t in_len,
-                                      uint8_t *out, uint32_t out_len,
-                                      bool *selftest_done,
--                                     Error **err)
-+                                     Error **errp)
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index ca544d64c5..46b0a413cf 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -110,12 +110,12 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
+ 
+ static void s390_ipl_realize(DeviceState *dev, Error **errp)
  {
-     ssize_t ret;
-     bool is_selftest = false;
-@@ -165,20 +165,20 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
-         is_selftest = tpm_util_is_selftest(in, in_len);
++    ERRP_AUTO_PROPAGATE();
+     S390IPLState *ipl = S390_IPL(dev);
+     uint32_t *ipl_psw;
+     uint64_t pentry;
+     char *magic;
+     int kernel_size;
+-    Error *err = NULL;
+ 
+     int bios_size;
+     char *bios_filename;
+@@ -133,8 +133,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+ 
+         bios_filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+         if (bios_filename == NULL) {
+-            error_setg(&err, "could not find stage1 bootloader");
+-            goto error;
++            error_setg(errp, "could not find stage1 bootloader");
++            return;
+         }
+ 
+         bios_size = load_elf(bios_filename, NULL,
+@@ -153,8 +153,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+         g_free(bios_filename);
+ 
+         if (bios_size == -1) {
+-            error_setg(&err, "could not load bootloader '%s'", bios_name);
+-            goto error;
++            error_setg(errp, "could not load bootloader '%s'", bios_name);
++            return;
+         }
+ 
+         /* default boot target is the bios */
+@@ -168,8 +168,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+         if (kernel_size < 0) {
+             kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
+             if (kernel_size < 0) {
+-                error_setg(&err, "could not load kernel '%s'", ipl->kernel);
+-                goto error;
++                error_setg(errp, "could not load kernel '%s'", ipl->kernel);
++                return;
+             }
+             /* if this is Linux use KERN_IMAGE_START */
+             magic = rom_ptr(LINUX_MAGIC_ADDR, 6);
+@@ -181,8 +181,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+                 if (ipl_psw) {
+                     pentry = be32_to_cpu(*ipl_psw) & 0x7fffffffUL;
+                 } else {
+-                    error_setg(&err, "Could not get IPL PSW");
+-                    goto error;
++                    error_setg(errp, "Could not get IPL PSW");
++                    return;
+                 }
+             }
+         }
+@@ -215,8 +215,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+             initrd_size = load_image_targphys(ipl->initrd, initrd_offset,
+                                               ram_size - initrd_offset);
+             if (initrd_size == -1) {
+-                error_setg(&err, "could not load initrd '%s'", ipl->initrd);
+-                goto error;
++                error_setg(errp, "could not load initrd '%s'", ipl->initrd);
++                return;
+             }
+ 
+             /*
+@@ -238,8 +238,6 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+     ipl->compat_start_addr = ipl->start_addr;
+     ipl->compat_bios_start_addr = ipl->bios_start_addr;
+     qemu_register_reset(qdev_reset_all_fn, dev);
+-error:
+-    error_propagate(errp, err);
+ }
+ 
+ static Property s390_ipl_properties[] = {
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 2d2f4a7c41..273e32d4ae 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -737,11 +737,11 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
+ 
+ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PCIBus *b;
+     BusState *bus;
+     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
+     S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
+-    Error *local_err = NULL;
+ 
+     DPRINTF("host_init\n");
+ 
+@@ -751,17 +751,15 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+     pci_setup_iommu(b, s390_pci_dma_iommu, s);
+ 
+     bus = BUS(b);
+-    qbus_set_hotplug_handler(bus, OBJECT(dev), &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qbus_set_hotplug_handler(bus, OBJECT(dev), errp);
++    if (*errp) {
+         return;
+     }
+     phb->bus = b;
+ 
+     s->bus = S390_PCI_BUS(qbus_create(TYPE_S390_PCI_BUS, dev, NULL));
+-    qbus_set_hotplug_handler(BUS(s->bus), OBJECT(dev), &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qbus_set_hotplug_handler(BUS(s->bus), OBJECT(dev), errp);
++    if (*errp) {
+         return;
      }
  
--    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, err);
-+    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, errp);
-     if (ret != 0) {
-         return -1;
+@@ -773,8 +771,7 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+     QTAILQ_INIT(&s->zpci_devs);
+ 
+     css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
+-                             S390_ADAPTER_SUPPRESSIBLE, &local_err);
+-    error_propagate(errp, local_err);
++                             S390_ADAPTER_SUPPRESSIBLE, errp);
+ }
+ 
+ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+@@ -821,7 +818,7 @@ static void s390_pci_msix_free(S390PCIBusDevice *pbdev)
+ static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+                                              const char *target, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev;
+ 
+     dev = qdev_try_create(BUS(s->bus), TYPE_S390_PCI_DEVICE);
+@@ -830,17 +827,17 @@ static S390PCIBusDevice *s390_pci_device_new(S390pciState *s,
+         return NULL;
      }
  
-     ret = qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
--              sizeof(struct tpm_resp_hdr), err);
-+              sizeof(struct tpm_resp_hdr), errp);
-     if (ret != 0) {
-         return -1;
+-    object_property_set_str(OBJECT(dev), target, "target", &local_err);
+-    if (local_err) {
++    object_property_set_str(OBJECT(dev), target, "target", errp);
++    if (*errp) {
+         object_unparent(OBJECT(dev));
+-        error_propagate_prepend(errp, local_err,
++        error_prepend(errp,
+                                 "zPCI device could not be created: ");
+         return NULL;
+     }
+-    object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
+-    if (local_err) {
++    object_property_set_bool(OBJECT(dev), true, "realized", errp);
++    if (*errp) {
+         object_unparent(OBJECT(dev));
+-        error_propagate_prepend(errp, local_err,
++        error_prepend(errp,
+                                 "zPCI device could not be created: ");
+         return NULL;
+     }
+@@ -1187,6 +1184,7 @@ static uint32_t s390_pci_generate_fid(S390pciState *s, Error **errp)
+ 
+ static void s390_pci_device_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     S390PCIBusDevice *zpci = S390_PCI_DEVICE(dev);
+     S390pciState *s = s390_get_phb();
+ 
+@@ -1213,11 +1211,8 @@ static void s390_pci_device_realize(DeviceState *dev, Error **errp)
      }
  
-     ret = qio_channel_read_all(tpm_emu->data_ioc,
-               (char *)out + sizeof(struct tpm_resp_hdr),
--              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), err);
-+              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), errp);
-     if (ret != 0) {
-         return -1;
-     }
+     if (!zpci->fid_defined) {
+-        Error *local_error = NULL;
+-
+-        zpci->fid = s390_pci_generate_fid(s, &local_error);
+-        if (local_error) {
+-            error_propagate(errp, local_error);
++        zpci->fid = s390_pci_generate_fid(s, errp);
++        if (*errp) {
+             return;
+         }
+     } else if (s390_pci_find_dev_by_fid(s, zpci->fid)) {
 -- 
 2.21.0
 
