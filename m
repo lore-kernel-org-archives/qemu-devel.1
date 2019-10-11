@@ -2,59 +2,64 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CB2ECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C46FFC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:52:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68B6B2084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:52:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68B6B2084C
+	by mail.kernel.org (Postfix) with ESMTPS id 959F02084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:52:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 959F02084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ2pN-0002yx-JD
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:52:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55417)
+	id 1iJ2qG-0004V5-O1
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:52:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iJ2Rk-0003jN-Is
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:37 -0400
+ (envelope-from <eblake@redhat.com>) id 1iJ2m6-0007BO-Dg
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:48:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iJ2Rj-0001R9-50
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36770)
+ (envelope-from <eblake@redhat.com>) id 1iJ2m5-0007ed-93
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:48:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53654)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iJ2Rf-0001Oj-5A; Fri, 11 Oct 2019 17:27:31 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iJ2m2-0007bh-Dj; Fri, 11 Oct 2019 17:48:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 07CE52D0FC7;
- Fri, 11 Oct 2019 21:27:30 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A566525263;
- Fri, 11 Oct 2019 21:27:28 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 16/19] block/qcow2-bitmap: fix and improve
- qcow2_reopen_bitmaps_rw
-Date: Fri, 11 Oct 2019 17:25:47 -0400
-Message-Id: <20191011212550.27269-17-jsnow@redhat.com>
-In-Reply-To: <20191011212550.27269-1-jsnow@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 80E3C368DA;
+ Fri, 11 Oct 2019 21:48:31 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC18D10016EB;
+ Fri, 11 Oct 2019 21:48:23 +0000 (UTC)
+Subject: Re: [PULL 01/19] util/hbitmap: strict hbitmap_reset
+To: John Snow <jsnow@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org
 References: <20191011212550.27269-1-jsnow@redhat.com>
+ <20191011212550.27269-2-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <15c20480-0240-bdd2-2cc2-60c388022e86@redhat.com>
+Date: Fri, 11 Oct 2019 16:48:22 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20191011212550.27269-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Fri, 11 Oct 2019 21:27:30 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.30]); Fri, 11 Oct 2019 21:48:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -72,165 +77,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
  Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
- John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 10/11/19 4:25 PM, John Snow wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+> hbitmap_reset has an unobvious property: it rounds requested region up.
+> It may provoke bugs, like in recently fixed write-blocking mode of
+> mirror: user calls reset on unaligned region, not keeping in mind that
+> there are possible unrelated dirty bytes, covered by rounded-up region
+> and information of this unrelated "dirtiness" will be lost.
+> 
+> Make hbitmap_reset strict: assert that arguments are aligned, allowing
+> only one exception when @start + @count == hb->orig_size. It's needed
+> to comfort users of hbitmap_next_dirty_area, which cares about
+> hb->orig_size.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Message-Id: <20190806152611.280389-1-vsementsov@virtuozzo.com>
+> [Maintainer edit: Max's suggestions from on-list. --js]
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   include/qemu/hbitmap.h | 5 +++++
+>   tests/test-hbitmap.c   | 2 +-
+>   util/hbitmap.c         | 4 ++++
+>   3 files changed, 10 insertions(+), 1 deletion(-)
+> 
 
-- Correct check for write access to file child, and in correct place
-  (only if we want to write).
-- Support reopen rw -> rw (which will be used in following commit),
-  for example, !bdrv_dirty_bitmap_readonly() is not a corruption if
-  bitmap is marked IN_USE in the image.
-- Consider unexpected bitmap as a corruption and check other
-  combinations of in-image and in-RAM bitmaps.
+> +++ b/util/hbitmap.c
+> @@ -476,6 +476,10 @@ void hbitmap_reset(HBitmap *hb, uint64_t start, uint64_t count)
+>       /* Compute range in the last layer.  */
+>       uint64_t first;
+>       uint64_t last = start + count - 1;
+> +    uint64_t gran = 1ULL << hb->granularity;
+> +
+> +    assert(!(start & (gran - 1)));
+> +    assert(!(count & (gran - 1)) || (start + count == hb->orig_size));
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190927122355.7344-9-vsementsov@virtuozzo.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/qcow2-bitmap.c | 77 +++++++++++++++++++++++++++++++++-----------
- 1 file changed, 58 insertions(+), 19 deletions(-)
+I know I'm replying a bit late (since this is now a pull request), but 
+would it be worth using the dedicated macro:
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index f7dfb40256e..98294a76965 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1108,18 +1108,14 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs,=
- Error **errp)
-     Qcow2BitmapList *bm_list;
-     Qcow2Bitmap *bm;
-     GSList *ro_dirty_bitmaps =3D NULL;
--    int ret =3D 0;
-+    int ret =3D -EINVAL;
-+    bool need_header_update =3D false;
-=20
-     if (s->nb_bitmaps =3D=3D 0) {
-         /* No bitmaps - nothing to do */
-         return 0;
-     }
-=20
--    if (!can_write(bs)) {
--        error_setg(errp, "Can't write to the image on reopening bitmaps =
-rw");
--        return -EINVAL;
--    }
--
-     bm_list =3D bitmap_list_load(bs, s->bitmap_directory_offset,
-                                s->bitmap_directory_size, errp);
-     if (bm_list =3D=3D NULL) {
-@@ -1128,32 +1124,75 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs,=
- Error **errp)
-=20
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-         BdrvDirtyBitmap *bitmap =3D bdrv_find_dirty_bitmap(bs, bm->name)=
-;
--        if (bitmap =3D=3D NULL) {
--            continue;
--        }
-=20
--        if (!bdrv_dirty_bitmap_readonly(bitmap)) {
--            error_setg(errp, "Bitmap %s was loaded prior to rw-reopen, b=
-ut was "
--                       "not marked as readonly. This is a bug, something=
- went "
--                       "wrong. All of the bitmaps may be corrupted", bm-=
->name);
--            ret =3D -EINVAL;
-+        if (!bitmap) {
-+            error_setg(errp, "Unexpected bitmap '%s' in image '%s'",
-+                       bm->name, bs->filename);
-             goto out;
-         }
-=20
--        bm->flags |=3D BME_FLAG_IN_USE;
--        ro_dirty_bitmaps =3D g_slist_append(ro_dirty_bitmaps, bitmap);
-+        if (!(bm->flags & BME_FLAG_IN_USE)) {
-+            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
-+                error_setg(errp, "Corruption: bitmap '%s' is not marked =
-IN_USE "
-+                           "in the image '%s' and not marked readonly in=
- RAM",
-+                           bm->name, bs->filename);
-+                goto out;
-+            }
-+            if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
-+                error_setg(errp, "Corruption: bitmap '%s' is inconsisten=
-t but "
-+                           "is not marked IN_USE in the image '%s'", bm-=
->name,
-+                           bs->filename);
-+                goto out;
-+            }
-+
-+            bm->flags |=3D BME_FLAG_IN_USE;
-+            need_header_update =3D true;
-+        } else {
-+            /*
-+             * What if flags already has BME_FLAG_IN_USE ?
-+             *
-+             * 1. if we are reopening RW -> RW it's OK, of course.
-+             * 2. if we are reopening RO -> RW:
-+             *   2.1 if @bitmap is inconsistent, it's OK. It means that =
-it was
-+             *       inconsistent (IN_USE) when we loaded it
-+             *   2.2 if @bitmap is not inconsistent. This seems to be im=
-possible
-+             *       and implies third party interaction. Let's error-ou=
-t for
-+             *       safety.
-+             */
-+            if (bdrv_dirty_bitmap_readonly(bitmap) &&
-+                !bdrv_dirty_bitmap_inconsistent(bitmap))
-+            {
-+                error_setg(errp, "Corruption: bitmap '%s' is marked IN_U=
-SE "
-+                           "in the image '%s' but it is readonly and "
-+                           "consistent in RAM",
-+                           bm->name, bs->filename);
-+                goto out;
-+            }
-+        }
-+
-+        if (bdrv_dirty_bitmap_readonly(bitmap)) {
-+            ro_dirty_bitmaps =3D g_slist_append(ro_dirty_bitmaps, bitmap=
-);
-+        }
-     }
-=20
--    if (ro_dirty_bitmaps !=3D NULL) {
-+    if (need_header_update) {
-+        if (!can_write(bs->file->bs) || !(bs->file->perm & BLK_PERM_WRIT=
-E)) {
-+            error_setg(errp, "Failed to reopen bitmaps rw: no write acce=
-ss "
-+                       "the protocol file");
-+            goto out;
-+        }
-+
-         /* in_use flags must be updated */
-         ret =3D update_ext_header_and_dir_in_place(bs, bm_list);
-         if (ret < 0) {
--            error_setg_errno(errp, -ret, "Can't update bitmap directory"=
-);
-+            error_setg_errno(errp, -ret, "Cannot update bitmap directory=
-");
-             goto out;
-         }
--        g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-     }
-=20
-+    g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-+    ret =3D 0;
-+
- out:
-     g_slist_free(ro_dirty_bitmaps);
-     bitmap_list_free(bm_list);
---=20
-2.21.0
+assert(QEMU_IS_ALIGNED(start, gran));
+assert(QEMU_IS_ALIGNED(count, gran) || start + count == hb->orig_size);
 
+instead of open-coding it?  (I would also drop the extra () around the 
+right half of ||). If we want it, that would now be a followup patch.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
