@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C29EFECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3F5C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:02:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97FB021835
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:00:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97FB021835
+	by mail.kernel.org (Postfix) with ESMTPS id 7BD992054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:01:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BD992054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyGy-0002fx-2M
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:00:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36952)
+	id 1iIyIf-0004lq-Lz
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:01:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRB-0006hQ-SG
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:44 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRD-0006k5-CG
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0004oC-In
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:41 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48480)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0004oN-JC
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:43 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR8-0004WK-8f
+ id 1iIxR8-0004WM-8x
  for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQw-0003XG-MD; Fri, 11 Oct 2019 19:06:26 +0300
+ id 1iIxQv-0003XG-KW; Fri, 11 Oct 2019 19:06:25 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 091/126] colo: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:17 +0300
-Message-Id: <20191011160552.22907-92-vsementsov@virtuozzo.com>
+Subject: [RFC v5 087/126] Migration: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:13 +0300
+Message-Id: <20191011160552.22907-88-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,9 +61,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
  Juan Quintela <quintela@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -112,103 +111,292 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- migration/colo.c | 38 +++++++++++++++++---------------------
- 1 file changed, 17 insertions(+), 21 deletions(-)
+ migration/migration.c | 39 ++++++++++++++++++---------------------
+ migration/ram.c       | 13 ++++++-------
+ migration/rdma.c      | 13 ++++++-------
+ migration/savevm.c    |  2 ++
+ migration/socket.c    | 18 ++++++++----------
+ 5 files changed, 40 insertions(+), 45 deletions(-)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 2c88aa57a2..375aa6d8ce 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -243,19 +243,19 @@ void qmp_xen_set_replication(bool enable, bool primary,
+diff --git a/migration/migration.c b/migration/migration.c
+index 5f7e4d15e9..36a0b9e783 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -583,6 +583,7 @@ void migration_fd_process_incoming(QEMUFile *f)
  
- ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
+ void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     bool start_migration;
+ 
+@@ -603,12 +604,10 @@ void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp)
+          */
+         start_migration = !migrate_use_multifd();
+     } else {
+-        Error *local_err = NULL;
+         /* Multiple connections */
+         assert(migrate_use_multifd());
+-        start_migration = multifd_recv_new_channel(ioc, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        start_migration = multifd_recv_new_channel(ioc, errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -971,6 +970,7 @@ static bool migrate_caps_check(bool *cap_list,
+                                MigrationCapabilityStatusList *params,
+                                Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MigrationCapabilityStatusList *cap;
+     bool old_postcopy_cap;
+     MigrationIncomingState *mis = migration_incoming_get_current();
+@@ -1764,7 +1764,7 @@ void migrate_del_blocker(Error *reason)
+ 
+ void qmp_migrate_incoming(const char *uri, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     static bool once = true;
+ 
+     if (!deferred_incoming) {
+@@ -1775,10 +1775,9 @@ void qmp_migrate_incoming(const char *uri, Error **errp)
+         error_setg(errp, "The incoming migration has already been started");
+     }
+ 
+-    qemu_start_incoming_migration(uri, &local_err);
++    qemu_start_incoming_migration(uri, errp);
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1856,7 +1855,7 @@ bool migration_is_blocked(Error **errp)
+ static bool migrate_prepare(MigrationState *s, bool blk, bool blk_inc,
+                             bool resume, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+     if (resume) {
+         if (s->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
+@@ -1909,9 +1908,8 @@ static bool migrate_prepare(MigrationState *s, bool blk, bool blk_inc,
+                        "current migration capabilities");
+             return false;
+         }
+-        migrate_set_block_enabled(true, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        migrate_set_block_enabled(true, errp);
++        if (*errp) {
+             return false;
+         }
+         s->must_remove_block_options = true;
+@@ -1935,7 +1933,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+                  bool has_inc, bool inc, bool has_detach, bool detach,
+                  bool has_resume, bool resume, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     MigrationState *s = migrate_get_current();
+     const char *p;
+ 
+@@ -1946,17 +1944,17 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+     }
+ 
+     if (strstart(uri, "tcp:", &p)) {
+-        tcp_start_outgoing_migration(s, p, &local_err);
++        tcp_start_outgoing_migration(s, p, errp);
+ #ifdef CONFIG_RDMA
+     } else if (strstart(uri, "rdma:", &p)) {
+-        rdma_start_outgoing_migration(s, p, &local_err);
++        rdma_start_outgoing_migration(s, p, errp);
+ #endif
+     } else if (strstart(uri, "exec:", &p)) {
+-        exec_start_outgoing_migration(s, p, &local_err);
++        exec_start_outgoing_migration(s, p, errp);
+     } else if (strstart(uri, "unix:", &p)) {
+-        unix_start_outgoing_migration(s, p, &local_err);
++        unix_start_outgoing_migration(s, p, errp);
+     } else if (strstart(uri, "fd:", &p)) {
+-        fd_start_outgoing_migration(s, p, &local_err);
++        fd_start_outgoing_migration(s, p, errp);
+     } else {
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "uri",
+                    "a valid migration protocol");
+@@ -1966,9 +1964,8 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+         return;
+     }
+ 
+-    if (local_err) {
+-        migrate_fd_error(s, local_err);
+-        error_propagate(errp, local_err);
++    if (*errp) {
++        migrate_fd_error(s, *errp);
+         return;
+     }
+ }
+diff --git a/migration/ram.c b/migration/ram.c
+index 22423f08cd..0100c11dd7 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1474,14 +1474,14 @@ bool multifd_recv_all_channels_created(void)
+  */
+ bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MultiFDRecvParams *p;
+-    Error *local_err = NULL;
+     int id;
+ 
+-    id = multifd_recv_initial_packet(ioc, &local_err);
++    id = multifd_recv_initial_packet(ioc, errp);
+     if (id < 0) {
+-        multifd_recv_terminate_threads(local_err);
+-        error_propagate_prepend(errp, local_err,
++        multifd_recv_terminate_threads(*errp);
++        error_prepend(errp,
+                                 "failed to receive packet"
+                                 " via multifd channel %d: ",
+                                 atomic_read(&multifd_recv_state->count));
+@@ -1491,10 +1491,9 @@ bool multifd_recv_new_channel(QIOChannel *ioc, Error **errp)
+ 
+     p = &multifd_recv_state->params[id];
+     if (p->c != NULL) {
+-        error_setg(&local_err, "multifd: received id '%d' already setup'",
++        error_setg(errp, "multifd: received id '%d' already setup'",
+                    id);
+-        multifd_recv_terminate_threads(local_err);
+-        error_propagate(errp, local_err);
++        multifd_recv_terminate_threads(*errp);
+         return false;
+     }
+     p->c = ioc;
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 4c74e88a37..db985fee73 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -2396,8 +2396,9 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+ 
+ static int qemu_rdma_source_init(RDMAContext *rdma, bool pin_all, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret, idx;
+-    Error *local_err = NULL, **temp = &local_err;
++    Error **temp = errp;
+ 
+     /*
+      * Will be validated against destination's actual capabilities
+@@ -2450,7 +2451,6 @@ static int qemu_rdma_source_init(RDMAContext *rdma, bool pin_all, Error **errp)
+     return 0;
+ 
+ err_rdma_source_init:
+-    error_propagate(errp, local_err);
+     qemu_rdma_cleanup(rdma);
+     return -1;
+ }
+@@ -4044,18 +4044,18 @@ static void rdma_accept_incoming_migration(void *opaque)
+ 
+ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+     RDMAContext *rdma, *rdma_return_path = NULL;
+-    Error *local_err = NULL;
+ 
+     trace_rdma_start_incoming_migration();
+-    rdma = qemu_rdma_data_init(host_port, &local_err);
++    rdma = qemu_rdma_data_init(host_port, errp);
+ 
+     if (rdma == NULL) {
+         goto err;
+     }
+ 
+-    ret = qemu_rdma_dest_init(rdma, &local_err);
++    ret = qemu_rdma_dest_init(rdma, errp);
+ 
+     if (ret) {
+         goto err;
+@@ -4074,7 +4074,7 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+ 
+     /* initialize the RDMAContext for return path */
+     if (migrate_postcopy()) {
+-        rdma_return_path = qemu_rdma_data_init(host_port, &local_err);
++        rdma_return_path = qemu_rdma_data_init(host_port, errp);
+ 
+         if (rdma_return_path == NULL) {
+             goto err;
+@@ -4087,7 +4087,6 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+                         NULL, (void *)(intptr_t)rdma);
+     return;
+ err:
+-    error_propagate(errp, local_err);
+     g_free(rdma);
+     g_free(rdma_return_path);
+ }
+diff --git a/migration/savevm.c b/migration/savevm.c
+index bb9462a54d..f9293fe192 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2586,6 +2586,7 @@ int qemu_load_device_state(QEMUFile *f)
+ 
+ int save_snapshot(const char *name, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs, *bs1;
+     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+     int ret = -1;
+@@ -2790,6 +2791,7 @@ void qmp_xen_load_devices_state(const char *filename, Error **errp)
+ 
+ int load_snapshot(const char *name, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs, *bs_vm_state;
+     QEMUSnapshotInfo sn;
+     QEMUFile *f;
+diff --git a/migration/socket.c b/migration/socket.c
+index 97c9efde59..bc07ef92a1 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -139,12 +139,11 @@ void tcp_start_outgoing_migration(MigrationState *s,
+                                   const char *host_port,
+                                   Error **errp)
  {
 -    Error *err = NULL;
+-    SocketAddress *saddr = tcp_build_address(host_port, &err);
+-    if (!err) {
+-        socket_start_outgoing_migration(s, saddr, &err);
 +    ERRP_AUTO_PROPAGATE();
-     ReplicationStatus *s = g_new0(ReplicationStatus, 1);
- 
--    replication_get_error_all(&err);
--    if (err) {
-+    replication_get_error_all(errp);
-+    if (*errp) {
-         s->error = true;
-         s->has_desc = true;
--        s->desc = g_strdup(error_get_pretty(err));
-+        s->desc = g_strdup(error_get_pretty(*errp));
-     } else {
-         s->error = false;
++    SocketAddress *saddr = tcp_build_address(host_port, errp);
++    if (!*errp) {
++        socket_start_outgoing_migration(s, saddr, errp);
      }
- 
--    error_free(err);
-+    error_free_errp(errp);
-     return s;
+-    error_propagate(errp, err);
  }
  
-@@ -314,12 +314,11 @@ static void colo_send_message(QEMUFile *f, COLOMessage msg,
- static void colo_send_message_value(QEMUFile *f, COLOMessage msg,
-                                     uint64_t value, Error **errp)
+ void unix_start_outgoing_migration(MigrationState *s,
+@@ -209,13 +208,12 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+ 
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
  {
--    Error *local_err = NULL;
+-    Error *err = NULL;
+-    SocketAddress *saddr = tcp_build_address(host_port, &err);
+-    if (!err) {
+-        socket_start_incoming_migration(saddr, &err);
 +    ERRP_AUTO_PROPAGATE();
-     int ret;
- 
--    colo_send_message(f, msg, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    colo_send_message(f, msg, errp);
-+    if (*errp) {
-         return;
++    SocketAddress *saddr = tcp_build_address(host_port, errp);
++    if (!*errp) {
++        socket_start_incoming_migration(saddr, errp);
      }
-     qemu_put_be64(f, value);
-@@ -354,12 +353,11 @@ static COLOMessage colo_receive_message(QEMUFile *f, Error **errp)
- static void colo_receive_check_message(QEMUFile *f, COLOMessage expect_msg,
-                                        Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     COLOMessage msg;
--    Error *local_err = NULL;
+     qapi_free_SocketAddress(saddr);
+-    error_propagate(errp, err);
+ }
  
--    msg = colo_receive_message(f, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    msg = colo_receive_message(f, errp);
-+    if (*errp) {
-         return;
-     }
-     if (msg != expect_msg) {
-@@ -371,13 +369,12 @@ static void colo_receive_check_message(QEMUFile *f, COLOMessage expect_msg,
- static uint64_t colo_receive_message_value(QEMUFile *f, uint32_t expect_msg,
-                                            Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     uint64_t value;
-     int ret;
- 
--    colo_receive_check_message(f, expect_msg, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    colo_receive_check_message(f, expect_msg, errp);
-+    if (*errp) {
-         return 0;
-     }
- 
-@@ -667,12 +664,11 @@ void migrate_start_colo_process(MigrationState *s)
- static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
-                                      Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     COLOMessage msg;
--    Error *local_err = NULL;
- 
--    msg = colo_receive_message(f, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    msg = colo_receive_message(f, errp);
-+    if (*errp) {
-         return;
-     }
- 
+ void unix_start_incoming_migration(const char *path, Error **errp)
 -- 
 2.21.0
 
