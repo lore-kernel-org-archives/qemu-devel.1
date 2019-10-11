@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0B6ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77EA3C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:08:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A33DF206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:08:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A33DF206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 506FC206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:08:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 506FC206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyOu-0006ML-FC
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:08:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36268)
+	id 1iIyPR-0007EY-Nl
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:08:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQs-00069l-PP
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:25 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR5-0006VR-8m
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQp-0004M5-IH
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:22 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47936)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR3-0004ge-5B
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQp-00049j-6I
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:19 -0400
+ id 1iIxR2-0004OA-Tz
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:33 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQd-0003XG-Pg; Fri, 11 Oct 2019 19:06:07 +0300
+ id 1iIxQr-0003XG-JP; Fri, 11 Oct 2019 19:06:21 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 032/126] Hosts: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:18 +0300
-Message-Id: <20191011160552.22907-33-vsementsov@virtuozzo.com>
+Subject: [RFC v5 075/126] Main loop: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:01 +0300
+Message-Id: <20191011160552.22907-76-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,9 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Michael Roth <mdroth@linux.vnet.ibm.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ vsementsov@virtuozzo.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,438 +110,79 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qga/commands-win32.c | 139 +++++++++++++++++++------------------------
- util/oslib-posix.c   |   6 +-
- 2 files changed, 64 insertions(+), 81 deletions(-)
+ util/main-loop.c |  5 ++---
+ vl.c             | 14 ++++++--------
+ 2 files changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 9789465b4a..70e4311a98 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -240,15 +240,15 @@ void qmp_guest_file_close(int64_t handle, Error **errp)
+diff --git a/util/main-loop.c b/util/main-loop.c
+index e3eaa55866..fdd7f50fc8 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -145,9 +145,9 @@ static GArray *gpollfds;
  
- static void acquire_privilege(const char *name, Error **errp)
+ int qemu_init_main_loop(Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     HANDLE token = NULL;
-     TOKEN_PRIVILEGES priv;
--    Error *local_err = NULL;
+     int ret;
+     GSource *src;
+-    Error *local_error = NULL;
  
-     if (OpenProcessToken(GetCurrentProcess(),
-         TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY, &token))
-     {
-         if (!LookupPrivilegeValue(NULL, name, &priv.Privileges[0].Luid)) {
--            error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+            error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                        "no luid for requested privilege");
-             goto out;
-         }
-@@ -257,13 +257,13 @@ static void acquire_privilege(const char *name, Error **errp)
-         priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+     init_clocks(qemu_timer_notify_cb);
  
-         if (!AdjustTokenPrivileges(token, FALSE, &priv, 0, NULL, 0)) {
--            error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+            error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                        "unable to acquire requested privilege");
-             goto out;
-         }
- 
-     } else {
--        error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+        error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                    "failed to open privilege token");
+@@ -156,9 +156,8 @@ int qemu_init_main_loop(Error **errp)
+         return ret;
      }
  
-@@ -271,25 +271,23 @@ out:
-     if (token) {
-         CloseHandle(token);
+-    qemu_aio_context = aio_context_new(&local_error);
++    qemu_aio_context = aio_context_new(errp);
+     if (!qemu_aio_context) {
+-        error_propagate(errp, local_error);
+         return -EMFILE;
      }
--    error_propagate(errp, local_err);
- }
+     qemu_notify_bh = qemu_bh_new(notify_event_cb, NULL);
+diff --git a/vl.c b/vl.c
+index 002bf4919e..7499ff5691 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2213,11 +2213,10 @@ static int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
  
- static void execute_async(DWORD WINAPI (*func)(LPVOID), LPVOID opaque,
-                           Error **errp)
+ static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
  {
 -    Error *local_err = NULL;
 +    ERRP_AUTO_PROPAGATE();
  
-     HANDLE thread = CreateThread(NULL, 0, func, opaque, 0, NULL);
-     if (!thread) {
--        error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+        error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                    "failed to dispatch asynchronous command");
--        error_propagate(errp, local_err);
-     }
- }
- 
- void qmp_guest_shutdown(bool has_mode, const char *mode, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     UINT shutdown_flag = EWX_FORCE;
- 
-     slog("guest-shutdown called, mode: %s", mode);
-@@ -308,9 +306,8 @@ void qmp_guest_shutdown(bool has_mode, const char *mode, Error **errp)
- 
-     /* Request a shutdown privilege, but try to shut down the system
-        anyway. */
--    acquire_privilege(SE_SHUTDOWN_NAME, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    acquire_privilege(SE_SHUTDOWN_NAME, errp);
-+    if (*errp) {
-         return;
-     }
- 
-@@ -409,6 +406,7 @@ GuestFileSeek *qmp_guest_file_seek(int64_t handle, int64_t offset,
-                                    GuestFileWhence *whence_code,
-                                    Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     GuestFileHandle *gfh;
-     GuestFileSeek *seek_data;
-     HANDLE fh;
-@@ -416,7 +414,6 @@ GuestFileSeek *qmp_guest_file_seek(int64_t handle, int64_t offset,
-     off_pos.QuadPart = offset;
-     BOOL res;
-     int whence;
--    Error *err = NULL;
- 
-     gfh = guest_file_handle_find(handle, errp);
-     if (!gfh) {
-@@ -424,9 +421,8 @@ GuestFileSeek *qmp_guest_file_seek(int64_t handle, int64_t offset,
-     }
- 
-     /* We stupidly exposed 'whence':'int' in our qapi */
--    whence = ga_parse_whence(whence_code, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    whence = ga_parse_whence(whence_code, errp);
-+    if (*errp) {
-         return NULL;
-     }
- 
-@@ -792,10 +788,10 @@ out_free:
- static void get_single_disk_info(int disk_number,
-                                  GuestDiskAddress *disk, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     SCSI_ADDRESS addr, *scsi_ad;
-     DWORD len;
-     HANDLE disk_h;
--    Error *local_err = NULL;
- 
-     scsi_ad = &addr;
- 
-@@ -807,9 +803,8 @@ static void get_single_disk_info(int disk_number,
-         return;
-     }
- 
--    get_disk_properties(disk_h, disk, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    get_disk_properties(disk_h, disk, errp);
-+    if (*errp) {
-         goto err_close;
-     }
- 
-@@ -819,9 +814,8 @@ static void get_single_disk_info(int disk_number,
-      * if that doesn't hold since that suggests some other unexpected
-      * breakage
-      */
--    disk->pci_controller = get_pci_info(disk_number, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    disk->pci_controller = get_pci_info(disk_number, errp);
-+    if (*errp) {
-         goto err_close;
-     }
-     if (disk->bus_type == GUEST_DISK_BUS_TYPE_SCSI
-@@ -854,7 +848,7 @@ err_close:
-  * volume is returned for the spanned disk group (LVM) */
- static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     GuestDiskAddressList *list = NULL, *cur_item = NULL;
-     GuestDiskAddress *disk = NULL;
-     int i;
-@@ -900,11 +894,11 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-             disk = g_malloc0(sizeof(GuestDiskAddress));
-             disk->has_dev = true;
-             disk->dev = g_strdup(name);
--            get_single_disk_info(0xffffffff, disk, &local_err);
--            if (local_err) {
-+            get_single_disk_info(0xffffffff, disk, errp);
-+            if (*errp) {
-                 g_debug("failed to get disk info, ignoring error: %s",
--                    error_get_pretty(local_err));
--                error_free(local_err);
-+                    error_get_pretty(*errp));
-+                error_free_errp(errp);
-                 goto out;
-             }
-             list = g_malloc0(sizeof(*list));
-@@ -936,9 +930,8 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-         disk->dev = g_strdup_printf("\\\\.\\PhysicalDrive%lu",
-                                     extents->Extents[i].DiskNumber);
- 
--        get_single_disk_info(extents->Extents[i].DiskNumber, disk, &local_err);
+-    if (!qemu_chr_new_from_opts(opts, NULL, &local_err)) {
 -        if (local_err) {
 -            error_propagate(errp, local_err);
-+        get_single_disk_info(extents->Extents[i].DiskNumber, disk, errp);
++    if (!qemu_chr_new_from_opts(opts, NULL, errp)) {
 +        if (*errp) {
-             goto out;
+             return -1;
          }
-         cur_item = g_malloc0(sizeof(*list));
-@@ -1090,8 +1083,8 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
-                                        strList *mountpoints,
-                                        Error **errp)
+         exit(0);
+@@ -2613,8 +2612,8 @@ static int machine_set_property(void *opaque,
+                                 const char *name, const char *value,
+                                 Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     int i;
+     Object *obj = OBJECT(opaque);
 -    Error *local_err = NULL;
+     char *p, *qom_name;
  
-     if (!vss_initialized()) {
-         error_setg(errp, QERR_UNSUPPORTED);
-@@ -1103,20 +1096,19 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
-     /* cannot risk guest agent blocking itself on a write in this state */
-     ga_set_frozen(ga_state);
- 
--    qga_vss_fsfreeze(&i, true, mountpoints, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qga_vss_fsfreeze(&i, true, mountpoints, errp);
-+    if (*errp) {
-         goto error;
-     }
- 
-     return i;
- 
- error:
--    local_err = NULL;
--    qmp_guest_fsfreeze_thaw(&local_err);
--    if (local_err) {
--        g_debug("cleanup thaw: %s", error_get_pretty(local_err));
--        error_free(local_err);
-+    *errp = NULL;
-+    qmp_guest_fsfreeze_thaw(errp);
-+    if (*errp) {
-+        g_debug("cleanup thaw: %s", error_get_pretty(*errp));
-+        error_free_errp(errp);
-     }
-     return 0;
- }
-@@ -1281,36 +1273,33 @@ typedef enum {
- 
- static void check_suspend_mode(GuestSuspendMode mode, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     SYSTEM_POWER_CAPABILITIES sys_pwr_caps;
--    Error *local_err = NULL;
- 
-     ZeroMemory(&sys_pwr_caps, sizeof(sys_pwr_caps));
-     if (!GetPwrCapabilities(&sys_pwr_caps)) {
--        error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+        error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                    "failed to determine guest suspend capabilities");
--        goto out;
-+        return;
-     }
- 
-     switch (mode) {
-     case GUEST_SUSPEND_MODE_DISK:
-         if (!sys_pwr_caps.SystemS4) {
--            error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+            error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                        "suspend-to-disk not supported by OS");
+     if (strcmp(name, "type") == 0) {
+@@ -2628,11 +2627,10 @@ static int machine_set_property(void *opaque,
          }
-         break;
-     case GUEST_SUSPEND_MODE_RAM:
-         if (!sys_pwr_caps.SystemS3) {
--            error_setg(&local_err, QERR_QGA_COMMAND_FAILED,
-+            error_setg(errp, QERR_QGA_COMMAND_FAILED,
-                        "suspend-to-ram not supported by OS");
-         }
-         break;
-     default:
--        error_setg(&local_err, QERR_INVALID_PARAMETER_VALUE, "mode",
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "mode",
-                    "GuestSuspendMode");
      }
--
--out:
--    error_propagate(errp, local_err);
- }
  
- static DWORD WINAPI do_suspend(LPVOID opaque)
-@@ -1328,32 +1317,30 @@ static DWORD WINAPI do_suspend(LPVOID opaque)
- 
- void qmp_guest_suspend_disk(Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     GuestSuspendMode *mode = g_new(GuestSuspendMode, 1);
- 
-     *mode = GUEST_SUSPEND_MODE_DISK;
--    check_suspend_mode(*mode, &local_err);
--    acquire_privilege(SE_SHUTDOWN_NAME, &local_err);
--    execute_async(do_suspend, mode, &local_err);
-+    check_suspend_mode(*mode, errp);
-+    acquire_privilege(SE_SHUTDOWN_NAME, errp);
-+    execute_async(do_suspend, mode, errp);
+-    object_property_parse(obj, value, qom_name, &local_err);
++    object_property_parse(obj, value, qom_name, errp);
+     g_free(qom_name);
  
 -    if (local_err) {
 -        error_propagate(errp, local_err);
 +    if (*errp) {
-         g_free(mode);
-     }
- }
- 
- void qmp_guest_suspend_ram(Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     GuestSuspendMode *mode = g_new(GuestSuspendMode, 1);
- 
-     *mode = GUEST_SUSPEND_MODE_RAM;
--    check_suspend_mode(*mode, &local_err);
--    acquire_privilege(SE_SHUTDOWN_NAME, &local_err);
--    execute_async(do_suspend, mode, &local_err);
-+    check_suspend_mode(*mode, errp);
-+    acquire_privilege(SE_SHUTDOWN_NAME, errp);
-+    execute_async(do_suspend, mode, errp);
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         g_free(mode);
-     }
- }
-@@ -1616,7 +1603,7 @@ int64_t qmp_guest_get_time(Error **errp)
- 
- void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     SYSTEMTIME ts;
-     FILETIME tf;
-     LONGLONG time;
-@@ -1681,9 +1668,8 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
-         return;
+         return -1;
      }
  
--    acquire_privilege(SE_SYSTEMTIME_NAME, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    acquire_privilege(SE_SYSTEMTIME_NAME, errp);
-+    if (*errp) {
-         return;
-     }
- 
-@@ -1695,10 +1681,10 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
- 
- GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PSYSTEM_LOGICAL_PROCESSOR_INFORMATION pslpi, ptr;
-     DWORD length;
-     GuestLogicalProcessorList *head, **link;
--    Error *local_err = NULL;
-     int64_t current;
- 
-     ptr = pslpi = NULL;
-@@ -1712,16 +1698,16 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-         (length > sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION))) {
-         ptr = pslpi = g_malloc0(length);
-         if (GetLogicalProcessorInformation(pslpi, &length) == FALSE) {
--            error_setg(&local_err, "Failed to get processor information: %d",
-+            error_setg(errp, "Failed to get processor information: %d",
-                        (int)GetLastError());
-         }
-     } else {
--        error_setg(&local_err,
-+        error_setg(errp,
-                    "Failed to get processor information buffer length: %d",
-                    (int)GetLastError());
-     }
- 
--    while ((local_err == NULL) && (length > 0)) {
-+    while ((*errp == NULL) && (length > 0)) {
-         if (pslpi->Relationship == RelationProcessorCore) {
-             ULONG_PTR cpu_bits = pslpi->ProcessorMask;
- 
-@@ -1750,16 +1736,15 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
- 
-     g_free(ptr);
- 
--    if (local_err == NULL) {
-+    if (*errp == NULL) {
-         if (head != NULL) {
-             return head;
-         }
-         /* there's no guest with zero VCPUs */
--        error_setg(&local_err, "Guest reported zero VCPUs");
-+        error_setg(errp, "Guest reported zero VCPUs");
-     }
- 
-     qapi_free_GuestLogicalProcessorList(head);
--    error_propagate(errp, local_err);
-     return NULL;
- }
- 
-@@ -2186,22 +2171,20 @@ static char *ga_get_current_arch(void)
- 
- GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     OSVERSIONINFOEXW os_version = {0};
-     bool server;
-     char *product_name;
-     GuestOSInfo *info;
- 
--    ga_get_win_version(&os_version, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    ga_get_win_version(&os_version, errp);
-+    if (*errp) {
-         return NULL;
-     }
- 
-     server = os_version.wProductType != VER_NT_WORKSTATION;
--    product_name = ga_get_win_product_name(&local_err);
-+    product_name = ga_get_win_product_name(errp);
-     if (product_name == NULL) {
--        error_propagate(errp, local_err);
-         return NULL;
-     }
- 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index f8693384fc..ad4cbe9c16 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -542,6 +542,7 @@ char *qemu_get_pid_name(pid_t pid)
- 
- pid_t qemu_fork(Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     sigset_t oldmask, newmask;
-     struct sigaction sig_action;
-     int saved_errno;
-@@ -600,10 +601,9 @@ pid_t qemu_fork(Error **errp)
-          * propagate that to children */
-         sigemptyset(&newmask);
-         if (pthread_sigmask(SIG_SETMASK, &newmask, NULL) != 0) {
--            Error *local_err = NULL;
--            error_setg_errno(&local_err, errno,
-+            error_setg_errno(errp, errno,
-                              "cannot unblock signals");
--            error_report_err(local_err);
-+            error_report_errp(errp);
-             _exit(1);
-         }
-     }
 -- 
 2.21.0
 
