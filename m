@@ -2,68 +2,53 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B2D5C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E010ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:59:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F850206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:58:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F850206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 525C7206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:59:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 525C7206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzBm-00017S-In
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:58:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47482)
+	id 1iIzCh-0002Cq-O5
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:59:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iIyTs-0004jm-Q3
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 13:13:34 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRF-0006nK-Az
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iIyTr-0008Hq-EO
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 13:13:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55802)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR6-0004l6-4s
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:45 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48398)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iIyTl-0008D5-Qi; Fri, 11 Oct 2019 13:13:26 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ABE5711A23;
- Fri, 11 Oct 2019 17:13:24 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F02B560923;
- Fri, 11 Oct 2019 17:12:49 +0000 (UTC)
-Subject: Re: [RFC v5 025/126] scripts: add coccinelle script to use auto
- propagated errp
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIxR5-0004SB-En
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:36 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIxQt-0003XG-Ru; Fri, 11 Oct 2019 19:06:24 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC v5 082/126] QOM: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:08 +0300
+Message-Id: <20191011160552.22907-83-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-26-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5dd4d642-7ea6-42a2-66fc-6d6710b77b8d@redhat.com>
-Date: Fri, 11 Oct 2019 12:12:49 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191011160552.22907-26-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 11 Oct 2019 17:13:25 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,199 +60,1489 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Alberto Garcia <berto@igalia.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>, qemu-block@nongnu.org,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Halil Pasic <pasic@linux.ibm.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Anthony Green <green@moxielogic.com>, Laurent Vivier <lvivier@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>, Chris Wulff <crwulff@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
- qemu-ppc@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>,
- Peter Maydell <peter.maydell@linaro.org>, sheepdog@lists.wpkg.org,
- Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Palmer Dabbelt <palmer@sifive.com>, Thomas Huth <thuth@redhat.com>,
- Max Filippov <jcmvbkbc@gmail.com>, "Denis V. Lunev" <den@openvz.org>,
- Hannes Reinecke <hare@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, Liu Yuan <namei.unix@gmail.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eric Farman <farman@linux.ibm.com>,
- Amit Shah <amit@kernel.org>, Stefan Weil <sw@weilnetz.de>,
- Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Stafford Horne <shorne@gmail.com>, qemu-riscv@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <pburton@wavecomp.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
- Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Ari Sundholm <ari@tuxera.com>,
- Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Joel Stanley <joel@jms.id.au>,
- Jason Dillaman <dillaman@redhat.com>, Antony Pavlov <antonynpavlov@gmail.com>,
- xen-devel@lists.xenproject.org, integration@gluster.org,
- Laszlo Ersek <lersek@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, Max Reitz <mreitz@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Vincenzo Maffione <v.maffione@gmail.com>, Marek Vasut <marex@denx.de>,
- armbru@redhat.com,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
- David Gibson <david@gibson.dropbear.id.au>,
- Tony Krowiak <akrowiak@linux.ibm.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Wen Congyang <wencongyang2@huawei.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/11/19 11:04 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
-> 
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
->   scripts/coccinelle/auto-propagated-errp.cocci | 118 ++++++++++++++++++
->   1 file changed, 118 insertions(+)
->   create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
-> 
-> diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/coccinelle/auto-propagated-errp.cocci
-> new file mode 100644
-> index 0000000000..d9731620aa
-> --- /dev/null
-> +++ b/scripts/coccinelle/auto-propagated-errp.cocci
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
 
-> +@rule1@
-> +// Drop local_err
-> +identifier fn, local_err;
-> +symbol errp;
-> +@@
-> +
-> + fn(..., Error **errp, ...)
-> + {
-> +     <...
-> +-    Error *local_err = NULL;
-> +     ...>
-> + }
-> +
+This commit (together with its neighbors) was generated by
 
-So our goal is to automate removal of all local_err (including when it 
-is spelled err)...
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
 
-> +@@
-> +// Handle pattern with goto, otherwise we'll finish up
-> +// with labels at function end which will not compile.
-> +identifier rule1.fn;
-> +identifier rule1.local_err;
-> +identifier OUT;
-> +@@
-> +
-> + fn(...)
-> + {
-> +     <...
-> +-    goto OUT;
-> ++    return;
-> +     ...>
-> +- OUT:
-> +-    error_propagate(errp, local_err);
-> + }
-> +
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
 
-this dangling label cleanup makes sense
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
 
-> +@@
-> +identifier rule1.fn;
-> +identifier rule1.local_err;
-> +@@
-> +
-> + fn(...)
-> + {
-> +     <...
-> +(
-> +-    error_free(local_err);
-> +-    local_err = NULL;
-> ++    error_free_errp(errp);
+(auto-msg was a file with this commit message)
 
-This does not make sense - error_free_errp() is not defined prior to 
-this series or anywhere in patches 1-24, if I'm reading it correctly.
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
 
-> +|
-> +-    error_free(local_err);
-> ++    error_free_errp(errp);
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ hw/core/qdev-properties-system.c |  28 ++--
+ hw/core/qdev-properties.c        |  89 +++++------
+ hw/core/qdev.c                   |  40 +++--
+ qdev-monitor.c                   |  41 +++---
+ qom/object.c                     | 246 ++++++++++++++-----------------
+ qom/object_interfaces.c          |  27 ++--
+ qom/qom-qobject.c                |   7 +-
+ 7 files changed, 212 insertions(+), 266 deletions(-)
 
-and again
-
-> +|
-> +-    error_report_err(local_err);
-> ++    error_report_errp(errp);
-> +|
-> +-    warn_report_err(local_err);
-> ++    warn_report_errp(errp);
-> +|
-> +-    error_propagate_prepend(errp, local_err,
-> ++    error_prepend(errp,
-> +                              ...);
-> +|
-> +-    error_propagate(errp, local_err);
-> +)
-> +     ...>
-> + }
-> +
-
-It looks like once this script is run, error_propagate_prepend() will 
-have no clients.  Is there a non-generated cleanup patch that removes it 
-(and once it is removed, it can also be removed from the .cocci script 
-as no further clients will reappear later)?
-
-
-> +@@
-> +identifier rule1.fn;
-> +identifier rule1.local_err;
-> +@@
-> +
-> + fn(...)
-> + {
-> +     <...
-> +(
-> +-    &local_err
-> ++    errp
-> +|
-> +-    local_err
-> ++    *errp
-> +)
-> +     ...>
-> + }
-> +
-> +@@
-> +symbol errp;
-> +@@
-> +
-> +- *errp != NULL
-> ++ *errp
-> 
-
-Seems to make sense.
-
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index 70bfd4809b..2c7cddcf74 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -44,8 +44,8 @@ static void set_pointer(Object *obj, Visitor *v, Property *prop,
+                                       Error **errp),
+                         const char *name, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+-    Error *local_err = NULL;
+     void **ptr = qdev_get_prop_ptr(dev, prop);
+     char *str;
+ 
+@@ -54,9 +54,8 @@ static void set_pointer(Object *obj, Visitor *v, Property *prop,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+     if (!*str) {
+@@ -221,8 +220,8 @@ static void get_chr(Object *obj, Visitor *v, const char *name, void *opaque,
+ static void set_chr(Object *obj, Visitor *v, const char *name, void *opaque,
+                     Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+-    Error *local_err = NULL;
+     Property *prop = opaque;
+     CharBackend *be = qdev_get_prop_ptr(dev, prop);
+     Chardev *s;
+@@ -233,9 +232,8 @@ static void set_chr(Object *obj, Visitor *v, const char *name, void *opaque,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -289,12 +287,12 @@ static void get_netdev(Object *obj, Visitor *v, const char *name,
+ static void set_netdev(Object *obj, Visitor *v, const char *name,
+                        void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     NICPeers *peers_ptr = qdev_get_prop_ptr(dev, prop);
+     NetClientState **ncs = peers_ptr->ncs;
+     NetClientState *peers[MAX_QUEUE_NUM];
+-    Error *local_err = NULL;
+     int queues, err = 0, i = 0;
+     char *str;
+ 
+@@ -303,9 +301,8 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -370,11 +367,11 @@ static void get_audiodev(Object *obj, Visitor *v, const char* name,
+ static void set_audiodev(Object *obj, Visitor *v, const char* name,
+                          void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     QEMUSoundCard *card = qdev_get_prop_ptr(dev, prop);
+     AudioState *state;
+-    Error *local_err = NULL;
+     int err = 0;
+     char *str;
+ 
+@@ -383,9 +380,8 @@ static void set_audiodev(Object *obj, Visitor *v, const char* name,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index ac28890e5a..66418edcf7 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -114,9 +114,9 @@ static void prop_get_bit(Object *obj, Visitor *v, const char *name,
+ static void prop_set_bit(Object *obj, Visitor *v, const char *name,
+                          void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+-    Error *local_err = NULL;
+     bool value;
+ 
+     if (dev->realized) {
+@@ -124,9 +124,8 @@ static void prop_set_bit(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+ 
+-    visit_type_bool(v, name, &value, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_bool(v, name, &value, errp);
++    if (*errp) {
+         return;
+     }
+     bit_prop_set(dev, prop, value);
+@@ -178,9 +177,9 @@ static void prop_get_bit64(Object *obj, Visitor *v, const char *name,
+ static void prop_set_bit64(Object *obj, Visitor *v, const char *name,
+                            void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+-    Error *local_err = NULL;
+     bool value;
+ 
+     if (dev->realized) {
+@@ -188,9 +187,8 @@ static void prop_set_bit64(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+ 
+-    visit_type_bool(v, name, &value, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_bool(v, name, &value, errp);
++    if (*errp) {
+         return;
+     }
+     bit64_prop_set(dev, prop, value);
+@@ -474,10 +472,10 @@ static void get_string(Object *obj, Visitor *v, const char *name,
+ static void set_string(Object *obj, Visitor *v, const char *name,
+                        void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     char **ptr = qdev_get_prop_ptr(dev, prop);
+-    Error *local_err = NULL;
+     char *str;
+ 
+     if (dev->realized) {
+@@ -485,9 +483,8 @@ static void set_string(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+     g_free(*ptr);
+@@ -534,10 +531,10 @@ static void get_mac(Object *obj, Visitor *v, const char *name, void *opaque,
+ static void set_mac(Object *obj, Visitor *v, const char *name, void *opaque,
+                     Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     MACAddr *mac = qdev_get_prop_ptr(dev, prop);
+-    Error *local_err = NULL;
+     int i, pos;
+     char *str, *p;
+ 
+@@ -546,9 +543,8 @@ static void set_mac(Object *obj, Visitor *v, const char *name, void *opaque,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -656,11 +652,11 @@ const PropertyInfo qdev_prop_fdc_drive_type = {
+ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+                           void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     int32_t value, *ptr = qdev_get_prop_ptr(dev, prop);
+     unsigned int slot, fn, n;
+-    Error *local_err = NULL;
+     char *str;
+ 
+     if (dev->realized) {
+@@ -668,13 +664,11 @@ static void set_pci_devfn(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_free(local_err);
+-        local_err = NULL;
+-        visit_type_int32(v, name, &value, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
++        error_free_errp(errp);
++        visit_type_int32(v, name, &value, errp);
++        if (*errp) {
+         } else if (value < -1 || value > 255) {
+             error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                        name ? name : "null", "pci_devfn");
+@@ -728,10 +722,10 @@ const PropertyInfo qdev_prop_pci_devfn = {
+ static void set_blocksize(Object *obj, Visitor *v, const char *name,
+                           void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     uint16_t value, *ptr = qdev_get_prop_ptr(dev, prop);
+-    Error *local_err = NULL;
+     const int64_t min = 512;
+     const int64_t max = 32768;
+ 
+@@ -740,9 +734,8 @@ static void set_blocksize(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+ 
+-    visit_type_uint16(v, name, &value, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_uint16(v, name, &value, errp);
++    if (*errp) {
+         return;
+     }
+     /* value of 0 means "unset" */
+@@ -803,10 +796,10 @@ static void get_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
+ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
+                                  void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     PCIHostDeviceAddress *addr = qdev_get_prop_ptr(dev, prop);
+-    Error *local_err = NULL;
+     char *str, *p;
+     char *e;
+     unsigned long val;
+@@ -818,9 +811,8 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -907,10 +899,10 @@ static void get_uuid(Object *obj, Visitor *v, const char *name, void *opaque,
+ static void set_uuid(Object *obj, Visitor *v, const char *name, void *opaque,
+                     Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     QemuUUID *uuid = qdev_get_prop_ptr(dev, prop);
+-    Error *local_err = NULL;
+     char *str;
+ 
+     if (dev->realized) {
+@@ -918,9 +910,8 @@ static void set_uuid(Object *obj, Visitor *v, const char *name, void *opaque,
+         return;
+     }
+ 
+-    visit_type_str(v, name, &str, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &str, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -977,6 +968,7 @@ static void array_element_release(Object *obj, const char *name, void *opaque)
+ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     /* Setter for the property which defines the length of a
+      * variable-sized property array. As well as actually setting the
+      * array-length field in the device struct, we have to create the
+@@ -986,7 +978,6 @@ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
+     Property *prop = opaque;
+     uint32_t *alenptr = qdev_get_prop_ptr(dev, prop);
+     void **arrayptr = (void *)dev + prop->arrayoffset;
+-    Error *local_err = NULL;
+     void *eltptr;
+     const char *arrayname;
+     int i;
+@@ -1000,9 +991,8 @@ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
+                    name);
+         return;
+     }
+-    visit_type_uint32(v, name, alenptr, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_uint32(v, name, alenptr, errp);
++    if (*errp) {
+         return;
+     }
+     if (!*alenptr) {
+@@ -1039,9 +1029,8 @@ static void set_prop_arraylen(Object *obj, Visitor *v, const char *name,
+                             arrayprop->prop.info->get,
+                             arrayprop->prop.info->set,
+                             array_element_release,
+-                            arrayprop, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                            arrayprop, errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -1322,20 +1311,19 @@ static void get_prop_pcielinkspeed(Object *obj, Visitor *v, const char *name,
+ static void set_prop_pcielinkspeed(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     PCIExpLinkSpeed *p = qdev_get_prop_ptr(dev, prop);
+     int speed;
+-    Error *local_err = NULL;
+ 
+     if (dev->realized) {
+         qdev_prop_set_after_realize(dev, name, errp);
+         return;
+     }
+ 
+-    visit_type_enum(v, prop->name, &speed, prop->info->enum_table, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_enum(v, prop->name, &speed, prop->info->enum_table, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1410,20 +1398,19 @@ static void get_prop_pcielinkwidth(Object *obj, Visitor *v, const char *name,
+ static void set_prop_pcielinkwidth(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     PCIExpLinkWidth *p = qdev_get_prop_ptr(dev, prop);
+     int width;
+-    Error *local_err = NULL;
+ 
+     if (dev->realized) {
+         qdev_prop_set_after_realize(dev, name, errp);
+         return;
+     }
+ 
+-    visit_type_enum(v, prop->name, &width, prop->info->enum_table, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_enum(v, prop->name, &width, prop->info->enum_table, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index e3be8cc3c4..72fd91e548 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -709,11 +709,11 @@ static void qdev_property_add_legacy(DeviceState *dev, Property *prop,
+ void qdev_property_add_static(DeviceState *dev, Property *prop,
+                               Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     Object *obj = OBJECT(dev);
+ 
+     if (prop->info->create) {
+-        prop->info->create(obj, prop, &local_err);
++        prop->info->create(obj, prop, errp);
+     } else {
+         /*
+          * TODO qdev_prop_ptr does not have getters or setters.  It must
+@@ -726,11 +726,10 @@ void qdev_property_add_static(DeviceState *dev, Property *prop,
+         object_property_add(obj, prop->name, prop->info->name,
+                             prop->info->get, prop->info->set,
+                             prop->info->release,
+-                            prop, &local_err);
++                            prop, errp);
+     }
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -812,11 +811,11 @@ static bool check_only_migratable(Object *obj, Error **errp)
+ 
+ static void device_set_realized(Object *obj, bool value, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev = DEVICE(obj);
+     DeviceClass *dc = DEVICE_GET_CLASS(dev);
+     HotplugHandler *hotplug_ctrl;
+     BusState *bus;
+-    Error *local_err = NULL;
+     bool unattached_parent = false;
+     static int unattached_count;
+ 
+@@ -826,7 +825,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+     }
+ 
+     if (value && !dev->realized) {
+-        if (!check_only_migratable(obj, &local_err)) {
++        if (!check_only_migratable(obj, errp)) {
+             goto fail;
+         }
+ 
+@@ -842,15 +841,15 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+ 
+         hotplug_ctrl = qdev_get_hotplug_handler(dev);
+         if (hotplug_ctrl) {
+-            hotplug_handler_pre_plug(hotplug_ctrl, dev, &local_err);
+-            if (local_err != NULL) {
++            hotplug_handler_pre_plug(hotplug_ctrl, dev, errp);
++            if (*errp) {
+                 goto fail;
+             }
+         }
+ 
+         if (dc->realize) {
+-            dc->realize(dev, &local_err);
+-            if (local_err != NULL) {
++            dc->realize(dev, errp);
++            if (*errp) {
+                 goto fail;
+             }
+         }
+@@ -868,15 +867,15 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+             if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(dev), dev,
+                                                dev->instance_id_alias,
+                                                dev->alias_required_for_version,
+-                                               &local_err) < 0) {
++                                               errp) < 0) {
+                 goto post_realize_fail;
+             }
+         }
+ 
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+             object_property_set_bool(OBJECT(bus), true, "realized",
+-                                         &local_err);
+-            if (local_err != NULL) {
++                                         errp);
++            if (*errp) {
+                 goto child_realize_fail;
+             }
+         }
+@@ -886,8 +885,8 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+         dev->pending_deleted_event = false;
+ 
+         if (hotplug_ctrl) {
+-            hotplug_handler_plug(hotplug_ctrl, dev, &local_err);
+-            if (local_err != NULL) {
++            hotplug_handler_plug(hotplug_ctrl, dev, errp);
++            if (*errp) {
+                 goto child_realize_fail;
+             }
+        }
+@@ -896,23 +895,23 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+         /* We want to catch in local_err only first error */
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+             object_property_set_bool(OBJECT(bus), false, "realized",
+-                                     local_err ? NULL : &local_err);
++                                     *errp ? NULL : errp);
+         }
+         if (qdev_get_vmsd(dev)) {
+             vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
+         }
+         if (dc->unrealize) {
+-            dc->unrealize(dev, local_err ? NULL : &local_err);
++            dc->unrealize(dev, *errp ? NULL : errp);
+         }
+         dev->pending_deleted_event = true;
+         DEVICE_LISTENER_CALL(unrealize, Reverse, dev);
+ 
+-        if (local_err != NULL) {
++        if (*errp) {
+             goto fail;
+         }
+     }
+ 
+-    assert(local_err == NULL);
++    assert(*errp == NULL);
+     dev->realized = value;
+     return;
+ 
+@@ -934,7 +933,6 @@ post_realize_fail:
+     }
+ 
+ fail:
+-    error_propagate(errp, local_err);
+     if (unattached_parent) {
+         object_unparent(OBJECT(dev));
+         unattached_count--;
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index d14ef6af01..0a6f4e03ab 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -170,17 +170,16 @@ static void qdev_print_devinfos(bool show_no_user)
+ static int set_property(void *opaque, const char *name, const char *value,
+                         Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Object *obj = opaque;
+-    Error *err = NULL;
+ 
+     if (strcmp(name, "driver") == 0)
+         return 0;
+     if (strcmp(name, "bus") == 0)
+         return 0;
+ 
+-    object_property_parse(obj, value, name, &err);
+-    if (err != NULL) {
+-        error_propagate(errp, err);
++    object_property_parse(obj, value, name, errp);
++    if (*errp) {
+         return -1;
+     }
+     return 0;
+@@ -564,11 +563,11 @@ void qdev_set_id(DeviceState *dev, const char *id)
+ 
+ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceClass *dc;
+     const char *driver, *path;
+     DeviceState *dev;
+     BusState *bus = NULL;
+-    Error *err = NULL;
+ 
+     driver = qemu_opt_get(opts, "driver");
+     if (!driver) {
+@@ -616,9 +615,9 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+     dev = DEVICE(object_new(driver));
+ 
+     /* Check whether the hotplug is allowed by the machine */
+-    if (qdev_hotplug && !qdev_hotplug_allowed(dev, &err)) {
++    if (qdev_hotplug && !qdev_hotplug_allowed(dev, errp)) {
+         /* Error must be set in the machine hook */
+-        assert(err);
++        assert(*errp);
+         goto err_del_dev;
+     }
+ 
+@@ -626,7 +625,7 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+         qdev_set_parent_bus(dev, bus);
+     } else if (qdev_hotplug && !qdev_get_machine_hotplug_handler(dev)) {
+         /* No bus, no machine hotplug handler --> device is not hotpluggable */
+-        error_setg(&err, "Device '%s' can not be hotplugged on this machine",
++        error_setg(errp, "Device '%s' can not be hotplugged on this machine",
+                    driver);
+         goto err_del_dev;
+     }
+@@ -634,20 +633,19 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+     qdev_set_id(dev, qemu_opts_id(opts));
+ 
+     /* set properties */
+-    if (qemu_opt_foreach(opts, set_property, dev, &err)) {
++    if (qemu_opt_foreach(opts, set_property, dev, errp)) {
+         goto err_del_dev;
+     }
+ 
+     dev->opts = opts;
+-    object_property_set_bool(OBJECT(dev), true, "realized", &err);
+-    if (err != NULL) {
++    object_property_set_bool(OBJECT(dev), true, "realized", errp);
++    if (*errp) {
+         dev->opts = NULL;
+         goto err_del_dev;
+     }
+     return dev;
+ 
+ err_del_dev:
+-    error_propagate(errp, err);
+     object_unparent(OBJECT(dev));
+     object_unref(OBJECT(dev));
+     return NULL;
+@@ -749,22 +747,20 @@ void hmp_info_qdm(Monitor *mon, const QDict *qdict)
+ 
+ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     QemuOpts *opts;
+     DeviceState *dev;
+ 
+-    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, errp);
++    if (*errp) {
+         return;
+     }
+     if (!monitor_cur_is_qmp() && qdev_device_help(opts)) {
+         qemu_opts_del(opts);
+         return;
+     }
+-    dev = qdev_device_add(opts, &local_err);
++    dev = qdev_device_add(opts, errp);
+     if (!dev) {
+-        error_propagate(errp, local_err);
+         qemu_opts_del(opts);
+         return;
+     }
+@@ -802,10 +798,10 @@ static DeviceState *find_device_state(const char *id, Error **errp)
+ 
+ void qdev_unplug(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DeviceClass *dc = DEVICE_GET_CLASS(dev);
+     HotplugHandler *hotplug_ctrl;
+     HotplugHandlerClass *hdc;
+-    Error *local_err = NULL;
+ 
+     if (dev->parent_bus && !qbus_is_hotpluggable(dev->parent_bus)) {
+         error_setg(errp, QERR_BUS_NO_HOTPLUG, dev->parent_bus->name);
+@@ -834,14 +830,13 @@ void qdev_unplug(DeviceState *dev, Error **errp)
+      * otherwise just remove it synchronously */
+     hdc = HOTPLUG_HANDLER_GET_CLASS(hotplug_ctrl);
+     if (hdc->unplug_request) {
+-        hotplug_handler_unplug_request(hotplug_ctrl, dev, &local_err);
++        hotplug_handler_unplug_request(hotplug_ctrl, dev, errp);
+     } else {
+-        hotplug_handler_unplug(hotplug_ctrl, dev, &local_err);
+-        if (!local_err) {
++        hotplug_handler_unplug(hotplug_ctrl, dev, errp);
++        if (!*errp) {
+             object_unparent(OBJECT(dev));
+         }
+     }
+-    error_propagate(errp, local_err);
+ }
+ 
+ void qmp_device_del(const char *id, Error **errp)
+diff --git a/qom/object.c b/qom/object.c
+index 6fa9c619fa..b56f4bb6e7 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -374,6 +374,7 @@ static void object_post_init_with_type(Object *obj, TypeImpl *ti)
+ 
+ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int i;
+ 
+     if (!props) {
+@@ -382,7 +383,6 @@ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp
+ 
+     for (i = 0; i < props->len; i++) {
+         GlobalProperty *p = g_ptr_array_index(props, i);
+-        Error *err = NULL;
+ 
+         if (object_dynamic_cast(obj, p->driver) == NULL) {
+             continue;
+@@ -391,9 +391,9 @@ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp
+             continue;
+         }
+         p->used = true;
+-        object_property_parse(obj, p->value, p->property, &err);
+-        if (err != NULL) {
+-            error_prepend(&err, "can't apply global %s.%s=%s: ",
++        object_property_parse(obj, p->value, p->property, errp);
++        if (*errp) {
++            error_prepend(errp, "can't apply global %s.%s=%s: ",
+                           p->driver, p->property, p->value);
+             /*
+              * If errp != NULL, propagate error and return.
+@@ -401,10 +401,9 @@ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp
+              * with the remaining globals.
+              */
+             if (errp) {
+-                error_propagate(errp, err);
+                 return;
+             } else {
+-                warn_report_err(err);
++                warn_report_errp(errp);
+             }
+         }
+     }
+@@ -496,27 +495,27 @@ void object_initialize_childv(Object *parentobj, const char *propname,
+                               void *childobj, size_t size, const char *type,
+                               Error **errp, va_list vargs)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     Object *obj;
+     UserCreatable *uc;
+ 
+     object_initialize(childobj, size, type);
+     obj = OBJECT(childobj);
+ 
+-    object_set_propv(obj, &local_err, vargs);
+-    if (local_err) {
++    object_set_propv(obj, errp, vargs);
++    if (*errp) {
+         goto out;
+     }
+ 
+-    object_property_add_child(parentobj, propname, obj, &local_err);
+-    if (local_err) {
++    object_property_add_child(parentobj, propname, obj, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+     uc = (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
+     if (uc) {
+-        user_creatable_complete(uc, &local_err);
+-        if (local_err) {
++        user_creatable_complete(uc, errp);
++        if (*errp) {
+             object_unparent(obj);
+             goto out;
+         }
+@@ -530,8 +529,7 @@ void object_initialize_childv(Object *parentobj, const char *propname,
+     object_unref(obj);
+ 
+ out:
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         object_unref(obj);
+     }
+ }
+@@ -670,9 +668,9 @@ Object *object_new_with_propv(const char *typename,
+                               Error **errp,
+                               va_list vargs)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Object *obj;
+     ObjectClass *klass;
+-    Error *local_err = NULL;
+     UserCreatable *uc;
+ 
+     klass = object_class_by_name(typename);
+@@ -687,21 +685,21 @@ Object *object_new_with_propv(const char *typename,
+     }
+     obj = object_new_with_type(klass->type);
+ 
+-    if (object_set_propv(obj, &local_err, vargs) < 0) {
++    if (object_set_propv(obj, errp, vargs) < 0) {
+         goto error;
+     }
+ 
+     if (id != NULL) {
+-        object_property_add_child(parent, id, obj, &local_err);
+-        if (local_err) {
++        object_property_add_child(parent, id, obj, errp);
++        if (*errp) {
+             goto error;
+         }
+     }
+ 
+     uc = (UserCreatable *)object_dynamic_cast(obj, TYPE_USER_CREATABLE);
+     if (uc) {
+-        user_creatable_complete(uc, &local_err);
+-        if (local_err) {
++        user_creatable_complete(uc, errp);
++        if (*errp) {
+             if (id != NULL) {
+                 object_unparent(obj);
+             }
+@@ -713,7 +711,6 @@ Object *object_new_with_propv(const char *typename,
+     return obj;
+ 
+  error:
+-    error_propagate(errp, local_err);
+     object_unref(obj);
+     return NULL;
+ }
+@@ -738,17 +735,16 @@ int object_set_propv(Object *obj,
+                      Error **errp,
+                      va_list vargs)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const char *propname;
+-    Error *local_err = NULL;
+ 
+     propname = va_arg(vargs, char *);
+     while (propname != NULL) {
+         const char *value = va_arg(vargs, char *);
+ 
+         g_assert(value != NULL);
+-        object_property_parse(obj, value, propname, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        object_property_parse(obj, value, propname, errp);
++        if (*errp) {
+             return -1;
+         }
+         propname = va_arg(vargs, char *);
+@@ -1430,7 +1426,7 @@ typedef struct EnumProperty {
+ int object_property_get_enum(Object *obj, const char *name,
+                              const char *typename, Error **errp)
+ {
+-    Error *err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     Visitor *v;
+     char *str;
+     int ret;
+@@ -1451,9 +1447,8 @@ int object_property_get_enum(Object *obj, const char *name,
+     enumprop = prop->opaque;
+ 
+     v = string_output_visitor_new(false, &str);
+-    object_property_get(obj, v, name, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_get(obj, v, name, errp);
++    if (*errp) {
+         visit_free(v);
+         return 0;
+     }
+@@ -1471,14 +1466,13 @@ int object_property_get_enum(Object *obj, const char *name,
+ void object_property_get_uint16List(Object *obj, const char *name,
+                                     uint16List **list, Error **errp)
+ {
+-    Error *err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     Visitor *v;
+     char *str;
+ 
+     v = string_output_visitor_new(false, &str);
+-    object_property_get(obj, v, name, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_get(obj, v, name, errp);
++    if (*errp) {
+         goto out;
+     }
+     visit_complete(v, &str);
+@@ -1502,14 +1496,13 @@ void object_property_parse(Object *obj, const char *string,
+ char *object_property_print(Object *obj, const char *name, bool human,
+                             Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Visitor *v;
+     char *string = NULL;
+-    Error *local_err = NULL;
+ 
+     v = string_output_visitor_new(human, &string);
+-    object_property_get(obj, v, name, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_get(obj, v, name, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -1589,7 +1582,7 @@ static void object_finalize_child_property(Object *obj, const char *name,
+ void object_property_add_child(Object *obj, const char *name,
+                                Object *child, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     gchar *type;
+     ObjectProperty *op;
+ 
+@@ -1601,9 +1594,8 @@ void object_property_add_child(Object *obj, const char *name,
+     type = g_strdup_printf("child<%s>", object_get_typename(OBJECT(child)));
+ 
+     op = object_property_add(obj, name, type, object_get_child_property, NULL,
+-                             object_finalize_child_property, child, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                             object_finalize_child_property, child, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -1689,28 +1681,26 @@ static void object_set_link_property(Object *obj, Visitor *v,
+                                      const char *name, void *opaque,
+                                      Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     LinkProperty *prop = opaque;
+     Object **child = prop->child;
+     Object *old_target = *child;
+     Object *new_target = NULL;
+     char *path = NULL;
+ 
+-    visit_type_str(v, name, &path, &local_err);
++    visit_type_str(v, name, &path, errp);
+ 
+-    if (!local_err && strcmp(path, "") != 0) {
+-        new_target = object_resolve_link(obj, name, path, &local_err);
++    if (!*errp && strcmp(path, "") != 0) {
++        new_target = object_resolve_link(obj, name, path, errp);
+     }
+ 
+     g_free(path);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         return;
+     }
+ 
+-    prop->check(obj, name, new_target, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    prop->check(obj, name, new_target, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1746,7 +1736,7 @@ void object_property_add_link(Object *obj, const char *name,
+                               ObjectPropertyLinkFlags flags,
+                               Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     LinkProperty *prop = g_malloc(sizeof(*prop));
+     gchar *full_type;
+     ObjectProperty *op;
+@@ -1762,9 +1752,8 @@ void object_property_add_link(Object *obj, const char *name,
+                              check ? object_set_link_property : NULL,
+                              object_release_link_property,
+                              prop,
+-                             &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                             errp);
++    if (*errp) {
+         g_free(prop);
+         goto out;
+     }
+@@ -1959,13 +1948,12 @@ typedef struct StringProperty
+ static void property_get_str(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     StringProperty *prop = opaque;
+     char *value;
+-    Error *err = NULL;
+ 
+-    value = prop->get(obj, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    value = prop->get(obj, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1976,13 +1964,12 @@ static void property_get_str(Object *obj, Visitor *v, const char *name,
+ static void property_set_str(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     StringProperty *prop = opaque;
+     char *value;
+-    Error *local_err = NULL;
+ 
+-    visit_type_str(v, name, &value, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &value, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -2002,7 +1989,7 @@ void object_property_add_str(Object *obj, const char *name,
+                            void (*set)(Object *, const char *, Error **),
+                            Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     StringProperty *prop = g_malloc0(sizeof(*prop));
+ 
+     prop->get = get;
+@@ -2012,9 +1999,8 @@ void object_property_add_str(Object *obj, const char *name,
+                         get ? property_get_str : NULL,
+                         set ? property_set_str : NULL,
+                         property_release_str,
+-                        prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                        prop, errp);
++    if (*errp) {
+         g_free(prop);
+     }
+ }
+@@ -2025,7 +2011,7 @@ void object_class_property_add_str(ObjectClass *klass, const char *name,
+                                                Error **),
+                                    Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     StringProperty *prop = g_malloc0(sizeof(*prop));
+ 
+     prop->get = get;
+@@ -2035,9 +2021,8 @@ void object_class_property_add_str(ObjectClass *klass, const char *name,
+                               get ? property_get_str : NULL,
+                               set ? property_set_str : NULL,
+                               property_release_str,
+-                              prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                              prop, errp);
++    if (*errp) {
+         g_free(prop);
+     }
+ }
+@@ -2051,13 +2036,12 @@ typedef struct BoolProperty
+ static void property_get_bool(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BoolProperty *prop = opaque;
+     bool value;
+-    Error *err = NULL;
+ 
+-    value = prop->get(obj, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    value = prop->get(obj, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -2067,13 +2051,12 @@ static void property_get_bool(Object *obj, Visitor *v, const char *name,
+ static void property_set_bool(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BoolProperty *prop = opaque;
+     bool value;
+-    Error *local_err = NULL;
+ 
+-    visit_type_bool(v, name, &value, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_bool(v, name, &value, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -2092,7 +2075,7 @@ void object_property_add_bool(Object *obj, const char *name,
+                               void (*set)(Object *, bool, Error **),
+                               Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     BoolProperty *prop = g_malloc0(sizeof(*prop));
+ 
+     prop->get = get;
+@@ -2102,9 +2085,8 @@ void object_property_add_bool(Object *obj, const char *name,
+                         get ? property_get_bool : NULL,
+                         set ? property_set_bool : NULL,
+                         property_release_bool,
+-                        prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                        prop, errp);
++    if (*errp) {
+         g_free(prop);
+     }
+ }
+@@ -2114,7 +2096,7 @@ void object_class_property_add_bool(ObjectClass *klass, const char *name,
+                                     void (*set)(Object *, bool, Error **),
+                                     Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     BoolProperty *prop = g_malloc0(sizeof(*prop));
+ 
+     prop->get = get;
+@@ -2124,9 +2106,8 @@ void object_class_property_add_bool(ObjectClass *klass, const char *name,
+                               get ? property_get_bool : NULL,
+                               set ? property_set_bool : NULL,
+                               property_release_bool,
+-                              prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                              prop, errp);
++    if (*errp) {
+         g_free(prop);
+     }
+ }
+@@ -2134,13 +2115,12 @@ void object_class_property_add_bool(ObjectClass *klass, const char *name,
+ static void property_get_enum(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     EnumProperty *prop = opaque;
+     int value;
+-    Error *err = NULL;
+ 
+-    value = prop->get(obj, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    value = prop->get(obj, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -2150,13 +2130,12 @@ static void property_get_enum(Object *obj, Visitor *v, const char *name,
+ static void property_set_enum(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     EnumProperty *prop = opaque;
+     int value;
+-    Error *err = NULL;
+ 
+-    visit_type_enum(v, name, &value, prop->lookup, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    visit_type_enum(v, name, &value, prop->lookup, errp);
++    if (*errp) {
+         return;
+     }
+     prop->set(obj, value, errp);
+@@ -2176,7 +2155,7 @@ void object_property_add_enum(Object *obj, const char *name,
+                               void (*set)(Object *, int, Error **),
+                               Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     EnumProperty *prop = g_malloc(sizeof(*prop));
+ 
+     prop->lookup = lookup;
+@@ -2187,9 +2166,8 @@ void object_property_add_enum(Object *obj, const char *name,
+                         get ? property_get_enum : NULL,
+                         set ? property_set_enum : NULL,
+                         property_release_enum,
+-                        prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                        prop, errp);
++    if (*errp) {
+         g_free(prop);
+     }
+ }
+@@ -2201,7 +2179,7 @@ void object_class_property_add_enum(ObjectClass *klass, const char *name,
+                                     void (*set)(Object *, int, Error **),
+                                     Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     EnumProperty *prop = g_malloc(sizeof(*prop));
+ 
+     prop->lookup = lookup;
+@@ -2212,9 +2190,8 @@ void object_class_property_add_enum(ObjectClass *klass, const char *name,
+                               get ? property_get_enum : NULL,
+                               set ? property_set_enum : NULL,
+                               property_release_enum,
+-                              prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                              prop, errp);
++    if (*errp) {
+         g_free(prop);
+     }
+ }
+@@ -2226,48 +2203,46 @@ typedef struct TMProperty {
+ static void property_get_tm(Object *obj, Visitor *v, const char *name,
+                             void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     TMProperty *prop = opaque;
+-    Error *err = NULL;
+     struct tm value;
+ 
+-    prop->get(obj, &value, &err);
+-    if (err) {
+-        goto out;
++    prop->get(obj, &value, errp);
++    if (*errp) {
++        return;
+     }
+ 
+-    visit_start_struct(v, name, NULL, 0, &err);
+-    if (err) {
+-        goto out;
++    visit_start_struct(v, name, NULL, 0, errp);
++    if (*errp) {
++        return;
+     }
+-    visit_type_int32(v, "tm_year", &value.tm_year, &err);
+-    if (err) {
++    visit_type_int32(v, "tm_year", &value.tm_year, errp);
++    if (*errp) {
+         goto out_end;
+     }
+-    visit_type_int32(v, "tm_mon", &value.tm_mon, &err);
+-    if (err) {
++    visit_type_int32(v, "tm_mon", &value.tm_mon, errp);
++    if (*errp) {
+         goto out_end;
+     }
+-    visit_type_int32(v, "tm_mday", &value.tm_mday, &err);
+-    if (err) {
++    visit_type_int32(v, "tm_mday", &value.tm_mday, errp);
++    if (*errp) {
+         goto out_end;
+     }
+-    visit_type_int32(v, "tm_hour", &value.tm_hour, &err);
+-    if (err) {
++    visit_type_int32(v, "tm_hour", &value.tm_hour, errp);
++    if (*errp) {
+         goto out_end;
+     }
+-    visit_type_int32(v, "tm_min", &value.tm_min, &err);
+-    if (err) {
++    visit_type_int32(v, "tm_min", &value.tm_min, errp);
++    if (*errp) {
+         goto out_end;
+     }
+-    visit_type_int32(v, "tm_sec", &value.tm_sec, &err);
+-    if (err) {
++    visit_type_int32(v, "tm_sec", &value.tm_sec, errp);
++    if (*errp) {
+         goto out_end;
+     }
+-    visit_check_struct(v, &err);
++    visit_check_struct(v, errp);
+ out_end:
+     visit_end_struct(v, NULL);
+-out:
+-    error_propagate(errp, err);
+ 
+ }
+ 
+@@ -2282,7 +2257,7 @@ void object_property_add_tm(Object *obj, const char *name,
+                             void (*get)(Object *, struct tm *, Error **),
+                             Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     TMProperty *prop = g_malloc0(sizeof(*prop));
+ 
+     prop->get = get;
+@@ -2290,9 +2265,8 @@ void object_property_add_tm(Object *obj, const char *name,
+     object_property_add(obj, name, "struct tm",
+                         get ? property_get_tm : NULL, NULL,
+                         property_release_tm,
+-                        prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                        prop, errp);
++    if (*errp) {
+         g_free(prop);
+     }
+ }
+@@ -2301,7 +2275,7 @@ void object_class_property_add_tm(ObjectClass *klass, const char *name,
+                                   void (*get)(Object *, struct tm *, Error **),
+                                   Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     TMProperty *prop = g_malloc0(sizeof(*prop));
+ 
+     prop->get = get;
+@@ -2309,9 +2283,8 @@ void object_class_property_add_tm(ObjectClass *klass, const char *name,
+     object_class_property_add(klass, name, "struct tm",
+                               get ? property_get_tm : NULL, NULL,
+                               property_release_tm,
+-                              prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                              prop, errp);
++    if (*errp) {
+         g_free(prop);
+     }
+ }
+@@ -2446,11 +2419,11 @@ void object_property_add_alias(Object *obj, const char *name,
+                                Object *target_obj, const char *target_name,
+                                Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     AliasProperty *prop;
+     ObjectProperty *op;
+     ObjectProperty *target_prop;
+     gchar *prop_type;
+-    Error *local_err = NULL;
+ 
+     target_prop = object_property_find(target_obj, target_name, errp);
+     if (!target_prop) {
+@@ -2472,9 +2445,8 @@ void object_property_add_alias(Object *obj, const char *name,
+                              property_get_alias,
+                              property_set_alias,
+                              property_release_alias,
+-                             prop, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                             prop, errp);
++    if (*errp) {
+         g_free(prop);
+         goto out;
+     }
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index cb5809934a..02a43b6d98 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -33,10 +33,10 @@ Object *user_creatable_add_type(const char *type, const char *id,
+                                 const QDict *qdict,
+                                 Visitor *v, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Object *obj;
+     ObjectClass *klass;
+     const QDictEntry *e;
+-    Error *local_err = NULL;
+ 
+     klass = object_class_by_name(type);
+     if (!klass) {
+@@ -57,34 +57,34 @@ Object *user_creatable_add_type(const char *type, const char *id,
+ 
+     assert(qdict);
+     obj = object_new(type);
+-    visit_start_struct(v, NULL, NULL, 0, &local_err);
+-    if (local_err) {
++    visit_start_struct(v, NULL, NULL, 0, errp);
++    if (*errp) {
+         goto out;
+     }
+     for (e = qdict_first(qdict); e; e = qdict_next(qdict, e)) {
+-        object_property_set(obj, v, e->key, &local_err);
+-        if (local_err) {
++        object_property_set(obj, v, e->key, errp);
++        if (*errp) {
+             break;
+         }
+     }
+-    if (!local_err) {
+-        visit_check_struct(v, &local_err);
++    if (!*errp) {
++        visit_check_struct(v, errp);
+     }
+     visit_end_struct(v, NULL);
+-    if (local_err) {
++    if (*errp) {
+         goto out;
+     }
+ 
+     if (id != NULL) {
+         object_property_add_child(object_get_objects_root(),
+-                                  id, obj, &local_err);
+-        if (local_err) {
++                                  id, obj, errp);
++        if (*errp) {
+             goto out;
+         }
+     }
+ 
+-    user_creatable_complete(USER_CREATABLE(obj), &local_err);
+-    if (local_err) {
++    user_creatable_complete(USER_CREATABLE(obj), errp);
++    if (*errp) {
+         if (id != NULL) {
+             object_property_del(object_get_objects_root(),
+                                 id, &error_abort);
+@@ -92,8 +92,7 @@ Object *user_creatable_add_type(const char *type, const char *id,
+         goto out;
+     }
+ out:
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         object_unref(obj);
+         return NULL;
+     }
+diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
+index c3b95aa354..6713c29503 100644
+--- a/qom/qom-qobject.c
++++ b/qom/qom-qobject.c
+@@ -30,16 +30,15 @@ void object_property_set_qobject(Object *obj, QObject *value,
+ QObject *object_property_get_qobject(Object *obj, const char *name,
+                                      Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QObject *ret = NULL;
+-    Error *local_err = NULL;
+     Visitor *v;
+ 
+     v = qobject_output_visitor_new(&ret);
+-    object_property_get(obj, v, name, &local_err);
+-    if (!local_err) {
++    object_property_get(obj, v, name, errp);
++    if (!*errp) {
+         visit_complete(v, &ret);
+     }
+-    error_propagate(errp, local_err);
+     visit_free(v);
+     return ret;
+ }
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.21.0
+
 
