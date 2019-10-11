@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C21C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 259E3C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:40:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 587072084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:39:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 587072084C
+	by mail.kernel.org (Postfix) with ESMTPS id F01522084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:40:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F01522084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIysd-0003te-1o
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:39:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36534)
+	id 1iIyu9-0005TP-KR
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:40:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41352)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR0-0006MB-1d
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:31 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlO-0006n8-Ld
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0004ax-LF
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:29 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48190)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlM-0002Vz-MU
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:34 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49794)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQy-0004JN-DC
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
+ id 1iIxlK-0002Sc-Sh; Fri, 11 Oct 2019 12:27:32 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQm-0003XG-Ri; Fri, 11 Oct 2019 19:06:17 +0300
+ id 1iIxR1-0003XG-5G; Fri, 11 Oct 2019 19:06:31 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 062/126] eepro100: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:48 +0300
-Message-Id: <20191011160552.22907-63-vsementsov@virtuozzo.com>
+Subject: [RFC v5 100/126] NFS: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:26 +0300
+Message-Id: <20191011160552.22907-101-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,8 +60,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- armbru@redhat.com, Greg Kurz <groug@kaod.org>
+ qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, armbru@redhat.com,
+ Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,32 +110,36 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/net/eepro100.c | 7 +++----
+ block/nfs.c | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index cc2dd8b1c9..f40ae698fe 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -1829,17 +1829,16 @@ static NetClientInfo net_eepro100_info = {
- 
- static void e100_nic_realize(PCIDevice *pci_dev, Error **errp)
+diff --git a/block/nfs.c b/block/nfs.c
+index f39acfdb28..ec0dbe3385 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -561,21 +561,20 @@ out:
+ static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
+                                                      Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     EEPRO100State *s = DO_UPCAST(EEPRO100State, dev, pci_dev);
-     E100PCIDeviceInfo *info = eepro100_get_class(s);
+     BlockdevOptionsNfs *opts = NULL;
+     Visitor *v;
+     const QDictEntry *e;
 -    Error *local_err = NULL;
  
-     TRACE(OTHER, logout("\n"));
+     v = qobject_input_visitor_new_flat_confused(options, errp);
+     if (!v) {
+         return NULL;
+     }
  
-     s->device = info->device;
+-    visit_type_BlockdevOptionsNfs(v, NULL, &opts, &local_err);
++    visit_type_BlockdevOptionsNfs(v, NULL, &opts, errp);
+     visit_free(v);
  
--    e100_pci_reset(s, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    e100_pci_reset(s, errp);
 +    if (*errp) {
-         return;
+         return NULL;
      }
  
 -- 
