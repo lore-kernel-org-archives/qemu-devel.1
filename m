@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C584ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8E5ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:39:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7379B2089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:39:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7379B2089F
+	by mail.kernel.org (Postfix) with ESMTPS id 4F7BA2089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:39:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F7BA2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxxH-0003AJ-3H
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:39:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36679)
+	id 1iIxxN-0003KA-Vs
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:39:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36658)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0006Tm-ET
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:36 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR3-0006Sb-Jv
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR2-0004fj-Kg
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:34 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48314)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR1-0004ef-QZ
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:33 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48276)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR2-0004Nn-Cx
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:32 -0400
+ id 1iIxR1-0004Mz-Gp
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:31 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQr-0003XG-1K; Fri, 11 Oct 2019 19:06:21 +0300
+ id 1iIxQp-0003XG-Rb; Fri, 11 Oct 2019 19:06:20 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 073/126] SPICE: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:59 +0300
-Message-Id: <20191011160552.22907-74-vsementsov@virtuozzo.com>
+Subject: [RFC v5 069/126] chardev: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:55 +0300
+Message-Id: <20191011160552.22907-70-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,9 +60,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Gerd Hoffmann <kraxel@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,36 +111,118 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/display/qxl.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ chardev/char-socket.c |  7 +++----
+ chardev/char.c        | 20 +++++++++-----------
+ chardev/spice.c       |  1 +
+ 3 files changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-index cd7eb39d20..7596c7969b 100644
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -2210,9 +2210,9 @@ static void qxl_realize_common(PCIQXLDevice *qxl, Error **errp)
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 185fe38dda..75649630d3 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -963,6 +963,7 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
  
- static void qxl_realize_primary(PCIDevice *dev, Error **errp)
+ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     PCIQXLDevice *qxl = PCI_QXL(dev);
-     VGACommonState *vga = &qxl->vga;
--    Error *local_err = NULL;
+     SocketChardev *s = SOCKET_CHARDEV(chr);
+     const char *opts[] = { "telnet", "tn3270", "websock", "tls-creds" };
+     bool optset[] = { s->is_telnet, s->is_tn3270, s->is_websock, s->tls_creds };
+@@ -1031,13 +1032,11 @@ static int tcp_chr_wait_connected(Chardev *chr, Error **errp)
+         if (s->is_listen) {
+             tcp_chr_accept_server_sync(chr);
+         } else {
+-            Error *err = NULL;
+-            if (tcp_chr_connect_client_sync(chr, &err) < 0) {
++            if (tcp_chr_connect_client_sync(chr, errp) < 0) {
+                 if (s->reconnect_time) {
+-                    error_free(err);
++                    error_free_errp(errp);
+                     g_usleep(s->reconnect_time * 1000ULL * 1000ULL);
+                 } else {
+-                    error_propagate(errp, err);
+                     return -1;
+                 }
+             }
+diff --git a/chardev/char.c b/chardev/char.c
+index 7b6b2cb123..49eb5ffe06 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -603,7 +603,7 @@ static const char *chardev_alias_translate(const char *name)
  
-     qxl_init_ramsize(qxl);
-     vga->vbe_size = qxl->vgamem_size;
-@@ -2234,9 +2234,8 @@ static void qxl_realize_primary(PCIDevice *dev, Error **errp)
-         return;
+ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     const ChardevClass *cc;
+     ChardevBackend *backend = NULL;
+     const char *name = chardev_alias_translate(qemu_opt_get(opts, "backend"));
+@@ -623,9 +623,8 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
+     backend->type = CHARDEV_BACKEND_KIND_NULL;
+ 
+     if (cc->parse) {
+-        cc->parse(opts, backend, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        cc->parse(opts, backend, errp);
++        if (*errp) {
+             qapi_free_ChardevBackend(backend);
+             return NULL;
+         }
+@@ -949,9 +948,9 @@ Chardev *qemu_chardev_new(const char *id, const char *typename,
+                           GMainContext *gcontext,
+                           Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Object *obj;
+     Chardev *chr = NULL;
+-    Error *local_err = NULL;
+     bool be_opened = true;
+ 
+     assert(g_str_has_prefix(typename, "chardev-"));
+@@ -961,8 +960,8 @@ Chardev *qemu_chardev_new(const char *id, const char *typename,
+     chr->label = g_strdup(id);
+     chr->gcontext = gcontext;
+ 
+-    qemu_char_open(chr, backend, &be_opened, &local_err);
+-    if (local_err) {
++    qemu_char_open(chr, backend, &be_opened, errp);
++    if (*errp) {
+         goto end;
      }
  
--    qxl_realize_common(qxl, &local_err);
+@@ -974,16 +973,15 @@ Chardev *qemu_chardev_new(const char *id, const char *typename,
+     }
+ 
+     if (id) {
+-        object_property_add_child(get_chardevs_root(), id, obj, &local_err);
+-        if (local_err) {
++        object_property_add_child(get_chardevs_root(), id, obj, errp);
++        if (*errp) {
+             goto end;
+         }
+         object_unref(obj);
+     }
+ 
+ end:
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    qxl_realize_common(qxl, errp);
 +    if (*errp) {
-         return;
+         object_unref(obj);
+         return NULL;
      }
- 
+diff --git a/chardev/spice.c b/chardev/spice.c
+index 241e2b7770..ce2145fb19 100644
+--- a/chardev/spice.c
++++ b/chardev/spice.c
+@@ -267,6 +267,7 @@ static void qemu_chr_open_spice_vmc(Chardev *chr,
+                                     bool *be_opened,
+                                     Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     ChardevSpiceChannel *spicevmc = backend->u.spicevmc.data;
+     const char *type = spicevmc->type;
+     const char **psubtype = spice_server_char_device_recognized_subtypes();
 -- 
 2.21.0
 
