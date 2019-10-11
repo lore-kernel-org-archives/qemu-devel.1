@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C129C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 172A2ECE58E
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:29:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9E58206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:29:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9E58206A1
+	by mail.kernel.org (Postfix) with ESMTPS id E4C63206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:29:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4C63206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxnV-0008VY-Ai
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:29:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36311)
+	id 1iIxnW-0008Tz-Fx
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:29:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36555)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQu-0006Cg-CG
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:26 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR0-0006NS-Ha
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQs-0004OR-CX
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:24 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48004)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQz-0004bl-5t
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:30 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48208)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQs-0004BW-0B
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:22 -0400
+ id 1iIxQy-0004Jz-UW
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:29 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQg-0003XG-OQ; Fri, 11 Oct 2019 19:06:10 +0300
+ id 1iIxQn-0003XG-JA; Fri, 11 Oct 2019 19:06:17 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 043/126] ACPI/SMBIOS: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:29 +0300
-Message-Id: <20191011160552.22907-44-vsementsov@virtuozzo.com>
+Subject: [RFC v5 064/126] fw_cfg: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:50 +0300
+Message-Id: <20191011160552.22907-65-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,8 +61,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ armbru@redhat.com, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,331 +112,47 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/acpi/core.c           | 18 ++++++++---------
- hw/acpi/cpu_hotplug.c    |  2 +-
- hw/acpi/memory_hotplug.c |  7 +++----
- hw/mem/memory-device.c   | 20 +++++++++----------
- hw/mem/pc-dimm.c         | 23 ++++++++++------------
- hw/smbios/smbios.c       | 42 ++++++++++++++++------------------------
- 6 files changed, 48 insertions(+), 64 deletions(-)
+ hw/nvram/fw_cfg.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 45cbed49ab..2ade3d45e4 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -238,8 +238,8 @@ static void acpi_table_install(const char unsigned *blob, size_t bloblen,
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index 7dc3ac378e..e10687c876 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -1104,12 +1104,11 @@ static Property fw_cfg_io_properties[] = {
  
- void acpi_table_add(const QemuOpts *opts, Error **errp)
+ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     AcpiTableOptions *hdrs = NULL;
--    Error *err = NULL;
-     char **pathnames = NULL;
-     char **cur;
-     size_t bloblen = 0;
-@@ -249,21 +249,21 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-         Visitor *v;
- 
-         v = opts_visitor_new(opts);
--        visit_type_AcpiTableOptions(v, NULL, &hdrs, &err);
-+        visit_type_AcpiTableOptions(v, NULL, &hdrs, errp);
-         visit_free(v);
-     }
- 
--    if (err) {
-+    if (*errp) {
-         goto out;
-     }
-     if (hdrs->has_file == hdrs->has_data) {
--        error_setg(&err, "'-acpitable' requires one of 'data' or 'file'");
-+        error_setg(errp, "'-acpitable' requires one of 'data' or 'file'");
-         goto out;
-     }
- 
-     pathnames = g_strsplit(hdrs->has_file ? hdrs->file : hdrs->data, ":", 0);
-     if (pathnames == NULL || pathnames[0] == NULL) {
--        error_setg(&err, "'-acpitable' requires at least one pathname");
-+        error_setg(errp, "'-acpitable' requires at least one pathname");
-         goto out;
-     }
- 
-@@ -272,7 +272,7 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-         int fd = open(*cur, O_RDONLY | O_BINARY);
- 
-         if (fd < 0) {
--            error_setg(&err, "can't open file %s: %s", *cur, strerror(errno));
-+            error_setg(errp, "can't open file %s: %s", *cur, strerror(errno));
-             goto out;
-         }
- 
-@@ -288,7 +288,7 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-                 memcpy(blob + bloblen, data, r);
-                 bloblen += r;
-             } else if (errno != EINTR) {
--                error_setg(&err, "can't read file %s: %s",
-+                error_setg(errp, "can't read file %s: %s",
-                            *cur, strerror(errno));
-                 close(fd);
-                 goto out;
-@@ -298,14 +298,12 @@ void acpi_table_add(const QemuOpts *opts, Error **errp)
-         close(fd);
-     }
- 
--    acpi_table_install(blob, bloblen, hdrs->has_file, hdrs, &err);
-+    acpi_table_install(blob, bloblen, hdrs->has_file, hdrs, errp);
- 
- out:
-     g_free(blob);
-     g_strfreev(pathnames);
-     qapi_free_AcpiTableOptions(hdrs);
--
--    error_propagate(errp, err);
- }
- 
- unsigned acpi_table_len(void *current)
-diff --git a/hw/acpi/cpu_hotplug.c b/hw/acpi/cpu_hotplug.c
-index 6e8293aac9..cef72139fa 100644
---- a/hw/acpi/cpu_hotplug.c
-+++ b/hw/acpi/cpu_hotplug.c
-@@ -75,7 +75,7 @@ void legacy_acpi_cpu_plug_cb(HotplugHandler *hotplug_dev,
-                              AcpiCpuHotplug *g, DeviceState *dev, Error **errp)
- {
-     acpi_set_cpu_present_bit(g, CPU(dev), errp);
--    if (*errp != NULL) {
-+    if (*errp) {
-         return;
-     }
-     acpi_send_event(DEVICE(hotplug_dev), ACPI_CPU_HOTPLUG_STATUS);
-diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-index 9483d66e86..b127040613 100644
---- a/hw/acpi/memory_hotplug.c
-+++ b/hw/acpi/memory_hotplug.c
-@@ -241,12 +241,11 @@ static MemStatus *
- acpi_memory_slot_status(MemHotplugState *mem_st,
-                         DeviceState *dev, Error **errp)
- {
+     FWCfgIoState *s = FW_CFG_IO(dev);
 -    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     int slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
--                                       &local_err);
-+                                       errp);
  
+-    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    if (*errp) {
-         return NULL;
-     }
- 
-diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-index 53953fdc3a..f2b8de52aa 100644
---- a/hw/mem/memory-device.c
-+++ b/hw/mem/memory-device.c
-@@ -253,30 +253,28 @@ uint64_t get_plugged_memory_size(void)
- void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
-                             const uint64_t *legacy_align, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
--    Error *local_err = NULL;
-     uint64_t addr, align;
-     MemoryRegion *mr;
- 
--    mr = mdc->get_memory_region(md, &local_err);
--    if (local_err) {
--        goto out;
-+    mr = mdc->get_memory_region(md, errp);
-+    if (*errp) {
-+        return;
-     }
- 
-     align = legacy_align ? *legacy_align : memory_region_get_alignment(mr);
-     addr = mdc->get_addr(md);
-     addr = memory_device_get_free_addr(ms, !addr ? NULL : &addr, align,
--                                       memory_region_size(mr), &local_err);
--    if (local_err) {
--        goto out;
-+                                       memory_region_size(mr), errp);
-+    if (*errp) {
-+        return;
-     }
--    mdc->set_addr(md, addr, &local_err);
--    if (!local_err) {
-+    mdc->set_addr(md, addr, errp);
-+    if (!*errp) {
-         trace_memory_device_pre_plug(DEVICE(md)->id ? DEVICE(md)->id : "",
-                                      addr);
-     }
--out:
--    error_propagate(errp, local_err);
- }
- 
- void memory_device_plug(MemoryDeviceState *md, MachineState *ms)
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 99e2faf01b..f1ffb7b225 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -37,31 +37,29 @@ static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
- void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState *machine,
-                       const uint64_t *legacy_align, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     int slot;
- 
-     slot = object_property_get_int(OBJECT(dimm), PC_DIMM_SLOT_PROP,
-                                    &error_abort);
-     if ((slot < 0 || slot >= machine->ram_slots) &&
-          slot != PC_DIMM_UNASSIGNED_SLOT) {
--        error_setg(&local_err, "invalid slot number, valid range is [0-%"
-+        error_setg(errp, "invalid slot number, valid range is [0-%"
-                    PRIu64 "]", machine->ram_slots - 1);
--        goto out;
-+        return;
-     }
- 
-     slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
--                                 machine->ram_slots, &local_err);
--    if (local_err) {
--        goto out;
-+                                 machine->ram_slots, errp);
-+    if (*errp) {
-+        return;
-     }
-     object_property_set_int(OBJECT(dimm), slot, PC_DIMM_SLOT_PROP,
-                             &error_abort);
-     trace_mhp_pc_dimm_assigned_slot(slot);
- 
-     memory_device_pre_plug(MEMORY_DEVICE(dimm), machine, legacy_align,
--                           &local_err);
--out:
--    error_propagate(errp, local_err);
-+                           errp);
- }
- 
- void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine, Error **errp)
-@@ -150,12 +148,11 @@ static Property pc_dimm_properties[] = {
- static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
-                              void *opaque, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     uint64_t value;
- 
--    value = memory_device_get_region_size(MEMORY_DEVICE(obj), &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    value = memory_device_get_region_size(MEMORY_DEVICE(obj), errp);
++    fw_cfg_file_slots_allocate(FW_CFG(s), errp);
 +    if (*errp) {
          return;
      }
  
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 11d476c4a2..8dac885173 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -954,7 +954,7 @@ static void save_opt_list(size_t *ndest, const char ***dest,
+@@ -1155,14 +1154,13 @@ static Property fw_cfg_mem_properties[] = {
  
- void smbios_entry_add(QemuOpts *opts, Error **errp)
+ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
  {
--    Error *err = NULL;
 +    ERRP_AUTO_PROPAGATE();
-     const char *val;
+     FWCfgMemState *s = FW_CFG_MEM(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     const MemoryRegionOps *data_ops = &fw_cfg_data_mem_ops;
+-    Error *local_err = NULL;
  
-     assert(!smbios_immutable);
-@@ -965,9 +965,8 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-         int size;
-         struct smbios_table *table; /* legacy mode only */
+-    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    fw_cfg_file_slots_allocate(FW_CFG(s), errp);
++    if (*errp) {
+         return;
+     }
  
--        qemu_opts_validate(opts, qemu_smbios_file_opts, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        qemu_opts_validate(opts, qemu_smbios_file_opts, errp);
-+        if (*errp) {
-             return;
-         }
- 
-@@ -1052,9 +1051,8 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
- 
-         switch (type) {
-         case 0:
--            qemu_opts_validate(opts, qemu_smbios_type0_opts, &err);
--            if (err) {
--                error_propagate(errp, err);
-+            qemu_opts_validate(opts, qemu_smbios_type0_opts, errp);
-+            if (*errp) {
-                 return;
-             }
-             save_opt(&type0.vendor, opts, "vendor");
-@@ -1072,9 +1070,8 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-             }
-             return;
-         case 1:
--            qemu_opts_validate(opts, qemu_smbios_type1_opts, &err);
--            if (err) {
--                error_propagate(errp, err);
-+            qemu_opts_validate(opts, qemu_smbios_type1_opts, errp);
-+            if (*errp) {
-                 return;
-             }
-             save_opt(&type1.manufacturer, opts, "manufacturer");
-@@ -1094,9 +1091,8 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-             }
-             return;
-         case 2:
--            qemu_opts_validate(opts, qemu_smbios_type2_opts, &err);
--            if (err) {
--                error_propagate(errp, err);
-+            qemu_opts_validate(opts, qemu_smbios_type2_opts, errp);
-+            if (*errp) {
-                 return;
-             }
-             save_opt(&type2.manufacturer, opts, "manufacturer");
-@@ -1107,9 +1103,8 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-             save_opt(&type2.location, opts, "location");
-             return;
-         case 3:
--            qemu_opts_validate(opts, qemu_smbios_type3_opts, &err);
--            if (err) {
--                error_propagate(errp, err);
-+            qemu_opts_validate(opts, qemu_smbios_type3_opts, errp);
-+            if (*errp) {
-                 return;
-             }
-             save_opt(&type3.manufacturer, opts, "manufacturer");
-@@ -1119,9 +1114,8 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-             save_opt(&type3.sku, opts, "sku");
-             return;
-         case 4:
--            qemu_opts_validate(opts, qemu_smbios_type4_opts, &err);
--            if (err) {
--                error_propagate(errp, err);
-+            qemu_opts_validate(opts, qemu_smbios_type4_opts, errp);
-+            if (*errp) {
-                 return;
-             }
-             save_opt(&type4.sock_pfx, opts, "sock_pfx");
-@@ -1132,17 +1126,15 @@ void smbios_entry_add(QemuOpts *opts, Error **errp)
-             save_opt(&type4.part, opts, "part");
-             return;
-         case 11:
--            qemu_opts_validate(opts, qemu_smbios_type11_opts, &err);
--            if (err) {
--                error_propagate(errp, err);
-+            qemu_opts_validate(opts, qemu_smbios_type11_opts, errp);
-+            if (*errp) {
-                 return;
-             }
-             save_opt_list(&type11.nvalues, &type11.values, opts, "value");
-             return;
-         case 17:
--            qemu_opts_validate(opts, qemu_smbios_type17_opts, &err);
--            if (err) {
--                error_propagate(errp, err);
-+            qemu_opts_validate(opts, qemu_smbios_type17_opts, errp);
-+            if (*errp) {
-                 return;
-             }
-             save_opt(&type17.loc_pfx, opts, "loc_pfx");
 -- 
 2.21.0
 
