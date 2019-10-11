@@ -2,47 +2,45 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98372C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE02EC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:55:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D38721835
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:54:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D38721835
+	by mail.kernel.org (Postfix) with ESMTPS id A0DF421835
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:55:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0DF421835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54211 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyBY-0003lW-G2
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:54:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36387)
+	id 1iIyCg-00056R-LM
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:55:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQw-0006GE-Gt
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRA-0006eS-9V
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQt-0004R2-SI
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:26 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48034)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR6-0004lw-No
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48136)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQt-0004Ci-G3
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:23 -0400
+ id 1iIxR6-0004HR-Eu; Fri, 11 Oct 2019 12:06:36 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQi-0003XG-0y; Fri, 11 Oct 2019 19:06:12 +0300
+ id 1iIxQk-0003XG-Ud; Fri, 11 Oct 2019 19:06:15 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 048/126] USB: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:34 +0300
-Message-Id: <20191011160552.22907-49-vsementsov@virtuozzo.com>
+Subject: [RFC v5 056/126] virtio-ccw: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:42 +0300
+Message-Id: <20191011160552.22907-57-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -62,8 +60,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Gerd Hoffmann <kraxel@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ David Hildenbrand <david@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -112,357 +113,106 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/usb/bus.c                  | 37 +++++++++++++++--------------------
- hw/usb/ccid-card-emulated.c   |  1 +
- hw/usb/dev-smartcard-reader.c | 14 ++++++-------
- hw/usb/dev-storage.c          | 17 +++++++---------
- hw/usb/hcd-ohci-pci.c         |  7 +++----
- hw/usb/hcd-ohci.c             | 14 ++++++-------
- hw/usb/hcd-uhci.c             |  7 +++----
- hw/usb/hcd-xhci.c             | 13 ++++++------
- 8 files changed, 48 insertions(+), 62 deletions(-)
+ hw/s390x/virtio-ccw-crypto.c |  7 +++----
+ hw/s390x/virtio-ccw-rng.c    |  7 +++----
+ hw/s390x/virtio-ccw.c        | 13 ++++++-------
+ 3 files changed, 12 insertions(+), 15 deletions(-)
 
-diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-index a6522f5429..b2ef85afe4 100644
---- a/hw/usb/bus.c
-+++ b/hw/usb/bus.c
-@@ -240,8 +240,8 @@ void usb_device_free_streams(USBDevice *dev, USBEndpoint **eps, int nr_eps)
+diff --git a/hw/s390x/virtio-ccw-crypto.c b/hw/s390x/virtio-ccw-crypto.c
+index 086b397ad2..b942179f3f 100644
+--- a/hw/s390x/virtio-ccw-crypto.c
++++ b/hw/s390x/virtio-ccw-crypto.c
+@@ -17,14 +17,13 @@
  
- static void usb_qdev_realize(DeviceState *qdev, Error **errp)
+ static void virtio_ccw_crypto_realize(VirtioCcwDevice *ccw_dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     USBDevice *dev = USB_DEVICE(qdev);
--    Error *local_err = NULL;
- 
-     pstrcpy(dev->product_desc, sizeof(dev->product_desc),
-             usb_device_get_product_desc(dev));
-@@ -249,24 +249,21 @@ static void usb_qdev_realize(DeviceState *qdev, Error **errp)
-     QLIST_INIT(&dev->strings);
-     usb_ep_init(dev);
- 
--    usb_claim_port(dev, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    usb_claim_port(dev, errp);
-+    if (*errp) {
-         return;
-     }
- 
--    usb_device_realize(dev, &local_err);
--    if (local_err) {
-+    usb_device_realize(dev, errp);
-+    if (*errp) {
-         usb_release_port(dev);
--        error_propagate(errp, local_err);
-         return;
-     }
- 
-     if (dev->auto_attach) {
--        usb_device_attach(dev, &local_err);
--        if (local_err) {
-+        usb_device_attach(dev, errp);
-+        if (*errp) {
-             usb_qdev_unrealize(qdev, NULL);
--            error_propagate(errp, local_err);
-             return;
-         }
-     }
-@@ -325,7 +322,7 @@ USBDevice *usb_create(USBBus *bus, const char *name)
- static USBDevice *usb_try_create_simple(USBBus *bus, const char *name,
-                                         Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     USBDevice *dev;
- 
-     dev = USB_DEVICE(qdev_try_create(&bus->qbus, name));
-@@ -333,9 +330,9 @@ static USBDevice *usb_try_create_simple(USBBus *bus, const char *name,
-         error_setg(errp, "Failed to create USB device '%s'", name);
-         return NULL;
-     }
--    object_property_set_bool(OBJECT(dev), true, "realized", &err);
--    if (err) {
--        error_propagate_prepend(errp, err,
-+    object_property_set_bool(OBJECT(dev), true, "realized", errp);
-+    if (*errp) {
-+        error_prepend(errp,
-                                 "Failed to initialize USB device '%s': ",
-                                 name);
-         return NULL;
-@@ -532,12 +529,11 @@ void usb_check_attach(USBDevice *dev, Error **errp)
- 
- void usb_device_attach(USBDevice *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     USBPort *port = dev->port;
--    Error *local_err = NULL;
- 
--    usb_check_attach(dev, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    usb_check_attach(dev, errp);
-+    if (*errp) {
-         return;
-     }
- 
-@@ -731,16 +727,15 @@ static bool usb_get_attached(Object *obj, Error **errp)
- 
- static void usb_set_attached(Object *obj, bool value, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     USBDevice *dev = USB_DEVICE(obj);
+     VirtIOCryptoCcw *dev = VIRTIO_CRYPTO_CCW(ccw_dev);
+     DeviceState *vdev = DEVICE(&dev->vdev);
 -    Error *err = NULL;
  
-     if (dev->attached == value) {
-         return;
-     }
- 
-     if (value) {
--        usb_device_attach(dev, &err);
--        error_propagate(errp, err);
-+        usb_device_attach(dev, errp);
-     } else {
-         usb_device_detach(dev);
-     }
-diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
-index 291e41db8a..958791e817 100644
---- a/hw/usb/ccid-card-emulated.c
-+++ b/hw/usb/ccid-card-emulated.c
-@@ -488,6 +488,7 @@ static uint32_t parse_enumeration(char *str,
- 
- static void emulated_realize(CCIDCardState *base, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     EmulatedState *card = EMULATED_CCID_CARD(base);
-     VCardEmulError ret;
-     const EnumTable *ptable;
-diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-index 4568db2568..116bbc5c13 100644
---- a/hw/usb/dev-smartcard-reader.c
-+++ b/hw/usb/dev-smartcard-reader.c
-@@ -1271,19 +1271,18 @@ void ccid_card_card_inserted(CCIDCardState *card)
- 
- static void ccid_card_unrealize(DeviceState *qdev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     CCIDCardState *card = CCID_CARD(qdev);
-     CCIDCardClass *cc = CCID_CARD_GET_CLASS(card);
-     USBDevice *dev = USB_DEVICE(qdev->parent_bus->parent);
-     USBCCIDState *s = USB_CCID_DEV(dev);
--    Error *local_err = NULL;
- 
-     if (ccid_card_inserted(s)) {
-         ccid_card_card_removed(card);
-     }
-     if (cc->unrealize) {
--        cc->unrealize(card, &local_err);
--        if (local_err != NULL) {
--            error_propagate(errp, local_err);
-+        cc->unrealize(card, errp);
-+        if (*errp) {
-             return;
-         }
-     }
-@@ -1292,11 +1291,11 @@ static void ccid_card_unrealize(DeviceState *qdev, Error **errp)
- 
- static void ccid_card_realize(DeviceState *qdev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     CCIDCardState *card = CCID_CARD(qdev);
-     CCIDCardClass *cc = CCID_CARD_GET_CLASS(card);
-     USBDevice *dev = USB_DEVICE(qdev->parent_bus->parent);
-     USBCCIDState *s = USB_CCID_DEV(dev);
--    Error *local_err = NULL;
- 
-     if (card->slot != 0) {
-         error_setg(errp, "usb-ccid supports one slot, can't add %d",
-@@ -1308,9 +1307,8 @@ static void ccid_card_realize(DeviceState *qdev, Error **errp)
-         return;
-     }
-     if (cc->realize) {
--        cc->realize(card, &local_err);
--        if (local_err != NULL) {
--            error_propagate(errp, local_err);
-+        cc->realize(card, errp);
-+        if (*errp) {
-             return;
-         }
-     }
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 8545193488..71b6440801 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -717,19 +717,19 @@ static void usb_msd_get_bootindex(Object *obj, Visitor *v, const char *name,
- static void usb_msd_set_bootindex(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     USBDevice *dev = USB_DEVICE(obj);
-     MSDState *s = USB_STORAGE_DEV(dev);
-     int32_t boot_index;
--    Error *local_err = NULL;
- 
--    visit_type_int32(v, name, &boot_index, &local_err);
--    if (local_err) {
--        goto out;
-+    visit_type_int32(v, name, &boot_index, errp);
-+    if (*errp) {
-+        return;
-     }
-     /* check whether bootindex is present in fw_boot_order list  */
--    check_boot_index(boot_index, &local_err);
--    if (local_err) {
--        goto out;
-+    check_boot_index(boot_index, errp);
-+    if (*errp) {
-+        return;
-     }
-     /* change bootindex to a new one */
-     s->conf.bootindex = boot_index;
-@@ -738,9 +738,6 @@ static void usb_msd_set_bootindex(Object *obj, Visitor *v, const char *name,
-         object_property_set_int(OBJECT(s->scsi_dev), boot_index, "bootindex",
-                                 &error_abort);
-     }
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- static const TypeInfo usb_storage_dev_type_info = {
-diff --git a/hw/usb/hcd-ohci-pci.c b/hw/usb/hcd-ohci-pci.c
-index c052f10521..2e88561bf8 100644
---- a/hw/usb/hcd-ohci-pci.c
-+++ b/hw/usb/hcd-ohci-pci.c
-@@ -60,7 +60,7 @@ static void ohci_pci_die(struct OHCIState *ohci)
- 
- static void usb_ohci_realize_pci(PCIDevice *dev, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     OHCIPCIState *ohci = PCI_OHCI(dev);
- 
-     dev->config[PCI_CLASS_PROG] = 0x10; /* OHCI */
-@@ -68,9 +68,8 @@ static void usb_ohci_realize_pci(PCIDevice *dev, Error **errp)
- 
-     usb_ohci_init(&ohci->state, DEVICE(dev), ohci->num_ports, 0,
-                   ohci->masterbus, ohci->firstport,
--                  pci_get_address_space(dev), ohci_pci_die, &err);
+     qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
 -    if (err) {
 -        error_propagate(errp, err);
-+                  pci_get_address_space(dev), ohci_pci_die, errp);
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +    if (*errp) {
          return;
      }
  
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index 145ee21fd6..d54a7c429f 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -1795,7 +1795,7 @@ void usb_ohci_init(OHCIState *ohci, DeviceState *dev, uint32_t num_ports,
-                    uint32_t firstport, AddressSpace *as,
-                    void (*ohci_die_fn)(struct OHCIState *), Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     int i;
+diff --git a/hw/s390x/virtio-ccw-rng.c b/hw/s390x/virtio-ccw-rng.c
+index 854254dd50..bc242f1fc6 100644
+--- a/hw/s390x/virtio-ccw-rng.c
++++ b/hw/s390x/virtio-ccw-rng.c
+@@ -18,14 +18,13 @@
  
-     ohci->as = as;
-@@ -1831,9 +1831,8 @@ void usb_ohci_init(OHCIState *ohci, DeviceState *dev, uint32_t num_ports,
-         usb_register_companion(masterbus, ports, num_ports,
-                                firstport, ohci, &ohci_port_ops,
-                                USB_SPEED_MASK_LOW | USB_SPEED_MASK_FULL,
--                               &err);
+ static void virtio_ccw_rng_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VirtIORNGCcw *dev = VIRTIO_RNG_CCW(ccw_dev);
+     DeviceState *vdev = DEVICE(&dev->vdev);
+-    Error *err = NULL;
+ 
+     qdev_set_parent_bus(vdev, BUS(&ccw_dev->bus));
+-    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 6580ce5907..3d80b27ef5 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -692,18 +692,18 @@ static void virtio_sch_disable_cb(SubchDev *sch)
+ 
+ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+     SubchDev *sch;
+-    Error *err = NULL;
+ 
+     sch = css_create_sch(ccw_dev->devno, errp);
+     if (!sch) {
+         return;
+     }
+     if (!virtio_ccw_rev_max(dev) && dev->force_revision_1) {
+-        error_setg(&err, "Invalid value of property max_rev "
++        error_setg(errp, "Invalid value of property max_rev "
+                    "(is %d expected >= 1)", virtio_ccw_rev_max(dev));
+         goto out_err;
+     }
+@@ -728,21 +728,20 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+     }
+ 
+     if (k->realize) {
+-        k->realize(dev, &err);
 -        if (err) {
--            error_propagate(errp, err);
-+                               errp);
++        k->realize(dev, errp);
 +        if (*errp) {
-             return;
+             goto out_err;
          }
-     } else {
-@@ -1887,15 +1886,14 @@ typedef struct {
+     }
  
- static void ohci_realize_pxa(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     OHCISysBusState *s = SYSBUS_OHCI(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
--    Error *err = NULL;
- 
-     usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset,
-                   s->masterbus, s->firstport,
--                  &address_space_memory, ohci_sysbus_die, &err);
+-    ck->realize(ccw_dev, &err);
 -    if (err) {
--        error_propagate(errp, err);
-+                  &address_space_memory, ohci_sysbus_die, errp);
++    ck->realize(ccw_dev, errp);
 +    if (*errp) {
-         return;
-     }
-     sysbus_init_irq(sbd, &s->ohci.irq);
-diff --git a/hw/usb/hcd-uhci.c b/hw/usb/hcd-uhci.c
-index 23507ad3b5..758d2c700a 100644
---- a/hw/usb/hcd-uhci.c
-+++ b/hw/usb/hcd-uhci.c
-@@ -1213,7 +1213,7 @@ static USBBusOps uhci_bus_ops = {
- 
- static void usb_uhci_common_realize(PCIDevice *dev, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(dev);
-     UHCIPCIDeviceClass *u = container_of(pc, UHCIPCIDeviceClass, parent_class);
-     UHCIState *s = UHCI(dev);
-@@ -1234,9 +1234,8 @@ static void usb_uhci_common_realize(PCIDevice *dev, Error **errp)
-         usb_register_companion(s->masterbus, ports, NB_PORTS,
-                                s->firstport, s, &uhci_port_ops,
-                                USB_SPEED_MASK_LOW | USB_SPEED_MASK_FULL,
--                               &err);
--        if (err) {
--            error_propagate(errp, err);
-+                               errp);
-+        if (*errp) {
-             return;
-         }
-     } else {
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 80988bb305..4dec185ab5 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3369,8 +3369,8 @@ static void usb_xhci_init(XHCIState *xhci)
- 
- static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int i, ret;
--    Error *err = NULL;
- 
-     XHCIState *xhci = XHCI(dev);
- 
-@@ -3404,20 +3404,19 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+         goto out_err;
      }
  
-     if (xhci->msi != ON_OFF_AUTO_OFF) {
--        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, &err);
-+        ret = msi_init(dev, 0x70, xhci->numintrs, true, false, errp);
-         /* Any error other than -ENOTSUP(board's MSI support is broken)
-          * is a programming error */
-         assert(!ret || ret == -ENOTSUP);
-         if (ret && xhci->msi == ON_OFF_AUTO_ON) {
-             /* Can't satisfy user's explicit msi=on request, fail */
--            error_append_hint(&err, "You have to use msi=auto (default) or "
--                    "msi=off with this machine type.\n");
--            error_propagate(errp, err);
-+            error_append_hint(errp, "You have to use msi=auto (default) or "
-+                              "msi=off with this machine type.\n");
-             return;
-         }
--        assert(!err || xhci->msi == ON_OFF_AUTO_AUTO);
-+        assert(!*errp || xhci->msi == ON_OFF_AUTO_AUTO);
-         /* With msi=auto, we fall back to MSI off silently */
--        error_free(err);
-+        error_free_errp(errp);
-     }
+     return;
  
-     usb_xhci_init(xhci);
+ out_err:
+-    error_propagate(errp, err);
+     css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+     ccw_dev->sch = NULL;
+     g_free(sch);
 -- 
 2.21.0
 
