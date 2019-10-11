@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97312C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C85FC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:18:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EBCA214E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:17:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EBCA214E0
+	by mail.kernel.org (Postfix) with ESMTPS id 42EAB2089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:18:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42EAB2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyXZ-0008U3-Ug
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:17:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36284)
+	id 1iIyYN-00012B-2E
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:18:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQt-0006Ao-DX
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:25 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR7-0006ZK-Ez
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQr-0004NW-9M
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:23 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47972)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0004ie-Bi
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:37 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48362)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQq-0004Av-Tg
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:21 -0400
+ id 1iIxR4-0004Pf-3f
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:34 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQf-0003XG-Gj; Fri, 11 Oct 2019 19:06:09 +0300
+ id 1iIxQs-0003XG-GX; Fri, 11 Oct 2019 19:06:22 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 038/126] X86 Machines: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:24 +0300
-Message-Id: <20191011160552.22907-39-vsementsov@virtuozzo.com>
+Subject: [RFC v5 078/126] hostmem: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:04 +0300
+Message-Id: <20191011160552.22907-79-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,10 +61,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- armbru@redhat.com, Greg Kurz <groug@kaod.org>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+ Eduardo Habkost <ehabkost@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -113,385 +111,213 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/acpi/ich9.c             | 30 +++++++++-------------
- hw/char/debugcon.c         |  7 +++---
- hw/char/serial-pci-multi.c |  7 +++---
- hw/char/serial-pci.c       |  7 +++---
- hw/core/machine.c          | 21 +++++++---------
- hw/core/numa.c             | 51 +++++++++++++++++---------------------
- hw/intc/apic_common.c      |  7 +++---
- hw/pci-host/piix.c         |  7 +++---
- 8 files changed, 59 insertions(+), 78 deletions(-)
+ backends/hostmem-file.c  | 21 ++++++++------------
+ backends/hostmem-memfd.c | 18 ++++++++----------
+ backends/hostmem.c       | 41 ++++++++++++++++++----------------------
+ 3 files changed, 34 insertions(+), 46 deletions(-)
 
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index 2034dd749e..686b7cdf3a 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -369,17 +369,15 @@ static void ich9_pm_get_disable_s3(Object *obj, Visitor *v, const char *name,
- static void ich9_pm_set_disable_s3(Object *obj, Visitor *v, const char *name,
-                                    void *opaque, Error **errp)
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index be64020746..4d03b9f33a 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -116,25 +116,22 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
+                                           const char *name, void *opaque,
+                                           Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     ICH9LPCPMRegs *pm = opaque;
+     HostMemoryBackend *backend = MEMORY_BACKEND(o);
+     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
 -    Error *local_err = NULL;
-     uint8_t value;
+     uint64_t val;
  
--    visit_type_uint8(v, name, &value, &local_err);
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(&local_err, "cannot change property '%s' of %s",
++        error_setg(errp, "cannot change property '%s' of %s",
+                    name, object_get_typename(o));
+-        goto out;
++        return;
+     }
+ 
+-    visit_type_size(v, name, &val, &local_err);
 -    if (local_err) {
 -        goto out;
-+    visit_type_uint8(v, name, &value, errp);
++    visit_type_size(v, name, &val, errp);
 +    if (*errp) {
 +        return;
      }
-     pm->disable_s3 = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void ich9_pm_get_disable_s4(Object *obj, Visitor *v, const char *name,
-@@ -394,17 +392,15 @@ static void ich9_pm_get_disable_s4(Object *obj, Visitor *v, const char *name,
- static void ich9_pm_set_disable_s4(Object *obj, Visitor *v, const char *name,
-                                    void *opaque, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     ICH9LPCPMRegs *pm = opaque;
--    Error *local_err = NULL;
-     uint8_t value;
- 
--    visit_type_uint8(v, name, &value, &local_err);
--    if (local_err) {
--        goto out;
-+    visit_type_uint8(v, name, &value, errp);
-+    if (*errp) {
-+        return;
-     }
-     pm->disable_s4 = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void ich9_pm_get_s4_val(Object *obj, Visitor *v, const char *name,
-@@ -419,17 +415,15 @@ static void ich9_pm_get_s4_val(Object *obj, Visitor *v, const char *name,
- static void ich9_pm_set_s4_val(Object *obj, Visitor *v, const char *name,
-                                void *opaque, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     ICH9LPCPMRegs *pm = opaque;
--    Error *local_err = NULL;
-     uint8_t value;
- 
--    visit_type_uint8(v, name, &value, &local_err);
--    if (local_err) {
--        goto out;
-+    visit_type_uint8(v, name, &value, errp);
-+    if (*errp) {
-+        return;
-     }
-     pm->s4_val = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static bool ich9_pm_get_enable_tco(Object *obj, Error **errp)
-diff --git a/hw/char/debugcon.c b/hw/char/debugcon.c
-index 5c592e091b..0a6d0870bb 100644
---- a/hw/char/debugcon.c
-+++ b/hw/char/debugcon.c
-@@ -97,14 +97,13 @@ static void debugcon_realize_core(DebugconState *s, Error **errp)
- 
- static void debugcon_isa_realizefn(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     ISADevice *d = ISA_DEVICE(dev);
-     ISADebugconState *isa = ISA_DEBUGCON_DEVICE(dev);
-     DebugconState *s = &isa->state;
--    Error *err = NULL;
- 
--    debugcon_realize_core(s, &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
-+    debugcon_realize_core(s, errp);
-+    if (*errp) {
-         return;
-     }
-     memory_region_init_io(&s->io, OBJECT(dev), &debugcon_ops, s,
-diff --git a/hw/char/serial-pci-multi.c b/hw/char/serial-pci-multi.c
-index 5f13b5663b..fa7e348870 100644
---- a/hw/char/serial-pci-multi.c
-+++ b/hw/char/serial-pci-multi.c
-@@ -79,10 +79,10 @@ static void multi_serial_irq_mux(void *opaque, int n, int level)
- 
- static void multi_serial_pci_realize(PCIDevice *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(dev);
-     PCIMultiSerialState *pci = DO_UPCAST(PCIMultiSerialState, dev, dev);
-     SerialState *s;
--    Error *err = NULL;
-     int i, nr_ports = 0;
- 
-     switch (pc->device_id) {
-@@ -106,9 +106,8 @@ static void multi_serial_pci_realize(PCIDevice *dev, Error **errp)
-     for (i = 0; i < nr_ports; i++) {
-         s = pci->state + i;
-         s->baudbase = 115200;
--        serial_realize_core(s, &err);
--        if (err != NULL) {
--            error_propagate(errp, err);
-+        serial_realize_core(s, errp);
-+        if (*errp) {
-             multi_serial_pci_exit(dev);
-             return;
-         }
-diff --git a/hw/char/serial-pci.c b/hw/char/serial-pci.c
-index cb9b76e22b..7d31f7066c 100644
---- a/hw/char/serial-pci.c
-+++ b/hw/char/serial-pci.c
-@@ -43,14 +43,13 @@ typedef struct PCISerialState {
- 
- static void serial_pci_realize(PCIDevice *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PCISerialState *pci = DO_UPCAST(PCISerialState, dev, dev);
-     SerialState *s = &pci->state;
--    Error *err = NULL;
- 
-     s->baudbase = 115200;
--    serial_realize_core(s, &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
-+    serial_realize_core(s, errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 1689ad3bf8..89ba1845dc 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -192,13 +192,12 @@ static void machine_set_kernel_irqchip(Object *obj, Visitor *v,
-                                        const char *name, void *opaque,
-                                        Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     MachineState *ms = MACHINE(obj);
-     OnOffSplit mode;
- 
--    visit_type_OnOffSplit(v, name, &mode, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    visit_type_OnOffSplit(v, name, &mode, errp);
-+    if (*errp) {
-         return;
-     } else {
-         switch (mode) {
-@@ -240,13 +239,12 @@ static void machine_set_kvm_shadow_mem(Object *obj, Visitor *v,
-                                        const char *name, void *opaque,
-                                        Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     MachineState *ms = MACHINE(obj);
--    Error *error = NULL;
-     int64_t value;
- 
--    visit_type_int(v, name, &value, &error);
--    if (error) {
--        error_propagate(errp, error);
-+    visit_type_int(v, name, &value, errp);
-+    if (*errp) {
-         return;
-     }
- 
-@@ -342,13 +340,12 @@ static void machine_set_phandle_start(Object *obj, Visitor *v,
-                                       const char *name, void *opaque,
-                                       Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     MachineState *ms = MACHINE(obj);
--    Error *error = NULL;
-     int64_t value;
- 
--    visit_type_int(v, name, &value, &error);
--    if (error) {
--        error_propagate(errp, error);
-+    visit_type_int(v, name, &value, errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 4dfec5c95b..fa3b392e5c 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -59,7 +59,7 @@ static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
- static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-                             Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     uint16_t nodenr;
-     uint16List *cpus = NULL;
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
-@@ -99,9 +99,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-         props = mc->cpu_index_to_instance_props(ms, cpus->value);
-         props.node_id = nodenr;
-         props.has_node_id = true;
--        machine_set_cpu_numa_node(ms, &props, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        machine_set_cpu_numa_node(ms, &props, errp);
-+        if (*errp) {
-             return;
-         }
-     }
-@@ -177,60 +176,57 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
- 
- void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
- 
-     if (!mc->numa_mem_supported) {
-         error_setg(errp, "NUMA is not supported by this machine-type");
--        goto end;
-+        return;
-     }
- 
-     switch (object->type) {
-     case NUMA_OPTIONS_TYPE_NODE:
--        parse_numa_node(ms, &object->u.node, &err);
--        if (err) {
--            goto end;
-+        parse_numa_node(ms, &object->u.node, errp);
-+        if (*errp) {
-+            return;
-         }
-         break;
-     case NUMA_OPTIONS_TYPE_DIST:
--        parse_numa_distance(ms, &object->u.dist, &err);
--        if (err) {
--            goto end;
-+        parse_numa_distance(ms, &object->u.dist, errp);
-+        if (*errp) {
-+            return;
-         }
-         break;
-     case NUMA_OPTIONS_TYPE_CPU:
-         if (!object->u.cpu.has_node_id) {
--            error_setg(&err, "Missing mandatory node-id property");
--            goto end;
-+            error_setg(errp, "Missing mandatory node-id property");
-+            return;
-         }
-         if (!ms->numa_state->nodes[object->u.cpu.node_id].present) {
--            error_setg(&err, "Invalid node-id=%" PRId64 ", NUMA node must be "
--                "defined with -numa node,nodeid=ID before it's used with "
--                "-numa cpu,node-id=ID", object->u.cpu.node_id);
--            goto end;
-+            error_setg(errp, "Invalid node-id=%" PRId64 ", NUMA node must be "
-+                       "defined with -numa node,nodeid=ID before it's used with "
-+                       "-numa cpu,node-id=ID", object->u.cpu.node_id);
-+            return;
-         }
- 
-         machine_set_cpu_numa_node(ms, qapi_NumaCpuOptions_base(&object->u.cpu),
--                                  &err);
-+                                  errp);
-         break;
-     default:
-         abort();
-     }
+     fb->align = val;
 -
--end:
--    error_propagate(errp, err);
+- out:
+-    error_propagate(errp, local_err);
  }
  
- static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+ static bool file_memory_backend_get_pmem(Object *o, Error **errp)
+@@ -144,6 +141,7 @@ static bool file_memory_backend_get_pmem(Object *o, Error **errp)
+ 
+ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     NumaOptions *object = NULL;
-     MachineState *ms = MACHINE(opaque);
--    Error *err = NULL;
-     Visitor *v = opts_visitor_new(opts);
+     HostMemoryBackend *backend = MEMORY_BACKEND(o);
+     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
  
--    visit_type_NumaOptions(v, NULL, &object, &err);
-+    visit_type_NumaOptions(v, NULL, &object, errp);
-     visit_free(v);
--    if (err) {
-+    if (*errp) {
-         goto end;
-     }
+@@ -156,13 +154,10 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
  
-@@ -240,12 +236,11 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
-         qemu_strtosz_MiB(mem_str, NULL, &object->u.node.mem);
-     }
- 
--    set_numa_options(ms, object, &err);
-+    set_numa_options(ms, object, errp);
- 
- end:
-     qapi_free_NumaOptions(object);
--    if (err) {
--        error_propagate(errp, err);
-+    if (*errp) {
-         return -1;
-     }
- 
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index aafd8e0e33..81ed4b4ea8 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -464,9 +464,9 @@ static void apic_common_get_id(Object *obj, Visitor *v, const char *name,
- static void apic_common_set_id(Object *obj, Visitor *v, const char *name,
-                                void *opaque, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     APICCommonState *s = APIC_COMMON(obj);
-     DeviceState *dev = DEVICE(obj);
--    Error *local_err = NULL;
-     uint32_t value;
- 
-     if (dev->realized) {
-@@ -474,9 +474,8 @@ static void apic_common_set_id(Object *obj, Visitor *v, const char *name,
-         return;
-     }
- 
--    visit_type_uint32(v, name, &value, &local_err);
--    if (local_err) {
+ #ifndef CONFIG_LIBPMEM
+     if (value) {
+-        Error *local_err = NULL;
+-
+-        error_setg(&local_err,
++        error_setg(errp,
+                    "Lack of libpmem support while setting the 'pmem=on'"
+                    " of %s. We can't ensure data persistence.",
+                    object_get_typename(o));
 -        error_propagate(errp, local_err);
-+    visit_type_uint32(v, name, &value, errp);
-+    if (*errp) {
          return;
      }
- 
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index 135c645535..24b32aa33b 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -855,18 +855,17 @@ out:
- 
- static void igd_pt_i440fx_realize(PCIDevice *pci_dev, Error **errp)
+ #endif
+diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
+index 26070b425e..1f0677e5b4 100644
+--- a/backends/hostmem-memfd.c
++++ b/backends/hostmem-memfd.c
+@@ -77,27 +77,25 @@ static void
+ memfd_backend_set_hugetlbsize(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     uint32_t val = 0;
-     int i, num;
-     int pos, len;
+     HostMemoryBackendMemfd *m = MEMORY_BACKEND_MEMFD(obj);
 -    Error *local_err = NULL;
+     uint64_t value;
  
-     num = ARRAY_SIZE(igd_host_bridge_infos);
-     for (i = 0; i < num; i++) {
-         pos = igd_host_bridge_infos[i].offset;
-         len = igd_host_bridge_infos[i].len;
--        host_pci_config_read(pos, len, &val, &local_err);
+     if (host_memory_backend_mr_inited(MEMORY_BACKEND(obj))) {
+-        error_setg(&local_err, "cannot change property value");
+-        goto out;
++        error_setg(errp, "cannot change property value");
++        return;
+     }
+ 
+-    visit_type_size(v, name, &value, &local_err);
+-    if (local_err) {
+-        goto out;
++    visit_type_size(v, name, &value, errp);
++    if (*errp) {
++        return;
+     }
+     if (!value) {
+-        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
++        error_setg(errp, "Property '%s.%s' doesn't take value '%"
+                    PRIu64 "'", object_get_typename(obj), name, value);
+-        goto out;
++        return;
+     }
+     m->hugetlbsize = value;
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 6d333dc23c..7a3dd9d69b 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -53,29 +53,27 @@ static void
+ host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
+                              void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+-    Error *local_err = NULL;
+     uint64_t value;
+ 
+     if (host_memory_backend_mr_inited(backend)) {
+-        error_setg(&local_err, "cannot change property %s of %s ",
++        error_setg(errp, "cannot change property %s of %s ",
+                    name, object_get_typename(obj));
+-        goto out;
++        return;
+     }
+ 
+-    visit_type_size(v, name, &value, &local_err);
+-    if (local_err) {
+-        goto out;
++    visit_type_size(v, name, &value, errp);
++    if (*errp) {
++        return;
+     }
+     if (!value) {
+-        error_setg(&local_err,
++        error_setg(errp,
+                    "property '%s' of %s doesn't take value '%" PRIu64 "'",
+                    name, object_get_typename(obj), value);
+-        goto out;
++        return;
+     }
+     backend->size = value;
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void
+@@ -221,7 +219,7 @@ static bool host_memory_backend_get_prealloc(Object *obj, Error **errp)
+ static void host_memory_backend_set_prealloc(Object *obj, bool value,
+                                              Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
+     MachineState *ms = MACHINE(qdev_get_machine());
+ 
+@@ -243,9 +241,8 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
+         void *ptr = memory_region_get_ram_ptr(&backend->mr);
+         uint64_t sz = memory_region_size(&backend->mr);
+ 
+-        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
 -        if (local_err) {
 -            error_propagate(errp, local_err);
-+        host_pci_config_read(pos, len, &val, errp);
++        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, errp);
 +        if (*errp) {
              return;
          }
-         pci_default_write_config(pci_dev, pos, val, len);
+         backend->prealloc = true;
+@@ -311,17 +308,17 @@ size_t host_memory_backend_pagesize(HostMemoryBackend *memdev)
+ static void
+ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     HostMemoryBackend *backend = MEMORY_BACKEND(uc);
+     HostMemoryBackendClass *bc = MEMORY_BACKEND_GET_CLASS(uc);
+     MachineState *ms = MACHINE(qdev_get_machine());
+-    Error *local_err = NULL;
+     void *ptr;
+     uint64_t sz;
+ 
+     if (bc->alloc) {
+-        bc->alloc(backend, &local_err);
+-        if (local_err) {
+-            goto out;
++        bc->alloc(backend, errp);
++        if (*errp) {
++            return;
+         }
+ 
+         ptr = memory_region_get_ram_ptr(&backend->mr);
+@@ -378,14 +375,12 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+          */
+         if (backend->prealloc) {
+             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
+-                            ms->smp.cpus, &local_err);
+-            if (local_err) {
+-                goto out;
++                            ms->smp.cpus, errp);
++            if (*errp) {
++                return;
+             }
+         }
+     }
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static bool
 -- 
 2.21.0
 
