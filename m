@@ -2,58 +2,58 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1F2C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B737C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:45:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE310206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:43:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE310206CD
+	by mail.kernel.org (Postfix) with ESMTPS id E8CDE206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:45:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8CDE206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ2h3-0001lQ-If
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:43:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55472)
+	id 1iJ2jC-0004AE-If
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:45:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iJ2Ro-0003no-H7
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:41 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iJ2RU-0003YS-Jf
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iJ2Rn-0001T3-88
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46388)
+ (envelope-from <jsnow@redhat.com>) id 1iJ2RT-0001KY-Dc
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:27:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38150)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iJ2Rk-0001RK-2u; Fri, 11 Oct 2019 17:27:36 -0400
+ id 1iJ2RQ-0001Jr-Pu; Fri, 11 Oct 2019 17:27:17 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4C40418C428E;
- Fri, 11 Oct 2019 21:27:35 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 02736315C00D;
+ Fri, 11 Oct 2019 21:27:16 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E71631EC;
- Fri, 11 Oct 2019 21:27:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF2E545A2;
+ Fri, 11 Oct 2019 21:26:27 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 18/19] MAINTAINERS: Add Vladimir as a reviewer for bitmaps
-Date: Fri, 11 Oct 2019 17:25:49 -0400
-Message-Id: <20191011212550.27269-19-jsnow@redhat.com>
+Subject: [PULL 11/19] iotests: add test-case to 165 to test reopening qcow2
+ bitmaps to RW
+Date: Fri, 11 Oct 2019 17:25:42 -0400
+Message-Id: <20191011212550.27269-12-jsnow@redhat.com>
 In-Reply-To: <20191011212550.27269-1-jsnow@redhat.com>
 References: <20191011212550.27269-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 11 Oct 2019 21:27:35 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Fri, 11 Oct 2019 21:27:16 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -79,42 +79,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I already try to make sure all bitmaps patches have been reviewed by both
-Red Hat and Virtuozzo anyway, so this formalizes the arrangement.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Fam meanwhile is no longer as active, so I am removing him as a co-mainta=
-iner
-simply to reflect the current practice.
+Reopening bitmaps to RW was broken prior to previous commit. Check that
+it works now.
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190927122355.7344-4-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20191005194448.16629-2-jsnow@redhat.com
 ---
- MAINTAINERS | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tests/qemu-iotests/165     | 57 ++++++++++++++++++++++++++++++++++++--
+ tests/qemu-iotests/165.out |  4 +--
+ 2 files changed, 57 insertions(+), 4 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3ca814850e0..a08c92a4162 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1816,8 +1816,8 @@ F: qapi/transaction.json
- T: git https://repo.or.cz/qemu/armbru.git block-next
+diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+index 5650dc7c874..951ea011a27 100755
+--- a/tests/qemu-iotests/165
++++ b/tests/qemu-iotests/165
+@@ -43,10 +43,10 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
+         os.remove(disk)
 =20
- Dirty Bitmaps
--M: Fam Zheng <fam@euphon.net>
- M: John Snow <jsnow@redhat.com>
-+R: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
- L: qemu-block@nongnu.org
- S: Supported
- F: util/hbitmap.c
-@@ -1826,7 +1826,6 @@ F: include/qemu/hbitmap.h
- F: include/block/dirty-bitmap.h
- F: tests/test-hbitmap.c
- F: docs/interop/bitmaps.rst
--T: git https://github.com/famz/qemu.git bitmaps
- T: git https://github.com/jnsnow/qemu.git bitmaps
+     def mkVm(self):
+-        return iotests.VM().add_drive(disk)
++        return iotests.VM().add_drive(disk, opts=3D'node-name=3Dnode0')
 =20
- Character device backends
+     def mkVmRo(self):
+-        return iotests.VM().add_drive(disk, opts=3D'readonly=3Don')
++        return iotests.VM().add_drive(disk, opts=3D'readonly=3Don,node-n=
+ame=3Dnode0')
+=20
+     def getSha256(self):
+         result =3D self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
+@@ -102,6 +102,59 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase)=
+:
+=20
+         self.vm.shutdown()
+=20
++    def test_reopen_rw(self):
++        self.vm =3D self.mkVm()
++        self.vm.launch()
++        self.qmpAddBitmap()
++
++        # Calculate hashes
++
++        self.writeRegions(regions1)
++        sha256_1 =3D self.getSha256()
++
++        self.writeRegions(regions2)
++        sha256_2 =3D self.getSha256()
++        assert sha256_1 !=3D sha256_2 # Otherwise, it's not very interes=
+ting.
++
++        result =3D self.vm.qmp('block-dirty-bitmap-clear', node=3D'drive=
+0',
++                             name=3D'bitmap0')
++        self.assert_qmp(result, 'return', {})
++
++        # Start with regions1
++
++        self.writeRegions(regions1)
++        assert sha256_1 =3D=3D self.getSha256()
++
++        self.vm.shutdown()
++
++        self.vm =3D self.mkVmRo()
++        self.vm.launch()
++
++        assert sha256_1 =3D=3D self.getSha256()
++
++        # Check that we are in RO mode and can't modify bitmap.
++        self.writeRegions(regions2)
++        assert sha256_1 =3D=3D self.getSha256()
++
++        # Reopen to RW
++        result =3D self.vm.qmp('x-blockdev-reopen', **{
++            'node-name': 'node0',
++            'driver': iotests.imgfmt,
++            'file': {
++                'driver': 'file',
++                'filename': disk
++            },
++            'read-only': False
++        })
++        self.assert_qmp(result, 'return', {})
++
++        # Check that bitmap is reopened to RW and we can write to it.
++        self.writeRegions(regions2)
++        assert sha256_2 =3D=3D self.getSha256()
++
++        self.vm.shutdown()
++
++
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['qcow2'],
+                  supported_protocols=3D['file'])
+diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
+index ae1213e6f86..fbc63e62f88 100644
+--- a/tests/qemu-iotests/165.out
++++ b/tests/qemu-iotests/165.out
+@@ -1,5 +1,5 @@
+-.
++..
+ ----------------------------------------------------------------------
+-Ran 1 tests
++Ran 2 tests
+=20
+ OK
 --=20
 2.21.0
 
