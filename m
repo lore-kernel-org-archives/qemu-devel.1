@@ -2,55 +2,54 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0B9C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 20:46:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 972E5C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 20:50:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CCE0218AC
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 20:46:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CCE0218AC
+	by mail.kernel.org (Postfix) with ESMTPS id 6137B218AC
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 20:50:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6137B218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ1nc-0000nJ-25
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 16:46:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49803)
+	id 1iJ1rs-0004DP-JR
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 16:50:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50560)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iJ1ln-0008A2-UL
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 16:44:18 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iJ1qX-0003Ha-48
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 16:49:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iJ1lm-0006Um-25
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 16:44:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46292)
+ (envelope-from <jsnow@redhat.com>) id 1iJ1qV-0007uj-Lf
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 16:49:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44352)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iJ1li-0006Tl-Kf; Fri, 11 Oct 2019 16:44:10 -0400
+ id 1iJ1qQ-0007ra-Ob; Fri, 11 Oct 2019 16:49:02 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C27D487630;
- Fri, 11 Oct 2019 20:44:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C986B1DA3;
+ Fri, 11 Oct 2019 20:49:00 +0000 (UTC)
 Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2B135D9CA;
- Fri, 11 Oct 2019 20:44:03 +0000 (UTC)
-Subject: Re: [PATCH v2 1/1] IDE: deprecate ide-drive
-To: Peter Krempa <pkrempa@redhat.com>
-References: <20191009224303.10232-1-jsnow@redhat.com>
- <20191009224303.10232-2-jsnow@redhat.com>
- <518ae20b-049d-19ee-1e86-c48466ba0655@redhat.com>
- <20191010112650.GR6129@angien.pipo.sk>
- <10bb29c8-2375-25cd-af67-edddca1be5d7@redhat.com>
- <20191010115436.GS6129@angien.pipo.sk>
- <1a35d92f-ccb1-9e54-193b-a1b193c3e696@redhat.com>
- <20191011091247.GD1979@andariel.pipo.sk>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B66DD5D9CA;
+ Fri, 11 Oct 2019 20:48:59 +0000 (UTC)
+Subject: Re: [PATCH] qcow2-bitmaps: fix qcow2_can_store_new_dirty_bitmap
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190607184802.100945-1-vsementsov@virtuozzo.com>
+ <f218e52c-8b0b-07cc-519f-23e9612b2320@virtuozzo.com>
+ <6fde60fa-a4fb-eaf8-3830-5d358afb121f@redhat.com>
+ <97542d69-0304-2b0a-e33b-de4369b35b4d@redhat.com>
+ <ce2c7d48-80f1-5b21-b5da-abb98add9cbc@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -126,17 +125,17 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <ac0d5096-b374-f385-1d84-5e554539a361@redhat.com>
-Date: Fri, 11 Oct 2019 16:44:03 -0400
+Message-ID: <26ab9ab1-cbc9-2af0-2eaf-a6b2475b45af@redhat.com>
+Date: Fri, 11 Oct 2019 16:48:59 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191011091247.GD1979@andariel.pipo.sk>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <ce2c7d48-80f1-5b21-b5da-abb98add9cbc@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 11 Oct 2019 20:44:09 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Fri, 11 Oct 2019 20:49:00 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -152,51 +151,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 10/11/19 5:12 AM, Peter Krempa wrote:
-> On Thu, Oct 10, 2019 at 14:08:12 -0400, John Snow wrote:
->> On 10/10/19 7:54 AM, Peter Krempa wrote:
->>> On Thu, Oct 10, 2019 at 13:42:26 +0200, Philippe Mathieu-Daud=E9 wrot=
-e:
->>>> On 10/10/19 1:26 PM, Peter Krempa wrote:
->=20
-> [...]
->=20
->>> To be honest, I didn't really review the code nor the documentation.
->>> I actually reviewed only the idea itself in the context of integratio=
-n
->>> with libvirt and that's why I didn't go for 'Reviewed-by:'.
+On 10/11/19 6:02 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 10.10.2019 21:46, John Snow wrote:
+>>
+>>
+>> On 10/10/19 11:39 AM, Eric Blake wrote:
+>>> On 6/7/19 1:53 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 07.06.2019 21:48, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> qcow2_can_store_new_dirty_bitmap works wrong, as it considers only
+>>>>> bitmaps already stored in the qcow2 image and ignores persistent
+>>>>> BdrvDirtyBitmap objects.
+>>>>>
+>>>>> So, let's instead count persistent BdrvDirtyBitmaps. We load all qc=
+ow2
+>>>>> bitmaps on open, so there should not be any bitmap in the image for
+>>>>> which we don't have BdrvDirtyBitmaps version. If it is - it's a kin=
+d of
+>>>>> corruption, and no reason to check for corruptions here (open() and
+>>>>> close() are better places for it).
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+>>>>> ---
+>>>>>
+>>>>> Hi!
+>>>>>
+>>>>> Patch is better than discussing I thing, so here is my
+>>>>> counter-suggestion for
+>>>>> "[PATCH 0/5] block/dirty-bitmap: check number and size constraints
+>>>>> against queued bitmaps"
+>>>>> by John.
+>>>>>
+>>>>> It's of course needs some additional refactoring, as first assert
+>>>>> shows bad design,
+>>>>> I just wrote it in such manner to make minimum changes to fix the b=
+ug.
+>>>>>
 >>>
->>> The gist of the citation above is that we should stick to well known
->>> tags with their well known meanings and I think that considering this=
- a
->>> 'review' would be a stretch of the definiton.
+>>>>> +=C2=A0=C2=A0=C2=A0 assert(!bdrv_find_dirty_bitmap(bs, name));
+>>>>
+>>>> exactly bad, this should be checked in qmp_block_dirty_bitmap_add(),
+>>>> before checks around
+>>>> persistence. and aio_context_acquire may be dropped..
+>>>>
+>>>> But anyway, idea is clear I think, consider it as RFC patch
+>>>
+>>> Are you planning to post a v2, as this affects at least
+>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1712636
 >>>
 >>
->> I wasn't aware that PMM wanted to avoid non-standard tags; I consider
->> them to be for human use, but I can change that behavior.
+>> I suppose we ought to do it this way for now as it's less SLOC than my
+>> idea, but I have to admit I would still prefer to get rid of "can_stor=
+e"
+>> altogether and provide concrete bitmap_store() and bitmap_remove()
+>> callbacks for purpose of symmetry and model simplicity.
 >>
->> Peter, I'll change it to an ACK (as suggested by Kevin) is that's OK b=
-y you.
+>> I guess I'll worry about that discussion some other time.
+>>
+>> --js
+>>
 >=20
-> Sure! I'll spell it out even for compliance:
->=20
-> ACKed-by: Peter Krempa <pkrempa@redhat.com>
+> Should I base it on master or on you bitmaps branch? Do we want it for =
+stable?
 >=20
 
-Thanks, applied to my IDE tree:
-
-https://github.com/jnsnow/qemu/commits/ide
-https://github.com/jnsnow/qemu.git
+Not sure. I'm going to send the PR out today and you can decide what's
+best to do. (Please do CC qemu-stable, though.)
 
 --js
 
