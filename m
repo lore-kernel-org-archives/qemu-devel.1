@@ -2,52 +2,66 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC62CECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 09:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C873C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 09:13:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C38782084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 09:12:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C38782084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 068BE2084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 09:13:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 068BE2084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIqyl-0005LI-BT
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 05:12:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49517)
+	id 1iIqzl-000689-HS
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 05:13:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50084)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIqtM-0005x7-Cw
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:07:21 -0400
+ (envelope-from <pkrempa@redhat.com>) id 1iIqwP-0002fs-6S
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIqtL-0004B1-1C
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:07:20 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60302)
+ (envelope-from <pkrempa@redhat.com>) id 1iIqwN-0005kl-Rt
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:10:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43564)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIqtH-000479-ML; Fri, 11 Oct 2019 05:07:15 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIqtE-0000XM-Qx; Fri, 11 Oct 2019 12:07:12 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 4/5] block/mirror: support unaligned write in active mirror
-Date: Fri, 11 Oct 2019 12:07:10 +0300
-Message-Id: <20191011090711.19940-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191011090711.19940-1-vsementsov@virtuozzo.com>
-References: <20191011090711.19940-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iIqwN-0005jv-LH
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 05:10:27 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CFC8C18CB8E0
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 09:10:26 +0000 (UTC)
+Received: from andariel.pipo.sk (ovpn-204-231.brq.redhat.com [10.40.204.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 10C695D6C8;
+ Fri, 11 Oct 2019 09:10:24 +0000 (UTC)
+Date: Fri, 11 Oct 2019 11:10:21 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v4 0/4] qapi: Add detection for the 'savevm' fix for
+ blockdev
+Message-ID: <20191011091021.GC1979@andariel.pipo.sk>
+References: <20191011085027.28606-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="oJ71EGRlYNjSvfq7"
+Content-Disposition: inline
+In-Reply-To: <20191011085027.28606-1-armbru@redhat.com>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Fri, 11 Oct 2019 09:10:26 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,151 +73,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Prior 9adc1cb49af8d do_sync_target_write had a bug: it reset aligned-up
-region in the dirty bitmap, which means that we may not copy some bytes
-and assume them copied, which actually leads to producing corrupted
-target.
 
-So 9adc1cb49af8d forced dirty bitmap granularity to be
-request_alignment for mirror-top filter, so we are not working with
-unaligned requests. However forcing large alignment obviously decreases
-performance of unaligned requests.
+--oJ71EGRlYNjSvfq7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This commit provides another solution for the problem: if unaligned
-padding is already dirty, we can safely ignore it, as
-1. It's dirty, it will be copied by mirror_iteration anyway
-2. It's dirty, so skipping it now we don't increase dirtiness of the
-   bitmap and therefore don't damage "synchronicity" of the
-   write-blocking mirror.
+On Fri, Oct 11, 2019 at 10:50:23 +0200, Markus Armbruster wrote:
+> Add 'features' field in the schema for commands and add a feature flag
+> to advertise that the fix for savevm [1] is present.
+>=20
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg03487.html
+>=20
+> Based-on: <20191001191514.11208-1-armbru@redhat.com>
+>=20
+> v4:
+>  - PATCH 1: New
+>  - PATCH 2: Factor out check_features()
+>  - PATCH 3: Factor out _print_features(), drop duplicated test
+>  - PATCH 4: Shorten savevm-blockdev-monitor-nodes to just
+>             savevm-monitor-nodes; tweak commit message and
+> 	    documentation
 
-If unaligned padding is not dirty, we just write it, no reason to touch
-dirty bitmap if we succeed (on failure we'll set the whole region
-ofcourse, but we loss "synchronicity" on failure anyway).
+Thanks for fixing the problems in 2-4, they all look good to me. Adding
+a reviewed-by in this case would not be appropriate.
 
-Note: we need to disable dirty_bitmap, otherwise we will not be able to
-see in do_sync_target_write bitmap state before current operation. We
-may of course check dirty bitmap before the operation in
-bdrv_mirror_top_do_write and remember it, but we don't need active
-dirty bitmap for write-blocking mirror anyway.
+--oJ71EGRlYNjSvfq7
+Content-Type: application/pgp-signature; name="signature.asc"
 
-New code-path is unused until the following commit reverts
-9adc1cb49af8d.
+-----BEGIN PGP SIGNATURE-----
 
-Suggested-by: Denis V. Lunev <den@openvz.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/mirror.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 68 insertions(+), 3 deletions(-)
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAl2gRv0ACgkQHGwCByjY
+1Gr7ohAAmXqbc9TaxV87ELX4ep5PPIqGrNQJ9E1wWrSatuTPMUKuJLaF4cQld7Mz
+p/4eoykEDDz6DUs9/OeyTel2PykBsy4FyjTsvsVE8Tlz8pP/kbllDnRdEYAqth0/
+xefgYdJPL5fj9vz6Sr+wv9emdtrBhNYPhcuQStf5Npo225Njs3N46LNbuIAUQb19
+Tn7IrtJN0zYMJkbbOylNPmDWxSxIdf3GYo7/Ik7EmJGx5Wllt8rmNnT9h+AePvoo
+KeYEavMVmNImK+pDyLwnBaD/sA57IXzUV1hfcxrWhaDceJQxHp2bNN5uw6Hwz0K+
+WMD5/a2xTJnzoqeWWUqYOJUBd+QCAGhKzY5OYdvNZo7bYvrb3clWl0RYQUqXAlaN
+5wzKGwX4zoHLvFqxyCSip4t2KYXIymZ/zj52pfA4Em382KBU5vaBTzvOQX4tJ3UE
+G3hwPOrEXpYSKD2GNQ3bl1t7n/gqKfVka4WFgBvbjWXB+N/oGoSZjk631iTzSW7O
+wylEq5Uq4Mx46hUmiCz/9YWDQO5VtQrb5nnHIE/g5yea3seQZjpjTLYMptVOckUY
+/84U2ytApQ6LiR1IxSYt2w6JKV7MFeAqRkhBkVgpFh4797DIeQvMIxzhxkd/6gXg
+eKUbcRPlsZUuuHMXyzvJ6zvubcIi9wW2d7/adtrMR23GtaitmAQ=
+=HOB8
+-----END PGP SIGNATURE-----
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 1ae57a5131..1ed1d79ff8 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1182,14 +1182,67 @@ do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
-                      QEMUIOVector *qiov, int flags)
- {
-     int ret;
-+    size_t qiov_offset = 0;
-+    int64_t bitmap_offset, bitmap_end;
- 
--    bdrv_reset_dirty_bitmap(job->dirty_bitmap, offset, bytes);
-+    if (!QEMU_IS_ALIGNED(offset, job->granularity) &&
-+        bdrv_dirty_bitmap_get(job->dirty_bitmap, offset))
-+    {
-+            /*
-+             * Dirty unaligned padding: ignore it.
-+             *
-+             * Reasoning:
-+             * 1. If we copy it, we can't reset corresponding bit in
-+             *    dirty_bitmap as there may be some "dirty" bytes still not
-+             *    copied.
-+             * 2. It's already dirty, so skipping it we don't diverge mirror
-+             *    progress.
-+             *
-+             * Note, that because of this, guest write may have no contribution
-+             * into mirror converge, but that's not bad, as we have background
-+             * process of mirroring. If under some bad circumstances (high guest
-+             * IO load) background process starve, we will not converge anyway,
-+             * even if each write will contribute, as guest is not guaranteed to
-+             * rewrite the whole disk.
-+             */
-+            qiov_offset = QEMU_ALIGN_UP(offset, job->granularity) - offset;
-+            if (bytes <= qiov_offset) {
-+                /* nothing to do after shrink */
-+                return;
-+            }
-+            offset += qiov_offset;
-+            bytes -= qiov_offset;
-+    }
-+
-+    if (!QEMU_IS_ALIGNED(offset + bytes, job->granularity) &&
-+        bdrv_dirty_bitmap_get(job->dirty_bitmap, offset + bytes - 1))
-+    {
-+        uint64_t tail = (offset + bytes) % job->granularity;
-+
-+        if (bytes <= tail) {
-+            /* nothing to do after shrink */
-+            return;
-+        }
-+        bytes -= tail;
-+    }
-+
-+    /*
-+     * Tails are either clean or shrunk, so for bitmap resetting
-+     * we safely align the range down.
-+     */
-+    bitmap_offset = QEMU_ALIGN_UP(offset, job->granularity);
-+    bitmap_end = QEMU_ALIGN_DOWN(offset + bytes, job->granularity);
-+    if (bitmap_offset < bitmap_end) {
-+        bdrv_reset_dirty_bitmap(job->dirty_bitmap, bitmap_offset,
-+                                bitmap_end - bitmap_offset);
-+    }
- 
-     job_progress_increase_remaining(&job->common.job, bytes);
- 
-     switch (method) {
-     case MIRROR_METHOD_COPY:
--        ret = blk_co_pwritev(job->target, offset, bytes, qiov, flags);
-+        ret = blk_co_pwritev_part(job->target, offset, bytes,
-+                                  qiov, qiov_offset, flags);
-         break;
- 
-     case MIRROR_METHOD_ZERO:
-@@ -1211,7 +1264,16 @@ do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
-     } else {
-         BlockErrorAction action;
- 
--        bdrv_set_dirty_bitmap(job->dirty_bitmap, offset, bytes);
-+        /*
-+         * We failed, so we should mark dirty the whole area, aligned up.
-+         * Note that we don't care about shrunk tails if any: they were dirty
-+         * at function start, and they must be still dirty, as we've locked
-+         * the region for in-flight op.
-+         */
-+        bitmap_offset = QEMU_ALIGN_DOWN(offset, job->granularity);
-+        bitmap_end = QEMU_ALIGN_UP(offset + bytes, job->granularity);
-+        bdrv_set_dirty_bitmap(job->dirty_bitmap, bitmap_offset,
-+                              bitmap_end - bitmap_offset);
-         job->actively_synced = false;
- 
-         action = mirror_error_action(job, false, -ret);
-@@ -1618,6 +1680,9 @@ static BlockJob *mirror_start_job(
-     if (!s->dirty_bitmap) {
-         goto fail;
-     }
-+    if (s->copy_mode == MIRROR_COPY_MODE_WRITE_BLOCKING) {
-+        bdrv_disable_dirty_bitmap(s->dirty_bitmap);
-+    }
- 
-     ret = block_job_add_bdrv(&s->common, "source", bs, 0,
-                              BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE |
--- 
-2.21.0
-
+--oJ71EGRlYNjSvfq7--
 
