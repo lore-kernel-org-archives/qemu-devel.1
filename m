@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BD6C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EBEC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:08:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18221206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:07:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18221206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 01B91206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:08:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01B91206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyON-0005Yj-Mc
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:07:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37255)
+	id 1iIyOr-0006I9-SE
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:08:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRK-0006we-Uj
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRC-0006hn-2T
  for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRJ-0004wI-4b
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:50 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48516)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR1-0004di-40
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:41 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47958)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxRI-0004Yu-Sf; Fri, 11 Oct 2019 12:06:49 -0400
+ id 1iIxR0-0004Ah-Bu; Fri, 11 Oct 2019 12:06:31 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQx-0003XG-IF; Fri, 11 Oct 2019 19:06:27 +0300
+ id 1iIxQe-0003XG-PO; Fri, 11 Oct 2019 19:06:08 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 094/126] RBD: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:20 +0300
-Message-Id: <20191011160552.22907-95-vsementsov@virtuozzo.com>
+Subject: [RFC v5 035/126] PowerPC Machines: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:21 +0300
+Message-Id: <20191011160552.22907-36-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +60,11 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
- Greg Kurz <groug@kaod.org>, Jason Dillaman <dillaman@redhat.com>
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,120 +113,2449 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/rbd.c | 29 ++++++++++++-----------------
- 1 file changed, 12 insertions(+), 17 deletions(-)
+ hw/intc/pnv_xive.c      |  15 ++---
+ hw/intc/xics.c          |  28 ++++-----
+ hw/intc/xics_kvm.c      |  30 +++++----
+ hw/intc/xics_pnv.c      |   7 +--
+ hw/intc/xics_spapr.c    |   7 +--
+ hw/isa/pc87312.c        |   7 +--
+ hw/misc/macio/macio.c   |  68 +++++++++-----------
+ hw/ppc/e500.c           |   7 +--
+ hw/ppc/mac_newworld.c   |   1 +
+ hw/ppc/pnv.c            | 109 ++++++++++++++------------------
+ hw/ppc/pnv_core.c       |  23 +++----
+ hw/ppc/pnv_homer.c      |   5 +-
+ hw/ppc/pnv_lpc.c        |  26 ++++----
+ hw/ppc/pnv_occ.c        |   5 +-
+ hw/ppc/pnv_psi.c        |  23 +++----
+ hw/ppc/spapr.c          | 133 ++++++++++++++++++----------------------
+ hw/ppc/spapr_caps.c     |  57 ++++++++---------
+ hw/ppc/spapr_cpu_core.c |  36 +++++------
+ hw/ppc/spapr_drc.c      |  48 ++++++---------
+ hw/ppc/spapr_irq.c      |  98 +++++++++++++----------------
+ hw/ppc/spapr_pci.c      |  97 +++++++++++++----------------
+ hw/ppc/spapr_vio.c      |  12 ++--
+ 22 files changed, 364 insertions(+), 478 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index 057af43d48..fc821da17e 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -428,10 +428,10 @@ static int coroutine_fn qemu_rbd_co_create_opts(const char *filename,
-                                                 QemuOpts *opts,
-                                                 Error **errp)
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index ed6e9d71bb..05acec9b91 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -1659,15 +1659,14 @@ static void pnv_xive_init(Object *obj)
+ 
+ static void pnv_xive_realize(DeviceState *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptions *create_options;
-     BlockdevCreateOptionsRbd *rbd_opts;
-     BlockdevOptionsRbd *loc;
+     PnvXive *xive = PNV_XIVE(dev);
+     XiveSource *xsrc = &xive->ipi_source;
+     XiveENDSource *end_xsrc = &xive->end_source;
 -    Error *local_err = NULL;
-     const char *keypairs, *password_secret;
-     QDict *options = NULL;
-     int ret = 0;
-@@ -452,10 +452,9 @@ static int coroutine_fn qemu_rbd_co_create_opts(const char *filename,
-     rbd_opts->has_cluster_size = (rbd_opts->cluster_size != 0);
+     Object *obj;
  
-     options = qdict_new();
--    qemu_rbd_parse_filename(filename, options, &local_err);
--    if (local_err) {
-+    qemu_rbd_parse_filename(filename, options, errp);
-+    if (*errp) {
-         ret = -EINVAL;
+-    obj = object_property_get_link(OBJECT(dev), "chip", &local_err);
++    obj = object_property_get_link(OBJECT(dev), "chip", errp);
+     if (!obj) {
 -        error_propagate(errp, local_err);
-         goto exit;
+         error_prepend(errp, "required link 'chip' not found: ");
+         return;
+     }
+@@ -1685,9 +1684,8 @@ static void pnv_xive_realize(DeviceState *dev, Error **errp)
+                             &error_fatal);
+     object_property_add_const_link(OBJECT(xsrc), "xive", OBJECT(xive),
+                                    &error_fatal);
+-    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(xsrc), true, "realized", errp);
++    if (*errp) {
+         return;
      }
  
-@@ -572,8 +571,8 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-                             const char *keypairs, const char *secretid,
+@@ -1695,9 +1693,8 @@ static void pnv_xive_realize(DeviceState *dev, Error **errp)
+                             &error_fatal);
+     object_property_add_const_link(OBJECT(end_xsrc), "xive", OBJECT(xive),
+                                    &error_fatal);
+-    object_property_set_bool(OBJECT(end_xsrc), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(end_xsrc), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index dfe7dbd254..91a3e8840a 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -297,15 +297,15 @@ static void icp_reset_handler(void *dev)
+ 
+ static void icp_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     ICPState *icp = ICP(dev);
+     PowerPCCPU *cpu;
+     CPUPPCState *env;
+     Object *obj;
+-    Error *err = NULL;
+ 
+-    obj = object_property_get_link(OBJECT(dev), ICP_PROP_XICS, &err);
++    obj = object_property_get_link(OBJECT(dev), ICP_PROP_XICS, errp);
+     if (!obj) {
+-        error_propagate_prepend(errp, err,
++        error_prepend(errp,
+                                 "required link '" ICP_PROP_XICS
+                                 "' not found: ");
+         return;
+@@ -313,9 +313,9 @@ static void icp_realize(DeviceState *dev, Error **errp)
+ 
+     icp->xics = XICS_FABRIC(obj);
+ 
+-    obj = object_property_get_link(OBJECT(dev), ICP_PROP_CPU, &err);
++    obj = object_property_get_link(OBJECT(dev), ICP_PROP_CPU, errp);
+     if (!obj) {
+-        error_propagate_prepend(errp, err,
++        error_prepend(errp,
+                                 "required link '" ICP_PROP_CPU
+                                 "' not found: ");
+         return;
+@@ -344,9 +344,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
+ 
+     /* Connect the presenter to the VCPU (required for CPU hotplug) */
+     if (kvm_irqchip_in_kernel()) {
+-        icp_kvm_realize(dev, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        icp_kvm_realize(dev, errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -381,7 +380,7 @@ static const TypeInfo icp_info = {
+ 
+ Object *icp_create(Object *cpu, const char *type, XICSFabric *xi, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     Object *obj;
+ 
+     obj = object_new(type);
+@@ -390,10 +389,9 @@ Object *icp_create(Object *cpu, const char *type, XICSFabric *xi, Error **errp)
+     object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
+                                    &error_abort);
+     object_property_add_const_link(obj, ICP_PROP_CPU, cpu, &error_abort);
+-    object_property_set_bool(obj, true, "realized", &local_err);
+-    if (local_err) {
++    object_property_set_bool(obj, true, "realized", errp);
++    if (*errp) {
+         object_unparent(obj);
+-        error_propagate(errp, local_err);
+         obj = NULL;
+     }
+ 
+@@ -587,13 +585,13 @@ static void ics_reset_handler(void *dev)
+ 
+ static void ics_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     ICSState *ics = ICS(dev);
+-    Error *local_err = NULL;
+     Object *obj;
+ 
+-    obj = object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &local_err);
++    obj = object_property_get_link(OBJECT(dev), ICS_PROP_XICS, errp);
+     if (!obj) {
+-        error_propagate_prepend(errp, local_err,
++        error_prepend(errp,
+                                 "required link '" ICS_PROP_XICS
+                                 "' not found: ");
+         return;
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index ba90d6dc96..66902228e3 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -294,6 +294,7 @@ int ics_set_kvm_state_one(ICSState *ics, int srcno, Error **errp)
+ 
+ int ics_set_kvm_state(ICSState *ics, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int i;
+ 
+     /* The KVM XICS device is not in use */
+@@ -302,16 +303,14 @@ int ics_set_kvm_state(ICSState *ics, Error **errp)
+     }
+ 
+     for (i = 0; i < ics->nr_irqs; i++) {
+-        Error *local_err = NULL;
+         int ret;
+ 
+         if (ics_irq_free(ics, i)) {
+             continue;
+         }
+ 
+-        ret = ics_set_kvm_state_one(ics, i, &local_err);
++        ret = ics_set_kvm_state_one(ics, i, errp);
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             return ret;
+         }
+     }
+@@ -344,9 +343,9 @@ void ics_kvm_set_irq(ICSState *ics, int srcno, int val)
+ 
+ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int rc;
+     CPUState *cs;
+-    Error *local_err = NULL;
+ 
+     /*
+      * The KVM XICS device already in use. This is the case when
+@@ -364,28 +363,28 @@ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
+ 
+     rc = kvmppc_define_rtas_kernel_token(RTAS_IBM_SET_XIVE, "ibm,set-xive");
+     if (rc < 0) {
+-        error_setg_errno(&local_err, -rc,
++        error_setg_errno(errp, -rc,
+                          "kvmppc_define_rtas_kernel_token: ibm,set-xive");
+         goto fail;
+     }
+ 
+     rc = kvmppc_define_rtas_kernel_token(RTAS_IBM_GET_XIVE, "ibm,get-xive");
+     if (rc < 0) {
+-        error_setg_errno(&local_err, -rc,
++        error_setg_errno(errp, -rc,
+                          "kvmppc_define_rtas_kernel_token: ibm,get-xive");
+         goto fail;
+     }
+ 
+     rc = kvmppc_define_rtas_kernel_token(RTAS_IBM_INT_ON, "ibm,int-on");
+     if (rc < 0) {
+-        error_setg_errno(&local_err, -rc,
++        error_setg_errno(errp, -rc,
+                          "kvmppc_define_rtas_kernel_token: ibm,int-on");
+         goto fail;
+     }
+ 
+     rc = kvmppc_define_rtas_kernel_token(RTAS_IBM_INT_OFF, "ibm,int-off");
+     if (rc < 0) {
+-        error_setg_errno(&local_err, -rc,
++        error_setg_errno(errp, -rc,
+                          "kvmppc_define_rtas_kernel_token: ibm,int-off");
+         goto fail;
+     }
+@@ -393,7 +392,7 @@ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
+     /* Create the KVM XICS device */
+     rc = kvm_create_device(kvm_state, KVM_DEV_TYPE_XICS, false);
+     if (rc < 0) {
+-        error_setg_errno(&local_err, -rc, "Error on KVM_CREATE_DEVICE for XICS");
++        error_setg_errno(errp, -rc, "Error on KVM_CREATE_DEVICE for XICS");
+         goto fail;
+     }
+ 
+@@ -406,23 +405,23 @@ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
+     CPU_FOREACH(cs) {
+         PowerPCCPU *cpu = POWERPC_CPU(cs);
+ 
+-        icp_kvm_realize(DEVICE(spapr_cpu_state(cpu)->icp), &local_err);
+-        if (local_err) {
++        icp_kvm_realize(DEVICE(spapr_cpu_state(cpu)->icp), errp);
++        if (*errp) {
+             goto fail;
+         }
+     }
+ 
+     /* Update the KVM sources */
+-    ics_set_kvm_state(spapr->ics, &local_err);
+-    if (local_err) {
++    ics_set_kvm_state(spapr->ics, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+     /* Connect the presenters to the initial VCPUs of the machine */
+     CPU_FOREACH(cs) {
+         PowerPCCPU *cpu = POWERPC_CPU(cs);
+-        icp_set_kvm_state(spapr_cpu_state(cpu)->icp, &local_err);
+-        if (local_err) {
++        icp_set_kvm_state(spapr_cpu_state(cpu)->icp, errp);
++        if (*errp) {
+             goto fail;
+         }
+     }
+@@ -430,7 +429,6 @@ int xics_kvm_connect(SpaprMachineState *spapr, Error **errp)
+     return 0;
+ 
+ fail:
+-    error_propagate(errp, local_err);
+     xics_kvm_disconnect(spapr, NULL);
+     return -1;
+ }
+diff --git a/hw/intc/xics_pnv.c b/hw/intc/xics_pnv.c
+index 35f3811264..501aee21d7 100644
+--- a/hw/intc/xics_pnv.c
++++ b/hw/intc/xics_pnv.c
+@@ -161,14 +161,13 @@ static const MemoryRegionOps pnv_icp_ops = {
+ 
+ static void pnv_icp_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     ICPState *icp = ICP(dev);
+     PnvICPState *pnv_icp = PNV_ICP(icp);
+     ICPStateClass *icpc = ICP_GET_CLASS(icp);
+-    Error *local_err = NULL;
+ 
+-    icpc->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    icpc->parent_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 6e5eb24b3c..2c21ad8ea9 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -285,13 +285,12 @@ static void rtas_int_on(PowerPCCPU *cpu, SpaprMachineState *spapr,
+ 
+ static void ics_spapr_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     ICSState *ics = ICS_SPAPR(dev);
+     ICSStateClass *icsc = ICS_GET_CLASS(ics);
+-    Error *local_err = NULL;
+ 
+-    icsc->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    icsc->parent_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
+index b9bd57471e..ac30eaed33 100644
+--- a/hw/isa/pc87312.c
++++ b/hw/isa/pc87312.c
+@@ -291,18 +291,17 @@ static void pc87312_reset(DeviceState *d)
+ 
+ static void pc87312_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PC87312State *s;
+     ISADevice *isa;
+-    Error *local_err = NULL;
+ 
+     s = PC87312(dev);
+     isa = ISA_DEVICE(dev);
+     isa_register_ioport(isa, &s->io, s->iobase);
+     pc87312_hard_reset(s);
+ 
+-    ISA_SUPERIO_GET_CLASS(dev)->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ISA_SUPERIO_GET_CLASS(dev)->parent_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+ }
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 50f20d8206..612a8203d9 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -105,13 +105,12 @@ static void macio_init_child_obj(MacIOState *s, const char *childname,
+ 
+ static void macio_common_realize(PCIDevice *d, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MacIOState *s = MACIO(d);
+     SysBusDevice *sysbus_dev;
+-    Error *err = NULL;
+ 
+-    object_property_set_bool(OBJECT(&s->dbdma), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(&s->dbdma), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+     sysbus_dev = SYS_BUS_DEVICE(&s->dbdma);
+@@ -125,9 +124,8 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
+     qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hd(1));
+     qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
+     qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
+-    object_property_set_bool(OBJECT(&s->escc), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(&s->escc), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -153,23 +151,21 @@ static void macio_realize_ide(MacIOState *s, MACIOIDEState *ide,
+ 
+ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MacIOState *s = MACIO(d);
+     OldWorldMacIOState *os = OLDWORLD_MACIO(d);
+     DeviceState *pic_dev = DEVICE(os->pic);
+-    Error *err = NULL;
+     SysBusDevice *sysbus_dev;
+ 
+-    macio_common_realize(d, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    macio_common_realize(d, errp);
++    if (*errp) {
+         return;
+     }
+ 
+     qdev_prop_set_uint64(DEVICE(&s->cuda), "timebase-frequency",
+                          s->frequency);
+-    object_property_set_bool(OBJECT(&s->cuda), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(&s->cuda), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+     sysbus_dev = SYS_BUS_DEVICE(&s->cuda);
+@@ -184,9 +180,8 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
+     sysbus_connect_irq(sysbus_dev, 1, qdev_get_gpio_in(pic_dev,
+                                                        OLDWORLD_ESCCA_IRQ));
+ 
+-    object_property_set_bool(OBJECT(&os->nvram), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(&os->nvram), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+     sysbus_dev = SYS_BUS_DEVICE(&os->nvram);
+@@ -203,18 +198,16 @@ static void macio_oldworld_realize(PCIDevice *d, Error **errp)
+     macio_realize_ide(s, &os->ide[0],
+                       qdev_get_gpio_in(pic_dev, OLDWORLD_IDE0_IRQ),
+                       qdev_get_gpio_in(pic_dev, OLDWORLD_IDE0_DMA_IRQ),
+-                      0x16, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++                      0x16, errp);
++    if (*errp) {
+         return;
+     }
+ 
+     macio_realize_ide(s, &os->ide[1],
+                       qdev_get_gpio_in(pic_dev, OLDWORLD_IDE1_IRQ),
+                       qdev_get_gpio_in(pic_dev, OLDWORLD_IDE1_DMA_IRQ),
+-                      0x1a, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++                      0x1a, errp);
++    if (*errp) {
+         return;
+     }
+ }
+@@ -291,16 +284,15 @@ static const MemoryRegionOps timer_ops = {
+ 
+ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MacIOState *s = MACIO(d);
+     NewWorldMacIOState *ns = NEWWORLD_MACIO(d);
+     DeviceState *pic_dev = DEVICE(ns->pic);
+-    Error *err = NULL;
+     SysBusDevice *sysbus_dev;
+     MemoryRegion *timer_memory = NULL;
+ 
+-    macio_common_realize(d, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    macio_common_realize(d, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -319,18 +311,16 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+     macio_realize_ide(s, &ns->ide[0],
+                       qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_IRQ),
+                       qdev_get_gpio_in(pic_dev, NEWWORLD_IDE0_DMA_IRQ),
+-                      0x16, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++                      0x16, errp);
++    if (*errp) {
+         return;
+     }
+ 
+     macio_realize_ide(s, &ns->ide[1],
+                       qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_IRQ),
+                       qdev_get_gpio_in(pic_dev, NEWWORLD_IDE1_DMA_IRQ),
+-                      0x1a, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++                      0x1a, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -347,7 +337,7 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+                                  &error_abort);
+         memory_region_add_subregion(&s->bar, 0x50,
+                                     sysbus_mmio_get_region(sysbus_dev, 0));
+-        object_property_set_bool(OBJECT(&ns->gpio), true, "realized", &err);
++        object_property_set_bool(OBJECT(&ns->gpio), true, "realized", errp);
+ 
+         /* PMU */
+         object_initialize_child(OBJECT(s), "pmu", &s->pmu, sizeof(s->pmu),
+@@ -357,9 +347,8 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+         qdev_prop_set_bit(DEVICE(&s->pmu), "has-adb", ns->has_adb);
+         qdev_set_parent_bus(DEVICE(&s->pmu), BUS(&s->macio_bus));
+ 
+-        object_property_set_bool(OBJECT(&s->pmu), true, "realized", &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        object_property_set_bool(OBJECT(&s->pmu), true, "realized", errp);
++        if (*errp) {
+             return;
+         }
+         sysbus_dev = SYS_BUS_DEVICE(&s->pmu);
+@@ -375,9 +364,8 @@ static void macio_newworld_realize(PCIDevice *d, Error **errp)
+         qdev_prop_set_uint64(DEVICE(&s->cuda), "timebase-frequency",
+                              s->frequency);
+ 
+-        object_property_set_bool(OBJECT(&s->cuda), true, "realized", &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        object_property_set_bool(OBJECT(&s->cuda), true, "realized", errp);
++        if (*errp) {
+             return;
+         }
+         sysbus_dev = SYS_BUS_DEVICE(&s->cuda);
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 91cd4c26f9..468d667261 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -764,16 +764,15 @@ static DeviceState *ppce500_init_mpic_qemu(PPCE500MachineState *pms,
+ static DeviceState *ppce500_init_mpic_kvm(const PPCE500MachineClass *pmc,
+                                           IrqLines *irqs, Error **errp)
+ {
+-    Error *err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     DeviceState *dev;
+     CPUState *cs;
+ 
+     dev = qdev_create(NULL, TYPE_KVM_OPENPIC);
+     qdev_prop_set_uint32(dev, "model", pmc->mpic_version);
+ 
+-    object_property_set_bool(OBJECT(dev), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(dev), true, "realized", errp);
++    if (*errp) {
+         object_unparent(OBJECT(dev));
+         return NULL;
+     }
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index c5bbcc7433..1a37412d31 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -609,6 +609,7 @@ static char *core99_get_via_config(Object *obj, Error **errp)
+ 
+ static void core99_set_via_config(Object *obj, const char *value, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Core99MachineState *cms = CORE99_MACHINE(obj);
+ 
+     if (!strcmp(value, "cuda")) {
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 7cf64b6d25..7155259f13 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -764,14 +764,13 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip, uint32_t core_id)
+ static void pnv_chip_power8_intc_create(PnvChip *chip, PowerPCCPU *cpu,
+                                         Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     Object *obj;
+     PnvCPUState *pnv_cpu = pnv_cpu_state(cpu);
+ 
+     obj = icp_create(OBJECT(cpu), TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine()),
+-                     &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                     errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -796,8 +795,8 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip, uint32_t core_id)
+ static void pnv_chip_power9_intc_create(PnvChip *chip, PowerPCCPU *cpu,
+                                         Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Pnv9Chip *chip9 = PNV9_CHIP(chip);
+-    Error *local_err = NULL;
+     Object *obj;
+     PnvCPUState *pnv_cpu = pnv_cpu_state(cpu);
+ 
+@@ -806,9 +805,8 @@ static void pnv_chip_power9_intc_create(PnvChip *chip, PowerPCCPU *cpu,
+      * controller object is initialized afterwards. Hopefully, it's
+      * only used at runtime.
+      */
+-    obj = xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(&chip9->xive), &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    obj = xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(&chip9->xive), errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -901,32 +899,29 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, Error **errp)
+ 
+ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(dev);
+     PnvChip *chip = PNV_CHIP(dev);
+     Pnv8Chip *chip8 = PNV8_CHIP(dev);
+     Pnv8Psi *psi8 = &chip8->psi;
+-    Error *local_err = NULL;
+ 
+     /* XSCOM bridge is first */
+-    pnv_xscom_realize(chip, PNV_XSCOM_SIZE, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    pnv_xscom_realize(chip, PNV_XSCOM_SIZE, errp);
++    if (*errp) {
+         return;
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
+ 
+-    pcc->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    pcc->parent_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+ 
+     /* Processor Service Interface (PSI) Host Bridge */
+     object_property_set_int(OBJECT(&chip8->psi), PNV_PSIHB_BASE(chip),
+                             "bar", &error_fatal);
+-    object_property_set_bool(OBJECT(&chip8->psi), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(&chip8->psi), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+     pnv_xscom_add_subregion(chip, PNV_XSCOM_PSIHB_BASE,
+@@ -945,16 +940,14 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+      * Interrupt Management Area. This is the memory region holding
+      * all the Interrupt Control Presenter (ICP) registers
+      */
+-    pnv_chip_icp_realize(chip8, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    pnv_chip_icp_realize(chip8, errp);
++    if (*errp) {
+         return;
+     }
+ 
+     /* Create the simplified OCC model */
+-    object_property_set_bool(OBJECT(&chip8->occ), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(&chip8->occ), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+     pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip8->occ.xscom_regs);
+@@ -965,9 +958,8 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+ 
+     /* HOMER */
+     object_property_set_bool(OBJECT(&chip8->homer), true, "realized",
+-                             &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                             errp);
++    if (*errp) {
+         return;
+     }
+     memory_region_add_subregion(get_system_memory(), PNV_HOMER_BASE(chip),
+@@ -1091,29 +1083,26 @@ static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
+ 
+ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(dev);
+     Pnv9Chip *chip9 = PNV9_CHIP(dev);
+     PnvChip *chip = PNV_CHIP(dev);
+     Pnv9Psi *psi9 = &chip9->psi;
+-    Error *local_err = NULL;
+ 
+     /* XSCOM bridge is first */
+-    pnv_xscom_realize(chip, PNV9_XSCOM_SIZE, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    pnv_xscom_realize(chip, PNV9_XSCOM_SIZE, errp);
++    if (*errp) {
+         return;
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV9_XSCOM_BASE(chip));
+ 
+-    pcc->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    pcc->parent_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+ 
+-    pnv_chip_quad_realize(chip9, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    pnv_chip_quad_realize(chip9, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1127,9 +1116,8 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+     object_property_set_int(OBJECT(&chip9->xive), PNV9_XIVE_TM_BASE(chip),
+                             "tm-bar", &error_fatal);
+     object_property_set_bool(OBJECT(&chip9->xive), true, "realized",
+-                             &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                             errp);
++    if (*errp) {
+         return;
+     }
+     pnv_xscom_add_subregion(chip, PNV9_XSCOM_XIVE_BASE,
+@@ -1138,18 +1126,16 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+     /* Processor Service Interface (PSI) Host Bridge */
+     object_property_set_int(OBJECT(&chip9->psi), PNV9_PSIHB_BASE(chip),
+                             "bar", &error_fatal);
+-    object_property_set_bool(OBJECT(&chip9->psi), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(&chip9->psi), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+     pnv_xscom_add_subregion(chip, PNV9_XSCOM_PSIHB_BASE,
+                             &PNV_PSI(psi9)->xscom_regs);
+ 
+     /* LPC */
+-    object_property_set_bool(OBJECT(&chip9->lpc), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(&chip9->lpc), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+     memory_region_add_subregion(get_system_memory(), PNV9_LPCM_BASE(chip),
+@@ -1159,9 +1145,8 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+                                             (uint64_t) PNV9_LPCM_BASE(chip));
+ 
+     /* Create the simplified OCC model */
+-    object_property_set_bool(OBJECT(&chip9->occ), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(&chip9->occ), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+     pnv_xscom_add_subregion(chip, PNV9_XSCOM_OCC_BASE, &chip9->occ.xscom_regs);
+@@ -1172,9 +1157,8 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+ 
+     /* HOMER */
+     object_property_set_bool(OBJECT(&chip9->homer), true, "realized",
+-                             &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                             errp);
++    if (*errp) {
+         return;
+     }
+     memory_region_add_subregion(get_system_memory(), PNV9_HOMER_BASE(chip),
+@@ -1232,8 +1216,8 @@ static void pnv_chip_core_sanitize(PnvChip *chip, Error **errp)
+ 
+ static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MachineState *ms = MACHINE(qdev_get_machine());
+-    Error *error = NULL;
+     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
+     const char *typename = pnv_chip_core_typename(chip);
+     size_t typesize = object_type_get_instance_size(typename);
+@@ -1245,9 +1229,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
+     }
+ 
+     /* Cores */
+-    pnv_chip_core_sanitize(chip, &error);
+-    if (error) {
+-        error_propagate(errp, error);
++    pnv_chip_core_sanitize(chip, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1293,13 +1276,12 @@ static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
+ 
+ static void pnv_chip_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvChip *chip = PNV_CHIP(dev);
+-    Error *error = NULL;
+ 
+     /* Cores */
+-    pnv_chip_core_realize(chip, &error);
+-    if (error) {
+-        error_propagate(errp, error);
++    pnv_chip_core_realize(chip, errp);
++    if (*errp) {
+         return;
+     }
+ }
+@@ -1387,13 +1369,12 @@ static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
+ static void pnv_set_num_chips(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvMachineState *pnv = PNV_MACHINE(obj);
+     uint32_t num_chips;
+-    Error *local_err = NULL;
+ 
+-    visit_type_uint32(v, name, &num_chips, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_uint32(v, name, &num_chips, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index b1a7489e7a..c45b326f78 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -162,22 +162,20 @@ static const MemoryRegionOps pnv_core_power9_xscom_ops = {
+ 
+ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip *chip, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CPUPPCState *env = &cpu->env;
+     int core_pir;
+     int thread_index = 0; /* TODO: TCG supports only one thread */
+     ppc_spr_t *pir = &env->spr_cb[SPR_PIR];
+-    Error *local_err = NULL;
+     PnvChipClass *pcc = PNV_CHIP_GET_CLASS(chip);
+ 
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(cpu), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+ 
+-    pcc->intc_create(chip, cpu, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    pcc->intc_create(chip, cpu, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -198,19 +196,19 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip *chip, Error **errp)
+ 
+ static void pnv_core_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvCore *pc = PNV_CORE(OBJECT(dev));
+     PnvCoreClass *pcc = PNV_CORE_GET_CLASS(pc);
+     CPUCore *cc = CPU_CORE(OBJECT(dev));
+     const char *typename = pnv_core_cpu_typename(pc);
+-    Error *local_err = NULL;
+     void *obj;
+     int i, j;
+     char name[32];
+     Object *chip;
+ 
+-    chip = object_property_get_link(OBJECT(dev), "chip", &local_err);
++    chip = object_property_get_link(OBJECT(dev), "chip", errp);
+     if (!chip) {
+-        error_propagate_prepend(errp, local_err,
++        error_prepend(errp,
+                                 "required link 'chip' not found: ");
+         return;
+     }
+@@ -235,8 +233,8 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     for (j = 0; j < cc->nr_threads; j++) {
+-        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), &local_err);
+-        if (local_err) {
++        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), errp);
++        if (*errp) {
+             goto err;
+         }
+     }
+@@ -252,7 +250,6 @@ err:
+         object_unparent(obj);
+     }
+     g_free(pc->threads);
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
+diff --git a/hw/ppc/pnv_homer.c b/hw/ppc/pnv_homer.c
+index cc881a3b32..80e3acf94a 100644
+--- a/hw/ppc/pnv_homer.c
++++ b/hw/ppc/pnv_homer.c
+@@ -227,14 +227,13 @@ static const TypeInfo pnv_homer_power9_type_info = {
+ 
+ static void pnv_homer_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvHomer *homer = PNV_HOMER(dev);
+     PnvHomerClass *hmrc = PNV_HOMER_GET_CLASS(homer);
+     Object *obj;
+-    Error *local_err = NULL;
+ 
+-    obj = object_property_get_link(OBJECT(dev), "chip", &local_err);
++    obj = object_property_get_link(OBJECT(dev), "chip", errp);
+     if (!obj) {
+-        error_propagate(errp, local_err);
+         error_prepend(errp, "required link 'chip' not found: ");
+         return;
+     }
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index 9466d4a1be..7f6041cc28 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -599,13 +599,12 @@ static const MemoryRegionOps opb_master_ops = {
+ 
+ static void pnv_lpc_power8_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvLpcController *lpc = PNV_LPC(dev);
+     PnvLpcClass *plc = PNV_LPC_GET_CLASS(dev);
+-    Error *local_err = NULL;
+ 
+-    plc->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    plc->parent_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -644,13 +643,12 @@ static const TypeInfo pnv_lpc_power8_info = {
+ 
+ static void pnv_lpc_power9_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvLpcController *lpc = PNV_LPC(dev);
+     PnvLpcClass *plc = PNV_LPC_GET_CLASS(dev);
+-    Error *local_err = NULL;
+ 
+-    plc->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    plc->parent_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -681,13 +679,12 @@ static const TypeInfo pnv_lpc_power9_info = {
+ 
+ static void pnv_lpc_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvLpcController *lpc = PNV_LPC(dev);
+     Object *obj;
+-    Error *local_err = NULL;
+ 
+-    obj = object_property_get_link(OBJECT(dev), "psi", &local_err);
++    obj = object_property_get_link(OBJECT(dev), "psi", errp);
+     if (!obj) {
+-        error_propagate(errp, local_err);
+         error_prepend(errp, "required link 'psi' not found: ");
+         return;
+     }
+@@ -797,7 +794,7 @@ static void pnv_lpc_isa_irq_handler(void *opaque, int n, int level)
+ 
+ ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     ISABus *isa_bus;
+     qemu_irq *irqs;
+     qemu_irq_handler handler;
+@@ -806,9 +803,8 @@ ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error **errp)
+      * devices speficied on the command line won't find the bus and
+      * will fail to create.
+      */
+-    isa_bus = isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    isa_bus = isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io, errp);
++    if (*errp) {
+         return NULL;
+     }
+ 
+diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
+index 785653bb67..3306109a9b 100644
+--- a/hw/ppc/pnv_occ.c
++++ b/hw/ppc/pnv_occ.c
+@@ -255,16 +255,15 @@ static const TypeInfo pnv_occ_power9_type_info = {
+ 
+ static void pnv_occ_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvOCC *occ = PNV_OCC(dev);
+     PnvOCCClass *poc = PNV_OCC_GET_CLASS(occ);
+     Object *obj;
+-    Error *local_err = NULL;
+ 
+     occ->occmisc = 0;
+ 
+-    obj = object_property_get_link(OBJECT(dev), "psi", &local_err);
++    obj = object_property_get_link(OBJECT(dev), "psi", errp);
+     if (!obj) {
+-        error_propagate(errp, local_err);
+         error_prepend(errp, "required link 'psi' not found: ");
+         return;
+     }
+diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+index a997f16bb4..e96db52b82 100644
+--- a/hw/ppc/pnv_psi.c
++++ b/hw/ppc/pnv_psi.c
+@@ -483,30 +483,28 @@ static const uint8_t irq_to_xivr[] = {
+ 
+ static void pnv_psi_power8_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvPsi *psi = PNV_PSI(dev);
+     ICSState *ics = &PNV8_PSI(psi)->ics;
+     Object *obj;
+-    Error *err = NULL;
+     unsigned int i;
+ 
+-    obj = object_property_get_link(OBJECT(dev), "xics", &err);
++    obj = object_property_get_link(OBJECT(dev), "xics", errp);
+     if (!obj) {
+         error_setg(errp, "%s: required link 'xics' not found: %s",
+-                   __func__, error_get_pretty(err));
++                   __func__, error_get_pretty(*errp));
+         return;
+     }
+ 
+     /* Create PSI interrupt control source */
+     object_property_add_const_link(OBJECT(ics), ICS_PROP_XICS, obj,
+                                    &error_abort);
+-    object_property_set_int(OBJECT(ics), PSI_NUM_INTERRUPTS, "nr-irqs", &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_int(OBJECT(ics), PSI_NUM_INTERRUPTS, "nr-irqs", errp);
++    if (*errp) {
+         return;
+     }
+-    object_property_set_bool(OBJECT(ics), true, "realized",  &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(ics), true, "realized",  errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -832,9 +830,9 @@ static void pnv_psi_power9_instance_init(Object *obj)
+ 
+ static void pnv_psi_power9_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     PnvPsi *psi = PNV_PSI(dev);
+     XiveSource *xsrc = &PNV9_PSI(psi)->source;
+-    Error *local_err = NULL;
+     int i;
+ 
+     /* This is the only device with 4k ESB pages */
+@@ -844,9 +842,8 @@ static void pnv_psi_power9_realize(DeviceState *dev, Error **errp)
+                             &error_fatal);
+     object_property_add_const_link(OBJECT(xsrc), "xive", OBJECT(psi),
+                                    &error_fatal);
+-    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    object_property_set_bool(OBJECT(xsrc), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6729269aa9..7d59e53020 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2503,31 +2503,31 @@ static CPUArchId *spapr_find_cpu_slot(MachineState *ms, uint32_t id, int *idx)
+ 
+ static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MachineState *ms = MACHINE(spapr);
+-    Error *local_err = NULL;
+     bool vsmt_user = !!spapr->vsmt;
+     int kvm_smt = kvmppc_smt_threads();
+     int ret;
+     unsigned int smp_threads = ms->smp.threads;
+ 
+     if (!kvm_enabled() && (smp_threads > 1)) {
+-        error_setg(&local_err, "TCG cannot support more than 1 thread/core "
++        error_setg(errp, "TCG cannot support more than 1 thread/core "
+                      "on a pseries machine");
+-        goto out;
++        return;
+     }
+     if (!is_power_of_2(smp_threads)) {
+-        error_setg(&local_err, "Cannot support %d threads/core on a pseries "
++        error_setg(errp, "Cannot support %d threads/core on a pseries "
+                      "machine because it must be a power of 2", smp_threads);
+-        goto out;
++        return;
+     }
+ 
+     /* Detemine the VSMT mode to use: */
+     if (vsmt_user) {
+         if (spapr->vsmt < smp_threads) {
+-            error_setg(&local_err, "Cannot support VSMT mode %d"
++            error_setg(errp, "Cannot support VSMT mode %d"
+                          " because it must be >= threads/core (%d)",
+                          spapr->vsmt, smp_threads);
+-            goto out;
++            return;
+         }
+         /* In this case, spapr->vsmt has been set by the command line */
+     } else {
+@@ -2546,7 +2546,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
+         ret = kvmppc_set_smt_threads(spapr->vsmt);
+         if (ret) {
+             /* Looks like KVM isn't able to change VSMT mode */
+-            error_setg(&local_err,
++            error_setg(errp,
+                        "Failed to set KVM's VSMT mode to %d (errno %d)",
+                        spapr->vsmt, ret);
+             /* We can live with that if the default one is big enough
+@@ -2554,25 +2554,22 @@ static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
+              * we want.  In this case we'll waste some vcpu ids, but
+              * behaviour will be correct */
+             if ((kvm_smt >= smp_threads) && ((spapr->vsmt % kvm_smt) == 0)) {
+-                warn_report_err(local_err);
+-                local_err = NULL;
+-                goto out;
++                warn_report_errp(errp);
++                *errp = NULL;
++                return;
+             } else {
+                 if (!vsmt_user) {
+-                    error_append_hint(&local_err,
++                    error_append_hint(errp,
+                                       "On PPC, a VM with %d threads/core"
+                                       " on a host with %d threads/core"
+                                       " requires the use of VSMT mode %d.\n",
+                                       smp_threads, kvm_smt, spapr->vsmt);
+                 }
+-                error_append_kvmppc_smt_possible_hint(&local_err);
+-                goto out;
++                error_append_kvmppc_smt_possible_hint(errp);
++                return;
+             }
+         }
+     }
+-    /* else TCG: nothing to do currently */
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void spapr_init_cpus(SpaprMachineState *spapr)
+@@ -3404,27 +3401,26 @@ int spapr_lmb_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+                            bool dedicated_hp_event_source, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprDrc *drc;
+     uint32_t nr_lmbs = size/SPAPR_MEMORY_BLOCK_SIZE;
+     int i;
+     uint64_t addr = addr_start;
+     bool hotplugged = spapr_drc_hotplugged(dev);
+-    Error *local_err = NULL;
+ 
+     for (i = 0; i < nr_lmbs; i++) {
+         drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+                               addr / SPAPR_MEMORY_BLOCK_SIZE);
+         g_assert(drc);
+ 
+-        spapr_drc_attach(drc, dev, &local_err);
+-        if (local_err) {
++        spapr_drc_attach(drc, dev, errp);
++        if (*errp) {
+             while (addr > addr_start) {
+                 addr -= SPAPR_MEMORY_BLOCK_SIZE;
+                 drc = spapr_drc_by_id(TYPE_SPAPR_DRC_LMB,
+                                       addr / SPAPR_MEMORY_BLOCK_SIZE);
+                 spapr_drc_detach(drc);
+             }
+-            error_propagate(errp, local_err);
+             return;
+         }
+         if (!hotplugged) {
+@@ -3452,27 +3448,27 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
+ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                               Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     SpaprMachineState *ms = SPAPR_MACHINE(hotplug_dev);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     uint64_t size, addr;
+ 
+     size = memory_device_get_region_size(MEMORY_DEVICE(dev), &error_abort);
+ 
+-    pc_dimm_plug(dimm, MACHINE(ms), &local_err);
+-    if (local_err) {
+-        goto out;
++    pc_dimm_plug(dimm, MACHINE(ms), errp);
++    if (*errp) {
++        return;
+     }
+ 
+     addr = object_property_get_uint(OBJECT(dimm),
+-                                    PC_DIMM_ADDR_PROP, &local_err);
+-    if (local_err) {
++                                    PC_DIMM_ADDR_PROP, errp);
++    if (*errp) {
+         goto out_unplug;
+     }
+ 
+     spapr_add_lmbs(dev, addr, size, spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
+-                   &local_err);
+-    if (local_err) {
++                   errp);
++    if (*errp) {
+         goto out_unplug;
+     }
+ 
+@@ -3480,17 +3476,15 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ 
+ out_unplug:
+     pc_dimm_unplug(dimm, MACHINE(ms));
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                   Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(hotplug_dev);
+     SpaprMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+-    Error *local_err = NULL;
+     uint64_t size;
+     Object *memdev;
+     hwaddr pagesize;
+@@ -3500,9 +3494,8 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
+ 
+-    size = memory_device_get_region_size(MEMORY_DEVICE(dimm), &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    size = memory_device_get_region_size(MEMORY_DEVICE(dimm), errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -3515,9 +3508,8 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     memdev = object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
+                                       &error_abort);
+     pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(memdev));
+-    spapr_check_pagesize(spapr, pagesize, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    spapr_check_pagesize(spapr, pagesize, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -3641,8 +3633,8 @@ static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev)
+ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+                                         DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+-    Error *local_err = NULL;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     uint32_t nr_lmbs;
+     uint64_t size, addr_start, addr;
+@@ -3653,9 +3645,9 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+     nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+ 
+     addr_start = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
+-                                         &local_err);
+-    if (local_err) {
+-        goto out;
++                                         errp);
++    if (*errp) {
++        return;
+     }
+ 
+     /*
+@@ -3665,10 +3657,10 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+      * bail out to avoid detaching DRCs that were already released.
+      */
+     if (spapr_pending_dimm_unplugs_find(spapr, dimm)) {
+-        error_setg(&local_err,
++        error_setg(errp,
+                    "Memory unplug already in progress for device %s",
+                    dev->id);
+-        goto out;
++        return;
+     }
+ 
+     spapr_pending_dimm_unplugs_add(spapr, nr_lmbs, dimm);
+@@ -3687,8 +3679,6 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+                           addr_start / SPAPR_MEMORY_BLOCK_SIZE);
+     spapr_hotplug_req_remove_by_count_indexed(SPAPR_DR_CONNECTOR_TYPE_LMB,
+                                               nr_lmbs, spapr_drc_index(drc));
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ /* Callback to be called during DRC release. */
+@@ -3776,6 +3766,7 @@ int spapr_core_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
                              Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     char *mon_host = NULL;
+     SpaprMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
+     MachineClass *mc = MACHINE_GET_CLASS(spapr);
+     SpaprMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
+@@ -3783,7 +3774,6 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     CPUCore *cc = CPU_CORE(dev);
+     CPUState *cs;
+     SpaprDrc *drc;
 -    Error *local_err = NULL;
-     int r;
+     CPUArchId *core_slot;
+     int index;
+     bool hotplugged = spapr_drc_hotplugged(dev);
+@@ -3801,9 +3791,8 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     g_assert(drc || !mc->has_hotpluggable_cpus);
  
-     if (secretid) {
-@@ -586,9 +585,8 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-         opts->has_key_secret = true;
+     if (drc) {
+-        spapr_drc_attach(drc, dev, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        spapr_drc_attach(drc, dev, errp);
++        if (*errp) {
+             return;
+         }
+ 
+@@ -3834,9 +3823,8 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     if (hotplugged) {
+         for (i = 0; i < cc->nr_threads; i++) {
+             ppc_set_compat(core->threads[i], POWERPC_CPU(first_cpu)->compat_pvr,
+-                           &local_err);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
++                           errp);
++            if (*errp) {
+                 return;
+             }
+         }
+@@ -3846,9 +3834,9 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                 Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MachineState *machine = MACHINE(OBJECT(hotplug_dev));
+     MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+-    Error *local_err = NULL;
+     CPUCore *cc = CPU_CORE(dev);
+     const char *base_core_type = spapr_get_cpu_core_type(machine->cpu_type);
+     const char *type = object_get_typename(OBJECT(dev));
+@@ -3857,18 +3845,18 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     unsigned int smp_threads = machine->smp.threads;
+ 
+     if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
+-        error_setg(&local_err, "CPU hotplug not supported for this machine");
+-        goto out;
++        error_setg(errp, "CPU hotplug not supported for this machine");
++        return;
      }
  
--    mon_host = qemu_rbd_mon_host(opts, &local_err);
+     if (strcmp(base_core_type, type)) {
+-        error_setg(&local_err, "CPU core type should be %s", base_core_type);
+-        goto out;
++        error_setg(errp, "CPU core type should be %s", base_core_type);
++        return;
+     }
+ 
+     if (cc->core_id % smp_threads) {
+-        error_setg(&local_err, "invalid core id %d", cc->core_id);
+-        goto out;
++        error_setg(errp, "invalid core id %d", cc->core_id);
++        return;
+     }
+ 
+     /*
+@@ -3878,26 +3866,23 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+      * total vcpus not a multiple of threads-per-core.
+      */
+     if (mc->has_hotpluggable_cpus && (cc->nr_threads != smp_threads)) {
+-        error_setg(&local_err, "invalid nr-threads %d, must be %d",
++        error_setg(errp, "invalid nr-threads %d, must be %d",
+                    cc->nr_threads, smp_threads);
+-        goto out;
++        return;
+     }
+ 
+     core_slot = spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index);
+     if (!core_slot) {
+-        error_setg(&local_err, "core id %d out of range", cc->core_id);
+-        goto out;
++        error_setg(errp, "core id %d out of range", cc->core_id);
++        return;
+     }
+ 
+     if (core_slot->cpu) {
+-        error_setg(&local_err, "core %d already populated", cc->core_id);
+-        goto out;
++        error_setg(errp, "core %d already populated", cc->core_id);
++        return;
+     }
+ 
+-    numa_cpu_pre_plug(core_slot, dev, &local_err);
+-
+-out:
+-    error_propagate(errp, local_err);
++    numa_cpu_pre_plug(core_slot, dev, errp);
+ }
+ 
+ int spapr_phb_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+@@ -3956,12 +3941,12 @@ static void spapr_phb_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                            Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
+     SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+     SpaprPhbState *sphb = SPAPR_PCI_HOST_BRIDGE(dev);
+     SpaprDrc *drc;
+     bool hotplugged = spapr_drc_hotplugged(dev);
+-    Error *local_err = NULL;
+ 
+     if (!smc->dr_phb_enabled) {
+         return;
+@@ -3971,9 +3956,8 @@ static void spapr_phb_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     /* hotplug hooks should check it's enabled before getting this far */
+     assert(drc);
+ 
+-    spapr_drc_attach(drc, DEVICE(dev), &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    mon_host = qemu_rbd_mon_host(opts, errp);
++    spapr_drc_attach(drc, DEVICE(dev), errp);
 +    if (*errp) {
-         r = -EINVAL;
-         goto failed_opts;
+         return;
      }
-@@ -660,8 +658,8 @@ failed_opts:
- static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
+ 
+@@ -4283,6 +4267,7 @@ int spapr_get_vcpu_id(PowerPCCPU *cpu)
+ 
+ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     MachineState *ms = MACHINE(spapr);
+     int vcpu_id;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 481dfd2a27..324f5080cd 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -83,14 +83,13 @@ static void spapr_cap_get_bool(Object *obj, Visitor *v, const char *name,
+ static void spapr_cap_set_bool(Object *obj, Visitor *v, const char *name,
+                                void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprCapabilityInfo *cap = opaque;
+     SpaprMachineState *spapr = SPAPR_MACHINE(obj);
+     bool value;
+-    Error *local_err = NULL;
+ 
+-    visit_type_bool(v, name, &value, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_bool(v, name, &value, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -121,15 +120,14 @@ static void  spapr_cap_get_string(Object *obj, Visitor *v, const char *name,
+ static void spapr_cap_set_string(Object *obj, Visitor *v, const char *name,
+                                  void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprCapabilityInfo *cap = opaque;
+     SpaprMachineState *spapr = SPAPR_MACHINE(obj);
+-    Error *local_err = NULL;
+     uint8_t i;
+     char *val;
+ 
+-    visit_type_str(v, name, &val, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_str(v, name, &val, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -165,15 +163,14 @@ static void spapr_cap_get_pagesize(Object *obj, Visitor *v, const char *name,
+ static void spapr_cap_set_pagesize(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprCapabilityInfo *cap = opaque;
+     SpaprMachineState *spapr = SPAPR_MACHINE(obj);
+     uint64_t pagesize;
+     uint8_t val;
+-    Error *local_err = NULL;
+ 
+-    visit_type_size(v, name, &pagesize, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_size(v, name, &pagesize, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -248,12 +245,12 @@ SpaprCapPossible cap_cfpc_possible = {
+ static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
+                                  Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     uint8_t kvm_val =  kvmppc_get_cap_safe_cache();
+ 
+     if (tcg_enabled() && val) {
+         /* TCG only supports broken, allow other values and print a warning */
+-        error_setg(&local_err,
++        error_setg(errp,
+                    "TCG doesn't support requested feature, cap-cfpc=%s",
+                    cap_cfpc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+@@ -263,8 +260,8 @@ static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
+                    cap_cfpc_possible.vals[kvm_val]);
+     }
+ 
+-    if (local_err != NULL)
+-        warn_report_err(local_err);
++    if (*errp)
++        warn_report_errp(errp);
+ }
+ 
+ SpaprCapPossible cap_sbbc_possible = {
+@@ -277,12 +274,12 @@ SpaprCapPossible cap_sbbc_possible = {
+ static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uint8_t val,
+                                         Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     uint8_t kvm_val =  kvmppc_get_cap_safe_bounds_check();
+ 
+     if (tcg_enabled() && val) {
+         /* TCG only supports broken, allow other values and print a warning */
+-        error_setg(&local_err,
++        error_setg(errp,
+                    "TCG doesn't support requested feature, cap-sbbc=%s",
+                    cap_sbbc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+@@ -292,8 +289,8 @@ static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uint8_t val,
+                    cap_sbbc_possible.vals[kvm_val]);
+     }
+ 
+-    if (local_err != NULL)
+-        warn_report_err(local_err);
++    if (*errp)
++        warn_report_errp(errp);
+ }
+ 
+ SpaprCapPossible cap_ibs_possible = {
+@@ -309,12 +306,12 @@ SpaprCapPossible cap_ibs_possible = {
+ static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
+                                            uint8_t val, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     uint8_t kvm_val = kvmppc_get_cap_safe_indirect_branch();
+ 
+     if (tcg_enabled() && val) {
+         /* TCG only supports broken, allow other values and print a warning */
+-        error_setg(&local_err,
++        error_setg(errp,
+                    "TCG doesn't support requested feature, cap-ibs=%s",
+                    cap_ibs_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+@@ -324,8 +321,8 @@ static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
+                    cap_ibs_possible.vals[kvm_val]);
+     }
+ 
+-    if (local_err != NULL) {
+-        warn_report_err(local_err);
++    if (*errp) {
++        warn_report_errp(errp);
+     }
+ }
+ 
+@@ -787,7 +784,7 @@ void spapr_caps_cpu_apply(SpaprMachineState *spapr, PowerPCCPU *cpu)
+ 
+ void spapr_caps_add_properties(SpaprMachineClass *smc, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     ObjectClass *klass = OBJECT_CLASS(smc);
+     int i;
+ 
+@@ -798,19 +795,17 @@ void spapr_caps_add_properties(SpaprMachineClass *smc, Error **errp)
+ 
+         object_class_property_add(klass, name, cap->type,
+                                   cap->get, cap->set,
+-                                  NULL, cap, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                                  NULL, cap, errp);
++        if (*errp) {
+             g_free(name);
+             return;
+         }
+ 
+         desc = g_strdup_printf("%s", cap->description);
+-        object_class_property_set_description(klass, name, desc, &local_err);
++        object_class_property_set_description(klass, name, desc, errp);
+         g_free(name);
+         g_free(desc);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (*errp) {
+             return;
+         }
+     }
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 1d93de8161..471eaee317 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -219,13 +219,13 @@ static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+ static void spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
+                                SpaprCpuCore *sc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CPUPPCState *env = &cpu->env;
+     CPUState *cs = CPU(cpu);
+-    Error *local_err = NULL;
+ 
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
+-    if (local_err) {
+-        goto error;
++    object_property_set_bool(OBJECT(cpu), true, "realized", errp);
++    if (*errp) {
++        return;
+     }
+ 
+     /* Set time-base frequency to 512 MHz */
+@@ -237,8 +237,8 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     qemu_register_reset(spapr_cpu_reset, cpu);
+     spapr_cpu_reset(cpu);
+ 
+-    spapr->irq->cpu_intc_create(spapr, cpu, &local_err);
+-    if (local_err) {
++    spapr->irq->cpu_intc_create(spapr, cpu, errp);
++    if (*errp) {
+         goto error_unregister;
+     }
+ 
+@@ -252,36 +252,34 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
+ error_unregister:
+     qemu_unregister_reset(spapr_cpu_reset, cpu);
+     cpu_remove_sync(CPU(cpu));
+-error:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprCpuCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(sc);
+     CPUCore *cc = CPU_CORE(sc);
+     Object *obj;
+     char *id;
+     CPUState *cs;
+     PowerPCCPU *cpu;
+-    Error *local_err = NULL;
+ 
+     obj = object_new(scc->cpu_type);
+ 
+     cs = CPU(obj);
+     cpu = POWERPC_CPU(obj);
+     cs->cpu_index = cc->core_id + i;
+-    spapr_set_vcpu_id(cpu, cs->cpu_index, &local_err);
+-    if (local_err) {
++    spapr_set_vcpu_id(cpu, cs->cpu_index, errp);
++    if (*errp) {
+         goto err;
+     }
+ 
+     cpu->node_id = sc->node_id;
+ 
+     id = g_strdup_printf("thread[%d]", i);
+-    object_property_add_child(OBJECT(sc), id, obj, &local_err);
++    object_property_add_child(OBJECT(sc), id, obj, errp);
+     g_free(id);
+-    if (local_err) {
++    if (*errp) {
+         goto err;
+     }
+ 
+@@ -292,7 +290,6 @@ static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
+ 
+ err:
+     object_unref(obj);
+-    error_propagate(errp, local_err);
+     return NULL;
+ }
+ 
+@@ -307,6 +304,7 @@ static void spapr_delete_vcpu(PowerPCCPU *cpu, SpaprCpuCore *sc)
+ 
+ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
+      * tries to add a sPAPR CPU core to a non-pseries machine.
+      */
+@@ -315,7 +313,6 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+                                                   TYPE_SPAPR_MACHINE);
+     SpaprCpuCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+     CPUCore *cc = CPU_CORE(OBJECT(dev));
+-    Error *local_err = NULL;
+     int i, j;
+ 
+     if (!spapr) {
+@@ -325,15 +322,15 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+ 
+     sc->threads = g_new(PowerPCCPU *, cc->nr_threads);
+     for (i = 0; i < cc->nr_threads; i++) {
+-        sc->threads[i] = spapr_create_vcpu(sc, i, &local_err);
+-        if (local_err) {
++        sc->threads[i] = spapr_create_vcpu(sc, i, errp);
++        if (*errp) {
+             goto err;
+         }
+     }
+ 
+     for (j = 0; j < cc->nr_threads; j++) {
+-        spapr_realize_vcpu(sc->threads[j], spapr, sc, &local_err);
+-        if (local_err) {
++        spapr_realize_vcpu(sc->threads[j], spapr, sc, errp);
++        if (*errp) {
+             goto err_unrealize;
+         }
+     }
+@@ -348,7 +345,6 @@ err:
+         spapr_delete_vcpu(sc->threads[i], sc);
+     }
+     g_free(sc->threads);
+-    error_propagate(errp, local_err);
+ }
+ 
+ static Property spapr_cpu_core_properties[] = {
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 62f1a42592..22226939e1 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -299,9 +299,9 @@ static void prop_get_index(Object *obj, Visitor *v, const char *name,
+ static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+                          void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprDrc *drc = SPAPR_DR_CONNECTOR(obj);
+     QNull *null = NULL;
+-    Error *err = NULL;
+     int fdt_offset_next, fdt_offset, fdt_depth;
+     void *fdt;
+ 
+@@ -326,19 +326,17 @@ static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+         case FDT_BEGIN_NODE:
+             fdt_depth++;
+             name = fdt_get_name(fdt, fdt_offset, &name_len);
+-            visit_start_struct(v, name, NULL, 0, &err);
+-            if (err) {
+-                error_propagate(errp, err);
++            visit_start_struct(v, name, NULL, 0, errp);
++            if (*errp) {
+                 return;
+             }
+             break;
+         case FDT_END_NODE:
+             /* shouldn't ever see an FDT_END_NODE before FDT_BEGIN_NODE */
+             g_assert(fdt_depth > 0);
+-            visit_check_struct(v, &err);
++            visit_check_struct(v, errp);
+             visit_end_struct(v, NULL);
+-            if (err) {
+-                error_propagate(errp, err);
++            if (*errp) {
+                 return;
+             }
+             fdt_depth--;
+@@ -347,22 +345,19 @@ static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
+             int i;
+             prop = fdt_get_property_by_offset(fdt, fdt_offset, &prop_len);
+             name = fdt_string(fdt, fdt32_to_cpu(prop->nameoff));
+-            visit_start_list(v, name, NULL, 0, &err);
+-            if (err) {
+-                error_propagate(errp, err);
++            visit_start_list(v, name, NULL, 0, errp);
++            if (*errp) {
+                 return;
+             }
+             for (i = 0; i < prop_len; i++) {
+-                visit_type_uint8(v, NULL, (uint8_t *)&prop->data[i], &err);
+-                if (err) {
+-                    error_propagate(errp, err);
++                visit_type_uint8(v, NULL, (uint8_t *)&prop->data[i], errp);
++                if (*errp) {
+                     return;
+                 }
+             }
+-            visit_check_list(v, &err);
++            visit_check_list(v, errp);
+             visit_end_list(v, NULL);
+-            if (err) {
+-                error_propagate(errp, err);
++            if (*errp) {
+                 return;
+             }
+             break;
+@@ -485,11 +480,11 @@ static const VMStateDescription vmstate_spapr_drc = {
+ 
+ static void realize(DeviceState *d, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprDrc *drc = SPAPR_DR_CONNECTOR(d);
+     Object *root_container;
+     gchar *link_name;
+     gchar *child_name;
+-    Error *err = NULL;
+ 
+     trace_spapr_drc_realize(spapr_drc_index(drc));
+     /* NOTE: we do this as part of realize/unrealize due to the fact
+@@ -504,11 +499,10 @@ static void realize(DeviceState *d, Error **errp)
+     child_name = object_get_canonical_path_component(OBJECT(drc));
+     trace_spapr_drc_realize_child(spapr_drc_index(drc), child_name);
+     object_property_add_alias(root_container, link_name,
+-                              drc->owner, child_name, &err);
++                              drc->owner, child_name, errp);
+     g_free(child_name);
+     g_free(link_name);
+-    if (err) {
+-        error_propagate(errp, err);
++    if (*errp) {
+         return;
+     }
+     vmstate_register(DEVICE(drc), spapr_drc_index(drc), &vmstate_spapr_drc,
+@@ -610,12 +604,11 @@ static void drc_physical_reset(void *opaque)
+ 
+ static void realize_physical(DeviceState *d, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprDrcPhysical *drcp = SPAPR_DRC_PHYSICAL(d);
+-    Error *local_err = NULL;
+ 
+-    realize(d, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    realize(d, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -626,12 +619,11 @@ static void realize_physical(DeviceState *d, Error **errp)
+ 
+ static void unrealize_physical(DeviceState *d, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprDrcPhysical *drcp = SPAPR_DRC_PHYSICAL(d);
+-    Error *local_err = NULL;
+ 
+-    unrealize(d, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    unrealize(d, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 457eabe24c..9bccc9beeb 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -62,19 +62,18 @@ void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t num)
+ static void spapr_irq_init_kvm(SpaprMachineState *spapr,
+                                   SpaprIrq *irq, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MachineState *machine = MACHINE(spapr);
+-    Error *local_err = NULL;
+ 
+     if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
+-        irq->init_kvm(spapr, &local_err);
+-        if (local_err && machine_kernel_irqchip_required(machine)) {
+-            error_prepend(&local_err,
++        irq->init_kvm(spapr, errp);
++        if (*errp && machine_kernel_irqchip_required(machine)) {
++            error_prepend(errp,
+                           "kernel_irqchip requested but unavailable: ");
+-            error_propagate(errp, local_err);
+             return;
+         }
+ 
+-        if (!local_err) {
++        if (!*errp) {
+             return;
+         }
+ 
+@@ -82,9 +81,9 @@ static void spapr_irq_init_kvm(SpaprMachineState *spapr,
+          * We failed to initialize the KVM device, fallback to
+          * emulated mode
+          */
+-        error_prepend(&local_err, "kernel_irqchip allowed but unavailable: ");
+-        error_append_hint(&local_err, "Falling back to kernel-irqchip=off\n");
+-        warn_report_err(local_err);
++        error_prepend(errp, "kernel_irqchip allowed but unavailable: ");
++        error_append_hint(errp, "Falling back to kernel-irqchip=off\n");
++        warn_report_errp(errp);
+     }
+ }
+ 
+@@ -135,14 +134,13 @@ static void spapr_irq_print_info_xics(SpaprMachineState *spapr, Monitor *mon)
+ static void spapr_irq_cpu_intc_create_xics(SpaprMachineState *spapr,
+                                            PowerPCCPU *cpu, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     Object *obj;
+     SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
+ 
+     obj = icp_create(OBJECT(cpu), TYPE_ICP, XICS_FABRIC(spapr),
+-                     &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                     errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -171,11 +169,10 @@ static void spapr_irq_set_irq_xics(void *opaque, int irq, int val)
+ 
+ static void spapr_irq_reset_xics(SpaprMachineState *spapr, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+-    spapr_irq_init_kvm(spapr, &spapr_irq_xics, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    spapr_irq_init_kvm(spapr, &spapr_irq_xics, errp);
++    if (*errp) {
+         return;
+     }
+ }
+@@ -236,13 +233,12 @@ static void spapr_irq_print_info_xive(SpaprMachineState *spapr,
+ static void spapr_irq_cpu_intc_create_xive(SpaprMachineState *spapr,
+                                            PowerPCCPU *cpu, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     Object *obj;
+     SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
+ 
+-    obj = xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(spapr->xive), &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    obj = xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(spapr->xive), errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -262,8 +258,8 @@ static int spapr_irq_post_load_xive(SpaprMachineState *spapr, int version_id)
+ 
+ static void spapr_irq_reset_xive(SpaprMachineState *spapr, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CPUState *cs;
+-    Error *local_err = NULL;
+ 
+     CPU_FOREACH(cs) {
+         PowerPCCPU *cpu = POWERPC_CPU(cs);
+@@ -272,9 +268,8 @@ static void spapr_irq_reset_xive(SpaprMachineState *spapr, Error **errp)
+         spapr_xive_set_tctx_os_cam(spapr_cpu_state(cpu)->tctx);
+     }
+ 
+-    spapr_irq_init_kvm(spapr, &spapr_irq_xive, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    spapr_irq_init_kvm(spapr, &spapr_irq_xive, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -339,18 +334,16 @@ static SpaprIrq *spapr_irq_current(SpaprMachineState *spapr)
+ static int spapr_irq_claim_dual(SpaprMachineState *spapr, int irq, bool lsi,
+                                 Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+ 
+-    ret = spapr_irq_xics.claim(spapr, irq, lsi, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = spapr_irq_xics.claim(spapr, irq, lsi, errp);
++    if (*errp) {
+         return ret;
+     }
+ 
+-    ret = spapr_irq_xive.claim(spapr, irq, lsi, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = spapr_irq_xive.claim(spapr, irq, lsi, errp);
++    if (*errp) {
+         return ret;
+     }
+ 
+@@ -378,11 +371,10 @@ static void spapr_irq_dt_populate_dual(SpaprMachineState *spapr,
+ static void spapr_irq_cpu_intc_create_dual(SpaprMachineState *spapr,
+                                            PowerPCCPU *cpu, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+-    spapr_irq_xive.cpu_intc_create(spapr, cpu, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    spapr_irq_xive.cpu_intc_create(spapr, cpu, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -407,7 +399,7 @@ static int spapr_irq_post_load_dual(SpaprMachineState *spapr, int version_id)
+ 
+ static void spapr_irq_reset_dual(SpaprMachineState *spapr, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+     /*
+      * Deactivate the XIVE MMIOs. The XIVE backend will reenable them
+@@ -417,15 +409,13 @@ static void spapr_irq_reset_dual(SpaprMachineState *spapr, Error **errp)
+ 
+     /* Destroy all KVM devices */
+     if (kvm_irqchip_in_kernel()) {
+-        xics_kvm_disconnect(spapr, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        xics_kvm_disconnect(spapr, errp);
++        if (*errp) {
+             error_prepend(errp, "KVM XICS disconnect failed: ");
+             return;
+         }
+-        kvmppc_xive_disconnect(spapr->xive, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        kvmppc_xive_disconnect(spapr->xive, errp);
++        if (*errp) {
+             error_prepend(errp, "KVM XIVE disconnect failed: ");
+             return;
+         }
+@@ -523,6 +513,7 @@ static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
+  */
+ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MachineState *machine = MACHINE(spapr);
+ 
+     if (machine_kernel_irqchip_split(machine)) {
+@@ -546,33 +537,28 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+     }
+ 
+     if (spapr->irq->xics) {
+-        Error *local_err = NULL;
+         Object *obj;
+ 
+         obj = object_new(TYPE_ICS_SPAPR);
+-        object_property_add_child(OBJECT(spapr), "ics", obj, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        object_property_add_child(OBJECT(spapr), "ics", obj, errp);
++        if (*errp) {
+             return;
+         }
+ 
+         object_property_add_const_link(obj, ICS_PROP_XICS, OBJECT(spapr),
+-                                       &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                                       errp);
++        if (*errp) {
+             return;
+         }
+ 
+         object_property_set_int(obj, spapr->irq->nr_xirqs, "nr-irqs",
+-                                &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                                errp);
++        if (*errp) {
+             return;
+         }
+ 
+-        object_property_set_bool(obj, true, "realized", &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        object_property_set_bool(obj, true, "realized", errp);
++        if (*errp) {
+             return;
+         }
+ 
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 01ff41d4c4..2022af1ce6 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1229,18 +1229,17 @@ static SpaprDrc *drc_from_dev(SpaprPhbState *phb, PCIDevice *dev)
+ 
+ static void add_drcs(SpaprPhbState *phb, PCIBus *bus, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     Object *owner;
+     int i;
+     uint8_t chassis;
+-    Error *local_err = NULL;
+ 
+     if (!phb->dr_enabled) {
+         return;
+     }
+ 
+-    chassis = chassis_from_bus(bus, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    chassis = chassis_from_bus(bus, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1258,17 +1257,16 @@ static void add_drcs(SpaprPhbState *phb, PCIBus *bus, Error **errp)
+ 
+ static void remove_drcs(SpaprPhbState *phb, PCIBus *bus, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int i;
+     uint8_t chassis;
+-    Error *local_err = NULL;
+ 
+     if (!phb->dr_enabled) {
+         return;
+     }
+ 
+-    chassis = chassis_from_bus(bus, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    chassis = chassis_from_bus(bus, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1491,12 +1489,11 @@ static void spapr_pci_bridge_plug(SpaprPhbState *phb,
+                                   PCIBridge *bridge,
+                                   Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     PCIBus *bus = pci_bridge_get_sec_bus(bridge);
+ 
+-    add_drcs(phb, bus, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    add_drcs(phb, bus, errp);
++    if (*errp) {
+         return;
+     }
+ }
+@@ -1504,11 +1501,11 @@ static void spapr_pci_bridge_plug(SpaprPhbState *phb,
+ static void spapr_pci_plug(HotplugHandler *plug_handler,
+                            DeviceState *plugged_dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprPhbState *phb = SPAPR_PCI_HOST_BRIDGE(DEVICE(plug_handler));
+     PCIDevice *pdev = PCI_DEVICE(plugged_dev);
+     PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(plugged_dev);
+     SpaprDrc *drc = drc_from_dev(phb, pdev);
+-    Error *local_err = NULL;
+     PCIBus *bus = PCI_BUS(qdev_get_parent_bus(DEVICE(pdev)));
+     uint32_t slotnr = PCI_SLOT(pdev->devfn);
+ 
+@@ -1520,18 +1517,17 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+          * we need to let them know it's not enabled
+          */
+         if (plugged_dev->hotplugged) {
+-            error_setg(&local_err, QERR_BUS_NO_HOTPLUG,
++            error_setg(errp, QERR_BUS_NO_HOTPLUG,
+                        object_get_typename(OBJECT(phb)));
+         }
+-        goto out;
++        return;
+     }
+ 
+     g_assert(drc);
+ 
+     if (pc->is_bridge) {
+-        spapr_pci_bridge_plug(phb, PCI_BRIDGE(plugged_dev), &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        spapr_pci_bridge_plug(phb, PCI_BRIDGE(plugged_dev), errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -1542,15 +1538,15 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+      */
+     if (plugged_dev->hotplugged && bus->devices[PCI_DEVFN(slotnr, 0)] &&
+         PCI_FUNC(pdev->devfn) != 0) {
+-        error_setg(&local_err, "PCI: slot %d function 0 already ocuppied by %s,"
++        error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+                    " additional functions can no longer be exposed to guest.",
+                    slotnr, bus->devices[PCI_DEVFN(slotnr, 0)]->name);
+-        goto out;
++        return;
+     }
+ 
+-    spapr_drc_attach(drc, DEVICE(pdev), &local_err);
+-    if (local_err) {
+-        goto out;
++    spapr_drc_attach(drc, DEVICE(pdev), errp);
++    if (*errp) {
++        return;
+     }
+ 
+     /* If this is function 0, signal hotplug for all the device functions.
+@@ -1560,10 +1556,9 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+         spapr_drc_reset(drc);
+     } else if (PCI_FUNC(pdev->devfn) == 0) {
+         int i;
+-        uint8_t chassis = chassis_from_bus(pci_get_bus(pdev), &local_err);
++        uint8_t chassis = chassis_from_bus(pci_get_bus(pdev), errp);
+ 
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (*errp) {
+             return;
+         }
+ 
+@@ -1581,21 +1576,17 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+             }
+         }
+     }
+-
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void spapr_pci_bridge_unplug(SpaprPhbState *phb,
+                                     PCIBridge *bridge,
                                      Error **errp)
  {
-+    ERRP_AUTO_PROPAGATE();
-     Visitor *v;
 -    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     PCIBus *bus = pci_bridge_get_sec_bus(bridge);
  
-     /* Convert the remaining options into a QAPI object */
-     v = qobject_input_visitor_new_flat_confused(options, errp);
-@@ -669,11 +667,10 @@ static int qemu_rbd_convert_options(QDict *options, BlockdevOptionsRbd **opts,
-         return -EINVAL;
-     }
- 
--    visit_type_BlockdevOptionsRbd(v, NULL, opts, &local_err);
-+    visit_type_BlockdevOptionsRbd(v, NULL, opts, errp);
-     visit_free(v);
- 
+-    remove_drcs(phb, bus, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
++    remove_drcs(phb, bus, errp);
 +    if (*errp) {
-         return -EINVAL;
+         return;
      }
- 
-@@ -710,10 +707,10 @@ static int qemu_rbd_attempt_legacy_options(QDict *options,
- static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
+ }
+@@ -1603,6 +1594,7 @@ static void spapr_pci_bridge_unplug(SpaprPhbState *phb,
+ static void spapr_pci_unplug(HotplugHandler *plug_handler,
+                              DeviceState *plugged_dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     BDRVRBDState *s = bs->opaque;
-     BlockdevOptionsRbd *opts = NULL;
-     const QDictEntry *e;
--    Error *local_err = NULL;
-     char *keypairs, *secretid;
-     int r;
+     PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(plugged_dev);
+     SpaprPhbState *phb = SPAPR_PCI_HOST_BRIDGE(DEVICE(plug_handler));
  
-@@ -727,13 +724,12 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         qdict_del(options, "password-secret");
+@@ -1619,10 +1611,8 @@ static void spapr_pci_unplug(HotplugHandler *plug_handler,
+     pci_device_reset(PCI_DEVICE(plugged_dev));
+ 
+     if (pc->is_bridge) {
+-        Error *local_err = NULL;
+-        spapr_pci_bridge_unplug(phb, PCI_BRIDGE(plugged_dev), &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        spapr_pci_bridge_unplug(phb, PCI_BRIDGE(plugged_dev), errp);
++        if (*errp) {
+         }
+         return;
+     }
+@@ -1633,6 +1623,7 @@ static void spapr_pci_unplug(HotplugHandler *plug_handler,
+ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+                                      DeviceState *plugged_dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprPhbState *phb = SPAPR_PCI_HOST_BRIDGE(DEVICE(plug_handler));
+     PCIDevice *pdev = PCI_DEVICE(plugged_dev);
+     SpaprDrc *drc = drc_from_dev(phb, pdev);
+@@ -1653,11 +1644,9 @@ static void spapr_pci_unplug_request(HotplugHandler *plug_handler,
+         SpaprDrcClass *func_drck;
+         SpaprDREntitySense state;
+         int i;
+-        Error *local_err = NULL;
+-        uint8_t chassis = chassis_from_bus(pci_get_bus(pdev), &local_err);
++        uint8_t chassis = chassis_from_bus(pci_get_bus(pdev), errp);
+ 
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (*errp) {
+             return;
+         }
+ 
+@@ -1712,6 +1701,7 @@ static void spapr_phb_finalizefn(Object *obj)
+ 
+ static void spapr_phb_unrealize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     SysBusDevice *s = SYS_BUS_DEVICE(dev);
+     PCIHostState *phb = PCI_HOST_BRIDGE(s);
+@@ -1719,7 +1709,6 @@ static void spapr_phb_unrealize(DeviceState *dev, Error **errp)
+     SpaprTceTable *tcet;
+     int i;
+     const unsigned windows_supported = spapr_phb_windows_supported(sphb);
+-    Error *local_err = NULL;
+ 
+     spapr_phb_nvgpu_free(sphb);
+ 
+@@ -1740,9 +1729,8 @@ static void spapr_phb_unrealize(DeviceState *dev, Error **errp)
+         }
      }
  
--    r = qemu_rbd_convert_options(options, &opts, &local_err);
+-    remove_drcs(sphb, phb->bus, &local_err);
 -    if (local_err) {
-+    r = qemu_rbd_convert_options(options, &opts, errp);
+-        error_propagate(errp, local_err);
++    remove_drcs(sphb, phb->bus, errp);
 +    if (*errp) {
-         /* If keypairs are present, that means some options are present in
-          * the modern option format.  Don't attempt to parse legacy option
-          * formats, as we won't support mixed usage. */
-         if (keypairs) {
--            error_propagate(errp, local_err);
-             goto out;
+         return;
+     }
+ 
+@@ -1790,6 +1778,7 @@ static void spapr_phb_destroy_msi(gpointer opaque)
+ 
+ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     /* We don't use SPAPR_MACHINE() in order to exit gracefully if the user
+      * tries to add a sPAPR PHB to a non-pseries machine.
+      */
+@@ -1807,7 +1796,6 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     uint64_t msi_window_size = 4096;
+     SpaprTceTable *tcet;
+     const unsigned windows_supported = spapr_phb_windows_supported(sphb);
+-    Error *local_err = NULL;
+ 
+     if (!spapr) {
+         error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries machine");
+@@ -1961,9 +1949,9 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+         uint32_t irq = SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + i;
+ 
+         if (smc->legacy_irq_allocation) {
+-            irq = spapr_irq_findone(spapr, &local_err);
+-            if (local_err) {
+-                error_propagate_prepend(errp, local_err,
++            irq = spapr_irq_findone(spapr, errp);
++            if (*errp) {
++                error_prepend(errp,
+                                         "can't allocate LSIs: ");
+                 /*
+                  * Older machines will never support PHB hotplug, ie, this is an
+@@ -1973,9 +1961,9 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+             }
          }
  
-@@ -746,7 +742,6 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         if (r < 0) {
-             /* Propagate the original error, not the legacy parsing fallback
-              * error, as the latter was just a best-effort attempt. */
--            error_propagate(errp, local_err);
-             goto out;
+-        spapr_irq_claim(spapr, irq, true, &local_err);
+-        if (local_err) {
+-            error_propagate_prepend(errp, local_err, "can't allocate LSIs: ");
++        spapr_irq_claim(spapr, irq, true, errp);
++        if (*errp) {
++            error_prepend(errp, "can't allocate LSIs: ");
+             goto unrealize;
          }
-         /* Take care whenever deciding to actually deprecate; once this ability
+ 
+@@ -1983,9 +1971,8 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     /* allocate connectors for child PCI devices */
+-    add_drcs(sphb, phb->bus, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    add_drcs(sphb, phb->bus, errp);
++    if (*errp) {
+         goto unrealize;
+     }
+ 
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index 554de9930d..cae3e99412 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -463,11 +463,11 @@ static inline uint32_t spapr_vio_reg_to_irq(uint32_t reg)
+ 
+ static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     SpaprVioDevice *dev = (SpaprVioDevice *)qdev;
+     SpaprVioDeviceClass *pc = VIO_SPAPR_DEVICE_GET_CLASS(dev);
+     char *id;
+-    Error *local_err = NULL;
+ 
+     if (dev->reg != -1) {
+         /*
+@@ -503,16 +503,14 @@ static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+     dev->irq = spapr_vio_reg_to_irq(dev->reg);
+ 
+     if (SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
+-        dev->irq = spapr_irq_findone(spapr, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        dev->irq = spapr_irq_findone(spapr, errp);
++        if (*errp) {
+             return;
+         }
+     }
+ 
+-    spapr_irq_claim(spapr, dev->irq, false, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    spapr_irq_claim(spapr, dev->irq, false, errp);
++    if (*errp) {
+         return;
+     }
+ 
 -- 
 2.21.0
 
