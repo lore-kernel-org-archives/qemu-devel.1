@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA51C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7901DC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:20:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2F092089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:19:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2F092089F
+	by mail.kernel.org (Postfix) with ESMTPS id 4F8992089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:20:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8992089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54559 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyZh-0002re-3Y
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:19:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40441)
+	id 1iIyaf-0003qw-Ag
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:20:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgl-0000Ju-9O
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:48 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQu-0006DI-S3
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgj-00083D-UE
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:47 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49644)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQt-0004QA-BN
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:24 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48030)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxgj-00082L-My
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:45 -0400
+ id 1iIxQt-0004C6-3w
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:23 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR9-0003XG-75; Fri, 11 Oct 2019 19:06:39 +0300
+ id 1iIxQh-0003XG-QU; Fri, 11 Oct 2019 19:06:11 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 121/126] hw/sd/ssi-sd.c: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:47 +0300
-Message-Id: <20191011160552.22907-122-vsementsov@virtuozzo.com>
+Subject: [RFC v5 047/126] SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:33 +0300
+Message-Id: <20191011160552.22907-48-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +60,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ armbru@redhat.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,45 +111,88 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/sd/ssi-sd.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ hw/sd/sdhci-pci.c |  7 +++----
+ hw/sd/sdhci.c     | 21 +++++++++------------
+ 2 files changed, 12 insertions(+), 16 deletions(-)
 
-diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-index 91db069212..f42204d649 100644
---- a/hw/sd/ssi-sd.c
-+++ b/hw/sd/ssi-sd.c
-@@ -241,10 +241,10 @@ static const VMStateDescription vmstate_ssi_sd = {
+diff --git a/hw/sd/sdhci-pci.c b/hw/sd/sdhci-pci.c
+index 2c8d8f59b5..b1448cf22e 100644
+--- a/hw/sd/sdhci-pci.c
++++ b/hw/sd/sdhci-pci.c
+@@ -29,13 +29,12 @@ static Property sdhci_pci_properties[] = {
  
- static void ssi_sd_realize(SSISlave *d, Error **errp)
+ static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, d);
-     DeviceState *carddev;
-     DriveInfo *dinfo;
--    Error *err = NULL;
+     SDHCIState *s = PCI_SDHCI(dev);
+-    Error *local_err = NULL;
  
-     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
-                         DEVICE(d), "sd-bus");
-@@ -254,12 +254,14 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
-     dinfo = drive_get_next(IF_SD);
-     carddev = qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
-     if (dinfo) {
--        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
-+        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo),
-+                            errp);
-     }
--    object_property_set_bool(OBJECT(carddev), true, "spi", &err);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
--    if (err) {
--        error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
-+    object_property_set_bool(OBJECT(carddev), true, "spi", errp);
-+    object_property_set_bool(OBJECT(carddev), true, "realized", errp);
+     sdhci_initfn(s);
+-    sdhci_common_realize(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    sdhci_common_realize(s, errp);
 +    if (*errp) {
-+        error_setg(errp, "failed to init SD card: %s",
-+                   error_get_pretty(*errp));
+         return;
+     }
+ 
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index e56031b5e4..db9e9add82 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1293,7 +1293,7 @@ static const MemoryRegionOps sdhci_mmio_ops = {
+ 
+ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+     switch (s->sd_spec_version) {
+     case 2 ... 3:
+@@ -1304,9 +1304,8 @@ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+     }
+     s->version = (SDHC_HCVER_VENDOR << 8) | (s->sd_spec_version - 1);
+ 
+-    sdhci_check_capareg(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    sdhci_check_capareg(s, errp);
++    if (*errp) {
          return;
      }
  }
+@@ -1337,11 +1336,10 @@ void sdhci_uninitfn(SDHCIState *s)
+ 
+ void sdhci_common_realize(SDHCIState *s, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+-    sdhci_init_readonly_registers(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    sdhci_init_readonly_registers(s, errp);
++    if (*errp) {
+         return;
+     }
+     s->buf_maxsz = sdhci_get_fifolen(s);
+@@ -1461,13 +1459,12 @@ static void sdhci_sysbus_finalize(Object *obj)
+ 
+ static void sdhci_sysbus_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SDHCIState *s = SYSBUS_SDHCI(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+-    Error *local_err = NULL;
+ 
+-    sdhci_common_realize(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    sdhci_common_realize(s, errp);
++    if (*errp) {
+         return;
+     }
+ 
 -- 
 2.21.0
 
