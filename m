@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A151ECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE79ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:37:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 331212084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:37:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 331212084C
+	by mail.kernel.org (Postfix) with ESMTPS id 6093E2084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:37:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6093E2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyrJ-0001lL-1E
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:37:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37273)
+	id 1iIyrP-0001qa-00
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:37:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRL-0006yE-Lm
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:53 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlD-0006k6-9W
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRK-0004x5-0P
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:51 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48542)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlA-0002Ks-B2
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:23 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49782)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxRJ-0004bD-Oh; Fri, 11 Oct 2019 12:06:49 -0400
+ id 1iIxl9-0002J8-Fr; Fri, 11 Oct 2019 12:27:19 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQy-0003XG-8Z; Fri, 11 Oct 2019 19:06:28 +0300
+ id 1iIxR2-0003XG-DE; Fri, 11 Oct 2019 19:06:32 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 096/126] VHDX: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:22 +0300
-Message-Id: <20191011160552.22907-97-vsementsov@virtuozzo.com>
+Subject: [RFC v5 102/126] CURL: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:28 +0300
+Message-Id: <20191011160552.22907-103-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +60,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, Jeff Cody <codyprime@gmail.com>, armbru@redhat.com,
- Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,101 +110,37 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/vhdx-log.c |  1 +
- block/vhdx.c     | 22 +++++++++-------------
- 2 files changed, 10 insertions(+), 13 deletions(-)
+ block/curl.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/block/vhdx-log.c b/block/vhdx-log.c
-index fdd3a7adc3..176e03327b 100644
---- a/block/vhdx-log.c
-+++ b/block/vhdx-log.c
-@@ -748,6 +748,7 @@ exit:
- int vhdx_parse_log(BlockDriverState *bs, BDRVVHDXState *s, bool *flushed,
-                    Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret = 0;
-     VHDXHeader *hdr;
-     VHDXLogSequence logs = { 0 };
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 6a09d0a55c..e3ca23214c 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -898,11 +898,11 @@ static void vhdx_close(BlockDriverState *bs)
- static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
+diff --git a/block/curl.c b/block/curl.c
+index f86299378e..bd687ec9f0 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -642,10 +642,10 @@ static QemuOptsList runtime_opts = {
+ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
                       Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     BDRVVHDXState *s = bs->opaque;
-     int ret = 0;
-     uint32_t i;
-     uint64_t signature;
+     BDRVCURLState *s = bs->opaque;
+     CURLState *state = NULL;
+     QemuOpts *opts;
 -    Error *local_err = NULL;
+     const char *file;
+     const char *cookie;
+     const char *cookie_secret;
+@@ -671,9 +671,8 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
  
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
-                                false, errp);
-@@ -931,9 +931,8 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
-      * header update */
-     vhdx_guid_generate(&s->session_guid);
- 
--    vhdx_parse_header(bs, s, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
-+    vhdx_parse_header(bs, s, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
-@@ -1007,9 +1006,8 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
-     error_setg(&s->migration_blocker, "The vhdx format used by node '%s' "
-                "does not support live migration",
-                bdrv_get_device_or_node_name(bs));
--    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+     qemu_mutex_init(&s->mutex);
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    ret = migrate_add_blocker(s->migration_blocker, errp);
++    qemu_opts_absorb_qdict(opts, options, errp);
 +    if (*errp) {
-         error_free(s->migration_blocker);
-         goto fail;
-     }
-@@ -1966,11 +1964,11 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
-                                             QemuOpts *opts,
-                                             Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptions *create_options = NULL;
-     QDict *qdict;
-     Visitor *v;
-     BlockDriverState *bs = NULL;
--    Error *local_err = NULL;
-     int ret;
- 
-     static const QDictRenames opt_renames[] = {
-@@ -1989,9 +1987,8 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
+         goto out_noclean;
      }
  
-     /* Create and open the file (protocol layer) */
--    ret = bdrv_create_file(filename, opts, &local_err);
-+    ret = bdrv_create_file(filename, opts, errp);
-     if (ret < 0) {
--        error_propagate(errp, local_err);
-         goto fail;
-     }
- 
-@@ -2012,11 +2009,10 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
-         goto fail;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
 -- 
 2.21.0
 
