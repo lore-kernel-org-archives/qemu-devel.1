@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 046B3C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F453ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:26:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDF712064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:26:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDF712064A
+	by mail.kernel.org (Postfix) with ESMTPS id D78CA2064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:26:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D78CA2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIygN-0003lh-L1
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:26:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36839)
+	id 1iIygn-0004Yl-62
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:26:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0006bQ-Lx
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:42 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgT-0008MG-Gf
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR5-0004kS-GP
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48084)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgQ-0007wr-AY
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:29 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49616)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR5-0004Fv-8B; Fri, 11 Oct 2019 12:06:35 -0400
+ id 1iIxgQ-0007wY-3B; Fri, 11 Oct 2019 12:22:26 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQj-0003XG-KL; Fri, 11 Oct 2019 19:06:13 +0300
+ id 1iIxR2-0003XG-LB; Fri, 11 Oct 2019 19:06:32 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 052/126] vhost: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:38 +0300
-Message-Id: <20191011160552.22907-53-vsementsov@virtuozzo.com>
+Subject: [RFC v5 103/126] GLUSTER: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:29 +0300
+Message-Id: <20191011160552.22907-104-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -59,11 +59,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
- Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, integration@gluster.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -112,118 +110,238 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/block/vhost-user-blk.c |  6 +++---
- hw/scsi/vhost-scsi.c      | 12 +++++-------
- hw/scsi/vhost-user-scsi.c |  7 +++----
- hw/virtio/vhost-vsock.c   |  1 +
- 4 files changed, 12 insertions(+), 14 deletions(-)
+ block/gluster.c | 69 ++++++++++++++++++++++++-------------------------
+ 1 file changed, 34 insertions(+), 35 deletions(-)
 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 63da9bb619..9dfe173c19 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -388,9 +388,9 @@ static void vhost_user_blk_event(void *opaque, int event)
- 
- static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+diff --git a/block/gluster.c b/block/gluster.c
+index 64028b2cba..683101612e 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -419,6 +419,7 @@ out:
+ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+                                            Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
--    Error *err = NULL;
-     int i, ret;
- 
-     if (!s->chardev.chr) {
-@@ -429,8 +429,8 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-                              NULL, (void *)dev, NULL, true);
- 
- reconnect:
--    if (qemu_chr_fe_wait_connected(&s->chardev, &err) < 0) {
--        error_report_err(err);
-+    if (qemu_chr_fe_wait_connected(&s->chardev, errp) < 0) {
-+        error_report_errp(errp);
-         goto virtio_err;
-     }
- 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index c693fc748a..2dca1f7fe2 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -165,9 +165,9 @@ static const VMStateDescription vmstate_virtio_vhost_scsi = {
- 
- static void vhost_scsi_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(dev);
--    Error *err = NULL;
-     int vhostfd = -1;
+     struct glfs *glfs;
      int ret;
+     int old_errno;
+@@ -512,38 +513,38 @@ out:
+ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+                                   QDict *options, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QemuOpts *opts;
+     SocketAddress *gsconf = NULL;
+     SocketAddressList *curr = NULL;
+     QDict *backing_options = NULL;
+-    Error *local_err = NULL;
+     char *str = NULL;
+     const char *ptr;
+     int i, type, num_servers;
  
-@@ -195,9 +195,8 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-                                vhost_dummy_handle_output,
-                                vhost_dummy_handle_output,
-                                vhost_dummy_handle_output,
--                               &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
-+                               errp);
+     /* create opts info from runtime_json_opts list */
+     opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
++    qemu_opts_absorb_qdict(opts, options, errp);
 +    if (*errp) {
-         goto close_fd;
+         goto out;
      }
  
-@@ -207,9 +206,8 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-                 "When external environment supports it (Orchestrator migrates "
-                 "target SCSI device state or use shared storage over network), "
-                 "set 'migratable' property to true to enable migration.");
--        migrate_add_blocker(vsc->migration_blocker, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        migrate_add_blocker(vsc->migration_blocker, errp);
+     num_servers = qdict_array_entries(options, GLUSTER_OPT_SERVER_PATTERN);
+     if (num_servers < 1) {
+-        error_setg(&local_err, QERR_MISSING_PARAMETER, "server");
++        error_setg(errp, QERR_MISSING_PARAMETER, "server");
+         goto out;
+     }
+ 
+     ptr = qemu_opt_get(opts, GLUSTER_OPT_VOLUME);
+     if (!ptr) {
+-        error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_VOLUME);
++        error_setg(errp, QERR_MISSING_PARAMETER, GLUSTER_OPT_VOLUME);
+         goto out;
+     }
+     gconf->volume = g_strdup(ptr);
+ 
+     ptr = qemu_opt_get(opts, GLUSTER_OPT_PATH);
+     if (!ptr) {
+-        error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_PATH);
++        error_setg(errp, QERR_MISSING_PARAMETER, GLUSTER_OPT_PATH);
+         goto out;
+     }
+     gconf->path = g_strdup(ptr);
+@@ -555,15 +556,15 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+ 
+         /* create opts info from runtime_type_opts list */
+         opts = qemu_opts_create(&runtime_type_opts, NULL, 0, &error_abort);
+-        qemu_opts_absorb_qdict(opts, backing_options, &local_err);
+-        if (local_err) {
++        qemu_opts_absorb_qdict(opts, backing_options, errp);
 +        if (*errp) {
-             error_free(vsc->migration_blocker);
-             goto free_virtio;
+             goto out;
          }
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index 6a6c15dd32..ef4b25104f 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -68,11 +68,11 @@ static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
  
- static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
+         ptr = qemu_opt_get(opts, GLUSTER_OPT_TYPE);
+         if (!ptr) {
+-            error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_TYPE);
+-            error_append_hint(&local_err, GERR_INDEX_HINT, i);
++            error_setg(errp, QERR_MISSING_PARAMETER, GLUSTER_OPT_TYPE);
++            error_append_hint(errp, GERR_INDEX_HINT, i);
+             goto out;
+ 
+         }
+@@ -574,10 +575,10 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+         type = qapi_enum_parse(&SocketAddressType_lookup, ptr, -1, NULL);
+         if (type != SOCKET_ADDRESS_TYPE_INET
+             && type != SOCKET_ADDRESS_TYPE_UNIX) {
+-            error_setg(&local_err,
++            error_setg(errp,
+                        "Parameter '%s' may be 'inet' or 'unix'",
+                        GLUSTER_OPT_TYPE);
+-            error_append_hint(&local_err, GERR_INDEX_HINT, i);
++            error_append_hint(errp, GERR_INDEX_HINT, i);
+             goto out;
+         }
+         gsconf->type = type;
+@@ -586,24 +587,24 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+         if (gsconf->type == SOCKET_ADDRESS_TYPE_INET) {
+             /* create opts info from runtime_inet_opts list */
+             opts = qemu_opts_create(&runtime_inet_opts, NULL, 0, &error_abort);
+-            qemu_opts_absorb_qdict(opts, backing_options, &local_err);
+-            if (local_err) {
++            qemu_opts_absorb_qdict(opts, backing_options, errp);
++            if (*errp) {
+                 goto out;
+             }
+ 
+             ptr = qemu_opt_get(opts, GLUSTER_OPT_HOST);
+             if (!ptr) {
+-                error_setg(&local_err, QERR_MISSING_PARAMETER,
++                error_setg(errp, QERR_MISSING_PARAMETER,
+                            GLUSTER_OPT_HOST);
+-                error_append_hint(&local_err, GERR_INDEX_HINT, i);
++                error_append_hint(errp, GERR_INDEX_HINT, i);
+                 goto out;
+             }
+             gsconf->u.inet.host = g_strdup(ptr);
+             ptr = qemu_opt_get(opts, GLUSTER_OPT_PORT);
+             if (!ptr) {
+-                error_setg(&local_err, QERR_MISSING_PARAMETER,
++                error_setg(errp, QERR_MISSING_PARAMETER,
+                            GLUSTER_OPT_PORT);
+-                error_append_hint(&local_err, GERR_INDEX_HINT, i);
++                error_append_hint(errp, GERR_INDEX_HINT, i);
+                 goto out;
+             }
+             gsconf->u.inet.port = g_strdup(ptr);
+@@ -624,19 +625,19 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+                 gsconf->u.inet.has_ipv6 = true;
+             }
+             if (gsconf->u.inet.has_to) {
+-                error_setg(&local_err, "Parameter 'to' not supported");
++                error_setg(errp, "Parameter 'to' not supported");
+                 goto out;
+             }
+             if (gsconf->u.inet.has_ipv4 || gsconf->u.inet.has_ipv6) {
+-                error_setg(&local_err, "Parameters 'ipv4/ipv6' not supported");
++                error_setg(errp, "Parameters 'ipv4/ipv6' not supported");
+                 goto out;
+             }
+             qemu_opts_del(opts);
+         } else {
+             /* create opts info from runtime_unix_opts list */
+             opts = qemu_opts_create(&runtime_unix_opts, NULL, 0, &error_abort);
+-            qemu_opts_absorb_qdict(opts, backing_options, &local_err);
+-            if (local_err) {
++            qemu_opts_absorb_qdict(opts, backing_options, errp);
++            if (*errp) {
+                 goto out;
+             }
+ 
+@@ -644,15 +645,15 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+             if (!ptr) {
+                 ptr = qemu_opt_get(opts, GLUSTER_OPT_SOCKET);
+             } else if (qemu_opt_get(opts, GLUSTER_OPT_SOCKET)) {
+-                error_setg(&local_err,
++                error_setg(errp,
+                            "Conflicting parameters 'path' and 'socket'");
+-                error_append_hint(&local_err, GERR_INDEX_HINT, i);
++                error_append_hint(errp, GERR_INDEX_HINT, i);
+                 goto out;
+             }
+             if (!ptr) {
+-                error_setg(&local_err, QERR_MISSING_PARAMETER,
++                error_setg(errp, QERR_MISSING_PARAMETER,
+                            GLUSTER_OPT_PATH);
+-                error_append_hint(&local_err, GERR_INDEX_HINT, i);
++                error_append_hint(errp, GERR_INDEX_HINT, i);
+                 goto out;
+             }
+             gsconf->u.q_unix.path = g_strdup(ptr);
+@@ -679,7 +680,6 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+     return 0;
+ 
+ out:
+-    error_propagate(errp, local_err);
+     qapi_free_SocketAddress(gsconf);
+     qemu_opts_del(opts);
+     g_free(str);
+@@ -694,6 +694,7 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
+                               const char *filename,
+                               QDict *options, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-     VHostUserSCSI *s = VHOST_USER_SCSI(dev);
-     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-     struct vhost_virtqueue *vqs = NULL;
--    Error *err = NULL;
+     int ret;
+     if (filename) {
+         ret = qemu_gluster_parse_uri(gconf, filename);
+@@ -810,18 +811,17 @@ static bool qemu_gluster_test_seek(struct glfs_fd *fd)
+ static int qemu_gluster_open(BlockDriverState *bs,  QDict *options,
+                              int bdrv_flags, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVGlusterState *s = bs->opaque;
+     int open_flags = 0;
+     int ret = 0;
+     BlockdevOptionsGluster *gconf = NULL;
+     QemuOpts *opts;
+-    Error *local_err = NULL;
+     const char *filename, *logfile;
+ 
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -1134,11 +1134,11 @@ static int coroutine_fn qemu_gluster_co_create_opts(const char *filename,
+                                                     QemuOpts *opts,
+                                                     Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockdevCreateOptions *options;
+     BlockdevCreateOptionsGluster *gopts;
+     BlockdevOptionsGluster *gconf;
+     char *tmp = NULL;
+-    Error *local_err = NULL;
      int ret;
  
-     if (!vs->conf.chardev.chr) {
-@@ -82,9 +82,8 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
+     options = g_new0(BlockdevCreateOptions, 1);
+@@ -1153,10 +1153,9 @@ static int coroutine_fn qemu_gluster_co_create_opts(const char *filename,
  
-     virtio_scsi_common_realize(dev, vhost_dummy_handle_output,
-                                vhost_dummy_handle_output,
--                               vhost_dummy_handle_output, &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
-+                               vhost_dummy_handle_output, errp);
+     tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+     gopts->preallocation = qapi_enum_parse(&PreallocMode_lookup, tmp,
+-                                           PREALLOC_MODE_OFF, &local_err);
++                                           PREALLOC_MODE_OFF, errp);
+     g_free(tmp);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
 +    if (*errp) {
-         return;
+         ret = -EINVAL;
+         goto fail;
      }
- 
-diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-index f5744363a8..61ade0fa65 100644
---- a/hw/virtio/vhost-vsock.c
-+++ b/hw/virtio/vhost-vsock.c
-@@ -300,6 +300,7 @@ static const VMStateDescription vmstate_virtio_vhost_vsock = {
- 
- static void vhost_vsock_device_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostVSock *vsock = VHOST_VSOCK(dev);
-     int vhostfd;
 -- 
 2.21.0
 
