@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C85FC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA51C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:19:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42EAB2089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:18:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42EAB2089F
+	by mail.kernel.org (Postfix) with ESMTPS id C2F092089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:19:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2F092089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyYN-00012B-2E
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:18:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36804)
+	id 1iIyZh-0002re-3Y
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:19:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40441)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR7-0006ZK-Ez
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgl-0000Ju-9O
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0004ie-Bi
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:37 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48362)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgj-00083D-UE
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:47 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49644)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR4-0004Pf-3f
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:34 -0400
+ id 1iIxgj-00082L-My
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:45 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQs-0003XG-GX; Fri, 11 Oct 2019 19:06:22 +0300
+ id 1iIxR9-0003XG-75; Fri, 11 Oct 2019 19:06:39 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 078/126] hostmem: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:04 +0300
-Message-Id: <20191011160552.22907-79-vsementsov@virtuozzo.com>
+Subject: [RFC v5 121/126] hw/sd/ssi-sd.c: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:47 +0300
+Message-Id: <20191011160552.22907-122-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,9 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Eduardo Habkost <ehabkost@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,213 +110,45 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- backends/hostmem-file.c  | 21 ++++++++------------
- backends/hostmem-memfd.c | 18 ++++++++----------
- backends/hostmem.c       | 41 ++++++++++++++++++----------------------
- 3 files changed, 34 insertions(+), 46 deletions(-)
+ hw/sd/ssi-sd.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index be64020746..4d03b9f33a 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -116,25 +116,22 @@ static void file_memory_backend_set_align(Object *o, Visitor *v,
-                                           const char *name, void *opaque,
-                                           Error **errp)
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index 91db069212..f42204d649 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -241,10 +241,10 @@ static const VMStateDescription vmstate_ssi_sd = {
+ 
+ static void ssi_sd_realize(SSISlave *d, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     HostMemoryBackend *backend = MEMORY_BACKEND(o);
-     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
--    Error *local_err = NULL;
-     uint64_t val;
+     ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, d);
+     DeviceState *carddev;
+     DriveInfo *dinfo;
+-    Error *err = NULL;
  
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(&local_err, "cannot change property '%s' of %s",
-+        error_setg(errp, "cannot change property '%s' of %s",
-                    name, object_get_typename(o));
--        goto out;
-+        return;
+     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+                         DEVICE(d), "sd-bus");
+@@ -254,12 +254,14 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
+     dinfo = drive_get_next(IF_SD);
+     carddev = qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
+     if (dinfo) {
+-        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
++        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo),
++                            errp);
      }
- 
--    visit_type_size(v, name, &val, &local_err);
--    if (local_err) {
--        goto out;
-+    visit_type_size(v, name, &val, errp);
+-    object_property_set_bool(OBJECT(carddev), true, "spi", &err);
+-    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+-    if (err) {
+-        error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
++    object_property_set_bool(OBJECT(carddev), true, "spi", errp);
++    object_property_set_bool(OBJECT(carddev), true, "realized", errp);
 +    if (*errp) {
-+        return;
-     }
-     fb->align = val;
--
-- out:
--    error_propagate(errp, local_err);
- }
- 
- static bool file_memory_backend_get_pmem(Object *o, Error **errp)
-@@ -144,6 +141,7 @@ static bool file_memory_backend_get_pmem(Object *o, Error **errp)
- 
- static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     HostMemoryBackend *backend = MEMORY_BACKEND(o);
-     HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(o);
- 
-@@ -156,13 +154,10 @@ static void file_memory_backend_set_pmem(Object *o, bool value, Error **errp)
- 
- #ifndef CONFIG_LIBPMEM
-     if (value) {
--        Error *local_err = NULL;
--
--        error_setg(&local_err,
-+        error_setg(errp,
-                    "Lack of libpmem support while setting the 'pmem=on'"
-                    " of %s. We can't ensure data persistence.",
-                    object_get_typename(o));
--        error_propagate(errp, local_err);
++        error_setg(errp, "failed to init SD card: %s",
++                   error_get_pretty(*errp));
          return;
      }
- #endif
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index 26070b425e..1f0677e5b4 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -77,27 +77,25 @@ static void
- memfd_backend_set_hugetlbsize(Object *obj, Visitor *v, const char *name,
-                               void *opaque, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     HostMemoryBackendMemfd *m = MEMORY_BACKEND_MEMFD(obj);
--    Error *local_err = NULL;
-     uint64_t value;
- 
-     if (host_memory_backend_mr_inited(MEMORY_BACKEND(obj))) {
--        error_setg(&local_err, "cannot change property value");
--        goto out;
-+        error_setg(errp, "cannot change property value");
-+        return;
-     }
- 
--    visit_type_size(v, name, &value, &local_err);
--    if (local_err) {
--        goto out;
-+    visit_type_size(v, name, &value, errp);
-+    if (*errp) {
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' doesn't take value '%"
-+        error_setg(errp, "Property '%s.%s' doesn't take value '%"
-                    PRIu64 "'", object_get_typename(obj), name, value);
--        goto out;
-+        return;
-     }
-     m->hugetlbsize = value;
--out:
--    error_propagate(errp, local_err);
  }
- 
- static void
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 6d333dc23c..7a3dd9d69b 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -53,29 +53,27 @@ static void
- host_memory_backend_set_size(Object *obj, Visitor *v, const char *name,
-                              void *opaque, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
--    Error *local_err = NULL;
-     uint64_t value;
- 
-     if (host_memory_backend_mr_inited(backend)) {
--        error_setg(&local_err, "cannot change property %s of %s ",
-+        error_setg(errp, "cannot change property %s of %s ",
-                    name, object_get_typename(obj));
--        goto out;
-+        return;
-     }
- 
--    visit_type_size(v, name, &value, &local_err);
--    if (local_err) {
--        goto out;
-+    visit_type_size(v, name, &value, errp);
-+    if (*errp) {
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err,
-+        error_setg(errp,
-                    "property '%s' of %s doesn't take value '%" PRIu64 "'",
-                    name, object_get_typename(obj), value);
--        goto out;
-+        return;
-     }
-     backend->size = value;
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void
-@@ -221,7 +219,7 @@ static bool host_memory_backend_get_prealloc(Object *obj, Error **errp)
- static void host_memory_backend_set_prealloc(Object *obj, bool value,
-                                              Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     HostMemoryBackend *backend = MEMORY_BACKEND(obj);
-     MachineState *ms = MACHINE(qdev_get_machine());
- 
-@@ -243,9 +241,8 @@ static void host_memory_backend_set_prealloc(Object *obj, bool value,
-         void *ptr = memory_region_get_ram_ptr(&backend->mr);
-         uint64_t sz = memory_region_size(&backend->mr);
- 
--        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        os_mem_prealloc(fd, ptr, sz, ms->smp.cpus, errp);
-+        if (*errp) {
-             return;
-         }
-         backend->prealloc = true;
-@@ -311,17 +308,17 @@ size_t host_memory_backend_pagesize(HostMemoryBackend *memdev)
- static void
- host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     HostMemoryBackend *backend = MEMORY_BACKEND(uc);
-     HostMemoryBackendClass *bc = MEMORY_BACKEND_GET_CLASS(uc);
-     MachineState *ms = MACHINE(qdev_get_machine());
--    Error *local_err = NULL;
-     void *ptr;
-     uint64_t sz;
- 
-     if (bc->alloc) {
--        bc->alloc(backend, &local_err);
--        if (local_err) {
--            goto out;
-+        bc->alloc(backend, errp);
-+        if (*errp) {
-+            return;
-         }
- 
-         ptr = memory_region_get_ram_ptr(&backend->mr);
-@@ -378,14 +375,12 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
-          */
-         if (backend->prealloc) {
-             os_mem_prealloc(memory_region_get_fd(&backend->mr), ptr, sz,
--                            ms->smp.cpus, &local_err);
--            if (local_err) {
--                goto out;
-+                            ms->smp.cpus, errp);
-+            if (*errp) {
-+                return;
-             }
-         }
-     }
--out:
--    error_propagate(errp, local_err);
- }
- 
- static bool
 -- 
 2.21.0
 
