@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 336BBC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFEF1ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB6C82054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:04:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6C82054F
+	by mail.kernel.org (Postfix) with ESMTPS id 77345206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:04:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77345206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyLD-0008Vm-F2
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:04:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36919)
+	id 1iIyLI-00009w-3J
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:04:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRA-0006fO-NF
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:47 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR0-0006Ny-Mf
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR5-0004k6-Cd
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48388)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0004aC-9e
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:30 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47914)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR4-0004RB-Vf
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
+ id 1iIxQx-00048G-SA; Fri, 11 Oct 2019 12:06:28 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQt-0003XG-Ho; Fri, 11 Oct 2019 19:06:23 +0300
+ id 1iIxQc-0003XG-Hd; Fri, 11 Oct 2019 19:06:06 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 081/126] qga: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:07 +0300
-Message-Id: <20191011160552.22907-82-vsementsov@virtuozzo.com>
+Subject: [RFC v5 028/126] s390x: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:14 +0300
+Message-Id: <20191011160552.22907-29-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +59,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- vsementsov@virtuozzo.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eric Farman <farman@linux.ibm.com>,
+ vsementsov@virtuozzo.com, David Hildenbrand <david@redhat.com>,
+ qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,723 +114,442 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qga/commands-posix.c | 220 +++++++++++++++++++------------------------
- 1 file changed, 97 insertions(+), 123 deletions(-)
+ hw/intc/s390_flic_kvm.c    |  9 ++++-----
+ hw/s390x/3270-ccw.c        | 13 ++++++-------
+ hw/s390x/css-bridge.c      |  7 +++----
+ hw/s390x/css.c             |  7 +++----
+ hw/s390x/s390-skeys.c      |  7 +++----
+ hw/s390x/s390-virtio-ccw.c | 11 +++++------
+ hw/s390x/sclp.c            | 15 ++++++---------
+ hw/s390x/tod-kvm.c         | 14 ++++++--------
+ hw/vfio/ccw.c              | 24 +++++++++++-------------
+ target/s390x/cpu.c         | 26 ++++++++++++--------------
+ 10 files changed, 59 insertions(+), 74 deletions(-)
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 6dcd2d5db6..257eaaf0da 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -82,8 +82,8 @@ static void ga_wait_child(pid_t pid, int *status, Error **errp)
+diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+index cedccba8a9..5550cecef8 100644
+--- a/hw/intc/s390_flic_kvm.c
++++ b/hw/intc/s390_flic_kvm.c
+@@ -578,14 +578,14 @@ typedef struct KVMS390FLICStateClass {
  
- void qmp_guest_shutdown(bool has_mode, const char *mode, Error **errp)
+ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     const char *shutdown_flag;
--    Error *local_err = NULL;
-     pid_t pid;
-     int status;
- 
-@@ -116,9 +116,8 @@ void qmp_guest_shutdown(bool has_mode, const char *mode, Error **errp)
-         return;
-     }
- 
--    ga_wait_child(pid, &status, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    ga_wait_child(pid, &status, errp);
-+    if (*errp) {
-         return;
-     }
- 
-@@ -151,10 +150,10 @@ int64_t qmp_guest_get_time(Error **errp)
- 
- void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
+     KVMS390FLICState *flic_state = KVM_S390_FLIC(dev);
+     struct kvm_create_device cd = {0};
+     struct kvm_device_attr test_attr = {0};
      int ret;
-     int status;
-     pid_t pid;
--    Error *local_err = NULL;
-     struct timeval tv;
+-    Error *errp_local = NULL;
  
-     /* If user has passed a time, validate and set it. */
-@@ -203,9 +202,8 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
-         return;
-     }
- 
--    ga_wait_child(pid, &status, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    ga_wait_child(pid, &status, errp);
+-    KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, &errp_local);
+-    if (errp_local) {
++    KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, errp);
 +    if (*errp) {
-         return;
+         goto fail;
      }
- 
-@@ -328,11 +326,11 @@ find_open_flag(const char *mode_str, Error **errp)
- static FILE *
- safe_open_or_create(const char *path, const char *mode, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     int oflag;
- 
--    oflag = find_open_flag(mode, &local_err);
--    if (local_err == NULL) {
-+    oflag = find_open_flag(mode, errp);
-+    if (*errp == NULL) {
-         int fd;
- 
-         /* If the caller wants / allows creation of a new file, we implement it
-@@ -364,13 +362,13 @@ safe_open_or_create(const char *path, const char *mode, Error **errp)
-         }
- 
-         if (fd == -1) {
--            error_setg_errno(&local_err, errno, "failed to open file '%s' "
-+            error_setg_errno(errp, errno, "failed to open file '%s' "
-                              "(mode: '%s')", path, mode);
-         } else {
-             qemu_set_cloexec(fd);
- 
-             if ((oflag & O_CREAT) && fchmod(fd, DEFAULT_NEW_FILE_MODE) == -1) {
--                error_setg_errno(&local_err, errno, "failed to set permission "
-+                error_setg_errno(errp, errno, "failed to set permission "
-                                  "0%03o on new file '%s' (mode: '%s')",
-                                  (unsigned)DEFAULT_NEW_FILE_MODE, path, mode);
-             } else {
-@@ -378,7 +376,7 @@ safe_open_or_create(const char *path, const char *mode, Error **errp)
- 
-                 f = fdopen(fd, mode);
-                 if (f == NULL) {
--                    error_setg_errno(&local_err, errno, "failed to associate "
-+                    error_setg_errno(errp, errno, "failed to associate "
-                                      "stdio stream with file descriptor %d, "
-                                      "file '%s' (mode: '%s')", fd, path, mode);
-                 } else {
-@@ -393,24 +391,22 @@ safe_open_or_create(const char *path, const char *mode, Error **errp)
-         }
+     flic_state->fd = -1;
+@@ -593,7 +593,7 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+     cd.type = KVM_DEV_TYPE_FLIC;
+     ret = kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
+     if (ret < 0) {
+-        error_setg_errno(&errp_local, errno, "Creating the KVM device failed");
++        error_setg_errno(errp, errno, "Creating the KVM device failed");
+         trace_flic_create_device(errno);
+         goto fail;
      }
- 
--    error_propagate(errp, local_err);
-     return NULL;
+@@ -605,7 +605,6 @@ static void kvm_s390_flic_realize(DeviceState *dev, Error **errp)
+                                             KVM_HAS_DEVICE_ATTR, test_attr);
+     return;
+ fail:
+-    error_propagate(errp, errp_local);
  }
  
- int64_t qmp_guest_file_open(const char *path, bool has_mode, const char *mode,
-                             Error **errp)
+ static void kvm_s390_flic_reset(DeviceState *dev)
+diff --git a/hw/s390x/3270-ccw.c b/hw/s390x/3270-ccw.c
+index c19a75b9b7..830d7f385e 100644
+--- a/hw/s390x/3270-ccw.c
++++ b/hw/s390x/3270-ccw.c
+@@ -95,13 +95,13 @@ static int emulated_ccw_3270_cb(SubchDev *sch, CCW1 ccw)
+ 
+ static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     FILE *fh;
--    Error *local_err = NULL;
-     int64_t handle;
- 
-     if (!has_mode) {
-         mode = "r";
-     }
-     slog("guest-file-open called, filepath: %s, mode: %s", path, mode);
--    fh = safe_open_or_create(path, mode, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
-+    fh = safe_open_or_create(path, mode, errp);
-+    if (*errp) {
-         return -1;
-     }
- 
-@@ -563,21 +559,20 @@ struct GuestFileSeek *qmp_guest_file_seek(int64_t handle, int64_t offset,
-                                           GuestFileWhence *whence_code,
-                                           Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     GuestFileHandle *gfh = guest_file_handle_find(handle, errp);
-     GuestFileSeek *seek_data = NULL;
-     FILE *fh;
-     int ret;
-     int whence;
+     uint16_t chpid;
+     EmulatedCcw3270Device *dev = EMULATED_CCW_3270(ds);
+     EmulatedCcw3270Class *ck = EMULATED_CCW_3270_GET_CLASS(dev);
+     CcwDevice *cdev = CCW_DEVICE(ds);
+     CCWDeviceClass *cdk = CCW_DEVICE_GET_CLASS(cdev);
+     SubchDev *sch;
 -    Error *err = NULL;
  
-     if (!gfh) {
-         return NULL;
+     sch = css_create_sch(cdev->devno, errp);
+     if (!sch) {
+@@ -117,7 +117,7 @@ static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
+     chpid = css_find_free_chpid(sch->cssid);
+ 
+     if (chpid > MAX_CHPID) {
+-        error_setg(&err, "No available chpid to use.");
++        error_setg(errp, "No available chpid to use.");
+         goto out_err;
      }
  
-     /* We stupidly exposed 'whence':'int' in our qapi */
--    whence = ga_parse_whence(whence_code, &err);
+@@ -128,20 +128,19 @@ static void emulated_ccw_3270_realize(DeviceState *ds, Error **errp)
+     sch->do_subchannel_work = do_subchannel_work_virtual;
+     sch->ccw_cb = emulated_ccw_3270_cb;
+ 
+-    ck->init(dev, &err);
 -    if (err) {
--        error_propagate(errp, err);
-+    whence = ga_parse_whence(whence_code, errp);
++    ck->init(dev, errp);
 +    if (*errp) {
-         return NULL;
+         goto out_err;
      }
  
-@@ -1150,15 +1145,14 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
+-    cdk->realize(cdev, &err);
+-    if (err) {
++    cdk->realize(cdev, errp);
++    if (*errp) {
+         goto out_err;
+     }
  
- GuestFilesystemInfoList *qmp_guest_get_fsinfo(Error **errp)
+     return;
+ 
+ out_err:
+-    error_propagate(errp, err);
+     css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+     cdev->sch = NULL;
+     g_free(sch);
+diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+index 15a8ed96de..93dca01b0f 100644
+--- a/hw/s390x/css-bridge.c
++++ b/hw/s390x/css-bridge.c
+@@ -30,15 +30,14 @@
+ static void ccw_device_unplug(HotplugHandler *hotplug_dev,
+                               DeviceState *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     FsMountList mounts;
-     struct FsMount *mount;
-     GuestFilesystemInfoList *new, *ret = NULL;
--    Error *local_err = NULL;
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     CCWDeviceClass *k = CCW_DEVICE_GET_CLASS(ccw_dev);
+     SubchDev *sch = ccw_dev->sch;
+-    Error *err = NULL;
  
-     QTAILQ_INIT(&mounts);
--    build_fs_mount_list(&mounts, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    build_fs_mount_list(&mounts, errp);
-+    if (*errp) {
-         return NULL;
-     }
- 
-@@ -1166,11 +1160,10 @@ GuestFilesystemInfoList *qmp_guest_get_fsinfo(Error **errp)
-         g_debug("Building guest fsinfo for '%s'", mount->dirname);
- 
-         new = g_malloc0(sizeof(*ret));
--        new->value = build_guest_fsinfo(mount, &local_err);
-+        new->value = build_guest_fsinfo(mount, errp);
-         new->next = ret;
-         ret = new;
--        if (local_err) {
--            error_propagate(errp, local_err);
+     if (k->unplug) {
+-        k->unplug(hotplug_dev, dev, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        k->unplug(hotplug_dev, dev, errp);
 +        if (*errp) {
-             qapi_free_GuestFilesystemInfoList(ret);
-             ret = NULL;
-             break;
-@@ -1194,11 +1187,11 @@ static const char *fsfreeze_hook_arg_string[] = {
- 
- static void execute_fsfreeze_hook(FsfreezeHookArg arg, Error **errp)
+             return;
+         }
+     }
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 844caab408..e911d2fbd2 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -2351,10 +2351,10 @@ static void get_css_devid(Object *obj, Visitor *v, const char *name,
+ static void set_css_devid(Object *obj, Visitor *v, const char *name,
+                           void *opaque, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     int status;
-     pid_t pid;
-     const char *hook;
-     const char *arg_str = fsfreeze_hook_arg_string[arg];
+     DeviceState *dev = DEVICE(obj);
+     Property *prop = opaque;
+     CssDevId *dev_id = qdev_get_prop_ptr(dev, prop);
 -    Error *local_err = NULL;
- 
-     hook = ga_fsfreeze_hook(ga_state);
-     if (!hook) {
-@@ -1224,9 +1217,8 @@ static void execute_fsfreeze_hook(FsfreezeHookArg arg, Error **errp)
+     char *str;
+     int num, n1, n2;
+     unsigned int cssid, ssid, devid;
+@@ -2364,9 +2364,8 @@ static void set_css_devid(Object *obj, Visitor *v, const char *name,
          return;
      }
  
--    ga_wait_child(pid, &status, &local_err);
+-    visit_type_str(v, name, &str, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    ga_wait_child(pid, &status, errp);
++    visit_type_str(v, name, &str, errp);
 +    if (*errp) {
          return;
      }
  
-@@ -1267,25 +1259,23 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
-                                        strList *mountpoints,
-                                        Error **errp)
+diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+index bd37f39120..f176db09c9 100644
+--- a/hw/s390x/s390-skeys.c
++++ b/hw/s390x/s390-skeys.c
+@@ -107,11 +107,11 @@ void hmp_dump_skeys(Monitor *mon, const QDict *qdict)
+ 
+ void qmp_dump_skeys(const char *filename, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     int ret = 0, i = 0;
-     strList *list;
-     FsMountList mounts;
-     struct FsMount *mount;
--    Error *local_err = NULL;
-     int fd;
- 
-     slog("guest-fsfreeze called");
- 
--    execute_fsfreeze_hook(FSFREEZE_HOOK_FREEZE, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    execute_fsfreeze_hook(FSFREEZE_HOOK_FREEZE, errp);
-+    if (*errp) {
-         return -1;
-     }
- 
-     QTAILQ_INIT(&mounts);
--    build_fs_mount_list(&mounts, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    build_fs_mount_list(&mounts, errp);
-+    if (*errp) {
-         return -1;
-     }
- 
-@@ -1358,16 +1348,15 @@ error:
-  */
- int64_t qmp_guest_fsfreeze_thaw(Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
+     S390SKeysState *ss = s390_get_skeys_device();
+     S390SKeysClass *skeyclass = S390_SKEYS_GET_CLASS(ss);
+     const uint64_t total_count = ram_size / TARGET_PAGE_SIZE;
+     uint64_t handled_count = 0, cur_count;
+-    Error *lerr = NULL;
+     vaddr cur_gfn = 0;
+     uint8_t *buf;
      int ret;
-     FsMountList mounts;
-     FsMount *mount;
-     int fd, i = 0, logged;
--    Error *local_err = NULL;
+@@ -155,8 +155,8 @@ void qmp_dump_skeys(const char *filename, Error **errp)
+         }
  
-     QTAILQ_INIT(&mounts);
--    build_fs_mount_list(&mounts, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    build_fs_mount_list(&mounts, errp);
-+    if (*errp) {
-         return 0;
-     }
- 
-@@ -1433,6 +1422,7 @@ static void guest_fsfreeze_cleanup(void)
- GuestFilesystemTrimResponse *
- qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     GuestFilesystemTrimResponse *response;
-     GuestFilesystemTrimResultList *list;
-     GuestFilesystemTrimResult *result;
-@@ -1440,15 +1430,13 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
-     FsMountList mounts;
-     struct FsMount *mount;
-     int fd;
--    Error *local_err = NULL;
-     struct fstrim_range r;
- 
-     slog("guest-fstrim called");
- 
-     QTAILQ_INIT(&mounts);
--    build_fs_mount_list(&mounts, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    build_fs_mount_list(&mounts, errp);
-+    if (*errp) {
-         return NULL;
-     }
- 
-@@ -1554,13 +1542,13 @@ static int run_process_child(const char *command[], Error **errp)
- 
- static bool systemd_supports_mode(SuspendMode mode, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     const char *systemctl_args[3] = {"systemd-hibernate", "systemd-suspend",
-                                      "systemd-hybrid-sleep"};
-     const char *cmd[4] = {"systemctl", "status", systemctl_args[mode], NULL};
-     int status;
- 
--    status = run_process_child(cmd, &local_err);
-+    status = run_process_child(cmd, errp);
- 
-     /*
-      * systemctl status uses LSB return codes so we can expect
-@@ -1574,31 +1562,29 @@ static bool systemd_supports_mode(SuspendMode mode, Error **errp)
-         return true;
-     }
- 
--    error_propagate(errp, local_err);
-     return false;
- }
- 
- static void systemd_suspend(SuspendMode mode, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     const char *systemctl_args[3] = {"hibernate", "suspend", "hybrid-sleep"};
-     const char *cmd[3] = {"systemctl", systemctl_args[mode], NULL};
-     int status;
- 
--    status = run_process_child(cmd, &local_err);
-+    status = run_process_child(cmd, errp);
- 
-     if (status == 0) {
-         return;
-     }
- 
--    if ((status == -1) && !local_err) {
-+    if ((status == -1) && !*errp) {
-         error_setg(errp, "the helper program 'systemctl %s' was not found",
-                    systemctl_args[mode]);
-         return;
-     }
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-     } else {
-         error_setg(errp, "the helper program 'systemctl %s' returned an "
-                    "unexpected exit status code (%d)",
-@@ -1608,24 +1594,23 @@ static void systemd_suspend(SuspendMode mode, Error **errp)
- 
- static bool pmutils_supports_mode(SuspendMode mode, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     const char *pmutils_args[3] = {"--hibernate", "--suspend",
-                                    "--suspend-hybrid"};
-     const char *cmd[3] = {"pm-is-supported", pmutils_args[mode], NULL};
-     int status;
- 
--    status = run_process_child(cmd, &local_err);
-+    status = run_process_child(cmd, errp);
- 
-     if (status == SUSPEND_SUPPORTED) {
-         return true;
-     }
- 
--    if ((status == -1) && !local_err) {
-+    if ((status == -1) && !*errp) {
-         return false;
-     }
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-     } else {
-         error_setg(errp,
-                    "the helper program '%s' returned an unexpected exit"
-@@ -1637,26 +1622,25 @@ static bool pmutils_supports_mode(SuspendMode mode, Error **errp)
- 
- static void pmutils_suspend(SuspendMode mode, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     const char *pmutils_binaries[3] = {"pm-hibernate", "pm-suspend",
-                                        "pm-suspend-hybrid"};
-     const char *cmd[2] = {pmutils_binaries[mode], NULL};
-     int status;
- 
--    status = run_process_child(cmd, &local_err);
-+    status = run_process_child(cmd, errp);
- 
-     if (status == 0) {
-         return;
-     }
- 
--    if ((status == -1) && !local_err) {
-+    if ((status == -1) && !*errp) {
-         error_setg(errp, "the helper program '%s' was not found",
-                    pmutils_binaries[mode]);
-         return;
-     }
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-     } else {
-         error_setg(errp,
-                    "the helper program '%s' returned an unexpected exit"
-@@ -1697,7 +1681,7 @@ static bool linux_sys_state_supports_mode(SuspendMode mode, Error **errp)
- 
- static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     const char *sysfile_strs[3] = {"disk", "mem", NULL};
-     const char *sysfile_str = sysfile_strs[mode];
-     pid_t pid;
-@@ -1733,9 +1717,8 @@ static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
-         return;
-     }
- 
--    ga_wait_child(pid, &status, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    ga_wait_child(pid, &status, errp);
-+    if (*errp) {
-         return;
-     }
- 
-@@ -1747,41 +1730,40 @@ static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
- 
- static void guest_suspend(SuspendMode mode, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     bool mode_supported = false;
- 
--    if (systemd_supports_mode(mode, &local_err)) {
-+    if (systemd_supports_mode(mode, errp)) {
-         mode_supported = true;
--        systemd_suspend(mode, &local_err);
-+        systemd_suspend(mode, errp);
-     }
- 
--    if (!local_err) {
-+    if (!*errp) {
-         return;
-     }
- 
--    error_free(local_err);
-+    error_free_errp(errp);
- 
--    if (pmutils_supports_mode(mode, &local_err)) {
-+    if (pmutils_supports_mode(mode, errp)) {
-         mode_supported = true;
--        pmutils_suspend(mode, &local_err);
-+        pmutils_suspend(mode, errp);
-     }
- 
--    if (!local_err) {
-+    if (!*errp) {
-         return;
-     }
- 
--    error_free(local_err);
-+    error_free_errp(errp);
- 
--    if (linux_sys_state_supports_mode(mode, &local_err)) {
-+    if (linux_sys_state_supports_mode(mode, errp)) {
-         mode_supported = true;
--        linux_sys_state_suspend(mode, &local_err);
-+        linux_sys_state_suspend(mode, errp);
-     }
- 
-     if (!mode_supported) {
-         error_setg(errp,
-                    "the requested suspend mode is not supported by the guest");
-     } else {
--        error_propagate(errp, local_err);
-     }
- }
- 
-@@ -2120,17 +2102,17 @@ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
- 
- GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int64_t current;
-     GuestLogicalProcessorList *head, **link;
-     long sc_max;
--    Error *local_err = NULL;
- 
-     current = 0;
-     head = NULL;
-     link = &head;
--    sc_max = SYSCONF_EXACT(_SC_NPROCESSORS_CONF, &local_err);
-+    sc_max = SYSCONF_EXACT(_SC_NPROCESSORS_CONF, errp);
- 
--    while (local_err == NULL && current < sc_max) {
-+    while (*errp == NULL && current < sc_max) {
-         GuestLogicalProcessor *vcpu;
-         GuestLogicalProcessorList *entry;
-         int64_t id = current++;
-@@ -2141,7 +2123,7 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-             vcpu = g_malloc0(sizeof *vcpu);
-             vcpu->logical_id = id;
-             vcpu->has_can_offline = true; /* lolspeak ftw */
--            transfer_vcpu(vcpu, true, path, &local_err);
-+            transfer_vcpu(vcpu, true, path, errp);
-             entry = g_malloc0(sizeof *entry);
-             entry->value = vcpu;
-             *link = entry;
-@@ -2150,41 +2132,39 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
-         g_free(path);
-     }
- 
--    if (local_err == NULL) {
-+    if (*errp == NULL) {
-         /* there's no guest with zero VCPUs */
-         g_assert(head != NULL);
-         return head;
-     }
- 
-     qapi_free_GuestLogicalProcessorList(head);
--    error_propagate(errp, local_err);
-     return NULL;
- }
- 
- int64_t qmp_guest_set_vcpus(GuestLogicalProcessorList *vcpus, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int64_t processed;
--    Error *local_err = NULL;
- 
-     processed = 0;
-     while (vcpus != NULL) {
-         char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
-                                      vcpus->value->logical_id);
- 
--        transfer_vcpu(vcpus->value, false, path, &local_err);
-+        transfer_vcpu(vcpus->value, false, path, errp);
-         g_free(path);
--        if (local_err != NULL) {
+         /* write keys to stream */
+-        write_keys(f, buf, cur_gfn, cur_count, &lerr);
+-        if (lerr) {
++        write_keys(f, buf, cur_gfn, cur_count, errp);
 +        if (*errp) {
-             break;
+             goto out_free;
          }
-         ++processed;
-         vcpus = vcpus->next;
+ 
+@@ -165,7 +165,6 @@ void qmp_dump_skeys(const char *filename, Error **errp)
      }
  
--    if (local_err != NULL) {
-+    if (*errp) {
-         if (processed == 0) {
--            error_propagate(errp, local_err);
-         } else {
--            error_free(local_err);
-+            error_free_errp(errp);
-         }
-     }
- 
-@@ -2196,7 +2176,7 @@ void qmp_guest_set_user_password(const char *username,
-                                  bool crypted,
-                                  Error **errp)
+ out_free:
+-    error_propagate(errp, lerr);
+     g_free(buf);
+ out:
+     fclose(f);
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 18ad279a00..3c5e4c9804 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -61,19 +61,18 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+ static S390CPU *s390x_new_cpu(const char *typename, uint32_t core_id,
+                               Error **errp)
  {
--    Error *local_err = NULL;
 +    ERRP_AUTO_PROPAGATE();
-     char *passwd_path = NULL;
-     pid_t pid;
-     int status;
-@@ -2268,9 +2248,8 @@ void qmp_guest_set_user_password(const char *username,
-     close(datafd[1]);
-     datafd[1] = -1;
+     S390CPU *cpu = S390_CPU(object_new(typename));
+-    Error *err = NULL;
  
--    ga_wait_child(pid, &status, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    ga_wait_child(pid, &status, errp);
+-    object_property_set_int(OBJECT(cpu), core_id, "core-id", &err);
+-    if (err != NULL) {
++    object_property_set_int(OBJECT(cpu), core_id, "core-id", errp);
 +    if (*errp) {
          goto out;
      }
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
++    object_property_set_bool(OBJECT(cpu), true, "realized", errp);
  
-@@ -2356,10 +2335,10 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
-                                   GuestMemoryBlockResponse *result,
-                                   Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     char *dirpath;
-     int dirfd;
-     char *status;
--    Error *local_err = NULL;
- 
-     if (!sys2memblk) {
-         DIR *dp;
-@@ -2404,11 +2383,11 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
-     g_free(dirpath);
- 
-     status = g_malloc0(10);
--    ga_read_sysfs_file(dirfd, "state", status, 10, &local_err);
--    if (local_err) {
-+    ga_read_sysfs_file(dirfd, "state", status, 10, errp);
+ out:
+     object_unref(OBJECT(cpu));
+-    if (err) {
+-        error_propagate(errp, err);
 +    if (*errp) {
-         /* treat with sysfs file that not exist in old kernel */
-         if (errno == ENOENT) {
--            error_free(local_err);
-+            error_free_errp(errp);
-             if (sys2memblk) {
-                 mem_blk->online = true;
-                 mem_blk->can_offline = false;
-@@ -2418,7 +2397,6 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
-             }
-         } else {
-             if (sys2memblk) {
--                error_propagate(errp, local_err);
-             } else {
-                 result->response =
-                     GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_FAILED;
-@@ -2432,14 +2410,13 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
+         cpu = NULL;
+     }
+     return cpu;
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index f57ce7b739..4cacd7b3a8 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -300,16 +300,16 @@ void s390_sclp_init(void)
  
-         mem_blk->online = (strncmp(status, "online", 6) == 0);
- 
--        ga_read_sysfs_file(dirfd, "removable", &removable, 1, &local_err);
--        if (local_err) {
-+        ga_read_sysfs_file(dirfd, "removable", &removable, 1, errp);
-+        if (*errp) {
-             /* if no 'removable' file, it doesn't support offline mem blk */
-             if (errno == ENOENT) {
--                error_free(local_err);
-+                error_free_errp(errp);
-                 mem_blk->can_offline = false;
-             } else {
--                error_propagate(errp, local_err);
-             }
-         } else {
-             mem_blk->can_offline = (removable != '0');
-@@ -2449,9 +2426,9 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
-             const char *new_state = mem_blk->online ? "online" : "offline";
- 
-             ga_write_sysfs_file(dirfd, "state", new_state, strlen(new_state),
--                                &local_err);
--            if (local_err) {
--                error_free(local_err);
-+                                errp);
-+            if (*errp) {
-+                error_free_errp(errp);
-                 result->response =
-                     GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_FAILED;
-                 goto out2;
-@@ -2477,8 +2454,8 @@ out1:
- 
- GuestMemoryBlockList *qmp_guest_get_memory_blocks(Error **errp)
+ static void sclp_realize(DeviceState *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     GuestMemoryBlockList *head, **link;
--    Error *local_err = NULL;
-     struct dirent *de;
-     DIR *dp;
+     MachineState *machine = MACHINE(qdev_get_machine());
+     SCLPDevice *sclp = SCLP(dev);
+-    Error *err = NULL;
+     uint64_t hw_limit;
+     int ret;
  
-@@ -2516,7 +2493,7 @@ GuestMemoryBlockList *qmp_guest_get_memory_blocks(Error **errp)
-         /* The d_name is "memoryXXX",  phys_index is block id, same as XXX */
-         mem_blk->phys_index = strtoul(&de->d_name[6], NULL, 10);
-         mem_blk->has_can_offline = true; /* lolspeak ftw */
--        transfer_memory_block(mem_blk, true, NULL, &local_err);
-+        transfer_memory_block(mem_blk, true, NULL, errp);
- 
-         entry = g_malloc0(sizeof *entry);
-         entry->value = mem_blk;
-@@ -2526,7 +2503,7 @@ GuestMemoryBlockList *qmp_guest_get_memory_blocks(Error **errp)
+     object_property_set_bool(OBJECT(sclp->event_facility), true, "realized",
+-                             &err);
+-    if (err) {
+-        goto out;
++                             errp);
++    if (*errp) {
++        return;
      }
+     /*
+      * qdev_device_add searches the sysbus for TYPE_SCLP_EVENTS_BUS. As long
+@@ -320,14 +320,11 @@ static void sclp_realize(DeviceState *dev, Error **errp)
  
-     closedir(dp);
--    if (local_err == NULL) {
-+    if (*errp == NULL) {
-         /* there's no guest with zero memory blocks */
-         if (head == NULL) {
-             error_setg(errp, "guest reported zero memory blocks!");
-@@ -2535,15 +2512,14 @@ GuestMemoryBlockList *qmp_guest_get_memory_blocks(Error **errp)
+     ret = s390_set_memory_limit(machine->maxram_size, &hw_limit);
+     if (ret == -E2BIG) {
+-        error_setg(&err, "host supports a maximum of %" PRIu64 " GB",
++        error_setg(errp, "host supports a maximum of %" PRIu64 " GB",
+                    hw_limit / GiB);
+     } else if (ret) {
+-        error_setg(&err, "setting the guest size failed");
++        error_setg(errp, "setting the guest size failed");
      }
- 
-     qapi_free_GuestMemoryBlockList(head);
--    error_propagate(errp, local_err);
-     return NULL;
+-
+-out:
+-    error_propagate(errp, err);
  }
  
- GuestMemoryBlockResponseList *
- qmp_guest_set_memory_blocks(GuestMemoryBlockList *mem_blks, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     GuestMemoryBlockResponseList *head, **link;
--    Error *local_err = NULL;
+ static void sclp_memory_init(SCLPDevice *sclp)
+diff --git a/hw/s390x/tod-kvm.c b/hw/s390x/tod-kvm.c
+index 6e21d83181..f59d07b375 100644
+--- a/hw/s390x/tod-kvm.c
++++ b/hw/s390x/tod-kvm.c
+@@ -55,7 +55,7 @@ static void kvm_s390_set_tod_raw(const S390TOD *tod, Error **errp)
  
-     head = NULL;
-     link = &head;
-@@ -2555,8 +2531,8 @@ qmp_guest_set_memory_blocks(GuestMemoryBlockList *mem_blks, Error **errp)
- 
-         result = g_malloc0(sizeof(*result));
-         result->phys_index = current_mem_blk->phys_index;
--        transfer_memory_block(current_mem_blk, false, result, &local_err);
--        if (local_err) { /* should never happen */
-+        transfer_memory_block(current_mem_blk, false, result, errp);
-+        if (*errp) { /* should never happen */
-             goto err;
-         }
-         entry = g_malloc0(sizeof *entry);
-@@ -2570,13 +2546,12 @@ qmp_guest_set_memory_blocks(GuestMemoryBlockList *mem_blks, Error **errp)
-     return head;
- err:
-     qapi_free_GuestMemoryBlockResponseList(head);
--    error_propagate(errp, local_err);
-     return NULL;
- }
- 
- GuestMemoryBlockInfo *qmp_guest_get_memory_block_info(Error **errp)
+ static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
  {
 -    Error *local_err = NULL;
 +    ERRP_AUTO_PROPAGATE();
-     char *dirpath;
-     int dirfd;
-     char *buf;
-@@ -2592,11 +2567,10 @@ GuestMemoryBlockInfo *qmp_guest_get_memory_block_info(Error **errp)
-     g_free(dirpath);
  
-     buf = g_malloc0(20);
--    ga_read_sysfs_file(dirfd, "block_size_bytes", buf, 20, &local_err);
-+    ga_read_sysfs_file(dirfd, "block_size_bytes", buf, 20, errp);
-     close(dirfd);
+     /*
+      * Somebody (e.g. migration) set the TOD. We'll store it into KVM to
+@@ -64,9 +64,8 @@ static void kvm_s390_tod_set(S390TODState *td, const S390TOD *tod, Error **errp)
+      * is the point where we want to stop the initially running TOD to fire
+      * it back up when actually starting the migrated guest.
+      */
+-    kvm_s390_set_tod_raw(tod, &local_err);
 -    if (local_err) {
-+    if (*errp) {
-         g_free(buf);
 -        error_propagate(errp, local_err);
-         return NULL;
++    kvm_s390_set_tod_raw(tod, errp);
++    if (*errp) {
+         return;
      }
  
+@@ -106,13 +105,12 @@ static void kvm_s390_tod_vm_state_change(void *opaque, int running,
+ 
+ static void kvm_s390_tod_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     S390TODState *td = S390_TOD(dev);
+     S390TODClass *tdc = S390_TOD_GET_CLASS(td);
+-    Error *local_err = NULL;
+ 
+-    tdc->parent_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    tdc->parent_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 6863f6c69f..057c2e4f09 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -476,38 +476,38 @@ static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
+ 
+ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VFIOGroup *group;
+     CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+     S390CCWDevice *cdev = DO_UPCAST(S390CCWDevice, parent_obj, ccw_dev);
+     VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+     S390CCWDeviceClass *cdc = S390_CCW_DEVICE_GET_CLASS(cdev);
+-    Error *err = NULL;
+ 
+     /* Call the class init function for subchannel. */
+     if (cdc->realize) {
+-        cdc->realize(cdev, vcdev->vdev.sysfsdev, &err);
+-        if (err) {
+-            goto out_err_propagate;
++        cdc->realize(cdev, vcdev->vdev.sysfsdev, errp);
++        if (*errp) {
++            return;
+         }
+     }
+ 
+-    group = vfio_ccw_get_group(cdev, &err);
++    group = vfio_ccw_get_group(cdev, errp);
+     if (!group) {
+         goto out_group_err;
+     }
+ 
+-    vfio_ccw_get_device(group, vcdev, &err);
+-    if (err) {
++    vfio_ccw_get_device(group, vcdev, errp);
++    if (*errp) {
+         goto out_device_err;
+     }
+ 
+-    vfio_ccw_get_region(vcdev, &err);
+-    if (err) {
++    vfio_ccw_get_region(vcdev, errp);
++    if (*errp) {
+         goto out_region_err;
+     }
+ 
+-    vfio_ccw_register_io_notifier(vcdev, &err);
+-    if (err) {
++    vfio_ccw_register_io_notifier(vcdev, errp);
++    if (*errp) {
+         goto out_notifier_err;
+     }
+ 
+@@ -523,8 +523,6 @@ out_group_err:
+     if (cdc->unrealize) {
+         cdc->unrealize(cdev, NULL);
+     }
+-out_err_propagate:
+-    error_propagate(errp, err);
+ }
+ 
+ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 3abe7e80fd..5569b48934 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -184,42 +184,42 @@ static void s390_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
+ 
+ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CPUState *cs = CPU(dev);
+     S390CPUClass *scc = S390_CPU_GET_CLASS(dev);
+ #if !defined(CONFIG_USER_ONLY)
+     S390CPU *cpu = S390_CPU(dev);
+ #endif
+-    Error *err = NULL;
+ 
+     /* the model has to be realized before qemu_init_vcpu() due to kvm */
+-    s390_realize_cpu_model(cs, &err);
+-    if (err) {
+-        goto out;
++    s390_realize_cpu_model(cs, errp);
++    if (*errp) {
++        return;
+     }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+     MachineState *ms = MACHINE(qdev_get_machine());
+     unsigned int max_cpus = ms->smp.max_cpus;
+     if (cpu->env.core_id >= max_cpus) {
+-        error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
++        error_setg(errp, "Unable to add CPU with core-id: %" PRIu32
+                    ", maximum core-id: %d", cpu->env.core_id,
+                    max_cpus - 1);
+-        goto out;
++        return;
+     }
+ 
+     if (cpu_exists(cpu->env.core_id)) {
+-        error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
++        error_setg(errp, "Unable to add CPU with core-id: %" PRIu32
+                    ", it already exists", cpu->env.core_id);
+-        goto out;
++        return;
+     }
+ 
+     /* sync cs->cpu_index and env->core_id. The latter is needed for TCG. */
+     cs->cpu_index = cpu->env.core_id;
+ #endif
+ 
+-    cpu_exec_realizefn(cs, &err);
+-    if (err != NULL) {
+-        goto out;
++    cpu_exec_realizefn(cs, errp);
++    if (*errp) {
++        return;
+     }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+@@ -240,9 +240,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+         cpu_reset(cs);
+     }
+ 
+-    scc->parent_realize(dev, &err);
+-out:
+-    error_propagate(errp, err);
++    scc->parent_realize(dev, errp);
+ }
+ 
+ static GuestPanicInformation *s390_cpu_get_crash_info(CPUState *cs)
 -- 
 2.21.0
 
