@@ -2,57 +2,56 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD067C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E04CECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:28:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AF8F214E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:28:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AF8F214E0
+	by mail.kernel.org (Postfix) with ESMTPS id 614E9214E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 21:28:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 614E9214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ2Sm-0004Qw-4I
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:28:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55126)
+	id 1iJ2Sn-0004P3-EH
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 17:28:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iJ2QT-0002QK-Fz
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:26:19 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iJ2QI-00027F-8O
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iJ2QR-00012u-BH
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:26:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60226)
+ (envelope-from <jsnow@redhat.com>) id 1iJ2QH-0000z5-0Z
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 17:26:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34242)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iJ2QM-00010y-17; Fri, 11 Oct 2019 17:26:10 -0400
+ id 1iJ2QD-0000xv-2d; Fri, 11 Oct 2019 17:26:01 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3FD50305C3A4;
- Fri, 11 Oct 2019 21:26:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 313C7A3CD67;
+ Fri, 11 Oct 2019 21:26:00 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA37F1EC;
- Fri, 11 Oct 2019 21:26:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 66AA545A3;
+ Fri, 11 Oct 2019 21:25:51 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 06/19] block/dirty-bitmap: add bs link
-Date: Fri, 11 Oct 2019 17:25:37 -0400
-Message-Id: <20191011212550.27269-7-jsnow@redhat.com>
-In-Reply-To: <20191011212550.27269-1-jsnow@redhat.com>
-References: <20191011212550.27269-1-jsnow@redhat.com>
+Subject: [PULL 00/19] Bitmaps patches
+Date: Fri, 11 Oct 2019 17:25:31 -0400
+Message-Id: <20191011212550.27269-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 11 Oct 2019 21:26:09 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.68]); Fri, 11 Oct 2019 21:26:00 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -78,408 +77,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The following changes since commit 98b2e3c9ab3abfe476a2b02f8f51813edb90e7=
+2d:
 
-Add bs field to BdrvDirtyBitmap structure. Drop BlockDriverState
-parameter from bitmap APIs where possible.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2019-10-08 16:08:35 +0100)
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20190916141911.5255-3-vsementsov@virtuozzo.com
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- include/block/dirty-bitmap.h   | 14 +++++---------
- block/backup.c                 | 14 ++++++--------
- block/dirty-bitmap.c           | 24 ++++++++++++------------
- block/mirror.c                 |  4 ++--
- block/qcow2-bitmap.c           |  6 +++---
- blockdev.c                     |  6 +++---
- migration/block-dirty-bitmap.c |  7 +++----
- migration/block.c              |  4 ++--
- 8 files changed, 36 insertions(+), 43 deletions(-)
+are available in the Git repository at:
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 973056778aa..2f9b088e11e 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -18,21 +18,18 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriver=
-State *bs,
-                                           uint32_t granularity,
-                                           const char *name,
-                                           Error **errp);
--int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
--                                       BdrvDirtyBitmap *bitmap,
-+int bdrv_dirty_bitmap_create_successor(BdrvDirtyBitmap *bitmap,
-                                        Error **errp);
--BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
--                                            BdrvDirtyBitmap *bitmap,
-+BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BdrvDirtyBitmap *bitmap,
-                                             Error **errp);
--BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
--                                           BdrvDirtyBitmap *bitmap,
-+BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                                            Error **errp);
- void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap);
- BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
-                                         const char *name);
- int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t flag=
-s,
-                             Error **errp);
--void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bi=
-tmap);
-+void bdrv_release_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
- int bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs, const char=
- *name,
-                                         Error **errp);
-@@ -106,8 +103,7 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *=
-bitmap, uint64_t offset,
-                                     uint64_t bytes);
- bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
-                                        uint64_t *offset, uint64_t *bytes=
-);
--BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
--                                                  BdrvDirtyBitmap *bitma=
-p,
-+BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BdrvDirtyBitmap *bitma=
-p,
-                                                   Error **errp);
-=20
- #endif
-diff --git a/block/backup.c b/block/backup.c
-index 763f0d7ff6d..acb67da3a7b 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -352,7 +352,6 @@ static int coroutine_fn backup_before_write_notify(
- static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
- {
-     BdrvDirtyBitmap *bm;
--    BlockDriverState *bs =3D blk_bs(job->common.blk);
-     bool sync =3D (((ret =3D=3D 0) || (job->bitmap_mode =3D=3D BITMAP_SY=
-NC_MODE_ALWAYS)) \
-                  && (job->bitmap_mode !=3D BITMAP_SYNC_MODE_NEVER));
-=20
-@@ -361,13 +360,13 @@ static void backup_cleanup_sync_bitmap(BackupBlockJ=
-ob *job, int ret)
-          * We succeeded, or we always intended to sync the bitmap.
-          * Delete this bitmap and install the child.
-          */
--        bm =3D bdrv_dirty_bitmap_abdicate(bs, job->sync_bitmap, NULL);
-+        bm =3D bdrv_dirty_bitmap_abdicate(job->sync_bitmap, NULL);
-     } else {
-         /*
-          * We failed, or we never intended to sync the bitmap anyway.
-          * Merge the successor back into the parent, keeping all data.
-          */
--        bm =3D bdrv_reclaim_dirty_bitmap(bs, job->sync_bitmap, NULL);
-+        bm =3D bdrv_reclaim_dirty_bitmap(job->sync_bitmap, NULL);
-     }
-=20
-     assert(bm);
-@@ -398,10 +397,9 @@ static void backup_abort(Job *job)
- static void backup_clean(Job *job)
- {
-     BackupBlockJob *s =3D container_of(job, BackupBlockJob, common.job);
--    BlockDriverState *bs =3D blk_bs(s->common.blk);
-=20
-     if (s->copy_bitmap) {
--        bdrv_release_dirty_bitmap(bs, s->copy_bitmap);
-+        bdrv_release_dirty_bitmap(s->copy_bitmap);
-         s->copy_bitmap =3D NULL;
-     }
-=20
-@@ -679,7 +677,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
-DriverState *bs,
-         }
-=20
-         /* Create a new bitmap, and freeze/disable this one. */
--        if (bdrv_dirty_bitmap_create_successor(bs, sync_bitmap, errp) < =
-0) {
-+        if (bdrv_dirty_bitmap_create_successor(sync_bitmap, errp) < 0) {
-             return NULL;
-         }
-     }
-@@ -758,10 +756,10 @@ BlockJob *backup_job_create(const char *job_id, Blo=
-ckDriverState *bs,
-  error:
-     if (copy_bitmap) {
-         assert(!job || !job->copy_bitmap);
--        bdrv_release_dirty_bitmap(bs, copy_bitmap);
-+        bdrv_release_dirty_bitmap(copy_bitmap);
-     }
-     if (sync_bitmap) {
--        bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
-+        bdrv_reclaim_dirty_bitmap(sync_bitmap, NULL);
-     }
-     if (job) {
-         backup_clean(&job->common.job);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 4ecf18d5df7..44453ff8241 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -30,6 +30,7 @@
-=20
- struct BdrvDirtyBitmap {
-     QemuMutex *mutex;
-+    BlockDriverState *bs;
-     HBitmap *bitmap;            /* Dirty bitmap implementation */
-     bool busy;                  /* Bitmap is busy, it can't be used via =
-QMP */
-     BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
-@@ -115,6 +116,7 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriver=
-State *bs,
-         return NULL;
-     }
-     bitmap =3D g_new0(BdrvDirtyBitmap, 1);
-+    bitmap->bs =3D bs;
-     bitmap->mutex =3D &bs->dirty_bitmap_mutex;
-     bitmap->bitmap =3D hbitmap_alloc(bitmap_size, ctz32(granularity));
-     bitmap->size =3D bitmap_size;
-@@ -237,8 +239,7 @@ int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bi=
-tmap, uint32_t flags,
-  * The successor will be enabled if the parent bitmap was.
-  * Called with BQL taken.
-  */
--int bdrv_dirty_bitmap_create_successor(BlockDriverState *bs,
--                                       BdrvDirtyBitmap *bitmap, Error **=
-errp)
-+int bdrv_dirty_bitmap_create_successor(BdrvDirtyBitmap *bitmap, Error **=
-errp)
- {
-     uint64_t granularity;
-     BdrvDirtyBitmap *child;
-@@ -254,7 +255,7 @@ int bdrv_dirty_bitmap_create_successor(BlockDriverSta=
-te *bs,
-=20
-     /* Create an anonymous successor */
-     granularity =3D bdrv_dirty_bitmap_granularity(bitmap);
--    child =3D bdrv_create_dirty_bitmap(bs, granularity, NULL, errp);
-+    child =3D bdrv_create_dirty_bitmap(bitmap->bs, granularity, NULL, er=
-rp);
-     if (!child) {
-         return -1;
-     }
-@@ -300,8 +301,7 @@ static void bdrv_release_dirty_bitmap_locked(BdrvDirt=
-yBitmap *bitmap)
-  * delete the old bitmap, and return a handle to the new bitmap.
-  * Called with BQL taken.
-  */
--BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
--                                            BdrvDirtyBitmap *bitmap,
-+BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BdrvDirtyBitmap *bitmap,
-                                             Error **errp)
- {
-     char *name;
-@@ -320,7 +320,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriv=
-erState *bs,
-     successor->persistent =3D bitmap->persistent;
-     bitmap->persistent =3D false;
-     bitmap->busy =3D false;
--    bdrv_release_dirty_bitmap(bs, bitmap);
-+    bdrv_release_dirty_bitmap(bitmap);
-=20
-     return successor;
- }
-@@ -332,8 +332,7 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriv=
-erState *bs,
-  * The marged parent will be enabled if and only if the successor was en=
-abled.
-  * Called within bdrv_dirty_bitmap_lock..unlock and with BQL taken.
-  */
--BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
--                                                  BdrvDirtyBitmap *paren=
-t,
-+BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BdrvDirtyBitmap *paren=
-t,
-                                                   Error **errp)
- {
-     BdrvDirtyBitmap *successor =3D parent->successor;
-@@ -357,14 +356,13 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(B=
-lockDriverState *bs,
- }
-=20
- /* Called with BQL taken. */
--BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
--                                           BdrvDirtyBitmap *parent,
-+BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BdrvDirtyBitmap *parent,
-                                            Error **errp)
- {
-     BdrvDirtyBitmap *ret;
-=20
-     qemu_mutex_lock(parent->mutex);
--    ret =3D bdrv_reclaim_dirty_bitmap_locked(bs, parent, errp);
-+    ret =3D bdrv_reclaim_dirty_bitmap_locked(parent, errp);
-     qemu_mutex_unlock(parent->mutex);
-=20
-     return ret;
-@@ -390,8 +388,10 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs=
-, int64_t bytes)
- }
-=20
- /* Called with BQL taken.  */
--void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bi=
-tmap)
-+void bdrv_release_dirty_bitmap(BdrvDirtyBitmap *bitmap)
- {
-+    BlockDriverState *bs =3D bitmap->bs;
-+
-     bdrv_dirty_bitmaps_lock(bs);
-     bdrv_release_dirty_bitmap_locked(bitmap);
-     bdrv_dirty_bitmaps_unlock(bs);
-diff --git a/block/mirror.c b/block/mirror.c
-index fe984efb90b..a6c50caea44 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -638,7 +638,7 @@ static int mirror_exit_common(Job *job)
-         bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
-     }
-=20
--    bdrv_release_dirty_bitmap(src, s->dirty_bitmap);
-+    bdrv_release_dirty_bitmap(s->dirty_bitmap);
-=20
-     /* Make sure that the source BDS doesn't go away during bdrv_replace=
-_node,
-      * before we can call bdrv_drained_end */
-@@ -1709,7 +1709,7 @@ fail:
-         blk_unref(s->target);
-         bs_opaque->job =3D NULL;
-         if (s->dirty_bitmap) {
--            bdrv_release_dirty_bitmap(bs, s->dirty_bitmap);
-+            bdrv_release_dirty_bitmap(s->dirty_bitmap);
-         }
-         job_early_fail(&s->common.job);
-     }
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 644837eb033..687087d2bc2 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -374,7 +374,7 @@ static BdrvDirtyBitmap *load_bitmap(BlockDriverState =
-*bs,
- fail:
-     g_free(bitmap_table);
-     if (bitmap !=3D NULL) {
--        bdrv_release_dirty_bitmap(bs, bitmap);
-+        bdrv_release_dirty_bitmap(bitmap);
-     }
-=20
-     return NULL;
-@@ -941,7 +941,7 @@ fail:
- static void release_dirty_bitmap_helper(gpointer bitmap,
-                                         gpointer bs)
- {
--    bdrv_release_dirty_bitmap(bs, bitmap);
-+    bdrv_release_dirty_bitmap(bitmap);
- }
-=20
- /* for g_slist_foreach for GSList of BdrvDirtyBitmap* elements */
-@@ -1577,7 +1577,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriv=
-erState *bs, Error **errp)
-             continue;
-         }
-=20
--        bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
-+        bdrv_release_dirty_bitmap(bm->dirty_bitmap);
-     }
-=20
-     bitmap_list_free(bm_list);
-diff --git a/blockdev.c b/blockdev.c
-index 228ce94a88c..9b6eca66430 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2178,7 +2178,7 @@ static void block_dirty_bitmap_remove_commit(BlkAct=
-ionState *common)
-                                              common, common);
-=20
-     bdrv_dirty_bitmap_set_busy(state->bitmap, false);
--    bdrv_release_dirty_bitmap(state->bs, state->bitmap);
-+    bdrv_release_dirty_bitmap(state->bitmap);
- }
-=20
- static void abort_prepare(BlkActionState *common, Error **errp)
-@@ -2940,7 +2940,7 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_remov=
-e(
-     }
-=20
-     if (release) {
--        bdrv_release_dirty_bitmap(bs, bitmap);
-+        bdrv_release_dirty_bitmap(bitmap);
-     }
-=20
-     if (bitmap_bs) {
-@@ -3072,7 +3072,7 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_merge=
-(
-     bdrv_merge_dirty_bitmap(dst, anon, backup, errp);
-=20
-  out:
--    bdrv_release_dirty_bitmap(bs, anon);
-+    bdrv_release_dirty_bitmap(anon);
-     return dst;
- }
-=20
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
-p.c
-index 5121f86d734..793f249aa5b 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -474,7 +474,7 @@ static int dirty_bitmap_load_start(QEMUFile *f, Dirty=
-BitmapLoadState *s)
-     if (flags & DIRTY_BITMAP_MIG_START_FLAG_ENABLED) {
-         DirtyBitmapLoadBitmapState *b;
-=20
--        bdrv_dirty_bitmap_create_successor(s->bs, s->bitmap, &local_err)=
-;
-+        bdrv_dirty_bitmap_create_successor(s->bitmap, &local_err);
-         if (local_err) {
-             error_report_err(local_err);
-             return -EINVAL;
-@@ -535,13 +535,12 @@ static void dirty_bitmap_load_complete(QEMUFile *f,=
- DirtyBitmapLoadState *s)
-         bdrv_dirty_bitmap_lock(s->bitmap);
-         if (enabled_bitmaps =3D=3D NULL) {
-             /* in postcopy */
--            bdrv_reclaim_dirty_bitmap_locked(s->bs, s->bitmap, &error_ab=
-ort);
-+            bdrv_reclaim_dirty_bitmap_locked(s->bitmap, &error_abort);
-             bdrv_enable_dirty_bitmap_locked(s->bitmap);
-         } else {
-             /* target not started, successor must be empty */
-             int64_t count =3D bdrv_get_dirty_count(s->bitmap);
--            BdrvDirtyBitmap *ret =3D bdrv_reclaim_dirty_bitmap_locked(s-=
->bs,
--                                                                    s->b=
-itmap,
-+            BdrvDirtyBitmap *ret =3D bdrv_reclaim_dirty_bitmap_locked(s-=
->bitmap,
-                                                                     NULL=
-);
-             /* bdrv_reclaim_dirty_bitmap can fail only on no successor (=
-it
-              * must be) or on merge fail, but merge can't fail when seco=
-nd
-diff --git a/migration/block.c b/migration/block.c
-index 8e493820707..c90288ed290 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -361,7 +361,7 @@ static int set_dirty_tracking(void)
- fail:
-     QSIMPLEQ_FOREACH(bmds, &block_mig_state.bmds_list, entry) {
-         if (bmds->dirty_bitmap) {
--            bdrv_release_dirty_bitmap(blk_bs(bmds->blk), bmds->dirty_bit=
-map);
-+            bdrv_release_dirty_bitmap(bmds->dirty_bitmap);
-         }
-     }
-     return ret;
-@@ -374,7 +374,7 @@ static void unset_dirty_tracking(void)
-     BlkMigDevState *bmds;
-=20
-     QSIMPLEQ_FOREACH(bmds, &block_mig_state.bmds_list, entry) {
--        bdrv_release_dirty_bitmap(blk_bs(bmds->blk), bmds->dirty_bitmap)=
-;
-+        bdrv_release_dirty_bitmap(bmds->dirty_bitmap);
-     }
- }
-=20
+  https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
+
+for you to fetch changes up to b97d9a1014b61dd0980e7f4a0c9ca1e3b0aaa761:
+
+  dirty-bitmaps: remove deprecated autoload parameter (2019-10-09 17:02:4=
+5 -0400)
+
+----------------------------------------------------------------
+Pull request
+
+----------------------------------------------------------------
+
+John Snow (2):
+  MAINTAINERS: Add Vladimir as a reviewer for bitmaps
+  dirty-bitmaps: remove deprecated autoload parameter
+
+Vladimir Sementsov-Ogievskiy (17):
+  util/hbitmap: strict hbitmap_reset
+  block: move bdrv_can_store_new_dirty_bitmap to block/dirty-bitmap.c
+  block/dirty-bitmap: return int from
+    bdrv_remove_persistent_dirty_bitmap
+  block/qcow2: proper locking on bitmap add/remove paths
+  block/dirty-bitmap: drop meta
+  block/dirty-bitmap: add bs link
+  block/dirty-bitmap: drop BdrvDirtyBitmap.mutex
+  block/dirty-bitmap: refactor bdrv_dirty_bitmap_next
+  block: switch reopen queue from QSIMPLEQ to QTAILQ
+  block: reverse order for reopen commits
+  iotests: add test-case to 165 to test reopening qcow2 bitmaps to RW
+  block/qcow2-bitmap: get rid of bdrv_has_changed_persistent_bitmaps
+  block/qcow2-bitmap: drop qcow2_reopen_bitmaps_rw_hint()
+  block/qcow2-bitmap: do not remove bitmaps on reopen-ro
+  iotests: add test 260 to check bitmap life after snapshot + commit
+  block/qcow2-bitmap: fix and improve qcow2_reopen_bitmaps_rw
+  qcow2-bitmap: move bitmap reopen-rw code to qcow2_reopen_commit
+
+ qemu-deprecated.texi           |  20 ++-
+ qapi/block-core.json           |   6 +-
+ block/qcow2.h                  |  19 +--
+ include/block/block.h          |   2 +-
+ include/block/block_int.h      |  20 +--
+ include/block/dirty-bitmap.h   |  34 ++--
+ include/qemu/hbitmap.h         |   5 +
+ block.c                        |  79 +++------
+ block/backup.c                 |  14 +-
+ block/dirty-bitmap.c           | 290 +++++++++++++++++++--------------
+ block/mirror.c                 |   4 +-
+ block/qcow2-bitmap.c           | 212 +++++++++++++++---------
+ block/qcow2.c                  |  22 ++-
+ blockdev.c                     |  40 ++---
+ migration/block-dirty-bitmap.c |  11 +-
+ migration/block.c              |   4 +-
+ tests/test-hbitmap.c           |   2 +-
+ util/hbitmap.c                 |   4 +
+ MAINTAINERS                    |   3 +-
+ tests/qemu-iotests/165         |  57 ++++++-
+ tests/qemu-iotests/165.out     |   4 +-
+ tests/qemu-iotests/260         |  89 ++++++++++
+ tests/qemu-iotests/260.out     |  52 ++++++
+ tests/qemu-iotests/group       |   1 +
+ 24 files changed, 624 insertions(+), 370 deletions(-)
+ create mode 100755 tests/qemu-iotests/260
+ create mode 100644 tests/qemu-iotests/260.out
+
 --=20
 2.21.0
 
