@@ -2,53 +2,63 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E96CECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C6C9ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:12:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3056B206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:11:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3056B206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54013206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:12:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54013206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzNx-0007eD-4r
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:11:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40602)
+	id 1iIzOf-0008LE-3u
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:12:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxhG-00010I-Da
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:19 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iIy7D-0006ZM-2b
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:50:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxhF-0008Mb-10
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:18 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49696)
+ (envelope-from <dgilbert@redhat.com>) id 1iIy7B-0006ad-Fm
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:50:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54042)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxhE-0008MF-Qa
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:16 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR8-0003XG-Kt; Fri, 11 Oct 2019 19:06:38 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC v5 119/126] hw/core/bus.c: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:45 +0300
-Message-Id: <20191011160552.22907-120-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iIy7B-0006aC-6e
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:50:05 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 64334309C388;
+ Fri, 11 Oct 2019 16:50:04 +0000 (UTC)
+Received: from work-vm (ovpn-117-210.ams2.redhat.com [10.36.117.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 377535D713;
+ Fri, 11 Oct 2019 16:49:52 +0000 (UTC)
+Date: Fri, 11 Oct 2019 17:49:50 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Jens Freimann <jfreimann@redhat.com>
+Subject: Re: [PATCH v3 07/10] migration: add new migration state wait-unplug
+Message-ID: <20191011164950.GS3354@work-vm>
+References: <20191011112015.11785-1-jfreimann@redhat.com>
+ <20191011112015.11785-8-jfreimann@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191011112015.11785-8-jfreimann@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 11 Oct 2019 16:50:04 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,105 +70,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: ehabkost@redhat.com, mst@redhat.com, aadam@redhat.com,
+ qemu-devel@nongnu.org, alex.williamson@redhat.com, laine@redhat.com,
+ ailan@redhat.com, parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+* Jens Freimann (jfreimann@redhat.com) wrote:
+> This patch adds a new migration state called wait-unplug.  It is entered
+> after the SETUP state and will transition into ACTIVE once all devices
+> were succesfully unplugged from the guest.
+> 
+> So if a guest doesn't respond or takes long to honor the unplug request
+> the user will see the migration state 'wait-unplug'.
+> 
+> In the migration thread we query failover devices if they're are still
+> pending the guest unplug. When all are unplugged the migration
+> continues. We give it a defined number of iterations including small
+> waiting periods before we proceed.
+> 
+> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> ---
+>  include/migration/vmstate.h |  2 ++
+>  migration/migration.c       | 34 ++++++++++++++++++++++++++++++++++
+>  migration/migration.h       |  3 +++
+>  migration/savevm.c          | 36 ++++++++++++++++++++++++++++++++++++
+>  migration/savevm.h          |  1 +
+>  qapi/migration.json         |  5 ++++-
+>  6 files changed, 80 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 1fbfd099dd..39ef125225 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -186,6 +186,8 @@ struct VMStateDescription {
+>      int (*pre_save)(void *opaque);
+>      int (*post_save)(void *opaque);
+>      bool (*needed)(void *opaque);
+> +    bool (*dev_unplug_pending)(void *opaque);
+> +
+>      const VMStateField *fields;
+>      const VMStateDescription **subsections;
+>  };
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 5f7e4d15e9..a17d9fb990 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -52,9 +52,14 @@
+>  #include "hw/qdev-properties.h"
+>  #include "monitor/monitor.h"
+>  #include "net/announce.h"
+> +#include "qemu/queue.h"
+>  
+>  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+>  
+> +/* Time in milliseconds to wait for guest OS to unplug PCI device */
+> +#define FAILOVER_GUEST_UNPLUG_WAIT 10000
+> +#define FAILOVER_UNPLUG_RETRIES 5
+> +
+>  /* Amount of time to allocate to each "chunk" of bandwidth-throttled
+>   * data. */
+>  #define BUFFER_DELAY     100
+> @@ -954,6 +959,9 @@ static void fill_source_migration_info(MigrationInfo *info)
+>      case MIGRATION_STATUS_CANCELLED:
+>          info->has_status = true;
+>          break;
+> +    case MIGRATION_STATUS_WAIT_UNPLUG:
+> +        info->has_status = true;
+> +        break;
+>      }
+>      info->status = s->state;
+>  }
+> @@ -1695,6 +1703,7 @@ bool migration_is_idle(void)
+>      case MIGRATION_STATUS_COLO:
+>      case MIGRATION_STATUS_PRE_SWITCHOVER:
+>      case MIGRATION_STATUS_DEVICE:
+> +    case MIGRATION_STATUS_WAIT_UNPLUG:
 
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+I think the patchew failure that it shows in the migration test is
+because that new state is visible to the test and it's not expecting it.
 
-This commit (together with its neighbors) was generated by
+Dave
 
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
-
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
-
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- hw/core/bus.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/hw/core/bus.c b/hw/core/bus.c
-index 7f3d2a3dbd..0a1e508963 100644
---- a/hw/core/bus.c
-+++ b/hw/core/bus.c
-@@ -146,14 +146,14 @@ static bool bus_get_realized(Object *obj, Error **errp)
- 
- static void bus_set_realized(Object *obj, bool value, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BusState *bus = BUS(obj);
-     BusClass *bc = BUS_GET_CLASS(bus);
-     BusChild *kid;
--    Error *local_err = NULL;
- 
-     if (value && !bus->realized) {
-         if (bc->realize) {
--            bc->realize(bus, &local_err);
-+            bc->realize(bus, errp);
-         }
- 
-         /* TODO: recursive realization */
-@@ -161,18 +161,17 @@ static void bus_set_realized(Object *obj, bool value, Error **errp)
-         QTAILQ_FOREACH(kid, &bus->children, sibling) {
-             DeviceState *dev = kid->child;
-             object_property_set_bool(OBJECT(dev), false, "realized",
--                                     &local_err);
--            if (local_err != NULL) {
-+                                     errp);
-+            if (*errp) {
-                 break;
-             }
-         }
--        if (bc->unrealize && local_err == NULL) {
--            bc->unrealize(bus, &local_err);
-+        if (bc->unrealize && *errp == NULL) {
-+            bc->unrealize(bus, errp);
-         }
-     }
- 
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         return;
-     }
- 
--- 
-2.21.0
-
+>          return false;
+>      case MIGRATION_STATUS__MAX:
+>          g_assert_not_reached();
+> @@ -3224,6 +3233,8 @@ static void *migration_thread(void *opaque)
+>      int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
+>      MigThrError thr_error;
+>      bool urgent = false;
+> +    bool all_unplugged = true;
+> +    int i = 0;
+>  
+>      rcu_register_thread();
+>  
+> @@ -3260,6 +3271,27 @@ static void *migration_thread(void *opaque)
+>  
+>      qemu_savevm_state_setup(s->to_dst_file);
+>  
+> +    migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+> +                      MIGRATION_STATUS_WAIT_UNPLUG);
+> +
+> +    while (i < FAILOVER_UNPLUG_RETRIES &&
+> +           s->state == MIGRATION_STATUS_WAIT_UNPLUG) {
+> +        i++;
+> +        qemu_sem_timedwait(&s->wait_unplug_sem, FAILOVER_GUEST_UNPLUG_WAIT);
+> +        all_unplugged = qemu_savevm_state_guest_unplug_pending();
+> +        if (all_unplugged) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    if (all_unplugged) {
+> +        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
+> +                MIGRATION_STATUS_ACTIVE);
+> +    } else {
+> +        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
+> +                          MIGRATION_STATUS_CANCELLING);
+> +    }
+> +
+>      s->setup_time = qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
+>      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>                        MIGRATION_STATUS_ACTIVE);
+> @@ -3508,6 +3540,7 @@ static void migration_instance_finalize(Object *obj)
+>      qemu_mutex_destroy(&ms->qemu_file_lock);
+>      g_free(params->tls_hostname);
+>      g_free(params->tls_creds);
+> +    qemu_sem_destroy(&ms->wait_unplug_sem);
+>      qemu_sem_destroy(&ms->rate_limit_sem);
+>      qemu_sem_destroy(&ms->pause_sem);
+>      qemu_sem_destroy(&ms->postcopy_pause_sem);
+> @@ -3553,6 +3586,7 @@ static void migration_instance_init(Object *obj)
+>      qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
+>      qemu_sem_init(&ms->rp_state.rp_sem, 0);
+>      qemu_sem_init(&ms->rate_limit_sem, 0);
+> +    qemu_sem_init(&ms->wait_unplug_sem, 0);
+>      qemu_mutex_init(&ms->qemu_file_lock);
+>  }
+>  
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 4f2fe193dc..79b3dda146 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -206,6 +206,9 @@ struct MigrationState
+>      /* Flag set once the migration thread called bdrv_inactivate_all */
+>      bool block_inactive;
+>  
+> +    /* Migration is waiting for guest to unplug device */
+> +    QemuSemaphore wait_unplug_sem;
+> +
+>      /* Migration is paused due to pause-before-switchover */
+>      QemuSemaphore pause_sem;
+>  
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index bb9462a54d..26e5bde687 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -942,6 +942,20 @@ static void qemu_savevm_command_send(QEMUFile *f,
+>      qemu_fflush(f);
+>  }
+>  
+> +static int qemu_savevm_nr_failover_devices(void)
+> +{
+> +    SaveStateEntry *se;
+> +    int n = 0;
+> +
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (se->vmsd && se->vmsd->dev_unplug_pending) {
+> +            n++;
+> +        }
+> +    }
+> +
+> +    return n;
+> +}
+> +
+>  void qemu_savevm_send_colo_enable(QEMUFile *f)
+>  {
+>      trace_savevm_send_colo_enable();
+> @@ -1113,6 +1127,28 @@ void qemu_savevm_state_header(QEMUFile *f)
+>      }
+>  }
+>  
+> +bool qemu_savevm_state_guest_unplug_pending(void)
+> +{
+> +    int nr_failover_devs;
+> +    SaveStateEntry *se;
+> +    bool ret = false;
+> +    int n = 0;
+> +
+> +    nr_failover_devs = qemu_savevm_nr_failover_devices();
+> +
+> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> +        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
+> +            continue;
+> +        }
+> +        ret = se->vmsd->dev_unplug_pending(se->opaque);
+> +        if (!ret) {
+> +            n++;
+> +        }
+> +    }
+> +
+> +    return n == nr_failover_devs;
+> +}
+> +
+>  void qemu_savevm_state_setup(QEMUFile *f)
+>  {
+>      SaveStateEntry *se;
+> diff --git a/migration/savevm.h b/migration/savevm.h
+> index 51a4b9caa8..ba64a7e271 100644
+> --- a/migration/savevm.h
+> +++ b/migration/savevm.h
+> @@ -31,6 +31,7 @@
+>  
+>  bool qemu_savevm_state_blocked(Error **errp);
+>  void qemu_savevm_state_setup(QEMUFile *f);
+> +bool qemu_savevm_state_guest_unplug_pending(void);
+>  int qemu_savevm_state_resume_prepare(MigrationState *s);
+>  void qemu_savevm_state_header(QEMUFile *f);
+>  int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 52e69e2868..5a06cd489f 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -133,6 +133,9 @@
+>  # @device: During device serialisation when pause-before-switchover is enabled
+>  #        (since 2.11)
+>  #
+> +# @wait-unplug: wait for device unplug request by guest OS to be completed.
+> +#               (since 4.2)
+> +#
+>  # Since: 2.3
+>  #
+>  ##
+> @@ -140,7 +143,7 @@
+>    'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+>              'active', 'postcopy-active', 'postcopy-paused',
+>              'postcopy-recover', 'completed', 'failed', 'colo',
+> -            'pre-switchover', 'device' ] }
+> +            'pre-switchover', 'device', 'wait-unplug' ] }
+>  
+>  ##
+>  # @MigrationInfo:
+> -- 
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
