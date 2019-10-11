@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2001C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE4EECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:43:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C82AB2089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:43:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C82AB2089F
+	by mail.kernel.org (Postfix) with ESMTPS id 90A802089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:43:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90A802089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIy0W-0007UP-Fe
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:43:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36695)
+	id 1iIy1F-0008Us-7l
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:43:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35901)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0006Ua-S2
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:37 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQW-0005Yh-EM
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR2-0004fX-GP
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:34 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48306)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQV-00041L-8J
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:00 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47786)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR2-0004Nb-8D
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:32 -0400
+ id 1iIxQV-0003zo-12
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:05:59 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQq-0003XG-QV; Fri, 11 Oct 2019 19:06:20 +0300
+ id 1iIxQS-0003XG-3M; Fri, 11 Oct 2019 19:05:56 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 072/126] Memory API: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:58 +0300
-Message-Id: <20191011160552.22907-73-vsementsov@virtuozzo.com>
+Subject: [RFC v5 001/126] hw/core/loader-fit: fix freeing errp in fit_load_fdt
+Date: Fri, 11 Oct 2019 19:03:47 +0300
+Message-Id: <20191011160552.22907-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,245 +60,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- vsementsov@virtuozzo.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Paul Burton <pburton@wavecomp.com>, vsementsov@virtuozzo.com,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+fit_load_fdt forget to check that errp is not NULL and to zero it after
+freeing. Fix it.
 
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
-
-This commit (together with its neighbors) was generated by
-
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
-
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
-
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- memory.c | 63 ++++++++++++++++++++++++--------------------------------
- 1 file changed, 27 insertions(+), 36 deletions(-)
+ hw/core/loader-fit.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/memory.c b/memory.c
-index 978da3d3df..b46b5f41e9 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1524,17 +1524,16 @@ void memory_region_init_ram_shared_nomigrate(MemoryRegion *mr,
-                                              bool share,
-                                              Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     memory_region_init(mr, owner, name, size);
-     mr->ram = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
--    mr->ram_block = qemu_ram_alloc(size, share, mr, &err);
-+    mr->ram_block = qemu_ram_alloc(size, share, mr, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
--    if (err) {
-+    if (*errp) {
-         mr->size = int128_zero();
-         object_unparent(OBJECT(mr));
--        error_propagate(errp, err);
-     }
- }
- 
-@@ -1548,18 +1547,17 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
-                                                        void *host),
-                                        Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     memory_region_init(mr, owner, name, size);
-     mr->ram = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
-     mr->ram_block = qemu_ram_alloc_resizeable(size, max_size, resized,
--                                              mr, &err);
-+                                              mr, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
--    if (err) {
-+    if (*errp) {
-         mr->size = int128_zero();
-         object_unparent(OBJECT(mr));
--        error_propagate(errp, err);
-     }
- }
- 
-@@ -1573,18 +1571,17 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
-                                       const char *path,
-                                       Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     memory_region_init(mr, owner, name, size);
-     mr->ram = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
-     mr->align = align;
--    mr->ram_block = qemu_ram_alloc_from_file(size, mr, ram_flags, path, &err);
-+    mr->ram_block = qemu_ram_alloc_from_file(size, mr, ram_flags, path, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
--    if (err) {
-+    if (*errp) {
-         mr->size = int128_zero();
-         object_unparent(OBJECT(mr));
--        error_propagate(errp, err);
-     }
- }
- 
-@@ -1596,19 +1593,18 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-                                     int fd,
-                                     Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     memory_region_init(mr, owner, name, size);
-     mr->ram = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
-     mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
-                                            share ? RAM_SHARED : 0,
--                                           fd, &err);
-+                                           fd, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
--    if (err) {
-+    if (*errp) {
-         mr->size = int128_zero();
-         object_unparent(OBJECT(mr));
--        error_propagate(errp, err);
-     }
- }
- #endif
-@@ -1667,18 +1663,17 @@ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
-                                       uint64_t size,
-                                       Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     memory_region_init(mr, owner, name, size);
-     mr->ram = true;
-     mr->readonly = true;
-     mr->terminates = true;
-     mr->destructor = memory_region_destructor_ram;
--    mr->ram_block = qemu_ram_alloc(size, false, mr, &err);
-+    mr->ram_block = qemu_ram_alloc(size, false, mr, errp);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
--    if (err) {
-+    if (*errp) {
-         mr->size = int128_zero();
-         object_unparent(OBJECT(mr));
--        error_propagate(errp, err);
-     }
- }
- 
-@@ -1690,7 +1685,7 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
-                                              uint64_t size,
-                                              Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     assert(ops);
-     memory_region_init(mr, owner, name, size);
-     mr->ops = ops;
-@@ -1698,11 +1693,10 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
-     mr->terminates = true;
-     mr->rom_device = true;
-     mr->destructor = memory_region_destructor_ram;
--    mr->ram_block = qemu_ram_alloc(size, false,  mr, &err);
--    if (err) {
-+    mr->ram_block = qemu_ram_alloc(size, false,  mr, errp);
-+    if (*errp) {
-         mr->size = int128_zero();
-         object_unparent(OBJECT(mr));
--        error_propagate(errp, err);
-     }
- }
- 
-@@ -3162,12 +3156,11 @@ void memory_region_init_ram(MemoryRegion *mr,
-                             uint64_t size,
-                             Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     DeviceState *owner_dev;
--    Error *err = NULL;
- 
--    memory_region_init_ram_nomigrate(mr, owner, name, size, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    memory_region_init_ram_nomigrate(mr, owner, name, size, errp);
-+    if (*errp) {
-         return;
-     }
-     /* This will assert if owner is neither NULL nor a DeviceState.
-@@ -3186,12 +3179,11 @@ void memory_region_init_rom(MemoryRegion *mr,
-                             uint64_t size,
-                             Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     DeviceState *owner_dev;
--    Error *err = NULL;
- 
--    memory_region_init_rom_nomigrate(mr, owner, name, size, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    memory_region_init_rom_nomigrate(mr, owner, name, size, errp);
-+    if (*errp) {
-         return;
-     }
-     /* This will assert if owner is neither NULL nor a DeviceState.
-@@ -3212,13 +3204,12 @@ void memory_region_init_rom_device(MemoryRegion *mr,
-                                    uint64_t size,
-                                    Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     DeviceState *owner_dev;
--    Error *err = NULL;
- 
-     memory_region_init_rom_device_nomigrate(mr, owner, ops, opaque,
--                                            name, size, &err);
--    if (err) {
--        error_propagate(errp, err);
-+                                            name, size, errp);
-+    if (*errp) {
-         return;
-     }
-     /* This will assert if owner is neither NULL nor a DeviceState.
+diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
+index 953b16bc82..3ee9fb2f2e 100644
+--- a/hw/core/loader-fit.c
++++ b/hw/core/loader-fit.c
+@@ -200,7 +200,10 @@ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
+     err = fit_image_addr(itb, img_off, "load", &load_addr, errp);
+     if (err == -ENOENT) {
+         load_addr = ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
+-        error_free(*errp);
++        if (errp) {
++            error_free(*errp);
++            *errp = NULL;
++        }
+     } else if (err) {
+         error_prepend(errp, "unable to read FDT load address from FIT: ");
+         ret = err;
 -- 
 2.21.0
 
