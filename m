@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17151ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8663AC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:42:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD331214E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:42:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD331214E0
+	by mail.kernel.org (Postfix) with ESMTPS id 59A8D2089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:42:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59A8D2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxzX-0005sp-Ix
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:42:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36297)
+	id 1iIy0D-0007Cl-Fs
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:42:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36743)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQt-0006Be-Se
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:25 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR6-0006Wq-4B
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQs-0004Og-HW
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:23 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48010)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR3-0004gK-1s
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48328)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQs-0004Ba-9z
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:22 -0400
+ id 1iIxR2-0004O1-NO
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:32 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQg-0003XG-TA; Fri, 11 Oct 2019 19:06:11 +0300
+ id 1iIxQr-0003XG-9u; Fri, 11 Oct 2019 19:06:21 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 044/126] Network devices: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:30 +0300
-Message-Id: <20191011160552.22907-45-vsementsov@virtuozzo.com>
+Subject: [RFC v5 074/126] Graphics: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:00 +0300
+Message-Id: <20191011160552.22907-75-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +60,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Jason Wang <jasowang@redhat.com>,
- vsementsov@virtuozzo.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Gerd Hoffmann <kraxel@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,75 +111,129 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/net/dp8393x.c    |  7 +++----
- hw/net/ne2000-isa.c | 17 +++++++----------
- 2 files changed, 10 insertions(+), 14 deletions(-)
+ ui/input-barrier.c |  7 +++----
+ ui/input.c         | 14 ++++++--------
+ ui/vnc.c           | 19 ++++++++-----------
+ 3 files changed, 17 insertions(+), 23 deletions(-)
 
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index a5678e11fa..4def282da5 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -874,10 +874,10 @@ static void dp8393x_instance_init(Object *obj)
+diff --git a/ui/input-barrier.c b/ui/input-barrier.c
+index a2c961f285..cce1cf35c3 100644
+--- a/ui/input-barrier.c
++++ b/ui/input-barrier.c
+@@ -492,8 +492,8 @@ static gboolean input_barrier_event(QIOChannel *ioc G_GNUC_UNUSED,
  
- static void dp8393x_realize(DeviceState *dev, Error **errp)
+ static void input_barrier_complete(UserCreatable *uc, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     dp8393xState *s = DP8393X(dev);
-     int i, checksum;
-     uint8_t *prom;
+     InputBarrier *ib = INPUT_BARRIER(uc);
 -    Error *local_err = NULL;
  
-     address_space_init(&s->as, s->dma_mr, "dp8393x");
-     memory_region_init_io(&s->mmio, OBJECT(dev), &dp8393x_ops, s,
-@@ -891,9 +891,8 @@ static void dp8393x_realize(DeviceState *dev, Error **errp)
-     s->regs[SONIC_SR] = 0x0004; /* only revision recognized by Linux */
+     if (!ib->name) {
+         error_setg(errp, QERR_MISSING_PARAMETER, "name");
+@@ -509,9 +509,8 @@ static void input_barrier_complete(UserCreatable *uc, Error **errp)
+     ib->sioc = qio_channel_socket_new();
+     qio_channel_set_name(QIO_CHANNEL(ib->sioc), "barrier-client");
  
-     memory_region_init_ram(&s->prom, OBJECT(dev),
--                           "dp8393x-prom", SONIC_PROM_SIZE, &local_err);
+-    qio_channel_socket_connect_sync(ib->sioc, &ib->saddr, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+                           "dp8393x-prom", SONIC_PROM_SIZE, errp);
++    qio_channel_socket_connect_sync(ib->sioc, &ib->saddr, errp);
 +    if (*errp) {
          return;
      }
-     memory_region_set_readonly(&s->prom, true);
-diff --git a/hw/net/ne2000-isa.c b/hw/net/ne2000-isa.c
-index 6fcf3d5cd9..73c88a907e 100644
---- a/hw/net/ne2000-isa.c
-+++ b/hw/net/ne2000-isa.c
-@@ -108,25 +108,22 @@ static void isa_ne2000_set_bootindex(Object *obj, Visitor *v,
-                                      const char *name, void *opaque,
-                                      Error **errp)
+ 
+diff --git a/ui/input.c b/ui/input.c
+index 4791b089c7..bea1745a33 100644
+--- a/ui/input.c
++++ b/ui/input.c
+@@ -87,12 +87,11 @@ void qemu_input_handler_bind(QemuInputHandlerState *s,
+                              const char *device_id, int head,
+                              Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     ISANE2000State *isa = ISA_NE2000(obj);
-     NE2000State *s = &isa->ne2000;
-     int32_t boot_index;
+     QemuConsole *con;
+-    Error *err = NULL;
+ 
+-    con = qemu_console_lookup_by_device_name(device_id, head, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    con = qemu_console_lookup_by_device_name(device_id, head, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -128,18 +127,17 @@ void qmp_input_send_event(bool has_device, const char *device,
+                           bool has_head, int64_t head,
+                           InputEventList *events, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     InputEventList *e;
+     QemuConsole *con;
+-    Error *err = NULL;
+ 
+     con = NULL;
+     if (has_device) {
+         if (!has_head) {
+             head = 0;
+         }
+-        con = qemu_console_lookup_by_device_name(device, head, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        con = qemu_console_lookup_by_device_name(device, head, errp);
++        if (*errp) {
+             return;
+         }
+     }
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 4100d6e404..0354d30168 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3795,6 +3795,7 @@ static int vnc_display_listen(VncDisplay *vd,
+ 
+ void vnc_display_open(const char *id, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VncDisplay *vd = vnc_display_find(id);
+     QemuOpts *opts = qemu_opts_find(&qemu_vnc_opts, id);
+     SocketAddress **saddr = NULL, **wsaddr = NULL;
+@@ -4008,11 +4009,9 @@ void vnc_display_open(const char *id, Error **errp)
+     device_id = qemu_opt_get(opts, "display");
+     if (device_id) {
+         int head = qemu_opt_get_number(opts, "head", 0);
+-        Error *err = NULL;
+ 
+-        con = qemu_console_lookup_by_device_name(device_id, head, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        con = qemu_console_lookup_by_device_name(device_id, head, errp);
++        if (*errp) {
+             goto fail;
+         }
+     } else {
+@@ -4106,18 +4105,16 @@ QemuOpts *vnc_parse(const char *str, Error **errp)
+ 
+ int vnc_init_func(void *opaque, QemuOpts *opts, Error **errp)
+ {
 -    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     char *id = (char *)qemu_opts_id(opts);
  
--    visit_type_int32(v, name, &boot_index, &local_err);
+     assert(id);
+-    vnc_display_init(id, &local_err);
 -    if (local_err) {
--        goto out;
-+    visit_type_int32(v, name, &boot_index, errp);
+-        error_propagate(errp, local_err);
++    vnc_display_init(id, errp);
 +    if (*errp) {
-+        return;
+         return -1;
      }
-     /* check whether bootindex is present in fw_boot_order list  */
--    check_boot_index(boot_index, &local_err);
--    if (local_err) {
--        goto out;
-+    check_boot_index(boot_index, errp);
+-    vnc_display_open(id, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    vnc_display_open(id, errp);
 +    if (*errp) {
-+        return;
+         return -1;
      }
-     /* change bootindex to a new one */
-     s->c.bootindex = boot_index;
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void isa_ne2000_instance_init(Object *obj)
+     return 0;
 -- 
 2.21.0
 
