@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B7AC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD739ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A5B220673
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:21:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A5B220673
+	by mail.kernel.org (Postfix) with ESMTPS id 92DC020673
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:21:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92DC020673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55345 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzXo-0002Be-Cp
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:21:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40408)
+	id 1iIzXy-0002bw-QK
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:21:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41681)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgh-0000D6-F1
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:44 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmX-0007u9-T7
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgg-00081t-3W
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:43 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49636)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmW-00038l-Nq
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:45 -0400
+Received: from relay.sw.ru ([185.231.240.75]:50008)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxgf-00081S-Sg; Fri, 11 Oct 2019 12:22:42 -0400
+ id 1iIxmV-00038R-SS
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:44 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR8-0003XG-33; Fri, 11 Oct 2019 19:06:38 +0300
+ id 1iIxR8-0003XG-VV; Fri, 11 Oct 2019 19:06:39 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 116/126] vvfat: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:42 +0300
-Message-Id: <20191011160552.22907-117-vsementsov@virtuozzo.com>
+Subject: [RFC v5 120/126] hw/cpu/core.c: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:46 +0300
+Message-Id: <20191011160552.22907-121-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -59,8 +60,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
  Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -110,51 +110,47 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/vvfat.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ hw/cpu/core.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 019b8f1341..34cbed71b7 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1149,12 +1149,12 @@ static void vvfat_parse_filename(const char *filename, QDict *options,
- static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-                       Error **errp)
+diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+index 9874c5c870..9620bd7939 100644
+--- a/hw/cpu/core.c
++++ b/hw/cpu/core.c
+@@ -27,13 +27,12 @@ static void core_prop_get_core_id(Object *obj, Visitor *v, const char *name,
+ static void core_prop_set_core_id(Object *obj, Visitor *v, const char *name,
+                                   void *opaque, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     BDRVVVFATState *s = bs->opaque;
-     int cyls, heads, secs;
-     bool floppy;
-     const char *dirname, *label;
-     QemuOpts *opts;
+     CPUCore *core = CPU_CORE(obj);
 -    Error *local_err = NULL;
-     int ret;
+     int64_t value;
  
- #ifdef DEBUG
-@@ -1162,9 +1162,8 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
- #endif
- 
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    visit_type_int(v, name, &value, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    qemu_opts_absorb_qdict(opts, options, errp);
++    visit_type_int(v, name, &value, errp);
 +    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
+         return;
      }
-@@ -1282,9 +1281,8 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-                    "The vvfat (rw) format used by node '%s' "
-                    "does not support live migration",
-                    bdrv_get_device_or_node_name(bs));
--        ret = migrate_add_blocker(s->migration_blocker, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        ret = migrate_add_blocker(s->migration_blocker, errp);
-+        if (*errp) {
-             error_free(s->migration_blocker);
-             goto fail;
-         }
+ 
+@@ -57,13 +56,12 @@ static void core_prop_get_nr_threads(Object *obj, Visitor *v, const char *name,
+ static void core_prop_set_nr_threads(Object *obj, Visitor *v, const char *name,
+                                      void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CPUCore *core = CPU_CORE(obj);
+-    Error *local_err = NULL;
+     int64_t value;
+ 
+-    visit_type_int(v, name, &value, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_int(v, name, &value, errp);
++    if (*errp) {
+         return;
+     }
+ 
 -- 
 2.21.0
 
