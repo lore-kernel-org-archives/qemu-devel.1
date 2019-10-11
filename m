@@ -2,84 +2,141 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42687C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A66C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:20:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 078522089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:18:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkeley-edu.20150623.gappssmtp.com header.i=@berkeley-edu.20150623.gappssmtp.com header.b="kp4iHyo3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 078522089F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=berkeley.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 19F582089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:20:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F582089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ4Ai-0001YJ-2C
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 19:18:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37929)
+	id 1iJ4Ca-0002tw-9f
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 19:20:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dayeol@berkeley.edu>) id 1iJ47H-0000eL-3D
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:14:36 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iJ4BT-00028K-79
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:18:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dayeol@berkeley.edu>) id 1iJ47F-0001Jd-Dl
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:14:34 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:44330)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1iJ47F-0001JJ-4B
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:14:33 -0400
-Received: by mail-qt1-x843.google.com with SMTP id u40so16174428qth.11
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 16:14:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=berkeley-edu.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=UtUDd5e/TA51h4IZxO1cpupAltRdyzMyfziFMZdbB/U=;
- b=kp4iHyo3TaywfyDOiK+F/61RdOqMWz28RUJq+PdXiO1NrDfhTErkDbHUfv7T7DBUog
- 56eoIOFMtMQ6sDZgwzHDUNIpjbxQ5xVJyhP8G16BbbB1wricN8KJ7I9L6JeGEir3zccP
- lqyDfyRrhToeGaGp6m6ZBOMwUpWkObz+YDVnToCoiv/mcUDA/dqzB/WnYrVnF9NVh953
- VkAB89aNLnurH8364HssS2pz/5hMudAUTEu8Vxr+En7IJuANWCZlKXSIxZ2BV42s69Y3
- Z7yfEt/SN7b/9V6aGOEnsYwUm56op4HYcQLiuOVlf49s56itglAUta6V5JoOA6L/FVbf
- G+/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=UtUDd5e/TA51h4IZxO1cpupAltRdyzMyfziFMZdbB/U=;
- b=W9D6z5ryMHR9iemkuqK/HMON1vaUy+dVbjaMo3r7W8Y1+aef8JtE03yBhU5IvOUskO
- 5rdh0hvgc2evkn0qZzk8CPFBMxY+yamz5094oI2/5KZSRHtW55uXKG42dzy3OUzpRgp1
- hStXAVg798ujSOFn6KcECZ/2rPug/q0VFdJUkNWWn1IIf9Z3ni2AAJixJ/x3g4llsgP7
- 1V0vAaSXN42G02PpS65V0fXSqWssq9b2VRIQBFPnnJ5x7USRap0TWZz3B3ngK27cfrCW
- 7vs7gu4nrO6oI8HRMNm5+9gXcHU4jlziKzrk0ZmsczEjO+jhB6AJGzPWsKoZQGox/F3k
- f41g==
-X-Gm-Message-State: APjAAAU1t8XnMbVqvaGD4eiTT3h84Sw+QmrtxCKqJIMwhlY1mFLouy0y
- X1akm7LBDhtHG5c/XvQxDghKKLgoqi+LUQ==
-X-Google-Smtp-Source: APXvYqzRNlsgXmhqdup3Wb2rVu1disrPOOGbhEAj28ZsHBVFKB0kQ+GIZwMy/rvDVtwhuBL4a4QGxw==
-X-Received: by 2002:ac8:550d:: with SMTP id j13mr19683509qtq.37.1570835671728; 
- Fri, 11 Oct 2019 16:14:31 -0700 (PDT)
-Received: from ip-172-31-33-50.ec2.internal
- (ec2-34-206-44-154.compute-1.amazonaws.com. [34.206.44.154])
- by smtp.gmail.com with ESMTPSA id 194sm4305953qkm.62.2019.10.11.16.14.30
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Fri, 11 Oct 2019 16:14:30 -0700 (PDT)
-From: Dayeol Lee <dayeol@berkeley.edu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/riscv: PMP violation due to wrong size parameter
-Date: Fri, 11 Oct 2019 23:14:06 +0000
-Message-Id: <20191011231406.9808-1-dayeol@berkeley.edu>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <jsnow@redhat.com>) id 1iJ4BS-0002eD-4p
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:18:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50978)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iJ4BO-0002cm-AC; Fri, 11 Oct 2019 19:18:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4760F307D868;
+ Fri, 11 Oct 2019 23:18:49 +0000 (UTC)
+Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D4EA5D9D5;
+ Fri, 11 Oct 2019 23:18:42 +0000 (UTC)
+Subject: Re: [PULL 01/19] util/hbitmap: strict hbitmap_reset
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
+ qemu-devel@nongnu.org
+References: <20191011212550.27269-1-jsnow@redhat.com>
+ <20191011212550.27269-2-jsnow@redhat.com>
+ <15c20480-0240-bdd2-2cc2-60c388022e86@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <e403b26e-5775-a134-b23f-2fbc698dca25@redhat.com>
+Date: Fri, 11 Oct 2019 19:18:42 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::843
+In-Reply-To: <15c20480-0240-bdd2-2cc2-60c388022e86@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 11 Oct 2019 23:18:49 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,66 +148,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Dayeol Lee <dayeol@berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, diodesign@tuta.io
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, libvir-list@redhat.com,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-riscv_cpu_tlb_fill() uses the `size` parameter to check PMP violation
-using pmp_hart_has_privs().
-However, if the size is unknown (=0), the ending address will be
-`addr - 1` as it is `addr + size - 1` in `pmp_hart_has_privs()`.
-This always causes a false PMP violation on the starting address of the
-range, as `addr - 1` is not in the range.
 
-In order to fix, we just assume that all bytes from addr to the end of
-the page will be accessed if the size is unknown.
 
-Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/riscv/cpu_helper.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+On 10/11/19 5:48 PM, Eric Blake wrote:
+> On 10/11/19 4:25 PM, John Snow wrote:
+>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>
+>> hbitmap_reset has an unobvious property: it rounds requested region up=
+.
+>> It may provoke bugs, like in recently fixed write-blocking mode of
+>> mirror: user calls reset on unaligned region, not keeping in mind that
+>> there are possible unrelated dirty bytes, covered by rounded-up region
+>> and information of this unrelated "dirtiness" will be lost.
+>>
+>> Make hbitmap_reset strict: assert that arguments are aligned, allowing
+>> only one exception when @start + @count =3D=3D hb->orig_size. It's nee=
+ded
+>> to comfort users of hbitmap_next_dirty_area, which cares about
+>> hb->orig_size.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>> Message-Id: <20190806152611.280389-1-vsementsov@virtuozzo.com>
+>> [Maintainer edit: Max's suggestions from on-list. --js]
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>> =C2=A0 include/qemu/hbitmap.h | 5 +++++
+>> =C2=A0 tests/test-hbitmap.c=C2=A0=C2=A0 | 2 +-
+>> =C2=A0 util/hbitmap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+| 4 ++++
+>> =C2=A0 3 files changed, 10 insertions(+), 1 deletion(-)
+>>
+>=20
+>> +++ b/util/hbitmap.c
+>> @@ -476,6 +476,10 @@ void hbitmap_reset(HBitmap *hb, uint64_t start,
+>> uint64_t count)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Compute range in the last layer.=C2=A0=
+ */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t first;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t last =3D start + count - 1;
+>> +=C2=A0=C2=A0=C2=A0 uint64_t gran =3D 1ULL << hb->granularity;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 assert(!(start & (gran - 1)));
+>> +=C2=A0=C2=A0=C2=A0 assert(!(count & (gran - 1)) || (start + count =3D=
+=3D hb->orig_size));
+>=20
+> I know I'm replying a bit late (since this is now a pull request), but
+> would it be worth using the dedicated macro:
+>=20
+> assert(QEMU_IS_ALIGNED(start, gran));
+> assert(QEMU_IS_ALIGNED(count, gran) || start + count =3D=3D hb->orig_si=
+ze);
+>=20
+> instead of open-coding it?=C2=A0 (I would also drop the extra () around=
+ the
+> right half of ||). If we want it, that would now be a followup patch.
+>=20
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index e32b6126af..7d9a22b601 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -441,6 +441,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     CPURISCVState *env = &cpu->env;
-     hwaddr pa = 0;
-     int prot;
-+    int pmp_size = 0;
-     bool pmp_violation = false;
-     int ret = TRANSLATE_FAIL;
-     int mode = mmu_idx;
-@@ -460,9 +461,19 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-                   "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
-                   " prot %d\n", __func__, address, ret, pa, prot);
- 
-+    /*
-+     * if size is unknown (0), assume that all bytes
-+     * from addr to the end of the page will be accessed.
-+     */
-+    if (size == 0) {
-+        pmp_size = -(address | TARGET_PAGE_MASK);
-+    } else {
-+        pmp_size = size;
-+    }
-+
-     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-         (ret == TRANSLATE_SUCCESS) &&
--        !pmp_hart_has_privs(env, pa, size, 1 << access_type, mode)) {
-+        !pmp_hart_has_privs(env, pa, pmp_size, 1 << access_type, mode)) {
-         ret = TRANSLATE_PMP_FAIL;
-     }
-     if (ret == TRANSLATE_PMP_FAIL) {
--- 
-2.20.1
+If the PR doesn't make it for some reason, I can amend a cleanup patch
+for the next PR.
 
+--js
 
