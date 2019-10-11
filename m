@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F453ECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA88C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:28:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D78CA2064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:26:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D78CA2064A
+	by mail.kernel.org (Postfix) with ESMTPS id 1B5F42064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:28:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B5F42064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIygn-0004Yl-62
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:26:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40322)
+	id 1iIyi5-0006e0-Al
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:28:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36440)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgT-0008MG-Gf
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:32 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0006It-4n
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgQ-0007wr-AY
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:29 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49616)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQw-0004Vh-QX
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47894)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxgQ-0007wY-3B; Fri, 11 Oct 2019 12:22:26 -0400
+ id 1iIxQw-00047A-JD; Fri, 11 Oct 2019 12:06:26 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR2-0003XG-LB; Fri, 11 Oct 2019 19:06:32 +0300
+ id 1iIxQb-0003XG-3k; Fri, 11 Oct 2019 19:06:05 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 103/126] GLUSTER: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:29 +0300
-Message-Id: <20191011160552.22907-104-vsementsov@virtuozzo.com>
+Subject: [RFC v5 023/126] hw/vfio/ap: drop local_err from vfio_ap_realize
+Date: Fri, 11 Oct 2019 19:04:09 +0300
+Message-Id: <20191011160552.22907-24-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -59,289 +59,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
- Greg Kurz <groug@kaod.org>, integration@gluster.org
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, vsementsov@virtuozzo.com,
+ Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>, armbru@redhat.com,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+No reason for local_err here, use errp directly instead.
 
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
-
-This commit (together with its neighbors) was generated by
-
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
-
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
-
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/gluster.c | 69 ++++++++++++++++++++++++-------------------------
- 1 file changed, 34 insertions(+), 35 deletions(-)
+ hw/vfio/ap.c | 16 +++-------------
+ 1 file changed, 3 insertions(+), 13 deletions(-)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 64028b2cba..683101612e 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -419,6 +419,7 @@ out:
- static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
-                                            Error **errp)
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index da6a20669d..db816e1860 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -87,16 +87,14 @@ static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
+ 
+ static void vfio_ap_realize(DeviceState *dev, Error **errp)
  {
-+    ERRP_AUTO_PROPAGATE();
-     struct glfs *glfs;
-     int ret;
-     int old_errno;
-@@ -512,38 +513,38 @@ out:
- static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-                                   QDict *options, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     QemuOpts *opts;
-     SocketAddress *gsconf = NULL;
-     SocketAddressList *curr = NULL;
-     QDict *backing_options = NULL;
+-    int ret;
+     char *mdevid;
 -    Error *local_err = NULL;
-     char *str = NULL;
-     const char *ptr;
-     int i, type, num_servers;
+     VFIOGroup *vfio_group;
+     APDevice *apdev = AP_DEVICE(dev);
+     VFIOAPDevice *vapdev = VFIO_AP_DEVICE(apdev);
  
-     /* create opts info from runtime_json_opts list */
-     opts = qemu_opts_create(&runtime_json_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
-+    qemu_opts_absorb_qdict(opts, options, errp);
-+    if (*errp) {
-         goto out;
+-    vfio_group = vfio_ap_get_group(vapdev, &local_err);
++    vfio_group = vfio_ap_get_group(vapdev, errp);
+     if (!vfio_group) {
+-        goto out_err;
++        return;
      }
  
-     num_servers = qdict_array_entries(options, GLUSTER_OPT_SERVER_PATTERN);
-     if (num_servers < 1) {
--        error_setg(&local_err, QERR_MISSING_PARAMETER, "server");
-+        error_setg(errp, QERR_MISSING_PARAMETER, "server");
-         goto out;
-     }
+     vapdev->vdev.ops = &vfio_ap_ops;
+@@ -113,18 +111,10 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+      */
+     vapdev->vdev.balloon_allowed = true;
  
-     ptr = qemu_opt_get(opts, GLUSTER_OPT_VOLUME);
-     if (!ptr) {
--        error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_VOLUME);
-+        error_setg(errp, QERR_MISSING_PARAMETER, GLUSTER_OPT_VOLUME);
-         goto out;
-     }
-     gconf->volume = g_strdup(ptr);
+-    ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
+-    if (ret) {
+-        goto out_get_dev_err;
+-    }
+-
+-    return;
++    vfio_get_device(vfio_group, mdevid, &vapdev->vdev, errp);
  
-     ptr = qemu_opt_get(opts, GLUSTER_OPT_PATH);
-     if (!ptr) {
--        error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_PATH);
-+        error_setg(errp, QERR_MISSING_PARAMETER, GLUSTER_OPT_PATH);
-         goto out;
-     }
-     gconf->path = g_strdup(ptr);
-@@ -555,15 +556,15 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
- 
-         /* create opts info from runtime_type_opts list */
-         opts = qemu_opts_create(&runtime_type_opts, NULL, 0, &error_abort);
--        qemu_opts_absorb_qdict(opts, backing_options, &local_err);
--        if (local_err) {
-+        qemu_opts_absorb_qdict(opts, backing_options, errp);
-+        if (*errp) {
-             goto out;
-         }
- 
-         ptr = qemu_opt_get(opts, GLUSTER_OPT_TYPE);
-         if (!ptr) {
--            error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_TYPE);
--            error_append_hint(&local_err, GERR_INDEX_HINT, i);
-+            error_setg(errp, QERR_MISSING_PARAMETER, GLUSTER_OPT_TYPE);
-+            error_append_hint(errp, GERR_INDEX_HINT, i);
-             goto out;
- 
-         }
-@@ -574,10 +575,10 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-         type = qapi_enum_parse(&SocketAddressType_lookup, ptr, -1, NULL);
-         if (type != SOCKET_ADDRESS_TYPE_INET
-             && type != SOCKET_ADDRESS_TYPE_UNIX) {
--            error_setg(&local_err,
-+            error_setg(errp,
-                        "Parameter '%s' may be 'inet' or 'unix'",
-                        GLUSTER_OPT_TYPE);
--            error_append_hint(&local_err, GERR_INDEX_HINT, i);
-+            error_append_hint(errp, GERR_INDEX_HINT, i);
-             goto out;
-         }
-         gsconf->type = type;
-@@ -586,24 +587,24 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-         if (gsconf->type == SOCKET_ADDRESS_TYPE_INET) {
-             /* create opts info from runtime_inet_opts list */
-             opts = qemu_opts_create(&runtime_inet_opts, NULL, 0, &error_abort);
--            qemu_opts_absorb_qdict(opts, backing_options, &local_err);
--            if (local_err) {
-+            qemu_opts_absorb_qdict(opts, backing_options, errp);
-+            if (*errp) {
-                 goto out;
-             }
- 
-             ptr = qemu_opt_get(opts, GLUSTER_OPT_HOST);
-             if (!ptr) {
--                error_setg(&local_err, QERR_MISSING_PARAMETER,
-+                error_setg(errp, QERR_MISSING_PARAMETER,
-                            GLUSTER_OPT_HOST);
--                error_append_hint(&local_err, GERR_INDEX_HINT, i);
-+                error_append_hint(errp, GERR_INDEX_HINT, i);
-                 goto out;
-             }
-             gsconf->u.inet.host = g_strdup(ptr);
-             ptr = qemu_opt_get(opts, GLUSTER_OPT_PORT);
-             if (!ptr) {
--                error_setg(&local_err, QERR_MISSING_PARAMETER,
-+                error_setg(errp, QERR_MISSING_PARAMETER,
-                            GLUSTER_OPT_PORT);
--                error_append_hint(&local_err, GERR_INDEX_HINT, i);
-+                error_append_hint(errp, GERR_INDEX_HINT, i);
-                 goto out;
-             }
-             gsconf->u.inet.port = g_strdup(ptr);
-@@ -624,19 +625,19 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-                 gsconf->u.inet.has_ipv6 = true;
-             }
-             if (gsconf->u.inet.has_to) {
--                error_setg(&local_err, "Parameter 'to' not supported");
-+                error_setg(errp, "Parameter 'to' not supported");
-                 goto out;
-             }
-             if (gsconf->u.inet.has_ipv4 || gsconf->u.inet.has_ipv6) {
--                error_setg(&local_err, "Parameters 'ipv4/ipv6' not supported");
-+                error_setg(errp, "Parameters 'ipv4/ipv6' not supported");
-                 goto out;
-             }
-             qemu_opts_del(opts);
-         } else {
-             /* create opts info from runtime_unix_opts list */
-             opts = qemu_opts_create(&runtime_unix_opts, NULL, 0, &error_abort);
--            qemu_opts_absorb_qdict(opts, backing_options, &local_err);
--            if (local_err) {
-+            qemu_opts_absorb_qdict(opts, backing_options, errp);
-+            if (*errp) {
-                 goto out;
-             }
- 
-@@ -644,15 +645,15 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-             if (!ptr) {
-                 ptr = qemu_opt_get(opts, GLUSTER_OPT_SOCKET);
-             } else if (qemu_opt_get(opts, GLUSTER_OPT_SOCKET)) {
--                error_setg(&local_err,
-+                error_setg(errp,
-                            "Conflicting parameters 'path' and 'socket'");
--                error_append_hint(&local_err, GERR_INDEX_HINT, i);
-+                error_append_hint(errp, GERR_INDEX_HINT, i);
-                 goto out;
-             }
-             if (!ptr) {
--                error_setg(&local_err, QERR_MISSING_PARAMETER,
-+                error_setg(errp, QERR_MISSING_PARAMETER,
-                            GLUSTER_OPT_PATH);
--                error_append_hint(&local_err, GERR_INDEX_HINT, i);
-+                error_append_hint(errp, GERR_INDEX_HINT, i);
-                 goto out;
-             }
-             gsconf->u.q_unix.path = g_strdup(ptr);
-@@ -679,7 +680,6 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-     return 0;
- 
- out:
+-out_get_dev_err:
+     vfio_ap_put_device(vapdev);
+     vfio_put_group(vfio_group);
+-out_err:
 -    error_propagate(errp, local_err);
-     qapi_free_SocketAddress(gsconf);
-     qemu_opts_del(opts);
-     g_free(str);
-@@ -694,6 +694,7 @@ static int qemu_gluster_parse(BlockdevOptionsGluster *gconf,
-                               const char *filename,
-                               QDict *options, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret;
-     if (filename) {
-         ret = qemu_gluster_parse_uri(gconf, filename);
-@@ -810,18 +811,17 @@ static bool qemu_gluster_test_seek(struct glfs_fd *fd)
- static int qemu_gluster_open(BlockDriverState *bs,  QDict *options,
-                              int bdrv_flags, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVGlusterState *s = bs->opaque;
-     int open_flags = 0;
-     int ret = 0;
-     BlockdevOptionsGluster *gconf = NULL;
-     QemuOpts *opts;
--    Error *local_err = NULL;
-     const char *filename, *logfile;
+ }
  
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_opts_absorb_qdict(opts, options, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto out;
-     }
-@@ -1134,11 +1134,11 @@ static int coroutine_fn qemu_gluster_co_create_opts(const char *filename,
-                                                     QemuOpts *opts,
-                                                     Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptions *options;
-     BlockdevCreateOptionsGluster *gopts;
-     BlockdevOptionsGluster *gconf;
-     char *tmp = NULL;
--    Error *local_err = NULL;
-     int ret;
- 
-     options = g_new0(BlockdevCreateOptions, 1);
-@@ -1153,10 +1153,9 @@ static int coroutine_fn qemu_gluster_co_create_opts(const char *filename,
- 
-     tmp = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
-     gopts->preallocation = qapi_enum_parse(&PreallocMode_lookup, tmp,
--                                           PREALLOC_MODE_OFF, &local_err);
-+                                           PREALLOC_MODE_OFF, errp);
-     g_free(tmp);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
+ static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
 -- 
 2.21.0
 
