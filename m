@@ -2,62 +2,53 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09644C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E96CECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:11:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D284520659
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:09:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D284520659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3056B206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:11:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3056B206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzLy-0004uD-SS
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:09:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44341)
+	id 1iIzNx-0007eD-4r
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:11:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iIy4e-0003vI-0J
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:47:30 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxhG-00010I-Da
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iIy4b-00051b-TU
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:47:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54638)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxhF-0008Mb-10
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:18 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49696)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iIy4b-000519-Nm
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:47:25 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 396CB3172D8A;
- Fri, 11 Oct 2019 16:47:24 +0000 (UTC)
-Received: from redhat.com (ovpn-116-51.ams2.redhat.com [10.36.116.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DC4410016EB;
- Fri, 11 Oct 2019 16:47:17 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v6] migration: Support gtree migration
-In-Reply-To: <20191011121724.433-1-eric.auger@redhat.com> (Eric Auger's
- message of "Fri, 11 Oct 2019 14:17:24 +0200")
-References: <20191011121724.433-1-eric.auger@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Fri, 11 Oct 2019 18:47:14 +0200
-Message-ID: <87v9svut4d.fsf@trasno.org>
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIxhE-0008MF-Qa
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:16 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIxR8-0003XG-Kt; Fri, 11 Oct 2019 19:06:38 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC v5 119/126] hw/core/bus.c: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:45 +0300
+Message-Id: <20191011160552.22907-120-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 11 Oct 2019 16:47:24 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,31 +60,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: peterx@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- eric.auger.pro@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Auger <eric.auger@redhat.com> wrote:
-> Introduce support for GTree migration. A custom save/restore
-> is implemented. Each item is made of a key and a data.
->
-> If the key is a pointer to an object, 2 VMSDs are passed into
-> the GTree VMStateField.
->
-> When putting the items, the tree is traversed in sorted order by
-> g_tree_foreach.
->
-> On the get() path, gtrees must be allocated using the proper
-> key compare, key destroy and value destroy. This must be handled
-> beforehand, for example in a pre_load method.
->
-> Tests are added to test save/dump of structs containing gtrees
-> including the virtio-iommu domain/mappings scenario.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ hw/core/bus.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index 7f3d2a3dbd..0a1e508963 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -146,14 +146,14 @@ static bool bus_get_realized(Object *obj, Error **errp)
+ 
+ static void bus_set_realized(Object *obj, bool value, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BusState *bus = BUS(obj);
+     BusClass *bc = BUS_GET_CLASS(bus);
+     BusChild *kid;
+-    Error *local_err = NULL;
+ 
+     if (value && !bus->realized) {
+         if (bc->realize) {
+-            bc->realize(bus, &local_err);
++            bc->realize(bus, errp);
+         }
+ 
+         /* TODO: recursive realization */
+@@ -161,18 +161,17 @@ static void bus_set_realized(Object *obj, bool value, Error **errp)
+         QTAILQ_FOREACH(kid, &bus->children, sibling) {
+             DeviceState *dev = kid->child;
+             object_property_set_bool(OBJECT(dev), false, "realized",
+-                                     &local_err);
+-            if (local_err != NULL) {
++                                     errp);
++            if (*errp) {
+                 break;
+             }
+         }
+-        if (bc->unrealize && local_err == NULL) {
+-            bc->unrealize(bus, &local_err);
++        if (bc->unrealize && *errp == NULL) {
++            bc->unrealize(bus, errp);
+         }
+     }
+ 
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         return;
+     }
+ 
+-- 
+2.21.0
+
 
