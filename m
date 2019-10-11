@@ -2,76 +2,80 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29215C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15801ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:49:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E58FF2064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6D682064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:49:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vniI6nEW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E58FF2064A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fQ4GJyGd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6D682064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIvIZ-0004F8-SB
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:49:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38496)
+	id 1iIvIc-0004NP-P1
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:49:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iIvHD-0002sP-Ra
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:48:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iIvHG-0002su-Bj
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iIvHC-0002wW-1O
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:48:15 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:40333)
+ (envelope-from <richard.henderson@linaro.org>) id 1iIvHE-0002yG-Ld
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:48:18 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:47094)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iIvHB-0002vF-U9
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:48:13 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id s7so3114299ybq.7
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:48:13 -0700 (PDT)
+ id 1iIvHE-0002xZ-HO
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:48:16 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id h202so3096383ybg.13
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=xmUaFHpu+lWY1a4oEujNqO15G+zNUx5P27Y/+JXsJIk=;
- b=vniI6nEWgQGjaqruQnSOhtv+QJhIk7rTAXzmo6V1OntciiUW0gxZsmESnKehNBT4Ny
- IY8vXWWLo5qOij5g5q2swrXog1J4keo4/iDZp1YPvDun+vqtxST3FLy39Syo/hnvtmGQ
- OTErbE8nL4//MOU5+n/niwKRQq1fmlOsnDNR2/5cI1ZAHQtEa5XEKgPqfI72cZA4My9A
- zaDFr0MeuPClIdThBCQuYR+wJTF8lCvpE4LY+0BoSBMye0rkaPPyKipGXeIlERuNaEz/
- 99nmbP16Lw4rZa1aUkvRW0/SdUZc0AbSuqCmyZ/ryo37IGSCfxZjOntyjCaxoL5N5372
- R5iw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=4U1VNzdFGB+MUTDr/itV77DWvfbivchrYuksbXDh0Hc=;
+ b=fQ4GJyGdFsxuedYQWS4Bgm7JXo3sLB+cZ7kqE0WNA+6Sory1/T9rPKSY2kTfekL7Bl
+ LyU/ZYXBgeOIkC6y8rZXG86YoWqUJ6ccx0s7oVdrpdIDi18erP7ufY7PzqJ/dxsSTj0F
+ t5ENiGBl7yNy/AXDUgMBWWAs730hvT3yKiNnpV8eLtOo2lOKbeDCu8h6XeiL+dFHz/W7
+ aGeKEDq3NczFlYf0T5wn5hyxHrOx3QP50wT6Wc/473q07WKSNgT2AGYrxb5NuGYsbATx
+ Nxp9BamD5SX9wTOp0fH/U1Cpq7nUe0uuS3B/8mhAGAwBaHYi2+IATpGotmmbhCZub8oH
+ gwlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=xmUaFHpu+lWY1a4oEujNqO15G+zNUx5P27Y/+JXsJIk=;
- b=lWzDcpEDQ98D/bn8M8uSstkZqrkaodSOEbPT8J953i18RuMHG8F+TUvrxX/s0M4eMe
- VD1OMPdt/oJjZrAt8fGAXAGr8HlNyCWvSLccl3kLn4TahiJ6qpKAtKmsFcjw8NrrtRWK
- RXXJ2MGWEdfTEkoQJEI8z3ETL14RU3xM7L3P4MIMYGZpqAIIDse3QGrNiPmYv14Uxf0n
- LXH9UKhvKT/Q2vKBQUuvePsATd1qYeQklWEi7zZ7ifRiXj47dsxZzewE37u/QOaDGxn7
- seCd2vRbwv8mI71HZw/8cp7vz1vhcTJmj+mVcskfnuFwaGRiDTGIZ85pCYu5F82X95rT
- YnPg==
-X-Gm-Message-State: APjAAAWdxsF+T5DKPjyQaXmmRd2DhsuGCGpBLWTr5vPv/QcvCjdxYbc3
- fwExONCTtOOfsMCIRkKGnhtKEKRykt4=
-X-Google-Smtp-Source: APXvYqyWjVZf0B23dPtrpvMWCPFUzL4Ju9DQQ2QYpTxQkTkbRdYc5TNHycWzxkHzhYkmecz3xzLvRw==
-X-Received: by 2002:a25:ed7:: with SMTP id 206mr9778464ybo.162.1570801692248; 
- Fri, 11 Oct 2019 06:48:12 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=4U1VNzdFGB+MUTDr/itV77DWvfbivchrYuksbXDh0Hc=;
+ b=bSQ2YAKLI8iTtmgckeq7EX8n0xazWKwwi9KwoRKGTODA310fAsd+8IWkernupHWMIJ
+ FkM7AHhlw5dN9kxG3783BKspbOOHPBUa0e/RmWle9GujFQspPSh6Ey57UMZsWawLGlFe
+ wgoeWsenuCr8aMOGnZ/VCOPKXKzKyvl0lf0UGYjASeYq1hryyhZKeIMDq+IBuXk6Ts3A
+ D9GkdLkHGYyC+Bq5va/VE/J0P1d7deKubS+2mc3EV/UoE2LKGt5mgm4E4709TC+Ji9s0
+ GmWApWUljJeZGi+n64JOPP+wJsLdlB0Ro4KsRDDAD0MR9jf6KwZIDpbZHqi/Xn7ZSWD9
+ 54OA==
+X-Gm-Message-State: APjAAAUNmuIYNL8ZqLeMzixXWy9exzh1sRDwjUalrr4IidhVeXscrzqO
+ xacuu4yBiBasrUbtsjrohhoxN1xu9dI=
+X-Google-Smtp-Source: APXvYqwCLLpxMPDAVRHUChI2C734K2JjLT25iI0cBxSFhl4dK/vmtomNSulHRO2dm5PE2MRsTB3LJQ==
+X-Received: by 2002:a25:d20f:: with SMTP id j15mr9906861ybg.174.1570801695496; 
+ Fri, 11 Oct 2019 06:48:15 -0700 (PDT)
 Received: from cloudburst.gateway.pace.com (67.216.151.25.pool.hargray.net.
  [67.216.151.25])
- by smtp.gmail.com with ESMTPSA id f68sm2534000ywb.96.2019.10.11.06.48.05
+ by smtp.gmail.com with ESMTPSA id f68sm2534000ywb.96.2019.10.11.06.48.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Oct 2019 06:48:11 -0700 (PDT)
+ Fri, 11 Oct 2019 06:48:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 00/22] target/arm: Implement ARMv8.5-MemTag, system mode
-Date: Fri, 11 Oct 2019 09:47:22 -0400
-Message-Id: <20191011134744.2477-1-richard.henderson@linaro.org>
+Subject: [PATCH v5 01/22] target/arm: Add MTE_ACTIVE to tb_flags
+Date: Fri, 11 Oct 2019 09:47:23 -0400
+Message-Id: <20191011134744.2477-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191011134744.2477-1-richard.henderson@linaro.org>
+References: <20191011134744.2477-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::b41
@@ -91,229 +95,278 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an update of the v4 patch from March.
+When MTE is fully enabled, i.e. access to tags are enabled and
+tag checks affect the PE, then arrange to perform the check
+while stripping the TBI.
 
-I believe I've fixed the address space issues that Peter noticed.
-If the board model does not supply tag memory, then I downgrade
-the cpu support to "instructions only" (id_aa64pfr1.mte == 1),
-which does not allow tag memory access to be enabled in the cpu.
+The check is not yet implemented, just the plumbing to that point.
 
-I did not update the arm_hcr_el2_eff comment re ARMv8.4, because
-I have not done a complete audit of all of the v8.5 bits.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v2: Clean TBI bits exactly.
+    Fix license to lgpl 2.1.
+v3: Remove stub helper_mte_check; moved to a later patch.
+---
+ target/arm/cpu.h           | 12 ++++++++
+ target/arm/internals.h     | 19 ++++++++++++
+ target/arm/translate.h     |  2 ++
+ target/arm/helper.c        | 61 ++++++++++++++++++++++++++++++--------
+ target/arm/translate-a64.c |  1 +
+ 5 files changed, 82 insertions(+), 13 deletions(-)
 
-The hacky kernel testing patch has needed some updates since March.
-The following applies to v5.4-rc2.
-
-
-r~
-
-
-Richard Henderson (22):
-  target/arm: Add MTE_ACTIVE to tb_flags
-  target/arm: Add regime_has_2_ranges
-  target/arm: Add MTE system registers
-  target/arm: Add helper_mte_check{1,2,3}
-  target/arm: Suppress tag check for sp+offset
-  target/arm: Implement the IRG instruction
-  target/arm: Implement ADDG, SUBG instructions
-  target/arm: Implement the GMI instruction
-  target/arm: Implement the SUBP instruction
-  target/arm: Define arm_cpu_do_unaligned_access for CONFIG_USER_ONLY
-  target/arm: Implement LDG, STG, ST2G instructions
-  target/arm: Implement the STGP instruction
-  target/arm: Implement the LDGM and STGM instructions
-  target/arm: Implement the access tag cache flushes
-  target/arm: Clean address for DC ZVA
-  target/arm: Implement data cache set allocation tags
-  target/arm: Set PSTATE.TCO on exception entry
-  target/arm: Enable MTE
-  target/arm: Cache the Tagged bit for a page in MemTxAttrs
-  target/arm: Create tagged ram when MTE is enabled
-  target/arm: Add mmu indexes for tag memory
-  target/arm: Add allocation tag storage for system mode
-
- target/arm/cpu-param.h     |   2 +-
- target/arm/cpu.h           |  37 ++-
- target/arm/helper-a64.h    |  17 ++
- target/arm/internals.h     |  45 +++
- target/arm/translate.h     |   2 +
- hw/arm/virt.c              |  54 ++++
- target/arm/cpu.c           |  63 +++-
- target/arm/cpu64.c         |   1 +
- target/arm/helper.c        | 277 ++++++++++++++---
- target/arm/mte_helper.c    | 601 +++++++++++++++++++++++++++++++++++++
- target/arm/tlb_helper.c    |   3 +-
- target/arm/translate-a64.c | 342 ++++++++++++++++++---
- target/arm/Makefile.objs   |   1 +
- 13 files changed, 1345 insertions(+), 100 deletions(-)
- create mode 100644 target/arm/mte_helper.c
-
---- kernel patch
-
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index f19fe4b9acc4..ee6b7f387a9a 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -52,7 +52,8 @@
- #define ARM64_HAS_IRQ_PRIO_MASKING		42
- #define ARM64_HAS_DCPODP			43
- #define ARM64_WORKAROUND_1463225		44
-+#define ARM64_HAS_MTE				45
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 297ad5e47a..408d749b7a 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1201,6 +1201,7 @@ void pmu_init(ARMCPU *cpu);
+ #define PSTATE_BTYPE (3U << 10)
+ #define PSTATE_IL (1U << 20)
+ #define PSTATE_SS (1U << 21)
++#define PSTATE_TCO (1U << 25)
+ #define PSTATE_V (1U << 28)
+ #define PSTATE_C (1U << 29)
+ #define PSTATE_Z (1U << 30)
+@@ -3196,6 +3197,7 @@ FIELD(TBFLAG_A64, PAUTH_ACTIVE, 8, 1)
+ FIELD(TBFLAG_A64, BT, 9, 1)
+ FIELD(TBFLAG_A64, BTYPE, 10, 2)
+ FIELD(TBFLAG_A64, TBID, 12, 2)
++FIELD(TBFLAG_A64, MTE_ACTIVE, 14, 1)
  
--#define ARM64_NCAPS				45
-+#define ARM64_NCAPS				46
- 
- #endif /* __ASM_CPUCAPS_H */
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index ddf9d762ac62..5825130bd8eb 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -12,6 +12,7 @@
- #include <asm/types.h>
- 
- /* Hyp Configuration Register (HCR) bits */
-+#define HCR_ATA		(UL(1) << 56)
- #define HCR_FWB		(UL(1) << 46)
- #define HCR_API		(UL(1) << 41)
- #define HCR_APK		(UL(1) << 40)
-@@ -78,8 +79,8 @@
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
--#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
--#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
-+#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
-+#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H | HCR_ATA)
- 
- /* TCR_EL2 Registers bits */
- #define TCR_EL2_RES1		((1 << 31) | (1 << 23))
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 972d196c7714..2a65831f6e0f 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -482,6 +482,7 @@
- 
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_DSSBS	(BIT(44))
-+#define SCTLR_ELx_ATA	(BIT(43))
- #define SCTLR_ELx_ENIA	(BIT(31))
- #define SCTLR_ELx_ENIB	(BIT(30))
- #define SCTLR_ELx_ENDA	(BIT(27))
-@@ -510,6 +511,7 @@
- #endif
- 
- /* SCTLR_EL1 specific flags. */
-+#define SCTLR_EL1_ATA0		(BIT(42))
- #define SCTLR_EL1_UCI		(BIT(26))
- #define SCTLR_EL1_E0E		(BIT(24))
- #define SCTLR_EL1_SPAN		(BIT(23))
-@@ -598,6 +600,7 @@
- #define ID_AA64PFR0_EL0_32BIT_64BIT	0x2
- 
- /* id_aa64pfr1 */
-+#define ID_AA64PFR1_MTE_SHIFT		8
- #define ID_AA64PFR1_SSBS_SHIFT		4
- 
- #define ID_AA64PFR1_SSBS_PSTATE_NI	0
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index cabebf1a7976..6a122ed7f76b 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -171,6 +171,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
- };
- 
- static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_MTE_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_SSBS_SHIFT, 4, ID_AA64PFR1_SSBS_PSTATE_NI),
- 	ARM64_FTR_END,
- };
-@@ -1261,6 +1262,11 @@ static bool can_use_gic_priorities(const struct arm64_cpu_capabilities *entry,
+ static inline bool bswap_code(bool sctlr_b)
+ {
+@@ -3598,6 +3600,16 @@ static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, BT) != 0;
  }
- #endif
  
-+static void cpu_enable_mte(struct arm64_cpu_capabilities const *cap)
++static inline bool isar_feature_aa64_mte_insn_reg(const ARMISARegisters *id)
 +{
-+	sysreg_clear_set(sctlr_el1, 0, SCTLR_ELx_ATA | SCTLR_EL1_ATA0);
++    return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, MTE) != 0;
 +}
 +
- static const struct arm64_cpu_capabilities arm64_features[] = {
- 	{
- 		.desc = "GIC system register CPU interface",
-@@ -1561,6 +1567,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.min_field_value = 1,
- 	},
- #endif
-+	{
-+		.desc = "Memory Tagging",
-+		.capability = ARM64_HAS_MTE,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_cpuid_feature,
-+		.sys_reg = SYS_ID_AA64PFR1_EL1,
-+		.field_pos = ID_AA64PFR1_MTE_SHIFT,
-+		.sign = FTR_UNSIGNED,
-+		.min_field_value = 2,
-+		.cpu_enable = cpu_enable_mte,
-+	},
- 	{},
- };
++static inline bool isar_feature_aa64_mte(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, MTE) >= 2;
++}
++
+ /*
+  * Forward to the above feature tests given an ARMCPU pointer.
+  */
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 232d963875..dcc5d6cca3 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -983,6 +983,7 @@ typedef struct ARMVAParameters {
+     bool tbid       : 1;
+     bool epd        : 1;
+     bool hpd        : 1;
++    bool tcma       : 1;
+     bool using16k   : 1;
+     bool using64k   : 1;
+ } ARMVAParameters;
+@@ -1007,6 +1008,24 @@ static inline int exception_target_el(CPUARMState *env)
+     return target_el;
+ }
  
-diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
-index a1e0592d1fbc..32cfa35195ae 100644
---- a/arch/arm64/mm/proc.S
-+++ b/arch/arm64/mm/proc.S
-@@ -424,14 +424,14 @@ ENTRY(__cpu_setup)
- 	 *   DEVICE_nGnRE	001	00000100
- 	 *   DEVICE_GRE		010	00001100
- 	 *   NORMAL_NC		011	01000100
--	 *   NORMAL		100	11111111
-+	 *   NORMAL		100	11110000 (Tag)
- 	 *   NORMAL_WT		101	10111011
- 	 */
- 	ldr	x5, =MAIR(0x00, MT_DEVICE_nGnRnE) | \
- 		     MAIR(0x04, MT_DEVICE_nGnRE) | \
- 		     MAIR(0x0c, MT_DEVICE_GRE) | \
- 		     MAIR(0x44, MT_NORMAL_NC) | \
--		     MAIR(0xff, MT_NORMAL) | \
-+		     MAIR(0xf0, MT_NORMAL) | \
- 		     MAIR(0xbb, MT_NORMAL_WT)
- 	msr	mair_el1, x5
- 	/*
-
---- mte smoke test
-
-/*
- * Memory tagging, basic pass cases.
- */
-
-#include <stdio.h>
-#include <assert.h>
-#include <sys/mman.h>
-
-asm(".arch armv8.5-a+memtag");
-
-int data[16 / sizeof(int)] __attribute__((aligned(16)));
-
-int main(int ac, char **av)
-{
-    int *p0 = data;
-    int *p1, *p2;
-    long c;
-
-    if (mlock(data, sizeof(data)) < 0) {
-        perror("mlock");
-        return 1;
-    }
-
-    asm("irg %0,%1,%2" : "=r"(p1) : "r"(p0), "r"(1));
-    assert(p1 != p0);
-    asm("subp %0,%1,%2" : "=r"(c) : "r"(p0), "r"(p1));
-    assert(c == 0);
-
-    asm("stg %0, [%0]" : : "r"(p1));
-    asm("ldg %0, [%1]" : "=r"(p2) : "r"(p0), "0"(p0));
-    assert(p1 == p2);
-
-    return 0;
-}
++/* Determine if allocation tags are available.  */
++static inline bool allocation_tag_access_enabled(CPUARMState *env, int el,
++                                                 uint64_t sctlr)
++{
++    if (el < 3
++        && arm_feature(env, ARM_FEATURE_EL3)
++        && !(env->cp15.scr_el3 & SCR_ATA)) {
++        return false;
++    }
++    if (el < 2
++        && arm_feature(env, ARM_FEATURE_EL2)
++        && !(arm_hcr_el2_eff(env) & HCR_ATA)) {
++        return false;
++    }
++    sctlr &= (el == 0 ? SCTLR_ATA0 : SCTLR_ATA);
++    return sctlr != 0;
++}
++
+ #ifndef CONFIG_USER_ONLY
+ 
+ /* Security attributes for an address, as returned by v8m_security_lookup. */
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index dd24f91f26..9913c35cc2 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -75,6 +75,8 @@ typedef struct DisasContext {
+     bool is_ldex;
+     /* True if v8.3-PAuth is active.  */
+     bool pauth_active;
++    /* True if v8.5-MTE tag checks affect the PE.  */
++    bool mte_active;
+     /* True with v8.5-BTI and SCTLR_ELx.BT* set.  */
+     bool bt;
+     /*
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 0d9a2d2ab7..b690eda136 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1904,6 +1904,9 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+     if (cpu_isar_feature(aa64_pauth, cpu)) {
+         valid_mask |= SCR_API | SCR_APK;
+     }
++    if (cpu_isar_feature(aa64_mte, cpu)) {
++        valid_mask |= SCR_ATA;
++    }
+ 
+     /* Clear all-context RES0 bits.  */
+     value &= valid_mask;
+@@ -4158,22 +4161,31 @@ static void sctlr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ {
+     ARMCPU *cpu = env_archcpu(env);
+ 
+-    if (raw_read(env, ri) == value) {
+-        /* Skip the TLB flush if nothing actually changed; Linux likes
+-         * to do a lot of pointless SCTLR writes.
+-         */
+-        return;
+-    }
+-
+     if (arm_feature(env, ARM_FEATURE_PMSA) && !cpu->has_mpu) {
+         /* M bit is RAZ/WI for PMSA with no MPU implemented */
+         value &= ~SCTLR_M;
+     }
+ 
+-    raw_write(env, ri, value);
++    if (!cpu_isar_feature(aa64_mte, cpu)) {
++        if (ri->opc1 == 6) { /* SCTLR_EL3 */
++            value &= ~(SCTLR_ITFSB | SCTLR_TCF | SCTLR_ATA);
++        } else {
++            value &= ~(SCTLR_ITFSB | SCTLR_TCF0 | SCTLR_TCF |
++                       SCTLR_ATA0 | SCTLR_ATA);
++        }
++    }
++
+     /* ??? Lots of these bits are not implemented.  */
+-    /* This may enable/disable the MMU, so do a TLB flush.  */
+-    tlb_flush(CPU(cpu));
++
++    if (raw_read(env, ri) != value) {
++        /*
++         * This may enable/disable the MMU, so do a TLB flush.
++         * Skip the TLB flush if nothing actually changed;
++         * Linux likes to do a lot of pointless SCTLR writes.
++         */
++        raw_write(env, ri, value);
++        tlb_flush(CPU(cpu));
++    }
+ }
+ 
+ static CPAccessResult fpexc32_access(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -4679,6 +4691,9 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+     if (cpu_isar_feature(aa64_pauth, cpu)) {
+         valid_mask |= HCR_API | HCR_APK;
+     }
++    if (cpu_isar_feature(aa64_mte, cpu)) {
++        valid_mask |= HCR_ATA;
++    }
+ 
+     /* Clear RES0 bits.  */
+     value &= valid_mask;
+@@ -9302,7 +9317,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+ {
+     uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
+     uint32_t el = regime_el(env, mmu_idx);
+-    bool tbi, tbid, epd, hpd, using16k, using64k;
++    bool tbi, tbid, epd, hpd, tcma, using16k, using64k;
+     int select, tsz;
+ 
+     /*
+@@ -9317,11 +9332,12 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+         using16k = extract32(tcr, 15, 1);
+         if (mmu_idx == ARMMMUIdx_S2NS) {
+             /* VTCR_EL2 */
+-            tbi = tbid = hpd = false;
++            tbi = tbid = hpd = tcma = false;
+         } else {
+             tbi = extract32(tcr, 20, 1);
+             hpd = extract32(tcr, 24, 1);
+             tbid = extract32(tcr, 29, 1);
++            tcma = extract32(tcr, 30, 1);
+         }
+         epd = false;
+     } else if (!select) {
+@@ -9332,6 +9348,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+         tbi = extract64(tcr, 37, 1);
+         hpd = extract64(tcr, 41, 1);
+         tbid = extract64(tcr, 51, 1);
++        tcma = extract64(tcr, 57, 1);
+     } else {
+         int tg = extract32(tcr, 30, 2);
+         using16k = tg == 1;
+@@ -9341,6 +9358,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+         tbi = extract64(tcr, 38, 1);
+         hpd = extract64(tcr, 42, 1);
+         tbid = extract64(tcr, 52, 1);
++        tcma = extract64(tcr, 58, 1);
+     }
+     tsz = MIN(tsz, 39);  /* TODO: ARMv8.4-TTST */
+     tsz = MAX(tsz, 16);  /* TODO: ARMv8.2-LVA  */
+@@ -9352,6 +9370,7 @@ ARMVAParameters aa64_va_parameters_both(CPUARMState *env, uint64_t va,
+         .tbid = tbid,
+         .epd = epd,
+         .hpd = hpd,
++        .tcma = tcma,
+         .using16k = using16k,
+         .using64k = using64k,
+     };
+@@ -11065,6 +11084,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+     if (is_a64(env)) {
+         ARMCPU *cpu = env_archcpu(env);
+         uint64_t sctlr;
++        int tbid;
+ 
+         *pc = env->pc;
+         flags = FIELD_DP32(flags, TBFLAG_ANY, AARCH64_STATE, 1);
+@@ -11073,7 +11093,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+         {
+             ARMMMUIdx stage1 = stage_1_mmu_idx(mmu_idx);
+             ARMVAParameters p0 = aa64_va_parameters_both(env, 0, stage1);
+-            int tbii, tbid;
++            int tbii;
+ 
+             /* FIXME: ARMv8.1-VHE S2 translation regime.  */
+             if (regime_el(env, stage1) < 2) {
+@@ -11126,6 +11146,21 @@ void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
+             }
+             flags = FIELD_DP32(flags, TBFLAG_A64, BTYPE, env->btype);
+         }
++
++        /*
++         * Set MTE_ACTIVE if any access may be Checked, and leave clear
++         * if all accesses must be Unchecked:
++         * 1) If no TBI, then there are no tags in the address to check,
++         * 2) If Tag Check Override, then all accesses are Unchecked,
++         * 3) If Tag Check Fail == 0, then Checked access have no effect,
++         * 4) If no Allocation Tag Access, then all accesses are Unchecked.
++         */
++        if (tbid
++            && !(env->pstate & PSTATE_TCO)
++            && (sctlr & (current_el == 0 ? SCTLR_TCF0 : SCTLR_TCF))
++            && allocation_tag_access_enabled(env, current_el, sctlr)) {
++            flags = FIELD_DP32(flags, TBFLAG_A64, MTE_ACTIVE, 1);
++        }
+     } else {
+         *pc = env->regs[15];
+         flags = FIELD_DP32(flags, TBFLAG_A32, THUMB, env->thumb);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 2d6cd09634..51f3af9cd9 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -14161,6 +14161,7 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
+     dc->pauth_active = FIELD_EX32(tb_flags, TBFLAG_A64, PAUTH_ACTIVE);
+     dc->bt = FIELD_EX32(tb_flags, TBFLAG_A64, BT);
+     dc->btype = FIELD_EX32(tb_flags, TBFLAG_A64, BTYPE);
++    dc->mte_active = FIELD_EX32(tb_flags, TBFLAG_A64, MTE_ACTIVE);
+     dc->vec_len = 0;
+     dc->vec_stride = 0;
+     dc->cp_regs = arm_cpu->cp_regs;
+-- 
+2.17.1
 
 
