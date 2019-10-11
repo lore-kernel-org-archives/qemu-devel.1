@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFEFCC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 08:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE277ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 08:59:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C386E21A4A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 08:58:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C386E21A4A
+	by mail.kernel.org (Postfix) with ESMTPS id A220F21D6C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 08:59:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A220F21D6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIqke-00058H-Kn
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 04:58:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47540)
+	id 1iIqlo-0006qs-RF
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 04:59:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47569)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iIqil-0002ZZ-En
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 04:56:24 -0400
+ (envelope-from <stefanha@redhat.com>) id 1iIqir-0002jd-IS
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 04:56:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iIqik-0007ia-6S
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 04:56:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50414)
+ (envelope-from <stefanha@redhat.com>) id 1iIqiq-0007jh-A8
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 04:56:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47268)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iIqij-0007hq-V2
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 04:56:22 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iIqiq-0007jS-2a
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 04:56:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 343CC3082DDD
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 08:56:21 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5524D10C0930
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 08:56:27 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B9BF360BE1;
- Fri, 11 Oct 2019 08:56:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 60BEA5D9C3;
+ Fri, 11 Oct 2019 08:56:22 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/7] libqos: extract Legacy virtio-pci.c code
-Date: Fri, 11 Oct 2019 09:56:05 +0100
-Message-Id: <20191011085611.4194-2-stefanha@redhat.com>
+Subject: [PATCH v2 2/7] libqos: add iteration support to qpci_find_capability()
+Date: Fri, 11 Oct 2019 09:56:06 +0100
+Message-Id: <20191011085611.4194-3-stefanha@redhat.com>
 In-Reply-To: <20191011085611.4194-1-stefanha@redhat.com>
 References: <20191011085611.4194-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 11 Oct 2019 08:56:21 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.66]); Fri, 11 Oct 2019 08:56:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -74,99 +74,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current libqos virtio-pci.c code implements the VIRTIO Legacy
-interface.  Extract existing code in preparation for VIRTIO 1.0 support.
+VIRTIO 1.0 PCI devices have multiple PCI_CAP_ID_VNDR capabilities so we
+need a way to iterate over them.  Extend qpci_find_capability() to take
+the last address.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/libqos/virtio-pci.h |  2 --
- tests/libqos/virtio-pci.c | 25 ++++++++++---------------
- 2 files changed, 10 insertions(+), 17 deletions(-)
+ tests/libqos/pci.h |  2 +-
+ tests/libqos/pci.c | 18 ++++++++++++------
+ 2 files changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
-index 728b4715f1..0d105d67b3 100644
---- a/tests/libqos/virtio-pci.h
-+++ b/tests/libqos/virtio-pci.h
-@@ -31,8 +31,6 @@ typedef struct QVirtQueuePCI {
-     uint32_t msix_data;
- } QVirtQueuePCI;
+diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
+index a5389a5845..590c175190 100644
+--- a/tests/libqos/pci.h
++++ b/tests/libqos/pci.h
+@@ -86,7 +86,7 @@ bool qpci_has_buggy_msi(QPCIDevice *dev);
+ bool qpci_check_buggy_msi(QPCIDevice *dev);
 =20
--extern const QVirtioBus qvirtio_pci;
--
- void virtio_pci_init(QVirtioPCIDevice *dev, QPCIBus *bus, QPCIAddress * =
+ void qpci_device_enable(QPCIDevice *dev);
+-uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id);
++uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id, uint8_t start_=
 addr);
- QVirtioPCIDevice *virtio_pci_new(QPCIBus *bus, QPCIAddress * addr);
-=20
-diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-index 50499e75ef..c8d736f4d1 100644
---- a/tests/libqos/virtio-pci.c
-+++ b/tests/libqos/virtio-pci.c
-@@ -35,14 +35,6 @@
-  * original qvirtio_pci_destructor and qvirtio_pci_start_hw.
-  */
-=20
--static inline bool qvirtio_pci_is_big_endian(QVirtioPCIDevice *dev)
--{
--    QPCIBus *bus =3D dev->pdev->bus;
--
--    /* FIXME: virtio 1.0 is always little-endian */
--    return qtest_big_endian(bus->qts);
--}
--
- #define CONFIG_BASE(dev) (VIRTIO_PCI_CONFIG_OFF((dev)->pdev->msix_enable=
-d))
-=20
- static uint8_t qvirtio_pci_config_readb(QVirtioDevice *d, uint64_t off)
-@@ -55,8 +47,7 @@ static uint8_t qvirtio_pci_config_readb(QVirtioDevice *=
-d, uint64_t off)
-  * but virtio ( < 1.0) is in guest order
-  * so with a big-endian guest the order has been reversed,
-  * reverse it again
-- * virtio-1.0 is always little-endian, like PCI, but this
-- * case will be managed inside qvirtio_pci_is_big_endian()
-+ * virtio-1.0 is always little-endian, like PCI
-  */
-=20
- static uint16_t qvirtio_pci_config_readw(QVirtioDevice *d, uint64_t off)
-@@ -258,7 +249,7 @@ static void qvirtio_pci_virtqueue_kick(QVirtioDevice =
-*d, QVirtQueue *vq)
-     qpci_io_writew(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NOTIFY, vq->ind=
-ex);
+ void qpci_msix_enable(QPCIDevice *dev);
+ void qpci_msix_disable(QPCIDevice *dev);
+ bool qpci_msix_pending(QPCIDevice *dev, uint16_t entry);
+diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+index 662ee7a517..b8679dff1d 100644
+--- a/tests/libqos/pci.c
++++ b/tests/libqos/pci.c
+@@ -115,10 +115,16 @@ void qpci_device_enable(QPCIDevice *dev)
+     g_assert_cmphex(cmd & PCI_COMMAND_MASTER, =3D=3D, PCI_COMMAND_MASTER=
+);
  }
 =20
--const QVirtioBus qvirtio_pci =3D {
-+static const QVirtioBus qvirtio_pci_legacy =3D {
-     .config_readb =3D qvirtio_pci_config_readb,
-     .config_readw =3D qvirtio_pci_config_readw,
-     .config_readl =3D qvirtio_pci_config_readl,
-@@ -374,15 +365,19 @@ void qvirtio_pci_start_hw(QOSGraphObject *obj)
-     qvirtio_start_device(&dev->vdev);
- }
-=20
-+static void qvirtio_pci_init_legacy(QVirtioPCIDevice *dev)
-+{
-+    dev->vdev.device_type =3D qpci_config_readw(dev->pdev, PCI_SUBSYSTEM=
-_ID);
-+    dev->vdev.bus =3D &qvirtio_pci_legacy;
-+    dev->vdev.big_endian =3D qtest_big_endian(dev->pdev->bus->qts);
-+}
-+
- static void qvirtio_pci_init_from_pcidev(QVirtioPCIDevice *dev, QPCIDevi=
-ce *pci_dev)
+-uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id)
++uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id, uint8_t start_=
+addr)
  {
-     dev->pdev =3D pci_dev;
--    dev->vdev.device_type =3D qpci_config_readw(pci_dev, PCI_SUBSYSTEM_I=
-D);
--
-     dev->config_msix_entry =3D -1;
+     uint8_t cap;
+-    uint8_t addr =3D qpci_config_readb(dev, PCI_CAPABILITY_LIST);
++    uint8_t addr;
++
++    if (start_addr) {
++        addr =3D qpci_config_readb(dev, start_addr + PCI_CAP_LIST_NEXT);
++    } else {
++        addr =3D qpci_config_readb(dev, PCI_CAPABILITY_LIST);
++    }
 =20
--    dev->vdev.bus =3D &qvirtio_pci;
--    dev->vdev.big_endian =3D qvirtio_pci_is_big_endian(dev);
-+    qvirtio_pci_init_legacy(dev);
+     do {
+         cap =3D qpci_config_readb(dev, addr);
+@@ -138,7 +144,7 @@ void qpci_msix_enable(QPCIDevice *dev)
+     uint8_t bir_table;
+     uint8_t bir_pba;
 =20
-     /* each virtio-xxx-pci device should override at least this function=
- */
-     dev->obj.get_driver =3D NULL;
+-    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX);
++    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
+     g_assert_cmphex(addr, !=3D, 0);
+=20
+     val =3D qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
+@@ -167,7 +173,7 @@ void qpci_msix_disable(QPCIDevice *dev)
+     uint16_t val;
+=20
+     g_assert(dev->msix_enabled);
+-    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX);
++    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
+     g_assert_cmphex(addr, !=3D, 0);
+     val =3D qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
+     qpci_config_writew(dev, addr + PCI_MSIX_FLAGS,
+@@ -203,7 +209,7 @@ bool qpci_msix_masked(QPCIDevice *dev, uint16_t entry=
+)
+     uint64_t vector_off =3D dev->msix_table_off + entry * PCI_MSIX_ENTRY=
+_SIZE;
+=20
+     g_assert(dev->msix_enabled);
+-    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX);
++    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
+     g_assert_cmphex(addr, !=3D, 0);
+     val =3D qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
+=20
+@@ -221,7 +227,7 @@ uint16_t qpci_msix_table_size(QPCIDevice *dev)
+     uint8_t addr;
+     uint16_t control;
+=20
+-    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX);
++    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
+     g_assert_cmphex(addr, !=3D, 0);
+=20
+     control =3D qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
 --=20
 2.21.0
 
