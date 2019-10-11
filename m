@@ -6,43 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4BA6C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C29EFECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:00:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB4C521835
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:59:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4C521835
+	by mail.kernel.org (Postfix) with ESMTPS id 97FB021835
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:00:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97FB021835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyGi-0002Mr-Ge
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:59:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36203)
+	id 1iIyGy-0002fx-2M
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:00:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQp-00063a-7q
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:20 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRB-0006hQ-SG
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQo-0004Kn-9D
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:19 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47918)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0004oC-In
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:41 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48480)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQo-00048h-1U
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:18 -0400
+ id 1iIxR8-0004WK-8f
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQa-0003XG-Rs; Fri, 11 Oct 2019 19:06:05 +0300
+ id 1iIxQw-0003XG-MD; Fri, 11 Oct 2019 19:06:26 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 022/126] backends/cryptodev: drop local_err from
- cryptodev_backend_complete()
-Date: Fri, 11 Oct 2019 19:04:08 +0300
-Message-Id: <20191011160552.22907-23-vsementsov@virtuozzo.com>
+Subject: [RFC v5 091/126] colo: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:17 +0300
+Message-Id: <20191011160552.22907-92-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,44 +60,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, vsementsov@virtuozzo.com,
- armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ Juan Quintela <quintela@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No reason for local_err here, use errp directly instead.
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- backends/cryptodev.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ migration/colo.c | 38 +++++++++++++++++---------------------
+ 1 file changed, 17 insertions(+), 21 deletions(-)
 
-diff --git a/backends/cryptodev.c b/backends/cryptodev.c
-index 3c071eab95..5a9735684e 100644
---- a/backends/cryptodev.c
-+++ b/backends/cryptodev.c
-@@ -176,19 +176,10 @@ cryptodev_backend_complete(UserCreatable *uc, Error **errp)
- {
-     CryptoDevBackend *backend = CRYPTODEV_BACKEND(uc);
-     CryptoDevBackendClass *bc = CRYPTODEV_BACKEND_GET_CLASS(uc);
--    Error *local_err = NULL;
+diff --git a/migration/colo.c b/migration/colo.c
+index 2c88aa57a2..375aa6d8ce 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -243,19 +243,19 @@ void qmp_xen_set_replication(bool enable, bool primary,
  
-     if (bc->init) {
--        bc->init(backend, &local_err);
--        if (local_err) {
--            goto out;
--        }
-+        bc->init(backend, errp);
+ ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
+ {
+-    Error *err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     ReplicationStatus *s = g_new0(ReplicationStatus, 1);
+ 
+-    replication_get_error_all(&err);
+-    if (err) {
++    replication_get_error_all(errp);
++    if (*errp) {
+         s->error = true;
+         s->has_desc = true;
+-        s->desc = g_strdup(error_get_pretty(err));
++        s->desc = g_strdup(error_get_pretty(*errp));
+     } else {
+         s->error = false;
      }
--
--    return;
--
--out:
--    error_propagate(errp, local_err);
+ 
+-    error_free(err);
++    error_free_errp(errp);
+     return s;
  }
  
- void cryptodev_backend_set_used(CryptoDevBackend *backend, bool used)
+@@ -314,12 +314,11 @@ static void colo_send_message(QEMUFile *f, COLOMessage msg,
+ static void colo_send_message_value(QEMUFile *f, COLOMessage msg,
+                                     uint64_t value, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+ 
+-    colo_send_message(f, msg, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    colo_send_message(f, msg, errp);
++    if (*errp) {
+         return;
+     }
+     qemu_put_be64(f, value);
+@@ -354,12 +353,11 @@ static COLOMessage colo_receive_message(QEMUFile *f, Error **errp)
+ static void colo_receive_check_message(QEMUFile *f, COLOMessage expect_msg,
+                                        Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     COLOMessage msg;
+-    Error *local_err = NULL;
+ 
+-    msg = colo_receive_message(f, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    msg = colo_receive_message(f, errp);
++    if (*errp) {
+         return;
+     }
+     if (msg != expect_msg) {
+@@ -371,13 +369,12 @@ static void colo_receive_check_message(QEMUFile *f, COLOMessage expect_msg,
+ static uint64_t colo_receive_message_value(QEMUFile *f, uint32_t expect_msg,
+                                            Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     uint64_t value;
+     int ret;
+ 
+-    colo_receive_check_message(f, expect_msg, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    colo_receive_check_message(f, expect_msg, errp);
++    if (*errp) {
+         return 0;
+     }
+ 
+@@ -667,12 +664,11 @@ void migrate_start_colo_process(MigrationState *s)
+ static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
+                                      Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     COLOMessage msg;
+-    Error *local_err = NULL;
+ 
+-    msg = colo_receive_message(f, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    msg = colo_receive_message(f, errp);
++    if (*errp) {
+         return;
+     }
+ 
 -- 
 2.21.0
 
