@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3725AC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A28ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:43:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0922020640
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:42:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0922020640
+	by mail.kernel.org (Postfix) with ESMTPS id 2CF1220640
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:43:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF1220640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyvp-0007la-SL
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36599)
+	id 1iIyww-0000bO-Aw
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:43:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41457)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR1-0006Pb-T1
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:33 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxli-0007Aa-7y
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR0-0004cy-D1
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:31 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48240)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlg-0002cH-Jl
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:54 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49820)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR0-0004Ln-5F
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:30 -0400
+ id 1iIxlg-0002c0-Cp; Fri, 11 Oct 2019 12:27:52 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQo-0003XG-HU; Fri, 11 Oct 2019 19:06:18 +0300
+ id 1iIxR6-0003XG-5E; Fri, 11 Oct 2019 19:06:36 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 066/126] Audio: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:52 +0300
-Message-Id: <20191011160552.22907-67-vsementsov@virtuozzo.com>
+Subject: [RFC v5 110/126] qed: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:36 +0300
+Message-Id: <20191011160552.22907-111-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,8 +60,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Gerd Hoffmann <kraxel@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,80 +110,74 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- audio/audio.c        | 12 +++++-------
- hw/audio/intel-hda.c | 13 ++++++-------
- 2 files changed, 11 insertions(+), 14 deletions(-)
+ block/qed.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/audio/audio.c b/audio/audio.c
-index 7128ee98dc..774f47d418 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -1936,19 +1936,17 @@ static void audio_validate_per_direction_opts(
- 
- static void audio_validate_opts(Audiodev *dev, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
- 
-     audio_create_pdos(dev);
- 
--    audio_validate_per_direction_opts(audio_get_pdo_in(dev), &err);
--    if (err) {
--        error_propagate(errp, err);
-+    audio_validate_per_direction_opts(audio_get_pdo_in(dev), errp);
-+    if (*errp) {
-         return;
-     }
- 
--    audio_validate_per_direction_opts(audio_get_pdo_out(dev), &err);
--    if (err) {
--        error_propagate(errp, err);
-+    audio_validate_per_direction_opts(audio_get_pdo_out(dev), errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-index 6ecd383540..d0b178a1e1 100644
---- a/hw/audio/intel-hda.c
-+++ b/hw/audio/intel-hda.c
-@@ -1095,9 +1095,9 @@ static void intel_hda_reset(DeviceState *dev)
- 
- static void intel_hda_realize(PCIDevice *pci, Error **errp)
+diff --git a/block/qed.c b/block/qed.c
+index 0d8fd507aa..689522519d 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -721,11 +721,11 @@ static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
+                                                 QemuOpts *opts,
+                                                 Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     IntelHDAState *d = INTEL_HDA(pci);
-     uint8_t *conf = d->pci.config;
--    Error *err = NULL;
+     BlockdevCreateOptions *create_options = NULL;
+     QDict *qdict;
+     Visitor *v;
+     BlockDriverState *bs = NULL;
+-    Error *local_err = NULL;
      int ret;
  
-     d->name = object_get_typename(OBJECT(d));
-@@ -1109,20 +1109,19 @@ static void intel_hda_realize(PCIDevice *pci, Error **errp)
- 
-     if (d->msi != ON_OFF_AUTO_OFF) {
-         ret = msi_init(&d->pci, d->old_msi_addr ? 0x50 : 0x60,
--                       1, true, false, &err);
-+                       1, true, false, errp);
-         /* Any error other than -ENOTSUP(board's MSI support is broken)
-          * is a programming error */
-         assert(!ret || ret == -ENOTSUP);
-         if (ret && d->msi == ON_OFF_AUTO_ON) {
-             /* Can't satisfy user's explicit msi=on request, fail */
--            error_append_hint(&err, "You have to use msi=auto (default) or "
--                    "msi=off with this machine type.\n");
--            error_propagate(errp, err);
-+            error_append_hint(errp, "You have to use msi=auto (default) or "
-+                              "msi=off with this machine type.\n");
-             return;
-         }
--        assert(!err || d->msi == ON_OFF_AUTO_AUTO);
-+        assert(!*errp || d->msi == ON_OFF_AUTO_AUTO);
-         /* With msi=auto, we fall back to MSI off silently */
--        error_free(err);
-+        error_free_errp(errp);
+     static const QDictRenames opt_renames[] = {
+@@ -745,9 +745,8 @@ static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
      }
  
-     memory_region_init_io(&d->mmio, OBJECT(d), &intel_hda_mmio_ops, d,
+     /* Create and open the file (protocol layer) */
+-    ret = bdrv_create_file(filename, opts, &local_err);
++    ret = bdrv_create_file(filename, opts, errp);
+     if (ret < 0) {
+-        error_propagate(errp, local_err);
+         goto fail;
+     }
+ 
+@@ -768,11 +767,10 @@ static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
+         goto fail;
+     }
+ 
+-    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
++    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
+     visit_free(v);
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
+     }
+@@ -1587,18 +1585,18 @@ static int bdrv_qed_change_backing_file(BlockDriverState *bs,
+ static void coroutine_fn bdrv_qed_co_invalidate_cache(BlockDriverState *bs,
+                                                       Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVQEDState *s = bs->opaque;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     bdrv_qed_close(bs);
+ 
+     bdrv_qed_init_state(bs);
+     qemu_co_mutex_lock(&s->table_lock);
+-    ret = bdrv_qed_do_open(bs, NULL, bs->open_flags, &local_err);
++    ret = bdrv_qed_do_open(bs, NULL, bs->open_flags, errp);
+     qemu_co_mutex_unlock(&s->table_lock);
+-    if (local_err) {
+-        error_propagate_prepend(errp, local_err,
++    if (*errp) {
++        error_prepend(errp,
+                                 "Could not reopen qed layer: ");
+         return;
+     } else if (ret < 0) {
 -- 
 2.21.0
 
