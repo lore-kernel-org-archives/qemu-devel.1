@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0B0C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F22ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:58:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01D6921835
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:58:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D6921835
+	by mail.kernel.org (Postfix) with ESMTPS id 8A36D21835
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:58:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A36D21835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyFc-0000e1-Kr
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:58:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37001)
+	id 1iIyFf-0000lF-Hx
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:58:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRC-0006j3-PU
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:45 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0006Jg-IB
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0004oO-JF
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:42 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48478)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQx-0004W4-4w
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48152)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR8-0004WI-8Y
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
+ id 1iIxQw-0004IL-Tc
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQw-0003XG-En; Fri, 11 Oct 2019 19:06:26 +0300
+ id 1iIxQl-0003XG-JW; Fri, 11 Oct 2019 19:06:15 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 090/126] Sockets: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:16 +0300
-Message-Id: <20191011160552.22907-91-vsementsov@virtuozzo.com>
+Subject: [RFC v5 058/126] virtio-serial: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:44 +0300
+Message-Id: <20191011160552.22907-59-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,10 +60,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- armbru@redhat.com, Greg Kurz <groug@kaod.org>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ vsementsov@virtuozzo.com, "Michael S. Tsirkin" <mst@redhat.com>,
+ Amit Shah <amit@kernel.org>, armbru@redhat.com, Greg Kurz <groug@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -112,137 +113,39 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- util/qemu-sockets.c | 31 ++++++++++++++-----------------
- 1 file changed, 14 insertions(+), 17 deletions(-)
+ hw/char/virtio-serial-bus.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index bcc06d0e01..12db07c092 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -211,6 +211,7 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
-                              int num,
-                              Error **errp)
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index 4e0ed829ae..8ab7f29d0a 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -935,12 +935,12 @@ static void remove_port(VirtIOSerial *vser, uint32_t port_id)
+ 
+ static void virtser_port_device_realize(DeviceState *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     struct addrinfo ai,*res,*e;
-     char port[33];
-     char uaddr[INET6_ADDRSTRLEN+1];
-@@ -219,7 +220,6 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
-     int slisten = -1;
-     int saved_errno = 0;
-     bool socket_created = false;
+     VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
+     VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
+     VirtIOSerialBus *bus = VIRTIO_SERIAL_BUS(qdev_get_parent_bus(dev));
+     int max_nr_ports;
+     bool plugging_port0;
 -    Error *err = NULL;
  
-     if (saddr->keep_alive) {
-         error_setg(errp, "keep-alive option is not supported for passive "
-@@ -232,11 +232,10 @@ static int inet_listen_saddr(InetSocketAddress *saddr,
-     if (saddr->has_numeric && saddr->numeric) {
-         ai.ai_flags |= AI_NUMERICHOST | AI_NUMERICSERV;
+     port->vser = bus->vser;
+     port->bh = qemu_bh_new(flush_queued_data_bh, port);
+@@ -986,9 +986,8 @@ static void virtser_port_device_realize(DeviceState *dev, Error **errp)
+         return;
      }
--    ai.ai_family = inet_ai_family_from_address(saddr, &err);
-+    ai.ai_family = inet_ai_family_from_address(saddr, errp);
-     ai.ai_socktype = SOCK_STREAM;
  
--    if (err) {
+-    vsc->realize(dev, &err);
+-    if (err != NULL) {
 -        error_propagate(errp, err);
++    vsc->realize(dev, errp);
 +    if (*errp) {
-         return -1;
+         return;
      }
  
-@@ -387,9 +386,9 @@ static int inet_connect_addr(struct addrinfo *addr, Error **errp)
- static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
-                                                  Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     struct addrinfo ai, *res;
-     int rc;
--    Error *err = NULL;
-     static int useV4Mapped = 1;
- 
-     memset(&ai, 0, sizeof(ai));
-@@ -398,11 +397,10 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
-     if (atomic_read(&useV4Mapped)) {
-         ai.ai_flags |= AI_V4MAPPED;
-     }
--    ai.ai_family = inet_ai_family_from_address(saddr, &err);
-+    ai.ai_family = inet_ai_family_from_address(saddr, errp);
-     ai.ai_socktype = SOCK_STREAM;
- 
--    if (err) {
--        error_propagate(errp, err);
-+    if (*errp) {
-         return NULL;
-     }
- 
-@@ -443,7 +441,7 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
-  */
- int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     struct addrinfo *res, *e;
-     int sock = -1;
- 
-@@ -453,9 +451,8 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
-     }
- 
-     for (e = res; e != NULL; e = e->ai_next) {
--        error_free(local_err);
--        local_err = NULL;
--        sock = inet_connect_addr(e, &local_err);
-+        error_free_errp(errp);
-+        sock = inet_connect_addr(e, errp);
-         if (sock >= 0) {
-             break;
-         }
-@@ -464,7 +461,6 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
-     freeaddrinfo(res);
- 
-     if (sock < 0) {
--        error_propagate(errp, local_err);
-         return sock;
-     }
- 
-@@ -487,20 +483,19 @@ static int inet_dgram_saddr(InetSocketAddress *sraddr,
-                             InetSocketAddress *sladdr,
-                             Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     struct addrinfo ai, *peer = NULL, *local = NULL;
-     const char *addr;
-     const char *port;
-     int sock = -1, rc;
--    Error *err = NULL;
- 
-     /* lookup peer addr */
-     memset(&ai,0, sizeof(ai));
-     ai.ai_flags = AI_CANONNAME | AI_V4MAPPED | AI_ADDRCONFIG;
--    ai.ai_family = inet_ai_family_from_address(sraddr, &err);
-+    ai.ai_family = inet_ai_family_from_address(sraddr, errp);
-     ai.ai_socktype = SOCK_DGRAM;
- 
--    if (err) {
--        error_propagate(errp, err);
-+    if (*errp) {
-         goto err;
-     }
- 
-@@ -861,6 +856,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
-                              int num,
-                              Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     struct sockaddr_un un;
-     int sock, fd;
-     char *pathbuf = NULL;
-@@ -936,6 +932,7 @@ err:
- 
- static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     struct sockaddr_un un;
-     int sock, rc;
-     size_t pathlen;
 -- 
 2.21.0
 
