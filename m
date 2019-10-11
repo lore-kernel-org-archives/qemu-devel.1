@@ -2,67 +2,112 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A54C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 06:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF754C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 06:56:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF08A214E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 06:55:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF08A214E0
+	by mail.kernel.org (Postfix) with ESMTPS id 72036214E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 06:56:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72036214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIopy-0004hl-VB
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 02:55:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57038)
+	id 1iIor2-0005zW-DQ
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 02:56:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57228)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iIoot-0004AQ-JE
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:54:36 -0400
+ (envelope-from <thuth@redhat.com>) id 1iIopy-00056n-Sj
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:55:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iIoor-00046K-Vt
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:54:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33634)
+ (envelope-from <thuth@redhat.com>) id 1iIopx-0004h7-5f
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:55:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38086)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iIoor-00044o-Ns
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:54:33 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iIopw-0004gy-TC
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:55:41 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0058918C8902;
- Fri, 11 Oct 2019 06:54:33 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-177.rdu2.redhat.com
- [10.10.120.177])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 20508194BE;
- Fri, 11 Oct 2019 06:54:23 +0000 (UTC)
-Subject: Re: [RFC 0/3] acpi: cphp: add CPHP_GET_CPU_ID_CMD command to cpu
- hotplug MMIO interface
-To: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20191009132252.17860-1-imammedo@redhat.com>
- <20191010055356-mutt-send-email-mst@kernel.org>
- <20191010153815.4f7a3fc9@redhat.com>
- <20191010095459-mutt-send-email-mst@kernel.org>
- <20191010175754.7c62cf8f@Igors-MacBook-Pro>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <5b0a1c33-3528-1a31-0e5d-44fa875a15b9@redhat.com>
-Date: Fri, 11 Oct 2019 08:54:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mx1.redhat.com (Postfix) with ESMTPS id DB8BC88384B;
+ Fri, 11 Oct 2019 06:55:39 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 84EEB196B2;
+ Fri, 11 Oct 2019 06:55:33 +0000 (UTC)
+Subject: Re: Is network backend vde worth keeping? (was: Is network backend
+ netmap worth keeping?)
+From: Thomas Huth <thuth@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-28-armbru@redhat.com>
+ <8c2a6fad-6ac1-21b1-c17c-e1bd5ac41c9f@redhat.com>
+ <87a7ckrat7.fsf@dusky.pond.sub.org>
+ <ee3709c9-f351-081a-3aeb-53b7b6036b0a@redhat.com>
+ <87imr8l0ti.fsf_-_@dusky.pond.sub.org> <878spwct7p.fsf_-_@dusky.pond.sub.org>
+ <80874887-71f2-0233-cd4b-0205a4330aca@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <2ed5660c-dc1a-5a29-498e-0382e1e5596a@redhat.com>
+Date: Fri, 11 Oct 2019 08:55:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191010175754.7c62cf8f@Igors-MacBook-Pro>
+In-Reply-To: <80874887-71f2-0233-cd4b-0205a4330aca@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Fri, 11 Oct 2019 06:54:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.69]); Fri, 11 Oct 2019 06:55:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -77,94 +122,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, renzo@cs.unibo.it,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Julia Suvorova <jusual@mail.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/10/19 17:57, Igor Mammedov wrote:
-> On Thu, 10 Oct 2019 09:59:42 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
->> On Thu, Oct 10, 2019 at 03:39:12PM +0200, Igor Mammedov wrote:
->>> On Thu, 10 Oct 2019 05:56:55 -0400
->>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>>
->>>> On Wed, Oct 09, 2019 at 09:22:49AM -0400, Igor Mammedov wrote:
->>>>> As an alternative to passing to firmware topology info via new fwcfg files
->>>>> so it could recreate APIC IDs based on it and order CPUs are enumerated,
->>>>>
->>>>> extend CPU hotplug interface to return APIC ID as response to the new command
->>>>> CPHP_GET_CPU_ID_CMD.  
->>>>
->>>> One big piece missing here is motivation:
->>> I thought the only willing reader was Laszlo (who is aware of context)
->>> so I skipped on details and confused others :/
->>>
->>>> Who's going to use this interface?
->>> In current state it's for firmware, since ACPI tables can cheat
->>> by having APIC IDs statically built in.
->>>
->>> If we were creating CPU objects in ACPI dynamically
->>> we would be using this command as well.
+On 09/10/2019 11.13, Thomas Huth wrote:
+> On 07/10/2019 20.21, Markus Armbruster wrote:
+>> Markus Armbruster <armbru@redhat.com> writes:
 >>
->> I'm not sure how it's even possible to create devices dynamically. Well
->> I guess it's possible with LoadTable. Is this what you had in
->> mind?
-> 
-> Yep. I even played this shiny toy and I can say it's very tempting one.
-> On the  other side, even problem of legacy OSes not working with it aside,
-> it's hard to debug and reproduce compared to static tables.
-> So from maintaining pov I dislike it enough to be against it.
-> 
-> 
->>> It would save
->>> us quite a bit space in ACPI blob but it would be a pain
->>> to debug and diagnose problems in ACPI tables, so I'd rather
->>> stay with static CPU descriptions in ACPI tables for the sake
->>> of maintenance.
->>>> So far CPU hotplug was used by the ACPI, so we didn't
->>>> really commit to a fixed interface too strongly.
->>>>
->>>> Is this a replacement to Laszlo's fw cfg interface?
->>>> If yes is the idea that OVMF going to depend on CPU hotplug directly then?
->>>> It does not depend on it now, does it?
->>> It doesn't, but then it doesn't support cpu hotplug,
->>> OVMF(SMM) needs to cooperate with QEMU "and" ACPI tables to perform
->>> the task and using the same interface/code path between all involved
->>> parties makes the task easier with the least amount of duplicated
->>> interfaces and more robust.
->>>
->>> Re-implementing alternative interface for firmware (fwcfg or what not)
->>> would work as well, but it's only question of time when ACPI and
->>> this new interface disagree on how world works and process falls
->>> apart.
+>>> Please excuse the attention-grabbing subject.
 >>
->> Then we should consider switching acpi to use fw cfg.
->> Or build another interface that can scale.
+>> Again.
+>>
+>> [...]
+>>> So, to make use of QEMU's netmap backend (CONFIG_NETMAP), you have to
+>>> build and install netmap software from sources.  Which pretty much
+>>
+>> CONFIG_VDE seems to be similarly cumbersome to build-test.
 > 
-> Could be an option, it would be a pain to write a driver in AML for fwcfg access though
-> (I've looked at possibility to access fwcfg from AML about a year ago and gave up.
-> I'm definitely not volunteering for the second attempt and can't even give an estimate
-> it it's viable approach).
-> 
-> But what scaling issue you are talking about, exactly?
-> With current CPU hotplug interface we can handle upto UNIT32_MAX cpus, and extend
-> interface without need to increase IO window we are using now.
-> 
-> Granted IO access it not fastest compared to fwcfg in DMA mode, but we already
-> doing stop machine when switching to SMM which is orders of magnitude slower.
-> Consensus was to compromise on speed of CPU hotplug versus more complex and more
-> problematic unicast SMM mode in OVMF (can't find a particular email but we have discussed
-> it with Laszlo already, when I considered ways to optimize hotplug speed)
+> There seems to be a libvdeplug-dev package on Debian / Ubuntu which
+> should provide the necessary headers if I've got that right...?
 
-Right, the speed of handling a CPU hotplug event is basically
-irrelevant, whereas broadcast SMI (in response to writing IO port 0xB2)
-is really important.
+FWIW:
+https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg01983.html
 
-Thanks
-Laszlo
+That seems to enable "vde support" according to the output of configure:
+
+https://travis-ci.com/huth/qemu/jobs/243803521#L1019
+https://travis-ci.com/huth/qemu/jobs/243803521#L2522
+
+ Thomas
 
