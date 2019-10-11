@@ -2,51 +2,51 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07675C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D37ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:56:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D21A221A4A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:55:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21A221A4A
+	by mail.kernel.org (Postfix) with ESMTPS id 4973C20679
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:56:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4973C20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIpm4-0005pr-U9
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:55:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37269)
+	id 1iIpml-0006U7-3V
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:56:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIpiU-0001cy-5v
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:52:04 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIpkd-0004Ul-Qw
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIpiS-0007aA-J1
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:52:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51188)
+ (envelope-from <mreitz@redhat.com>) id 1iIpkc-0000cx-Fp
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:54:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34037)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIpiN-0007XX-Uh; Fri, 11 Oct 2019 03:51:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1iIpkZ-0000Xm-Ph; Fri, 11 Oct 2019 03:54:12 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C66C818CB8E8;
- Fri, 11 Oct 2019 07:51:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0B18510C092E;
+ Fri, 11 Oct 2019 07:54:11 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-40.ams2.redhat.com
  [10.36.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1097360600;
- Fri, 11 Oct 2019 07:51:52 +0000 (UTC)
-Subject: Re: [PATCH 01/23] iotests: Introduce $SOCK_DIR
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F8945D6C8;
+ Fri, 11 Oct 2019 07:54:08 +0000 (UTC)
+Subject: Re: [PATCH 04/23] iotests: Filter $SOCK_DIR
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20191010152457.17713-1-mreitz@redhat.com>
- <20191010152457.17713-2-mreitz@redhat.com>
- <28d6c3e1-7efa-7e31-0b95-c8b5c79f75dc@redhat.com>
+ <20191010152457.17713-5-mreitz@redhat.com>
+ <a9930ccd-dcee-ef5f-20f0-a2a909b5cf86@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <de01a842-4418-c3f4-7521-d11ae10d2866@redhat.com>
-Date: Fri, 11 Oct 2019 09:51:50 +0200
+Message-ID: <cbe205ec-536b-1f91-6a52-465155c34995@redhat.com>
+Date: Fri, 11 Oct 2019 09:54:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <28d6c3e1-7efa-7e31-0b95-c8b5c79f75dc@redhat.com>
+In-Reply-To: <a9930ccd-dcee-ef5f-20f0-a2a909b5cf86@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="y87eIPQbEVqP3XnoQomm7hycFd90Lh6Uw"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="RU8zTzYPId4Aqy9C9Nv71MidT9xDwh0AL"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Fri, 11 Oct 2019 07:51:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.66]); Fri, 11 Oct 2019 07:54:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -105,84 +105,75 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---y87eIPQbEVqP3XnoQomm7hycFd90Lh6Uw
-Content-Type: multipart/mixed; boundary="7uLSqz0Cr1J1qBP1FGInxhBykxNhTzarR"
+--RU8zTzYPId4Aqy9C9Nv71MidT9xDwh0AL
+Content-Type: multipart/mixed; boundary="a8rIlcL9yOeb2BU4cUe4AIUNXxNJksSPv"
 
---7uLSqz0Cr1J1qBP1FGInxhBykxNhTzarR
+--a8rIlcL9yOeb2BU4cUe4AIUNXxNJksSPv
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 10.10.19 20:18, Eric Blake wrote:
+On 10.10.19 20:42, Eric Blake wrote:
 > On 10/10/19 10:24 AM, Max Reitz wrote:
->> Unix sockets generally have a maximum path length.=C2=A0 Depending on =
-your
->> $TEST_DIR, it may be exceeded and then all tests that create and use
->> Unix sockets there may fail.
->>
->> Circumvent this by adding a new scratch directory specifically for
->> Unix socket files.=C2=A0 It defaults to a temporary directory (mktemp =
--d)
->> that is completely removed after the iotests are done.
->>
->> (By default, mktemp -d creates a /tmp/tmp.XXXXXXXXXX directory, which
->> should be short enough for our use cases.)
->>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->> =C2=A0 tests/qemu-iotests/check | 17 +++++++++++++++++
+>> =C2=A0 tests/qemu-iotests/common.filter | 8 ++++++--
+>> =C2=A0 1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/common.filter
+>> b/tests/qemu-iotests/common.filter
+>> index 9f418b4881..cd42f5e7e3 100644
+>> --- a/tests/qemu-iotests/common.filter
+>> +++ b/tests/qemu-iotests/common.filter
+>> @@ -43,7 +43,8 @@ _filter_qom_path()
+>> =C2=A0 # replace occurrences of the actual TEST_DIR value with TEST_DI=
+R
+>> =C2=A0 _filter_testdir()
+>> =C2=A0 {
+>> -=C2=A0=C2=A0=C2=A0 $SED -e "s#$TEST_DIR/#TEST_DIR/#g"
+>> +=C2=A0=C2=A0=C2=A0 $SED -e "s#$TEST_DIR/#TEST_DIR/#g" \
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -e "s#$SOCK_DIR/#SOC=
+K_DIR/#g"
 >=20
->> +tmp_sock_dir=3Dfalse
->> +if [ -z "$SOCK_DIR" ]; then
->> +=C2=A0=C2=A0=C2=A0 SOCK_DIR=3D$(mktemp -d)
->> +=C2=A0=C2=A0=C2=A0 tmp_sock_dir=3Dtrue
->> +fi
->> +
->> +if [ ! -d "$SOCK_DIR" ]; then
->> +=C2=A0=C2=A0=C2=A0 mkdir "$SOCK_DIR"
->> +fi
->=20
-> Should this use mkdir -p, in case two parallel processes compete with
-> the same SOCK_DIR?
+> Do we want to output a literal 'SOCK_DIR' (every test that uses it has
+> to update their expected output), or can we make this also output a
+> literal 'TEST_DIR' (output is a bit more confusing on which dir to look=
 
-I would have used mkdir -p, but I saw we used this construct for
-TEST_DIR, so I thought I=E2=80=98d just go for the same.
+> in, but fewer files to touch)?=C2=A0 Your preference.
 
-> What if SOCK_DIR is set to something that is not a directory (say a
-> file), at which point mkdir fails, but you don't seem to be catching
-> that failure.
+There=E2=80=99s another advantage to filtering it to be TEST_DIR, and tha=
+t=E2=80=99s the
+fact that if $TEST_DIR and $SOCK_DIR are the same, we will always
+replace $SOCK_DIR by TEST_DIR.
 
-Well, the same applies to TEST_DIR.  And technically, as long as we
-don=E2=80=99t use mkdir -p for either, not catching the error at least he=
-lps
-circumvent the potential race. O:-)
+But I still preferred filtering it to be SOCK_DIR, because that seemed
+to me like we would have done it had we had a SOCK_DIR from the start.
 
-(I=E2=80=99ll convert both to mkdir -p with error handling.)
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks for reviewing!
 
 Max
 
-> Otherwise looks good.
 
+--a8rIlcL9yOeb2BU4cUe4AIUNXxNJksSPv--
 
-
---7uLSqz0Cr1J1qBP1FGInxhBykxNhTzarR--
-
---y87eIPQbEVqP3XnoQomm7hycFd90Lh6Uw
+--RU8zTzYPId4Aqy9C9Nv71MidT9xDwh0AL
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2gNJYACgkQ9AfbAGHV
-z0BbSAgAlv5vgfSXX/7ZTm5Cd+ZEaeJKH6W/ogbJchgvEUcBVDKuu5SrS8UsE6yv
-4BaQtoHTW6cfK/Mm6o6XrD5grfucmwufycP0eBuIG+oTYIam9FYGQas6hic3kxgl
-TzdeSwOfpXoppXIbAREEdQPPsNm0Jt3E2XV5hnqIK9WNbRC/1grn5iYPQZGk6h3j
-EVeS0YWePfrh1yRjOALFfvkoP23V22OoMcvGdDsfO3zPVzTuLrydrMw4X05+bupa
-t/ncE8280ZSunEpp+lE8zJASIs64zc8M1TDldnZCLQ9UCnBMBjYCj+gCEbgc/enA
-EvbgR1zRoSitofLYpNbK5DcodPgOpw==
-=4an6
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2gNR8ACgkQ9AfbAGHV
+z0D5rQf+Oq+CMQmbzzJMfLGtVWydMp0uBH0sYbBZVhWMCrAsKfahdWdqf5JrLsQE
+MeCyn8eIKaSsIFE8pcHQQtjUQNhbbH6Tm/fOO/A8lNTcK6oxfCar5ED+UYQzVuDC
+bejvHpHG1V/+/UTw9QxmC/fPr+43EIkf27vv+YngL6jws0/eviXzwVNWJvuCoff4
++Kg6e00d4va+iGFBPSRSVR2aLkgvtZllk8aDOVzCAZlQRnWd39EK0nOWtbfEeSi1
+wIkDr57kaKKNI69xy1nwrxLNBISVVRYBIPG+cfkAz3k3cZjOGfcxR9v8dChTT+11
+jfhMTvuXrcgk+cpthFWLuLHFPmv1JQ==
+=+iOD
 -----END PGP SIGNATURE-----
 
---y87eIPQbEVqP3XnoQomm7hycFd90Lh6Uw--
+--RU8zTzYPId4Aqy9C9Nv71MidT9xDwh0AL--
 
