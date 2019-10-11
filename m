@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EAFFC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67992C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:48:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7568206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:48:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7568206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 2CA55206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:48:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA55206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIy5C-0003wS-38
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:48:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35987)
+	id 1iIy5t-0004Mp-SJ
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:48:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36744)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQZ-0005d0-4Q
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:04 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR6-0006Wr-3b
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQY-00044c-4z
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:03 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47830)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR2-0004fP-Bl
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48296)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQX-00043e-Ti; Fri, 11 Oct 2019 12:06:02 -0400
+ id 1iIxR1-0004NO-V9
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:32 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQW-0003XG-8v; Fri, 11 Oct 2019 19:06:00 +0300
+ id 1iIxQq-0003XG-Jy; Fri, 11 Oct 2019 19:06:20 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 011/126] block/snapshot: rename Error ** parameter to more
- common errp
-Date: Fri, 11 Oct 2019 19:03:57 +0300
-Message-Id: <20191011160552.22907-12-vsementsov@virtuozzo.com>
+Subject: [RFC v5 071/126] Dump: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:57 +0300
+Message-Id: <20191011160552.22907-72-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,39 +60,551 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ vsementsov@virtuozzo.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
+
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/snapshot.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ dump/dump.c     | 151 ++++++++++++++++++++----------------------------
+ dump/win_dump.c |  29 ++++------
+ 2 files changed, 76 insertions(+), 104 deletions(-)
 
-diff --git a/block/snapshot.c b/block/snapshot.c
-index 8081616ae9..bd9fb01817 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -426,7 +426,7 @@ fail:
+diff --git a/dump/dump.c b/dump/dump.c
+index 6fb6e1245a..421e33d684 100644
+--- a/dump/dump.c
++++ b/dump/dump.c
+@@ -387,23 +387,21 @@ static void write_data(DumpState *s, void *buf, int length, Error **errp)
+ static void write_memory(DumpState *s, GuestPhysBlock *block, ram_addr_t start,
+                          int64_t size, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int64_t i;
+-    Error *local_err = NULL;
+ 
+     for (i = 0; i < size / s->dump_info.page_size; i++) {
+         write_data(s, block->host_addr + start + i * s->dump_info.page_size,
+-                   s->dump_info.page_size, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                   s->dump_info.page_size, errp);
++        if (*errp) {
+             return;
+         }
+     }
+ 
+     if ((size % s->dump_info.page_size) != 0) {
+         write_data(s, block->host_addr + start + i * s->dump_info.page_size,
+-                   size % s->dump_info.page_size, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                   size % s->dump_info.page_size, errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -473,11 +471,11 @@ static void get_offset_range(hwaddr phys_addr,
+ 
+ static void write_elf_loads(DumpState *s, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     hwaddr offset, filesz;
+     MemoryMapping *memory_mapping;
+     uint32_t phdr_index = 1;
+     uint32_t max_index;
+-    Error *local_err = NULL;
+ 
+     if (s->have_section) {
+         max_index = s->sh_info;
+@@ -491,14 +489,13 @@ static void write_elf_loads(DumpState *s, Error **errp)
+                          s, &offset, &filesz);
+         if (s->dump_info.d_class == ELFCLASS64) {
+             write_elf64_load(s, memory_mapping, phdr_index++, offset,
+-                             filesz, &local_err);
++                             filesz, errp);
+         } else {
+             write_elf32_load(s, memory_mapping, phdr_index++, offset,
+-                             filesz, &local_err);
++                             filesz, errp);
+         }
+ 
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (*errp) {
+             return;
+         }
+ 
+@@ -511,7 +508,7 @@ static void write_elf_loads(DumpState *s, Error **errp)
+ /* write elf header, PT_NOTE and elf note to vmcore. */
+ static void dump_begin(DumpState *s, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+     /*
+      * the vmcore's format is:
+@@ -539,73 +536,64 @@ static void dump_begin(DumpState *s, Error **errp)
+ 
+     /* write elf header to vmcore */
+     if (s->dump_info.d_class == ELFCLASS64) {
+-        write_elf64_header(s, &local_err);
++        write_elf64_header(s, errp);
+     } else {
+-        write_elf32_header(s, &local_err);
++        write_elf32_header(s, errp);
+     }
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         return;
+     }
+ 
+     if (s->dump_info.d_class == ELFCLASS64) {
+         /* write PT_NOTE to vmcore */
+-        write_elf64_note(s, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        write_elf64_note(s, errp);
++        if (*errp) {
+             return;
+         }
+ 
+         /* write all PT_LOAD to vmcore */
+-        write_elf_loads(s, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        write_elf_loads(s, errp);
++        if (*errp) {
+             return;
+         }
+ 
+         /* write section to vmcore */
+         if (s->have_section) {
+-            write_elf_section(s, 1, &local_err);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
++            write_elf_section(s, 1, errp);
++            if (*errp) {
+                 return;
+             }
+         }
+ 
+         /* write notes to vmcore */
+-        write_elf64_notes(fd_write_vmcore, s, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        write_elf64_notes(fd_write_vmcore, s, errp);
++        if (*errp) {
+             return;
+         }
+     } else {
+         /* write PT_NOTE to vmcore */
+-        write_elf32_note(s, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        write_elf32_note(s, errp);
++        if (*errp) {
+             return;
+         }
+ 
+         /* write all PT_LOAD to vmcore */
+-        write_elf_loads(s, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        write_elf_loads(s, errp);
++        if (*errp) {
+             return;
+         }
+ 
+         /* write section to vmcore */
+         if (s->have_section) {
+-            write_elf_section(s, 0, &local_err);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
++            write_elf_section(s, 0, errp);
++            if (*errp) {
+                 return;
+             }
+         }
+ 
+         /* write notes to vmcore */
+-        write_elf32_notes(fd_write_vmcore, s, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        write_elf32_notes(fd_write_vmcore, s, errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -641,9 +629,9 @@ static int get_next_block(DumpState *s, GuestPhysBlock *block)
+ /* write all memory to vmcore */
+ static void dump_iterate(DumpState *s, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     GuestPhysBlock *block;
+     int64_t size;
+-    Error *local_err = NULL;
+ 
+     do {
+         block = s->next_block;
+@@ -655,9 +643,8 @@ static void dump_iterate(DumpState *s, Error **errp)
+                 size -= block->target_end - (s->begin + s->length);
+             }
+         }
+-        write_memory(s, block, s->start, size, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        write_memory(s, block, s->start, size, errp);
++        if (*errp) {
+             return;
+         }
+ 
+@@ -666,11 +653,10 @@ static void dump_iterate(DumpState *s, Error **errp)
+ 
+ static void create_vmcore(DumpState *s, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+-    dump_begin(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    dump_begin(s, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -807,6 +793,7 @@ static bool note_name_equal(DumpState *s,
+ /* write common header, sub header and elf note to vmcore */
+ static void create_header32(DumpState *s, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DiskDumpHeader32 *dh = NULL;
+     KdumpSubHeader32 *kh = NULL;
+     size_t size;
+@@ -815,7 +802,6 @@ static void create_header32(DumpState *s, Error **errp)
+     uint32_t bitmap_blocks;
+     uint32_t status = 0;
+     uint64_t offset_note;
+-    Error *local_err = NULL;
+ 
+     /* write common header, the version of kdump-compressed format is 6th */
+     size = sizeof(DiskDumpHeader32);
+@@ -891,9 +877,8 @@ static void create_header32(DumpState *s, Error **errp)
+     s->note_buf_offset = 0;
+ 
+     /* use s->note_buf to store notes temporarily */
+-    write_elf32_notes(buf_write_note, s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    write_elf32_notes(buf_write_note, s, errp);
++    if (*errp) {
+         goto out;
+     }
+     if (write_buffer(s->fd, offset_note, s->note_buf,
+@@ -919,6 +904,7 @@ out:
+ /* write common header, sub header and elf note to vmcore */
+ static void create_header64(DumpState *s, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DiskDumpHeader64 *dh = NULL;
+     KdumpSubHeader64 *kh = NULL;
+     size_t size;
+@@ -927,7 +913,6 @@ static void create_header64(DumpState *s, Error **errp)
+     uint32_t bitmap_blocks;
+     uint32_t status = 0;
+     uint64_t offset_note;
+-    Error *local_err = NULL;
+ 
+     /* write common header, the version of kdump-compressed format is 6th */
+     size = sizeof(DiskDumpHeader64);
+@@ -1003,9 +988,8 @@ static void create_header64(DumpState *s, Error **errp)
+     s->note_buf_offset = 0;
+ 
+     /* use s->note_buf to store notes temporarily */
+-    write_elf64_notes(buf_write_note, s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    write_elf64_notes(buf_write_note, s, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -1031,14 +1015,13 @@ out:
+ 
+ static void write_dump_header(DumpState *s, Error **errp)
+ {
+-     Error *local_err = NULL;
++     ERRP_AUTO_PROPAGATE();
+ 
+     if (s->dump_info.d_class == ELFCLASS32) {
+-        create_header32(s, &local_err);
++        create_header32(s, errp);
+     } else {
+-        create_header64(s, &local_err);
++        create_header64(s, errp);
+     }
+-    error_propagate(errp, local_err);
  }
  
- int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bad_bs,
--                             Error **err)
-+                             Error **errp)
+ static size_t dump_bitmap_get_bufsize(DumpState *s)
+@@ -1472,8 +1455,8 @@ out:
+ 
+ static void create_kdump_vmcore(DumpState *s, Error **errp)
  {
-     int ret = 0;
-     BlockDriverState *bs;
-@@ -441,7 +441,7 @@ int bdrv_all_delete_snapshot(const char *name, BlockDriverState **first_bad_bs,
-             bdrv_snapshot_find(bs, snapshot, name) >= 0)
-         {
-             ret = bdrv_snapshot_delete(bs, snapshot->id_str,
--                                       snapshot->name, err);
-+                                       snapshot->name, errp);
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+-    Error *local_err = NULL;
+ 
+     /*
+      * the kdump-compressed format is:
+@@ -1503,21 +1486,18 @@ static void create_kdump_vmcore(DumpState *s, Error **errp)
+         return;
+     }
+ 
+-    write_dump_header(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    write_dump_header(s, errp);
++    if (*errp) {
+         return;
+     }
+ 
+-    write_dump_bitmap(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    write_dump_bitmap(s, errp);
++    if (*errp) {
+         return;
+     }
+ 
+-    write_dump_pages(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    write_dump_pages(s, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1647,10 +1627,10 @@ static void dump_init(DumpState *s, int fd, bool has_format,
+                       DumpGuestMemoryFormat format, bool paging, bool has_filter,
+                       int64_t begin, int64_t length, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VMCoreInfoState *vmci = vmcoreinfo_find();
+     CPUState *cpu;
+     int nr_cpus;
+-    Error *err = NULL;
+     int ret;
+ 
+     s->has_format = has_format;
+@@ -1769,9 +1749,8 @@ static void dump_init(DumpState *s, int fd, bool has_format,
+ 
+     /* get memory mapping */
+     if (paging) {
+-        qemu_get_guest_memory_mapping(&s->list, &s->guest_phys_blocks, &err);
+-        if (err != NULL) {
+-            error_propagate(errp, err);
++        qemu_get_guest_memory_mapping(&s->list, &s->guest_phys_blocks, errp);
++        if (*errp) {
+             goto cleanup;
          }
-         aio_context_release(ctx);
-         if (ret < 0) {
+     } else {
+@@ -1870,33 +1849,32 @@ cleanup:
+ /* this operation might be time consuming. */
+ static void dump_process(DumpState *s, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     DumpQueryResult *result = NULL;
+ 
+     if (s->has_format && s->format == DUMP_GUEST_MEMORY_FORMAT_WIN_DMP) {
+ #ifdef TARGET_X86_64
+-        create_win_dump(s, &local_err);
++        create_win_dump(s, errp);
+ #endif
+     } else if (s->has_format && s->format != DUMP_GUEST_MEMORY_FORMAT_ELF) {
+-        create_kdump_vmcore(s, &local_err);
++        create_kdump_vmcore(s, errp);
+     } else {
+-        create_vmcore(s, &local_err);
++        create_vmcore(s, errp);
+     }
+ 
+     /* make sure status is written after written_size updates */
+     smp_wmb();
+     atomic_set(&s->status,
+-               (local_err ? DUMP_STATUS_FAILED : DUMP_STATUS_COMPLETED));
++               (*errp ? DUMP_STATUS_FAILED : DUMP_STATUS_COMPLETED));
+ 
+     /* send DUMP_COMPLETED message (unconditionally) */
+     result = qmp_query_dump(NULL);
+     /* should never fail */
+     assert(result);
+-    qapi_event_send_dump_completed(result, !!local_err, (local_err ? \
+-                                   error_get_pretty(local_err) : NULL));
++    qapi_event_send_dump_completed(result, !!*errp, (*errp ? \
++                                   error_get_pretty(*errp) : NULL));
+     qapi_free_DumpQueryResult(result);
+ 
+-    error_propagate(errp, local_err);
+     dump_cleanup(s);
+ }
+ 
+@@ -1925,10 +1903,10 @@ void qmp_dump_guest_memory(bool paging, const char *file,
+                            int64_t length, bool has_format,
+                            DumpGuestMemoryFormat format, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const char *p;
+     int fd = -1;
+     DumpState *s;
+-    Error *local_err = NULL;
+     bool detach_p = false;
+ 
+     if (runstate_check(RUN_STATE_INMIGRATE)) {
+@@ -2013,9 +1991,8 @@ void qmp_dump_guest_memory(bool paging, const char *file,
+     dump_state_prepare(s);
+ 
+     dump_init(s, fd, has_format, format, paging, has_begin,
+-              begin, length, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++              begin, length, errp);
++    if (*errp) {
+         atomic_set(&s->status, DUMP_STATUS_FAILED);
+         return;
+     }
+diff --git a/dump/win_dump.c b/dump/win_dump.c
+index eda2a48974..7e905e7589 100644
+--- a/dump/win_dump.c
++++ b/dump/win_dump.c
+@@ -60,15 +60,14 @@ static size_t write_run(WinDumpPhyMemRun64 *run, int fd, Error **errp)
+ 
+ static void write_runs(DumpState *s, WinDumpHeader64 *h, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     WinDumpPhyMemDesc64 *desc = &h->PhysicalMemoryBlock;
+     WinDumpPhyMemRun64 *run = desc->Run;
+-    Error *local_err = NULL;
+     int i;
+ 
+     for (i = 0; i < desc->NumberOfRuns; i++) {
+-        s->written_size += write_run(run + i, s->fd, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        s->written_size += write_run(run + i, s->fd, errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -317,12 +316,12 @@ static void restore_context(WinDumpHeader64 *h,
+ 
+ void create_win_dump(DumpState *s, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     WinDumpHeader64 *h = (WinDumpHeader64 *)(s->guest_note +
+             VMCOREINFO_ELF_NOTE_HDR_SIZE);
+     X86CPU *first_x86_cpu = X86_CPU(first_cpu);
+     uint64_t saved_cr3 = first_x86_cpu->env.cr[3];
+     struct saved_context *saved_ctx = NULL;
+-    Error *local_err = NULL;
+ 
+     if (s->guest_note_size != sizeof(WinDumpHeader64) +
+             VMCOREINFO_ELF_NOTE_HDR_SIZE) {
+@@ -330,9 +329,8 @@ void create_win_dump(DumpState *s, Error **errp)
+         return;
+     }
+ 
+-    check_header(h, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    check_header(h, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -343,9 +341,8 @@ void create_win_dump(DumpState *s, Error **errp)
+ 
+     first_x86_cpu->env.cr[3] = h->DirectoryTableBase;
+ 
+-    check_kdbg(h, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    check_kdbg(h, errp);
++    if (*errp) {
+         goto out_cr3;
+     }
+ 
+@@ -358,9 +355,8 @@ void create_win_dump(DumpState *s, Error **errp)
+      * to determine if the system-saved context is valid
+      */
+ 
+-    patch_and_save_context(h, saved_ctx, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    patch_and_save_context(h, saved_ctx, errp);
++    if (*errp) {
+         goto out_free;
+     }
+ 
+@@ -372,9 +368,8 @@ void create_win_dump(DumpState *s, Error **errp)
+         goto out_restore;
+     }
+ 
+-    write_runs(s, h, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    write_runs(s, h, errp);
++    if (*errp) {
+         goto out_restore;
+     }
+ 
 -- 
 2.21.0
 
