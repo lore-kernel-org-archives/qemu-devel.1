@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9409DECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B85EECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:46:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C73D206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:46:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C73D206A1
+	by mail.kernel.org (Postfix) with ESMTPS id EA29D206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:46:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA29D206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIz06-0004Yu-KG
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:46:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41585)
+	id 1iIz08-0004aw-Mw
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:46:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37336)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmD-0007bS-BX
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:26 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRN-00070y-6A
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmC-0002qs-3r
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:25 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49974)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRL-0004y8-Es
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:53 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48578)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxmB-0002qI-Sr
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:24 -0400
+ id 1iIxRL-0004cu-6b; Fri, 11 Oct 2019 12:06:51 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR9-0003XG-MP; Fri, 11 Oct 2019 19:06:39 +0300
+ id 1iIxQz-0003XG-AJ; Fri, 11 Oct 2019 19:06:29 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 124/126] target/tilegx/cpu.c: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:50 +0300
-Message-Id: <20191011160552.22907-125-vsementsov@virtuozzo.com>
+Subject: [RFC v5 098/126] iSCSI: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:24 +0300
+Message-Id: <20191011160552.22907-99-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +59,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,30 +111,125 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- target/tilegx/cpu.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ block/iscsi.c | 36 +++++++++++++++---------------------
+ 1 file changed, 15 insertions(+), 21 deletions(-)
 
-diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
-index 2b2a7ccc31..79bfe27856 100644
---- a/target/tilegx/cpu.c
-+++ b/target/tilegx/cpu.c
-@@ -81,13 +81,12 @@ static void tilegx_cpu_reset(CPUState *s)
- 
- static void tilegx_cpu_realizefn(DeviceState *dev, Error **errp)
+diff --git a/block/iscsi.c b/block/iscsi.c
+index 506bf5f875..bd825fe40e 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -1779,6 +1779,7 @@ static void iscsi_save_designator(IscsiLun *lun,
+ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+                       Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     CPUState *cs = CPU(dev);
-     TileGXCPUClass *tcc = TILEGX_CPU_GET_CLASS(dev);
+     IscsiLun *iscsilun = bs->opaque;
+     struct iscsi_context *iscsi = NULL;
+     struct scsi_task *task = NULL;
+@@ -1786,7 +1787,6 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+     struct scsi_inquiry_supported_pages *inq_vpd;
+     char *initiator_name = NULL;
+     QemuOpts *opts;
 -    Error *local_err = NULL;
+     const char *transport_name, *portal, *target;
+ #if LIBISCSI_API_VERSION >= (20160603)
+     enum iscsi_transport_type transport;
+@@ -1794,9 +1794,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+     int i, ret = 0, timeout = 0, lun;
  
--    cpu_exec_realizefn(cs, &local_err);
--    if (local_err != NULL) {
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
 -        error_propagate(errp, local_err);
-+    cpu_exec_realizefn(cs, errp);
++    qemu_opts_absorb_qdict(opts, options, errp);
 +    if (*errp) {
-         return;
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -1850,9 +1849,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
      }
  
+     /* check if we got CHAP username/password via the options */
+-    apply_chap(iscsi, opts, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    apply_chap(iscsi, opts, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -1864,9 +1862,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+ 
+     /* check if we got HEADER_DIGEST via the options */
+-    apply_header_digest(iscsi, opts, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    apply_header_digest(iscsi, opts, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -1918,9 +1915,8 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+         flags &= ~BDRV_O_RDWR;
+     }
+ 
+-    iscsi_readcapacity_sync(iscsilun, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    iscsi_readcapacity_sync(iscsilun, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -2124,8 +2120,8 @@ static void iscsi_reopen_commit(BDRVReopenState *reopen_state)
+ static int coroutine_fn iscsi_co_truncate(BlockDriverState *bs, int64_t offset,
+                                           PreallocMode prealloc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     IscsiLun *iscsilun = bs->opaque;
+-    Error *local_err = NULL;
+ 
+     if (prealloc != PREALLOC_MODE_OFF) {
+         error_setg(errp, "Unsupported preallocation mode '%s'",
+@@ -2138,9 +2134,8 @@ static int coroutine_fn iscsi_co_truncate(BlockDriverState *bs, int64_t offset,
+         return -ENOTSUP;
+     }
+ 
+-    iscsi_readcapacity_sync(iscsilun, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    iscsi_readcapacity_sync(iscsilun, errp);
++    if (*errp) {
+         return -EIO;
+     }
+ 
+@@ -2159,12 +2154,12 @@ static int coroutine_fn iscsi_co_truncate(BlockDriverState *bs, int64_t offset,
+ static int coroutine_fn iscsi_co_create_opts(const char *filename, QemuOpts *opts,
+                                              Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret = 0;
+     int64_t total_size = 0;
+     BlockDriverState *bs;
+     IscsiLun *iscsilun = NULL;
+     QDict *bs_options;
+-    Error *local_err = NULL;
+ 
+     bs = bdrv_new();
+ 
+@@ -2175,9 +2170,8 @@ static int coroutine_fn iscsi_co_create_opts(const char *filename, QemuOpts *opt
+     iscsilun = bs->opaque;
+ 
+     bs_options = qdict_new();
+-    iscsi_parse_filename(filename, bs_options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    iscsi_parse_filename(filename, bs_options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+     } else {
+         ret = iscsi_open(bs, bs_options, 0, NULL);
 -- 
 2.21.0
 
