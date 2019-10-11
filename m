@@ -2,78 +2,59 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F81ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E29C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:33:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC7D8214E0
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:30:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC7D8214E0
+	by mail.kernel.org (Postfix) with ESMTPS id 3DBFE20673
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:33:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DBFE20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIvw8-0006cI-49
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 10:30:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46583)
+	id 1iIvzQ-000071-Dd
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 10:33:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47282)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iIvun-0005vp-NI
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:29:11 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iIvyf-0007wk-Rf
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:33:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iIvuk-00061z-WA
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:29:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35180)
+ (envelope-from <dgilbert@redhat.com>) id 1iIvyc-0007ik-GP
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:33:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53626)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iIvuk-00061X-Mr
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:29:06 -0400
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iIvyc-0007hG-57
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:33:06 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7E016CA380
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 14:29:05 +0000 (UTC)
-Received: by mail-qt1-f197.google.com with SMTP id 59so9605975qtc.5
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 07:29:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=pJ+0lE4051l8ew2szHzavu90Jwmg0rZjsyua5bK7odI=;
- b=jYYEKFXTTy1A1ZltVtY1YsRvP+HV2C+M+5z+Gg0lx4gSGcIw7MNCY9vlrzs8jYFTGF
- F7aK1ZR6W0qqe82O+oJLi4UW6wzQTbkxtx5vEexZ+3hWu94tKNanK+RfsIpGmvlt1QIv
- GfudrHQfwSQYTOtgeA9hE9PWl1tV5MxFDtm2GXEFgxN3dvYbCbEj58NtKomVIUfnvxOb
- tGP7da0RWHRoLFnuODx+HHN5UaDkvzfOXuVQ49VagB8QdGCvJLoHtpIDanT74cdn5BvY
- u6u2okPMKR9iOTDCGLV2P7S0Dur7aRDW8xk/MJ3ZJOR7Upm2Z8FfiLby9d+tucz3G7hj
- rk8A==
-X-Gm-Message-State: APjAAAXYhPyKiJ0l72CI/BEoCtDnkRAUzxMf13vhdLeSWcDJun7Cx+DP
- 6gN2glk8S91XTiv45OxcCgryf9mK5bCjvFO0cGrPoqyJORNc7UBX09Sb01dBddn7EkpD9fZ3Ydr
- rD1cL8jGpUBQE408=
-X-Received: by 2002:ac8:7302:: with SMTP id x2mr16994174qto.323.1570804144657; 
- Fri, 11 Oct 2019 07:29:04 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqybJYQ313FsqpnKERwMCP5RTyn7AxQPzWwA/DqgVVwEqZVcjp+JsKFntRqSjrwiQf/C/EIExA==
-X-Received: by 2002:ac8:7302:: with SMTP id x2mr16994122qto.323.1570804144309; 
- Fri, 11 Oct 2019 07:29:04 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- p56sm5965213qtp.81.2019.10.11.07.29.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Oct 2019 07:29:03 -0700 (PDT)
-Date: Fri, 11 Oct 2019 10:28:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v3 0/10] add failover feature for assigned network devices
-Message-ID: <20191011102725-mutt-send-email-mst@kernel.org>
-References: <20191011112015.11785-1-jfreimann@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 3ADD9309BF1A;
+ Fri, 11 Oct 2019 14:33:04 +0000 (UTC)
+Received: from work-vm (ovpn-117-210.ams2.redhat.com [10.36.117.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B68E601AC;
+ Fri, 11 Oct 2019 14:32:50 +0000 (UTC)
+Date: Fri, 11 Oct 2019 15:32:48 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v6] migration: Support gtree migration
+Message-ID: <20191011143248.GP3354@work-vm>
+References: <20191011121724.433-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191011112015.11785-1-jfreimann@redhat.com>
+In-Reply-To: <20191011121724.433-1-eric.auger@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 11 Oct 2019 14:33:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -88,177 +69,741 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: parav@mellanox.com, aadam@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, alex.williamson@redhat.com, laine@redhat.com,
- ailan@redhat.com, ehabkost@redhat.com
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 11, 2019 at 01:20:05PM +0200, Jens Freimann wrote:
-> This is implementing the host side of the net_failover concept
-> (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
+* Eric Auger (eric.auger@redhat.com) wrote:
+> Introduce support for GTree migration. A custom save/restore
+> is implemented. Each item is made of a key and a data.
+> 
+> If the key is a pointer to an object, 2 VMSDs are passed into
+> the GTree VMStateField.
+> 
+> When putting the items, the tree is traversed in sorted order by
+> g_tree_foreach.
+> 
+> On the get() path, gtrees must be allocated using the proper
+> key compare, key destroy and value destroy. This must be handled
+> beforehand, for example in a pre_load method.
+> 
+> Tests are added to test save/dump of structs containing gtrees
+> including the virtio-iommu domain/mappings scenario.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-I posted a comment about the migration changes.
-Besides that this looks good to me.
-I did not look at VFIO parts at all yet.
-Alex, could you pls review/ack the VFIO patch?
-
-
-> Changes since v2:
-> * back out of creating failover pair when it is a non-networking
->   vfio-pci device (Alex W)
-> * handle migration state change from within the migration thread. I do a
->   timed wait on a semaphore and then check if all unplugs were
->   succesful. Added a new function to each device that checks the device
->   if the unplug for it has happened. When all devices report the succesful
->   unplug *or* the time/retries is up, continue with the migration or
->   cancel. When not all devices could be unplugged I am cancelling at the
->   moment. It is likely that we can't plug it back at the destination which
->   would result in degraded network performance.
-> * fix a few bugs regarding re-plug on migration source and target 
-> * run full set of tests including migration tests
-> * add patch for libqos to tolerate new migration state
-> * squashed patch 1 and 2, added patch 8 
+> 
+> ---
+> 
+> v4 -> v5:
+> - swap key/value in vmsd array
+> - fix g_free(key) in case of direct key
+> - return an error if the number of decoded nodes does not
+>   match nnodes
+> 
+> v3 -> v4:
+> - properly initialize capsule.vmdesc in put_gtree()
+> - use uintptr_t
+> - add trace points
+> 
+> v2 -> v3:
+> - do not include glib.h anymore
+> - introduce VMSTATE_GTREE_DIRECT_KEY_V
+> - use pre_load to allocate the tree and remove data pointer
+> - dump the number of nnodes and add checks on get path
+> 
+> v1 -> v2:
+> - fix compilation issues reported by robots
+> - fixed init of VMSD array
+> - direct key now dumped as a 32b
+> - removed useless cast from/to pointer
+> ---
+>  include/migration/vmstate.h |  40 ++++
+>  migration/trace-events      |   5 +
+>  migration/vmstate-types.c   | 152 +++++++++++++
+>  tests/test-vmstate.c        | 421 ++++++++++++++++++++++++++++++++++++
+>  4 files changed, 618 insertions(+)
+> 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 1fbfd099dd..b9ee563aa4 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -224,6 +224,7 @@ extern const VMStateInfo vmstate_info_unused_buffer;
+>  extern const VMStateInfo vmstate_info_tmp;
+>  extern const VMStateInfo vmstate_info_bitmap;
+>  extern const VMStateInfo vmstate_info_qtailq;
+> +extern const VMStateInfo vmstate_info_gtree;
 >  
-> The general idea is that we have a pair of devices, a vfio-pci and a
-> virtio-net device. Before migration the vfio device is unplugged and data
-> flows to the virtio-net device, on the target side another vfio-pci device
-> is plugged in to take over the data-path. In the guest the net_failover
-> module will pair net devices with the same MAC address.
-> 
-> * Patch 1 adds the infrastructure to hide the device for the qbus and qdev APIs
-> 
-> * Patch 2 sets a new flag for PCIDevice 'partially_hotplugged' which we
->   use to skip the unrealize code path when doing a unplug of the primary
->   device
-> 
-> * Patch 3 sets the pending_deleted_event before triggering the guest
->   unplug request
-> 
-> * Patch 4 and 5 add new qmp events, one sends the device id of a device
->   that was just requested to be unplugged from the guest and another one
->   to let libvirt know if VIRTIO_NET_F_STANDBY was negotiated
-> 
-> * Patch 6 make sure that we can unplug the vfio-device before
->   migration starts
-> 
-> * Patch 7 adds a new migration state that is entered while we wait for
->   devices to be unplugged by guest OS
-> 
-> * Patch 8 just adds the new migration state to a check in libqos code
-> 
-> * Patch 9 In the second patch the virtio-net uses the API to defer adding the vfio
->   device until the VIRTIO_NET_F_STANDBY feature is acked. It also
->   implements the migration handler to unplug the device from the guest and
->   re-plug in case of migration failure
-> 
-> * Patch 10 allows migration for failover vfio-pci devices, but only when it is
->   a networking device 
-> 
-> Previous discussion:
->   RFC v1 https://patchwork.ozlabs.org/cover/989098/
->   RFC v2 https://www.mail-archive.com/qemu-devel@nongnu.org/msg606906.html
->   v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03968.html
->   v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg635214.html
-> 
-> To summarize concerns/feedback from previous discussion:
-> 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
->   Migration might get stuck for unpredictable time with unclear reason.
->   This approach combines two tricky things, hot/unplug and migration.
->   -> We need to let libvirt know what's happening. Add new qmp events
->      and a new migration state. When a primary device is (partially)
->      unplugged (only from guest) we send a qmp event with the device id. When
->      it is unplugged from the guest the DEVICE_DELETED event is sent.
->      Migration will enter the wait-unplug state while waiting for the guest
->      os to unplug all primary devices and then move on with migration.
-> 2. PCI devices are a precious ressource. The primary device should never
->   be added to QEMU if it won't be used by guest instead of hiding it in
->   QEMU.
->   -> We only hotplug the device when the standby feature bit was
->      negotiated. We save the device cmdline options until we need it for
->      qdev_device_add()
->      Hiding a device can be a useful concept to model. For example a
->      pci device in a powered-off slot could be marked as hidden until the slot is
->      powered on (mst).
-> 3. Management layer software should handle this. Open Stack already has
->   components/code to handle unplug/replug VFIO devices and metadata to
->   provide to the guest for detecting which devices should be paired.
->   -> An approach that includes all software from firmware to
->      higher-level management software wasn't tried in the last years. This is
->      an attempt to keep it simple and contained in QEMU as much as possible.
->      One of the problems that stopped management software and libvirt from
->      implementing this idea is that it can't be sure that it's possible to
->      re-plug the primary device. By not freeing the devices resources in QEMU
->      and only asking the guest OS to unplug it is possible to re-plug the
->      device in case of a migration failure.
-> 4. Hotplugging a device and then making it part of a failover setup is
->    not possible
->   -> addressed by extending qdev hotplug functions to check for hidden
->      attribute, so e.g. device_add can be used to plug a device.
-> 
-> 
-> I have tested this with a mlx5 and igb NIC and was able to migrate the VM.
-> 
-> Command line example:
-> 
-> qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
->         -machine q35,kernel-irqchip=split -cpu host   \
->         -serial stdio   \
->         -net none \
->         -qmp unix:/tmp/qmp.socket,server,nowait \
->         -monitor telnet:127.0.0.1:5555,server,nowait \
->         -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
->         -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
->         -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
->         -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
->         -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,failover=on \
-> 	-device vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,net_failover_pair_id =net1 \
->         /root/rhel-guest-image-8.0-1781.x86_64.qcow2
-> 
-> I'm grateful for any remarks or ideas!
-> 
-> Thanks!
-> 
-> regards,
-> Jens 
-> 
-> 
-> Jens Freimann (10):
->   qdev/qbus: add hidden device support
->   pci: mark devices partially unplugged
->   pci: mark device having guest unplug request pending
->   qapi: add unplug primary event
->   qapi: add failover negotiated event
->   migration: allow unplug during migration for failover devices
->   migration: add new migration state wait-unplug
->   libqos: tolerate wait-unplug migration state
->   net/virtio: add failover support
->   vfio: unplug failover primary device before migration
-> 
->  hw/core/qdev.c                 |  20 +++
->  hw/net/virtio-net.c            | 267 +++++++++++++++++++++++++++++++++
->  hw/pci/pci.c                   |   2 +
->  hw/pci/pcie.c                  |   6 +
->  hw/vfio/pci.c                  |  35 ++++-
->  hw/vfio/pci.h                  |   2 +
->  include/hw/pci/pci.h           |   1 +
->  include/hw/qdev-core.h         |  10 ++
->  include/hw/virtio/virtio-net.h |  12 ++
->  include/hw/virtio/virtio.h     |   1 +
->  include/migration/vmstate.h    |   2 +
->  migration/migration.c          |  34 +++++
->  migration/migration.h          |   3 +
->  migration/savevm.c             |  36 +++++
->  migration/savevm.h             |   1 +
->  qapi/migration.json            |  24 ++-
->  qapi/net.json                  |  16 ++
->  qdev-monitor.c                 |  43 +++++-
->  tests/libqos/libqos.c          |   3 +-
->  vl.c                           |   6 +-
->  20 files changed, 515 insertions(+), 9 deletions(-)
-> 
+>  #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
+>  /*
+> @@ -754,6 +755,45 @@ extern const VMStateInfo vmstate_info_qtailq;
+>      .start        = offsetof(_type, _next),                              \
+>  }
+>  
+> +/*
+> + * For migrating a GTree whose key is a pointer to _key_type and the
+> + * value, a pointer to _val_type
+> + * The target tree must have been properly initialized
+> + * _vmsd: Start address of the 2 element array containing the data vmsd
+> + *        and the key vmsd, in that order
+> + * _key_type: type of the key
+> + * _val_type: type of the value
+> + */
+> +#define VMSTATE_GTREE_V(_field, _state, _version, _vmsd,                       \
+> +                        _key_type, _val_type)                                  \
+> +{                                                                              \
+> +    .name         = (stringify(_field)),                                       \
+> +    .version_id   = (_version),                                                \
+> +    .vmsd         = (_vmsd),                                                   \
+> +    .info         = &vmstate_info_gtree,                                       \
+> +    .start        = sizeof(_key_type),                                         \
+> +    .size         = sizeof(_val_type),                                         \
+> +    .offset       = offsetof(_state, _field),                                  \
+> +}
+> +
+> +/*
+> + * For migrating a GTree with direct key and the value a pointer
+> + * to _val_type
+> + * The target tree must have been properly initialized
+> + * _vmsd: data vmsd
+> + * _val_type: type of the value
+> + */
+> +#define VMSTATE_GTREE_DIRECT_KEY_V(_field, _state, _version, _vmsd, _val_type) \
+> +{                                                                              \
+> +    .name         = (stringify(_field)),                                       \
+> +    .version_id   = (_version),                                                \
+> +    .vmsd         = (_vmsd),                                                   \
+> +    .info         = &vmstate_info_gtree,                                       \
+> +    .start        = 0,                                                         \
+> +    .size         = sizeof(_val_type),                                         \
+> +    .offset       = offsetof(_state, _field),                                  \
+> +}
+> +
+>  /* _f : field name
+>     _f_n : num of elements field_name
+>     _n : num of elements
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 858d415d56..6dee7b5389 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -71,6 +71,11 @@ get_qtailq_end(const char *name, const char *reason, int val) "%s %s/%d"
+>  put_qtailq(const char *name, int version_id) "%s v%d"
+>  put_qtailq_end(const char *name, const char *reason) "%s %s"
+>  
+> +get_gtree(const char *field_name, const char *key_vmsd_name, const char *val_vmsd_name, uint32_t nnodes) "%s(%s/%s) nnodes=%d"
+> +get_gtree_end(const char *field_name, const char *key_vmsd_name, const char *val_vmsd_name, int ret) "%s(%s/%s) %d"
+> +put_gtree(const char *field_name, const char *key_vmsd_name, const char *val_vmsd_name, uint32_t nnodes) "%s(%s/%s) nnodes=%d"
+> +put_gtree_end(const char *field_name, const char *key_vmsd_name, const char *val_vmsd_name, int ret) "%s(%s/%s) %d"
+> +
+>  # qemu-file.c
+>  qemu_file_fclose(void) ""
+>  
+> diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+> index bee658a1b2..7236cf92bc 100644
+> --- a/migration/vmstate-types.c
+> +++ b/migration/vmstate-types.c
+> @@ -691,3 +691,155 @@ const VMStateInfo vmstate_info_qtailq = {
+>      .get  = get_qtailq,
+>      .put  = put_qtailq,
+>  };
+> +
+> +struct put_gtree_data {
+> +    QEMUFile *f;
+> +    const VMStateDescription *key_vmsd;
+> +    const VMStateDescription *val_vmsd;
+> +    QJSON *vmdesc;
+> +    int ret;
+> +};
+> +
+> +static gboolean put_gtree_elem(gpointer key, gpointer value, gpointer data)
+> +{
+> +    struct put_gtree_data *capsule = (struct put_gtree_data *)data;
+> +    QEMUFile *f = capsule->f;
+> +    int ret;
+> +
+> +    qemu_put_byte(f, true);
+> +
+> +    /* put the key */
+> +    if (!capsule->key_vmsd) {
+> +        qemu_put_be64(f, (uint64_t)(uintptr_t)(key)); /* direct key */
+> +    } else {
+> +        ret = vmstate_save_state(f, capsule->key_vmsd, key, capsule->vmdesc);
+> +        if (ret) {
+> +            capsule->ret = ret;
+> +            return true;
+> +        }
+> +    }
+> +
+> +    /* put the data */
+> +    ret = vmstate_save_state(f, capsule->val_vmsd, value, capsule->vmdesc);
+> +    if (ret) {
+> +        capsule->ret = ret;
+> +        return true;
+> +    }
+> +    return false;
+> +}
+> +
+> +static int put_gtree(QEMUFile *f, void *pv, size_t unused_size,
+> +                     const VMStateField *field, QJSON *vmdesc)
+> +{
+> +    bool direct_key = (!field->start);
+> +    const VMStateDescription *key_vmsd = direct_key ? NULL : &field->vmsd[1];
+> +    const VMStateDescription *val_vmsd = &field->vmsd[0];
+> +    const char *key_vmsd_name = direct_key ? "direct" : key_vmsd->name;
+> +    struct put_gtree_data capsule = {
+> +        .f = f,
+> +        .key_vmsd = key_vmsd,
+> +        .val_vmsd = val_vmsd,
+> +        .vmdesc = vmdesc,
+> +        .ret = 0};
+> +    GTree **pval = pv;
+> +    GTree *tree = *pval;
+> +    uint32_t nnodes = g_tree_nnodes(tree);
+> +    int ret;
+> +
+> +    trace_put_gtree(field->name, key_vmsd_name, val_vmsd->name, nnodes);
+> +    qemu_put_be32(f, nnodes);
+> +    g_tree_foreach(tree, put_gtree_elem, (gpointer)&capsule);
+> +    qemu_put_byte(f, false);
+> +    ret = capsule.ret;
+> +    if (ret) {
+> +        error_report("%s : failed to save gtree (%d)", field->name, ret);
+> +    }
+> +    trace_put_gtree_end(field->name, key_vmsd_name, val_vmsd->name, ret);
+> +    return ret;
+> +}
+> +
+> +static int get_gtree(QEMUFile *f, void *pv, size_t unused_size,
+> +                     const VMStateField *field)
+> +{
+> +    bool direct_key = (!field->start);
+> +    const VMStateDescription *key_vmsd = direct_key ? NULL : &field->vmsd[1];
+> +    const VMStateDescription *val_vmsd = &field->vmsd[0];
+> +    const char *key_vmsd_name = direct_key ? "direct" : key_vmsd->name;
+> +    int version_id = field->version_id;
+> +    size_t key_size = field->start;
+> +    size_t val_size = field->size;
+> +    int nnodes, count = 0;
+> +    GTree **pval = pv;
+> +    GTree *tree = *pval;
+> +    void *key, *val;
+> +    int ret = 0;
+> +
+> +    /* in case of direct key, the key vmsd can be {}, ie. check fields */
+> +    if (!direct_key && version_id > key_vmsd->version_id) {
+> +        error_report("%s %s",  key_vmsd->name, "too new");
+> +        return -EINVAL;
+> +    }
+> +    if (!direct_key && version_id < key_vmsd->minimum_version_id) {
+> +        error_report("%s %s",  key_vmsd->name, "too old");
+> +        return -EINVAL;
+> +    }
+> +    if (version_id > val_vmsd->version_id) {
+> +        error_report("%s %s",  val_vmsd->name, "too new");
+> +        return -EINVAL;
+> +    }
+> +    if (version_id < val_vmsd->minimum_version_id) {
+> +        error_report("%s %s",  val_vmsd->name, "too old");
+> +        return -EINVAL;
+> +    }
+> +
+> +    nnodes = qemu_get_be32(f);
+> +    trace_get_gtree(field->name, key_vmsd_name, val_vmsd->name, nnodes);
+> +
+> +    while (qemu_get_byte(f)) {
+> +        if ((++count) > nnodes) {
+> +            ret = -EINVAL;
+> +            break;
+> +        }
+> +        if (direct_key) {
+> +            key = (void *)(uintptr_t)qemu_get_be64(f);
+> +        } else {
+> +            key = g_malloc0(key_size);
+> +            ret = vmstate_load_state(f, key_vmsd, key, version_id);
+> +            if (ret) {
+> +                error_report("%s : failed to load %s (%d)",
+> +                             field->name, key_vmsd->name, ret);
+> +                goto key_error;
+> +            }
+> +        }
+> +        val = g_malloc0(val_size);
+> +        ret = vmstate_load_state(f, val_vmsd, val, version_id);
+> +        if (ret) {
+> +            error_report("%s : failed to load %s (%d)",
+> +                         field->name, val_vmsd->name, ret);
+> +            goto val_error;
+> +        }
+> +        g_tree_insert(tree, key, val);
+> +    }
+> +    if (count != nnodes) {
+> +        error_report("%s inconsistent stream when loading the gtree",
+> +                     field->name);
+> +        return -EINVAL;
+> +    }
+> +    trace_get_gtree_end(field->name, key_vmsd_name, val_vmsd->name, ret);
+> +    return ret;
+> +val_error:
+> +    g_free(val);
+> +key_error:
+> +    if (!direct_key) {
+> +        g_free(key);
+> +    }
+> +    trace_get_gtree_end(field->name, key_vmsd_name, val_vmsd->name, ret);
+> +    return ret;
+> +}
+> +
+> +
+> +const VMStateInfo vmstate_info_gtree = {
+> +    .name = "gtree",
+> +    .get  = get_gtree,
+> +    .put  = put_gtree,
+> +};
+> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> index e80c4c6143..cc5fd8d3b1 100644
+> --- a/tests/test-vmstate.c
+> +++ b/tests/test-vmstate.c
+> @@ -812,6 +812,423 @@ static void test_load_q(void)
+>      qemu_fclose(fload);
+>  }
+>  
+> +/* interval (key) */
+> +typedef struct TestGTreeInterval {
+> +    uint64_t low;
+> +    uint64_t high;
+> +} TestGTreeInterval;
+> +
+> +#define VMSTATE_INTERVAL                               \
+> +{                                                      \
+> +    .name = "interval",                                \
+> +    .version_id = 1,                                   \
+> +    .minimum_version_id = 1,                           \
+> +    .fields = (VMStateField[]) {                       \
+> +        VMSTATE_UINT64(low, TestGTreeInterval),        \
+> +        VMSTATE_UINT64(high, TestGTreeInterval),       \
+> +        VMSTATE_END_OF_LIST()                          \
+> +    }                                                  \
+> +}
+> +
+> +/* mapping (value) */
+> +typedef struct TestGTreeMapping {
+> +    uint64_t phys_addr;
+> +    uint32_t flags;
+> +} TestGTreeMapping;
+> +
+> +#define VMSTATE_MAPPING                               \
+> +{                                                     \
+> +    .name = "mapping",                                \
+> +    .version_id = 1,                                  \
+> +    .minimum_version_id = 1,                          \
+> +    .fields = (VMStateField[]) {                      \
+> +        VMSTATE_UINT64(phys_addr, TestGTreeMapping),  \
+> +        VMSTATE_UINT32(flags, TestGTreeMapping),      \
+> +        VMSTATE_END_OF_LIST()                         \
+> +    },                                                \
+> +}
+> +
+> +static const VMStateDescription vmstate_interval_mapping[2] = {
+> +    VMSTATE_MAPPING,   /* value */
+> +    VMSTATE_INTERVAL   /* key   */
+> +};
+> +
+> +typedef struct TestGTreeDomain {
+> +    int32_t  id;
+> +    GTree    *mappings;
+> +} TestGTreeDomain;
+> +
+> +typedef struct TestGTreeIOMMU {
+> +    int32_t  id;
+> +    GTree    *domains;
+> +} TestGTreeIOMMU;
+> +
+> +/* Interval comparison function */
+> +static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
+> +{
+> +    TestGTreeInterval *inta = (TestGTreeInterval *)a;
+> +    TestGTreeInterval *intb = (TestGTreeInterval *)b;
+> +
+> +    if (inta->high < intb->low) {
+> +        return -1;
+> +    } else if (intb->high < inta->low) {
+> +        return 1;
+> +    } else {
+> +        return 0;
+> +    }
+> +}
+> +
+> +/* ID comparison function */
+> +static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
+> +{
+> +    uint ua = GPOINTER_TO_UINT(a);
+> +    uint ub = GPOINTER_TO_UINT(b);
+> +    return (ua > ub) - (ua < ub);
+> +}
+> +
+> +static void destroy_domain(gpointer data)
+> +{
+> +    TestGTreeDomain *domain = (TestGTreeDomain *)data;
+> +
+> +    g_tree_destroy(domain->mappings);
+> +    g_free(domain);
+> +}
+> +
+> +static int domain_preload(void *opaque)
+> +{
+> +    TestGTreeDomain *domain = opaque;
+> +
+> +    domain->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp,
+> +                                       NULL, g_free, g_free);
+> +    return 0;
+> +}
+> +
+> +static int iommu_preload(void *opaque)
+> +{
+> +    TestGTreeIOMMU *iommu = opaque;
+> +
+> +    iommu->domains = g_tree_new_full((GCompareDataFunc)int_cmp,
+> +                                     NULL, NULL, destroy_domain);
+> +    return 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_domain = {
+> +    .name = "domain",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .pre_load = domain_preload,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_INT32(id, TestGTreeDomain),
+> +        VMSTATE_GTREE_V(mappings, TestGTreeDomain, 1,
+> +                        vmstate_interval_mapping,
+> +                        TestGTreeInterval, TestGTreeMapping),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static const VMStateDescription vmstate_iommu = {
+> +    .name = "iommu",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .pre_load = iommu_preload,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_INT32(id, TestGTreeIOMMU),
+> +        VMSTATE_GTREE_DIRECT_KEY_V(domains, TestGTreeIOMMU, 1,
+> +                                   &vmstate_domain, TestGTreeDomain),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +uint8_t first_domain_dump[] = {
+> +    /* id */
+> +    0x00, 0x0, 0x0, 0x6,
+> +    0x00, 0x0, 0x0, 0x2, /* 2 mappings */
+> +    0x1, /* start of a */
+> +    /* a */
+> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
+> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0xFF,
+> +    /* map_a */
+> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xa0, 0x00,
+> +    0x00, 0x00, 0x00, 0x01,
+> +    0x1, /* start of b */
+> +    /* b */
+> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00,
+> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF,
+> +    /* map_b */
+> +    0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00,
+> +    0x00, 0x00, 0x00, 0x02,
+> +    0x0, /* end of gtree */
+> +    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely */
+> +};
+> +
+> +static TestGTreeDomain *create_first_domain(void)
+> +{
+> +    TestGTreeDomain *domain;
+> +    TestGTreeMapping *map_a, *map_b;
+> +    TestGTreeInterval *a, *b;
+> +
+> +    domain = g_malloc0(sizeof(TestGTreeDomain));
+> +    domain->id = 6;
+> +
+> +    a = g_malloc0(sizeof(TestGTreeInterval));
+> +    a->low = 0x1000;
+> +    a->high = 0x1FFF;
+> +
+> +    b = g_malloc0(sizeof(TestGTreeInterval));
+> +    b->low = 0x4000;
+> +    b->high = 0x4FFF;
+> +
+> +    map_a = g_malloc0(sizeof(TestGTreeMapping));
+> +    map_a->phys_addr = 0xa000;
+> +    map_a->flags = 1;
+> +
+> +    map_b = g_malloc0(sizeof(TestGTreeMapping));
+> +    map_b->phys_addr = 0xe0000;
+> +    map_b->flags = 2;
+> +
+> +    domain->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp, NULL,
+> +                                        (GDestroyNotify)g_free,
+> +                                        (GDestroyNotify)g_free);
+> +    g_tree_insert(domain->mappings, a, map_a);
+> +    g_tree_insert(domain->mappings, b, map_b);
+> +    return domain;
+> +}
+> +
+> +static void test_gtree_save_domain(void)
+> +{
+> +    TestGTreeDomain *first_domain = create_first_domain();
+> +
+> +    save_vmstate(&vmstate_domain, first_domain);
+> +    compare_vmstate(first_domain_dump, sizeof(first_domain_dump));
+> +    destroy_domain(first_domain);
+> +}
+> +
+> +struct match_node_data {
+> +    GTree *tree;
+> +    gpointer key;
+> +    gpointer value;
+> +};
+> +
+> +struct tree_cmp_data {
+> +    GTree *tree1;
+> +    GTree *tree2;
+> +    GTraverseFunc match_node;
+> +};
+> +
+> +static gboolean match_interval_mapping_node(gpointer key,
+> +                                            gpointer value, gpointer data)
+> +{
+> +    TestGTreeMapping *map_a, *map_b;
+> +    TestGTreeInterval *a, *b;
+> +    struct match_node_data *d = (struct match_node_data *)data;
+> +    char *str = g_strdup_printf("dest");
+> +
+> +    g_free(str);
+> +    a = (TestGTreeInterval *)key;
+> +    b = (TestGTreeInterval *)d->key;
+> +
+> +    map_a = (TestGTreeMapping *)value;
+> +    map_b = (TestGTreeMapping *)d->value;
+> +
+> +    assert(a->low == b->low);
+> +    assert(a->high == b->high);
+> +    assert(map_a->phys_addr == map_b->phys_addr);
+> +    assert(map_a->flags == map_b->flags);
+> +    g_tree_remove(d->tree, key);
+> +    return true;
+> +}
+> +
+> +static gboolean diff_tree(gpointer key, gpointer value, gpointer data)
+> +{
+> +    struct tree_cmp_data *tp = (struct tree_cmp_data *)data;
+> +    struct match_node_data d = {tp->tree2, key, value};
+> +
+> +    g_tree_foreach(tp->tree2, tp->match_node, &d);
+> +    g_tree_remove(tp->tree1, key);
+> +    return false;
+> +}
+> +
+> +static void compare_trees(GTree *tree1, GTree *tree2,
+> +                          GTraverseFunc function)
+> +{
+> +    struct tree_cmp_data tp = {tree1, tree2, function};
+> +
+> +    g_tree_foreach(tree1, diff_tree, &tp);
+> +    assert(g_tree_nnodes(tree1) == 0);
+> +    assert(g_tree_nnodes(tree2) == 0);
+> +}
+> +
+> +static void diff_domain(TestGTreeDomain *d1, TestGTreeDomain *d2)
+> +{
+> +    assert(d1->id == d2->id);
+> +    compare_trees(d1->mappings, d2->mappings, match_interval_mapping_node);
+> +}
+> +
+> +static gboolean match_domain_node(gpointer key, gpointer value, gpointer data)
+> +{
+> +    uint64_t id1, id2;
+> +    TestGTreeDomain *d1, *d2;
+> +    struct match_node_data *d = (struct match_node_data *)data;
+> +
+> +    id1 = (uint64_t)key;
+> +    id2 = (uint64_t)d->key;
+> +    d1 = (TestGTreeDomain *)value;
+> +    d2 = (TestGTreeDomain *)d->value;
+> +    assert(id1 == id2);
+> +    diff_domain(d1, d2);
+> +    g_tree_remove(d->tree, key);
+> +    return true;
+> +}
+> +
+> +static void diff_iommu(TestGTreeIOMMU *iommu1, TestGTreeIOMMU *iommu2)
+> +{
+> +    assert(iommu1->id == iommu2->id);
+> +    compare_trees(iommu1->domains, iommu2->domains, match_domain_node);
+> +}
+> +
+> +static void test_gtree_load_domain(void)
+> +{
+> +    TestGTreeDomain *dest_domain = g_malloc0(sizeof(TestGTreeDomain));
+> +    TestGTreeDomain *orig_domain = create_first_domain();
+> +    QEMUFile *fload, *fsave;
+> +    char eof;
+> +
+> +    fsave = open_test_file(true);
+> +    qemu_put_buffer(fsave, first_domain_dump, sizeof(first_domain_dump));
+> +    g_assert(!qemu_file_get_error(fsave));
+> +    qemu_fclose(fsave);
+> +
+> +    fload = open_test_file(false);
+> +
+> +    vmstate_load_state(fload, &vmstate_domain, dest_domain, 1);
+> +    eof = qemu_get_byte(fload);
+> +    g_assert(!qemu_file_get_error(fload));
+> +    g_assert_cmpint(orig_domain->id, ==, dest_domain->id);
+> +    g_assert_cmpint(eof, ==, QEMU_VM_EOF);
+> +
+> +    diff_domain(orig_domain, dest_domain);
+> +    destroy_domain(orig_domain);
+> +    destroy_domain(dest_domain);
+> +    qemu_fclose(fload);
+> +}
+> +
+> +uint8_t iommu_dump[] = {
+> +    /* iommu id */
+> +    0x00, 0x0, 0x0, 0x7,
+> +    0x00, 0x0, 0x0, 0x2, /* 2 domains */
+> +    0x1,/* start of domain 5 */
+> +        0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x0, 0x5, /* key = 5 */
+> +        0x00, 0x0, 0x0, 0x5, /* domain1 id */
+> +        0x00, 0x0, 0x0, 0x1, /* 1 mapping */
+> +        0x1, /* start of mappings */
+> +            /* c */
+> +            0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+> +            0x00, 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF,
+> +            /* map_c */
+> +            0x00, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00,
+> +            0x00, 0x0, 0x0, 0x3,
+> +            0x0, /* end of domain1 mappings*/
+> +    0x1,/* start of domain 6 */
+> +        0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x0, 0x6, /* key = 6 */
+> +        0x00, 0x0, 0x0, 0x6, /* domain6 id */
+> +            0x00, 0x0, 0x0, 0x2, /* 2 mappings */
+> +            0x1, /* start of a */
+> +            /* a */
+> +            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
+> +            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F, 0xFF,
+> +            /* map_a */
+> +            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xa0, 0x00,
+> +            0x00, 0x00, 0x00, 0x01,
+> +            0x1, /* start of b */
+> +            /* b */
+> +            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00,
+> +            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4F, 0xFF,
+> +            /* map_b */
+> +            0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00,
+> +            0x00, 0x00, 0x00, 0x02,
+> +            0x0, /* end of domain6 mappings*/
+> +    0x0, /* end of domains */
+> +    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely */
+> +};
+> +
+> +static TestGTreeIOMMU *create_iommu(void)
+> +{
+> +    TestGTreeIOMMU *iommu = g_malloc0(sizeof(TestGTreeIOMMU));
+> +    TestGTreeDomain *first_domain = create_first_domain();
+> +    TestGTreeDomain *second_domain;
+> +    TestGTreeMapping *map_c;
+> +    TestGTreeInterval *c;
+> +
+> +    iommu->id = 7;
+> +    iommu->domains = g_tree_new_full((GCompareDataFunc)int_cmp, NULL,
+> +                                     NULL,
+> +                                     destroy_domain);
+> +
+> +    second_domain = g_malloc0(sizeof(TestGTreeDomain));
+> +    second_domain->id = 5;
+> +    second_domain->mappings = g_tree_new_full((GCompareDataFunc)interval_cmp,
+> +                                              NULL,
+> +                                              (GDestroyNotify)g_free,
+> +                                              (GDestroyNotify)g_free);
+> +
+> +    g_tree_insert(iommu->domains, GUINT_TO_POINTER(6), first_domain);
+> +    g_tree_insert(iommu->domains, (gpointer)0x0000000000000005, second_domain);
+> +
+> +    c = g_malloc0(sizeof(TestGTreeInterval));
+> +    c->low = 0x1000000;
+> +    c->high = 0x1FFFFFF;
+> +
+> +    map_c = g_malloc0(sizeof(TestGTreeMapping));
+> +    map_c->phys_addr = 0xF000000;
+> +    map_c->flags = 0x3;
+> +
+> +    g_tree_insert(second_domain->mappings, c, map_c);
+> +    return iommu;
+> +}
+> +
+> +static void destroy_iommu(TestGTreeIOMMU *iommu)
+> +{
+> +    g_tree_destroy(iommu->domains);
+> +    g_free(iommu);
+> +}
+> +
+> +static void test_gtree_save_iommu(void)
+> +{
+> +    TestGTreeIOMMU *iommu = create_iommu();
+> +
+> +    save_vmstate(&vmstate_iommu, iommu);
+> +    compare_vmstate(iommu_dump, sizeof(iommu_dump));
+> +    destroy_iommu(iommu);
+> +}
+> +
+> +static void test_gtree_load_iommu(void)
+> +{
+> +    TestGTreeIOMMU *dest_iommu = g_malloc0(sizeof(TestGTreeIOMMU));
+> +    TestGTreeIOMMU *orig_iommu = create_iommu();
+> +    QEMUFile *fsave, *fload;
+> +    char eof;
+> +    int ret;
+> +
+> +    fsave = open_test_file(true);
+> +    qemu_put_buffer(fsave, iommu_dump, sizeof(iommu_dump));
+> +    g_assert(!qemu_file_get_error(fsave));
+> +    qemu_fclose(fsave);
+> +
+> +    fload = open_test_file(false);
+> +    vmstate_load_state(fload, &vmstate_iommu, dest_iommu, 1);
+> +    ret = qemu_file_get_error(fload);
+> +    eof = qemu_get_byte(fload);
+> +    ret = qemu_file_get_error(fload);
+> +    g_assert(!ret);
+> +    g_assert_cmpint(orig_iommu->id, ==, dest_iommu->id);
+> +    g_assert_cmpint(eof, ==, QEMU_VM_EOF);
+> +
+> +    diff_iommu(orig_iommu, dest_iommu);
+> +    destroy_iommu(orig_iommu);
+> +    destroy_iommu(dest_iommu);
+> +    qemu_fclose(fload);
+> +}
+> +
+>  typedef struct TmpTestStruct {
+>      TestStruct *parent;
+>      int64_t diff;
+> @@ -932,6 +1349,10 @@ int main(int argc, char **argv)
+>                      test_arr_ptr_prim_0_load);
+>      g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
+>      g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
+> +    g_test_add_func("/vmstate/gtree/save/savedomain", test_gtree_save_domain);
+> +    g_test_add_func("/vmstate/gtree/load/loaddomain", test_gtree_load_domain);
+> +    g_test_add_func("/vmstate/gtree/save/saveiommu", test_gtree_save_iommu);
+> +    g_test_add_func("/vmstate/gtree/load/loadiommu", test_gtree_load_iommu);
+>      g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
+>      g_test_run();
+>  
 > -- 
-> 2.21.0
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
