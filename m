@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A76C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 336BBC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D7CC2054F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:03:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D7CC2054F
+	by mail.kernel.org (Postfix) with ESMTPS id EB6C82054F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:04:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6C82054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyKZ-0007Wj-W3
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:03:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36207)
+	id 1iIyLD-0008Vm-F2
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:04:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36919)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQp-000641-G9
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:20 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRA-0006fO-NF
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQn-0004Ji-Vc
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:19 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47908)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR5-0004k6-Cd
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48388)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQn-00048C-O7
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:17 -0400
+ id 1iIxR4-0004RB-Vf
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQc-0003XG-8s; Fri, 11 Oct 2019 19:06:06 +0300
+ id 1iIxQt-0003XG-Ho; Fri, 11 Oct 2019 19:06:23 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 027/126] misc: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:13 +0300
-Message-Id: <20191011160552.22907-28-vsementsov@virtuozzo.com>
+Subject: [RFC v5 081/126] qga: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:07 +0300
+Message-Id: <20191011160552.22907-82-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ vsementsov@virtuozzo.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,160 +110,721 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/misc/ivshmem.c | 37 ++++++++++++++++---------------------
- hw/misc/tmp105.c  |  7 +++----
- hw/misc/tmp421.c  |  7 +++----
- 3 files changed, 22 insertions(+), 29 deletions(-)
+ qga/commands-posix.c | 220 +++++++++++++++++++------------------------
+ 1 file changed, 97 insertions(+), 123 deletions(-)
 
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 5e3b05eae0..31292c3f43 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -474,11 +474,11 @@ static void ivshmem_add_kvm_msi_virq(IVShmemState *s, int vector,
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 6dcd2d5db6..257eaaf0da 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -82,8 +82,8 @@ static void ga_wait_child(pid_t pid, int *status, Error **errp)
  
- static void setup_interrupt(IVShmemState *s, int vector, Error **errp)
+ void qmp_guest_shutdown(bool has_mode, const char *mode, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     EventNotifier *n = &s->peers[s->vm_id].eventfds[vector];
-     bool with_irqfd = kvm_msi_via_irqfd_enabled() &&
-         ivshmem_has_feature(s, IVSHMEM_MSI);
-     PCIDevice *pdev = PCI_DEVICE(s);
--    Error *err = NULL;
- 
-     IVSHMEM_DPRINTF("setting up interrupt for vector: %d\n", vector);
- 
-@@ -487,9 +487,8 @@ static void setup_interrupt(IVShmemState *s, int vector, Error **errp)
-         watch_vector_notifier(s, n, vector);
-     } else if (msix_enabled(pdev)) {
-         IVSHMEM_DPRINTF("with irqfd\n");
--        ivshmem_add_kvm_msi_virq(s, vector, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        ivshmem_add_kvm_msi_virq(s, vector, errp);
-+        if (*errp) {
-             return;
-         }
- 
-@@ -506,7 +505,7 @@ static void setup_interrupt(IVShmemState *s, int vector, Error **errp)
- 
- static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
- {
+     const char *shutdown_flag;
 -    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     struct stat buf;
-     size_t size;
+     pid_t pid;
+     int status;
  
-@@ -527,9 +526,8 @@ static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
+@@ -116,9 +116,8 @@ void qmp_guest_shutdown(bool has_mode, const char *mode, Error **errp)
+         return;
+     }
  
-     /* mmap the region and map into the BAR2 */
-     memory_region_init_ram_from_fd(&s->server_bar2, OBJECT(s),
--                                   "ivshmem.bar2", size, true, fd, &local_err);
+-    ga_wait_child(pid, &status, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+                                   "ivshmem.bar2", size, true, fd, errp);
++    ga_wait_child(pid, &status, errp);
 +    if (*errp) {
          return;
      }
  
-@@ -662,13 +660,12 @@ static int64_t ivshmem_recv_msg(IVShmemState *s, int *pfd, Error **errp)
+@@ -151,10 +150,10 @@ int64_t qmp_guest_get_time(Error **errp)
  
- static void ivshmem_recv_setup(IVShmemState *s, Error **errp)
+ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
  {
--    Error *err = NULL;
 +    ERRP_AUTO_PROPAGATE();
-     int64_t msg;
+     int ret;
+     int status;
+     pid_t pid;
+-    Error *local_err = NULL;
+     struct timeval tv;
+ 
+     /* If user has passed a time, validate and set it. */
+@@ -203,9 +202,8 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
+         return;
+     }
+ 
+-    ga_wait_child(pid, &status, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ga_wait_child(pid, &status, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -328,11 +326,11 @@ find_open_flag(const char *mode_str, Error **errp)
+ static FILE *
+ safe_open_or_create(const char *path, const char *mode, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int oflag;
+ 
+-    oflag = find_open_flag(mode, &local_err);
+-    if (local_err == NULL) {
++    oflag = find_open_flag(mode, errp);
++    if (*errp == NULL) {
+         int fd;
+ 
+         /* If the caller wants / allows creation of a new file, we implement it
+@@ -364,13 +362,13 @@ safe_open_or_create(const char *path, const char *mode, Error **errp)
+         }
+ 
+         if (fd == -1) {
+-            error_setg_errno(&local_err, errno, "failed to open file '%s' "
++            error_setg_errno(errp, errno, "failed to open file '%s' "
+                              "(mode: '%s')", path, mode);
+         } else {
+             qemu_set_cloexec(fd);
+ 
+             if ((oflag & O_CREAT) && fchmod(fd, DEFAULT_NEW_FILE_MODE) == -1) {
+-                error_setg_errno(&local_err, errno, "failed to set permission "
++                error_setg_errno(errp, errno, "failed to set permission "
+                                  "0%03o on new file '%s' (mode: '%s')",
+                                  (unsigned)DEFAULT_NEW_FILE_MODE, path, mode);
+             } else {
+@@ -378,7 +376,7 @@ safe_open_or_create(const char *path, const char *mode, Error **errp)
+ 
+                 f = fdopen(fd, mode);
+                 if (f == NULL) {
+-                    error_setg_errno(&local_err, errno, "failed to associate "
++                    error_setg_errno(errp, errno, "failed to associate "
+                                      "stdio stream with file descriptor %d, "
+                                      "file '%s' (mode: '%s')", fd, path, mode);
+                 } else {
+@@ -393,24 +391,22 @@ safe_open_or_create(const char *path, const char *mode, Error **errp)
+         }
+     }
+ 
+-    error_propagate(errp, local_err);
+     return NULL;
+ }
+ 
+ int64_t qmp_guest_file_open(const char *path, bool has_mode, const char *mode,
+                             Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     FILE *fh;
+-    Error *local_err = NULL;
+     int64_t handle;
+ 
+     if (!has_mode) {
+         mode = "r";
+     }
+     slog("guest-file-open called, filepath: %s, mode: %s", path, mode);
+-    fh = safe_open_or_create(path, mode, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    fh = safe_open_or_create(path, mode, errp);
++    if (*errp) {
+         return -1;
+     }
+ 
+@@ -563,21 +559,20 @@ struct GuestFileSeek *qmp_guest_file_seek(int64_t handle, int64_t offset,
+                                           GuestFileWhence *whence_code,
+                                           Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     GuestFileHandle *gfh = guest_file_handle_find(handle, errp);
+     GuestFileSeek *seek_data = NULL;
+     FILE *fh;
+     int ret;
+     int whence;
+-    Error *err = NULL;
+ 
+     if (!gfh) {
+         return NULL;
+     }
+ 
+     /* We stupidly exposed 'whence':'int' in our qapi */
+-    whence = ga_parse_whence(whence_code, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    whence = ga_parse_whence(whence_code, errp);
++    if (*errp) {
+         return NULL;
+     }
+ 
+@@ -1150,15 +1145,14 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
+ 
+ GuestFilesystemInfoList *qmp_guest_get_fsinfo(Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     FsMountList mounts;
+     struct FsMount *mount;
+     GuestFilesystemInfoList *new, *ret = NULL;
+-    Error *local_err = NULL;
+ 
+     QTAILQ_INIT(&mounts);
+-    build_fs_mount_list(&mounts, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    build_fs_mount_list(&mounts, errp);
++    if (*errp) {
+         return NULL;
+     }
+ 
+@@ -1166,11 +1160,10 @@ GuestFilesystemInfoList *qmp_guest_get_fsinfo(Error **errp)
+         g_debug("Building guest fsinfo for '%s'", mount->dirname);
+ 
+         new = g_malloc0(sizeof(*ret));
+-        new->value = build_guest_fsinfo(mount, &local_err);
++        new->value = build_guest_fsinfo(mount, errp);
+         new->next = ret;
+         ret = new;
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (*errp) {
+             qapi_free_GuestFilesystemInfoList(ret);
+             ret = NULL;
+             break;
+@@ -1194,11 +1187,11 @@ static const char *fsfreeze_hook_arg_string[] = {
+ 
+ static void execute_fsfreeze_hook(FsfreezeHookArg arg, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int status;
+     pid_t pid;
+     const char *hook;
+     const char *arg_str = fsfreeze_hook_arg_string[arg];
+-    Error *local_err = NULL;
+ 
+     hook = ga_fsfreeze_hook(ga_state);
+     if (!hook) {
+@@ -1224,9 +1217,8 @@ static void execute_fsfreeze_hook(FsfreezeHookArg arg, Error **errp)
+         return;
+     }
+ 
+-    ga_wait_child(pid, &status, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ga_wait_child(pid, &status, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1267,25 +1259,23 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
+                                        strList *mountpoints,
+                                        Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret = 0, i = 0;
+     strList *list;
+     FsMountList mounts;
+     struct FsMount *mount;
+-    Error *local_err = NULL;
      int fd;
  
--    msg = ivshmem_recv_msg(s, &fd, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    msg = ivshmem_recv_msg(s, &fd, errp);
-+    if (*errp) {
-         return;
-     }
-     if (msg != IVSHMEM_PROTOCOL_VERSION) {
-@@ -694,9 +691,8 @@ static void ivshmem_recv_setup(IVShmemState *s, Error **errp)
-      * older versions of the device accepted it out of order, but
-      * broke when an interrupt setup message arrived before it.
-      */
--    msg = ivshmem_recv_msg(s, &fd, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    msg = ivshmem_recv_msg(s, &fd, errp);
-+    if (*errp) {
-         return;
-     }
-     if (fd != -1 || msg < 0 || msg > IVSHMEM_MAX_PEERS) {
-@@ -709,14 +705,12 @@ static void ivshmem_recv_setup(IVShmemState *s, Error **errp)
-      * Receive more messages until we got shared memory.
-      */
-     do {
--        msg = ivshmem_recv_msg(s, &fd, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        msg = ivshmem_recv_msg(s, &fd, errp);
-+        if (*errp) {
-             return;
-         }
--        process_msg(s, msg, fd, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        process_msg(s, msg, fd, errp);
-+        if (*errp) {
-             return;
-         }
-     } while (msg != -1);
-@@ -864,6 +858,7 @@ static void ivshmem_write_config(PCIDevice *pdev, uint32_t address,
+     slog("guest-fsfreeze called");
  
- static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-     Error *err = NULL;
-     uint8_t *pci_conf;
-diff --git a/hw/misc/tmp105.c b/hw/misc/tmp105.c
-index 75ddad3a12..c603f7024d 100644
---- a/hw/misc/tmp105.c
-+++ b/hw/misc/tmp105.c
-@@ -71,13 +71,12 @@ static void tmp105_get_temperature(Object *obj, Visitor *v, const char *name,
- static void tmp105_set_temperature(Object *obj, Visitor *v, const char *name,
-                                    void *opaque, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     TMP105State *s = TMP105(obj);
--    Error *local_err = NULL;
-     int64_t temp;
- 
--    visit_type_int(v, name, &temp, &local_err);
+-    execute_fsfreeze_hook(FSFREEZE_HOOK_FREEZE, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    visit_type_int(v, name, &temp, errp);
++    execute_fsfreeze_hook(FSFREEZE_HOOK_FREEZE, errp);
++    if (*errp) {
+         return -1;
+     }
+ 
+     QTAILQ_INIT(&mounts);
+-    build_fs_mount_list(&mounts, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    build_fs_mount_list(&mounts, errp);
++    if (*errp) {
+         return -1;
+     }
+ 
+@@ -1358,16 +1348,15 @@ error:
+  */
+ int64_t qmp_guest_fsfreeze_thaw(Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+     FsMountList mounts;
+     FsMount *mount;
+     int fd, i = 0, logged;
+-    Error *local_err = NULL;
+ 
+     QTAILQ_INIT(&mounts);
+-    build_fs_mount_list(&mounts, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    build_fs_mount_list(&mounts, errp);
++    if (*errp) {
+         return 0;
+     }
+ 
+@@ -1433,6 +1422,7 @@ static void guest_fsfreeze_cleanup(void)
+ GuestFilesystemTrimResponse *
+ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     GuestFilesystemTrimResponse *response;
+     GuestFilesystemTrimResultList *list;
+     GuestFilesystemTrimResult *result;
+@@ -1440,15 +1430,13 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
+     FsMountList mounts;
+     struct FsMount *mount;
+     int fd;
+-    Error *local_err = NULL;
+     struct fstrim_range r;
+ 
+     slog("guest-fstrim called");
+ 
+     QTAILQ_INIT(&mounts);
+-    build_fs_mount_list(&mounts, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    build_fs_mount_list(&mounts, errp);
++    if (*errp) {
+         return NULL;
+     }
+ 
+@@ -1554,13 +1542,13 @@ static int run_process_child(const char *command[], Error **errp)
+ 
+ static bool systemd_supports_mode(SuspendMode mode, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     const char *systemctl_args[3] = {"systemd-hibernate", "systemd-suspend",
+                                      "systemd-hybrid-sleep"};
+     const char *cmd[4] = {"systemctl", "status", systemctl_args[mode], NULL};
+     int status;
+ 
+-    status = run_process_child(cmd, &local_err);
++    status = run_process_child(cmd, errp);
+ 
+     /*
+      * systemctl status uses LSB return codes so we can expect
+@@ -1574,31 +1562,29 @@ static bool systemd_supports_mode(SuspendMode mode, Error **errp)
+         return true;
+     }
+ 
+-    error_propagate(errp, local_err);
+     return false;
+ }
+ 
+ static void systemd_suspend(SuspendMode mode, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     const char *systemctl_args[3] = {"hibernate", "suspend", "hybrid-sleep"};
+     const char *cmd[3] = {"systemctl", systemctl_args[mode], NULL};
+     int status;
+ 
+-    status = run_process_child(cmd, &local_err);
++    status = run_process_child(cmd, errp);
+ 
+     if (status == 0) {
+         return;
+     }
+ 
+-    if ((status == -1) && !local_err) {
++    if ((status == -1) && !*errp) {
+         error_setg(errp, "the helper program 'systemctl %s' was not found",
+                    systemctl_args[mode]);
+         return;
+     }
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+     } else {
+         error_setg(errp, "the helper program 'systemctl %s' returned an "
+                    "unexpected exit status code (%d)",
+@@ -1608,24 +1594,23 @@ static void systemd_suspend(SuspendMode mode, Error **errp)
+ 
+ static bool pmutils_supports_mode(SuspendMode mode, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     const char *pmutils_args[3] = {"--hibernate", "--suspend",
+                                    "--suspend-hybrid"};
+     const char *cmd[3] = {"pm-is-supported", pmutils_args[mode], NULL};
+     int status;
+ 
+-    status = run_process_child(cmd, &local_err);
++    status = run_process_child(cmd, errp);
+ 
+     if (status == SUSPEND_SUPPORTED) {
+         return true;
+     }
+ 
+-    if ((status == -1) && !local_err) {
++    if ((status == -1) && !*errp) {
+         return false;
+     }
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+     } else {
+         error_setg(errp,
+                    "the helper program '%s' returned an unexpected exit"
+@@ -1637,26 +1622,25 @@ static bool pmutils_supports_mode(SuspendMode mode, Error **errp)
+ 
+ static void pmutils_suspend(SuspendMode mode, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     const char *pmutils_binaries[3] = {"pm-hibernate", "pm-suspend",
+                                        "pm-suspend-hybrid"};
+     const char *cmd[2] = {pmutils_binaries[mode], NULL};
+     int status;
+ 
+-    status = run_process_child(cmd, &local_err);
++    status = run_process_child(cmd, errp);
+ 
+     if (status == 0) {
+         return;
+     }
+ 
+-    if ((status == -1) && !local_err) {
++    if ((status == -1) && !*errp) {
+         error_setg(errp, "the helper program '%s' was not found",
+                    pmutils_binaries[mode]);
+         return;
+     }
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+     } else {
+         error_setg(errp,
+                    "the helper program '%s' returned an unexpected exit"
+@@ -1697,7 +1681,7 @@ static bool linux_sys_state_supports_mode(SuspendMode mode, Error **errp)
+ 
+ static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     const char *sysfile_strs[3] = {"disk", "mem", NULL};
+     const char *sysfile_str = sysfile_strs[mode];
+     pid_t pid;
+@@ -1733,9 +1717,8 @@ static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
+         return;
+     }
+ 
+-    ga_wait_child(pid, &status, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ga_wait_child(pid, &status, errp);
 +    if (*errp) {
          return;
      }
-     if (temp >= 128000 || temp < -128000) {
-diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
-index 9f044705fa..20f069513c 100644
---- a/hw/misc/tmp421.c
-+++ b/hw/misc/tmp421.c
-@@ -140,16 +140,15 @@ static void tmp421_get_temperature(Object *obj, Visitor *v, const char *name,
- static void tmp421_set_temperature(Object *obj, Visitor *v, const char *name,
-                                    void *opaque, Error **errp)
+ 
+@@ -1747,41 +1730,40 @@ static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
+ 
+ static void guest_suspend(SuspendMode mode, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     bool mode_supported = false;
+ 
+-    if (systemd_supports_mode(mode, &local_err)) {
++    if (systemd_supports_mode(mode, errp)) {
+         mode_supported = true;
+-        systemd_suspend(mode, &local_err);
++        systemd_suspend(mode, errp);
+     }
+ 
+-    if (!local_err) {
++    if (!*errp) {
+         return;
+     }
+ 
+-    error_free(local_err);
++    error_free_errp(errp);
+ 
+-    if (pmutils_supports_mode(mode, &local_err)) {
++    if (pmutils_supports_mode(mode, errp)) {
+         mode_supported = true;
+-        pmutils_suspend(mode, &local_err);
++        pmutils_suspend(mode, errp);
+     }
+ 
+-    if (!local_err) {
++    if (!*errp) {
+         return;
+     }
+ 
+-    error_free(local_err);
++    error_free_errp(errp);
+ 
+-    if (linux_sys_state_supports_mode(mode, &local_err)) {
++    if (linux_sys_state_supports_mode(mode, errp)) {
+         mode_supported = true;
+-        linux_sys_state_suspend(mode, &local_err);
++        linux_sys_state_suspend(mode, errp);
+     }
+ 
+     if (!mode_supported) {
+         error_setg(errp,
+                    "the requested suspend mode is not supported by the guest");
+     } else {
+-        error_propagate(errp, local_err);
+     }
+ }
+ 
+@@ -2120,17 +2102,17 @@ static void transfer_vcpu(GuestLogicalProcessor *vcpu, bool sys2vcpu,
+ 
+ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     TMP421State *s = TMP421(obj);
+     int64_t current;
+     GuestLogicalProcessorList *head, **link;
+     long sc_max;
 -    Error *local_err = NULL;
-     int64_t temp;
-     bool ext_range = (s->config[0] & TMP421_CONFIG_RANGE);
-     int offset = ext_range * 64 * 256;
-     int tempid;
  
--    visit_type_int(v, name, &temp, &local_err);
+     current = 0;
+     head = NULL;
+     link = &head;
+-    sc_max = SYSCONF_EXACT(_SC_NPROCESSORS_CONF, &local_err);
++    sc_max = SYSCONF_EXACT(_SC_NPROCESSORS_CONF, errp);
+ 
+-    while (local_err == NULL && current < sc_max) {
++    while (*errp == NULL && current < sc_max) {
+         GuestLogicalProcessor *vcpu;
+         GuestLogicalProcessorList *entry;
+         int64_t id = current++;
+@@ -2141,7 +2123,7 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+             vcpu = g_malloc0(sizeof *vcpu);
+             vcpu->logical_id = id;
+             vcpu->has_can_offline = true; /* lolspeak ftw */
+-            transfer_vcpu(vcpu, true, path, &local_err);
++            transfer_vcpu(vcpu, true, path, errp);
+             entry = g_malloc0(sizeof *entry);
+             entry->value = vcpu;
+             *link = entry;
+@@ -2150,41 +2132,39 @@ GuestLogicalProcessorList *qmp_guest_get_vcpus(Error **errp)
+         g_free(path);
+     }
+ 
+-    if (local_err == NULL) {
++    if (*errp == NULL) {
+         /* there's no guest with zero VCPUs */
+         g_assert(head != NULL);
+         return head;
+     }
+ 
+     qapi_free_GuestLogicalProcessorList(head);
+-    error_propagate(errp, local_err);
+     return NULL;
+ }
+ 
+ int64_t qmp_guest_set_vcpus(GuestLogicalProcessorList *vcpus, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int64_t processed;
+-    Error *local_err = NULL;
+ 
+     processed = 0;
+     while (vcpus != NULL) {
+         char *path = g_strdup_printf("/sys/devices/system/cpu/cpu%" PRId64 "/",
+                                      vcpus->value->logical_id);
+ 
+-        transfer_vcpu(vcpus->value, false, path, &local_err);
++        transfer_vcpu(vcpus->value, false, path, errp);
+         g_free(path);
+-        if (local_err != NULL) {
++        if (*errp) {
+             break;
+         }
+         ++processed;
+         vcpus = vcpus->next;
+     }
+ 
+-    if (local_err != NULL) {
++    if (*errp) {
+         if (processed == 0) {
+-            error_propagate(errp, local_err);
+         } else {
+-            error_free(local_err);
++            error_free_errp(errp);
+         }
+     }
+ 
+@@ -2196,7 +2176,7 @@ void qmp_guest_set_user_password(const char *username,
+                                  bool crypted,
+                                  Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     char *passwd_path = NULL;
+     pid_t pid;
+     int status;
+@@ -2268,9 +2248,8 @@ void qmp_guest_set_user_password(const char *username,
+     close(datafd[1]);
+     datafd[1] = -1;
+ 
+-    ga_wait_child(pid, &status, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+    visit_type_int(v, name, &temp, errp);
++    ga_wait_child(pid, &status, errp);
 +    if (*errp) {
-         return;
+         goto out;
+     }
+ 
+@@ -2356,10 +2335,10 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
+                                   GuestMemoryBlockResponse *result,
+                                   Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     char *dirpath;
+     int dirfd;
+     char *status;
+-    Error *local_err = NULL;
+ 
+     if (!sys2memblk) {
+         DIR *dp;
+@@ -2404,11 +2383,11 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
+     g_free(dirpath);
+ 
+     status = g_malloc0(10);
+-    ga_read_sysfs_file(dirfd, "state", status, 10, &local_err);
+-    if (local_err) {
++    ga_read_sysfs_file(dirfd, "state", status, 10, errp);
++    if (*errp) {
+         /* treat with sysfs file that not exist in old kernel */
+         if (errno == ENOENT) {
+-            error_free(local_err);
++            error_free_errp(errp);
+             if (sys2memblk) {
+                 mem_blk->online = true;
+                 mem_blk->can_offline = false;
+@@ -2418,7 +2397,6 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
+             }
+         } else {
+             if (sys2memblk) {
+-                error_propagate(errp, local_err);
+             } else {
+                 result->response =
+                     GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_FAILED;
+@@ -2432,14 +2410,13 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
+ 
+         mem_blk->online = (strncmp(status, "online", 6) == 0);
+ 
+-        ga_read_sysfs_file(dirfd, "removable", &removable, 1, &local_err);
+-        if (local_err) {
++        ga_read_sysfs_file(dirfd, "removable", &removable, 1, errp);
++        if (*errp) {
+             /* if no 'removable' file, it doesn't support offline mem blk */
+             if (errno == ENOENT) {
+-                error_free(local_err);
++                error_free_errp(errp);
+                 mem_blk->can_offline = false;
+             } else {
+-                error_propagate(errp, local_err);
+             }
+         } else {
+             mem_blk->can_offline = (removable != '0');
+@@ -2449,9 +2426,9 @@ static void transfer_memory_block(GuestMemoryBlock *mem_blk, bool sys2memblk,
+             const char *new_state = mem_blk->online ? "online" : "offline";
+ 
+             ga_write_sysfs_file(dirfd, "state", new_state, strlen(new_state),
+-                                &local_err);
+-            if (local_err) {
+-                error_free(local_err);
++                                errp);
++            if (*errp) {
++                error_free_errp(errp);
+                 result->response =
+                     GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_FAILED;
+                 goto out2;
+@@ -2477,8 +2454,8 @@ out1:
+ 
+ GuestMemoryBlockList *qmp_guest_get_memory_blocks(Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     GuestMemoryBlockList *head, **link;
+-    Error *local_err = NULL;
+     struct dirent *de;
+     DIR *dp;
+ 
+@@ -2516,7 +2493,7 @@ GuestMemoryBlockList *qmp_guest_get_memory_blocks(Error **errp)
+         /* The d_name is "memoryXXX",  phys_index is block id, same as XXX */
+         mem_blk->phys_index = strtoul(&de->d_name[6], NULL, 10);
+         mem_blk->has_can_offline = true; /* lolspeak ftw */
+-        transfer_memory_block(mem_blk, true, NULL, &local_err);
++        transfer_memory_block(mem_blk, true, NULL, errp);
+ 
+         entry = g_malloc0(sizeof *entry);
+         entry->value = mem_blk;
+@@ -2526,7 +2503,7 @@ GuestMemoryBlockList *qmp_guest_get_memory_blocks(Error **errp)
+     }
+ 
+     closedir(dp);
+-    if (local_err == NULL) {
++    if (*errp == NULL) {
+         /* there's no guest with zero memory blocks */
+         if (head == NULL) {
+             error_setg(errp, "guest reported zero memory blocks!");
+@@ -2535,15 +2512,14 @@ GuestMemoryBlockList *qmp_guest_get_memory_blocks(Error **errp)
+     }
+ 
+     qapi_free_GuestMemoryBlockList(head);
+-    error_propagate(errp, local_err);
+     return NULL;
+ }
+ 
+ GuestMemoryBlockResponseList *
+ qmp_guest_set_memory_blocks(GuestMemoryBlockList *mem_blks, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     GuestMemoryBlockResponseList *head, **link;
+-    Error *local_err = NULL;
+ 
+     head = NULL;
+     link = &head;
+@@ -2555,8 +2531,8 @@ qmp_guest_set_memory_blocks(GuestMemoryBlockList *mem_blks, Error **errp)
+ 
+         result = g_malloc0(sizeof(*result));
+         result->phys_index = current_mem_blk->phys_index;
+-        transfer_memory_block(current_mem_blk, false, result, &local_err);
+-        if (local_err) { /* should never happen */
++        transfer_memory_block(current_mem_blk, false, result, errp);
++        if (*errp) { /* should never happen */
+             goto err;
+         }
+         entry = g_malloc0(sizeof *entry);
+@@ -2570,13 +2546,12 @@ qmp_guest_set_memory_blocks(GuestMemoryBlockList *mem_blks, Error **errp)
+     return head;
+ err:
+     qapi_free_GuestMemoryBlockResponseList(head);
+-    error_propagate(errp, local_err);
+     return NULL;
+ }
+ 
+ GuestMemoryBlockInfo *qmp_guest_get_memory_block_info(Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     char *dirpath;
+     int dirfd;
+     char *buf;
+@@ -2592,11 +2567,10 @@ GuestMemoryBlockInfo *qmp_guest_get_memory_block_info(Error **errp)
+     g_free(dirpath);
+ 
+     buf = g_malloc0(20);
+-    ga_read_sysfs_file(dirfd, "block_size_bytes", buf, 20, &local_err);
++    ga_read_sysfs_file(dirfd, "block_size_bytes", buf, 20, errp);
+     close(dirfd);
+-    if (local_err) {
++    if (*errp) {
+         g_free(buf);
+-        error_propagate(errp, local_err);
+         return NULL;
      }
  
 -- 
