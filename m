@@ -2,80 +2,139 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB42BECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E032BC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:40:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A715E2089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:20:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkeley-edu.20150623.gappssmtp.com header.i=@berkeley-edu.20150623.gappssmtp.com header.b="MGQLcawi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A715E2089F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=berkeley.edu
+	by mail.kernel.org (Postfix) with ESMTPS id B38CC2084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:40:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B38CC2084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ4DI-0003CY-O3
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 19:20:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38142)
+	id 1iJ4W2-0007Bf-Te
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 19:40:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dayeol@berkeley.edu>) id 1iJ4AG-0001bx-O2
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:17:42 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iJ4V6-0006in-BE
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:39:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dayeol@berkeley.edu>) id 1iJ4AE-0002Eb-SA
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:17:40 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41041)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1iJ4AD-0002DX-0F
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:17:37 -0400
-Received: by mail-pf1-x442.google.com with SMTP id q7so6922941pfh.8
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 16:17:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=berkeley-edu.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WqqbTIAy+kfymfY7HkIZ00SnVjzCr6un7JnhABIzqoM=;
- b=MGQLcawiaRcn+4K840jk+UHH+OyWbQT0KGhbgC94OCMOn6803UyZdmo2gOfLGje+2N
- K4vsYaYNT7QDY93YkvUCxn1rY+zqt1Cupg/7iJ0/+h/qAKpwD4CjSCix6uawbP0XLw2p
- 1urUdbR99TSFxxjVIXCyjC10sDzZINp9PIF1EPyBJ3Z2hA1rAgRmjfaYfHhxR2R4s/Xy
- T1PZp8O92BNwu6yEu/uu+QHQFAOXnuTAPfs7mPlJy6PmR9QvB6+5r/hR9TyciAn3vUnu
- p/jnhYiSVM/MGtyWjCcNIx6/NIxaX1bZ5NSvcj7FSU/waRXI9RsPh3TD2WjrD2NAxxfw
- T/aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WqqbTIAy+kfymfY7HkIZ00SnVjzCr6un7JnhABIzqoM=;
- b=HNkHoHJPOd+JruMldT9hV4bB0boiT9mA4s2QVAefUe/Jcol7hVTkJ4XSmq4WtBTEBf
- JKyXtYu+RTZwzCvsXvmptcXTRuiEEE6Di87NpeW1JRypuK06nLogy9fZPdsavHq+tCxp
- WO4Szl2EGrd2s2+t5Kp4UJOxCjXrN7jJiNrKLByFoQ+oSHhF3xm4/nZYCGlXn9kFcfzN
- SDKpz3ylBI9WN+tjuPwgareEQM14JUJzdDgAztQGXg3yxUc/wdFIbzlkdoJjar35Jl+i
- t8KGGeaHg/LhN4lm6KWpl0nd119cDBneC/u4NzTyJCPXzYNL+JfHE9nBdMfC5Mrnrogm
- RXRg==
-X-Gm-Message-State: APjAAAVEoTONUthHvD4U+vE0/RTP8087Z6xUX8vjFLJ5WR3hziACFhQn
- gKDqqqFgCsWPHwyuMvwcBx8/rSkfplwK/zY1a+KBLg==
-X-Google-Smtp-Source: APXvYqwywFjpVpY4fX+LhgHydWhqDVf1u0VRAKcGuXi0vj/NL6kwNvtSXLcXpWPUxeUD6T7wkGkXJWBtC7XgmjL4aQA=
-X-Received: by 2002:a63:1521:: with SMTP id v33mr1072460pgl.273.1570835854898; 
- Fri, 11 Oct 2019 16:17:34 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1iJ4V5-0000Kz-9s
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:39:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55000)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1iJ4V2-0000JB-Jq; Fri, 11 Oct 2019 19:39:08 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6BF31796EB;
+ Fri, 11 Oct 2019 23:39:07 +0000 (UTC)
+Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9693A5D721;
+ Fri, 11 Oct 2019 23:39:06 +0000 (UTC)
+Subject: Re: [PATCH v5 0/5] iotests: use python logging
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20190917234549.22910-1-jsnow@redhat.com>
+ <06a3a386-a8c0-84eb-f678-ea7168666367@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <afe4c6fd-985d-ec97-d18d-ec319adbd94a@redhat.com>
+Date: Fri, 11 Oct 2019 19:39:06 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-References: <LqVBb_I--3-1@tuta.io>
- <CAKmqyKNh-jgg-LWHp4RMM9vaaMNr7qHtNSVYs9OFXhvJ-+7RXA@mail.gmail.com>
-In-Reply-To: <CAKmqyKNh-jgg-LWHp4RMM9vaaMNr7qHtNSVYs9OFXhvJ-+7RXA@mail.gmail.com>
-From: Dayeol Lee <dayeol@berkeley.edu>
-Date: Fri, 11 Oct 2019 16:17:24 -0700
-Message-ID: <CACjxMEsUrDqSZNHdLEXoOAbNFmyT+iNjjTqSDBDBZ-NgdggJqA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] target/riscv/pmp: Fix bug preventing
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: multipart/alternative; boundary="00000000000021d5920594aab983"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+In-Reply-To: <06a3a386-a8c0-84eb-f678-ea7168666367@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Fri, 11 Oct 2019 23:39:07 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,299 +146,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu Riscv <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>, Qemu Devel <qemu-devel@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- Chris Williams <diodesign@tuta.io>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000021d5920594aab983
-Content-Type: text/plain; charset="UTF-8"
 
-Hi, Alistair,
 
-Thank you for reminding me.
-I already had the local patch, so I re-submitted the patch.
-Please let me know if that's fair enough (or you have any other comments)
+On 10/4/19 11:39 AM, Max Reitz wrote:
+> On 18.09.19 01:45, John Snow wrote:
+>> This series uses python logging to enable output conditionally on
+>> iotests.log(). We unify an initialization call (which also enables
+>> debugging output for those tests with -d) and then make the switch
+>> inside of iotests.
+>>
+>> It will help alleviate the need to create logged/unlogged versions
+>> of all the various helpers we have made.
+>>
+>> V5:
+>>  - Rebased again
+>>  - Allow Python tests to run on any platform
+>>
+>> V4:
+>>  - Rebased on top of kwolf/block at the behest of mreitz
+>>
+>> V3:
+>>  - Rebased for 4.1+; now based on main branch.
+>>
+>> V2:
+>>  - Added all of the other python tests I missed to use script_initiali=
+ze
+>>  - Refactored the common setup as per Ehabkost's suggestion
+>>  - Added protocol arguments to common initialization,
+>>    but this isn't strictly required.
+>=20
+> I=E2=80=99m OK to take the series as-is (it doesn=E2=80=99t affect any =
+auto tests, so we
+> can decide what to do about non-Linux platforms in make check at a late=
+r
+> point), but there seems to be something you wanted to fix up in patch 5=
+.
+>=20
+> (And there=E2=80=99s also Kevin=E2=80=99s pending pull request that cha=
+nges a bit of
+> iotests.py.)
+>=20
+> Max
+>=20
 
-Thanks,
+Just caught up with the discussion.
 
-Dayeol
+It looks like Thomas took my 1/5; so I'll respin on top of his "[PATCH
+0/5] Enable more iotests during "make check-block" series to catch those
+improvements as they stand.
 
-On Fri, Oct 11, 2019 at 3:24 PM Alistair Francis <alistair23@gmail.com>
-wrote:
-
-> On Sun, Oct 6, 2019 at 1:32 AM Chris Williams <diodesign@tuta.io> wrote:
-> >
-> > Hello. I hope you don't mind me resubmitting this patch. Please let me
-> know if
->
-> Not at all!
->
-> Thanks for the patch.
->
-> In future if people don't respond you can just keep pinging your patch.
->
-> > I've formatted it incorrectly or if it needs more explanation. My
-> previous
-> > attempt probably wasn't formatted quite right. This is my first time
-> > contributing to Qemu, so I'm keen to get it right - thanks.
->
-> This whole paragraph should not be in the commit. It can go below the
-> line though.
->
-> Also please use `git format-patch` to format the patch and then `git
-> send-email` to send the patch. There is a whole heap of detail here:
-> https://wiki.qemu.org/Contribute/SubmitAPatch
->
-> >
-> > This fixes an issue that prevents a RISC-V CPU from executing
-> instructions
-> > immediately from the base address of a PMP TOR region.
-> >
-> > When jumping to an instruction in a PMP TOR region, pmp_hart_has_privs()
-> is
-> > called to validate the access. If this instruction is the very first
-> word of a
-> > PMP TOR region, at address 0 relative to the start address of the
-> region, then
-> > the access will fail. This is because pmp_hart_has_privs() is called
-> with size
-> > 0 to perform this validation, causing this check...
-> >
-> > e = pmp_is_in_range(env, i, addr + size - 1);
-> >
-> > ... to fail, as (addr + size - 1) falls below the base address of the PMP
-> > region. Really, the access should succeed. For example, if I have a
-> region
-> > spanning 0x80d96000 to 0x88d95fff and the CPU jumps to 0x80d96000, then:
-> >
-> > s = 0x80d96000
-> > e = 0x80d95fff
-> >
-> > And the validation fails. The size check proposed below catches these
-> zero-size
-> > instruction fetch access probes. The word alignment in pmpaddr{0-15} and
-> > earlier instruction alignment checks should prevent the execution of
-> > instructions over the upper boundary of the PMP region, though I'm happy
-> to give
-> > this more attention if this is a concern.
->
-> This seems like a similar issue to this patch as well:
->
-> https://lore.kernel.org/qemu-devel/20191007052813.25814-1-dayeol@berkeley.edu/
->
-> From that discussion:
->
-> "In general, size 0 means "unknown size".  In this case, the one tlb
-> lookup is
-> going to be used by lots of instructions -- everything that fits on the
-> page."
->
-> Richard's last comment seems like a better fix:
->
-> "You certainly could do
->
->     if (size == 0) {
->         size = -(addr | TARGET_PAGE_MASK);
->     }
->
-> to assume that all bytes from addr to the end of the page are accessed.
-> That
-> would avoid changing too much of the rest of the logic.
->
-> That said, this code will continue to not work for mis-aligned boundaries."
->
-> So I don't think this is the correct solution. I'm not sure if Dayeol
-> is planning on sending a follow up version. If not feel free to send
-> it.
->
-> >
-> > Signed-off-by: Chris Williams <diodesign@tuta.io <mailto:
-> diodesign@tuta.io>>
->
-> It looks like this is a HTML patch, also ensure all patches are just
-> plain text, `git send-email` will do this.
->
-> Thanks for the patch though! Please send any more fixes that you find :)
->
-> Alistair
->
-> >
-> > diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-> > index d4f1007109..9308672e20 100644
-> > --- a/target/riscv/pmp.c
-> > +++ b/target/riscv/pmp.c
-> > @@ -235,8 +235,9 @@ bool pmp_hart_has_privs(CPURISCVState *env,
-> target_ulong
-> > addr,
-> >      /* 1.10 draft priv spec states there is an implicit order
-> >           from low to high */
-> >      for (i = 0; i < MAX_RISCV_PMPS; i++) {
-> > +        /* catch zero-size instruction checks */
-> >          s = pmp_is_in_range(env, i, addr);
-> > -        e = pmp_is_in_range(env, i, addr + size - 1);
-> > +        e = pmp_is_in_range(env, i, (size == 0) ? addr : addr + size -
-> 1);
-> >
-> >          /* partially inside */
-> >          if ((s + e) == 1) {
-> >
-> >
->
-
---00000000000021d5920594aab983
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi, Alistair,=C2=A0<div><br><div>Thank you for reminding m=
-e.<div>I already had the local patch, so I re-submitted the patch.</div></d=
-iv></div><div>Please let me know if that&#39;s fair enough (or you have any=
- other comments)<br></div><div><br></div><div>Thanks,</div><div><br></div><=
-div>Dayeol</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
-=3D"gmail_attr">On Fri, Oct 11, 2019 at 3:24 PM Alistair Francis &lt;<a hre=
-f=3D"mailto:alistair23@gmail.com">alistair23@gmail.com</a>&gt; wrote:<br></=
-div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bor=
-der-left:1px solid rgb(204,204,204);padding-left:1ex">On Sun, Oct 6, 2019 a=
-t 1:32 AM Chris Williams &lt;<a href=3D"mailto:diodesign@tuta.io" target=3D=
-"_blank">diodesign@tuta.io</a>&gt; wrote:<br>
-&gt;<br>
-&gt; Hello. I hope you don&#39;t mind me resubmitting this patch. Please le=
-t me know if<br>
-<br>
-Not at all!<br>
-<br>
-Thanks for the patch.<br>
-<br>
-In future if people don&#39;t respond you can just keep pinging your patch.=
-<br>
-<br>
-&gt; I&#39;ve formatted it incorrectly or if it needs more explanation. My =
-previous<br>
-&gt; attempt probably wasn&#39;t formatted quite right. This is my first ti=
-me<br>
-&gt; contributing to Qemu, so I&#39;m keen to get it right - thanks.<br>
-<br>
-This whole paragraph should not be in the commit. It can go below the<br>
-line though.<br>
-<br>
-Also please use `git format-patch` to format the patch and then `git<br>
-send-email` to send the patch. There is a whole heap of detail here:<br>
-<a href=3D"https://wiki.qemu.org/Contribute/SubmitAPatch" rel=3D"noreferrer=
-" target=3D"_blank">https://wiki.qemu.org/Contribute/SubmitAPatch</a><br>
-<br>
-&gt;<br>
-&gt; This fixes an issue that prevents a RISC-V CPU from executing instruct=
-ions<br>
-&gt; immediately from the base address of a PMP TOR region.<br>
-&gt;<br>
-&gt; When jumping to an instruction in a PMP TOR region, pmp_hart_has_privs=
-() is<br>
-&gt; called to validate the access. If this instruction is the very first w=
-ord of a<br>
-&gt; PMP TOR region, at address 0 relative to the start address of the regi=
-on, then<br>
-&gt; the access will fail. This is because pmp_hart_has_privs() is called w=
-ith size<br>
-&gt; 0 to perform this validation, causing this check...<br>
-&gt;<br>
-&gt; e =3D pmp_is_in_range(env, i, addr + size - 1);<br>
-&gt;<br>
-&gt; ... to fail, as (addr + size - 1) falls below the base address of the =
-PMP<br>
-&gt; region. Really, the access should succeed. For example, if I have a re=
-gion<br>
-&gt; spanning 0x80d96000 to 0x88d95fff and the CPU jumps to 0x80d96000, the=
-n:<br>
-&gt;<br>
-&gt; s =3D 0x80d96000<br>
-&gt; e =3D 0x80d95fff<br>
-&gt;<br>
-&gt; And the validation fails. The size check proposed below catches these =
-zero-size<br>
-&gt; instruction fetch access probes. The word alignment in pmpaddr{0-15} a=
-nd<br>
-&gt; earlier instruction alignment checks should prevent the execution of<b=
-r>
-&gt; instructions over the upper boundary of the PMP region, though I&#39;m=
- happy to give<br>
-&gt; this more attention if this is a concern.<br>
-<br>
-This seems like a similar issue to this patch as well:<br>
-<a href=3D"https://lore.kernel.org/qemu-devel/20191007052813.25814-1-dayeol=
-@berkeley.edu/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.or=
-g/qemu-devel/20191007052813.25814-1-dayeol@berkeley.edu/</a><br>
-<br>
-From that discussion:<br>
-<br>
-&quot;In general, size 0 means &quot;unknown size&quot;.=C2=A0 In this case=
-, the one tlb lookup is<br>
-going to be used by lots of instructions -- everything that fits on the pag=
-e.&quot;<br>
-<br>
-Richard&#39;s last comment seems like a better fix:<br>
-<br>
-&quot;You certainly could do<br>
-<br>
-=C2=A0 =C2=A0 if (size =3D=3D 0) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 size =3D -(addr | TARGET_PAGE_MASK);<br>
-=C2=A0 =C2=A0 }<br>
-<br>
-to assume that all bytes from addr to the end of the page are accessed.=C2=
-=A0 That<br>
-would avoid changing too much of the rest of the logic.<br>
-<br>
-That said, this code will continue to not work for mis-aligned boundaries.&=
-quot;<br>
-<br>
-So I don&#39;t think this is the correct solution. I&#39;m not sure if Daye=
-ol<br>
-is planning on sending a follow up version. If not feel free to send<br>
-it.<br>
-<br>
-&gt;<br>
-&gt; Signed-off-by: Chris Williams &lt;<a href=3D"mailto:diodesign@tuta.io"=
- target=3D"_blank">diodesign@tuta.io</a> &lt;mailto:<a href=3D"mailto:diode=
-sign@tuta.io" target=3D"_blank">diodesign@tuta.io</a>&gt;&gt;<br>
-<br>
-It looks like this is a HTML patch, also ensure all patches are just<br>
-plain text, `git send-email` will do this.<br>
-<br>
-Thanks for the patch though! Please send any more fixes that you find :)<br=
->
-<br>
-Alistair<br>
-<br>
-&gt;<br>
-&gt; diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c<br>
-&gt; index d4f1007109..9308672e20 100644<br>
-&gt; --- a/target/riscv/pmp.c<br>
-&gt; +++ b/target/riscv/pmp.c<br>
-&gt; @@ -235,8 +235,9 @@ bool pmp_hart_has_privs(CPURISCVState *env, target=
-_ulong<br>
-&gt; addr,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 /* 1.10 draft priv spec states there is an implici=
-t order<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0from low to high */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i &lt; MAX_RISCV_PMPS; i++) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* catch zero-size instruction checks */<=
-br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 s =3D pmp_is_in_range(env, i, addr);=
-<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 e =3D pmp_is_in_range(env, i, addr + size=
- - 1);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 e =3D pmp_is_in_range(env, i, (size =3D=
-=3D 0) ? addr : addr + size - 1);<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* partially inside */<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((s + e) =3D=3D 1) {<br>
-&gt;<br>
-&gt;<br>
-</blockquote></div>
-
---00000000000021d5920594aab983--
+--js
 
