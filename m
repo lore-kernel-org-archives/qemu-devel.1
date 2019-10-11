@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64847C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A0BCECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:31:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36C0A21D56
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:31:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36C0A21D56
+	by mail.kernel.org (Postfix) with ESMTPS id 5FD292084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:31:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FD292084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyks-0001PG-T2
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:31:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36422)
+	id 1iIylb-0002Ly-UX
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:31:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQx-0006IF-K1
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:29 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxln-0007G5-Vz
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQv-0004UE-N8
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48094)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxll-0002cq-RZ
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:59 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49832)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQv-0004GB-Eb
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:25 -0400
+ id 1iIxlj-0002cf-VN; Fri, 11 Oct 2019 12:27:56 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQj-0003XG-VY; Fri, 11 Oct 2019 19:06:14 +0300
+ id 1iIxR7-0003XG-49; Fri, 11 Oct 2019 19:06:37 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 053/126] virtio: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:39 +0300
-Message-Id: <20191011160552.22907-54-vsementsov@virtuozzo.com>
+Subject: [RFC v5 112/126] qcow2: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:38 +0300
+Message-Id: <20191011160552.22907-113-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,7 +60,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
  Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -111,234 +110,374 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/virtio/virtio-balloon.c | 35 ++++++++++++++++-------------------
- hw/virtio/virtio-bus.c     | 17 +++++++----------
- hw/virtio/virtio-pci.c     |  2 ++
- hw/virtio/virtio-rng-pci.c |  7 +++----
- hw/virtio/virtio.c         | 19 ++++++++-----------
- 5 files changed, 36 insertions(+), 44 deletions(-)
+ block/qcow2-bitmap.c |  9 ++--
+ block/qcow2.c        | 98 +++++++++++++++++++-------------------------
+ 2 files changed, 48 insertions(+), 59 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 40b04f5180..eaee19df71 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -229,40 +229,38 @@ static void balloon_stats_poll_cb(void *opaque)
- static void balloon_stats_get_all(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index b2487101ed..b060911faa 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1447,6 +1447,7 @@ fail:
+ 
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
  {
--    Error *err = NULL;
 +    ERRP_AUTO_PROPAGATE();
-     VirtIOBalloon *s = opaque;
+     BdrvDirtyBitmap *bitmap;
+     BDRVQcow2State *s = bs->opaque;
+     uint32_t new_nb_bitmaps = s->nb_bitmaps;
+@@ -1593,12 +1594,11 @@ fail:
+ 
+ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BdrvDirtyBitmap *bitmap;
+-    Error *local_err = NULL;
+ 
+-    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    qcow2_store_persistent_dirty_bitmaps(bs, errp);
++    if (*errp) {
+         return -EINVAL;
+     }
+ 
+@@ -1618,6 +1618,7 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+                                       uint32_t granularity,
+                                       Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVQcow2State *s = bs->opaque;
+     bool found;
+     Qcow2BitmapList *bm_list;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 4d16393e61..7555e526af 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -923,6 +923,7 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
+                                         QDict *options, int flags,
+                                         Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVQcow2State *s = bs->opaque;
+     QemuOpts *opts = NULL;
+     const char *opt_overlap_check, *opt_overlap_check_template;
+@@ -931,25 +932,22 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
      int i;
+     const char *encryptfmt;
+     QDict *encryptopts = NULL;
+-    Error *local_err = NULL;
+     int ret;
  
--    visit_start_struct(v, name, NULL, 0, &err);
--    if (err) {
--        goto out;
-+    visit_start_struct(v, name, NULL, 0, errp);
+     qdict_extract_subqdict(options, &encryptopts, "encrypt.");
+     encryptfmt = qdict_get_try_str(encryptopts, "format");
+ 
+     opts = qemu_opts_create(&qcow2_runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, options, errp);
 +    if (*errp) {
-+        return;
-     }
--    visit_type_int(v, "last-update", &s->stats_last_update, &err);
--    if (err) {
-+    visit_type_int(v, "last-update", &s->stats_last_update, errp);
-+    if (*errp) {
-         goto out_end;
+         ret = -EINVAL;
+         goto fail;
      }
  
--    visit_start_struct(v, "stats", NULL, 0, &err);
--    if (err) {
-+    visit_start_struct(v, "stats", NULL, 0, errp);
+     /* get L2 table/refcount block cache size from command line options */
+     read_cache_sizes(bs, opts, &l2_cache_size, &l2_cache_entry_size,
+-                     &refcount_cache_size, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                     &refcount_cache_size, errp);
 +    if (*errp) {
-         goto out_end;
+         ret = -EINVAL;
+         goto fail;
      }
-     for (i = 0; i < VIRTIO_BALLOON_S_NR; i++) {
--        visit_type_uint64(v, balloon_stat_names[i], &s->stats[i], &err);
--        if (err) {
-+        visit_type_uint64(v, balloon_stat_names[i], &s->stats[i], errp);
-+        if (*errp) {
-             goto out_nested;
+@@ -1207,11 +1205,11 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
+ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+                                       int flags, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVQcow2State *s = bs->opaque;
+     unsigned int len, i;
+     int ret = 0;
+     QCowHeader header;
+-    Error *local_err = NULL;
+     uint64_t ext_end;
+     uint64_t l1_vm_state_index;
+     bool update_header = false;
+@@ -1486,17 +1484,15 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+ 
+     /* read qcow2 extensions */
+     if (qcow2_read_extensions(bs, header.header_length, ext_end, NULL,
+-                              flags, &update_header, &local_err)) {
+-        error_propagate(errp, local_err);
++                              flags, &update_header, errp)) {
+         ret = -EINVAL;
+         goto fail;
+     }
+ 
+     /* Open external data file */
+     s->data_file = bdrv_open_child(NULL, options, "data-file", bs, &child_file,
+-                                   true, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                                   true, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
+     }
+@@ -1657,12 +1653,11 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+ 
+     if (!(bdrv_get_flags(bs) & BDRV_O_INACTIVE)) {
+         /* It's case 1, 2 or 3.2. Or 3.1 which is BUG in management layer. */
+-        bool header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
++        bool header_updated = qcow2_load_dirty_bitmaps(bs, errp);
+ 
+         update_header = update_header && !header_updated;
+     }
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
+     }
+@@ -2424,11 +2419,11 @@ static void qcow2_close(BlockDriverState *bs)
+ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
+                                                    Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVQcow2State *s = bs->opaque;
+     int flags = s->flags;
+     QCryptoBlock *crypto = NULL;
+     QDict *options;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     /*
+@@ -2446,11 +2441,11 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
+ 
+     flags &= ~BDRV_O_INACTIVE;
+     qemu_co_mutex_lock(&s->lock);
+-    ret = qcow2_do_open(bs, options, flags, &local_err);
++    ret = qcow2_do_open(bs, options, flags, errp);
+     qemu_co_mutex_unlock(&s->lock);
+     qobject_unref(options);
+-    if (local_err) {
+-        error_propagate_prepend(errp, local_err,
++    if (*errp) {
++        error_prepend(errp,
+                                 "Could not reopen qcow2 layer: ");
+         bs->drv = NULL;
+         return;
+@@ -3036,6 +3031,7 @@ static uint64_t qcow2_opt_get_refcount_bits_del(QemuOpts *opts, int version,
+ static int coroutine_fn
+ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockdevCreateOptionsQcow2 *qcow2_opts;
+     QDict *options;
+ 
+@@ -3059,7 +3055,6 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+     int version;
+     int refcount_order;
+     uint64_t* refcount_table;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     assert(create_options->driver == BLOCKDEV_DRIVER_QCOW2);
+@@ -3258,9 +3253,8 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+     }
+     blk = blk_new_open(NULL, NULL, options,
+                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
+-                       &local_err);
++                       errp);
+     if (blk == NULL) {
+-        error_propagate(errp, local_err);
+         ret = -EIO;
+         goto out;
+     }
+@@ -3339,9 +3333,8 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+     }
+     blk = blk_new_open(NULL, NULL, options,
+                        BDRV_O_RDWR | BDRV_O_NO_BACKING | BDRV_O_NO_IO,
+-                       &local_err);
++                       errp);
+     if (blk == NULL) {
+-        error_propagate(errp, local_err);
+         ret = -EIO;
+         goto out;
+     }
+@@ -3357,12 +3350,12 @@ out:
+ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opts,
+                                              Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockdevCreateOptions *create_options = NULL;
+     QDict *qdict;
+     Visitor *v;
+     BlockDriverState *bs = NULL;
+     BlockDriverState *data_bs = NULL;
+-    Error *local_err = NULL;
+     const char *val;
+     int ret;
+ 
+@@ -3457,11 +3450,10 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
+         goto finish;
+     }
+ 
+-    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
++    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
+     visit_free(v);
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         ret = -EINVAL;
+         goto finish;
+     }
+@@ -3740,6 +3732,7 @@ fail:
+ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+                                           PreallocMode prealloc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t old_length;
+     int64_t new_l1_size;
+@@ -3824,12 +3817,10 @@ static int coroutine_fn qcow2_co_truncate(BlockDriverState *bs, int64_t offset,
+             goto fail;
          }
-     }
--    visit_check_struct(v, &err);
-+    visit_check_struct(v, errp);
- out_nested:
-     visit_end_struct(v, NULL);
+         if ((last_cluster + 1) * s->cluster_size < old_file_size) {
+-            Error *local_err = NULL;
+-
+             bdrv_co_truncate(bs->file, (last_cluster + 1) * s->cluster_size,
+-                             PREALLOC_MODE_OFF, &local_err);
+-            if (local_err) {
+-                warn_reportf_err(local_err,
++                             PREALLOC_MODE_OFF, errp);
++            if (*errp) {
++                warn_reportf_err(*errp,
+                                  "Failed to truncate the tail of the image: ");
+             }
+         }
+@@ -4405,7 +4396,7 @@ static bool qcow2_measure_luks_headerlen(QemuOpts *opts, size_t *len,
+ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+                                        Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     BlockMeasureInfo *info;
+     uint64_t required = 0; /* bytes that contribute to required size */
+     uint64_t virtual_size; /* disk size as seen by guest */
+@@ -4420,26 +4411,26 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     bool has_luks;
  
--    if (!err) {
--        visit_check_struct(v, &err);
-+    if (!*errp) {
-+        visit_check_struct(v, errp);
+     /* Parse image creation options */
+-    cluster_size = qcow2_opt_get_cluster_size_del(opts, &local_err);
+-    if (local_err) {
++    cluster_size = qcow2_opt_get_cluster_size_del(opts, errp);
++    if (*errp) {
+         goto err;
      }
- out_end:
-     visit_end_struct(v, NULL);
--out:
--    error_propagate(errp, err);
+ 
+-    version = qcow2_opt_get_version_del(opts, &local_err);
+-    if (local_err) {
++    version = qcow2_opt_get_version_del(opts, errp);
++    if (*errp) {
+         goto err;
+     }
+ 
+-    refcount_bits = qcow2_opt_get_refcount_bits_del(opts, version, &local_err);
+-    if (local_err) {
++    refcount_bits = qcow2_opt_get_refcount_bits_del(opts, version, errp);
++    if (*errp) {
+         goto err;
+     }
+ 
+     optstr = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+     prealloc = qapi_enum_parse(&PreallocMode_lookup, optstr,
+-                               PREALLOC_MODE_OFF, &local_err);
++                               PREALLOC_MODE_OFF, errp);
+     g_free(optstr);
+-    if (local_err) {
++    if (*errp) {
+         goto err;
+     }
+ 
+@@ -4454,7 +4445,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     if (has_luks) {
+         size_t headerlen;
+ 
+-        if (!qcow2_measure_luks_headerlen(opts, &headerlen, &local_err)) {
++        if (!qcow2_measure_luks_headerlen(opts, &headerlen, errp)) {
+             goto err;
+         }
+ 
+@@ -4468,7 +4459,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     l2_tables = DIV_ROUND_UP(virtual_size / cluster_size,
+                              cluster_size / sizeof(uint64_t));
+     if (l2_tables * sizeof(uint64_t) > QCOW_MAX_L1_SIZE) {
+-        error_setg(&local_err, "The image size is too large "
++        error_setg(errp, "The image size is too large "
+                                "(try using a larger cluster size)");
+         goto err;
+     }
+@@ -4477,7 +4468,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     if (in_bs) {
+         int64_t ssize = bdrv_getlength(in_bs);
+         if (ssize < 0) {
+-            error_setg_errno(&local_err, -ssize,
++            error_setg_errno(errp, -ssize,
+                              "Unable to get image virtual_size");
+             goto err;
+         }
+@@ -4502,7 +4493,7 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+                                               ssize - offset, &pnum, NULL,
+                                               NULL);
+                 if (ret < 0) {
+-                    error_setg_errno(&local_err, -ret,
++                    error_setg_errno(errp, -ret,
+                                      "Unable to get block status");
+                     goto err;
+                 }
+@@ -4541,7 +4532,6 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+     return info;
+ 
+ err:
+-    error_propagate(errp, local_err);
+     return NULL;
  }
  
- static void balloon_stats_get_poll_interval(Object *obj, Visitor *v,
-@@ -277,13 +275,12 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
-                                             const char *name, void *opaque,
-                                             Error **errp)
+@@ -4557,15 +4547,14 @@ static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
+                                                   Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     VirtIOBalloon *s = opaque;
--    Error *local_err = NULL;
-     int64_t value;
- 
--    visit_type_int(v, name, &value, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    visit_type_int(v, name, &value, errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-index b2c804292e..d823fe682d 100644
---- a/hw/virtio/virtio-bus.c
-+++ b/hw/virtio/virtio-bus.c
-@@ -42,20 +42,19 @@ do { printf("virtio_bus: " fmt , ## __VA_ARGS__); } while (0)
- /* A VirtIODevice is being plugged */
- void virtio_bus_device_plugged(VirtIODevice *vdev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     DeviceState *qdev = DEVICE(vdev);
-     BusState *qbus = BUS(qdev_get_parent_bus(qdev));
-     VirtioBusState *bus = VIRTIO_BUS(qbus);
-     VirtioBusClass *klass = VIRTIO_BUS_GET_CLASS(bus);
-     VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
-     bool has_iommu = virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
+     BDRVQcow2State *s = bs->opaque;
+     ImageInfoSpecific *spec_info;
+     QCryptoBlockInfo *encrypt_info = NULL;
 -    Error *local_err = NULL;
  
-     DPRINTF("%s: plug device.\n", qbus->name);
- 
-     if (klass->pre_plugged != NULL) {
--        klass->pre_plugged(qbus->parent, &local_err);
+     if (s->crypto != NULL) {
+-        encrypt_info = qcrypto_block_get_info(s->crypto, &local_err);
 -        if (local_err) {
 -            error_propagate(errp, local_err);
-+        klass->pre_plugged(qbus->parent, errp);
++        encrypt_info = qcrypto_block_get_info(s->crypto, errp);
 +        if (*errp) {
-             return;
+             return NULL;
          }
      }
-@@ -63,17 +62,15 @@ void virtio_bus_device_plugged(VirtIODevice *vdev, Error **errp)
-     /* Get the features of the plugged device. */
-     assert(vdc->get_features != NULL);
-     vdev->host_features = vdc->get_features(vdev, vdev->host_features,
--                                            &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                                            errp);
-+    if (*errp) {
-         return;
-     }
- 
-     if (klass->device_plugged != NULL) {
--        klass->device_plugged(qbus->parent, &local_err);
-+        klass->device_plugged(qbus->parent, errp);
-     }
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index c6b47a9c73..a36e5f6990 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1525,6 +1525,7 @@ static void virtio_pci_pre_plugged(DeviceState *d, Error **errp)
- /* This is called by virtio-bus just after the device is plugged. */
- static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
-     VirtioBusState *bus = &proxy->bus;
-     bool legacy = virtio_pci_legacy(proxy);
-@@ -1684,6 +1685,7 @@ static void virtio_pci_device_unplugged(DeviceState *d)
- 
- static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
-     VirtioPCIClass *k = VIRTIO_PCI_GET_CLASS(pci_dev);
-     bool pcie_port = pci_bus_is_express(pci_get_bus(pci_dev)) &&
-diff --git a/hw/virtio/virtio-rng-pci.c b/hw/virtio/virtio-rng-pci.c
-index 8aaf54b781..993bb9aae4 100644
---- a/hw/virtio/virtio-rng-pci.c
-+++ b/hw/virtio/virtio-rng-pci.c
-@@ -32,14 +32,13 @@ struct VirtIORngPCI {
- 
- static void virtio_rng_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIORngPCI *vrng = VIRTIO_RNG_PCI(vpci_dev);
-     DeviceState *vdev = DEVICE(&vrng->vdev);
--    Error *err = NULL;
- 
-     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    object_property_set_bool(OBJECT(vdev), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 527df03bfd..3a318232e6 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2606,24 +2606,22 @@ static void virtio_memory_listener_commit(MemoryListener *listener)
- 
- static void virtio_device_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(dev);
--    Error *err = NULL;
- 
-     /* Devices should either use vmsd or the load/save methods */
-     assert(!vdc->vmsd || !vdc->load);
- 
-     if (vdc->realize != NULL) {
--        vdc->realize(dev, &err);
--        if (err != NULL) {
--            error_propagate(errp, err);
-+        vdc->realize(dev, errp);
+@@ -4582,9 +4571,8 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
+         };
+     } else if (s->qcow_version == 3) {
+         Qcow2BitmapInfoList *bitmaps;
+-        bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        bitmaps = qcow2_get_bitmap_info_list(bs, errp);
 +        if (*errp) {
-             return;
+             qapi_free_ImageInfoSpecific(spec_info);
+             return NULL;
          }
-     }
- 
--    virtio_bus_device_plugged(vdev, &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
-+    virtio_bus_device_plugged(vdev, errp);
-+    if (*errp) {
-         vdc->unrealize(dev, NULL);
-         return;
-     }
-@@ -2634,16 +2632,15 @@ static void virtio_device_realize(DeviceState *dev, Error **errp)
- 
- static void virtio_device_unrealize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(dev);
--    Error *err = NULL;
- 
-     virtio_bus_device_unplugged(vdev);
- 
-     if (vdc->unrealize != NULL) {
--        vdc->unrealize(dev, &err);
--        if (err != NULL) {
--            error_propagate(errp, err);
-+        vdc->unrealize(dev, errp);
-+        if (*errp) {
-             return;
-         }
-     }
 -- 
 2.21.0
 
