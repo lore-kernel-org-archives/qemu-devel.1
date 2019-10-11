@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B6F0ECE58E
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B7AC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:21:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24E9221835
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:20:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E9221835
+	by mail.kernel.org (Postfix) with ESMTPS id 8A5B220673
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:21:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A5B220673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55345 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzWI-0007ya-57
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:20:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41664)
+	id 1iIzXo-0002Be-Cp
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:21:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40408)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmU-0007sV-PU
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:44 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgh-0000D6-F1
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmS-000372-CQ
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:42 -0400
-Received: from relay.sw.ru ([185.231.240.75]:50000)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgg-00081t-3W
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:43 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49636)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxmS-00032N-58; Fri, 11 Oct 2019 12:28:40 -0400
+ id 1iIxgf-00081S-Sg; Fri, 11 Oct 2019 12:22:42 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR7-0003XG-Lb; Fri, 11 Oct 2019 19:06:37 +0300
+ id 1iIxR8-0003XG-33; Fri, 11 Oct 2019 19:06:38 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 114/126] blkdebug: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:40 +0300
-Message-Id: <20191011160552.22907-115-vsementsov@virtuozzo.com>
+Subject: [RFC v5 116/126] vvfat: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:42 +0300
+Message-Id: <20191011160552.22907-117-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -110,96 +110,29 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/blkdebug.c | 36 +++++++++++++++---------------------
- 1 file changed, 15 insertions(+), 21 deletions(-)
+ block/vvfat.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 5ae96c52b0..7c3fc222f3 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -164,6 +164,7 @@ struct add_rule_data {
- 
- static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 019b8f1341..34cbed71b7 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -1149,12 +1149,12 @@ static void vvfat_parse_filename(const char *filename, QDict *options,
+ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+                       Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     struct add_rule_data *d = opaque;
-     BDRVBlkdebugState *s = d->s;
-     const char* event_name;
-@@ -171,7 +172,6 @@ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
-     struct BlkdebugRule *rule;
-     int64_t sector;
-     BlkdebugIOType iotype;
--    Error *local_error = NULL;
- 
-     /* Find the right event for the rule */
-     event_name = qemu_opt_get(opts, "event");
-@@ -205,9 +205,8 @@ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
- 
-         iotype = qapi_enum_parse(&BlkdebugIOType_lookup,
-                                  qemu_opt_get(opts, "iotype"),
--                                 BLKDEBUG_IO_TYPE__MAX, &local_error);
--        if (local_error) {
--            error_propagate(errp, local_error);
-+                                 BLKDEBUG_IO_TYPE__MAX, errp);
-+        if (*errp) {
-             return -1;
-         }
-         if (iotype != BLKDEBUG_IO_TYPE__MAX) {
-@@ -259,10 +258,10 @@ static void remove_rule(BlkdebugRule *rule)
- static int read_config(BDRVBlkdebugState *s, const char *filename,
-                        QDict *options, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     FILE *f = NULL;
-     int ret;
-     struct add_rule_data d;
--    Error *local_err = NULL;
- 
-     if (filename) {
-         f = fopen(filename, "r");
-@@ -278,26 +277,23 @@ static int read_config(BDRVBlkdebugState *s, const char *filename,
-         }
-     }
- 
--    qemu_config_parse_qdict(options, config_groups, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_config_parse_qdict(options, config_groups, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
- 
-     d.s = s;
-     d.action = ACTION_INJECT_ERROR;
--    qemu_opts_foreach(&inject_error_opts, add_rule, &d, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_opts_foreach(&inject_error_opts, add_rule, &d, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
- 
-     d.action = ACTION_SET_STATE;
--    qemu_opts_foreach(&set_state_opts, add_rule, &d, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_opts_foreach(&set_state_opts, add_rule, &d, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
-@@ -395,16 +391,15 @@ static QemuOptsList runtime_opts = {
- static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVBlkdebugState *s = bs->opaque;
+     BDRVVVFATState *s = bs->opaque;
+     int cyls, heads, secs;
+     bool floppy;
+     const char *dirname, *label;
      QemuOpts *opts;
 -    Error *local_err = NULL;
      int ret;
-     uint64_t align;
+ 
+ #ifdef DEBUG
+@@ -1162,9 +1162,8 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+ #endif
  
      opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
 -    qemu_opts_absorb_qdict(opts, options, &local_err);
@@ -208,21 +141,20 @@ index 5ae96c52b0..7c3fc222f3 100644
 +    qemu_opts_absorb_qdict(opts, options, errp);
 +    if (*errp) {
          ret = -EINVAL;
-         goto out;
+         goto fail;
      }
-@@ -421,10 +416,9 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     /* Open the image file */
-     bs->file = bdrv_open_child(qemu_opt_get(opts, "x-image"), options, "image",
--                               bs, &child_file, false, &local_err);
--    if (local_err) {
-+                               bs, &child_file, false, errp);
-+    if (*errp) {
-         ret = -EINVAL;
--        error_propagate(errp, local_err);
-         goto out;
-     }
- 
+@@ -1282,9 +1281,8 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
+                    "The vvfat (rw) format used by node '%s' "
+                    "does not support live migration",
+                    bdrv_get_device_or_node_name(bs));
+-        ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        ret = migrate_add_blocker(s->migration_blocker, errp);
++        if (*errp) {
+             error_free(s->migration_blocker);
+             goto fail;
+         }
 -- 
 2.21.0
 
