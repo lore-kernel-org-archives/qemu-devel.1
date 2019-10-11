@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8BCC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E225C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FA732089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:33:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FA732089F
+	by mail.kernel.org (Postfix) with ESMTPS id 2A2432089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A2432089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxrH-0004AG-8b
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:33:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36550)
+	id 1iIxtt-0006m0-FT
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:36:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36144)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR0-0006N8-Ex
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:31 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQm-0005ya-Bm
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0004bU-Uz
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:30 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48198)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQl-0004HD-8C
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:16 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47874)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQy-0004JW-My
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
+ id 1iIxQl-00046G-0Y
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:15 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQn-0003XG-8m; Fri, 11 Oct 2019 19:06:17 +0300
+ id 1iIxQZ-0003XG-KW; Fri, 11 Oct 2019 19:06:03 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 063/126] virtio-gpu: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:49 +0300
-Message-Id: <20191011160552.22907-64-vsementsov@virtuozzo.com>
+Subject: [RFC v5 017/126] hw/tpm: rename Error ** parameter to more common errp
+Date: Fri, 11 Oct 2019 19:04:03 +0300
+Message-Id: <20191011160552.22907-18-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,143 +60,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: vsementsov@virtuozzo.com, armbru@redhat.com,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
-
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
-
-This commit (together with its neighbors) was generated by
-
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
-
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
-
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/display/virtio-gpu-base.c | 7 +++----
- hw/display/virtio-gpu-pci.c  | 7 +++----
- hw/display/virtio-vga.c      | 7 +++----
- 3 files changed, 9 insertions(+), 12 deletions(-)
+ hw/tpm/tpm_emulator.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/display/virtio-gpu-base.c b/hw/display/virtio-gpu-base.c
-index 55e07995fe..e1f25456a7 100644
---- a/hw/display/virtio-gpu-base.c
-+++ b/hw/display/virtio-gpu-base.c
-@@ -126,9 +126,9 @@ virtio_gpu_base_device_realize(DeviceState *qdev,
-                                VirtIOHandleOutput cursor_cb,
-                                Error **errp)
+diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+index 22f9113432..10d587ed40 100644
+--- a/hw/tpm/tpm_emulator.c
++++ b/hw/tpm/tpm_emulator.c
+@@ -155,7 +155,7 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
+                                      const uint8_t *in, uint32_t in_len,
+                                      uint8_t *out, uint32_t out_len,
+                                      bool *selftest_done,
+-                                     Error **err)
++                                     Error **errp)
  {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIODevice *vdev = VIRTIO_DEVICE(qdev);
-     VirtIOGPUBase *g = VIRTIO_GPU_BASE(qdev);
--    Error *local_err = NULL;
-     int i;
- 
-     if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
-@@ -139,9 +139,8 @@ virtio_gpu_base_device_realize(DeviceState *qdev,
-     g->use_virgl_renderer = false;
-     if (virtio_gpu_virgl_enabled(g->conf)) {
-         error_setg(&g->migration_blocker, "virgl is not yet migratable");
--        migrate_add_blocker(g->migration_blocker, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        migrate_add_blocker(g->migration_blocker, errp);
-+        if (*errp) {
-             error_free(g->migration_blocker);
-             return false;
-         }
-diff --git a/hw/display/virtio-gpu-pci.c b/hw/display/virtio-gpu-pci.c
-index 25e4038874..13cd695a46 100644
---- a/hw/display/virtio-gpu-pci.c
-+++ b/hw/display/virtio-gpu-pci.c
-@@ -27,18 +27,17 @@ static Property virtio_gpu_pci_base_properties[] = {
- 
- static void virtio_gpu_pci_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIOGPUPCIBase *vgpu = VIRTIO_GPU_PCI_BASE(vpci_dev);
-     VirtIOGPUBase *g = vgpu->vgpu;
-     DeviceState *vdev = DEVICE(g);
-     int i;
--    Error *local_error = NULL;
- 
-     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-     virtio_pci_force_virtio_1(vpci_dev);
--    object_property_set_bool(OBJECT(vdev), true, "realized", &local_error);
-+    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
- 
--    if (local_error) {
--        error_propagate(errp, local_error);
-+    if (*errp) {
-         return;
+     ssize_t ret;
+     bool is_selftest = false;
+@@ -165,20 +165,20 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
+         is_selftest = tpm_util_is_selftest(in, in_len);
      }
  
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index cc6e66ea1c..047528ec37 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -90,10 +90,10 @@ static const VMStateDescription vmstate_virtio_vga_base = {
- /* VGA device wrapper around PCI device around virtio GPU */
- static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIOVGABase *vvga = VIRTIO_VGA_BASE(vpci_dev);
-     VirtIOGPUBase *g = vvga->vgpu;
-     VGACommonState *vga = &vvga->vga;
--    Error *err = NULL;
-     uint32_t offset;
-     int i;
- 
-@@ -138,9 +138,8 @@ static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     /* init virtio bits */
-     qdev_set_parent_bus(DEVICE(g), BUS(&vpci_dev->bus));
-     virtio_pci_force_virtio_1(vpci_dev);
--    object_property_set_bool(OBJECT(g), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
-+    object_property_set_bool(OBJECT(g), true, "realized", errp);
-+    if (*errp) {
-         return;
+-    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, err);
++    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, errp);
+     if (ret != 0) {
+         return -1;
      }
  
+     ret = qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+-              sizeof(struct tpm_resp_hdr), err);
++              sizeof(struct tpm_resp_hdr), errp);
+     if (ret != 0) {
+         return -1;
+     }
+ 
+     ret = qio_channel_read_all(tpm_emu->data_ioc,
+               (char *)out + sizeof(struct tpm_resp_hdr),
+-              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), err);
++              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), errp);
+     if (ret != 0) {
+         return -1;
+     }
 -- 
 2.21.0
 
