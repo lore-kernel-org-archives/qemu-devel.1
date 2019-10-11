@@ -3,78 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EE5ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B3AEECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:19:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FE9F206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:18:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FE9F206A1
+	by mail.kernel.org (Postfix) with ESMTPS id F3940206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:19:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3940206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIvkQ-00077v-3W
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 10:18:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43361)
+	id 1iIvln-0000VK-3R
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 10:19:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iIvfm-0001m0-8y
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:13:39 -0400
+ (envelope-from <imammedo@redhat.com>) id 1iIvbL-0003q2-Ec
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iIvfk-0007P5-4W
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:13:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38814)
+ (envelope-from <imammedo@redhat.com>) id 1iIvbI-0005MK-1T
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:09:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44612)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iIvfj-0007OQ-S4
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:13:36 -0400
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iIvbH-0005Lr-OE
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:08:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8CA0F83F3D
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 14:13:34 +0000 (UTC)
-Received: by mail-qt1-f199.google.com with SMTP id j5so9531693qtn.10
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 07:13:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=lQoM6SVgSl+WUsWqGtYAQJaCewCcSYBKjWOyzD9L0gQ=;
- b=G3QJJbFWkRUjGln7Rwrcpfj8Pqgz53nfJLOwrt2nL+aTGQ2fkatDxVFHtPeAnNwl+n
- d1R/ozht8T0a6+LoK0Hxye2Pnz5sDJ2LAPg0J9OUyyXWdpaoah+LtmTM6qZkVJC416dN
- mWnazKNu+vrGdWzmpEa+FZJtnhltdSPdzHnug5pSOGy92MlVDKfiWawu8eyWU7ATwgoe
- IkN9u1nPUJ9cumQBo8V83do207KoGPcDWkHhnpCx62TRQODFzVKMPT6Uc7Zyoli58pEr
- jLJUlK7hXSlDhFGn+JDopvOh+BrQMvC4n/0Eb80fOn8TGGO/uOfPqs7sdXPPU1rpj/Ee
- Tm8A==
-X-Gm-Message-State: APjAAAV5p2oEKErTZCvoh9Swq9pfLIpA9aPkVLG7JhXpiosAY8nw9YzQ
- gJZqQpCmZ/MGW81o4fajotXAygmESPo4BQxsMZ2fo6s5wnasKbvTQakQSTN7/isGyKgnEvdGnjE
- gTmPfSgDdaUIeTew=
-X-Received: by 2002:a0c:8731:: with SMTP id 46mr16155311qvh.141.1570803212786; 
- Fri, 11 Oct 2019 07:13:32 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyAASb3gjZlozG19qgcwrpxSU0KZwm5JB+sCE1oCGKCpT3ECttkgZ+oJuzpk+97VRMvupWWKQ==
-X-Received: by 2002:a0c:8731:: with SMTP id 46mr16155286qvh.141.1570803212452; 
- Fri, 11 Oct 2019 07:13:32 -0700 (PDT)
-Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
- by smtp.gmail.com with ESMTPSA id
- g25sm4022997qtp.96.2019.10.11.07.13.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Oct 2019 07:13:31 -0700 (PDT)
-Date: Fri, 11 Oct 2019 10:13:27 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
-Subject: Re: [PATCH v4 2/2] virtio-net: prevent offloads reset on migration
-Message-ID: <20191011101256-mutt-send-email-mst@kernel.org>
-References: <1570802284-3064-1-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
- <1570802284-3064-2-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 719EF3082128;
+ Fri, 11 Oct 2019 14:08:58 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 029D55DA60;
+ Fri, 11 Oct 2019 14:08:56 +0000 (UTC)
+Date: Fri, 11 Oct 2019 16:08:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Subject: Re: [PATCH v12 09/11] hmat acpi: Build System Locality Latency and
+ Bandwidth Information Structure(s)
+Message-ID: <20191011160855.6d13eb69@redhat.com>
+In-Reply-To: <24a4842c-4ce4-3a7f-5032-8e74458de44c@intel.com>
+References: <20190920074349.2616-1-tao3.xu@intel.com>
+ <20190920074349.2616-10-tao3.xu@intel.com>
+ <20191003164111.078fdce4@redhat.com>
+ <24a4842c-4ce4-3a7f-5032-8e74458de44c@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1570802284-3064-2-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 11 Oct 2019 14:08:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -89,131 +72,269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- stefanha@redhat.com, dgilbert@redhat.com
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>, "Williams, Dan
+ J" <dan.j.williams@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 11, 2019 at 03:58:04PM +0200, Mikhail Sennikovsky wrote:
-> Currently offloads disabled by guest via the VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET
-> command are not preserved on VM migration.
-> Instead all offloads reported by guest features (via VIRTIO_PCI_GUEST_FEATURES)
-> get enabled.
-> What happens is: first the VirtIONet::curr_guest_offloads gets restored and offloads
-> are getting set correctly:
-> 
->  #0  qemu_set_offload (nc=0x555556a11400, csum=1, tso4=0, tso6=0, ecn=0, ufo=0) at net/net.c:474
->  #1  virtio_net_apply_guest_offloads (n=0x555557701ca0) at hw/net/virtio-net.c:720
->  #2  virtio_net_post_load_device (opaque=0x555557701ca0, version_id=11) at hw/net/virtio-net.c:2334
->  #3  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577c80 <vmstate_virtio_net_device>, opaque=0x555557701ca0, version_id=11)
->      at migration/vmstate.c:168
->  #4  virtio_load (vdev=0x555557701ca0, f=0x5555569dc010, version_id=11) at hw/virtio/virtio.c:2197
->  #5  virtio_device_get (f=0x5555569dc010, opaque=0x555557701ca0, size=0, field=0x55555668cd00 <__compound_literal.5>) at hw/virtio/virtio.c:2036
->  #6  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577ce0 <vmstate_virtio_net>, opaque=0x555557701ca0, version_id=11) at migration/vmstate.c:143
->  #7  vmstate_load (f=0x5555569dc010, se=0x5555578189e0) at migration/savevm.c:829
->  #8  qemu_loadvm_section_start_full (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2211
->  #9  qemu_loadvm_state_main (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2395
->  #10 qemu_loadvm_state (f=0x5555569dc010) at migration/savevm.c:2467
->  #11 process_incoming_migration_co (opaque=0x0) at migration/migration.c:449
-> 
-> However later on the features are getting restored, and offloads get reset to
-> everything supported by features:
-> 
->  #0  qemu_set_offload (nc=0x555556a11400, csum=1, tso4=1, tso6=1, ecn=0, ufo=0) at net/net.c:474
->  #1  virtio_net_apply_guest_offloads (n=0x555557701ca0) at hw/net/virtio-net.c:720
->  #2  virtio_net_set_features (vdev=0x555557701ca0, features=5104441767) at hw/net/virtio-net.c:773
->  #3  virtio_set_features_nocheck (vdev=0x555557701ca0, val=5104441767) at hw/virtio/virtio.c:2052
->  #4  virtio_load (vdev=0x555557701ca0, f=0x5555569dc010, version_id=11) at hw/virtio/virtio.c:2220
->  #5  virtio_device_get (f=0x5555569dc010, opaque=0x555557701ca0, size=0, field=0x55555668cd00 <__compound_literal.5>) at hw/virtio/virtio.c:2036
->  #6  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577ce0 <vmstate_virtio_net>, opaque=0x555557701ca0, version_id=11) at migration/vmstate.c:143
->  #7  vmstate_load (f=0x5555569dc010, se=0x5555578189e0) at migration/savevm.c:829
->  #8  qemu_loadvm_section_start_full (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2211
->  #9  qemu_loadvm_state_main (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2395
->  #10 qemu_loadvm_state (f=0x5555569dc010) at migration/savevm.c:2467
->  #11 process_incoming_migration_co (opaque=0x0) at migration/migration.c:449
-> 
-> Fix this by preserving the state in saved_guest_offloads field and
-> pushing out offload initialization to the new post load hook.
-> 
-> Signed-off-by: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
+On Thu, 10 Oct 2019 14:53:56 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-kind of ugly, but works:
+> On 10/3/2019 10:41 PM, Igor Mammedov wrote:
+> > On Fri, 20 Sep 2019 15:43:47 +0800
+> > Tao Xu <tao3.xu@intel.com> wrote:
+> >   
+> >> From: Liu Jingqi <jingqi.liu@intel.com>
+> >>
+> >> This structure describes the memory access latency and bandwidth
+> >> information from various memory access initiator proximity domains.
+> >> The latency and bandwidth numbers represented in this structure
+> >> correspond to rated latency and bandwidth for the platform.
+> >> The software could use this information as hint for optimization.
+> >>
+> >> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+> >> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> >> ---
+> >>
+> >> Changes in v12:
+> >>      - Fix a bug that if HMAT is enabled and without hmat-lb setting,
+> >>        QEMU will crash. (reported by Danmei Wei)
+> >>
+> >> Changes in v11:
+> >>      - Calculate base in build_hmat_lb().
+> >> ---
+> >>   hw/acpi/hmat.c | 126 ++++++++++++++++++++++++++++++++++++++++++++++++-
+> >>   hw/acpi/hmat.h |   2 +
+> >>   2 files changed, 127 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+> >> index 1368fce7ee..e7be849581 100644
+> >> --- a/hw/acpi/hmat.c
+> >> +++ b/hw/acpi/hmat.c
+> >> @@ -27,6 +27,7 @@
+> >>   #include "qemu/osdep.h"
+> >>   #include "sysemu/numa.h"
+> >>   #include "hw/acpi/hmat.h"
+> >> +#include "qemu/error-report.h"
+> >>   
+> >>   /*
+> >>    * ACPI 6.3:
+> >> @@ -67,11 +68,105 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
+> >>       build_append_int_noprefix(table_data, 0, 8);
+> >>   }
+> >>   
+> >> +static bool entry_overflow(uint64_t *lb_data, uint64_t base, int len)
+> >> +{
+> >> +    int i;
+> >> +
+> >> +    for (i = 0; i < len; i++) {
+> >> +        if (lb_data[i] / base >= UINT16_MAX) {
+> >> +            return true;
+> >> +        }
+> >> +    }
+> >> +
+> >> +    return false;
+> >> +}  
+> > I suggest to do this check at CLI parsing time
+> >   
+> >> +/*
+> >> + * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
+> >> + * Structure: Table 5-146
+> >> + */
+> >> +static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
+> >> +                          uint32_t num_initiator, uint32_t num_target,
+> >> +                          uint32_t *initiator_list, int type)
+> >> +{
+> >> +    uint8_t mask = 0x0f;
+> >> +    uint32_t s = num_initiator;
+> >> +    uint32_t t = num_target;  
+> > drop this locals and use arguments directly
+> >   
+> >> +    uint64_t base = 1;
+> >> +    uint64_t *lb_data;
+> >> +    int i, unit;
+> >> +
+> >> +    /* Type */
+> >> +    build_append_int_noprefix(table_data, 1, 2);
+> >> +    /* Reserved */
+> >> +    build_append_int_noprefix(table_data, 0, 2);
+> >> +    /* Length */
+> >> +    build_append_int_noprefix(table_data, 32 + 4 * s + 4 * t + 2 * s * t, 4);  
+> >                                               ^^^^
+> > to me above looks like /dev/random output, absolutely unreadable.
+> > Suggest to use local var (like: lb_length) for expression with comments
+> > beside magic numbers.
+> >   
+> >> +    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
+> >> +    build_append_int_noprefix(table_data, hmat_lb->hierarchy & mask, 1);  
+> > 
+> > why do you need to use mask here?
+> >   
+> Because Bits[7:4] Reserved, so I use mask to keep it reserved.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+these bits are not user provided and set to 0, if they get set it's
+programming error and instead of masking problem out QEMU should abort,
+I suggest replace masking with assert(!foo>>x).
 
-Jason can you merge this and the previous patch pls?
-
-> ---
->  hw/net/virtio-net.c            | 27 ++++++++++++++++++++++++---
->  include/hw/virtio/virtio-net.h |  2 ++
->  2 files changed, 26 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index b9e1cd7..6adb0fe 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -2330,9 +2330,13 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
->          n->curr_guest_offloads = virtio_net_supported_guest_offloads(n);
->      }
->  
-> -    if (peer_has_vnet_hdr(n)) {
-> -        virtio_net_apply_guest_offloads(n);
-> -    }
-> +    /*
-> +     * curr_guest_offloads will be later overwritten by the
-> +     * virtio_set_features_nocheck call done from the virtio_load.
-> +     * Here we make sure it is preserved and restored accordingly
-> +     * in the virtio_net_post_load_virtio callback.
-> +     */
-> +    n->saved_guest_offloads = n->curr_guest_offloads;
->  
->      virtio_net_set_queues(n);
->  
-> @@ -2367,6 +2371,22 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
->      return 0;
->  }
->  
-> +static int virtio_net_post_load_virtio(VirtIODevice *vdev)
-> +{
-> +    VirtIONet *n = VIRTIO_NET(vdev);
-> +    /*
-> +     * The actual needed state is now in saved_guest_offloads,
-> +     * see virtio_net_post_load_device for detail.
-> +     * Restore it back and apply the desired offloads.
-> +     */
-> +    n->curr_guest_offloads = n->saved_guest_offloads;
-> +    if (peer_has_vnet_hdr(n)) {
-> +        virtio_net_apply_guest_offloads(n);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  /* tx_waiting field of a VirtIONetQueue */
->  static const VMStateDescription vmstate_virtio_net_queue_tx_waiting = {
->      .name = "virtio-net-queue-tx_waiting",
-> @@ -2909,6 +2929,7 @@ static void virtio_net_class_init(ObjectClass *klass, void *data)
->      vdc->guest_notifier_mask = virtio_net_guest_notifier_mask;
->      vdc->guest_notifier_pending = virtio_net_guest_notifier_pending;
->      vdc->legacy_features |= (0x1 << VIRTIO_NET_F_GSO);
-> +    vdc->post_load = virtio_net_post_load_virtio;
->      vdc->vmsd = &vmstate_virtio_net_device;
->  }
->  
-> diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-> index b96f0c6..07a9319 100644
-> --- a/include/hw/virtio/virtio-net.h
-> +++ b/include/hw/virtio/virtio-net.h
-> @@ -182,6 +182,8 @@ struct VirtIONet {
->      char *netclient_name;
->      char *netclient_type;
->      uint64_t curr_guest_offloads;
-> +    /* used on saved state restore phase to preserve the curr_guest_offloads */
-> +    uint64_t saved_guest_offloads;
->      AnnounceTimer announce_timer;
->      bool needs_vnet_hdr_swap;
->      bool mtu_bypass_backend;
-> -- 
-> 2.7.4
+> >> +    /* Data Type */
+> >> +    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);  
+> > 
+> > Isn't hmat_lb->data_type and passed argument 'type' the same?
+> >   
+> Yes, I will drop 'type'.
+> >   
+> >> +    /* Reserved */
+> >> +    build_append_int_noprefix(table_data, 0, 2);
+> >> +    /* Number of Initiator Proximity Domains (s) */
+> >> +    build_append_int_noprefix(table_data, s, 4);
+> >> +    /* Number of Target Proximity Domains (t) */
+> >> +    build_append_int_noprefix(table_data, t, 4);
+> >> +    /* Reserved */
+> >> +    build_append_int_noprefix(table_data, 0, 4);
+> >> +
+> >> +    if (HMAT_IS_LATENCY(type)) {
+> >> +        unit = 1000;
+> >> +        lb_data = hmat_lb->latency;
+> >> +    } else {
+> >> +        unit = 1024;
+> >> +        lb_data = hmat_lb->bandwidth;
+> >> +    }
+> >> +
+> >> +    while (entry_overflow(lb_data, base, s * t)) {
+> >> +        for (i = 0; i < s * t; i++) {
+> >> +            if (!QEMU_IS_ALIGNED(lb_data[i], unit * base)) {
+> >> +                error_report("Invalid latency/bandwidth input, all "
+> >> +                "latencies/bandwidths should be specified in the same units.");
+> >> +                exit(1);
+> >> +            }
+> >> +        }
+> >> +        base *= unit;
+> >> +    }  
+> > Can you clarify what you are trying to check here?
+> >   
+> This part I use entry_overflow() to check if uint16 can store entry. If 
+> can't store and the entries matrix can be divisible by unit * base, then 
+> base will be unit * base.
+> 
+> For example, if lb_data[i] are 1048576(1TB/s) and 1024(1GB/s), unit is 
+> 1024, so 1048576 is bigger than UINT16_MAX, and can be divisible by 1024 
+> * 1, so base is 1024 and entries are 1024 and 1 (see entry = 
+> hmat_lb->latency[i] / base;). The benefit is even user input different 
+> unit(TB/s vs GB/s), we can still store the data as far as possible.
+
+Is it possible instead of doing multiple iterations over lb_data
+until it finds valid base, just go over lb_data once to find MIN/MAX
+and then calculate base using it. Error out with max/min offending
+values if it's not possible to compress the range into uint16_t?
+
+
+> >> +
+> >> +    /* Entry Base Unit */
+> >> +    build_append_int_noprefix(table_data, base, 8);
+> >> +
+> >> +    /* Initiator Proximity Domain List */
+> >> +    for (i = 0; i < s; i++) {
+> >> +        build_append_int_noprefix(table_data, initiator_list[i], 4);
+> >> +    }
+> >> +
+> >> +    /* Target Proximity Domain List */
+> >> +    for (i = 0; i < t; i++) {
+> >> +        build_append_int_noprefix(table_data, i, 4);
+> >> +    }
+> >> +
+> >> +    /* Latency or Bandwidth Entries */
+> >> +    for (i = 0; i < s * t; i++) {
+> >> +        uint16_t entry;
+> >> +
+> >> +        if (HMAT_IS_LATENCY(type)) {  
+> > drop if condition and reuse lb_data, that you've just initialized above
+> > 
+> >   
+> >> +            entry = hmat_lb->latency[i] / base;  
+> > ...  
+> >> +            entry = hmat_lb->bandwidth[i] / base;  
+> > I'm not sure that above is correct.
+> > Pls clarify math behind above 2 expressions
+> >   
+> >> +        }
+> >> +
+> >> +        build_append_int_noprefix(table_data, entry, 2);
+> >> +    }
+> >> +}
+> >> +
+> >>   /* Build HMAT sub table structures */
+> >>   static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
+> >>   {
+> >>       uint16_t flags;
+> >> -    int i;
+> >> +    uint32_t *initiator_list = NULL;
+> >> +    int i, j, hrchy, type;  
+> > s/hrchy/hierarchy/
+> >   
+> >> +    HMAT_LB_Info *numa_hmat_lb;
+> >>   
+> >>       for (i = 0; i < nstat->num_nodes; i++) {
+> >>           flags = 0;
+> >> @@ -82,6 +177,35 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
+> >>   
+> >>           build_hmat_mpda(table_data, flags, nstat->nodes[i].initiator, i);
+> >>       }
+> >> +
+> >> +    if (nstat->num_initiator) {
+> >> +        initiator_list = g_malloc0(nstat->num_initiator * sizeof(uint32_t));
+> >> +        for (i = 0, j = 0; i < nstat->num_nodes; i++) {
+> >> +            if (nstat->nodes[i].has_cpu) {
+> >> +                initiator_list[j] = i;
+> >> +                j++;
+> >> +            }
+> >> +        }
+> >> +    }
+> >> +
+> >> +    /*
+> >> +     * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
+> >> +     * Structure: Table 5-146
+> >> +     */
+> >> +    for (hrchy = HMAT_LB_MEM_MEMORY;
+> >> +         hrchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hrchy++) {
+> >> +        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
+> >> +             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
+> >> +            numa_hmat_lb = nstat->hmat_lb[hrchy][type];
+> >> +
+> >> +            if (numa_hmat_lb) {
+> >> +                build_hmat_lb(table_data, numa_hmat_lb, nstat->num_initiator,
+> >> +                              nstat->num_nodes, initiator_list, type);
+> >> +            }
+> >> +        }
+> >> +    }
+> >> +
+> >> +    g_free(initiator_list);
+> >>   }
+> >>   
+> >>   void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
+> >> diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
+> >> index 0c1839cf6f..1154dfb48e 100644
+> >> --- a/hw/acpi/hmat.h
+> >> +++ b/hw/acpi/hmat.h
+> >> @@ -40,6 +40,8 @@
+> >>    */
+> >>   #define HMAT_PROX_INIT_VALID 0x1
+> >>   
+> >> +#define HMAT_IS_LATENCY(type) (type <= HMAT_LB_DATA_WRITE_LATENCY)  
+> > 
+> > it's not worth to create macro for 1-off calculation, just drop it
+> > and s/if (HMAT_IS_LATENCY(type))/if(type <= HMAT_LB_DATA_WRITE_LATENCY)/
+> >   
+> >> +
+> >>   void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
+> >>   
+> >>   #endif  
+> >   
+> 
+> 
+
 
