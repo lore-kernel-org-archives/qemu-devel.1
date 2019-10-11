@@ -2,67 +2,52 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E807DC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04085ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDF5120659
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:09:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDF5120659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A850620659
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:09:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A850620659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzLf-0004LE-PF
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:09:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40561)
+	id 1iIzLr-0004dm-HG
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:09:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37310)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iIxhA-0000rx-IP
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:13 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRM-0006zk-IW
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:07:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iIxh9-0008KA-6T
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46152)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRB-0004qg-FH
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:52 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48252)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1iIxh5-0008Fk-0t; Fri, 11 Oct 2019 12:23:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2F98918C4268;
- Fri, 11 Oct 2019 16:23:06 +0000 (UTC)
-Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ABE7E5D6C8;
- Fri, 11 Oct 2019 16:23:05 +0000 (UTC)
-Subject: Re: [PATCH v3 07/16] qcow2: Write v3-compliant snapshot list on
- upgrade
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20191011152814.14791-1-mreitz@redhat.com>
- <20191011152814.14791-8-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <a9263c74-f958-5859-9db3-a67aefe73ff5@redhat.com>
-Date: Fri, 11 Oct 2019 11:23:05 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIxRA-0004MM-MT; Fri, 11 Oct 2019 12:06:41 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIxQp-0003XG-5Q; Fri, 11 Oct 2019 19:06:19 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC v5 067/126] block: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:53 +0300
+Message-Id: <20191011160552.22907-68-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20191011152814.14791-8-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.62]); Fri, 11 Oct 2019 16:23:06 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,41 +59,2322 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/11/19 10:28 AM, Max Reitz wrote:
-> qcow2 v3 requires every snapshot table entry to have two extra data
-> fields: The 64-bit VM state size, and the virtual disk size.  Both are
-> optional for v2 images, so they may not be present.
-> 
-> qcow2_upgrade() therefore should update the snapshot table to ensure all
-> entries have these extra data fields.
-> 
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1727347
-> Reported-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
->   block/qcow2.c | 32 ++++++++++++++++++++++++++++++--
->   1 file changed, 30 insertions(+), 2 deletions(-)
-> 
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
-> +    need_snapshot_update = false;
-> +    for (i = 0; i < s->nb_snapshots; i++) {
-> +        if (s->snapshots[i].extra_data_size <
-> +            sizeof_field(QCowSnapshotExtraData, vm_state_size_large) +
-> +            sizeof_field(QCowSnapshotExtraData, disk_size))
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
 
-Shorter as:
-if (s->snapshots[i].extra_data_size < sizeof(QCowSnapshotExtraData))
+This commit (together with its neighbors) was generated by
 
-but that's stylistic, so R-b still stands.
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
 
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block.c                 | 225 ++++++++++++++++-------------------
+ block/backup.c          |   1 +
+ block/block-backend.c   |  19 ++-
+ block/commit.c          |   7 +-
+ block/crypto.c          |  14 +--
+ block/dirty-bitmap.c    |   1 +
+ block/io.c              |  12 +-
+ block/mirror.c          |  19 ++-
+ block/qapi.c            |  26 ++---
+ block/snapshot.c        |  16 +--
+ block/throttle-groups.c |  24 ++--
+ block/throttle.c        |   7 +-
+ block/vxhs.c            |  23 ++--
+ blockdev.c              | 252 +++++++++++++++++-----------------------
+ blockjob.c              |   8 +-
+ hw/block/onenand.c      |   7 +-
+ job.c                   |   7 +-
+ 17 files changed, 287 insertions(+), 381 deletions(-)
+
+diff --git a/block.c b/block.c
+index 5944124845..5cdfbb19fa 100644
+--- a/block.c
++++ b/block.c
+@@ -534,8 +534,8 @@ out:
+ 
+ int bdrv_create_file(const char *filename, QemuOpts *opts, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriver *drv;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     drv = bdrv_find_protocol(filename, true, errp);
+@@ -543,8 +543,7 @@ int bdrv_create_file(const char *filename, QemuOpts *opts, Error **errp)
+         return -ENOENT;
+     }
+ 
+-    ret = bdrv_create(drv, filename, opts, &local_err);
+-    error_propagate(errp, local_err);
++    ret = bdrv_create(drv, filename, opts, errp);
+     return ret;
+ }
+ 
+@@ -824,14 +823,13 @@ static BlockdevDetectZeroesOptions bdrv_parse_detect_zeroes(QemuOpts *opts,
+                                                             int open_flags,
+                                                             Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     char *value = qemu_opt_get_del(opts, "detect-zeroes");
+     BlockdevDetectZeroesOptions detect_zeroes =
+         qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup, value,
+-                        BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF, &local_err);
++                        BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF, errp);
+     g_free(value);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         return detect_zeroes;
+     }
+ 
+@@ -1275,12 +1273,11 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+                             const char *node_name, QDict *options,
+                             int open_flags, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int i, ret;
+ 
+-    bdrv_assign_node_name(bs, node_name, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    bdrv_assign_node_name(bs, node_name, errp);
++    if (*errp) {
+         return -EINVAL;
+     }
+ 
+@@ -1290,16 +1287,15 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+ 
+     if (drv->bdrv_file_open) {
+         assert(!drv->bdrv_needs_filename || bs->filename[0]);
+-        ret = drv->bdrv_file_open(bs, options, open_flags, &local_err);
++        ret = drv->bdrv_file_open(bs, options, open_flags, errp);
+     } else if (drv->bdrv_open) {
+-        ret = drv->bdrv_open(bs, options, open_flags, &local_err);
++        ret = drv->bdrv_open(bs, options, open_flags, errp);
+     } else {
+         ret = 0;
+     }
+ 
+     if (ret < 0) {
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (*errp) {
+         } else if (bs->filename[0]) {
+             error_setg_errno(errp, -ret, "Could not open '%s'", bs->filename);
+         } else {
+@@ -1314,9 +1310,8 @@ static int bdrv_open_driver(BlockDriverState *bs, BlockDriver *drv,
+         return ret;
+     }
+ 
+-    bdrv_refresh_limits(bs, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    bdrv_refresh_limits(bs, errp);
++    if (*errp) {
+         return -EINVAL;
+     }
+ 
+@@ -1430,6 +1425,7 @@ QemuOptsList bdrv_runtime_opts = {
+ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+                             QDict *options, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret, open_flags;
+     const char *filename;
+     const char *driver_name = NULL;
+@@ -1437,15 +1433,13 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     const char *discard;
+     QemuOpts *opts;
+     BlockDriver *drv;
+-    Error *local_err = NULL;
+ 
+     assert(bs->file == NULL);
+     assert(options != NULL && bs->options != options);
+ 
+     opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail_opts;
+     }
+@@ -1531,9 +1525,8 @@ static int bdrv_open_common(BlockDriverState *bs, BlockBackend *file,
+     }
+ 
+     bs->detect_zeroes =
+-        bdrv_parse_detect_zeroes(opts, bs->open_flags, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++        bdrv_parse_detect_zeroes(opts, bs->open_flags, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail_opts;
+     }
+@@ -1565,6 +1558,7 @@ fail_opts:
+ 
+ static QDict *parse_json_filename(const char *filename, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QObject *options_obj;
+     QDict *options;
+     int ret;
+@@ -1593,17 +1587,16 @@ static QDict *parse_json_filename(const char *filename, Error **errp)
+ static void parse_json_protocol(QDict *options, const char **pfilename,
+                                 Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QDict *json_options;
+-    Error *local_err = NULL;
+ 
+     /* Parse json: pseudo-protocol */
+     if (!*pfilename || !g_str_has_prefix(*pfilename, "json:")) {
+         return;
+     }
+ 
+-    json_options = parse_json_filename(*pfilename, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    json_options = parse_json_filename(*pfilename, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -1623,11 +1616,11 @@ static void parse_json_protocol(QDict *options, const char **pfilename,
+ static int bdrv_fill_options(QDict **options, const char *filename,
+                              int *flags, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const char *drvname;
+     bool protocol = *flags & BDRV_O_PROTOCOL;
+     bool parse_filename = false;
+     BlockDriver *drv = NULL;
+-    Error *local_err = NULL;
+ 
+     /*
+      * Caution: while qdict_get_try_str() is fine, getting non-string
+@@ -1692,9 +1685,8 @@ static int bdrv_fill_options(QDict **options, const char *filename,
+ 
+     /* Driver-specific filename parsing */
+     if (drv && drv->bdrv_parse_filename && parse_filename) {
+-        drv->bdrv_parse_filename(filename, *options, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        drv->bdrv_parse_filename(filename, *options, errp);
++        if (*errp) {
+             return -EINVAL;
+         }
+ 
+@@ -2123,16 +2115,15 @@ static void bdrv_child_abort_perm_update(BdrvChild *c)
+ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+                             Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+     bool tighten_restrictions;
+ 
+     ret = bdrv_child_check_perm(c, NULL, perm, shared, NULL,
+-                                &tighten_restrictions, &local_err);
++                                &tighten_restrictions, errp);
+     if (ret < 0) {
+         bdrv_child_abort_perm_update(c);
+         if (tighten_restrictions) {
+-            error_propagate(errp, local_err);
+         } else {
+             /*
+              * Our caller may intend to only loosen restrictions and
+@@ -2140,7 +2131,7 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+              * fatal in such a case, so we can just hide them from our
+              * caller.
+              */
+-            error_free(local_err);
++            error_free_errp(errp);
+             ret = 0;
+         }
+         return ret;
+@@ -2366,8 +2357,8 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+                                   uint64_t perm, uint64_t shared_perm,
+                                   void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BdrvChild *child;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     ret = bdrv_check_update_perm(child_bs, NULL, perm, shared_perm, NULL, NULL,
+@@ -2392,12 +2383,12 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+      * child_bs into the AioContext of the new parent. If this doesn't work,
+      * try moving the parent into the AioContext of child_bs instead. */
+     if (bdrv_get_aio_context(child_bs) != ctx) {
+-        ret = bdrv_try_set_aio_context(child_bs, ctx, &local_err);
++        ret = bdrv_try_set_aio_context(child_bs, ctx, errp);
+         if (ret < 0 && child_role->can_set_aio_ctx) {
+             GSList *ignore = g_slist_prepend(NULL, child);;
+             ctx = bdrv_get_aio_context(child_bs);
+             if (child_role->can_set_aio_ctx(child, ctx, &ignore, NULL)) {
+-                error_free(local_err);
++                error_free_errp(errp);
+                 ret = 0;
+                 g_slist_free(ignore);
+                 ignore = g_slist_prepend(NULL, child);;
+@@ -2406,7 +2397,6 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+             g_slist_free(ignore);
+         }
+         if (ret < 0) {
+-            error_propagate(errp, local_err);
+             g_free(child);
+             bdrv_abort_perm_update(child_bs);
+             return NULL;
+@@ -2592,6 +2582,7 @@ out:
+ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+                            const char *bdref_key, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     char *backing_filename = NULL;
+     char *bdref_key_dot;
+     const char *reference = NULL;
+@@ -2600,7 +2591,6 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+     BlockDriverState *backing_hd;
+     QDict *options;
+     QDict *tmp_parent_options = NULL;
+-    Error *local_err = NULL;
+ 
+     if (bs->backing != NULL) {
+         goto free_exit;
+@@ -2642,10 +2632,9 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+             implicit_backing = !strcmp(bs->auto_backing_file, bs->backing_file);
+         }
+ 
+-        backing_filename = bdrv_get_full_backing_filename(bs, &local_err);
+-        if (local_err) {
++        backing_filename = bdrv_get_full_backing_filename(bs, errp);
++        if (*errp) {
+             ret = -EINVAL;
+-            error_propagate(errp, local_err);
+             qobject_unref(options);
+             goto free_exit;
+         }
+@@ -2680,10 +2669,9 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
+ 
+     /* Hook up the backing file link; drop our reference, bs owns the
+      * backing_hd reference now */
+-    bdrv_set_backing_hd(bs, backing_hd, &local_err);
++    bdrv_set_backing_hd(bs, backing_hd, errp);
+     bdrv_unref(backing_hd);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         ret = -EINVAL;
+         goto free_exit;
+     }
+@@ -2775,8 +2763,8 @@ BdrvChild *bdrv_open_child(const char *filename,
+  * option inheritance to work. Existing callers use it for the root node. */
+ BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs = NULL;
+-    Error *local_err = NULL;
+     QObject *obj = NULL;
+     QDict *qdict = NULL;
+     const char *reference = NULL;
+@@ -2789,9 +2777,8 @@ BlockDriverState *bdrv_open_blockdev_ref(BlockdevRef *ref, Error **errp)
+         assert(ref->type == QTYPE_QDICT);
+ 
+         v = qobject_output_visitor_new(&obj);
+-        visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        visit_type_BlockdevOptions(v, NULL, &options, errp);
++        if (*errp) {
+             goto fail;
+         }
+         visit_complete(v, &obj);
+@@ -2823,12 +2810,12 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+                                                    QDict *snapshot_options,
+                                                    Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     /* TODO: extra byte is a hack to ensure MAX_PATH space on Windows. */
+     char *tmp_filename = g_malloc0(PATH_MAX + 1);
+     int64_t total_size;
+     QemuOpts *opts = NULL;
+     BlockDriverState *bs_snapshot = NULL;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     /* if snapshot, we create a temporary backing file and open it
+@@ -2875,9 +2862,8 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+      * order to be able to return one, we have to increase
+      * bs_snapshot's refcount here */
+     bdrv_ref(bs_snapshot);
+-    bdrv_append(bs_snapshot, bs, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    bdrv_append(bs_snapshot, bs, errp);
++    if (*errp) {
+         bs_snapshot = NULL;
+         goto out;
+     }
+@@ -2910,6 +2896,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+                                            const BdrvChildRole *child_role,
+                                            Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+     BlockBackend *file = NULL;
+     BlockDriverState *bs;
+@@ -2917,7 +2904,6 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+     BdrvChild *child;
+     const char *drvname;
+     const char *backing;
+-    Error *local_err = NULL;
+     QDict *snapshot_options = NULL;
+     int snapshot_flags = 0;
+ 
+@@ -2951,8 +2937,8 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+     }
+ 
+     /* json: syntax counts as explicit options, as if in the QDict */
+-    parse_json_protocol(options, &filename, &local_err);
+-    if (local_err) {
++    parse_json_protocol(options, &filename, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+@@ -2964,8 +2950,8 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+                                     parent->open_flags, parent->options);
+     }
+ 
+-    ret = bdrv_fill_options(&options, filename, &flags, &local_err);
+-    if (local_err) {
++    ret = bdrv_fill_options(&options, filename, &flags, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+@@ -3029,8 +3015,8 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+         BlockDriverState *file_bs;
+ 
+         file_bs = bdrv_open_child_bs(filename, options, "file", bs,
+-                                     &child_file, true, &local_err);
+-        if (local_err) {
++                                     &child_file, true, errp);
++        if (*errp) {
+             goto fail;
+         }
+         if (file_bs != NULL) {
+@@ -3038,9 +3024,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+              * looking at the header to guess the image format. This works even
+              * in cases where a guest would not see a consistent state. */
+             file = blk_new(bdrv_get_aio_context(file_bs), 0, BLK_PERM_ALL);
+-            blk_insert_bs(file, file_bs, &local_err);
++            blk_insert_bs(file, file_bs, errp);
+             bdrv_unref(file_bs);
+-            if (local_err) {
++            if (*errp) {
+                 goto fail;
+             }
+ 
+@@ -3051,7 +3037,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+     /* Image format probing */
+     bs->probed = !drv;
+     if (!drv && file) {
+-        ret = find_image_format(file, filename, &drv, &local_err);
++        ret = find_image_format(file, filename, &drv, errp);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -3080,7 +3066,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+     assert(!(flags & BDRV_O_PROTOCOL) || !file);
+ 
+     /* Open the image */
+-    ret = bdrv_open_common(bs, file, options, &local_err);
++    ret = bdrv_open_common(bs, file, options, errp);
+     if (ret < 0) {
+         goto fail;
+     }
+@@ -3092,7 +3078,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+ 
+     /* If there is a backing file, use it */
+     if ((flags & BDRV_O_NO_BACKING) == 0) {
+-        ret = bdrv_open_backing_file(bs, options, "backing", &local_err);
++        ret = bdrv_open_backing_file(bs, options, "backing", errp);
+         if (ret < 0) {
+             goto close_and_fail;
+         }
+@@ -3135,9 +3121,9 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+     if (snapshot_flags) {
+         BlockDriverState *snapshot_bs;
+         snapshot_bs = bdrv_append_temp_snapshot(bs, snapshot_flags,
+-                                                snapshot_options, &local_err);
++                                                snapshot_options, errp);
+         snapshot_options = NULL;
+-        if (local_err) {
++        if (*errp) {
+             goto close_and_fail;
+         }
+         /* We are not going to return bs but the overlay on top of it
+@@ -3159,14 +3145,12 @@ fail:
+     bs->options = NULL;
+     bs->explicit_options = NULL;
+     bdrv_unref(bs);
+-    error_propagate(errp, local_err);
+     return NULL;
+ 
+ close_and_fail:
+     bdrv_unref(bs);
+     qobject_unref(snapshot_options);
+     qobject_unref(options);
+-    error_propagate(errp, local_err);
+     return NULL;
+ }
+ 
+@@ -3709,9 +3693,9 @@ static int bdrv_reopen_parse_backing(BDRVReopenState *reopen_state,
+ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+                         Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret = -1;
+     int old_flags;
+-    Error *local_err = NULL;
+     BlockDriver *drv;
+     QemuOpts *opts;
+     QDict *orig_reopen_opts;
+@@ -3730,9 +3714,8 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+ 
+     /* Process generic block layer options */
+     opts = qemu_opts_create(&bdrv_runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, reopen_state->options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, reopen_state->options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto error;
+     }
+@@ -3754,9 +3737,8 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+     }
+ 
+     reopen_state->detect_zeroes =
+-        bdrv_parse_detect_zeroes(opts, reopen_state->flags, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++        bdrv_parse_detect_zeroes(opts, reopen_state->flags, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto error;
+     }
+@@ -3770,9 +3752,8 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+      * to r/w. Attempting to set to r/w may fail if either BDRV_O_ALLOW_RDWR is
+      * not set, or if the BDS still has copy_on_read enabled */
+     read_only = !(reopen_state->flags & BDRV_O_RDWR);
+-    ret = bdrv_can_set_read_only(reopen_state->bs, read_only, true, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = bdrv_can_set_read_only(reopen_state->bs, read_only, true, errp);
++    if (*errp) {
+         goto error;
+     }
+ 
+@@ -3798,10 +3779,9 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+             goto error;
+         }
+ 
+-        ret = drv->bdrv_reopen_prepare(reopen_state, queue, &local_err);
++        ret = drv->bdrv_reopen_prepare(reopen_state, queue, errp);
+         if (ret) {
+-            if (local_err != NULL) {
+-                error_propagate(errp, local_err);
++            if (*errp) {
+             } else {
+                 bdrv_refresh_filename(reopen_state->bs);
+                 error_setg(errp, "failed while preparing to reopen image '%s'",
+@@ -4238,17 +4218,15 @@ out:
+ void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
+                  Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+-    bdrv_set_backing_hd(bs_new, bs_top, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    bdrv_set_backing_hd(bs_new, bs_top, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+-    bdrv_replace_node(bs_top, bs_new, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    bdrv_replace_node(bs_top, bs_new, errp);
++    if (*errp) {
+         bdrv_set_backing_hd(bs_new, NULL, &error_abort);
+         goto out;
+     }
+@@ -5309,9 +5287,9 @@ void bdrv_init_with_whitelist(void)
+ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+                                                   Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BdrvChild *child, *parent;
+     uint64_t perm, shared_perm;
+-    Error *local_err = NULL;
+     int ret;
+     BdrvDirtyBitmap *bm;
+ 
+@@ -5324,9 +5302,8 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+     }
+ 
+     QLIST_FOREACH(child, &bs->children, next) {
+-        bdrv_co_invalidate_cache(child->bs, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        bdrv_co_invalidate_cache(child->bs, errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -5346,19 +5323,17 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+      */
+     bs->open_flags &= ~BDRV_O_INACTIVE;
+     bdrv_get_cumulative_perm(bs, &perm, &shared_perm);
+-    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, &local_err);
++    ret = bdrv_check_perm(bs, NULL, perm, shared_perm, NULL, NULL, errp);
+     if (ret < 0) {
+         bs->open_flags |= BDRV_O_INACTIVE;
+-        error_propagate(errp, local_err);
+         return;
+     }
+     bdrv_set_perm(bs, perm, shared_perm);
+ 
+     if (bs->drv->bdrv_co_invalidate_cache) {
+-        bs->drv->bdrv_co_invalidate_cache(bs, &local_err);
+-        if (local_err) {
++        bs->drv->bdrv_co_invalidate_cache(bs, errp);
++        if (*errp) {
+             bs->open_flags |= BDRV_O_INACTIVE;
+-            error_propagate(errp, local_err);
+             return;
+         }
+     }
+@@ -5378,10 +5353,9 @@ static void coroutine_fn bdrv_co_invalidate_cache(BlockDriverState *bs,
+ 
+     QLIST_FOREACH(parent, &bs->parents, next_parent) {
+         if (parent->role->activate) {
+-            parent->role->activate(parent, &local_err);
+-            if (local_err) {
++            parent->role->activate(parent, errp);
++            if (*errp) {
+                 bs->open_flags |= BDRV_O_INACTIVE;
+-                error_propagate(errp, local_err);
+                 return;
+             }
+         }
+@@ -5423,18 +5397,17 @@ void bdrv_invalidate_cache(BlockDriverState *bs, Error **errp)
+ 
+ void bdrv_invalidate_cache_all(Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+-    Error *local_err = NULL;
+     BdrvNextIterator it;
+ 
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+ 
+         aio_context_acquire(aio_context);
+-        bdrv_invalidate_cache(bs, &local_err);
++        bdrv_invalidate_cache(bs, errp);
+         aio_context_release(aio_context);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (*errp) {
+             bdrv_next_cleanup(&it);
+             return;
+         }
+@@ -5705,12 +5678,12 @@ void bdrv_img_create(const char *filename, const char *fmt,
+                      char *options, uint64_t img_size, int flags, bool quiet,
+                      Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QemuOptsList *create_opts = NULL;
+     QemuOpts *opts = NULL;
+     const char *backing_fmt, *backing_file;
+     int64_t size;
+     BlockDriver *drv, *proto_drv;
+-    Error *local_err = NULL;
+     int ret = 0;
+ 
+     /* Find driver and parse its options */
+@@ -5746,15 +5719,15 @@ void bdrv_img_create(const char *filename, const char *fmt,
+ 
+     /* Parse -o options */
+     if (options) {
+-        qemu_opts_do_parse(opts, options, NULL, &local_err);
+-        if (local_err) {
++        qemu_opts_do_parse(opts, options, NULL, errp);
++        if (*errp) {
+             goto out;
+         }
+     }
+ 
+     if (base_filename) {
+-        qemu_opt_set(opts, BLOCK_OPT_BACKING_FILE, base_filename, &local_err);
+-        if (local_err) {
++        qemu_opt_set(opts, BLOCK_OPT_BACKING_FILE, base_filename, errp);
++        if (*errp) {
+             error_setg(errp, "Backing file not supported for file format '%s'",
+                        fmt);
+             goto out;
+@@ -5762,8 +5735,8 @@ void bdrv_img_create(const char *filename, const char *fmt,
+     }
+ 
+     if (base_fmt) {
+-        qemu_opt_set(opts, BLOCK_OPT_BACKING_FMT, base_fmt, &local_err);
+-        if (local_err) {
++        qemu_opt_set(opts, BLOCK_OPT_BACKING_FMT, base_fmt, errp);
++        if (*errp) {
+             error_setg(errp, "Backing file format not supported for file "
+                              "format '%s'", fmt);
+             goto out;
+@@ -5792,8 +5765,8 @@ void bdrv_img_create(const char *filename, const char *fmt,
+ 
+         full_backing =
+             bdrv_get_full_backing_filename_from_filename(filename, backing_file,
+-                                                         &local_err);
+-        if (local_err) {
++                                                         errp);
++        if (*errp) {
+             goto out;
+         }
+         assert(full_backing);
+@@ -5809,17 +5782,17 @@ void bdrv_img_create(const char *filename, const char *fmt,
+         qdict_put_bool(backing_options, BDRV_OPT_FORCE_SHARE, true);
+ 
+         bs = bdrv_open(full_backing, NULL, backing_options, back_flags,
+-                       &local_err);
++                       errp);
+         g_free(full_backing);
+         if (!bs && size != -1) {
+             /* Couldn't open BS, but we have a size, so it's nonfatal */
+-            warn_reportf_err(local_err,
+-                            "Could not verify backing image. "
+-                            "This may become an error in future versions.\n");
+-            local_err = NULL;
++            warn_reportf_err(*errp,
++                             "Could not verify backing image. "
++                             "This may become an error in future versions.\n");
++            *errp = NULL;
+         } else if (!bs) {
+             /* Couldn't open bs, do not have size */
+-            error_append_hint(&local_err,
++            error_append_hint(errp,
+                               "Could not open backing image to determine size.\n");
+             goto out;
+         } else {
+@@ -5849,7 +5822,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
+         puts("");
+     }
+ 
+-    ret = bdrv_create(drv, filename, opts, &local_err);
++    ret = bdrv_create(drv, filename, opts, errp);
+ 
+     if (ret == -EFBIG) {
+         /* This is generally a better message than whatever the driver would
+@@ -5861,14 +5834,12 @@ void bdrv_img_create(const char *filename, const char *fmt,
+         }
+         error_setg(errp, "The image size is too large for file format '%s'"
+                    "%s", fmt, cluster_size_hint);
+-        error_free(local_err);
+-        local_err = NULL;
++        error_free_errp(errp);
+     }
+ 
+ out:
+     qemu_opts_del(opts);
+     qemu_opts_free(create_opts);
+-    error_propagate(errp, local_err);
+ }
+ 
+ AioContext *bdrv_get_aio_context(BlockDriverState *bs)
+diff --git a/block/backup.c b/block/backup.c
+index 763f0d7ff6..58488a21fb 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -583,6 +583,7 @@ static const BlockJobDriver backup_job_driver = {
+ static int64_t backup_calculate_cluster_size(BlockDriverState *target,
+                                              Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+     BlockDriverInfo bdi;
+ 
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 1c605d5444..5c7d0015c0 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -186,8 +186,8 @@ static void blk_vm_state_changed(void *opaque, int running, RunState state)
+  */
+ static void blk_root_activate(BdrvChild *child, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockBackend *blk = child->opaque;
+-    Error *local_err = NULL;
+ 
+     if (!blk->disable_perm) {
+         return;
+@@ -195,9 +195,8 @@ static void blk_root_activate(BdrvChild *child, Error **errp)
+ 
+     blk->disable_perm = false;
+ 
+-    blk_set_perm(blk, blk->perm, BLK_PERM_ALL, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    blk_set_perm(blk, blk->perm, BLK_PERM_ALL, errp);
++    if (*errp) {
+         blk->disable_perm = true;
+         return;
+     }
+@@ -213,9 +212,8 @@ static void blk_root_activate(BdrvChild *child, Error **errp)
+         return;
+     }
+ 
+-    blk_set_perm(blk, blk->perm, blk->shared_perm, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    blk_set_perm(blk, blk->perm, blk->shared_perm, errp);
++    if (*errp) {
+         blk->disable_perm = true;
+         return;
+     }
+@@ -961,15 +959,14 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
+  */
+ void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     if (blk->dev_ops && blk->dev_ops->change_media_cb) {
+         bool tray_was_open, tray_is_open;
+-        Error *local_err = NULL;
+ 
+         tray_was_open = blk_dev_is_tray_open(blk);
+-        blk->dev_ops->change_media_cb(blk->dev_opaque, load, &local_err);
+-        if (local_err) {
++        blk->dev_ops->change_media_cb(blk->dev_opaque, load, errp);
++        if (*errp) {
+             assert(load == true);
+-            error_propagate(errp, local_err);
+             return;
+         }
+         tray_is_open = blk_dev_is_tray_open(blk);
+diff --git a/block/commit.c b/block/commit.c
+index bc8454463d..2538f6c799 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -261,10 +261,10 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+                   BlockdevOnError on_error, const char *backing_file_str,
+                   const char *filter_node_name, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CommitBlockJob *s;
+     BlockDriverState *iter;
+     BlockDriverState *commit_top_bs = NULL;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     assert(top != bs);
+@@ -303,10 +303,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+ 
+     commit_top_bs->total_sectors = top->total_sectors;
+ 
+-    bdrv_append(commit_top_bs, top, &local_err);
+-    if (local_err) {
++    bdrv_append(commit_top_bs, top, errp);
++    if (*errp) {
+         commit_top_bs = NULL;
+-        error_propagate(errp, local_err);
+         goto fail;
+     }
+ 
+diff --git a/block/crypto.c b/block/crypto.c
+index 7eb698774e..a1ecddee62 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -192,9 +192,9 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+                                      int flags,
+                                      Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockCrypto *crypto = bs->opaque;
+     QemuOpts *opts = NULL;
+-    Error *local_err = NULL;
+     int ret = -EINVAL;
+     QCryptoBlockOpenOptions *open_opts = NULL;
+     unsigned int cflags = 0;
+@@ -210,9 +210,8 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+         bs->file->bs->supported_write_flags;
+ 
+     opts = qemu_opts_create(opts_spec, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, options, errp);
++    if (*errp) {
+         goto cleanup;
+     }
+ 
+@@ -543,6 +542,7 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+                                                          QemuOpts *opts,
+                                                          Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QCryptoBlockCreateOptions *create_opts = NULL;
+     BlockDriverState *bs = NULL;
+     QDict *cryptoopts;
+@@ -550,17 +550,15 @@ static int coroutine_fn block_crypto_co_create_opts_luks(const char *filename,
+     char *buf = NULL;
+     int64_t size;
+     int ret;
+-    Error *local_err = NULL;
+ 
+     /* Parse options */
+     size = qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0);
+ 
+     buf = qemu_opt_get_del(opts, BLOCK_OPT_PREALLOC);
+     prealloc = qapi_enum_parse(&PreallocMode_lookup, buf,
+-                               PREALLOC_MODE_OFF, &local_err);
++                               PREALLOC_MODE_OFF, errp);
+     g_free(buf);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         return -EINVAL;
+     }
+ 
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 134e0c9a0c..099ed74dfa 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -237,6 +237,7 @@ static bool bdrv_dirty_bitmap_recording(BdrvDirtyBitmap *bitmap)
+ int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t flags,
+                             Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     if ((flags & BDRV_BITMAP_BUSY) && bdrv_dirty_bitmap_busy(bitmap)) {
+         error_setg(errp, "Bitmap '%s' is currently in use by another"
+                    " operation and cannot be used", bitmap->name);
+diff --git a/block/io.c b/block/io.c
+index 4f9ee97c2b..c3381103df 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -135,8 +135,8 @@ static void bdrv_merge_limits(BlockLimits *dst, const BlockLimits *src)
+ 
+ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriver *drv = bs->drv;
+-    Error *local_err = NULL;
+ 
+     memset(&bs->bl, 0, sizeof(bs->bl));
+ 
+@@ -151,9 +151,8 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+ 
+     /* Take some limits from the children as a default */
+     if (bs->file) {
+-        bdrv_refresh_limits(bs->file->bs, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        bdrv_refresh_limits(bs->file->bs, errp);
++        if (*errp) {
+             return;
+         }
+         bdrv_merge_limits(&bs->bl, &bs->file->bs->bl);
+@@ -166,9 +165,8 @@ void bdrv_refresh_limits(BlockDriverState *bs, Error **errp)
+     }
+ 
+     if (bs->backing) {
+-        bdrv_refresh_limits(bs->backing->bs, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        bdrv_refresh_limits(bs->backing->bs, errp);
++        if (*errp) {
+             return;
+         }
+         bdrv_merge_limits(&bs->bl, &bs->backing->bs->bl);
+diff --git a/block/mirror.c b/block/mirror.c
+index fe984efb90..c5462e81f2 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -1507,12 +1507,12 @@ static BlockJob *mirror_start_job(
+                              bool is_mirror, MirrorCopyMode copy_mode,
+                              Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     MirrorBlockJob *s;
+     MirrorBDSOpaque *bs_opaque;
+     BlockDriverState *mirror_top_bs;
+     bool target_graph_mod;
+     bool target_is_backing;
+-    Error *local_err = NULL;
+     int ret;
+ 
+     if (granularity == 0) {
+@@ -1561,12 +1561,11 @@ static BlockJob *mirror_start_job(
+      * it alive until block_job_create() succeeds even if bs has no parent. */
+     bdrv_ref(mirror_top_bs);
+     bdrv_drained_begin(bs);
+-    bdrv_append(mirror_top_bs, bs, &local_err);
++    bdrv_append(mirror_top_bs, bs, errp);
+     bdrv_drained_end(bs);
+ 
+-    if (local_err) {
++    if (*errp) {
+         bdrv_unref(mirror_top_bs);
+-        error_propagate(errp, local_err);
+         return NULL;
+     }
+ 
+@@ -1647,9 +1646,8 @@ static BlockJob *mirror_start_job(
+      * (We start tracking writes as of the following
+      * bdrv_create_dirty_bitmap() call.)
+      */
+-    bdrv_refresh_limits(mirror_top_bs, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    bdrv_refresh_limits(mirror_top_bs, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+@@ -1760,8 +1758,8 @@ BlockJob *commit_active_start(const char *job_id, BlockDriverState *bs,
+                               BlockCompletionFunc *cb, void *opaque,
+                               bool auto_complete, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     bool base_read_only;
+-    Error *local_err = NULL;
+     BlockJob *ret;
+ 
+     base_read_only = bdrv_is_read_only(base);
+@@ -1778,9 +1776,8 @@ BlockJob *commit_active_start(const char *job_id, BlockDriverState *bs,
+                      on_error, on_error, true, cb, opaque,
+                      &commit_active_job_driver, false, base, auto_complete,
+                      filter_node_name, false, MIRROR_COPY_MODE_BACKGROUND,
+-                     &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                     errp);
++    if (*errp) {
+         goto error_restore_flags;
+     }
+ 
+diff --git a/block/qapi.c b/block/qapi.c
+index 7ee2ee065d..b3df170037 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -44,6 +44,7 @@
+ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+                                         BlockDriverState *bs, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     ImageInfo **p_image_info;
+     BlockDriverState *bs0;
+     BlockDeviceInfo *info;
+@@ -148,10 +149,8 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+     p_image_info = &info->image;
+     info->backing_file_depth = 0;
+     while (1) {
+-        Error *local_err = NULL;
+-        bdrv_query_image_info(bs0, p_image_info, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        bdrv_query_image_info(bs0, p_image_info, errp);
++        if (*errp) {
+             qapi_free_BlockDeviceInfo(info);
+             return NULL;
+         }
+@@ -257,11 +256,11 @@ void bdrv_query_image_info(BlockDriverState *bs,
+                            ImageInfo **p_info,
+                            Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int64_t size;
+     const char *backing_filename;
+     BlockDriverInfo bdi;
+     int ret;
+-    Error *err = NULL;
+     ImageInfo *info;
+ 
+     aio_context_acquire(bdrv_get_aio_context(bs));
+@@ -293,9 +292,8 @@ void bdrv_query_image_info(BlockDriverState *bs,
+         info->dirty_flag = bdi.is_dirty;
+         info->has_dirty_flag = true;
+     }
+-    info->format_specific = bdrv_get_specific_info(bs, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    info->format_specific = bdrv_get_specific_info(bs, errp);
++    if (*errp) {
+         qapi_free_ImageInfo(info);
+         goto out;
+     }
+@@ -322,7 +320,7 @@ void bdrv_query_image_info(BlockDriverState *bs,
+         g_free(backing_filename2);
+     }
+ 
+-    ret = bdrv_query_snapshot_info_list(bs, &info->snapshots, &err);
++    ret = bdrv_query_snapshot_info_list(bs, &info->snapshots, errp);
+     switch (ret) {
+     case 0:
+         if (info->snapshots) {
+@@ -332,10 +330,9 @@ void bdrv_query_image_info(BlockDriverState *bs,
+     /* recoverable error */
+     case -ENOMEDIUM:
+     case -ENOTSUP:
+-        error_free(err);
++        error_free_errp(errp);
+         break;
+     default:
+-        error_propagate(errp, err);
+         qapi_free_ImageInfo(info);
+         goto out;
+     }
+@@ -552,9 +549,9 @@ static BlockStats *bdrv_query_bds_stats(BlockDriverState *bs,
+ 
+ BlockInfoList *qmp_query_block(Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockInfoList *head = NULL, **p_next = &head;
+     BlockBackend *blk;
+-    Error *local_err = NULL;
+ 
+     for (blk = blk_all_next(NULL); blk; blk = blk_all_next(blk)) {
+         BlockInfoList *info;
+@@ -564,9 +561,8 @@ BlockInfoList *qmp_query_block(Error **errp)
+         }
+ 
+         info = g_malloc0(sizeof(*info));
+-        bdrv_query_info(blk, &info->value, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        bdrv_query_info(blk, &info->value, errp);
++        if (*errp) {
+             g_free(info);
+             qapi_free_BlockInfoList(head);
+             return NULL;
+diff --git a/block/snapshot.c b/block/snapshot.c
+index bd9fb01817..8ef1d6573a 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -184,6 +184,7 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+                        const char *snapshot_id,
+                        Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriver *drv = bs->drv;
+     int ret, open_ret;
+ 
+@@ -209,7 +210,6 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+         BlockDriverState *file;
+         QDict *options = qdict_clone_shallow(bs->options);
+         QDict *file_options;
+-        Error *local_err = NULL;
+ 
+         file = bs->file->bs;
+         /* Prevent it from getting deleted when detached from bs */
+@@ -226,13 +226,12 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+         bs->file = NULL;
+ 
+         ret = bdrv_snapshot_goto(file, snapshot_id, errp);
+-        open_ret = drv->bdrv_open(bs, options, bs->open_flags, &local_err);
++        open_ret = drv->bdrv_open(bs, options, bs->open_flags, errp);
+         qobject_unref(options);
+         if (open_ret < 0) {
+             bdrv_unref(file);
+             bs->drv = NULL;
+             /* A bdrv_snapshot_goto() error takes precedence */
+-            error_propagate(errp, local_err);
+             return ret < 0 ? ret : open_ret;
+         }
+ 
+@@ -370,18 +369,15 @@ int bdrv_snapshot_load_tmp_by_id_or_name(BlockDriverState *bs,
+                                          const char *id_or_name,
+                                          Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+-    Error *local_err = NULL;
+ 
+-    ret = bdrv_snapshot_load_tmp(bs, id_or_name, NULL, &local_err);
++    ret = bdrv_snapshot_load_tmp(bs, id_or_name, NULL, errp);
+     if (ret == -ENOENT || ret == -EINVAL) {
+-        error_free(local_err);
+-        local_err = NULL;
+-        ret = bdrv_snapshot_load_tmp(bs, NULL, id_or_name, &local_err);
++        error_free_errp(errp);
++        ret = bdrv_snapshot_load_tmp(bs, NULL, id_or_name, errp);
+     }
+ 
+-    error_propagate(errp, local_err);
+-
+     return ret;
+ }
+ 
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index 77014c741b..299ebd3f6f 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -808,10 +808,10 @@ static void throttle_group_set(Object *obj, Visitor *v, const char * name,
+                                void *opaque, Error **errp)
+ 
+ {
++    ERRP_AUTO_PROPAGATE();
+     ThrottleGroup *tg = THROTTLE_GROUP(obj);
+     ThrottleConfig *cfg;
+     ThrottleParamInfo *info = opaque;
+-    Error *local_err = NULL;
+     int64_t value;
+ 
+     /* If we have finished initialization, don't accept individual property
+@@ -819,16 +819,16 @@ static void throttle_group_set(Object *obj, Visitor *v, const char * name,
+      * transaction, as certain combinations are invalid.
+      */
+     if (tg->is_initialized) {
+-        error_setg(&local_err, "Property cannot be set after initialization");
++        error_setg(errp, "Property cannot be set after initialization");
+         goto ret;
+     }
+ 
+-    visit_type_int64(v, name, &value, &local_err);
+-    if (local_err) {
++    visit_type_int64(v, name, &value, errp);
++    if (*errp) {
+         goto ret;
+     }
+     if (value < 0) {
+-        error_setg(&local_err, "Property values cannot be negative");
++        error_setg(errp, "Property values cannot be negative");
+         goto ret;
+     }
+ 
+@@ -842,7 +842,7 @@ static void throttle_group_set(Object *obj, Visitor *v, const char * name,
+         break;
+     case BURST_LENGTH:
+         if (value > UINT_MAX) {
+-            error_setg(&local_err, "%s value must be in the"
++            error_setg(errp, "%s value must be in the"
+                        "range [0, %u]", info->name, UINT_MAX);
+             goto ret;
+         }
+@@ -854,7 +854,6 @@ static void throttle_group_set(Object *obj, Visitor *v, const char * name,
+     }
+ 
+ ret:
+-    error_propagate(errp, local_err);
+     return;
+ 
+ }
+@@ -891,20 +890,20 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+                                       Error **errp)
+ 
+ {
++    ERRP_AUTO_PROPAGATE();
+     ThrottleGroup *tg = THROTTLE_GROUP(obj);
+     ThrottleConfig cfg;
+     ThrottleLimits arg = { 0 };
+     ThrottleLimits *argp = &arg;
+-    Error *local_err = NULL;
+ 
+-    visit_type_ThrottleLimits(v, name, &argp, &local_err);
+-    if (local_err) {
++    visit_type_ThrottleLimits(v, name, &argp, errp);
++    if (*errp) {
+         goto ret;
+     }
+     qemu_mutex_lock(&tg->lock);
+     throttle_get_config(&tg->ts, &cfg);
+-    throttle_limits_to_config(argp, &cfg, &local_err);
+-    if (local_err) {
++    throttle_limits_to_config(argp, &cfg, errp);
++    if (*errp) {
+         goto unlock;
+     }
+     throttle_config(&tg->ts, tg->clock_type, &cfg);
+@@ -912,7 +911,6 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+ unlock:
+     qemu_mutex_unlock(&tg->lock);
+ ret:
+-    error_propagate(errp, local_err);
+     return;
+ }
+ 
+diff --git a/block/throttle.c b/block/throttle.c
+index 0349f42257..8955cfdc90 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -44,14 +44,13 @@ static QemuOptsList throttle_opts = {
+  */
+ static int throttle_parse_options(QDict *options, char **group, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+     const char *group_name;
+-    Error *local_err = NULL;
+     QemuOpts *opts = qemu_opts_create(&throttle_opts, NULL, 0, &error_abort);
+ 
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fin;
+     }
+diff --git a/block/vxhs.c b/block/vxhs.c
+index 77fd5eb20d..b57e5471cd 100644
+--- a/block/vxhs.c
++++ b/block/vxhs.c
+@@ -293,13 +293,13 @@ static void vxhs_get_tls_creds(const char *id, char **cacert,
+ static int vxhs_open(BlockDriverState *bs, QDict *options,
+                      int bdrv_flags, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVVXHSState *s = bs->opaque;
+     void *dev_handlep;
+     QDict *backing_options = NULL;
+     QemuOpts *opts = NULL;
+     QemuOpts *tcp_opts = NULL;
+     char *of_vsa_addr = NULL;
+-    Error *local_err = NULL;
+     const char *vdisk_id_opt;
+     const char *server_host_opt;
+     int ret = 0;
+@@ -317,8 +317,8 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     tcp_opts = qemu_opts_create(&runtime_tcp_opts, NULL, 0, &error_abort);
+ 
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
++    qemu_opts_absorb_qdict(opts, options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -326,14 +326,14 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+     /* vdisk-id is the disk UUID */
+     vdisk_id_opt = qemu_opt_get(opts, VXHS_OPT_VDISK_ID);
+     if (!vdisk_id_opt) {
+-        error_setg(&local_err, QERR_MISSING_PARAMETER, VXHS_OPT_VDISK_ID);
++        error_setg(errp, QERR_MISSING_PARAMETER, VXHS_OPT_VDISK_ID);
+         ret = -EINVAL;
+         goto out;
+     }
+ 
+     /* vdisk-id may contain a leading '/' */
+     if (strlen(vdisk_id_opt) > UUID_FMT_LEN + 1) {
+-        error_setg(&local_err, "vdisk-id cannot be more than %d characters",
++        error_setg(errp, "vdisk-id cannot be more than %d characters",
+                    UUID_FMT_LEN);
+         ret = -EINVAL;
+         goto out;
+@@ -345,22 +345,22 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+     /* get the 'server.' arguments */
+     qdict_extract_subqdict(options, &backing_options, VXHS_OPT_SERVER".");
+ 
+-    qemu_opts_absorb_qdict(tcp_opts, backing_options, &local_err);
+-    if (local_err != NULL) {
++    qemu_opts_absorb_qdict(tcp_opts, backing_options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto out;
+     }
+ 
+     server_host_opt = qemu_opt_get(tcp_opts, VXHS_OPT_HOST);
+     if (!server_host_opt) {
+-        error_setg(&local_err, QERR_MISSING_PARAMETER,
++        error_setg(errp, QERR_MISSING_PARAMETER,
+                    VXHS_OPT_SERVER"."VXHS_OPT_HOST);
+         ret = -EINVAL;
+         goto out;
+     }
+ 
+     if (strlen(server_host_opt) > MAXHOSTNAMELEN) {
+-        error_setg(&local_err, "server.host cannot be more than %d characters",
++        error_setg(errp, "server.host cannot be more than %d characters",
+                    MAXHOSTNAMELEN);
+         ret = -EINVAL;
+         goto out;
+@@ -370,8 +370,8 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+     s->tlscredsid = g_strdup(qemu_opt_get(opts, "tls-creds"));
+     if (s->tlscredsid) {
+         vxhs_get_tls_creds(s->tlscredsid, &cacert, &client_key,
+-                           &client_cert, &local_err);
+-        if (local_err != NULL) {
++                           &client_cert, errp);
++        if (*errp) {
+             ret = -EINVAL;
+             goto out;
+         }
+@@ -413,7 +413,6 @@ out:
+ 
+     if (ret < 0) {
+         vxhs_unref();
+-        error_propagate(errp, local_err);
+         g_free(s->vdisk_hostinfo.host);
+         g_free(s->vdisk_guid);
+         g_free(s->tlscredsid);
+diff --git a/blockdev.c b/blockdev.c
+index fbef6845c8..cfa5eae6c9 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -376,7 +376,7 @@ static void extract_common_blockdev_options(QemuOpts *opts, int *bdrv_flags,
+     const char **throttling_group, ThrottleConfig *throttle_cfg,
+     BlockdevDetectZeroesOptions *detect_zeroes, Error **errp)
+ {
+-    Error *local_error = NULL;
++    ERRP_AUTO_PROPAGATE();
+     const char *aio;
+ 
+     if (bdrv_flags) {
+@@ -455,9 +455,8 @@ static void extract_common_blockdev_options(QemuOpts *opts, int *bdrv_flags,
+             qapi_enum_parse(&BlockdevDetectZeroesOptions_lookup,
+                             qemu_opt_get(opts, "detect-zeroes"),
+                             BLOCKDEV_DETECT_ZEROES_OPTIONS_OFF,
+-                            &local_error);
+-        if (local_error) {
+-            error_propagate(errp, local_error);
++                            errp);
++        if (*errp) {
+             return;
+         }
+     }
+@@ -467,6 +466,7 @@ static void extract_common_blockdev_options(QemuOpts *opts, int *bdrv_flags,
+ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+                                    Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const char *buf;
+     int bdrv_flags = 0;
+     int on_read_error, on_write_error;
+@@ -476,7 +476,6 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+     BlockDriverState *bs;
+     ThrottleConfig cfg;
+     int snapshot = 0;
+-    Error *error = NULL;
+     QemuOpts *opts;
+     QDict *interval_dict = NULL;
+     QList *interval_list = NULL;
+@@ -488,15 +487,13 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+     /* Check common options by copying from bs_opts to opts, all other options
+      * stay in bs_opts for processing by bdrv_open(). */
+     id = qdict_get_try_str(bs_opts, "id");
+-    opts = qemu_opts_create(&qemu_common_drive_opts, id, 1, &error);
+-    if (error) {
+-        error_propagate(errp, error);
++    opts = qemu_opts_create(&qemu_common_drive_opts, id, 1, errp);
++    if (*errp) {
+         goto err_no_opts;
+     }
+ 
+-    qemu_opts_absorb_qdict(opts, bs_opts, &error);
+-    if (error) {
+-        error_propagate(errp, error);
++    qemu_opts_absorb_qdict(opts, bs_opts, errp);
++    if (*errp) {
+         goto early_err;
+     }
+ 
+@@ -524,9 +521,8 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+     }
+ 
+     extract_common_blockdev_options(opts, &bdrv_flags, &throttling_group, &cfg,
+-                                    &detect_zeroes, &error);
+-    if (error) {
+-        error_propagate(errp, error);
++                                    &detect_zeroes, errp);
++    if (*errp) {
+         goto early_err;
+     }
+ 
+@@ -549,18 +545,16 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+ 
+     on_write_error = BLOCKDEV_ON_ERROR_ENOSPC;
+     if ((buf = qemu_opt_get(opts, "werror")) != NULL) {
+-        on_write_error = parse_block_error_action(buf, 0, &error);
+-        if (error) {
+-            error_propagate(errp, error);
++        on_write_error = parse_block_error_action(buf, 0, errp);
++        if (*errp) {
+             goto early_err;
+         }
+     }
+ 
+     on_read_error = BLOCKDEV_ON_ERROR_REPORT;
+     if ((buf = qemu_opt_get(opts, "rerror")) != NULL) {
+-        on_read_error = parse_block_error_action(buf, 1, &error);
+-        if (error) {
+-            error_propagate(errp, error);
++        on_read_error = parse_block_error_action(buf, 1, errp);
++        if (*errp) {
+             goto early_err;
+         }
+     }
+@@ -767,6 +761,7 @@ QemuOptsList qemu_legacy_drive_opts = {
+ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type,
+                      Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const char *value;
+     BlockBackend *blk;
+     DriveInfo *dinfo = NULL;
+@@ -779,7 +774,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type,
+     bool read_only = false;
+     bool copy_on_read;
+     const char *filename;
+-    Error *local_err = NULL;
+     int i;
+ 
+     /* Change legacy command line options into QMP ones */
+@@ -812,9 +806,8 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type,
+ 
+     for (i = 0; i < ARRAY_SIZE(opt_renames); i++) {
+         qemu_opt_rename(all_opts, opt_renames[i].from, opt_renames[i].to,
+-                        &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                        errp);
++        if (*errp) {
+             return NULL;
+         }
+     }
+@@ -851,9 +844,8 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type,
+ 
+     legacy_opts = qemu_opts_create(&qemu_legacy_drive_opts, NULL, 0,
+                                    &error_abort);
+-    qemu_opts_absorb_qdict(legacy_opts, bs_opts, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(legacy_opts, bs_opts, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+@@ -993,13 +985,12 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type,
+     }
+ 
+     /* Actual block device init: Functionality shared with blockdev-add */
+-    blk = blockdev_init(filename, bs_opts, &local_err);
++    blk = blockdev_init(filename, bs_opts, errp);
+     bs_opts = NULL;
+     if (!blk) {
+-        error_propagate(errp, local_err);
+         goto fail;
+     } else {
+-        assert(!local_err);
++        assert(!*errp);
+     }
+ 
+     /* Create legacy DriveInfo */
+@@ -1183,10 +1174,10 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+                                                          const char *name,
+                                                          Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     AioContext *aio_context;
+     QEMUSnapshotInfo sn;
+-    Error *local_err = NULL;
+     SnapshotInfo *info = NULL;
+     int ret;
+ 
+@@ -1214,9 +1205,8 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+         goto out_aio_context;
+     }
+ 
+-    ret = bdrv_snapshot_find_by_id_and_name(bs, id, name, &sn, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = bdrv_snapshot_find_by_id_and_name(bs, id, name, &sn, errp);
++    if (*errp) {
+         goto out_aio_context;
+     }
+     if (!ret) {
+@@ -1227,9 +1217,8 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
+         goto out_aio_context;
+     }
+ 
+-    bdrv_snapshot_delete(bs, id, name, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    bdrv_snapshot_delete(bs, id, name, errp);
++    if (*errp) {
+         goto out_aio_context;
+     }
+ 
+@@ -1370,7 +1359,7 @@ static int action_check_completion_mode(BlkActionState *s, Error **errp)
+ static void internal_snapshot_prepare(BlkActionState *common,
+                                       Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     const char *device;
+     const char *name;
+     BlockDriverState *bs;
+@@ -1432,9 +1421,8 @@ static void internal_snapshot_prepare(BlkActionState *common,
+ 
+     /* check whether a snapshot with name exist */
+     ret = bdrv_snapshot_find_by_id_and_name(bs, NULL, name, &old_sn,
+-                                            &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                                            errp);
++    if (*errp) {
+         goto out;
+     } else if (ret) {
+         error_setg(errp,
+@@ -1522,9 +1510,9 @@ typedef struct ExternalSnapshotState {
+ static void external_snapshot_prepare(BlkActionState *common,
+                                       Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int flags = 0;
+     QDict *options = NULL;
+-    Error *local_err = NULL;
+     /* Device and node name of the image to generate the snapshot from */
+     const char *device;
+     const char *node_name;
+@@ -1635,9 +1623,8 @@ static void external_snapshot_prepare(BlkActionState *common,
+             bdrv_img_create(new_image_file, format,
+                             state->old_bs->filename,
+                             state->old_bs->drv->format_name,
+-                            NULL, size, flags, false, &local_err);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
++                            NULL, size, flags, false, errp);
++            if (*errp) {
+                 goto out;
+             }
+         }
+@@ -1685,9 +1672,8 @@ static void external_snapshot_prepare(BlkActionState *common,
+      * can fail, so we need to do it in .prepare; undoing it for abort is
+      * always possible. */
+     bdrv_ref(state->new_bs);
+-    bdrv_append(state->new_bs, state->old_bs, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    bdrv_append(state->new_bs, state->old_bs, errp);
++    if (*errp) {
+         goto out;
+     }
+     state->overlay_appended = true;
+@@ -1767,11 +1753,11 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+ 
+ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DriveBackupState *state = DO_UPCAST(DriveBackupState, common, common);
+     BlockDriverState *bs;
+     DriveBackup *backup;
+     AioContext *aio_context;
+-    Error *local_err = NULL;
+ 
+     assert(common->action->type == TRANSACTION_ACTION_KIND_DRIVE_BACKUP);
+     backup = common->action->u.drive_backup.data;
+@@ -1789,9 +1775,8 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+ 
+     state->bs = bs;
+ 
+-    state->job = do_drive_backup(backup, common->block_job_txn, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    state->job = do_drive_backup(backup, common->block_job_txn, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -1857,11 +1842,11 @@ static BlockJob *do_blockdev_backup(BlockdevBackup *backup, JobTxn *txn,
+ 
+ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockdevBackupState *state = DO_UPCAST(BlockdevBackupState, common, common);
+     BlockdevBackup *backup;
+     BlockDriverState *bs, *target;
+     AioContext *aio_context;
+-    Error *local_err = NULL;
+ 
+     assert(common->action->type == TRANSACTION_ACTION_KIND_BLOCKDEV_BACKUP);
+     backup = common->action->u.blockdev_backup.data;
+@@ -1883,9 +1868,8 @@ static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
+     /* Paired with .clean() */
+     bdrv_drained_begin(state->bs);
+ 
+-    state->job = do_blockdev_backup(backup, common->block_job_txn, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    state->job = do_blockdev_backup(backup, common->block_job_txn, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -1952,7 +1936,7 @@ typedef struct BlockDirtyBitmapState {
+ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+                                            Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     BlockDirtyBitmapAdd *action;
+     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
+                                              common, common);
+@@ -1968,12 +1952,11 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+                                action->has_persistent, action->persistent,
+                                action->has_autoload, action->autoload,
+                                action->has_disabled, action->disabled,
+-                               &local_err);
++                               errp);
+ 
+-    if (!local_err) {
++    if (!*errp) {
+         state->prepared = true;
+     } else {
+-        error_propagate(errp, local_err);
+     }
+ }
+ 
+@@ -2300,10 +2283,10 @@ void qmp_transaction(TransactionActionList *dev_list,
+                      struct TransactionProperties *props,
+                      Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     TransactionActionList *dev_entry = dev_list;
+     JobTxn *block_job_txn = NULL;
+     BlkActionState *state, *next;
+-    Error *local_err = NULL;
+ 
+     QTAILQ_HEAD(, BlkActionState) snap_bdrv_states;
+     QTAILQ_INIT(&snap_bdrv_states);
+@@ -2339,9 +2322,8 @@ void qmp_transaction(TransactionActionList *dev_list,
+         state->txn_props = props;
+         QTAILQ_INSERT_TAIL(&snap_bdrv_states, state, entry);
+ 
+-        state->ops->prepare(state, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        state->ops->prepare(state, errp);
++        if (*errp) {
+             goto delete_and_fail;
+         }
+     }
+@@ -2379,7 +2361,7 @@ void qmp_eject(bool has_device, const char *device,
+                bool has_id, const char *id,
+                bool has_force, bool force, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int rc;
+ 
+     if (!has_force) {
+@@ -2388,12 +2370,11 @@ void qmp_eject(bool has_device, const char *device,
+ 
+     rc = do_open_tray(has_device ? device : NULL,
+                       has_id ? id : NULL,
+-                      force, &local_err);
++                      force, errp);
+     if (rc && rc != -ENOSYS) {
+-        error_propagate(errp, local_err);
+         return;
+     }
+-    error_free(local_err);
++    error_free_errp(errp);
+ 
+     blockdev_remove_medium(has_device, device, has_id, id, errp);
+ }
+@@ -2466,7 +2447,7 @@ void qmp_blockdev_open_tray(bool has_device, const char *device,
+                             bool has_force, bool force,
+                             Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int rc;
+ 
+     if (!has_force) {
+@@ -2474,20 +2455,19 @@ void qmp_blockdev_open_tray(bool has_device, const char *device,
+     }
+     rc = do_open_tray(has_device ? device : NULL,
+                       has_id ? id : NULL,
+-                      force, &local_err);
++                      force, errp);
+     if (rc && rc != -ENOSYS && rc != -EINPROGRESS) {
+-        error_propagate(errp, local_err);
+         return;
+     }
+-    error_free(local_err);
++    error_free_errp(errp);
+ }
+ 
+ void qmp_blockdev_close_tray(bool has_device, const char *device,
+                              bool has_id, const char *id,
+                              Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockBackend *blk;
+-    Error *local_err = NULL;
+ 
+     device = has_device ? device : NULL;
+     id = has_id ? id : NULL;
+@@ -2511,9 +2491,8 @@ void qmp_blockdev_close_tray(bool has_device, const char *device,
+         return;
+     }
+ 
+-    blk_dev_change_media_cb(blk, true, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    blk_dev_change_media_cb(blk, true, errp);
++    if (*errp) {
+         return;
+     }
+ }
+@@ -2583,7 +2562,7 @@ void qmp_blockdev_remove_medium(const char *id, Error **errp)
+ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
+                                             BlockDriverState *bs, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     bool has_device;
+     int ret;
+ 
+@@ -2616,9 +2595,8 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
+          * slot here.
+          * Do it after blk_insert_bs() so blk_is_inserted(blk) returns the @load
+          * value passed here (i.e. true). */
+-        blk_dev_change_media_cb(blk, true, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        blk_dev_change_media_cb(blk, true, errp);
++        if (*errp) {
+             blk_remove_bs(blk);
+             return;
+         }
+@@ -2667,13 +2645,13 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
+                                 BlockdevChangeReadOnlyMode read_only,
+                                 Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockBackend *blk;
+     BlockDriverState *medium_bs = NULL;
+     int bdrv_flags;
+     bool detect_zeroes;
+     int rc;
+     QDict *options = NULL;
+-    Error *err = NULL;
+ 
+     blk = qmp_get_blk(has_device ? device : NULL,
+                       has_id ? id : NULL,
+@@ -2725,23 +2703,19 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
+ 
+     rc = do_open_tray(has_device ? device : NULL,
+                       has_id ? id : NULL,
+-                      false, &err);
++                      false, errp);
+     if (rc && rc != -ENOSYS) {
+-        error_propagate(errp, err);
+         goto fail;
+     }
+-    error_free(err);
+-    err = NULL;
++    error_free_errp(errp);
+ 
+-    blockdev_remove_medium(has_device, device, has_id, id, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    blockdev_remove_medium(has_device, device, has_id, id, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+-    qmp_blockdev_insert_anon_medium(blk, medium_bs, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    qmp_blockdev_insert_anon_medium(blk, medium_bs, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+@@ -2926,6 +2900,7 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_remove(
+         const char *node, const char *name, bool release,
+         BlockDriverState **bitmap_bs, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
+ 
+@@ -2941,14 +2916,12 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_remove(
+ 
+     if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+-        Error *local_err = NULL;
+ 
+         aio_context_acquire(aio_context);
+-        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
++        bdrv_remove_persistent_dirty_bitmap(bs, name, errp);
+         aio_context_release(aio_context);
+ 
+-        if (local_err != NULL) {
+-            error_propagate(errp, local_err);
++        if (*errp) {
+             return NULL;
+         }
+     }
+@@ -3033,10 +3006,10 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_merge(
+         BlockDirtyBitmapMergeSourceList *bitmaps,
+         HBitmap **backup, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *dst, *src, *anon;
+     BlockDirtyBitmapMergeSourceList *lst;
+-    Error *local_err = NULL;
+ 
+     dst = block_dirty_bitmap_lookup(node, target, &bs, errp);
+     if (!dst) {
+@@ -3074,9 +3047,8 @@ static BdrvDirtyBitmap *do_block_dirty_bitmap_merge(
+             abort();
+         }
+ 
+-        bdrv_merge_dirty_bitmap(anon, src, NULL, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        bdrv_merge_dirty_bitmap(anon, src, NULL, errp);
++        if (*errp) {
+             dst = NULL;
+             goto out;
+         }
+@@ -3186,7 +3158,7 @@ void qmp_block_resize(bool has_device, const char *device,
+                       bool has_node_name, const char *node_name,
+                       int64_t size, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     BlockBackend *blk = NULL;
+     BlockDriverState *bs;
+     AioContext *aio_context;
+@@ -3194,9 +3166,8 @@ void qmp_block_resize(bool has_device, const char *device,
+ 
+     bs = bdrv_lookup_bs(has_device ? device : NULL,
+                         has_node_name ? node_name : NULL,
+-                        &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                        errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -3243,10 +3214,10 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+                       bool has_auto_dismiss, bool auto_dismiss,
+                       Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs, *iter;
+     BlockDriverState *base_bs = NULL;
+     AioContext *aio_context;
+-    Error *local_err = NULL;
+     const char *base_name = NULL;
+     int job_flags = JOB_DEFAULT;
+ 
+@@ -3319,9 +3290,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
+     }
+ 
+     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
+-                 job_flags, has_speed ? speed : 0, on_error, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                 job_flags, has_speed ? speed : 0, on_error, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -3343,11 +3313,11 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+                       bool has_auto_dismiss, bool auto_dismiss,
+                       Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     BlockDriverState *iter;
+     BlockDriverState *base_bs, *top_bs;
+     AioContext *aio_context;
+-    Error *local_err = NULL;
+     /* This will be part of the QMP command, if/when the
+      * BlockdevOnError change for blkmirror makes it in
+      */
+@@ -3372,15 +3342,14 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+      *  live commit feature versions; for this to work, we must make sure to
+      *  perform the device lookup before any generic errors that may occur in a
+      *  scenario in which all optional arguments are omitted. */
+-    bs = qmp_get_root_bs(device, &local_err);
++    bs = qmp_get_root_bs(device, errp);
+     if (!bs) {
+         bs = bdrv_lookup_bs(device, device, NULL);
+         if (!bs) {
+-            error_free(local_err);
++            error_free_errp(errp);
+             error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+                       "Device '%s' not found", device);
+         } else {
+-            error_propagate(errp, local_err);
+         }
+         return;
+     }
+@@ -3471,7 +3440,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+         }
+         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
+                             job_flags, speed, on_error,
+-                            filter_node_name, NULL, NULL, false, &local_err);
++                            filter_node_name, NULL, NULL, false, errp);
+     } else {
+         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
+         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
+@@ -3479,10 +3448,9 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+         }
+         commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, job_flags,
+                      speed, on_error, has_backing_file ? backing_file : NULL,
+-                     filter_node_name, &local_err);
++                     filter_node_name, errp);
+     }
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -3610,13 +3578,13 @@ static BlockJob *do_backup_common(BackupCommon *backup,
+ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+                                  Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     BlockDriverState *target_bs;
+     BlockDriverState *source = NULL;
+     BlockJob *job = NULL;
+     AioContext *aio_context;
+     QDict *options;
+-    Error *local_err = NULL;
+     int flags;
+     int64_t size;
+     bool set_backing_hd = false;
+@@ -3676,15 +3644,14 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+             bdrv_refresh_filename(source);
+             bdrv_img_create(backup->target, backup->format, source->filename,
+                             source->drv->format_name, NULL,
+-                            size, flags, false, &local_err);
++                            size, flags, false, errp);
+         } else {
+             bdrv_img_create(backup->target, backup->format, NULL, NULL, NULL,
+-                            size, flags, false, &local_err);
++                            size, flags, false, errp);
+         }
+     }
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -3701,8 +3668,8 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+     }
+ 
+     if (set_backing_hd) {
+-        bdrv_set_backing_hd(target_bs, source, &local_err);
+-        if (local_err) {
++        bdrv_set_backing_hd(target_bs, source, errp);
++        if (*errp) {
+             goto unref;
+         }
+     }
+@@ -3898,11 +3865,11 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
+ 
+ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     BlockDriverState *source, *target_bs;
+     AioContext *aio_context;
+     BlockMirrorBackingMode backing_mode;
+-    Error *local_err = NULL;
+     QDict *options = NULL;
+     int flags;
+     int64_t size;
+@@ -3970,7 +3937,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+         /* create new image w/o backing file */
+         assert(format);
+         bdrv_img_create(arg->target, format,
+-                        NULL, NULL, NULL, size, flags, false, &local_err);
++                        NULL, NULL, NULL, size, flags, false, errp);
+     } else {
+         switch (arg->mode) {
+         case NEW_IMAGE_MODE_EXISTING:
+@@ -3981,15 +3948,14 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+             bdrv_img_create(arg->target, format,
+                             source->filename,
+                             source->drv->format_name,
+-                            NULL, size, flags, false, &local_err);
++                            NULL, size, flags, false, errp);
+             break;
+         default:
+             abort();
+         }
+     }
+ 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -4032,9 +3998,8 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+                            arg->has_copy_mode, arg->copy_mode,
+                            arg->has_auto_finalize, arg->auto_finalize,
+                            arg->has_auto_dismiss, arg->auto_dismiss,
+-                           &local_err);
++                           errp);
+     bdrv_unref(target_bs);
+-    error_propagate(errp, local_err);
+ out:
+     aio_context_release(aio_context);
+ }
+@@ -4057,11 +4022,11 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+                          bool has_auto_dismiss, bool auto_dismiss,
+                          Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     BlockDriverState *target_bs;
+     AioContext *aio_context;
+     BlockMirrorBackingMode backing_mode = MIRROR_LEAVE_BACKING_CHAIN;
+-    Error *local_err = NULL;
+     bool zero_target;
+     int ret;
+ 
+@@ -4097,8 +4062,7 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+                            has_copy_mode, copy_mode,
+                            has_auto_finalize, auto_finalize,
+                            has_auto_dismiss, auto_dismiss,
+-                           &local_err);
+-    error_propagate(errp, local_err);
++                           errp);
+ out:
+     aio_context_release(aio_context);
+ }
+@@ -4243,10 +4207,10 @@ void qmp_change_backing_file(const char *device,
+                              const char *backing_file,
+                              Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs = NULL;
+     AioContext *aio_context;
+     BlockDriverState *image_bs = NULL;
+-    Error *local_err = NULL;
+     bool ro;
+     int ret;
+ 
+@@ -4258,9 +4222,8 @@ void qmp_change_backing_file(const char *device,
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+ 
+-    image_bs = bdrv_lookup_bs(NULL, image_node_name, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    image_bs = bdrv_lookup_bs(NULL, image_node_name, errp);
++    if (*errp) {
+         goto out;
+     }
+ 
+@@ -4308,8 +4271,7 @@ void qmp_change_backing_file(const char *device,
+     }
+ 
+     if (ro) {
+-        bdrv_reopen_set_read_only(image_bs, true, &local_err);
+-        error_propagate(errp, local_err);
++        bdrv_reopen_set_read_only(image_bs, true, errp);
+     }
+ 
+ out:
+@@ -4349,15 +4311,14 @@ out:
+ 
+ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     QObject *obj;
+     Visitor *v = qobject_output_visitor_new(&obj);
+     QDict *qdict;
+-    Error *local_err = NULL;
+ 
+-    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_BlockdevOptions(v, NULL, &options, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+@@ -4384,11 +4345,11 @@ fail:
+ 
+ void qmp_x_blockdev_reopen(BlockdevOptions *options, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockDriverState *bs;
+     AioContext *ctx;
+     QObject *obj;
+     Visitor *v = qobject_output_visitor_new(&obj);
+-    Error *local_err = NULL;
+     BlockReopenQueue *queue;
+     QDict *qdict;
+ 
+@@ -4405,9 +4366,8 @@ void qmp_x_blockdev_reopen(BlockdevOptions *options, Error **errp)
+     }
+ 
+     /* Put all options in a QDict and flatten it */
+-    visit_type_BlockdevOptions(v, NULL, &options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    visit_type_BlockdevOptions(v, NULL, &options, errp);
++    if (*errp) {
+         goto fail;
+     }
+ 
+diff --git a/blockjob.c b/blockjob.c
+index c6e20e2fcd..2673fd91b8 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -394,6 +394,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+                        uint64_t shared_perm, int64_t speed, int flags,
+                        BlockCompletionFunc *cb, void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockBackend *blk;
+     BlockJob *job;
+     int ret;
+@@ -449,12 +450,9 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+ 
+     /* Only set speed when necessary to avoid NotSupported error */
+     if (speed != 0) {
+-        Error *local_err = NULL;
+-
+-        block_job_set_speed(job, speed, &local_err);
+-        if (local_err) {
++        block_job_set_speed(job, speed, errp);
++        if (*errp) {
+             job_early_fail(&job->job);
+-            error_propagate(errp, local_err);
+             return NULL;
+         }
+     }
+diff --git a/hw/block/onenand.c b/hw/block/onenand.c
+index fcc5a69b90..4e0f1bc1e5 100644
+--- a/hw/block/onenand.c
++++ b/hw/block/onenand.c
+@@ -776,11 +776,11 @@ static const MemoryRegionOps onenand_ops = {
+ 
+ static void onenand_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     OneNANDState *s = ONE_NAND(dev);
+     uint32_t size = 1 << (24 + ((s->id.dev >> 4) & 7));
+     void *ram;
+-    Error *local_err = NULL;
+ 
+     s->base = (hwaddr)-1;
+     s->rdy = NULL;
+@@ -800,9 +800,8 @@ static void onenand_realize(DeviceState *dev, Error **errp)
+             return;
+         }
+         blk_set_perm(s->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
+-                     BLK_PERM_ALL, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++                     BLK_PERM_ALL, errp);
++        if (*errp) {
+             return;
+         }
+         s->blk_cur = s->blk;
+diff --git a/job.c b/job.c
+index 04409b40aa..a12108a6d7 100644
+--- a/job.c
++++ b/job.c
+@@ -966,16 +966,15 @@ void job_complete(Job *job, Error **errp)
+ 
+ int job_finish_sync(Job *job, void (*finish)(Job *, Error **errp), Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int ret;
+ 
+     job_ref(job);
+ 
+     if (finish) {
+-        finish(job, &local_err);
++        finish(job, errp);
+     }
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         job_unref(job);
+         return -EBUSY;
+     }
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.21.0
+
 
