@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD739ECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ACC1C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:24:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92DC020673
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:21:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92DC020673
+	by mail.kernel.org (Postfix) with ESMTPS id D3AD820673
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:24:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3AD820673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzXy-0002bw-QK
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:21:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41681)
+	id 1iIza3-0005RD-PK
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:23:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmX-0007u9-T7
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:48 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgu-0000Um-8F
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmW-00038l-Nq
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:45 -0400
-Received: from relay.sw.ru ([185.231.240.75]:50008)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgs-00086y-O6
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:56 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49656)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxmV-00038R-SS
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:44 -0400
+ id 1iIxgs-00086p-H3
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:22:54 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR8-0003XG-VV; Fri, 11 Oct 2019 19:06:39 +0300
+ id 1iIxR9-0003XG-CQ; Fri, 11 Oct 2019 19:06:39 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 120/126] hw/cpu/core.c: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:46 +0300
-Message-Id: <20191011160552.22907-121-vsementsov@virtuozzo.com>
+Subject: [RFC v5 122/126] iothread.c: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:48 +0300
+Message-Id: <20191011160552.22907-123-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -110,47 +110,84 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/cpu/core.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ iothread.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-index 9874c5c870..9620bd7939 100644
---- a/hw/cpu/core.c
-+++ b/hw/cpu/core.c
-@@ -27,13 +27,12 @@ static void core_prop_get_core_id(Object *obj, Visitor *v, const char *name,
- static void core_prop_set_core_id(Object *obj, Visitor *v, const char *name,
-                                   void *opaque, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     CPUCore *core = CPU_CORE(obj);
--    Error *local_err = NULL;
-     int64_t value;
+diff --git a/iothread.c b/iothread.c
+index 7130be58e3..726b60df53 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -163,15 +163,14 @@ static void iothread_init_gcontext(IOThread *iothread)
  
--    visit_type_int(v, name, &value, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    visit_type_int(v, name, &value, errp);
-+    if (*errp) {
+ static void iothread_complete(UserCreatable *obj, Error **errp)
+ {
+-    Error *local_error = NULL;
++    ERRP_AUTO_PROPAGATE();
+     IOThread *iothread = IOTHREAD(obj);
+     char *name, *thread_name;
+ 
+     iothread->stopping = false;
+     iothread->running = true;
+-    iothread->ctx = aio_context_new(&local_error);
++    iothread->ctx = aio_context_new(errp);
+     if (!iothread->ctx) {
+-        error_propagate(errp, local_error);
          return;
      }
  
-@@ -57,13 +56,12 @@ static void core_prop_get_nr_threads(Object *obj, Visitor *v, const char *name,
- static void core_prop_set_nr_threads(Object *obj, Visitor *v, const char *name,
-                                      void *opaque, Error **errp)
+@@ -185,9 +184,8 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+                                 iothread->poll_max_ns,
+                                 iothread->poll_grow,
+                                 iothread->poll_shrink,
+-                                &local_error);
+-    if (local_error) {
+-        error_propagate(errp, local_error);
++                                errp);
++    if (*errp) {
+         aio_context_unref(iothread->ctx);
+         iothread->ctx = NULL;
+         return;
+@@ -237,21 +235,21 @@ static void iothread_get_poll_param(Object *obj, Visitor *v,
+ static void iothread_set_poll_param(Object *obj, Visitor *v,
+         const char *name, void *opaque, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     CPUCore *core = CPU_CORE(obj);
+     IOThread *iothread = IOTHREAD(obj);
+     PollParamInfo *info = opaque;
+     int64_t *field = (void *)iothread + info->offset;
 -    Error *local_err = NULL;
      int64_t value;
  
--    visit_type_int(v, name, &value, &local_err);
+-    visit_type_int64(v, name, &value, &local_err);
 -    if (local_err) {
--        error_propagate(errp, local_err);
-+    visit_type_int(v, name, &value, errp);
+-        goto out;
++    visit_type_int64(v, name, &value, errp);
 +    if (*errp) {
-         return;
++        return;
      }
  
+     if (value < 0) {
+-        error_setg(&local_err, "%s value must be in range [0, %"PRId64"]",
++        error_setg(errp, "%s value must be in range [0, %"PRId64"]",
+                    info->name, INT64_MAX);
+-        goto out;
++        return;
+     }
+ 
+     *field = value;
+@@ -261,11 +259,8 @@ static void iothread_set_poll_param(Object *obj, Visitor *v,
+                                     iothread->poll_max_ns,
+                                     iothread->poll_grow,
+                                     iothread->poll_shrink,
+-                                    &local_err);
++                                    errp);
+     }
+-
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void iothread_class_init(ObjectClass *klass, void *class_data)
 -- 
 2.21.0
 
