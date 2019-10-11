@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA88C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7218ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:28:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B5F42064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:28:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B5F42064A
+	by mail.kernel.org (Postfix) with ESMTPS id AE0722064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:28:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE0722064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyi5-0006e0-Al
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:28:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36440)
+	id 1iIyiN-0006oZ-Lm
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:28:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41263)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0006It-4n
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:29 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxlA-0006jV-8D
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQw-0004Vh-QX
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47894)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxl6-0002J0-Hc
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:27:19 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49774)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQw-00047A-JD; Fri, 11 Oct 2019 12:06:26 -0400
+ id 1iIxl4-0002GX-LT; Fri, 11 Oct 2019 12:27:14 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQb-0003XG-3k; Fri, 11 Oct 2019 19:06:05 +0300
+ id 1iIxR7-0003XG-GU; Fri, 11 Oct 2019 19:06:37 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 023/126] hw/vfio/ap: drop local_err from vfio_ap_realize
-Date: Fri, 11 Oct 2019 19:04:09 +0300
-Message-Id: <20191011160552.22907-24-vsementsov@virtuozzo.com>
+Subject: [RFC v5 113/126] qcow: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:39 +0300
+Message-Id: <20191011160552.22907-114-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -59,66 +59,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, vsementsov@virtuozzo.com,
- Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, armbru@redhat.com,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Alex Williamson <alex.williamson@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No reason for local_err here, use errp directly instead.
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/vfio/ap.c | 16 +++-------------
- 1 file changed, 3 insertions(+), 13 deletions(-)
+ block/qcow.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index da6a20669d..db816e1860 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -87,16 +87,14 @@ static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
- 
- static void vfio_ap_realize(DeviceState *dev, Error **errp)
+diff --git a/block/qcow.c b/block/qcow.c
+index 5bdf72ba33..c58d3e36be 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -117,11 +117,11 @@ static QemuOptsList qcow_runtime_opts = {
+ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+                      Error **errp)
  {
--    int ret;
-     char *mdevid;
++    ERRP_AUTO_PROPAGATE();
+     BDRVQcowState *s = bs->opaque;
+     unsigned int len, i, shift;
+     int ret;
+     QCowHeader header;
 -    Error *local_err = NULL;
-     VFIOGroup *vfio_group;
-     APDevice *apdev = AP_DEVICE(dev);
-     VFIOAPDevice *vapdev = VFIO_AP_DEVICE(apdev);
+     QCryptoBlockOpenOptions *crypto_opts = NULL;
+     unsigned int cflags = 0;
+     QDict *encryptopts = NULL;
+@@ -314,9 +314,8 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+     error_setg(&s->migration_blocker, "The qcow format used by node '%s' "
+                "does not support live migration",
+                bdrv_get_device_or_node_name(bs));
+-    ret = migrate_add_blocker(s->migration_blocker, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    ret = migrate_add_blocker(s->migration_blocker, errp);
++    if (*errp) {
+         error_free(s->migration_blocker);
+         goto fail;
+     }
+@@ -942,12 +941,12 @@ exit:
+ static int coroutine_fn qcow_co_create_opts(const char *filename,
+                                             QemuOpts *opts, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BlockdevCreateOptions *create_options = NULL;
+     BlockDriverState *bs = NULL;
+     QDict *qdict;
+     Visitor *v;
+     const char *val;
+-    Error *local_err = NULL;
+     int ret;
  
--    vfio_group = vfio_ap_get_group(vapdev, &local_err);
-+    vfio_group = vfio_ap_get_group(vapdev, errp);
-     if (!vfio_group) {
--        goto out_err;
-+        return;
+     static const QDictRenames opt_renames[] = {
+@@ -977,9 +976,8 @@ static int coroutine_fn qcow_co_create_opts(const char *filename,
      }
  
-     vapdev->vdev.ops = &vfio_ap_ops;
-@@ -113,18 +111,10 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
-      */
-     vapdev->vdev.balloon_allowed = true;
+     /* Create and open the file (protocol layer) */
+-    ret = bdrv_create_file(filename, opts, &local_err);
++    ret = bdrv_create_file(filename, opts, errp);
+     if (ret < 0) {
+-        error_propagate(errp, local_err);
+         goto fail;
+     }
  
--    ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
--    if (ret) {
--        goto out_get_dev_err;
--    }
--
--    return;
-+    vfio_get_device(vfio_group, mdevid, &vapdev->vdev, errp);
+@@ -1000,11 +998,10 @@ static int coroutine_fn qcow_co_create_opts(const char *filename,
+         goto fail;
+     }
  
--out_get_dev_err:
-     vfio_ap_put_device(vapdev);
-     vfio_put_group(vfio_group);
--out_err:
--    error_propagate(errp, local_err);
- }
+-    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
++    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
+     visit_free(v);
  
- static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
+     }
 -- 
 2.21.0
 
