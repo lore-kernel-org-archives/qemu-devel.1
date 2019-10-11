@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD21ECE58E
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8BCC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:33:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 565C42089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:33:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 565C42089F
+	by mail.kernel.org (Postfix) with ESMTPS id 6FA732089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:33:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FA732089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxrB-0003ze-VP
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:33:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36648)
+	id 1iIxrH-0004AG-8b
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:33:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36550)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR3-0006Rv-3p
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR0-0006N8-Ex
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR1-0004eO-Ms
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:32 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47990)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0004bU-Uz
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:30 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48198)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR1-0004B7-Dm; Fri, 11 Oct 2019 12:06:31 -0400
+ id 1iIxQy-0004JW-My
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQg-0003XG-37; Fri, 11 Oct 2019 19:06:10 +0300
+ id 1iIxQn-0003XG-8m; Fri, 11 Oct 2019 19:06:17 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 040/126] Floppy: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:26 +0300
-Message-Id: <20191011160552.22907-41-vsementsov@virtuozzo.com>
+Subject: [RFC v5 063/126] virtio-gpu: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:49 +0300
+Message-Id: <20191011160552.22907-64-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +61,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
- Greg Kurz <groug@kaod.org>, John Snow <jsnow@redhat.com>
+ "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,72 +111,92 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/block/fdc.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ hw/display/virtio-gpu-base.c | 7 +++----
+ hw/display/virtio-gpu-pci.c  | 7 +++----
+ hw/display/virtio-vga.c      | 7 +++----
+ 3 files changed, 9 insertions(+), 12 deletions(-)
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index ac5d31e8c1..7590b63c19 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -2522,11 +2522,11 @@ static void fdctrl_result_timer(void *opaque)
- static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
-                                   Error **errp)
+diff --git a/hw/display/virtio-gpu-base.c b/hw/display/virtio-gpu-base.c
+index 55e07995fe..e1f25456a7 100644
+--- a/hw/display/virtio-gpu-base.c
++++ b/hw/display/virtio-gpu-base.c
+@@ -126,9 +126,9 @@ virtio_gpu_base_device_realize(DeviceState *qdev,
+                                VirtIOHandleOutput cursor_cb,
+                                Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     unsigned int i;
-     FDrive *drive;
-     DeviceState *dev;
-     BlockBackend *blk;
+     VirtIODevice *vdev = VIRTIO_DEVICE(qdev);
+     VirtIOGPUBase *g = VIRTIO_GPU_BASE(qdev);
 -    Error *local_err = NULL;
+     int i;
  
-     for (i = 0; i < MAX_FD; i++) {
-         drive = &fdctrl->drives[i];
-@@ -2548,17 +2548,15 @@ static void fdctrl_connect_drives(FDCtrl *fdctrl, DeviceState *fdc_dev,
-         blk_ref(blk);
-         blk_detach_dev(blk, fdc_dev);
-         fdctrl->qdev_for_drives[i].blk = NULL;
--        qdev_prop_set_drive(dev, "drive", blk, &local_err);
-+        qdev_prop_set_drive(dev, "drive", blk, errp);
-         blk_unref(blk);
- 
+     if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
+@@ -139,9 +139,8 @@ virtio_gpu_base_device_realize(DeviceState *qdev,
+     g->use_virgl_renderer = false;
+     if (virtio_gpu_virgl_enabled(g->conf)) {
+         error_setg(&g->migration_blocker, "virgl is not yet migratable");
+-        migrate_add_blocker(g->migration_blocker, &local_err);
 -        if (local_err) {
 -            error_propagate(errp, local_err);
++        migrate_add_blocker(g->migration_blocker, errp);
 +        if (*errp) {
-             return;
+             error_free(g->migration_blocker);
+             return false;
          }
+diff --git a/hw/display/virtio-gpu-pci.c b/hw/display/virtio-gpu-pci.c
+index 25e4038874..13cd695a46 100644
+--- a/hw/display/virtio-gpu-pci.c
++++ b/hw/display/virtio-gpu-pci.c
+@@ -27,18 +27,17 @@ static Property virtio_gpu_pci_base_properties[] = {
  
--        object_property_set_bool(OBJECT(dev), true, "realized", &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        object_property_set_bool(OBJECT(dev), true, "realized", errp);
-+        if (*errp) {
-             return;
-         }
-     }
-@@ -2685,10 +2683,10 @@ static const MemoryRegionPortio fdc_portio_list[] = {
- 
- static void isabus_fdc_realize(DeviceState *dev, Error **errp)
+ static void virtio_gpu_pci_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     ISADevice *isadev = ISA_DEVICE(dev);
-     FDCtrlISABus *isa = ISA_FDC(dev);
-     FDCtrl *fdctrl = &isa->state;
--    Error *err = NULL;
+     VirtIOGPUPCIBase *vgpu = VIRTIO_GPU_PCI_BASE(vpci_dev);
+     VirtIOGPUBase *g = vgpu->vgpu;
+     DeviceState *vdev = DEVICE(g);
+     int i;
+-    Error *local_error = NULL;
  
-     isa_register_portio_list(isadev, &fdctrl->portio_list,
-                              isa->iobase, fdc_portio_list, fdctrl,
-@@ -2705,9 +2703,8 @@ static void isabus_fdc_realize(DeviceState *dev, Error **errp)
-     }
+     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+     virtio_pci_force_virtio_1(vpci_dev);
+-    object_property_set_bool(OBJECT(vdev), true, "realized", &local_error);
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
  
-     qdev_set_legacy_instance_id(dev, isa->iobase, 2);
--    fdctrl_realize_common(dev, fdctrl, &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
-+    fdctrl_realize_common(dev, fdctrl, errp);
+-    if (local_error) {
+-        error_propagate(errp, local_error);
 +    if (*errp) {
          return;
      }
- }
+ 
+diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
+index cc6e66ea1c..047528ec37 100644
+--- a/hw/display/virtio-vga.c
++++ b/hw/display/virtio-vga.c
+@@ -90,10 +90,10 @@ static const VMStateDescription vmstate_virtio_vga_base = {
+ /* VGA device wrapper around PCI device around virtio GPU */
+ static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VirtIOVGABase *vvga = VIRTIO_VGA_BASE(vpci_dev);
+     VirtIOGPUBase *g = vvga->vgpu;
+     VGACommonState *vga = &vvga->vga;
+-    Error *err = NULL;
+     uint32_t offset;
+     int i;
+ 
+@@ -138,9 +138,8 @@ static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+     /* init virtio bits */
+     qdev_set_parent_bus(DEVICE(g), BUS(&vpci_dev->bus));
+     virtio_pci_force_virtio_1(vpci_dev);
+-    object_property_set_bool(OBJECT(g), true, "realized", &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(g), true, "realized", errp);
++    if (*errp) {
+         return;
+     }
+ 
 -- 
 2.21.0
 
