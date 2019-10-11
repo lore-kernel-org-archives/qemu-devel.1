@@ -2,117 +2,73 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7957ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 583A8C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:54:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95CFF20679
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:52:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="cmzzY7/w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95CFF20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 29AC820679
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:54:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29AC820679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIpiu-0001Sz-GA
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:52:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35408)
+	id 1iIpkT-0003tz-Ah
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:54:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36292)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIpYL-0000hw-4V
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:41:34 -0400
+ (envelope-from <lersek@redhat.com>) id 1iIpd8-0004fr-3d
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:46:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIpYK-0003hK-39
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:41:33 -0400
-Received: from mail-eopbgr10113.outbound.protection.outlook.com
- ([40.107.1.113]:23501 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIpYE-0003d2-TF; Fri, 11 Oct 2019 03:41:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DBQY5qhr6FvLjBJ8L79jct1SSHRViSRE07G83/+O5Y3t24JaU+lDYFOEB4ePfaXeTLQzsoIyz7S6mLRzUV8vxLGDHOk3+aQHd+zHs+Ypa+53TKNwZLgMe7TQMGi/O2cVpeZdzdcIUvT6py4a3rlY5efDFuPY5uPFIqYmA5ALGFLKKiuGTtDgBy83ui/tZxT3ZL7XicIFsz9KscxbBnFTAoC96WOX/XL/evnOvNUGIS7/kPuQOdDtDL+0OG909fZUm+OO98Z5T8Dg9v3hrTvOnfKHKOL6EPvwhRbCd8vhKfMorjbnyhDxx4/5jXnRxd/jjJoQw88IBRp63ZvGAXI9Xg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xI8rt3+fS4QcOpgfQetZBHeg4htyBmOoOtQeyugTto0=;
- b=l4g0RK7bkw/mStUn0SYT0KzkQGkWWcu6dxQMIfMGH/7Cbl6ibQ7MsTEMWYtqGy315Cy9fPpUjIRwn1Gy7MF6dg85ng0O605i6Fw+ATzDUGd/IUo/yFWomR30epJIpGw/amvBBWLp7fAaMLK7xl7LQeQ1TSMKLEoE7GHn3ZKZS5UUx2l76Cgvok4a2RI7aBz+/GR6zplkg0INMkZkrZRKjBzLYsHaSX8xv7hNyIH/qJdSttxlW39qs5NHgkfFBR5LI+dp6XMU0zulmDNULv5m3EIYixovljlDi536z1RxbiPyvC9xXs0d0eXCQCAjaFA85WORRFvktXx4wF6USnmn0g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xI8rt3+fS4QcOpgfQetZBHeg4htyBmOoOtQeyugTto0=;
- b=cmzzY7/w6ZP1za1Yd22HKOk8KTkbxIYyXdU3L7JRX3I9ADxLVZ5mP0DN8SjZcW9JX1DWaBavs/Zjre1ltuuk7yt8a7yKS3NLu55bbTGqquVqmFbxP9qRiWWzPc+SHqfNIdkgQJNtT2pzQ2mNzKPhZBmEblUwBh3RX8gLTojHtZ4=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5018.eurprd08.prod.outlook.com (10.255.16.139) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.21; Fri, 11 Oct 2019 07:41:20 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::2856:990a:197a:288f%2]) with mapi id 15.20.2347.021; Fri, 11 Oct 2019
- 07:41:20 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v2 2/2] nbd: Allow description when creating NBD blockdev
-Thread-Topic: [PATCH v2 2/2] nbd: Allow description when creating NBD blockdev
-Thread-Index: AQHVf629k2MuG+kVEE64yFRXZjDGPadVDyyA
-Date: Fri, 11 Oct 2019 07:41:20 +0000
-Message-ID: <ac6040ac-a42a-8c23-3958-6566b22960b9@virtuozzo.com>
-References: <20191010210018.22000-1-eblake@redhat.com>
- <20191010210018.22000-3-eblake@redhat.com>
-In-Reply-To: <20191010210018.22000-3-eblake@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P190CA0026.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::15)
- To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191011104116975
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9b8c6d94-b5df-4454-739a-08d74e1e6864
-x-ms-traffictypediagnostic: DB8PR08MB5018:
-x-microsoft-antispam-prvs: <DB8PR08MB50183E63AAD69C1779A72012C1970@DB8PR08MB5018.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2657;
-x-forefront-prvs: 0187F3EA14
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39830400003)(346002)(376002)(396003)(366004)(136003)(189003)(199004)(66476007)(8936002)(6116002)(8676002)(6512007)(11346002)(25786009)(446003)(476003)(486006)(6436002)(7736002)(66066001)(2616005)(6246003)(4326008)(31686004)(81156014)(86362001)(26005)(66946007)(14454004)(186003)(256004)(3846002)(71190400001)(71200400001)(6486002)(81166006)(66446008)(5660300002)(102836004)(31696002)(64756008)(66556008)(110136005)(54906003)(386003)(2501003)(6506007)(36756003)(99286004)(229853002)(305945005)(478600001)(316002)(52116002)(76176011)(2906002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5018;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: WqbhYo/Ixy0BlrC0VSo/Jqb+nwHreGtZLgRU92HyklIwWYBl9EN4fBU+u7IihJ071TagD2btCDm0B0utL9r3uqZWMHPky0mnGCvQIMIE8Z7M9JLgs3njciJVqoJUFvgn8zaqZYTT08L2rcHQWuHc1FNlVNuJyL56ihV9NFXQojBA6Bd+S+eNb47N2jKbabp57DtHlSSLTdl7FlIwX9HTogjOUXFPgkaTbx55w9aZoW588gYdP6o48U9FZyoDstYq6p8LUFPDup6DiGTZJ70dwks6SCkjg9LAw0Q0jNPTh+/R2DN9qHAeQ2ml3NKv31tijFHv2lgRAs4t2PMldv8Dv2zbpWaEr1v3GNFiw0NLB1gwYHhu2XFTH2RCDSu74KxyHankXKWfAnuOvsnW7FBku6R9PnXYsbbeF7RNhGqkSqI=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D5C0D84C1E42F348B60B0B44B4113B64@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <lersek@redhat.com>) id 1iIpd6-0001Wr-4m
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:46:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36354)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iIpd0-00019j-Pm
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:46:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C8DA3308620B;
+ Fri, 11 Oct 2019 07:46:16 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-120-177.rdu2.redhat.com
+ [10.10.120.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A5A5560BF4;
+ Fri, 11 Oct 2019 07:46:10 +0000 (UTC)
+Subject: Re: [PATCH 3/4] hw/i386: add facility to expose CPU topology over
+ fw-cfg
+From: Laszlo Ersek <lersek@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20191008105259.5378-1-lersek@redhat.com>
+ <20191008105259.5378-4-lersek@redhat.com>
+ <20191008175931.483af366@redhat.com>
+ <20191010055733-mutt-send-email-mst@kernel.org>
+ <20191010144812.20fd8b5d@redhat.com>
+ <0032ef80-4e75-5802-8a7a-098e9ff57cfa@redhat.com>
+ <20191010140724-mutt-send-email-mst@kernel.org>
+ <2d8022a1-e2f0-bd7c-76f2-f7e47327adea@redhat.com>
+Message-ID: <96d2ed57-e465-fc72-155d-457aa1fd04d8@redhat.com>
+Date: Fri, 11 Oct 2019 09:46:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b8c6d94-b5df-4454-739a-08d74e1e6864
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Oct 2019 07:41:20.5194 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aNcojDHoPFBN3+PFFk56xh1HOXUJWxSdfPtAe5Ps7L8nINDqG/u8Rm9Nv+RMQ9Kp+PgYypeitTC5qgICmw9BziVmYVnan85nQkFGh0y2l1E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5018
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.113
+In-Reply-To: <2d8022a1-e2f0-bd7c-76f2-f7e47327adea@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 11 Oct 2019 07:46:16 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,38 +80,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTEuMTAuMjAxOSAwOjAwLCBFcmljIEJsYWtlIHdyb3RlOg0KPiBBbGxvdyBibG9ja2RldnMgdG8g
-bWF0Y2ggdGhlIGZlYXR1cmUgYWxyZWFkeSBwcmVzZW50IGluIHFlbXUtbmJkIC1ELg0KPiBFbmhh
-bmNlIGlvdGVzdCAyMjMgdG8gY292ZXIgaXQuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEJs
-YWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCg0KUmV2aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNv
-di1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCg0KPiAtLS0NCj4gICBxYXBp
-L2Jsb2NrLmpzb24gICAgICAgICAgICB8IDggKysrKystLS0NCj4gICBibG9ja2Rldi1uYmQuYyAg
-ICAgICAgICAgICB8IDkgKysrKysrKystDQo+ICAgbW9uaXRvci9obXAtY21kcy5jICAgICAgICAg
-fCA0ICsrLS0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjIzICAgICB8IDIgKy0NCj4gICB0ZXN0
-cy9xZW11LWlvdGVzdHMvMjIzLm91dCB8IDEgKw0KPiAgIDUgZmlsZXMgY2hhbmdlZCwgMTcgaW5z
-ZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9xYXBpL2Jsb2Nr
-Lmpzb24gYi9xYXBpL2Jsb2NrLmpzb24NCj4gaW5kZXggMTQ1YzI2OGJiNjQ2Li5hNjYxN2I1YmQw
-M2EgMTAwNjQ0DQo+IC0tLSBhL3FhcGkvYmxvY2suanNvbg0KPiArKysgYi9xYXBpL2Jsb2NrLmpz
-b24NCj4gQEAgLTI1MCw5ICsyNTAsMTEgQEANCj4gICAjIEBuYW1lOiBFeHBvcnQgbmFtZS4gSWYg
-dW5zcGVjaWZpZWQsIHRoZSBAZGV2aWNlIHBhcmFtZXRlciBpcyB1c2VkIGFzIHRoZQ0KPiAgICMg
-ICAgICAgIGV4cG9ydCBuYW1lLiAoU2luY2UgMi4xMikNCj4gICAjDQo+ICsjIEBkZXNjcmlwdGlv
-bjogRnJlZS1mb3JtIGRlc2NyaXB0aW9uIG9mIHRoZSBleHBvcnQuIChTaW5jZSA0LjIpDQoNCldv
-cnRoIG1lbnRpb24gbWF4aW11bSBvZiA0MDk2Pw0KDQo+ICsjDQo+ICAgIyBAd3JpdGFibGU6IFdo
-ZXRoZXIgY2xpZW50cyBzaG91bGQgYmUgYWJsZSB0byB3cml0ZSB0byB0aGUgZGV2aWNlIHZpYSB0
-aGUNCj4gICAjICAgICBOQkQgY29ubmVjdGlvbiAoZGVmYXVsdCBmYWxzZSkuDQo+IC0NCj4gKyMN
-Cj4gICAjIEBiaXRtYXA6IEFsc28gZXhwb3J0IHRoZSBkaXJ0eSBiaXRtYXAgcmVhY2hhYmxlIGZy
-b20gQGRldmljZSwgc28gdGhlDQo+ICAgIyAgICAgICAgICBOQkQgY2xpZW50IGNhbiB1c2UgTkJE
-X09QVF9TRVRfTUVUQV9DT05URVhUIHdpdGgNCj4gICAjICAgICAgICAgICJxZW11OmRpcnR5LWJp
-dG1hcDpOQU1FIiB0byBpbnNwZWN0IHRoZSBiaXRtYXAuIChzaW5jZSA0LjApDQo+IEBAIC0yNjMs
-OCArMjY1LDggQEANCj4gICAjIFNpbmNlOiAxLjMuMA0KPiAgICMjDQoNClsuLl0NCg0KDQotLSAN
-CkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On 10/11/19 08:50, Laszlo Ersek wrote:
+> On 10/10/19 20:08, Michael S. Tsirkin wrote:
+>> On Thu, Oct 10, 2019 at 06:23:00PM +0200, Laszlo Ersek wrote:
+>>> On 10/10/19 14:48, Igor Mammedov wrote:
+>>>
+>>>> it doesn't really matter if it's ACPI blob or fw_cfg,
+>>>> what firmware needs is a table of possible CPUs with APIC IDs.
+>>>
+>>> To repeat my previous point:
+>>>
+>>> Not necessarily taking sides between "data table" and "register block",
+>>> but *if* we opt for "data table", then it *must* be fw_cfg.
+>>>
+>>>> But if we go this route (i.e. not reuse CPU hotplug interface),
+>>>> the table alone is not enough, one would need to build a protocol
+>>>> between ACPI and firmware to communicate what CPUs to (un)hotplug.
+>>>
+>>> That's for sure, yes -- for finding out what CPU has been hotplugged,
+>>> the hotplug SMI handler in the firmware has to look at the register
+>>> block no matter what.
+>>
+>> I thought all that's done by ACPI, with ACPI returning an event
+>> to the OSPM reporting what happened.
+> 
+> That works if only the OS needs to care -- the OS can rely on ACPI.
+> 
+> But with SMM in the picture, the firmware has to care too (the new CPU's
+> SMBASE has to be relocated, and the SMM data structures need to account
+> for the new CPU). The firmware cannot rely on any AML generated by QEMU.
+
+To clarify, I mean that the firmware cannot call AML methods, plus the
+firmware can take a limited amount of parameters when the AML raises the
+hotplug SMI. Basically everything has to be passed in chipset registers,
+and due to SEV, those registers had better all be IO ports.
+
+>>
+>>> The "data table" vs "register block" question only arises *afterwards*,
+>>> for translating the CPU selector (fetched from the register block) to
+>>> the APIC-ID domain. (The generic edk2 infrastructure requires APIC-IDs).
+>>>
+>>> Thanks
+>>> Laszlo
+> 
+
 
