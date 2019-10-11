@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 621B4C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE62ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:06:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 352A2206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:06:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352A2206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 1E455206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:06:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E455206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyMl-0002q4-Tj
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:06:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36243)
+	id 1iIyNK-0003ml-3X
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:06:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36671)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQr-00067u-OK
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:22 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0006TD-27
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQq-0004N3-GQ
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:21 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47950)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR1-0004f0-Vt
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:33 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48286)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQq-0004Ab-9G
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:20 -0400
+ id 1iIxR1-0004NH-NY
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:31 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQZ-0003XG-UG; Fri, 11 Oct 2019 19:06:04 +0300
+ id 1iIxQq-0003XG-8S; Fri, 11 Oct 2019 19:06:20 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 018/126] hw/usb: rename Error ** parameter to more common errp
-Date: Fri, 11 Oct 2019 19:04:04 +0300
-Message-Id: <20191011160552.22907-19-vsementsov@virtuozzo.com>
+Subject: [RFC v5 070/126] cmdline: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:56 +0300
+Message-Id: <20191011160552.22907-71-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,30 +60,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, armbru@redhat.com,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
+
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/usb/dev-network.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ util/qemu-option.c | 59 ++++++++++++++++++++--------------------------
+ 1 file changed, 26 insertions(+), 33 deletions(-)
 
-diff --git a/hw/usb/dev-network.c b/hw/usb/dev-network.c
-index 5de6213cc4..b81a8abe83 100644
---- a/hw/usb/dev-network.c
-+++ b/hw/usb/dev-network.c
-@@ -1342,7 +1342,7 @@ static NetClientInfo net_usbnet_info = {
-     .cleanup = usbnet_cleanup,
- };
- 
--static void usb_net_realize(USBDevice *dev, Error **errrp)
-+static void usb_net_realize(USBDevice *dev, Error **errp)
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 97172b5eaa..43633fe56f 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -145,6 +145,7 @@ static const QemuOptDesc *find_desc_by_name(const QemuOptDesc *desc,
+ void parse_option_size(const char *name, const char *value,
+                        uint64_t *ret, Error **errp)
  {
-     USBNetState *s = USB_NET(dev);
++    ERRP_AUTO_PROPAGATE();
+     uint64_t size;
+     int err;
  
+@@ -541,9 +542,9 @@ int qemu_opt_unset(QemuOpts *opts, const char *name)
+ static void opt_set(QemuOpts *opts, const char *name, char *value,
+                     bool prepend, bool *invalidp, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QemuOpt *opt;
+     const QemuOptDesc *desc;
+-    Error *local_err = NULL;
+ 
+     desc = find_desc_by_name(opts->list->desc, name);
+     if (!desc && !opts_accepts_any(opts)) {
+@@ -565,9 +566,8 @@ static void opt_set(QemuOpts *opts, const char *name, char *value,
+     }
+     opt->desc = desc;
+     opt->str = value;
+-    qemu_opt_parse(opt, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opt_parse(opt, errp);
++    if (*errp) {
+         qemu_opt_del(opt);
+     }
+ }
+@@ -660,6 +660,7 @@ QemuOpts *qemu_opts_find(QemuOptsList *list, const char *id)
+ QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id,
+                            int fail_if_exists, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QemuOpts *opts = NULL;
+ 
+     if (id) {
+@@ -711,12 +712,11 @@ void qemu_opts_loc_restore(QemuOpts *opts)
+ void qemu_opts_set(QemuOptsList *list, const char *id,
+                    const char *name, const char *value, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QemuOpts *opts;
+-    Error *local_err = NULL;
+ 
+-    opts = qemu_opts_create(list, id, 1, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    opts = qemu_opts_create(list, id, 1, errp);
++    if (*errp) {
+         return;
+     }
+     qemu_opt_set(opts, name, value, errp);
+@@ -809,10 +809,10 @@ static void opts_do_parse(QemuOpts *opts, const char *params,
+                           const char *firstname, bool prepend,
+                           bool *invalidp, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     char *option = NULL;
+     char *value = NULL;
+     const char *p,*pe,*pc;
+-    Error *local_err = NULL;
+ 
+     for (p = params; *p != '\0'; p++) {
+         pe = strchr(p, '=');
+@@ -842,10 +842,9 @@ static void opts_do_parse(QemuOpts *opts, const char *params,
+         }
+         if (strcmp(option, "id") != 0) {
+             /* store and parse */
+-            opt_set(opts, option, value, prepend, invalidp, &local_err);
++            opt_set(opts, option, value, prepend, invalidp, errp);
+             value = NULL;
+-            if (local_err) {
+-                error_propagate(errp, local_err);
++            if (*errp) {
+                 goto cleanup;
+             }
+         }
+@@ -878,11 +877,11 @@ static QemuOpts *opts_parse(QemuOptsList *list, const char *params,
+                             bool permit_abbrev, bool defaults,
+                             bool *invalidp, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const char *firstname;
+     char *id = NULL;
+     const char *p;
+     QemuOpts *opts;
+-    Error *local_err = NULL;
+ 
+     assert(!permit_abbrev || list->implied_opt_name);
+     firstname = permit_abbrev ? list->implied_opt_name : NULL;
+@@ -901,16 +900,14 @@ static QemuOpts *opts_parse(QemuOptsList *list, const char *params,
+      * (if unlikely) future misuse:
+      */
+     assert(!defaults || list->merge_lists);
+-    opts = qemu_opts_create(list, id, !defaults, &local_err);
++    opts = qemu_opts_create(list, id, !defaults, errp);
+     g_free(id);
+     if (opts == NULL) {
+-        error_propagate(errp, local_err);
+         return NULL;
+     }
+ 
+-    opts_do_parse(opts, params, firstname, defaults, invalidp, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    opts_do_parse(opts, params, firstname, defaults, invalidp, errp);
++    if (*errp) {
+         qemu_opts_del(opts);
+         return NULL;
+     }
+@@ -1012,24 +1009,22 @@ static void qemu_opts_from_qdict_1(const char *key, QObject *obj, void *opaque)
+ QemuOpts *qemu_opts_from_qdict(QemuOptsList *list, const QDict *qdict,
+                                Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     OptsFromQDictState state;
+-    Error *local_err = NULL;
+     QemuOpts *opts;
+ 
+     opts = qemu_opts_create(list, qdict_get_try_str(qdict, "id"), 1,
+-                            &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++                            errp);
++    if (*errp) {
+         return NULL;
+     }
+ 
+     assert(opts != NULL);
+ 
+-    state.errp = &local_err;
++    state.errp = errp;
+     state.opts = opts;
+     qdict_iter(qdict, qemu_opts_from_qdict_1, &state);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         qemu_opts_del(opts);
+         return NULL;
+     }
+@@ -1044,14 +1039,14 @@ QemuOpts *qemu_opts_from_qdict(QemuOptsList *list, const QDict *qdict,
+  */
+ void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *qdict, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const QDictEntry *entry, *next;
+ 
+     entry = qdict_first(qdict);
+ 
+     while (entry != NULL) {
+-        Error *local_err = NULL;
+         OptsFromQDictState state = {
+-            .errp = &local_err,
++            .errp = errp,
+             .opts = opts,
+         };
+ 
+@@ -1059,8 +1054,7 @@ void qemu_opts_absorb_qdict(QemuOpts *opts, QDict *qdict, Error **errp)
+ 
+         if (find_desc_by_name(opts->list->desc, entry->key)) {
+             qemu_opts_from_qdict_1(entry->key, entry->value, &state);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
++            if (*errp) {
+                 return;
+             } else {
+                 qdict_del(qdict, entry->key);
+@@ -1130,8 +1124,8 @@ QDict *qemu_opts_to_qdict(QemuOpts *opts, QDict *qdict)
+  */
+ void qemu_opts_validate(QemuOpts *opts, const QemuOptDesc *desc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     QemuOpt *opt;
+-    Error *local_err = NULL;
+ 
+     assert(opts_accepts_any(opts));
+ 
+@@ -1142,9 +1136,8 @@ void qemu_opts_validate(QemuOpts *opts, const QemuOptDesc *desc, Error **errp)
+             return;
+         }
+ 
+-        qemu_opt_parse(opt, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        qemu_opt_parse(opt, errp);
++        if (*errp) {
+             return;
+         }
+     }
 -- 
 2.21.0
 
