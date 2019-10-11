@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D29CCECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A88D2C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:45:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A998C20640
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:44:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A998C20640
+	by mail.kernel.org (Postfix) with ESMTPS id 77C4520640
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:45:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77C4520640
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyxL-0000zN-Ke
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:43:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37293)
+	id 1iIyyM-0002RI-TB
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:45:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRM-0006zK-DE
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:54 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR7-0006ZG-IF
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRJ-0004wx-Ph
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:52 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48536)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR5-0004jm-2X
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:37 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48070)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxRJ-0004aS-G6; Fri, 11 Oct 2019 12:06:49 -0400
+ id 1iIxR4-0004Fd-O5; Fri, 11 Oct 2019 12:06:34 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQx-0003XG-P2; Fri, 11 Oct 2019 19:06:27 +0300
+ id 1iIxQi-0003XG-W4; Fri, 11 Oct 2019 19:06:13 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 095/126] Sheepdog: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:21 +0300
-Message-Id: <20191011160552.22907-96-vsementsov@virtuozzo.com>
+Subject: [RFC v5 051/126] vfio-ccw: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:37 +0300
+Message-Id: <20191011160552.22907-52-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -59,10 +59,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- sheepdog@lists.wpkg.org, qemu-block@nongnu.org, armbru@redhat.com,
- Max Reitz <mreitz@redhat.com>, Greg Kurz <groug@kaod.org>,
- Liu Yuan <namei.unix@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eric Farman <farman@linux.ibm.com>,
+ vsementsov@virtuozzo.com, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,263 +113,72 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/sheepdog.c | 73 ++++++++++++++++++++++--------------------------
- 1 file changed, 33 insertions(+), 40 deletions(-)
+ hw/s390x/s390-ccw.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 773dfc6ab1..396ec1be28 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -529,10 +529,10 @@ static void sd_aio_setup(SheepdogAIOCB *acb, BDRVSheepdogState *s,
- 
- static SocketAddress *sd_server_config(QDict *options, Error **errp)
+diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+index 0c5a5b60bd..415fa04091 100644
+--- a/hw/s390x/s390-ccw.c
++++ b/hw/s390x/s390-ccw.c
+@@ -55,6 +55,7 @@ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
+                                   char *sysfsdev,
+                                   Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     QDict *server = NULL;
-     Visitor *iv = NULL;
-     SocketAddress *saddr = NULL;
--    Error *local_err = NULL;
+     unsigned int cssid, ssid, devid;
+     char dev_path[PATH_MAX] = {0}, *tmp;
  
-     qdict_extract_subqdict(options, &server, "server.");
+@@ -86,19 +87,19 @@ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
  
-@@ -541,9 +541,8 @@ static SocketAddress *sd_server_config(QDict *options, Error **errp)
-         goto done;
-     }
- 
--    visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    visit_type_SocketAddress(iv, NULL, &saddr, errp);
-+    if (*errp) {
-         goto done;
-     }
- 
-@@ -1008,7 +1007,7 @@ static void sd_config_done(SheepdogConfig *cfg)
- static void sd_parse_uri(SheepdogConfig *cfg, const char *filename,
-                          Error **errp)
+ static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
  {
++    ERRP_AUTO_PROPAGATE();
+     CcwDevice *ccw_dev = CCW_DEVICE(cdev);
+     CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
+     DeviceState *parent = DEVICE(ccw_dev);
+     SubchDev *sch;
+     int ret;
 -    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     QueryParams *qp = NULL;
-     bool is_unix;
-     URI *uri;
-@@ -1017,7 +1016,7 @@ static void sd_parse_uri(SheepdogConfig *cfg, const char *filename,
  
-     cfg->uri = uri = uri_parse(filename);
-     if (!uri) {
--        error_setg(&err, "invalid URI '%s'", filename);
-+        error_setg(errp, "invalid URI '%s'", filename);
-         goto out;
-     }
- 
-@@ -1029,18 +1028,18 @@ static void sd_parse_uri(SheepdogConfig *cfg, const char *filename,
-     } else if (!g_strcmp0(uri->scheme, "sheepdog+unix")) {
-         is_unix = true;
-     } else {
--        error_setg(&err, "URI scheme must be 'sheepdog', 'sheepdog+tcp',"
-+        error_setg(errp, "URI scheme must be 'sheepdog', 'sheepdog+tcp',"
-                    " or 'sheepdog+unix'");
-         goto out;
-     }
- 
-     if (uri->path == NULL || !strcmp(uri->path, "/")) {
--        error_setg(&err, "missing file path in URI");
-+        error_setg(errp, "missing file path in URI");
-         goto out;
-     }
-     if (g_strlcpy(cfg->vdi, uri->path + 1, SD_MAX_VDI_LEN)
-         >= SD_MAX_VDI_LEN) {
--        error_setg(&err, "VDI name is too long");
-+        error_setg(errp, "VDI name is too long");
-         goto out;
-     }
- 
-@@ -1049,25 +1048,25 @@ static void sd_parse_uri(SheepdogConfig *cfg, const char *filename,
-     if (is_unix) {
-         /* sheepdog+unix:///vdiname?socket=path */
-         if (uri->server || uri->port) {
--            error_setg(&err, "URI scheme %s doesn't accept a server address",
-+            error_setg(errp, "URI scheme %s doesn't accept a server address",
-                        uri->scheme);
-             goto out;
-         }
-         if (!qp->n) {
--            error_setg(&err,
-+            error_setg(errp,
-                        "URI scheme %s requires query parameter 'socket'",
-                        uri->scheme);
-             goto out;
-         }
-         if (qp->n != 1 || strcmp(qp->p[0].name, "socket")) {
--            error_setg(&err, "unexpected query parameters");
-+            error_setg(errp, "unexpected query parameters");
-             goto out;
-         }
-         cfg->path = qp->p[0].value;
-     } else {
-         /* sheepdog[+tcp]://[host:port]/vdiname */
-         if (qp->n) {
--            error_setg(&err, "unexpected query parameters");
-+            error_setg(errp, "unexpected query parameters");
-             goto out;
-         }
-         cfg->host = uri->server;
-@@ -1078,7 +1077,7 @@ static void sd_parse_uri(SheepdogConfig *cfg, const char *filename,
-     if (uri->fragment) {
-         if (!sd_parse_snapid_or_tag(uri->fragment,
-                                     &cfg->snap_id, cfg->tag)) {
--            error_setg(&err, "'%s' is not a valid snapshot ID",
-+            error_setg(errp, "'%s' is not a valid snapshot ID",
-                        uri->fragment);
-             goto out;
-         }
-@@ -1087,8 +1086,7 @@ static void sd_parse_uri(SheepdogConfig *cfg, const char *filename,
-     }
- 
- out:
+-    s390_ccw_get_dev_info(cdev, sysfsdev, &err);
 -    if (err) {
--        error_propagate(errp, err);
+-        goto out_err_propagate;
++    s390_ccw_get_dev_info(cdev, sysfsdev, errp);
 +    if (*errp) {
-         sd_config_done(cfg);
++        return;
      }
+ 
+-    sch = css_create_sch(ccw_dev->devno, &err);
++    sch = css_create_sch(ccw_dev->devno, errp);
+     if (!sch) {
+         goto out_mdevid_free;
+     }
+@@ -108,13 +109,13 @@ static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
+     ccw_dev->sch = sch;
+     ret = css_sch_build_schib(sch, &cdev->hostid);
+     if (ret) {
+-        error_setg_errno(&err, -ret, "%s: Failed to build initial schib",
++        error_setg_errno(errp, -ret, "%s: Failed to build initial schib",
+                          __func__);
+         goto out_err;
+     }
+ 
+-    ck->realize(ccw_dev, &err);
+-    if (err) {
++    ck->realize(ccw_dev, errp);
++    if (*errp) {
+         goto out_err;
+     }
+ 
+@@ -128,8 +129,6 @@ out_err:
+     g_free(sch);
+ out_mdevid_free:
+     g_free(cdev->mdevid);
+-out_err_propagate:
+-    error_propagate(errp, err);
  }
-@@ -1113,7 +1111,7 @@ out:
- static void parse_vdiname(SheepdogConfig *cfg, const char *filename,
-                           Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     char *p, *q, *uri;
-     const char *host_spec, *vdi_spec;
-     int nr_sep;
-@@ -1155,14 +1153,14 @@ static void parse_vdiname(SheepdogConfig *cfg, const char *filename,
-      * FIXME We to escape URI meta-characters, e.g. "x?y=z"
-      * produces "sheepdog://x?y=z".  Because of that ...
-      */
--    sd_parse_uri(cfg, uri, &err);
--    if (err) {
-+    sd_parse_uri(cfg, uri, errp);
-+    if (*errp) {
-         /*
-          * ... this can fail, but the error message is misleading.
-          * Replace it by the traditional useless one until the
-          * escaping is fixed.
-          */
--        error_free(err);
-+        error_free_errp(errp);
-         error_setg(errp, "Can't parse filename");
-     }
  
-@@ -1173,17 +1171,16 @@ static void parse_vdiname(SheepdogConfig *cfg, const char *filename,
- static void sd_parse_filename(const char *filename, QDict *options,
-                               Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     SheepdogConfig cfg;
-     char buf[32];
- 
-     if (strstr(filename, "://")) {
--        sd_parse_uri(&cfg, filename, &err);
-+        sd_parse_uri(&cfg, filename, errp);
-     } else {
--        parse_vdiname(&cfg, filename, &err);
-+        parse_vdiname(&cfg, filename, errp);
-     }
--    if (err) {
--        error_propagate(errp, err);
-+    if (*errp) {
-         return;
-     }
- 
-@@ -1543,6 +1540,7 @@ static QemuOptsList runtime_opts = {
- static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-                    Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     int ret, fd;
-     uint32_t vid = 0;
-     BDRVSheepdogState *s = bs->opaque;
-@@ -1550,15 +1548,13 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     uint64_t snap_id;
-     char *buf = NULL;
-     QemuOpts *opts;
--    Error *local_err = NULL;
- 
-     s->bs = bs;
-     s->aio_context = bdrv_get_aio_context(bs);
- 
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    qemu_opts_absorb_qdict(opts, options, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto err_no_fd;
-     }
-@@ -1850,19 +1846,18 @@ out_with_err_set:
- static int sd_create_prealloc(BlockdevOptionsSheepdog *location, int64_t size,
-                               Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockDriverState *bs;
-     Visitor *v;
-     QObject *obj = NULL;
-     QDict *qdict;
--    Error *local_err = NULL;
-     int ret;
- 
-     v = qobject_output_visitor_new(&obj);
--    visit_type_BlockdevOptionsSheepdog(v, NULL, &location, &local_err);
-+    visit_type_BlockdevOptionsSheepdog(v, NULL, &location, errp);
-     visit_free(v);
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         qobject_unref(obj);
-         return -EINVAL;
-     }
-@@ -2160,11 +2155,11 @@ out:
- static int coroutine_fn sd_co_create_opts(const char *filename, QemuOpts *opts,
-                                           Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptions *create_options = NULL;
-     QDict *qdict, *location_qdict;
-     Visitor *v;
-     char *redundancy;
--    Error *local_err = NULL;
-     int ret;
- 
-     redundancy = qemu_opt_get_del(opts, BLOCK_OPT_REDUNDANCY);
-@@ -2175,9 +2170,8 @@ static int coroutine_fn sd_co_create_opts(const char *filename, QemuOpts *opts,
-     location_qdict = qdict_new();
-     qdict_put(qdict, "location", location_qdict);
- 
--    sd_parse_filename(filename, location_qdict, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    sd_parse_filename(filename, location_qdict, errp);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
-@@ -2203,11 +2197,10 @@ static int coroutine_fn sd_co_create_opts(const char *filename, QemuOpts *opts,
-         goto fail;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto fail;
-     }
+ static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
 -- 
 2.21.0
 
