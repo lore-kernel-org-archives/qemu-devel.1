@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0968C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BB2C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:38:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 939842064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:37:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939842064A
+	by mail.kernel.org (Postfix) with ESMTPS id D98702064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:38:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98702064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIpUR-0005fz-P2
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:37:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34645)
+	id 1iIpVh-0006Qn-T0
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:38:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iIpT4-0004Zf-4s
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:36:07 -0400
+ (envelope-from <thuth@redhat.com>) id 1iIpS4-0003Ba-Jr
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:35:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iIpT3-00016e-88
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:36:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33491)
+ (envelope-from <thuth@redhat.com>) id 1iIpS3-0000Wr-IT
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:35:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46554)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1iIpT0-00013d-VC; Fri, 11 Oct 2019 03:36:03 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1iIpS1-0000V5-DG; Fri, 11 Oct 2019 03:35:01 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 30B883084288;
- Fri, 11 Oct 2019 07:36:01 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9E31718CB8F1;
+ Fri, 11 Oct 2019 07:35:00 +0000 (UTC)
 Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 632E160BE1;
- Fri, 11 Oct 2019 07:36:00 +0000 (UTC)
-Subject: Re: [PATCH 08/23] iotests/143: Create socket in $SOCK_DIR
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D6CD10018F8;
+ Fri, 11 Oct 2019 07:34:57 +0000 (UTC)
+Subject: Re: [PATCH 07/23] iotests/140: Create socket in $SOCK_DIR
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20191010152457.17713-1-mreitz@redhat.com>
- <20191010152457.17713-9-mreitz@redhat.com>
+ <20191010152457.17713-8-mreitz@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,18 +90,18 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <8e5d95f4-5419-de89-980d-7baf56efda5f@redhat.com>
-Date: Fri, 11 Oct 2019 09:35:59 +0200
+Message-ID: <18298f7a-e341-2db8-9a5e-76ff065f504d@redhat.com>
+Date: Fri, 11 Oct 2019 09:34:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191010152457.17713-9-mreitz@redhat.com>
+In-Reply-To: <20191010152457.17713-8-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 11 Oct 2019 07:36:01 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.63]); Fri, 11 Oct 2019 07:35:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -124,9 +124,9 @@ Sender: "Qemu-devel"
 On 10/10/2019 17.24, Max Reitz wrote:
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/143     | 6 +++---
->  tests/qemu-iotests/143.out | 2 +-
->  2 files changed, 4 insertions(+), 4 deletions(-)
+>  tests/qemu-iotests/140     | 8 ++++----
+>  tests/qemu-iotests/140.out | 2 +-
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
