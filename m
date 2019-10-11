@@ -2,82 +2,60 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D158AECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 990D6C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:33:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A15AE21835
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:31:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A15AE21835
+	by mail.kernel.org (Postfix) with ESMTPS id 6271821A4A
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:33:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6271821A4A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ0dK-0000zT-A3
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 15:31:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38376)
+	id 1iJ0eo-0002Gd-Q2
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 15:32:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37563)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iJ0Ud-0007Oo-2E
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:22:27 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iJ0Pe-0000Oq-Ad
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iJ0Ua-0007Ce-V1
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:22:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50004)
+ (envelope-from <dgilbert@redhat.com>) id 1iJ0Pd-0003sn-7T
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50684)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iJ0Ua-0007C4-PO
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:22:24 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iJ0Pd-0003s5-26
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3E5B4757C5
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 19:22:23 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id b6so4821051wrw.2
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 12:22:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:cc:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ELMRBxvKSoWHhLzmpAUJbHUQr00+9jvSfjvYT/qSEAg=;
- b=uW7xvFrRXpUVcQ/kUimXesxqK303u1vU9kgEtrhJaBSjyDwhEUsZQJvViDklgIkqkd
- e68SokqfP2WfGDkKkNFlo0xM5l3q3pL8oUtFNWdMqRFY6tKiPBKUmPPTM/EWiWpLdU1S
- ezn9b5hEVB9Bgq4UD8NnP74PFlcgK74eiJCq1QN/tlfEZqMm04OdrhjfX1zjkzH4j3gD
- 4wNhXGNd7QRhia30KSoIPf5WTHkp4hTvZSqKRQKmNw3/5Oj696H+P6e1LJIx7fGX12hV
- z8swTB1a5P687VTV3qKgokJ8zqI8XUq7ZPEyIdvlsnpfwNN1sC/1yUCLDxDaQ7r8s1Dy
- AFJA==
-X-Gm-Message-State: APjAAAXA9hq5MplEd3XkkVSTYWFM7z9MRC94VCeWGt1IUqj9TPT+LsL9
- SbtSSGNqQVlgBy9F6oMabjTFP+OtVbe7IzslSxU+/MBAawDclPifi714LYBAOc6B4rkMrph56G6
- 1cGmz+9GsNG0IoUc=
-X-Received: by 2002:adf:fecd:: with SMTP id q13mr13730841wrs.224.1570821741945; 
- Fri, 11 Oct 2019 12:22:21 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwpL/ENBRAo+d12syMQPfSG/634EhJdHdYOwomzuH8c8Bw1Xb+gq/bly/yxn6chwl43K0oifQ==
-X-Received: by 2002:adf:fecd:: with SMTP id q13mr13730830wrs.224.1570821741756; 
- Fri, 11 Oct 2019 12:22:21 -0700 (PDT)
-Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id n26sm6966676wmd.42.2019.10.11.12.22.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 11 Oct 2019 12:22:21 -0700 (PDT)
-Subject: Re: ACPI table modifications
-To: Gautam Bhat <mindentropy@gmail.com>, qemu-devel@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-References: <CAM2a4uzF-mtTEYwQE3+MvvDiQrfC_KQMwX4vqCg_dY9ytjZrjA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8a3d99b5-d9d3-28a7-2de0-e8a0a17356c1@redhat.com>
-Date: Fri, 11 Oct 2019 21:22:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 92F94306729E;
+ Fri, 11 Oct 2019 19:17:15 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-210.ams2.redhat.com
+ [10.36.117.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C23695D6C8;
+ Fri, 11 Oct 2019 19:17:11 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, eric.auger@redhat.com,
+ richardw.yang@linux.intel.com
+Subject: [PULL 10/21] migration/postcopy: fix typo in
+ mark_postcopy_blocktime_begin's comment
+Date: Fri, 11 Oct 2019 20:16:35 +0100
+Message-Id: <20191011191646.226814-11-dgilbert@redhat.com>
+In-Reply-To: <20191011191646.226814-1-dgilbert@redhat.com>
+References: <20191011191646.226814-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAM2a4uzF-mtTEYwQE3+MvvDiQrfC_KQMwX4vqCg_dY9ytjZrjA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Fri, 11 Oct 2019 19:17:15 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -93,46 +71,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peterx@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gautam,
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-On 10/11/19 8:47 PM, Gautam Bhat wrote:
-> Hi,
->=20
-> I want to add some I2C based temperature sensors to the -M Q35 machine.=
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Message-Id: <20191005220517.24029-3-richardw.yang@linux.intel.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/postcopy-ram.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 08a3ed516e..3a72f7b4fe 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -768,9 +768,11 @@ static void mark_postcopy_blocktime_begin(uintptr_t =
+addr, uint32_t ptid,
+     atomic_xchg(&dc->page_fault_vcpu_time[cpu], low_time_offset);
+     atomic_xchg(&dc->vcpu_addr[cpu], addr);
 =20
-> I want to update the ACPI tables to add this device information. How ca=
-n=20
-> I go about=C2=A0 doing this?
+-    /* check it here, not at the begining of the function,
+-     * due to, check could accur early than bitmap_set in
+-     * qemu_ufd_copy_ioctl */
++    /*
++     * check it here, not at the beginning of the function,
++     * due to, check could occur early than bitmap_set in
++     * qemu_ufd_copy_ioctl
++     */
+     already_received =3D ramblock_recv_bitmap_test(rb, (void *)addr);
+     if (already_received) {
+         atomic_xchg(&dc->vcpu_addr[cpu], 0);
+--=20
+2.23.0
 
-QEMU provides a MAINTAINERS file with persons to contact sorted by=20
-topics (I Cc'ed in this reply).
-
-This is the relevant ACPI section, it also lists the files you might=20
-look at:
-
-ACPI/SMBIOS
-M: Michael S. Tsirkin
-M: Igor Mammedov
-S: Supported
-F: include/hw/acpi/*
-F: include/hw/firmware/smbios.h
-F: hw/mem/*
-F: hw/acpi/*
-F: hw/smbios/*
-F: hw/i386/acpi-build.[hc]
-F: hw/arm/virt-acpi-build.c
-F: tests/bios-tables-test.c
-F: tests/acpi-utils.[hc]
-F: tests/data/acpi/
-
-Eventually the bios-tables-test.c file is a good starting point.
-
-Regards,
-
-Phil.
 
