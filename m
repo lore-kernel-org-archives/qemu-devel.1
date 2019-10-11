@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CD0C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E00E9C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:51:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B4F0206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:51:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B4F0206CD
+	by mail.kernel.org (Postfix) with ESMTPS id A93C9206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:51:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A93C9206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIy8N-00080C-Ro
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:51:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36132)
+	id 1iIy8R-00087g-8A
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:51:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQl-0005xw-Ts
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:16 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR7-0006Yz-8W
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQk-0004Gd-Ua
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:15 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47866)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0004iJ-1V
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:37 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQk-000463-Nh
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:14 -0400
+ id 1iIxR3-0004Ou-Kb
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:33 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQZ-0003XG-4s; Fri, 11 Oct 2019 19:06:03 +0300
+ id 1iIxQs-0003XG-8S; Fri, 11 Oct 2019 19:06:22 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 016/126] hw/sd: rename Error ** parameter to more common errp
-Date: Fri, 11 Oct 2019 19:04:02 +0300
-Message-Id: <20191011160552.22907-17-vsementsov@virtuozzo.com>
+Subject: [RFC v5 077/126] net: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:03 +0300
+Message-Id: <20191011160552.22907-78-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,31 +60,449 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ Jason Wang <jasowang@redhat.com>, armbru@redhat.com,
+ Vincenzo Maffione <v.maffione@gmail.com>, Greg Kurz <groug@kaod.org>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
+
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit (together with its neighbors) was generated by
+
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
+
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
+
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/sd/sdhci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/can/can_host.c  |  7 +++----
+ net/dump.c          | 15 ++++++---------
+ net/filter-buffer.c | 15 ++++++---------
+ net/filter.c        |  7 +++----
+ net/net.c           | 41 +++++++++++++++++----------------------
+ net/netmap.c        |  7 +++----
+ net/tap.c           | 47 ++++++++++++++++++---------------------------
+ 7 files changed, 58 insertions(+), 81 deletions(-)
 
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index e08ec3e398..e56031b5e4 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -1459,7 +1459,7 @@ static void sdhci_sysbus_finalize(Object *obj)
-     sdhci_uninitfn(s);
+diff --git a/net/can/can_host.c b/net/can/can_host.c
+index 1dfaf0ced0..ddbfdb8bac 100644
+--- a/net/can/can_host.c
++++ b/net/can/can_host.c
+@@ -50,12 +50,11 @@ static void can_host_disconnect(CanHostState *ch)
+ 
+ static void can_host_connect(CanHostState *ch, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     CanHostClass *chc = CAN_HOST_GET_CLASS(ch);
+-    Error *local_err = NULL;
+ 
+-    chc->connect(ch, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    chc->connect(ch, errp);
++    if (*errp) {
+         return;
+     }
+ 
+diff --git a/net/dump.c b/net/dump.c
+index 23b3628dde..57d665b10d 100644
+--- a/net/dump.c
++++ b/net/dump.c
+@@ -191,23 +191,20 @@ static void filter_dump_get_maxlen(Object *obj, Visitor *v, const char *name,
+ static void filter_dump_set_maxlen(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NetFilterDumpState *nfds = FILTER_DUMP(obj);
+-    Error *local_err = NULL;
+     uint32_t value;
+ 
+-    visit_type_uint32(v, name, &value, &local_err);
+-    if (local_err) {
+-        goto out;
++    visit_type_uint32(v, name, &value, errp);
++    if (*errp) {
++        return;
+     }
+     if (value == 0) {
+-        error_setg(&local_err, "Property '%s.%s' doesn't take value '%u'",
++        error_setg(errp, "Property '%s.%s' doesn't take value '%u'",
+                    object_get_typename(obj), name, value);
+-        goto out;
++        return;
+     }
+     nfds->maxlen = value;
+-
+-out:
+-    error_propagate(errp, local_err);
  }
  
--static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-+static void sdhci_sysbus_realize(DeviceState *dev, Error **errp)
+ static char *file_dump_get_filename(Object *obj, Error **errp)
+diff --git a/net/filter-buffer.c b/net/filter-buffer.c
+index 88da78f821..ac798ba421 100644
+--- a/net/filter-buffer.c
++++ b/net/filter-buffer.c
+@@ -169,23 +169,20 @@ static void filter_buffer_set_interval(Object *obj, Visitor *v,
+                                        const char *name, void *opaque,
+                                        Error **errp)
  {
-     SDHCIState *s = SYSBUS_SDHCI(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    ERRP_AUTO_PROPAGATE();
+     FilterBufferState *s = FILTER_BUFFER(obj);
+-    Error *local_err = NULL;
+     uint32_t value;
+ 
+-    visit_type_uint32(v, name, &value, &local_err);
+-    if (local_err) {
+-        goto out;
++    visit_type_uint32(v, name, &value, errp);
++    if (*errp) {
++        return;
+     }
+     if (!value) {
+-        error_setg(&local_err, "Property '%s.%s' requires a positive value",
++        error_setg(errp, "Property '%s.%s' requires a positive value",
+                    object_get_typename(obj), name);
+-        goto out;
++        return;
+     }
+     s->interval = value;
+-
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ static void filter_buffer_init(Object *obj)
+diff --git a/net/filter.c b/net/filter.c
+index 4b932e79f9..7d5e457db0 100644
+--- a/net/filter.c
++++ b/net/filter.c
+@@ -191,11 +191,11 @@ static void netfilter_init(Object *obj)
+ 
+ static void netfilter_complete(UserCreatable *uc, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NetFilterState *nf = NETFILTER(uc);
+     NetClientState *ncs[MAX_QUEUE_NUM];
+     NetFilterClass *nfc = NETFILTER_GET_CLASS(uc);
+     int queues;
+-    Error *local_err = NULL;
+ 
+     if (!nf->netdev_id) {
+         error_setg(errp, "Parameter 'netdev' is required");
+@@ -222,9 +222,8 @@ static void netfilter_complete(UserCreatable *uc, Error **errp)
+     nf->netdev = ncs[0];
+ 
+     if (nfc->setup) {
+-        nfc->setup(nf, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        nfc->setup(nf, errp);
++        if (*errp) {
+             return;
+         }
+     }
+diff --git a/net/net.c b/net/net.c
+index 9e93c3f8a1..9bad414840 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1098,9 +1098,9 @@ static void show_netdevs(void)
+ 
+ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     gchar **substrings = NULL;
+     void *object = NULL;
+-    Error *err = NULL;
+     int ret = -1;
+     Visitor *v = opts_visitor_new(opts);
+ 
+@@ -1143,13 +1143,13 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+     }
+ 
+     if (is_netdev) {
+-        visit_type_Netdev(v, NULL, (Netdev **)&object, &err);
++        visit_type_Netdev(v, NULL, (Netdev **)&object, errp);
+     } else {
+-        visit_type_NetLegacy(v, NULL, (NetLegacy **)&object, &err);
++        visit_type_NetLegacy(v, NULL, (NetLegacy **)&object, errp);
+     }
+ 
+-    if (!err) {
+-        ret = net_client_init1(object, is_netdev, &err);
++    if (!*errp) {
++        ret = net_client_init1(object, is_netdev, errp);
+     }
+ 
+     if (is_netdev) {
+@@ -1159,7 +1159,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+     }
+ 
+ out:
+-    error_propagate(errp, err);
+     g_strfreev(substrings);
+     visit_free(v);
+     return ret;
+@@ -1172,28 +1171,25 @@ void netdev_add(QemuOpts *opts, Error **errp)
+ 
+ void qmp_netdev_add(QDict *qdict, QObject **ret, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     QemuOptsList *opts_list;
+     QemuOpts *opts;
+ 
+-    opts_list = qemu_find_opts_err("netdev", &local_err);
+-    if (local_err) {
+-        goto out;
++    opts_list = qemu_find_opts_err("netdev", errp);
++    if (*errp) {
++        return;
+     }
+ 
+-    opts = qemu_opts_from_qdict(opts_list, qdict, &local_err);
+-    if (local_err) {
+-        goto out;
++    opts = qemu_opts_from_qdict(opts_list, qdict, errp);
++    if (*errp) {
++        return;
+     }
+ 
+-    netdev_add(opts, &local_err);
+-    if (local_err) {
++    netdev_add(opts, errp);
++    if (*errp) {
+         qemu_opts_del(opts);
+-        goto out;
++        return;
+     }
+-
+-out:
+-    error_propagate(errp, local_err);
+ }
+ 
+ void qmp_netdev_del(const char *id, Error **errp)
+@@ -1348,17 +1344,16 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
+ 
+ void colo_notify_filters_event(int event, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     NetClientState *nc;
+     NetFilterState *nf;
+     NetFilterClass *nfc = NULL;
+-    Error *local_err = NULL;
+ 
+     QTAILQ_FOREACH(nc, &net_clients, next) {
+         QTAILQ_FOREACH(nf, &nc->filters, next) {
+             nfc = NETFILTER_GET_CLASS(OBJECT(nf));
+-            nfc->handle_event(nf, event, &local_err);
+-            if (local_err) {
+-                error_propagate(errp, local_err);
++            nfc->handle_event(nf, event, errp);
++            if (*errp) {
+                 return;
+             }
+         }
+diff --git a/net/netmap.c b/net/netmap.c
+index 350f097f91..42982445be 100644
+--- a/net/netmap.c
++++ b/net/netmap.c
+@@ -406,15 +406,14 @@ static NetClientInfo net_netmap_info = {
+ int net_init_netmap(const Netdev *netdev,
+                     const char *name, NetClientState *peer, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const NetdevNetmapOptions *netmap_opts = &netdev->u.netmap;
+     struct nm_desc *nmd;
+     NetClientState *nc;
+-    Error *err = NULL;
+     NetmapState *s;
+ 
+-    nmd = netmap_open(netmap_opts, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    nmd = netmap_open(netmap_opts, errp);
++    if (*errp) {
+         return -1;
+     }
+     /* Create the object. */
+diff --git a/net/tap.c b/net/tap.c
+index 6207f61f84..b03146605d 100644
+--- a/net/tap.c
++++ b/net/tap.c
+@@ -610,7 +610,7 @@ static int net_tap_init(const NetdevTapOptions *tap, int *vnet_hdr,
+                         const char *setup_script, char *ifname,
+                         size_t ifname_sz, int mq_required, Error **errp)
+ {
+-    Error *err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     int fd, vnet_hdr_required;
+ 
+     if (tap->has_vnet_hdr) {
+@@ -630,9 +630,8 @@ static int net_tap_init(const NetdevTapOptions *tap, int *vnet_hdr,
+     if (setup_script &&
+         setup_script[0] != '\0' &&
+         strcmp(setup_script, "no") != 0) {
+-        launch_script(setup_script, ifname, fd, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++        launch_script(setup_script, ifname, fd, errp);
++        if (*errp) {
+             close(fd);
+             return -1;
+         }
+@@ -649,13 +648,12 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+                              const char *downscript, const char *vhostfdname,
+                              int vnet_hdr, int fd, Error **errp)
+ {
+-    Error *err = NULL;
++    ERRP_AUTO_PROPAGATE();
+     TAPState *s = net_tap_fd_init(peer, model, name, fd, vnet_hdr);
+     int vhostfd;
+ 
+-    tap_set_sndbuf(s->fd, tap, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    tap_set_sndbuf(s->fd, tap, errp);
++    if (*errp) {
+         return;
+     }
+ 
+@@ -689,12 +687,11 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+         }
+ 
+         if (vhostfdname) {
+-            vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
++            vhostfd = monitor_fd_param(cur_mon, vhostfdname, errp);
+             if (vhostfd == -1) {
+                 if (tap->has_vhostforce && tap->vhostforce) {
+-                    error_propagate(errp, err);
+                 } else {
+-                    warn_report_err(err);
++                    warn_report_errp(errp);
+                 }
+                 return;
+             }
+@@ -758,12 +755,12 @@ static int get_fds(char *str, char *fds[], int max)
+ int net_init_tap(const Netdev *netdev, const char *name,
+                  NetClientState *peer, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const NetdevTapOptions *tap;
+     int fd, vnet_hdr = 0, i = 0, queues;
+     /* for the no-fd, no-helper case */
+     const char *script = NULL; /* suppress wrong "uninit'd use" gcc warning */
+     const char *downscript = NULL;
+-    Error *err = NULL;
+     const char *vhostfdname;
+     char ifname[128];
+ 
+@@ -789,9 +786,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
+             return -1;
+         }
+ 
+-        fd = monitor_fd_param(cur_mon, tap->fd, &err);
++        fd = monitor_fd_param(cur_mon, tap->fd, errp);
+         if (fd == -1) {
+-            error_propagate(errp, err);
+             return -1;
+         }
+ 
+@@ -801,9 +797,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
+ 
+         net_init_tap_one(tap, peer, "tap", name, NULL,
+                          script, downscript,
+-                         vhostfdname, vnet_hdr, fd, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++                         vhostfdname, vnet_hdr, fd, errp);
++        if (*errp) {
+             return -1;
+         }
+     } else if (tap->has_fds) {
+@@ -836,9 +831,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
+         }
+ 
+         for (i = 0; i < nfds; i++) {
+-            fd = monitor_fd_param(cur_mon, fds[i], &err);
++            fd = monitor_fd_param(cur_mon, fds[i], errp);
+             if (fd == -1) {
+-                error_propagate(errp, err);
+                 ret = -1;
+                 goto free_fail;
+             }
+@@ -857,9 +851,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
+             net_init_tap_one(tap, peer, "tap", name, ifname,
+                              script, downscript,
+                              tap->has_vhostfds ? vhost_fds[i] : NULL,
+-                             vnet_hdr, fd, &err);
+-            if (err) {
+-                error_propagate(errp, err);
++                             vnet_hdr, fd, errp);
++            if (*errp) {
+                 ret = -1;
+                 goto free_fail;
+             }
+@@ -896,9 +889,8 @@ free_fail:
+ 
+         net_init_tap_one(tap, peer, "bridge", name, ifname,
+                          script, downscript, vhostfdname,
+-                         vnet_hdr, fd, &err);
+-        if (err) {
+-            error_propagate(errp, err);
++                         vnet_hdr, fd, errp);
++        if (*errp) {
+             close(fd);
+             return -1;
+         }
+@@ -935,9 +927,8 @@ free_fail:
+             net_init_tap_one(tap, peer, "tap", name, ifname,
+                              i >= 1 ? "no" : script,
+                              i >= 1 ? "no" : downscript,
+-                             vhostfdname, vnet_hdr, fd, &err);
+-            if (err) {
+-                error_propagate(errp, err);
++                             vhostfdname, vnet_hdr, fd, errp);
++            if (*errp) {
+                 close(fd);
+                 return -1;
+             }
 -- 
 2.21.0
 
