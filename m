@@ -6,42 +6,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F22ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4BA6C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:59:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A36D21835
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:58:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A36D21835
+	by mail.kernel.org (Postfix) with ESMTPS id BB4C521835
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:59:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4C521835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyFf-0000lF-Hx
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:58:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36472)
+	id 1iIyGi-0002Mr-Ge
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQy-0006Jg-IB
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:29 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQp-00063a-7q
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQx-0004W4-4w
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48152)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQo-0004Kn-9D
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:19 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47918)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQw-0004IL-Tc
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
+ id 1iIxQo-00048h-1U
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:18 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQl-0003XG-JW; Fri, 11 Oct 2019 19:06:15 +0300
+ id 1iIxQa-0003XG-Rs; Fri, 11 Oct 2019 19:06:05 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 058/126] virtio-serial: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:44 +0300
-Message-Id: <20191011160552.22907-59-vsementsov@virtuozzo.com>
+Subject: [RFC v5 022/126] backends/cryptodev: drop local_err from
+ cryptodev_backend_complete()
+Date: Fri, 11 Oct 2019 19:04:08 +0300
+Message-Id: <20191011160552.22907-23-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,92 +61,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- vsementsov@virtuozzo.com, "Michael S. Tsirkin" <mst@redhat.com>,
- Amit Shah <amit@kernel.org>, armbru@redhat.com, Greg Kurz <groug@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, vsementsov@virtuozzo.com,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+No reason for local_err here, use errp directly instead.
 
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
-
-This commit (together with its neighbors) was generated by
-
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
-
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
-
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/char/virtio-serial-bus.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ backends/cryptodev.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-index 4e0ed829ae..8ab7f29d0a 100644
---- a/hw/char/virtio-serial-bus.c
-+++ b/hw/char/virtio-serial-bus.c
-@@ -935,12 +935,12 @@ static void remove_port(VirtIOSerial *vser, uint32_t port_id)
- 
- static void virtser_port_device_realize(DeviceState *dev, Error **errp)
+diff --git a/backends/cryptodev.c b/backends/cryptodev.c
+index 3c071eab95..5a9735684e 100644
+--- a/backends/cryptodev.c
++++ b/backends/cryptodev.c
+@@ -176,19 +176,10 @@ cryptodev_backend_complete(UserCreatable *uc, Error **errp)
  {
-+    ERRP_AUTO_PROPAGATE();
-     VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
-     VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-     VirtIOSerialBus *bus = VIRTIO_SERIAL_BUS(qdev_get_parent_bus(dev));
-     int max_nr_ports;
-     bool plugging_port0;
--    Error *err = NULL;
+     CryptoDevBackend *backend = CRYPTODEV_BACKEND(uc);
+     CryptoDevBackendClass *bc = CRYPTODEV_BACKEND_GET_CLASS(uc);
+-    Error *local_err = NULL;
  
-     port->vser = bus->vser;
-     port->bh = qemu_bh_new(flush_queued_data_bh, port);
-@@ -986,9 +986,8 @@ static void virtser_port_device_realize(DeviceState *dev, Error **errp)
-         return;
+     if (bc->init) {
+-        bc->init(backend, &local_err);
+-        if (local_err) {
+-            goto out;
+-        }
++        bc->init(backend, errp);
      }
+-
+-    return;
+-
+-out:
+-    error_propagate(errp, local_err);
+ }
  
--    vsc->realize(dev, &err);
--    if (err != NULL) {
--        error_propagate(errp, err);
-+    vsc->realize(dev, errp);
-+    if (*errp) {
-         return;
-     }
- 
+ void cryptodev_backend_set_used(CryptoDevBackend *backend, bool used)
 -- 
 2.21.0
 
