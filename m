@@ -2,79 +2,84 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EE4C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 22:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42687C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 951C2218AC
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 22:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 078522089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:18:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k+JD85aK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951C2218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=berkeley-edu.20150623.gappssmtp.com header.i=@berkeley-edu.20150623.gappssmtp.com header.b="kp4iHyo3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 078522089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=berkeley.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ3LD-0005MB-Ot
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 18:24:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33681)
+	id 1iJ4Ai-0001YJ-2C
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 19:18:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iJ3KT-0004ut-64
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 18:24:10 -0400
+ (envelope-from <dayeol@berkeley.edu>) id 1iJ47H-0000eL-3D
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:14:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iJ3KR-0001Wk-PN
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 18:24:08 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43498)
+ (envelope-from <dayeol@berkeley.edu>) id 1iJ47F-0001Jd-Dl
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:14:34 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:44330)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iJ3KO-0001Mn-JK; Fri, 11 Oct 2019 18:24:04 -0400
-Received: by mail-lf1-x141.google.com with SMTP id u3so8065243lfl.10;
- Fri, 11 Oct 2019 15:24:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=k98FUPIsfV/LM/5NVcO5lDSAEMNWmkx1yca0Rwd7Ozo=;
- b=k+JD85aKN0Gr3kB0ykAR0dZ7YvVqhK0X6crBA3FYyV35OwIFxT/SiP6WHVvoaA5kUY
- CHfUJQqsa0Zsxu6TQyctkR+BMkwTbl2smAFmVsn0r8zJ+fyVzmJGDSi6T1huTSIdgUl/
- J+BV3PWABp9rOFB1cmxgJKZgqRB4P7zn1/Op2iIUpyfLK7tqTFYbdsZyN5nqPHYfuX2n
- t3fuV44HFSf41LtgH0VFB4G+au4NpAA1X9u07Q+Rw8GIsMfAUSHYPGJkmO5qAJ/5JADR
- XnqH73oLU9TCxOUbH7gZhwaH+DQ5SmtarUVX8lVTngf/FSkrqbNe0myhglc8xtugRc8o
- H51w==
+ (Exim 4.71) (envelope-from <dayeol@berkeley.edu>) id 1iJ47F-0001JJ-4B
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:14:33 -0400
+Received: by mail-qt1-x843.google.com with SMTP id u40so16174428qth.11
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 16:14:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=berkeley-edu.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=UtUDd5e/TA51h4IZxO1cpupAltRdyzMyfziFMZdbB/U=;
+ b=kp4iHyo3TaywfyDOiK+F/61RdOqMWz28RUJq+PdXiO1NrDfhTErkDbHUfv7T7DBUog
+ 56eoIOFMtMQ6sDZgwzHDUNIpjbxQ5xVJyhP8G16BbbB1wricN8KJ7I9L6JeGEir3zccP
+ lqyDfyRrhToeGaGp6m6ZBOMwUpWkObz+YDVnToCoiv/mcUDA/dqzB/WnYrVnF9NVh953
+ VkAB89aNLnurH8364HssS2pz/5hMudAUTEu8Vxr+En7IJuANWCZlKXSIxZ2BV42s69Y3
+ Z7yfEt/SN7b/9V6aGOEnsYwUm56op4HYcQLiuOVlf49s56itglAUta6V5JoOA6L/FVbf
+ G+/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=k98FUPIsfV/LM/5NVcO5lDSAEMNWmkx1yca0Rwd7Ozo=;
- b=s9QFVvoYiM60H3vNs3vsMYPn2mlFCeWIcEbtuTBCZXYvN3pckIniW/qXGy9VZUpywQ
- TTKPYQfnRxnDW5zD4jXDHv2S8EKxDm6LVoyf8b2ZF3z9PboGmptY0YH1aSUqBKe8edc9
- qWG8voDyC/08WJJ1NC894xYBfDAJ2l7xIImtN0Y/gw53NERwBJbJQWFUA/VrzFUI9MYg
- giAqRQ5XXfNf3ngUCu7ecU0iZcbJ3s+63HTkoawTf0xokZ6W5iLdSrLR8D4jMuy3cZPx
- KhrnnMOuAeckk3qgzBHHf9t79PLPNfFeip7h9gUD1AeFxkoBN0i2tcB54hhjXjC/prxi
- Ms2Q==
-X-Gm-Message-State: APjAAAUVi6x4ZPHxVbjtARIt05+bTeAzfTmuOFc92eNId4xyd/wwbXty
- 5mvmeuMQ5XNCEPcnAaNYT87HJgeDVhmepr6kIUg=
-X-Google-Smtp-Source: APXvYqyvRX8vT89krooWVA7CZwnqTWVr6sLq6Defg7QJnoYUZ5KiohFYzFdq3DYSbti1s3nCYZZKpZdcDKP7T7K3G9k=
-X-Received: by 2002:a19:c392:: with SMTP id
- t140mr10228222lff.156.1570832642085; 
- Fri, 11 Oct 2019 15:24:02 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=UtUDd5e/TA51h4IZxO1cpupAltRdyzMyfziFMZdbB/U=;
+ b=W9D6z5ryMHR9iemkuqK/HMON1vaUy+dVbjaMo3r7W8Y1+aef8JtE03yBhU5IvOUskO
+ 5rdh0hvgc2evkn0qZzk8CPFBMxY+yamz5094oI2/5KZSRHtW55uXKG42dzy3OUzpRgp1
+ hStXAVg798ujSOFn6KcECZ/2rPug/q0VFdJUkNWWn1IIf9Z3ni2AAJixJ/x3g4llsgP7
+ 1V0vAaSXN42G02PpS65V0fXSqWssq9b2VRIQBFPnnJ5x7USRap0TWZz3B3ngK27cfrCW
+ 7vs7gu4nrO6oI8HRMNm5+9gXcHU4jlziKzrk0ZmsczEjO+jhB6AJGzPWsKoZQGox/F3k
+ f41g==
+X-Gm-Message-State: APjAAAU1t8XnMbVqvaGD4eiTT3h84Sw+QmrtxCKqJIMwhlY1mFLouy0y
+ X1akm7LBDhtHG5c/XvQxDghKKLgoqi+LUQ==
+X-Google-Smtp-Source: APXvYqzRNlsgXmhqdup3Wb2rVu1disrPOOGbhEAj28ZsHBVFKB0kQ+GIZwMy/rvDVtwhuBL4a4QGxw==
+X-Received: by 2002:ac8:550d:: with SMTP id j13mr19683509qtq.37.1570835671728; 
+ Fri, 11 Oct 2019 16:14:31 -0700 (PDT)
+Received: from ip-172-31-33-50.ec2.internal
+ (ec2-34-206-44-154.compute-1.amazonaws.com. [34.206.44.154])
+ by smtp.gmail.com with ESMTPSA id 194sm4305953qkm.62.2019.10.11.16.14.30
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Fri, 11 Oct 2019 16:14:30 -0700 (PDT)
+From: Dayeol Lee <dayeol@berkeley.edu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] target/riscv: PMP violation due to wrong size parameter
+Date: Fri, 11 Oct 2019 23:14:06 +0000
+Message-Id: <20191011231406.9808-1-dayeol@berkeley.edu>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <LqVBb_I--3-1@tuta.io>
-In-Reply-To: <LqVBb_I--3-1@tuta.io>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 11 Oct 2019 15:18:56 -0700
-Message-ID: <CAKmqyKNh-jgg-LWHp4RMM9vaaMNr7qHtNSVYs9OFXhvJ-+7RXA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] target/riscv/pmp: Fix bug preventing
-To: Chris Williams <diodesign@tuta.io>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::141
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,113 +91,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu Riscv <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, dayeol@berkeley.edu,
+Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Dayeol Lee <dayeol@berkeley.edu>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>, Qemu Devel <qemu-devel@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>
+ Palmer Dabbelt <palmer@sifive.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, diodesign@tuta.io
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Oct 6, 2019 at 1:32 AM Chris Williams <diodesign@tuta.io> wrote:
->
-> Hello. I hope you don't mind me resubmitting this patch. Please let me know if
+riscv_cpu_tlb_fill() uses the `size` parameter to check PMP violation
+using pmp_hart_has_privs().
+However, if the size is unknown (=0), the ending address will be
+`addr - 1` as it is `addr + size - 1` in `pmp_hart_has_privs()`.
+This always causes a false PMP violation on the starting address of the
+range, as `addr - 1` is not in the range.
 
-Not at all!
+In order to fix, we just assume that all bytes from addr to the end of
+the page will be accessed if the size is unknown.
 
-Thanks for the patch.
+Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/cpu_helper.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-In future if people don't respond you can just keep pinging your patch.
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index e32b6126af..7d9a22b601 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -441,6 +441,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     CPURISCVState *env = &cpu->env;
+     hwaddr pa = 0;
+     int prot;
++    int pmp_size = 0;
+     bool pmp_violation = false;
+     int ret = TRANSLATE_FAIL;
+     int mode = mmu_idx;
+@@ -460,9 +461,19 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                   "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
+                   " prot %d\n", __func__, address, ret, pa, prot);
+ 
++    /*
++     * if size is unknown (0), assume that all bytes
++     * from addr to the end of the page will be accessed.
++     */
++    if (size == 0) {
++        pmp_size = -(address | TARGET_PAGE_MASK);
++    } else {
++        pmp_size = size;
++    }
++
+     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+         (ret == TRANSLATE_SUCCESS) &&
+-        !pmp_hart_has_privs(env, pa, size, 1 << access_type, mode)) {
++        !pmp_hart_has_privs(env, pa, pmp_size, 1 << access_type, mode)) {
+         ret = TRANSLATE_PMP_FAIL;
+     }
+     if (ret == TRANSLATE_PMP_FAIL) {
+-- 
+2.20.1
 
-> I've formatted it incorrectly or if it needs more explanation. My previous
-> attempt probably wasn't formatted quite right. This is my first time
-> contributing to Qemu, so I'm keen to get it right - thanks.
-
-This whole paragraph should not be in the commit. It can go below the
-line though.
-
-Also please use `git format-patch` to format the patch and then `git
-send-email` to send the patch. There is a whole heap of detail here:
-https://wiki.qemu.org/Contribute/SubmitAPatch
-
->
-> This fixes an issue that prevents a RISC-V CPU from executing instructions
-> immediately from the base address of a PMP TOR region.
->
-> When jumping to an instruction in a PMP TOR region, pmp_hart_has_privs() is
-> called to validate the access. If this instruction is the very first word of a
-> PMP TOR region, at address 0 relative to the start address of the region, then
-> the access will fail. This is because pmp_hart_has_privs() is called with size
-> 0 to perform this validation, causing this check...
->
-> e = pmp_is_in_range(env, i, addr + size - 1);
->
-> ... to fail, as (addr + size - 1) falls below the base address of the PMP
-> region. Really, the access should succeed. For example, if I have a region
-> spanning 0x80d96000 to 0x88d95fff and the CPU jumps to 0x80d96000, then:
->
-> s = 0x80d96000
-> e = 0x80d95fff
->
-> And the validation fails. The size check proposed below catches these zero-size
-> instruction fetch access probes. The word alignment in pmpaddr{0-15} and
-> earlier instruction alignment checks should prevent the execution of
-> instructions over the upper boundary of the PMP region, though I'm happy to give
-> this more attention if this is a concern.
-
-This seems like a similar issue to this patch as well:
-https://lore.kernel.org/qemu-devel/20191007052813.25814-1-dayeol@berkeley.edu/
-
-From that discussion:
-
-"In general, size 0 means "unknown size".  In this case, the one tlb lookup is
-going to be used by lots of instructions -- everything that fits on the page."
-
-Richard's last comment seems like a better fix:
-
-"You certainly could do
-
-    if (size == 0) {
-        size = -(addr | TARGET_PAGE_MASK);
-    }
-
-to assume that all bytes from addr to the end of the page are accessed.  That
-would avoid changing too much of the rest of the logic.
-
-That said, this code will continue to not work for mis-aligned boundaries."
-
-So I don't think this is the correct solution. I'm not sure if Dayeol
-is planning on sending a follow up version. If not feel free to send
-it.
-
->
-> Signed-off-by: Chris Williams <diodesign@tuta.io <mailto:diodesign@tuta.io>>
-
-It looks like this is a HTML patch, also ensure all patches are just
-plain text, `git send-email` will do this.
-
-Thanks for the patch though! Please send any more fixes that you find :)
-
-Alistair
-
->
-> diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-> index d4f1007109..9308672e20 100644
-> --- a/target/riscv/pmp.c
-> +++ b/target/riscv/pmp.c
-> @@ -235,8 +235,9 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong
-> addr,
->      /* 1.10 draft priv spec states there is an implicit order
->           from low to high */
->      for (i = 0; i < MAX_RISCV_PMPS; i++) {
-> +        /* catch zero-size instruction checks */
->          s = pmp_is_in_range(env, i, addr);
-> -        e = pmp_is_in_range(env, i, addr + size - 1);
-> +        e = pmp_is_in_range(env, i, (size == 0) ? addr : addr + size - 1);
->
->          /* partially inside */
->          if ((s + e) == 1) {
->
->
 
