@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52DAC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 500E4ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:26:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7600206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:26:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7600206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 23F02214E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:26:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23F02214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxkG-0004tT-G6
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:26:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36413)
+	id 1iIxkJ-0004uJ-JD
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:26:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQx-0006Hf-CB
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQs-00069A-Gn
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQv-0004Uj-Sj
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:27 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48114)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQr-0004Ng-Cb
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:22 -0400
+Received: from relay.sw.ru ([185.231.240.75]:47976)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQv-0004GN-LU
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:25 -0400
+ id 1iIxQr-0004B3-4b
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:21 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQk-0003XG-9F; Fri, 11 Oct 2019 19:06:14 +0300
+ id 1iIxQe-0003XG-Do; Fri, 11 Oct 2019 19:06:08 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 054/126] virtio-9p: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:40 +0300
-Message-Id: <20191011160552.22907-55-vsementsov@virtuozzo.com>
+Subject: [RFC v5 034/126] MIPS Machines: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:20 +0300
+Message-Id: <20191011160552.22907-35-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,8 +60,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paul Burton <pburton@wavecomp.com>,
+ vsementsov@virtuozzo.com, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ armbru@redhat.com, Greg Kurz <groug@kaod.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,50 +113,29 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/9pfs/9p-local.c | 8 ++++----
- hw/9pfs/9p.c       | 1 +
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ hw/core/loader-fit.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 35635e7e7e..aac7989f16 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -1477,9 +1477,9 @@ static void error_append_security_model_hint(Error **errp_in)
- 
- static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
+index 3ee9fb2f2e..84f35a1fe2 100644
+--- a/hw/core/loader-fit.c
++++ b/hw/core/loader-fit.c
+@@ -120,6 +120,7 @@ static int fit_load_kernel(const struct fit_loader *ldr, const void *itb,
+                            int cfg, void *opaque, hwaddr *pend,
+                            Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     const char *sec_model = qemu_opt_get(opts, "security_model");
-     const char *path = qemu_opt_get(opts, "path");
--    Error *local_err = NULL;
- 
-     if (!sec_model) {
-         error_setg(errp, "security_model property not set");
-@@ -1507,9 +1507,9 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
-         return -1;
-     }
- 
--    fsdev_throttle_parse_opts(opts, &fse->fst, &local_err);
--    if (local_err) {
--        error_propagate_prepend(errp, local_err,
-+    fsdev_throttle_parse_opts(opts, &fse->fst, errp);
-+    if (*errp) {
-+        error_prepend(errp,
-                                 "invalid throttle configuration: ");
-         return -1;
-     }
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index cce2366219..1df2749e03 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -3552,6 +3552,7 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
- int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
-                                Error **errp)
+     const char *name;
+     const void *data;
+     const void *load_data;
+@@ -178,6 +179,7 @@ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
+                         int cfg, void *opaque, const void *match_data,
+                         hwaddr kernel_end, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     int i, len;
-     struct stat stat;
-     FsDriverEntry *fse;
+     const char *name;
+     const void *data;
+     const void *load_data;
 -- 
 2.21.0
 
