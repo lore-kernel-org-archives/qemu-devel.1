@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C050BC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A33C1C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D1D52084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:31:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1D52084C
+	by mail.kernel.org (Postfix) with ESMTPS id 74DEA2084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:32:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74DEA2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIylf-0002Te-HD
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:31:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37015)
+	id 1iIylk-0002YU-RF
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40504)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRD-0006jZ-3z
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:45 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgy-0000cs-5r
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0004ox-VP
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:42 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47926)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxgw-00088V-Mu
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:23:00 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49666)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR8-000499-NT; Fri, 11 Oct 2019 12:06:38 -0400
+ id 1iIxgw-000886-Fo; Fri, 11 Oct 2019 12:22:58 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQd-0003XG-6W; Fri, 11 Oct 2019 19:06:07 +0300
+ id 1iIxR4-0003XG-L5; Fri, 11 Oct 2019 19:06:34 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 030/126] kvm: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:16 +0300
-Message-Id: <20191011160552.22907-31-vsementsov@virtuozzo.com>
+Subject: [RFC v5 107/126] blklogwrites: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:33 +0300
+Message-Id: <20191011160552.22907-108-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,12 +60,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- armbru@redhat.com, Greg Kurz <groug@kaod.org>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-ppc@nongnu.org, Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Ari Sundholm <ari@tuxera.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -114,64 +110,70 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- target/ppc/kvm.c          | 8 ++++----
- target/s390x/cpu_models.c | 2 ++
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ block/blklogwrites.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index af6e667bf8..d58a3f5bf5 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -237,6 +237,7 @@ static int kvm_booke206_tlb_init(PowerPCCPU *cpu)
- #if defined(TARGET_PPC64)
- static void kvm_get_smmu_info(struct kvm_ppc_smmu_info *info, Error **errp)
+diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+index 04d8b33607..841cfeef95 100644
+--- a/block/blklogwrites.c
++++ b/block/blklogwrites.c
+@@ -141,36 +141,33 @@ static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
+ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+                                Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     int ret;
- 
-     assert(kvm_state != NULL);
-@@ -325,18 +326,17 @@ bool kvmppc_hpt_needs_host_contiguous_pages(void)
- 
- void kvm_check_mmu(PowerPCCPU *cpu, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     struct kvm_ppc_smmu_info smmu_info;
-     int iq, ik, jq, jk;
+     BDRVBlkLogWritesState *s = bs->opaque;
+     QemuOpts *opts;
 -    Error *local_err = NULL;
+     int ret;
+     uint64_t log_sector_size;
+     bool log_append;
  
-     /* For now, we only have anything to check on hash64 MMUs */
-     if (!cpu->hash64_opts || !kvm_enabled()) {
-         return;
-     }
- 
--    kvm_get_smmu_info(&smmu_info, &local_err);
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
 -    if (local_err) {
--        error_propagate(errp, local_err);
-+    kvm_get_smmu_info(&smmu_info, errp);
++    qemu_opts_absorb_qdict(opts, options, errp);
 +    if (*errp) {
-         return;
+         ret = -EINVAL;
+-        error_propagate(errp, local_err);
+         goto fail;
      }
  
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 009afc38b9..32f2e5e822 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -840,6 +840,7 @@ static void error_prepend_missing_feat(const char *name, void *opaque)
- static void check_compatibility(const S390CPUModel *max_model,
-                                 const S390CPUModel *model, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     S390FeatBitmap missing;
+     /* Open the file */
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
+-                               &local_err);
+-    if (local_err) {
++                               errp);
++    if (*errp) {
+         ret = -EINVAL;
+-        error_propagate(errp, local_err);
+         goto fail;
+     }
  
-     if (model->def->gen > max_model->def->gen) {
-@@ -922,6 +923,7 @@ static inline void apply_cpu_model(const S390CPUModel *model, Error **errp)
+     /* Open the log file */
+     s->log_file = bdrv_open_child(NULL, options, "log", bs, &child_file, false,
+-                                  &local_err);
+-    if (local_err) {
++                                  errp);
++    if (*errp) {
+         ret = -EINVAL;
+-        error_propagate(errp, local_err);
+         goto fail;
+     }
  
- void s390_realize_cpu_model(CPUState *cs, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     S390CPUClass *xcc = S390_CPU_GET_CLASS(cs);
-     S390CPU *cpu = S390_CPU(cs);
-     const S390CPUModel *max_model;
+@@ -220,10 +217,9 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
+         if (blk_log_writes_sector_size_valid(log_sector_size)) {
+             s->cur_log_sector =
+                 blk_log_writes_find_cur_log_sector(s->log_file, log_sector_size,
+-                                    le64_to_cpu(log_sb.nr_entries), &local_err);
+-            if (local_err) {
++                                    le64_to_cpu(log_sb.nr_entries), errp);
++            if (*errp) {
+                 ret = -EINVAL;
+-                error_propagate(errp, local_err);
+                 goto fail_log;
+             }
+ 
 -- 
 2.21.0
 
