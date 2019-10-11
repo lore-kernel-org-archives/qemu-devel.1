@@ -3,58 +3,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656D2C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B837C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:28:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36D97206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:27:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D97206CD
+	by mail.kernel.org (Postfix) with ESMTPS id F0339206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 19:28:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0339206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ0Zl-00057x-32
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 15:27:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37643)
+	id 1iJ0aE-0005wo-Qe
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 15:28:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37703)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iJ0Pn-0000er-F0
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:28 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iJ0Pw-0000ty-UX
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iJ0Pm-0003yM-8e
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50928)
+ (envelope-from <dgilbert@redhat.com>) id 1iJ0Pv-000443-Um
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43572)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iJ0Pm-0003y6-33
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:26 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iJ0Pv-00043n-Oz
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 15:17:35 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5A248300BEAB;
- Fri, 11 Oct 2019 19:17:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0BA1630655F9;
+ Fri, 11 Oct 2019 19:17:35 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-210.ams2.redhat.com
  [10.36.117.210])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E0A15D6C8;
- Fri, 11 Oct 2019 19:17:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A2465D6C8;
+ Fri, 11 Oct 2019 19:17:31 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, quintela@redhat.com, eric.auger@redhat.com,
  richardw.yang@linux.intel.com
-Subject: [PULL 15/21] migration/postcopy: rename postcopy_ram_enable_notify to
- postcopy_ram_incoming_setup
-Date: Fri, 11 Oct 2019 20:16:40 +0100
-Message-Id: <20191011191646.226814-16-dgilbert@redhat.com>
+Subject: [PULL 18/21] migration/multifd: use pages->allocated instead of the
+ static max
+Date: Fri, 11 Oct 2019 20:16:43 +0100
+Message-Id: <20191011191646.226814-19-dgilbert@redhat.com>
 In-Reply-To: <20191011191646.226814-1-dgilbert@redhat.com>
 References: <20191011191646.226814-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 11 Oct 2019 19:17:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 11 Oct 2019 19:17:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -77,74 +77,38 @@ Sender: "Qemu-devel"
 
 From: Wei Yang <richardw.yang@linux.intel.com>
 
-Function postcopy_ram_incoming_setup and postcopy_ram_incoming_cleanup
-is a pair. Rename to make it clear for audience.
+multifd_send_fill_packet() prepares meta data for following pages to
+transfer. It would be more proper to fill pages->allocated instead of
+static max value, especially we want to support flexible packet size.
 
 Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20191010011316.31363-2-richardw.yang@linux.intel.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20191011085050.17622-3-richardw.yang@linux.intel.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/postcopy-ram.c | 4 ++--
- migration/postcopy-ram.h | 2 +-
- migration/savevm.c       | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ migration/ram.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index a793bad477..abccafc8c8 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -1094,7 +1094,7 @@ retry:
-     return NULL;
- }
-=20
--int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-+int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
+diff --git a/migration/ram.c b/migration/ram.c
+index 698ba4d669..84c5953a84 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -791,13 +791,12 @@ static void multifd_pages_clear(MultiFDPages_t *pag=
+es)
+ static void multifd_send_fill_packet(MultiFDSendParams *p)
  {
-     /* Open the fd for the kernel to give us userfaults */
-     mis->userfault_fd =3D syscall(__NR_userfaultfd, O_CLOEXEC | O_NONBLO=
-CK);
-@@ -1307,7 +1307,7 @@ int postcopy_request_shared_page(struct PostCopyFD =
-*pcfd, RAMBlock *rb,
-     return -1;
- }
+     MultiFDPacket_t *packet =3D p->packet;
+-    uint32_t page_max =3D MULTIFD_PACKET_SIZE / qemu_target_page_size();
+     int i;
 =20
--int postcopy_ram_enable_notify(MigrationIncomingState *mis)
-+int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
- {
-     assert(0);
-     return -1;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index fb4cd11d28..9941feb63a 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -20,7 +20,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingSt=
-ate *mis);
-  * Make all of RAM sensitive to accesses to areas that haven't yet been =
-written
-  * and wire up anything necessary to deal with it.
-  */
--int postcopy_ram_enable_notify(MigrationIncomingState *mis);
-+int postcopy_ram_incoming_setup(MigrationIncomingState *mis);
-=20
- /*
-  * Initialise postcopy-ram, setting the RAM to a state where we can go i=
-nto
-diff --git a/migration/savevm.c b/migration/savevm.c
-index bf3da58ecc..95574c4e9d 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1869,7 +1869,7 @@ static int loadvm_postcopy_handle_listen(MigrationI=
-ncomingState *mis)
-      * shouldn't be doing anything yet so don't actually expect requests
-      */
-     if (migrate_postcopy_ram()) {
--        if (postcopy_ram_enable_notify(mis)) {
-+        if (postcopy_ram_incoming_setup(mis)) {
-             postcopy_ram_incoming_cleanup(mis);
-             return -1;
-         }
+     packet->magic =3D cpu_to_be32(MULTIFD_MAGIC);
+     packet->version =3D cpu_to_be32(MULTIFD_VERSION);
+     packet->flags =3D cpu_to_be32(p->flags);
+-    packet->pages_alloc =3D cpu_to_be32(page_max);
++    packet->pages_alloc =3D cpu_to_be32(p->pages->allocated);
+     packet->pages_used =3D cpu_to_be32(p->pages->used);
+     packet->next_packet_size =3D cpu_to_be32(p->next_packet_size);
+     packet->packet_num =3D cpu_to_be64(p->packet_num);
 --=20
 2.23.0
 
