@@ -2,51 +2,51 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6808ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08659C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:59:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF5C20679
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF5C20679
+	by mail.kernel.org (Postfix) with ESMTPS id CD67320679
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 07:59:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD67320679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIpnO-0007cU-Ns
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38218)
+	id 1iIppe-00018q-UZ
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 03:59:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38452)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iIpmF-0006Py-1C
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:55:57 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iIpnY-00087w-P3
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:57:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iIpmE-0001U9-0n
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:55:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54578)
+ (envelope-from <mreitz@redhat.com>) id 1iIpnX-0002O7-OW
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 03:57:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39906)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1iIpmB-0001S8-4x; Fri, 11 Oct 2019 03:55:51 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1iIpnV-0002Mb-Hu; Fri, 11 Oct 2019 03:57:13 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5F60A4E83C;
- Fri, 11 Oct 2019 07:55:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AF50EC05AA56;
+ Fri, 11 Oct 2019 07:57:12 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-116-40.ams2.redhat.com
  [10.36.116.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A938D1001B08;
- Fri, 11 Oct 2019 07:55:48 +0000 (UTC)
-Subject: Re: [PATCH 14/23] iotests/194: Create sockets in $SOCK_DIR
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C3ACF5D9DC;
+ Fri, 11 Oct 2019 07:57:10 +0000 (UTC)
+Subject: Re: [PATCH 04/23] iotests: Filter $SOCK_DIR
 To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20191010152457.17713-1-mreitz@redhat.com>
- <20191010152457.17713-15-mreitz@redhat.com>
- <01965c19-f5eb-c1a1-4108-f79b9c76f323@redhat.com>
+ <20191010152457.17713-5-mreitz@redhat.com>
+ <727638b4-8588-76eb-1428-9b2a9a8df380@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -72,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <67a65ece-97b2-c527-eb00-054bc6018bd7@redhat.com>
-Date: Fri, 11 Oct 2019 09:55:46 +0200
+Message-ID: <333ea7f7-ee1c-16d3-0f1e-9828686e97a5@redhat.com>
+Date: Fri, 11 Oct 2019 09:57:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <01965c19-f5eb-c1a1-4108-f79b9c76f323@redhat.com>
+In-Reply-To: <727638b4-8588-76eb-1428-9b2a9a8df380@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="TwfsDZHOiT2bbsb1yjsozhHQ0tYkWf8UA"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="YfgGrC6pwV1dC57VhgCXFqTtlHiTnuqav"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 11 Oct 2019 07:55:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Fri, 11 Oct 2019 07:57:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -105,85 +105,74 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TwfsDZHOiT2bbsb1yjsozhHQ0tYkWf8UA
-Content-Type: multipart/mixed; boundary="78Q9AxXEVz5P9mrSYtmA6j3exuK1wMGlI"
+--YfgGrC6pwV1dC57VhgCXFqTtlHiTnuqav
+Content-Type: multipart/mixed; boundary="lQ6ohhLSZzi0lKpxeI83Im2sYSdkUuIfx"
 
---78Q9AxXEVz5P9mrSYtmA6j3exuK1wMGlI
+--lQ6ohhLSZzi0lKpxeI83Im2sYSdkUuIfx
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 10.10.19 21:43, Eric Blake wrote:
+On 10.10.19 21:50, Eric Blake wrote:
 > On 10/10/19 10:24 AM, Max Reitz wrote:
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->> =C2=A0 tests/qemu-iotests/194 | 4 ++--
->> =C2=A0 1 file changed, 2 insertions(+), 2 deletions(-)
+>> =C2=A0 tests/qemu-iotests/common.filter | 8 ++++++--
+>> =C2=A0 1 file changed, 6 insertions(+), 2 deletions(-)
 >>
->> diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
->> index d746ab1e21..72e47e8833 100755
->> --- a/tests/qemu-iotests/194
->> +++ b/tests/qemu-iotests/194
->> @@ -26,8 +26,8 @@ iotests.verify_platform(['linux'])
->> =C2=A0 =C2=A0 with iotests.FilePath('source.img') as source_img_path, =
-\
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iotests.FilePath('dest.img') as d=
-est_img_path, \
 >=20
-> Any reason these are still two iotests.FilePath(),
+>> @@ -218,7 +221,8 @@ _filter_nbd()
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Filter out the TCP port number since =
+this changes between runs.
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 $SED -e '/nbd\/.*\.c:/d' \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -e 's#127\.0\.0=
+\.1:[0-9]*#127.0.0.1:PORT#g' \
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -e "s#?socket=3D$TEST_DIR#=
+?socket=3DTEST_DIR#g" \
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -e "s#?socket=3D$SOCK_DIR#=
+?socket=3DTEST_DIR#g" \
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -e "s#?socket=3D$SOCK_DIR#=
+?socket=3DSOCK_DIR#g" \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -e 's#\(foo\|PO=
+RT/\?\|.sock\): Failed to .*$#\1#'
 >=20
->> -=C2=A0=C2=A0=C2=A0=C2=A0 iotests.FilePath('migration.sock') as migrat=
-ion_sock_path, \
->> -=C2=A0=C2=A0=C2=A0=C2=A0 iotests.FilePath('nbd.sock') as nbd_sock_pat=
-h, \
->> +=C2=A0=C2=A0=C2=A0=C2=A0 iotests.FilePaths(['migration.sock', 'nbd.so=
-ck'],
->> iotests.sock_dir) as \
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [migration_sock_path=
-, nbd_sock_path], \
+> This goes away in 23, but this looks crazy.=C2=A0 Don't you really want=
+ the
+> first line to replace $TEST_DIR with TEST_DIR (not $SOCK_DIR with
+> TEST_DIR)?=C2=A0 Otherwise, bisection is likely to break until all the
+> intermediate patches have made the conversion to stop using TEST_DIR.
 >=20
-> while you joined this into one iotests.FilePaths()?=C2=A0 Doesn't affec=
-t
-> correctness, but does raise a consistency issue (I noticed it again in
-> the untouched part of patch 17).
+> I already gave R-b, but you'll need to fix this one.
 
-The migration.sock FilePath line would have exceeded 80 characters, so I
-would=E2=80=99ve had to wrap it.  Thus I decided I might as well make it =
-a
-FilePaths.
+Oops, yes.  I messed it up.  I only intended to add the SOCK_DIR
+replacement line.
 
-I didn=E2=80=99t dare touch the surrounding code, because that would have=
+(Originally I had 23 merged into this one, and then I noticed it would
+break bisection, so I tried to pull it out.  And failed, as you can see.)=
 
-required me to explain myself in the commit message. O:-)
 
 Max
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iotests.VM('source') as source_vm=
-, \
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iotests.VM('dest') as dest_vm:
->> =C2=A0
->=20
 
 
+--lQ6ohhLSZzi0lKpxeI83Im2sYSdkUuIfx--
 
---78Q9AxXEVz5P9mrSYtmA6j3exuK1wMGlI--
-
---TwfsDZHOiT2bbsb1yjsozhHQ0tYkWf8UA
+--YfgGrC6pwV1dC57VhgCXFqTtlHiTnuqav
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2gNYIACgkQ9AfbAGHV
-z0Antwf/YJrmH1gPCxg3IATLyYSGytWnhyCGeMU5Yznaxi6lZIgDLx1hfm8xFinO
-1/JFmnKUmTG3Sl5O12nrjVefnj9m5soBgRCCLghZvHOMi9qZAO7/MgDCs4N9/Fm/
-BIYbGXavzQOsGZNjcF0QAU8oux4L78C4ANZb0e/pwufw/dxE+AqHjIros8uV7vyb
-Te3+Lro/DjsJ3FSs4CGQ4VUZSJhtVt3mmd1sOHmyl/5sihPV+SuA54FyuYAqNuHc
-1O9F6ej6K0wkZIjEMzt2wAe3ncMS/4Vf71qyucX0PyS4zW/XDPA2DWvQ1ev3gDnB
-b3ehHxIiMyaoD0i/dB9Msi4aiOB8ww==
-=2QeL
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl2gNdUACgkQ9AfbAGHV
+z0DL4Qf+ILS8dO9D5tQpCjkNxtD9sSLeALgjADnZc+DeF6heZ0kRA1O+ESSgBH52
+WFceQk9nYdGBmSFsRVi14eMNVRUyQ5+Vkf1gKpI/MZYZpkFUFILZZWw76f17DoRp
+/gbs62lMeSI04S2Wa2vjvwNvCkAQbTx3v6FzSyEw45w4kGTJl0sZvl8ok/3DXS4E
+U/is5fFvT5J9OkgUurAKA7KNm9pIJANbH4EU205cWMpR57XgA2BruRL2FI7CJQAN
+jIAc4pXKsuwNAhZeNnVsA76I4SPA36wwbZPnEY1W/yB1OOwDho1Jn6QSKo5dLJ9+
+7tDap479d+hFfAYP9BXgLW+/pifU7w==
+=S3wQ
 -----END PGP SIGNATURE-----
 
---TwfsDZHOiT2bbsb1yjsozhHQ0tYkWf8UA--
+--YfgGrC6pwV1dC57VhgCXFqTtlHiTnuqav--
 
