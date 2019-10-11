@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD506C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84896ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:15:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 925F7206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:14:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 925F7206A1
+	by mail.kernel.org (Postfix) with ESMTPS id 5BB5B206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:15:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BB5B206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyUt-0005B1-EH
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:14:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36308)
+	id 1iIyVJ-0005ur-L4
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:15:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQu-0006CO-Ge
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:25 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR5-0006WB-Lw
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQt-0004PA-1L
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:24 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48024)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR3-0004hu-OL
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:35 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48350)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQs-0004Bj-QL
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:22 -0400
+ id 1iIxR3-0004Ok-Ev
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:33 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQg-0003XG-Au; Fri, 11 Oct 2019 19:06:10 +0300
+ id 1iIxQr-0003XG-QI; Fri, 11 Oct 2019 19:06:21 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 041/126] IPack: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:27 +0300
-Message-Id: <20191011160552.22907-42-vsementsov@virtuozzo.com>
+Subject: [RFC v5 076/126] Human Monitor (HMP): introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:02 +0300
+Message-Id: <20191011160552.22907-77-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,9 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Alberto Garcia <berto@igalia.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,29 +110,38 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/ipack/ipack.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ monitor/misc.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ipack/ipack.c b/hw/ipack/ipack.c
-index 30e16696c0..a9bc7bd269 100644
---- a/hw/ipack/ipack.c
-+++ b/hw/ipack/ipack.c
-@@ -62,13 +62,12 @@ static void ipack_device_realize(DeviceState *dev, Error **errp)
+diff --git a/monitor/misc.c b/monitor/misc.c
+index aef16f6cfb..4c658884f4 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -1775,20 +1775,19 @@ void monitor_fdset_dup_fd_remove(int dup_fd)
  
- static void ipack_device_unrealize(DeviceState *dev, Error **errp)
+ int monitor_fd_param(Monitor *mon, const char *fdname, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     IPackDevice *idev = IPACK_DEVICE(dev);
-     IPackDeviceClass *k = IPACK_DEVICE_GET_CLASS(dev);
--    Error *err = NULL;
+     int fd;
+-    Error *local_err = NULL;
  
-     if (k->unrealize) {
--        k->unrealize(dev, &err);
--        error_propagate(errp, err);
-+        k->unrealize(dev, errp);
-         return;
+     if (!qemu_isdigit(fdname[0]) && mon) {
+-        fd = monitor_get_fd(mon, fdname, &local_err);
++        fd = monitor_get_fd(mon, fdname, errp);
+     } else {
+         fd = qemu_parse_fd(fdname);
+         if (fd == -1) {
+-            error_setg(&local_err, "Invalid file descriptor number '%s'",
++            error_setg(errp, "Invalid file descriptor number '%s'",
+                        fdname);
+         }
      }
- 
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (*errp) {
+         assert(fd == -1);
+     } else {
+         assert(fd != -1);
 -- 
 2.21.0
 
