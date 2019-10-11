@@ -2,65 +2,88 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3886ECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49919C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:13:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3DC4218AC
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:12:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3DC4218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 13E9A20679
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 14:13:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="brjyj0pQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13E9A20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cloud.ionos.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51063 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIveB-0007q7-3F
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 10:11:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42524)
+	id 1iIvfG-0000YR-3w
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 10:13:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40500)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iIvcb-00061P-Bg
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:10:23 -0400
+ (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
+ id 1iIvRG-0008Gr-Ef
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:58:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iIvcZ-0005uY-4o
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:10:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44824)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iIvcY-0005tr-R6
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 10:10:19 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 077633091D70;
- Fri, 11 Oct 2019 14:10:18 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 174E7100EBD3;
- Fri, 11 Oct 2019 14:10:15 +0000 (UTC)
-Date: Fri, 11 Oct 2019 16:10:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v12 07/11] numa: Extend CLI to provide memory side cache
- information
-Message-ID: <20191011161014.75be6892@redhat.com>
-In-Reply-To: <0ec60fe1-2817-16e0-9a4a-ca1a0a3536e1@intel.com>
-References: <20190920074349.2616-1-tao3.xu@intel.com>
- <20190920074349.2616-8-tao3.xu@intel.com>
- <20191003131901.630b1e0e@redhat.com>
- <0ec60fe1-2817-16e0-9a4a-ca1a0a3536e1@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 11 Oct 2019 14:10:18 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+ (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
+ id 1iIvRF-0000Xv-0l
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:58:38 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:39270)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mikhail.sennikovskii@cloud.ionos.com>)
+ id 1iIvRE-0000Xb-Om
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:58:36 -0400
+Received: by mail-ed1-x542.google.com with SMTP id a15so8767190edt.6
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:58:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=cloud.ionos.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=nNPD57i+zdP3HSzedsX84NREYpBQ/HXdziN+13fyCCQ=;
+ b=brjyj0pQCvV4N1+yy5EwxCMUOSFqyqdMeQnXYvYdMnTiEQsca4UC2rGkVK2n8VGTCn
+ /PLYWLHyVI5yrrPpcgHHjWm1suxNwoZn0r897Ta2OKFRmPLHngH7TkuVNdzAcq+2MskF
+ uzGsJ8I2pcmlI4uksh/y14TcGUgITiDZEczZDswWiTmnM3txR4L+B+ICT7lGxJwxLwn5
+ WsHfy4oYq5g44N6WASeoUJGW+2FNqm9BrHUytnf6oovl3kuuFh/0XSNsx24ptpOvHtkg
+ FXE7xwAFP3Km70R4cuu1DfnwZGjlxWRwgVMt1tHMrJR3HTpOLENNPHFJLmn/HKGmtdk1
+ +Bhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=nNPD57i+zdP3HSzedsX84NREYpBQ/HXdziN+13fyCCQ=;
+ b=nIcgHz8wxLfr4ZolGGS9CJYe2nCZeq24+nr/Mn02oqxY2m0A4CCaObAASYRJqPs+vy
+ vUeOtIqDvHs3CPZQSxKyvRBFntCnPYLVrvA6scypLtMKuFuhzqeWtIKuruxDUOntqCCR
+ 0w9wS/9KGFd0cmJ1sGrPscBsPZSiebENB6s/GtJ/qnT/AXXlwuSZMH+WyXbvszcjZaes
+ fRC6cig+fOnY5eZHdT9bOQFOaIT4Di6w7P/o2ajApzrisvEvCILdDz1DLhe1vl0m/z37
+ Lw0CIf5yHBDgd8lIGMtPqz/8N7MeZJ5UOuhdTuR9+Wok8eR2nVUwfEN/CS2s/SEqgV8L
+ d65Q==
+X-Gm-Message-State: APjAAAXmc3PzdwKKinbKyC0AB5ZNN0d/6DbfpubD5aPRRrA4BWwNBMKh
+ YqxM6nat3scjCVTTit0KYEqntQ==
+X-Google-Smtp-Source: APXvYqwpj+rnC0j9t1hvN8td1G/OYp4PoDR0Sw0ZDRUAOhw9Ox3IxA0sAeKwMIdXMHoSx35eKR0Pnw==
+X-Received: by 2002:a17:906:3385:: with SMTP id
+ v5mr13914224eja.154.1570802315775; 
+ Fri, 11 Oct 2019 06:58:35 -0700 (PDT)
+Received: from msennikovskii2.pb.local
+ ([2001:1438:4010:2558:9cc:2ca5:45db:2acf])
+ by smtp.googlemail.com with ESMTPSA id 36sm1547982edz.92.2019.10.11.06.58.34
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Fri, 11 Oct 2019 06:58:34 -0700 (PDT)
+From: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
+To: "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ stefanha@redhat.com, dgilbert@redhat.com, Jason Wang <jasowang@redhat.com>
+Subject: [PATCH v4 2/2] virtio-net: prevent offloads reset on migration
+Date: Fri, 11 Oct 2019 15:58:04 +0200
+Message-Id: <1570802284-3064-2-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1570802284-3064-1-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
+References: <1570802284-3064-1-git-send-email-mikhail.sennikovskii@cloud.ionos.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,380 +95,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Daniel Black <daniel@linux.ibm.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>, "Williams,
- Dan J" <dan.j.williams@intel.com>
+Cc: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 9 Oct 2019 15:54:00 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
+Currently offloads disabled by guest via the VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET
+command are not preserved on VM migration.
+Instead all offloads reported by guest features (via VIRTIO_PCI_GUEST_FEATURES)
+get enabled.
+What happens is: first the VirtIONet::curr_guest_offloads gets restored and offloads
+are getting set correctly:
 
-> On 10/3/2019 7:19 PM, Igor Mammedov wrote:
-> > On Fri, 20 Sep 2019 15:43:45 +0800
-> > Tao Xu <tao3.xu@intel.com> wrote:
-> >   
-> >> From: Liu Jingqi <jingqi.liu@intel.com>
-> >>
-> >> Add -numa hmat-cache option to provide Memory Side Cache Information.
-> >> These memory attributes help to build Memory Side Cache Information
-> >> Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
-> >>
-> >> Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-> >> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> >> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> >> ---
-> >>
-> >> No changes in v12.
-> >>
-> >> Changes in v11:
-> >>      - Move numa option patches forward.
-> >> ---
-> >>   hw/core/numa.c        | 74 +++++++++++++++++++++++++++++++++++++++
-> >>   include/sysemu/numa.h | 31 +++++++++++++++++
-> >>   qapi/machine.json     | 81 +++++++++++++++++++++++++++++++++++++++++--
-> >>   qemu-options.hx       | 16 +++++++--
-> >>   4 files changed, 198 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> >> index f5a1c9e909..182e4d9d62 100644
-> >> --- a/hw/core/numa.c
-> >> +++ b/hw/core/numa.c
-> >> @@ -293,6 +293,67 @@ void parse_numa_hmat_lb(NumaState *nstat, NumaHmatLBOptions *node,
-> >>       }
-> >>   }
-> >>   
-> >> +void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-> >> +                           Error **errp)
-> >> +{
-> >> +    int nb_numa_nodes = ms->numa_state->num_nodes;
-> >> +    HMAT_Cache_Info *hmat_cache = NULL;
-> >> +
-> >> +    if (node->node_id >= nb_numa_nodes) {
-> >> +        error_setg(errp, "Invalid node-id=%" PRIu32
-> >> +                   ", it should be less than %d.",
-> >> +                   node->node_id, nb_numa_nodes);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (node->total > MAX_HMAT_CACHE_LEVEL) {
-> >> +        error_setg(errp, "Invalid total=%" PRIu8
-> >> +                   ", it should be less than or equal to %d.",
-> >> +                   node->total, MAX_HMAT_CACHE_LEVEL);
-> >> +        return;
-> >> +    }
-> >> +    if (node->level > node->total) {
-> >> +        error_setg(errp, "Invalid level=%" PRIu8
-> >> +                   ", it should be less than or equal to"
-> >> +                   " total=%" PRIu8 ".",
-> >> +                   node->level, node->total);
-> >> +        return;
-> >> +    }
-> >> +    if (ms->numa_state->hmat_cache[node->node_id][node->level]) {
-> >> +        error_setg(errp, "Duplicate configuration of the side cache for "
-> >> +                   "node-id=%" PRIu32 " and level=%" PRIu8 ".",
-> >> +                   node->node_id, node->level);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if ((node->level > 1) &&
-> >> +        ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
-> >> +        (node->size >=
-> >> +            ms->numa_state->hmat_cache[node->node_id][node->level - 1]->size)) {
-> >> +        error_setg(errp, "Invalid size=0x%" PRIx64
-> >> +                   ", the size of level=%" PRIu8
-> >> +                   " should be less than the size(0x%" PRIx64
-> >> +                   ") of level=%" PRIu8 ".",
-> >> +                   node->size, node->level,
-> >> +                   ms->numa_state->hmat_cache[node->node_id]
-> >> +                                             [node->level - 1]->size,
-> >> +                   node->level - 1);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    hmat_cache = g_malloc0(sizeof(*hmat_cache));
-> >> +
-> >> +    hmat_cache->mem_proximity = node->node_id;
-> >> +    hmat_cache->size = node->size;
-> >> +    hmat_cache->total_levels = node->total;
-> >> +    hmat_cache->level = node->level;
-> >> +    hmat_cache->associativity = node->assoc;
-> >> +    hmat_cache->write_policy = node->policy;
-> >> +    hmat_cache->line_size = node->line;
-> >> +
-> >> +    ms->numa_state->hmat_cache[node->node_id][node->level] = hmat_cache;
-> >> +}
-> >> +
-> >>   void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
-> >>   {
-> >>       Error *err = NULL;
-> >> @@ -344,6 +405,19 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
-> >>               goto end;
-> >>           }
-> >>           break;
-> >> +    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
-> >> +        if (!ms->numa_state->hmat_enabled) {
-> >> +            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table "
-> >> +                       "(HMAT) is disabled, use -machine hmat=on before "
-> >> +                       "set initiator of NUMA");
-> >> +            return;  
-> > the same as in 6/11 at similar place
-> >   
-> >> +        }
-> >> +
-> >> +        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
-> >> +        if (err) {
-> >> +            goto end;
-> >> +        }
-> >> +        break;
-> >>       default:
-> >>           abort();
-> >>       }
-> >> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> >> index 876beaee22..39312eefd4 100644
-> >> --- a/include/sysemu/numa.h
-> >> +++ b/include/sysemu/numa.h
-> >> @@ -35,6 +35,8 @@ enum {
-> >>   #define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
-> >>   #define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
-> >>   
-> >> +#define MAX_HMAT_CACHE_LEVEL        3  
-> > 
-> > s/3/HMAT_LB_MEM_CACHE_3RD_LEVEL/
-> > 
-> >   
-> >>   struct NodeInfo {
-> >>       uint64_t node_mem;
-> >>       struct HostMemoryBackend *node_memdev;
-> >> @@ -65,6 +67,30 @@ struct HMAT_LB_Info {
-> >>   };
-> >>   typedef struct HMAT_LB_Info HMAT_LB_Info;
-> >>   
-> >> +struct HMAT_Cache_Info {
-> >> +    /* The memory proximity domain to which the memory belongs. */
-> >> +    uint32_t    mem_proximity;  
-> > mem prefix here is redundant
-> >   
-> >> +    /* Size of memory side cache in bytes. */
-> >> +    uint64_t    size;
-> >> +
-> >> +    /* Total cache levels for this memory proximity domain. */
-> >> +    uint8_t     total_levels;
-> >> +
-> >> +    /* Cache level described in this structure. */
-> >> +    uint8_t     level;
-> >> +
-> >> +    /* Cache Associativity: None/Direct Mapped/Comple Cache Indexing */
-> >> +    uint8_t     associativity;
-> >> +
-> >> +    /* Write Policy: None/Write Back(WB)/Write Through(WT) */
-> >> +    uint8_t     write_policy;
-> >> +
-> >> +    /* Cache Line size in bytes. */
-> >> +    uint16_t    line_size;
-> >> +};
-> >> +typedef struct HMAT_Cache_Info HMAT_Cache_Info;
-> >> +
-> >>   struct NumaState {
-> >>       /* Number of NUMA nodes */
-> >>       int num_nodes;
-> >> @@ -83,6 +109,9 @@ struct NumaState {
-> >>   
-> >>       /* NUMA nodes HMAT Locality Latency and Bandwidth Information */
-> >>       HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
-> >> +
-> >> +    /* Memory Side Cache Information Structure */
-> >> +    HMAT_Cache_Info *hmat_cache[MAX_NODES][MAX_HMAT_CACHE_LEVEL + 1];
-> >>   };
-> >>   typedef struct NumaState NumaState;
-> >>   
-> >> @@ -90,6 +119,8 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp);
-> >>   void parse_numa_opts(MachineState *ms);
-> >>   void parse_numa_hmat_lb(NumaState *nstat, NumaHmatLBOptions *node,
-> >>                           Error **errp);
-> >> +void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-> >> +                           Error **errp);
-> >>   void numa_complete_configuration(MachineState *ms);
-> >>   void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
-> >>   extern QemuOptsList qemu_numa_opts;
-> >> diff --git a/qapi/machine.json b/qapi/machine.json
-> >> index b6019335e8..088be81920 100644
-> >> --- a/qapi/machine.json
-> >> +++ b/qapi/machine.json
-> >> @@ -428,10 +428,12 @@
-> >>   #
-> >>   # @hmat-lb: memory latency and bandwidth information (Since: 4.2)
-> >>   #
-> >> +# @hmat-cache: memory side cache information (Since: 4.2)
-> >> +#
-> >>   # Since: 2.1
-> >>   ##
-> >>   { 'enum': 'NumaOptionsType',
-> >> -  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
-> >> +  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
-> >>   
-> >>   ##
-> >>   # @NumaOptions:
-> >> @@ -447,7 +449,8 @@
-> >>       'node': 'NumaNodeOptions',
-> >>       'dist': 'NumaDistOptions',
-> >>       'cpu': 'NumaCpuOptions',
-> >> -    'hmat-lb': 'NumaHmatLBOptions' }}
-> >> +    'hmat-lb': 'NumaHmatLBOptions',
-> >> +    'hmat-cache': 'NumaHmatCacheOptions' }}
-> >>   
-> >>   ##
-> >>   # @NumaNodeOptions:
-> >> @@ -648,6 +651,80 @@
-> >>       '*latency': 'time',
-> >>       '*bandwidth': 'size' }}
-> >>   
-> >> +##
-> >> +# @HmatCacheAssociativity:
-> >> +#
-> >> +# Cache associativity in the Memory Side Cache
-> >> +# Information Structure of HMAT
-> >> +#
-> >> +# For more information of @HmatCacheAssociativity see
-> >> +# the chapter 5.2.27.5: Table 5-143 of ACPI 6.3 spec.
-> >> +#
-> >> +# @none: None
-> >> +#
-> >> +# @direct: Direct Mapped
-> >> +#
-> >> +# @complex: Complex Cache Indexing (implementation specific)
-> >> +#
-> >> +# Since: 4.2
-> >> +##
-> >> +{ 'enum': 'HmatCacheAssociativity',
-> >> +  'data': [ 'none', 'direct', 'complex' ] }
-> >> +
-> >> +##
-> >> +# @HmatCacheWritePolicy:
-> >> +#
-> >> +# Cache write policy in the Memory Side Cache
-> >> +# Information Structure of HMAT
-> >> +#
-> >> +# For more information of @HmatCacheWritePolicy see
-> >> +# the chapter 5.2.27.5: Table 5-143: Field "Cache Attributes" of ACPI 6.3 spec.
-> >> +#
-> >> +# @none: None
-> >> +#
-> >> +# @write-back: Write Back (WB)
-> >> +#
-> >> +# @write-through: Write Through (WT)
-> >> +#
-> >> +# Since: 4.2
-> >> +##
-> >> +{ 'enum': 'HmatCacheWritePolicy',
-> >> +  'data': [ 'none', 'write-back', 'write-through' ] }
-> >> +
-> >> +##
-> >> +# @NumaHmatCacheOptions:
-> >> +#
-> >> +# Set the memory side cache information for a given memory domain.
-> >> +#
-> >> +# For more information of @NumaHmatCacheOptions see
-> >> +# the chapter 5.2.27.5: Table 5-143: Field "Cache Attributes" of ACPI 6.3 spec.
-> >> +#
-> >> +# @node-id: the memory proximity domain to which the memory belongs.
-> >> +#
-> >> +# @size: the size of memory side cache in bytes.
-> >> +#
-> >> +# @total: the total cache levels for this memory proximity domain.  
-> > 
-> > Can we calculate this without making user to do it?
-> >   
-> 
-> Yes we can. For example, if user input level 1 2 3, total is 3.
+ #0  qemu_set_offload (nc=0x555556a11400, csum=1, tso4=0, tso6=0, ecn=0, ufo=0) at net/net.c:474
+ #1  virtio_net_apply_guest_offloads (n=0x555557701ca0) at hw/net/virtio-net.c:720
+ #2  virtio_net_post_load_device (opaque=0x555557701ca0, version_id=11) at hw/net/virtio-net.c:2334
+ #3  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577c80 <vmstate_virtio_net_device>, opaque=0x555557701ca0, version_id=11)
+     at migration/vmstate.c:168
+ #4  virtio_load (vdev=0x555557701ca0, f=0x5555569dc010, version_id=11) at hw/virtio/virtio.c:2197
+ #5  virtio_device_get (f=0x5555569dc010, opaque=0x555557701ca0, size=0, field=0x55555668cd00 <__compound_literal.5>) at hw/virtio/virtio.c:2036
+ #6  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577ce0 <vmstate_virtio_net>, opaque=0x555557701ca0, version_id=11) at migration/vmstate.c:143
+ #7  vmstate_load (f=0x5555569dc010, se=0x5555578189e0) at migration/savevm.c:829
+ #8  qemu_loadvm_section_start_full (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2211
+ #9  qemu_loadvm_state_main (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2395
+ #10 qemu_loadvm_state (f=0x5555569dc010) at migration/savevm.c:2467
+ #11 process_incoming_migration_co (opaque=0x0) at migration/migration.c:449
 
-Please do so
+However later on the features are getting restored, and offloads get reset to
+everything supported by features:
 
-> 
-> >> +# @level: the cache level described in this structure.
-> >> +#
-> >> +# @assoc: the cache associativity, none/direct-mapped/complex(complex cache indexing).
-> >> +#
-> >> +# @policy: the write policy, none/write-back/write-through.
-> >> +#
-> >> +# @line: the cache Line size in bytes.
-> >> +#
-> >> +# Since: 4.2
-> >> +##
-> >> +{ 'struct': 'NumaHmatCacheOptions',
-> >> +  'data': {
-> >> +   'node-id': 'uint32',
-> >> +   'size': 'size',
-> >> +   'total': 'uint8',
-> >> +   'level': 'uint8',
-> >> +   'assoc': 'HmatCacheAssociativity',
-> >> +   'policy': 'HmatCacheWritePolicy',
-> >> +   'line': 'uint16' }}
-> >> +
-> >>   ##
-> >>   # @HostMemPolicy:
-> >>   #
-> >> diff --git a/qemu-options.hx b/qemu-options.hx
-> >> index 129da0cdc3..7cf214a653 100644
-> >> --- a/qemu-options.hx
-> >> +++ b/qemu-options.hx
-> >> @@ -169,7 +169,8 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
-> >>       "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
-> >>       "-numa dist,src=source,dst=destination,val=distance\n"
-> >>       "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
-> >> -    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,latency=lat][,bandwidth=bw]\n",
-> >> +    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,latency=lat][,bandwidth=bw]\n"
-> >> +    "-numa hmat-cache,node-id=node,size=size,total=total,level=level[,assoc=none|direct|complex][,policy=none|write-back|write-through][,line=size]\n",
-> >>       QEMU_ARCH_ALL)
-> >>   STEXI
-> >>   @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
-> >> @@ -177,6 +178,7 @@ STEXI
-> >>   @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
-> >>   @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
-> >>   @itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,latency=@var{lat}][,bandwidth=@var{bw}]
-> >> +@itemx -numa hmat-cache,node-id=@var{node},size=@var{size},total=@var{total},level=@var{level}[,assoc=@var{str}][,policy=@var{str}][,line=@var{size}]
-> >>   @findex -numa
-> >>   Define a NUMA node and assign RAM and VCPUs to it.
-> >>   Set the NUMA distance from a source node to a destination node.
-> >> @@ -282,11 +284,19 @@ if NUM is 0, means the corresponding latency or bandwidth information is not pro
-> >>   And if input numbers without any unit, the latency unit will be 'ps' and the bandwidth
-> >>   will be MB/s.
-> >>   
-> >> +In @samp{hmat-cache} option, @var{node-id} is the NUMA-id of the memory belongs.
-> >> +@var{size} is the size of memory side cache in bytes. @var{total} is the total cache levels.
-> >> +@var{level} is the cache level described in this structure. @var{assoc} is the cache associativity,
-> >> +the possible value is 'none/direct(direct-mapped)/complex(complex cache indexing)'.
-> >> +@var{policy} is the write policy. @var{line} is the cache Line size in bytes.
-> >> +
-> >>   For example, the following option assigns NUMA node 0 and 1. Node 0 has 2 cpus and
-> >>   a ram, node 1 has only a ram. The processors in node 0 access memory in node
-> >>   0 with access-latency 5 nanoseconds, access-bandwidth is 200 MB/s;
-> >>   The processors in NUMA node 0 access memory in NUMA node 1 with access-latency 10
-> >>   nanoseconds, access-bandwidth is 100 MB/s.
-> >> +And for memory side cache information, NUMA node 0 and 1 both have 1 level memory
-> >> +cache, size is 0x20000 bytes, policy is write-back, the cache Line size is 8 bytes:  
-> > hex is not particularly user readable format, use decimal here and size suffixes
-> > here and in the example below.
-> >   
-> >>   @example
-> >>   -machine hmat=on \
-> >>   -m 2G \
-> >> @@ -300,7 +310,9 @@ nanoseconds, access-bandwidth is 100 MB/s.
-> >>   -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,latency=5ns \
-> >>   -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,bandwidth=200M \
-> >>   -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,latency=10ns \
-> >> --numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=100M
-> >> +-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=100M \
-> >> +-numa hmat-cache,node-id=0,size=0x20000,total=1,level=1,assoc=direct,policy=write-back,line=8 \
-> >> +-numa hmat-cache,node-id=1,size=0x20000,total=1,level=1,assoc=direct,policy=write-back,line=8
-> >>   @end example
-> >>   
-> >>   ETEXI  
-> >   
-> 
+ #0  qemu_set_offload (nc=0x555556a11400, csum=1, tso4=1, tso6=1, ecn=0, ufo=0) at net/net.c:474
+ #1  virtio_net_apply_guest_offloads (n=0x555557701ca0) at hw/net/virtio-net.c:720
+ #2  virtio_net_set_features (vdev=0x555557701ca0, features=5104441767) at hw/net/virtio-net.c:773
+ #3  virtio_set_features_nocheck (vdev=0x555557701ca0, val=5104441767) at hw/virtio/virtio.c:2052
+ #4  virtio_load (vdev=0x555557701ca0, f=0x5555569dc010, version_id=11) at hw/virtio/virtio.c:2220
+ #5  virtio_device_get (f=0x5555569dc010, opaque=0x555557701ca0, size=0, field=0x55555668cd00 <__compound_literal.5>) at hw/virtio/virtio.c:2036
+ #6  vmstate_load_state (f=0x5555569dc010, vmsd=0x555556577ce0 <vmstate_virtio_net>, opaque=0x555557701ca0, version_id=11) at migration/vmstate.c:143
+ #7  vmstate_load (f=0x5555569dc010, se=0x5555578189e0) at migration/savevm.c:829
+ #8  qemu_loadvm_section_start_full (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2211
+ #9  qemu_loadvm_state_main (f=0x5555569dc010, mis=0x5555569eee20) at migration/savevm.c:2395
+ #10 qemu_loadvm_state (f=0x5555569dc010) at migration/savevm.c:2467
+ #11 process_incoming_migration_co (opaque=0x0) at migration/migration.c:449
+
+Fix this by preserving the state in saved_guest_offloads field and
+pushing out offload initialization to the new post load hook.
+
+Signed-off-by: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
+---
+ hw/net/virtio-net.c            | 27 ++++++++++++++++++++++++---
+ include/hw/virtio/virtio-net.h |  2 ++
+ 2 files changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index b9e1cd7..6adb0fe 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -2330,9 +2330,13 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+         n->curr_guest_offloads = virtio_net_supported_guest_offloads(n);
+     }
+ 
+-    if (peer_has_vnet_hdr(n)) {
+-        virtio_net_apply_guest_offloads(n);
+-    }
++    /*
++     * curr_guest_offloads will be later overwritten by the
++     * virtio_set_features_nocheck call done from the virtio_load.
++     * Here we make sure it is preserved and restored accordingly
++     * in the virtio_net_post_load_virtio callback.
++     */
++    n->saved_guest_offloads = n->curr_guest_offloads;
+ 
+     virtio_net_set_queues(n);
+ 
+@@ -2367,6 +2371,22 @@ static int virtio_net_post_load_device(void *opaque, int version_id)
+     return 0;
+ }
+ 
++static int virtio_net_post_load_virtio(VirtIODevice *vdev)
++{
++    VirtIONet *n = VIRTIO_NET(vdev);
++    /*
++     * The actual needed state is now in saved_guest_offloads,
++     * see virtio_net_post_load_device for detail.
++     * Restore it back and apply the desired offloads.
++     */
++    n->curr_guest_offloads = n->saved_guest_offloads;
++    if (peer_has_vnet_hdr(n)) {
++        virtio_net_apply_guest_offloads(n);
++    }
++
++    return 0;
++}
++
+ /* tx_waiting field of a VirtIONetQueue */
+ static const VMStateDescription vmstate_virtio_net_queue_tx_waiting = {
+     .name = "virtio-net-queue-tx_waiting",
+@@ -2909,6 +2929,7 @@ static void virtio_net_class_init(ObjectClass *klass, void *data)
+     vdc->guest_notifier_mask = virtio_net_guest_notifier_mask;
+     vdc->guest_notifier_pending = virtio_net_guest_notifier_pending;
+     vdc->legacy_features |= (0x1 << VIRTIO_NET_F_GSO);
++    vdc->post_load = virtio_net_post_load_virtio;
+     vdc->vmsd = &vmstate_virtio_net_device;
+ }
+ 
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index b96f0c6..07a9319 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -182,6 +182,8 @@ struct VirtIONet {
+     char *netclient_name;
+     char *netclient_type;
+     uint64_t curr_guest_offloads;
++    /* used on saved state restore phase to preserve the curr_guest_offloads */
++    uint64_t saved_guest_offloads;
+     AnnounceTimer announce_timer;
+     bool needs_vnet_hdr_swap;
+     bool mtu_bypass_backend;
+-- 
+2.7.4
 
 
