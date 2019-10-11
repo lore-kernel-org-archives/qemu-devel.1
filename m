@@ -2,53 +2,66 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58DE4C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D5EC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:24:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D5312067B
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:23:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D5312067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0AB5F2067B
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:24:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB5F2067B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIydm-000096-QZ
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:23:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36836)
+	id 1iIyeD-0000m7-NN
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:24:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40215)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR8-0006aw-GF
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:42 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIxf0-0005qj-QJ
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:20:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR5-0004ja-0h
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:38 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48386)
+ (envelope-from <eblake@redhat.com>) id 1iIxez-0007Fg-KD
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:20:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54514)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR4-0004Qo-MV
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:34 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQt-0003XG-Av; Fri, 11 Oct 2019 19:06:23 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC v5 080/126] QAPI: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:06 +0300
-Message-Id: <20191011160552.22907-81-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iIxev-0007AD-Kv; Fri, 11 Oct 2019 12:20:53 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8CA0C82A4C9;
+ Fri, 11 Oct 2019 16:20:51 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 33DFD600CC;
+ Fri, 11 Oct 2019 16:20:51 +0000 (UTC)
+Subject: Re: [PATCH v3 04/16] qcow2: Keep unknown extra snapshot data
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20191011152814.14791-1-mreitz@redhat.com>
+ <20191011152814.14791-5-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <8ecf3ce6-51e4-63ee-8fdc-945ca3e1f397@redhat.com>
+Date: Fri, 11 Oct 2019 11:20:50 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <20191011152814.14791-5-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.69]); Fri, 11 Oct 2019 16:20:51 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,268 +73,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- vsementsov@virtuozzo.com, armbru@redhat.com, Greg Kurz <groug@kaod.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+On 10/11/19 10:28 AM, Max Reitz wrote:
+> The qcow2 specification says to ignore unknown extra data fields in
+> snapshot table entries.  Currently, we discard it whenever we update the
+> image, which is a bit different from "ignore".
+> 
+> This patch makes the qcow2 driver keep all unknown extra data fields
+> when updating an image's snapshot table.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
 
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+>   /* Bitmap header extension constraints */
+>   #define QCOW2_MAX_BITMAPS 65535
+>   #define QCOW2_MAX_BITMAP_DIRECTORY_SIZE (1024 * QCOW2_MAX_BITMAPS)
+> @@ -181,6 +184,8 @@ typedef struct QCowSnapshot {
+>       uint32_t date_sec;
+>       uint32_t date_nsec;
+>       uint64_t vm_clock_nsec;
+> +    uint32_t extra_data_size;
+> +    void *unknown_extra_data; /* Extra data past QCowSnapshotExtraData */
 
-This commit (together with its neighbors) was generated by
+Would it be worth a comment change:
 
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
+uint32_t extra_data_size; /* Size of all extra data, including 
+QCowSnapshotExtraData */
+void *unknown_extra_data; /* Data beyond QCowSnapshotExtraData, if any */
 
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
+Either way, R-b stands.
 
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- qapi/qapi-visit-core.c      | 56 ++++++++++++++++---------------------
- qapi/qmp-dispatch.c         |  7 ++---
- qapi/string-input-visitor.c |  7 ++---
- 3 files changed, 30 insertions(+), 40 deletions(-)
-
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 5365561b07..f8c5be9130 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -39,18 +39,17 @@ void visit_free(Visitor *v)
- void visit_start_struct(Visitor *v, const char *name, void **obj,
-                         size_t size, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
- 
-     trace_visit_start_struct(v, name, obj, size);
-     if (obj) {
-         assert(size);
-         assert(!(v->type & VISITOR_OUTPUT) || *obj);
-     }
--    v->start_struct(v, name, obj, size, &err);
-+    v->start_struct(v, name, obj, size, errp);
-     if (obj && (v->type & VISITOR_INPUT)) {
--        assert(!err != !*obj);
-+        assert(!*errp != !*obj);
-     }
--    error_propagate(errp, err);
- }
- 
- void visit_check_struct(Visitor *v, Error **errp)
-@@ -70,15 +69,14 @@ void visit_end_struct(Visitor *v, void **obj)
- void visit_start_list(Visitor *v, const char *name, GenericList **list,
-                       size_t size, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
- 
-     assert(!list || size >= sizeof(GenericList));
-     trace_visit_start_list(v, name, list, size);
--    v->start_list(v, name, list, size, &err);
-+    v->start_list(v, name, list, size, errp);
-     if (list && (v->type & VISITOR_INPUT)) {
--        assert(!(err && *list));
-+        assert(!(*errp && *list));
-     }
--    error_propagate(errp, err);
- }
- 
- GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t size)
-@@ -106,18 +104,17 @@ void visit_start_alternate(Visitor *v, const char *name,
-                            GenericAlternate **obj, size_t size,
-                            Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
- 
-     assert(obj && size >= sizeof(GenericAlternate));
-     assert(!(v->type & VISITOR_OUTPUT) || *obj);
-     trace_visit_start_alternate(v, name, obj, size);
-     if (v->start_alternate) {
--        v->start_alternate(v, name, obj, size, &err);
-+        v->start_alternate(v, name, obj, size, errp);
-     }
-     if (v->type & VISITOR_INPUT) {
--        assert(v->start_alternate && !err != !*obj);
-+        assert(v->start_alternate && !*errp != !*obj);
-     }
--    error_propagate(errp, err);
- }
- 
- void visit_end_alternate(Visitor *v, void **obj)
-@@ -152,12 +149,11 @@ void visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **errp)
- static void visit_type_uintN(Visitor *v, uint64_t *obj, const char *name,
-                              uint64_t max, const char *type, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     uint64_t value = *obj;
- 
--    v->type_uint64(v, name, &value, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    v->type_uint64(v, name, &value, errp);
-+    if (*errp) {
-     } else if (value > max) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    name ? name : "null", type);
-@@ -211,12 +207,11 @@ static void visit_type_intN(Visitor *v, int64_t *obj, const char *name,
-                             int64_t min, int64_t max, const char *type,
-                             Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     int64_t value = *obj;
- 
--    v->type_int64(v, name, &value, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    v->type_int64(v, name, &value, errp);
-+    if (*errp) {
-     } else if (value < min || value > max) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-                    name ? name : "null", type);
-@@ -286,7 +281,7 @@ void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
- 
- void visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
- 
-     assert(obj);
-     /* TODO: Fix callers to not pass NULL when they mean "", so that we
-@@ -294,11 +289,10 @@ void visit_type_str(Visitor *v, const char *name, char **obj, Error **errp)
-     assert(!(v->type & VISITOR_OUTPUT) || *obj);
-      */
-     trace_visit_type_str(v, name, obj);
--    v->type_str(v, name, obj, &err);
-+    v->type_str(v, name, obj, errp);
-     if (v->type & VISITOR_INPUT) {
--        assert(!err != !*obj);
-+        assert(!*errp != !*obj);
-     }
--    error_propagate(errp, err);
- }
- 
- void visit_type_number(Visitor *v, const char *name, double *obj,
-@@ -311,16 +305,15 @@ void visit_type_number(Visitor *v, const char *name, double *obj,
- 
- void visit_type_any(Visitor *v, const char *name, QObject **obj, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
- 
-     assert(obj);
-     assert(v->type != VISITOR_OUTPUT || *obj);
-     trace_visit_type_any(v, name, obj);
--    v->type_any(v, name, obj, &err);
-+    v->type_any(v, name, obj, errp);
-     if (v->type == VISITOR_INPUT) {
--        assert(!err != !*obj);
-+        assert(!*errp != !*obj);
-     }
--    error_propagate(errp, err);
- }
- 
- void visit_type_null(Visitor *v, const char *name, QNull **obj,
-@@ -352,13 +345,12 @@ static void output_type_enum(Visitor *v, const char *name, int *obj,
- static void input_type_enum(Visitor *v, const char *name, int *obj,
-                             const QEnumLookup *lookup, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     int64_t value;
-     char *enum_str;
- 
--    visit_type_str(v, name, &enum_str, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    visit_type_str(v, name, &enum_str, errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index bc264b3c9b..205e183871 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -78,7 +78,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oob,
- static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
-                                 bool allow_oob, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     bool oob;
-     const char *command;
-     QDict *args, *dict;
-@@ -129,9 +129,8 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
-         qobject_ref(args);
-     }
- 
--    cmd->fn(args, &ret, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    cmd->fn(args, &ret, errp);
-+    if (*errp) {
-     } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
-         g_assert(!ret);
-     } else if (!ret) {
-diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-index 9be418b6d6..ef9b9b961a 100644
---- a/qapi/string-input-visitor.c
-+++ b/qapi/string-input-visitor.c
-@@ -313,14 +313,13 @@ static void parse_type_uint64(Visitor *v, const char *name, uint64_t *obj,
- static void parse_type_size(Visitor *v, const char *name, uint64_t *obj,
-                             Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     StringInputVisitor *siv = to_siv(v);
--    Error *err = NULL;
-     uint64_t val;
- 
-     assert(siv->lm == LM_NONE);
--    parse_option_size(name, siv->string, &val, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    parse_option_size(name, siv->string, &val, errp);
-+    if (*errp) {
-         return;
-     }
- 
 -- 
-2.21.0
-
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
