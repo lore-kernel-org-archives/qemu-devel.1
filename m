@@ -2,69 +2,75 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAAA5C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 06:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98F57C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 06:12:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C17CF2196E
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 06:11:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C17CF2196E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 6E02C2196E
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 06:12:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E02C2196E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIo9I-0003IU-Tm
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 02:11:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50805)
+	id 1iIo9i-0003jh-HD
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 02:12:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50833)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1iIo8G-0002am-Ua
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:10:34 -0400
+ (envelope-from <bounces@canonical.com>) id 1iIo8U-0002lg-QS
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:10:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iIo8F-0003w2-Gy
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:10:32 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:56642)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1iIo8F-0003uj-5o
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:10:31 -0400
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 3F39E54006A;
- Fri, 11 Oct 2019 09:10:27 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: "'Kevin Wolf'" <kwolf@redhat.com>
-References: <20190918094436.GG5207@localhost.localdomain>
- <001501d56e06$bbd7aa30$3386fe90$@ru>
- <20190919085302.GA10163@localhost.localdomain>
- <001901d56ec9$620ae260$2620a720$@ru>
- <20190919112702.GC10163@localhost.localdomain>
- <001a01d56ee3$4354a530$c9fdef90$@ru>
- <20190919130005.GF10163@localhost.localdomain>
- <002401d56f84$83900e40$8ab02ac0$@ru>
- <20190920100150.GD5458@localhost.localdomain>
- <001601d57380$002b3f20$0081bd60$@ru>
- <20191010152830.GF7616@localhost.localdomain>
-In-Reply-To: <20191010152830.GF7616@localhost.localdomain>
-Subject: RE: [for-4.2 PATCH 3/6] replay: update docs for record/replay with
- block devices
-Date: Fri, 11 Oct 2019 09:10:24 +0300
-Message-ID: <002401d57ffa$927ffab0$b77ff010$@ru>
+ (envelope-from <bounces@canonical.com>) id 1iIo8T-00040j-9K
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:10:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60488)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iIo8T-00040T-3M
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 02:10:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iIo8R-0000ow-Tg
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:10:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D479D2E80C7
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 06:10:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdV/f2Y6+SShHM08RyCUBXimHJwn0wAeknuw
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 83.149.199.45
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 11 Oct 2019 05:59:35 -0000
+From: David Gibson <1847440@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: kvm powerpcm qemu
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dwg sathnaga
+X-Launchpad-Bug-Reporter: Satheesh Rajendran (sathnaga)
+X-Launchpad-Bug-Modifier: David Gibson (dwg)
+References: <157061153044.21976.18153238088035049329.malonedeb@gac.canonical.com>
+Message-Id: <157077357555.1127.5093355430352851261.malone@chaenomeles.canonical.com>
+Subject: [Bug 1847440] Re: ppc64le: KVM guest fails to boot with an error
+ `virtio_scsi: probe of virtio1 failed with error -22` on master
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="af2eefe214bd95389a09b7c956720881bab16807";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: bce67072e7100845a8d37115fa5a223afc62dd5a
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,145 +79,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru, quintela@redhat.com,
- ciro.santilli@gmail.com, jasowang@redhat.com, crosthwaite.peter@gmail.com,
- qemu-devel@nongnu.org, armbru@redhat.com, alex.bennee@linaro.org,
- maria.klimushenkova@ispras.ru, mst@redhat.com, kraxel@redhat.com,
- boost.lists@gmail.com, thomas.dullien@googlemail.com, pbonzini@redhat.com,
- mreitz@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Reply-To: Bug 1847440 <1847440@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> Am 25.09.2019 um 11:02 hat Pavel Dovgalyuk geschrieben:
-> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > Am 20.09.2019 um 09:25 hat Pavel Dovgalyuk geschrieben:
-> > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > > > Am 19.09.2019 um 14:10 hat Pavel Dovgalyuk geschrieben:
-> > > > > > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > > > > > > diff --git a/block/block-backend.c b/block/block-backend.c
-> > > > > > > index 1c605d5444..c57d3d9fdf 100644
-> > > > > > > --- a/block/block-backend.c
-> > > > > > > +++ b/block/block-backend.c
-> > > > > > > @@ -17,6 +17,7 @@
-> > > > > > >  #include "block/throttle-groups.h"
-> > > > > > >  #include "hw/qdev-core.h"
-> > > > > > >  #include "sysemu/blockdev.h"
-> > > > > > > +#include "sysemu/replay.h"
-> > > > > > >  #include "sysemu/runstate.h"
-> > > > > > >  #include "qapi/error.h"
-> > > > > > >  #include "qapi/qapi-events-block.h"
-> > > > > > > @@ -808,6 +809,12 @@ void blk_remove_bs(BlockBackend *blk)
-> > > > > > >  int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
-> > > > > > >  {
-> > > > > > >      ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
-> > > > > > > +
-> > > > > > > +    if (replay_mode != REPLAY_MODE_NONE && bs->drv != &bdrv_blkreplay) {
-> > > > > > > +        error_setg(errp, "Root node must be blkreplay");
-> > > > > > > +        return -ENOTSUP;
-> > > > > > > +    }
-> > > > > >
-> > > > > > I guess this is opposite direction - bs->drv is bdrv_file.
-> > > > > > And we should check its parent.
-> > > > >
-> > > > > If bs->drv is bdrv_file, you want this to fail because only
-> > > > > bdrv_blkreplay should be able to be attached to devices.
-> > > >
-> > > > There was a regular rr invocation (as described in docs).
-> > > > And bs->drv always was a pointer to bdrv_file: for original image,
-> > > > and for temporary snapshot.
-> > >
-> > > Hm, what was the actual command line you used? I can see that you have a
-> > > separate -drive for the qcow2 file, so I can see how you get an unused
-> > > BlockBackend for the qcow2 node, but I don't see how it would be a file
-> > > node.
-> > >
-> > > Anyway, this leaves us two options: Either change the recommended
-> > > command line to use -blockdev for the qcow2 file so that no BlockBackend
-> > > is created for it (I think this might be preferable), or restrict the
-> > > error to when the BlockBackend is used.
-> >
-> > I started playing with -blockdev: added new blockdev for blkreplay and
-> > constructed the following command line:
-> >
-> > -blockdev driver=file,filename=disk.img,node-name=hd0
-> > -blockdev driver=blkreplay,file=hd0,node-name=hd0-rr
-> > -device virtio-blk-device,drive=hd0-rr
-> >
-> > However, I get an error: "Could not open 'disk.img': Permission denied"
-> > Everything works when I use this file in '-drive' parameter.
-> > What am I doing wrong?
-> 
-> The reason why I didn't reply immediately is because I don't see
-> anything wrong in the options you used.
-> 
-> Just to confirm, do you still get the same error when you use only the
-> first -blockdev option and no other options at all?
+Oh... are you using the SLOF (guest firmware) image included in the qemu
+tree, or is it coming from a separate package?
 
-Ok, I tried again and got different error, which was caused by incorrect
-QAPI schema for blkreplay.
-Now it seems ok, but I still can't boot.
 
-> I've now tried out the options you gave, and it does fail for me, but
-> with a different error:
-> 
->     qemu-system-x86_64: -blockdev driver=blkreplay,file=hd0,node-name=hd0-rr: Invalid
-> parameter 'blkreplay'
-> 
-> This one is because the QAPI schema doesn't know blkreplay and should
-> easily be fixed by adding a blkreplay field to BlockdevOptions.
+If it's from a separate package, that could be the problem - it needs to be=
+ updated before that qemu patch is safe.
 
-Right, I added the following schema:
+-- =
 
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2832,8 +2832,8 @@
- # Since: 2.9
- ##
- { 'enum': 'BlockdevDriver',
--  'data': [ 'blkdebug', 'blklogwrites', 'blkverify', 'bochs', 'cloop',
--            'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
-+  'data': [ 'blkdebug', 'blklogwrites', 'blkreplay', 'blkverify', 'bochs',
-+            'cloop', 'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
-             'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'luks',
-             'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', 'qcow',
-             'qcow2', 'qed', 'quorum', 'raw', 'rbd',
-@@ -3446,6 +3446,18 @@
-   'data': { 'test': 'BlockdevRef',
-             'raw': 'BlockdevRef' } }
- 
-+##
-+# @BlockdevOptionsBlkreplay:
-+#
-+# Driver specific block device options for blkreplay.
-+#
-+# @image:     disk image which should be controlled with blkreplay
-+#
-+# Since: 4.2
-+##
-+{ 'struct': 'BlockdevOptionsBlkreplay',
-+  'data': { 'image': 'BlockdevRef' } }
-+
- ##
- # @QuorumReadPattern:
- #
-@@ -3973,6 +3985,7 @@
-       'blkdebug':   'BlockdevOptionsBlkdebug',
-       'blklogwrites':'BlockdevOptionsBlklogwrites',
-       'blkverify':  'BlockdevOptionsBlkverify',
-+      'blkreplay':  'BlockdevOptionsBlkreplay',
-       'bochs':      'BlockdevOptionsGenericFormat',
-       'cloop':      'BlockdevOptionsGenericFormat',
-       'copy-on-read':'BlockdevOptionsGenericFormat',
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1847440
 
-> As soft freeze is coming closer, I'm considering taking this series as
-> it is (it's wrong in parts, but the old state is probably even more
-> wrong) and letting you fix up these checks on top. What do you think?
+Title:
+  ppc64le: KVM guest fails to boot with an error `virtio_scsi: probe of
+  virtio1 failed with error -22` on master
 
-That sounds reasonable.
+Status in QEMU:
+  New
 
-Pavel Dovgalyuk
+Bug description:
+  PowerPC KVM Guest fails to boot on current qemu master, bad commit:
+  e68cd0cb5cf49d334abe17231a1d2c28b846afa2
 
+  Env:
+  HW: IBM Power9
+  Host Kernel: 5.4.0-rc2-00038-ge3280b54afed
+  Guest Kernel: 4.13.9-300.fc27.ppc64le
+  Qemu: https://github.com/qemu/qemu.git (master)
+  Libvirt: 5.4.0
+
+  Guest boot gets stuck:
+  ...
+  [  OK  ] Mounted Kernel Configuration File System.
+  [    7.598740] virtio-pci 0000:00:01.0: enabling device (0000 -> 0003)
+  [    7.598828] virtio-pci 0000:00:01.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.598957] virtio-pci 0000:00:02.0: enabling device (0000 -> 0003)
+  [    7.599017] virtio-pci 0000:00:02.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.599123] virtio-pci 0000:00:04.0: enabling device (0000 -> 0003)
+  [    7.599182] virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy dr=
+iver
+  [    7.620620] synth uevent: /devices/vio: failed to send uevent
+  [    7.620624] vio vio: uevent: failed to send synthetic uevent
+  [  OK  ] Started udev Coldplug all Devices.
+  [    7.624559] audit: type=3D1130 audit(1570610300.990:5): pid=3D1 uid=3D=
+0 auid=3D4294967295 ses=3D4294967295 subj=3Dkernel msg=3D'unit=3Dsystemd-ud=
+ev-trigger comm=3D"systemd" exe=3D"/usr/lib/systemd/systemd" hostname=3D? a=
+ddr=3D? terminal=3D? res=3Dsuccess'
+  [  OK  ] Reached target System Initialization.
+  [  OK  ] Reached target Basic System.
+  [  OK  ] Reached target Remote File Systems (Pre).
+  [  OK  ] Reached target Remote File Systems.
+  [    7.642961] virtio_scsi: probe of virtio1 failed with error -22
+  [ ***  ] A start job is running for dev-disk=E2=80=A621b3519a80.device (1=
+4s / no limit)
+  ...
+
+  git bisect, yielded a bad commit
+  [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT on
+  ibm,client-architecture-support, reverting this commit boot the guest
+  properly.
+
+  git bisect start
+  # good: [9e06029aea3b2eca1d5261352e695edc1e7d7b8b] Update version for v4.=
+1.0 release
+  git bisect good 9e06029aea3b2eca1d5261352e695edc1e7d7b8b
+  # bad: [98b2e3c9ab3abfe476a2b02f8f51813edb90e72d] Merge remote-tracking b=
+ranch 'remotes/stefanha/tags/block-pull-request' into staging
+  git bisect bad 98b2e3c9ab3abfe476a2b02f8f51813edb90e72d
+  # good: [56e6250ede81b4e4b4ddb623874d6c3cdad4a96d] target/arm: Convert T1=
+6, nop hints
+  git bisect good 56e6250ede81b4e4b4ddb623874d6c3cdad4a96d
+  # good: [5d69cbdfdd5cd6dadc9f0c986899844a0e4de703] tests/tcg: target/s390=
+x: Test MVC
+  git bisect good 5d69cbdfdd5cd6dadc9f0c986899844a0e4de703
+  # good: [88112488cf228df8b7588c8aa38e16ecd0dff48e] qapi: Make check_type(=
+)'s array case a bit more obvious
+  git bisect good 88112488cf228df8b7588c8aa38e16ecd0dff48e
+  # good: [972bd57689f1e11311d86b290134ea2ed9c7c11e] ppc/kvm: Skip writing =
+DPDES back when in run time state
+  git bisect good 972bd57689f1e11311d86b290134ea2ed9c7c11e
+  # bad: [1aba8716c8335e88b8c358002a6e1ac89f7dd258] ppc/pnv: Remove the XIC=
+SFabric Interface from the POWER9 machine
+  git bisect bad 1aba8716c8335e88b8c358002a6e1ac89f7dd258
+  # bad: [00ed3da9b5c2e66e796a172df3e19545462b9c90] xics: Minor fixes for X=
+ICSFabric interface
+  git bisect bad 00ed3da9b5c2e66e796a172df3e19545462b9c90
+  # good: [33432d7737b53c92791f90ece5dbe3b7bb1c79f5] target/ppc: introduce =
+set_dfp{64,128}() helper functions
+  git bisect good 33432d7737b53c92791f90ece5dbe3b7bb1c79f5
+  # good: [f6d4c423a222f02bfa84a49c3d306d7341ec9bab] target/ppc: remove unn=
+ecessary if() around calls to set_dfp{64,128}() in DFP macros
+  git bisect good f6d4c423a222f02bfa84a49c3d306d7341ec9bab
+  # bad: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Render full FDT =
+on ibm,client-architecture-support
+  git bisect bad e68cd0cb5cf49d334abe17231a1d2c28b846afa2
+  # good: [c4ec08ab70bab90685d1443d6da47293e3aa312a] spapr-pci: Stop provid=
+ing assigned-addresses
+  git bisect good c4ec08ab70bab90685d1443d6da47293e3aa312a
+  # first bad commit: [e68cd0cb5cf49d334abe17231a1d2c28b846afa2] spapr: Ren=
+der full FDT on ibm,client-architecture-support
+
+  attached vmxml.
+
+  qemu commandline:
+  /home/sath/qemu/ppc64-softmmu/qemu-system-ppc64 -name guest=3Dvm1,debug-t=
+hreads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/=
+libvirt/qemu/domain-19-vm1/master-key.aes -machine pseries-4.2,accel=3Dkvm,=
+usb=3Doff,dump-guest-core=3Doff -m 81920 -overcommit mem-lock=3Doff -smp 51=
+2,sockets=3D1,cores=3D128,threads=3D4 -uuid fd4a5d54-0216-490e-82d2-1d4e896=
+83b3d -display none -no-user-config -nodefaults -chardev socket,id=3Dcharmo=
+nitor,fd=3D24,server,nowait -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3D=
+control -rtc base=3Dutc -no-shutdown -boot strict=3Don -device qemu-xhci,id=
+=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.=
+0,addr=3D0x2 -drive file=3D/home/sath/tests/data/avocado-vt/images/jeos-27-=
+ppc64le_vm1.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device s=
+csi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-scsi=
+0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -netdev ta=
+p,fd=3D26,id=3Dhostnet0,vhost=3Don,vhostfd=3D27 -device virtio-net-pci,netd=
+ev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:e6:df:24,bus=3Dpci.0,addr=3D0x1 -cha=
+rdev pty,id=3Dcharserial0 -device spapr-vty,chardev=3Dcharserial0,id=3Dseri=
+al0,reg=3D0x30000000 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,a=
+ddr=3D0x4 -M pseries,ic-mode=3Dxics -msg timestamp=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1847440/+subscriptions
 
