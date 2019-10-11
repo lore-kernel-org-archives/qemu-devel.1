@@ -2,57 +2,61 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FCA6C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14837ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:24:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 230E0206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:24:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 230E0206A1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id DC56D206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 13:24:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC56D206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIuuA-0003yy-6o
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:24:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35217)
+	id 1iIuuP-0004Ey-2v
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 09:24:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iIusr-0002wt-U0
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:23:07 -0400
+ (envelope-from <xiaoyao.li@intel.com>) id 1iIutQ-0003EY-HG
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iIusq-00087x-Kn
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:23:05 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:55086 helo=huawei.com)
+ (envelope-from <xiaoyao.li@intel.com>) id 1iIutL-0008SD-Bn
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:23:37 -0400
+Received: from mga11.intel.com ([192.55.52.93]:18516)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iIusg-0007xE-IT; Fri, 11 Oct 2019 09:22:56 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id AD56447B52ADEC86952F;
- Fri, 11 Oct 2019 21:22:42 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Fri, 11 Oct 2019
- 21:22:34 +0800
-To: QEMU Developers <qemu-devel@nongnu.org>, <qemu-block@nongnu.org>
-From: Guoheyi <guoheyi@huawei.com>
-Subject: Occasional VM soft lockup when a remote cdrom is attached
-Message-ID: <a6a0d139-9107-83bd-8ba5-8bdc310f6ca7@huawei.com>
-Date: Fri, 11 Oct 2019 21:22:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
+ (Exim 4.71) (envelope-from <xiaoyao.li@intel.com>)
+ id 1iIutJ-0008Ln-57
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 09:23:33 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 11 Oct 2019 06:23:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,284,1566889200"; d="scan'208";a="193534282"
+Received: from lxy-dell.sh.intel.com ([10.239.159.46])
+ by fmsmga008.fm.intel.com with ESMTP; 11 Oct 2019 06:23:28 -0700
+Message-ID: <28fc2886186f10954ac773100bdd4ca3c483d362.camel@intel.com>
+Subject: Re: [PATCH] target/i386: Remove MPX support on Snowridge CPU model
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri, 11 Oct 2019 21:16:28 +0800
+In-Reply-To: <20191011125723.GP4084@habkost.net>
+References: <20191011071844.108924-1-xiaoyao.li@intel.com>
+ <20191011125723.GP4084@habkost.net>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-5.el7) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,108 +68,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, wanghaibin
- 00208455 <wanghaibin.wang@huawei.com>,
- zhengxiang 00421807 <zhengxiang9@huawei.com>, John Snow <jsnow@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi folks,
+On Fri, 2019-10-11 at 09:57 -0300, Eduardo Habkost wrote:
+> On Fri, Oct 11, 2019 at 03:18:44PM +0800, Xiaoyao Li wrote:
+> > MPX support is being phased out by Intel. Following other CPU models
+> > like Skylake, Icelake and Cascadelake, do not enable it by default.
+> > 
+> > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> > ---
+> > I'm not sure is there anyone already use Snowridge CPU model and whether to
+> > add it in pc_compat_4_1, since Snowridge has not been released yet.
+> 
+> We have a CPU model versioning mechanism now, please implement this using the
+> new system.  e.g.:
+> 
+>         .versions = (X86CPUVersionDefinition[]) {
+>             { .version = 1 },
+>             {
+>                 .version = 2,
+>                 .props = (PropValue[]) {
+>                     { "mpx", "off" },
+>                     { /* end of list */ }
+>                 }
+>             },
+>             { /* end of list */ }
+>         }
+> 
+> Then machine-type compat properties won't be needed anymore.
 
-We observed Linux on VM occasionally (at very low rate) got soft lockup 
-when a remote cdrom is attached. The guest hangs up at below call trace:
+Since Snowridge CPU hasn't been released yet and I guess there might be no real
+user use this CPU model. So do we really need to add v2? Can we just remove the
+mpx feature in the original version?
 
-[Tue Oct8 23:02:53 2019]ata_scsi_queuecmd+0xe0/0x2a0 [libata]
-
-[Tue Oct8 23:02:53 2019]scsi_dispatch_cmd+0xec/0x288
-
-[Tue Oct8 23:02:53 2019]scsi_queue_rq+0x5f4/0x6b8
-
-[Tue Oct8 23:02:53 2019]blk_mq_dispatch_rq_list+0xb0/0x690
-
-[Tue Oct8 23:02:53 2019]blk_mq_do_dispatch_sched+0x8c/0x130
-
-[Tue Oct8 23:02:53 2019]blk_mq_sched_dispatch_requests+0x128/0x1f0
-
-[Tue Oct8 23:02:53 2019]__blk_mq_run_hw_queue+0x9c/0x128
-
-[Tue Oct8 23:02:53 2019]__blk_mq_delay_run_hw_queue+0x198/0x1d8
-
-[Tue Oct8 23:02:53 2019]blk_mq_run_hw_queue+0x68/0x180
-
-[Tue Oct8 23:02:53 2019]blk_mq_sched_insert_request+0xbc/0x210
-
-[Tue Oct8 23:02:53 2019]blk_execute_rq_nowait+0x118/0x168
-
-[Tue Oct8 23:02:53 2019]blk_execute_rq+0x74/0xd8
-
-[Tue Oct8 23:02:53 2019]__scsi_execute+0xd8/0x1e0
-
-[Tue Oct8 23:02:53 2019]sr_check_events+0xd4/0x2c8 [sr_mod]
-
-[Tue Oct8 23:02:53 2019]cdrom_check_events+0x34/0x50 [cdrom]
-
-[Tue Oct8 23:02:53 2019]sr_block_check_events+0xdc/0x108 [sr_mod]
-
-[Tue Oct8 23:02:53 2019]disk_check_events+0x60/0x198
-
-[Tue Oct8 23:02:53 2019]disk_events_workfn+0x24/0x30
-
-[Tue Oct8 23:02:53 2019]process_one_work+0x1b4/0x3f8
-
-[Tue Oct8 23:02:53 2019]worker_thread+0x54/0x470
-
-[Tue Oct8 23:02:53 2019]kthread+0x134/0x138
-
-[Tue Oct8 23:02:53 2019]ret_from_fork+0x10/0x18
-
-
-We are running the whole stack on ARM64 platforms, using rcdrom on host 
-to connect a remote cdrom, which is appeared as "/dev/sr0" on the host. 
-Our Linux kernel version is 4.19.36 and qemu version is 2.8.1, which is 
-fairly old but I checked the mainline and found the work flow does not 
-change much. And KVM is enabled.
-
-We provide the remote cdrom to guest as a block device, attached under 
-ICH SATA bus.
-
-
-The work flow should be like this (please correct me if I was wrong):
-
-1. There is a kworker thread in guest kernel which will check cdrom 
-status periodically.
-
-2. The call of "ata_scsi_queuecmd" in guest will write AHCI port 
-register "PORT_CMD_ISSUE", so this VCPU thread is trapped out to qemu.
-
-3. qemu will grab the BQL and then dispatch the access to ahci_port_write().
-
-4. For this is a "get event status notification" command, qemu finally 
-goes to cmd_get_event_status_notification() and then cdrom_is_inserted().
-
-5. In cdrom_is_inserted(), an ioctl to cdrom fd is issued.
-
-
-However, in the last step, we found the ioctl() may have large latency, 
-for it is a virtual device of remote cdrom, when the remote server is 
-busy and of poor performance. We have observed more than 8 seconds 
-latency in half an hour test, and the latency might reach more than 20 
-seconds when guest soft lockup occurred.
-
-
-My question is, is there any way to get around of this issue? Does it 
-make sense for qemu to setup an IO thread to issue this ioctl() and let 
-the VCPU thread return to guest as soon as possible? Or it is kernel's 
-responsibility to break up the long time ioctl() and return to user space?
-
-
-Any comments or advice will be appreciated :)
-
-
-HG
-
-
-
+> > 
+> > ---
+> >  hw/i386/pc.c      | 4 +++-
+> >  target/i386/cpu.c | 1 -
+> >  2 files changed, 3 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > index bcda50efcc23..97eb7ac32588 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -105,7 +105,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+> >  /* Physical Address of PVH entry point read from kernel ELF NOTE */
+> >  static size_t pvh_start_addr;
+> >  
+> > -GlobalProperty pc_compat_4_1[] = {};
+> > +GlobalProperty pc_compat_4_1[] = {
+> > +    { "Snowridge" "-" TYPE_X86_CPU, "mpx", "on" },
+> > +};
+> >  const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
+> >  
+> >  GlobalProperty pc_compat_4_0[] = {};
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 44f1bbdcac76..885bea76205d 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -2762,7 +2762,6 @@ static X86CPUDefinition builtin_x86_defs[] = {
+> >              CPUID_7_0_EBX_FSGSBASE |
+> >              CPUID_7_0_EBX_SMEP |
+> >              CPUID_7_0_EBX_ERMS |
+> > -            CPUID_7_0_EBX_MPX |  /* missing bits 13, 15 */
+> >              CPUID_7_0_EBX_RDSEED |
+> >              CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLUSHOPT |
+> >              CPUID_7_0_EBX_CLWB |
+> > -- 
+> > 2.19.1
+> > 
+> 
+> 
 
 
