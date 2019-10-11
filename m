@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9465C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 12:23:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C04ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 12:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1FF22190F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 12:23:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1FF22190F
+	by mail.kernel.org (Postfix) with ESMTPS id 1CD2E2089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 12:26:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CD2E2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iItxT-0005Kd-T0
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 08:23:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52730)
+	id 1iItzo-00079a-4s
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 08:26:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iItvs-00043h-HE
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:22:09 -0400
+ (envelope-from <slp@redhat.com>) id 1iItwb-0004kB-GY
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:22:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iItvr-0002jU-AE
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:22:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33422)
+ (envelope-from <slp@redhat.com>) id 1iItwZ-000369-Rz
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:22:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53032)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iItvr-0002jG-1D
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:22:07 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iItwX-00035A-U0
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 08:22:50 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E456FC057FA6
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 12:22:05 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id i2so4309185wrv.0
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 05:22:05 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id D011588306
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 12:22:48 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id i2so4309978wrv.0
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 05:22:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version;
- bh=Jakrpdd8gtxEIqOy43mVaH1S94XS97FyyWbR/IJvm60=;
- b=CaP59ZlL9K9DxPM+myuxLr6dhuihV4sDapOg1LLT6On7ZY7WzBr0Kn/0NAsgKeg/LZ
- eASbVWJAOrfth/531spmKDYzkYIR1LrrZ+sx67vWervNj3aZ6CwTqn1xySA1DVOxoMZT
- uZ5IHzj9CWZjhuEVCpMn+ca/ZshJ9CRhzfFSVBbInnHZ7AHyzod8YlFNDuD5N+WxHYwS
- nzPIfBUhPW0q8KlaPCEfkmDIQGmEzWsta2MV8yn+LlhDzyRDR8Z/MfDfPzd6HD7m283z
- gYAefUGWwMqaWuSs8wfsb/i+bYbJJbSlid24UXWvBh+zex0P+onxxHqQfxoTBbhDGPv/
- stqg==
-X-Gm-Message-State: APjAAAWltKVE4WsbrRivoxEm+XQKV0il1g3Hm/+f29Xmv1fRXap09lqd
- jdu4TF/WVJNpTGr8XJleNVuNBIren5J66jsS5yk3mChL8/cB5fAet1m8o2Eg5k+RPc6tfTEmIwT
- vcWNqaA98OzKrQdI=
-X-Received: by 2002:a5d:4fcd:: with SMTP id h13mr10291658wrw.307.1570796524347; 
- Fri, 11 Oct 2019 05:22:04 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqz3vi7zvLOP4aVU6Kyvfvpw1/9xpfnzuIT8ce/aUYy0Dhkt4Srf7bRgwsYb32Dj5mHIc22RWg==
-X-Received: by 2002:a5d:4fcd:: with SMTP id h13mr10291640wrw.307.1570796524161; 
- Fri, 11 Oct 2019 05:22:04 -0700 (PDT)
+ bh=bmBztziAuDiqdcIAey+kj3bOFlXKkTs13C4e/Axy074=;
+ b=hA3E0PsIOsLr3KFJL+HfALzaER/3BzcMx4m41whmSKV3rit4lcDbit7SjUNFWORY33
+ 3qWkcvwHXzD+zPQ4E2G9HXzgthxAjRGa7BvnrsUoprMBsOZWuy9zbMV0lVJxGEWuIVZ4
+ gWe7FU3isCQW5HzpnB3i8I+5FeyZA9nP6d3lAa1o0LP6CXxPaqZA8UAg8uDRHOssBMYb
+ BLx/THpbkWQ1rbYxFghkeBIpST5eh64clz2ZL14FB0hEUYEWNh+aAVGTq84bbqe6Dsil
+ LWVUkSMYNmeel2Grk0nxnyRl7PA5tS4ctkG0ZrXSmqAKFP7HLaFFFt6ZXq9CBIrtyv2w
+ 0opg==
+X-Gm-Message-State: APjAAAVLQqocw9DrhkEin0Orc+t9lO2kAeQ/Rd6IM1BNGSyaHcISHiU0
+ Oq7Hsf3ioYDif9mokc2XcIfi2iOFe64QROMIUG7xy+X6uLy2CZ9UDJRqwq6rLEo71sgVZy98glE
+ /VxiqVi4PQf4phE4=
+X-Received: by 2002:a1c:99cd:: with SMTP id b196mr3064548wme.105.1570796567183; 
+ Fri, 11 Oct 2019 05:22:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw62ht1qJDRzShztuCoq+bESu18OfgJxByU50f/GrJ0grNwDnlIRuPhlCjZGxVN2TC7X4lwXA==
+X-Received: by 2002:a1c:99cd:: with SMTP id b196mr3064532wme.105.1570796566940; 
+ Fri, 11 Oct 2019 05:22:46 -0700 (PDT)
 Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
  [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id x129sm14619422wmg.8.2019.10.11.05.22.03
+ by smtp.gmail.com with ESMTPSA id z142sm12740804wmc.24.2019.10.11.05.22.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 11 Oct 2019 05:22:03 -0700 (PDT)
+ Fri, 11 Oct 2019 05:22:46 -0700 (PDT)
 References: <20191011085611.4194-1-stefanha@redhat.com>
- <20191011085611.4194-3-stefanha@redhat.com>
+ <20191011085611.4194-4-stefanha@redhat.com>
 User-agent: mu4e 1.2.0; emacs 26.2
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v2 2/7] libqos: add iteration support to
- qpci_find_capability()
-In-reply-to: <20191011085611.4194-3-stefanha@redhat.com>
-Date: Fri, 11 Oct 2019 14:22:01 +0200
-Message-ID: <8736fzcw0m.fsf@redhat.com>
+Subject: Re: [PATCH v2 3/7] libqos: pass full QVirtQueue to set_queue_address()
+In-reply-to: <20191011085611.4194-4-stefanha@redhat.com>
+Date: Fri, 11 Oct 2019 14:22:44 +0200
+Message-ID: <871rvjcvzf.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
  micalg=pgp-sha256; protocol="application/pgp-signature"
@@ -104,92 +103,92 @@ Content-Transfer-Encoding: quoted-printable
 
 Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-> VIRTIO 1.0 PCI devices have multiple PCI_CAP_ID_VNDR capabilities so we
-> need a way to iterate over them.  Extend qpci_find_capability() to take
-> the last address.
+> Instead of just passing the vring page frame number, pass the full
+> QVirtQueue.  This will allow the VIRTIO 1.0 transport to program the
+> fine-grained vring address registers in the future.
 >
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  tests/libqos/pci.h |  2 +-
->  tests/libqos/pci.c | 18 ++++++++++++------
->  2 files changed, 13 insertions(+), 7 deletions(-)
+>  tests/libqos/virtio.h      | 2 +-
+>  tests/libqos/virtio-mmio.c | 6 ++++--
+>  tests/libqos/virtio-pci.c  | 6 ++++--
+>  3 files changed, 9 insertions(+), 5 deletions(-)
 >
-> diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
-> index a5389a5845..590c175190 100644
-> --- a/tests/libqos/pci.h
-> +++ b/tests/libqos/pci.h
-> @@ -86,7 +86,7 @@ bool qpci_has_buggy_msi(QPCIDevice *dev);
->  bool qpci_check_buggy_msi(QPCIDevice *dev);
+> diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
+> index 2cb2448f46..37f55b6ade 100644
+> --- a/tests/libqos/virtio.h
+> +++ b/tests/libqos/virtio.h
+> @@ -79,7 +79,7 @@ struct QVirtioBus {
+>      uint16_t (*get_queue_size)(QVirtioDevice *d);
 >=20=20
->  void qpci_device_enable(QPCIDevice *dev);
-> -uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id);
-> +uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id, uint8_t start_=
-addr);
->  void qpci_msix_enable(QPCIDevice *dev);
->  void qpci_msix_disable(QPCIDevice *dev);
->  bool qpci_msix_pending(QPCIDevice *dev, uint16_t entry);
-> diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
-> index 662ee7a517..b8679dff1d 100644
-> --- a/tests/libqos/pci.c
-> +++ b/tests/libqos/pci.c
-> @@ -115,10 +115,16 @@ void qpci_device_enable(QPCIDevice *dev)
->      g_assert_cmphex(cmd & PCI_COMMAND_MASTER, =3D=3D, PCI_COMMAND_MASTER=
-);
+>      /* Set the address of the selected queue */
+> -    void (*set_queue_address)(QVirtioDevice *d, uint32_t pfn);
+> +    void (*set_queue_address)(QVirtioDevice *d, QVirtQueue *vq);
+>=20=20
+>      /* Setup the virtqueue specified by index */
+>      QVirtQueue *(*virtqueue_setup)(QVirtioDevice *d, QGuestAllocator *al=
+loc,
+> diff --git a/tests/libqos/virtio-mmio.c b/tests/libqos/virtio-mmio.c
+> index d0047876a8..43ca4e49c1 100644
+> --- a/tests/libqos/virtio-mmio.c
+> +++ b/tests/libqos/virtio-mmio.c
+> @@ -127,9 +127,11 @@ static uint16_t qvirtio_mmio_get_queue_size(QVirtioD=
+evice *d)
+>      return (uint16_t)qtest_readl(dev->qts, dev->addr + QVIRTIO_MMIO_QUEU=
+E_NUM_MAX);
 >  }
 >=20=20
-> -uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id)
-> +uint8_t qpci_find_capability(QPCIDevice *dev, uint8_t id, uint8_t start_=
-addr)
+> -static void qvirtio_mmio_set_queue_address(QVirtioDevice *d, uint32_t pf=
+n)
+> +static void qvirtio_mmio_set_queue_address(QVirtioDevice *d, QVirtQueue =
+*vq)
 >  {
->      uint8_t cap;
-> -    uint8_t addr =3D qpci_config_readb(dev, PCI_CAPABILITY_LIST);
-> +    uint8_t addr;
+>      QVirtioMMIODevice *dev =3D container_of(d, QVirtioMMIODevice, vdev);
+> +    uint64_t pfn =3D vq->desc / dev->page_size;
 > +
-> +    if (start_addr) {
-> +        addr =3D qpci_config_readb(dev, start_addr + PCI_CAP_LIST_NEXT);
-> +    } else {
-> +        addr =3D qpci_config_readb(dev, PCI_CAPABILITY_LIST);
-> +    }
+>      qtest_writel(dev->qts, dev->addr + QVIRTIO_MMIO_QUEUE_PFN, pfn);
+>  }
 >=20=20
->      do {
->          cap =3D qpci_config_readb(dev, addr);
-> @@ -138,7 +144,7 @@ void qpci_msix_enable(QPCIDevice *dev)
->      uint8_t bir_table;
->      uint8_t bir_pba;
+> @@ -162,7 +164,7 @@ static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVirt=
+ioDevice *d,
 >=20=20
-> -    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX);
-> +    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
->      g_assert_cmphex(addr, !=3D, 0);
+>      addr =3D guest_alloc(alloc, qvring_size(vq->size, dev->page_size));
+>      qvring_init(dev->qts, alloc, vq, addr);
+> -    qvirtio_mmio_set_queue_address(d, vq->desc / dev->page_size);
+> +    qvirtio_mmio_set_queue_address(d, vq);
 >=20=20
->      val =3D qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
-> @@ -167,7 +173,7 @@ void qpci_msix_disable(QPCIDevice *dev)
->      uint16_t val;
+>      return vq;
+>  }
+> diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
+> index c8d736f4d1..4772239b61 100644
+> --- a/tests/libqos/virtio-pci.c
+> +++ b/tests/libqos/virtio-pci.c
+> @@ -190,9 +190,11 @@ static uint16_t qvirtio_pci_get_queue_size(QVirtioDe=
+vice *d)
+>      return qpci_io_readw(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_NUM);
+>  }
 >=20=20
->      g_assert(dev->msix_enabled);
-> -    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX);
-> +    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
->      g_assert_cmphex(addr, !=3D, 0);
->      val =3D qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
->      qpci_config_writew(dev, addr + PCI_MSIX_FLAGS,
-> @@ -203,7 +209,7 @@ bool qpci_msix_masked(QPCIDevice *dev, uint16_t entry)
->      uint64_t vector_off =3D dev->msix_table_off + entry * PCI_MSIX_ENTRY=
-_SIZE;
+> -static void qvirtio_pci_set_queue_address(QVirtioDevice *d, uint32_t pfn)
+> +static void qvirtio_pci_set_queue_address(QVirtioDevice *d, QVirtQueue *=
+vq)
+>  {
+>      QVirtioPCIDevice *dev =3D container_of(d, QVirtioPCIDevice, vdev);
+> +    uint64_t pfn =3D vq->desc / VIRTIO_PCI_VRING_ALIGN;
+> +
+>      qpci_io_writel(dev->pdev, dev->bar, VIRTIO_PCI_QUEUE_PFN, pfn);
+>  }
 >=20=20
->      g_assert(dev->msix_enabled);
-> -    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX);
-> +    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
->      g_assert_cmphex(addr, !=3D, 0);
->      val =3D qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
+> @@ -229,7 +231,7 @@ static QVirtQueue *qvirtio_pci_virtqueue_setup(QVirti=
+oDevice *d,
+>      addr =3D guest_alloc(alloc, qvring_size(vqpci->vq.size,
+>                                            VIRTIO_PCI_VRING_ALIGN));
+>      qvring_init(qvpcidev->pdev->bus->qts, alloc, &vqpci->vq, addr);
+> -    qvirtio_pci_set_queue_address(d, vqpci->vq.desc / VIRTIO_PCI_VRING_A=
+LIGN);
+> +    qvirtio_pci_set_queue_address(d, &vqpci->vq);
 >=20=20
-> @@ -221,7 +227,7 @@ uint16_t qpci_msix_table_size(QPCIDevice *dev)
->      uint8_t addr;
->      uint16_t control;
->=20=20
-> -    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX);
-> +    addr =3D qpci_find_capability(dev, PCI_CAP_ID_MSIX, 0);
->      g_assert_cmphex(addr, !=3D, 0);
->=20=20
->      control =3D qpci_config_readw(dev, addr + PCI_MSIX_FLAGS);
+>      return &vqpci->vq;
+>  }
 
 Reviewed-by: Sergio Lopez <slp@redhat.com>
 
@@ -198,19 +197,19 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2gc+kACgkQ9GknjS8M
-AjXaMxAAhyPZsFtkBwQAN8uCiGRx5xPcdbntPiM9tGkdR4YmvK7ZOlzvXArtSVnz
-fSPhY/BkMwjG6v7E4aKFPeYNRmI9PsRiej5mh0TSV7hT1TleSDHsjmi+Koq9BIZp
-IcCatcYN/1bkiUhSsyLOIXA8tZZHdIqc2RxXrQsbeWGMVGIvbw2wxZrCzuBrhXUG
-Q6FroEnpE6ENhNAYfm577COpw/7ceekysDzYaFYCUC61sNLi3StfY/hu/dXQbtFv
-YMcToVKs3ruedaGLQJixhuT/yFDxQTqkYEzjcg5jDhWAC1Aok33jhZxeVKIXsq6U
-wn0Z6YpXH2ZR0eeRtRzJr4B3DxDyyD4tE0Lubvs/4aDtHWEsit/8L+s6g4ayCi1B
-7zmHQLHY8cMDvkgYJImCvSODv70Rr7OE5/lylmW36lJpsyWhAznUjiz+7FPgULXu
-iSYmjmCV1X2t+99g0EbA/9FkiTgLj2v+OPRxI54httyvaqqypc+5P5yNBUSDU4ob
-KJT6xPW8PjGKYlaJT8CHvDVee3hK6K6BUk5VaJpcEZ8M4ZDf7R3XGHU+juVY3PzQ
-w9+++CU0QR2pc3XQ15ndaz1VajDzcYjvYugXsNLgzPJ4PkD0YSI7Ml4QJcn6iCgd
-1jbWToPncLPsWVH49FClbimi7adxg2mHBt4q9SKiNWUSPd2qwRE=
-=3gcU
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2gdBQACgkQ9GknjS8M
+AjU5OxAAhXBSLsmBBKNa5zKdLtoYuPsZ31tor1GgwhWdlCwsA0V2mdY27FBCCoyo
+g3kVtNZJfw66ZMEmyvo5q6QbTAilxw0rfFAKbbl45ks5aGNauq4qUyZmJYPiVoE1
+F+LlzdM6fGP6X3DdVMjDkewcWsq0osvPoMHilLnKT8h7Wk+M/rvMVv5ldInDUbiW
+2ih5UCUDZi6rnRuMsLgd95yyd6xzPtp0QT4cbZOUcY5pBdqqcVwJQYbAl2lUNfa2
+f3HYpQn3LIxM1K5KcNUZm6A3hOIlaH3mfNyrzQZb7Ula8CeGbGFFKx+fWChtdBqS
+weDiCsyhiI3xZRMbupVc/hwVDCHu18mhNsMymvEnmN29aLM6JoUs6j/ej5EtkJ7e
+3WeGmUboS/n7Wn/5c3PrO3wTqi4NkasSw4EqNkH8/W+qppbEhCHk3GzK3xQ75Za6
+6NUk057JW49CRb4aL1vOEbariY7H8CXzl93VNqdNHx+ucDkc/gGFVQXCOyxK16pT
+Py9EkYOuyj6edoO6dRp11MxRJ+lsm0quM43d+IjmLwPbMbcdjVDI8gvQecsFVUa1
+zmf1Buz21GutyBlR4CU1TBSjQGbSr1hthq1BN2pYEtuAYjZGc8jeeveJzMVHQS3X
+g2AqQFTo0QI6zDKANVpRBz9kbgChp92aq1cO8yLjXmMzsPoOq4k=
+=5aJP
 -----END PGP SIGNATURE-----
 --=-=-=--
 
