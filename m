@@ -2,82 +2,84 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F70CECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 15:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1DFC47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 15:57:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A17820673
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 15:55:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D948E2089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 15:57:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MbzxfxWI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A17820673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ATF8CZGP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D948E2089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxGV-0001st-ED
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 11:55:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33314)
+	id 1iIxI6-0003ya-L6
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 11:57:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iIxFm-0001N5-Lh
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 11:54:55 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iIxGg-0002AH-8Q
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 11:55:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iIxFl-0006xp-AF
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 11:54:54 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43274)
+ (envelope-from <richard.henderson@linaro.org>) id 1iIxGe-0007VS-O5
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 11:55:49 -0400
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:45679)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iIxFl-0006xR-4r
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 11:54:53 -0400
-Received: by mail-ot1-x342.google.com with SMTP id o44so8350286ota.10
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 08:54:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=DWz0+nozvnZMjtdngygEUcxoFesR1E4Zp1WMKU0KeGA=;
- b=MbzxfxWIgVYU8zfR73JZwSXW1KKXhAXlOJmtYjLlF+JDkUTM+6nfr3cdPfojiTW/rq
- 2H/VB6rjO4dU8rCnZYOV14OcqbK+QKPfJQJPfjpXrksp9RieIe9vPLUTx+u5DqHOEcTz
- E9+O2wDC5GWYG5PNwrACNVNpIKt1GmdRBmfk0pG1QojtFfpokXhvZL1dayxxioSVWT4v
- bMcbH1ZmkjsGcJ9qsifFVpSSgeF8d9ywrmpv1s/5mElylGzoBwtRc/ms0cRGqZ9RDD8Z
- TgHwV2260aQThNAtBBLMtbj3r9Nht7iKDXPOyCUZuyFAotmjS8RGil70Ng/YDQkBg+8o
- l7eg==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iIxGe-0007V5-JM
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 11:55:48 -0400
+Received: by mail-yw1-xc41.google.com with SMTP id x65so3633525ywf.12
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 08:55:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=0PIckjc+jDPiUlR/QPCiF7wRLH0buusyiLHFkX56XIE=;
+ b=ATF8CZGP3jKyOcu2xyN4V/rsokVjTh6f3oh+Gb6BUFfLFFDKfDk/RYHYEOWBkc839q
+ NC/Fmc2OzXKJLp6dIjWMLJ+3ckcx6EUiSoTee8TStKHnbsSh4ZGLF6Ukd5eoCtr9X//1
+ 815PNZNU5W6DDgPWwe52/TMN0lc/C3j774yISr+cxu8Jo52BW3qjPINc+aW5YSiNgEk8
+ aWStEtg2GwMZdwU1JymqzJITdhLJ7ODLBTczxHR7akaHh8HYPFDI7J6AfWZe3M9mdJDH
+ PwE2lgYjzrs1zciE/y6xenlnjJX2Od4m7C+5WH/XWs8PGNtinWxXLhly8dTZq1lxb9sx
+ AeCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=DWz0+nozvnZMjtdngygEUcxoFesR1E4Zp1WMKU0KeGA=;
- b=lhEIqz+GSkc+WWu2Hj8wnkUJzMeZnZnLwxtL7epNk3E9a+R4FlqpDjd8EzIpikgDUQ
- COkTHD/TlEZjgoQHVsbRCV5oMRMxH4a21p7bfA8unEBQ61U8NaEmN+NwYPnje5cB3+gs
- KKrWKcZI83ZGQGMakh0+7YNnsEjk8SR/yEezA7K6B3yT4DiowDrf5tVI39ovb0Z4H3mp
- 2jIgAVH3v4JwOlIHqtoZ6oExLEaFjmthw40k5DXRVrMbC1WpXqofo7nOQ9JGB+gcsoI8
- 9FZIJEXXIDb5X1BcG88m9JGS6aSQGmlQAtBk+bp9MThY0s5P1/A9aJLYj9fn3eiw8dBT
- Idcg==
-X-Gm-Message-State: APjAAAXnoLHdah/F9SGd+SbGuxfnN8ajN7SFprf39owTpaeAfyLNAv+B
- qwWdgg1wkRSdBCzLnpU3gJ3DAsT7ypGmYvyaOgc=
-X-Google-Smtp-Source: APXvYqw9jyHGURGqBJ0Rr6559NImSKrHt4aY9fXhufrqJ954OSjVwRIh9pVM5kBAMkeUHj+9mJvj5/xvZYsl8DdVmvk=
-X-Received: by 2002:a9d:5914:: with SMTP id t20mr13054254oth.306.1570809292310; 
- Fri, 11 Oct 2019 08:54:52 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=0PIckjc+jDPiUlR/QPCiF7wRLH0buusyiLHFkX56XIE=;
+ b=JSxcld5WDkaxAiRR3b0xVXx6u1Tv94Ri8AnE03lkD+muy66kANKrFpC2jRTcm9BQBb
+ EhT+4NomBlCiuwUVuNvuzl8NJPJVWw9HX+uGo1gKhVuvxpahszr7bP835Gx7JPaEOjHN
+ 7PpKqv7TskLw6iw2N7yCeon1CSD8KluO3Nr0JDlQou4msgJrH4neDZdHDErqY3ns5VyD
+ vsOL7+7lrMSjjGWqVD6FGbrMoxZ5Y5dJyqPLBaT5mOE6NpMcF4z7AKeT7MbkQWDlCrBO
+ 6H5+VTWr/olN6cckaLvF++VlsZHfqSlX+3J9p0M51b0NMkRhx6jzn0PhIV1ZAxHgJYJy
+ COSw==
+X-Gm-Message-State: APjAAAWPaldMRcplrXDvGkHykRPEpxoliKg2kFM5CrX8ldy4XpjcfHp9
+ B1+OLZAE+ahQBt7Jk6kYP+ifp3qw9wY=
+X-Google-Smtp-Source: APXvYqyWyr02v66TSSYoFnTc4QKG618LzawAKGGMUNcZOiEBd0DxkwZTpMQ5KGr4JBCijU0UVmaadQ==
+X-Received: by 2002:a81:5b46:: with SMTP id p67mr2810079ywb.228.1570809347611; 
+ Fri, 11 Oct 2019 08:55:47 -0700 (PDT)
+Received: from cloudburst.gateway.pace.com (67.216.151.25.pool.hargray.net.
+ [67.216.151.25])
+ by smtp.gmail.com with ESMTPSA id d17sm2473139ywb.95.2019.10.11.08.55.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 11 Oct 2019 08:55:47 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 00/20] target/arm: Reduce overhead of cpu_get_tb_cpu_state
+Date: Fri, 11 Oct 2019 11:55:26 -0400
+Message-Id: <20191011155546.14342-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Fri, 11 Oct 2019 08:54:51
- -0700 (PDT)
-In-Reply-To: <949009b8-58ec-4a9e-cfd7-7d4611fad380@redhat.com>
-References: <20190902140134.74081-1-mrolnik@gmail.com>
- <949009b8-58ec-4a9e-cfd7-7d4611fad380@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 11 Oct 2019 17:54:51 +0200
-Message-ID: <CAL1e-=h1PV6djRgWXikjnU79Ca7Pjfw9=0u9__Nz00FJ4R49Hg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v30 0/8] QEMU AVR 8 bit cores
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000e0ccac0594a489a1"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::c41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,191 +91,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- Michael Rolnik <mrolnik@gmail.com>
+Cc: laurent.desnogues@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e0ccac0594a489a1
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Changes since v5:
+  * Fix the debug assertion ifdef in the final patch.
+  * Add more calls to arm_rebuild_hflags: CPSR and M-profile
+    These become two new patches, 18 & 19.
+  * Update some comments per review. (Alex)
 
-On Friday, October 11, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
->
-wrote:
+Changes since v4:
+  * Split patch 1 into 15 smaller patches.
+  * Cache the new DEBUG_TARGET_EL field.
+  * Split out m-profile hflags separately from a-profile 32-bit.
+  * Move around non-cached tb flags as well, avoiding repetitive
+    checks for m-profile or other mutually exclusive conditions.
 
-> Hi Michael,
->
-> On 9/2/19 4:01 PM, Michael Rolnik wrote:
->
->> This series of patches adds 8bit AVR cores to QEMU.
->> All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully
->> tested yet.
->> However I was able to execute simple code with functions. e.g fibonacci
->> calculation.
->> This series of patches include a non real, sample board.
->> No fuses support yet. PC is set to 0 at reset.
->>
->> the patches include the following
->> 1. just a basic 8bit AVR CPU, without instruction decoding or translatio=
-n
->> 2. CPU features which allow define the following 8bit AVR cores
->>       avr1
->>       avr2 avr25
->>       avr3 avr31 avr35
->>       avr4
->>       avr5 avr51
->>       avr6
->>       xmega2 xmega4 xmega5 xmega6 xmega7
->> 3. a definition of sample machine with SRAM, FLASH and CPU which allows
->> to execute simple code
->> 4. encoding for all AVR instructions
->> 5. interrupt handling
->> 6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
->> 7. a decoder which given an opcode decides what istruction it is
->> 8. translation of AVR instruction into TCG
->> 9. all features together
->>
->> [..]
->
->> Michael Rolnik (7):
->>    target/avr: Add outward facing interfaces and core CPU logic
->>    target/avr: Add instruction helpers
->>    target/avr: Add instruction decoding
->>    target/avr: Add instruction translation
->>    target/avr: Add example board configuration
->>    target/avr: Register AVR support with the rest of QEMU, the build
->>      system, and the MAINTAINERS file
->>    target/avr: Add tests
->>
->> Sarah Harris (1):
->>    target/avr: Add limited support for USART and 16 bit timer peripheral=
-s
->>
->
-> Overall architecture patches look good, but I'd like some more time to
-> review the hardware patches. Unfortunately I won't have time until Novemb=
-er.
-> There was a chat on IRC about your series,
+  I haven't officially re-run the performance test quoted in the
+  last patch, but I have eyeballed "perf top", and have dug into
+  the compiled code a bit, which resulted in a few of the new
+  cleanup patches (e.g. cs_base, arm_mmu_idx_el, and
+  arm_cpu_data_is_big_endian).
+
+Changes since v3:
+  * Rebase.
+  * Do not cache XSCALE_CPAR now that it overlaps VECSTRIDE.
+  * Leave the new v7m bits as uncached.  I haven't figured
+    out all of the ways fpccr is modified.
+
+Changes since v2:
+  * Do not cache VECLEN, VECSTRIDE, VFPEN.
+    These variables come from VFP_FPSCR and VFP_FPEXC, not from
+    system control registers.
+  * Move HANDLER and STACKCHECK to rebuild_hflags_a32,
+    instead of building them in rebuild_hflags_common.
+
+Changes since v1:
+  * Apparently I had started a last-minute API change, and failed to
+    covert all of the users, and also failed to re-test afterward.
+  * Retain assertions for --enable-debug-tcg.
 
 
->
->
-I don't see the reason why do you initiate IRC communication on this topic,
-if we have the mailing list for discussing such important issues as
-introducing a new target (that should be definitely visible to all
-participants).
+Richard Henderson (20):
+  target/arm: Split out rebuild_hflags_common
+  target/arm: Split out rebuild_hflags_a64
+  target/arm: Split out rebuild_hflags_common_32
+  target/arm: Split arm_cpu_data_is_big_endian
+  target/arm: Split out rebuild_hflags_m32
+  target/arm: Reduce tests vs M-profile in cpu_get_tb_cpu_state
+  target/arm: Split out rebuild_hflags_a32
+  target/arm: Split out rebuild_hflags_aprofile
+  target/arm: Hoist XSCALE_CPAR, VECLEN, VECSTRIDE in
+    cpu_get_tb_cpu_state
+  target/arm: Simplify set of PSTATE_SS in cpu_get_tb_cpu_state
+  target/arm: Hoist computation of TBFLAG_A32.VFPEN
+  target/arm: Add arm_rebuild_hflags
+  target/arm: Split out arm_mmu_idx_el
+  target/arm: Hoist store to cs_base in cpu_get_tb_cpu_state
+  target/arm: Add HELPER(rebuild_hflags_{a32,a64,m32})
+  target/arm: Rebuild hflags at EL changes
+  target/arm: Rebuild hflags at MSR writes
+  target/arm: Rebuild hflags at CPSR writes
+  target/arm: Rebuild hflags for M-profile.
+  target/arm: Rely on hflags correct in cpu_get_tb_cpu_state
 
-Thanks, Aleksandar
+ target/arm/cpu.h           |  84 +++++---
+ target/arm/helper.h        |   4 +
+ target/arm/internals.h     |   9 +
+ linux-user/syscall.c       |   1 +
+ target/arm/cpu.c           |   1 +
+ target/arm/helper-a64.c    |   3 +
+ target/arm/helper.c        | 383 ++++++++++++++++++++++++-------------
+ target/arm/m_helper.c      |   6 +
+ target/arm/machine.c       |   1 +
+ target/arm/op_helper.c     |   4 +
+ target/arm/translate-a64.c |  13 +-
+ target/arm/translate.c     |  28 ++-
+ 12 files changed, 363 insertions(+), 174 deletions(-)
 
+-- 
+2.17.1
 
-
->
->
->
-
-> I suggested Richard we could merge patches 1-4 and 7. They are almost
-> sufficient to run the qemu-avr-tests gdbstub tests (but not the FreeRTOS
-> ones).
->
-> Regards,
->
-> Phil.
->
->
-
---000000000000e0ccac0594a489a1
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Friday, October 11, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hre=
-f=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc s=
-olid;padding-left:1ex">Hi Michael,<br>
-<br>
-On 9/2/19 4:01 PM, Michael Rolnik wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-This series of patches adds 8bit AVR cores to QEMU.<br>
-All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully test=
-ed yet.<br>
-However I was able to execute simple code with functions. e.g fibonacci cal=
-culation.<br>
-This series of patches include a non real, sample board.<br>
-No fuses support yet. PC is set to 0 at reset.<br>
-<br>
-the patches include the following<br>
-1. just a basic 8bit AVR CPU, without instruction decoding or translation<b=
-r>
-2. CPU features which allow define the following 8bit AVR cores<br>
-=C2=A0 =C2=A0 =C2=A0 avr1<br>
-=C2=A0 =C2=A0 =C2=A0 avr2 avr25<br>
-=C2=A0 =C2=A0 =C2=A0 avr3 avr31 avr35<br>
-=C2=A0 =C2=A0 =C2=A0 avr4<br>
-=C2=A0 =C2=A0 =C2=A0 avr5 avr51<br>
-=C2=A0 =C2=A0 =C2=A0 avr6<br>
-=C2=A0 =C2=A0 =C2=A0 xmega2 xmega4 xmega5 xmega6 xmega7<br>
-3. a definition of sample machine with SRAM, FLASH and CPU which allows to =
-execute simple code<br>
-4. encoding for all AVR instructions<br>
-5. interrupt handling<br>
-6. helpers for IN, OUT, SLEEP, WBR &amp; unsupported instructions<br>
-7. a decoder which given an opcode decides what istruction it is<br>
-8. translation of AVR instruction into TCG<br>
-9. all features together<br>
-<br>
-</blockquote>
-[..]<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-Michael Rolnik (7):<br>
-=C2=A0 =C2=A0target/avr: Add outward facing interfaces and core CPU logic<b=
-r>
-=C2=A0 =C2=A0target/avr: Add instruction helpers<br>
-=C2=A0 =C2=A0target/avr: Add instruction decoding<br>
-=C2=A0 =C2=A0target/avr: Add instruction translation<br>
-=C2=A0 =C2=A0target/avr: Add example board configuration<br>
-=C2=A0 =C2=A0target/avr: Register AVR support with the rest of QEMU, the bu=
-ild<br>
-=C2=A0 =C2=A0 =C2=A0system, and the MAINTAINERS file<br>
-=C2=A0 =C2=A0target/avr: Add tests<br>
-<br>
-Sarah Harris (1):<br>
-=C2=A0 =C2=A0target/avr: Add limited support for USART and 16 bit timer per=
-ipherals<br>
-</blockquote>
-<br>
-Overall architecture patches look good, but I&#39;d like some more time to =
-review the hardware patches. Unfortunately I won&#39;t have time until Nove=
-mber.<br>
-There was a chat on IRC about your series,=C2=A0</blockquote><blockquote cl=
-ass=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;p=
-adding-left:1ex"><br></blockquote><blockquote class=3D"gmail_quote" style=
-=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><br></bl=
-ockquote><div><br></div><div>I don&#39;t see the reason why do you initiate=
- IRC communication on this topic, if we have the mailing list for discussin=
-g such important issues as introducing a new target (that should be definit=
-ely visible to all participants).</div><div><br></div><div>Thanks, Aleksand=
-ar</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" s=
-tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><br>=
-</blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
-order-left:1px #ccc solid;padding-left:1ex">=C2=A0<br></blockquote><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc s=
-olid;padding-left:1ex"><br></blockquote><blockquote class=3D"gmail_quote" s=
-tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">I su=
-ggested Richard we could merge patches 1-4 and 7. They are almost sufficien=
-t to run the qemu-avr-tests gdbstub tests (but not the FreeRTOS ones).<br>
-<br>
-Regards,<br>
-<br>
-Phil.<br>
-<br>
-</blockquote>
-
---000000000000e0ccac0594a489a1--
 
