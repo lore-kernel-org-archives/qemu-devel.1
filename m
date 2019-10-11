@@ -2,52 +2,68 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70473C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:41:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B20C2C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:43:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 423D4218AC
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:41:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 423D4218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 82C0F206CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:43:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82C0F206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzqc-000804-DG
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:41:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41561)
+	id 1iIzsm-0002Xx-DQ
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:43:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxm9-0007UQ-6I
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:22 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIzfq-0004LP-B4
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 14:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxm7-0002oW-PK
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:21 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49960)
+ (envelope-from <eblake@redhat.com>) id 1iIzfn-0001va-Q5
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 14:29:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37264)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxm7-0002mQ-Hq; Fri, 11 Oct 2019 12:28:19 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR5-0003XG-Rp; Fri, 11 Oct 2019 19:06:36 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC v5 109/126] parallels: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:35 +0300
-Message-Id: <20191011160552.22907-110-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iIzfn-0001ui-KE
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 14:29:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 57A0130715F9;
+ Fri, 11 Oct 2019 18:29:54 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA2E25D6C8;
+ Fri, 11 Oct 2019 18:29:53 +0000 (UTC)
+Subject: Re: [RFC v5 003/126] error: rename errp to errp_in where it is
+ IN-argument
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ <20191011160552.22907-4-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <9f23dc4a-92e5-003e-ac3b-16a91df6df17@redhat.com>
+Date: Fri, 11 Oct 2019 13:29:53 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <20191011160552.22907-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 11 Oct 2019 18:29:54 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,164 +75,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Greg Kurz <groug@kaod.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+On 10/11/19 11:03 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Error **errp is almost always OUT-argument: it's assumed to be NULL, or
+> pointer to NULL-initialized pointer, or pointer to error_abort or
+> error_fatal, for callee to report error.
+> 
+> But very few functions instead get Error **errp as IN-argument:
+> it's assumed to be set (or, maybe, NULL), and callee should clean it,
+> or add some information.
+> 
+> In such cases, rename errp to errp_in.
+> 
+> This patch updates only error API functions. There still a few
+> functions with errp-in semantics, they will be updated in further
+> commits.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   include/qapi/error.h |  8 ++++----
+>   util/error.c         | 30 +++++++++++++++---------------
+>   2 files changed, 19 insertions(+), 19 deletions(-)
+> 
 
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+> +++ b/include/qapi/error.h
+> @@ -233,13 +233,13 @@ void error_propagate_prepend(Error **dst_errp, Error *local_err,
+>    * Prepend some text to @errp's human-readable error message.
+>    * The text is made by formatting @fmt, @ap like vprintf().
+>    */
+> -void error_vprepend(Error **errp, const char *fmt, va_list ap);
+> +void error_vprepend(Error **errp_in, const char *fmt, va_list ap);
 
-This commit (together with its neighbors) was generated by
+Fails to update the comment.
 
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
+>   
+>   /*
+>    * Prepend some text to @errp's human-readable error message.
+>    * The text is made by formatting @fmt, ... like printf().
+>    */
+> -void error_prepend(Error **errp, const char *fmt, ...)
+> +void error_prepend(Error **errp_in, const char *fmt, ...)
 
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
+and again
 
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+>       GCC_FMT_ATTR(2, 3);
+>   
+>   /*
+> @@ -256,7 +256,7 @@ void error_prepend(Error **errp, const char *fmt, ...)
+>    * May be called multiple times.  The resulting hint should end with a
+>    * newline.
+>    */
+> -void error_append_hint(Error **errp, const char *fmt, ...)
+> +void error_append_hint(Error **errp_in, const char *fmt, ...)
+>       GCC_FMT_ATTR(2, 3);
+>   
+>   /*
+> @@ -283,7 +283,7 @@ void error_free(Error *err);
+>   /*
+>    * Convenience function to assert that *@errp is set, then silently free it.
+>    */
+> -void error_free_or_abort(Error **errp);
+> +void error_free_or_abort(Error **errp_in);
 
-(auto-msg was a file with this commit message)
+and again.
 
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
+Otherwise makes sense; if matching comments are the only things changed,
 
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/parallels.c | 30 +++++++++++++-----------------
- 1 file changed, 13 insertions(+), 17 deletions(-)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 7cd2714b69..c8ba23bbd5 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -613,8 +613,8 @@ static int coroutine_fn parallels_co_create_opts(const char *filename,
-                                                  QemuOpts *opts,
-                                                  Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BlockdevCreateOptions *create_options = NULL;
--    Error *local_err = NULL;
-     BlockDriverState *bs = NULL;
-     QDict *qdict;
-     Visitor *v;
-@@ -635,9 +635,8 @@ static int coroutine_fn parallels_co_create_opts(const char *filename,
-     }
- 
-     /* Create and open the file (protocol layer) */
--    ret = bdrv_create_file(filename, opts, &local_err);
-+    ret = bdrv_create_file(filename, opts, errp);
-     if (ret < 0) {
--        error_propagate(errp, local_err);
-         goto done;
-     }
- 
-@@ -658,11 +657,10 @@ static int coroutine_fn parallels_co_create_opts(const char *filename,
-         goto done;
-     }
- 
--    visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-+    visit_type_BlockdevCreateOptions(v, NULL, &create_options, errp);
-     visit_free(v);
- 
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    if (*errp) {
-         ret = -EINVAL;
-         goto done;
-     }
-@@ -721,11 +719,11 @@ static int parallels_update_header(BlockDriverState *bs)
- static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     BDRVParallelsState *s = bs->opaque;
-     ParallelsHeader ph;
-     int ret, size, i;
-     QemuOpts *opts = NULL;
--    Error *local_err = NULL;
-     char *buf;
- 
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
-@@ -813,13 +811,13 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-         }
-     }
- 
--    opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0, &local_err);
--    if (local_err != NULL) {
-+    opts = qemu_opts_create(&parallels_runtime_opts, NULL, 0, errp);
-+    if (*errp) {
-         goto fail_options;
-     }
- 
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err != NULL) {
-+    qemu_opts_absorb_qdict(opts, options, errp);
-+    if (*errp) {
-         goto fail_options;
-     }
- 
-@@ -829,9 +827,9 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-     buf = qemu_opt_get_del(opts, PARALLELS_OPT_PREALLOC_MODE);
-     s->prealloc_mode = qapi_enum_parse(&prealloc_mode_lookup, buf,
-                                        PRL_PREALLOC_MODE_FALLOCATE,
--                                       &local_err);
-+                                       errp);
-     g_free(buf);
--    if (local_err != NULL) {
-+    if (*errp) {
-         goto fail_options;
-     }
- 
-@@ -855,9 +853,8 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
-     error_setg(&s->migration_blocker, "The Parallels format used by node '%s' "
-                "does not support live migration",
-                bdrv_get_device_or_node_name(bs));
--    ret = migrate_add_blocker(s->migration_blocker, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    ret = migrate_add_blocker(s->migration_blocker, errp);
-+    if (*errp) {
-         error_free(s->migration_blocker);
-         goto fail;
-     }
-@@ -872,7 +869,6 @@ fail:
-     return ret;
- 
- fail_options:
--    error_propagate(errp, local_err);
-     ret = -EINVAL;
-     goto fail;
- }
 -- 
-2.21.0
-
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
