@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E00E9C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF073C47404
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:51:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A93C9206CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:51:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A93C9206CD
+	by mail.kernel.org (Postfix) with ESMTPS id A1D10214E0
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:51:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1D10214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIy8R-00087g-8A
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:51:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36797)
+	id 1iIy8i-00008L-F7
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:51:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR7-0006Yz-8W
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:41 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQw-0006Gg-N9
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0004iJ-1V
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:37 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48356)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQu-0004SR-Of
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:26 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48058)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR3-0004Ou-Kb
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:33 -0400
+ id 1iIxQu-0004Fb-Fi
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:24 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQs-0003XG-8S; Fri, 11 Oct 2019 19:06:22 +0300
+ id 1iIxQh-0003XG-MQ; Fri, 11 Oct 2019 19:06:11 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 077/126] net: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:05:03 +0300
-Message-Id: <20191011160552.22907-78-vsementsov@virtuozzo.com>
+Subject: [RFC v5 046/126] SCSI: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:32 +0300
+Message-Id: <20191011160552.22907-47-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -60,10 +60,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Jason Wang <jasowang@redhat.com>, armbru@redhat.com,
- Vincenzo Maffione <v.maffione@gmail.com>, Greg Kurz <groug@kaod.org>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ vsementsov@virtuozzo.com, "Michael S. Tsirkin" <mst@redhat.com>,
+ armbru@redhat.com, Greg Kurz <groug@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -112,397 +112,215 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- net/can/can_host.c  |  7 +++----
- net/dump.c          | 15 ++++++---------
- net/filter-buffer.c | 15 ++++++---------
- net/filter.c        |  7 +++----
- net/net.c           | 41 +++++++++++++++++----------------------
- net/netmap.c        |  7 +++----
- net/tap.c           | 47 ++++++++++++++++++---------------------------
- 7 files changed, 58 insertions(+), 81 deletions(-)
+ hw/scsi/esp-pci.c      |  7 +++----
+ hw/scsi/mptsas.c       | 13 ++++++-------
+ hw/scsi/scsi-bus.c     | 24 ++++++++++--------------
+ hw/scsi/scsi-disk.c    |  8 ++++----
+ hw/scsi/scsi-generic.c |  1 +
+ hw/scsi/virtio-scsi.c  |  7 +++----
+ 6 files changed, 27 insertions(+), 33 deletions(-)
 
-diff --git a/net/can/can_host.c b/net/can/can_host.c
-index 1dfaf0ced0..ddbfdb8bac 100644
---- a/net/can/can_host.c
-+++ b/net/can/can_host.c
-@@ -50,12 +50,11 @@ static void can_host_disconnect(CanHostState *ch)
+diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
+index d5a1f9e017..eab48e3b38 100644
+--- a/hw/scsi/esp-pci.c
++++ b/hw/scsi/esp-pci.c
+@@ -468,16 +468,15 @@ static void dc390_write_config(PCIDevice *dev,
  
- static void can_host_connect(CanHostState *ch, Error **errp)
+ static void dc390_scsi_realize(PCIDevice *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     CanHostClass *chc = CAN_HOST_GET_CLASS(ch);
--    Error *local_err = NULL;
+     DC390State *pci = DC390(dev);
+-    Error *err = NULL;
+     uint8_t *contents;
+     uint16_t chksum = 0;
+     int i;
  
--    chc->connect(ch, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+    chc->connect(ch, errp);
+     /* init base class */
+-    esp_pci_scsi_realize(dev, &err);
+-    if (err) {
+-        error_propagate(errp, err);
++    esp_pci_scsi_realize(dev, errp);
 +    if (*errp) {
          return;
      }
  
-diff --git a/net/dump.c b/net/dump.c
-index 23b3628dde..57d665b10d 100644
---- a/net/dump.c
-+++ b/net/dump.c
-@@ -191,23 +191,20 @@ static void filter_dump_get_maxlen(Object *obj, Visitor *v, const char *name,
- static void filter_dump_set_maxlen(Object *obj, Visitor *v, const char *name,
-                                    void *opaque, Error **errp)
+diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+index b8a4b37cf3..a14cfb3b74 100644
+--- a/hw/scsi/mptsas.c
++++ b/hw/scsi/mptsas.c
+@@ -1272,28 +1272,27 @@ static const struct SCSIBusInfo mptsas_scsi_info = {
+ 
+ static void mptsas_scsi_realize(PCIDevice *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     NetFilterDumpState *nfds = FILTER_DUMP(obj);
--    Error *local_err = NULL;
-     uint32_t value;
+     MPTSASState *s = MPT_SAS(dev);
+-    Error *err = NULL;
+     int ret;
  
--    visit_type_uint32(v, name, &value, &local_err);
--    if (local_err) {
--        goto out;
-+    visit_type_uint32(v, name, &value, errp);
-+    if (*errp) {
-+        return;
-     }
-     if (value == 0) {
--        error_setg(&local_err, "Property '%s.%s' doesn't take value '%u'",
-+        error_setg(errp, "Property '%s.%s' doesn't take value '%u'",
-                    object_get_typename(obj), name, value);
--        goto out;
-+        return;
-     }
-     nfds->maxlen = value;
--
--out:
--    error_propagate(errp, local_err);
- }
+     dev->config[PCI_LATENCY_TIMER] = 0;
+     dev->config[PCI_INTERRUPT_PIN] = 0x01;
  
- static char *file_dump_get_filename(Object *obj, Error **errp)
-diff --git a/net/filter-buffer.c b/net/filter-buffer.c
-index 88da78f821..ac798ba421 100644
---- a/net/filter-buffer.c
-+++ b/net/filter-buffer.c
-@@ -169,23 +169,20 @@ static void filter_buffer_set_interval(Object *obj, Visitor *v,
-                                        const char *name, void *opaque,
-                                        Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     FilterBufferState *s = FILTER_BUFFER(obj);
--    Error *local_err = NULL;
-     uint32_t value;
- 
--    visit_type_uint32(v, name, &value, &local_err);
--    if (local_err) {
--        goto out;
-+    visit_type_uint32(v, name, &value, errp);
-+    if (*errp) {
-+        return;
-     }
-     if (!value) {
--        error_setg(&local_err, "Property '%s.%s' requires a positive value",
-+        error_setg(errp, "Property '%s.%s' requires a positive value",
-                    object_get_typename(obj), name);
--        goto out;
-+        return;
-     }
-     s->interval = value;
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- static void filter_buffer_init(Object *obj)
-diff --git a/net/filter.c b/net/filter.c
-index 4b932e79f9..7d5e457db0 100644
---- a/net/filter.c
-+++ b/net/filter.c
-@@ -191,11 +191,11 @@ static void netfilter_init(Object *obj)
- 
- static void netfilter_complete(UserCreatable *uc, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     NetFilterState *nf = NETFILTER(uc);
-     NetClientState *ncs[MAX_QUEUE_NUM];
-     NetFilterClass *nfc = NETFILTER_GET_CLASS(uc);
-     int queues;
--    Error *local_err = NULL;
- 
-     if (!nf->netdev_id) {
-         error_setg(errp, "Parameter 'netdev' is required");
-@@ -222,9 +222,8 @@ static void netfilter_complete(UserCreatable *uc, Error **errp)
-     nf->netdev = ncs[0];
- 
-     if (nfc->setup) {
--        nfc->setup(nf, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
-+        nfc->setup(nf, errp);
-+        if (*errp) {
+     if (s->msi != ON_OFF_AUTO_OFF) {
+-        ret = msi_init(dev, 0, 1, true, false, &err);
++        ret = msi_init(dev, 0, 1, true, false, errp);
+         /* Any error other than -ENOTSUP(board's MSI support is broken)
+          * is a programming error */
+         assert(!ret || ret == -ENOTSUP);
+         if (ret && s->msi == ON_OFF_AUTO_ON) {
+             /* Can't satisfy user's explicit msi=on request, fail */
+-            error_append_hint(&err, "You have to use msi=auto (default) or "
+-                    "msi=off with this machine type.\n");
+-            error_propagate(errp, err);
++            error_append_hint(errp, "You have to use msi=auto (default) or "
++                              "msi=off with this machine type.\n");
              return;
          }
-     }
-diff --git a/net/net.c b/net/net.c
-index 9e93c3f8a1..9bad414840 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1098,9 +1098,9 @@ static void show_netdevs(void)
+-        assert(!err || s->msi == ON_OFF_AUTO_AUTO);
++        assert(!*errp || s->msi == ON_OFF_AUTO_AUTO);
+         /* With msi=auto, we fall back to MSI off silently */
+-        error_free(err);
++        error_free_errp(errp);
  
- static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+         /* Only used for migration.  */
+         s->msi_in_use = (ret == 0);
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index bccb7cc4c6..b8ec65fd25 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -154,10 +154,10 @@ static void scsi_dma_restart_cb(void *opaque, int running, RunState state)
+ 
+ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     gchar **substrings = NULL;
-     void *object = NULL;
--    Error *err = NULL;
-     int ret = -1;
-     Visitor *v = opts_visitor_new(opts);
- 
-@@ -1143,13 +1143,13 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
-     }
- 
-     if (is_netdev) {
--        visit_type_Netdev(v, NULL, (Netdev **)&object, &err);
-+        visit_type_Netdev(v, NULL, (Netdev **)&object, errp);
-     } else {
--        visit_type_NetLegacy(v, NULL, (NetLegacy **)&object, &err);
-+        visit_type_NetLegacy(v, NULL, (NetLegacy **)&object, errp);
-     }
- 
--    if (!err) {
--        ret = net_client_init1(object, is_netdev, &err);
-+    if (!*errp) {
-+        ret = net_client_init1(object, is_netdev, errp);
-     }
- 
-     if (is_netdev) {
-@@ -1159,7 +1159,6 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
-     }
- 
- out:
--    error_propagate(errp, err);
-     g_strfreev(substrings);
-     visit_free(v);
-     return ret;
-@@ -1172,28 +1171,25 @@ void netdev_add(QemuOpts *opts, Error **errp)
- 
- void qmp_netdev_add(QDict *qdict, QObject **ret, Error **errp)
- {
--    Error *local_err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     QemuOptsList *opts_list;
-     QemuOpts *opts;
- 
--    opts_list = qemu_find_opts_err("netdev", &local_err);
--    if (local_err) {
--        goto out;
-+    opts_list = qemu_find_opts_err("netdev", errp);
-+    if (*errp) {
-+        return;
-     }
- 
--    opts = qemu_opts_from_qdict(opts_list, qdict, &local_err);
--    if (local_err) {
--        goto out;
-+    opts = qemu_opts_from_qdict(opts_list, qdict, errp);
-+    if (*errp) {
-+        return;
-     }
- 
--    netdev_add(opts, &local_err);
--    if (local_err) {
-+    netdev_add(opts, errp);
-+    if (*errp) {
-         qemu_opts_del(opts);
--        goto out;
-+        return;
-     }
--
--out:
--    error_propagate(errp, local_err);
- }
- 
- void qmp_netdev_del(const char *id, Error **errp)
-@@ -1348,17 +1344,16 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
- 
- void colo_notify_filters_event(int event, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     NetClientState *nc;
-     NetFilterState *nf;
-     NetFilterClass *nfc = NULL;
+     SCSIDevice *dev = SCSI_DEVICE(qdev);
+     SCSIBus *bus = DO_UPCAST(SCSIBus, qbus, dev->qdev.parent_bus);
+     SCSIDevice *d;
 -    Error *local_err = NULL;
  
-     QTAILQ_FOREACH(nc, &net_clients, next) {
-         QTAILQ_FOREACH(nf, &nc->filters, next) {
-             nfc = NETFILTER_GET_CLASS(OBJECT(nf));
--            nfc->handle_event(nf, event, &local_err);
--            if (local_err) {
--                error_propagate(errp, local_err);
-+            nfc->handle_event(nf, event, errp);
-+            if (*errp) {
-                 return;
-             }
-         }
-diff --git a/net/netmap.c b/net/netmap.c
-index 350f097f91..42982445be 100644
---- a/net/netmap.c
-+++ b/net/netmap.c
-@@ -406,15 +406,14 @@ static NetClientInfo net_netmap_info = {
- int net_init_netmap(const Netdev *netdev,
-                     const char *name, NetClientState *peer, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     const NetdevNetmapOptions *netmap_opts = &netdev->u.netmap;
-     struct nm_desc *nmd;
-     NetClientState *nc;
--    Error *err = NULL;
-     NetmapState *s;
- 
--    nmd = netmap_open(netmap_opts, &err);
--    if (err) {
--        error_propagate(errp, err);
-+    nmd = netmap_open(netmap_opts, errp);
-+    if (*errp) {
-         return -1;
+     if (dev->channel > bus->info->max_channel) {
+         error_setg(errp, "bad scsi channel id: %d", dev->channel);
+@@ -205,9 +205,8 @@ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
      }
-     /* Create the object. */
-diff --git a/net/tap.c b/net/tap.c
-index 6207f61f84..b03146605d 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -610,7 +610,7 @@ static int net_tap_init(const NetdevTapOptions *tap, int *vnet_hdr,
-                         const char *setup_script, char *ifname,
-                         size_t ifname_sz, int mq_required, Error **errp)
- {
--    Error *err = NULL;
-+    ERRP_AUTO_PROPAGATE();
-     int fd, vnet_hdr_required;
  
-     if (tap->has_vnet_hdr) {
-@@ -630,9 +630,8 @@ static int net_tap_init(const NetdevTapOptions *tap, int *vnet_hdr,
-     if (setup_script &&
-         setup_script[0] != '\0' &&
-         strcmp(setup_script, "no") != 0) {
--        launch_script(setup_script, ifname, fd, &err);
--        if (err) {
--            error_propagate(errp, err);
-+        launch_script(setup_script, ifname, fd, errp);
-+        if (*errp) {
-             close(fd);
-             return -1;
-         }
-@@ -649,13 +648,12 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-                              const char *downscript, const char *vhostfdname,
-                              int vnet_hdr, int fd, Error **errp)
+     QTAILQ_INIT(&dev->requests);
+-    scsi_device_realize(dev, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    scsi_device_realize(dev, errp);
++    if (*errp) {
+         return;
+     }
+     dev->vmsentry = qdev_add_vm_change_state_handler(DEVICE(dev),
+@@ -234,10 +233,10 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       BlockdevOnError werror,
+                                       const char *serial, Error **errp)
  {
--    Error *err = NULL;
 +    ERRP_AUTO_PROPAGATE();
-     TAPState *s = net_tap_fd_init(peer, model, name, fd, vnet_hdr);
-     int vhostfd;
+     const char *driver;
+     char *name;
+     DeviceState *dev;
+-    Error *err = NULL;
  
--    tap_set_sndbuf(s->fd, tap, &err);
+     driver = blk_is_sg(blk) ? "scsi-generic" : "scsi-disk";
+     dev = qdev_create(&bus->qbus, driver);
+@@ -256,15 +255,13 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+     if (serial && object_property_find(OBJECT(dev), "serial", NULL)) {
+         qdev_prop_set_string(dev, "serial", serial);
+     }
+-    qdev_prop_set_drive(dev, "drive", blk, &err);
 -    if (err) {
 -        error_propagate(errp, err);
-+    tap_set_sndbuf(s->fd, tap, errp);
++    qdev_prop_set_drive(dev, "drive", blk, errp);
++    if (*errp) {
+         object_unparent(OBJECT(dev));
+         return NULL;
+     }
+-    object_property_set_bool(OBJECT(dev), share_rw, "share-rw", &err);
+-    if (err != NULL) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(dev), share_rw, "share-rw", errp);
++    if (*errp) {
+         object_unparent(OBJECT(dev));
+         return NULL;
+     }
+@@ -272,9 +269,8 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+     qdev_prop_set_enum(dev, "rerror", rerror);
+     qdev_prop_set_enum(dev, "werror", werror);
+ 
+-    object_property_set_bool(OBJECT(dev), true, "realized", &err);
+-    if (err != NULL) {
+-        error_propagate(errp, err);
++    object_property_set_bool(OBJECT(dev), true, "realized", errp);
++    if (*errp) {
+         object_unparent(OBJECT(dev));
+         return NULL;
+     }
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index 915641a0f1..2f3064d8da 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2455,13 +2455,12 @@ static void scsi_cd_realize(SCSIDevice *dev, Error **errp)
+ 
+ static void scsi_disk_realize(SCSIDevice *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     DriveInfo *dinfo;
+-    Error *local_err = NULL;
+ 
+     if (!dev->conf.blk) {
+-        scsi_realize(dev, &local_err);
+-        assert(local_err);
+-        error_propagate(errp, local_err);
++        scsi_realize(dev, errp);
++        assert(*errp);
+         return;
+     }
+ 
+@@ -2597,6 +2596,7 @@ static int get_device_type(SCSIDiskState *s)
+ 
+ static void scsi_block_realize(SCSIDevice *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
+     AioContext *ctx;
+     int sg_version;
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index e7798ebcd0..4c7543801f 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -653,6 +653,7 @@ static void scsi_generic_reset(DeviceState *dev)
+ 
+ static void scsi_generic_realize(SCSIDevice *s, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int rc;
+     int sg_version;
+     struct sg_scsi_id scsiid;
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index ee52aa7d17..86c71f93fd 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -905,17 +905,16 @@ void virtio_scsi_common_realize(DeviceState *dev,
+ 
+ static void virtio_scsi_device_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+     VirtIOSCSI *s = VIRTIO_SCSI(dev);
+-    Error *err = NULL;
+ 
+     virtio_scsi_common_realize(dev,
+                                virtio_scsi_handle_ctrl,
+                                virtio_scsi_handle_event,
+                                virtio_scsi_handle_cmd,
+-                               &err);
+-    if (err != NULL) {
+-        error_propagate(errp, err);
++                               errp);
 +    if (*errp) {
          return;
      }
  
-@@ -689,12 +687,11 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-         }
- 
-         if (vhostfdname) {
--            vhostfd = monitor_fd_param(cur_mon, vhostfdname, &err);
-+            vhostfd = monitor_fd_param(cur_mon, vhostfdname, errp);
-             if (vhostfd == -1) {
-                 if (tap->has_vhostforce && tap->vhostforce) {
--                    error_propagate(errp, err);
-                 } else {
--                    warn_report_err(err);
-+                    warn_report_errp(errp);
-                 }
-                 return;
-             }
-@@ -758,12 +755,12 @@ static int get_fds(char *str, char *fds[], int max)
- int net_init_tap(const Netdev *netdev, const char *name,
-                  NetClientState *peer, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     const NetdevTapOptions *tap;
-     int fd, vnet_hdr = 0, i = 0, queues;
-     /* for the no-fd, no-helper case */
-     const char *script = NULL; /* suppress wrong "uninit'd use" gcc warning */
-     const char *downscript = NULL;
--    Error *err = NULL;
-     const char *vhostfdname;
-     char ifname[128];
- 
-@@ -789,9 +786,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
-             return -1;
-         }
- 
--        fd = monitor_fd_param(cur_mon, tap->fd, &err);
-+        fd = monitor_fd_param(cur_mon, tap->fd, errp);
-         if (fd == -1) {
--            error_propagate(errp, err);
-             return -1;
-         }
- 
-@@ -801,9 +797,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
- 
-         net_init_tap_one(tap, peer, "tap", name, NULL,
-                          script, downscript,
--                         vhostfdname, vnet_hdr, fd, &err);
--        if (err) {
--            error_propagate(errp, err);
-+                         vhostfdname, vnet_hdr, fd, errp);
-+        if (*errp) {
-             return -1;
-         }
-     } else if (tap->has_fds) {
-@@ -836,9 +831,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
-         }
- 
-         for (i = 0; i < nfds; i++) {
--            fd = monitor_fd_param(cur_mon, fds[i], &err);
-+            fd = monitor_fd_param(cur_mon, fds[i], errp);
-             if (fd == -1) {
--                error_propagate(errp, err);
-                 ret = -1;
-                 goto free_fail;
-             }
-@@ -857,9 +851,8 @@ int net_init_tap(const Netdev *netdev, const char *name,
-             net_init_tap_one(tap, peer, "tap", name, ifname,
-                              script, downscript,
-                              tap->has_vhostfds ? vhost_fds[i] : NULL,
--                             vnet_hdr, fd, &err);
--            if (err) {
--                error_propagate(errp, err);
-+                             vnet_hdr, fd, errp);
-+            if (*errp) {
-                 ret = -1;
-                 goto free_fail;
-             }
-@@ -896,9 +889,8 @@ free_fail:
- 
-         net_init_tap_one(tap, peer, "bridge", name, ifname,
-                          script, downscript, vhostfdname,
--                         vnet_hdr, fd, &err);
--        if (err) {
--            error_propagate(errp, err);
-+                         vnet_hdr, fd, errp);
-+        if (*errp) {
-             close(fd);
-             return -1;
-         }
-@@ -935,9 +927,8 @@ free_fail:
-             net_init_tap_one(tap, peer, "tap", name, ifname,
-                              i >= 1 ? "no" : script,
-                              i >= 1 ? "no" : downscript,
--                             vhostfdname, vnet_hdr, fd, &err);
--            if (err) {
--                error_propagate(errp, err);
-+                             vhostfdname, vnet_hdr, fd, errp);
-+            if (*errp) {
-                 close(fd);
-                 return -1;
-             }
 -- 
 2.21.0
 
