@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B9BECE58C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C584ECE58C
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2AB1D2089F
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:38:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AB1D2089F
+	by mail.kernel.org (Postfix) with ESMTPS id 7379B2089F
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 16:39:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7379B2089F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIxwK-00026I-Qh
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:38:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36246)
+	id 1iIxxH-0003AJ-3H
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 12:39:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQr-00068B-Sq
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:23 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR4-0006Tm-ET
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxQq-0004NB-Jt
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:21 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47956)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR2-0004fj-Kg
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:34 -0400
+Received: from relay.sw.ru ([185.231.240.75]:48314)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQq-0004Ai-Ch
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:20 -0400
+ id 1iIxR2-0004Nn-Cx
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:32 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQf-0003XG-1k; Fri, 11 Oct 2019 19:06:09 +0300
+ id 1iIxQr-0003XG-1K; Fri, 11 Oct 2019 19:06:21 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 036/126] SPARC Machines: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:22 +0300
-Message-Id: <20191011160552.22907-37-vsementsov@virtuozzo.com>
+Subject: [RFC v5 073/126] SPICE: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:04:59 +0300
+Message-Id: <20191011160552.22907-74-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -61,8 +61,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Artyom Tarasenko <atar4qemu@gmail.com>
+ Gerd Hoffmann <kraxel@redhat.com>, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,86 +111,32 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/sparc/sun4m.c   | 21 +++++++++------------
- hw/sparc64/sun4u.c |  7 +++----
- 2 files changed, 12 insertions(+), 16 deletions(-)
+ hw/display/qxl.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 6c5a17a020..3490992cdf 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -601,14 +601,13 @@ typedef struct IDRegState {
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index cd7eb39d20..7596c7969b 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -2210,9 +2210,9 @@ static void qxl_realize_common(PCIQXLDevice *qxl, Error **errp)
  
- static void idreg_realize(DeviceState *ds, Error **errp)
+ static void qxl_realize_primary(PCIDevice *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     IDRegState *s = MACIO_ID_REGISTER(ds);
-     SysBusDevice *dev = SYS_BUS_DEVICE(ds);
+     PCIQXLDevice *qxl = PCI_QXL(dev);
+     VGACommonState *vga = &qxl->vga;
 -    Error *local_err = NULL;
  
-     memory_region_init_ram_nomigrate(&s->mem, OBJECT(ds), "sun4m.idreg",
--                                     sizeof(idreg_data), &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                                     sizeof(idreg_data), errp);
-+    if (*errp) {
+     qxl_init_ramsize(qxl);
+     vga->vbe_size = qxl->vgamem_size;
+@@ -2234,9 +2234,8 @@ static void qxl_realize_primary(PCIDevice *dev, Error **errp)
          return;
      }
  
-@@ -655,14 +654,13 @@ static void afx_init(hwaddr addr)
- 
- static void afx_realize(DeviceState *ds, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     AFXState *s = TCX_AFX(ds);
-     SysBusDevice *dev = SYS_BUS_DEVICE(ds);
--    Error *local_err = NULL;
- 
-     memory_region_init_ram_nomigrate(&s->mem, OBJECT(ds), "sun4m.afx", 4,
--                                     &local_err);
+-    qxl_realize_common(qxl, &local_err);
 -    if (local_err) {
 -        error_propagate(errp, local_err);
-+                                     errp);
-+    if (*errp) {
-         return;
-     }
- 
-@@ -737,14 +735,13 @@ static void prom_init(hwaddr addr, const char *bios_name)
- 
- static void prom_realize(DeviceState *ds, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PROMState *s = OPENPROM(ds);
-     SysBusDevice *dev = SYS_BUS_DEVICE(ds);
--    Error *local_err = NULL;
- 
-     memory_region_init_ram_nomigrate(&s->prom, OBJECT(ds), "sun4m.prom",
--                                     PROM_SIZE_MAX, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                                     PROM_SIZE_MAX, errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 1ded2a4c9a..dbd6ee6111 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -455,14 +455,13 @@ static void prom_init(hwaddr addr, const char *bios_name)
- 
- static void prom_realize(DeviceState *ds, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PROMState *s = OPENPROM(ds);
-     SysBusDevice *dev = SYS_BUS_DEVICE(ds);
--    Error *local_err = NULL;
- 
-     memory_region_init_ram_nomigrate(&s->prom, OBJECT(ds), "sun4u.prom",
--                                     PROM_SIZE_MAX, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                                     PROM_SIZE_MAX, errp);
++    qxl_realize_common(qxl, errp);
 +    if (*errp) {
          return;
      }
