@@ -2,52 +2,67 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92041C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DEB1ECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:53:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A04F206A1
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:53:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A04F206A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42A6C206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:53:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42A6C206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIz6L-00032r-1M
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:53:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36922)
+	id 1iIz6u-00042H-Nf
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:53:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41984)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxRA-0006fT-Pa
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:44 -0400
+ (envelope-from <eblake@redhat.com>) id 1iIxoz-0002At-2D
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR7-0004nB-RN
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48174)
+ (envelope-from <eblake@redhat.com>) id 1iIxox-0004Pt-UM
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:31:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34974)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR7-0004Ii-Jm; Fri, 11 Oct 2019 12:06:37 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.2)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQm-0003XG-4Q; Fri, 11 Oct 2019 19:06:16 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC v5 060/126] megasas: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:46 +0300
-Message-Id: <20191011160552.22907-61-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1iIxou-0004Jh-OD; Fri, 11 Oct 2019 12:31:12 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8FA991DA3;
+ Fri, 11 Oct 2019 16:31:11 +0000 (UTC)
+Received: from [10.3.116.168] (ovpn-116-168.phx2.redhat.com [10.3.116.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3647D1001B36;
+ Fri, 11 Oct 2019 16:31:11 +0000 (UTC)
+Subject: Re: [PATCH v3 13/16] qcow2: Repair snapshot table with too many
+ entries
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20191011152814.14791-1-mreitz@redhat.com>
+ <20191011152814.14791-14-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <567b9148-c1fa-ea1e-250a-5b7851b8edd4@redhat.com>
+Date: Fri, 11 Oct 2019 11:31:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+In-Reply-To: <20191011152814.14791-14-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.71]); Fri, 11 Oct 2019 16:31:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,104 +74,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Hannes Reinecke <hare@suse.com>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, armbru@redhat.com, Greg Kurz <groug@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &fatal_err
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
+On 10/11/19 10:28 AM, Max Reitz wrote:
+> The user cannot choose which snapshots are removed.  This is fine
+> because we have chosen the maximum snapshot table size to be so large
+> (65536 entries) that it cannot be reasonably reached.  If the snapshot
+> table exceeds this size, the image has probably been corrupted in some
+> way; in this case, it is most important to just make the image usable
+> such that the user can copy off at least the active layer.
+> (Also note that the snapshots will be removed only with "-r all", so a
+> plain "check" or "check -r leaks" will not delete any data.)
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-If we want to check error after errp-function call, we need to
-introduce local_err and than propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatel, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
+The updated commit messages are good.
 
-This commit (together with its neighbors) was generated by
-
-for f in $(git grep -l errp \*.[ch]); do \
-    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
-done;
-
-then fix a bit of compilation problems: coccinelle for some reason
-leaves several
-f() {
-    ...
-    goto out;
-    ...
-    out:
-}
-patterns, with "out:" at function end.
-
-then
-./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
-
-(auto-msg was a file with this commit message)
-
-Still, for backporting it may be more comfortable to use only the first
-command and then do one huge commit.
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- hw/scsi/megasas.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index de9bd20887..007cfcff88 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -2311,11 +2311,11 @@ static const struct SCSIBusInfo megasas_scsi_info = {
- 
- static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     MegasasState *s = MEGASAS(dev);
-     MegasasBaseClass *b = MEGASAS_DEVICE_GET_CLASS(s);
-     uint8_t *pci_conf;
-     int i, bar_type;
--    Error *err = NULL;
-     int ret;
- 
-     pci_conf = dev->config;
-@@ -2326,20 +2326,19 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
-     pci_conf[PCI_INTERRUPT_PIN] = 0x01;
- 
-     if (s->msi != ON_OFF_AUTO_OFF) {
--        ret = msi_init(dev, 0x50, 1, true, false, &err);
-+        ret = msi_init(dev, 0x50, 1, true, false, errp);
-         /* Any error other than -ENOTSUP(board's MSI support is broken)
-          * is a programming error */
-         assert(!ret || ret == -ENOTSUP);
-         if (ret && s->msi == ON_OFF_AUTO_ON) {
-             /* Can't satisfy user's explicit msi=on request, fail */
--            error_append_hint(&err, "You have to use msi=auto (default) or "
--                    "msi=off with this machine type.\n");
--            error_propagate(errp, err);
-+            error_append_hint(errp, "You have to use msi=auto (default) or "
-+                              "msi=off with this machine type.\n");
-             return;
-         } else if (ret) {
-             /* With msi=auto, we fall back to MSI off silently */
-             s->msi = ON_OFF_AUTO_OFF;
--            error_free(err);
-+            error_free_errp(errp);
-         }
-     }
- 
 -- 
-2.21.0
-
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
