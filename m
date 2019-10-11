@@ -2,101 +2,52 @@ Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1FF1ECE58D
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B6F0ECE58E
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:20:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 881D420673
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:19:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 881D420673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 24E9221835
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 18:20:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E9221835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIzVy-0007Ie-Bl
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:19:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45787)
+	id 1iIzWI-0007ya-57
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 14:20:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41664)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1iIyHA-0003eK-TW
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 13:00:26 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmU-0007sV-PU
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1iIyH8-00036T-Lo
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 13:00:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29822)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1iIyH8-00034I-Cs
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 13:00:22 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x9BGrSM0076468; Fri, 11 Oct 2019 13:00:19 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vjwdprwbv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 11 Oct 2019 13:00:18 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x9BGukiv083866;
- Fri, 11 Oct 2019 13:00:18 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2vjwdprwa6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 11 Oct 2019 13:00:18 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x9BGuF0k032448;
- Fri, 11 Oct 2019 17:00:16 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma01dal.us.ibm.com with ESMTP id 2vejt82d7f-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 11 Oct 2019 17:00:16 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x9BH0Fj347972670
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 11 Oct 2019 17:00:15 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 96DF9124054;
- Fri, 11 Oct 2019 17:00:15 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 88C68124053;
- Fri, 11 Oct 2019 17:00:15 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Fri, 11 Oct 2019 17:00:15 +0000 (GMT)
-Subject: Re: [RFC v5 017/126] hw/tpm: rename Error ** parameter to more common
- errp
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmS-000372-CQ
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:42 -0400
+Received: from relay.sw.ru ([185.231.240.75]:50000)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIxmS-00032N-58; Fri, 11 Oct 2019 12:28:40 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iIxR7-0003XG-Lb; Fri, 11 Oct 2019 19:06:37 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC v5 114/126] blkdebug: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:40 +0300
+Message-Id: <20191011160552.22907-115-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-18-vsementsov@virtuozzo.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <d590bbd5-196c-4a60-17c6-26cff54e3be1@linux.ibm.com>
-Date: Fri, 11 Oct 2019 13:00:15 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20191011160552.22907-18-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-MW
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-10-11_10:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910110149
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,59 +59,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, armbru@redhat.com, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/11/19 12:04 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &fatal_err
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+If we want to check error after errp-function call, we need to
+introduce local_err and than propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatel, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
 
+This commit (together with its neighbors) was generated by
 
+for f in $(git grep -l errp \*.[ch]); do \
+    spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+    --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+done;
 
-> ---
->   hw/tpm/tpm_emulator.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-> index 22f9113432..10d587ed40 100644
-> --- a/hw/tpm/tpm_emulator.c
-> +++ b/hw/tpm/tpm_emulator.c
-> @@ -155,7 +155,7 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
->                                        const uint8_t *in, uint32_t in_len,
->                                        uint8_t *out, uint32_t out_len,
->                                        bool *selftest_done,
-> -                                     Error **err)
-> +                                     Error **errp)
->   {
->       ssize_t ret;
->       bool is_selftest = false;
-> @@ -165,20 +165,20 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
->           is_selftest = tpm_util_is_selftest(in, in_len);
->       }
->   
-> -    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, err);
-> +    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, errp);
->       if (ret != 0) {
->           return -1;
->       }
->   
->       ret = qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
-> -              sizeof(struct tpm_resp_hdr), err);
-> +              sizeof(struct tpm_resp_hdr), errp);
->       if (ret != 0) {
->           return -1;
->       }
->   
->       ret = qio_channel_read_all(tpm_emu->data_ioc,
->                 (char *)out + sizeof(struct tpm_resp_hdr),
-> -              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), err);
-> +              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), errp);
->       if (ret != 0) {
->           return -1;
->       }
+then fix a bit of compilation problems: coccinelle for some reason
+leaves several
+f() {
+    ...
+    goto out;
+    ...
+    out:
+}
+patterns, with "out:" at function end.
 
+then
+./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+
+(auto-msg was a file with this commit message)
+
+Still, for backporting it may be more comfortable to use only the first
+command and then do one huge commit.
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/blkdebug.c | 36 +++++++++++++++---------------------
+ 1 file changed, 15 insertions(+), 21 deletions(-)
+
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 5ae96c52b0..7c3fc222f3 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -164,6 +164,7 @@ struct add_rule_data {
+ 
+ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     struct add_rule_data *d = opaque;
+     BDRVBlkdebugState *s = d->s;
+     const char* event_name;
+@@ -171,7 +172,6 @@ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
+     struct BlkdebugRule *rule;
+     int64_t sector;
+     BlkdebugIOType iotype;
+-    Error *local_error = NULL;
+ 
+     /* Find the right event for the rule */
+     event_name = qemu_opt_get(opts, "event");
+@@ -205,9 +205,8 @@ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
+ 
+         iotype = qapi_enum_parse(&BlkdebugIOType_lookup,
+                                  qemu_opt_get(opts, "iotype"),
+-                                 BLKDEBUG_IO_TYPE__MAX, &local_error);
+-        if (local_error) {
+-            error_propagate(errp, local_error);
++                                 BLKDEBUG_IO_TYPE__MAX, errp);
++        if (*errp) {
+             return -1;
+         }
+         if (iotype != BLKDEBUG_IO_TYPE__MAX) {
+@@ -259,10 +258,10 @@ static void remove_rule(BlkdebugRule *rule)
+ static int read_config(BDRVBlkdebugState *s, const char *filename,
+                        QDict *options, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     FILE *f = NULL;
+     int ret;
+     struct add_rule_data d;
+-    Error *local_err = NULL;
+ 
+     if (filename) {
+         f = fopen(filename, "r");
+@@ -278,26 +277,23 @@ static int read_config(BDRVBlkdebugState *s, const char *filename,
+         }
+     }
+ 
+-    qemu_config_parse_qdict(options, config_groups, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_config_parse_qdict(options, config_groups, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
+     }
+ 
+     d.s = s;
+     d.action = ACTION_INJECT_ERROR;
+-    qemu_opts_foreach(&inject_error_opts, add_rule, &d, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_foreach(&inject_error_opts, add_rule, &d, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
+     }
+ 
+     d.action = ACTION_SET_STATE;
+-    qemu_opts_foreach(&set_state_opts, add_rule, &d, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_foreach(&set_state_opts, add_rule, &d, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto fail;
+     }
+@@ -395,16 +391,15 @@ static QemuOptsList runtime_opts = {
+ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+                          Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     BDRVBlkdebugState *s = bs->opaque;
+     QemuOpts *opts;
+-    Error *local_err = NULL;
+     int ret;
+     uint64_t align;
+ 
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+-    qemu_opts_absorb_qdict(opts, options, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    qemu_opts_absorb_qdict(opts, options, errp);
++    if (*errp) {
+         ret = -EINVAL;
+         goto out;
+     }
+@@ -421,10 +416,9 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     /* Open the image file */
+     bs->file = bdrv_open_child(qemu_opt_get(opts, "x-image"), options, "image",
+-                               bs, &child_file, false, &local_err);
+-    if (local_err) {
++                               bs, &child_file, false, errp);
++    if (*errp) {
+         ret = -EINVAL;
+-        error_propagate(errp, local_err);
+         goto out;
+     }
+ 
+-- 
+2.21.0
 
 
