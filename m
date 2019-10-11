@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A88D2C47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:45:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9409DECE58D
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:46:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77C4520640
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:45:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77C4520640
+	by mail.kernel.org (Postfix) with ESMTPS id 6C73D206A1
+	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 17:46:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C73D206A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iIyyM-0002RI-TB
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:45:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36802)
+	id 1iIz06-0004Yu-KG
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 13:46:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41585)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR7-0006ZG-IF
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:40 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmD-0007bS-BX
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iIxR5-0004jm-2X
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:06:37 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48070)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iIxmC-0002qs-3r
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:25 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49974)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxR4-0004Fd-O5; Fri, 11 Oct 2019 12:06:34 -0400
+ id 1iIxmB-0002qI-Sr
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 12:28:24 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.2)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iIxQi-0003XG-W4; Fri, 11 Oct 2019 19:06:13 +0300
+ id 1iIxR9-0003XG-MP; Fri, 11 Oct 2019 19:06:39 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC v5 051/126] vfio-ccw: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 11 Oct 2019 19:04:37 +0300
-Message-Id: <20191011160552.22907-52-vsementsov@virtuozzo.com>
+Subject: [RFC v5 124/126] target/tilegx/cpu.c: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 11 Oct 2019 19:05:50 +0300
+Message-Id: <20191011160552.22907-125-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
@@ -59,12 +60,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eric Farman <farman@linux.ibm.com>,
- vsementsov@virtuozzo.com, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, armbru@redhat.com,
- Greg Kurz <groug@kaod.org>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com, armbru@redhat.com,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -113,72 +110,30 @@ Reported-by: Kevin Wolf <kwolf@redhat.com>
 Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/s390x/s390-ccw.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ target/tilegx/cpu.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-index 0c5a5b60bd..415fa04091 100644
---- a/hw/s390x/s390-ccw.c
-+++ b/hw/s390x/s390-ccw.c
-@@ -55,6 +55,7 @@ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
-                                   char *sysfsdev,
-                                   Error **errp)
+diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
+index 2b2a7ccc31..79bfe27856 100644
+--- a/target/tilegx/cpu.c
++++ b/target/tilegx/cpu.c
+@@ -81,13 +81,12 @@ static void tilegx_cpu_reset(CPUState *s)
+ 
+ static void tilegx_cpu_realizefn(DeviceState *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     unsigned int cssid, ssid, devid;
-     char dev_path[PATH_MAX] = {0}, *tmp;
+     CPUState *cs = CPU(dev);
+     TileGXCPUClass *tcc = TILEGX_CPU_GET_CLASS(dev);
+-    Error *local_err = NULL;
  
-@@ -86,19 +87,19 @@ static void s390_ccw_get_dev_info(S390CCWDevice *cdev,
- 
- static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     CcwDevice *ccw_dev = CCW_DEVICE(cdev);
-     CCWDeviceClass *ck = CCW_DEVICE_GET_CLASS(ccw_dev);
-     DeviceState *parent = DEVICE(ccw_dev);
-     SubchDev *sch;
-     int ret;
--    Error *err = NULL;
- 
--    s390_ccw_get_dev_info(cdev, sysfsdev, &err);
--    if (err) {
--        goto out_err_propagate;
-+    s390_ccw_get_dev_info(cdev, sysfsdev, errp);
+-    cpu_exec_realizefn(cs, &local_err);
+-    if (local_err != NULL) {
+-        error_propagate(errp, local_err);
++    cpu_exec_realizefn(cs, errp);
 +    if (*errp) {
-+        return;
+         return;
      }
  
--    sch = css_create_sch(ccw_dev->devno, &err);
-+    sch = css_create_sch(ccw_dev->devno, errp);
-     if (!sch) {
-         goto out_mdevid_free;
-     }
-@@ -108,13 +109,13 @@ static void s390_ccw_realize(S390CCWDevice *cdev, char *sysfsdev, Error **errp)
-     ccw_dev->sch = sch;
-     ret = css_sch_build_schib(sch, &cdev->hostid);
-     if (ret) {
--        error_setg_errno(&err, -ret, "%s: Failed to build initial schib",
-+        error_setg_errno(errp, -ret, "%s: Failed to build initial schib",
-                          __func__);
-         goto out_err;
-     }
- 
--    ck->realize(ccw_dev, &err);
--    if (err) {
-+    ck->realize(ccw_dev, errp);
-+    if (*errp) {
-         goto out_err;
-     }
- 
-@@ -128,8 +129,6 @@ out_err:
-     g_free(sch);
- out_mdevid_free:
-     g_free(cdev->mdevid);
--out_err_propagate:
--    error_propagate(errp, err);
- }
- 
- static void s390_ccw_unrealize(S390CCWDevice *cdev, Error **errp)
 -- 
 2.21.0
 
