@@ -2,65 +2,67 @@ Return-Path: <SRS0=IrLN=YF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D23C47404
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 02:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7608EC47404
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 02:32:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCADB20679
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 02:06:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCADB20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3D4B5206CD
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 02:32:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D4B5206CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ6nf-00053F-S8
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 22:06:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52859)
+	id 1iJ7Cy-0001Wg-D5
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 22:32:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54254)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iJ6mt-0004b9-MS
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 22:05:44 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iJ7CC-0000o2-ID
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 22:31:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iJ6mr-0001ss-5k
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 22:05:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46748)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iJ6mq-0001sN-Hy
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 22:05:41 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B8D6DC05AA63;
- Sat, 12 Oct 2019 02:05:38 +0000 (UTC)
-Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9A336092F;
- Sat, 12 Oct 2019 02:05:35 +0000 (UTC)
-Date: Fri, 11 Oct 2019 23:05:34 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [PATCH v2] target/i386: Add Snowridge-v2 (noMPX) CPU model
-Message-ID: <20191012020534.GA10330@habkost.net>
-References: <20191011145349.123425-1-xiaoyao.li@intel.com>
- <20191011182143.GD4084@habkost.net>
- <e89e2380-8d3c-621f-6534-9ec783405b11@intel.com>
- <20191012012134.GJ4084@habkost.net>
- <89f3f389-372e-e758-27dc-64aa165fd57c@intel.com>
+ (envelope-from <no-reply@patchew.org>) id 1iJ7CA-0005EO-Sv
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 22:31:52 -0400
+Resent-Date: Fri, 11 Oct 2019 22:31:52 -0400
+Resent-Message-Id: <E1iJ7CA-0005EO-Sv@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21469)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iJ7CA-0005CS-LD
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 22:31:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1570846255; cv=none; d=zoho.com; s=zohoarc; 
+ b=VUxSVqeGjbYocgCxZ0W1FhNccn6cM6qZLCuYnRgoYA42haMRd+Fb5v5exSvA/b6QdDTcDDKBwdX9KLDYP9U868tPKJbWCQMxuRAQtoeD0TykR3JRVVlZxCn7Rw1LFtfcMhIZYz3dgKXhebsKc7fXiv0BGjKCsFfFGbv/JJgzmMY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1570846255;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=Nn+4ktKBi6cVLXwxBAHDx3j4KR5hpkHDis4KeeHetHY=; 
+ b=kHqNrULIYgGoCxxHNWy0Vj7FuVcB+OAuwI1BahGD0g+0Nk4SMXAM164d6AIu6zcqmSsZjUuxTZKSRZZb+NMIyxqd//z1kYBlRn45TSHkc+8ntWAAggU01/c3K1oSZfYlMPF8NN6MA+4D+xgjKLtar6DTdJY/+DAB2WcVMZr0oio=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1570846252297989.3517926014251;
+ Fri, 11 Oct 2019 19:10:52 -0700 (PDT)
+In-Reply-To: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+Subject: Re: [RFC v5 000/126] error: auto propagated local_err
+Message-ID: <157084624355.16951.11945043823681183793@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89f3f389-372e-e758-27dc-64aa165fd57c@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Sat, 12 Oct 2019 02:05:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: vsementsov@virtuozzo.com
+Date: Fri, 11 Oct 2019 19:10:52 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,90 +74,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: ronniesahlberg@gmail.com, codyprime@gmail.com, jan.kiszka@siemens.com,
+ berto@igalia.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ arikalo@wavecomp.com, pasic@linux.ibm.com, hpoussin@reactos.org,
+ anthony.perard@citrix.com, samuel.thibault@ens-lyon.org, lersek@redhat.com,
+ jasowang@redhat.com, lvivier@redhat.com, ehabkost@redhat.com,
+ xiechanglong.d@gmail.com, pl@kamp.de, dgilbert@redhat.com, b.galvani@gmail.com,
+ eric.auger@redhat.com, alex.williamson@redhat.com, stefanha@redhat.com,
+ jsnow@redhat.com, rth@twiddle.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ andrew@aj.id.au, crwulff@gmail.com, sundeep.lkml@gmail.com, michael@walle.cc,
+ qemu-ppc@nongnu.org, kbastian@mail.uni-paderborn.de, imammedo@redhat.com,
+ fam@euphon.net, peter.maydell@linaro.org, sheepdog@lists.wpkg.org,
+ mjrosato@linux.ibm.com, david@redhat.com, palmer@sifive.com,
+ farman@linux.ibm.com, jcmvbkbc@gmail.com, den@openvz.org, hare@suse.com,
+ sstabellini@kernel.org, arei.gonglei@huawei.com, namei.unix@gmail.com,
+ atar4qemu@gmail.com, thuth@redhat.com, amit@kernel.org, sw@weilnetz.de,
+ groug@kaod.org, yuval.shaia@oracle.com, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, peter.chubb@nicta.com.au, clg@kaod.org, shorne@gmail.com,
+ qemu-riscv@nongnu.org, cohuck@redhat.com, amarkovic@wavecomp.com,
+ aurelien@aurel32.net, pburton@wavecomp.com, sagark@eecs.berkeley.edu,
+ paul@xen.org, green@moxielogic.com, kraxel@redhat.com,
+ edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn, ari@tuxera.com,
+ quintela@redhat.com, mdroth@linux.vnet.ibm.com, borntraeger@de.ibm.com,
+ joel@jms.id.au, dillaman@redhat.com, antonynpavlov@gmail.com,
+ xen-devel@lists.xenproject.org, integration@gluster.org, philmd@redhat.com,
+ rjones@redhat.com, Andrew.Baumann@microsoft.com, mreitz@redhat.com,
+ mst@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
+ v.maffione@gmail.com, marex@denx.de, armbru@redhat.com,
+ marcandre.lureau@redhat.com, alistair@alistair23.me, pavel.dovgaluk@ispras.ru,
+ g.lettieri@iet.unipi.it, rizzo@iet.unipi.it, david@gibson.dropbear.id.au,
+ akrowiak@linux.ibm.com, berrange@redhat.com, xiaoguangrong.eric@gmail.com,
+ pmorel@linux.ibm.com, wencongyang2@huawei.com, jcd@tribudubois.net,
+ pbonzini@redhat.com, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Oct 12, 2019 at 09:31:25AM +0800, Xiaoyao Li wrote:
-> On 10/12/2019 9:21 AM, Eduardo Habkost wrote:
-> > On Sat, Oct 12, 2019 at 09:15:56AM +0800, Xiaoyao Li wrote:
-> > > On 10/12/2019 2:21 AM, Eduardo Habkost wrote:
-> > > > On Fri, Oct 11, 2019 at 10:53:49PM +0800, Xiaoyao Li wrote:
-> > > > > Add new version of Snowridge CPU model that removes MPX feature.
-> > > > > 
-> > > > > MPX support is being phased out by Intel. GCC has dropped it, Linux kernel
-> > > > > and kvm are also going to do that in the future.
-> > > > > 
-> > > > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > > > > ---
-> > > > > Changes in v2:
-> > > > >       - Use CPU model versioning mechanism instead of machine-type compat
-> > > > > ---
-> > > > >    target/i386/cpu.c | 13 +++++++++++++
-> > > > >    1 file changed, 13 insertions(+)
-> > > > > 
-> > > > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > > > > index 44f1bbdcac76..27b0a17b46a8 100644
-> > > > > --- a/target/i386/cpu.c
-> > > > > +++ b/target/i386/cpu.c
-> > > > > @@ -2793,6 +2793,19 @@ static X86CPUDefinition builtin_x86_defs[] = {
-> > > > >                CPUID_6_EAX_ARAT,
-> > > > >            .xlevel = 0x80000008,
-> > > > >            .model_id = "Intel Atom Processor (SnowRidge)",
-> > > > > +        .versions = (X86CPUVersionDefinition[]) {
-> > > > > +            { .version = 1 },
-> > > > > +            {
-> > > > > +                .version = 2,
-> > > > > +                .alias = "Snowridge-noMPX",
-> > > > 
-> > > > The intention is to stop creating new funny names for CPU model
-> > > > variations, now, and stick to -v1, -v2, -v3, etc.
-> > > > 
-> > > > The .alias field is optional, and was added only for
-> > > > compatibility with the existing -noTSX and -IBRS CPU models.
-> > > 
-> > > Got it.
-> > > 
-> > > > > +                .props = (PropValue[]) {
-> > > > > +                    { "mpx", "off" },
-> > > > > +                    { "model-id", "Intel Atom Processor (Snowridge, no MPX)" },
-> > > > 
-> > > > Do you think it's important to report a different model-id?
-> > > > I would keep it the same and only add mpx=off.
-> > > 
-> > > I just want to let user know easily the differences between Snowridge-v1 and
-> > > Snowridge-v2. Unfortunately, it seems ugly.
-> > > 
-> > > When testing with Cascadelake-Server, it puzzles every time that which one
-> > > should I choose between Cascadelake-Server-v1 and Cascadelake-Server-v2.
-> > >  From the output of "-cpu ?", I don't know the differences between them.
-> > > Everytime I have to go to the source code to see the difference.
-> > > 
-> > > Maybe there is a way to see/report the differences between different
-> > > versions of the same CPU model that I just don't know?
-> > 
-> > Good point.  I forgot that model-id is also the model description
-> > in "-cpu ?".
-> > 
-> > Well, it doesn't hurt to have a different model-id in v2 that's
-> > more informative.  Feel free to keep the model-id line in v3.
-> 
-> OK. I will send out the v3 patch keeping the model-id while removing the
-> alias.
-> 
-> BTW, do you have better idea to tell the differences among versions of the
-> same CPU model?
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxMTE2MDU1Mi4yMjkw
+Ny0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
+dGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
+aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
+bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcg
+Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VO
+Vj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgaW90
+ZXN0LXFjb3cyOiAwMTMKICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rlc3QtYmxvY2staW90
+aHJlYWQKICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rlc3QtaW1hZ2UtbG9ja2luZwp3YXJu
+aW5nOiBGYWlsZWQgdG8gZ2V0IHNoYXJlZCAiY29uc2lzdGVudCByZWFkIiBsb2NrCklzIGFub3Ro
+ZXIgcHJvY2VzcyB1c2luZyB0aGUgaW1hZ2UgWy90bXAvcXRlc3QuTzY2bDN0XT8Kd2FybmluZzog
+RmFpbGVkIHRvIGdldCBzaGFyZWQgImNvbnNpc3RlbnQgcmVhZCIgbG9jawpJcyBhbm90aGVyIHBy
+b2Nlc3MgdXNpbmcgdGhlIGltYWdlIFsvdG1wL3F0ZXN0LkcwTTlWOF0/CiAgVEVTVCAgICBjaGVj
+ay11bml0OiB0ZXN0cy90ZXN0LXg4Ni1jcHVpZAogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMv
+dGVzdC14YnpybGUKLS0tCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDI2NwpGYWlsdXJlczogMDU0
+CkZhaWxlZCAxIG9mIDEwOCBpb3Rlc3RzCm1ha2U6ICoqKiBbY2hlY2stdGVzdHMvY2hlY2stYmxv
+Y2suc2hdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4K
+ICBURVNUICAgIGNoZWNrLXF0ZXN0LWFhcmNoNjQ6IHRlc3RzL3Fvcy10ZXN0ClRyYWNlYmFjayAo
+bW9zdCByZWNlbnQgY2FsbCBsYXN0KToKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3Io
+cmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydz
+dWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5j
+ZS51dWlkPTJjNTVmYjYxYTYzYTQwOTM4MmYyYjNhOTlmY2E5M2Q5JywgJy11JywgJzEwMDMnLCAn
+LS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFS
+R0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICct
+ZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0ND
+QUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9x
+ZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0
+Y2hldy10ZXN0ZXItdG1wLXVzdmk4Zm9iL3NyYy9kb2NrZXItc3JjLjIwMTktMTAtMTEtMjIuMDAu
+MTAuMTkzMzovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3Fl
+bXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4K
+ZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9MmM1NWZiNjFhNjNh
+NDA5MzgyZjJiM2E5OWZjYTkzZDkKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1h
+a2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtdXN2
+aThmb2Ivc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJv
+ciAyCgpyZWFsICAgIDEwbTMzLjcxNHMKdXNlciAgICAwbTguMzYwcwoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMTExNjA1NTIuMjI5
+MDctMS12c2VtZW50c292QHZpcnR1b3p6by5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9z
+Ny8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-We could add a new field for a human-readable description of the
-CPU model version, and print that field on "-cpu help" if set.
-
-We could also try to generate a description automatically (e.g.
-automatically describe SnowRidge-v2 as "SnowRidge-v1 plus mpx"
-based on .props).  I'm not sure if it would be worth the effort,
-though.
-
--- 
-Eduardo
 
