@@ -2,67 +2,64 @@ Return-Path: <SRS0=IrLN=YF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC21C47404
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 03:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9848BC47404
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 03:15:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 403902084C
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 03:05:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 403902084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6E5DC214AF
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 03:15:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E5DC214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ7iH-0006Cw-F7
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 23:05:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56429)
+	id 1iJ7rz-0000EW-IZ
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 23:15:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56855)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iJ7hP-0005oP-Vn
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 23:04:09 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1iJ7rB-0007zq-Jh
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 23:14:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iJ7hO-0008W0-EP
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 23:04:07 -0400
-Received: from mga05.intel.com ([192.55.52.43]:2923)
+ (envelope-from <ehabkost@redhat.com>) id 1iJ7r9-0002JV-4y
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 23:14:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48712)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iJ7hO-0008Vn-5B
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 23:04:06 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 11 Oct 2019 20:04:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,286,1566889200"; d="scan'208";a="194514920"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.197.6])
- ([10.239.197.6])
- by fmsmga007.fm.intel.com with ESMTP; 11 Oct 2019 20:04:03 -0700
-Subject: Re: [PATCH v12 09/11] hmat acpi: Build System Locality Latency and
- Bandwidth Information Structure(s)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20190920074349.2616-1-tao3.xu@intel.com>
- <20190920074349.2616-10-tao3.xu@intel.com>
- <20191003164111.078fdce4@redhat.com>
- <24a4842c-4ce4-3a7f-5032-8e74458de44c@intel.com>
- <20191011160855.6d13eb69@redhat.com>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <7f431c7c-b745-3001-d0ba-d94f7230b426@intel.com>
-Date: Sat, 12 Oct 2019 11:04:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iJ7r8-0002J3-Sa
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 23:14:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6D4A3307D989;
+ Sat, 12 Oct 2019 03:14:09 +0000 (UTC)
+Received: from localhost (ovpn-116-20.phx2.redhat.com [10.3.116.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CA0C76092D;
+ Sat, 12 Oct 2019 03:14:08 +0000 (UTC)
+Date: Sat, 12 Oct 2019 00:14:07 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Luwei Kang <luwei.kang@intel.com>
+Subject: Re: [PATCH v4 2/2] i386: Add support to get/set/migrate Intel
+ Processor Trace feature
+Message-ID: <20191012031407.GK4084@habkost.net>
+References: <1520182116-16485-1-git-send-email-luwei.kang@intel.com>
+ <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191011160855.6d13eb69@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.43
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1520182116-16485-2-git-send-email-luwei.kang@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Sat, 12 Oct 2019 03:14:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,172 +71,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>, "Williams,
- Dan J" <dan.j.williams@intel.com>
+Cc: kvm@vger.kernel.org, mtosatti@redhat.com, qemu-devel@nongnu.org,
+ Chao Peng <chao.p.peng@linux.intel.com>, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/11/2019 10:08 PM, Igor Mammedov wrote:
-> On Thu, 10 Oct 2019 14:53:56 +0800
-> Tao Xu <tao3.xu@intel.com> wrote:
+On Mon, Mar 05, 2018 at 12:48:36AM +0800, Luwei Kang wrote:
+> From: Chao Peng <chao.p.peng@linux.intel.com>
 > 
->> On 10/3/2019 10:41 PM, Igor Mammedov wrote:
->>> On Fri, 20 Sep 2019 15:43:47 +0800
->>> Tao Xu <tao3.xu@intel.com> wrote:
->>>    
->>>> From: Liu Jingqi <jingqi.liu@intel.com>
->>>>
->>>> This structure describes the memory access latency and bandwidth
->>>> information from various memory access initiator proximity domains.
->>>> The latency and bandwidth numbers represented in this structure
->>>> correspond to rated latency and bandwidth for the platform.
->>>> The software could use this information as hint for optimization.
->>>>
->>>> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
->>>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->>>> ---
->>>>
->>>> Changes in v12:
->>>>       - Fix a bug that if HMAT is enabled and without hmat-lb setting,
->>>>         QEMU will crash. (reported by Danmei Wei)
->>>>
->>>> Changes in v11:
->>>>       - Calculate base in build_hmat_lb().
->>>> ---
->>>>    hw/acpi/hmat.c | 126 ++++++++++++++++++++++++++++++++++++++++++++++++-
->>>>    hw/acpi/hmat.h |   2 +
->>>>    2 files changed, 127 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
->>>> index 1368fce7ee..e7be849581 100644
->>>> --- a/hw/acpi/hmat.c
->>>> +++ b/hw/acpi/hmat.c
->>>> @@ -27,6 +27,7 @@
->>>>    #include "qemu/osdep.h"
->>>>    #include "sysemu/numa.h"
->>>>    #include "hw/acpi/hmat.h"
->>>> +#include "qemu/error-report.h"
->>>>    
->>>>    /*
->>>>     * ACPI 6.3:
->>>> @@ -67,11 +68,105 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
->>>>        build_append_int_noprefix(table_data, 0, 8);
->>>>    }
->>>>    
->>>> +static bool entry_overflow(uint64_t *lb_data, uint64_t base, int len)
->>>> +{
->>>> +    int i;
->>>> +
->>>> +    for (i = 0; i < len; i++) {
->>>> +        if (lb_data[i] / base >= UINT16_MAX) {
->>>> +            return true;
->>>> +        }
->>>> +    }
->>>> +
->>>> +    return false;
->>>> +}
->>> I suggest to do this check at CLI parsing time
->>>    
->>>> +/*
->>>> + * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
->>>> + * Structure: Table 5-146
->>>> + */
->>>> +static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
->>>> +                          uint32_t num_initiator, uint32_t num_target,
->>>> +                          uint32_t *initiator_list, int type)
->>>> +{
->>>> +    uint8_t mask = 0x0f;
->>>> +    uint32_t s = num_initiator;
->>>> +    uint32_t t = num_target;
->>> drop this locals and use arguments directly
->>>    
->>>> +    uint64_t base = 1;
->>>> +    uint64_t *lb_data;
->>>> +    int i, unit;
->>>> +
->>>> +    /* Type */
->>>> +    build_append_int_noprefix(table_data, 1, 2);
->>>> +    /* Reserved */
->>>> +    build_append_int_noprefix(table_data, 0, 2);
->>>> +    /* Length */
->>>> +    build_append_int_noprefix(table_data, 32 + 4 * s + 4 * t + 2 * s * t, 4);
->>>                                                ^^^^
->>> to me above looks like /dev/random output, absolutely unreadable.
->>> Suggest to use local var (like: lb_length) for expression with comments
->>> beside magic numbers.
->>>    
->>>> +    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
->>>> +    build_append_int_noprefix(table_data, hmat_lb->hierarchy & mask, 1);
->>>
->>> why do you need to use mask here?
->>>    
->> Because Bits[7:4] Reserved, so I use mask to keep it reserved.
+> Add Intel Processor Trace related definition. It also add
+> corresponding part to kvm_get/set_msr and vmstate.
 > 
-> these bits are not user provided and set to 0, if they get set it's
-> programming error and instead of masking problem out QEMU should abort,
-> I suggest replace masking with assert(!foo>>x).
-> 
->>
->>>> +    /* Data Type */
->>>> +    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);
->>>
->>> Isn't hmat_lb->data_type and passed argument 'type' the same?
->>>    
->> Yes, I will drop 'type'.
->>>    
->>>> +    /* Reserved */
->>>> +    build_append_int_noprefix(table_data, 0, 2);
->>>> +    /* Number of Initiator Proximity Domains (s) */
->>>> +    build_append_int_noprefix(table_data, s, 4);
->>>> +    /* Number of Target Proximity Domains (t) */
->>>> +    build_append_int_noprefix(table_data, t, 4);
->>>> +    /* Reserved */
->>>> +    build_append_int_noprefix(table_data, 0, 4);
->>>> +
->>>> +    if (HMAT_IS_LATENCY(type)) {
->>>> +        unit = 1000;
->>>> +        lb_data = hmat_lb->latency;
->>>> +    } else {
->>>> +        unit = 1024;
->>>> +        lb_data = hmat_lb->bandwidth;
->>>> +    }
->>>> +
->>>> +    while (entry_overflow(lb_data, base, s * t)) {
->>>> +        for (i = 0; i < s * t; i++) {
->>>> +            if (!QEMU_IS_ALIGNED(lb_data[i], unit * base)) {
->>>> +                error_report("Invalid latency/bandwidth input, all "
->>>> +                "latencies/bandwidths should be specified in the same units.");
->>>> +                exit(1);
->>>> +            }
->>>> +        }
->>>> +        base *= unit;
->>>> +    }
->>> Can you clarify what you are trying to check here?
->>>    
->> This part I use entry_overflow() to check if uint16 can store entry. If
->> can't store and the entries matrix can be divisible by unit * base, then
->> base will be unit * base.
->>
->> For example, if lb_data[i] are 1048576(1TB/s) and 1024(1GB/s), unit is
->> 1024, so 1048576 is bigger than UINT16_MAX, and can be divisible by 1024
->> * 1, so base is 1024 and entries are 1024 and 1 (see entry =
->> hmat_lb->latency[i] / base;). The benefit is even user input different
->> unit(TB/s vs GB/s), we can still store the data as far as possible.
-> 
-> Is it possible instead of doing multiple iterations over lb_data
-> until it finds valid base, just go over lb_data once to find MIN/MAX
-> and then calculate base using it. Error out with max/min offending
-> values if it's not possible to compress the range into uint16_t?
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+[...]
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index f9f4cd1..097c953 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1811,6 +1811,25 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>                  kvm_msr_entry_add(cpu, MSR_MTRRphysMask(i), mask);
+>              }
+>          }
+> +        if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
+> +            int addr_num = kvm_arch_get_supported_cpuid(kvm_state,
+> +                                                    0x14, 1, R_EAX) & 0x7;
+> +
+> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL,
+> +                            env->msr_rtit_ctrl);
+> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS,
+> +                            env->msr_rtit_status);
+> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE,
+> +                            env->msr_rtit_output_base);
+
+This causes the following crash on some hosts:
+
+  qemu-system-x86_64: error: failed to set MSR 0x560 to 0x0
+  qemu-system-x86_64: target/i386/kvm.c:2673: kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+
+Checking for CPUID_7_0_EBX_INTEL_PT is not enough: KVM has
+additional conditions that might prevent writing to this MSR
+(PT_CAP_topa_output && PT_CAP_single_range_output).  This causes
+QEMU to crash if some of the conditions aren't met.
+
+Writing and reading this MSR (and the ones below) need to be
+conditional on KVM_GET_MSR_INDEX_LIST.
+
+
+> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK,
+> +                            env->msr_rtit_output_mask);
+> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH,
+> +                            env->msr_rtit_cr3_match);
+> +            for (i = 0; i < addr_num; i++) {
+> +                kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i,
+> +                            env->msr_rtit_addrs[i]);
+> +            }
+> +        }
+>  
+>          /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
+>           *       kvm_put_msr_feature_control. */
+> @@ -2124,6 +2143,20 @@ static int kvm_get_msrs(X86CPU *cpu)
+>          }
+>      }
+>  
+> +    if (env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) {
+> +        int addr_num =
+> +            kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX) & 0x7;
+> +
+> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CTL, 0);
+> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_STATUS, 0);
+> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_BASE, 0);
+> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_OUTPUT_MASK, 0);
+> +        kvm_msr_entry_add(cpu, MSR_IA32_RTIT_CR3_MATCH, 0);
+> +        for (i = 0; i < addr_num; i++) {
+> +            kvm_msr_entry_add(cpu, MSR_IA32_RTIT_ADDR0_A + i, 0);
+> +        }
+> +    }
+> +
+>      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
+>      if (ret < 0) {
+>          return ret;
+> @@ -2364,6 +2397,24 @@ static int kvm_get_msrs(X86CPU *cpu)
+>          case MSR_IA32_SPEC_CTRL:
+>              env->spec_ctrl = msrs[i].data;
+>              break;
+> +        case MSR_IA32_RTIT_CTL:
+> +            env->msr_rtit_ctrl = msrs[i].data;
+> +            break;
+> +        case MSR_IA32_RTIT_STATUS:
+> +            env->msr_rtit_status = msrs[i].data;
+> +            break;
+> +        case MSR_IA32_RTIT_OUTPUT_BASE:
+> +            env->msr_rtit_output_base = msrs[i].data;
+> +            break;
+> +        case MSR_IA32_RTIT_OUTPUT_MASK:
+> +            env->msr_rtit_output_mask = msrs[i].data;
+> +            break;
+> +        case MSR_IA32_RTIT_CR3_MATCH:
+> +            env->msr_rtit_cr3_match = msrs[i].data;
+> +            break;
+> +        case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
+> +            env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
+> +            break;
+>          }
+>      }
+>  
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index 361c05a..c05fe6f 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -837,6 +837,43 @@ static const VMStateDescription vmstate_spec_ctrl = {
+>      }
+>  };
+>  
+> +static bool intel_pt_enable_needed(void *opaque)
+> +{
+> +    X86CPU *cpu = opaque;
+> +    CPUX86State *env = &cpu->env;
+> +    int i;
+> +
+> +    if (env->msr_rtit_ctrl || env->msr_rtit_status ||
+> +        env->msr_rtit_output_base || env->msr_rtit_output_mask ||
+> +        env->msr_rtit_cr3_match) {
+> +        return true;
+> +    }
+> +
+> +    for (i = 0; i < MAX_RTIT_ADDRS; i++) {
+> +        if (env->msr_rtit_addrs[i]) {
+> +            return true;
+> +        }
+> +    }
+> +
+> +    return false;
+> +}
+> +
+> +static const VMStateDescription vmstate_msr_intel_pt = {
+> +    .name = "cpu/intel_pt",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = intel_pt_enable_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT64(env.msr_rtit_ctrl, X86CPU),
+> +        VMSTATE_UINT64(env.msr_rtit_status, X86CPU),
+> +        VMSTATE_UINT64(env.msr_rtit_output_base, X86CPU),
+> +        VMSTATE_UINT64(env.msr_rtit_output_mask, X86CPU),
+> +        VMSTATE_UINT64(env.msr_rtit_cr3_match, X86CPU),
+> +        VMSTATE_UINT64_ARRAY(env.msr_rtit_addrs, X86CPU, MAX_RTIT_ADDRS),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  VMStateDescription vmstate_x86_cpu = {
+>      .name = "cpu",
+>      .version_id = 12,
+> @@ -957,6 +994,7 @@ VMStateDescription vmstate_x86_cpu = {
+>  #endif
+>          &vmstate_spec_ctrl,
+>          &vmstate_mcg_ext_ctl,
+> +        &vmstate_msr_intel_pt,
+>          NULL
+>      }
+>  };
+> -- 
+> 1.8.3.1
 > 
 
-Although we tell user input same unit data, such as use 1GB/s 3GB/s. If 
-user input data such as 1048575, 1048576(1TB/s) and 1024(1GB/s), then we 
-will get 1024 * (1023 1024 1). I am wondering if it is appropriate 
-because we lose a float number(0.999020). But in our codes, it will 
-raise error.
-
+-- 
+Eduardo
 
