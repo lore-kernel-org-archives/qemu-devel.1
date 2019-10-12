@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB8FC4360C
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 17:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2FAC4360C
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 17:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23FE0206A1
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 17:43:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23FE0206A1
+	by mail.kernel.org (Postfix) with ESMTPS id DBEE0206A1
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 17:43:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBEE0206A1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJLQX-0006aB-Ck
-	for qemu-devel@archiver.kernel.org; Sat, 12 Oct 2019 13:43:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38575)
+	id 1iJLQd-0006hd-Pa
+	for qemu-devel@archiver.kernel.org; Sat, 12 Oct 2019 13:43:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38600)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iJLM5-0001Nd-2J
- for qemu-devel@nongnu.org; Sat, 12 Oct 2019 13:39:04 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iJLM8-0001OC-Ss
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 13:39:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iJLM2-00026k-KK
- for qemu-devel@nongnu.org; Sat, 12 Oct 2019 13:39:00 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36002 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iJLM4-00027Z-67
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 13:39:03 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:36144 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iJLM2-0001nt-7w
- for qemu-devel@nongnu.org; Sat, 12 Oct 2019 13:38:58 -0400
+ id 1iJLM3-00026t-HT
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 13:39:00 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 014651A1DD1;
+ by mail.rt-rk.com (Postfix) with ESMTP id 4F70D1A1CE2;
  Sat, 12 Oct 2019 19:37:53 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id CF3FA1A1CE2;
- Sat, 12 Oct 2019 19:37:52 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 10F2C1A1E80;
+ Sat, 12 Oct 2019 19:37:53 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/6] target/mips: Clean up helper.c
-Date: Sat, 12 Oct 2019 19:37:41 +0200
-Message-Id: <1570901866-9548-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v3 6/6] target/mips: msa: Split helpers for
+ ILV<EV|OD|L|R>.<B|H|W|D>
+Date: Sat, 12 Oct 2019 19:37:46 +0200
+Message-Id: <1570901866-9548-7-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1570901866-9548-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1570901866-9548-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -69,330 +70,937 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Mostly fix errors and warnings reported by 'checkpatch.pl -f'.
+Achieves clearer code and slightly better performance.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/helper.c | 128 +++++++++++++++++++++++++++++++--------------------
- 1 file changed, 78 insertions(+), 50 deletions(-)
+ target/mips/helper.h     |  21 +-
+ target/mips/msa_helper.c | 768 +++++++++++++++++++++++++----------------------
+ target/mips/translate.c  |  76 ++++-
+ 3 files changed, 496 insertions(+), 369 deletions(-)
 
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index a2b6459..2411a2c 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -39,8 +39,8 @@ enum {
- #if !defined(CONFIG_USER_ONLY)
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index 6419bb8..f3df187 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -912,6 +912,23 @@ DEF_HELPER_4(msa_mod_s_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_mod_s_w, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_mod_s_d, void, env, i32, i32, i32)
  
- /* no MMU emulation */
--int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
--                        target_ulong address, int rw, int access_type)
-+int no_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
-+                       target_ulong address, int rw, int access_type)
++DEF_HELPER_4(msa_ilvev_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvev_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvev_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvev_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvod_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvod_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvod_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvod_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvl_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvl_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvl_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvl_d, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvr_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvr_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvr_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_ilvr_d, void, env, i32, i32, i32)
++
+ DEF_HELPER_4(msa_and_v, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_nor_v, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_or_v, void, env, i32, i32, i32)
+@@ -984,10 +1001,6 @@ DEF_HELPER_5(msa_sld_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_splat_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_pckev_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_pckod_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_ilvl_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_ilvr_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_ilvev_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_ilvod_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_vshf_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_srar_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_srlr_df, void, env, i32, i32, i32, i32)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index 65df15d..499fcde 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -2432,7 +2432,421 @@ void helper_msa_mod_u_d(CPUMIPSState *env,
+  * +---------------+----------------------------------------------------------+
+  */
+ 
+-/* TODO: insert Interleave group helpers here */
++
++void helper_msa_ilvev_b(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->b[8]  = pws->b[9];
++    pwd->b[9]  = pwt->b[9];
++    pwd->b[10] = pws->b[11];
++    pwd->b[11] = pwt->b[11];
++    pwd->b[12] = pws->b[13];
++    pwd->b[13] = pwt->b[13];
++    pwd->b[14] = pws->b[15];
++    pwd->b[15] = pwt->b[15];
++    pwd->b[0]  = pws->b[1];
++    pwd->b[1]  = pwt->b[1];
++    pwd->b[2]  = pws->b[3];
++    pwd->b[3]  = pwt->b[3];
++    pwd->b[4]  = pws->b[5];
++    pwd->b[5]  = pwt->b[5];
++    pwd->b[6]  = pws->b[7];
++    pwd->b[7]  = pwt->b[7];
++#else
++    pwd->b[15] = pws->b[14];
++    pwd->b[14] = pwt->b[14];
++    pwd->b[13] = pws->b[12];
++    pwd->b[12] = pwt->b[12];
++    pwd->b[11] = pws->b[10];
++    pwd->b[10] = pwt->b[10];
++    pwd->b[9]  = pws->b[8];
++    pwd->b[8]  = pwt->b[8];
++    pwd->b[7]  = pws->b[6];
++    pwd->b[6]  = pwt->b[6];
++    pwd->b[5]  = pws->b[4];
++    pwd->b[4]  = pwt->b[4];
++    pwd->b[3]  = pws->b[2];
++    pwd->b[2]  = pwt->b[2];
++    pwd->b[1]  = pws->b[0];
++    pwd->b[0]  = pwt->b[0];
++#endif
++}
++
++void helper_msa_ilvev_h(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->h[4] = pws->h[5];
++    pwd->h[5] = pwt->h[5];
++    pwd->h[6] = pws->h[7];
++    pwd->h[7] = pwt->h[7];
++    pwd->h[0] = pws->h[1];
++    pwd->h[1] = pwt->h[1];
++    pwd->h[2] = pws->h[3];
++    pwd->h[3] = pwt->h[3];
++#else
++    pwd->h[7] = pws->h[6];
++    pwd->h[6] = pwt->h[6];
++    pwd->h[5] = pws->h[4];
++    pwd->h[4] = pwt->h[4];
++    pwd->h[3] = pws->h[2];
++    pwd->h[2] = pwt->h[2];
++    pwd->h[1] = pws->h[0];
++    pwd->h[0] = pwt->h[0];
++#endif
++}
++
++void helper_msa_ilvev_w(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->w[2] = pws->w[3];
++    pwd->w[3] = pwt->w[3];
++    pwd->w[0] = pws->w[1];
++    pwd->w[1] = pwt->w[1];
++#else
++    pwd->w[3] = pws->w[2];
++    pwd->w[2] = pwt->w[2];
++    pwd->w[1] = pws->w[0];
++    pwd->w[0] = pwt->w[0];
++#endif
++}
++
++void helper_msa_ilvev_d(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[1] = pws->d[0];
++    pwd->d[0] = pwt->d[0];
++}
++
++
++void helper_msa_ilvod_b(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->b[7]  = pwt->b[6];
++    pwd->b[6]  = pws->b[6];
++    pwd->b[5]  = pwt->b[4];
++    pwd->b[4]  = pws->b[4];
++    pwd->b[3]  = pwt->b[2];
++    pwd->b[2]  = pws->b[2];
++    pwd->b[1]  = pwt->b[0];
++    pwd->b[0]  = pws->b[0];
++    pwd->b[15] = pwt->b[14];
++    pwd->b[14] = pws->b[14];
++    pwd->b[13] = pwt->b[12];
++    pwd->b[12] = pws->b[12];
++    pwd->b[11] = pwt->b[10];
++    pwd->b[10] = pws->b[10];
++    pwd->b[9]  = pwt->b[8];
++    pwd->b[8]  = pws->b[8];
++#else
++    pwd->b[0]  = pwt->b[1];
++    pwd->b[1]  = pws->b[1];
++    pwd->b[2]  = pwt->b[3];
++    pwd->b[3]  = pws->b[3];
++    pwd->b[4]  = pwt->b[5];
++    pwd->b[5]  = pws->b[5];
++    pwd->b[6]  = pwt->b[7];
++    pwd->b[7]  = pws->b[7];
++    pwd->b[8]  = pwt->b[9];
++    pwd->b[9]  = pws->b[9];
++    pwd->b[10] = pwt->b[11];
++    pwd->b[11] = pws->b[11];
++    pwd->b[12] = pwt->b[13];
++    pwd->b[13] = pws->b[13];
++    pwd->b[14] = pwt->b[15];
++    pwd->b[15] = pws->b[15];
++#endif
++}
++
++void helper_msa_ilvod_h(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->h[3] = pwt->h[2];
++    pwd->h[2] = pws->h[2];
++    pwd->h[1] = pwt->h[0];
++    pwd->h[0] = pws->h[0];
++    pwd->h[7] = pwt->h[6];
++    pwd->h[6] = pws->h[6];
++    pwd->h[5] = pwt->h[4];
++    pwd->h[4] = pws->h[4];
++#else
++    pwd->h[0] = pwt->h[1];
++    pwd->h[1] = pws->h[1];
++    pwd->h[2] = pwt->h[3];
++    pwd->h[3] = pws->h[3];
++    pwd->h[4] = pwt->h[5];
++    pwd->h[5] = pws->h[5];
++    pwd->h[6] = pwt->h[7];
++    pwd->h[7] = pws->h[7];
++#endif
++}
++
++void helper_msa_ilvod_w(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->w[1] = pwt->w[0];
++    pwd->w[0] = pws->w[0];
++    pwd->w[3] = pwt->w[2];
++    pwd->w[2] = pws->w[2];
++#else
++    pwd->w[0] = pwt->w[1];
++    pwd->w[1] = pws->w[1];
++    pwd->w[2] = pwt->w[3];
++    pwd->w[3] = pws->w[3];
++#endif
++}
++
++void helper_msa_ilvod_d(CPUMIPSState *env,
++                        uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0] = pwt->d[1];
++    pwd->d[1] = pws->d[1];
++}
++
++
++void helper_msa_ilvl_b(CPUMIPSState *env,
++                       uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->b[7]  = pwt->b[15];
++    pwd->b[6]  = pws->b[15];
++    pwd->b[5]  = pwt->b[14];
++    pwd->b[4]  = pws->b[14];
++    pwd->b[3]  = pwt->b[13];
++    pwd->b[2]  = pws->b[13];
++    pwd->b[1]  = pwt->b[12];
++    pwd->b[0]  = pws->b[12];
++    pwd->b[15] = pwt->b[11];
++    pwd->b[14] = pws->b[11];
++    pwd->b[13] = pwt->b[10];
++    pwd->b[12] = pws->b[10];
++    pwd->b[11] = pwt->b[9];
++    pwd->b[10] = pws->b[9];
++    pwd->b[9]  = pwt->b[8];
++    pwd->b[8]  = pws->b[8];
++#else
++    pwd->b[0]  = pwt->b[8];
++    pwd->b[1]  = pws->b[8];
++    pwd->b[2]  = pwt->b[9];
++    pwd->b[3]  = pws->b[9];
++    pwd->b[4]  = pwt->b[10];
++    pwd->b[5]  = pws->b[10];
++    pwd->b[6]  = pwt->b[11];
++    pwd->b[7]  = pws->b[11];
++    pwd->b[8]  = pwt->b[12];
++    pwd->b[9]  = pws->b[12];
++    pwd->b[10] = pwt->b[13];
++    pwd->b[11] = pws->b[13];
++    pwd->b[12] = pwt->b[14];
++    pwd->b[13] = pws->b[14];
++    pwd->b[14] = pwt->b[15];
++    pwd->b[15] = pws->b[15];
++#endif
++}
++
++void helper_msa_ilvl_h(CPUMIPSState *env,
++                       uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->h[3] = pwt->h[7];
++    pwd->h[2] = pws->h[7];
++    pwd->h[1] = pwt->h[6];
++    pwd->h[0] = pws->h[6];
++    pwd->h[7] = pwt->h[5];
++    pwd->h[6] = pws->h[5];
++    pwd->h[5] = pwt->h[4];
++    pwd->h[4] = pws->h[4];
++#else
++    pwd->h[0] = pwt->h[4];
++    pwd->h[1] = pws->h[4];
++    pwd->h[2] = pwt->h[5];
++    pwd->h[3] = pws->h[5];
++    pwd->h[4] = pwt->h[6];
++    pwd->h[5] = pws->h[6];
++    pwd->h[6] = pwt->h[7];
++    pwd->h[7] = pws->h[7];
++#endif
++}
++
++void helper_msa_ilvl_w(CPUMIPSState *env,
++                       uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->w[1] = pwt->w[3];
++    pwd->w[0] = pws->w[3];
++    pwd->w[3] = pwt->w[2];
++    pwd->w[2] = pws->w[2];
++#else
++    pwd->w[0] = pwt->w[2];
++    pwd->w[1] = pws->w[2];
++    pwd->w[2] = pwt->w[3];
++    pwd->w[3] = pws->w[3];
++#endif
++}
++
++void helper_msa_ilvl_d(CPUMIPSState *env,
++                       uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[0] = pwt->d[1];
++    pwd->d[1] = pws->d[1];
++}
++
++
++void helper_msa_ilvr_b(CPUMIPSState *env,
++                       uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->b[8]  = pws->b[0];
++    pwd->b[9]  = pwt->b[0];
++    pwd->b[10] = pws->b[1];
++    pwd->b[11] = pwt->b[1];
++    pwd->b[12] = pws->b[2];
++    pwd->b[13] = pwt->b[2];
++    pwd->b[14] = pws->b[3];
++    pwd->b[15] = pwt->b[3];
++    pwd->b[0]  = pws->b[4];
++    pwd->b[1]  = pwt->b[4];
++    pwd->b[2]  = pws->b[5];
++    pwd->b[3]  = pwt->b[5];
++    pwd->b[4]  = pws->b[6];
++    pwd->b[5]  = pwt->b[6];
++    pwd->b[6]  = pws->b[7];
++    pwd->b[7]  = pwt->b[7];
++#else
++    pwd->b[15] = pws->b[7];
++    pwd->b[14] = pwt->b[7];
++    pwd->b[13] = pws->b[6];
++    pwd->b[12] = pwt->b[6];
++    pwd->b[11] = pws->b[5];
++    pwd->b[10] = pwt->b[5];
++    pwd->b[9]  = pws->b[4];
++    pwd->b[8]  = pwt->b[4];
++    pwd->b[7]  = pws->b[3];
++    pwd->b[6]  = pwt->b[3];
++    pwd->b[5]  = pws->b[2];
++    pwd->b[4]  = pwt->b[2];
++    pwd->b[3]  = pws->b[1];
++    pwd->b[2]  = pwt->b[1];
++    pwd->b[1]  = pws->b[0];
++    pwd->b[0]  = pwt->b[0];
++#endif
++}
++
++void helper_msa_ilvr_h(CPUMIPSState *env,
++                       uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->h[4] = pws->h[0];
++    pwd->h[5] = pwt->h[0];
++    pwd->h[6] = pws->h[1];
++    pwd->h[7] = pwt->h[1];
++    pwd->h[0] = pws->h[2];
++    pwd->h[1] = pwt->h[2];
++    pwd->h[2] = pws->h[3];
++    pwd->h[3] = pwt->h[3];
++#else
++    pwd->h[7] = pws->h[3];
++    pwd->h[6] = pwt->h[3];
++    pwd->h[5] = pws->h[2];
++    pwd->h[4] = pwt->h[2];
++    pwd->h[3] = pws->h[1];
++    pwd->h[2] = pwt->h[1];
++    pwd->h[1] = pws->h[0];
++    pwd->h[0] = pwt->h[0];
++#endif
++}
++
++void helper_msa_ilvr_w(CPUMIPSState *env,
++                       uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    pwd->w[2] = pws->w[0];
++    pwd->w[3] = pwt->w[0];
++    pwd->w[0] = pws->w[1];
++    pwd->w[1] = pwt->w[1];
++#else
++    pwd->w[3] = pws->w[1];
++    pwd->w[2] = pwt->w[1];
++    pwd->w[1] = pws->w[0];
++    pwd->w[0] = pwt->w[0];
++#endif
++}
++
++void helper_msa_ilvr_d(CPUMIPSState *env,
++                       uint32_t wd, uint32_t ws, uint32_t wt)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
++    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
++
++    pwd->d[1] = pws->d[0];
++    pwd->d[0] = pwt->d[0];
++}
+ 
+ 
+ /*
+@@ -3522,358 +3936,6 @@ MSA_FN_DF(vshf_df)
+ #undef MSA_FN_DF
+ 
+ 
+-void helper_msa_ilvev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+-                         uint32_t ws, uint32_t wt)
+-{
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+-    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
+-
+-    switch (df) {
+-    case DF_BYTE:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->b[8]  = pws->b[9];
+-        pwd->b[9]  = pwt->b[9];
+-        pwd->b[10] = pws->b[11];
+-        pwd->b[11] = pwt->b[11];
+-        pwd->b[12] = pws->b[13];
+-        pwd->b[13] = pwt->b[13];
+-        pwd->b[14] = pws->b[15];
+-        pwd->b[15] = pwt->b[15];
+-        pwd->b[0]  = pws->b[1];
+-        pwd->b[1]  = pwt->b[1];
+-        pwd->b[2]  = pws->b[3];
+-        pwd->b[3]  = pwt->b[3];
+-        pwd->b[4]  = pws->b[5];
+-        pwd->b[5]  = pwt->b[5];
+-        pwd->b[6]  = pws->b[7];
+-        pwd->b[7]  = pwt->b[7];
+-#else
+-        pwd->b[15] = pws->b[14];
+-        pwd->b[14] = pwt->b[14];
+-        pwd->b[13] = pws->b[12];
+-        pwd->b[12] = pwt->b[12];
+-        pwd->b[11] = pws->b[10];
+-        pwd->b[10] = pwt->b[10];
+-        pwd->b[9]  = pws->b[8];
+-        pwd->b[8]  = pwt->b[8];
+-        pwd->b[7]  = pws->b[6];
+-        pwd->b[6]  = pwt->b[6];
+-        pwd->b[5]  = pws->b[4];
+-        pwd->b[4]  = pwt->b[4];
+-        pwd->b[3]  = pws->b[2];
+-        pwd->b[2]  = pwt->b[2];
+-        pwd->b[1]  = pws->b[0];
+-        pwd->b[0]  = pwt->b[0];
+-#endif
+-        break;
+-    case DF_HALF:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->h[4] = pws->h[5];
+-        pwd->h[5] = pwt->h[5];
+-        pwd->h[6] = pws->h[7];
+-        pwd->h[7] = pwt->h[7];
+-        pwd->h[0] = pws->h[1];
+-        pwd->h[1] = pwt->h[1];
+-        pwd->h[2] = pws->h[3];
+-        pwd->h[3] = pwt->h[3];
+-#else
+-        pwd->h[7] = pws->h[6];
+-        pwd->h[6] = pwt->h[6];
+-        pwd->h[5] = pws->h[4];
+-        pwd->h[4] = pwt->h[4];
+-        pwd->h[3] = pws->h[2];
+-        pwd->h[2] = pwt->h[2];
+-        pwd->h[1] = pws->h[0];
+-        pwd->h[0] = pwt->h[0];
+-#endif
+-        break;
+-    case DF_WORD:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->w[2] = pws->w[3];
+-        pwd->w[3] = pwt->w[3];
+-        pwd->w[0] = pws->w[1];
+-        pwd->w[1] = pwt->w[1];
+-#else
+-        pwd->w[3] = pws->w[2];
+-        pwd->w[2] = pwt->w[2];
+-        pwd->w[1] = pws->w[0];
+-        pwd->w[0] = pwt->w[0];
+-#endif
+-        break;
+-    case DF_DOUBLE:
+-        pwd->d[1] = pws->d[0];
+-        pwd->d[0] = pwt->d[0];
+-        break;
+-    default:
+-        assert(0);
+-    }
+-}
+-
+-void helper_msa_ilvod_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+-                         uint32_t ws, uint32_t wt)
+-{
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+-    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
+-
+-    switch (df) {
+-    case DF_BYTE:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->b[7]  = pwt->b[6];
+-        pwd->b[6]  = pws->b[6];
+-        pwd->b[5]  = pwt->b[4];
+-        pwd->b[4]  = pws->b[4];
+-        pwd->b[3]  = pwt->b[2];
+-        pwd->b[2]  = pws->b[2];
+-        pwd->b[1]  = pwt->b[0];
+-        pwd->b[0]  = pws->b[0];
+-        pwd->b[15] = pwt->b[14];
+-        pwd->b[14] = pws->b[14];
+-        pwd->b[13] = pwt->b[12];
+-        pwd->b[12] = pws->b[12];
+-        pwd->b[11] = pwt->b[10];
+-        pwd->b[10] = pws->b[10];
+-        pwd->b[9]  = pwt->b[8];
+-        pwd->b[8]  = pws->b[8];
+-#else
+-        pwd->b[0]  = pwt->b[1];
+-        pwd->b[1]  = pws->b[1];
+-        pwd->b[2]  = pwt->b[3];
+-        pwd->b[3]  = pws->b[3];
+-        pwd->b[4]  = pwt->b[5];
+-        pwd->b[5]  = pws->b[5];
+-        pwd->b[6]  = pwt->b[7];
+-        pwd->b[7]  = pws->b[7];
+-        pwd->b[8]  = pwt->b[9];
+-        pwd->b[9]  = pws->b[9];
+-        pwd->b[10] = pwt->b[11];
+-        pwd->b[11] = pws->b[11];
+-        pwd->b[12] = pwt->b[13];
+-        pwd->b[13] = pws->b[13];
+-        pwd->b[14] = pwt->b[15];
+-        pwd->b[15] = pws->b[15];
+-#endif
+-        break;
+-    case DF_HALF:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->h[3] = pwt->h[2];
+-        pwd->h[2] = pws->h[2];
+-        pwd->h[1] = pwt->h[0];
+-        pwd->h[0] = pws->h[0];
+-        pwd->h[7] = pwt->h[6];
+-        pwd->h[6] = pws->h[6];
+-        pwd->h[5] = pwt->h[4];
+-        pwd->h[4] = pws->h[4];
+-#else
+-        pwd->h[0] = pwt->h[1];
+-        pwd->h[1] = pws->h[1];
+-        pwd->h[2] = pwt->h[3];
+-        pwd->h[3] = pws->h[3];
+-        pwd->h[4] = pwt->h[5];
+-        pwd->h[5] = pws->h[5];
+-        pwd->h[6] = pwt->h[7];
+-        pwd->h[7] = pws->h[7];
+-#endif
+-        break;
+-    case DF_WORD:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->w[1] = pwt->w[0];
+-        pwd->w[0] = pws->w[0];
+-        pwd->w[3] = pwt->w[2];
+-        pwd->w[2] = pws->w[2];
+-#else
+-        pwd->w[0] = pwt->w[1];
+-        pwd->w[1] = pws->w[1];
+-        pwd->w[2] = pwt->w[3];
+-        pwd->w[3] = pws->w[3];
+-#endif
+-        break;
+-    case DF_DOUBLE:
+-        pwd->d[0] = pwt->d[1];
+-        pwd->d[1] = pws->d[1];
+-        break;
+-    default:
+-        assert(0);
+-    }
+-}
+-
+-void helper_msa_ilvl_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+-                        uint32_t ws, uint32_t wt)
+-{
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+-    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
+-
+-    switch (df) {
+-    case DF_BYTE:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->b[7]  = pwt->b[15];
+-        pwd->b[6]  = pws->b[15];
+-        pwd->b[5]  = pwt->b[14];
+-        pwd->b[4]  = pws->b[14];
+-        pwd->b[3]  = pwt->b[13];
+-        pwd->b[2]  = pws->b[13];
+-        pwd->b[1]  = pwt->b[12];
+-        pwd->b[0]  = pws->b[12];
+-        pwd->b[15] = pwt->b[11];
+-        pwd->b[14] = pws->b[11];
+-        pwd->b[13] = pwt->b[10];
+-        pwd->b[12] = pws->b[10];
+-        pwd->b[11] = pwt->b[9];
+-        pwd->b[10] = pws->b[9];
+-        pwd->b[9]  = pwt->b[8];
+-        pwd->b[8]  = pws->b[8];
+-#else
+-        pwd->b[0]  = pwt->b[8];
+-        pwd->b[1]  = pws->b[8];
+-        pwd->b[2]  = pwt->b[9];
+-        pwd->b[3]  = pws->b[9];
+-        pwd->b[4]  = pwt->b[10];
+-        pwd->b[5]  = pws->b[10];
+-        pwd->b[6]  = pwt->b[11];
+-        pwd->b[7]  = pws->b[11];
+-        pwd->b[8]  = pwt->b[12];
+-        pwd->b[9]  = pws->b[12];
+-        pwd->b[10] = pwt->b[13];
+-        pwd->b[11] = pws->b[13];
+-        pwd->b[12] = pwt->b[14];
+-        pwd->b[13] = pws->b[14];
+-        pwd->b[14] = pwt->b[15];
+-        pwd->b[15] = pws->b[15];
+-#endif
+-        break;
+-    case DF_HALF:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->h[3] = pwt->h[7];
+-        pwd->h[2] = pws->h[7];
+-        pwd->h[1] = pwt->h[6];
+-        pwd->h[0] = pws->h[6];
+-        pwd->h[7] = pwt->h[5];
+-        pwd->h[6] = pws->h[5];
+-        pwd->h[5] = pwt->h[4];
+-        pwd->h[4] = pws->h[4];
+-#else
+-        pwd->h[0] = pwt->h[4];
+-        pwd->h[1] = pws->h[4];
+-        pwd->h[2] = pwt->h[5];
+-        pwd->h[3] = pws->h[5];
+-        pwd->h[4] = pwt->h[6];
+-        pwd->h[5] = pws->h[6];
+-        pwd->h[6] = pwt->h[7];
+-        pwd->h[7] = pws->h[7];
+-#endif
+-        break;
+-    case DF_WORD:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->w[1] = pwt->w[3];
+-        pwd->w[0] = pws->w[3];
+-        pwd->w[3] = pwt->w[2];
+-        pwd->w[2] = pws->w[2];
+-#else
+-        pwd->w[0] = pwt->w[2];
+-        pwd->w[1] = pws->w[2];
+-        pwd->w[2] = pwt->w[3];
+-        pwd->w[3] = pws->w[3];
+-#endif
+-        break;
+-    case DF_DOUBLE:
+-        pwd->d[0] = pwt->d[1];
+-        pwd->d[1] = pws->d[1];
+-        break;
+-    default:
+-        assert(0);
+-    }
+-}
+-
+-void helper_msa_ilvr_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+-                        uint32_t ws, uint32_t wt)
+-{
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+-    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
+-
+-    switch (df) {
+-    case DF_BYTE:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->b[8]  = pws->b[0];
+-        pwd->b[9]  = pwt->b[0];
+-        pwd->b[10] = pws->b[1];
+-        pwd->b[11] = pwt->b[1];
+-        pwd->b[12] = pws->b[2];
+-        pwd->b[13] = pwt->b[2];
+-        pwd->b[14] = pws->b[3];
+-        pwd->b[15] = pwt->b[3];
+-        pwd->b[0]  = pws->b[4];
+-        pwd->b[1]  = pwt->b[4];
+-        pwd->b[2]  = pws->b[5];
+-        pwd->b[3]  = pwt->b[5];
+-        pwd->b[4]  = pws->b[6];
+-        pwd->b[5]  = pwt->b[6];
+-        pwd->b[6]  = pws->b[7];
+-        pwd->b[7]  = pwt->b[7];
+-#else
+-        pwd->b[15] = pws->b[7];
+-        pwd->b[14] = pwt->b[7];
+-        pwd->b[13] = pws->b[6];
+-        pwd->b[12] = pwt->b[6];
+-        pwd->b[11] = pws->b[5];
+-        pwd->b[10] = pwt->b[5];
+-        pwd->b[9]  = pws->b[4];
+-        pwd->b[8]  = pwt->b[4];
+-        pwd->b[7]  = pws->b[3];
+-        pwd->b[6]  = pwt->b[3];
+-        pwd->b[5]  = pws->b[2];
+-        pwd->b[4]  = pwt->b[2];
+-        pwd->b[3]  = pws->b[1];
+-        pwd->b[2]  = pwt->b[1];
+-        pwd->b[1]  = pws->b[0];
+-        pwd->b[0]  = pwt->b[0];
+-#endif
+-        break;
+-    case DF_HALF:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->h[4] = pws->h[0];
+-        pwd->h[5] = pwt->h[0];
+-        pwd->h[6] = pws->h[1];
+-        pwd->h[7] = pwt->h[1];
+-        pwd->h[0] = pws->h[2];
+-        pwd->h[1] = pwt->h[2];
+-        pwd->h[2] = pws->h[3];
+-        pwd->h[3] = pwt->h[3];
+-#else
+-        pwd->h[7] = pws->h[3];
+-        pwd->h[6] = pwt->h[3];
+-        pwd->h[5] = pws->h[2];
+-        pwd->h[4] = pwt->h[2];
+-        pwd->h[3] = pws->h[1];
+-        pwd->h[2] = pwt->h[1];
+-        pwd->h[1] = pws->h[0];
+-        pwd->h[0] = pwt->h[0];
+-#endif
+-        break;
+-    case DF_WORD:
+-#if defined(HOST_WORDS_BIGENDIAN)
+-        pwd->w[2] = pws->w[0];
+-        pwd->w[3] = pwt->w[0];
+-        pwd->w[0] = pws->w[1];
+-        pwd->w[1] = pwt->w[1];
+-#else
+-        pwd->w[3] = pws->w[1];
+-        pwd->w[2] = pwt->w[1];
+-        pwd->w[1] = pws->w[0];
+-        pwd->w[0] = pwt->w[0];
+-#endif
+-        break;
+-    case DF_DOUBLE:
+-        pwd->d[1] = pws->d[0];
+-        pwd->d[0] = pwt->d[0];
+-        break;
+-    default:
+-        assert(0);
+-    }
+-}
+-
+ void helper_msa_pckev_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+                          uint32_t ws, uint32_t wt)
  {
-     *physical = address;
-     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-@@ -48,26 +48,28 @@ int no_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
- }
- 
- /* fixed mapping MMU emulation */
--int fixed_mmu_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
--                           target_ulong address, int rw, int access_type)
-+int fixed_mmu_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
-+                          target_ulong address, int rw, int access_type)
- {
-     if (address <= (int32_t)0x7FFFFFFFUL) {
--        if (!(env->CP0_Status & (1 << CP0St_ERL)))
-+        if (!(env->CP0_Status & (1 << CP0St_ERL))) {
-             *physical = address + 0x40000000UL;
--        else
-+        } else {
-             *physical = address;
--    } else if (address <= (int32_t)0xBFFFFFFFUL)
-+        }
-+    } else if (address <= (int32_t)0xBFFFFFFFUL) {
-         *physical = address & 0x1FFFFFFF;
--    else
-+    } else {
-         *physical = address;
-+    }
- 
-     *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     return TLBRET_MATCH;
- }
- 
- /* MIPS32/MIPS64 R4000-style MMU emulation */
--int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
--                     target_ulong address, int rw, int access_type)
-+int r4k_map_address(CPUMIPSState *env, hwaddr *physical, int *prot,
-+                    target_ulong address, int rw, int access_type)
- {
-     uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
-     int i;
-@@ -99,8 +101,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
-             if (rw != MMU_DATA_STORE || (n ? tlb->D1 : tlb->D0)) {
-                 *physical = tlb->PFN[n] | (address & (mask >> 1));
-                 *prot = PAGE_READ;
--                if (n ? tlb->D1 : tlb->D0)
-+                if (n ? tlb->D1 : tlb->D0) {
-                     *prot |= PAGE_WRITE;
-+                }
-                 if (!(n ? tlb->XI1 : tlb->XI0)) {
-                     *prot |= PAGE_EXEC;
-                 }
-@@ -130,8 +133,11 @@ static int is_seg_am_mapped(unsigned int am, bool eu, int mmu_idx)
-     int32_t adetlb_mask;
- 
-     switch (mmu_idx) {
--    case 3 /* ERL */:
--        /* If EU is set, always unmapped */
-+    case 3:
-+        /*
-+         * ERL
-+         * If EU is set, always unmapped
-+         */
-         if (eu) {
-             return 0;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 7a35c26..ea8b8f4 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -28770,6 +28770,70 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+             break;
          }
-@@ -204,7 +210,7 @@ static int get_segctl_physical_address(CPUMIPSState *env, hwaddr *physical,
-                                     pa & ~(hwaddr)segmask);
- }
- 
--static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-+static int get_physical_address(CPUMIPSState *env, hwaddr *physical,
-                                 int *prot, target_ulong real_address,
-                                 int rw, int access_type, int mmu_idx)
- {
-@@ -252,14 +258,15 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-         } else {
-             segctl = env->CP0_SegCtl2 >> 16;
-         }
--        ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
--                                          access_type, mmu_idx, segctl,
--                                          0x3FFFFFFF);
-+        ret = get_segctl_physical_address(env, physical, prot,
-+                                          real_address, rw, access_type,
-+                                          mmu_idx, segctl, 0x3FFFFFFF);
- #if defined(TARGET_MIPS64)
-     } else if (address < 0x4000000000000000ULL) {
-         /* xuseg */
-         if (UX && address <= (0x3FFFFFFFFFFFFFFFULL & env->SEGMask)) {
--            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
-+            ret = env->tlb->map_address(env, physical, prot,
-+                                        real_address, rw, access_type);
-         } else {
-             ret = TLBRET_BADADDR;
-         }
-@@ -267,7 +274,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-         /* xsseg */
-         if ((supervisor_mode || kernel_mode) &&
-             SX && address <= (0x7FFFFFFFFFFFFFFFULL & env->SEGMask)) {
--            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
-+            ret = env->tlb->map_address(env, physical, prot,
-+                                        real_address, rw, access_type);
-         } else {
-             ret = TLBRET_BADADDR;
-         }
-@@ -307,7 +315,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-         /* xkseg */
-         if (kernel_mode && KX &&
-             address <= (0xFFFFFFFF7FFFFFFFULL & env->SEGMask)) {
--            ret = env->tlb->map_address(env, physical, prot, real_address, rw, access_type);
-+            ret = env->tlb->map_address(env, physical, prot,
-+                                        real_address, rw, access_type);
-         } else {
-             ret = TLBRET_BADADDR;
-         }
-@@ -328,8 +337,10 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
-                                           access_type, mmu_idx,
-                                           env->CP0_SegCtl0 >> 16, 0x1FFFFFFF);
-     } else {
--        /* kseg3 */
--        /* XXX: debug segment is not emulated */
-+        /*
-+         * kseg3
-+         * XXX: debug segment is not emulated
-+         */
-         ret = get_segctl_physical_address(env, physical, prot, real_address, rw,
-                                           access_type, mmu_idx,
-                                           env->CP0_SegCtl0, 0x1FFFFFFF);
-@@ -515,9 +526,9 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
- #if defined(TARGET_MIPS64)
-     env->CP0_EntryHi &= env->SEGMask;
-     env->CP0_XContext =
--        /* PTEBase */   (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) |
--        /* R */         (extract64(address, 62, 2) << (env->SEGBITS - 9)) |
--        /* BadVPN2 */   (extract64(address, 13, env->SEGBITS - 13) << 4);
-+        (env->CP0_XContext & ((~0ULL) << (env->SEGBITS - 7))) | /* PTEBase */
-+        (extract64(address, 62, 2) << (env->SEGBITS - 9)) |     /* R       */
-+        (extract64(address, 13, env->SEGBITS - 13) << 4);       /* BadVPN2 */
- #endif
-     cs->exception_index = exception;
-     env->error_code = error_code;
-@@ -945,7 +956,8 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
- }
- 
- #ifndef CONFIG_USER_ONLY
--hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address, int rw)
-+hwaddr cpu_mips_translate_address(CPUMIPSState *env, target_ulong address,
-+                                  int rw)
- {
-     hwaddr physical;
-     int prot;
-@@ -1005,7 +1017,7 @@ static const char * const excp_names[EXCP_LAST + 1] = {
- };
- #endif
- 
--target_ulong exception_resume_pc (CPUMIPSState *env)
-+target_ulong exception_resume_pc(CPUMIPSState *env)
- {
-     target_ulong bad_pc;
-     target_ulong isa_mode;
-@@ -1013,8 +1025,10 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
-     isa_mode = !!(env->hflags & MIPS_HFLAG_M16);
-     bad_pc = env->active_tc.PC | isa_mode;
-     if (env->hflags & MIPS_HFLAG_BMASK) {
--        /* If the exception was raised from a delay slot, come back to
--           the jump.  */
-+        /*
-+         * If the exception was raised from a delay slot, come back to
-+         * the jump.
-+         */
-         bad_pc -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
-     }
- 
-@@ -1022,14 +1036,14 @@ target_ulong exception_resume_pc (CPUMIPSState *env)
- }
- 
- #if !defined(CONFIG_USER_ONLY)
--static void set_hflags_for_handler (CPUMIPSState *env)
-+static void set_hflags_for_handler(CPUMIPSState *env)
- {
-     /* Exception handlers are entered in 32-bit mode.  */
-     env->hflags &= ~(MIPS_HFLAG_M16);
-     /* ...except that microMIPS lets you choose.  */
-     if (env->insn_flags & ASE_MICROMIPS) {
--        env->hflags |= (!!(env->CP0_Config3
--                           & (1 << CP0C3_ISA_ON_EXC))
-+        env->hflags |= (!!(env->CP0_Config3 &
-+                           (1 << CP0C3_ISA_ON_EXC))
-                         << MIPS_HFLAG_M16_SHIFT);
-     }
- }
-@@ -1096,10 +1110,12 @@ void mips_cpu_do_interrupt(CPUState *cs)
-     switch (cs->exception_index) {
-     case EXCP_DSS:
-         env->CP0_Debug |= 1 << CP0DB_DSS;
--        /* Debug single step cannot be raised inside a delay slot and
--           resume will always occur on the next instruction
--           (but we assume the pc has always been updated during
--           code translation). */
-+        /*
-+         * Debug single step cannot be raised inside a delay slot and
-+         * resume will always occur on the next instruction
-+         * (but we assume the pc has always been updated during
-+         * code translation).
-+         */
-         env->CP0_DEPC = env->active_tc.PC | !!(env->hflags & MIPS_HFLAG_M16);
-         goto enter_debug_mode;
-     case EXCP_DINT:
-@@ -1111,7 +1127,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
-     case EXCP_DBp:
-         env->CP0_Debug |= 1 << CP0DB_DBp;
-         /* Setup DExcCode - SDBBP instruction */
--        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) | 9 << CP0DB_DEC;
-+        env->CP0_Debug = (env->CP0_Debug & ~(0x1fULL << CP0DB_DEC)) |
-+                         (9 << CP0DB_DEC);
-         goto set_DEPC;
-     case EXCP_DDBS:
-         env->CP0_Debug |= 1 << CP0DB_DDBS;
-@@ -1132,8 +1149,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
-         env->hflags |= MIPS_HFLAG_DM | MIPS_HFLAG_CP0;
-         env->hflags &= ~(MIPS_HFLAG_KSU);
-         /* EJTAG probe trap enable is not implemented... */
--        if (!(env->CP0_Status & (1 << CP0St_EXL)))
-+        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
-             env->CP0_Cause &= ~(1U << CP0Ca_BD);
-+        }
-         env->active_tc.PC = env->exception_base + 0x480;
-         set_hflags_for_handler(env);
          break;
-@@ -1159,8 +1177,9 @@ void mips_cpu_do_interrupt(CPUState *cs)
-         }
-         env->hflags |= MIPS_HFLAG_CP0;
-         env->hflags &= ~(MIPS_HFLAG_KSU);
--        if (!(env->CP0_Status & (1 << CP0St_EXL)))
-+        if (!(env->CP0_Status & (1 << CP0St_EXL))) {
-             env->CP0_Cause &= ~(1U << CP0Ca_BD);
++    case OPC_ILVEV_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_ilvev_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_ilvev_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_ilvev_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_ilvev_d(cpu_env, twd, tws, twt);
++            break;
 +        }
-         env->active_tc.PC = env->exception_base;
-         set_hflags_for_handler(env);
++        break;
++    case OPC_ILVOD_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_ilvod_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_ilvod_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_ilvod_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_ilvod_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
++    case OPC_ILVL_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_ilvl_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_ilvl_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_ilvl_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_ilvl_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
++    case OPC_ILVR_df:
++        switch (df) {
++        case DF_BYTE:
++            gen_helper_msa_ilvr_b(cpu_env, twd, tws, twt);
++            break;
++        case DF_HALF:
++            gen_helper_msa_ilvr_h(cpu_env, twd, tws, twt);
++            break;
++        case DF_WORD:
++            gen_helper_msa_ilvr_w(cpu_env, twd, tws, twt);
++            break;
++        case DF_DOUBLE:
++            gen_helper_msa_ilvr_d(cpu_env, twd, tws, twt);
++            break;
++        }
++        break;
+     case OPC_SLL_df:
+         gen_helper_msa_sll_df(cpu_env, tdf, twd, tws, twt);
          break;
-@@ -1176,12 +1195,16 @@ void mips_cpu_do_interrupt(CPUState *cs)
-                 uint32_t pending = (env->CP0_Cause & CP0Ca_IP_mask) >> CP0Ca_IP;
- 
-                 if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
--                    /* For VEIC mode, the external interrupt controller feeds
--                     * the vector through the CP0Cause IP lines.  */
-+                    /*
-+                     * For VEIC mode, the external interrupt controller feeds
-+                     * the vector through the CP0Cause IP lines.
-+                     */
-                     vector = pending;
-                 } else {
--                    /* Vectored Interrupts
--                     * Mask with Status.IM7-IM0 to get enabled interrupts. */
-+                    /*
-+                     * Vectored Interrupts
-+                     * Mask with Status.IM7-IM0 to get enabled interrupts.
-+                     */
-                     pending &= (env->CP0_Status >> CP0St_IM) & 0xff;
-                     /* Find the highest-priority interrupt. */
-                     while (pending >>= 1) {
-@@ -1354,7 +1377,8 @@ void mips_cpu_do_interrupt(CPUState *cs)
- 
-         env->active_tc.PC += offset;
-         set_hflags_for_handler(env);
--        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) | (cause << CP0Ca_EC);
-+        env->CP0_Cause = (env->CP0_Cause & ~(0x1f << CP0Ca_EC)) |
-+                         (cause << CP0Ca_EC);
+@@ -28842,21 +28906,9 @@ static void gen_msa_3r(CPUMIPSState *env, DisasContext *ctx)
+     case OPC_ASUB_S_df:
+         gen_helper_msa_asub_s_df(cpu_env, tdf, twd, tws, twt);
          break;
-     default:
-         abort();
-@@ -1390,7 +1414,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- }
+-    case OPC_ILVL_df:
+-        gen_helper_msa_ilvl_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+     case OPC_ASUB_U_df:
+         gen_helper_msa_asub_u_df(cpu_env, tdf, twd, tws, twt);
+         break;
+-    case OPC_ILVR_df:
+-        gen_helper_msa_ilvr_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+-    case OPC_ILVEV_df:
+-        gen_helper_msa_ilvev_df(cpu_env, tdf, twd, tws, twt);
+-        break;
+-    case OPC_ILVOD_df:
+-        gen_helper_msa_ilvod_df(cpu_env, tdf, twd, tws, twt);
+-        break;
  
- #if !defined(CONFIG_USER_ONLY)
--void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
-+void r4k_invalidate_tlb(CPUMIPSState *env, int idx, int use_extra)
- {
-     CPUState *cs = env_cpu(env);
-     r4k_tlb_t *tlb;
-@@ -1400,16 +1424,20 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
-     target_ulong mask;
- 
-     tlb = &env->tlb->mmu.r4k.tlb[idx];
--    /* The qemu TLB is flushed when the ASID changes, so no need to
--       flush these entries again.  */
-+    /*
-+     * The qemu TLB is flushed when the ASID changes, so no need to
-+     * flush these entries again.
-+     */
-     if (tlb->G == 0 && tlb->ASID != ASID) {
-         return;
-     }
- 
-     if (use_extra && env->tlb->tlb_in_use < MIPS_TLB_MAX) {
--        /* For tlbwr, we can shadow the discarded entry into
--           a new (fake) TLB entry, as long as the guest can not
--           tell that it's there.  */
-+        /*
-+         * For tlbwr, we can shadow the discarded entry into
-+         * a new (fake) TLB entry, as long as the guest can not
-+         * tell that it's there.
-+         */
-         env->tlb->mmu.r4k.tlb[env->tlb->tlb_in_use] = *tlb;
-         env->tlb->tlb_in_use++;
-         return;
+     case OPC_DOTP_S_df:
+     case OPC_DOTP_U_df:
 -- 
 2.7.4
 
