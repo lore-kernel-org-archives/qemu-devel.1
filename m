@@ -2,56 +2,86 @@ Return-Path: <SRS0=IrLN=YF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9930C10F14
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 07:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08355C10F14
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 07:19:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80F35206CD
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 07:16:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F35206CD
+	by mail.kernel.org (Postfix) with ESMTPS id D23092087E
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 07:19:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D23092087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJBdw-00077i-Kp
-	for qemu-devel@archiver.kernel.org; Sat, 12 Oct 2019 03:16:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48672)
+	id 1iJBgo-0008TS-Q4
+	for qemu-devel@archiver.kernel.org; Sat, 12 Oct 2019 03:19:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49195)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iJBaW-0003lf-Di
- for qemu-devel@nongnu.org; Sat, 12 Oct 2019 03:13:17 -0400
+ (envelope-from <philmd@redhat.com>) id 1iJBf4-0007rX-CV
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 03:17:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iJBaV-0006wx-6S
- for qemu-devel@nongnu.org; Sat, 12 Oct 2019 03:13:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33030)
+ (envelope-from <philmd@redhat.com>) id 1iJBf2-0000wE-Rs
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 03:17:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51562)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>)
- id 1iJBaV-0006wb-0j; Sat, 12 Oct 2019 03:13:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iJBf2-0000vz-Mk
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 03:17:56 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2DF2C18CB8F0;
- Sat, 12 Oct 2019 07:13:14 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-46.brq.redhat.com [10.40.204.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08D415C1B2;
- Sat, 12 Oct 2019 07:13:09 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] MAINTAINERS: Replace tab indent by spaces in the Status
- description
-Date: Sat, 12 Oct 2019 09:13:07 +0200
-Message-Id: <20191012071307.14314-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 63DDB33027C
+ for <qemu-devel@nongnu.org>; Sat, 12 Oct 2019 07:17:55 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id t11so5481089wro.10
+ for <qemu-devel@nongnu.org>; Sat, 12 Oct 2019 00:17:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YMFJqdZvxz7LkdzBSGR29K1A4/C6gMAzg3dfEammoiU=;
+ b=pIBjRZrvpD1ECh/wiPoJh8eJNzLAB/7fWv7Tu+lKTAAV1bk6SM5i/qv6EOgXTkdZzF
+ 3olhSRb4WtrqqP9p1WPKC6a0AsnVmKFom1itqc3IoR/x+HGRpZ8X0qyoKdMq2EDDVMwa
+ kfWBmnCfxzB/tCv8ozeAMGFhTcaWUMeEBmDXRZJ8CuduO1YSCSTGr4sb1aWVX2et/9fr
+ xWoe7MgHswhA48NwMsgydSlA5K3yqJ+xgKRQDD1zF2EnY+2vClzoiOo5XK0eFYb0o4YY
+ GKCwinyzkowTG2KB8UI3NfftFrOCt2OU/yd3SOazrdvhlnnif5XYiRGfEwJJ8IKGuvUR
+ RRew==
+X-Gm-Message-State: APjAAAVGS5hlVKMOfePrEq/4Qrh0xps6w/c7dZZMh2cIpt17+AmElCAD
+ qS6PBYEzb3cVouTYyhJJU5SD0k4/Fz0Y0U6ZBlg/DTFglADY1RGnIbk6DqZyi+A0tve1ly3C3et
+ 7QThrxoWT+ITldIU=
+X-Received: by 2002:adf:fe10:: with SMTP id n16mr5886314wrr.288.1570864674207; 
+ Sat, 12 Oct 2019 00:17:54 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzIL98qd2hOWamNHBpbWDDiPInctjvmGJar+6zs3A0VxVefrYDs5++zdrQ1gRy1APk5nWxi9g==
+X-Received: by 2002:adf:fe10:: with SMTP id n16mr5886296wrr.288.1570864674016; 
+ Sat, 12 Oct 2019 00:17:54 -0700 (PDT)
+Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.46])
+ by smtp.gmail.com with ESMTPSA id f83sm18066010wmf.43.2019.10.12.00.17.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 12 Oct 2019 00:17:53 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v29 8/8] target/avr: Add tests
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ =?UTF-8?B?J0FsZXggQmVubsOpZSc=?= <alex.bennee@linaro.org>,
+ 'Richard Henderson' <richard.henderson@linaro.org>
+References: <20190824184635.34192-1-mrolnik@gmail.com>
+ <20190824184635.34192-9-mrolnik@gmail.com> <87mufwz3e0.fsf@linaro.org>
+ <6c7f5897-e7ed-b5f3-f167-78073a9e5b67@linaro.org> <87r25755a7.fsf@linaro.org>
+ <001b01d55cb9$f5f88df0$e1e9a9d0$@ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0e57fb85-200d-de10-331f-977c9f4246ed@redhat.com>
+Date: Sat, 12 Oct 2019 09:17:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.63]); Sat, 12 Oct 2019 07:13:14 +0000 (UTC)
+In-Reply-To: <001b01d55cb9$f5f88df0$e1e9a9d0$@ru>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -67,54 +97,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: imammedo@redhat.com, thuth@redhat.com, 'Michael Rolnik' <mrolnik@gmail.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Status description has a mix of tabs and spaces and displays
-unaligned. Unify using spaces.
+Hi Pavel,
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- MAINTAINERS | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+On 8/27/19 11:29 AM, Pavel Dovgalyuk wrote:
+>> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>
+>>> On 8/26/19 2:23 AM, Alex Benn=C3=A9e wrote:
+>>>> Are there any compilers available so we can add the multiarch tests =
+to "check-tcg"?
+>>>
+>>> Debian has a gcc-avr package.
+>>
+>> Looking at the bios "bytes" it should be easy enough to do a simple
+>> serial based test. We can add it after it's merged though... is it rea=
+dy
+>> to go yet?
+>=20
+> I tried running this series with ASCIITable example from Arduino IDE.
+> Everything worked and I've got an ASCII table in the console.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3ca814850e..b9093e4dac 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -24,15 +24,15 @@ Descriptions of section entries:
- 	Q: Patchwork web based patch tracking system site
- 	T: SCM tree type and location.  Type is one of: git, hg, quilt, stgit.
- 	S: Status, one of the following:
--	   Supported:	Someone is actually paid to look after this.
--	   Maintained:	Someone actually looks after it.
--	   Odd Fixes:	It has a maintainer but they don't have time to do
--			much other than throw the odd patch in. See below.
--	   Orphan:	No current maintainer [but maybe you could take the
--			role as you write your new code].
--	   Obsolete:	Old code. Something tagged obsolete generally means
--			it has been replaced by a better system and you
--			should be using that.
-+          Supported:   Someone is actually paid to look after this.
-+          Maintained:  Someone actually looks after it.
-+          Odd Fixes:   It has a maintainer but they don't have time to d=
-o
-+                       much other than throw the odd patch in. See below=
-.
-+          Orphan:      No current maintainer [but maybe you could take t=
-he
-+                       role as you write your new code].
-+          Obsolete:    Old code. Something tagged obsolete generally mea=
-ns
-+                       it has been replaced by a better system and you
-+                       should be using that.
- 	F: Files and directories with wildcard patterns.
- 	   A trailing slash includes all files and subdirectory files.
- 	   F:	drivers/net/	all files in and below drivers/net
---=20
-2.21.0
-
+Does that mean we can add your Tested-by tag?
 
