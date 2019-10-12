@@ -2,49 +2,50 @@ Return-Path: <SRS0=IrLN=YF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 000B3C47404
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 00:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 940EEC47404
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 00:24:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA84F2089F
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 00:15:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA84F2089F
+	by mail.kernel.org (Postfix) with ESMTPS id 5AA192084C
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 00:24:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA192084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ548-0005Sm-W8
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 20:15:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42151)
+	id 1iJ5DO-0007rR-I6
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 20:24:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42636)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iJ53E-0004z7-38
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 20:14:29 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iJ5CU-0007A1-1H
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 20:24:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iJ53D-0001uo-06
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 20:14:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53148)
+ (envelope-from <jsnow@redhat.com>) id 1iJ5CR-0006rS-SA
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 20:24:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37284)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iJ538-0001pS-OA; Fri, 11 Oct 2019 20:14:22 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iJ5CR-0006qv-JT
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 20:23:59 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C9F0086FC91;
- Sat, 12 Oct 2019 00:14:21 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7C525315C00D;
+ Sat, 12 Oct 2019 00:23:58 +0000 (UTC)
 Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3518D60BF4;
- Sat, 12 Oct 2019 00:14:21 +0000 (UTC)
-Subject: Re: [PATCH v2] iotests/028: Fix for long $TEST_DIRs
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20191011121808.3243-1-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DE5065C1B2;
+ Sat, 12 Oct 2019 00:23:57 +0000 (UTC)
+Subject: Re: Exploring Sphinx, autodoc, apidoc, and coverage tools for
+ python/qemu
 From: John Snow <jsnow@redhat.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+References: <3dd21116-32ae-3eb2-ffcf-2ba77391ccc3@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
  IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
@@ -119,18 +120,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <25db5267-44f3-5adf-4340-4f49d65bec1f@redhat.com>
-Date: Fri, 11 Oct 2019 20:14:20 -0400
+Message-ID: <44c3afbc-2036-f619-0f77-6fe69ff058e6@redhat.com>
+Date: Fri, 11 Oct 2019 20:23:57 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191011121808.3243-1-mreitz@redhat.com>
+In-Reply-To: <3dd21116-32ae-3eb2-ffcf-2ba77391ccc3@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.69]); Sat, 12 Oct 2019 00:14:21 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Sat, 12 Oct 2019 00:23:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -145,70 +146,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 10/11/19 8:18 AM, Max Reitz wrote:
-> For long test image paths, the order of the "Formatting" line and the
-> "(qemu)" prompt after a drive_backup HMP command may be reversed.  In
-> fact, the interaction between the prompt and the line may lead to the
-> "Formatting" to being greppable at all after "read"-ing it (if the
-> prompt injects an IFS character into the "Formatting" string).
+On 7/24/19 5:06 PM, John Snow wrote:
+> Has anyone on this list experimented with these tools?
 > 
-> So just wait until we get a prompt.  At that point, the block job must
-> have been started, so "info block-jobs" will only return "No active
-> jobs" once it is done.
+> I was hoping to use them to document things like the python/machine.py
+> and python/qmp.py modules to help demonstrate some of our internal
+> tooling API (for test writers, GSoC/Outreachy interns, folks who want to
+> script QEMU at a level between writing a CLI driver and using libvirt.)
 > 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> v2:
-> - Fix another kind of race...
-> ---
->  tests/qemu-iotests/028     | 11 ++++++++---
->  tests/qemu-iotests/028.out |  1 -
->  2 files changed, 8 insertions(+), 4 deletions(-)
+> What follows below is my process trying to enable this and some of the
+> problems I'm still stuck with, summarized below at the end of this more
+> exploratory text.
 > 
-> diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-> index 71301ec6e5..bba1ee59ae 100755
-> --- a/tests/qemu-iotests/028
-> +++ b/tests/qemu-iotests/028
-> @@ -119,9 +119,14 @@ fi
->  # Silence output since it contains the disk image path and QEMU's readline
->  # character echoing makes it very hard to filter the output. Plus, there
->  # is no telling how many times the command will repeat before succeeding.
-> -_send_qemu_cmd $h "drive_backup disk ${TEST_IMG}.copy" "(qemu)" >/dev/null
-> -_send_qemu_cmd $h "" "Formatting" | _filter_img_create
-> -qemu_cmd_repeat=20 _send_qemu_cmd $h "info block-jobs" "No active jobs" >/dev/null
-> +# (Note that creating the image results in a "Formatting..." message over
-> +# stdout, which is the same channel the monitor uses.  We cannot reliably
-> +# wait for it because the monitor output may interact with it in such a
-> +# way that _timed_wait_for cannot read it.  However, once the block job is
-> +# done, we know that the "Formatting..." message must have appeared
-> +# already, so the output is still deterministic.)
-> +silent=y _send_qemu_cmd $h "drive_backup disk ${TEST_IMG}.copy" "(qemu)"
-> +silent=y qemu_cmd_repeat=20 _send_qemu_cmd $h "info block-jobs" "No active jobs"
->  _send_qemu_cmd $h "info block-jobs" "No active jobs"
->  _send_qemu_cmd $h 'quit' ""
->  
-> diff --git a/tests/qemu-iotests/028.out b/tests/qemu-iotests/028.out
-> index 7d54aeb003..37aed84436 100644
-> --- a/tests/qemu-iotests/028.out
-> +++ b/tests/qemu-iotests/028.out
-> @@ -468,7 +468,6 @@ No errors were found on the image.
->  
->  block-backup
->  
-> -Formatting 'TEST_DIR/t.IMGFMT.copy', fmt=IMGFMT size=4294968832 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
->  (qemu) info block-jobs
->  No active jobs
->  === IO: pattern 195
+> 
+> Enabling autodoc:
+> 
+> First, it appears as if enabling the "sphinx-autodoc" tool is not
+> sufficient for actually generating anything at all when you invoke the
+> sphinx-generated "make html" target. It just enables understanding
+> certain directives.
+> 
+> So apparently you need to generate module "stubs" using sphinx-autodoc.
+> Sphinx uses the sphinx-autodoc extension to understand how to consume
+> the directives in these stubs.
+> 
+> That strikes me as odd, because these stubs might need to be changed
+> frequently as code comes and goes; it seems strange that it isn't
+> integrated at the top level. (Do I have the wrong idea on how these
+> tools should be used?)
+> 
+> So you need to run:
+>> sphinx-apidoc --separate --module-first -o docs/ python/qemu/
+> 
+> which generates stubs to docs:
+> 
+> Creating file docs/qemu.machine.rst.
+> Creating file docs/qemu.qmp.rst.
+> Creating file docs/qemu.qtest.rst.
+> Creating file docs/qemu.rst.
+> Creating file docs/modules.rst.
+> 
+> And then you can edit e.g. the top-level index.rst TOC in docs/index.rst
+> to look like this:
+> 
+> ```
+> .. toctree::
+>    :maxdepth: 2
+>    :caption: Contents:
+> 
+>    interop/index
+>    devel/index
+>    specs/index
+>    modules
+> ```
+> 
+> And then finally generating the build; manually removing the -W option
+> from the Makefile: there are a lot of warnings in here.
+> 
+>> sphinx-build -n -b html -D version=4.0.92 -D release="4.0.92
+> (v4.1.0-rc2-34-g160802eb07-dirty)" -d .doctrees/
+> /home/bos/jhuston/src/qemu/docs/ docs/
+> 
+> Great! that will generate output to docs/index.html which indeed shows
+> APIdoc comments generated from our Python files. Good.
+> 
+> However, where this gets a little strange is if you look at the
+> generated stubs. For instance, qemu.machine.rst looks like this:
+> 
+> ```
+> .. automodule:: qemu.machine
+>     :members:
+>     :undoc-members:
+>     :show-inheritance:
+> ```
+> 
+> :undoc-members: says that we want to "document" any members that don't
+> have a matching apidoc comment by generating a stub.
+> 
+> Oops, but the presence of that stub will cause the sphinx coverage tool
+> to happily report 100% coverage.
+> 
+> Further oops, pylint doesn't understand apidoc comments and can't be
+> used as the linter in this case, either.
+> 
+> You can edit the stubs to remove these directives, but these stubs are
+> generated -- and it doesn't appear like there's a command line option to
+> change this behavior. ...Hmm.
 > 
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Update: there is indeed a way to change this behavior, through
+environment variables.
+
+https://www.sphinx-doc.org/en/master/man/sphinx-apidoc.html
+
+SPHINX_APIDOC_OPTIONS
+A comma-separated list of option to append to generated automodule
+directives. Defaults to members,undoc-members,show-inheritance.
+
+You just have to set it and remove 'undoc-members'.
+
+> And either way, the coverage tool only generates a report and not
+> something with an error code that I could use to gate the build. Same
+> goes for the general build: if I remove the :undoc-members: parameter,
+> there's nothing in the autodoc module that appears to throw warnings
+> when it encounters undocumented parameters or members.
+> 
+
+This is still a problem, though. Nothing gates on undocumented members
+at all.
+
+> That seems disappointing, because it's hard to keep docstrings up to
+> date unless they are checked conclusively at build time.
+> 
+> 
+> Conclusions:
+> 
+> - the autodoc documentation page doesn't seem to document examples of
+> how you're expected to write meaningful docstrings for the tool to extract.
+> 
+> - autodoc fools the coverage tool into reporting 100% coverage.
+> 
+> - autodoc can be configured to omit non-documented members to allow the
+> coverage tool to work, but the configuration is auto-generated and
+> defaults to always generating documentation for these entities.
+> 
+
+apidoc (the stub generator for autodoc) can indeed be configured to omit
+non-documented members through an environment variable now, so this
+point is not true.
+
+> - coverage tool doesn't appear like it can be used for gating the build
+> natively for missing python docs; it only generates a report.
+> 
+
+Still seems true, though there are other tools that can gate on such
+things. Specifically we can use pylint and require that docstrings are
+present.
+
+Notably, pylint only checks that there is a docstring at all, and
+doesn't try to perform any semantic validation of what's in it.
+
+To my knowledge, there are no standalone tools that do such work -- but
+the pycharm built-in linter appears to have semantic support for certain
+docstring formats.
+
+> - Even if we script to block on a non-empty report, the coverage tool
+> only works at the function/class level and does not understand the
+> concept of missing parameter or return value tags.
+> 
+
+Still a problem based on the above; there is just no agreed upon
+semantic format in the python world for documenting parameters.
+
+> - It would seem that it would be the Autodoc module's job to be
+> responsible for understanding incomplete documentation, but doesn't
+> appear to. The :param name: syntax is just a ReST "field list" and isn't
+> parsed semantically by autodoc, sadly.
+> 
+
+Might be something I investigate based on some discussions I've had in
+the Python community. Could be useful to have a canonical docstring
+format that sphinx is able to give warnings against.
+
+> 
+> It looks to me, at a glance, that there's nothing in Sphinx that knows
+> how to look for and warn about undocumented parameters, exception types,
+> return values, etc. Hopefully I've missed something and it is possible.
+> 
+> --js
+> 
+
 
