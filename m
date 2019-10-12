@@ -1,140 +1,70 @@
-Return-Path: <SRS0=T2pn=YE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=IrLN=YF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E032BC47404
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4B76C47404
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 00:02:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B38CC2084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 11 Oct 2019 23:40:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B38CC2084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 677412089F
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 00:02:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Ou7M1bhT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 677412089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJ4W2-0007Bf-Te
-	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 19:40:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39512)
+	id 1iJ4rZ-00031w-Jm
+	for qemu-devel@archiver.kernel.org; Fri, 11 Oct 2019 20:02:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41381)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iJ4V6-0006in-BE
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:39:13 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iJ4qJ-0002Ox-41
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 20:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iJ4V5-0000Kz-9s
- for qemu-devel@nongnu.org; Fri, 11 Oct 2019 19:39:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55000)
+ (envelope-from <dgibson@ozlabs.org>) id 1iJ4qF-0001du-Ry
+ for qemu-devel@nongnu.org; Fri, 11 Oct 2019 20:01:06 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:57719 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1iJ4V2-0000JB-Jq; Fri, 11 Oct 2019 19:39:08 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6BF31796EB;
- Fri, 11 Oct 2019 23:39:07 +0000 (UTC)
-Received: from [10.18.17.173] (dhcp-17-173.bos.redhat.com [10.18.17.173])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9693A5D721;
- Fri, 11 Oct 2019 23:39:06 +0000 (UTC)
-Subject: Re: [PATCH v5 0/5] iotests: use python logging
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <06a3a386-a8c0-84eb-f678-ea7168666367@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <afe4c6fd-985d-ec97-d18d-ec319adbd94a@redhat.com>
-Date: Fri, 11 Oct 2019 19:39:06 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iJ4qE-0001Nn-Fv; Fri, 11 Oct 2019 20:01:03 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46qlMr5p55z9sP4; Sat, 12 Oct 2019 11:00:56 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1570838456;
+ bh=IfKZjYnFnjN4KP/ZCu28+kcwR+wK8aXGic+MYsn2x3k=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Ou7M1bhTE0+pYU96MgmcV0QfPnwReiVi5HAPCgJiBm2xtaH1o8zHleairzjYIPMHT
+ 5SlaNsQPhZa+U0Z2J0svoVBIxUOOwqeY7kv9u0bkQ/HarbWeF4RG49Dat4bJwWA6Nv
+ xav71VdK2vq4yDnl3oF85FJpv46Ag+6DecSFfsfU=
+Date: Sat, 12 Oct 2019 11:00:41 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v4 17/19] spapr: Remove last pieces of SpaprIrq
+Message-ID: <20191012000041.GE4080@umbus.fritz.box>
+References: <20191009060818.29719-1-david@gibson.dropbear.id.au>
+ <20191009060818.29719-18-david@gibson.dropbear.id.au>
+ <20191009190215.7e05c017@bahia.lan>
+ <20191010020209.GC28552@umbus.fritz.box>
+ <20191010082958.12e17561@bahia.lan>
+ <20191010223304.0cf7ccd3@bahia.lan>
+ <20191011050758.GD4080@umbus.fritz.box>
+ <20191011081333.7e483b95@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <06a3a386-a8c0-84eb-f678-ea7168666367@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 11 Oct 2019 23:39:07 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="HnQK338I3UIa/qiP"
+Content-Disposition: inline
+In-Reply-To: <20191011081333.7e483b95@bahia.lan>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,60 +76,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-block@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--HnQK338I3UIa/qiP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 10/4/19 11:39 AM, Max Reitz wrote:
-> On 18.09.19 01:45, John Snow wrote:
->> This series uses python logging to enable output conditionally on
->> iotests.log(). We unify an initialization call (which also enables
->> debugging output for those tests with -d) and then make the switch
->> inside of iotests.
->>
->> It will help alleviate the need to create logged/unlogged versions
->> of all the various helpers we have made.
->>
->> V5:
->>  - Rebased again
->>  - Allow Python tests to run on any platform
->>
->> V4:
->>  - Rebased on top of kwolf/block at the behest of mreitz
->>
->> V3:
->>  - Rebased for 4.1+; now based on main branch.
->>
->> V2:
->>  - Added all of the other python tests I missed to use script_initiali=
-ze
->>  - Refactored the common setup as per Ehabkost's suggestion
->>  - Added protocol arguments to common initialization,
->>    but this isn't strictly required.
+On Fri, Oct 11, 2019 at 08:13:33AM +0200, Greg Kurz wrote:
+> On Fri, 11 Oct 2019 16:07:58 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> I=E2=80=99m OK to take the series as-is (it doesn=E2=80=99t affect any =
-auto tests, so we
-> can decide what to do about non-Linux platforms in make check at a late=
-r
-> point), but there seems to be something you wanted to fix up in patch 5=
-.
+> > On Thu, Oct 10, 2019 at 10:33:04PM +0200, Greg Kurz wrote:
+> > > On Thu, 10 Oct 2019 08:29:58 +0200
+> > > Greg Kurz <groug@kaod.org> wrote:
+> > >=20
+> > > > On Thu, 10 Oct 2019 13:02:09 +1100
+> > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > >=20
+> > > > > On Wed, Oct 09, 2019 at 07:02:15PM +0200, Greg Kurz wrote:
+> > > > > > On Wed,  9 Oct 2019 17:08:16 +1100
+> > > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > > > >=20
+> > > > > > > The only thing remaining in this structure are the flags to a=
+llow either
+> > > > > > > XICS or XIVE to be present.  These actually make more sense a=
+s spapr
+> > > > > > > capabilities - that way they can take advantage of the existi=
+ng
+> > > > > > > infrastructure to sanity check capability states across migra=
+tion and so
+> > > > > > > forth.
+> > > > > > >=20
+> > > > > >=20
+> > > > > > The user can now choose the interrupt controller mode either th=
+rough
+> > > > > > ic-mode or through cap-xics/cap-xive. I guess it doesn't break =
+anything
+> > > > > > to expose another API to do the same thing but it raises some q=
+uestions.
+> > > > > >=20
+> > > > > > We should at least document somewhere that ic-mode is an alias =
+to these
+> > > > > > caps, and maybe state which is the preferred method (I personal=
+ly vote
+> > > > > > for the caps).
+> > > > > >=20
+> > > > > > Also, we must keep ic-mode for the moment to stay compatible wi=
+th the
+> > > > > > existing pseries-4.0 and pseries-4.1 machine types, but will we
+> > > > > > keep ic-mode forever ? If no, maybe start by not allowing it for
+> > > > > > pseries-4.2 ?
+> > > > >=20
+> > > > > I'm actually inclined to keep it for now, maybe even leave it as =
+the
+> > > > > suggested way to configure this.  The caps are nice from an inter=
+nal
+> > > > > organization point of view, but ic-mode is arguably a more user
+> > > > > friendly way of configuring it.  The conversion of one to the oth=
+er is
+> > > > > straightforward, isolated ans small, so I'm not especially bother=
+ed by
+> > > > > keeping it around.
+> > > > >=20
+> > > >=20
+> > > > Fair enough.
+> > > >=20
+> > > > Reviewed-by: Greg Kurz <groug@kaod.org>
+> > > >=20
+> > >=20
+> > > But unfortunately this still requires care :-\
+> > >=20
+> > > qemu-system-ppc64: cap-xive higher level (1) in incoming stream than =
+on destination (0)
+> > > qemu-system-ppc64: error while loading state for instance 0x0 of devi=
+ce 'spapr'
+> > > qemu-system-ppc64: load of migration failed: Invalid argument
+> > >=20
+> > > or
+> > >=20
+> > > qemu-system-ppc64: cap-xics higher level (1) in incoming stream than =
+on destination (0)
+> > > qemu-system-ppc64: error while loading state for instance 0x0 of devi=
+ce 'spapr'
+> > > qemu-system-ppc64: load of migration failed: Invalid argument
+> > >=20
+> > > when migrating from QEMU 4.1 with ic-mode=3Dxics and ic-mode=3Dxive r=
+espectively.
+> > >=20
+> > > This happens because the existing pseries-4.1 machine type doesn't se=
+nd the
+> > > new caps and the logic in spapr_caps_post_migration() wrongly assumes=
+ that
+> > > the source has both caps set:
+> > >=20
+> > >     srccaps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type=
+);
+> > >     for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
+> > >         /* If not default value then assume came in with the migratio=
+n */
+> > >         if (spapr->mig.caps[i] !=3D spapr->def.caps[i]) {
+> > >=20
+> > > spapr->mig.caps[SPAPR_CAP_XICS] =3D 0
+> > > spapr->mig.caps[SPAPR_CAP_XIVE] =3D 0
+> > >=20
+> > >             srccaps.caps[i] =3D spapr->mig.caps[i];
+> > >=20
+> > > srcaps.caps[SPAPR_CAP_XICS] =3D 1
+> > > srcaps.caps[SPAPR_CAP_XIVE] =3D 1
+> > >=20
+> > >         }
+> > >     }
+> > >=20
+> > > and breaks
+> > >=20
+> > >     for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
+> > >         SpaprCapabilityInfo *info =3D &capability_table[i];
+> > >=20
+> > >         if (srccaps.caps[i] > dstcaps.caps[i]) {
+> > >=20
+> > > srcaps.caps[SPAPR_CAP_XICS] =3D 0 when ic-mode=3Dxive
+> > > srcaps.caps[SPAPR_CAP_XIVE] =3D 0 when ic-mode=3Dxics
+> > >=20
+> > >             error_report("cap-%s higher level (%d) in incoming stream=
+ than on destination (%d)",
+> > >                          info->name, srccaps.caps[i], dstcaps.caps[i]=
+);
+> > >             ok =3D false;
+> > >         }
+> >=20
+> > Ah.. right.  I thought there would be problems with backwards
+> > migration, but I didn't think of this problem even with forward
+> > migration.
+> >=20
+> > > Maybe we shouldn't check capabilities that we know the source
+> > > isn't supposed to send, eg. by having a smc->max_cap ?
+> >=20
+> > Uh.. I'm not really sure what exactly you're suggesting here.
+> >=20
 >=20
-> (And there=E2=80=99s also Kevin=E2=80=99s pending pull request that cha=
-nges a bit of
-> iotests.py.)
+> I'm suggesting to have a per-machine version smc->max_cap that
+> contains the highest supported cap index, to be used instead of
+> SPAPR_CAP_NUM in this functions, ie.
 >=20
-> Max
+> for (i =3D 0; i <=3D smc->max_cap; i++) {
+>     ...
+> }
 >=20
+> where we would have
+>=20
+> smc->max_cap =3D SPAPR_CAP_CCF_ASSIST for pseries-4.1
+>=20
+> and
+>=20
+> smc->max_cap =3D SPAPR_CAP_XIVE for psereis-4.2
 
-Just caught up with the discussion.
+Oh, I see, a max cap index.  I think that sounds fragile if we ever
+deprecate any caps, and it also might be problematic for downstream
+where we've sometimes selectively backported caps.
 
-It looks like Thomas took my 1/5; so I'll respin on top of his "[PATCH
-0/5] Enable more iotests during "make check-block" series to catch those
-improvements as they stand.
+> > I think what we need here is a custom migrate_needed function, like we
+> > already have for cap_hpt_maxpagesize, to exclude it from the migration
+> > stream for machine versions before 4.2.
+> >=20
+>=20
+> No, VMState needed() hooks are for outgoing migration only.
 
---js
+Ah, yeah, right.  Essentially the problem is that in the absence of
+caps, the new qemu assumes they're in the default state, but if an old
+source had ic-mode set, then they effectively aren't.  Or looked at
+another way, it's now trying to check that the ends match w.r.t. intc
+selection, but doesn't have enough information supplied by old sources
+to do so correctly.
+
+Ugh, that's a bit trickier to work around.
+
+> bool vmstate_save_needed(const VMStateDescription *vmsd, void *opaque)
+> {
+>     if (vmsd->needed && !vmsd->needed(opaque)) {
+>         /* optional section not needed */
+>         return false;
+>     }
+>     return true;
+> }
+
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--HnQK338I3UIa/qiP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2hF6cACgkQbDjKyiDZ
+s5KdMhAAi4qZ1RbJ7wkKD7tkGEMa1pZJ3wEtWkF404MavXgweqcsmr1nNtkXsQ1h
+RpwSLBsI3V9drU8R3Uq32heaf0CkdEtbkMf6TOpFKgSTX+K9ff0q/yvtytvA/DdE
+Naq4CRCM37V0DS52IYyecHjzSgwRuAvo15snqcL6rZBcczli171Znv/PkoUsoxd1
+R4QmuPP/9qQP5lMnwhxznCxznLyjHdvykht8wBQMnR1NAT+GiP9SDInkMkx0Kj+a
+MnlGrpe2ixWnRzDllLwBi9OMAySE4y9jUAUBVCcLA8P8AZFZz2B9znTtnZoe6TCq
+7ZIo2/mWkqq+06TTpAAH4UGow3UczGGlUXcdjlqHBzbxhZfeg8aRucjgRhvgSqmL
+ucDtNA23p4Ti4w9MTEXXO6t9geMtlJA2yHMYTuL2P22roTvNAxA2i+iDufKQJjBT
+mabBYNuiZzTaoqKXPFW+te08h5fq456ukHa7Bh+OwtSMij3Jzao4vqDEfDN+xoMu
+U7qfxN7MOUAVOg0XO32rQh1A8A+lXU9lE4BFRHd3+e5TTnEktCmCco14mrORTLYi
+o7vJC7jWx0KPces8vS2qnSMPYy19fzIXycRPG/f/kzlZ1wYjlFe8DwiiLOrjet8w
+DRd1vJILbA4WZF+PwYxwlejBAaRTAcM2CXCCxT1ugVidb8pccDM=
+=5Mwj
+-----END PGP SIGNATURE-----
+
+--HnQK338I3UIa/qiP--
 
