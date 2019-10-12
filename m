@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C29A3C4360C
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 06:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 264BAC4360C
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 06:34:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F40D20673
-	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 06:30:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F40D20673
+	by mail.kernel.org (Postfix) with ESMTPS id EFA2120659
+	for <qemu-devel@archiver.kernel.org>; Sat, 12 Oct 2019 06:34:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA2120659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJAv0-0007qx-VH
-	for qemu-devel@archiver.kernel.org; Sat, 12 Oct 2019 02:30:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45496)
+	id 1iJAyl-0000wH-41
+	for qemu-devel@archiver.kernel.org; Sat, 12 Oct 2019 02:34:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iJAu1-0007Ow-Ft
- for qemu-devel@nongnu.org; Sat, 12 Oct 2019 02:29:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1iJAxs-0000VB-6I
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 02:33:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iJAu0-00068l-1t
- for qemu-devel@nongnu.org; Sat, 12 Oct 2019 02:29:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49806)
+ (envelope-from <philmd@redhat.com>) id 1iJAxq-0007mG-2m
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 02:33:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iJAtz-00068Y-Q3
- for qemu-devel@nongnu.org; Sat, 12 Oct 2019 02:29:19 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iJAxp-0007lx-Jw
+ for qemu-devel@nongnu.org; Sat, 12 Oct 2019 02:33:17 -0400
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AE65936955
- for <qemu-devel@nongnu.org>; Sat, 12 Oct 2019 06:29:18 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id n3so4993621wmf.3
- for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 23:29:18 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 43EFD821C3
+ for <qemu-devel@nongnu.org>; Sat, 12 Oct 2019 06:33:16 +0000 (UTC)
+Received: by mail-wm1-f70.google.com with SMTP id k9so5005963wmb.0
+ for <qemu-devel@nongnu.org>; Fri, 11 Oct 2019 23:33:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=F/Re1LtalC/hfshbOT6DreKgpgwSaDkzXGcjNo6f+ZM=;
- b=mTbJdUvNvVgAUGcGlTPSrT7ScxYUQNGhReKXEwmWBdgxscAf8CRwFEFCrkEbzX3Mtv
- 4o9w25n8csBOs+GDJp394vDC3BnK9oxvWG/kSTUi1S/zozUxcSFrg+CIJmD/RxyH67ms
- k2jZTP0w9uLLUpxgITk7AcbUnGlVfkBpm5hgT6JGJT5wrzh6WCXosIc6VJTOXsUDYj3e
- yZdmJbDvZwHvJ6NJPcBQCLvQM8sNS/myjCLt/icmxNoPptkgjzRTn0fWpguKB713smHn
- uXQBJVHGHKwkILJ06F381TwrUgWfl8LIKcPMn43oSqHdDp0kxt2FS3eXD4HY4oXzAlOZ
- iFjA==
-X-Gm-Message-State: APjAAAUokycmq3aipiuI+/U39QncK3VTpdVVubPLBEqnIPbsEXn10exR
- FxXFsFERIsj/Y0azxGoyhV/Wpnzq2Njls1U7xhoHlC9kqT9pg/7BAzMd0T8N7mIhgR0mUhbdne5
- rUje2GhrSGpTv9UQ=
-X-Received: by 2002:adf:fad1:: with SMTP id a17mr17216210wrs.148.1570861757333; 
- Fri, 11 Oct 2019 23:29:17 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwV7IbJ6pU1RuQTVvrX33VzSBeVOKWpK3iVFW+RyO3/NtSlfUBQl3ocZYxWt9znE/5GTlbyig==
-X-Received: by 2002:adf:fad1:: with SMTP id a17mr17216194wrs.148.1570861757043; 
- Fri, 11 Oct 2019 23:29:17 -0700 (PDT)
+ bh=+AwujAzxwwII62SzHPivrju0d5DeXpV1bF5AZOVG9ws=;
+ b=aFd2FzUYl8kKWex4cBO49trzTqu6dKeCytpdgqqyH4q9eHMdiItLRzTRv1kpXj/cTT
+ Y0BX6usqbEKgtWafEmZnhdNOK9Ll1LWbeq9AdCWFe85I01jCq0qJzexFLNrRJp0b2fZR
+ qG0Ymg10iw4Fh+CPX9UhIBAicLYIRF/Kc1ZKzHor+DL7yduZF0Jva3523yaQ1HM8vERH
+ ExSQ0kbmR8v87NHi3mzelH8viv6IWsG4FM5afyCxgBjgLEqVlai4yveT1YD12zX/v/6P
+ VxH8pNlgNAQDvQ4lHUnMYm6A6QZFEP1v299sPbpxk2WsarTFBKJfF42RmVv2kIepF7P7
+ TP+A==
+X-Gm-Message-State: APjAAAWIwxQmKMc/XfEvRhFoBWqQRxRWDj2AxBbT2PFTIxR32qD5/VPO
+ 8VO164saOND6jjVOeyz9uPzkp9i8l+wFRmxrDvHHd0ZW4uB72sAuLItpa2sfq1nycfPt7eVP18R
+ S81B20cU1IFH4Guc=
+X-Received: by 2002:adf:f9cf:: with SMTP id w15mr17138541wrr.61.1570861994990; 
+ Fri, 11 Oct 2019 23:33:14 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwCTajEaWuLzW4q24LRW2h2Op8OGcWhYbPhU0M9oVmN6uVbqDGAU2Jep56ZJKWENgjjKy3V1w==
+X-Received: by 2002:adf:f9cf:: with SMTP id w15mr17138524wrr.61.1570861994780; 
+ Fri, 11 Oct 2019 23:33:14 -0700 (PDT)
 Received: from [192.168.1.35] (46.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.46])
- by smtp.gmail.com with ESMTPSA id z13sm572430wrm.64.2019.10.11.23.29.16
+ by smtp.gmail.com with ESMTPSA id l9sm9823309wme.45.2019.10.11.23.33.13
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 11 Oct 2019 23:29:16 -0700 (PDT)
-Subject: Re: [RFC v5 119/126] hw/core/bus.c: introduce ERRP_AUTO_PROPAGATE
+ Fri, 11 Oct 2019 23:33:14 -0700 (PDT)
+Subject: Re: [RFC v5 121/126] hw/sd/ssi-sd.c: introduce ERRP_AUTO_PROPAGATE
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-120-vsementsov@virtuozzo.com>
+ <20191011160552.22907-122-vsementsov@virtuozzo.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a665d34c-b465-5966-e44a-c836643a3c26@redhat.com>
-Date: Sat, 12 Oct 2019 08:29:15 +0200
+Message-ID: <fe720ff6-0949-fced-8d33-2e8dcb5d568a@redhat.com>
+Date: Sat, 12 Oct 2019 08:33:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <20191011160552.22907-120-vsementsov@virtuozzo.com>
+In-Reply-To: <20191011160552.22907-122-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -146,61 +146,59 @@ $f; \
 > Reported-by: Greg Kurz <groug@kaod.org>
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->   hw/core/bus.c | 15 +++++++--------
->   1 file changed, 7 insertions(+), 8 deletions(-)
+>   hw/sd/ssi-sd.c | 14 ++++++++------
+>   1 file changed, 8 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/hw/core/bus.c b/hw/core/bus.c
-> index 7f3d2a3dbd..0a1e508963 100644
-> --- a/hw/core/bus.c
-> +++ b/hw/core/bus.c
-> @@ -146,14 +146,14 @@ static bool bus_get_realized(Object *obj, Error *=
-*errp)
+> diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+> index 91db069212..f42204d649 100644
+> --- a/hw/sd/ssi-sd.c
+> +++ b/hw/sd/ssi-sd.c
+> @@ -241,10 +241,10 @@ static const VMStateDescription vmstate_ssi_sd =3D=
+ {
 >  =20
->   static void bus_set_realized(Object *obj, bool value, Error **errp)
+>   static void ssi_sd_realize(SSISlave *d, Error **errp)
 >   {
 > +    ERRP_AUTO_PROPAGATE();
->       BusState *bus =3D BUS(obj);
->       BusClass *bc =3D BUS_GET_CLASS(bus);
->       BusChild *kid;
-> -    Error *local_err =3D NULL;
+>       ssi_sd_state *s =3D FROM_SSI_SLAVE(ssi_sd_state, d);
+>       DeviceState *carddev;
+>       DriveInfo *dinfo;
+> -    Error *err =3D NULL;
 >  =20
->       if (value && !bus->realized) {
->           if (bc->realize) {
-> -            bc->realize(bus, &local_err);
-> +            bc->realize(bus, errp);
->           }
->  =20
->           /* TODO: recursive realization */
-> @@ -161,18 +161,17 @@ static void bus_set_realized(Object *obj, bool va=
-lue, Error **errp)
->           QTAILQ_FOREACH(kid, &bus->children, sibling) {
->               DeviceState *dev =3D kid->child;
->               object_property_set_bool(OBJECT(dev), false, "realized",
-> -                                     &local_err);
-> -            if (local_err !=3D NULL) {
-> +                                     errp);
+>       qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
+>                           DEVICE(d), "sd-bus");
+> @@ -254,12 +254,14 @@ static void ssi_sd_realize(SSISlave *d, Error **e=
+rrp)
+>       dinfo =3D drive_get_next(IF_SD);
+>       carddev =3D qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
+>       if (dinfo) {
+> -        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinf=
+o), &err);
+> +        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinf=
+o),
+> +                            errp);
 
-You can add it at the end of the previous line.
+This fits 72 chars, can you keep it in the same line?
 
-Regardless:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-> +            if (*errp) {
->                   break;
->               }
->           }
-> -        if (bc->unrealize && local_err =3D=3D NULL) {
-> -            bc->unrealize(bus, &local_err);
-> +        if (bc->unrealize && *errp =3D=3D NULL) {
-> +            bc->unrealize(bus, errp);
->           }
 >       }
->  =20
-> -    if (local_err !=3D NULL) {
-> -        error_propagate(errp, local_err);
+> -    object_property_set_bool(OBJECT(carddev), true, "spi", &err);
+> -    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+> -    if (err) {
+> -        error_setg(errp, "failed to init SD card: %s", error_get_prett=
+y(err));
+> +    object_property_set_bool(OBJECT(carddev), true, "spi", errp);
+> +    object_property_set_bool(OBJECT(carddev), true, "realized", errp);
 > +    if (*errp) {
+> +        error_setg(errp, "failed to init SD card: %s",
+> +                   error_get_pretty(*errp));
+
+Ditto...
+
 >           return;
 >       }
->  =20
+>   }
 >=20
+
+If possible please squash with "47/126 SD (Secure Card)"
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
