@@ -8,67 +8,67 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D032C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 20:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D35BEC4CECE
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 20:07:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02B9C20673
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 20:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8934B20673
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 20:07:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQMcAN1s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02B9C20673
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j9WWdzXQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8934B20673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJk8L-0004Ou-7B
-	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 16:06:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37256)
+	id 1iJk8s-0004xv-Pb
+	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 16:07:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37289)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iJk0N-0005ST-9S
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 15:58:16 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iJk0O-0005Ub-NT
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 15:58:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iJk0M-0003HY-8o
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 15:58:15 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:42449)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1iJk0M-0003HA-2W
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 15:58:16 -0400
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:54284)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iJk0M-0003GW-34
+ id 1iJk0L-0003Fu-Pu
  for qemu-devel@nongnu.org; Sun, 13 Oct 2019 15:58:14 -0400
-Received: by mail-wr1-x430.google.com with SMTP id n14so17210568wrw.9
- for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 12:58:14 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id p7so15065194wmp.4
+ for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 12:58:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=I/J8Dq/+F7R0/J6BZwd7lt84Aly4P3hEz64ceVDIF5c=;
- b=UQMcAN1saSM6BhMkpDnD/DLaxnxTqZ0i+JK64gPzjROixw9xZlODptRlTnZBWVG/dB
- kZIQjK8R8fRz4D7l3v3IBFyy+PiY10UPYd9xTx3QqGNcufL2HJ+Gl94o41LUBOsdh4bE
- Pycd8WRVDfPzecrfxCu4bBVTlyWPzsfQVVq0vjAIuv4h4pZFlAGormOhUblva1MQ6/ex
- EWHfF7OwMtF10EW1nVV3FfuUinE75d999AAe8mRWDJFjHB/10JPs126jsRytXvQZHllG
- 3aC1iF9r2JcwWJMGisrSXL+uzM5YWrwL7OLd6uiRbZU2sSrYbDAHyYKjl7iMblWys1I1
- n4PQ==
+ bh=FZBJxE6vgXiUYQRHq25EgBqFYd27odUS2eGRI60cvzc=;
+ b=j9WWdzXQvOAbfxnY6Q7siDlc2Wp684F54O6cHZdPiFO7bO+2MueQ7h6CDj3/Zmns/s
+ yyaZeg9KOiodEnaXz7u0oZe3LfBjAZnGWLexTjOlElYIYPHDC4j+GD8+XgtpAu7Ftzig
+ z+nKdgBxMY5zLAvwTTHbky612X/jRMdt8d2R/BSpUav2ggUvu0z0m5/5kFw43+S06NwO
+ /Rx+V6lI/66Nm7Eu4C3LnGBACvGDa+c29uiImQCMtMaO56qTm7nSSOWi67Whj2Yn4RsQ
+ 1ujKKN8ioKCm0f1FHZaF1BdAnuW6M0t5Epj9ZFlspj/BguyIuG6zVaNJmPdTuUVb1tMu
+ zYmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=I/J8Dq/+F7R0/J6BZwd7lt84Aly4P3hEz64ceVDIF5c=;
- b=AgeuHzhGvuxhMSCx8SfKbFpUQmXz5Yd8MPs998ARVjMr4iJ5Q3aIIJmwnYTjxBaw8V
- god03ZcN8484FLBEbH5z+E8x+/qYq/izZPJxyx/OYosh6+M1qJpcpnmCkgpUMJ1qLfpY
- nddXPh3DUzHuKPgctMdyCFzHiIeMyqplT3BvMpdQ8byCpZN1eSVzGbyTb3DCvZXliLNV
- lhcQpbBl0+ODOsSfk+olPs0jcEuSrZpbwvBWZROpuNsrz6KK4t3W0Zkn8S2Hgaj0rQgm
- wtDFWXuum3Yld8S68461c+01h3ztngXAGQTs2MZ58Imy7lrR5EV+UbGzboHRnGePCwST
- QWyQ==
-X-Gm-Message-State: APjAAAXaCLgD6PlpCE9qumlszhcLRe/Wsxx+glO1pV2AniNBwxkRJNeR
- VkPaoj98XuikeoQvWy2AJeDZ9IwU
-X-Google-Smtp-Source: APXvYqws10uyMYDBwQV/MOgpbo80z1fsv80qiS3nKrFRPUczZ/oBC8Fy7qMuOC1ouCx/anudy0Ihmw==
-X-Received: by 2002:adf:f30b:: with SMTP id i11mr21261264wro.377.1570996692989; 
+ bh=FZBJxE6vgXiUYQRHq25EgBqFYd27odUS2eGRI60cvzc=;
+ b=l2IDzPhHilab+406n0DzrJsztu6pFhzL1YOemf0wpDMjDy93KcYNo5BaMxBO5AvGpC
+ 7aGU3ilgIipGlCjg1WLNlRallos/DjAlueplqxvadDNdTgTVwfJx0Qx74vz3qq1nkr1W
+ jKaE6ltdtTslXt/OVgY8FhMxBTszHGUAwn4olURe5Xy1DbRozKcZT3eYyfBmk0DZRFSl
+ 5x3ewhIL45YjjXl5dIDFtBw0HiR+8Y1EWVrPT4NcGwoAr7fSwS1sXhy13ervHGH2KSh3
+ 3vd3GPRTFIQRxSPvwPFJ+x4q87CFmAe5MqC52fAwdeqUB5bhnET53Iqk6c8izHMWGjkZ
+ AKyA==
+X-Gm-Message-State: APjAAAU0U5NK3agL5/K1lodoPpxjzEs8ZGVsFgR7BYgnyxlhe5CW9iNo
+ Bo5MBFi9BZo1wy8v6uGsxnEskWOB
+X-Google-Smtp-Source: APXvYqzIOf/OJoHYKdfT1aOGIZWI9u176blMGRUKCJP5BEM2nWiqbncmf6+MRqBiB7oHzG6hEzmc+A==
+X-Received: by 2002:a1c:7e10:: with SMTP id z16mr11919966wmc.11.1570996692382; 
  Sun, 13 Oct 2019 12:58:12 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-0052-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:52::5])
- by smtp.gmail.com with ESMTPSA id x129sm29941857wmg.8.2019.10.13.12.58.12
+ by smtp.gmail.com with ESMTPSA id x129sm29941857wmg.8.2019.10.13.12.58.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Sun, 13 Oct 2019 12:58:12 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
@@ -76,9 +76,10 @@ From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 06/10] audio: basic support for multichannel audio
-Date: Sun, 13 Oct 2019 21:58:03 +0200
-Message-Id: <7e53be1f97e939ed3bb729ef39e76b775643118a.1570996490.git.DirtY.iCE.hu@gmail.com>
+Subject: [PATCH v6 05/10] audio: replace shift in audio_pcm_info with
+ bytes_per_frame
+Date: Sun, 13 Oct 2019 21:58:02 +0200
+Message-Id: <1351fd9bcce0ff20d81850c5292722194329de02.1570996490.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1570996490.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1570996490.git.DirtY.iCE.hu@gmail.com>
@@ -87,7 +88,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::430
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,46 +105,539 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Which currently only means removing some checks.  Old code won't require
-more than two channels, but new code will need it.
+The bit shifting trick worked because the number of bytes per frame was
+always a power-of-two (since QEMU only supports mono, stereo and 8, 16
+and 32 bit samples).  But if we want to add support for surround sound,
+this no longer holds true.
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
 ---
- audio/alsaaudio.c | 7 -------
- audio/audio.c     | 2 +-
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ audio/alsaaudio.c       | 11 +++---
+ audio/audio.c           | 74 ++++++++++++++++++++---------------------
+ audio/audio_int.h       |  3 +-
+ audio/coreaudio.c       |  4 +--
+ audio/dsound_template.h | 10 +++---
+ audio/dsoundaudio.c     |  4 +--
+ audio/noaudio.c         |  2 +-
+ audio/ossaudio.c        | 14 ++++----
+ audio/spiceaudio.c      |  3 +-
+ audio/wavaudio.c        |  6 ++--
+ 10 files changed, 66 insertions(+), 65 deletions(-)
 
 diff --git a/audio/alsaaudio.c b/audio/alsaaudio.c
-index eddf013a53..f37ce1ce85 100644
+index cfe42284a6..eddf013a53 100644
 --- a/audio/alsaaudio.c
 +++ b/audio/alsaaudio.c
-@@ -493,13 +493,6 @@ static int alsa_open(bool in, struct alsa_params_req *req,
-         goto err;
+@@ -602,7 +602,7 @@ static size_t alsa_write(HWVoiceOut *hw, void *buf, size_t len)
+ {
+     ALSAVoiceOut *alsa = (ALSAVoiceOut *) hw;
+     size_t pos = 0;
+-    size_t len_frames = len >> hw->info.shift;
++    size_t len_frames = len / hw->info.bytes_per_frame;
+ 
+     while (len_frames) {
+         char *src = advance(buf, pos);
+@@ -648,7 +648,7 @@ static size_t alsa_write(HWVoiceOut *hw, void *buf, size_t len)
+             }
+         }
+ 
+-        pos += written << hw->info.shift;
++        pos += written * hw->info.bytes_per_frame;
+         if (written < len_frames) {
+             break;
+         }
+@@ -802,7 +802,8 @@ static size_t alsa_read(HWVoiceIn *hw, void *buf, size_t len)
+         void *dst = advance(buf, pos);
+         snd_pcm_sframes_t nread;
+ 
+-        nread = snd_pcm_readi(alsa->handle, dst, len >> hw->info.shift);
++        nread = snd_pcm_readi(
++            alsa->handle, dst, len / hw->info.bytes_per_frame);
+ 
+         if (nread <= 0) {
+             switch (nread) {
+@@ -828,8 +829,8 @@ static size_t alsa_read(HWVoiceIn *hw, void *buf, size_t len)
+             }
+         }
+ 
+-        pos += nread << hw->info.shift;
+-        len -= nread << hw->info.shift;
++        pos += nread * hw->info.bytes_per_frame;
++        len -= nread * hw->info.bytes_per_frame;
      }
  
--    if (nchannels != 1 && nchannels != 2) {
--        alsa_logerr2 (err, typ,
--                      "Can not handle obtained number of channels %d\n",
--                      nchannels);
--        goto err;
--    }
--
-     if (apdo->buffer_length) {
-         int dir = 0;
-         unsigned int btime = apdo->buffer_length;
+     return pos;
 diff --git a/audio/audio.c b/audio/audio.c
-index c00f4deddd..7fc3aa9d16 100644
+index f1c145dfcd..c00f4deddd 100644
 --- a/audio/audio.c
 +++ b/audio/audio.c
-@@ -242,7 +242,7 @@ static int audio_validate_settings (struct audsettings *as)
- {
-     int invalid;
+@@ -299,12 +299,13 @@ static int audio_pcm_info_eq (struct audio_pcm_info *info, struct audsettings *a
  
--    invalid = as->nchannels != 1 && as->nchannels != 2;
-+    invalid = as->nchannels < 1;
-     invalid |= as->endianness != 0 && as->endianness != 1;
+ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as)
+ {
+-    int bits = 8, sign = 0, shift = 0;
++    int bits = 8, sign = 0, mul;
  
      switch (as->fmt) {
+     case AUDIO_FORMAT_S8:
+         sign = 1;
+     case AUDIO_FORMAT_U8:
++        mul = 1;
+         break;
+ 
+     case AUDIO_FORMAT_S16:
+@@ -312,7 +313,7 @@ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as)
+         /* fall through */
+     case AUDIO_FORMAT_U16:
+         bits = 16;
+-        shift = 1;
++        mul = 2;
+         break;
+ 
+     case AUDIO_FORMAT_S32:
+@@ -320,7 +321,7 @@ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as)
+         /* fall through */
+     case AUDIO_FORMAT_U32:
+         bits = 32;
+-        shift = 2;
++        mul = 4;
+         break;
+ 
+     default:
+@@ -331,9 +332,8 @@ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as)
+     info->bits = bits;
+     info->sign = sign;
+     info->nchannels = as->nchannels;
+-    info->shift = (as->nchannels == 2) + shift;
+-    info->align = (1 << info->shift) - 1;
+-    info->bytes_per_second = info->freq << info->shift;
++    info->bytes_per_frame = as->nchannels * mul;
++    info->bytes_per_second = info->freq * info->bytes_per_frame;
+     info->swap_endianness = (as->endianness != AUDIO_HOST_ENDIANNESS);
+ }
+ 
+@@ -344,26 +344,25 @@ void audio_pcm_info_clear_buf (struct audio_pcm_info *info, void *buf, int len)
+     }
+ 
+     if (info->sign) {
+-        memset (buf, 0x00, len << info->shift);
++        memset(buf, 0x00, len * info->bytes_per_frame);
+     }
+     else {
+         switch (info->bits) {
+         case 8:
+-            memset (buf, 0x80, len << info->shift);
++            memset(buf, 0x80, len * info->bytes_per_frame);
+             break;
+ 
+         case 16:
+             {
+                 int i;
+                 uint16_t *p = buf;
+-                int shift = info->nchannels - 1;
+                 short s = INT16_MAX;
+ 
+                 if (info->swap_endianness) {
+                     s = bswap16 (s);
+                 }
+ 
+-                for (i = 0; i < len << shift; i++) {
++                for (i = 0; i < len * info->nchannels; i++) {
+                     p[i] = s;
+                 }
+             }
+@@ -373,14 +372,13 @@ void audio_pcm_info_clear_buf (struct audio_pcm_info *info, void *buf, int len)
+             {
+                 int i;
+                 uint32_t *p = buf;
+-                int shift = info->nchannels - 1;
+                 int32_t s = INT32_MAX;
+ 
+                 if (info->swap_endianness) {
+                     s = bswap32 (s);
+                 }
+ 
+-                for (i = 0; i < len << shift; i++) {
++                for (i = 0; i < len * info->nchannels; i++) {
+                     p[i] = s;
+                 }
+             }
+@@ -558,7 +556,7 @@ static void audio_pcm_hw_clip_out(HWVoiceOut *hw, void *pcm_buf, size_t len)
+ 
+     while (len) {
+         st_sample *src = hw->mix_buf->samples + pos;
+-        uint8_t *dst = advance(pcm_buf, clipped << hw->info.shift);
++        uint8_t *dst = advance(pcm_buf, clipped * hw->info.bytes_per_frame);
+         size_t samples_till_end_of_buf = hw->mix_buf->size - pos;
+         size_t samples_to_clip = MIN(len, samples_till_end_of_buf);
+ 
+@@ -607,7 +605,7 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *buf, size_t size)
+         return 0;
+     }
+ 
+-    samples = size >> sw->info.shift;
++    samples = size / sw->info.bytes_per_frame;
+     if (!live) {
+         return 0;
+     }
+@@ -642,7 +640,7 @@ static size_t audio_pcm_sw_read(SWVoiceIn *sw, void *buf, size_t size)
+ 
+     sw->clip (buf, sw->buf, ret);
+     sw->total_hw_samples_acquired += total;
+-    return ret << sw->info.shift;
++    return ret * sw->info.bytes_per_frame;
+ }
+ 
+ /*
+@@ -715,7 +713,7 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *buf, size_t size)
+     }
+ 
+     wpos = (sw->hw->mix_buf->pos + live) % hwsamples;
+-    samples = size >> sw->info.shift;
++    samples = size / sw->info.bytes_per_frame;
+ 
+     dead = hwsamples - live;
+     swlim = ((int64_t) dead << 32) / sw->ratio;
+@@ -759,13 +757,13 @@ static size_t audio_pcm_sw_write(SWVoiceOut *sw, void *buf, size_t size)
+     dolog (
+         "%s: write size %zu ret %zu total sw %zu\n",
+         SW_NAME (sw),
+-        size >> sw->info.shift,
++        size / sw->info.bytes_per_frame,
+         ret,
+         sw->total_hw_samples_mixed
+         );
+ #endif
+ 
+-    return ret << sw->info.shift;
++    return ret * sw->info.bytes_per_frame;
+ }
+ 
+ #ifdef DEBUG_AUDIO
+@@ -882,7 +880,7 @@ size_t AUD_read(SWVoiceIn *sw, void *buf, size_t size)
+ 
+ int AUD_get_buffer_size_out (SWVoiceOut *sw)
+ {
+-    return sw->hw->mix_buf->size << sw->hw->info.shift;
++    return sw->hw->mix_buf->size * sw->hw->info.bytes_per_frame;
+ }
+ 
+ void AUD_set_active_out (SWVoiceOut *sw, int on)
+@@ -998,10 +996,10 @@ static size_t audio_get_avail (SWVoiceIn *sw)
+     ldebug (
+         "%s: get_avail live %d ret %" PRId64 "\n",
+         SW_NAME (sw),
+-        live, (((int64_t) live << 32) / sw->ratio) << sw->info.shift
++        live, (((int64_t) live << 32) / sw->ratio) * sw->info.bytes_per_frame
+         );
+ 
+-    return (((int64_t) live << 32) / sw->ratio) << sw->info.shift;
++    return (((int64_t) live << 32) / sw->ratio) * sw->info.bytes_per_frame;
+ }
+ 
+ static size_t audio_get_free(SWVoiceOut *sw)
+@@ -1025,10 +1023,11 @@ static size_t audio_get_free(SWVoiceOut *sw)
+ #ifdef DEBUG_OUT
+     dolog ("%s: get_free live %d dead %d ret %" PRId64 "\n",
+            SW_NAME (sw),
+-           live, dead, (((int64_t) dead << 32) / sw->ratio) << sw->info.shift);
++           live, dead, (((int64_t) dead << 32) / sw->ratio) *
++           sw->info.bytes_per_frame);
+ #endif
+ 
+-    return (((int64_t) dead << 32) / sw->ratio) << sw->info.shift;
++    return (((int64_t) dead << 32) / sw->ratio) * sw->info.bytes_per_frame;
+ }
+ 
+ static void audio_capture_mix_and_clear(HWVoiceOut *hw, size_t rpos,
+@@ -1047,7 +1046,7 @@ static void audio_capture_mix_and_clear(HWVoiceOut *hw, size_t rpos,
+             while (n) {
+                 size_t till_end_of_hw = hw->mix_buf->size - rpos2;
+                 size_t to_write = MIN(till_end_of_hw, n);
+-                size_t bytes = to_write << hw->info.shift;
++                size_t bytes = to_write * hw->info.bytes_per_frame;
+                 size_t written;
+ 
+                 sw->buf = hw->mix_buf->samples + rpos2;
+@@ -1082,10 +1081,11 @@ static size_t audio_pcm_hw_run_out(HWVoiceOut *hw, size_t live)
+             return clipped + live;
+         }
+ 
+-        decr = MIN(size >> hw->info.shift, live);
++        decr = MIN(size / hw->info.bytes_per_frame, live);
+         audio_pcm_hw_clip_out(hw, buf, decr);
+-        proc = hw->pcm_ops->put_buffer_out(hw, buf, decr << hw->info.shift) >>
+-            hw->info.shift;
++        proc = hw->pcm_ops->put_buffer_out(hw, buf,
++                                           decr * hw->info.bytes_per_frame) /
++            hw->info.bytes_per_frame;
+ 
+         live -= proc;
+         clipped += proc;
+@@ -1234,16 +1234,16 @@ static size_t audio_pcm_hw_run_in(HWVoiceIn *hw, size_t samples)
+ 
+     while (samples) {
+         size_t proc;
+-        size_t size = samples << hw->info.shift;
++        size_t size = samples * hw->info.bytes_per_frame;
+         void *buf = hw->pcm_ops->get_buffer_in(hw, &size);
+ 
+-        assert((size & hw->info.align) == 0);
++        assert(size % hw->info.bytes_per_frame == 0);
+         if (size == 0) {
+             hw->pcm_ops->put_buffer_in(hw, buf, size);
+             break;
+         }
+ 
+-        proc = MIN(size >> hw->info.shift,
++        proc = MIN(size / hw->info.bytes_per_frame,
+                    conv_buf->size - conv_buf->pos);
+ 
+         hw->conv(conv_buf->samples + conv_buf->pos, buf, proc);
+@@ -1251,7 +1251,7 @@ static size_t audio_pcm_hw_run_in(HWVoiceIn *hw, size_t samples)
+ 
+         samples -= proc;
+         conv += proc;
+-        hw->pcm_ops->put_buffer_in(hw, buf, proc << hw->info.shift);
++        hw->pcm_ops->put_buffer_in(hw, buf, proc * hw->info.bytes_per_frame);
+     }
+ 
+     return conv;
+@@ -1325,7 +1325,7 @@ static void audio_run_capture (AudioState *s)
+ 
+             for (cb = cap->cb_head.lh_first; cb; cb = cb->entries.le_next) {
+                 cb->ops.capture (cb->opaque, cap->buf,
+-                                 to_capture << hw->info.shift);
++                                 to_capture * hw->info.bytes_per_frame);
+             }
+             rpos = (rpos + to_capture) % hw->mix_buf->size;
+             live -= to_capture;
+@@ -1378,7 +1378,7 @@ void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t *size)
+     ssize_t start;
+ 
+     if (unlikely(!hw->buf_emul)) {
+-        size_t calc_size = hw->conv_buf->size << hw->info.shift;
++        size_t calc_size = hw->conv_buf->size * hw->info.bytes_per_frame;
+         hw->buf_emul = g_malloc(calc_size);
+         hw->size_emul = calc_size;
+         hw->pos_emul = hw->pending_emul = 0;
+@@ -1414,7 +1414,7 @@ void audio_generic_put_buffer_in(HWVoiceIn *hw, void *buf, size_t size)
+ void *audio_generic_get_buffer_out(HWVoiceOut *hw, size_t *size)
+ {
+     if (unlikely(!hw->buf_emul)) {
+-        size_t calc_size = hw->mix_buf->size << hw->info.shift;
++        size_t calc_size = hw->mix_buf->size * hw->info.bytes_per_frame;
+ 
+         hw->buf_emul = g_malloc(calc_size);
+         hw->size_emul = calc_size;
+@@ -1833,7 +1833,7 @@ CaptureVoiceOut *AUD_add_capture(
+ 
+         audio_pcm_init_info (&hw->info, as);
+ 
+-        cap->buf = g_malloc0_n(hw->mix_buf->size, 1 << hw->info.shift);
++        cap->buf = g_malloc0_n(hw->mix_buf->size, hw->info.bytes_per_frame);
+ 
+         hw->clip = mixeng_clip
+             [hw->info.nchannels == 2]
+@@ -2153,14 +2153,14 @@ size_t audio_rate_get_bytes(struct audio_pcm_info *info, RateCtl *rate,
+     now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     ticks = now - rate->start_ticks;
+     bytes = muldiv64(ticks, info->bytes_per_second, NANOSECONDS_PER_SECOND);
+-    samples = (bytes - rate->bytes_sent) >> info->shift;
++    samples = (bytes - rate->bytes_sent) / info->bytes_per_frame;
+     if (samples < 0 || samples > 65536) {
+         AUD_log(NULL, "Resetting rate control (%" PRId64 " samples)\n", samples);
+         audio_rate_start(rate);
+         samples = 0;
+     }
+ 
+-    ret = MIN(samples << info->shift, bytes_avail);
++    ret = MIN(samples * info->bytes_per_frame, bytes_avail);
+     rate->bytes_sent += ret;
+     return ret;
+ }
+diff --git a/audio/audio_int.h b/audio/audio_int.h
+index 9176db249b..5ba2078346 100644
+--- a/audio/audio_int.h
++++ b/audio/audio_int.h
+@@ -43,8 +43,7 @@ struct audio_pcm_info {
+     int sign;
+     int freq;
+     int nchannels;
+-    int align;
+-    int shift;
++    int bytes_per_frame;
+     int bytes_per_second;
+     int swap_endianness;
+ };
+diff --git a/audio/coreaudio.c b/audio/coreaudio.c
+index 1427c9f622..66f0f459cf 100644
+--- a/audio/coreaudio.c
++++ b/audio/coreaudio.c
+@@ -440,7 +440,7 @@ static OSStatus audioDeviceIOProc(
+     }
+ 
+     frameCount = core->audioDevicePropertyBufferFrameSize;
+-    pending_frames = hw->pending_emul >> hw->info.shift;
++    pending_frames = hw->pending_emul / hw->info.bytes_per_frame;
+ 
+     /* if there are not enough samples, set signal and return */
+     if (pending_frames < frameCount) {
+@@ -449,7 +449,7 @@ static OSStatus audioDeviceIOProc(
+         return 0;
+     }
+ 
+-    len = frameCount << hw->info.shift;
++    len = frameCount * hw->info.bytes_per_frame;
+     while (len) {
+         size_t write_len;
+         ssize_t start = ((ssize_t) hw->pos_emul) - hw->pending_emul;
+diff --git a/audio/dsound_template.h b/audio/dsound_template.h
+index 9f10b688df..7a15f91ce5 100644
+--- a/audio/dsound_template.h
++++ b/audio/dsound_template.h
+@@ -98,8 +98,8 @@ static int glue (dsound_lock_, TYPE) (
+         goto fail;
+     }
+ 
+-    if ((p1p && *p1p && (*blen1p & info->align)) ||
+-        (p2p && *p2p && (*blen2p & info->align))) {
++    if ((p1p && *p1p && (*blen1p % info->bytes_per_frame)) ||
++        (p2p && *p2p && (*blen2p % info->bytes_per_frame))) {
+         dolog("DirectSound returned misaligned buffer %ld %ld\n",
+               *blen1p, *blen2p);
+         glue(dsound_unlock_, TYPE)(buf, *p1p, p2p ? *p2p : NULL, *blen1p,
+@@ -247,14 +247,14 @@ static int dsound_init_out(HWVoiceOut *hw, struct audsettings *as,
+     obt_as.endianness = 0;
+     audio_pcm_init_info (&hw->info, &obt_as);
+ 
+-    if (bc.dwBufferBytes & hw->info.align) {
++    if (bc.dwBufferBytes % hw->info.bytes_per_frame) {
+         dolog (
+             "GetCaps returned misaligned buffer size %ld, alignment %d\n",
+-            bc.dwBufferBytes, hw->info.align + 1
++            bc.dwBufferBytes, hw->info.bytes_per_frame
+             );
+     }
+     hw->size_emul = bc.dwBufferBytes;
+-    hw->samples = bc.dwBufferBytes >> hw->info.shift;
++    hw->samples = bc.dwBufferBytes / hw->info.bytes_per_frame;
+     ds->s = s;
+ 
+ #ifdef DEBUG_DSOUND
+diff --git a/audio/dsoundaudio.c b/audio/dsoundaudio.c
+index d4a4757445..c265c0094b 100644
+--- a/audio/dsoundaudio.c
++++ b/audio/dsoundaudio.c
+@@ -320,8 +320,8 @@ static void dsound_clear_sample (HWVoiceOut *hw, LPDIRECTSOUNDBUFFER dsb,
+         return;
+     }
+ 
+-    len1 = blen1 >> hw->info.shift;
+-    len2 = blen2 >> hw->info.shift;
++    len1 = blen1 / hw->info.bytes_per_frame;
++    len2 = blen2 / hw->info.bytes_per_frame;
+ 
+ #ifdef DEBUG_DSOUND
+     dolog ("clear %p,%ld,%ld %p,%ld,%ld\n",
+diff --git a/audio/noaudio.c b/audio/noaudio.c
+index ec8a287f36..ff99b253ff 100644
+--- a/audio/noaudio.c
++++ b/audio/noaudio.c
+@@ -91,7 +91,7 @@ static size_t no_read(HWVoiceIn *hw, void *buf, size_t size)
+     NoVoiceIn *no = (NoVoiceIn *) hw;
+     int64_t bytes = audio_rate_get_bytes(&hw->info, &no->rate, size);
+ 
+-    audio_pcm_info_clear_buf(&hw->info, buf, bytes >> hw->info.shift);
++    audio_pcm_info_clear_buf(&hw->info, buf, bytes / hw->info.bytes_per_frame);
+     return bytes;
+ }
+ 
+diff --git a/audio/ossaudio.c b/audio/ossaudio.c
+index 0c4451e972..c43faeeea4 100644
+--- a/audio/ossaudio.c
++++ b/audio/ossaudio.c
+@@ -506,16 +506,16 @@ static int oss_init_out(HWVoiceOut *hw, struct audsettings *as,
+     oss->nfrags = obt.nfrags;
+     oss->fragsize = obt.fragsize;
+ 
+-    if (obt.nfrags * obt.fragsize & hw->info.align) {
++    if (obt.nfrags * obt.fragsize % hw->info.bytes_per_frame) {
+         dolog ("warning: Misaligned DAC buffer, size %d, alignment %d\n",
+-               obt.nfrags * obt.fragsize, hw->info.align + 1);
++               obt.nfrags * obt.fragsize, hw->info.bytes_per_frame);
+     }
+ 
+-    hw->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
++    hw->samples = (obt.nfrags * obt.fragsize) / hw->info.bytes_per_frame;
+ 
+     oss->mmapped = 0;
+     if (oopts->has_try_mmap && oopts->try_mmap) {
+-        hw->size_emul = hw->samples << hw->info.shift;
++        hw->size_emul = hw->samples * hw->info.bytes_per_frame;
+         hw->buf_emul = mmap(
+             NULL,
+             hw->size_emul,
+@@ -644,12 +644,12 @@ static int oss_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
+     oss->nfrags = obt.nfrags;
+     oss->fragsize = obt.fragsize;
+ 
+-    if (obt.nfrags * obt.fragsize & hw->info.align) {
++    if (obt.nfrags * obt.fragsize % hw->info.bytes_per_frame) {
+         dolog ("warning: Misaligned ADC buffer, size %d, alignment %d\n",
+-               obt.nfrags * obt.fragsize, hw->info.align + 1);
++               obt.nfrags * obt.fragsize, hw->info.bytes_per_frame);
+     }
+ 
+-    hw->samples = (obt.nfrags * obt.fragsize) >> hw->info.shift;
++    hw->samples = (obt.nfrags * obt.fragsize) / hw->info.bytes_per_frame;
+ 
+     oss->fd = fd;
+     oss->dev = dev;
+diff --git a/audio/spiceaudio.c b/audio/spiceaudio.c
+index 6ed7f7a79e..b6b5da4812 100644
+--- a/audio/spiceaudio.c
++++ b/audio/spiceaudio.c
+@@ -131,7 +131,8 @@ static void *line_out_get_buffer(HWVoiceOut *hw, size_t *size)
+ 
+     if (out->frame) {
+         *size = audio_rate_get_bytes(
+-            &hw->info, &out->rate, (out->fsize - out->fpos) << hw->info.shift);
++            &hw->info, &out->rate,
++            (out->fsize - out->fpos) * hw->info.bytes_per_frame);
+     } else {
+         audio_rate_start(&out->rate);
+     }
+diff --git a/audio/wavaudio.c b/audio/wavaudio.c
+index 47efdc1b1e..e46d834bd3 100644
+--- a/audio/wavaudio.c
++++ b/audio/wavaudio.c
+@@ -43,14 +43,14 @@ static size_t wav_write_out(HWVoiceOut *hw, void *buf, size_t len)
+ {
+     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
+     int64_t bytes = audio_rate_get_bytes(&hw->info, &wav->rate, len);
+-    assert(bytes >> hw->info.shift << hw->info.shift == bytes);
++    assert(bytes % hw->info.bytes_per_frame == 0);
+ 
+     if (bytes && fwrite(buf, bytes, 1, wav->f) != 1) {
+         dolog("wav_write_out: fwrite of %" PRId64 " bytes failed\nReason: %s\n",
+               bytes, strerror(errno));
+     }
+ 
+-    wav->total_samples += bytes >> hw->info.shift;
++    wav->total_samples += bytes / hw->info.bytes_per_frame;
+     return bytes;
+ }
+ 
+@@ -134,7 +134,7 @@ static void wav_fini_out (HWVoiceOut *hw)
+     WAVVoiceOut *wav = (WAVVoiceOut *) hw;
+     uint8_t rlen[4];
+     uint8_t dlen[4];
+-    uint32_t datalen = wav->total_samples << hw->info.shift;
++    uint32_t datalen = wav->total_samples * hw->info.bytes_per_frame;
+     uint32_t rifflen = datalen + 36;
+ 
+     if (!wav->f) {
 -- 
 2.23.0
 
