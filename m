@@ -2,64 +2,65 @@ Return-Path: <SRS0=Jehb=YG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1F8C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 09:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E8EECE587
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 09:33:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 895C420679
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 09:33:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCA6F20679
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 09:33:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cr6XmDtw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 895C420679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZMQM43PJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCA6F20679
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJaFI-0005Pw-Ik
-	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 05:33:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54963)
+	id 1iJaFK-0005Rm-0W
+	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 05:33:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54958)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iJaE5-0004Nx-3K
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 05:31:46 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iJaE3-0003gC-ST
+ (envelope-from <dgibson@ozlabs.org>) id 1iJaE4-0004Ns-JR
  for qemu-devel@nongnu.org; Sun, 13 Oct 2019 05:31:45 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36547 helo=ozlabs.org)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1iJaE3-0003g2-Is
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 05:31:44 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:44611 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iJaDz-0003b5-4v; Sun, 13 Oct 2019 05:31:41 -0400
+ id 1iJaDz-0003b4-Vb; Sun, 13 Oct 2019 05:31:40 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 46rbzl3Qkvz9sP6; Sun, 13 Oct 2019 20:31:31 +1100 (AEDT)
+ id 46rbzl4Sbfz9sP4; Sun, 13 Oct 2019 20:31:31 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1570959091;
- bh=zAcblpc8D9oNHNEbUfiTdWI/qxLNZyr05HMAZLFVUWY=;
+ bh=i5xS6cPr2WJVD3/YqmmPSLVsXZ5M8GbGBm7P0cdXklU=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=cr6XmDtwsinvm9utixAbBZ2/ehBzPmW8jiobwysKCqvbu1TinbFzBqi2pdT1YMDHK
- 5UD/AgxkABh4VHlfkMkrjARon9hhELlu5xlnnL8sJfXRwrLIS0WDbetn8rU950HYxR
- JoajNC6+uSeBXuglbAwd7Loo+EeMAjd+Y48q3b1A=
-Date: Sun, 13 Oct 2019 20:27:12 +1100
+ b=ZMQM43PJjVgP7i63eZxa7Ra+RGIxXqCY0k0darmsdyDGmOBILIozLNv+Ig8U6Bk1h
+ A6fh3OZW+P2gEEjyX0ROLCNNScY7AfUuQZVPQQ5jxhNZRp6IZP74F9o5o+cIrHBuB8
+ D3tHrQj29ANQECYJWpvaNYKBCZbVMfr/cbK+1ro8=
+Date: Sun, 13 Oct 2019 20:28:41 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [PATCH 1/2] cpu: use ROUND_UP() to define xxx_PAGE_ALIGN
-Message-ID: <20191013092712.GF4080@umbus.fritz.box>
+Subject: Re: [PATCH 2/2] core: replace getpagesize() with
+ qemu_real_host_page_size
+Message-ID: <20191013092841.GG4080@umbus.fritz.box>
 References: <20191013021145.16011-1-richardw.yang@linux.intel.com>
- <20191013021145.16011-2-richardw.yang@linux.intel.com>
+ <20191013021145.16011-3-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="K/NRh952CO+2tg14"
+ protocol="application/pgp-signature"; boundary="KIzF6Cje4W/osXrF"
 Content-Disposition: inline
-In-Reply-To: <20191013021145.16011-2-richardw.yang@linux.intel.com>
+In-Reply-To: <20191013021145.16011-3-richardw.yang@linux.intel.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,51 +86,32 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---K/NRh952CO+2tg14
+--KIzF6Cje4W/osXrF
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Oct 13, 2019 at 10:11:44AM +0800, Wei Yang wrote:
-> Use ROUND_UP() to define, which is a little bit easy to read.
+On Sun, Oct 13, 2019 at 10:11:45AM +0800, Wei Yang wrote:
+> There are three page size in qemu:
+>=20
+>   real host page size
+>   host page size
+>   target page size
+>=20
+> All of them have dedicate variable to represent. For the last two, we
+> use the same form in the whole qemu project, while for the first one we
+> use two forms: qemu_real_host_page_size and getpagesize().
+>=20
+> qemu_real_host_page_size is defined to be a replacement of
+> getpagesize(), so let it serve the role.
+>=20
+> [Note] Not fully tested for some arch or device.
 >=20
 > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-> ---
->  include/exec/cpu-all.h | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
->=20
-> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> index ad9ab85eb3..255bb186ac 100644
-> --- a/include/exec/cpu-all.h
-> +++ b/include/exec/cpu-all.h
-> @@ -220,7 +220,7 @@ extern int target_page_bits;
-> =20
->  #define TARGET_PAGE_SIZE (1 << TARGET_PAGE_BITS)
->  #define TARGET_PAGE_MASK ~(TARGET_PAGE_SIZE - 1)
-> -#define TARGET_PAGE_ALIGN(addr) (((addr) + TARGET_PAGE_SIZE - 1) & TARGE=
-T_PAGE_MASK)
-> +#define TARGET_PAGE_ALIGN(addr) ROUND_UP((addr), TARGET_PAGE_SIZE)
-> =20
->  /* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
->   * when intptr_t is 32-bit and we are aligning a long long.
-> @@ -228,9 +228,8 @@ extern int target_page_bits;
->  extern uintptr_t qemu_host_page_size;
->  extern intptr_t qemu_host_page_mask;
-> =20
-> -#define HOST_PAGE_ALIGN(addr) (((addr) + qemu_host_page_size - 1) & qemu=
-_host_page_mask)
-> -#define REAL_HOST_PAGE_ALIGN(addr) (((addr) + qemu_real_host_page_size -=
- 1) & \
-> -                                    qemu_real_host_page_mask)
-> +#define HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_host_page_size)
-> +#define REAL_HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_real_host_page_=
-size)
-> =20
->  /* same as PROT_xxx */
->  #define PAGE_READ      0x0001
+Although the chances of someone messing this up again are almost 100%.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -137,25 +119,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---K/NRh952CO+2tg14
+--KIzF6Cje4W/osXrF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2i7e0ACgkQbDjKyiDZ
-s5L5IRAAhKogha3/Q23X/xOOl9tAUbbi4iHveQC2aXE6LrTBuGERxq+yalBcpAl5
-oIURkcHnOIuv7/gth4d6ZMqChElfX9Rgf1YxV7667X90gYqcEHB8dEfIuGBa1WvG
-3CwvTlPrfzeE2Vf75gVgS6SUOormrSCigvq21TvGAQNnFV0LEUL2v1v2yewei2Sh
-ssHf29dTUJUkZoBZg1v+/d3Yb4Kyflf3BaRpQpDuek91k/7h3UkyzxUQ8a7T6cBM
-mT46l5ZRjk3Q4iMfmnGaYcbuaxnHChHODsCwlxiU1GWQNQsaJi7yHBRy+bnfN0VC
-40XtvubdCE/1Yxt18dLC+7KQDmvM5Rue7gZIwlKwod/7N7r862HLAhYXf4QQOHKB
-tbpEP9UyBTcsjkPTDcW4zZExXcjWsVd2Aye5BK3nO25qj1RxjRGpkiYaMUrmAaNr
-QZORes+RxVB/0uesqp4x/WE2nNkiftzbO3UCkoo1jo7108v4/tN/QcLDZXXj3V8B
-1GGyxWGRf3TRKE8Xs55jGrTB5MWnY8rgwOqY41Sfae129fsMdcsH0NTGHgSCmmXw
-MiePK8a5htGyR31oQoRPnm1ss+GpsPquV6SwyoqBuAXZWefzuuUlWirVm3FoHlkk
-cXMh0bkFxvPKClCdvn9oD4ivXt2NWyVf2ChVrTtXEnkblFiUXl4=
-=exjc
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2i7kkACgkQbDjKyiDZ
+s5L5RA//fSeFYUbSHTX8CMa1bv1+lCy+cczMxZeOo0BSSRNNYXDhFgdJN4/GEo2r
++2zVy/3qiuwYLPRb+KkuLwX/C42GhLWJuzcoMxm00BlaujRk9W9MMKTkGYBqkKkE
+Up/MgLeJcXx0UrcRVVKadCZd4jw7IeC0q9skTlTxCCIoXka8VvCmPsiKu5w/kHpt
+NHR1CJ4fFxSMyLbu4ZiuYZOFBSxozoY3eEu4hFolljHEyLBT6gBdPzGmkZ+5ygc7
+DxeFbhQjashtQvF4UKOxIRAAchoD9YvvPIbNaRbMpqzYU5EoQGmQH4xw6Dna6oKD
+WnjxYSbTd/a48a0bNqzr+nBGmszeZQ2Ab7yWGWliAbTooL73VKz2tn2A31GnF6Ks
+/gK19Ap1zuZZ1EsRwBmHY+7EoUiNzd/huTOYnATWbpLRixA/ybpy1ceQCbNOYYEk
+/uvurC+IO6HYtm7AKHSosjGjgTl2WalaOBcdnv6wLVokj93UTRrwpwwGD+Oc7uCN
+DfrtuomVxqsywtEkcFbfuNmyHuudY5C+4CbOxqowSLPABy3TbCSSE0zXRbUSODLG
+JLZFsrXzQ5lFQnoOrsWSJq4qWbcLdZltbIVjnDlm03MFiPzNh0xp74d3evu0gim+
+7gnFT3z1QqhF+s/gpeadN5eJ3pIF+BZnYaT68yk8tlDgWkuP88o=
+=aM3A
 -----END PGP SIGNATURE-----
 
---K/NRh952CO+2tg14--
+--KIzF6Cje4W/osXrF--
 
