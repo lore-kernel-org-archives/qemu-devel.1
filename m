@@ -2,64 +2,86 @@ Return-Path: <SRS0=Jehb=YG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C751C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 20:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B6EC4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:27:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C63620673
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 20:52:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8248220673
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:27:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="N1DuToE9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C63620673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H1d3Ki3Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8248220673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJkqS-0004pN-7k
-	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 16:52:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43175)
+	id 1iJmL8-0008Hq-5e
+	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 18:27:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iJkof-0003YS-96
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 16:50:15 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iJmJC-0006Xy-7r
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iJkod-0006y8-Kp
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 16:50:12 -0400
-Received: from 6.130.60.178.static.reverse-mundo-r.com ([178.60.130.6]:34463
- helo=fanzine.igalia.com)
+ (envelope-from <richard.henderson@linaro.org>) id 1iJmJA-0000oe-Oy
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:25:49 -0400
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:42304)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iJkod-0006bR-1t; Sun, 13 Oct 2019 16:50:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
- bh=OBrDj1CP4bLQyTFrO2ilHsg5cU7WOeNqHGGdr6oBxio=; 
- b=N1DuToE964Zg2z/xR0fJu8Pk3waHCrloJiTBCofTxjf2ch9G9UXi/ea2AvqhVtUMQ2hXXQkw3yFM4XdfRQ/w3Hl5WfdOz2L62dZKuu3zvf6r4e6eBaqKXex0ydR5FN5viwxBgljWy7mMjiMyt1nEbBh/+60sClEwc7RyB4z7Y59M7t7bp7LVii6MaHMJJ5GDlF2yP1IK9cwXFoj7YuAJvfsPAXWxDdlhzvMDLZvURbpCff9KaqG2KClLo3BuGmP8szxaU/Yiaj+k7kTFIVVnrqUqw/WJgUTE0W8epd+pfQnpx6mExZybufmx9HwzSs5XGqp/j5Nst8nyNdh6BIigFg==;
-Received: from 87-100-137-117.bb.dnainternet.fi ([87.100.137.117]
- helo=perseus.local) by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1iJkoJ-0004KZ-9L; Sun, 13 Oct 2019 22:49:51 +0200
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1iJknS-0000Hl-GX; Sun, 13 Oct 2019 23:48:58 +0300
-From: Alberto Garcia <berto@igalia.com>
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iJmJA-0000oL-JQ
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:25:48 -0400
+Received: by mail-pl1-x636.google.com with SMTP id e5so7127648pls.9
+ for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 15:25:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=M9R3OnmWTj4pP1yFiSVngG2aJy6lC36iJTj89+hW20g=;
+ b=H1d3Ki3Y6L+kJyS8K7HatN1cLw/fmUyVFUEAYZvWizoPPbUCy6ZRKz0Fr8e+qT3ufv
+ QS4UL/yWYk0f465peiGeWL4zbb1Pnc4tUXR5kUXy3zAdPwVUF3SaW/S+FnhK+mUzLxkG
+ oeCnsN4GF78/PscdXYRjLKgTNPwGToYgUbJN0kXb6V+LUz8cqW5nP2L6gi7C8jWD53lD
+ gMDmoiPdMiyYOH0bqqGqZKGpuMM6sybLWSoYp6gi5fMQdL4MWKE+AGJfyTgeKADsM6xo
+ GSxs7iQboKXXkWaP1LXYNmeyRW8AdLhZVDwJA2bYmIls8JMeayZtfb4hcG4VXC4xWTRZ
+ s/zA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=M9R3OnmWTj4pP1yFiSVngG2aJy6lC36iJTj89+hW20g=;
+ b=ExudNmSlFD0yHLpX4dxVj5UzxiVJbs+2JC5eKfvOAmmCZe8X3y9RJ37Ps0FxnQMBJd
+ b74FV1XsyttER0j6z5TXJOZGHsUO7Eef48bTqGwkq340wB1E7pKUieMqC0C4ajOMO3oC
+ f3Bb9D+qvfjTmWPZF6SZ/JmIXu47Xelhl4ceuFrcbQ9j7ZR/Jn4vij5obGnQIYaOfhnT
+ atI1Eiil1IvGdHUuU/vdF0C3ol72j8Va6WzrDqaj3vGmXK7SvGVK4+oWb7tGXOwW5BJW
+ TLpZdEu7J15eSiL5C0wTkoYzWHrjKzjxIrGrKZ/dsccBWmtopdN3jWET7r/1vIn9IfMj
+ lx2w==
+X-Gm-Message-State: APjAAAXSE7WU+Xr4QscHIbdI382eKFtyCZS6euk7IHVVDN9ZTq+DKPM2
+ doKgT/n+rgH304CL7S6vLXVLUU8gNhs=
+X-Google-Smtp-Source: APXvYqymW9wLyXI/IeHB8psDwNX1BhvLAAqnznJlWkGQ5eBTF2MPjeY98nlMGKry5IpihJvSRFtYGw==
+X-Received: by 2002:a17:902:7d92:: with SMTP id
+ a18mr22491631plm.102.1571005546662; 
+ Sun, 13 Oct 2019 15:25:46 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d76sm15940571pfd.185.2019.10.13.15.25.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 13 Oct 2019 15:25:45 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] block: Reject misaligned write requests with
- BDRV_REQ_NO_FALLBACK
-Date: Sun, 13 Oct 2019 23:48:53 +0300
-Message-Id: <20191013204853.1046-1-berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
+Subject: [PULL 00/23] tcg patch queue
+Date: Sun, 13 Oct 2019 15:25:21 -0700
+Message-Id: <20191013222544.3679-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::636
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,139 +93,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The BDRV_REQ_NO_FALLBACK flag means that an operation should only be
-performed if it can be offloaded or otherwise performed efficiently.
+The following changes since commit 9e5319ca52a5b9e84d55ad9c36e2c0b317a122bb:
 
-However a misaligned write request requires a RMW so we should return
-an error and let the caller decide how to proceed.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2019-10-04 18:32:34 +0100)
 
-This hits an assertion since commit c8bb23cbdb if the required
-alignment is larger than the cluster size:
+are available in the Git repository at:
 
-qemu-img create -f qcow2 -o cluster_size=2k img.qcow2 4G
-qemu-io -c "open -o driver=qcow2,file.align=4k blkdebug::img.qcow2" \
-        -c 'write 0 512'
-qemu-io: block/io.c:1127: bdrv_driver_pwritev: Assertion `!(flags & BDRV_REQ_NO_FALLBACK)' failed.
-Aborted
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20191013
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/io.c                 |  6 +++++
- tests/qemu-iotests/268     | 55 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/268.out |  7 +++++
- tests/qemu-iotests/group   |  1 +
- 4 files changed, 69 insertions(+)
- create mode 100755 tests/qemu-iotests/268
- create mode 100644 tests/qemu-iotests/268.out
+for you to fetch changes up to d2f86bba6931388e275e8eb4ccd1dbcc7cae6328:
 
-diff --git a/block/io.c b/block/io.c
-index 4f9ee97c2b..c5d4d029da 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2071,6 +2071,12 @@ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
-         return ret;
-     }
- 
-+    /* If the request is misaligned then we can't make it efficient */
-+    if (((offset & (align - 1)) || (bytes & (align - 1))) &&
-+        (flags & BDRV_REQ_NO_FALLBACK)) {
-+        return -ENOTSUP;
-+    }
-+
-     bdrv_inc_in_flight(bs);
-     /*
-      * Align write if necessary by performing a read-modify-write cycle.
-diff --git a/tests/qemu-iotests/268 b/tests/qemu-iotests/268
-new file mode 100755
-index 0000000000..895f6e593f
---- /dev/null
-+++ b/tests/qemu-iotests/268
-@@ -0,0 +1,55 @@
-+#!/usr/bin/env bash
-+#
-+# Test write request with required alignment larger than the cluster size
-+#
-+# Copyright (C) 2019 Igalia, S.L.
-+# Author: Alberto Garcia <berto@igalia.com>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=berto@igalia.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+
-+echo
-+echo "== Required alignment larger than cluster size =="
-+
-+CLUSTER_SIZE=2k _make_test_img 1M
-+# Since commit c8bb23cbdb writing to an allocated cluster fills the
-+# empty COW areas with bdrv_write_zeroes(flags=BDRV_REQ_NO_FALLBACK)
-+$QEMU_IO -c "open -o driver=$IMGFMT,file.align=4k blkdebug::$TEST_IMG" \
-+         -c "write 0 512" | _filter_qemu_io
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/268.out b/tests/qemu-iotests/268.out
-new file mode 100644
-index 0000000000..2ed6c68529
---- /dev/null
-+++ b/tests/qemu-iotests/268.out
-@@ -0,0 +1,7 @@
-+QA output created by 268
-+
-+== Required alignment larger than cluster size ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+wrote 512/512 bytes at offset 0
-+512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 5805a79d9e..4c861f7eed 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -278,3 +278,4 @@
- 265 rw auto quick
- 266 rw quick
- 267 rw auto quick snapshot
-+268 rw auto quick
--- 
-2.20.1
+  cpus: kick all vCPUs when running thread=single (2019-10-07 14:08:58 -0400)
 
+----------------------------------------------------------------
+Host vector support for tcg/ppc.
+Fix thread=single cpu kicking.
+
+----------------------------------------------------------------
+Alex Bennée (1):
+      cpus: kick all vCPUs when running thread=single
+
+Richard Henderson (22):
+      tcg/ppc: Introduce Altivec registers
+      tcg/ppc: Introduce macro VX4()
+      tcg/ppc: Introduce macros VRT(), VRA(), VRB(), VRC()
+      tcg/ppc: Create TCGPowerISA and have_isa
+      tcg/ppc: Replace HAVE_ISA_2_06
+      tcg/ppc: Replace HAVE_ISEL macro with a variable
+      tcg/ppc: Enable tcg backend vector compilation
+      tcg/ppc: Add support for load/store/logic/comparison
+      tcg/ppc: Add support for vector maximum/minimum
+      tcg/ppc: Add support for vector add/subtract
+      tcg/ppc: Add support for vector saturated add/subtract
+      tcg/ppc: Support vector shift by immediate
+      tcg/ppc: Support vector multiply
+      tcg/ppc: Support vector dup2
+      tcg/ppc: Enable Altivec detection
+      tcg/ppc: Update vector support for VSX
+      tcg/ppc: Update vector support for v2.07 Altivec
+      tcg/ppc: Update vector support for v2.07 VSX
+      tcg/ppc: Update vector support for v2.07 FP
+      tcg/ppc: Update vector support for v3.00 Altivec
+      tcg/ppc: Update vector support for v3.00 load/store
+      tcg/ppc: Update vector support for v3.00 dup/dupi
+
+ tcg/ppc/tcg-target.h     |   51 ++-
+ tcg/ppc/tcg-target.opc.h |   13 +
+ cpus.c                   |   24 +-
+ tcg/ppc/tcg-target.inc.c | 1118 ++++++++++++++++++++++++++++++++++++++++++----
+ 4 files changed, 1119 insertions(+), 87 deletions(-)
+ create mode 100644 tcg/ppc/tcg-target.opc.h
 
