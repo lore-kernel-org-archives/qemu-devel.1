@@ -2,67 +2,65 @@ Return-Path: <SRS0=Jehb=YG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1739C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 23:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E33C4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 23:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A9502067B
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 23:27:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A9502067B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BC9AE206A3
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 23:49:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="blu3Xbfh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC9AE206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJnGS-00058V-MA
-	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 19:27:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55495)
+	id 1iJncC-0000kj-RX
+	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 19:49:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iJnFj-0004Yf-8x
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 19:26:20 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iJnbF-0008Qc-BW
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 19:48:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iJnFh-0005ki-F8
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 19:26:18 -0400
-Resent-Date: Sun, 13 Oct 2019 19:26:18 -0400
-Resent-Message-Id: <E1iJnFh-0005ki-F8@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21401)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iJnFh-0005je-7H
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 19:26:17 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1571009168; cv=none; d=zoho.com; s=zohoarc; 
- b=cLpM4riKcaINxYYSaqTeea2v3J0zTtaHrgDaCKOsx8NJqbcfGibj9NMvWi4krx9o+OVihJ7jJpSRSbxE0ihr7RAY23g+ovRfNy6tfLR27M5LiLb4MDdFJqM/cE7MU+zzr0QIxVGeuiKm/WBoD0MArxozobOElMyp+Or8wd5LPCM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1571009168;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=SM6TDQZD3Qz1Vf1zyXwaxdGLoA5/ezTRIdAcREv/fdQ=; 
- b=k6ee1enmg/rS9KiiKUC0E1GjCLNIvZ/nq8vAHmvGS5c96wBYOp+tE/sqIUbhK9JSvffXeZjkO/kLG1lbhFVznhT6n4wpHxX/kRhY4QbaReEVZUvjVFbahOfTo0uSMKhdQxsL8IQ7+duSj+XeIZuwMStogNHA5AsiYzU+IoAdnHk=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1571009167084703.2855480711905;
- Sun, 13 Oct 2019 16:26:07 -0700 (PDT)
-In-Reply-To: <20191013222544.3679-1-richard.henderson@linaro.org>
-Subject: Re: [PULL 00/23] tcg patch queue
-Message-ID: <157100916607.19705.7982705330566487737@37313f22b938>
+ (envelope-from <dgibson@ozlabs.org>) id 1iJnbE-0004QQ-4R
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 19:48:33 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:34185)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iJnb9-0004Km-MG; Sun, 13 Oct 2019 19:48:28 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46rz0P0Pl1z9sPT; Mon, 14 Oct 2019 10:48:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1571010501;
+ bh=Pp3p9N2Nb23e+wArhuIV/kXQEFRhcrgh+P8qkGdmvOQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=blu3XbfhDQnzBaNZW9mwoXMKDmk/TTZnotvMyFeEr0/37jmAwZQIhrdxRfprCLvzX
+ sK4lVHK59H5m11WZVYKA5X3iyUePHPO3zjScj3J/UeJG1odzscgAPnUSu96hD2ykiX
+ FcmgYJJedYLiAYG6R3enLlmpV/LUpdrZaW5C8ZIY=
+Date: Mon, 14 Oct 2019 10:36:22 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 1/2] cpu: use ROUND_UP() to define xxx_PAGE_ALIGN
+Message-ID: <20191013233622.GK4080@umbus.fritz.box>
+References: <20191013021145.16011-1-richardw.yang@linux.intel.com>
+ <20191013021145.16011-2-richardw.yang@linux.intel.com>
+ <41a924dc-f91b-c03b-4f82-570757105798@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Sun, 13 Oct 2019 16:26:07 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="BOhpupldhMlYbdva"
+Content-Disposition: inline
+In-Reply-To: <41a924dc-f91b-c03b-4f82-570757105798@linaro.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,98 +72,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, den@openvz.org,
+ qemu-block@nongnu.org, quintela@redhat.com, armbru@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, marcandre.lureau@redhat.com,
+ ehabkost@redhat.com, sw@weilnetz.de, dgilbert@redhat.com,
+ yuval.shaia@oracle.com, alex.williamson@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com, kwolf@redhat.com, cohuck@redhat.com,
+ qemu-s390x@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org,
+ Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAxMzIyMjU0NC4zNjc5
-LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMjNdIHRjZyBwYXRjaCBxdWV1
-ZQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTEwMTMyMjI1NDQuMzY3OS0xLXJpY2hhcmQu
-aGVuZGVyc29uQGxpbmFyby5vcmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjY0MDdiZTQgY3B1czoga2ljayBhbGwg
-dkNQVXMgd2hlbiBydW5uaW5nIHRocmVhZD1zaW5nbGUKNWExNDQ1MiB0Y2cvcHBjOiBVcGRhdGUg
-dmVjdG9yIHN1cHBvcnQgZm9yIHYzLjAwIGR1cC9kdXBpCjY1ZjdhOWMgdGNnL3BwYzogVXBkYXRl
-IHZlY3RvciBzdXBwb3J0IGZvciB2My4wMCBsb2FkL3N0b3JlCjlmMTZhNGQgdGNnL3BwYzogVXBk
-YXRlIHZlY3RvciBzdXBwb3J0IGZvciB2My4wMCBBbHRpdmVjCmVlMGEwMTggdGNnL3BwYzogVXBk
-YXRlIHZlY3RvciBzdXBwb3J0IGZvciB2Mi4wNyBGUAowMWJiMTJjIHRjZy9wcGM6IFVwZGF0ZSB2
-ZWN0b3Igc3VwcG9ydCBmb3IgdjIuMDcgVlNYCmU0NjJlMjUgdGNnL3BwYzogVXBkYXRlIHZlY3Rv
-ciBzdXBwb3J0IGZvciB2Mi4wNyBBbHRpdmVjCmU1NWZkM2UgdGNnL3BwYzogVXBkYXRlIHZlY3Rv
-ciBzdXBwb3J0IGZvciBWU1gKMDM4MWFkNyB0Y2cvcHBjOiBFbmFibGUgQWx0aXZlYyBkZXRlY3Rp
-b24KMGU2OTdmYyB0Y2cvcHBjOiBTdXBwb3J0IHZlY3RvciBkdXAyCmVmZTFkMGQgdGNnL3BwYzog
-U3VwcG9ydCB2ZWN0b3IgbXVsdGlwbHkKYmM4OGQ4ZCB0Y2cvcHBjOiBTdXBwb3J0IHZlY3RvciBz
-aGlmdCBieSBpbW1lZGlhdGUKNDkxMmY4MiB0Y2cvcHBjOiBBZGQgc3VwcG9ydCBmb3IgdmVjdG9y
-IHNhdHVyYXRlZCBhZGQvc3VidHJhY3QKNzljYmJkZmMgdGNnL3BwYzogQWRkIHN1cHBvcnQgZm9y
-IHZlY3RvciBhZGQvc3VidHJhY3QKMzI1ZDgyZCB0Y2cvcHBjOiBBZGQgc3VwcG9ydCBmb3IgdmVj
-dG9yIG1heGltdW0vbWluaW11bQoxYTZmYzE4IHRjZy9wcGM6IEFkZCBzdXBwb3J0IGZvciBsb2Fk
-L3N0b3JlL2xvZ2ljL2NvbXBhcmlzb24KNDk1MzhiMiB0Y2cvcHBjOiBFbmFibGUgdGNnIGJhY2tl
-bmQgdmVjdG9yIGNvbXBpbGF0aW9uCmFjMmQ2YjUgdGNnL3BwYzogUmVwbGFjZSBIQVZFX0lTRUwg
-bWFjcm8gd2l0aCBhIHZhcmlhYmxlCjdlZTVkNmIgdGNnL3BwYzogUmVwbGFjZSBIQVZFX0lTQV8y
-XzA2CmQzMmQ1ZjQgdGNnL3BwYzogQ3JlYXRlIFRDR1Bvd2VySVNBIGFuZCBoYXZlX2lzYQo1Mjc4
-MDYyIHRjZy9wcGM6IEludHJvZHVjZSBtYWNyb3MgVlJUKCksIFZSQSgpLCBWUkIoKSwgVlJDKCkK
-YzlkNmNmNyB0Y2cvcHBjOiBJbnRyb2R1Y2UgbWFjcm8gVlg0KCkKMzc5NTI1MCB0Y2cvcHBjOiBJ
-bnRyb2R1Y2UgQWx0aXZlYyByZWdpc3RlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMjMgQ2hl
-Y2tpbmcgY29tbWl0IDM3OTUyNTBlNTg3OCAodGNnL3BwYzogSW50cm9kdWNlIEFsdGl2ZWMgcmVn
-aXN0ZXJzKQoyLzIzIENoZWNraW5nIGNvbW1pdCBjOWQ2Y2Y3NTAzNWMgKHRjZy9wcGM6IEludHJv
-ZHVjZSBtYWNybyBWWDQoKSkKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnfCcg
-KGN0eDpWeFYpCiMyMTogRklMRTogdGNnL3BwYy90Y2ctdGFyZ2V0LmluYy5jOjMyMjoKKyNkZWZp
-bmUgVlg0KG9wYykgIChPUENEKDQpfChvcGMpKQogICAgICAgICAgICAgICAgICAgICAgICAgICBe
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8y
-MyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8yMyBDaGVja2luZyBjb21taXQgNTI3ODA2
-MjI3YmIxICh0Y2cvcHBjOiBJbnRyb2R1Y2UgbWFjcm9zIFZSVCgpLCBWUkEoKSwgVlJCKCksIFZS
-QygpKQo0LzIzIENoZWNraW5nIGNvbW1pdCBkMzJkNWY0OGQ1Y2IgKHRjZy9wcGM6IENyZWF0ZSBU
-Q0dQb3dlcklTQSBhbmQgaGF2ZV9pc2EpCjUvMjMgQ2hlY2tpbmcgY29tbWl0IDdlZTVkNmIzNjQy
-ZiAodGNnL3BwYzogUmVwbGFjZSBIQVZFX0lTQV8yXzA2KQo2LzIzIENoZWNraW5nIGNvbW1pdCBh
-YzJkNmI1MTdjMGIgKHRjZy9wcGM6IFJlcGxhY2UgSEFWRV9JU0VMIG1hY3JvIHdpdGggYSB2YXJp
-YWJsZSkKNy8yMyBDaGVja2luZyBjb21taXQgNDk1MzhiMjIwZDA0ICh0Y2cvcHBjOiBFbmFibGUg
-dGNnIGJhY2tlbmQgdmVjdG9yIGNvbXBpbGF0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNjM6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjkgbGlu
-ZXMgY2hlY2tlZAoKUGF0Y2ggNy8yMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo4LzIzIENo
-ZWNraW5nIGNvbW1pdCAxYTZmYzE4YWM5YzQgKHRjZy9wcGM6IEFkZCBzdXBwb3J0IGZvciBsb2Fk
-L3N0b3JlL2xvZ2ljL2NvbXBhcmlzb24pCjkvMjMgQ2hlY2tpbmcgY29tbWl0IDMyNWQ4MmQxY2My
-ZiAodGNnL3BwYzogQWRkIHN1cHBvcnQgZm9yIHZlY3RvciBtYXhpbXVtL21pbmltdW0pCjEwLzIz
-IENoZWNraW5nIGNvbW1pdCA3OWNiYmRmYzQ4YjIgKHRjZy9wcGM6IEFkZCBzdXBwb3J0IGZvciB2
-ZWN0b3IgYWRkL3N1YnRyYWN0KQoxMS8yMyBDaGVja2luZyBjb21taXQgNDkxMmY4MmY1Njc5ICh0
-Y2cvcHBjOiBBZGQgc3VwcG9ydCBmb3IgdmVjdG9yIHNhdHVyYXRlZCBhZGQvc3VidHJhY3QpCjEy
-LzIzIENoZWNraW5nIGNvbW1pdCBiYzg4ZDhkYmNhNGIgKHRjZy9wcGM6IFN1cHBvcnQgdmVjdG9y
-IHNoaWZ0IGJ5IGltbWVkaWF0ZSkKMTMvMjMgQ2hlY2tpbmcgY29tbWl0IGVmZTFkMGRlZTFiNCAo
-dGNnL3BwYzogU3VwcG9ydCB2ZWN0b3IgbXVsdGlwbHkpCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
-bGQgbmV2ZXIgdXNlIHRhYnMKIzEzMzogRklMRTogdGNnL3BwYy90Y2ctdGFyZ2V0LmluYy5jOjMy
-MTc6CiteSWJyZWFrOyQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTkyIGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDEzLzIzIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoxNC8yMyBDaGVj
-a2luZyBjb21taXQgMGU2OTdmY2YyMjU0ICh0Y2cvcHBjOiBTdXBwb3J0IHZlY3RvciBkdXAyKQox
-NS8yMyBDaGVja2luZyBjb21taXQgMDM4MWFkN2QyNWZhICh0Y2cvcHBjOiBFbmFibGUgQWx0aXZl
-YyBkZXRlY3Rpb24pCjE2LzIzIENoZWNraW5nIGNvbW1pdCBlNTVmZDNlNmRlMTggKHRjZy9wcGM6
-IFVwZGF0ZSB2ZWN0b3Igc3VwcG9ydCBmb3IgVlNYKQoxNy8yMyBDaGVja2luZyBjb21taXQgZTQ2
-MmUyNTk5YzE1ICh0Y2cvcHBjOiBVcGRhdGUgdmVjdG9yIHN1cHBvcnQgZm9yIHYyLjA3IEFsdGl2
-ZWMpCjE4LzIzIENoZWNraW5nIGNvbW1pdCAwMWJiMTJjN2FjMjQgKHRjZy9wcGM6IFVwZGF0ZSB2
-ZWN0b3Igc3VwcG9ydCBmb3IgdjIuMDcgVlNYKQoxOS8yMyBDaGVja2luZyBjb21taXQgZWUwYTAx
-OGFkNzMzICh0Y2cvcHBjOiBVcGRhdGUgdmVjdG9yIHN1cHBvcnQgZm9yIHYyLjA3IEZQKQoyMC8y
-MyBDaGVja2luZyBjb21taXQgOWYxNmE0ZDQ4NzZmICh0Y2cvcHBjOiBVcGRhdGUgdmVjdG9yIHN1
-cHBvcnQgZm9yIHYzLjAwIEFsdGl2ZWMpCjIxLzIzIENoZWNraW5nIGNvbW1pdCA2NWY3YTljM2E4
-MDEgKHRjZy9wcGM6IFVwZGF0ZSB2ZWN0b3Igc3VwcG9ydCBmb3IgdjMuMDAgbG9hZC9zdG9yZSkK
-MjIvMjMgQ2hlY2tpbmcgY29tbWl0IDVhMTQ0NTIyYjgwMSAodGNnL3BwYzogVXBkYXRlIHZlY3Rv
-ciBzdXBwb3J0IGZvciB2My4wMCBkdXAvZHVwaSkKMjMvMjMgQ2hlY2tpbmcgY29tbWl0IDY0MDdi
-ZTRmZTIwMCAoY3B1czoga2ljayBhbGwgdkNQVXMgd2hlbiBydW5uaW5nIHRocmVhZD1zaW5nbGUp
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkx
-MDEzMjIyNTQ0LjM2NzktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hl
-Y2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
+--BOhpupldhMlYbdva
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, Oct 13, 2019 at 11:56:35AM -0400, Richard Henderson wrote:
+> On 10/12/19 10:11 PM, Wei Yang wrote:
+> > Use ROUND_UP() to define, which is a little bit easy to read.
+> >=20
+> > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> > ---
+> >  include/exec/cpu-all.h | 7 +++----
+> >  1 file changed, 3 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> > index ad9ab85eb3..255bb186ac 100644
+> > --- a/include/exec/cpu-all.h
+> > +++ b/include/exec/cpu-all.h
+> > @@ -220,7 +220,7 @@ extern int target_page_bits;
+> > =20
+> >  #define TARGET_PAGE_SIZE (1 << TARGET_PAGE_BITS)
+> >  #define TARGET_PAGE_MASK ~(TARGET_PAGE_SIZE - 1)
+> > -#define TARGET_PAGE_ALIGN(addr) (((addr) + TARGET_PAGE_SIZE - 1) & TAR=
+GET_PAGE_MASK)
+> > +#define TARGET_PAGE_ALIGN(addr) ROUND_UP((addr), TARGET_PAGE_SIZE)
+> > =20
+> >  /* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
+> >   * when intptr_t is 32-bit and we are aligning a long long.
+> > @@ -228,9 +228,8 @@ extern int target_page_bits;
+> >  extern uintptr_t qemu_host_page_size;
+> >  extern intptr_t qemu_host_page_mask;
+> > =20
+> > -#define HOST_PAGE_ALIGN(addr) (((addr) + qemu_host_page_size - 1) & qe=
+mu_host_page_mask)
+> > -#define REAL_HOST_PAGE_ALIGN(addr) (((addr) + qemu_real_host_page_size=
+ - 1) & \
+> > -                                    qemu_real_host_page_mask)
+> > +#define HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_host_page_size)
+> > +#define REAL_HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_real_host_pag=
+e_size)
+>=20
+>=20
+> No, please.
+>=20
+> (1) The compiler does not know that qemu_*host_page_size is a power of 2,=
+ and
+> will generate a real division at runtime.  The same is true for
+> TARGET_PAGE_SIZE when TARGET_PAGE_BITS_VARY.
+
+Ouch, good point, I didn't think of that when I gave an R-b.
+
+> (2) The first hunk conflicts with an in-flight patch of mine:
+>=20
+> https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg04526.html
+>=20
+>=20
+> r~
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--BOhpupldhMlYbdva
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2jtPQACgkQbDjKyiDZ
+s5IEsw//ftKuQboc8ntKEGJFGNJza6JgIgcbNUaew/8J0/HS16Jub+gBT2lCeES1
+xrK43Si7T6ZPHIRrVGvDPLCx4vboRnfuWkxL550XAHtUwN6h/rVI2NnHG5PzxBjq
+yDeCxc2fyr+sP/bDG7878ooNtGrRAUJNCttfkL9ebi6jck0ll1FX3o2wO2G53xQa
+ay0qIGJUUCpHlPELZCerNexNgbLaB6EdkFhLJq2U7sqenjc7Fqdc8Fd1fynKf7kn
+7fX9JPEEE132D8faEgog2VUfMnZjgnLL9LV/xx91f+1ffD9VOoyBDdnt/FHU8ovd
+WqXnEgHsz1zJALUBfFyJwsN1QNfpG97gj9zlAbO2RQWul54YafB3WBAhOr3UkMkH
+n8EZ/HEsQLIRJMZnOxFjsb+ghniHXR9c9z/4wbIgkE8XTUjgWoVZYkJLfoKJYfa0
+WxOyk7KZRWrEH4/jVSKUjPTHuP3A+wJ9bllet2JzqRE/f1rXUSriPkkEv8MRKywT
+6B4XBK8z9F5BS0HmU8k8JXuWh+OHHB000oo3TsydR57NiMz2w578MVOhx12tLQQn
+jLwSCJGn0ItS/ipvrCsWuy18Uau9XgvY32oyMJZ7w1+/EBThTYefXt+p7a1CsSeM
+GVSlbqj2jgfPyZfnkuQIqXsPr4BguaV38xKYdyBlvQZJxbeqBVk=
+=2kt0
+-----END PGP SIGNATURE-----
+
+--BOhpupldhMlYbdva--
 
