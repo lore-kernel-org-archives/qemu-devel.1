@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15863C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16123C4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:33:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D370A206B7
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:31:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0D1E206B7
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:33:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iRkFFzmx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D370A206B7
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mVCsUdRO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D1E206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJmOj-0003iT-EP
-	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 18:31:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51317)
+	id 1iJmQA-0004v5-Eq
+	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 18:33:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51262)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iJmJU-0006yT-SS
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:09 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iJmJQ-0006qm-E0
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iJmJT-00010F-RJ
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:08 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:40512)
+ (envelope-from <richard.henderson@linaro.org>) id 1iJmJP-0000vg-2j
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:04 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:42466)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iJmJT-0000zs-MU
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:07 -0400
-Received: by mail-pg1-x533.google.com with SMTP id e13so725608pga.7
- for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 15:26:07 -0700 (PDT)
+ id 1iJmJO-0000v4-TV
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:03 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id f14so3818015pgi.9
+ for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 15:26:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=oeW7tayprlItGgUIPuuSDkp5jBXbzTBuI3cJggBf824=;
- b=iRkFFzmxfrN5Tba9PDtDgK4IFVXLKCZPKmG8xdYRd+GiuLHpGAvd8gg7NPONxW3a5y
- cL0b/5ogdqDp0IAA/OzGP33x/yQP57fZQUmhcvwSQv4WoiyPctHkq+263sHadiQHo6bT
- QYM1pajLsIey9XcZUbFKcBoafN4KlowC4eQy7Ybp21Rz7HGad+ZAaA/NCKk05OlJk1yp
- 3Ssfli2zxpYtkG7Y4UUK07+gjx3gmTLhRH7XhbtKEQgVlKTuuRPGb1aTnJcfdX/KeFkI
- Yp5wbrFGKhGbKPmNwTlrgYy1Fa269l2uSWqUBaP9sVOYvOutNgSj7pxKiYXY9FWkLLPX
- fs9w==
+ bh=sTJW6UTbb1j2FRe7m1NuaoxYc6z6Y7/0xQA7i53LXsg=;
+ b=mVCsUdROSDlI5lgvf30ZPysYq9Xgc2jLOsgKpsVLAgHaq9pOLvxhOanzl7GO350z5E
+ L8oHFylDw10RUjlRVBbW8RZL1Z4GhdyKgU41fMZx40p8coGIIBqq7zDZlmfotIjlAYVh
+ 7h3U5GRgMDxklvx4KDmk3iNzFabPZHpo6iCc/JsE5pFgRQzD5j+30KygiYnNXkrczqDU
+ lqfaAo+vGLCGBzuWRuK/ed3T3WFoS3MIUqwFR1K+v+WCm/AFmB1pgC4N7TwuJ1W+DVkr
+ foFcWJOOusvdYLGJhSNmNROXNnTLchAUNEV2SndGCpS3RN8Y63vZpdTlB4q4jE36KkgS
+ cpBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=oeW7tayprlItGgUIPuuSDkp5jBXbzTBuI3cJggBf824=;
- b=iURNWqSYtsWbDMbapW1Bw5yNy6EOvmLRXTJkBk41PgtbMrjoK4seQqg2R0qw8vlA24
- 9XzNjUrWZBZ15Tew6y24zejyggxFr5kdF6dXmNd2xMHLgKt8CbDj6WFkw48OL7mHvKw2
- wtgi3vbIN1K3aS307pnHL7jh5LBTT44MygBfUXpS13gL/E4/LSLI+TJmGnHUA1ErB5pr
- dE9XXVfM1+48iP3MuMRJrgXXSQvwEOH/1tvRorvSW501Uvss0gqPM5MIRLi/cztZeD12
- Db2VwYHvhvNPsE8psi8u9xiMdX47uIEiJtl/Bgf9kEP5OP9ochcZc5ByoefkFj+jU7f7
- tLQQ==
-X-Gm-Message-State: APjAAAWlQRDL2xE8Xa8qbhe/kgMDxwKw44bgPsIUjSPeR+Zl80nHwYfv
- Xwn2eJCCr/a1mSVPbc/q39eyQpG3TsA=
-X-Google-Smtp-Source: APXvYqz5yUkyZcz1RlBGxMHuz3zJ1deTdJx+B3G2bdWz7wMsT+PTwRRm7CExjfJxnw4FULO4LkA8UA==
-X-Received: by 2002:a65:538c:: with SMTP id x12mr8390274pgq.289.1571005566351; 
- Sun, 13 Oct 2019 15:26:06 -0700 (PDT)
+ bh=sTJW6UTbb1j2FRe7m1NuaoxYc6z6Y7/0xQA7i53LXsg=;
+ b=n9ygWgszo+Oy/SUpqgyD0VdzEB7ZFx3fsPhKQJb2TlMpmvDdeeFgPRZJFOll4Bc4Sf
+ imqJd/Qf3O4VLJTCndMDiv6ZNZHbmWXAZbAuzfWPHiGl6hZgJhO2lruAJrnBqmQllZwW
+ TUp3RQV4K/VtDzadCWzqZvv+YzHUOE2cecsPkVQaCBoJTIPj2/ajr3LIuGehMu4J4F1p
+ uVoTSAfh9//FV4zD9KakW/R0OevUsA6osUTGDE/E/GWnPFxpYvahfN2dLiRNwEj0lHxw
+ a+biQc93HVi2EH7p+dSMLhWGdVeCRFUXtTL9YCji+r/RYI4Cb3nQHxSCjnU8F6ceOsoa
+ m+Dw==
+X-Gm-Message-State: APjAAAVmkaScuTYZ5Qbgwh2Eb+kq0qz3gL7BTXinHpqY5D9cpBgyxeO5
+ s3Ohqxg1edbqt2CGroeV3D8MhUojaLU=
+X-Google-Smtp-Source: APXvYqxrtpLA+rWXgZHAdq0+KHmvoxEzeqsPI3UK9xybhqqbvWG0OnKmu5sciE9ZZlzHv5Eg8CdlFw==
+X-Received: by 2002:a63:cf0b:: with SMTP id j11mr17358667pgg.240.1571005561158; 
+ Sun, 13 Oct 2019 15:26:01 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d76sm15940571pfd.185.2019.10.13.15.26.05
+ by smtp.gmail.com with ESMTPSA id d76sm15940571pfd.185.2019.10.13.15.26.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 13 Oct 2019 15:26:05 -0700 (PDT)
+ Sun, 13 Oct 2019 15:26:00 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/23] tcg/ppc: Enable Altivec detection
-Date: Sun, 13 Oct 2019 15:25:36 -0700
-Message-Id: <20191013222544.3679-16-richard.henderson@linaro.org>
+Subject: [PULL 11/23] tcg/ppc: Add support for vector saturated add/subtract
+Date: Sun, 13 Oct 2019 15:25:32 -0700
+Message-Id: <20191013222544.3679-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191013222544.3679-1-richard.henderson@linaro.org>
 References: <20191013222544.3679-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::533
+X-Received-From: 2607:f8b0:4864:20::52f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,36 +90,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we have implemented the required tcg operations,
-we can enable detection of host vector support.
+Add support for vector saturated add/subtract using Altivec
+instructions:
+VADDSBS, VADDSHS, VADDSWS, VADDUBS, VADDUHS, VADDUWS, and
+VSUBSBS, VSUBSHS, VSUBSWS, VSUBUBS, VSUBUHS, VSUBUWS.
 
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> (PPC32)
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tcg/ppc/tcg-target.inc.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ tcg/ppc/tcg-target.h     |  2 +-
+ tcg/ppc/tcg-target.inc.c | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 1 deletion(-)
 
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index 13699f1b63..3ebbbfa77e 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -163,7 +163,7 @@ extern bool have_altivec;
+ #define TCG_TARGET_HAS_shv_vec          0
+ #define TCG_TARGET_HAS_cmp_vec          1
+ #define TCG_TARGET_HAS_mul_vec          0
+-#define TCG_TARGET_HAS_sat_vec          0
++#define TCG_TARGET_HAS_sat_vec          1
+ #define TCG_TARGET_HAS_minmax_vec       1
+ #define TCG_TARGET_HAS_bitsel_vec       0
+ #define TCG_TARGET_HAS_cmpsel_vec       0
 diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 8a508136ce..d739f4b605 100644
+index 6cfc78bb59..a1165209fc 100644
 --- a/tcg/ppc/tcg-target.inc.c
 +++ b/tcg/ppc/tcg-target.inc.c
-@@ -3528,6 +3528,10 @@ static void tcg_target_init(TCGContext *s)
-     have_isel = have_isa_2_06;
- #endif
+@@ -471,12 +471,24 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define STVX       XO31(231)
+ #define STVEWX     XO31(199)
  
-+    if (hwcap & PPC_FEATURE_HAS_ALTIVEC) {
-+        have_altivec = true;
-+    }
-+
-     tcg_target_available_regs[TCG_TYPE_I32] = 0xffffffff;
-     tcg_target_available_regs[TCG_TYPE_I64] = 0xffffffff;
-     if (have_altivec) {
++#define VADDSBS    VX4(768)
++#define VADDUBS    VX4(512)
+ #define VADDUBM    VX4(0)
++#define VADDSHS    VX4(832)
++#define VADDUHS    VX4(576)
+ #define VADDUHM    VX4(64)
++#define VADDSWS    VX4(896)
++#define VADDUWS    VX4(640)
+ #define VADDUWM    VX4(128)
+ 
++#define VSUBSBS    VX4(1792)
++#define VSUBUBS    VX4(1536)
+ #define VSUBUBM    VX4(1024)
++#define VSUBSHS    VX4(1856)
++#define VSUBUHS    VX4(1600)
+ #define VSUBUHM    VX4(1088)
++#define VSUBSWS    VX4(1920)
++#define VSUBUWS    VX4(1664)
+ #define VSUBUWM    VX4(1152)
+ 
+ #define VMAXSB     VX4(258)
+@@ -2844,6 +2856,10 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
+     case INDEX_op_smin_vec:
+     case INDEX_op_umax_vec:
+     case INDEX_op_umin_vec:
++    case INDEX_op_ssadd_vec:
++    case INDEX_op_sssub_vec:
++    case INDEX_op_usadd_vec:
++    case INDEX_op_ussub_vec:
+         return vece <= MO_32;
+     case INDEX_op_cmp_vec:
+         return vece <= MO_32 ? -1 : 0;
+@@ -2945,6 +2961,10 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, 0 },
+         gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, 0 },
+         gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, 0 },
++        ssadd_op[4] = { VADDSBS, VADDSHS, VADDSWS, 0 },
++        usadd_op[4] = { VADDUBS, VADDUHS, VADDUWS, 0 },
++        sssub_op[4] = { VSUBSBS, VSUBSHS, VSUBSWS, 0 },
++        ussub_op[4] = { VSUBUBS, VSUBUHS, VSUBUWS, 0 },
+         umin_op[4] = { VMINUB, VMINUH, VMINUW, 0 },
+         smin_op[4] = { VMINSB, VMINSH, VMINSW, 0 },
+         umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, 0 },
+@@ -2971,6 +2991,18 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_sub_vec:
+         insn = sub_op[vece];
+         break;
++    case INDEX_op_ssadd_vec:
++        insn = ssadd_op[vece];
++        break;
++    case INDEX_op_sssub_vec:
++        insn = sssub_op[vece];
++        break;
++    case INDEX_op_usadd_vec:
++        insn = usadd_op[vece];
++        break;
++    case INDEX_op_ussub_vec:
++        insn = ussub_op[vece];
++        break;
+     case INDEX_op_smin_vec:
+         insn = smin_op[vece];
+         break;
+@@ -3277,6 +3309,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_andc_vec:
+     case INDEX_op_orc_vec:
+     case INDEX_op_cmp_vec:
++    case INDEX_op_ssadd_vec:
++    case INDEX_op_sssub_vec:
++    case INDEX_op_usadd_vec:
++    case INDEX_op_ussub_vec:
+     case INDEX_op_smax_vec:
+     case INDEX_op_smin_vec:
+     case INDEX_op_umax_vec:
 -- 
 2.17.1
 
