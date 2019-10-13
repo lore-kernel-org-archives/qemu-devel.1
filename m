@@ -2,83 +2,83 @@ Return-Path: <SRS0=Jehb=YG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38862C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 07:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07550C4CECE
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 07:52:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB65620679
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 07:52:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C609020679
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 07:52:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XzKSwq2M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB65620679
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ltBvMhVb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C609020679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJYg5-0005tF-Q3
-	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 03:52:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47671)
+	id 1iJYgC-00060b-G2
+	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 03:52:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47626)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iJYcC-0000fr-Vc
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 03:48:34 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iJYcB-0008JJ-IY
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 03:48:32 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:36576)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iJYcB-0008IS-C7
+ (envelope-from <mrolnik@gmail.com>) id 1iJYcA-0000cv-5S
  for qemu-devel@nongnu.org; Sun, 13 Oct 2019 03:48:31 -0400
-Received: by mail-wr1-x432.google.com with SMTP id y19so16153428wrd.3
- for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 00:48:31 -0700 (PDT)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <mrolnik@gmail.com>) id 1iJYc8-0008Gj-QU
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 03:48:30 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40365)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iJYc8-0008G0-KR
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 03:48:28 -0400
+Received: by mail-wm1-x344.google.com with SMTP id b24so13769021wmj.5
+ for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 00:48:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=MBE/sZ604WgtEEK2KK0XvQaJBBoGSHYTdBPmGrMUCB0=;
- b=XzKSwq2MIiUKjQ+NzhXqUUhyAy62iFyMuuNoCMkyWrfFBtRdu1na9qgb4kL2zuntmH
- t49Qg6+Z27a+4Ok/Tyq5+/3AWQspkAhclHMq4BJi6D7AlBAqdGdXPZphwVzfz3unu3pX
- 8W0B92z8g7n219M+Zqo0zAS5pDmNbpSW86DWhrIF8oeysM9xKDdzQRoIR5NdtOF842Px
- Rk+ktbjBPccKjHnPkTqPMjpvDdoJT560MWjOf2NrWQNkDk1/FDWL2zCD8wpg3uiAbXM/
- sJnd9Wq/HasN2VDsHsNJ8kv7ycG5VM6fB5/tmci01rvMCM2c1yXfeVAo5sx2fpByf9kr
- r2fQ==
+ bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
+ b=ltBvMhVb1sMm3pqrPq82g8RedUVfCTbI8dDxEBNYbo9NsZ1huVMmp5wfi4rJMOjFcb
+ wHvM6tsGrtJORTxE1nApXODLKEaz0hHv9yx8X9ofxxJY/j1/m1EfGpDBwSOUm8zGPSFu
+ umF63osxmCIStzdyk3tHKF9QK/+jO25YkDd6c2lUDf42mZb+yP7sck5hXXZ20UiUn7vw
+ Rr+P7uV7p0X/+xbMeVN+2zIlPtDZ40Mn6na3tQwB4JWhdrJpo2ENS9GE9db53g6W4j7C
+ V2ggTy0TLunc1M5HIOBHeUujVNzGXSge3pgr7kX+qv3a57sQSMB/b9oKZmOgxy2AbJnD
+ vjCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=MBE/sZ604WgtEEK2KK0XvQaJBBoGSHYTdBPmGrMUCB0=;
- b=e3sxqFrTn87HHQZHyGfB1iXqVEdExs/HrDX2KbVV/u76p2MiDk0va2WhQFmIeTqWgH
- OD/hzS/dgxM9btEfGjl4sEaob/HlXFOmgFJsTMFEHg8BShJ5/+/dxooxvNJ9AM7lvV9O
- K6PI4vg7ksccFXCpmL24rf8lBXr1SIE/NyPg3JRIP9ZXrCSorIxmExk2u16emPx7oCrJ
- FW9DYa8C2h7rFJuyC+OMzI1A32mrgMZPB63WzK2NnNZmWMzBGd8G891ehB70REdAzl8f
- KHfGQPkbZ2NWgsFUQcleW4RdMHHn1mkysgaPMB7YjIPOjLsi0b3g/S+KDS5dDTogAtg9
- GDVQ==
-X-Gm-Message-State: APjAAAUcstHV41NWKHRxKSV40aoSmvPwRF5+fcrNW/QaOkFCjToMEXr1
- mckV2XF2U9yK1jfjWVmE7WXn7AmD/6Y=
-X-Google-Smtp-Source: APXvYqzArfhhdD6iOTW48Z+zrQQdwtygRUu3gUFwBJKYsRzrlbjpupwECKN5Xg4BnOjHBIkrkCY7Yw==
-X-Received: by 2002:a5d:51d1:: with SMTP id n17mr20787368wrv.125.1570952909950; 
- Sun, 13 Oct 2019 00:48:29 -0700 (PDT)
+ bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
+ b=Ee8mhHXeZfHX4XY0J1BTHfN/WcbR1OAD2NrzvrO6bwXfbOD1lQF8ieCy3yycZm0DoN
+ bG2fB+zRqesy2DdmNPG9NYQM6OXNt3rC29px2GFaTo6QHVa1fOLyTVh/UxF/g+wNybfC
+ qfDrrfV6fmBsJX6VQREdQH0vIeHXqRraGBx+9XK4xcx/gHFgot5zSp7q0mA/VC/KrKur
+ nXIzMxsR4TQYsMzBE6AXV0+e79SA1WDkuwmHGo+EKxPRAtdlTR0k1qiaoOfv+RThDqmG
+ OZgbzOHe8A1AVrmydwNv8uo23c+VrditfTazaXoz3am2+ppXvYiIISx5ErZ25wCtk9OA
+ JHBQ==
+X-Gm-Message-State: APjAAAV+xQV1HO2h5xS8kEV4xKLPfmx4DkDhApFw9P9Q1xVVbmdrGB1w
+ lv6zgSyFV2dl5VRi6ojTkUMItnE82hA=
+X-Google-Smtp-Source: APXvYqywdvk3uI+qum07d+p5EX0kXxbOlIHhrVo3h5Zwz+s9NO3kiVg43mDQHHpFyb1BU+aaat5Anw==
+X-Received: by 2002:a1c:5641:: with SMTP id k62mr10350461wmb.97.1570952907118; 
+ Sun, 13 Oct 2019 00:48:27 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-179-64-109.red.bezeqint.net. [79.179.64.109])
- by smtp.gmail.com with ESMTPSA id u26sm9277532wrd.87.2019.10.13.00.48.28
+ by smtp.gmail.com with ESMTPSA id u26sm9277532wrd.87.2019.10.13.00.48.25
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sun, 13 Oct 2019 00:48:29 -0700 (PDT)
+ Sun, 13 Oct 2019 00:48:26 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v32 04/13] target/avr: Add instruction translation - begin
-Date: Sun, 13 Oct 2019 10:47:57 +0300
-Message-Id: <20191013074803.91390-6-mrolnik@gmail.com>
+Subject: [PATCH v32 03/13] target/avr: Add instruction decoding
+Date: Sun, 13 Oct 2019 10:47:55 +0300
+Message-Id: <20191013074803.91390-4-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191013074803.91390-1-mrolnik@gmail.com>
 References: <20191013074803.91390-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,152 +98,196 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This includes:
-- TCG translations for each instruction
+- encoding of all 16 bit instructions
+- encoding of all 32 bit instructions
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 ---
- target/avr/translate.c | 132 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 132 insertions(+)
- create mode 100644 target/avr/translate.c
+ target/avr/insn.decode | 175 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
+ create mode 100644 target/avr/insn.decode
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
 new file mode 100644
-index 0000000000..53c9892a60
+index 0000000000..6b387762c6
 --- /dev/null
-+++ b/target/avr/translate.c
-@@ -0,0 +1,132 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
++++ b/target/avr/insn.decode
+@@ -0,0 +1,175 @@
++#
++#   A = [16 .. 31]
++#   B = [16 .. 23]
++#   C = [24, 26, 28, 30]
++#   D = [0, 2, 4, 6, 8, .. 30]
 +
-+#include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
-+#include "tcg/tcg.h"
-+#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "disas/disas.h"
-+#include "tcg-op.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/helper-proto.h"
-+#include "exec/helper-gen.h"
-+#include "exec/log.h"
-+#include "exec/gdbstub.h"
-+#include "exec/translator.h"
-+#include "exec/gen-icount.h"
++%rd             4:5
++%rr             9:1 0:4
 +
-+/*
-+ *  Define if you want a BREAK instruction translated to a breakpoint
-+ *  Active debugging connection is assumed
-+ *  This is for
-+ *  https://github.com/seharris/qemu-avr-tests/tree/master/instruction-tests
-+ *  tests
-+ */
-+#undef BREAKPOINT_ON_BREAK
++&rd_rr          rd rr
++&rd_imm         rd imm
 +
-+static TCGv cpu_pc;
-+
-+static TCGv cpu_Cf;
-+static TCGv cpu_Zf;
-+static TCGv cpu_Nf;
-+static TCGv cpu_Vf;
-+static TCGv cpu_Sf;
-+static TCGv cpu_Hf;
-+static TCGv cpu_Tf;
-+static TCGv cpu_If;
-+
-+static TCGv cpu_rampD;
-+static TCGv cpu_rampX;
-+static TCGv cpu_rampY;
-+static TCGv cpu_rampZ;
-+
-+static TCGv cpu_r[NO_CPU_REGISTERS];
-+static TCGv cpu_eind;
-+static TCGv cpu_sp;
-+
-+static TCGv cpu_skip;
-+
-+static const char reg_names[NO_CPU_REGISTERS][8] = {
-+    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
-+    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
-+    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
-+    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
-+};
-+#define REG(x) (cpu_r[x])
-+
-+enum {
-+    DISAS_EXIT   = DISAS_TARGET_0,  /* We want return to the cpu main loop.  */
-+    DISAS_LOOKUP = DISAS_TARGET_1,  /* We have a variable condition exit.  */
-+    DISAS_CHAIN  = DISAS_TARGET_2,  /* We have a single condition exit.  */
-+};
-+
-+typedef struct DisasContext DisasContext;
-+
-+/* This is the state at translation time. */
-+struct DisasContext {
-+    TranslationBlock *tb;
-+
-+    CPUAVRState *env;
-+    CPUState *cs;
-+
-+    target_long npc;
-+    uint32_t opcode;
-+
-+    /* Routine used to access memory */
-+    int memidx;
-+    int bstate;
-+    int singlestep;
-+
-+    TCGv skip_var0;
-+    TCGv skip_var1;
-+    TCGCond skip_cond;
-+    bool free_skip_var0;
-+};
-+
-+static int to_A(DisasContext *ctx, int indx) { return 16 + (indx % 16); }
-+static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8); }
-+static int to_C(DisasContext *ctx, int indx) { return 24 + (indx % 4) * 2; }
-+static int to_D(DisasContext *ctx, int indx) { return (indx % 16) * 2; }
-+
-+static uint16_t next_word(DisasContext *ctx)
-+{
-+    return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
-+}
-+
-+static int append_16(DisasContext *ctx, int x)
-+{
-+    return x << 16 | next_word(ctx);
-+}
++@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=%rd rr=%rr
++ADD             0000 11 . ..... ....        @op_rd_rr
++ADC             0001 11 . ..... ....        @op_rd_rr
++AND             0010 00 . ..... ....        @op_rd_rr
++CP              0001 01 . ..... ....        @op_rd_rr
++CPC             0000 01 . ..... ....        @op_rd_rr
++CPSE            0001 00 . ..... ....        @op_rd_rr
++EOR             0010 01 . ..... ....        @op_rd_rr
++MOV             0010 11 . ..... ....        @op_rd_rr
++MUL             1001 11 . ..... ....        @op_rd_rr
++OR              0010 10 . ..... ....        @op_rd_rr
++SBC             0000 10 . ..... ....        @op_rd_rr
++SUB             0001 10 . ..... ....        @op_rd_rr
 +
 +
-+static bool avr_have_feature(DisasContext *ctx, int feature)
-+{
-+    if (!avr_feature(ctx->env, feature)) {
-+        gen_helper_unsupported(cpu_env);
-+        ctx->bstate = DISAS_NORETURN;
-+        return false;
-+    }
-+    return true;
-+}
++%rd_c           4:2                         !function=to_C
++%imm6           6:2 0:4
 +
-+static bool decode_insn(DisasContext *ctx, uint16_t insn);
-+#include "decode_insn.inc.c"
++@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=%rd_c imm=%imm6
++ADIW            1001 0110 .. .. ....        @op_rd_imm6
++SBIW            1001 0111 .. .. ....        @op_rd_imm6
 +
++
++%rd_a           4:4                         !function=to_A
++%rr_a           0:4                         !function=to_A
++%rd_d           4:4                         !function=to_D
++%rr_d           0:4                         !function=to_D
++%imm8           8:4 0:4
++
++@op_rd_imm8     .... .... .... ....         &rd_imm     rd=%rd_a imm=%imm8
++ANDI            0111 .... .... ....         @op_rd_imm8
++CPI             0011 .... .... ....         @op_rd_imm8
++LDI             1110 .... .... ....         @op_rd_imm8
++ORI             0110 .... .... ....         @op_rd_imm8
++SBCI            0100 .... .... ....         @op_rd_imm8
++SUBI            0101 .... .... ....         @op_rd_imm8
++
++
++@op_rd          .... ... rd:5 ....
++ASR             1001 010 ..... 0101         @op_rd
++COM             1001 010 ..... 0000         @op_rd
++DEC             1001 010 ..... 1010         @op_rd
++ELPM2           1001 000 ..... 0110         @op_rd
++ELPMX           1001 000 ..... 0111         @op_rd
++INC             1001 010 ..... 0011         @op_rd
++LDX1            1001 000 ..... 1100         @op_rd
++LDX2            1001 000 ..... 1101         @op_rd
++LDX3            1001 000 ..... 1110         @op_rd
++LDY2            1001 000 ..... 1001         @op_rd
++LDY3            1001 000 ..... 1010         @op_rd
++LDZ2            1001 000 ..... 0001         @op_rd
++LDZ3            1001 000 ..... 0010         @op_rd
++LPM2            1001 000 ..... 0100         @op_rd
++LPMX            1001 000 ..... 0101         @op_rd
++LSR             1001 010 ..... 0110         @op_rd
++NEG             1001 010 ..... 0001         @op_rd
++POP             1001 000 ..... 1111         @op_rd
++PUSH            1001 001 ..... 1111         @op_rd
++ROR             1001 010 ..... 0111         @op_rd
++STY2            1001 001 ..... 1001         @op_rd
++STY3            1001 001 ..... 1010         @op_rd
++STZ2            1001 001 ..... 0001         @op_rd
++STZ3            1001 001 ..... 0010         @op_rd
++SWAP            1001 010 ..... 0010         @op_rd
++
++
++@op_bit         .... .... . bit:3 ....
++BCLR            1001 0100 1 ... 1000        @op_bit
++BSET            1001 0100 0 ... 1000        @op_bit
++
++
++@op_rd_bit      .... ... rd:5 . bit:3
++BLD             1111 100 ..... 0 ...        @op_rd_bit
++BST             1111 101 ..... 0 ...        @op_rd_bit
++
++
++@op_bit_imm     .... .. imm:s7 bit:3
++BRBC            1111 01 ....... ...         @op_bit_imm
++BRBS            1111 00 ....... ...         @op_bit_imm
++
++
++BREAK           1001 0101 1001 1000
++EICALL          1001 0101 0001 1001
++EIJMP           1001 0100 0001 1001
++ELPM1           1001 0101 1101 1000
++ICALL           1001 0101 0000 1001
++IJMP            1001 0100 0000 1001
++LPM1            1001 0101 1100 1000
++NOP             0000 0000 0000 0000
++RET             1001 0101 0000 1000
++RETI            1001 0101 0001 1000
++SLEEP           1001 0101 1000 1000
++SPM             1001 0101 1110 1000
++SPMX            1001 0101 1111 1000
++WDR             1001 0101 1010 1000
++
++
++@op_reg_bit     .... .... reg:5 bit:3
++CBI             1001 1000 ..... ...         @op_reg_bit
++SBI             1001 1010 ..... ...         @op_reg_bit
++SBIC            1001 1001 ..... ...         @op_reg_bit
++SBIS            1001 1011 ..... ...         @op_reg_bit
++
++
++DES             1001 0100 imm:4 1011
++
++
++%rd_b           4:3                         !function=to_B
++%rr_b           0:3                         !function=to_B
++@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
++FMUL            0000 0011 0 ... 1 ...       @fmul
++FMULS           0000 0011 1 ... 0 ...       @fmul
++FMULSU          0000 0011 1 ... 1 ...       @fmul
++MULSU           0000 0011 0 ... 0 ...       @fmul
++
++
++%io_imm         9:2 0:4
++@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=%rd imm=%io_imm
++IN              1011 0 .. ..... ....        @io_rd_imm
++OUT             1011 1 .. ..... ....        @io_rd_imm
++
++
++XCH             1001 001 rd:5 0100
++LAC             1001 001 rd:5 0110
++LAS             1001 001 rd:5 0101
++LAT             1001 001 rd:5 0111
++STX1            1001 001 rr:5 1100
++STX2            1001 001 rr:5 1101
++STX3            1001 001 rr:5 1110
++
++
++%ldst_d_imm     13:1 10:2 0:3
++@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=%ldst_d_imm
++LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
++LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
++STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
++STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
++
++
++MOVW            0000 0001 .... ....         &rd_rr      rd=%rd_d rr=%rr_d
++MULS            0000 0010 .... ....         &rd_rr      rd=%rd_a rr=%rr_a
++
++RCALL           1101 imm:s12
++RJMP            1100 imm:s12
++
++SBRC            1111 110 rr:5 0 bit:3
++SBRS            1111 111 rr:5 0 bit:3
++
++# The 22-bit immediate is partially in the opcode word,
++# and partially in the next.  Use append_16 to build the
++# complete 22-bit value.
++%imm_call       4:5 0:1                     !function=append_16
++CALL            1001 010 ..... 111 .        imm=%imm_call
++JMP             1001 010 ..... 110 .        imm=%imm_call
++
++
++# The 16-bit immediate is completely in the next word.
++# Fields cannot be defined with no bits, so we cannot play
++# the same trick and append to a zero-bit value.
++# Defer reading the immediate until trans_{LDS,STS}.
++@ldst_s         .... ... rd:5 ....          imm=0
++LDS             1001 000 ..... 0000         @ldst_s
++STS             1001 001 ..... 0000         @ldst_s
 -- 
 2.17.2 (Apple Git-113)
 
