@@ -2,81 +2,64 @@ Return-Path: <SRS0=Jehb=YG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC02C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 08:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1F8C4360C
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 09:33:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0FFA2067B
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 08:50:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0FFA2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 895C420679
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 09:33:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cr6XmDtw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 895C420679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJZaG-00039U-2w
-	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 04:50:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52882)
+	id 1iJaFI-0005Pw-Ik
+	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 05:33:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vkuznets@redhat.com>) id 1iJZZL-0002bB-DF
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 04:49:41 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iJaE5-0004Nx-3K
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 05:31:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vkuznets@redhat.com>) id 1iJZZI-0007pl-Rk
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 04:49:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48940)
+ (envelope-from <dgibson@ozlabs.org>) id 1iJaE3-0003gC-ST
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 05:31:45 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36547 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1iJZZI-0007oZ-JK
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 04:49:36 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 912B83DE0C
- for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 08:49:33 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id k4so7009252wru.1
- for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 01:49:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=Ja9qbq8pwNINxaby4hLqVgL+JEeU/d+fL6MBhBXvMXU=;
- b=jN7a7r2RFfCba/Kh5DDtVpW3C5b0hb3v8DVTS1d1thOyHTVXkdQ0qYR6TqajKu/35g
- edyA93zJWpDJ3kyRFibCZUUbGqLS0uAoUtXtAZMCzVv/Uv2azVsNNhvzdhnMsytKIWue
- jKssIchIGP9yqqQ0H2/XqNHOZc51dztRVfIvhdPssyxa5njYgHjp8yzLA1a5qaeFnDdr
- GCxIhgoU96wWcv6M2PeQTBWIrsCNaA+rEGoVQitjsfZSiPKx0U5aSu2nfSWnJ6cwmu8e
- 3VywXv18A1wkafFaqkw0ZueEIJ1eyXiB7J3/2j/KZ+x+IJZCfvkrYjQkqDoeJPTe8eB4
- R6ow==
-X-Gm-Message-State: APjAAAUYDRqJMrux0J6L/PoBU4WBL3aLfmiCqrbLZGTc6UdPfAIjeGpR
- 7aUwAHr/Z3dRNb+O6nWlpLXj+YWWc0vphQqSRufAh43McVA9gIaU9Lin/sfz/T7O1vrX0L3Z78M
- OVL6NmqJlHgNIN14=
-X-Received: by 2002:a05:600c:2c2:: with SMTP id
- 2mr10686813wmn.112.1570956572215; 
- Sun, 13 Oct 2019 01:49:32 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxo3H0voKcFIvJsSqXkvXStyxqzlu/VzQtkrGy4RT5JKhephQan3h6hxxgpNm1WZEyY9x3gyQ==
-X-Received: by 2002:a05:600c:2c2:: with SMTP id
- 2mr10686793wmn.112.1570956571896; 
- Sun, 13 Oct 2019 01:49:31 -0700 (PDT)
-Received: from vitty.brq.redhat.com ([95.82.135.110])
- by smtp.gmail.com with ESMTPSA id u4sm27814969wmg.41.2019.10.13.01.49.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 13 Oct 2019 01:49:31 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: lantianyu1986@gmail.com
-Subject: Re: [PATCH] target/i386/kvm: Add Hyper-V direct tlb flush support
-In-Reply-To: <20191012034153.31817-1-Tianyu.Lan@microsoft.com>
-References: <20191012034153.31817-1-Tianyu.Lan@microsoft.com>
-Date: Sun, 13 Oct 2019 10:49:30 +0200
-Message-ID: <87r23h58th.fsf@vitty.brq.redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iJaDz-0003b5-4v; Sun, 13 Oct 2019 05:31:41 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 46rbzl3Qkvz9sP6; Sun, 13 Oct 2019 20:31:31 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1570959091;
+ bh=zAcblpc8D9oNHNEbUfiTdWI/qxLNZyr05HMAZLFVUWY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=cr6XmDtwsinvm9utixAbBZ2/ehBzPmW8jiobwysKCqvbu1TinbFzBqi2pdT1YMDHK
+ 5UD/AgxkABh4VHlfkMkrjARon9hhELlu5xlnnL8sJfXRwrLIS0WDbetn8rU950HYxR
+ JoajNC6+uSeBXuglbAwd7Loo+EeMAjd+Y48q3b1A=
+Date: Sun, 13 Oct 2019 20:27:12 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 1/2] cpu: use ROUND_UP() to define xxx_PAGE_ALIGN
+Message-ID: <20191013092712.GF4080@umbus.fritz.box>
+References: <20191013021145.16011-1-richardw.yang@linux.intel.com>
+ <20191013021145.16011-2-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="K/NRh952CO+2tg14"
+Content-Disposition: inline
+In-Reply-To: <20191013021145.16011-2-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,165 +71,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mtosatti@redhat.com, Tianyu Lan <Tianyu.Lan@microsoft.com>,
- ehabkost@redhat.com, kvm@vger.kernel.org, mst@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, Roman Kagan <rkagan@virtuozzo.com>, pbonzini@redhat.com,
- rth@twiddle.net
+Cc: fam@euphon.net, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, den@openvz.org,
+ qemu-block@nongnu.org, quintela@redhat.com, armbru@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, marcandre.lureau@redhat.com,
+ ehabkost@redhat.com, sw@weilnetz.de, dgilbert@redhat.com,
+ yuval.shaia@oracle.com, alex.williamson@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com, rth@twiddle.net, kwolf@redhat.com, cohuck@redhat.com,
+ qemu-s390x@nongnu.org, mreitz@redhat.com, qemu-ppc@nongnu.org,
+ imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-lantianyu1986@gmail.com writes:
 
-> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
->
+--K/NRh952CO+2tg14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-(Please also Cc: Roman on you Hyper-V related submissions to QEMU who's
-known to be a great reviewer)
+On Sun, Oct 13, 2019 at 10:11:44AM +0800, Wei Yang wrote:
+> Use ROUND_UP() to define, which is a little bit easy to read.
+>=20
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
-> Hyper-V direct tlb flush targets KVM on Hyper-V guest.
-> Enable direct TLB flush for its guests meaning that TLB
-> flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
-> bypassing KVM in Level 1. Due to the different ABI for hypercall
-> parameters between Hyper-V and KVM, KVM capabilities should be
-> hidden when enable Hyper-V direct tlb flush otherwise KVM
-> hypercalls may be intercepted by Hyper-V. Add new parameter
-> "hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
-> capability status before enabling the feature.
->
-> Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  docs/hyperv.txt           | 12 ++++++++++++
->  linux-headers/linux/kvm.h |  1 +
->  target/i386/cpu.c         |  2 ++
->  target/i386/cpu.h         |  1 +
->  target/i386/kvm.c         | 21 +++++++++++++++++++++
->  5 files changed, 37 insertions(+)
->
-> diff --git a/docs/hyperv.txt b/docs/hyperv.txt
-> index 8fdf25c829..ceab8c21fe 100644
-> --- a/docs/hyperv.txt
-> +++ b/docs/hyperv.txt
-> @@ -184,6 +184,18 @@ enabled.
->  
->  Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
->  
-> +3.18. hv-direct-tlbflush
-> +=======================
-> +The enlightenment targets KVM on Hyper-V guest. Enable direct TLB flush for
-> +its guests meaning that TLB flush hypercalls are handled by Level 0 hypervisor
-> +(Hyper-V) bypassing KVM in Level 1. Due to the different ABI for hypercall
-> +parameters between Hyper-V and KVM, enabling this capability effectively
-> +disables all hypercall handling by KVM (as some KVM hypercall may be mistakenly
-> +treated as TLB flush hypercalls by Hyper-V). So kvm capability should not show
-> +to guest when enable this capability. If not, user will fail to enable this
-> +capability.
-> +
-> +Requires: hv-tlbflush, -kvm
->  
->  4. Development features
->  ========================
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 18892d6541..923fb33a01 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -995,6 +995,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_ARM_SVE 170
->  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
->  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-> +#define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 174
+>  include/exec/cpu-all.h | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+> index ad9ab85eb3..255bb186ac 100644
+> --- a/include/exec/cpu-all.h
+> +++ b/include/exec/cpu-all.h
+> @@ -220,7 +220,7 @@ extern int target_page_bits;
+> =20
+>  #define TARGET_PAGE_SIZE (1 << TARGET_PAGE_BITS)
+>  #define TARGET_PAGE_MASK ~(TARGET_PAGE_SIZE - 1)
+> -#define TARGET_PAGE_ALIGN(addr) (((addr) + TARGET_PAGE_SIZE - 1) & TARGE=
+T_PAGE_MASK)
+> +#define TARGET_PAGE_ALIGN(addr) ROUND_UP((addr), TARGET_PAGE_SIZE)
+> =20
+>  /* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
+>   * when intptr_t is 32-bit and we are aligning a long long.
+> @@ -228,9 +228,8 @@ extern int target_page_bits;
+>  extern uintptr_t qemu_host_page_size;
+>  extern intptr_t qemu_host_page_mask;
+> =20
+> -#define HOST_PAGE_ALIGN(addr) (((addr) + qemu_host_page_size - 1) & qemu=
+_host_page_mask)
+> -#define REAL_HOST_PAGE_ALIGN(addr) (((addr) + qemu_real_host_page_size -=
+ 1) & \
+> -                                    qemu_real_host_page_mask)
+> +#define HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_host_page_size)
+> +#define REAL_HOST_PAGE_ALIGN(addr) ROUND_UP((addr), qemu_real_host_page_=
+size)
+> =20
+>  /* same as PROT_xxx */
+>  #define PAGE_READ      0x0001
 
-I was once told that scripts/update-linux-headers.sh script is supposed
-to be used instead of cherry-picking stuff you need (adn this would be a
-separate patch - update linux headers to smth).
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 44f1bbdcac..7bc7fee512 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -6156,6 +6156,8 @@ static Property x86_cpu_properties[] = {
->                        HYPERV_FEAT_IPI, 0),
->      DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
->                        HYPERV_FEAT_STIMER_DIRECT, 0),
-> +    DEFINE_PROP_BIT64("hv-direct-tlbflush", X86CPU, hyperv_features,
-> +                      HYPERV_FEAT_DIRECT_TLBFLUSH, 0),
->      DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
->  
->      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index eaa5395aa5..3cb105f7d6 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -907,6 +907,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
->  #define HYPERV_FEAT_EVMCS               12
->  #define HYPERV_FEAT_IPI                 13
->  #define HYPERV_FEAT_STIMER_DIRECT       14
-> +#define HYPERV_FEAT_DIRECT_TLBFLUSH     15
->  
->  #ifndef HYPERV_SPINLOCK_NEVER_RETRY
->  #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 11b9c854b5..8e999dbcf1 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1235,6 +1235,27 @@ static int hyperv_handle_properties(CPUState *cs,
->          r |= 1;
->      }
->  
-> +    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH)) {
-> +        if (!kvm_check_extension(cs->kvm_state,
-> +            KVM_CAP_HYPERV_DIRECT_TLBFLUSH)) {
-> +            fprintf(stderr,
-> +                    "Kernel doesn't support Hyper-V direct tlbflush.\n");
-> +            r = -ENOSYS;
-> +            goto free;
-> +        }
-> +
-> +        if (cpu->expose_kvm ||
-> +            !hyperv_feat_enabled(cpu, HYPERV_FEAT_TLBFLUSH)) {
-> +            fprintf(stderr, "Hyper-V direct tlbflush requires Hyper-V %s"
-> +                    " and not expose KVM.\n",
-> +                    kvm_hyperv_properties[HYPERV_FEAT_TLBFLUSH].desc);
-> +            r = -ENOSYS;
-> +            goto free;
-> +        }
-> +
-> +        kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0);
-> +    }
+--K/NRh952CO+2tg14
+Content-Type: application/pgp-signature; name="signature.asc"
 
-We also have hv-passthrough mode where all Hyper-V enlightenments are
-supposed to be enabled; I'd suggest you do the same we currently do with
-HYPERV_FEAT_EVMCS:
+-----BEGIN PGP SIGNATURE-----
 
-    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH) ||
-        cpu->hyperv_passthrough) {
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl2i7e0ACgkQbDjKyiDZ
+s5L5IRAAhKogha3/Q23X/xOOl9tAUbbi4iHveQC2aXE6LrTBuGERxq+yalBcpAl5
+oIURkcHnOIuv7/gth4d6ZMqChElfX9Rgf1YxV7667X90gYqcEHB8dEfIuGBa1WvG
+3CwvTlPrfzeE2Vf75gVgS6SUOormrSCigvq21TvGAQNnFV0LEUL2v1v2yewei2Sh
+ssHf29dTUJUkZoBZg1v+/d3Yb4Kyflf3BaRpQpDuek91k/7h3UkyzxUQ8a7T6cBM
+mT46l5ZRjk3Q4iMfmnGaYcbuaxnHChHODsCwlxiU1GWQNQsaJi7yHBRy+bnfN0VC
+40XtvubdCE/1Yxt18dLC+7KQDmvM5Rue7gZIwlKwod/7N7r862HLAhYXf4QQOHKB
+tbpEP9UyBTcsjkPTDcW4zZExXcjWsVd2Aye5BK3nO25qj1RxjRGpkiYaMUrmAaNr
+QZORes+RxVB/0uesqp4x/WE2nNkiftzbO3UCkoo1jo7108v4/tN/QcLDZXXj3V8B
+1GGyxWGRf3TRKE8Xs55jGrTB5MWnY8rgwOqY41Sfae129fsMdcsH0NTGHgSCmmXw
+MiePK8a5htGyR31oQoRPnm1ss+GpsPquV6SwyoqBuAXZWefzuuUlWirVm3FoHlkk
+cXMh0bkFxvPKClCdvn9oD4ivXt2NWyVf2ChVrTtXEnkblFiUXl4=
+=exjc
+-----END PGP SIGNATURE-----
 
-        r = kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0);
-
-        if (hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS) && r) {
-            fprintf(stderr, "Hyper-V %s is not supported by kernel\n",
-                    kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
-            return -ENOSYS;
-        }
-
-No need to check for a capability if you're going to enable it right
-away (and btw - this can fail).
-
-You also need to use kvm_hyperv_properties to track dependencies between
-features and not do it manually here (like you required
-HYPERV_FEAT_TLBFLUSH). This is going to be the first feature without its
-own CPUID bits assigned so some tweaks to kvm_hyperv_properties handling
-may be required. Or we can use HYPERV_FEAT_TLBFLUSH bits, I'm not sure
-here.
-
-
-> +
->      /* Not exposed by KVM but needed to make CPU hotplug in Windows work */
->      env->features[FEAT_HYPERV_EDX] |= HV_CPU_DYNAMIC_PARTITIONING_AVAILABLE;
-
--- 
-Vitaly
+--K/NRh952CO+2tg14--
 
