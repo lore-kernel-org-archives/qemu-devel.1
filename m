@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F26F8C4360C
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F1EC4CECE
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6C7D20663
-	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:41:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C682620663
+	for <qemu-devel@archiver.kernel.org>; Sun, 13 Oct 2019 22:41:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KTVt+CYe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6C7D20663
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Orl5U+SO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C682620663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJmXb-0006CV-Vg
+	id 1iJmXc-0006Dm-T7
 	for qemu-devel@archiver.kernel.org; Sun, 13 Oct 2019 18:40:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51359)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51241)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iJmJa-000749-OO
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iJmJP-0006lj-16
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iJmJZ-00013L-EY
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:14 -0400
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:40957)
+ (envelope-from <richard.henderson@linaro.org>) id 1iJmJM-0000tP-8x
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:02 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:42464)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iJmJZ-00012f-9L
- for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:13 -0400
-Received: by mail-pf1-x430.google.com with SMTP id x127so9259650pfb.7
- for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 15:26:12 -0700 (PDT)
+ id 1iJmJM-0000tC-2S
+ for qemu-devel@nongnu.org; Sun, 13 Oct 2019 18:26:00 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id f14so3817977pgi.9
+ for <qemu-devel@nongnu.org>; Sun, 13 Oct 2019 15:26:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=TP3AGBJHylcwVuHBsF2tuldK7PZ1RLZ5nrABMW1HnLc=;
- b=KTVt+CYePvbhTj9Xu/MEfannvdLUtWmznAGd2rxGCRf/QAJ0MKy75Py+IxKSltbg1G
- VSB1h4T0GyU65pwsBL+yMPxKGWwS9AHrqXhTCKozBsVV6cOyPRBuRDLS86PlB0+Dkezh
- phrpATOMHKT4CiWx152vywGyO/qwWj7hrM/nL1IMIr9U6o5nyZT4c4paKH9R60+Qm6k5
- j2biesOQ4jUP5ObHRl256a6UciJIF9rLiOO1gWa6EC4AtkgJDrRi2LjnYTSOTzyf+7Jq
- O4/P5JPb7Yl9jqoI/TE8GAZD77mkVFj062FlLW+4cv8MtvWBzzDyXyDazvd3agJ4XIPL
- Ntpg==
+ bh=5ZDmbwz7v2egeojt/Bhecjq76qk07ezt/13exaG5QJI=;
+ b=Orl5U+SOcF0h8ZUzIsugmGwxryPFjloJuDDAFeQw/GgTI797hHWQ8gygIbNoJUhLYw
+ obzvhLX/N/wEO5ZM5DP2uMuQQitTE56fri7arWrZgU4K8oolD2UG/A2oRkOnopJcFt91
+ Z/vGy9s9MgqMSoVwFy1pKoxXA1IhUEqnVGP/aNlgeBpfqqeK6lggok+NG711I+vslBXX
+ 3hrUqDxG6ynSPV8OU7W3IuCHDP6QxrjaOypheJymjFWe6SNOd4tRD/boWg8yu3IhIxZ+
+ sukhK7FvR/lCDxhB0+cAGDRTHxZuWXRtmVRIdtgfkFEbFa4G/nAiBYow2n2nyYATFkDt
+ 99Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=TP3AGBJHylcwVuHBsF2tuldK7PZ1RLZ5nrABMW1HnLc=;
- b=tGt2zR1za7ur+hS1o3J8PTtN9yeQH/a5etgFqL/JEr7r8o+xsuVD6dfToHxzXSbjAV
- J2D6mUx/vUZmfaBPbYPdlGKhxsa6l2vCyrqkoFwE1VWwTkaXqDyOY+mw4uhK5tznCQpJ
- Fwis56DfNmN8tl+sZI4jwUvFQe6vuN+ofTdPsmBMNtKwqvW7VLa76EupoPH4uu/YHnRi
- FBtC+PZDPM59doiT2puIjnGe5XuCDdHAjajBsyjUVDIRDmu5sPAejs1CRA31cRw9Slc2
- fvPjqTLnUaNh1WIjoQq3fTxJenl2ptuBeRZkJbyo/acUMC7Ca8aLzeDKZSAJU/GL/i0W
- OmHQ==
-X-Gm-Message-State: APjAAAW10mxBMk4P/CQusOkFKerDH9rZs7ylkofEor4K0+1jhh5qEzlS
- zRVBYB2t5eYgmUrrPhATlCasEXsLz2o=
-X-Google-Smtp-Source: APXvYqzkFHXdx5v47afG5kw0m9VMB9F0f1AzRrQ03GQSA4UGD0NVkQdcv1dxMZdTK1uQee4rp4N1Kw==
-X-Received: by 2002:a63:4525:: with SMTP id s37mr27676174pga.148.1571005571322; 
- Sun, 13 Oct 2019 15:26:11 -0700 (PDT)
+ bh=5ZDmbwz7v2egeojt/Bhecjq76qk07ezt/13exaG5QJI=;
+ b=QcVQq1R4s8V7XGD6UxTXVTVT4GTUyI/RuF73vWQloIf5vBvpKA4zH4dHvFpe4T7N7C
+ V68I4ojdrsho3Lii07e/FXtnCaJ2uTvEfhlatuaULvoR+a/A5pIiKeryncwpN1F910jI
+ 5M7lbErNufDtg1lxJdO38Uh2ZlpSQdwjRJuHPQM06lVBAt3trpUWnQKmdvpsa8fiiNIv
+ TtoFsugbUKC4F1R+53I1yRfmEGkQxsrHD4Tyfn5XBu6Y8np4E5CL5l6z1PbkGi9qV13z
+ 0TObUBZp0A63ReGPGhIMNQcmTNJosGj1ocgv0k++g854RnfYmobLrM5mbOUH4Wp8Q2dj
+ JE/A==
+X-Gm-Message-State: APjAAAXUEnxoqfJJ6wXZaXBiMFLgmLFL2xsnv30gRJ3Kb20Zl+upgLhX
+ 02kCnIEu1ebEF0cRuL1iTtrpStE8V1U=
+X-Google-Smtp-Source: APXvYqyNqrSEiqAL6HFpTXAJvJCc4wOJaypHw9Z4RdQAoegkEGVvyctjAzZFCrHZkNx7NAuVCbT2oQ==
+X-Received: by 2002:a63:d754:: with SMTP id w20mr11166502pgi.156.1571005558708; 
+ Sun, 13 Oct 2019 15:25:58 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id d76sm15940571pfd.185.2019.10.13.15.26.10
+ by smtp.gmail.com with ESMTPSA id d76sm15940571pfd.185.2019.10.13.15.25.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 13 Oct 2019 15:26:10 -0700 (PDT)
+ Sun, 13 Oct 2019 15:25:57 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 19/23] tcg/ppc: Update vector support for v2.07 FP
-Date: Sun, 13 Oct 2019 15:25:40 -0700
-Message-Id: <20191013222544.3679-20-richard.henderson@linaro.org>
+Subject: [PULL 09/23] tcg/ppc: Add support for vector maximum/minimum
+Date: Sun, 13 Oct 2019 15:25:30 -0700
+Message-Id: <20191013222544.3679-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191013222544.3679-1-richard.henderson@linaro.org>
 References: <20191013222544.3679-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::430
+X-Received-From: 2607:f8b0:4864:20::52d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,75 +90,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These new instructions are conditional on MSR.FP when TX=0 and
-MSR.VEC when TX=1.  Since we only care about the Altivec registers,
-and force TX=1, we can consider these to be Altivec instructions.
-Since Altivec is true for any use of vector types, we only need
-test have_isa_2_07.
+Add support for vector maximum/minimum using Altivec instructions
+VMAXSB, VMAXSH, VMAXSW, VMAXUB, VMAXUH, VMAXUW, and
+VMINSB, VMINSH, VMINSW, VMINUB, VMINUH, VMINUW.
 
-This includes moves to and from the integer registers.
-
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tcg/ppc/tcg-target.inc.c | 32 ++++++++++++++++++++++++++------
- 1 file changed, 26 insertions(+), 6 deletions(-)
+ tcg/ppc/tcg-target.h     |  2 +-
+ tcg/ppc/tcg-target.inc.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 2 deletions(-)
 
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index a0e59a5074..13699f1b63 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -164,7 +164,7 @@ extern bool have_altivec;
+ #define TCG_TARGET_HAS_cmp_vec          1
+ #define TCG_TARGET_HAS_mul_vec          0
+ #define TCG_TARGET_HAS_sat_vec          0
+-#define TCG_TARGET_HAS_minmax_vec       0
++#define TCG_TARGET_HAS_minmax_vec       1
+ #define TCG_TARGET_HAS_bitsel_vec       0
+ #define TCG_TARGET_HAS_cmpsel_vec       0
+ 
 diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 6321e0767f..840464aab5 100644
+index 1a8d7dc925..6879be6f80 100644
 --- a/tcg/ppc/tcg-target.inc.c
 +++ b/tcg/ppc/tcg-target.inc.c
-@@ -586,6 +586,11 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define XXPERMDI   (OPCD(60) | (10 << 3) | 7)  /* v2.06, force ax=bx=tx=1 */
- #define XXSEL      (OPCD(60) | (3 << 4) | 0xf) /* v2.06, force ax=bx=cx=tx=1 */
+@@ -471,6 +471,19 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define STVX       XO31(231)
+ #define STVEWX     XO31(199)
  
-+#define MFVSRD     (XO31(51) | 1)   /* v2.07, force sx=1 */
-+#define MFVSRWZ    (XO31(115) | 1)  /* v2.07, force sx=1 */
-+#define MTVSRD     (XO31(179) | 1)  /* v2.07, force tx=1 */
-+#define MTVSRWZ    (XO31(243) | 1)  /* v2.07, force tx=1 */
++#define VMAXSB     VX4(258)
++#define VMAXSH     VX4(322)
++#define VMAXSW     VX4(386)
++#define VMAXUB     VX4(2)
++#define VMAXUH     VX4(66)
++#define VMAXUW     VX4(130)
++#define VMINSB     VX4(770)
++#define VMINSH     VX4(834)
++#define VMINSW     VX4(898)
++#define VMINUB     VX4(514)
++#define VMINUH     VX4(578)
++#define VMINUW     VX4(642)
 +
- #define RT(r) ((r)<<21)
- #define RS(r) ((r)<<21)
- #define RA(r) ((r)<<16)
-@@ -715,12 +720,27 @@ static bool tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg)
-         tcg_debug_assert(TCG_TARGET_REG_BITS == 64);
-         /* fallthru */
-     case TCG_TYPE_I32:
--        if (ret < TCG_REG_V0 && arg < TCG_REG_V0) {
--            tcg_out32(s, OR | SAB(arg, ret, arg));
--            break;
--        } else if (ret < TCG_REG_V0 || arg < TCG_REG_V0) {
--            /* Altivec does not support vector/integer moves.  */
--            return false;
-+        if (ret < TCG_REG_V0) {
-+            if (arg < TCG_REG_V0) {
-+                tcg_out32(s, OR | SAB(arg, ret, arg));
-+                break;
-+            } else if (have_isa_2_07) {
-+                tcg_out32(s, (type == TCG_TYPE_I32 ? MFVSRWZ : MFVSRD)
-+                          | VRT(arg) | RA(ret));
-+                break;
-+            } else {
-+                /* Altivec does not support vector->integer moves.  */
-+                return false;
-+            }
-+        } else if (arg < TCG_REG_V0) {
-+            if (have_isa_2_07) {
-+                tcg_out32(s, (type == TCG_TYPE_I32 ? MTVSRWZ : MTVSRD)
-+                          | VRT(ret) | RA(arg));
-+                break;
-+            } else {
-+                /* Altivec does not support integer->vector moves.  */
-+                return false;
-+            }
-         }
-         /* fallthru */
-     case TCG_TYPE_V64:
+ #define VCMPEQUB   VX4(6)
+ #define VCMPEQUH   VX4(70)
+ #define VCMPEQUW   VX4(134)
+@@ -2817,6 +2830,11 @@ int tcg_can_emit_vec_op(TCGOpcode opc, TCGType type, unsigned vece)
+     case INDEX_op_andc_vec:
+     case INDEX_op_not_vec:
+         return 1;
++    case INDEX_op_smax_vec:
++    case INDEX_op_smin_vec:
++    case INDEX_op_umax_vec:
++    case INDEX_op_umin_vec:
++        return vece <= MO_32;
+     case INDEX_op_cmp_vec:
+         return vece <= MO_32 ? -1 : 0;
+     default:
+@@ -2914,7 +2932,11 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+     static const uint32_t
+         eq_op[4]  = { VCMPEQUB, VCMPEQUH, VCMPEQUW, 0 },
+         gts_op[4] = { VCMPGTSB, VCMPGTSH, VCMPGTSW, 0 },
+-        gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, 0 };
++        gtu_op[4] = { VCMPGTUB, VCMPGTUH, VCMPGTUW, 0 },
++        umin_op[4] = { VMINUB, VMINUH, VMINUW, 0 },
++        smin_op[4] = { VMINSB, VMINSH, VMINSW, 0 },
++        umax_op[4] = { VMAXUB, VMAXUH, VMAXUW, 0 },
++        smax_op[4] = { VMAXSB, VMAXSH, VMAXSW, 0 };
+ 
+     TCGType type = vecl + TCG_TYPE_V64;
+     TCGArg a0 = args[0], a1 = args[1], a2 = args[2];
+@@ -2931,6 +2953,18 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+         tcg_out_dupm_vec(s, type, vece, a0, a1, a2);
+         return;
+ 
++    case INDEX_op_smin_vec:
++        insn = smin_op[vece];
++        break;
++    case INDEX_op_umin_vec:
++        insn = umin_op[vece];
++        break;
++    case INDEX_op_smax_vec:
++        insn = smax_op[vece];
++        break;
++    case INDEX_op_umax_vec:
++        insn = umax_op[vece];
++        break;
+     case INDEX_op_and_vec:
+         insn = VAND;
+         break;
+@@ -3223,6 +3257,10 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_andc_vec:
+     case INDEX_op_orc_vec:
+     case INDEX_op_cmp_vec:
++    case INDEX_op_smax_vec:
++    case INDEX_op_smin_vec:
++    case INDEX_op_umax_vec:
++    case INDEX_op_umin_vec:
+         return &v_v_v;
+     case INDEX_op_not_vec:
+     case INDEX_op_dup_vec:
 -- 
 2.17.1
 
