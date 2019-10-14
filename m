@@ -2,78 +2,87 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88412C4CECE
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A49C4ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:48:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C60420663
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:32:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C60420663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 793AF20854
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 10:48:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 793AF20854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJxeJ-0002xJ-IW
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 06:32:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42668)
+	id 1iJxtb-0006dw-Ho
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 06:48:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iJxcz-0002TB-2G
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:31:07 -0400
+ (envelope-from <slp@redhat.com>) id 1iJxsY-0006BH-8V
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:47:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iJxcw-0001p6-DC
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:31:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49824)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iJxcw-0001mb-7A
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:30:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iJxcu-0008AI-Nm
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:30:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B27FF2E80C8
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:30:56 +0000 (UTC)
+ (envelope-from <slp@redhat.com>) id 1iJxsW-0002h2-0F
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:47:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59554)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iJxsV-0002eq-Lw
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 06:47:03 -0400
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AC2F28553D
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 10:47:01 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id i14so8321480wro.19
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 03:47:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=A7dB7NuiHuhHdxP5Zx1Nc3ItnZn4fE1OcGpaYrrdZdk=;
+ b=qFTjDLxapNIgRcI4X73c5yz/NcAO7TivPcPOrxh/ktzkGC3rqBtpMpthHmvJDHZyxJ
+ VLkGsDdfs5qp/wneyMQfZSJ4YACYOzmzM3uCgFk7n8mSNTCvOZxvae4wQELoKHejFCm3
+ FV5eQPjc8PFjPM63+pLoxMhAzbb31dau/OZt/3si6B8sdageeLMPfyjmN8tWg6AebGzC
+ +Q71HXNJEc5Gpn1OF7xyNXrxxanpAagWeb57KEPoqUkjtpKhkIfSrIUrlph9jkp9uaLQ
+ 9jPbcuG0EPGAWBDrU5fFO0pQMny82ok6usv0WvHABM7QmzKUqKcqQA00mVW9eH3kescV
+ YRww==
+X-Gm-Message-State: APjAAAV/HDgRqjTmgeSqX/GCp5lstnECymZaLzOKhpiIb86pagkcxyy1
+ 6YhceLBqn20P/4nAWQsBCvoJ9plvjmnHWpFnw9N7NdW4t6l3XZCUh7gjsnix8f1XWK4BP9oL6iK
+ N5HlAxev4dAESBi4=
+X-Received: by 2002:a5d:5587:: with SMTP id i7mr25231022wrv.57.1571050020474; 
+ Mon, 14 Oct 2019 03:47:00 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyCPbIU6FmnhXOYuPOQoM4tRsoxFZfCE9bsY0dvjBeqM/kwLqGQE5K+R4b2uYd7p1SwBZ93vA==
+X-Received: by 2002:a5d:5587:: with SMTP id i7mr25230999wrv.57.1571050020235; 
+ Mon, 14 Oct 2019 03:47:00 -0700 (PDT)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id a204sm30040864wmh.21.2019.10.14.03.46.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Oct 2019 03:46:59 -0700 (PDT)
+References: <20191011085611.4194-1-stefanha@redhat.com>
+ <20191011085611.4194-7-stefanha@redhat.com> <877e5bqyfq.fsf@redhat.com>
+ <20191014095214.GI22963@stefanha-x1.localdomain>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v2 6/7] libqos: make the virtio-pci BAR index configurable
+In-reply-to: <20191014095214.GI22963@stefanha-x1.localdomain>
+Date: Mon, 14 Oct 2019 12:46:53 +0200
+Message-ID: <87imorzjs2.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Oct 2019 10:22:11 -0000
-From: David Hildenbrand <1847232@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: davidhildenbrand ivmn
-X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
-X-Launchpad-Bug-Modifier: David Hildenbrand (davidhildenbrand)
-References: <157053356610.22354.6751604707489617887.malonedeb@gac.canonical.com>
- <61ce859f-0817-0eba-7eb8-2c16b3e73889@redhat.com>
- <7a661e58-72df-94bc-4712-f306ce5ee7c6@vmfacility.fr>
- <8ada8acb-d2ce-a09d-6c9a-b758360edcb2@redhat.com>
-Message-Id: <4115ee76-8f74-cce2-348b-44752cd402ed@redhat.com>
-Subject: Re: [Bug 1847232] [NEW] qemu TCG in s390x mode issue with calculating
- HASH
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="af2eefe214bd95389a09b7c956720881bab16807";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a9b07e664cd0a7ad86320f6e5f98ff7568469379
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,175 +91,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847232 <1847232@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20191014102211.S15TIf-xA3XnVaAllmCyP20WXyapTlVKccrDOKWmn-g@z>
 
-On 14.10.19 11:53, David Hildenbrand wrote:
-> On 08.10.19 16:11, Ivan Warren wrote:
->>
->> On 10/8/2019 3:35 PM, David Hildenbrand wrote:
->>> On 08.10.19 14:11, Cornelia Huck wrote:
->>>> On Tue, 08 Oct 2019 11:19:25 -0000
->>>> Ivan Warren via <qemu-devel@nongnu.org> wrote:
->>>>
->>>>> Public bug reported:
->>>>>
->>>>> When using go on s390x on Debian x64 (buster) (host) and debian s390x
->>>>> (sid) (guest) I run into the following problem :
->>>>>
->>>>> The following occurs while trying to build a custom project :
->>>>>
->>>>> go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
->>>>> Get
->>>>> https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0=
-.0-20150613233007-fe3947df716e.mod:
->>>>> local error: tls: bad record MAC
->>>>>
->>>>> Doing a git bisect I find that this problem only occurs on and after
->>>>> commit 08ef92d556c584c7faf594ff3af46df456276e1b
->>>>>
->>>>> Before that commit, all works fine. Past this commit, build always
->>>>> fails.
->>>> What version are you using? Current master?
->>>>
->>>> Can you please share your command line?
->>>>
->>>>> Without any proof, It looks like a hash calculation bug related to us=
-ing
->>>>> z/Arch vector facilities...
->>>> Not an unreasonable guess, cc:ing David in case he has seen that befor=
-e.
->>>>
->>> Can you reproduce with "-cpu qemu,vx=3Doff" added to the QEMU command
->>> line? Could be some fallout from vector instruction support. Currently
->>> ill, will have a look when I'm feeling better.
->>
->> Reposted with a reply all... (sorry for the duplicates)
->>
->> So it does !
->>
->>
->> My qemu command line is now (forget the odd funny networking things..)
->>
->> qemu-system-s390x \
->>    =C2=A0=C2=A0=C2=A0 -drive
->> file=3DDEB002.IMG.NEW,discard=3Dunmap,cache=3Dwriteback,id=3Ddrive-0,if=
-=3Dnone \
->>    =C2=A0=C2=A0=C2=A0 -device virtio-scsi-ccw,id=3Dvirtio-scsi-0 \
->>    =C2=A0=C2=A0=C2=A0 -device scsi-hd,id=3Dscsi-hd-0,drive=3Ddrive-0 \
->>    =C2=A0=C2=A0=C2=A0 -m 8G \
->>    =C2=A0=C2=A0=C2=A0 -net nic,macaddr=3D52:54:00:00:00:02 \
->>    =C2=A0=C2=A0=C2=A0 -net tap,ifname=3Dtaparm,script=3Dno \
->>    =C2=A0=C2=A0=C2=A0 -nographic -accel tcg,thread=3Dmulti \
->>    =C2=A0=C2=A0=C2=A0 -monitor unix:ms,server,nowait \
->>    =C2=A0=C2=A0=C2=A0 -cpu qemu,vx=3Doff \=C2=A0 ##### THAT WAS ADDED as=
- instructed - without it
->> everything goes kaput !
->>    =C2=A0=C2=A0=C2=A0 -smp 12
->>
->> And using the latest bleeding edge qemu from github, my build works (the
->> problem goes away).
->>
->> So the z/Arch vector instructions may have a glitch is a venue to
->> consider.. Probably one that couldn't be screened through conventional
->> methods.
->>
->> I'm not that versed into z/Arch vector instruction, but if there
->> anything I can help with, I will !
-> =
-
-> I'll have to reproduce, can you outline the steps needed to trigger
-> this? (never had to build a go project before #luckyme ( ;) )). It looks
-> like https://github.com/FactomProject/basen is getting pulled in from
-> some other project?
-> =
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
 
-I just tried with Fedora 31 Nightly using "go get"
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-[root@f31 ~]# go get -v -d github.com/FactomProject/factom
-github.com/FactomProject/factom (download)
-github.com/FactomProject/btcutil (download)
-github.com/FactomProject/ed25519 (download)
-github.com/FactomProject/go-bip32 (download)
-github.com/FactomProject/btcutilecc (download)
-package golang.org/x/crypto/ripemd160: unrecognized import path "golang.org=
-/x/crypto/ripemd160" (https fetch: Get https://golang.org/x/crypto/ripemd16=
-0?go-get=3D1: local error: tls: bad record MAC)
-github.com/FactomProject/go-bip39 (download)
-package golang.org/x/crypto/pbkdf2: unrecognized import path "golang.org/x/=
-crypto/pbkdf2" (https fetch: Get https://golang.org/x/crypto/pbkdf2?go-get=
-=3D1: local error: tls: bad record MAC)
-github.com/FactomProject/go-bip44 (download)
-github.com/FactomProject/netki-go-partner-client (download)
-github.com/FactomProject/go-simplejson (download)
+> On Fri, Oct 11, 2019 at 02:06:01PM +0200, Sergio Lopez wrote:
+>>=20
+>> Stefan Hajnoczi <stefanha@redhat.com> writes:
+>>=20
+>> > The Legacy virtio-pci interface always uses BAR 0.  VIRTIO 1.0 may need
+>> > to use a different BAR index, so make it configurable.
+>> >
+>> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> > ---
+>> >  tests/libqos/virtio-pci.h | 2 ++
+>> >  tests/libqos/virtio-pci.c | 3 ++-
+>> >  2 files changed, 4 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
+>> > index b620c30451..f2d53aa377 100644
+>> > --- a/tests/libqos/virtio-pci.h
+>> > +++ b/tests/libqos/virtio-pci.h
+>> > @@ -25,6 +25,8 @@ typedef struct QVirtioPCIDevice {
+>> >      uint16_t config_msix_entry;
+>> >      uint64_t config_msix_addr;
+>> >      uint32_t config_msix_data;
+>> > +
+>> > +    uint8_t bar_idx;
+>> >  } QVirtioPCIDevice;
+>> >=20=20
+>> >  struct QVirtioPCIMSIXOps {
+>> > diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
+>> > index 3fb4af4016..efd8caee18 100644
+>> > --- a/tests/libqos/virtio-pci.c
+>> > +++ b/tests/libqos/virtio-pci.c
+>> > @@ -300,7 +300,7 @@ static const QVirtioPCIMSIXOps qvirtio_pci_msix_op=
+s_legacy =3D {
+>> >  void qvirtio_pci_device_enable(QVirtioPCIDevice *d)
+>> >  {
+>> >      qpci_device_enable(d->pdev);
+>> > -    d->bar =3D qpci_iomap(d->pdev, 0, NULL);
+>> > +    d->bar =3D qpci_iomap(d->pdev, d->bar_idx, NULL);
+>> >  }
+>> >=20=20
+>> >  void qvirtio_pci_device_disable(QVirtioPCIDevice *d)
+>> > @@ -389,6 +389,7 @@ void qvirtio_pci_start_hw(QOSGraphObject *obj)
+>> >  static void qvirtio_pci_init_legacy(QVirtioPCIDevice *dev)
+>> >  {
+>> >      dev->vdev.device_type =3D qpci_config_readw(dev->pdev, PCI_SUBSYS=
+TEM_ID);
+>> > +    dev->bar_idx =3D 0;
+>> >      dev->vdev.bus =3D &qvirtio_pci_legacy;
+>> >      dev->msix_ops =3D &qvirtio_pci_msix_ops_legacy;
+>> >      dev->vdev.big_endian =3D qtest_big_endian(dev->pdev->bus->qts);
+>>=20
+>> qpci_iomap() is also called with a hardcoded bar at
+>> virtio-blk-test.c:test_nonexistent_virtqueue(). Should it be fixed here
+>> or in a future patch?
+>
+> That virtio-blk-pci-specific continues to work because the
+> virtio-blk-pci device is a Transitional device that still supports
+> Legacy mode in BAR 0.
+>
+> Also, that test doesn't use the libqos virtio API so there is no
+> conflict between it and this patch series.
 
-With vx=3Doff:
+OK, in that case:
 
-[root@f31 ~]# go get -v -d github.com/FactomProject/factom
-github.com/FactomProject/factom (download)
-github.com/FactomProject/btcutil (download)
-github.com/FactomProject/ed25519 (download)
-github.com/FactomProject/go-bip32 (download)
-github.com/FactomProject/basen (download)
-github.com/FactomProject/btcutilecc (download)
-get "golang.org/x/crypto/ripemd160": found meta tag get.metaImport{Prefix:"=
-golang.org/x/crypto", VCS:"git", RepoRoot:"https://go.googlesource.com/cryp=
-to"} at //golang.org/x/crypto/ripemd160?go-get=3D1
-get "golang.org/x/crypto/ripemd160": verifying non-authoritative meta tag
-golang.org/x/crypto (download)
-github.com/FactomProject/go-bip39 (download)
-github.com/FactomProject/go-bip44 (download)
-github.com/FactomProject/netki-go-partner-client (download)
-github.com/FactomProject/go-simplejson (download)
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+
+> Stefan
 
 
-That should be sufficient to identify the instruction. Might take some time=
-, though. E.g.,
-the HASH calculation in the kernel works just fine.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-
-David / dhildenb
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847232
-
-Title:
-  qemu TCG in s390x mode issue with calculating HASH
-
-Status in QEMU:
-  New
-
-Bug description:
-  When using go on s390x on Debian x64 (buster) (host) and debian s390x
-  (sid) (guest) I run into the following problem :
-
-  The following occurs while trying to build a custom project :
-
-  go: github.com/FactomProject/basen@v0.0.0-20150613233007-fe3947df716e:
-  Get
-  https://proxy.golang.org/github.com/%21factom%21project/basen/@v/v0.0.0-2=
-0150613233007-fe3947df716e.mod:
-  local error: tls: bad record MAC
-
-  Doing a git bisect I find that this problem only occurs on and after
-  commit 08ef92d556c584c7faf594ff3af46df456276e1b
-
-  Before that commit, all works fine. Past this commit, build always
-  fails.
-
-  Without any proof, It looks like a hash calculation bug related to
-  using z/Arch vector facilities...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847232/+subscriptions
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl2kUh4ACgkQ9GknjS8M
+AjXvwA//c3KMrz5ao6V/QPG49v41KB72/wwS/bkiDRTcNJG8Gd7eWqby/xZ/mtXS
+MwvMPi23HBdRb3cTBtzFwKxd+dLs2TMiBjO6TSG89L6/culiHrt9p5SyqkQIdEjt
+onAmrq/u+68uK06CrnnxQ64p2VeczW8UYQfbxdCqyzsN2zL9t3t9/m3tlM571zan
+EjDVtGYcdbFI7kV/1WCvqMrShqOekwfgvVDdDBPuRNnPhSsFfcahmEsDzRqJBfyH
+bauDLAT7F5/JY7l7sOVDnUHV43EKzgZmZ0hphrCix/LfaYMso/2XBLcJtlEY4340
+ZEIhRdrFWd6a1Q8rhDP2TVbWVQFzRYB1Sq/o9iEdEvqvF2PhCucVBTk6upksDzV6
+tNeRjBptCGJY1cFFUtgreSzCm1oOO6EEoNmDrq4fL2ig+Oj6sgNWGAACqYxqoQUG
+3C7QkGkLwT7K0B6/6/93tWP+lFZ+id3tARInaA58zKY7gwy5kcGmQM6/lwiw4rR5
+oPMuEep8EOw+NVj8zWvV1DVJTsAAGWhaH3Zcr4G0+6y5PuxMH9hbTS7/g5lCXutT
+BUyA4yYhtQFBYbJo0GJwznKp0hfW5/VnB9qS9l3zxApaWSXElEywfmEBMIbHFM24
+AXUjI2/wyoo1DCVp5SVDCah0idbtkkGImZxQ8ai5/BSwT0CZM8Q=
+=yftF
+-----END PGP SIGNATURE-----
+--=-=-=--
 
