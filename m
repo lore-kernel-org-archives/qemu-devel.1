@@ -2,81 +2,80 @@ Return-Path: <SRS0=PUPy=YH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB32ECE587
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9554ECE587
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 382BC206A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:45:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77CDC207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 14 Oct 2019 11:47:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ImaDVd7L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 382BC206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZTxPVhnl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77CDC207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iJyme-0001Ik-RO
-	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:45:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46830)
+	id 1iJyp3-0003jV-JQ
+	for qemu-devel@archiver.kernel.org; Mon, 14 Oct 2019 07:47:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46909)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyC8-00081p-WB
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:22 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iJyCF-0008C8-7A
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iJyC7-0007eJ-0w
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:20 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34882)
+ (envelope-from <alex.bennee@linaro.org>) id 1iJyCD-0007mQ-H8
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:27 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41285)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iJyC6-0007dM-Q4
- for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:18 -0400
-Received: by mail-wr1-x441.google.com with SMTP id v8so19217095wrt.2
- for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:18 -0700 (PDT)
+ id 1iJyCD-0007lU-AA
+ for qemu-devel@nongnu.org; Mon, 14 Oct 2019 07:07:25 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p4so3326796wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 14 Oct 2019 04:07:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=3DpqzaOrNntDkFAtLNgfVGSPKEwLzzpzG6mkI3f5/AE=;
- b=ImaDVd7LxXydpl7pcYiPgZ1vdyAVAgbO8Q7HnjywLiP1LCYREfdymKJKMBmr9msY+c
- sRDEuYHTtX18uefWeBvbQuD69iy9bP15FsASA+XryJLC6jkj1J6FYr5HVNOytqTcMzkQ
- 5viDbwswTo2RbXye7hWN/Xuz95LEOfkETPAri+iSoxW9JNkt021K3C6uVWgHzqqUBjRu
- ySkxJXtU2CbGa4AjV74Jt+KRSRdicnT+1Rpxz8J42j87clXXX2ilDPgy0aWz2L81WjTv
- +9rxZmBX1BmgMIAm4dRAaIqi63dM3oPA/6D876ELkiH8p05Vp3/mvAWVVN/bWkAR9awR
- WAeQ==
+ bh=jb94Z+Gp/SEto0c7c9pjyGvoGowBStIfIYtnSg1TGYw=;
+ b=ZTxPVhnlh6IJ0i9/HS02KCIiEi452j/wOypJG/2pzNwQM0y55fz2G6P+8xE1OdzHRW
+ 5NwTdR70fOms4try8kfS76K5rlAhyJX7qvxyK7vH9kuLEwTmGtLoyyvCeZ4pWpCBJid0
+ iNk8WARfSjA9N7g3EDTvdHZOKHBhicbmfrM4rvrx69f+KYaVH2YZvJFYyJirw+kbUqDN
+ 17k33wRfEncHSllzRMpz5jfP3poJiqICCdf3nsXxc5kQE56tPfJf47uNld/wgp0zPdXd
+ MzGh3tVLq5o8GTTxdkdxrImEwkSGrjJwH49Lw8opIOFJIqmy9e/mBpZv95Khl7yz+dLh
+ WhfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=3DpqzaOrNntDkFAtLNgfVGSPKEwLzzpzG6mkI3f5/AE=;
- b=G9ZjyZDL1NPtVeGhveG4fGKgFvFUZvFPJg+iyOYIfyFu4oPimfY9Ug7gXBhDa7dFoV
- Fj6n88nSbS/Ge9QmgOdTlnTBu3lfsJH5qkTDmBagNTjQoan6dZCoZgjzxW19QkT5zoy2
- i0/NiOuVwCaTl2b6eV5iAd5mYETibdYCZVYZnM6OiFbDln4KWHCMtC5bIZrTMF2zVAZV
- OXO9JxcCraCRtVyEZGBIz4WBzXgBi1miDkE3f5AZrAQTQ8QVCOE/SK6+NVNeunJfavEZ
- R1mfIgU0DDbSM/gSkO6UWG7vcyXJM4urlpbXMOYxcVsghzX9rWkGwy/eq2b9i+vXM0c9
- KflQ==
-X-Gm-Message-State: APjAAAVxuLsWwo6YD8J+4hb5ahaBYoHru+w1R7NK60nMxOdJE8Okhw22
- wuQW0z3ocrAIgGfpNVswXHt3+g==
-X-Google-Smtp-Source: APXvYqxMlONgYQY22I4g+e3D6trvZYDaQbeijXv3izPRzbL7LgRgKrfchx37nFsbPjPa+zLJGIojLw==
-X-Received: by 2002:adf:ba12:: with SMTP id o18mr15204429wrg.147.1571051237648; 
- Mon, 14 Oct 2019 04:07:17 -0700 (PDT)
+ bh=jb94Z+Gp/SEto0c7c9pjyGvoGowBStIfIYtnSg1TGYw=;
+ b=rRoTFY7nyFF0+IUhRcrxcq8QI7MGBf5ed4o6rWKBWaF5lzik3CICpjkQeVijZ7V713
+ s7bFLPiP7iUSksIPLWXw/XtYEi/q5ETtGm1OTqITijRemK2LLzc4Zv2io87Vw0N0o9Vz
+ JDGeMFNWZPFjuWAebvae9Z88BbgOKrT8BsYUGoSoVcXSj7/lk/nqZrJPhtRj+QcWOk+H
+ 7FlPkl0hZVzOw6d9N6RlkpWGX0ce+z2sv+B3hJORSzpAV8LbhU0YOgRmDZmp26uEa+1p
+ wdkZHsvfvGKHMYCW1ANNRt84Rv3kFCcrOSDBXbvZ0ZI/pRpUon0Wjs6393UMq1DKY219
+ pX0g==
+X-Gm-Message-State: APjAAAX3hI7HMiM6e3rPHuzh7b28kSmiRDnUFU7I0ajv1WU4RMb/atFl
+ NC80UyOirlr45WRQ7M13iSAExg==
+X-Google-Smtp-Source: APXvYqyJ+h0yBYUlY3GqEsLnp498zG79ulLX8zvNC6Q3Gy5yXJ3qUk0rnkwWvLs6Gl+L3Xo0lKDOrw==
+X-Received: by 2002:adf:f188:: with SMTP id h8mr25028454wro.38.1571051244216; 
+ Mon, 14 Oct 2019 04:07:24 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id h63sm31448934wmf.15.2019.10.14.04.07.16
+ by smtp.gmail.com with ESMTPSA id f8sm19894304wmb.37.2019.10.14.04.06.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Oct 2019 04:07:16 -0700 (PDT)
+ Mon, 14 Oct 2019 04:07:23 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 741E51FFAC;
- Mon, 14 Oct 2019 11:50:00 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id C01971FFC9;
+ Mon, 14 Oct 2019 11:49:57 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 51/55] plugins: expand the plugin_init function to include
- an info block
-Date: Mon, 14 Oct 2019 11:49:44 +0100
-Message-Id: <20191014104948.4291-52-alex.bennee@linaro.org>
+Subject: [PATCH  v5 39/55] tests/plugin: add sample plugins
+Date: Mon, 14 Oct 2019 11:49:32 +0100
+Message-Id: <20191014104948.4291-40-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014104948.4291-1-alex.bennee@linaro.org>
 References: <20191014104948.4291-1-alex.bennee@linaro.org>
@@ -104,249 +103,352 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This provides a limited amount of info to plugins about the guest
-system that will allow them to make some additional decisions on
-setup.
+From: "Emilio G. Cota" <cota@braap.org>
 
+Pass arguments with -plugin=libfoo.so,arg=bar,arg=baz
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- include/qemu/qemu-plugin.h | 26 ++++++++++++++++++++++++--
- plugins/loader.c           | 22 ++++++++++++++++++----
- tests/plugin/bb.c          |  5 +++--
- tests/plugin/empty.c       |  5 +++--
- tests/plugin/hotblocks.c   |  5 +++--
- tests/plugin/hotpages.c    |  5 +++--
- tests/plugin/howvec.c      |  5 +++--
- tests/plugin/insn.c        |  5 +++--
- tests/plugin/mem.c         |  5 +++--
- 9 files changed, 63 insertions(+), 20 deletions(-)
 
-diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-index 8b403dd615..719d7054a1 100644
---- a/include/qemu/qemu-plugin.h
-+++ b/include/qemu/qemu-plugin.h
-@@ -38,9 +38,27 @@
- 
- typedef uint64_t qemu_plugin_id_t;
- 
-+typedef struct {
-+    /* string describing architecture */
-+    const char *target_name;
-+    /* is this a full system emulation? */
-+    bool system_emulation;
-+    union {
-+        /*
-+         * smp_vcpus may change if vCPUs can be hot-plugged, max_vcpus
-+         * is the system-wide limit.
-+         */
-+        struct {
-+            int smp_vcpus;
-+            int max_vcpus;
-+        } system;
-+    };
-+} qemu_info_t;
+---
+v4
+   - tweaks for hwaddr API
+---
+ configure             |  1 +
+ tests/plugin/Makefile | 28 +++++++++++++
+ tests/plugin/bb.c     | 65 +++++++++++++++++++++++++++++
+ tests/plugin/empty.c  | 29 +++++++++++++
+ tests/plugin/insn.c   | 62 ++++++++++++++++++++++++++++
+ tests/plugin/mem.c    | 96 +++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 281 insertions(+)
+ create mode 100644 tests/plugin/Makefile
+ create mode 100644 tests/plugin/bb.c
+ create mode 100644 tests/plugin/empty.c
+ create mode 100644 tests/plugin/insn.c
+ create mode 100644 tests/plugin/mem.c
+
+diff --git a/configure b/configure
+index 75632b1df1..d5527a9f15 100755
+--- a/configure
++++ b/configure
+@@ -7887,6 +7887,7 @@ DIRS="$DIRS roms/seabios roms/vgabios"
+ LINKS="Makefile"
+ LINKS="$LINKS tests/tcg/lm32/Makefile po/Makefile"
+ LINKS="$LINKS tests/tcg/Makefile.target tests/fp/Makefile"
++LINKS="$LINKS tests/plugin/Makefile"
+ LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
+ LINKS="$LINKS pc-bios/s390-ccw/Makefile"
+ LINKS="$LINKS roms/seabios/Makefile roms/vgabios/Makefile"
+diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+new file mode 100644
+index 0000000000..f9a3546ea3
+--- /dev/null
++++ b/tests/plugin/Makefile
+@@ -0,0 +1,28 @@
++BUILD_DIR := $(CURDIR)/../..
 +
- /**
-  * qemu_plugin_install() - Install a plugin
-  * @id: this plugin's opaque ID
-+ * @info: a block describing some details about the guest
-  * @argc: number of arguments
-  * @argv: array of arguments (@argc elements)
-  *
-@@ -49,10 +67,14 @@ typedef uint64_t qemu_plugin_id_t;
-  * Note: Calling qemu_plugin_uninstall() from this function is a bug. To raise
-  * an error during install, return !0.
-  *
-+ * Note: @info is only live during the call. Copy any information we
-+ * want to keep.
-+ *
-  * Note: @argv remains valid throughout the lifetime of the loaded plugin.
-  */
--QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
--                                           char **argv);
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-+                                           const qemu_info_t *info,
-+                                           int argc, char **argv);
- 
- /*
-  * Prototypes for the various callback styles we will be registering
-diff --git a/plugins/loader.c b/plugins/loader.c
-index 5de5cff8e3..a136a71d35 100644
---- a/plugins/loader.c
-+++ b/plugins/loader.c
-@@ -29,6 +29,9 @@
- #include "hw/core/cpu.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
-+#ifndef CONFIG_USER_ONLY
-+#include "hw/boards.h"
-+#endif
- 
- #include "plugin.h"
- 
-@@ -60,7 +63,7 @@ QemuOptsList qemu_plugin_opts = {
-     },
- };
- 
--typedef int (*qemu_plugin_install_func_t)(qemu_plugin_id_t, int, char **);
-+typedef int (*qemu_plugin_install_func_t)(qemu_plugin_id_t, const qemu_info_t *, int, char **);
- 
- extern struct qemu_plugin_state plugin;
- 
-@@ -147,7 +150,7 @@ static uint64_t xorshift64star(uint64_t x)
-     return x * UINT64_C(2685821657736338717);
- }
- 
--static int plugin_load(struct qemu_plugin_desc *desc)
-+static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
- {
-     qemu_plugin_install_func_t install;
-     struct qemu_plugin_ctx *ctx;
-@@ -198,7 +201,7 @@ static int plugin_load(struct qemu_plugin_desc *desc)
-     }
-     QTAILQ_INSERT_TAIL(&plugin.ctxs, ctx, entry);
-     ctx->installing = true;
--    rc = install(ctx->id, desc->argc, desc->argv);
-+    rc = install(ctx->id, info, desc->argc, desc->argv);
-     ctx->installing = false;
-     if (rc) {
-         error_report("%s: qemu_plugin_install returned error code %d",
-@@ -249,11 +252,22 @@ static void plugin_desc_free(struct qemu_plugin_desc *desc)
- int qemu_plugin_load_list(QemuPluginList *head)
- {
-     struct qemu_plugin_desc *desc, *next;
-+    g_autofree qemu_info_t *info = g_new0(qemu_info_t, 1);
++include $(BUILD_DIR)/config-host.mak
++include $(SRC_PATH)/rules.mak
 +
-+    info->target_name = TARGET_NAME;
-+#ifndef CONFIG_USER_ONLY
-+    MachineState * ms = MACHINE(qdev_get_machine());
-+    info->system_emulation = true;
-+    info->system.smp_vcpus = ms->smp.cpus;
-+    info->system.max_vcpus = ms->smp.max_cpus;
-+#else
-+    info->system_emulation = false;
-+#endif
- 
-     QTAILQ_FOREACH_SAFE(desc, head, entry, next) {
-         int err;
- 
--        err = plugin_load(desc);
-+        err = plugin_load(desc, info);
-         if (err) {
-             return err;
-         }
++$(call set-vpath, $(SRC_PATH)/tests/plugin)
++
++NAMES :=
++NAMES += bb
++NAMES += empty
++NAMES += insn
++NAMES += mem
++
++SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
++
++QEMU_CFLAGS += -fPIC
++QEMU_CFLAGS += -I$(SRC_PATH)/include/qemu
++
++all: $(SONAMES)
++
++lib%.so: %.o
++	$(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
++
++clean:
++	rm -f *.o *.so *.d
++	rm -Rf .libs
++
++.PHONY: all clean
 diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
-index 93d25de363..4a6d6ca0bc 100644
---- a/tests/plugin/bb.c
+new file mode 100644
+index 0000000000..93d25de363
+--- /dev/null
 +++ b/tests/plugin/bb.c
-@@ -48,8 +48,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-     }
- }
- 
--QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
--                                           char **argv)
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-+                                           const qemu_info_t *info,
-+                                           int argc, char **argv)
- {
-     if (argc && strcmp(argv[0], "inline") == 0) {
-         do_inline = true;
+@@ -0,0 +1,65 @@
++/*
++ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++#include <inttypes.h>
++#include <assert.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <stdio.h>
++
++#include <qemu-plugin.h>
++
++static uint64_t bb_count;
++static uint64_t insn_count;
++static int stdout_fd;
++static bool do_inline;
++
++static void plugin_exit(qemu_plugin_id_t id, void *p)
++{
++    dprintf(stdout_fd, "bb's: %" PRIu64", insns: %" PRIu64 "\n",
++            bb_count, insn_count);
++}
++
++static void vcpu_tb_exec(unsigned int cpu_index, void *udata)
++{
++    unsigned long n_insns = (unsigned long)udata;
++
++    insn_count += n_insns;
++    bb_count++;
++}
++
++static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
++{
++    unsigned long n_insns = qemu_plugin_tb_n_insns(tb);
++
++    if (do_inline) {
++        qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
++                                                 &bb_count, 1);
++        qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
++                                                 &insn_count, n_insns);
++    } else {
++        qemu_plugin_register_vcpu_tb_exec_cb(tb, vcpu_tb_exec,
++                                             QEMU_PLUGIN_CB_NO_REGS,
++                                             (void *)n_insns);
++    }
++}
++
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
++                                           char **argv)
++{
++    if (argc && strcmp(argv[0], "inline") == 0) {
++        do_inline = true;
++    }
++
++    /* to be used when in the exit hook */
++    stdout_fd = dup(STDOUT_FILENO);
++    assert(stdout_fd);
++
++    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
++    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
++    return 0;
++}
 diff --git a/tests/plugin/empty.c b/tests/plugin/empty.c
-index b141ddd0df..3f60f69027 100644
---- a/tests/plugin/empty.c
+new file mode 100644
+index 0000000000..b141ddd0df
+--- /dev/null
 +++ b/tests/plugin/empty.c
-@@ -21,8 +21,9 @@
- static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
- { }
- 
--QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
--                                           char **argv)
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-+                                           const qemu_info_t *info,
-+                                           int argc, char **argv)
- {
-     qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-     return 0;
-diff --git a/tests/plugin/hotblocks.c b/tests/plugin/hotblocks.c
-index a150179a5c..57bea765b3 100644
---- a/tests/plugin/hotblocks.c
-+++ b/tests/plugin/hotblocks.c
-@@ -129,8 +129,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-     }
- }
- 
--QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
--                                           char **argv)
-+QEMU_PLUGIN_EXPORT
-+int qemu_plugin_install(qemu_plugin_id_t id, const qemu_info_t *info,
-+                        int argc, char **argv)
- {
-     if (argc && strcmp(argv[0], "inline") == 0) {
-         do_inline = true;
-diff --git a/tests/plugin/hotpages.c b/tests/plugin/hotpages.c
-index 13ce8ffeb8..99bb4be07c 100644
---- a/tests/plugin/hotpages.c
-+++ b/tests/plugin/hotpages.c
-@@ -148,8 +148,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-     }
- }
- 
--QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
--                                           char **argv)
-+QEMU_PLUGIN_EXPORT
-+int qemu_plugin_install(qemu_plugin_id_t id, const qemu_info_t *info,
-+                        int argc, char **argv)
- {
-     int i;
- 
-diff --git a/tests/plugin/howvec.c b/tests/plugin/howvec.c
-index b435c6b64d..3b1d177ef3 100644
---- a/tests/plugin/howvec.c
-+++ b/tests/plugin/howvec.c
-@@ -264,8 +264,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-     }
- }
- 
--QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
--                                           char **argv)
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-+                                           const qemu_info_t *info,
-+                                           int argc, char **argv)
- {
-     int i;
- 
+@@ -0,0 +1,29 @@
++/*
++ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++#include <inttypes.h>
++#include <assert.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <stdio.h>
++
++#include <qemu-plugin.h>
++
++/*
++ * Empty TB translation callback.
++ * This allows us to measure the overhead of injecting and then
++ * removing empty instrumentation.
++ */
++static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
++{ }
++
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
++                                           char **argv)
++{
++    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
++    return 0;
++}
 diff --git a/tests/plugin/insn.c b/tests/plugin/insn.c
-index 3000ab4b73..9cfa7d0e53 100644
---- a/tests/plugin/insn.c
+new file mode 100644
+index 0000000000..3000ab4b73
+--- /dev/null
 +++ b/tests/plugin/insn.c
-@@ -45,8 +45,9 @@ static void plugin_exit(qemu_plugin_id_t id, void *p)
-     dprintf(stdout_fd, "insns: %" PRIu64 "\n", insn_count);
- }
- 
--QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
--                                           char **argv)
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-+                                           const qemu_info_t *info,
-+                                           int argc, char **argv)
- {
-     if (argc && !strcmp(argv[0], "inline")) {
-         do_inline = true;
+@@ -0,0 +1,62 @@
++/*
++ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++#include <inttypes.h>
++#include <assert.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <stdio.h>
++
++#include <qemu-plugin.h>
++
++static int stdout_fd;
++static uint64_t insn_count;
++static bool do_inline;
++
++static void vcpu_insn_exec_before(unsigned int cpu_index, void *udata)
++{
++    insn_count++;
++}
++
++static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
++{
++    size_t n = qemu_plugin_tb_n_insns(tb);
++    size_t i;
++
++    for (i = 0; i < n; i++) {
++        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
++
++        if (do_inline) {
++            qemu_plugin_register_vcpu_insn_exec_inline(
++                insn, QEMU_PLUGIN_INLINE_ADD_U64, &insn_count, 1);
++        } else {
++            qemu_plugin_register_vcpu_insn_exec_cb(
++                insn, vcpu_insn_exec_before, QEMU_PLUGIN_CB_NO_REGS, NULL);
++        }
++    }
++}
++
++static void plugin_exit(qemu_plugin_id_t id, void *p)
++{
++    dprintf(stdout_fd, "insns: %" PRIu64 "\n", insn_count);
++}
++
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
++                                           char **argv)
++{
++    if (argc && !strcmp(argv[0], "inline")) {
++        do_inline = true;
++    }
++
++    /* to be used when in the exit hook */
++    stdout_fd = dup(STDOUT_FILENO);
++    assert(stdout_fd);
++
++    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
++    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
++    return 0;
++}
 diff --git a/tests/plugin/mem.c b/tests/plugin/mem.c
-index e5490f4a99..fdf4347c5e 100644
---- a/tests/plugin/mem.c
+new file mode 100644
+index 0000000000..e5490f4a99
+--- /dev/null
 +++ b/tests/plugin/mem.c
-@@ -64,8 +64,9 @@ static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-     }
- }
- 
--QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
--                                           char **argv)
-+QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-+                                           const qemu_info_t *info,
-+                                           int argc, char **argv)
- {
-     if (argc) {
-         if (argc >= 3) {
+@@ -0,0 +1,96 @@
++/*
++ * Copyright (C) 2018, Emilio G. Cota <cota@braap.org>
++ *
++ * License: GNU GPL, version 2 or later.
++ *   See the COPYING file in the top-level directory.
++ */
++#include <inttypes.h>
++#include <assert.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <stdio.h>
++
++#include <qemu-plugin.h>
++
++static uint64_t mem_count;
++static uint64_t io_count;
++static int stdout_fd;
++static bool do_inline;
++static bool do_haddr;
++static enum qemu_plugin_mem_rw rw = QEMU_PLUGIN_MEM_RW;
++
++static void plugin_exit(qemu_plugin_id_t id, void *p)
++{
++    dprintf(stdout_fd, "mem accesses: %" PRIu64 "\n", mem_count);
++    if (do_haddr) {
++        dprintf(stdout_fd, "io accesses: %" PRIu64 "\n", mem_count);
++    }
++}
++
++static void vcpu_mem(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
++                     uint64_t vaddr, void *udata)
++{
++    if (do_haddr) {
++        struct qemu_plugin_hwaddr *hwaddr;
++        hwaddr = qemu_plugin_get_hwaddr(meminfo, vaddr);
++        if (qemu_plugin_hwaddr_is_io(hwaddr)) {
++            io_count++;
++        } else {
++            mem_count++;
++        }
++    } else {
++        mem_count++;
++    }
++}
++
++static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
++{
++    size_t n = qemu_plugin_tb_n_insns(tb);
++    size_t i;
++
++    for (i = 0; i < n; i++) {
++        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
++
++        if (do_inline) {
++            qemu_plugin_register_vcpu_mem_inline(insn, rw,
++                                                 QEMU_PLUGIN_INLINE_ADD_U64,
++                                                 &mem_count, 1);
++        } else {
++            qemu_plugin_register_vcpu_mem_cb(insn, vcpu_mem,
++                                             QEMU_PLUGIN_CB_NO_REGS,
++                                             rw, NULL);
++        }
++    }
++}
++
++QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, int argc,
++                                           char **argv)
++{
++    if (argc) {
++        if (argc >= 3) {
++            if (!strcmp(argv[2], "haddr")) {
++                do_haddr = true;
++            }
++        }
++        if (argc >= 2) {
++            const char *str = argv[1];
++
++            if (!strcmp(str, "r")) {
++                rw = QEMU_PLUGIN_MEM_R;
++            } else if (!strcmp(str, "w")) {
++                rw = QEMU_PLUGIN_MEM_W;
++            }
++        }
++        if (!strcmp(argv[0], "inline")) {
++            do_inline = true;
++        }
++    }
++    /* plugin_exit might write to stdout after stdout has been closed */
++    stdout_fd = dup(STDOUT_FILENO);
++    assert(stdout_fd);
++
++    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
++    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
++    return 0;
++}
 -- 
 2.20.1
 
